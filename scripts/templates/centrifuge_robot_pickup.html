@@ -1,0 +1,116 @@
+<div id="cf01-bench-rack">
+  <style>
+    #cf01-bench-rack .cf01-scene {width:100%;height:490px;display:block;touch-action:pan-y}
+    #cf01-bench-rack .cf01-readouts {display:flex;gap:1.2em;flex-wrap:wrap;margin:.5em 0}
+    #cf01-bench-rack .cf01-timeline {width:100%;margin:.5em 0}
+    @media(max-width:480px){#cf01-bench-rack .cf01-scene{height:340px}}
+  </style>
+  <div class="viz-controls">
+    <button type="button" class="btn btn-primary" data-play>Play cycle</button>
+    <label class="form-label">View <select class="form-select" data-view><option value="assembly">Robot, centrifuge and rack</option><option value="tube">Tube handling close-up</option><option value="rack">Rack placement</option></select></label>
+    <label class="form-label">Playback <select class="form-select" data-speed><option value="1">1×</option><option value="2" selected>2×</option><option value="0.5">0.5×</option></select></label>
+  </div>
+  <canvas class="cf01-scene" data-scene role="img" aria-label="Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper"></canvas>
+  <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite">Closed and locked</span><span data-values></span></div>
+  <label class="form-label">Cycle time <span class="tabular-nums" data-time>0.0 / 60.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="60" step="0.05" value="0" aria-label="Cycle time in seconds"></label>
+  <div class="viz-row text-small"><span data-lift>Tube supported by centrifuge</span><span>Bench mounting · 1 mm transport target</span></div>
+  <script type="application/json" data-mesh>__MESH__</script>
+  <script>
+  (async()=>{
+    const root=document.getElementById('cf01-bench-rack');
+    const compressed=Uint8Array.from(atob(root.querySelector('[data-mesh]').textContent.trim()),c=>c.charCodeAt(0));
+    const mesh=JSON.parse(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
+    const keys=mesh.trajectory.samples.map(s=>({...s,values:s.station}));
+    const canvas=root.querySelector('[data-scene]'),ctx=canvas.getContext('2d'),slider=root.querySelector('[data-time-slider]'),button=root.querySelector('[data-play]'),view=root.querySelector('[data-view]'),speed=root.querySelector('[data-speed]');
+    const duration=keys[keys.length-1].time_s;
+    slider.max=duration;
+    let t=0,playing=false,last=0,lastPhase='',theme={},current=null;
+    const boundsCache=new Map();
+    const joints=new Map(mesh.station_joints.map(j=>[j.child,j]));
+    const ident={r:[1,0,0,0,1,0,0,0,1],p:[0,0,0]};
+    function matvec(r,v){return [r[0]*v[0]+r[1]*v[1]+r[2]*v[2],r[3]*v[0]+r[4]*v[1]+r[5]*v[2],r[6]*v[0]+r[7]*v[1]+r[8]*v[2]]}
+    function apply(m,v){const a=matvec(m.r,v);return a.map((x,i)=>x+m.p[i])}
+    function multiply(a,b){const r=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++)r.push(a.r[i*3]*b.r[j]+a.r[i*3+1]*b.r[j+3]+a.r[i*3+2]*b.r[j+6]);return {r,p:apply(a,b.p)}}
+    function from4(m){return {r:[m[0][0],m[0][1],m[0][2],m[1][0],m[1][1],m[1][2],m[2][0],m[2][1],m[2][2]],p:[m[0][3],m[1][3],m[2][3]]}}
+    function inverse(m){const r=[m.r[0],m.r[3],m.r[6],m.r[1],m.r[4],m.r[7],m.r[2],m.r[5],m.r[8]];return {r,p:matvec(r,m.p).map(x=>-x)}}
+    const armFrames=mesh.robot_frames.map(from4),armInverse=armFrames.map(inverse),armBase=from4(mesh.arm_base),attachment=from4(mesh.tube_attachment_from_tool),seatedTube=from4(mesh.tube_seated_matrix),rackFrame=from4(mesh.rack_frame);
+    function transforms(frame){
+      const values=frame.values;
+      const cache=new Map([['Frame',ident]]);
+      function get(group){if(cache.has(group))return cache.get(group);const j=joints.get(group);if(!j)return ident;
+        const [x,y,z]=j.axis,v=values[j.id];let local;
+        if(j.type==='slider')local={r:ident.r,p:j.axis.map(a=>a*v)};
+        else {const angle=v*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),d=1-c;
+          const r=[c+x*x*d,x*y*d-z*s,x*z*d+y*s,y*x*d+z*s,c+y*y*d,y*z*d-x*s,z*x*d-y*s,z*y*d+x*s,c+z*z*d];
+          const ro=matvec(r,j.origin);local={r,p:j.origin.map((a,i)=>a-ro[i])}}
+        const result=multiply(get(j.parent),local);cache.set(group,result);return result}
+      for(const b of mesh.bodies)get(b.group);
+      let arm=armBase;cache.set('Arm.L0_Base',arm);
+      mesh.robot_joints.forEach((j,i)=>{const a=frame.joints_deg[i]*Math.PI/180,c=Math.cos(a),s=Math.sin(a);const rz={r:[c,-s,0,s,c,0,0,0,1],p:[0,0,0]};arm=multiply(multiply(multiply(arm,armFrames[i]),rz),armInverse[i]);cache.set('Arm.'+j.child,arm)});
+      const flange=mesh.robot_flange.slice();flange[2]+=mesh.scene.gripper.flange_to_grip_mm;
+      const tool={r:arm.r,p:apply(arm,flange)};cache.set('Tool',tool);
+      cache.set('FingerLeft',{r:tool.r,p:apply(tool,[-frame.jaw_gap_mm/2,0,0])});
+      cache.set('FingerRight',{r:tool.r,p:apply(tool,[frame.jaw_gap_mm/2,0,0])});
+      if(frame.time_s>=mesh.scene.checks.attachment_time_s)cache.set('PresentedTube',multiply(tool,attachment));
+      if(frame.time_s>=mesh.scene.checks.rack_handoff_time_s)cache.set('PresentedTube',seatedTube);
+      cache.set('Rack',rackFrame);
+      cache.set('Scene',ident);return cache
+    }
+    function pose(time){
+      for(let i=1;i<keys.length;i++){const a=keys[i-1],b=keys[i];if(time<=b.time_s){const u=(time-a.time_s)/(b.time_s-a.time_s),values={};for(const k in a.values)values[k]=a.values[k]+(b.values[k]-a.values[k])*u;return {time_s:time,values,phase:time===0?keys[0].phase:b.phase,joints_deg:a.joints_deg.map((x,k)=>x+(b.joints_deg[k]-x)*u),jaw_gap_mm:a.jaw_gap_mm+(b.jaw_gap_mm-a.jaw_gap_mm)*u}}}
+      return {...keys[keys.length-1],values:keys[keys.length-1].station}
+    }
+    function color(variable){const probe=document.createElement('span');probe.style.color='var('+variable+')';root.appendChild(probe);const result=getComputedStyle(probe).color;probe.style.color='var(--background)';const background=getComputedStyle(probe).color;probe.remove();const scratch=document.createElement('canvas');scratch.width=scratch.height=1;const sc=scratch.getContext('2d');sc.fillStyle=background;sc.fillRect(0,0,1,1);sc.fillStyle=result;sc.fillRect(0,0,1,1);return Array.from(sc.getImageData(0,0,1,1).data).slice(0,3)}
+    function readTheme(){theme={text:color('--foreground'),muted:color('--muted-foreground'),background:color('--background'),rotor:color('--viz-series-1'),tube:color('--viz-series-2'),pusher:color('--viz-series-3'),motor:color('--viz-series-4')};draw()}
+    function rgb(c){return 'rgb('+c.map(x=>Math.max(0,Math.min(255,Math.round(x)))).join(',')+')'}
+    function bodyColor(b){if(b.id==='Tube01'||b.id==='ClosedCap01')return theme.tube;if(b.asset==='gripper'||b.id==='RetractablePusher'||b.id==='LiftActuatorEnvelope')return theme.pusher;if(b.id==='Rotor')return theme.rotor;if(b.asset==='arm'&&b.role==='structure')return theme.motor;if(b.id.includes('UMR'))return theme.text;return theme.muted}
+    function draw(){
+      if(!theme.text)return;
+      const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,h=rect.height;
+      if(w<1||h<1)return;
+      if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
+      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+      const frame=pose(t);current=frame;const matrices=transforms(frame),rackView=view.value==='rack',detail=view.value!=='assembly';
+      const yaw=detail?-0.55:-1.05,pitch=rackView?0.40:detail?0.08:0.35;
+      const eye=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)],right=[-Math.sin(yaw),Math.cos(yaw),0],up=[-Math.sin(pitch)*Math.cos(yaw),-Math.sin(pitch)*Math.sin(yaw),Math.cos(pitch)];
+      const detailKeep=new Set(['Tube01','ClosedCap01','RetractablePusher','LiftActuatorEnvelope','ToolMount','GripperBody','LeftFingerStem','LeftFingerPad','RightFingerStem','RightFingerPad']);
+      function raw(v){return [v.reduce((s,a,i)=>s+a*right[i],0),v.reduce((s,a,i)=>s+a*up[i],0),v.reduce((s,a,i)=>s+a*eye[i],0)]}
+      if(!boundsCache.has(view.value)){const lo=[Infinity,Infinity],hi=[-Infinity,-Infinity];for(const key of keys){const ms=transforms(key);for(const [group,corners] of Object.entries(mesh.group_bounds)){if(group==='Scene')continue;for(const v of corners){const q=raw(apply(ms.get(group)||ident,v));for(let i=0;i<2;i++){lo[i]=Math.min(lo[i],q[i]);hi[i]=Math.max(hi[i],q[i])}}}}boundsCache.set(view.value,{lo,hi})}
+      const bounds=boundsCache.get(view.value);let center=bounds.lo.map((v,i)=>(v+bounds.hi[i])/2),scale=Math.min((w-32)/(bounds.hi[0]-bounds.lo[0]),(h-48)/(bounds.hi[1]-bounds.lo[1]));
+      if(detail){let focus=apply(matrices.get('Tool'),[0,0,-20]);if(t<17.5||t>=55)focus=apply(matrices.get('PresentedTube'),mesh.grip_reference);if(rackView){focus=apply(rackFrame,[-20,-5,90]);scale=Math.min((w-50)/230,(h-48)/260)}else scale=Math.min((w-70)/140,(h-48)/150);center=raw(focus)}
+      function project(v){const p=raw(v);return [w/2+scale*(p[0]-center[0]),h/2-scale*(p[1]-center[1]),p[2]]}
+      const triangles=[];
+      for(const b of mesh.bodies){if(detail&&(rackView||t>=29.5)&&['RetractablePusher','LiftActuatorEnvelope'].includes(b.id))continue;if(detail&&!detailKeep.has(b.id)&&!(b.asset==='rack'&&(rackView||t>=46)))continue;const matrix=matrices.get(b.group)||ident,points=b.v.map(v=>project(apply(matrix,v))),base=bodyColor(b);
+        for(const f of b.f){const a=points[f[0]],c=points[f[1]],d=points[f[2]];
+          const ux=c[0]-a[0],uy=c[1]-a[1],uz=c[2]-a[2],vx=d[0]-a[0],vy=d[1]-a[1],vz=d[2]-a[2];
+          const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,n=Math.hypot(nx,ny,nz)||1;
+          const light=0.64+0.36*Math.abs((nx*0.3-ny*0.5+nz*0.8)/n);
+          if(b.opacity===1&&nz>=0)continue;
+          triangles.push({points:[a,c,d],depth:(a[2]+c[2]+d[2])/3,alpha:b.opacity,color:base.map(v=>v*light),shell:b.opacity<1})}}
+      triangles.sort((a,b)=>a.depth-b.depth);
+      for(const tri of triangles){ctx.globalAlpha=tri.alpha;ctx.fillStyle=rgb(tri.color);ctx.beginPath();tri.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill()}
+      ctx.globalAlpha=1;ctx.fillStyle=rgb(theme.text);ctx.font=getComputedStyle(root).font;
+      const seated=t>=mesh.scene.checks.rack_handoff_time_s,carried=t>=mesh.scene.checks.attachment_time_s&&!seated,clear=t>=mesh.scene.checks.robot_clear_confirmed_s;
+      if(detail)ctx.fillText(seated?'Tube supported in rack slot 01':carried?'Tube held by gripper':'Tube 01',12,24);
+      if(rackView){ctx.textAlign='center';for(const slot of mesh.rack_slots){const q=project(apply(rackFrame,[slot.grip_mm[0],slot.grip_mm[1]-10,25]));ctx.fillText(String(slot.slot).padStart(2,'0'),q[0],q[1])}ctx.textAlign='start'}
+      root.querySelector('[data-values]').textContent='Lid '+frame.values.Lid.toFixed(0)+'° · jaw gap '+frame.jaw_gap_mm.toFixed(1)+' mm';
+      root.querySelector('[data-time]').textContent=t.toFixed(1)+' / '+duration.toFixed(1)+' s';
+      root.querySelector('[data-lift]').textContent=seated?(t>=mesh.scene.checks.release_complete_time_s?'Tube in rack slot 01 · gripper released':'Tube supported in rack slot 01 · fingers still closed'):clear?'Robot and tube clear of centrifuge':carried?'Tube moves with gripper':'Rotor stopped · tube supported by station';
+      if(lastPhase!==frame.phase){lastPhase=frame.phase;root.querySelector('[data-phase]').textContent=frame.phase}
+      slider.value=t;
+      root.dataset.currentTime=t.toFixed(3);root.dataset.lidAngle=frame.values.Lid.toFixed(3);root.dataset.tubeOwner=seated?'rack':carried?'gripper':'station';root.dataset.robotClear=String(clear);
+    }
+    function save(){window.openai?.setWidgetState?.({modelContent:{scene_id:mesh.trajectory.scene_sha256,cycle_time_s:t,view:view.value},privateContent:{speed:speed.value}})?.catch(()=>{})}
+    function restore(state){const data=state?.modelContent,priv=state?.privateContent;if(data&&data.scene_id===mesh.trajectory.scene_sha256){t=Math.max(0,Math.min(duration,Number(data.cycle_time_s)||0));if(['assembly','tube','rack'].includes(data.view))view.value=data.view}if(priv&&['0.5','1','2'].includes(priv.speed))speed.value=priv.speed;draw()}
+    function tick(now){if(!playing)return;if(last)t=Math.min(duration,t+(now-last)/1000*Number(speed.value));last=now;draw();if(t>=duration){playing=false;button.textContent='Replay cycle';save();return}requestAnimationFrame(tick)}
+    button.addEventListener('click',()=>{playing=!playing;if(playing){if(t>=duration)t=0;last=0;requestAnimationFrame(tick)}button.textContent=playing?'Pause':'Play cycle';save()});
+    slider.addEventListener('input',()=>{playing=false;button.textContent='Play cycle';t=Number(slider.value);draw()});slider.addEventListener('change',save);
+    view.addEventListener('change',()=>{draw();save()});speed.addEventListener('change',save);
+    new ResizeObserver(draw).observe(canvas);
+    new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+    window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);readTheme()});
+    readTheme();restore(window.openai?.widgetState);
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.openai?.widgetState?.modelContent?.scene_id!==mesh.trajectory.scene_sha256){playing=true;button.textContent='Pause';requestAnimationFrame(tick)}
+  })();
+  </script>
+</div>

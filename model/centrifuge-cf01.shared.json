@@ -1,0 +1,644 @@
+{
+  "format": "solidcraftbot.centrifuge/1",
+  "id": "Centrifuge_CF01",
+  "status": "Spindle motor, controlled braking, parking caliper and powered lid mechanism concept; not qualified for high-speed manufacture",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s",
+    "speed": "rpm",
+    "rcf": "x_g"
+  },
+  "parameters": {
+    "base_width": {
+      "expression": 400,
+      "range": [
+        400,
+        440
+      ]
+    },
+    "base_depth": {
+      "expression": 380,
+      "range": [
+        380,
+        380
+      ]
+    },
+    "base_wall": {
+      "expression": 3,
+      "range": [
+        3,
+        4
+      ]
+    },
+    "base_floor": {
+      "expression": 6,
+      "range": [
+        6,
+        8
+      ]
+    },
+    "chamber_inner_radius": {
+      "expression": 116,
+      "range": [
+        116,
+        116
+      ]
+    },
+    "chamber_wall": {
+      "expression": 22,
+      "range": [
+        22,
+        26
+      ]
+    },
+    "chamber_floor": {
+      "expression": 12,
+      "range": [
+        12,
+        16
+      ]
+    },
+    "chamber_floor_z": {
+      "expression": "base_height+4",
+      "range": [
+        154,
+        164
+      ]
+    },
+    "floor_support_radius": {
+      "expression": 8,
+      "range": [
+        8,
+        10
+      ]
+    },
+    "chamber_top": {
+      "expression": "base_height+104",
+      "range": [
+        254,
+        264
+      ]
+    },
+    "lid_thickness": {
+      "expression": 20,
+      "range": [
+        20,
+        24
+      ]
+    },
+    "encoder_radius": {
+      "expression": 24,
+      "range": [
+        24,
+        24
+      ]
+    },
+    "encoder_z": {
+      "expression": "base_height-28",
+      "range": [
+        122,
+        132
+      ]
+    },
+    "encoder_gap": {
+      "expression": 1,
+      "range": [
+        0.8,
+        1.5
+      ]
+    },
+    "power_inlet_z": {
+      "expression": 40,
+      "range": [
+        40,
+        44
+      ]
+    },
+    "power_cable_radius": {
+      "expression": 3.5,
+      "range": [
+        3.5,
+        4
+      ]
+    },
+    "power_cable_bend": {
+      "expression": 45,
+      "range": [
+        45,
+        55
+      ]
+    },
+    "bottom_radius": {
+      "expression": 80,
+      "range": [
+        78,
+        84
+      ]
+    },
+    "rotor_radius": {
+      "expression": 106,
+      "range": [
+        104,
+        110
+      ]
+    },
+    "rotor_bottom": {
+      "expression": "base_height+48",
+      "range": [
+        198,
+        208
+      ]
+    },
+    "rotor_top": {
+      "expression": "rotor_bottom+46",
+      "range": [
+        244,
+        254
+      ]
+    },
+    "mouth_z": {
+      "expression": "rotor_top+mouth_clearance",
+      "range": [
+        250,
+        262
+      ]
+    },
+    "tube_length": {
+      "expression": 38,
+      "range": [
+        38,
+        38
+      ]
+    },
+    "tube_radius": {
+      "expression": 5.4,
+      "range": [
+        5.4,
+        5.4
+      ]
+    },
+    "lift_travel": {
+      "expression": 16,
+      "range": [
+        14,
+        18
+      ]
+    },
+    "park_gap": {
+      "expression": 12,
+      "range": [
+        12,
+        12
+      ]
+    },
+    "lid_z": {
+      "expression": "chamber_top+lid_clearance",
+      "range": [
+        258,
+        272
+      ]
+    },
+    "base_height": {
+      "expression": 150,
+      "range": [
+        150,
+        160
+      ]
+    },
+    "mouth_clearance": {
+      "expression": 6,
+      "range": [
+        6,
+        8
+      ]
+    },
+    "lid_clearance": {
+      "expression": 4,
+      "range": [
+        4,
+        8
+      ]
+    },
+    "brake_disc_z": {
+      "expression": "base_height-48",
+      "range": [
+        102,
+        112
+      ]
+    },
+    "brake_disc_radius": {
+      "expression": 30,
+      "range": [
+        30,
+        32
+      ]
+    },
+    "brake_disc_thickness": {
+      "expression": 6,
+      "range": [
+        6,
+        6
+      ]
+    },
+    "brake_clearance": {
+      "expression": 1.5,
+      "range": [
+        1.5,
+        2
+      ]
+    },
+    "motor_outer_radius": {
+      "expression": 38,
+      "range": [
+        38,
+        40
+      ]
+    },
+    "hinge_shaft_radius": {
+      "expression": 10,
+      "range": [
+        10,
+        10
+      ]
+    },
+    "latch_travel": {
+      "expression": 22,
+      "range": [
+        22,
+        24
+      ]
+    },
+    "hinge_lift": {
+      "expression": 8,
+      "range": [
+        8,
+        8
+      ]
+    }
+  },
+  "structure": {
+    "material": "steel",
+    "grade": null,
+    "scope": "housing, chamber wall, floor, lid and fixed structural supports only; rotor material remains unselected by owner decision",
+    "density_assumption_kg_m3": 7850,
+    "yield_strength_mpa": null,
+    "construction": "opaque cylindrical wall on separate floor plate, four steel support posts down to the base floor, hollow lower electrical bay and thick hinged lid",
+    "joint_and_weld_design": null,
+    "containment_qualified": false
+  },
+  "services": {
+    "format": "solidcraftbot.centrifuge-services/1",
+    "power": {
+      "id": "CF01.POWER",
+      "topology": "detachable three-conductor mains cord, combined inlet/switch/fuse envelope, protective earth to steel chassis, isolated low-voltage control supply and spindle drive",
+      "inlet_frame_mm": [
+        "base_width/2",
+        65,
+        "power_inlet_z"
+      ],
+      "insertion_axis": [
+        -1,
+        0,
+        0
+      ],
+      "inlet_part": null,
+      "cord_part": null,
+      "nominal_voltage_v": null,
+      "frequency_hz": null,
+      "power_w": null,
+      "fuse_a": null,
+      "conductor_cross_section_mm2": null,
+      "protective_earth_required": true,
+      "lid_bond_required": true,
+      "strain_relief_required": true,
+      "manufacturer_minimum_bend_radius_mm": null,
+      "routing_status": "external cord geometry and short chassis bond represented; complete wiring, lid braid and supply-side termination remain open",
+      "electrical_validation": "not_performed"
+    },
+    "rotation": {
+      "id": "CF01.ENCODER",
+      "architecture": "noncontact spindle ring encoder in lower dry bay",
+      "signals": [
+        "A",
+        "B",
+        "Z"
+      ],
+      "lines_per_revolution": 1024,
+      "quadrature_multiplier": 4,
+      "counts_per_revolution": 4096,
+      "required_speed_rating_rpm": 16000,
+      "counter_input_requirement_hz": 3000000,
+      "bandwidth_margin_factor": 2,
+      "required_calibrated_error_deg": 0.1,
+      "actual_accuracy_deg": null,
+      "part": null,
+      "target_ring_part": null,
+      "supply_v": null,
+      "counter_part": null,
+      "rated_speed_rpm": null,
+      "driver_status": "not_implemented",
+      "wiring": "shielded low-voltage signal cable routed separately from mains and drive power",
+      "index_reference": "Z home plus calibrated offset to rotor slot 01",
+      "independent_standstill_monitor": {
+        "id": "CF01.STANDSTILL",
+        "part": null,
+        "implementation": null
+      },
+      "failure_response": "inhibit start and access; fault and request stop while moving; never infer safe standstill from missing pulses alone"
+    }
+  },
+  "rotor": {
+    "id": "CF01-R12-CONCEPT",
+    "slots": 12,
+    "tilt_from_vertical_deg": 35,
+    "slot_1_angle_deg": -90,
+    "numbering": "01 to 12 counterclockwise viewed from above",
+    "target_rcf_x_g": 16000,
+    "rcf_reference": "tube-bottom centerline, not mean sample radius",
+    "tube_nominal_ml": [
+      1.5,
+      2.0
+    ],
+    "tube_article": null,
+    "material": null,
+    "rated_rpm": null,
+    "rated_rcf_x_g": null,
+    "qualified_assembly": null,
+    "aerosol_tight": false
+  },
+  "handling": {
+    "strategy": "index_closed_stop_open_then_axial_lift",
+    "index_limit_rpm": 2,
+    "stationary_required_rpm": 0,
+    "index_tolerance_deg": 0.2,
+    "pickup_angle_deg": -90,
+    "robot_clearance_above_grip_mm": 80,
+    "sensor_max_age_s": 0.5,
+    "owner_timeout_s": 10,
+    "mass_pair_tolerance_g": null,
+    "tube_mass_limit_g": null,
+    "lift_force_limit_n": null
+  },
+  "vision": {
+    "numerals": "large contrasting 01..12 on rotor face",
+    "home": "unique yellow triangle pointing towards slot 01",
+    "secondary": "cyan square at rotor +X; unequal symbols break rotational symmetry",
+    "station_reference": "black L and three dots fixed on front deck",
+    "encoding": "custom geometric landmarks; NOT an AprilTag or ArUco dictionary",
+    "marking_process": null,
+    "camera_calibration": null,
+    "recognition_verified": false,
+    "inspection": "only at confirmed standstill with lid open; encoder establishes index, vision cross-checks"
+  },
+  "operations": [
+    "steel_chamber_and_floor",
+    "hollow_steel_electrical_bay",
+    "power_entry_and_round_cord",
+    "spindle_encoder_with_signal_route",
+    "fixed_angle_pocket_pattern",
+    "contrasting_slot_numerals",
+    "asymmetric_rotor_landmarks",
+    "hinged_command_lid",
+    "retractable_axial_ejector",
+    "illustrative_closed_tubes",
+    "direct_drive_spindle_assembly",
+    "electrical_braking_and_parking_caliper",
+    "powered_geared_lid_and_lock_pins"
+  ],
+  "display_pose": "closed",
+  "presentation": {
+    "translucent_roles": [
+      "steel_housing",
+      "steel_chamber_wall",
+      "steel_chamber_floor",
+      "steel_lid"
+    ],
+    "opacity": 0.18,
+    "purpose": "Assembled inspection view: show the internal mechanisms through the steel enclosure; visual transparency does not change physical material."
+  },
+  "poses": {
+    "closed": {
+      "Lid": 0,
+      "Rotor": 0,
+      "Lift": 0,
+      "TubeLift": 0,
+      "BrakeUpper": 0,
+      "BrakeLower": 0,
+      "LatchLeft": 0,
+      "LatchRight": 0
+    },
+    "open": {
+      "Lid": 105,
+      "Rotor": 0,
+      "Lift": 0,
+      "TubeLift": 0,
+      "BrakeUpper": 0,
+      "BrakeLower": 0,
+      "LatchLeft": "latch_travel",
+      "LatchRight": "latch_travel"
+    },
+    "pickup": {
+      "Lid": 105,
+      "Rotor": 0,
+      "Lift": "park_gap+lift_travel",
+      "TubeLift": "lift_travel",
+      "BrakeUpper": 0,
+      "BrakeLower": 0,
+      "LatchLeft": "latch_travel",
+      "LatchRight": "latch_travel"
+    },
+    "lid_unlocked": {
+      "Lid": 0,
+      "Rotor": 0,
+      "Lift": 0,
+      "TubeLift": 0,
+      "BrakeUpper": 0,
+      "BrakeLower": 0,
+      "LatchLeft": "latch_travel",
+      "LatchRight": "latch_travel"
+    },
+    "ready_to_spin": {
+      "Lid": 0,
+      "Rotor": 0,
+      "Lift": 0,
+      "TubeLift": 0,
+      "BrakeUpper": "brake_clearance",
+      "BrakeLower": "brake_clearance",
+      "LatchLeft": 0,
+      "LatchRight": 0
+    }
+  },
+  "protocol": [
+    {
+      "id": "CF01.reserve",
+      "command": "acquire",
+      "requires": [
+        "exclusive owner",
+        "fresh hardware feedback in future driver"
+      ]
+    },
+    {
+      "id": "CF01.index",
+      "command": "index",
+      "requires": [
+        "robot clear",
+        "lid closed and locked",
+        "ejector parked",
+        "all tubes seated",
+        "speed at most 2 rpm"
+      ]
+    },
+    {
+      "id": "CF01.braking",
+      "command": "stop",
+      "requires": [
+        "lid remains locked",
+        "electrical deceleration with speed feedback",
+        "parking caliper remains released until independent standstill",
+        "confirm parking brake before granting access"
+      ]
+    },
+    {
+      "id": "CF01.access",
+      "command": "open_lid",
+      "requires": [
+        "independent zero-speed confirmation",
+        "index in tolerance",
+        "holding brake engaged"
+      ]
+    },
+    {
+      "id": "CF01.present",
+      "command": "present_tube",
+      "requires": [
+        "lid fully open",
+        "rotor held stationary",
+        "robot clear",
+        "selected tube present"
+      ]
+    },
+    {
+      "id": "CF01.take",
+      "command": "confirm_removed",
+      "requires": [
+        "robot grasp confirmed",
+        "tube absence confirmed",
+        "valid owner"
+      ]
+    },
+    {
+      "id": "CF01.park",
+      "command": "retract_lift",
+      "requires": [
+        "robot clear",
+        "tube removed or positively reseated"
+      ]
+    },
+    {
+      "id": "CF01.spin",
+      "command": "start",
+      "requires": [
+        "lid lock feedback",
+        "robot clear",
+        "all tubes seated",
+        "balanced measured load",
+        "qualified rotor/tubes/drive/containment",
+        "ejector park feedback"
+      ]
+    }
+  ],
+  "limitations": [
+    "No rotor stress, fatigue, overspeed, burst containment, bearing, vibration or safety validation",
+    "Bottom ejector passages alter rotor load paths; this concept needs a purpose-qualified rotor, never drilling a rated commercial rotor",
+    "Tube shapes, caps and pockets are illustrative; 1.5/2.0 mL is a target class, not an article qualification",
+    "Pocket clearance and tube support/contact load distribution require development; the CAD intentionally has clearance",
+    "Steel family is owner-selected only for the housing, chamber, floor, lid and supports; grade, joints, retention and strength remain open",
+    "22 mm wall, 12 mm floor and 20 mm lid are provisional layout dimensions, not burst-containment sizing",
+    "Lid lock, motor, brake, ejector, power inlet and encoder remain unselected component envelopes",
+    "Electrical ratings, fusing, PE continuity, lid bonding, isolation, creepage, heating and EMC are not validated",
+    "Encoder resolution is a requirement, not measured accuracy; independent standstill hardware remains unimplemented",
+    "A separate aerosol-tight rotor lid and its automated removal are not implemented; use with hazardous samples is not established",
+    "Vision shapes and numerals are layout aids; camera decoding, lighting, chemical durability and rotor balance are untested",
+    "Mock programming interface only; no hardware, ROS integration or SiLA server",
+    "Robot reach, gripper design, swept paths and multi-arm collision checking remain open",
+    "Centrifuge procurement and qualification cost is additional and is not covered by the existing arm budget estimate",
+    "Motor, spindle bearings, high-speed brake disc, caliper, braking resistor, geared lid motor, holding brake and locking pins are implemented concept geometry, not selected/rated purchase parts",
+    "Unknown rotor inertia prevents motor power, stop energy, brake temperature and stopping-time qualification",
+    "No hardware watchdog, power-loss braking/retention validation or obstruction-force test; mock mechanisms only"
+  ],
+  "mechanisms": {
+    "format": "solidcraftbot.centrifuge-mechanisms/1",
+    "spindle": {
+      "id": "CF01.MOTOR",
+      "architecture": "direct-drive three-phase brushless spindle; separate stator, rotor core, shaft and bearing envelopes",
+      "part": null,
+      "drive_part": null,
+      "required_speed_rating_rpm": 16000,
+      "rated_speed_rpm": null,
+      "continuous_power_w": null,
+      "torque_nm": null,
+      "supply_v": null,
+      "total_rotating_inertia_kg_m2": null,
+      "cooling": "to be sized with selected motor and enclosure",
+      "geometry_status": "parametric assembly concept, not a manufacturer motor"
+    },
+    "braking": {
+      "id": "CF01.BRAKE",
+      "service_brake": "drive-controlled electrical deceleration into a brake chopper/resistor",
+      "parking_brake": "electrically positioned bistable opposed-pad caliper on spindle disc; engagement only at independent standstill",
+      "drive_brake_part": null,
+      "resistor_part": null,
+      "resistance_ohm": null,
+      "energy_j": null,
+      "power_w": null,
+      "rated_stopping_time_s": null,
+      "parking_caliper_part": null,
+      "parking_torque_nm": null,
+      "disc_speed_rating_rpm": null,
+      "engagement_speed_rpm": 0,
+      "simulation_stop_s": 5,
+      "power_loss": "retain lid locks; parking caliper must not apply automatically to a spinning shaft; validated coastdown/hold-off and supervised recovery scheme remains open"
+    },
+    "lid": {
+      "id": "CF01.LID_DRIVE",
+      "architecture": "coaxial electric gearmotor, hinge shaft, output coupling, two bearing towers and separate motor holding brake",
+      "motor_part": null,
+      "gearbox_part": null,
+      "holding_brake_part": null,
+      "gear_ratio": 60,
+      "output_torque_target_nm": 40,
+      "rated_output_torque_nm": null,
+      "nominal_lid_speed_deg_s": 10,
+      "gravity_sizing_factor": 2,
+      "efficiency": null,
+      "self_locking_assumed": false,
+      "open_limit_feedback_required": true,
+      "closed_limit_feedback_required": true,
+      "obstruction_feedback_required": true,
+      "power_loss": "motor holding brake retains lid position; validate hardware under lid load"
+    },
+    "locks": {
+      "id": "CF01.LID_LOCK",
+      "architecture": "two powered retracting pins into bored lid strike lugs",
+      "part": null,
+      "both_locked_feedback_required": true,
+      "both_retracted_feedback_required": true,
+      "retention_load_n": null,
+      "opening_sequence": [
+        "confirm independent rotor standstill and parking brake",
+        "retract both locking pins and confirm",
+        "release lid motor holding brake",
+        "drive lid to open limit",
+        "engage lid holding brake"
+      ],
+      "closing_sequence": [
+        "confirm clear workspace and parked tube lifter",
+        "release lid motor holding brake",
+        "drive lid to closed limit with obstruction monitoring",
+        "engage lid holding brake",
+        "extend both locking pins and confirm"
+      ]
+    }
+  }
+}

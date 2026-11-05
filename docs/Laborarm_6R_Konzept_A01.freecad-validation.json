@@ -1,0 +1,672 @@
+{
+  "design": "Laborarm_6R_Konzept_A01",
+  "date": "2026-10-28",
+  "freecad_version": [
+    "27",
+    "1",
+    "0",
+    "20261020 (Git shallow)",
+    "Unknown",
+    "2026/10/20 22:15:52",
+    "(HEAD detached at 9946038aa)",
+    "9946038aace97af288eb28f2727a169f9d1158c7"
+  ],
+  "method": "STEP solids + native expression hierarchy, independent world-axis FK comparison",
+  "model_sha256": "7f757b6bda91c8bbab083eb19dfdac22e7366ae7808f32dcc2652436e3490a40",
+  "source_sha256": {
+    "cad/Laborarm_6R_Konzept_A01.solidcraft": "739ec28d5fcd9882cf90bce4efd76b89d055a8c0a1a71901976c7698aece10fc",
+    "exports/Laborarm_6R_Konzept_A01.step": "eb1e89e9234bd05ee0e3aeae5f42725eeaf9687099ca11e6dd58ac2bab2e2ee5"
+  },
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "body_count": 38,
+  "rigid_links": 7,
+  "revolute_axes": 6,
+  "geometry_checks": [
+    {
+      "body": "Base_plate",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.5072188776684925,
+      "relative_volume_error": 1.4807283572774439e-06,
+      "com_error_mm": 9.460990960047773e-15
+    },
+    {
+      "body": "J1_pedestal",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 13.38609846495092,
+      "relative_volume_error": 4.8960567334431894e-05,
+      "com_error_mm": 3.3110887657950437e-14
+    },
+    {
+      "body": "J1_lower_bearing_envelope",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.8398351002979325,
+      "relative_volume_error": 2.488221024719753e-05,
+      "com_error_mm": 2.2495163547188475e-14
+    },
+    {
+      "body": "J1_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 3.553371215055018e-15
+    },
+    {
+      "body": "J1_rotating_table",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 5.734103342241724,
+      "relative_volume_error": 4.82886222137607e-05,
+      "com_error_mm": 1.666285627036337e-14
+    },
+    {
+      "body": "Shoulder_crossmember",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 2.9103830456733704e-11,
+      "relative_volume_error": 1.7162706076764225e-16,
+      "com_error_mm": 1.429052476707224e-14
+    },
+    {
+      "body": "Shoulder_cheek_L",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.7440631593708531,
+      "relative_volume_error": 1.6559894086495363e-05,
+      "com_error_mm": 0.0003436514010287102
+    },
+    {
+      "body": "Shoulder_cheek_R",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.7440631593999569,
+      "relative_volume_error": 1.655989408714309e-05,
+      "com_error_mm": 0.00034365140105673155
+    },
+    {
+      "body": "J2_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 4.77535844311933,
+      "relative_volume_error": 4.9495125348788206e-05,
+      "com_error_mm": 3.004167416287495e-14
+    },
+    {
+      "body": "J2_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 2.9103830456733704e-11,
+      "relative_volume_error": 1.3996532806600927e-16,
+      "com_error_mm": 1.4232673479380846e-14
+    },
+    {
+      "body": "J2_rotating_hub",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 10.350946133272373,
+      "relative_volume_error": 9.932287603783653e-05,
+      "com_error_mm": 3.017097822058564e-14
+    },
+    {
+      "body": "Upper_plate_L",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.3521805232448969,
+      "relative_volume_error": 6.2532079350653005e-06,
+      "com_error_mm": 0.00011681333663205743
+    },
+    {
+      "body": "Upper_plate_R",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.3521805231066537,
+      "relative_volume_error": 6.2532079326106964e-06,
+      "com_error_mm": 0.0001168133368594311
+    },
+    {
+      "body": "Upper_crossmember_1",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 1.960959409975548e-15
+    },
+    {
+      "body": "Upper_crossmember_2",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 5.686201932993259e-14
+    },
+    {
+      "body": "J3_motor_bracket",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 1.8189894035458565e-12,
+      "relative_volume_error": 2.0670334131202914e-16,
+      "com_error_mm": 5.72875237978476e-14
+    },
+    {
+      "body": "J3_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 1.4551915228366852e-11,
+      "relative_volume_error": 1.6498770100189175e-16,
+      "com_error_mm": 3.1778289812106083e-14
+    },
+    {
+      "body": "J3_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 4.261847144858621,
+      "relative_volume_error": 6.851924404052273e-05,
+      "com_error_mm": 1.5285258770068398e-14
+    },
+    {
+      "body": "J3_belt_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 5.684618502114741e-14
+    },
+    {
+      "body": "J3_rotating_hub",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 6.767926317479578,
+      "relative_volume_error": 9.932287603153575e-05,
+      "com_error_mm": 1.2967401227234957e-13
+    },
+    {
+      "body": "Forearm_root",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.6093319381325273,
+      "relative_volume_error": 7.824025805076107e-06,
+      "com_error_mm": 0.00017126883579976493
+    },
+    {
+      "body": "J4_bearing_housing",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 2.3397170650205226,
+      "relative_volume_error": 4.40572543349665e-05,
+      "com_error_mm": 5.898171002006813e-14
+    },
+    {
+      "body": "J4_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 1.136883722664747e-13
+    },
+    {
+      "body": "J4_drive_bracket",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 8.831207370324247e-16
+    },
+    {
+      "body": "J4_rotating_shaft",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 3.7820764544740086,
+      "relative_volume_error": 9.93228755835049e-05,
+      "com_error_mm": 5.729751017694742e-14
+    },
+    {
+      "body": "Forearm_tube",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 4.636280986509519,
+      "relative_volume_error": 8.689445450191172e-05,
+      "com_error_mm": 1.7074050512926249e-13
+    },
+    {
+      "body": "Wrist_yoke_bridge",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 1.3584979453800707e-15
+    },
+    {
+      "body": "Wrist_cheek_L",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.20382258025892952,
+      "relative_volume_error": 1.6080856431773137e-05,
+      "com_error_mm": 0.0003176733161294209
+    },
+    {
+      "body": "Wrist_cheek_R",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.20382258027166245,
+      "relative_volume_error": 1.60808564327777e-05,
+      "com_error_mm": 0.00031767331602074867
+    },
+    {
+      "body": "J5_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 3.637978807091713e-12,
+      "relative_volume_error": 1.1600697726695514e-16,
+      "com_error_mm": 1.1390920819338213e-13
+    },
+    {
+      "body": "J5_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 1.144197835754312,
+      "relative_volume_error": 6.323481138691826e-05,
+      "com_error_mm": 1.1372761590015107e-13
+    },
+    {
+      "body": "J5_pitch_axle",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 4.416770146191993,
+      "relative_volume_error": 0.000166131281518107,
+      "com_error_mm": 5.726341809730428e-15
+    },
+    {
+      "body": "Wrist_pitch_hub",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 6.239048985633417,
+      "relative_volume_error": 0.00011285085731715349,
+      "com_error_mm": 1.1413300508322858e-13
+    },
+    {
+      "body": "Wrist_neck",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 2.084409547296673,
+      "relative_volume_error": 0.00011285085730760698,
+      "com_error_mm": 4.236723542275622e-15
+    },
+    {
+      "body": "J6_bearing_housing",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 1.2025264291078201,
+      "relative_volume_error": 4.614752440620324e-05,
+      "com_error_mm": 1.1589085554555954e-13
+    },
+    {
+      "body": "J6_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.0,
+      "relative_volume_error": 0.0,
+      "com_error_mm": 7.951201425665749e-16
+    },
+    {
+      "body": "J6_output_shaft",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 1.0295497754177632,
+      "relative_volume_error": 0.00010242169907818239,
+      "com_error_mm": 1.8495879731914832e-15
+    },
+    {
+      "body": "Bare_tool_flange",
+      "valid": true,
+      "solids": 1,
+      "volume_error_mm3": 0.11749485886139155,
+      "relative_volume_error": 8.20695572854105e-06,
+      "com_error_mm": 1.1902610484288323e-13
+    }
+  ],
+  "motion_checks": [
+    {
+      "pose": "nominal",
+      "angles_deg": [
+        20,
+        35,
+        65,
+        0,
+        80,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 4.858782460041413e-13
+    },
+    {
+      "pose": "J1_plus_5_deg",
+      "angles_deg": [
+        25,
+        35,
+        65,
+        0,
+        80,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 1.1439517378163435e-12
+    },
+    {
+      "pose": "J2_plus_5_deg",
+      "angles_deg": [
+        20,
+        40,
+        65,
+        0,
+        80,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 5.859285502108464e-13
+    },
+    {
+      "pose": "J3_plus_5_deg",
+      "angles_deg": [
+        20,
+        35,
+        70,
+        0,
+        80,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 6.12881724829544e-13
+    },
+    {
+      "pose": "J4_plus_5_deg",
+      "angles_deg": [
+        20,
+        35,
+        65,
+        5,
+        80,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 6.394884621840902e-13
+    },
+    {
+      "pose": "J5_plus_5_deg",
+      "angles_deg": [
+        20,
+        35,
+        65,
+        0,
+        85,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 4.591667681496435e-13
+    },
+    {
+      "pose": "J6_plus_5_deg",
+      "angles_deg": [
+        20,
+        35,
+        65,
+        0,
+        80,
+        20.0
+      ],
+      "max_probe_error_mm": 4.858782460041413e-13
+    },
+    {
+      "pose": "demo_00",
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "max_probe_error_mm": 4.858782460041413e-13
+    },
+    {
+      "pose": "demo_01",
+      "angles_deg": [
+        24.592201188381075,
+        36.91341716182545,
+        66.91341716182545,
+        4.592201188381077,
+        81.91341716182545,
+        20.740251485476346
+      ],
+      "max_probe_error_mm": 5.756711829158432e-13
+    },
+    {
+      "pose": "demo_02",
+      "angles_deg": [
+        28.48528137423857,
+        38.53553390593274,
+        68.53553390593274,
+        8.485281374238571,
+        83.53553390593274,
+        25.606601717798213
+      ],
+      "max_probe_error_mm": 2.8563464471519893e-13
+    },
+    {
+      "pose": "demo_03",
+      "angles_deg": [
+        31.08655439013544,
+        39.61939766255644,
+        69.61939766255644,
+        11.08655439013544,
+        84.61939766255644,
+        28.858192987669298
+      ],
+      "max_probe_error_mm": 4.148011930546552e-13
+    },
+    {
+      "pose": "demo_04",
+      "angles_deg": [
+        32.0,
+        40.0,
+        70.0,
+        12.0,
+        85.0,
+        30.0
+      ],
+      "max_probe_error_mm": 4.1382633578908315e-13
+    },
+    {
+      "pose": "demo_05",
+      "angles_deg": [
+        31.08655439013544,
+        39.61939766255644,
+        69.61939766255644,
+        11.08655439013544,
+        84.61939766255644,
+        28.858192987669298
+      ],
+      "max_probe_error_mm": 4.148011930546552e-13
+    },
+    {
+      "pose": "demo_06",
+      "angles_deg": [
+        28.48528137423857,
+        38.53553390593274,
+        68.53553390593274,
+        8.485281374238571,
+        83.53553390593274,
+        25.606601717798213
+      ],
+      "max_probe_error_mm": 2.8563464471519893e-13
+    },
+    {
+      "pose": "demo_07",
+      "angles_deg": [
+        24.59220118838108,
+        36.91341716182545,
+        66.91341716182545,
+        4.592201188381079,
+        81.91341716182545,
+        20.740251485476346
+      ],
+      "max_probe_error_mm": 5.756711829158432e-13
+    },
+    {
+      "pose": "demo_08",
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        1.4695761589768238e-15,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 4.858782460041413e-13
+    },
+    {
+      "pose": "demo_09",
+      "angles_deg": [
+        15.407798811618925,
+        33.08658283817455,
+        63.08658283817455,
+        -4.592201188381076,
+        78.08658283817455,
+        9.259748514523654
+      ],
+      "max_probe_error_mm": 5.997250083853826e-13
+    },
+    {
+      "pose": "demo_10",
+      "angles_deg": [
+        11.51471862576143,
+        31.464466094067262,
+        61.46446609406726,
+        -8.48528137423857,
+        76.46446609406726,
+        4.393398282201787
+      ],
+      "max_probe_error_mm": 5.859285502108464e-13
+    },
+    {
+      "pose": "demo_11",
+      "angles_deg": [
+        8.913445609864562,
+        30.38060233744357,
+        60.38060233744357,
+        -11.086554390135438,
+        75.38060233744356,
+        1.1418070123307
+      ],
+      "max_probe_error_mm": 2.8563464471519893e-13
+    },
+    {
+      "pose": "demo_12",
+      "angles_deg": [
+        8.0,
+        30.0,
+        60.0,
+        -12.0,
+        75.0,
+        -1.7763568394002505e-15
+      ],
+      "max_probe_error_mm": 5.341844976445743e-13
+    },
+    {
+      "pose": "demo_13",
+      "angles_deg": [
+        8.91344560986456,
+        30.380602337443566,
+        60.38060233744357,
+        -11.08655439013544,
+        75.38060233744356,
+        1.1418070123306983
+      ],
+      "max_probe_error_mm": 2.8563464471519893e-13
+    },
+    {
+      "pose": "demo_14",
+      "angles_deg": [
+        11.514718625761429,
+        31.464466094067262,
+        61.46446609406726,
+        -8.485281374238571,
+        76.46446609406726,
+        4.393398282201783
+      ],
+      "max_probe_error_mm": 5.859285502108464e-13
+    },
+    {
+      "pose": "demo_15",
+      "angles_deg": [
+        15.407798811618916,
+        33.08658283817455,
+        63.08658283817455,
+        -4.592201188381084,
+        78.08658283817455,
+        9.259748514523643
+      ],
+      "max_probe_error_mm": 5.997250083853826e-13
+    },
+    {
+      "pose": "demo_16",
+      "angles_deg": [
+        19.999999999999996,
+        35.0,
+        65.0,
+        -2.9391523179536475e-15,
+        80.0,
+        14.999999999999995
+      ],
+      "max_probe_error_mm": 5.115907697472721e-13
+    }
+  ],
+  "full_motion_envelope_checked": false,
+  "solidcraft_solver_comparison": [
+    {
+      "pose": "J1_plus_5_deg",
+      "max_probe_error_mm": 2.6812987050722663e-13
+    },
+    {
+      "pose": "J2_plus_5_deg",
+      "max_probe_error_mm": 3.8553082408300657e-13
+    },
+    {
+      "pose": "J3_plus_5_deg",
+      "max_probe_error_mm": 2.5776155819154743e-13
+    },
+    {
+      "pose": "J4_plus_5_deg",
+      "max_probe_error_mm": 3.3898176189599563e-13
+    },
+    {
+      "pose": "J5_plus_5_deg",
+      "max_probe_error_mm": 2.4490543551698474e-13
+    },
+    {
+      "pose": "J6_plus_5_deg",
+      "max_probe_error_mm": 1.8198773652309366e-13
+    }
+  ],
+  "nominal_collision_check": {
+    "pose_deg": [
+      20.0,
+      35.0,
+      65.0,
+      0.0,
+      80.0,
+      14.999999999999998
+    ],
+    "pairs": 604,
+    "overlaps": [],
+    "volume_threshold_mm3": 0.0001,
+    "full_motion_envelope_checked": false
+  },
+  "passed": true,
+  "limitations": [
+    "No native Assembly solver joints: prescribed serial forward kinematics",
+    "SolidCraft body measurements are tessellated; STEP analytic-solid mapping tolerances: 0.01 mm COM and 0.1 percent volume",
+    "Imported solid geometry; SolidCraft feature history is not transferred",
+    "Collision test covers nominal pose only; demonstration path and full joint ranges are not collision-certified",
+    "No tool, forces, dynamics, payload, precision, stiffness or safety validation"
+  ]
+}

@@ -1,0 +1,106 @@
+<div id="cf01-robot-cycle">
+  <style>
+    #cf01-robot-cycle .cf01-scene {width:100%;height:440px;display:block;touch-action:pan-y}
+    #cf01-robot-cycle .cf01-detail {width:100%;height:230px;display:block}
+    #cf01-robot-cycle .cf01-readouts {display:flex;gap:1.2em;flex-wrap:wrap;margin:.5em 0}
+    #cf01-robot-cycle .cf01-timeline {width:100%;margin:.5em 0}
+    @media(max-width:480px){#cf01-robot-cycle .cf01-scene{height:340px}}
+  </style>
+  <div class="viz-controls">
+    <button type="button" class="btn btn-primary" data-play>Play cycle</button>
+    <label class="form-label">View <select class="form-select" data-view><option value="assembly">Complete assembly</option><option value="tube">Tube 01 and pusher</option></select></label>
+    <label class="form-label">Playback <select class="form-select" data-speed><option value="1">1×</option><option value="2" selected>2×</option><option value="0.5">0.5×</option></select></label>
+  </div>
+  <canvas class="cf01-scene" data-scene role="img" aria-label="Animated native CAD geometry of the centrifuge, with translucent enclosure, opening lid and tube 01 lift"></canvas>
+  <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite">Closed and locked</span><span data-values></span></div>
+  <label class="form-label">Cycle time <span class="tabular-nums" data-time>0.0 / 33.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="33" step="0.05" value="0" aria-label="Cycle time in seconds"></label>
+  <div class="viz-row text-small"><span>Tube 01: <span data-lift>0.0 mm axial · 0.0 mm vertical</span></span><span>Rotor stopped · parking brake held</span></div>
+  <script type="application/json" data-mesh>__MESH__</script>
+  <script type="application/json" data-timeline>__TIMELINE__</script>
+  <script>
+  (()=>{
+    const root=document.getElementById('cf01-robot-cycle');
+    const mesh=JSON.parse(root.querySelector('[data-mesh]').textContent), keys=JSON.parse(root.querySelector('[data-timeline]').textContent).keyframes;
+    const canvas=root.querySelector('[data-scene]'),ctx=canvas.getContext('2d'),slider=root.querySelector('[data-time-slider]'),button=root.querySelector('[data-play]'),view=root.querySelector('[data-view]'),speed=root.querySelector('[data-speed]');
+    const duration=keys[keys.length-1].time_s;
+    slider.max=duration;
+    let t=0,playing=false,last=0,lastPhase='',theme={},current=null;
+    const boundsCache=new Map();
+    const joints=new Map(mesh.joints.map(j=>[j.child,j]));
+    const ident={r:[1,0,0,0,1,0,0,0,1],p:[0,0,0]};
+    function matvec(r,v){return [r[0]*v[0]+r[1]*v[1]+r[2]*v[2],r[3]*v[0]+r[4]*v[1]+r[5]*v[2],r[6]*v[0]+r[7]*v[1]+r[8]*v[2]]}
+    function apply(m,v){const a=matvec(m.r,v);return a.map((x,i)=>x+m.p[i])}
+    function multiply(a,b){const r=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++)r.push(a.r[i*3]*b.r[j]+a.r[i*3+1]*b.r[j+3]+a.r[i*3+2]*b.r[j+6]);return {r,p:apply(a,b.p)}}
+    function transforms(values){
+      const cache=new Map([['Frame',ident]]);
+      function get(group){if(cache.has(group))return cache.get(group);const j=joints.get(group);if(!j)return ident;
+        const [x,y,z]=j.axis,v=values[j.id];let local;
+        if(j.type==='slider')local={r:ident.r,p:j.axis.map(a=>a*v)};
+        else {const angle=v*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),d=1-c;
+          const r=[c+x*x*d,x*y*d-z*s,x*z*d+y*s,y*x*d+z*s,c+y*y*d,y*z*d-x*s,z*x*d-y*s,z*y*d+x*s,c+z*z*d];
+          const ro=matvec(r,j.origin);local={r,p:j.origin.map((a,i)=>a-ro[i])}}
+        const result=multiply(get(j.parent),local);cache.set(group,result);return result}
+      for(const b of mesh.bodies)get(b.group);return cache
+    }
+    function pose(time){
+      for(let i=1;i<keys.length;i++){const a=keys[i-1],b=keys[i];if(time<=b.time_s){const u=(time-a.time_s)/(b.time_s-a.time_s),values={};for(const k in a.values)values[k]=a.values[k]+(b.values[k]-a.values[k])*u;return {values,phase:time===0?keys[0].phase:b.phase}}}
+      return {values:keys[keys.length-1].values,phase:keys[keys.length-1].phase}
+    }
+    function color(variable){const probe=document.createElement('span');probe.style.color='var('+variable+')';root.appendChild(probe);const result=getComputedStyle(probe).color;probe.style.color='var(--background)';const background=getComputedStyle(probe).color;probe.remove();const scratch=document.createElement('canvas');scratch.width=scratch.height=1;const sc=scratch.getContext('2d');sc.fillStyle=background;sc.fillRect(0,0,1,1);sc.fillStyle=result;sc.fillRect(0,0,1,1);return Array.from(sc.getImageData(0,0,1,1).data).slice(0,3)}
+    function readTheme(){theme={text:color('--foreground'),muted:color('--muted-foreground'),background:color('--background'),rotor:color('--viz-series-1'),tube:color('--viz-series-2'),pusher:color('--viz-series-3'),motor:color('--viz-series-4')};draw()}
+    function rgb(c){return 'rgb('+c.map(x=>Math.max(0,Math.min(255,Math.round(x)))).join(',')+')'}
+    function bodyColor(b){if(b.id==='Tube01'||b.id==='ClosedCap01')return theme.tube;if(b.id==='RetractablePusher'||b.id==='LiftActuatorEnvelope')return theme.pusher;if(b.id==='Rotor')return theme.rotor;if(b.id.startsWith('Motor')||b.id==='SpindleShaft')return theme.motor;return theme.muted}
+    function draw(){
+      if(!theme.text)return;
+      const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,h=rect.height;
+      if(w<1||h<1)return;
+      if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
+      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+      const frame=pose(t);current=frame;const matrices=transforms(frame.values),detail=view.value==='tube';
+      const yaw=detail?-0.55:-1.0,pitch=detail?0.08:0.32;
+      const eye=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)],right=[-Math.sin(yaw),Math.cos(yaw),0],up=[-Math.sin(pitch)*Math.cos(yaw),-Math.sin(pitch)*Math.sin(yaw),Math.cos(pitch)];
+      const detailKeep=new Set(['Tube01','ClosedCap01','RetractablePusher','LiftActuatorEnvelope']);
+      function raw(v){return [v.reduce((s,a,i)=>s+a*right[i],0),v.reduce((s,a,i)=>s+a*up[i],0),v.reduce((s,a,i)=>s+a*eye[i],0)]}
+      if(!boundsCache.has(detail)){const lo=[Infinity,Infinity],hi=[-Infinity,-Infinity];for(const key of keys){const ms=transforms(key.values);for(const b of mesh.bodies){if(detail&&!detailKeep.has(b.id))continue;for(const v of b.v){const q=raw(apply(ms.get(b.group)||ident,v));for(let i=0;i<2;i++){lo[i]=Math.min(lo[i],q[i]);hi[i]=Math.max(hi[i],q[i])}}}}boundsCache.set(detail,{lo,hi})}
+      const bounds=boundsCache.get(detail),center=bounds.lo.map((v,i)=>(v+bounds.hi[i])/2),scale=Math.min((w-32)/(bounds.hi[0]-bounds.lo[0]),(h-48)/(bounds.hi[1]-bounds.lo[1]));
+      function project(v){const p=raw(v);return [w/2+scale*(p[0]-center[0]),h/2-scale*(p[1]-center[1]),p[2]]}
+      const triangles=[];
+      for(const b of mesh.bodies){if(detail&&!detailKeep.has(b.id))continue;const matrix=matrices.get(b.group)||ident,points=b.v.map(v=>project(apply(matrix,v))),base=bodyColor(b);
+        for(const f of b.f){const a=points[f[0]],c=points[f[1]],d=points[f[2]];
+          const ux=c[0]-a[0],uy=c[1]-a[1],uz=c[2]-a[2],vx=d[0]-a[0],vy=d[1]-a[1],vz=d[2]-a[2];
+          const nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx,n=Math.hypot(nx,ny,nz)||1;
+          const light=0.64+0.36*Math.abs((nx*0.3-ny*0.5+nz*0.8)/n);
+          triangles.push({points:[a,c,d],depth:(a[2]+c[2]+d[2])/3,alpha:b.opacity,color:base.map(v=>v*light),shell:b.opacity<1})}}
+      triangles.sort((a,b)=>a.depth-b.depth);
+      for(const tri of triangles){ctx.globalAlpha=tri.alpha;ctx.fillStyle=rgb(tri.color);ctx.beginPath();tri.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill()}
+      ctx.globalAlpha=1;ctx.fillStyle=rgb(theme.text);ctx.font=getComputedStyle(root).font;
+      const raised=frame.values.TubeLift,vertical=raised*mesh.pickup.axis[2];
+      if(detail){
+        const bottom=mesh.pickup.bottom,seated=bottom.map((v,i)=>v+mesh.pickup.axis[i]*(mesh.parameters.tube_length-8));
+        const a=project(seated),b=project(seated.map((v,i)=>v+mesh.pickup.axis[i]*raised));
+        ctx.strokeStyle=rgb(theme.text);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(a[0]+34,a[1]);ctx.lineTo(b[0]+34,b[1]);ctx.stroke();
+        for(const q of [a,b]){ctx.beginPath();ctx.moveTo(q[0]+28,q[1]);ctx.lineTo(q[0]+40,q[1]);ctx.stroke()}
+        ctx.fillText('Tube 01',12,24);ctx.fillText('Pusher',12,h-18);
+        if(raised>15)ctx.fillText('Ready for robot',Math.max(12,w-165),30);
+      }else if(raised>15){const grip=mesh.pickup.bottom.map((v,i)=>v+mesh.pickup.axis[i]*(mesh.parameters.tube_length-8+raised));const q=project(grip);ctx.strokeStyle=rgb(theme.tube);ctx.lineWidth=2;ctx.beginPath();ctx.arc(q[0],q[1],8,0,2*Math.PI);ctx.stroke();}
+      root.querySelector('[data-values]').textContent='Lid '+frame.values.Lid.toFixed(0)+'° · tube '+raised.toFixed(1)+' mm';
+      root.querySelector('[data-time]').textContent=t.toFixed(1)+' / '+duration.toFixed(1)+' s';
+      root.querySelector('[data-lift]').textContent=raised.toFixed(1)+' mm axial · '+vertical.toFixed(1)+' mm vertical';
+      if(lastPhase!==frame.phase){lastPhase=frame.phase;root.querySelector('[data-phase]').textContent=frame.phase}
+      slider.value=t;
+      root.dataset.currentTime=t.toFixed(3);root.dataset.lidAngle=frame.values.Lid.toFixed(3);root.dataset.tubeLift=raised.toFixed(3);
+    }
+    function save(){window.openai?.setWidgetState?.({modelContent:{cycle_time_s:t,view:view.value},privateContent:{speed:speed.value}})?.catch(()=>{})}
+    function restore(state){const data=state?.modelContent,priv=state?.privateContent;if(data){t=Math.max(0,Math.min(duration,Number(data.cycle_time_s)||0));if(['assembly','tube'].includes(data.view))view.value=data.view}if(priv&&['0.5','1','2'].includes(priv.speed))speed.value=priv.speed;draw()}
+    function tick(now){if(!playing)return;if(last)t=Math.min(duration,t+(now-last)/1000*Number(speed.value));last=now;draw();if(t>=duration){playing=false;button.textContent='Replay cycle';save();return}requestAnimationFrame(tick)}
+    button.addEventListener('click',()=>{playing=!playing;if(playing){if(t>=duration)t=0;last=0;requestAnimationFrame(tick)}button.textContent=playing?'Pause':'Play cycle';save()});
+    slider.addEventListener('input',()=>{playing=false;button.textContent='Play cycle';t=Number(slider.value);draw()});slider.addEventListener('change',save);
+    view.addEventListener('change',()=>{draw();save()});speed.addEventListener('change',save);
+    new ResizeObserver(draw).observe(canvas);
+    new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
+    window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);readTheme()});
+    readTheme();restore(window.openai?.widgetState);
+    if(!window.openai?.widgetState&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){playing=true;button.textContent='Pause';requestAnimationFrame(tick)}
+  })();
+  </script>
+</div>

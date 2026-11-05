@@ -1,0 +1,191 @@
+{
+  "design": "Laborarm_6R_Konzept_A01",
+  "date": "2026-10-27",
+  "units": "mm",
+  "status": "concept_not_for_manufacture",
+  "geometry": {
+    "components": 7,
+    "body_count": 38,
+    "upper_arm_length_mm": 200,
+    "elbow_to_wrist_length_mm": 175,
+    "shoulder_axis_height_mm": 150,
+    "base_plate_mm": [
+      180,
+      160,
+      12
+    ],
+    "side_plate_thickness_mm": 6,
+    "tool_adapter": "omitted; generic bare flange"
+  },
+  "nominal_pose_deg": {
+    "J1": 20,
+    "J2": 35,
+    "J3": 65,
+    "J4": 0,
+    "J5": 80,
+    "J6": 15
+  },
+  "validation": {
+    "joint_types": "six revolute",
+    "grounded_base": true,
+    "floating_chains": [],
+    "solver_errors": [],
+    "solver_conflicts": [],
+    "independent_joint_perturbations": [
+      {
+        "joint_id": 86,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 25
+      },
+      {
+        "joint_id": 87,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 40
+      },
+      {
+        "joint_id": 88,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 70
+      },
+      {
+        "joint_id": 89,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 5
+      },
+      {
+        "joint_id": 90,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 85
+      },
+      {
+        "joint_id": 91,
+        "moved": true,
+        "errors": [],
+        "conflicts": [],
+        "test_angle_deg": 20
+      }
+    ],
+    "interference": {
+      "checked_bodies": 38,
+      "unchecked": [],
+      "cross_component_interferences_in_nominal_pose": [],
+      "same_component_overlaps": [
+        {
+          "a": "J1_pedestal",
+          "b": "J1_lower_bearing_envelope",
+          "volume_mm3": 24126.935700338538
+        },
+        {
+          "a": "Shoulder_crossmember",
+          "b": "Shoulder_cheek_L",
+          "volume_mm3": 3520.0000000000005
+        },
+        {
+          "a": "Shoulder_crossmember",
+          "b": "Shoulder_cheek_R",
+          "volume_mm3": 3520.0000000000186
+        },
+        {
+          "a": "J3_motor_ENVELOPE",
+          "b": "J3_belt_ENVELOPE",
+          "volume_mm3": 11171.999999999985
+        },
+        {
+          "a": "J3_rotating_hub",
+          "b": "Forearm_root",
+          "volume_mm3": 16308.227033671988
+        },
+        {
+          "a": "Forearm_root",
+          "b": "J4_bearing_housing",
+          "volume_mm3": 2111.441630915843
+        },
+        {
+          "a": "Forearm_root",
+          "b": "J4_drive_bracket",
+          "volume_mm3": 1536.0391220066656
+        },
+        {
+          "a": "J4_motor_ENVELOPE",
+          "b": "J4_drive_bracket",
+          "volume_mm3": 8703.999999999976
+        },
+        {
+          "a": "J4_rotating_shaft",
+          "b": "Forearm_tube",
+          "volume_mm3": 980.2190568139395
+        },
+        {
+          "a": "Forearm_tube",
+          "b": "Wrist_yoke_bridge",
+          "volume_mm3": 9455.552436926784
+        },
+        {
+          "a": "Wrist_yoke_bridge",
+          "b": "Wrist_cheek_L",
+          "volume_mm3": 1343.9999999999523
+        },
+        {
+          "a": "Wrist_yoke_bridge",
+          "b": "Wrist_cheek_R",
+          "volume_mm3": 1343.999999999994
+        },
+        {
+          "a": "J5_motor_ENVELOPE",
+          "b": "J5_reducer_ENVELOPE",
+          "volume_mm3": 7840.00000000003
+        },
+        {
+          "a": "J5_pitch_axle",
+          "b": "Wrist_pitch_hub",
+          "volume_mm3": 18278.240251642186
+        },
+        {
+          "a": "J5_pitch_axle",
+          "b": "Wrist_neck",
+          "volume_mm3": 5271.367201116591
+        },
+        {
+          "a": "Wrist_pitch_hub",
+          "b": "Wrist_neck",
+          "volume_mm3": 11504.190777853151
+        }
+      ],
+      "full_motion_envelope_checked": false
+    },
+    "visual_review": {
+      "date": "2026-10-28",
+      "status": "two model renders inspected",
+      "authorization": "Owner explicitly authorized project model renderings and storage on 2026-10-28",
+      "views": [
+        "iso",
+        "front"
+      ],
+      "notes": "Full arm framing and visible completeness inspected; not a mechanical performance certification"
+    },
+    "joint_solver_recheck": {
+      "date": "2026-10-28",
+      "errors": [],
+      "conflicts": [],
+      "end_flange_dof": 6
+    }
+  },
+  "limitations": [
+    "Motor, reducer and bearing solids are packaging envelopes; components not selected or sized.",
+    "Static construction solids in the same rigid component intentionally overlap; no part-level fit or assembly drawing implied.",
+    "Link-length parameters drive geometry, but assembly parent frames are fixed in this concept: re-align joint anchors after changing lengths.",
+    "No verified stiffness, backlash, load rating, precision, fatigue, collision-free full travel, braking or safety assessment.",
+    "Generic flange hole pattern is conceptual, not a declared interface standard."
+  ],
+  "project_import_date": "2026-10-28"
+}

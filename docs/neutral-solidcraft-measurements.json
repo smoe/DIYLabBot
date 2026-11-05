@@ -1,0 +1,1483 @@
+{
+  "bodies": [
+    {
+      "area_mm2": 66608.25819290393,
+      "bbox": {
+        "max": [
+          90.0,
+          80.0,
+          12.000000000000007
+        ],
+        "min": [
+          -90.0,
+          -80.0,
+          0.0
+        ]
+      },
+      "center_of_mass": [
+        1.991542936337822e-15,
+        -1.5311051127050025e-15,
+        5.999999999999999
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 20,
+      "face_types": {
+        "cylinder": 4,
+        "plane": 6
+      },
+      "faces": 10,
+      "kernel": {
+        "edges": 36,
+        "faces": 14,
+        "shells": 1,
+        "vertices": 24
+      },
+      "mass_g": 441.88547411586916,
+      "material": "Default",
+      "name": "Base_plate",
+      "vertices": 16,
+      "volume_mm3": 342546.8791595885
+    },
+    {
+      "area_mm2": 36742.93683097539,
+      "bbox": {
+        "max": [
+          53.99916603551488,
+          53.99854922199471,
+          58.00000000000002
+        ],
+        "min": [
+          -53.99916603551485,
+          -53.998549221994736,
+          11.999999999999911
+        ]
+      },
+      "center_of_mass": [
+        2.5688492779718312e-14,
+        -2.5932468774443898e-14,
+        34.999999999999964
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 352.6933603901029,
+      "material": "Default",
+      "name": "J1_pedestal",
+      "vertices": 4,
+      "volume_mm3": 273405.7057287619
+    },
+    {
+      "area_mm2": 12408.999928001325,
+      "bbox": {
+        "max": [
+          47.999258698235415,
+          47.99886636117839,
+          60.00000000000003
+        ],
+        "min": [
+          -47.9992586982354,
+          -47.99886636117841,
+          51.9999999999999
+        ]
+      },
+      "center_of_mass": [
+        -1.4027878486312142e-15,
+        -2.389113221914425e-14,
+        55.99999999999996
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 43.54063680923821,
+      "material": "Default",
+      "name": "J1_lower_bearing_envelope",
+      "vertices": 4,
+      "volume_mm3": 33752.43163506838
+    },
+    {
+      "area_mm2": 9576.0,
+      "bbox": {
+        "max": [
+          21.0,
+          21.0,
+          48.0
+        ],
+        "min": [
+          -21.0,
+          -21.0,
+          12.0
+        ]
+      },
+      "center_of_mass": [
+        0.0,
+        0.0,
+        30.0
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 81.92016000000001,
+      "material": "Default",
+      "name": "J1_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 63504.0
+    },
+    {
+      "area_mm2": 21110.69599907917,
+      "bbox": {
+        "max": [
+          49.99979540435647,
+          49.997486407702056,
+          79.00000000000003
+        ],
+        "min": [
+          -49.99979540435648,
+          -49.99748640770204,
+          60.99999999999982
+        ]
+      },
+      "center_of_mass": [
+        -2.7601472948157653e-15,
+        2.0437420593714107e-14,
+        69.99999999999991
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 153.1829439810341,
+      "material": "Default",
+      "name": "J1_rotating_table",
+      "vertices": 4,
+      "volume_mm3": 118746.46820235201
+    },
+    {
+      "area_mm2": 23160.000000000004,
+      "bbox": {
+        "max": [
+          54.60234418852868,
+          58.188379053290134,
+          101.0
+        ],
+        "min": [
+          -54.602344188528676,
+          -58.188379053290134,
+          79.0
+        ]
+      },
+      "center_of_mass": [
+        4.4680580028945924e-15,
+        -1.6018525671646607e-15,
+        90.0
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 218.75304000000003,
+      "material": "Default",
+      "name": "Shoulder_crossmember",
+      "vertices": 8,
+      "volume_mm3": 169576.00000000003
+    },
+    {
+      "area_mm2": 12304.558152044168,
+      "bbox": {
+        "max": [
+          46.487130744781176,
+          -22.8842897618713,
+          181.99800629067244
+        ],
+        "min": [
+          -17.75743870542501,
+          -56.049890384145,
+          96.0
+        ]
+      },
+      "center_of_mass": [
+        14.364800871873967,
+        -39.46710650546406,
+        130.91252705604114
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 14,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 5
+      },
+      "faces": 7,
+      "kernel": {
+        "edges": 21,
+        "faces": 9,
+        "shells": 1,
+        "vertices": 14
+      },
+      "mass_g": 57.9617765302361,
+      "material": "Default",
+      "name": "Shoulder_cheek_L",
+      "vertices": 10,
+      "volume_mm3": 44931.609713361315
+    },
+    {
+      "area_mm2": 12304.558152044172,
+      "bbox": {
+        "max": [
+          17.757438705425027,
+          56.049890384145,
+          181.99800629067244
+        ],
+        "min": [
+          -46.48713074478118,
+          22.884289761871226,
+          96.0
+        ]
+      },
+      "center_of_mass": [
+        -14.364891167482202,
+        39.46707364055223,
+        130.91252705604114
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 14,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 5
+      },
+      "faces": 7,
+      "kernel": {
+        "edges": 21,
+        "faces": 9,
+        "shells": 1,
+        "vertices": 14
+      },
+      "mass_g": 57.96177653023615,
+      "material": "Default",
+      "name": "Shoulder_cheek_R",
+      "vertices": 10,
+      "volume_mm3": 44931.60971336136
+    },
+    {
+      "area_mm2": 17458.39699297763,
+      "bbox": {
+        "max": [
+          62.727359440919,
+          -33.048373691408266,
+          187.99897908214447
+        ],
+        "min": [
+          -18.948781095233393,
+          -87.23228176918806,
+          112.00102091785556
+        ]
+      },
+      "center_of_mass": [
+        21.889289172842812,
+        -60.14032773029818,
+        150.00000000000003
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 124.4541054902521,
+      "material": "Default",
+      "name": "J2_reducer_ENVELOPE",
+      "vertices": 4,
+      "volume_mm3": 96476.05076763728
+    },
+    {
+      "area_mm2": 21090.0,
+      "bbox": {
+        "max": [
+          75.69012018796901,
+          -64.4881429573052,
+          178.5
+        ],
+        "min": [
+          0.23835163032943285,
+          -144.12361885716646,
+          121.5
+        ]
+      },
+      "center_of_mass": [
+        37.96423590914923,
+        -104.30588090723583,
+        150.0
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 268.23744000000005,
+      "material": "Default",
+      "name": "J2_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 207936.00000000003
+    },
+    {
+      "area_mm2": 20953.611012154983,
+      "bbox": {
+        "max": [
+          36.57851410078834,
+          55.704278739360426,
+          169.99997193847753
+        ],
+        "min": [
+          -36.57851410078841,
+          -55.70427873936066,
+          130.0000280615225
+        ]
+      },
+      "center_of_mass": [
+        -5.3027859530410127e-14,
+        -8.745108715802484e-14,
+        149.99999999999994
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 134.4375137388763,
+      "material": "Default",
+      "name": "J2_rotating_hub",
+      "vertices": 4,
+      "volume_mm3": 104215.12692936148
+    },
+    {
+      "area_mm2": 23642.509562503663,
+      "bbox": {
+        "max": [
+          142.91735671051714,
+          21.47377526316776,
+          338.8274131873194
+        ],
+        "min": [
+          -13.91499888517459,
+          -40.49977875809196,
+          125.00299567047892
+        ]
+      },
+      "center_of_mass": [
+        64.13594704805614,
+        -9.64593527474025,
+        231.3601238122281
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 16,
+      "face_types": {
+        "cylinder": 4,
+        "plane": 4
+      },
+      "faces": 8,
+      "kernel": {
+        "edges": 30,
+        "faces": 12,
+        "shells": 1,
+        "vertices": 20
+      },
+      "mass_g": 72.6527695390273,
+      "material": "Default",
+      "name": "Upper_plate_L",
+      "vertices": 12,
+      "volume_mm3": 56319.97638684286
+    },
+    {
+      "area_mm2": 23642.50956250367,
+      "bbox": {
+        "max": [
+          121.7121078243257,
+          79.73471775189395,
+          338.8274131873194
+        ],
+        "min": [
+          -35.12024777136601,
+          17.76116373063434,
+          125.00299567047892
+        ]
+      },
+      "center_of_mass": [
+        42.93069816186473,
+        48.61500721398607,
+        231.3601238122281
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 16,
+      "face_types": {
+        "cylinder": 4,
+        "plane": 4
+      },
+      "faces": 8,
+      "kernel": {
+        "edges": 30,
+        "faces": 12,
+        "shells": 1,
+        "vertices": 20
+      },
+      "mass_g": 72.65276953902739,
+      "material": "Default",
+      "name": "Upper_plate_R",
+      "vertices": 12,
+      "volume_mm3": 56319.976386842936
+    },
+    {
+      "area_mm2": 6783.999999999992,
+      "bbox": {
+        "max": [
+          51.92086387430767,
+          41.723458122320714,
+          202.42913094147048
+        ],
+        "min": [
+          -4.490135941081151,
+          -24.460084965047734,
+          169.6562489559608
+        ]
+      },
+      "center_of_mass": [
+        23.715363966613257,
+        8.631686578636485,
+        186.04268994871563
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 34.67519999999991,
+      "material": "Default",
+      "name": "Upper_crossmember_1",
+      "vertices": 8,
+      "volume_mm3": 26879.999999999927
+    },
+    {
+      "area_mm2": 6784.0,
+      "bbox": {
+        "max": [
+          118.75507141658144,
+          66.04912029847807,
+          304.0039844333055
+        ],
+        "min": [
+          62.34407160119264,
+          -0.13442278889035464,
+          271.23110244779576
+        ]
+      },
+      "center_of_mass": [
+        90.54957150888704,
+        32.95734875479386,
+        287.6175434405506
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 34.67520000000002,
+      "material": "Default",
+      "name": "Upper_crossmember_2",
+      "vertices": 8,
+      "volume_mm3": 26880.000000000015
+    },
+    {
+      "area_mm2": 3040.0000000000014,
+      "bbox": {
+        "max": [
+          48.42468359162902,
+          63.20411390315204,
+          228.15084514284234
+        ],
+        "min": [
+          0.3557214863746765,
+          37.55636781381037,
+          186.53044105761649
+        ]
+      },
+      "center_of_mass": [
+        24.390202539001848,
+        50.38024085848121,
+        207.3406431002294
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 11.352000000000006,
+      "material": "Default",
+      "name": "J3_motor_bracket",
+      "vertices": 8,
+      "volume_mm3": 8800.000000000004
+    },
+    {
+      "area_mm2": 11928.000000000005,
+      "bbox": {
+        "max": [
+          51.24154310809709,
+          112.45884947745137,
+          238.22624528224821
+        ],
+        "min": [
+          -20.826404450850518,
+          45.467888266541586,
+          179.7316490953666
+        ]
+      },
+      "center_of_mass": [
+        15.207569328623286,
+        78.96336887199647,
+        208.9789471888074
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 113.77800000000006,
+      "material": "Default",
+      "name": "J3_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 88200.00000000004
+    },
+    {
+      "area_mm2": 9801.231220860576,
+      "bbox": {
+        "max": [
+          124.01660389453332,
+          103.05781206633898,
+          343.8303667650847
+        ],
+        "min": [
+          60.111760797807676,
+          61.863787033568954,
+          283.830450950512
+        ]
+      },
+      "center_of_mass": [
+        92.06418234617072,
+        82.46079954995342,
+        313.8304088577984
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 2,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 2
+      },
+      "faces": 3,
+      "kernel": {
+        "edges": 6,
+        "faces": 4,
+        "shells": 1,
+        "vertices": 4
+      },
+      "mass_g": 80.236109825299,
+      "material": "Default",
+      "name": "J3_reducer_ENVELOPE",
+      "vertices": 2,
+      "volume_mm3": 62198.53474829379
+    },
+    {
+      "area_mm2": 14482.000000000004,
+      "bbox": {
+        "max": [
+          102.58521212134355,
+          105.63812283715774,
+          324.72836114846825
+        ],
+        "min": [
+          -12.602231299940541,
+          58.0068697869167,
+          175.96388970233477
+        ]
+      },
+      "center_of_mass": [
+        44.99149041070151,
+        81.82249631203722,
+        250.3461254254015
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 53.186700000000044,
+      "material": "Default",
+      "name": "J3_belt_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 41230.00000000004
+    },
+    {
+      "area_mm2": 14394.177721151498,
+      "bbox": {
+        "max": [
+          138.2185484329397,
+          78.02449140237545,
+          333.82910971350765
+        ],
+        "min": [
+          77.37566944524394,
+          0.4453865852720729,
+          293.83170800208904
+        ]
+      },
+      "center_of_mass": [
+        107.79710893915122,
+        39.23493899380214,
+        313.8304088577983
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 87.90145129080561,
+      "material": "Default",
+      "name": "J3_rotating_hub",
+      "vertices": 4,
+      "volume_mm3": 68140.65991535319
+    },
+    {
+      "area_mm2": 11951.203572521717,
+      "bbox": {
+        "max": [
+          164.84023091457027,
+          77.11629431348501,
+          334.62793853573226
+        ],
+        "min": [
+          101.65189877564006,
+          19.87890855995998,
+          283.48222940818323
+        ]
+      },
+      "center_of_mass": [
+        131.9598159853673,
+        48.02944513791906,
+        309.29643989288394
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 14,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 7
+      },
+      "faces": 8,
+      "kernel": {
+        "edges": 18,
+        "faces": 9,
+        "shells": 1,
+        "vertices": 12
+      },
+      "mass_g": 100.4648197779327,
+      "material": "Default",
+      "name": "Forearm_root",
+      "vertices": 10,
+      "volume_mm3": 77879.7052542114
+    },
+    {
+      "area_mm2": 13029.08741395245,
+      "bbox": {
+        "max": [
+          188.40378639921258,
+          94.29004373016618,
+          337.35595408836065
+        ],
+        "min": [
+          138.24042088688805,
+          24.598724917453296,
+          269.467082307205
+        ]
+      },
+      "center_of_mass": [
+        163.32210364305004,
+        59.444384323809956,
+        303.4115181977827
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 68.50295594827494,
+      "material": "Default",
+      "name": "J4_bearing_housing",
+      "vertices": 4,
+      "volume_mm3": 53103.06662656973
+    },
+    {
+      "area_mm2": 11591.999999999998,
+      "bbox": {
+        "max": [
+          176.10162803042505,
+          81.2151076599074,
+          385.8379416923671
+        ],
+        "min": [
+          110.46339797863294,
+          23.086031989109756,
+          336.1409035378417
+        ]
+      },
+      "center_of_mass": [
+        143.282513004529,
+        52.15056982450858,
+        360.9894226151044
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 109.22688,
+      "material": "Default",
+      "name": "J4_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 84671.99999999999
+    },
+    {
+      "area_mm2": 4511.999999999995,
+      "bbox": {
+        "max": [
+          166.60820397567613,
+          73.68374653723254,
+          372.22908980526074
+        ],
+        "min": [
+          140.10143120374147,
+          37.94943123072149,
+          321.5995167333149
+        ]
+      },
+      "center_of_mass": [
+        153.35481758970877,
+        55.81658888397701,
+        346.9143032692878
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 16.511999999999958,
+      "material": "Default",
+      "name": "J4_drive_bracket",
+      "vertices": 8,
+      "volume_mm3": 12799.999999999965
+    },
+    {
+      "area_mm2": 8927.983311982172,
+      "bbox": {
+        "max": [
+          193.11075818622595,
+          86.35948880749291,
+          325.5384435621447
+        ],
+        "min": [
+          142.78761488385732,
+          35.897520728461274,
+          279.548111056751
+        ]
+      },
+      "center_of_mass": [
+        167.94918653504186,
+        61.12850476797719,
+        302.5432773094478
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 49.121399250765755,
+      "material": "Default",
+      "name": "J4_rotating_shaft",
+      "vertices": 4,
+      "volume_mm3": 38078.60407036105
+    },
+    {
+      "area_mm2": 22693.947833055165,
+      "bbox": {
+        "max": [
+          260.3310665848303,
+          114.04026438500512,
+          324.26816840754213
+        ],
+        "min": [
+          169.03438090348462,
+          42.23597812312963,
+          263.2799202669937
+        ]
+      },
+      "center_of_mass": [
+        214.68272374415756,
+        78.13812125406749,
+        293.77404433726787
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 68.82830523151372,
+      "material": "Default",
+      "name": "Forearm_tube",
+      "vertices": 4,
+      "volume_mm3": 53355.27537326645
+    },
+    {
+      "area_mm2": 9279.999999999989,
+      "bbox": {
+        "max": [
+          258.694212418123,
+          120.24363210820388,
+          314.3705873003896
+        ],
+        "min": [
+          216.0166474117101,
+          52.53699075277075,
+          264.6687406684666
+        ]
+      },
+      "center_of_mass": [
+        237.35542991491656,
+        86.39031143048732,
+        289.5196639844281
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 55.48031999999984,
+      "material": "Default",
+      "name": "Wrist_yoke_bridge",
+      "vertices": 8,
+      "volume_mm3": 43007.999999999876
+    },
+    {
+      "area_mm2": 5147.639491335498,
+      "bbox": {
+        "max": [
+          300.4223265074569,
+          82.80863680477464,
+          309.6796822646837
+        ],
+        "min": [
+          244.91346895543035,
+          56.08340516494651,
+          262.44472205420203
+        ]
+      },
+      "center_of_mass": [
+        270.3668983903435,
+        68.60852571587377,
+        285.1223504235201
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 14,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 5
+      },
+      "faces": 7,
+      "kernel": {
+        "edges": 24,
+        "faces": 10,
+        "shells": 1,
+        "vertices": 16
+      },
+      "mass_g": 16.35051155698227,
+      "material": "Default",
+      "name": "Wrist_cheek_L",
+      "vertices": 10,
+      "volume_mm3": 12674.815160451371
+    },
+    {
+      "area_mm2": 5147.639491335499,
+      "bbox": {
+        "max": [
+          281.26919848121963,
+          135.43142356878514,
+          309.6796822646837
+        ],
+        "min": [
+          225.76034092919284,
+          108.70619192895792,
+          262.4447220542021
+        ]
+      },
+      "center_of_mass": [
+        251.21377036410607,
+        121.2313124798847,
+        285.1223504235201
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 14,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 5
+      },
+      "faces": 7,
+      "kernel": {
+        "edges": 24,
+        "faces": 10,
+        "shells": 1,
+        "vertices": 16
+      },
+      "mass_g": 16.350511556982266,
+      "material": "Default",
+      "name": "Wrist_cheek_R",
+      "vertices": 10,
+      "volume_mm3": 12674.815160451368
+    },
+    {
+      "area_mm2": 6047.999999999995,
+      "bbox": {
+        "max": [
+          309.610755332214,
+          73.65600436277242,
+          299.6603607955935
+        ],
+        "min": [
+          265.4493598913713,
+          24.974272154810308,
+          267.2235947365776
+        ]
+      },
+      "center_of_mass": [
+        287.53005761179264,
+        49.31513825879136,
+        283.44197776608553
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 40.45439999999994,
+      "material": "Default",
+      "name": "J5_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 31359.999999999956
+    },
+    {
+      "area_mm2": 5126.774536557497,
+      "bbox": {
+        "max": [
+          306.66116172339497,
+          76.31699463673243,
+          307.44041879293667
+        ],
+        "min": [
+          258.1383492002778,
+          50.50406050447941,
+          259.44353673923433
+        ]
+      },
+      "center_of_mass": [
+        282.3997554619076,
+        63.41052757057998,
+        283.44197776608553
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 2,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 2
+      },
+      "faces": 3,
+      "kernel": {
+        "edges": 6,
+        "faces": 4,
+        "shells": 1,
+        "vertices": 4
+      },
+      "mass_g": 23.34151028397012,
+      "material": "Default",
+      "name": "J5_reducer_ENVELOPE",
+      "vertices": 2,
+      "volume_mm3": 18094.19401858149
+    },
+    {
+      "area_mm2": 5455.045577253925,
+      "bbox": {
+        "max": [
+          291.4959529915739,
+          132.18248930906202,
+          294.941668804103
+        ],
+        "min": [
+          247.99406732614167,
+          64.17581977025522,
+          271.94228672806815
+        ]
+      },
+      "center_of_mass": [
+        269.7450101588578,
+        98.17915453965863,
+        283.4419777660856
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 2,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 2
+      },
+      "faces": 3,
+      "kernel": {
+        "edges": 6,
+        "faces": 4,
+        "shells": 1,
+        "vertices": 4
+      },
+      "mass_g": 34.29597025029113,
+      "material": "Default",
+      "name": "J5_pitch_axle",
+      "vertices": 2,
+      "volume_mm3": 26586.023449838078
+    },
+    {
+      "area_mm2": 8042.027711068089,
+      "bbox": {
+        "max": [
+          296.0630154794916,
+          125.69268942173873,
+          303.4414404408984
+        ],
+        "min": [
+          243.42700483822412,
+          70.6656196575785,
+          263.4425150912726
+        ]
+      },
+      "center_of_mass": [
+        269.7450101588578,
+        98.17915453965863,
+        283.44197776608553
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 2,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 2
+      },
+      "faces": 3,
+      "kernel": {
+        "edges": 6,
+        "faces": 4,
+        "shells": 1,
+        "vertices": 4
+      },
+      "mass_g": 71.31848981884416,
+      "material": "Default",
+      "name": "Wrist_pitch_hub",
+      "vertices": 2,
+      "volume_mm3": 55285.651022359816
+    },
+    {
+      "area_mm2": 3870.2287399482384,
+      "bbox": {
+        "max": [
+          283.74501010153057,
+          112.17751076255952,
+          283.44197776608615
+        ],
+        "min": [
+          255.74501021618508,
+          84.18079831675773,
+          253.4419777660854
+        ]
+      },
+      "center_of_mass": [
+        269.74501015885784,
+        98.17915453965863,
+        268.4419777660857
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 2,
+      "face_types": {
+        "cylinder": 1,
+        "plane": 2
+      },
+      "faces": 3,
+      "kernel": {
+        "edges": 6,
+        "faces": 4,
+        "shells": 1,
+        "vertices": 4
+      },
+      "mass_g": 23.826919707693357,
+      "material": "Default",
+      "name": "Wrist_neck",
+      "vertices": 2,
+      "volume_mm3": 18470.48039356074
+    },
+    {
+      "area_mm2": 7569.438136714138,
+      "bbox": {
+        "max": [
+          294.74501005648733,
+          123.17915451392409,
+          253.44197776608686
+        ],
+        "min": [
+          244.74501026122778,
+          73.17915456539308,
+          233.44197776608547
+        ]
+      },
+      "center_of_mass": [
+        269.7450101588577,
+        98.1791545396586,
+        243.4419777660862
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 33.61521801027678,
+      "material": "Default",
+      "name": "J6_bearing_housing",
+      "vertices": 4,
+      "volume_mm3": 26058.308535098273
+    },
+    {
+      "area_mm2": 4191.999999999998,
+      "bbox": {
+        "max": [
+          316.81946010078303,
+          126.72575768031643,
+          281.44197776608553
+        ],
+        "min": [
+          288.4490436719462,
+          93.57396143179761,
+          249.44197776608553
+        ]
+      },
+      "center_of_mass": [
+        302.6342518863646,
+        110.14985955605702,
+        265.44197776608553
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "plane": 6
+      },
+      "faces": 6,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 23.116799999999987,
+      "material": "Default",
+      "name": "J6_motor_ENVELOPE",
+      "vertices": 8,
+      "volume_mm3": 17919.99999999999
+    },
+    {
+      "area_mm2": 3518.401179351735,
+      "bbox": {
+        "max": [
+          283.7449294073226,
+          112.17885199277671,
+          251.4419777660882
+        ],
+        "min": [
+          255.7450909103927,
+          84.1794570865412,
+          231.4419777660856
+        ]
+      },
+      "center_of_mass": [
+        269.7450101588577,
+        98.17915453965888,
+        241.44197776608655
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 4,
+      "face_types": {
+        "cylinder": 2,
+        "plane": 2
+      },
+      "faces": 4,
+      "kernel": {
+        "edges": 12,
+        "faces": 6,
+        "shells": 1,
+        "vertices": 8
+      },
+      "mass_g": 12.967166354808356,
+      "material": "Default",
+      "name": "J6_output_shaft",
+      "vertices": 4,
+      "volume_mm3": 10052.066941711904
+    },
+    {
+      "area_mm2": 5579.661228976813,
+      "bbox": {
+        "max": [
+          294.74486595908536,
+          123.17914812736807,
+          231.44197776609005
+        ],
+        "min": [
+          244.7451543586303,
+          73.17916095194899,
+          223.4419777660877
+        ]
+      },
+      "center_of_mass": [
+        269.74501015885784,
+        98.17915453965855,
+        227.44197776608874
+      ],
+      "closed": true,
+      "density_g_cm3": 1.29,
+      "edges": 12,
+      "face_types": {
+        "cylinder": 6,
+        "plane": 2
+      },
+      "faces": 8,
+      "kernel": {
+        "edges": 36,
+        "faces": 14,
+        "shells": 1,
+        "vertices": 24
+      },
+      "mass_g": 18.46828141208207,
+      "material": "Default",
+      "name": "Bare_tool_flange",
+      "vertices": 12,
+      "volume_mm3": 14316.497218668272
+    }
+  ],
+  "body_count": 38,
+  "total": {
+    "area_mm2": 509899.5215512531,
+    "edges": 344,
+    "faces": 207,
+    "mass_g": 3278.380886940423,
+    "open_bodies_skipped": 0,
+    "vertices": 260,
+    "volume_mm3": 2541380.532511955
+  }
+}

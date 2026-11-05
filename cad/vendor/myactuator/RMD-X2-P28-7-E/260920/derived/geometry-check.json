@@ -1,0 +1,74 @@
+{
+  "part": "RMD-X2-P28-7-E",
+  "bundle_revision": "260920",
+  "source": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step",
+  "source_sha256": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+  "step_timestamp": "2026-09-20T07:34:07",
+  "freecad_version": [
+    "27",
+    "1",
+    "0",
+    "20261020 (Git shallow)",
+    "Unknown",
+    "2026/10/20 22:15:52",
+    "(HEAD detached at 9946038aa)",
+    "9946038aace97af288eb28f2727a169f9d1158c7"
+  ],
+  "native_length_unit": "mm",
+  "step_declares_mm": true,
+  "shape_valid": true,
+  "solids": 52,
+  "invalid_solids": 0,
+  "faces": 2774,
+  "edges": 7365,
+  "geometric_volume_mm3": 23990.44833392818,
+  "cad_reference": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step",
+  "cad_reference_sha256": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
+  "cad_reference_valid": true,
+  "cad_reference_solids": 52,
+  "cad_reference_faces": 2774,
+  "omitted_invalid_micro_solids": [],
+  "reference_bbox_max_difference_mm": 4.760636329592671e-12,
+  "reference_volume_difference_mm3": 0.0002316586069355253,
+  "reference_volume_relative_difference": 9.656285022731532e-09,
+  "validation_scope": "Assembly/reference geometry only; no manufacturing interface approval",
+  "acceptance": {
+    "bbox_max_difference_mm": 1e-05,
+    "volume_relative_difference": 1e-05,
+    "all_reference_solids_valid": true,
+    "reference_topology_preserved": true
+  },
+  "bbox_mm": {
+    "min": [
+      -22.006833629902825,
+      -15.5,
+      -22.006833629902825
+    ],
+    "max": [
+      22.006833629902818,
+      48.0,
+      22.006833629902832
+    ],
+    "size": [
+      44.01366725980564,
+      63.5,
+      44.01366725980566
+    ],
+    "centre": [
+      -3.552713678800501e-15,
+      16.25,
+      3.552713678800501e-15
+    ]
+  },
+  "conservative_box": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/conservative-box.step",
+  "clearance_margin_mm": 0,
+  "housing_and_rotor_partition_verified": false,
+  "mounting_interface_verified": false,
+  "import_elapsed_s": 12.57281869999133,
+  "notes": [
+    "Bounds include every supplied solid, including projecting connectors/fasteners if present.",
+    "Geometric volume is not a measured mass or inertia.",
+    "File origin and axes remain vendor-defined; housing/output frames need drawing-based registration."
+  ],
+  "passed": true
+}

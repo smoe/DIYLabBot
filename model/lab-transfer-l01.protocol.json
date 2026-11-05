@@ -1,0 +1,358 @@
+{
+  "format": "solidcraftbot.lab-transfer/1",
+  "id": "L01.TR01_CF01_roundtrip",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "layout_source": "model/lab-layout-l01.shared.json",
+  "arm": "ArmC",
+  "sample": {
+    "transporter_body": "B2_Tube01",
+    "centrifuge_slot": 1,
+    "geometry_source": "CF01 Tube01 and ClosedCap01",
+    "cap_grip_clearance_mm": 8
+  },
+  "tool": {
+    "flange_standoff_mm": 80,
+    "shaft_radius_mm": 5,
+    "shaft_start_mm": 6,
+    "shaft_end_gap_mm": 10,
+    "qualified": false,
+    "physical_gripper": null
+  },
+  "path": {
+    "vehicle_lift_mm": 65,
+    "cf_clearance_mm": 40,
+    "transit_tcp_mm": [
+      800,
+      6200,
+      1210
+    ],
+    "cf_pre_tcp_mm": [
+      650,
+      6270,
+      1200
+    ],
+    "cf_side_tcp_mm": [
+      450,
+      6270,
+      1200
+    ],
+    "cf_vertical_clearance_mm": 20
+  },
+  "checks": {
+    "max_joint_step_deg": 2,
+    "max_tcp_step_mm": 5,
+    "max_lid_step_deg": 3,
+    "volume_threshold_mm3": 0.001,
+    "tcp_error_mm": 0.05,
+    "axis_error_deg": 0.05
+  },
+  "sequence": [
+    {
+      "id": "ready",
+      "duration_s": 0,
+      "arm_pose": "park",
+      "station_pose": "open",
+      "sample_owner": "TR01",
+      "action": "Rotor stopped, parking brake held, lid already fully open"
+    },
+    {
+      "id": "vehicle_approach",
+      "duration_s": 3,
+      "arm_pose": "vehicle_clear",
+      "station_pose": "open",
+      "sample_owner": "TR01"
+    },
+    {
+      "id": "vehicle_grasp",
+      "duration_s": 3,
+      "arm_pose": "vehicle_grip",
+      "station_pose": "open",
+      "sample_owner": "TR01",
+      "action": "Assumed grasp confirmation; no physical sensor"
+    },
+    {
+      "id": "vehicle_extract",
+      "duration_s": 3,
+      "arm_pose": "vehicle_clear",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "to_station",
+      "duration_s": 4,
+      "arm_pose": "transit",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "orient_before_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_pre",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "pass_inside_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_side",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "above_chamber",
+      "duration_s": 3,
+      "arm_pose": "cf_raised",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "cf_approach",
+      "duration_s": 4,
+      "arm_pose": "cf_clear",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "cf_insert",
+      "duration_s": 4,
+      "arm_pose": "cf_seat",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "cf_release",
+      "duration_s": 1,
+      "arm_pose": "cf_seat",
+      "station_pose": "open",
+      "sample_owner": "CF01",
+      "action": "Assumed seating confirmation"
+    },
+    {
+      "id": "cf_withdraw",
+      "duration_s": 4,
+      "arm_pose": "cf_clear",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "lift_above_chamber",
+      "duration_s": 3,
+      "arm_pose": "cf_raised",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "withdraw_inside_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_side",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "leave_lid_region",
+      "duration_s": 4,
+      "arm_pose": "cf_pre",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "arm_clear",
+      "duration_s": 4,
+      "arm_pose": "park",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "close_lid",
+      "duration_s": 10.5,
+      "arm_pose": "park",
+      "station_pose": "lid_unlocked",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "lock_lid",
+      "duration_s": 1,
+      "arm_pose": "park",
+      "station_pose": "closed",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "station_dwell",
+      "duration_s": 2,
+      "arm_pose": "park",
+      "station_pose": "closed",
+      "sample_owner": "CF01",
+      "action": "Stationary dwell only; centrifugation is not simulated"
+    },
+    {
+      "id": "unlock_lid",
+      "duration_s": 1,
+      "arm_pose": "park",
+      "station_pose": "lid_unlocked",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "open_lid",
+      "duration_s": 10.5,
+      "arm_pose": "park",
+      "station_pose": "open",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "present_sample",
+      "duration_s": 2,
+      "arm_pose": "park",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_preorient",
+      "duration_s": 4,
+      "arm_pose": "cf_pre",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_inside_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_side",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_above_chamber",
+      "duration_s": 3,
+      "arm_pose": "cf_raised",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_approach",
+      "duration_s": 4,
+      "arm_pose": "cf_clear",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_grasp",
+      "duration_s": 3,
+      "arm_pose": "cf_pickup",
+      "station_pose": "pickup",
+      "sample_owner": "CF01"
+    },
+    {
+      "id": "return_extract",
+      "duration_s": 4,
+      "arm_pose": "cf_clear",
+      "station_pose": "pickup",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "return_lift_above_chamber",
+      "duration_s": 3,
+      "arm_pose": "cf_raised",
+      "station_pose": "pickup",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "return_clear_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_side",
+      "station_pose": "pickup",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "return_leave_lid",
+      "duration_s": 4,
+      "arm_pose": "cf_pre",
+      "station_pose": "pickup",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "leave_station",
+      "duration_s": 4,
+      "arm_pose": "transit",
+      "station_pose": "pickup",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "park_pusher",
+      "duration_s": 2,
+      "arm_pose": "transit",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "vehicle_return_approach",
+      "duration_s": 4,
+      "arm_pose": "vehicle_clear",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "vehicle_replace",
+      "duration_s": 3,
+      "arm_pose": "vehicle_grip",
+      "station_pose": "open",
+      "sample_owner": "arm"
+    },
+    {
+      "id": "vehicle_release",
+      "duration_s": 1,
+      "arm_pose": "vehicle_grip",
+      "station_pose": "open",
+      "sample_owner": "TR01"
+    },
+    {
+      "id": "vehicle_withdraw",
+      "duration_s": 3,
+      "arm_pose": "vehicle_clear",
+      "station_pose": "open",
+      "sample_owner": "TR01"
+    },
+    {
+      "id": "complete",
+      "duration_s": 4,
+      "arm_pose": "park",
+      "station_pose": "open",
+      "sample_owner": "TR01"
+    }
+  ],
+  "limitations": [
+    "Illustrative timing and synthetic transfer confirmations",
+    "Assumed handling envelope, no selected or calibrated gripper",
+    "Sampled geometry, not continuous swept-volume certification",
+    "No dynamics, cable routing, payload or human detection validated",
+    "Rotor remains stopped; no balance or centrifugation performance claim"
+  ],
+  "ik_preference": {
+    "cf_pre": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    },
+    "cf_clear": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    },
+    "cf_seat": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    },
+    "cf_pickup": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    },
+    "cf_side": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    },
+    "cf_raised": {
+      "wrist_pitch_sign": 1,
+      "elbow_sign": 1
+    }
+  }
+}

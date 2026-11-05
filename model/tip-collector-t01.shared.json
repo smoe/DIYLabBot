@@ -1,0 +1,1365 @@
+{
+  "format": "solidcraftbot.collector/1",
+  "revision": "T01",
+  "date": "2026-10-28",
+  "status": "Review concept; no tip compatibility or manufacturing release",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "force": "N"
+  },
+  "coordinates": {
+    "x": "across the three grooves",
+    "y": "positive towards rear beam; robot enters from negative Y",
+    "z": "up from base underside"
+  },
+  "grooves": [
+    {
+      "id": "S",
+      "target_pipette_capacity_ul": 10,
+      "x_mm": -56,
+      "width_mm": 4,
+      "color": "#f59e36",
+      "qualified": false
+    },
+    {
+      "id": "M",
+      "target_pipette_capacity_ul": 200,
+      "x_mm": 0,
+      "width_mm": 6,
+      "color": "#26b7ad",
+      "qualified": false
+    },
+    {
+      "id": "L",
+      "target_pipette_capacity_ul": 1000,
+      "x_mm": 56,
+      "width_mm": 9,
+      "color": "#538ce5",
+      "qualified": false
+    }
+  ],
+  "fit_rule": {
+    "shaft_diameter_max_mm": null,
+    "collar_diameter_min_mm": null,
+    "radial_running_clearance_mm": null,
+    "radial_capture_margin_mm": null,
+    "access_gap_above_collar_min_mm": null,
+    "inequality": "shaft_diameter_max + 2*running_clearance <= groove_width <= collar_diameter_min - 2*capture_margin",
+    "additional_requirement": "Fork thickness plus vertical clearance must fit between tip rim and pipette/ejector sleeve; assess the complete swept tool envelope. Nominal tip volume is not a groove dimension."
+  },
+  "illustrative_envelopes": {
+    "status": "Synthetic geometry checks, not measured articles or executable robot motion",
+    "collar_top_z_mm": 167,
+    "maximum_tip_length_below_collar_mm": 120,
+    "initial_bin_fill_limit_z_mm": 35,
+    "approach_y_mm": -54,
+    "capture_y_mm": 0,
+    "illustrative_lift_mm": 20,
+    "tool_axis": "+Z; vertical pipette",
+    "tip_collar_diameter_mm": {
+      "S": 8,
+      "M": 11,
+      "L": 15
+    },
+    "shaft_diameter_mm": {
+      "S": 3,
+      "M": 5,
+      "L": 8
+    }
+  },
+  "hardware": {
+    "fork_material": "Metal insert candidate; material and edge finish to be selected after force and contamination tests",
+    "bin_material": "Removable smooth-wall liner/bin candidate; prototype printing does not establish cleanability or leak tightness",
+    "frame_connections": "Clearance holes and blind pilot placeholders only; threads, screws and welded/bolted joint design unqualified",
+    "bin_present_sensor": null,
+    "bin_full_sensor": null,
+    "tip_release_sensor": null,
+    "force_limit_N": null,
+    "lift_stroke_mm": null,
+    "approach_speed_mm_s": null,
+    "selected_parts": []
+  },
+  "workflow": [
+    "Reserve collector workspace for one arm; confirm correct groove/article profile, bin seated and fill below qualified limit",
+    "Locate real tip collar and station datum; lower collar below fork underside while remaining above bin interior",
+    "Translate from negative Y into straight groove around the exposed shaft without dragging the tip rim sideways",
+    "Lift pipette vertically with qualified stroke, speed and force limit; tip rim bears against fork underside and tip drops into bin",
+    "Verify tip absent from pipette and cleared from fork; withdraw fully before releasing workspace reservation",
+    "Stop on jam, overload, missing bin, ambiguous detachment or stale observation; no blind retries"
+  ],
+  "scope": [
+    "Independent fixed station; arm source and its six rotary axes are unchanged",
+    "No pipette adapter, selected pipette model, robot inverse kinematics, live motion or SiLA server",
+    "Groove inserts are exchangeable in the mechanical concept; mounting holes alone do not define a qualified attachment",
+    "Static CAD and synthetic straight-line clearances do not establish full robot workspace, strength, aerosol containment or cleanability",
+    "One collector can be reserved by up to three arms sequentially; no simultaneous access",
+    "Native CAD edits are explorations; adopt them in this shared source and rebuild both models"
+  ],
+  "id": "TipCollector_T01_Shared",
+  "historical_source": "model/tip-collector-t01.json",
+  "parameters": {
+    "base_x": {
+      "expression": "240",
+      "unit": "mm"
+    },
+    "base_y": {
+      "expression": "184",
+      "unit": "mm"
+    },
+    "base_t": {
+      "expression": "8",
+      "unit": "mm"
+    },
+    "bin_x": {
+      "expression": "184",
+      "unit": "mm"
+    },
+    "bin_y": {
+      "expression": "144",
+      "unit": "mm"
+    },
+    "bin_h": {
+      "expression": "150",
+      "unit": "mm",
+      "range_mm": [
+        140,
+        175
+      ]
+    },
+    "bin_wall": {
+      "expression": "4",
+      "unit": "mm"
+    },
+    "rim_to_fork": {
+      "expression": "10",
+      "unit": "mm"
+    },
+    "fork_t": {
+      "expression": "4",
+      "unit": "mm"
+    },
+    "fork_x": {
+      "expression": "48",
+      "unit": "mm"
+    },
+    "fork_front_y": {
+      "expression": "-42",
+      "unit": "mm"
+    },
+    "fork_rear_y": {
+      "expression": "54",
+      "unit": "mm"
+    },
+    "mouth_width": {
+      "expression": "20",
+      "unit": "mm"
+    },
+    "taper_end_y": {
+      "expression": "-24",
+      "unit": "mm"
+    },
+    "slot_end_y": {
+      "expression": "5",
+      "unit": "mm"
+    },
+    "beam_x": {
+      "expression": "232",
+      "unit": "mm"
+    },
+    "beam_y": {
+      "expression": "24",
+      "unit": "mm"
+    },
+    "beam_t": {
+      "expression": "8",
+      "unit": "mm"
+    },
+    "beam_center_y": {
+      "expression": "42",
+      "unit": "mm"
+    },
+    "post_x": {
+      "expression": "12",
+      "unit": "mm"
+    },
+    "post_y": {
+      "expression": "36",
+      "unit": "mm"
+    },
+    "post_center_x": {
+      "expression": "106",
+      "unit": "mm"
+    },
+    "insert_hole_d": {
+      "expression": "4.5",
+      "unit": "mm"
+    },
+    "insert_hole_dx": {
+      "expression": "16",
+      "unit": "mm"
+    },
+    "table_hole_d": {
+      "expression": "6.6",
+      "unit": "mm"
+    },
+    "fork_z": {
+      "expression": "base_t+bin_h+rim_to_fork",
+      "unit": "mm"
+    },
+    "post_h": {
+      "expression": "bin_h+rim_to_fork-beam_t",
+      "unit": "mm"
+    },
+    "groove_S": {
+      "expression": "4",
+      "unit": "mm",
+      "range_mm": [
+        2,
+        12
+      ]
+    },
+    "groove_M": {
+      "expression": "6",
+      "unit": "mm",
+      "range_mm": [
+        2,
+        12
+      ]
+    },
+    "groove_L": {
+      "expression": "9",
+      "unit": "mm",
+      "range_mm": [
+        2,
+        12
+      ]
+    },
+    "guide_gap": {
+      "expression": 1,
+      "unit": "mm"
+    },
+    "guide_width": {
+      "expression": 4,
+      "unit": "mm"
+    },
+    "guide_h": {
+      "expression": 6,
+      "unit": "mm"
+    },
+    "guide_overhang": {
+      "expression": 2,
+      "unit": "mm"
+    },
+    "table_inset": {
+      "expression": 12,
+      "unit": "mm"
+    },
+    "post_hole_d": {
+      "expression": 5.5,
+      "unit": "mm"
+    },
+    "pilot_d": {
+      "expression": 4.2,
+      "unit": "mm"
+    },
+    "pilot_depth": {
+      "expression": 12,
+      "unit": "mm"
+    },
+    "post_hole_spacing": {
+      "expression": 16,
+      "unit": "mm"
+    },
+    "mark_depth": {
+      "expression": 0.3,
+      "unit": "mm"
+    },
+    "umr_height": {
+      "expression": 24,
+      "unit": "mm"
+    },
+    "umr_depth": {
+      "expression": 0.8,
+      "unit": "mm"
+    },
+    "lane_S_x": {
+      "expression": -56,
+      "unit": "mm"
+    },
+    "lane_M_x": {
+      "expression": 0,
+      "unit": "mm"
+    },
+    "lane_L_x": {
+      "expression": 56,
+      "unit": "mm"
+    }
+  },
+  "components": [
+    {
+      "id": "Frame",
+      "fixed": true
+    },
+    {
+      "id": "Bin",
+      "fixed": true
+    },
+    {
+      "id": "InsertS",
+      "fixed": true
+    },
+    {
+      "id": "InsertM",
+      "fixed": true
+    },
+    {
+      "id": "InsertL",
+      "fixed": true
+    }
+  ],
+  "bodies": [
+    {
+      "id": "MountBase",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#334155",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "PostLeft",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#8f9ead",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "PostRight",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#8f9ead",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "RearBeam",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#8f9ead",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "BinGuideLeft",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#697b91",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "BinGuideRight",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#697b91",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "BinRearStop",
+      "component": "Frame",
+      "role": "structure",
+      "appearance": {
+        "color": "#697b91",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "RemovableBin",
+      "component": "Bin",
+      "role": "bin",
+      "appearance": {
+        "color": "#dfe8ed",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "Fork_S",
+      "component": "InsertS",
+      "role": "stripper_insert",
+      "appearance": {
+        "color": "#f59e36",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "Fork_M",
+      "component": "InsertM",
+      "role": "stripper_insert",
+      "appearance": {
+        "color": "#26b7ad",
+        "opacity": 1
+      }
+    },
+    {
+      "id": "Fork_L",
+      "component": "InsertL",
+      "role": "stripper_insert",
+      "appearance": {
+        "color": "#538ce5",
+        "opacity": 1
+      }
+    }
+  ],
+  "operations": [
+    {
+      "id": "MountBase",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "base_x",
+          "base_y",
+          "base_t"
+        ],
+        "center": [
+          0,
+          0,
+          "base_t/2"
+        ]
+      },
+      "body": "MountBase"
+    },
+    {
+      "id": "TableHole_-108_-80",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "table_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "-1*(base_x/2-table_inset)",
+          "-1*(base_y/2-table_inset)",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "TableHole_-108_80",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "table_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "-1*(base_x/2-table_inset)",
+          "1*(base_y/2-table_inset)",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "TableHole_108_-80",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "table_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "1*(base_x/2-table_inset)",
+          "-1*(base_y/2-table_inset)",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "TableHole_108_80",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "table_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "1*(base_x/2-table_inset)",
+          "1*(base_y/2-table_inset)",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "PostLeft",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "post_x",
+          "post_y",
+          "post_h"
+        ],
+        "center": [
+          "-1*post_center_x",
+          "beam_center_y",
+          "base_t+post_h/2"
+        ]
+      },
+      "body": "PostLeft"
+    },
+    {
+      "id": "PostTopPilot_Left_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "fork_z-beam_t-pilot_depth"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostLeft"
+      ]
+    },
+    {
+      "id": "PostBottomPilot_Left_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "base_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostLeft"
+      ]
+    },
+    {
+      "id": "PostBaseClearance_Left_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "PostTopPilot_Left_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "fork_z-beam_t-pilot_depth"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostLeft"
+      ]
+    },
+    {
+      "id": "PostBottomPilot_Left_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "base_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostLeft"
+      ]
+    },
+    {
+      "id": "PostBaseClearance_Left_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "PostRight",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "post_x",
+          "post_y",
+          "post_h"
+        ],
+        "center": [
+          "1*post_center_x",
+          "beam_center_y",
+          "base_t+post_h/2"
+        ]
+      },
+      "body": "PostRight"
+    },
+    {
+      "id": "PostTopPilot_Right_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "fork_z-beam_t-pilot_depth"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostRight"
+      ]
+    },
+    {
+      "id": "PostBottomPilot_Right_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "base_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostRight"
+      ]
+    },
+    {
+      "id": "PostBaseClearance_Right_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "PostTopPilot_Right_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "fork_z-beam_t-pilot_depth"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostRight"
+      ]
+    },
+    {
+      "id": "PostBottomPilot_Right_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "pilot_d",
+        "height": "pilot_depth+1",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "base_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "PostRight"
+      ]
+    },
+    {
+      "id": "PostBaseClearance_Right_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "base_t+2",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          -1
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "MountBase"
+      ]
+    },
+    {
+      "id": "RearBeam",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "beam_x",
+          "beam_y",
+          "beam_t"
+        ],
+        "center": [
+          0,
+          "beam_center_y",
+          "fork_z-beam_t/2"
+        ]
+      },
+      "body": "RearBeam"
+    },
+    {
+      "id": "BeamPostClearance_-106_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "beam_t+2",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "BeamPostClearance_-106_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "beam_t+2",
+        "base": [
+          "-1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "BeamPostClearance_106_34",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "beam_t+2",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y-post_hole_spacing/2",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "BeamPostClearance_106_50",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "post_hole_d",
+        "height": "beam_t+2",
+        "base": [
+          "1*post_center_x",
+          "beam_center_y+post_hole_spacing/2",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "BinGuideLeft",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "guide_width",
+          "bin_y+2*guide_overhang",
+          "guide_h"
+        ],
+        "center": [
+          "-1*(bin_x/2+guide_gap+guide_width/2)",
+          0,
+          "base_t+guide_h/2"
+        ]
+      },
+      "body": "BinGuideLeft"
+    },
+    {
+      "id": "BinGuideRight",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "guide_width",
+          "bin_y+2*guide_overhang",
+          "guide_h"
+        ],
+        "center": [
+          "1*(bin_x/2+guide_gap+guide_width/2)",
+          0,
+          "base_t+guide_h/2"
+        ]
+      },
+      "body": "BinGuideRight"
+    },
+    {
+      "id": "BinRearStop",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "bin_x",
+          "guide_width",
+          "guide_h"
+        ],
+        "center": [
+          0,
+          "bin_y/2+guide_gap+guide_width/2",
+          "base_t+guide_h/2"
+        ]
+      },
+      "body": "BinRearStop"
+    },
+    {
+      "id": "RemovableBin",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "bin_x",
+          "bin_y",
+          "bin_h"
+        ],
+        "center": [
+          0,
+          0,
+          "base_t+bin_h/2"
+        ]
+      },
+      "body": "RemovableBin"
+    },
+    {
+      "id": "BinCavity",
+      "action": "subtract",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "bin_x-2*bin_wall",
+          "bin_y-2*bin_wall",
+          "bin_h-bin_wall+1"
+        ],
+        "center": [
+          0,
+          0,
+          "base_t+bin_wall+(bin_h-bin_wall+1)/2"
+        ]
+      },
+      "targets": [
+        "RemovableBin"
+      ]
+    },
+    {
+      "id": "Fork_S_4mm",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "fork_x",
+          "fork_rear_y-fork_front_y",
+          "fork_t"
+        ],
+        "center": [
+          "lane_S_x",
+          "(fork_rear_y+fork_front_y)/2",
+          "fork_z+fork_t/2"
+        ]
+      },
+      "body": "Fork_S"
+    },
+    {
+      "id": "GrooveCutS",
+      "action": "subtract",
+      "targets": [
+        "Fork_S"
+      ],
+      "shape": {
+        "kind": "stripper_groove",
+        "lane": "S"
+      }
+    },
+    {
+      "id": "InsertFixS-1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_S_x+-1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_S",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "InsertFixS1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_S_x+1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_S",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "Fork_M_6mm",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "fork_x",
+          "fork_rear_y-fork_front_y",
+          "fork_t"
+        ],
+        "center": [
+          "lane_M_x",
+          "(fork_rear_y+fork_front_y)/2",
+          "fork_z+fork_t/2"
+        ]
+      },
+      "body": "Fork_M"
+    },
+    {
+      "id": "GrooveCutM",
+      "action": "subtract",
+      "targets": [
+        "Fork_M"
+      ],
+      "shape": {
+        "kind": "stripper_groove",
+        "lane": "M"
+      }
+    },
+    {
+      "id": "InsertFixM-1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_M_x+-1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_M",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "InsertFixM1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_M_x+1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_M",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "Fork_L_9mm",
+      "action": "create",
+      "shape": {
+        "kind": "box",
+        "size": [
+          "fork_x",
+          "fork_rear_y-fork_front_y",
+          "fork_t"
+        ],
+        "center": [
+          "lane_L_x",
+          "(fork_rear_y+fork_front_y)/2",
+          "fork_z+fork_t/2"
+        ]
+      },
+      "body": "Fork_L"
+    },
+    {
+      "id": "GrooveCutL",
+      "action": "subtract",
+      "targets": [
+        "Fork_L"
+      ],
+      "shape": {
+        "kind": "stripper_groove",
+        "lane": "L"
+      }
+    },
+    {
+      "id": "InsertFixL-1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_L_x+-1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_L",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "InsertFixL1",
+      "action": "subtract",
+      "shape": {
+        "kind": "cylinder",
+        "diameter": "insert_hole_d",
+        "height": "beam_t+fork_t+2",
+        "base": [
+          "lane_L_x+1*insert_hole_dx",
+          "beam_center_y",
+          "fork_z-beam_t-1"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ]
+      },
+      "targets": [
+        "Fork_L",
+        "RearBeam"
+      ]
+    },
+    {
+      "id": "CapacityMarkS",
+      "action": "subtract",
+      "targets": [
+        "Fork_S"
+      ],
+      "shape": {
+        "kind": "profile",
+        "asset_profile": "S",
+        "origin": [
+          "lane_S_x",
+          18,
+          "fork_z+fork_t-mark_depth"
+        ],
+        "u_axis": [
+          1,
+          0,
+          0
+        ],
+        "v_axis": [
+          0,
+          1,
+          0
+        ],
+        "depth": "2*mark_depth"
+      }
+    },
+    {
+      "id": "CapacityMarkM",
+      "action": "subtract",
+      "targets": [
+        "Fork_M"
+      ],
+      "shape": {
+        "kind": "profile",
+        "asset_profile": "M",
+        "origin": [
+          "lane_M_x",
+          18,
+          "fork_z+fork_t-mark_depth"
+        ],
+        "u_axis": [
+          1,
+          0,
+          0
+        ],
+        "v_axis": [
+          0,
+          1,
+          0
+        ],
+        "depth": "2*mark_depth"
+      }
+    },
+    {
+      "id": "CapacityMarkL",
+      "action": "subtract",
+      "targets": [
+        "Fork_L"
+      ],
+      "shape": {
+        "kind": "profile",
+        "asset_profile": "L",
+        "origin": [
+          "lane_L_x",
+          18,
+          "fork_z+fork_t-mark_depth"
+        ],
+        "u_axis": [
+          1,
+          0,
+          0
+        ],
+        "v_axis": [
+          0,
+          1,
+          0
+        ],
+        "depth": "2*mark_depth"
+      }
+    }
+  ],
+  "marking_asset": "model/tip-collector-t01-markings.json",
+  "labels": [
+    {
+      "id": "UMR",
+      "component": "Bin",
+      "text": "UMR",
+      "height": "umr_height",
+      "depth": "umr_depth",
+      "origin": [
+        0,
+        "-bin_y/2",
+        "base_t+bin_h/2-umr_height/2"
+      ],
+      "u_axis": [
+        1,
+        0,
+        0
+      ],
+      "v_axis": [
+        0,
+        0,
+        1
+      ],
+      "tracking": 2,
+      "appearance": {
+        "color": "#0f2d4b",
+        "opacity": 1
+      },
+      "role": "marking"
+    }
+  ]
+}

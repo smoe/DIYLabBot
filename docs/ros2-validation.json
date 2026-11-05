@@ -1,0 +1,32 @@
+{
+  "spec_sha256": "30973df1c25e4bce89f59de9bf220c84c18d7f9223abdb4daebfe9101961ad4f",
+  "target": "ROS 2 Jazzy, ros2_control mock components",
+  "offline_tests_passed": 14,
+  "runtime_tested": false,
+  "reason": "rclpy/ros2 not installed in the accessible Windows environment; WSL distribution enumeration returned access denied",
+  "assets": {
+    "revolute_joints": 6,
+    "visual_meshes": 8,
+    "rigid_links": 7,
+    "body_count_with_umr": 41
+  },
+  "gazebo_implemented": false,
+  "sources": [
+    "https://control.ros.org/jazzy/doc/ros2_control/hardware_interface/doc/mock_components_userdoc.html",
+    "https://control.ros.org/jazzy/doc/ros2_controllers/joint_trajectory_controller/doc/userdoc.html",
+    "https://control.ros.org/jazzy/doc/ros2_controllers/joint_state_broadcaster/doc/userdoc.html",
+    "https://www.pololu.com/product/1351/faqs",
+    "https://www.igus.com/contentData/wpck/pdf/us_en/Triflex%20Retraction%20System%20Assembly%20Guide.pdf"
+  ],
+  "offline_test_groups": {
+    "model_and_ros_interfaces": 9,
+    "servo_and_harness_contracts": 5
+  },
+  "services": {
+    "servo_requirements": 6,
+    "logical_connections": 6,
+    "moving_passages": 5,
+    "physical_cable_checks_performed": false,
+    "hardware_feedback_tested": false
+  }
+}

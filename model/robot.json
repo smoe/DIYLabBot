@@ -1,0 +1,3302 @@
+{
+  "format": "solidcraftbot.robot/1",
+  "id": "Laborarm_6R_A01_Neutral",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "status": "concept_not_for_manufacture",
+  "mobile_base": {
+    "source": "model/mobile-base-mb01.shared.json"
+  },
+  "parameters": {
+    "upper_len": {
+      "unit": "mm",
+      "expression": "200"
+    },
+    "fore_len": {
+      "unit": "mm",
+      "expression": "175"
+    },
+    "shoulder_z": {
+      "unit": "mm",
+      "expression": "150"
+    },
+    "elbow_z": {
+      "unit": "mm",
+      "expression": "shoulder_z + upper_len"
+    },
+    "roll_z": {
+      "unit": "mm",
+      "expression": "elbow_z + 60"
+    },
+    "wrist_z": {
+      "unit": "mm",
+      "expression": "elbow_z + fore_len"
+    },
+    "flange_z": {
+      "unit": "mm",
+      "expression": "wrist_z + 90"
+    },
+    "plate_t": {
+      "unit": "mm",
+      "expression": "6"
+    },
+    "cam_tip_offset_x": {
+      "unit": "mm",
+      "expression": "54"
+    },
+    "cam_tip_front_z": {
+      "unit": "mm",
+      "expression": "46"
+    },
+    "cam_tip_body_w": {
+      "unit": "mm",
+      "expression": "24"
+    },
+    "cam_tip_body_h": {
+      "unit": "mm",
+      "expression": "22"
+    },
+    "cam_tip_body_d": {
+      "unit": "mm",
+      "expression": "26"
+    },
+    "cam_tip_lens_r": {
+      "unit": "mm",
+      "expression": "7"
+    },
+    "cam_tip_lens_l": {
+      "unit": "mm",
+      "expression": "8"
+    },
+    "cam_tip_range": {
+      "unit": "mm",
+      "expression": "145"
+    },
+    "cam_tip_far_r": {
+      "unit": "mm",
+      "expression": "22"
+    },
+    "cam_scene_body_w": {
+      "unit": "mm",
+      "expression": "28"
+    },
+    "cam_scene_body_h": {
+      "unit": "mm",
+      "expression": "24"
+    },
+    "cam_scene_body_d": {
+      "unit": "mm",
+      "expression": "28"
+    },
+    "cam_scene_lens_r": {
+      "unit": "mm",
+      "expression": "8"
+    },
+    "cam_scene_lens_l": {
+      "unit": "mm",
+      "expression": "8"
+    },
+    "cam_scene_range": {
+      "unit": "mm",
+      "expression": "300"
+    },
+    "cam_scene_far_r": {
+      "unit": "mm",
+      "expression": "150"
+    },
+    "x6_plate_t": {
+      "unit": "mm",
+      "expression": "6"
+    },
+    "x2_plate_t": {
+      "unit": "mm",
+      "expression": "6"
+    },
+    "x4_plate_t": {
+      "unit": "mm",
+      "expression": "6"
+    },
+    "x4_elbow_mount_extra": {
+      "unit": "mm",
+      "expression": "3"
+    },
+    "x2_wrist_mount_extra": {
+      "unit": "mm",
+      "expression": "4"
+    }
+  },
+  "links": [
+    {
+      "id": "L0_Base",
+      "grounded": true,
+      "appearance": {
+        "color": [
+          70,
+          81,
+          99
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_003",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -90.0,
+              -80.0,
+              0
+            ],
+            "size": [
+              "180",
+              "160",
+              "12"
+            ]
+          },
+          "body": "Base_plate",
+          "role": "structure"
+        },
+        {
+          "id": "op_008",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -70.0,
+              -60.0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "4.5",
+            "length": "12"
+          },
+          "targets": [
+            "Base_plate"
+          ]
+        },
+        {
+          "id": "op_009",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -70.0,
+              60.0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "4.5",
+            "length": "12"
+          },
+          "targets": [
+            "Base_plate"
+          ]
+        },
+        {
+          "id": "op_010",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              70.0,
+              -60.0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "4.5",
+            "length": "12"
+          },
+          "targets": [
+            "Base_plate"
+          ]
+        },
+        {
+          "id": "op_011",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              70.0,
+              60.0,
+              0
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "4.5",
+            "length": "12"
+          },
+          "targets": [
+            "Base_plate"
+          ]
+        },
+        {
+          "id": "A1_housing",
+          "action": "vendor_component",
+          "body": "A1_housing",
+          "actuator": "A1",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              75
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A1_housing_plate",
+          "action": "mount_plate",
+          "body": "A1_housing_plate",
+          "actuator": "A1",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              75
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "outer_radius_mm": 33.5,
+          "clearance_radius_mm": 18.2,
+          "thickness_mm": "x4_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J1_mount_post_0",
+          "action": "create",
+          "body": "J1_mount_post_0",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              31.0,
+              0,
+              12
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 60
+          }
+        },
+        {
+          "id": "J1_mount_post_1",
+          "action": "create",
+          "body": "J1_mount_post_1",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              31.0,
+              12
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 60
+          }
+        },
+        {
+          "id": "J1_mount_post_2",
+          "action": "create",
+          "body": "J1_mount_post_2",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -31.0,
+              0,
+              12
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 60
+          }
+        },
+        {
+          "id": "J1_mount_post_3",
+          "action": "create",
+          "body": "J1_mount_post_3",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -31.0,
+              12
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 60
+          }
+        }
+      ]
+    },
+    {
+      "id": "L1_Turret",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          119,
+          145,
+          170
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_016",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -41.0,
+              -47.0,
+              "75 + x4_plate_t"
+            ],
+            "size": [
+              "82",
+              "94",
+              "26 - x4_plate_t"
+            ]
+          },
+          "body": "Shoulder_crossmember",
+          "role": "structure"
+        },
+        {
+          "id": "op_017",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -32.0,
+              -48.0,
+              96.0
+            ],
+            "size": [
+              "64",
+              "12",
+              "shoulder_z - 96"
+            ]
+          },
+          "body": "Shoulder_cheek_L",
+          "role": "structure"
+        },
+        {
+          "id": "op_018",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -48.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "32",
+            "length": "12"
+          },
+          "targets": [
+            "Shoulder_cheek_L"
+          ]
+        },
+        {
+          "id": "op_019",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -48.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "27.5",
+            "length": "12"
+          },
+          "targets": [
+            "Shoulder_cheek_L"
+          ]
+        },
+        {
+          "id": "op_020",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -32.0,
+              36.0,
+              96.0
+            ],
+            "size": [
+              "64",
+              "12",
+              "shoulder_z - 96"
+            ]
+          },
+          "body": "Shoulder_cheek_R",
+          "role": "structure"
+        },
+        {
+          "id": "op_021",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              36.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "32",
+            "length": "12"
+          },
+          "targets": [
+            "Shoulder_cheek_R"
+          ]
+        },
+        {
+          "id": "op_022",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              36.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "27.5",
+            "length": "12"
+          },
+          "targets": [
+            "Shoulder_cheek_R"
+          ]
+        },
+        {
+          "id": "A1_output",
+          "action": "vendor_component",
+          "body": "A1_output",
+          "actuator": "A1",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              75
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A1_output_plate",
+          "action": "mount_plate",
+          "body": "A1_output_plate",
+          "actuator": "A1",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              75
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              1,
+              0,
+              0
+            ]
+          },
+          "outer_radius_mm": 17.5,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x4_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "A2_housing",
+          "action": "vendor_component",
+          "body": "A2_housing",
+          "actuator": "A2",
+          "part": "RMD-X6-P20-60-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              -52,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A2_housing_plate",
+          "action": "mount_plate",
+          "body": "A2_housing_plate",
+          "actuator": "A2",
+          "part": "RMD-X6-P20-60-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              -52,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 46,
+          "clearance_radius_mm": 27.2,
+          "thickness_mm": "x6_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J1_output_coupler",
+          "action": "create",
+          "body": "J1_output_coupler",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "75 + x4_plate_t"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 20,
+            "length": "21 - x4_plate_t"
+          }
+        },
+        {
+          "id": "J1_coupler_bore",
+          "action": "subtract",
+          "targets": [
+            "J1_output_coupler"
+          ],
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              79
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 6,
+            "length": 17
+          }
+        },
+        {
+          "id": "C_scene",
+          "action": "camera",
+          "purpose": "awareness",
+          "status": "provisional",
+          "manufacturing_released": false,
+          "part": null,
+          "frame": {
+            "origin": [
+              -35,
+              -45,
+              "shoulder_z + 100"
+            ],
+            "axis": [
+              0.8,
+              0,
+              -0.6
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "body_size_mm": [
+            "cam_scene_body_w",
+            "cam_scene_body_h",
+            "cam_scene_body_d"
+          ],
+          "lens": {
+            "radius_mm": "cam_scene_lens_r",
+            "length_mm": "cam_scene_lens_l"
+          },
+          "mount_boxes": [
+            {
+              "origin": [
+                -65,
+                -45,
+                96
+              ],
+              "size": [
+                40,
+                10,
+                6
+              ]
+            },
+            {
+              "origin": [
+                -65,
+                -45,
+                102
+              ],
+              "size": [
+                10,
+                10,
+                "shoulder_z + 106 - 102"
+              ]
+            }
+          ],
+          "view": {
+            "kind": "illustrative_circular_cone",
+            "range_mm": "cam_scene_range",
+            "far_radius_mm": "cam_scene_far_r",
+            "opacity": 0.1,
+            "occlusion_checked": false
+          },
+          "color": [
+            35,
+            110,
+            230
+          ],
+          "connection": {
+            "controller": "arm_controller",
+            "route_links": [
+              "L0_Base",
+              "L1_Turret"
+            ],
+            "interface": null,
+            "cable": null,
+            "strain_relief": null,
+            "max_frame_age_ms": null
+          },
+          "aim_note": "Broad illustrative view outward and downward from the J1 turret; rotates with J1, not with shoulder pitch."
+        }
+      ]
+    },
+    {
+      "id": "L2_UpperArm",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          204,
+          213,
+          221
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_027",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              "-52 + x6_plate_t",
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20",
+            "length": "104 - x6_plate_t"
+          },
+          "body": "J2_rotating_hub",
+          "role": "structure"
+        },
+        {
+          "id": "op_028",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -52.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "9",
+            "length": "104"
+          },
+          "targets": [
+            "J2_rotating_hub"
+          ]
+        },
+        {
+          "id": "op_029",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -25.0,
+              -34.0,
+              "shoulder_z"
+            ],
+            "size": [
+              "50",
+              "plate_t",
+              "upper_len"
+            ]
+          },
+          "body": "Upper_plate_L",
+          "role": "structure"
+        },
+        {
+          "id": "op_030",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "25",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_L"
+          ]
+        },
+        {
+          "id": "op_031",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "25",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_L"
+          ]
+        },
+        {
+          "id": "op_032",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_L"
+          ]
+        },
+        {
+          "id": "op_033",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20.5",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_L"
+          ]
+        },
+        {
+          "id": "op_034",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -25.0,
+              28.0,
+              "shoulder_z"
+            ],
+            "size": [
+              "50",
+              "plate_t",
+              "upper_len"
+            ]
+          },
+          "body": "Upper_plate_R",
+          "role": "structure"
+        },
+        {
+          "id": "op_035",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              28.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "25",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_R"
+          ]
+        },
+        {
+          "id": "op_036",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              28.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "25",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_R"
+          ]
+        },
+        {
+          "id": "op_037",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              28.0,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_R"
+          ]
+        },
+        {
+          "id": "op_038",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              28.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20.5",
+            "length": "plate_t"
+          },
+          "targets": [
+            "Upper_plate_R"
+          ]
+        },
+        {
+          "id": "op_039",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -20.0,
+              -28.0,
+              "shoulder_z + 38"
+            ],
+            "size": [
+              "40",
+              "56",
+              "12"
+            ]
+          },
+          "body": "Upper_crossmember_1",
+          "role": "structure"
+        },
+        {
+          "id": "op_040",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -20.0,
+              -28.0,
+              "elbow_z - 38"
+            ],
+            "size": [
+              "40",
+              "56",
+              "12"
+            ]
+          },
+          "body": "Upper_crossmember_2",
+          "role": "structure"
+        },
+        {
+          "id": "UMR",
+          "action": "label",
+          "text": "UMR",
+          "origin": [
+            12,
+            -34,
+            "shoulder_z + upper_len/2"
+          ],
+          "u_axis": [
+            0,
+            0,
+            1
+          ],
+          "v_axis": [
+            -1,
+            0,
+            0
+          ],
+          "height": 24,
+          "depth": 0.8,
+          "tracking": 2,
+          "color": [
+            15,
+            45,
+            75
+          ]
+        },
+        {
+          "id": "A2_output",
+          "action": "vendor_component",
+          "body": "A2_output",
+          "actuator": "A2",
+          "part": "RMD-X6-P20-60-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              -52,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A2_output_plate",
+          "action": "mount_plate",
+          "body": "A2_output_plate",
+          "actuator": "A2",
+          "part": "RMD-X6-P20-60-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              -52,
+              "shoulder_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 26.5,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x6_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "A3_housing",
+          "action": "vendor_component",
+          "body": "A3_housing",
+          "actuator": "A3",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              "34 + x4_elbow_mount_extra",
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A3_housing_plate",
+          "action": "mount_plate",
+          "body": "A3_housing_plate",
+          "actuator": "A3",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              "34 + x4_elbow_mount_extra",
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 33.5,
+          "clearance_radius_mm": 20.7,
+          "thickness_mm": "x4_plate_t",
+          "manufacturing_released": false
+        }
+      ]
+    },
+    {
+      "id": "L3_Elbow",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          124,
+          154,
+          176
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_047",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20",
+            "length": "68 + x4_elbow_mount_extra - x4_plate_t"
+          },
+          "body": "J3_rotating_hub",
+          "role": "structure"
+        },
+        {
+          "id": "op_048",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -34.0,
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "9",
+            "length": "68"
+          },
+          "targets": [
+            "J3_rotating_hub"
+          ]
+        },
+        {
+          "id": "op_049",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -22.0,
+              -21.0,
+              "elbow_z + 5"
+            ],
+            "size": [
+              "44",
+              "42",
+              "15"
+            ]
+          },
+          "body": "Forearm_root",
+          "role": "structure"
+        },
+        {
+          "id": "op_093",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "roll_z - 14"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "20.5",
+            "length": "8"
+          },
+          "targets": [
+            "Forearm_root"
+          ]
+        },
+        {
+          "id": "A3_output",
+          "action": "vendor_component",
+          "body": "A3_output",
+          "actuator": "A3",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              "34 + x4_elbow_mount_extra",
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A3_output_plate",
+          "action": "mount_plate",
+          "body": "A3_output_plate",
+          "actuator": "A3",
+          "part": "RMD-X4-P36-36-E-L",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              "34 + x4_elbow_mount_extra",
+              "elbow_z"
+            ],
+            "axis": [
+              0,
+              -1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 17.5,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x4_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "A4_housing",
+          "action": "vendor_component",
+          "body": "A4_housing",
+          "actuator": "A4",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "roll_z + 24"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A4_housing_plate",
+          "action": "mount_plate",
+          "body": "A4_housing_plate",
+          "actuator": "A4",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "roll_z + 24"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "outer_radius_mm": 32,
+          "clearance_radius_mm": 16,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J4_mount_post_0",
+          "action": "create",
+          "body": "J4_mount_post_0",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              21,
+              19.5,
+              "elbow_z + 20"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 62
+          }
+        },
+        {
+          "id": "J4_mount_post_1",
+          "action": "create",
+          "body": "J4_mount_post_1",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -21,
+              19.5,
+              "elbow_z + 20"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 62
+          }
+        },
+        {
+          "id": "J4_mount_post_2",
+          "action": "create",
+          "body": "J4_mount_post_2",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -21,
+              -19.5,
+              "elbow_z + 20"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 62
+          }
+        },
+        {
+          "id": "J4_mount_post_3",
+          "action": "create",
+          "body": "J4_mount_post_3",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              21,
+              -19.5,
+              "elbow_z + 20"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 62
+          }
+        }
+      ]
+    },
+    {
+      "id": "L4_ForearmRoll",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          209,
+          217,
+          223
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_058",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "roll_z + 30"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "24",
+            "length": "wrist_z - roll_z - 50"
+          },
+          "body": "Forearm_tube",
+          "role": "structure"
+        },
+        {
+          "id": "op_059",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "roll_z + 30"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "19",
+            "length": "wrist_z - roll_z - 50"
+          },
+          "targets": [
+            "Forearm_tube"
+          ]
+        },
+        {
+          "id": "op_060",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -24.0,
+              -32.0,
+              "wrist_z - 24"
+            ],
+            "size": [
+              "48",
+              "64",
+              "14"
+            ]
+          },
+          "body": "Wrist_yoke_bridge",
+          "role": "structure"
+        },
+        {
+          "id": "op_061",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -21.0,
+              -32.0,
+              "wrist_z - 25"
+            ],
+            "size": [
+              "42",
+              "8",
+              "25"
+            ]
+          },
+          "body": "Wrist_cheek_L",
+          "role": "structure"
+        },
+        {
+          "id": "op_062",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -32.0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "21",
+            "length": "8"
+          },
+          "targets": [
+            "Wrist_cheek_L"
+          ]
+        },
+        {
+          "id": "op_063",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -32.0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "16.5",
+            "length": "8"
+          },
+          "targets": [
+            "Wrist_cheek_L"
+          ]
+        },
+        {
+          "id": "op_064",
+          "action": "create",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -21.0,
+              24.0,
+              "wrist_z - 25"
+            ],
+            "size": [
+              "42",
+              "8",
+              "25"
+            ]
+          },
+          "body": "Wrist_cheek_R",
+          "role": "structure"
+        },
+        {
+          "id": "op_065",
+          "action": "union",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              24.0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "21",
+            "length": "8"
+          },
+          "targets": [
+            "Wrist_cheek_R"
+          ]
+        },
+        {
+          "id": "op_066",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              24.0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "12",
+            "length": "8"
+          },
+          "targets": [
+            "Wrist_cheek_R"
+          ]
+        },
+        {
+          "id": "op_094",
+          "action": "translate",
+          "targets": [
+            "Wrist_yoke_bridge"
+          ],
+          "vector": [
+            "0",
+            "0",
+            "-18"
+          ]
+        },
+        {
+          "id": "op_097",
+          "action": "union",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -21.0,
+              -32.0,
+              "wrist_z - 32"
+            ],
+            "size": [
+              "42",
+              "8",
+              "20"
+            ]
+          },
+          "targets": [
+            "Wrist_cheek_L"
+          ]
+        },
+        {
+          "id": "op_098",
+          "action": "union",
+          "primitive": {
+            "kind": "box",
+            "origin": [
+              -21.0,
+              24.0,
+              "wrist_z - 32"
+            ],
+            "size": [
+              "42",
+              "8",
+              "20"
+            ]
+          },
+          "targets": [
+            "Wrist_cheek_R"
+          ]
+        },
+        {
+          "id": "A4_output",
+          "action": "vendor_component",
+          "body": "A4_output",
+          "actuator": "A4",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "roll_z + 24"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A4_output_plate",
+          "action": "mount_plate",
+          "body": "A4_output_plate",
+          "actuator": "A4",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "roll_z + 24"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "outer_radius_mm": 15.7,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "A5_housing",
+          "action": "vendor_component",
+          "body": "A5_housing",
+          "actuator": "A5",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              "-32 - x2_wrist_mount_extra",
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A5_housing_plate",
+          "action": "mount_plate",
+          "body": "A5_housing_plate",
+          "actuator": "A5",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              "-32 - x2_wrist_mount_extra",
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 28,
+          "clearance_radius_mm": 16,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J4_output_coupler",
+          "action": "create",
+          "body": "J4_output_coupler",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "roll_z + 24 + x2_plate_t"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 24,
+            "length": "14 - x2_plate_t"
+          }
+        },
+        {
+          "id": "J4_coupler_bore",
+          "action": "subtract",
+          "targets": [
+            "J4_output_coupler"
+          ],
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "roll_z + 28"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 6,
+            "length": 10
+          }
+        },
+        {
+          "id": "J5_left_clearance_final",
+          "action": "subtract",
+          "targets": [
+            "Wrist_cheek_L"
+          ],
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -32,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "radius": 16.5,
+            "length": 8
+          }
+        }
+      ]
+    },
+    {
+      "id": "L5_WristPitch",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          124,
+          154,
+          176
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_071",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              "-32 - x2_wrist_mount_extra + x2_plate_t",
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "11.5",
+            "length": "64 + x2_wrist_mount_extra - x2_plate_t"
+          },
+          "body": "J5_pitch_axle",
+          "role": "structure"
+        },
+        {
+          "id": "op_072",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -22.0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1.0,
+              0
+            ],
+            "radius": "20",
+            "length": "44"
+          },
+          "body": "Wrist_pitch_hub",
+          "role": "structure"
+        },
+        {
+          "id": "op_073",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "14",
+            "length": "30"
+          },
+          "body": "Wrist_neck",
+          "role": "structure"
+        },
+        {
+          "id": "A5_output",
+          "action": "vendor_component",
+          "body": "A5_output",
+          "actuator": "A5",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              "-32 - x2_wrist_mount_extra",
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          }
+        },
+        {
+          "id": "A5_output_plate",
+          "action": "mount_plate",
+          "body": "A5_output_plate",
+          "actuator": "A5",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              "-32 - x2_wrist_mount_extra",
+              "wrist_z"
+            ],
+            "axis": [
+              0,
+              1,
+              0
+            ],
+            "x": [
+              0,
+              0,
+              -1
+            ]
+          },
+          "outer_radius_mm": 15.7,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "A6_housing",
+          "action": "vendor_component",
+          "body": "A6_housing",
+          "actuator": "A6",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "flange_z + 10"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A6_housing_plate",
+          "action": "mount_plate",
+          "body": "A6_housing_plate",
+          "actuator": "A6",
+          "part": "RMD-X2-P28-7-E",
+          "section": "housing",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "flange_z + 10"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "outer_radius_mm": 29,
+          "clearance_radius_mm": 16,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J6_rear_support",
+          "action": "create",
+          "body": "J6_rear_support",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "wrist_z + 30"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 29,
+            "length": 6.5
+          }
+        },
+        {
+          "id": "J6_rear_support_bore",
+          "action": "subtract",
+          "targets": [
+            "J6_rear_support"
+          ],
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "wrist_z + 30"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 9,
+            "length": 6.5
+          }
+        },
+        {
+          "id": "J6_mount_post_0",
+          "action": "create",
+          "body": "J6_mount_post_0",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              26,
+              0,
+              "wrist_z + 34"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 64
+          }
+        },
+        {
+          "id": "J6_mount_post_1",
+          "action": "create",
+          "body": "J6_mount_post_1",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              26,
+              "wrist_z + 34"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 64
+          }
+        },
+        {
+          "id": "J6_mount_post_2",
+          "action": "create",
+          "body": "J6_mount_post_2",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -26,
+              0,
+              "wrist_z + 34"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 64
+          }
+        },
+        {
+          "id": "J6_mount_post_3",
+          "action": "create",
+          "body": "J6_mount_post_3",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -26,
+              "wrist_z + 34"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 2.5,
+            "length": 64
+          }
+        }
+      ]
+    },
+    {
+      "id": "L6_BareFlange",
+      "grounded": false,
+      "appearance": {
+        "color": [
+          199,
+          153,
+          73
+        ],
+        "name": "Custom",
+        "opacity": 1.0
+      },
+      "recipe": [
+        {
+          "id": "op_080",
+          "action": "create",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "flange_z + 18"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "25",
+            "length": "8"
+          },
+          "body": "Bare_tool_flange",
+          "role": "interface"
+        },
+        {
+          "id": "op_081",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "flange_z + 14"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "6",
+            "length": "12"
+          },
+          "targets": [
+            "Bare_tool_flange"
+          ]
+        },
+        {
+          "id": "op_082",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              18.0,
+              0,
+              "flange_z + 18"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "2.2",
+            "length": "8"
+          },
+          "targets": [
+            "Bare_tool_flange"
+          ]
+        },
+        {
+          "id": "op_083",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              18.0,
+              "flange_z + 18"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "2.2",
+            "length": "8"
+          },
+          "targets": [
+            "Bare_tool_flange"
+          ]
+        },
+        {
+          "id": "op_084",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              -18.0,
+              0,
+              "flange_z + 18"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "2.2",
+            "length": "8"
+          },
+          "targets": [
+            "Bare_tool_flange"
+          ]
+        },
+        {
+          "id": "op_085",
+          "action": "subtract",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              -18.0,
+              "flange_z + 18"
+            ],
+            "axis": [
+              0,
+              0,
+              1.0
+            ],
+            "radius": "2.2",
+            "length": "8"
+          },
+          "targets": [
+            "Bare_tool_flange"
+          ]
+        },
+        {
+          "id": "A6_output",
+          "action": "vendor_component",
+          "body": "A6_output",
+          "actuator": "A6",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "flange_z + 10"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          }
+        },
+        {
+          "id": "A6_output_plate",
+          "action": "mount_plate",
+          "body": "A6_output_plate",
+          "actuator": "A6",
+          "part": "RMD-X2-P28-7-E",
+          "section": "output",
+          "frame": {
+            "origin": [
+              0,
+              0,
+              "flange_z + 10"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "outer_radius_mm": 15.7,
+          "clearance_radius_mm": 6,
+          "thickness_mm": "x2_plate_t",
+          "manufacturing_released": false
+        },
+        {
+          "id": "J6_output_coupler",
+          "action": "create",
+          "body": "J6_output_coupler",
+          "role": "structure",
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "flange_z + 10 + x2_plate_t"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 14,
+            "length": "16 - x2_plate_t"
+          }
+        },
+        {
+          "id": "J6_coupler_bore",
+          "action": "subtract",
+          "targets": [
+            "J6_output_coupler"
+          ],
+          "primitive": {
+            "kind": "cylinder",
+            "origin": [
+              0,
+              0,
+              "flange_z + 14"
+            ],
+            "axis": [
+              0,
+              0,
+              1
+            ],
+            "radius": 6,
+            "length": 12
+          }
+        },
+        {
+          "id": "C_tip",
+          "action": "camera",
+          "purpose": "tip",
+          "status": "provisional",
+          "manufacturing_released": false,
+          "part": null,
+          "frame": {
+            "origin": [
+              "cam_tip_offset_x",
+              0,
+              "flange_z + cam_tip_front_z"
+            ],
+            "axis": [
+              -0.4472135954999579,
+              0,
+              0.8944271909999159
+            ],
+            "x": [
+              0,
+              1,
+              0
+            ]
+          },
+          "body_size_mm": [
+            "cam_tip_body_w",
+            "cam_tip_body_h",
+            "cam_tip_body_d"
+          ],
+          "lens": {
+            "radius_mm": "cam_tip_lens_r",
+            "length_mm": "cam_tip_lens_l"
+          },
+          "mount_boxes": [
+            {
+              "origin": [
+                18,
+                -6,
+                "flange_z + 20"
+              ],
+              "size": [
+                "cam_tip_offset_x - 12",
+                12,
+                6
+              ]
+            },
+            {
+              "origin": [
+                "cam_tip_offset_x",
+                -6,
+                "flange_z + 26"
+              ],
+              "size": [
+                6,
+                12,
+                "cam_tip_front_z - 26"
+              ]
+            }
+          ],
+          "view": {
+            "kind": "illustrative_circular_cone",
+            "range_mm": "cam_tip_range",
+            "far_radius_mm": "cam_tip_far_r",
+            "opacity": 0.18,
+            "occlusion_checked": false
+          },
+          "color": [
+            0,
+            155,
+            160
+          ],
+          "connection": {
+            "controller": "arm_controller",
+            "route_links": [
+              "L0_Base",
+              "L1_Turret",
+              "L2_UpperArm",
+              "L3_Elbow",
+              "L4_ForearmRoll",
+              "L5_WristPitch",
+              "L6_BareFlange"
+            ],
+            "interface": null,
+            "cable": null,
+            "strain_relief": null,
+            "max_frame_age_ms": null
+          },
+          "aim_note": "Aims at an illustrative tip on the tool axis 128 mm beyond the bare flange; no pipette or calibrated TCP is modeled."
+        }
+      ]
+    }
+  ],
+  "joints": [
+    {
+      "id": "J1_BaseYaw",
+      "kind": "revolute",
+      "parent": "L0_Base",
+      "child": "L1_Turret",
+      "frame": {
+        "origin": [
+          0,
+          0,
+          60
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ]
+      },
+      "home_deg": 20.0,
+      "limits_deg": [
+        -160.0,
+        160.0
+      ]
+    },
+    {
+      "id": "J2_Shoulder",
+      "kind": "revolute",
+      "parent": "L1_Turret",
+      "child": "L2_UpperArm",
+      "frame": {
+        "origin": [
+          0,
+          52,
+          "shoulder_z"
+        ],
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "x": [
+          0,
+          0,
+          -1
+        ]
+      },
+      "home_deg": 35.0,
+      "limits_deg": [
+        -70.0,
+        100.0
+      ]
+    },
+    {
+      "id": "J3_Elbow",
+      "kind": "revolute",
+      "parent": "L2_UpperArm",
+      "child": "L3_Elbow",
+      "frame": {
+        "origin": [
+          0,
+          34,
+          "elbow_z"
+        ],
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "x": [
+          0,
+          0,
+          -1
+        ]
+      },
+      "home_deg": 65.0,
+      "limits_deg": [
+        -135.0,
+        135.0
+      ]
+    },
+    {
+      "id": "J4_ForearmRoll",
+      "kind": "revolute",
+      "parent": "L3_Elbow",
+      "child": "L4_ForearmRoll",
+      "frame": {
+        "origin": [
+          0,
+          0,
+          "roll_z + 24"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          0,
+          1,
+          0
+        ]
+      },
+      "home_deg": 0.0,
+      "limits_deg": [
+        -170.0,
+        170.0
+      ]
+    },
+    {
+      "id": "J5_WristPitch",
+      "kind": "revolute",
+      "parent": "L4_ForearmRoll",
+      "child": "L5_WristPitch",
+      "frame": {
+        "origin": [
+          0,
+          32,
+          "wrist_z"
+        ],
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "x": [
+          0,
+          0,
+          -1
+        ]
+      },
+      "home_deg": 80.0,
+      "limits_deg": [
+        -110.0,
+        110.0
+      ]
+    },
+    {
+      "id": "J6_FlangeRoll",
+      "kind": "revolute",
+      "parent": "L5_WristPitch",
+      "child": "L6_BareFlange",
+      "frame": {
+        "origin": [
+          0,
+          0,
+          "flange_z + 10"
+        ],
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          0,
+          1,
+          0
+        ]
+      },
+      "home_deg": 15.0,
+      "limits_deg": [
+        -170.0,
+        170.0
+      ]
+    }
+  ],
+  "body_appearances": {},
+  "flange_reference": {
+    "link": "L6_BareFlange",
+    "point": [
+      0,
+      0,
+      "flange_z + 26"
+    ]
+  },
+  "profiles": {
+    "motion": {
+      "collision_geometry": "native recipe solids and simplified registered vendor exterior solids",
+      "tooth_contact": false,
+      "fluid_physics": false,
+      "notes": "Six selected integrated servos, separate vendor housings/output flanges, parametric concept motor plates. No payload or precision qualification.",
+      "services": {
+        "topology_audit": true,
+        "physical_cable_checks": false,
+        "notes": "Hidden servo and wiring requirements remain in the source; no flexible cable geometry or physics is generated."
+      }
+    }
+  },
+  "scenarios": [
+    {
+      "id": "base_sweep_return",
+      "profile": "motion",
+      "interpolation": "joint_linear",
+      "steps": [
+        {
+          "id": "home",
+          "duration_s": 0,
+          "joints_deg": {
+            "J1_BaseYaw": 20.0,
+            "J2_Shoulder": 35.0,
+            "J3_Elbow": 65.0,
+            "J4_ForearmRoll": 0.0,
+            "J5_WristPitch": 80.0,
+            "J6_FlangeRoll": 15.0
+          }
+        },
+        {
+          "id": "sweep",
+          "duration_s": 2,
+          "joints_deg": {
+            "J1_BaseYaw": 25.0,
+            "J2_Shoulder": 35.0,
+            "J3_Elbow": 65.0,
+            "J4_ForearmRoll": 0.0,
+            "J5_WristPitch": 80.0,
+            "J6_FlangeRoll": 15.0
+          }
+        },
+        {
+          "id": "return",
+          "duration_s": 2,
+          "joints_deg": {
+            "J1_BaseYaw": 20.0,
+            "J2_Shoulder": 35.0,
+            "J3_Elbow": 65.0,
+            "J4_ForearmRoll": 0.0,
+            "J5_WristPitch": 80.0,
+            "J6_FlangeRoll": 15.0
+          }
+        }
+      ],
+      "checks": {
+        "joint_limits": true,
+        "sampled_collision_step_deg": 1,
+        "full_motion_envelope": false
+      }
+    }
+  ],
+  "provenance": {
+    "migrated_from": "cad/Laborarm_6R_Konzept_A01.solidcraft",
+    "sha256": "739ec28d5fcd9882cf90bce4efd76b89d055a8c0a1a71901976c7698aece10fc"
+  },
+  "limitations": [
+    "Selected vendor drives represented; no load, stiffness, precision or safety qualification",
+    "No pipette adapter; generic flange only",
+    "No tooth contact or fluid simulation",
+    "Sampled collision checking is not continuous collision checking",
+    "Selected servo geometry and cable requirements modeled; physical wiring and measured feedback unverified",
+    "Selected vendor servos integrated as concept geometry; X6 drawing callout assignment corrected; housing 10 x M3 plus two locating sleeves, output 12 x M4; physical qualification remains open.",
+    "J3 uses direct integrated actuator; prior remote belt-drive concept removed.",
+    "Distal J6 package extended by 40 mm; generic flange reference now flange_z + 26 mm.",
+    "Two provisional unselected camera envelopes and mounts; circular viewing cones are visual guides only, not physical collision bodies or verified optical coverage. Camera wiring and calibration remain unresolved.",
+    "X2/X4/X6 plates have calculated nominal screw stacks and locating fits. Own X2/X4 round/relieved pins, press retention, vendor bore pitch, usable threads, preload and strength remain unqualified; X6 housing thread-depth datum still requires confirmation."
+  ],
+  "services": {
+    "format": "solidcraftbot.services/1",
+    "status": "requirements_and_concept_topology",
+    "controller": {
+      "id": "arm_controller",
+      "mounted_link": "L0_Base"
+    },
+    "actuators": [
+      {
+        "id": "A1",
+        "joint": "J1_BaseYaw",
+        "mounted_link": "L0_Base",
+        "envelope_body": "A1_housing",
+        "kind": "servo",
+        "part": "RMD-X4-P36-36-E-L",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 36,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      },
+      {
+        "id": "A2",
+        "joint": "J2_Shoulder",
+        "mounted_link": "L1_Turret",
+        "envelope_body": "A2_housing",
+        "kind": "servo",
+        "part": "RMD-X6-P20-60-E",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 19.612,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      },
+      {
+        "id": "A3",
+        "joint": "J3_Elbow",
+        "mounted_link": "L2_UpperArm",
+        "envelope_body": "A3_housing",
+        "kind": "servo",
+        "part": "RMD-X4-P36-36-E-L",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 36,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      },
+      {
+        "id": "A4",
+        "joint": "J4_ForearmRoll",
+        "mounted_link": "L3_Elbow",
+        "envelope_body": "A4_housing",
+        "kind": "servo",
+        "part": "RMD-X2-P28-7-E",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 28.17,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      },
+      {
+        "id": "A5",
+        "joint": "J5_WristPitch",
+        "mounted_link": "L4_ForearmRoll",
+        "envelope_body": "A5_housing",
+        "kind": "servo",
+        "part": "RMD-X2-P28-7-E",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 28.17,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      },
+      {
+        "id": "A6",
+        "joint": "J6_FlangeRoll",
+        "mounted_link": "L5_WristPitch",
+        "envelope_body": "A6_housing",
+        "kind": "servo",
+        "part": "RMD-X2-P28-7-E",
+        "command_interfaces": [
+          "position"
+        ],
+        "required_feedback": [
+          "measured_position",
+          "sample_time",
+          "fault_status"
+        ],
+        "feedback": {
+          "measurement_location": null,
+          "position_reference": null,
+          "period_ms": null,
+          "max_sample_age_ms": null,
+          "latency_ms": null
+        },
+        "transmission": {
+          "motor_revolutions_per_joint_revolution": 28.17,
+          "direction": null,
+          "joint_zero_offset_deg": null
+        }
+      }
+    ],
+    "harness": {
+      "topology": "logical_connections_physical_topology_unselected",
+      "render_in_motion": false,
+      "flexible_dynamics": false,
+      "circuits": [
+        {
+          "id": "C1",
+          "source": "arm_controller",
+          "target": "A1",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 24,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        },
+        {
+          "id": "C2",
+          "source": "arm_controller",
+          "target": "A2",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base",
+            "L1_Turret"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 48,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        },
+        {
+          "id": "C3",
+          "source": "arm_controller",
+          "target": "A3",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base",
+            "L1_Turret",
+            "L2_UpperArm"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 24,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        },
+        {
+          "id": "C4",
+          "source": "arm_controller",
+          "target": "A4",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base",
+            "L1_Turret",
+            "L2_UpperArm",
+            "L3_Elbow"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 24,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        },
+        {
+          "id": "C5",
+          "source": "arm_controller",
+          "target": "A5",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base",
+            "L1_Turret",
+            "L2_UpperArm",
+            "L3_Elbow",
+            "L4_ForearmRoll"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 24,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        },
+        {
+          "id": "C6",
+          "source": "arm_controller",
+          "target": "A6",
+          "signals": [
+            "power",
+            "command",
+            "position_feedback",
+            "fault_status"
+          ],
+          "route_links": [
+            "L0_Base",
+            "L1_Turret",
+            "L2_UpperArm",
+            "L3_Elbow",
+            "L4_ForearmRoll",
+            "L5_WristPitch"
+          ],
+          "cable": {
+            "part": null,
+            "outer_diameter_mm": null,
+            "installed_length_mm": null,
+            "minimum_dynamic_bend_radius_mm": null,
+            "maximum_torsion_deg_per_m": null,
+            "linear_mass_g_per_m": null
+          },
+          "routing": {
+            "guide_points": null,
+            "clamps_and_strain_relief": null,
+            "service_slack_mm": null,
+            "clearance_mm": null
+          },
+          "electrical": {
+            "voltage_v": 24,
+            "peak_current_a": null,
+            "protocol": "EtherCAT preferred; firmware/PDO confirmation pending",
+            "connector": null,
+            "shielding": null
+          }
+        }
+      ],
+      "joint_passages": [
+        {
+          "joint": "J1_BaseYaw",
+          "scheme": null,
+          "neutral_deg": null,
+          "allowed_limits_deg": null
+        },
+        {
+          "joint": "J2_Shoulder",
+          "scheme": null,
+          "neutral_deg": null,
+          "allowed_limits_deg": null
+        },
+        {
+          "joint": "J3_Elbow",
+          "scheme": null,
+          "neutral_deg": null,
+          "allowed_limits_deg": null
+        },
+        {
+          "joint": "J4_ForearmRoll",
+          "scheme": null,
+          "neutral_deg": null,
+          "allowed_limits_deg": null
+        },
+        {
+          "joint": "J5_WristPitch",
+          "scheme": null,
+          "neutral_deg": null,
+          "allowed_limits_deg": null
+        }
+      ]
+    }
+  },
+  "vendor_library": {
+    "path": "cad/vendor/myactuator/component-library.json",
+    "sha256": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78"
+  }
+}

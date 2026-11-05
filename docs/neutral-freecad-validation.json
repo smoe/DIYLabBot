@@ -1,0 +1,428 @@
+{
+  "spec_sha256": "99b72d8ff5554c2715ea6c376066ff1ad5a51baec4cad18e03786bbf8293ab67",
+  "backend": "FreeCAD native primitives and booleans; no STEP import",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "geometry": [
+    {
+      "body": "J1_pedestal",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 3.9135976466156895e-14,
+      "relative_volume_error": 4.896056733464479e-05
+    },
+    {
+      "body": "J1_lower_bearing_envelope",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 4.7125639799533896e-14,
+      "relative_volume_error": 2.4882210248922076e-05
+    },
+    {
+      "body": "Base_plate",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 3.39313048500929e-15,
+      "relative_volume_error": 1.4807283572774439e-06
+    },
+    {
+      "body": "J1_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "J1_rotating_table",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 7.195181160055013e-14,
+      "relative_volume_error": 4.828862221339306e-05
+    },
+    {
+      "body": "Shoulder_crossmember",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 1.7162706076764225e-16
+    },
+    {
+      "body": "Shoulder_cheek_L",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.00034365140076248824,
+      "relative_volume_error": 1.6559894090705645e-05
+    },
+    {
+      "body": "Shoulder_cheek_R",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0003436514008188264,
+      "relative_volume_error": 1.655989409167724e-05
+    },
+    {
+      "body": "J2_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "J2_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.434363703726621e-14,
+      "relative_volume_error": 4.949512534788324e-05
+    },
+    {
+      "body": "J2_rotating_hub",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 8.610330648770403e-14,
+      "relative_volume_error": 9.932287603993104e-05
+    },
+    {
+      "body": "Upper_plate_L",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.00011681333759839554,
+      "relative_volume_error": 6.253207938424231e-06
+    },
+    {
+      "body": "Upper_plate_R",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.00011681333759839552,
+      "relative_volume_error": 6.253207938811799e-06
+    },
+    {
+      "body": "Upper_crossmember_1",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 3.552713678800501e-15,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "Upper_crossmember_2",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 3.552713678800501e-15,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "J3_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.0830239518728914e-14,
+      "relative_volume_error": 6.851924404040575e-05
+    },
+    {
+      "body": "J3_belt_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 1.7647241363530016e-16
+    },
+    {
+      "body": "J3_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 1.6498770100189175e-16
+    },
+    {
+      "body": "J3_motor_bracket",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 2.0670334131202914e-16
+    },
+    {
+      "body": "J3_rotating_hub",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.2454473137165305e-13,
+      "relative_volume_error": 9.932287603089508e-05
+    },
+    {
+      "body": "J4_bearing_housing",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 6.902164029323318e-13,
+      "relative_volume_error": 4.405725433428146e-05
+    },
+    {
+      "body": "J4_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 1.7186218854363724e-16
+    },
+    {
+      "body": "J4_drive_bracket",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 2.842170943040401e-16
+    },
+    {
+      "body": "Forearm_root",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0001712688357429215,
+      "relative_volume_error": 7.824025800965375e-06
+    },
+    {
+      "body": "J4_rotating_shaft",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 4.930125851413331e-13,
+      "relative_volume_error": 9.93228755835049e-05
+    },
+    {
+      "body": "Forearm_tube",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.1432375738339494e-13,
+      "relative_volume_error": 8.689445450191172e-05
+    },
+    {
+      "body": "J5_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.7763568394002505e-15,
+      "relative_volume_error": 1.1600697726695514e-16
+    },
+    {
+      "body": "J5_reducer_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 7.425534060752673e-15,
+      "relative_volume_error": 6.323481138651616e-05
+    },
+    {
+      "body": "Wrist_yoke_bridge",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 7.944109290391274e-15,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "Wrist_cheek_L",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0003176733153711663,
+      "relative_volume_error": 1.6080856460044925e-05
+    },
+    {
+      "body": "Wrist_cheek_R",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.00031767331548277324,
+      "relative_volume_error": 1.6080856461193e-05
+    },
+    {
+      "body": "J5_pitch_axle",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.2162487674844321e-14,
+      "relative_volume_error": 0.0001661312815198859
+    },
+    {
+      "body": "Wrist_pitch_hub",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 6.048974299694201e-15,
+      "relative_volume_error": 0.00011285085731491618
+    },
+    {
+      "body": "Wrist_neck",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.137687351605113e-13,
+      "relative_volume_error": 0.00011285085730622825
+    },
+    {
+      "body": "J6_bearing_housing",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 8.048402420889428e-13,
+      "relative_volume_error": 4.614752440606363e-05
+    },
+    {
+      "body": "J6_motor_ENVELOPE",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 0.0,
+      "relative_volume_error": 0.0
+    },
+    {
+      "body": "J6_output_shaft",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 1.2795947327258147e-12,
+      "relative_volume_error": 0.00010242169907854431
+    },
+    {
+      "body": "Bare_tool_flange",
+      "valid": true,
+      "solids": 1,
+      "com_error_mm": 3.4173600878573755e-12,
+      "relative_volume_error": 8.206955727905774e-06
+    }
+  ],
+  "poses": [
+    {
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 6.916760369016377e-13
+    },
+    {
+      "angles_deg": [
+        25.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 8.556067554929069e-13
+    },
+    {
+      "angles_deg": [
+        20.0,
+        40.0,
+        65.0,
+        0.0,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 9.51172326647424e-13
+    },
+    {
+      "angles_deg": [
+        20.0,
+        35.0,
+        70.0,
+        0.0,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 6.102399809601561e-13
+    },
+    {
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        5.0,
+        80.0,
+        15.0
+      ],
+      "max_probe_error_mm": 9.61414473043922e-13
+    },
+    {
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        85.0,
+        15.0
+      ],
+      "max_probe_error_mm": 9.332756364332379e-13
+    },
+    {
+      "angles_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        20.0
+      ],
+      "max_probe_error_mm": 6.916760369016377e-13
+    }
+  ],
+  "parameter_change": {
+    "upper_len_mm": 220,
+    "max_probe_error_mm": 8.374764262360696e-13,
+    "elbow_anchor_z_mm": 370.0,
+    "wrist_anchor_z_mm": 545.0
+  },
+  "scenarios": [
+    {
+      "id": "base_sweep_return",
+      "samples": [
+        {
+          "step": "home",
+          "time_s": 0.0,
+          "overlaps": []
+        },
+        {
+          "step": "sweep",
+          "time_s": 0.4,
+          "overlaps": []
+        },
+        {
+          "step": "sweep",
+          "time_s": 0.8,
+          "overlaps": []
+        },
+        {
+          "step": "sweep",
+          "time_s": 1.2,
+          "overlaps": []
+        },
+        {
+          "step": "sweep",
+          "time_s": 1.6,
+          "overlaps": []
+        },
+        {
+          "step": "sweep",
+          "time_s": 2.0,
+          "overlaps": []
+        },
+        {
+          "step": "return",
+          "time_s": 2.4,
+          "overlaps": []
+        },
+        {
+          "step": "return",
+          "time_s": 2.8,
+          "overlaps": []
+        },
+        {
+          "step": "return",
+          "time_s": 3.2,
+          "overlaps": []
+        },
+        {
+          "step": "return",
+          "time_s": 3.6,
+          "overlaps": []
+        },
+        {
+          "step": "return",
+          "time_s": 4.0,
+          "overlaps": []
+        }
+      ],
+      "continuous_collision_checked": false
+    }
+  ],
+  "full_motion_envelope_checked": false,
+  "passed": true,
+  "model_sha256": "339f111fcee7ed268f542af0062a8e9a41ce8d1167b6cfaebb836fd9d8397797"
+}

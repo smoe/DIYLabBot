@@ -1,0 +1,542 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolidCraftBot shared robot model v1",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "status",
+    "parameters",
+    "links",
+    "joints",
+    "flange_reference",
+    "profiles",
+    "scenarios",
+    "body_appearances",
+    "limitations",
+    "services"
+  ],
+  "properties": {
+    "mobile_base": {
+      "description": "Optional external mobile assembly; the seven-link/six-axis arm contract stays unchanged",
+      "type": "object",
+      "required": [
+        "source"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/[A-Za-z0-9_.-]+[.]shared[.]json$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "format": {
+      "const": "solidcraftbot.robot/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "time": "s"
+      }
+    },
+    "status": {
+      "const": "concept_not_for_manufacture"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "unit",
+          "expression"
+        ],
+        "properties": {
+          "unit": {
+            "const": "mm"
+          },
+          "expression": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "links": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "grounded",
+          "appearance",
+          "recipe"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "grounded": {
+            "type": "boolean"
+          },
+          "appearance": {
+            "type": "object"
+          },
+          "recipe": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "action"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "action": {
+                  "enum": [
+                    "create",
+                    "subtract",
+                    "union",
+                    "translate",
+                    "label",
+                    "vendor_component",
+                    "mount_plate",
+                    "camera"
+                  ]
+                },
+                "body": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "targets": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  }
+                },
+                "role": {
+                  "enum": [
+                    "structure",
+                    "interface",
+                    "placeholder_envelope",
+                    "marking",
+                    "vendor_housing",
+                    "vendor_output",
+                    "mount_plate",
+                    "camera_envelope",
+                    "camera_mount",
+                    "viewing_cone",
+                    "locating_pin"
+                  ]
+                },
+                "primitive": {
+                  "type": "object",
+                  "required": [
+                    "kind",
+                    "origin"
+                  ],
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "box",
+                        "cylinder",
+                        "polygon_prism",
+                        "vendor_step",
+                        "cone"
+                      ]
+                    },
+                    "origin": {
+                      "type": "array",
+                      "items": {
+                        "type": [
+                          "number",
+                          "string"
+                        ]
+                      },
+                      "minItems": 3,
+                      "maxItems": 3
+                    }
+                  }
+                },
+                "vector": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "text": {
+                  "type": "string",
+                  "pattern": "^[UMR]+$"
+                },
+                "origin": {
+                  "type": "array",
+                  "items": {
+                    "type": [
+                      "number",
+                      "string"
+                    ]
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "u_axis": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "v_axis": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "height": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "depth": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "tracking": {
+                  "type": "number"
+                },
+                "color": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 255
+                  },
+                  "minItems": 3,
+                  "maxItems": 3
+                },
+                "part": {
+                  "type": "string"
+                },
+                "section": {
+                  "enum": [
+                    "housing",
+                    "output"
+                  ]
+                },
+                "actuator": {
+                  "type": "string"
+                },
+                "frame": {
+                  "type": "object",
+                  "required": [
+                    "origin",
+                    "axis",
+                    "x"
+                  ]
+                },
+                "outer_radius_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "clearance_radius_mm": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "thickness_mm": {
+                  "type": [
+                    "number",
+                    "string"
+                  ],
+                  "exclusiveMinimum": 0
+                },
+                "manufacturing_released": {
+                  "const": false
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "action": {
+                        "enum": [
+                          "vendor_component",
+                          "mount_plate"
+                        ]
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "body",
+                      "part",
+                      "section",
+                      "actuator",
+                      "frame"
+                    ]
+                  }
+                },
+                {
+                  "if": {
+                    "properties": {
+                      "action": {
+                        "const": "camera"
+                      }
+                    },
+                    "required": [
+                      "action"
+                    ]
+                  },
+                  "then": {
+                    "$ref": "camera.schema.json"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "joints": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "parent",
+          "child",
+          "frame",
+          "home_deg",
+          "limits_deg"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "kind": {
+            "const": "revolute"
+          },
+          "parent": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "child": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "frame": {
+            "type": "object",
+            "required": [
+              "origin",
+              "axis",
+              "x"
+            ],
+            "properties": {
+              "origin": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "axis": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "x": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              }
+            }
+          },
+          "home_deg": {
+            "type": "number"
+          },
+          "limits_deg": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "flange_reference": {
+      "type": "object",
+      "required": [
+        "link",
+        "point"
+      ],
+      "properties": {
+        "link": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "point": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          },
+          "minItems": 3,
+          "maxItems": 3
+        }
+      }
+    },
+    "profiles": {
+      "type": "object"
+    },
+    "body_appearances": {
+      "type": "object"
+    },
+    "scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "profile",
+          "interpolation",
+          "steps",
+          "checks"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "interpolation": {
+            "const": "joint_linear"
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "duration_s",
+                "joints_deg"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "duration_s": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "joints_deg": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "number"
+                  }
+                }
+              }
+            }
+          },
+          "checks": {
+            "type": "object",
+            "required": [
+              "joint_limits",
+              "sampled_collision_step_deg",
+              "full_motion_envelope"
+            ],
+            "properties": {
+              "joint_limits": {
+                "const": true
+              },
+              "sampled_collision_step_deg": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "full_motion_envelope": {
+                "const": false
+              }
+            }
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "services": {
+      "$ref": "services.schema.json"
+    },
+    "vendor_library": {
+      "type": "object",
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "properties": {
+        "path": {
+          "type": "string"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

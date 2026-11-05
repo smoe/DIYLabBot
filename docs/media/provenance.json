@@ -1,0 +1,77 @@
+{
+  "format": "solidcraftbot.readme-media/1",
+  "prepared_on": "2026-11-06",
+  "source_animation": "renders/centrifuge-cf01-robot-05dba7428daa/cf01-robot-pickup.html",
+  "source_animation_sha256": "7bcfd933d703bdb88f6ae4233ed883745a998972fa28770ba15e26cdd22529a9",
+  "source_files_sha256": {
+    "model/centrifuge-cf01.robot-pickup.shared.json": "05dba7428daa6540441847d3845dc4d744e4346530ee41798bae0945f7acc8f7",
+    "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+    "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+    "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
+    "scripts/centrifuge_robot_pickup.py": "9fd5e447d981ce4ea6a7f59d495d4851003e49aea7e2d5e7de17c70db394d698",
+    "scripts/build_centrifuge_robot_pickup.py": "89114a0e092a4a341df2143532db71495a3c7f1bbf828cdd79c71a4958c90ecd",
+    "scripts/build_centrifuge_robot_pickup_freecad.py": "1cebaf44efa70960452f76b899fcd5670a3e25f5a0dec81ca062c673563c6593",
+    "scripts/export_centrifuge_robot_pickup_solidcraft.py": "3a64393a0706cb1cb2af58586d08b1dbacd12d8bb8284d65335b0fb73ad235c8",
+    "scripts/build_centrifuge_robot_pickup_visual.py": "56225419e991b9bfda61cdfdbd657f0d06344d1bd0d9701a2406ca4c675775c3",
+    "scripts/report_centrifuge_robot_pickup.py": "c665e1942829f18cd0386c6c085a23fa5bfe0398414da6e31b125143e43b81ee",
+    "scripts/check_centrifuge_robot_motion.py": "c9edb19195674cdf12009e3cf85c31f3cce42210231866c7b4784995faeb465c",
+    "scripts/robot_spec.py": "239198f376c7467f10f1eb8903bef2783f24e305d8ef85f221303b44bff52fb3",
+    "scripts/lab_transfer_model.py": "ce4ef26ea0f5e1a4e829722f4fd8bdca1b6720d30d873cd17aef88488b5dbfd5",
+    "scripts/templates/centrifuge_robot_pickup.html": "1efacec216cc4fef45c96f734e4137027ef402b7e63861f119ae8e812c8646fe",
+    "scripts/templates/centrifuge_robot_pickup.FCMacro": "8909c35b5d69db11d434a36a7a2d9dd5f010f5c16ef5a80ee32bb68fa498d97a",
+    "tests/test_centrifuge_robot_pickup.py": "897291a8405e52d579f0e3a7f33555b8c8f9c9a874ac66add3d959a47581c14a"
+  },
+  "source_cycle_s": 60,
+  "historical_build_passed": true,
+  "historical_visual_review": {
+    "passed": true,
+    "scene_sha256": "05dba7428daa6540441847d3845dc4d744e4346530ee41798bae0945f7acc8f7",
+    "checks": [
+      "Bench-mounted base and long links visible in assembly",
+      "Revised fingers grasp tube body below cap",
+      "Robot and tube clear with lid fully open at 30.5 s",
+      "Lid closed while tube retained outside at 42 s",
+      "Rack support confirmed with fingers closed at 55 s",
+      "At 60 s tube stays in slot 01 and empty open fingers are withdrawn",
+      "Grasp and rack close-ups fit their content",
+      "Play/pause, scrub and view switching work",
+      "Final console contains no warnings or errors"
+    ],
+    "reviewed_times_s": [
+      21.5,
+      30.5,
+      42,
+      55,
+      60
+    ],
+    "browser_console_warnings": [],
+    "browser_console_errors": [],
+    "freecad_live_macro_executed": false,
+    "display_mesh": {
+      "body_count": 223,
+      "triangles": 95920,
+      "bytes": 838525,
+      "vendor_mesh_cluster_mm": 1,
+      "geometry_for_native_checks": "full source BRep, no clustering"
+    }
+  },
+  "current_verification": "Standalone browser runtime and sampled ownership states; no new CAD build or hardware validation",
+  "adaptation": "Standalone HTML wrapper with explicit theme colors; same embedded geometry, trajectory and playback code",
+  "hardware_connected": false,
+  "media_sha256": {
+    "robot-demo.html": "c9321e7b80c28167697b52ba435bc637be2a8a95af5d40e77a4b4bd7ffa93084",
+    "robot-demo.png": "10f32cf32b5a167f481f79b995d3a739fa66d36fde9cc593a24d304cf289d96c",
+    "robot-demo.mp4": "590f1f0a781a653310b503654127ce85883d1a5c1bef519ded508f35b3971b5f"
+  },
+  "video_target_duration_s": 20,
+  "browser_check": {
+    "console_errors": [],
+    "ownership_at_0_15_30_45_60_s": [
+      "station",
+      "station",
+      "gripper",
+      "gripper",
+      "rack"
+    ]
+  }
+}

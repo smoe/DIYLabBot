@@ -1,0 +1,39 @@
+{
+  "format": "solidcraftbot.tube-cam-cycle/1",
+  "id": "H03TransferReset",
+  "geometry_source": "model/tube-cam-h03.shared.json",
+  "geometry_sha256": "643bba546a73b7f7d3e7577d04a66e2703dc6e732246f2a6c942bdf65172bb10",
+  "variant": "V20",
+  "units": {"time":"s","cam":"deg","carry":"mm","release":"mm","turn":"deg"},
+  "timing_status": "Illustrative playback timing; no operating speed or cycle time is qualified",
+  "interpolation": "linear_robot_inputs_then_shared_cam_law",
+  "sample_fps": 12,
+  "keyframes": [
+    {"time_s":0,"phase":"ready","label":"Ready","detail":"Tube seated in the open donor frame.","inputs":[0,0,0,0]},
+    {"time_s":0.8,"phase":"ready","label":"Ready","detail":"Tube seated in the open donor frame.","inputs":[0,0,0,0]},
+    {"time_s":2.4,"phase":"contact","label":"Bottom contact","detail":"The robot turns the shaft; the pusher takes up the 2 mm gap.","inputs":[30,0,0,0]},
+    {"time_s":6,"phase":"eject","label":"Tube ejection","detail":"The shaped bottom pusher lifts the tube 28 mm into the open receiver.","inputs":[130,0,0,0]},
+    {"time_s":9,"phase":"capture","label":"Receiver capture","detail":"The closing cam raises the wedge and closes both receiver halves.","inputs":[200,0,0,0]},
+    {"time_s":10,"phase":"latch","label":"Latch engages","detail":"The spring bolt enters the collar window; the receiver is retained.","inputs":[210,0,0,0]},
+    {"time_s":10.5,"phase":"capture_check","label":"Confirm capture","detail":"Pause at 220° to confirm the tube and latch; confirmation is illustrated here.","inputs":[220,0,0,0]},
+    {"time_s":12,"phase":"capture_check","label":"Confirm capture","detail":"Pause at 220° to confirm the tube and latch; confirmation is illustrated here.","inputs":[220,0,0,0]},
+    {"time_s":16,"phase":"retract","label":"Pusher retracts","detail":"The cam completes its turn; the latched receiver keeps holding the tube.","inputs":[360,0,0,0],"capture_confirmed":true},
+    {"time_s":18,"phase":"depart","label":"Receiver departure","detail":"The robot lifts the complete latched receiver and tube away from the station.","inputs":[360,"receiver_travel",0,0]},
+    {"time_s":19,"phase":"held","label":"Tube held in receiver","detail":"The latch holds the collar closed while the station followers are clear.","inputs":[360,"receiver_travel",0,0]},
+    {"time_s":21,"phase":"return_receiver","label":"Receiver returns","detail":"The robot returns the still-latched receiver to the station.","inputs":[360,0,0,0]},
+    {"time_s":25,"phase":"support","label":"Restore bottom support","detail":"Reverse the main cam to 210°; pusher and closing follower support the load again.","inputs":[210,0,0,0]},
+    {"time_s":27,"phase":"pull","label":"Pull latch · 4.5 mm","detail":"With the tube supported, the robot pulls the latch handle fully outward.","inputs":[210,0,"bolt_travel",0]},
+    {"time_s":30,"phase":"quarter_turn","label":"Quarter turn · 90°","detail":"The robot turns the pulled cross-pin into the bayonet hold-open pockets.","inputs":[210,0,"bolt_travel",90]},
+    {"time_s":36,"phase":"lower","label":"Open receiver and lower tube","detail":"Reverse the main cam to zero; the receiver opens and the pusher lowers the tube.","inputs":[0,0,"bolt_travel",90]},
+    {"time_s":38,"phase":"untwist","label":"Untwist latch","detail":"With the tube seated, untwist the latch while keeping it pulled.","inputs":[0,0,"bolt_travel",0]},
+    {"time_s":39,"phase":"rearm","label":"Rearm latch","detail":"Release the pull; the bolt rests against the open collar stem, ready for the next cycle.","inputs":[0,0,0,0]},
+    {"time_s":40,"phase":"ready","label":"Reset complete","detail":"Tube seated, receiver open, main cam at zero: the starting state is restored.","inputs":[0,0,0,0]}
+  ],
+  "presentation": {"assembly_camera":{"yaw":-2.1,"pitch":0.18},"latch_camera":{"yaw":-1.05,"pitch":0.25},"latch_section_y_mm":21},
+  "limitations": [
+    "Robot inputs are illustrated; no robot arm, gripper path or hardware controller is simulated",
+    "Capture confirmation is an assumed animation event, not a sensor reading",
+    "Rigid motion only; spring/contact dynamics, torque, fit and fluid optics remain unqualified",
+    "The final untwist and spring return rearm the latch; the animation ends in the exact initial state"
+  ]
+}

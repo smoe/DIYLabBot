@@ -1,0 +1,147 @@
+{
+  "part": "RMD-X6-P20-60-E",
+  "source_sha256": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
+  "method": "Drawing leader assignment checked against coaxial STEP cylindrical faces and locating sleeve solids",
+  "interfaces": {
+    "housing": {
+      "fastener_count": 10,
+      "bolt_circle_mm": 72.5,
+      "vendor_thread": "M3",
+      "cad_pattern_bore_diameter_mm": 3.4,
+      "cad_thread_core_diameter_mm": 2.5,
+      "matched_thread_core_count": 10,
+      "hole_centres_mm": [
+        [
+          -33.491,
+          -13.872
+        ],
+        [
+          -25.633,
+          -25.633
+        ],
+        [
+          -25.633,
+          25.633
+        ],
+        [
+          -13.872,
+          -33.491
+        ],
+        [
+          -13.872,
+          33.491
+        ],
+        [
+          13.872,
+          -33.491
+        ],
+        [
+          13.872,
+          33.491
+        ],
+        [
+          25.633,
+          -25.633
+        ],
+        [
+          25.633,
+          25.633
+        ],
+        [
+          33.491,
+          13.872
+        ]
+      ]
+    },
+    "output": {
+      "fastener_count": 12,
+      "bolt_circle_mm": 44,
+      "vendor_thread": "M4",
+      "cad_pattern_bore_diameter_mm": 3.3,
+      "cad_thread_core_diameter_mm": 3.3,
+      "matched_thread_core_count": 12,
+      "hole_centres_mm": [
+        [
+          -22.0,
+          0.146
+        ],
+        [
+          -19.125,
+          -10.873
+        ],
+        [
+          -18.979,
+          11.127
+        ],
+        [
+          -11.127,
+          -18.979
+        ],
+        [
+          -10.873,
+          19.125
+        ],
+        [
+          -0.146,
+          -22.0
+        ],
+        [
+          0.146,
+          22.0
+        ],
+        [
+          10.873,
+          -19.125
+        ],
+        [
+          11.127,
+          18.979
+        ],
+        [
+          18.979,
+          -11.127
+        ],
+        [
+          19.125,
+          10.873
+        ],
+        [
+          22.0,
+          -0.146
+        ]
+      ]
+    }
+  },
+  "locating_pins": [
+    {
+      "centre_mm": [
+        33.491,
+        -13.872
+      ],
+      "outside_diameter_mm": 5.0,
+      "length_mm": 8.0,
+      "z_min_mm": -9.0,
+      "z_max_mm": -1.0,
+      "volume_mm3": 100.53096491487338
+    },
+    {
+      "centre_mm": [
+        -33.491,
+        13.872
+      ],
+      "outside_diameter_mm": 5.0,
+      "length_mm": 8.0,
+      "z_min_mm": -9.0,
+      "z_max_mm": -1.0,
+      "volume_mm3": 100.53096491487337
+    }
+  ],
+  "passed": true,
+  "drawing": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf",
+  "drawing_sha256": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+  "interface_spec": {
+    "path": "model/x6-mounting-interface.json",
+    "sha256": "f120bba32f6be97c2adc5c401c68ba358f9eb319fa3d9e32183c383277b8e4f8"
+  },
+  "manufacturing_released": false
+}

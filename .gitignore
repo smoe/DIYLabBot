@@ -1,0 +1,27 @@
+__pycache__/
+*.py[cod]
+*.FCBak
+ros2_ws/build/
+ros2_ws/install/
+ros2_ws/log/
+/tmp/
+*.FCStd[0-9]
+.venv/
+.env
+.env.*
+!.env.example
+*.lnk
+
+# Reproducible project outputs; vendor geometry is a checksummed build input.
+/cad/*
+!/cad/vendor/
+/exports/
+/renders/
+/MANIFEST.sha256
+/ros2_ws/src/solidcraftbot_ros/meshes/
+/ros2_ws/src/solidcraftbot_ros/urdf/
+/ros2_ws/src/solidcraftbot_ros/config/*.json
+/ros2_ws/src/solidcraftbot_ros/config/controllers.yaml
+/ros2_ws/src/solidcraftbot_cf01_interfaces/
+/interfaces/centrifuge-cf01/
+.DS_Store

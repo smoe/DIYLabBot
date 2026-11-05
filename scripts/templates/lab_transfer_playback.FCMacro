@@ -1,0 +1,49 @@
+"""Source-derived L01 sample roundtrip; illustrative prescribed kinematics."""
+import json
+import math
+import time
+from pathlib import Path
+import FreeCAD as App
+import FreeCADGui as Gui
+from PySide import QtCore, QtWidgets
+
+document_path=__DOCUMENT__
+frames=__FRAMES__
+doc=next((d for d in App.listDocuments().values() if d.FileName==document_path),None) or App.openDocument(document_path)
+App.setActiveDocument(doc.Name)
+duration=frames[-1]['time_s']
+
+class TransferPlayer(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__();self.setWindowTitle('L01 sample roundtrip — simulation')
+        self.t=0.;self.playing=False;self.last=time.monotonic();self.rate=4.
+        box=QtWidgets.QVBoxLayout(self);self.button=QtWidgets.QPushButton('Play / pause');box.addWidget(self.button)
+        self.button.clicked.connect(self.toggle)
+        self.slider=QtWidgets.QSlider(QtCore.Qt.Horizontal);self.slider.setRange(0,round(duration*1000));box.addWidget(self.slider)
+        self.slider.valueChanged.connect(self.seek);self.label=QtWidgets.QLabel();box.addWidget(self.label)
+        box.addWidget(QtWidgets.QLabel('4× playback · rotor stopped · assumed handling tool'))
+        self.timer=QtCore.QTimer(self);self.timer.timeout.connect(self.tick);self.timer.start(40);self.apply()
+    def toggle(self):self.playing=not self.playing;self.last=time.monotonic()
+    def seek(self,v):self.t=v/1000;self.apply()
+    def tick(self):
+        now=time.monotonic();dt=now-self.last;self.last=now
+        if not self.playing:return
+        self.t=min(duration,self.t+dt*self.rate)
+        if self.t>=duration:self.playing=False
+        self.slider.blockSignals(True);self.slider.setValue(round(self.t*1000));self.slider.blockSignals(False);self.apply()
+    def apply(self):
+        a=b=frames[-1];u=1
+        for first,last in zip(frames,frames[1:]):
+            if self.t<=last['time_s']:
+                a,b=first,last;u=max(0,(self.t-a['time_s'])/(b['time_s']-a['time_s']));break
+        for i in range(6):setattr(doc.ArmCControl,'J'+str(i+1),a['q'][i]+(b['q'][i]-a['q'][i])*u)
+        for name in a['cf']:setattr(doc.CF01Control,name,a['cf'][name]+(b['cf'][name]-a['cf'][name])*u)
+        bottom=[x+(y-x)*u for x,y in zip(a['sample_bottom'],b['sample_bottom'])]
+        axis=[x+(y-x)*u for x,y in zip(a['sample_axis'],b['sample_axis'])]
+        doc.Sample.Placement=App.Placement(App.Vector(*bottom),App.Rotation(App.Vector(0,0,1),App.Vector(*axis)))
+        doc.recompute();Gui.activeDocument().activeView().redraw()
+        self.label.setText('%5.1f / %.1f s — %s'%(self.t,duration,b['phase']))
+    def closeEvent(self,event):self.timer.stop();super().closeEvent(event)
+
+_l01_transfer_player=TransferPlayer();_l01_transfer_player.resize(620,180);_l01_transfer_player.show()
+Gui.activeDocument().activeView().viewAxonometric();Gui.activeDocument().activeView().fitAll()

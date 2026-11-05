@@ -1,0 +1,61 @@
+<div id="h03-transfer-reset">
+  <style>
+    #h03-transfer-reset .h03-scene{display:block;width:100%;height:540px}
+    #h03-transfer-reset .h03-readout{display:flex;gap:1em;flex-wrap:wrap;margin:.6em 0}
+    #h03-transfer-reset .h03-caption{min-height:2.5em;margin:.4em 0}
+    #h03-transfer-reset .h03-phase{font-weight:500}
+    #h03-transfer-reset .h03-timeline{width:100%}
+    @media(max-width:560px){#h03-transfer-reset .h03-scene{height:700px}}
+  </style>
+  <div class="viz-controls">
+    <button type="button" class="btn btn-primary" data-play>Play cycle</button>
+    <label class="form-label">Playback <select class="form-select" data-speed><option value="1" selected>1×</option><option value="0.5">0.5×</option><option value="2">2×</option></select></label>
+    <span class="text-small">2.0 mL tube · kinematic concept</span>
+  </div>
+  <canvas class="h03-scene" data-scene role="img" aria-label="Complete tube transfer and reset, using native CAD meshes, with a synchronized cutaway of the pull-and-quarter-turn latch"></canvas>
+  <div class="h03-caption"><span class="h03-phase" data-phase aria-live="polite">Ready</span><span data-detail> · Tube seated in the open donor frame.</span></div>
+  <div class="h03-readout tabular-nums text-small"><span data-cam>Main shaft 0°</span><span data-tube>Tube lift 0.0 mm</span><span data-latch>Bolt retracted 4.2 mm · turn 0°</span></div>
+  <label class="form-label">Cycle position <span class="tabular-nums" data-time>0.0 / 40.0 s</span><input class="form-range h03-timeline" type="range" data-time-slider min="0" max="40" step="0.025" value="0" aria-label="Cycle playback position in seconds"></label>
+  <script type="application/json" data-mesh>__MESH__</script>
+  <script type="application/json" data-timeline>__TIMELINE__</script>
+  <script>
+  (()=>{
+    const root=document.getElementById('h03-transfer-reset'),mesh=JSON.parse(root.querySelector('[data-mesh]').textContent),timeline=JSON.parse(root.querySelector('[data-timeline]').textContent);
+    const canvas=root.querySelector('[data-scene]'),ctx=canvas.getContext('2d'),button=root.querySelector('[data-play]'),slider=root.querySelector('[data-time-slider]'),speed=root.querySelector('[data-speed]');
+    const joints=new Map(mesh.joints.map(j=>[j.child,j])),identity={r:[1,0,0,0,1,0,0,0,1],p:[0,0,0]},variant=mesh.variant;
+    let time=0,playing=false,last=0,lastDraw=0,lastPhase='',theme={};const boundsCache=new Map();
+    function mv(r,v){return [r[0]*v[0]+r[1]*v[1]+r[2]*v[2],r[3]*v[0]+r[4]*v[1]+r[5]*v[2],r[6]*v[0]+r[7]*v[1]+r[8]*v[2]]}
+    function apply(m,v){return mv(m.r,v).map((x,i)=>x+m.p[i])}
+    function mul(a,b){const r=[];for(let i=0;i<3;i++)for(let j=0;j<3;j++)r.push(a.r[i*3]*b.r[j]+a.r[i*3+1]*b.r[j+3]+a.r[i*3+2]*b.r[j+6]);return {r,p:apply(a,b.p)}}
+    function transforms(values){const cache=new Map();function get(group){if(cache.has(group))return cache.get(group);const j=joints.get(group);if(!j)return identity;const v=values[j.id]||0,[x,y,z]=j.axis;let local;
+      if(j.type==='slider')local={r:identity.r,p:j.axis.map(a=>a*v)};
+      else{const c=Math.cos(v*Math.PI/180),s=Math.sin(v*Math.PI/180),d=1-c,r=[c+x*x*d,x*y*d-z*s,x*z*d+y*s,y*x*d+z*s,c+y*y*d,y*z*d-x*s,z*x*d-y*s,z*y*d+x*s,c+z*z*d];local={r,p:j.origin.map((a,i)=>a-mv(r,j.origin)[i])}}
+      const result=mul(get(j.parent),local);cache.set(group,result);return result}for(const b of mesh.bodies)get(b.group);return cache}
+    function pose(t){const frames=timeline.frames;let low=0,high=frames.length-1;while(low+1<high){const mid=(low+high)>>1;if(frames[mid][0]<t)low=mid;else high=mid}const a=frames[low],b=frames[high],u=Math.max(0,Math.min(1,(t-a[0])/(b[0]-a[0]))),values={};timeline.columns.forEach((k,i)=>values[k]=a[i+1]+(b[i+1]-a[i+1])*u);let phase=timeline.phases[0];if(t>0)phase=timeline.phases.find(k=>k.time_s>=t)||timeline.phases[timeline.phases.length-1];return {values,phase}}
+    function color(token){const probe=document.createElement('span');probe.style.color='var('+token+')';root.appendChild(probe);const value=getComputedStyle(probe).color;probe.remove();const c=document.createElement('canvas');c.width=c.height=1;const s=c.getContext('2d');s.fillStyle=value;s.fillRect(0,0,1,1);return Array.from(s.getImageData(0,0,1,1).data).slice(0,3)}
+    function rgb(v){return 'rgb('+v.map(x=>Math.max(0,Math.min(255,Math.round(x)))).join(',')+')'}
+    function readTheme(){theme={text:color('--foreground'),border:color('--border'),bg:color('--background'),lift:color('--viz-series-1'),receiver:color('--viz-series-2'),latch:color('--viz-series-3'),fluid:color('--viz-series-4')};theme.muted=theme.text.map((x,i)=>x*.55+theme.bg[i]*.45);draw()}
+    function bodyColor(b){if(b.role==='illustrative_fluid')return theme.fluid;if(['spring_bayonet_bolt','bayonet_cross_pin','robot_release_handle'].includes(b.role))return theme.latch;if(b.id.endsWith('PusherCam')||['external_bottom_pusher','cam_follower'].includes(b.role)&&!b.id.includes('Closing'))return theme.lift;if(b.id.endsWith('ClosingCam')||['closing_wedge_collar','split_receiver_seat_and_guide','wedge_roller'].includes(b.role))return theme.receiver;return theme.muted}
+    function panel(rect,detail,frame){const cam=detail?timeline.presentation.latch_camera:timeline.presentation.assembly_camera,yaw=cam.yaw,pitch=cam.pitch,right=[-Math.sin(yaw),Math.cos(yaw),0],up=[-Math.sin(pitch)*Math.cos(yaw),-Math.sin(pitch)*Math.sin(yaw),Math.cos(pitch)],eye=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];
+      function raw(v,carry){const p=[v[0],v[1],v[2]-(detail?carry:0)];return [p.reduce((s,a,i)=>s+a*right[i],0),p.reduce((s,a,i)=>s+a*up[i],0),p.reduce((s,a,i)=>s+a*eye[i],0)]}
+      if(!boundsCache.has(detail)){const lo=[Infinity,Infinity],hi=[-Infinity,-Infinity];const times=[...new Set([...timeline.phases.map(k=>k.time_s),...Array.from({length:41},(_,i)=>i)])];for(const t of times){const values=pose(t).values,ms=transforms(values),carry=values['ReceiverLift'+variant];for(const body of mesh.bodies){const geometry=detail?body.detail:body;if(!geometry)continue;for(const v of geometry.v){const q=raw(apply(ms.get(body.group)||identity,v),carry);for(let i=0;i<2;i++){lo[i]=Math.min(lo[i],q[i]);hi[i]=Math.max(hi[i],q[i])}}}}boundsCache.set(detail,{lo,hi})}
+      const bounds=boundsCache.get(detail),center=bounds.lo.map((x,i)=>(x+bounds.hi[i])/2),scale=Math.min((rect.w-24)/(bounds.hi[0]-bounds.lo[0]),(rect.h-64)/(bounds.hi[1]-bounds.lo[1]))*.94;
+      const matrices=transforms(frame.values),carry=frame.values['ReceiverLift'+variant];function project(v){const p=raw(v,carry);return [rect.x+rect.w/2+(p[0]-center[0])*scale,rect.y+rect.h/2+8-(p[1]-center[1])*scale,p[2]]}
+      ctx.save();ctx.beginPath();ctx.rect(rect.x,rect.y,rect.w,rect.h);ctx.clip();const triangles=[];
+      for(const body of mesh.bodies){const geometry=detail?body.detail:body;if(!geometry)continue;const m=matrices.get(body.group)||identity,world=geometry.v.map(v=>apply(m,v)),points=world.map(project),base=bodyColor(body),alpha=body.role==='tube_shape_reference'?.18:body.opacity;
+        for(const f of geometry.f){const a=points[f[0]],b=points[f[1]],c=points[f[2]],wa=world[f[0]],wb=world[f[1]],wc=world[f[2]],u=wb.map((x,i)=>x-wa[i]),v=wc.map((x,i)=>x-wa[i]),n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],length=Math.hypot(...n)||1;if(alpha>=.99&&n.reduce((s,x,i)=>s+x*eye[i],0)<=0)continue;const light=.68+.32*Math.abs((n[0]*.3-n[1]*.5+n[2]*.8)/length);triangles.push({p:[a,b,c],z:(a[2]+b[2]+c[2])/3,color:base.map(x=>x*light),alpha})}}
+      triangles.sort((a,b)=>a.z-b.z);for(const tri of triangles){ctx.globalAlpha=tri.alpha;ctx.fillStyle=rgb(tri.color);ctx.beginPath();tri.p.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill();if(tri.alpha>=.99){ctx.strokeStyle=ctx.fillStyle;ctx.lineWidth=.6;ctx.stroke()}}ctx.globalAlpha=1;ctx.fillStyle=rgb(theme.text);ctx.font=getComputedStyle(root).font;ctx.fillText(detail?'Latch section':'Complete transfer',rect.x+12,rect.y+20);
+      if(detail){const pull=frame.values['LatchRetract'+variant],turn=frame.values['BoltTurn'+variant];ctx.fillText('Retracted '+pull.toFixed(1)+' mm · '+turn.toFixed(0)+'°',rect.x+12,rect.y+rect.h-12);
+        if(['quarter_turn','untwist'].includes(frame.phase.phase)){const cx=mesh.parameters.module_pitch/2+79+pull,z=mesh.parameters.receiver_guide_z+2.5+carry,pts=[];for(let i=0;i<=30;i++){const a=i/30*Math.PI/2;pts.push(project([cx,21+7*Math.cos(a),z+7*Math.sin(a)]))}ctx.strokeStyle=rgb(theme.latch);ctx.lineWidth=2;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke()}}
+      ctx.restore();return {project,scale}}
+    function draw(){if(!theme.text)return;const r=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=r.width,h=r.height;if(w<1||h<1)return;if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);const frame=pose(time);if(w>560){panel({x:0,y:0,w:w*.57,h},false,frame);panel({x:w*.57,y:60,w:w*.43,h:h-120},true,frame)}else{panel({x:0,y:0,w,h:420},false,frame);panel({x:0,y:425,w,h:h-425},true,frame)}
+      root.querySelector('[data-cam]').textContent='Main shaft '+frame.values['CamAngle'+variant].toFixed(0)+'°';root.querySelector('[data-tube]').textContent='Tube lift '+frame.values['TubeLift'+variant].toFixed(1)+' mm';root.querySelector('[data-latch]').textContent='Bolt retracted '+frame.values['LatchRetract'+variant].toFixed(1)+' mm · turn '+frame.values['BoltTurn'+variant].toFixed(0)+'°';root.querySelector('[data-time]').textContent=time.toFixed(1)+' / '+timeline.duration.toFixed(1)+' s';if(lastPhase!==frame.phase.label){lastPhase=frame.phase.label;root.querySelector('[data-phase]').textContent=frame.phase.label;root.querySelector('[data-detail]').textContent=' · '+frame.phase.detail}slider.value=time;root.dataset.currentTime=time.toFixed(3);root.dataset.cam=frame.values['CamAngle'+variant].toFixed(6);root.dataset.tubeLift=frame.values['TubeLift'+variant].toFixed(6);root.dataset.pull=frame.values['LatchRetract'+variant].toFixed(6);root.dataset.turn=frame.values['BoltTurn'+variant].toFixed(6);root.dataset.phase=frame.phase.phase}
+    function save(){window.openai?.setWidgetState?.({modelContent:{cycle_time_s:time,phase:root.dataset.phase},privateContent:{speed:speed.value}})?.catch(()=>{})}
+    function restore(state){if(state?.modelContent)time=Math.max(0,Math.min(timeline.duration,Number(state.modelContent.cycle_time_s)||0));if(['0.5','1','2'].includes(state?.privateContent?.speed))speed.value=state.privateContent.speed;draw()}
+    function tick(now){if(!playing)return;if(last)time=Math.min(timeline.duration,time+(now-last)/1000*Number(speed.value));last=now;if(now-lastDraw>32){draw();lastDraw=now}if(time>=timeline.duration){playing=false;button.textContent='Replay cycle';draw();save();return}requestAnimationFrame(tick)}
+    button.addEventListener('click',()=>{playing=!playing;if(playing){if(time>=timeline.duration)time=0;last=0;requestAnimationFrame(tick)}button.textContent=playing?'Pause':'Play cycle';save()});slider.addEventListener('input',()=>{playing=false;button.textContent='Play cycle';time=Number(slider.value);draw()});slider.addEventListener('change',save);speed.addEventListener('change',save);
+    new ResizeObserver(draw).observe(canvas);new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);readTheme()});readTheme();restore(window.openai?.widgetState);
+    if(!window.openai?.widgetState&&!window.matchMedia('(prefers-reduced-motion: reduce)').matches){playing=true;button.textContent='Pause';requestAnimationFrame(tick)}
+  })();
+  </script>
+</div>

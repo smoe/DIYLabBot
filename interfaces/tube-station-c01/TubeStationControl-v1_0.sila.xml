@@ -1,0 +1,427 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Feature xmlns="http://www.sila-standard.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" SiLA2Version="1.1" FeatureVersion="1.0" MaturityLevel="Draft" Originator="org.solidcraftbot" Category="samplehandling" Locale="en-us" xsi:schemaLocation="http://www.sila-standard.org https://gitlab.com/SiLA2/sila_base/raw/master/schema/FeatureDefinition.xsd">
+  <Identifier>TubeStationControl</Identifier>
+  <DisplayName>TubeStationControl</DisplayName>
+  <Description>C01 proposal for a single cooled snap-cap tube station. No server is implemented. The originator is a provisional project namespace, not a registered standard feature. See docs/tube-station-c01.md for required preconditions and recovery semantics.</Description>
+  <Command>
+    <Identifier>AcquireControl</Identifier>
+    <DisplayName>AcquireControl</DisplayName>
+    <Description>Atomically reserve the station for one orchestrator. Repeated acquisition does not replace an existing owner.</Description>
+    <Observable>No</Observable>
+    <Parameter>
+      <Identifier>ClientId</Identifier>
+      <DisplayName>ClientId</DisplayName>
+      <Description>Human-readable controller identity.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Response>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Exclusive control token; explicit release or local recovery required.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Response>
+    <DefinedExecutionErrors>
+      <Identifier>OwnershipConflict</Identifier>
+      <Identifier>RecoveryRequired</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>ReleaseControl</Identifier>
+    <DisplayName>ReleaseControl</DisplayName>
+    <Description>Release ownership only when empty, motionless and without a robot access grant.</Description>
+    <Observable>No</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>InvalidState</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>Heartbeat</Identifier>
+    <DisplayName>Heartbeat</DisplayName>
+    <Description>Refresh the owner watchdog. Loss of heartbeats inhibits new motion and latches recovery; it never authorizes automatic closure or ownership transfer.</Description>
+    <Observable>No</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>Initialize</Identifier>
+    <DisplayName>Initialize</DisplayName>
+    <Description>Home and park fingers and release the retainer only with an empty nest and independently clear workspace. Reset cooling readiness on configuration change.</Description>
+    <Observable>Yes</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Parameter>
+      <Identifier>ProfileId</Identifier>
+      <DisplayName>ProfileId</DisplayName>
+      <Description>Only a measured and qualified tube article profile may be selected.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Parameter>
+      <Identifier>CoolingRequired</Identifier>
+      <DisplayName>CoolingRequired</DisplayName>
+      <Description>When true, pipetting access additionally requires validated cooling readiness.</Description>
+      <DataType>
+        <Basic>Boolean</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>UnknownProfile</Identifier>
+      <Identifier>InvalidState</Identifier>
+      <Identifier>WorkspaceNotClear</Identifier>
+      <Identifier>MotionFault</Identifier>
+      <Identifier>RecoveryRequired</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>BeginAccess</Identifier>
+    <DisplayName>BeginAccess</DisplayName>
+    <Description>Require measured standstill, parked fingers, Ready mode and no fault or other grant. Atomically inhibit all station actuation before granting robot entry. Loading requires empty/released; Pipetting requires secured/open and cooling ready if requested; Unloading requires verified closed/released. Exactly one grant may exist.</Description>
+    <Observable>No</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Parameter>
+      <Identifier>Purpose</Identifier>
+      <DisplayName>Purpose</DisplayName>
+      <Description>Exactly Loading, Pipetting or Unloading.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Response>
+      <Identifier>AccessToken</Identifier>
+      <DisplayName>AccessToken</DisplayName>
+      <Description>Unique token for one robot access grant.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Response>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>InvalidState</Identifier>
+      <Identifier>CoolingNotReady</Identifier>
+      <Identifier>RecoveryRequired</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>EndAccess</Identifier>
+    <DisplayName>EndAccess</DisplayName>
+    <Description>Robot reports fully withdrawn. Revoke the grant only after an independent clearance input also confirms the workspace clear. A failed request leaves motion inhibited.</Description>
+    <Observable>No</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <Parameter>
+      <Identifier>AccessToken</Identifier>
+      <DisplayName>AccessToken</DisplayName>
+      <Description>The active grant returned by BeginAccess.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>InvalidAccessToken</Identifier>
+      <Identifier>WorkspaceNotClear</Identifier>
+      <Identifier>InvalidState</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>OpenTube</Identifier>
+    <DisplayName>OpenTube</DisplayName>
+    <Description>With robot access ended and workspace independently clear: verify tube and orientation, secure it, lift and park the lid, park both fingers and verify the open position. Successful completion means these checks passed.</Description>
+    <Observable>Yes</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>InvalidState</Identifier>
+      <Identifier>WorkspaceNotClear</Identifier>
+      <Identifier>TubeNotReady</Identifier>
+      <Identifier>MotionFault</Identifier>
+      <Identifier>VerificationFailed</Identifier>
+      <Identifier>RecoveryRequired</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>CloseTube</Identifier>
+    <DisplayName>CloseTube</DisplayName>
+    <Description>With robot access ended and workspace independently clear: close with force/displacement limits, verify latching, park fingers, then release retainer. Failure keeps tube retained. Verified latching does not claim a leak-tight seal.</Description>
+    <Observable>Yes</Observable>
+    <Parameter>
+      <Identifier>ControlToken</Identifier>
+      <DisplayName>ControlToken</DisplayName>
+      <Description>Opaque coordination token scoped to the current BootId; not an authentication credential.</Description>
+      <DataType>
+        <Basic>String</Basic>
+      </DataType>
+    </Parameter>
+    <DefinedExecutionErrors>
+      <Identifier>InvalidControlToken</Identifier>
+      <Identifier>InvalidState</Identifier>
+      <Identifier>WorkspaceNotClear</Identifier>
+      <Identifier>TubeNotReady</Identifier>
+      <Identifier>MotionFault</Identifier>
+      <Identifier>VerificationFailed</Identifier>
+      <Identifier>RecoveryRequired</Identifier>
+    </DefinedExecutionErrors>
+  </Command>
+  <Command>
+    <Identifier>StopMotion</Identifier>
+    <DisplayName>StopMotion</DisplayName>
+    <Description>Priority controlled-stop request available to any authenticated client, even while a motion command is running. Latch RecoveryRequired and retain current access inhibition and tube support. This is not an emergency stop and does not certify that physical motion has already stopped.</Description>
+    <Observable>No</Observable>
+  </Command>
+  <Property>
+    <Identifier>Status</Identifier>
+    <DisplayName>Status</DisplayName>
+    <Description>One coherent, versioned snapshot. Publish on state change and at the configured period. Sequence increases within BootId. All fields are project-defined, not standard SiLA states.</Description>
+    <Observable>Yes</Observable>
+    <DataType>
+      <Structure>
+        <Element>
+          <Identifier>BootId</Identifier>
+          <DisplayName>BootId</DisplayName>
+          <Description>New UUID after every server/controller restart; old control/access tokens become invalid.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>Sequence</Identifier>
+          <DisplayName>Sequence</DisplayName>
+          <Description>Monotonically increasing snapshot sequence within BootId.</Description>
+          <DataType>
+            <Basic>Integer</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>ObservedAt</Identifier>
+          <DisplayName>ObservedAt</DisplayName>
+          <Description>UTC time of this coherent snapshot; client also checks local receipt age.</Description>
+          <DataType>
+            <Basic>Timestamp</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>Mode</Identifier>
+          <DisplayName>Mode</DisplayName>
+          <Description>Exactly NeedsInitialization, Initializing, Ready, Opening, Closing, Stopping or RecoveryRequired. Robot access is represented separately.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>ProfileId</Identifier>
+          <DisplayName>ProfileId</DisplayName>
+          <Description>Selected qualified tube profile, or empty string.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>TubePresent</Identifier>
+          <DisplayName>TubePresent</DisplayName>
+          <Description>Presence sensor; not identity or orientation proof.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>TubeSecured</Identifier>
+          <DisplayName>TubeSecured</DisplayName>
+          <Description>True only when retention is positively confirmed.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>LidState</Identifier>
+          <DisplayName>LidState</DisplayName>
+          <Description>Exactly Unknown, ClosedVerified, OpenVerified or InTransit.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>AccessPurpose</Identifier>
+          <DisplayName>AccessPurpose</DisplayName>
+          <Description>Exactly None, Loading, Pipetting or Unloading. Any active grant inhibits station actuation.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>WorkspaceClear</Identifier>
+          <DisplayName>WorkspaceClear</DisplayName>
+          <Description>Independent local clearance input. False or stale inhibits motion; no clearance safety performance is claimed.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>MotionStopped</Identifier>
+          <DisplayName>MotionStopped</DisplayName>
+          <Description>Measured standstill confirmation; not inferred from StopMotion RPC completion.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>CoolingRequired</Identifier>
+          <DisplayName>CoolingRequired</DisplayName>
+          <Description>The selected run requires cooling readiness for pipetting access.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>BlockTemperature</Identifier>
+          <DisplayName>BlockTemperature</DisplayName>
+          <Description>Degrees Celsius; meaningful only when BlockTemperatureValid is true. Not sample temperature.</Description>
+          <DataType>
+            <Basic>Real</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>BlockTemperatureValid</Identifier>
+          <DisplayName>BlockTemperatureValid</DisplayName>
+          <Description>False on failed or stale block sensing; numeric field must be ignored then.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>CoolingReady</Identifier>
+          <DisplayName>CoolingReady</DisplayName>
+          <Description>True only with a qualified thermal profile, valid block sensing, required soak and valid cooling checks. No sample-temperature guarantee from this Boolean alone.</Description>
+          <DataType>
+            <Basic>Boolean</Basic>
+          </DataType>
+        </Element>
+        <Element>
+          <Identifier>FaultCode</Identifier>
+          <DisplayName>FaultCode</DisplayName>
+          <Description>None or the current defined error identifier; unknown state requires recovery.</Description>
+          <DataType>
+            <Basic>String</Basic>
+          </DataType>
+        </Element>
+      </Structure>
+    </DataType>
+  </Property>
+  <Property>
+    <Identifier>SupportedProfiles</Identifier>
+    <DisplayName>SupportedProfiles</DisplayName>
+    <Description>Identifiers of implemented, experimentally qualified tube profiles. Empty for this unimplemented C01 draft.</Description>
+    <Observable>No</Observable>
+    <DataType>
+      <List>
+        <DataType>
+          <Basic>String</Basic>
+        </DataType>
+      </List>
+    </DataType>
+  </Property>
+  <DefinedExecutionError>
+    <Identifier>CoolingNotReady</Identifier>
+    <DisplayName>CoolingNotReady</DisplayName>
+    <Description>Required cooling checks failed or are not yet complete.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>InvalidAccessToken</Identifier>
+    <DisplayName>InvalidAccessToken</DisplayName>
+    <Description>Token does not match the active access grant.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>InvalidControlToken</Identifier>
+    <DisplayName>InvalidControlToken</DisplayName>
+    <Description>Token missing, unknown, stale or from another boot.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>InvalidState</Identifier>
+    <DisplayName>InvalidState</DisplayName>
+    <Description>Command preconditions failed; no new actuation is permitted.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>MotionFault</Identifier>
+    <DisplayName>MotionFault</DisplayName>
+    <Description>Motion timeout, overload, following error or feedback failure; retain support and require recovery.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>OwnershipConflict</Identifier>
+    <DisplayName>OwnershipConflict</DisplayName>
+    <Description>Another orchestrator owns the station; do not steal or auto-expire its access.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>RecoveryRequired</Identifier>
+    <DisplayName>RecoveryRequired</DisplayName>
+    <Description>Local inspection and controlled recovery are required before further actuation.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>TubeNotReady</Identifier>
+    <DisplayName>TubeNotReady</DisplayName>
+    <Description>Presence, orientation or retention verification failed.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>UnknownProfile</Identifier>
+    <DisplayName>UnknownProfile</DisplayName>
+    <Description>Tube profile is absent or unqualified; nominal volume is insufficient.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>VerificationFailed</Identifier>
+    <DisplayName>VerificationFailed</DisplayName>
+    <Description>Open or latch verification failed; do not report success.</Description>
+  </DefinedExecutionError>
+  <DefinedExecutionError>
+    <Identifier>WorkspaceNotClear</Identifier>
+    <DisplayName>WorkspaceNotClear</DisplayName>
+    <Description>Robot clearance is false or stale; retain inhibition.</Description>
+  </DefinedExecutionError>
+</Feature>

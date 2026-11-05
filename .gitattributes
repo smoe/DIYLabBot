@@ -1,0 +1,12 @@
+# Preserve exact bytes across Windows/Linux clones: model and vendor references
+# use SHA-256 checksums, so automatic line-ending conversion would invalidate them.
+* -text
+
+# Review construction intent in model/*.json; native/generated CAD files use
+# the CAD viewers and validation reports rather than large text diffs.
+*.step -diff
+*.stp -diff
+*.sc -diff
+*.solidcraft -diff
+*.FCStd -diff
+*.stl -diff

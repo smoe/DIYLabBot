@@ -1,0 +1,2346 @@
+{
+  "core_measurement": {
+    "bodies": [
+      {
+        "area_mm2": 95856.7208069691,
+        "bbox": {
+          "max": [
+            120,
+            92,
+            8.000000000000002
+          ],
+          "min": [
+            -120,
+            -92.00000000000001,
+            0
+          ]
+        },
+        "center_of_mass": [
+          3.1666110777955272e-15,
+          -0.09082074290903036,
+          4
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 28,
+        "face_types": {
+          "cylinder": 8,
+          "plane": 6
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 60,
+          "faces": 22,
+          "shells": 1,
+          "vertices": 40
+        },
+        "mass_g": 453.339085109868,
+        "material": "Default",
+        "name": "MountBase",
+        "vertices": 24,
+        "volume_mm3": 351425.64737199066
+      },
+      {
+        "area_mm2": 16089.309979573965,
+        "bbox": {
+          "max": [
+            -100,
+            60,
+            160.00000000000009
+          ],
+          "min": [
+            -112,
+            24,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -106,
+          42,
+          83.99999999999872
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 20,
+        "face_types": {
+          "cylinder": 4,
+          "plane": 10
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 36,
+          "faces": 18,
+          "shells": 1,
+          "vertices": 24
+        },
+        "mass_g": 83.84888424760156,
+        "material": "Default",
+        "name": "PostLeft",
+        "vertices": 16,
+        "volume_mm3": 64999.135075660124
+      },
+      {
+        "area_mm2": 16089.309979573965,
+        "bbox": {
+          "max": [
+            112,
+            60,
+            160.00000000000009
+          ],
+          "min": [
+            100,
+            24,
+            8
+          ]
+        },
+        "center_of_mass": [
+          105.99999999999999,
+          42,
+          84
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 20,
+        "face_types": {
+          "cylinder": 4,
+          "plane": 10
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 36,
+          "faces": 18,
+          "shells": 1,
+          "vertices": 24
+        },
+        "mass_g": 83.8488842476025,
+        "material": "Default",
+        "name": "PostRight",
+        "vertices": 16,
+        "volume_mm3": 64999.13507566085
+      },
+      {
+        "area_mm2": 16082.609972455892,
+        "bbox": {
+          "max": [
+            116.00000000000026,
+            54.000000000000306,
+            167.99999999998954
+          ],
+          "min": [
+            -116,
+            30,
+            159.99999999998104
+          ]
+        },
+        "center_of_mass": [
+          1.4062575957609415e-13,
+          42.00000000000015,
+          163.99999999998468
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 32,
+        "face_types": {
+          "cylinder": 10,
+          "plane": 6
+        },
+        "faces": 16,
+        "kernel": {
+          "edges": 72,
+          "faces": 26,
+          "shells": 1,
+          "vertices": 48
+        },
+        "mass_g": 55.49693569210103,
+        "material": "Default",
+        "name": "RearBeam",
+        "vertices": 28,
+        "volume_mm3": 43020.88038147367
+      },
+      {
+        "area_mm2": 3008,
+        "bbox": {
+          "max": [
+            -93,
+            74,
+            14
+          ],
+          "min": [
+            -97,
+            -74,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -95,
+          0,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 4.5820799999999995,
+        "material": "Default",
+        "name": "BinGuideLeft",
+        "vertices": 8,
+        "volume_mm3": 3552
+      },
+      {
+        "area_mm2": 3008,
+        "bbox": {
+          "max": [
+            97,
+            74,
+            14
+          ],
+          "min": [
+            93,
+            -74,
+            8
+          ]
+        },
+        "center_of_mass": [
+          95,
+          0,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 4.5820799999999995,
+        "material": "Default",
+        "name": "BinGuideRight",
+        "vertices": 8,
+        "volume_mm3": 3552
+      },
+      {
+        "area_mm2": 3728,
+        "bbox": {
+          "max": [
+            92,
+            77,
+            14
+          ],
+          "min": [
+            -92,
+            73,
+            8
+          ]
+        },
+        "center_of_mass": [
+          0,
+          75,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 5.69664,
+        "material": "Default",
+        "name": "BinRearStop",
+        "vertices": 8,
+        "volume_mm3": 4416
+      },
+      {
+        "area_mm2": 242496,
+        "bbox": {
+          "max": [
+            92,
+            72,
+            158
+          ],
+          "min": [
+            -92,
+            -72,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -1.2941938125548601e-14,
+          -5.17677525021944e-15,
+          68.43116328708643
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 24,
+        "face_types": {
+          "plane": 11
+        },
+        "faces": 11,
+        "kernel": {
+          "edges": 24,
+          "faces": 11,
+          "shells": 1,
+          "vertices": 16
+        },
+        "mass_g": 618.8697600000003,
+        "material": "Default",
+        "name": "RemovableBin",
+        "vertices": 16,
+        "volume_mm3": 479744.0000000002
+      },
+      {
+        "area_mm2": 10075.634418811089,
+        "bbox": {
+          "max": [
+            -32,
+            54,
+            172.0000000000001
+          ],
+          "min": [
+            -80,
+            -42.00000000000001,
+            167.9999999999999
+          ]
+        },
+        "center_of_mass": [
+          -56,
+          8.244030447233847,
+          170
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 34,
+        "face_types": {
+          "cylinder": 3,
+          "plane": 11
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 42,
+          "faces": 16,
+          "shells": 1,
+          "vertices": 28
+        },
+        "mass_g": 21.867635769328523,
+        "material": "Default",
+        "name": "Fork_S_4mm",
+        "vertices": 24,
+        "volume_mm3": 16951.655635138388
+      },
+      {
+        "area_mm2": 9917.418890990004,
+        "bbox": {
+          "max": [
+            24,
+            54,
+            172.0000000000001
+          ],
+          "min": [
+            -24,
+            -42,
+            167.99999999999932
+          ]
+        },
+        "center_of_mass": [
+          -1.2908401469250185e-15,
+          8.660581455869728,
+          169.9999999999998
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 34,
+        "face_types": {
+          "cylinder": 3,
+          "plane": 11
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 42,
+          "faces": 16,
+          "shells": 1,
+          "vertices": 28
+        },
+        "mass_g": 21.434956629292174,
+        "material": "Default",
+        "name": "Fork_M_6mm",
+        "vertices": 24,
+        "volume_mm3": 16616.2454490637
+      },
+      {
+        "area_mm2": 9668.995195989653,
+        "bbox": {
+          "max": [
+            80.00000000000006,
+            54,
+            171.99999999999997
+          ],
+          "min": [
+            31.999999999999996,
+            -42.00000000000001,
+            167.99999999999855
+          ]
+        },
+        "center_of_mass": [
+          56.00000000000003,
+          9.31833595032773,
+          169.99999999999943
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 34,
+        "face_types": {
+          "cylinder": 3,
+          "plane": 11
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 42,
+          "faces": 16,
+          "shells": 1,
+          "vertices": 28
+        },
+        "mass_g": 20.755540767044884,
+        "material": "Default",
+        "name": "Fork_L_9mm",
+        "vertices": 24,
+        "volume_mm3": 16089.566486081305
+      }
+    ],
+    "body_count": 11,
+    "total": {
+      "area_mm2": 426019.9992443637,
+      "edges": 262,
+      "faces": 129,
+      "mass_g": 1374.322482462839,
+      "open_bodies_skipped": 0,
+      "vertices": 196,
+      "volume_mm3": 1065366.265475069
+    }
+  },
+  "core_analytic_checks": [
+    {
+      "name": "MountBase",
+      "expected": 351424.95236990834,
+      "actual": 351425.64737199066,
+      "relative_error": 0.0000019776685680426312,
+      "closed": true,
+      "bbox_max_error": 1.4210854715202004e-14
+    },
+    {
+      "name": "PostLeft",
+      "expected": 64998.987667088106,
+      "actual": 64999.135075660124,
+      "relative_error": 0.0000022678595053405838,
+      "closed": true,
+      "bbox_max_error": 8.526512829121202e-14
+    },
+    {
+      "name": "PostRight",
+      "expected": 64998.987667088106,
+      "actual": 64999.13507566085,
+      "relative_error": 0.0000022678595165345392,
+      "closed": true,
+      "bbox_max_error": 8.526512829121202e-14
+    },
+    {
+      "name": "RearBeam",
+      "expected": 43020.32756300892,
+      "actual": 43020.88038147367,
+      "relative_error": 0.000012850168654308713,
+      "closed": true,
+      "bbox_max_error": 1.8957280190079473e-11
+    },
+    {
+      "name": "BinGuideLeft",
+      "expected": 3552,
+      "actual": 3552,
+      "relative_error": 0,
+      "closed": true,
+      "bbox_max_error": 0
+    },
+    {
+      "name": "BinGuideRight",
+      "expected": 3552,
+      "actual": 3552,
+      "relative_error": 0,
+      "closed": true,
+      "bbox_max_error": 0
+    },
+    {
+      "name": "BinRearStop",
+      "expected": 4416,
+      "actual": 4416,
+      "relative_error": 0,
+      "closed": true,
+      "bbox_max_error": 0
+    },
+    {
+      "name": "RemovableBin",
+      "expected": 479744,
+      "actual": 479744.0000000002,
+      "relative_error": 3.639920097810545e-16,
+      "closed": true,
+      "bbox_max_error": 0
+    },
+    {
+      "name": "Fork_S_4mm",
+      "expected": 16951.632756300893,
+      "actual": 16951.655635138388,
+      "relative_error": 0.0000013496539138227449,
+      "closed": true,
+      "bbox_max_error": 1.1368683772161603e-13
+    },
+    {
+      "name": "Fork_M_6mm",
+      "expected": 16616.216829764995,
+      "actual": 16616.2454490637,
+      "relative_error": 0.000001722371523996772,
+      "closed": true,
+      "bbox_max_error": 6.821210263296962e-13
+    },
+    {
+      "name": "Fork_L_9mm",
+      "expected": 16089.530995059227,
+      "actual": 16089.566486081305,
+      "relative_error": 0.000002205845657559594,
+      "closed": true,
+      "bbox_max_error": 1.4495071809506044e-12
+    }
+  ],
+  "final_measurement": {
+    "bodies": [
+      {
+        "area_mm2": 95856.7208069691,
+        "bbox": {
+          "max": [
+            120,
+            92,
+            8.000000000000002
+          ],
+          "min": [
+            -120,
+            -92.00000000000001,
+            0
+          ]
+        },
+        "center_of_mass": [
+          3.1666110777955272e-15,
+          -0.09082074290903036,
+          4
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 28,
+        "face_types": {
+          "cylinder": 8,
+          "plane": 6
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 60,
+          "faces": 22,
+          "shells": 1,
+          "vertices": 40
+        },
+        "mass_g": 453.339085109868,
+        "material": "Default",
+        "name": "MountBase",
+        "vertices": 24,
+        "volume_mm3": 351425.64737199066
+      },
+      {
+        "area_mm2": 16089.309979573965,
+        "bbox": {
+          "max": [
+            -100,
+            60,
+            160.00000000000009
+          ],
+          "min": [
+            -112,
+            24,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -106,
+          42,
+          83.99999999999872
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 20,
+        "face_types": {
+          "cylinder": 4,
+          "plane": 10
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 36,
+          "faces": 18,
+          "shells": 1,
+          "vertices": 24
+        },
+        "mass_g": 83.84888424760156,
+        "material": "Default",
+        "name": "PostLeft",
+        "vertices": 16,
+        "volume_mm3": 64999.135075660124
+      },
+      {
+        "area_mm2": 16089.309979573965,
+        "bbox": {
+          "max": [
+            112,
+            60,
+            160.00000000000009
+          ],
+          "min": [
+            100,
+            24,
+            8
+          ]
+        },
+        "center_of_mass": [
+          105.99999999999999,
+          42,
+          84
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 20,
+        "face_types": {
+          "cylinder": 4,
+          "plane": 10
+        },
+        "faces": 14,
+        "kernel": {
+          "edges": 36,
+          "faces": 18,
+          "shells": 1,
+          "vertices": 24
+        },
+        "mass_g": 83.8488842476025,
+        "material": "Default",
+        "name": "PostRight",
+        "vertices": 16,
+        "volume_mm3": 64999.13507566085
+      },
+      {
+        "area_mm2": 16082.609972455892,
+        "bbox": {
+          "max": [
+            116.00000000000026,
+            54.000000000000306,
+            167.99999999998954
+          ],
+          "min": [
+            -116,
+            30,
+            159.99999999998104
+          ]
+        },
+        "center_of_mass": [
+          1.4062575957609415e-13,
+          42.00000000000015,
+          163.99999999998468
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 32,
+        "face_types": {
+          "cylinder": 10,
+          "plane": 6
+        },
+        "faces": 16,
+        "kernel": {
+          "edges": 72,
+          "faces": 26,
+          "shells": 1,
+          "vertices": 48
+        },
+        "mass_g": 55.49693569210103,
+        "material": "Default",
+        "name": "RearBeam",
+        "vertices": 28,
+        "volume_mm3": 43020.88038147367
+      },
+      {
+        "area_mm2": 3008,
+        "bbox": {
+          "max": [
+            -93,
+            74,
+            14
+          ],
+          "min": [
+            -97,
+            -74,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -95,
+          0,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 4.5820799999999995,
+        "material": "Default",
+        "name": "BinGuideLeft",
+        "vertices": 8,
+        "volume_mm3": 3552
+      },
+      {
+        "area_mm2": 3008,
+        "bbox": {
+          "max": [
+            97,
+            74,
+            14
+          ],
+          "min": [
+            93,
+            -74,
+            8
+          ]
+        },
+        "center_of_mass": [
+          95,
+          0,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 4.5820799999999995,
+        "material": "Default",
+        "name": "BinGuideRight",
+        "vertices": 8,
+        "volume_mm3": 3552
+      },
+      {
+        "area_mm2": 3728,
+        "bbox": {
+          "max": [
+            92,
+            77,
+            14
+          ],
+          "min": [
+            -92,
+            73,
+            8
+          ]
+        },
+        "center_of_mass": [
+          0,
+          75,
+          11
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 12,
+        "face_types": {
+          "plane": 6
+        },
+        "faces": 6,
+        "kernel": {
+          "edges": 12,
+          "faces": 6,
+          "shells": 1,
+          "vertices": 8
+        },
+        "mass_g": 5.69664,
+        "material": "Default",
+        "name": "BinRearStop",
+        "vertices": 8,
+        "volume_mm3": 4416
+      },
+      {
+        "area_mm2": 242496,
+        "bbox": {
+          "max": [
+            92,
+            72,
+            158
+          ],
+          "min": [
+            -92,
+            -72,
+            8
+          ]
+        },
+        "center_of_mass": [
+          -1.2941938125548601e-14,
+          -5.17677525021944e-15,
+          68.43116328708643
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 24,
+        "face_types": {
+          "plane": 11
+        },
+        "faces": 11,
+        "kernel": {
+          "edges": 24,
+          "faces": 11,
+          "shells": 1,
+          "vertices": 16
+        },
+        "mass_g": 618.8697600000003,
+        "material": "Default",
+        "name": "RemovableBin",
+        "vertices": 16,
+        "volume_mm3": 479744.0000000002
+      },
+      {
+        "area_mm2": 10099.776204861771,
+        "bbox": {
+          "max": [
+            -32,
+            54,
+            172.0000000000001
+          ],
+          "min": [
+            -80,
+            -42,
+            167.99999999999986
+          ]
+        },
+        "center_of_mass": [
+          -55.999805200554206,
+          8.239199690994138,
+          169.9992462951513
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 190,
+        "face_types": {
+          "cylinder": 25,
+          "other": 5,
+          "plane": 41
+        },
+        "faces": 71,
+        "kernel": {
+          "edges": 204,
+          "faces": 75,
+          "shells": 1,
+          "vertices": 136
+        },
+        "mass_g": 21.858728244356204,
+        "material": "Default",
+        "name": "Fork_S_4mm",
+        "vertices": 128,
+        "volume_mm3": 16944.750577020313
+      },
+      {
+        "area_mm2": 9950.273911444001,
+        "bbox": {
+          "max": [
+            24,
+            54,
+            172
+          ],
+          "min": [
+            -24.000000000000057,
+            -42,
+            167.99999999999932
+          ]
+        },
+        "center_of_mass": [
+          0.0005917551321927641,
+          8.653985470535494,
+          169.99894793137227
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 277,
+        "face_types": {
+          "cylinder": 60,
+          "other": 5,
+          "plane": 37
+        },
+        "faces": 102,
+        "kernel": {
+          "edges": 291,
+          "faces": 106,
+          "shells": 1,
+          "vertices": 194
+        },
+        "mass_g": 21.42276775981419,
+        "material": "Default",
+        "name": "Fork_M_6mm",
+        "vertices": 186,
+        "volume_mm3": 16606.796713034255
+      },
+      {
+        "area_mm2": 9707.876839159904,
+        "bbox": {
+          "max": [
+            80.00000000000006,
+            54,
+            171.99999999999994
+          ],
+          "min": [
+            31.99999999999994,
+            -42,
+            167.99999999999855
+          ]
+        },
+        "center_of_mass": [
+          56.00064039619247,
+          9.310639849319147,
+          169.99869962785246
+        ],
+        "closed": true,
+        "density_g_cm3": 1.29,
+        "edges": 283,
+        "face_types": {
+          "cylinder": 57,
+          "other": 4,
+          "plane": 45
+        },
+        "faces": 106,
+        "kernel": {
+          "edges": 300,
+          "faces": 111,
+          "shells": 1,
+          "vertices": 200
+        },
+        "mass_g": 20.74095392292369,
+        "material": "Default",
+        "name": "Fork_L_9mm",
+        "vertices": 190,
+        "volume_mm3": 16078.258854979604
+      }
+    ],
+    "body_count": 11,
+    "total": {
+      "area_mm2": 426115.8776940386,
+      "edges": 910,
+      "faces": 366,
+      "mass_g": 1374.2867992242673,
+      "open_bodies_skipped": 0,
+      "vertices": 628,
+      "volume_mm3": 1065338.6040498198
+    }
+  },
+  "final_inspection": {
+    "active_sketch": null,
+    "bodies": [
+      {
+        "feature": 1,
+        "name": "MountBase",
+        "visible": true
+      },
+      {
+        "feature": 6,
+        "name": "PostLeft",
+        "visible": true
+      },
+      {
+        "feature": 13,
+        "name": "PostRight",
+        "visible": true
+      },
+      {
+        "feature": 20,
+        "name": "RearBeam",
+        "visible": true
+      },
+      {
+        "feature": 25,
+        "name": "BinGuideLeft",
+        "visible": true
+      },
+      {
+        "feature": 26,
+        "name": "BinGuideRight",
+        "visible": true
+      },
+      {
+        "feature": 27,
+        "name": "BinRearStop",
+        "visible": true
+      },
+      {
+        "feature": 28,
+        "name": "RemovableBin",
+        "visible": true
+      },
+      {
+        "feature": 30,
+        "name": "Fork_S_4mm",
+        "visible": true
+      },
+      {
+        "feature": 35,
+        "name": "Fork_M_6mm",
+        "visible": true
+      },
+      {
+        "feature": 40,
+        "name": "Fork_L_9mm",
+        "visible": true
+      }
+    ],
+    "dirty": false,
+    "hidden_origin": [],
+    "marker": 61,
+    "metadata": {
+      "org.solidcraftbot.tip-collector": {
+        "grooves_are_unqualified": true,
+        "revision": "T01",
+        "source": "model/tip-collector-t01.json",
+        "source_sha256": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
+        "status": "Review concept; no tip compatibility or manufacturing release"
+      }
+    },
+    "name": "TipCollector_T01.native",
+    "params": [
+      {
+        "comment": "",
+        "error": null,
+        "expression": "240 mm",
+        "model": false,
+        "name": "base_x",
+        "unit": "mm",
+        "value": 240
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "184 mm",
+        "model": false,
+        "name": "base_y",
+        "unit": "mm",
+        "value": 184
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "8 mm",
+        "model": false,
+        "name": "base_t",
+        "unit": "mm",
+        "value": 8
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "184 mm",
+        "model": false,
+        "name": "bin_x",
+        "unit": "mm",
+        "value": 184
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "144 mm",
+        "model": false,
+        "name": "bin_y",
+        "unit": "mm",
+        "value": 144
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "150 mm",
+        "model": false,
+        "name": "bin_h",
+        "unit": "mm",
+        "value": 150
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "4 mm",
+        "model": false,
+        "name": "bin_wall",
+        "unit": "mm",
+        "value": 4
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "10 mm",
+        "model": false,
+        "name": "rim_to_fork",
+        "unit": "mm",
+        "value": 10
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "4 mm",
+        "model": false,
+        "name": "fork_t",
+        "unit": "mm",
+        "value": 4
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "48 mm",
+        "model": false,
+        "name": "fork_x",
+        "unit": "mm",
+        "value": 48
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "-42 mm",
+        "model": false,
+        "name": "fork_front_y",
+        "unit": "mm",
+        "value": -42
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "54 mm",
+        "model": false,
+        "name": "fork_rear_y",
+        "unit": "mm",
+        "value": 54
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "20 mm",
+        "model": false,
+        "name": "mouth_width",
+        "unit": "mm",
+        "value": 20
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "-24 mm",
+        "model": false,
+        "name": "taper_end_y",
+        "unit": "mm",
+        "value": -24
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "5 mm",
+        "model": false,
+        "name": "slot_end_y",
+        "unit": "mm",
+        "value": 5
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "232 mm",
+        "model": false,
+        "name": "beam_x",
+        "unit": "mm",
+        "value": 232
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "24 mm",
+        "model": false,
+        "name": "beam_y",
+        "unit": "mm",
+        "value": 24
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "8 mm",
+        "model": false,
+        "name": "beam_t",
+        "unit": "mm",
+        "value": 8
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "42 mm",
+        "model": false,
+        "name": "beam_center_y",
+        "unit": "mm",
+        "value": 42
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "12 mm",
+        "model": false,
+        "name": "post_x",
+        "unit": "mm",
+        "value": 12
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "36 mm",
+        "model": false,
+        "name": "post_y",
+        "unit": "mm",
+        "value": 36
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "106 mm",
+        "model": false,
+        "name": "post_center_x",
+        "unit": "mm",
+        "value": 106
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "4.5 mm",
+        "model": false,
+        "name": "insert_hole_d",
+        "unit": "mm",
+        "value": 4.5
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "16 mm",
+        "model": false,
+        "name": "insert_hole_dx",
+        "unit": "mm",
+        "value": 16
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "6.6 mm",
+        "model": false,
+        "name": "table_hole_d",
+        "unit": "mm",
+        "value": 6.6
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "base_t+bin_h+rim_to_fork",
+        "model": false,
+        "name": "fork_z",
+        "unit": "mm",
+        "value": 168
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "bin_h+rim_to_fork-beam_t",
+        "model": false,
+        "name": "post_h",
+        "unit": "mm",
+        "value": 152
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "4 mm",
+        "model": false,
+        "name": "groove_S",
+        "unit": "mm",
+        "value": 4
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "6 mm",
+        "model": false,
+        "name": "groove_M",
+        "unit": "mm",
+        "value": 6
+      },
+      {
+        "comment": "",
+        "error": null,
+        "expression": "9 mm",
+        "model": false,
+        "name": "groove_L",
+        "unit": "mm",
+        "value": 9
+      }
+    ],
+    "path": "C:/Users/u005069/AppData/Local/Temp/solidcraft-mcp-5756-1f0afc84/TipCollector_T01.native.json",
+    "redo": 0,
+    "revision": 216,
+    "selection": [],
+    "sketches": [
+      {
+        "curves": 8,
+        "dof": 0,
+        "id": 31,
+        "name": "GrooveSketchS",
+        "profiles": 1,
+        "status": "solved",
+        "visible": false
+      },
+      {
+        "curves": 8,
+        "dof": 0,
+        "id": 36,
+        "name": "GrooveSketchM",
+        "profiles": 1,
+        "status": "solved",
+        "visible": false
+      },
+      {
+        "curves": 8,
+        "dof": 0,
+        "id": 41,
+        "name": "GrooveSketchL",
+        "profiles": 1,
+        "status": "solved",
+        "visible": false
+      },
+      {
+        "curves": 54,
+        "dof": 0,
+        "id": 45,
+        "name": "MarkSketchS",
+        "profiles": 5,
+        "status": "solved",
+        "visible": false
+      },
+      {
+        "curves": 83,
+        "dof": 0,
+        "id": 47,
+        "name": "MarkSketchM",
+        "profiles": 7,
+        "status": "solved",
+        "visible": false
+      },
+      {
+        "curves": 86,
+        "dof": 0,
+        "id": 49,
+        "name": "MarkSketchL",
+        "profiles": 9,
+        "status": "solved",
+        "visible": false
+      }
+    ],
+    "timeline": [
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 1,
+        "ms": 8.9313,
+        "name": "MountBase",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 2,
+        "ms": 26.969,
+        "name": "TableHole_-108_-80",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 3,
+        "ms": 24.130399999999998,
+        "name": "TableHole_-108_80",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 4,
+        "ms": 30.5641,
+        "name": "TableHole_108_-80",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 5,
+        "ms": 36.2722,
+        "name": "TableHole_108_80",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 6,
+        "ms": 0.7228,
+        "name": "PostLeft",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 7,
+        "ms": 84.84469999999999,
+        "name": "PostTopPilot_Left_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 8,
+        "ms": 52.8152,
+        "name": "PostBottomPilot_Left_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 9,
+        "ms": 37.7007,
+        "name": "PostBaseClearance_Left_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 10,
+        "ms": 44.5033,
+        "name": "PostTopPilot_Left_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 11,
+        "ms": 77.7878,
+        "name": "PostBottomPilot_Left_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 12,
+        "ms": 39.7376,
+        "name": "PostBaseClearance_Left_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 13,
+        "ms": 0.7245,
+        "name": "PostRight",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 14,
+        "ms": 44.8637,
+        "name": "PostTopPilot_Right_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 15,
+        "ms": 41.0317,
+        "name": "PostBottomPilot_Right_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 16,
+        "ms": 37.6757,
+        "name": "PostBaseClearance_Right_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 17,
+        "ms": 44.4383,
+        "name": "PostTopPilot_Right_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 18,
+        "ms": 50.3859,
+        "name": "PostBottomPilot_Right_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 19,
+        "ms": 43.4478,
+        "name": "PostBaseClearance_Right_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 20,
+        "ms": 0.7492,
+        "name": "RearBeam",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 21,
+        "ms": 29.9907,
+        "name": "BeamPostClearance_-106_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 22,
+        "ms": 30.619400000000002,
+        "name": "BeamPostClearance_-106_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 23,
+        "ms": 31.008399999999998,
+        "name": "BeamPostClearance_106_34",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 24,
+        "ms": 59.5051,
+        "name": "BeamPostClearance_106_50",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 25,
+        "ms": 0.7086,
+        "name": "BinGuideLeft",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 26,
+        "ms": 0.6211,
+        "name": "BinGuideRight",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 27,
+        "ms": 0.5963999999999999,
+        "name": "BinRearStop",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 28,
+        "ms": 0.6626,
+        "name": "RemovableBin",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 29,
+        "ms": 6.617900000000001,
+        "name": "BinCavity",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 30,
+        "ms": 1.2812999999999999,
+        "name": "Fork_S_4mm",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 31,
+        "ms": 0.3347,
+        "name": "GrooveSketchS",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 32,
+        "ms": 25.2455,
+        "name": "GrooveCutS",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 33,
+        "ms": 70.65299999999999,
+        "name": "InsertFixS-1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 34,
+        "ms": 86.0717,
+        "name": "InsertFixS1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 35,
+        "ms": 3.1571,
+        "name": "Fork_M_6mm",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 36,
+        "ms": 0.2949,
+        "name": "GrooveSketchM",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 37,
+        "ms": 23.2722,
+        "name": "GrooveCutM",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 38,
+        "ms": 78.4619,
+        "name": "InsertFixM-1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 39,
+        "ms": 80.31190000000001,
+        "name": "InsertFixM1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 40,
+        "ms": 0.6462,
+        "name": "Fork_L_9mm",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BoxFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 41,
+        "ms": 0.2764,
+        "name": "GrooveSketchL",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 42,
+        "ms": 19.2564,
+        "name": "GrooveCutL",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 43,
+        "ms": 80.822,
+        "name": "InsertFixL-1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 44,
+        "ms": 97.8787,
+        "name": "InsertFixL1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "CylinderFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 45,
+        "ms": 4.1309,
+        "name": "MarkSketchS",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 46,
+        "ms": 230.0954,
+        "name": "CapacityMarkS",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 47,
+        "ms": 7.6528,
+        "name": "MarkSketchM",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 48,
+        "ms": 285.4336,
+        "name": "CapacityMarkM",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 49,
+        "ms": 4.3420000000000005,
+        "name": "MarkSketchL",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "Sketch",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 50,
+        "ms": 274.2958,
+        "name": "CapacityMarkL",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "ExtrudeFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 53,
+        "ms": 0.0152,
+        "name": "BodyTransfer1",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 54,
+        "ms": 0.0048,
+        "name": "BodyTransfer2",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 55,
+        "ms": 0.0051,
+        "name": "BodyTransfer3",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 56,
+        "ms": 0.0073,
+        "name": "BodyTransfer4",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 57,
+        "ms": 0.0045000000000000005,
+        "name": "BodyTransfer5",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 58,
+        "ms": 0.0045000000000000005,
+        "name": "BodyTransfer6",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 59,
+        "ms": 0.0047,
+        "name": "BodyTransfer7",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 62,
+        "ms": 0.0043,
+        "name": "BodyTransfer8",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 65,
+        "ms": 0.0042,
+        "name": "BodyTransfer9",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 68,
+        "ms": 0.0040999999999999995,
+        "name": "BodyTransfer10",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      },
+      {
+        "boolean_diagnostics": {
+          "events": [],
+          "truncated": false
+        },
+        "error": null,
+        "id": 71,
+        "ms": 0.0044,
+        "name": "BodyTransfer11",
+        "rolled_back": false,
+        "suppressed": false,
+        "type": "BodyTransferFeature",
+        "warning": null
+      }
+    ],
+    "undo": 117,
+    "units": "mm"
+  },
+  "static_interference": {
+    "boolean_ms": 767.462,
+    "budget_exceeded": false,
+    "budget_s": 30,
+    "checked": 11,
+    "count": 0,
+    "interferences": [],
+    "ms": 741.757,
+    "pairs_candidate": 11,
+    "pairs_cleared": 0,
+    "pairs_intersected": 11,
+    "pairs_not_checked": 0,
+    "skipped_pairs": 0,
+    "slowest": [
+      {
+        "a": "RearBeam",
+        "b": "Fork_L_9mm",
+        "boolean_ms": 47.907,
+        "ms": 714.812,
+        "tessellate_ms": 210.688
+      },
+      {
+        "a": "RearBeam",
+        "b": "Fork_S_4mm",
+        "boolean_ms": 49.956,
+        "ms": 680.112,
+        "tessellate_ms": 278.112
+      },
+      {
+        "a": "RearBeam",
+        "b": "Fork_M_6mm",
+        "boolean_ms": 50.041,
+        "ms": 615.156,
+        "tessellate_ms": 95.467
+      },
+      {
+        "a": "MountBase",
+        "b": "PostLeft",
+        "boolean_ms": 50.529,
+        "ms": 489.564,
+        "tessellate_ms": 0
+      },
+      {
+        "a": "MountBase",
+        "b": "PostRight",
+        "boolean_ms": 146.387,
+        "ms": 481.258,
+        "tessellate_ms": 0
+      },
+      {
+        "a": "PostRight",
+        "b": "RearBeam",
+        "boolean_ms": 85.317,
+        "ms": 456.984,
+        "tessellate_ms": 0
+      },
+      {
+        "a": "PostLeft",
+        "b": "RearBeam",
+        "boolean_ms": 79.756,
+        "ms": 439.779,
+        "tessellate_ms": 0
+      },
+      {
+        "a": "MountBase",
+        "b": "RemovableBin",
+        "boolean_ms": 150.583,
+        "ms": 357.559,
+        "tessellate_ms": 0
+      }
+    ],
+    "tessellate_ms": 584.267,
+    "threads": 11,
+    "truncated": false,
+    "unchecked": []
+  },
+  "groove_parameter_test": {
+    "parameter": "groove_M",
+    "from_mm": 6,
+    "to_mm": 7,
+    "expected_volume_decrease_mm3": 172.42035224833364,
+    "actual_volume_decrease_mm3": 172.41819188033696,
+    "passed": true
+  },
+  "marking_checks": [
+    {
+      "body": "Fork_S_4mm",
+      "mark_depth_mm": 0.3,
+      "removed_volume_mm3": 6.905058118074521,
+      "relative_removed_volume": 0.0004073382722429372,
+      "bounds_max_error_mm": 2.842170943040401e-14,
+      "passed": true
+    },
+    {
+      "body": "Fork_M_6mm",
+      "mark_depth_mm": 0.3,
+      "removed_volume_mm3": 9.448736029444262,
+      "relative_removed_volume": 0.0005686444665498537,
+      "bounds_max_error_mm": 1.1368683772161603e-13,
+      "passed": true
+    },
+    {
+      "body": "Fork_L_9mm",
+      "mark_depth_mm": 0.3,
+      "removed_volume_mm3": 11.30763110170119,
+      "relative_removed_volume": 0.0007027927763922756,
+      "bounds_max_error_mm": 5.684341886080802e-14,
+      "passed": true
+    }
+  ]
+}

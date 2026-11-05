@@ -1,0 +1,330 @@
+{
+  "format": "solidcraftbot.lab-layout/1",
+  "id": "LabLayout_L01",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "status": "Static fit and access study; provisional room dimensions; not coordinated robot operation or human-machine safety validation",
+  "assets": {
+    "room": {
+      "source": "model/lab-room-l01.shared.json",
+      "source_sha256": "7f455f7221691476887c7c95f0c243f24956aeaefcf377011fdfeee93f3970e4",
+      "report": "cad/lab-room-l01/shared-build-report.json",
+      "native": "cad/generated/lab-room-l01-7f455f722169/default.FCStd",
+      "native_sha256": "152ec1d6a9356fd6d26d4b2c57f7c2791c3030bb5dc3aeaa5e6cf9787126219b"
+    },
+    "arm": {
+      "source": "model/robot.json",
+      "source_sha256": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
+      "report": "exports/generated/build-report.json",
+      "native": "cad/generated/c7dd198799c0/Laborarm_6R_A01_Neutral.FCStd",
+      "native_sha256": "d557f212facc9ba062ecc39c0fe761c8ea0f0ab80b409008d77d73d46288007e"
+    },
+    "centrifuge": {
+      "source": "model/centrifuge-cf01.shared.json",
+      "source_sha256": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+      "report": "cad/centrifuge-cf01/shared-build-report.json",
+      "native": "cad/generated/centrifuge-cf01-7a4eddd8ce4a/Centrifuge_CF01.FCStd",
+      "native_sha256": "0dc541addd7f81c43a16ef95b7dbaaa7ca44cb3427e2b65d159219ff54073ee2"
+    },
+    "transporter": {
+      "source": "model/sample-transport-tr01.shared.json",
+      "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
+      "report": "cad/sample-transport-tr01/shared-build-report.json",
+      "native": "cad/generated/sample-transport-tr01-4785a40b8bad/Floor_Mixed.FCStd",
+      "native_sha256": "858f6f864bea2e7ff4025f0f0900aec2448fda8830e64b10c96eb4ef10772dfb"
+    },
+    "tip_collector": {
+      "source": "model/tip-collector-t01.shared.json",
+      "source_sha256": "be9cf1f341cc32d2852c7807b67c1c2d13ae6568ff19e80dfd9ec777c4e81608",
+      "report": "cad/tip-collector-t01/shared-build-report.json",
+      "native": "cad/generated/tip-collector-t01-be9cf1f341cc-r4/TipCollector_T01_Shared.FCStd",
+      "native_sha256": "99d7376c14b7b004df49f53c40833ec4d031178290fbaea5a40a5d4c236715f3"
+    }
+  },
+  "parameters": {
+    "pair_center_y": 3400,
+    "pair_spacing": 660,
+    "arm_riser_h": 65,
+    "cf_x": 500,
+    "cf_y": 6050,
+    "cf_arm_x": 600,
+    "cf_arm_y": 6350,
+    "vehicle_x": 930,
+    "vehicle_y": 6250,
+    "vehicle_deck_z": 900,
+    "human_check_h": 2000,
+    "riser_wall": 16,
+    "pair_island_offset_x": 500,
+    "cf_arm_riser_h": 160
+  },
+  "instances": [
+    {
+      "id": "ArmA",
+      "asset": "arm",
+      "host": "IslandRight",
+      "xyz": [
+        "room_width/2+pair_island_offset_x",
+        "pair_center_y-pair_spacing/2",
+        "bench_height+arm_riser_h"
+      ],
+      "yaw_deg": 70,
+      "joints_deg": [
+        20,
+        35,
+        65,
+        0,
+        80,
+        15
+      ]
+    },
+    {
+      "id": "ArmB",
+      "asset": "arm",
+      "host": "IslandRight",
+      "xyz": [
+        "room_width/2+pair_island_offset_x",
+        "pair_center_y+pair_spacing/2",
+        "bench_height+arm_riser_h"
+      ],
+      "yaw_deg": -110,
+      "joints_deg": [
+        20,
+        35,
+        65,
+        0,
+        80,
+        15
+      ]
+    },
+    {
+      "id": "ArmC",
+      "asset": "arm",
+      "host": "LeftBench",
+      "xyz": [
+        "cf_arm_x",
+        "cf_arm_y",
+        "bench_height+cf_arm_riser_h"
+      ],
+      "yaw_deg": 0,
+      "joints_deg": [
+        20,
+        25,
+        65,
+        0,
+        0,
+        15
+      ],
+      "riser_height": "cf_arm_riser_h"
+    },
+    {
+      "id": "CF01",
+      "asset": "centrifuge",
+      "host": "LeftBench",
+      "xyz": [
+        "cf_x",
+        "cf_y",
+        "bench_height"
+      ],
+      "yaw_deg": 270,
+      "pose": "closed"
+    },
+    {
+      "id": "TR01",
+      "asset": "transporter",
+      "host": "Floor",
+      "xyz": [
+        "vehicle_x",
+        "vehicle_y",
+        0
+      ],
+      "yaw_deg": 90,
+      "overrides": {
+        "floor_deck_z": 900
+      },
+      "exclude_bodies": [
+        "TransportCover"
+      ]
+    },
+    {
+      "id": "T01",
+      "asset": "tip_collector",
+      "host": "IslandRight",
+      "xyz": [
+        "room_width/2+250",
+        "pair_center_y",
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "RackPair",
+      "asset": "tube_rack",
+      "host": "IslandRight",
+      "xyz": [
+        "room_width/2+600",
+        "pair_center_y",
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "RackCF",
+      "asset": "tube_rack",
+      "host": "LeftBench",
+      "xyz": [
+        "cf_x",
+        "cf_y-475",
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "RackManual",
+      "asset": "tube_rack",
+      "host": "IslandLeft",
+      "xyz": [
+        "room_width/2-450",
+        2700,
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    }
+  ],
+  "corridors": [
+    {
+      "id": "People_Left",
+      "bounds": [
+        1450,
+        2450,
+        1400,
+        6200
+      ],
+      "color": "#b8d7c4"
+    },
+    {
+      "id": "People_Right",
+      "bounds": [
+        "room_width-2100",
+        "room_width-1100",
+        1400,
+        6200
+      ],
+      "color": "#b8d7c4"
+    },
+    {
+      "id": "People_Entrance",
+      "bounds": [
+        1000,
+        "room_width-1100",
+        400,
+        1400
+      ],
+      "color": "#b8d7c4"
+    },
+    {
+      "id": "People_WindowEnd",
+      "bounds": [
+        1450,
+        "room_width-1100",
+        5300,
+        6200
+      ],
+      "color": "#b8d7c4"
+    }
+  ],
+  "vehicle_route": {
+    "id": "TR01.doorA_to_left_station",
+    "waypoints": [
+      [
+        "vehicle_x",
+        -400
+      ],
+      [
+        "vehicle_x",
+        "vehicle_y"
+      ]
+    ],
+    "yaw_deg": 90,
+    "sample_step_mm": 200,
+    "implementation": "sampled geometric footprint check only; no navigation or drive control"
+  },
+  "reach_targets": [
+    {
+      "id": "Pair.shared_zone",
+      "arms": [
+        "ArmA",
+        "ArmB"
+      ],
+      "xyz": [
+        "room_width/2+pair_island_offset_x",
+        "pair_center_y",
+        "bench_height+145"
+      ]
+    },
+    {
+      "id": "Pair.tip_collector_approach",
+      "arms": [
+        "ArmA",
+        "ArmB"
+      ],
+      "xyz": [
+        "room_width/2+250",
+        "pair_center_y",
+        "bench_height+190"
+      ]
+    },
+    {
+      "id": "CF01.approach_above_lid",
+      "arms": [
+        "ArmC"
+      ],
+      "xyz": [
+        "cf_x",
+        "cf_y",
+        "bench_height+330"
+      ]
+    },
+    {
+      "id": "TR01.plate_approach",
+      "arms": [
+        "ArmC"
+      ],
+      "xyz": [
+        "vehicle_x",
+        "vehicle_y-78",
+        "vehicle_deck_z+160"
+      ]
+    },
+    {
+      "id": "TR01.tube_rack_approach",
+      "arms": [
+        "ArmC"
+      ],
+      "xyz": [
+        "vehicle_x",
+        "vehicle_y+78",
+        "vehicle_deck_z+160"
+      ]
+    }
+  ],
+  "assumptions": [
+    "T01 means existing used-tip collector, confirmed by owner",
+    "owner requested collaborating pair on right-hand central bench",
+    "arm risers are open concept frames to clear motors below original base plate",
+    "TR01 deck regenerated at 900 mm; transport cover omitted for access, no cover-handling mechanism",
+    "rack geometry is the existing TR01 24-place tube cassette reused on benches",
+    "green floor strips indicate provisional geometric study corridors, not regulated or safe separation distances",
+    "CF01 rotated towards ArmC; station coordinates and ArmC riser revised for oriented sample handling"
+  ],
+  "limitations": [
+    "Room dimensions, doors and storage remain provisional",
+    "Equipment in the layout is a pinned, posed geometry snapshot; original six-axis joints remain editable in original models, not in this static scene",
+    "No pipette, gripper, calibrated tool TCP or liquid transfer modeled",
+    "Position-only inverse-kinematics screens do not establish orientation, approach path, cable clearance or physical grasp",
+    "No collaboration scheduler, robot-motion sweeps, human detection, protective separation, egress/accessibility compliance or payload/bench-load qualification",
+    "Floor transporter path is sampled against static geometry; dynamics, steering, localization and people interaction are not validated",
+    "Rack/vehicle article fits and centrifuge performance limits retain upstream qualifications"
+  ]
+}

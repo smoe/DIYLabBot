@@ -1,0 +1,40 @@
+# Generated pickup playback: conceptual six-axis arm, provisional gripper, no I/O.
+import sys,json,time
+import FreeCAD as App
+import FreeCADGui as Gui
+from PySide import QtCore,QtWidgets
+sys.path.insert(0,__SCRIPTS__)
+import centrifuge_robot_pickup as pickup
+import centrifuge_model as cf
+
+context=json.loads(open(__CONTEXT__,encoding='utf-8').read())
+scene=json.loads(open(context['out']+'/scene-source.json',encoding='utf-8').read())
+data=json.loads(open(context['out']+'/trajectory.json',encoding='utf-8').read())
+if cf.digest(pickup.SOURCE)!=data['scene_sha256']:raise RuntimeError('Pickup source changed; rebuild the scene before playback')
+if cf.digest(cf.SOURCE)!=data['geometry_sha256'] or cf.digest(cf.ROOT/scene['sources']['robot'])!=data['robot_sha256']:raise RuntimeError('Geometry source changed; rebuild the scene before playback')
+doc=App.openDocument(context['cad']+'/CF01_Robot_Closed.FCStd')
+Gui.activeDocument().activeView().viewAxonometric();Gui.activeDocument().activeView().fitAll()
+
+class PickupPlayback(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__(Gui.getMainWindow());self.setWindowTitle('Bench robot retrieves tube and places it in rack')
+        layout=QtWidgets.QVBoxLayout(self);self.label=QtWidgets.QLabel('Ready');layout.addWidget(self.label)
+        self.slider=QtWidgets.QSlider(QtCore.Qt.Horizontal);self.slider.setRange(0,round(data['duration_s']*100));layout.addWidget(self.slider)
+        self.button=QtWidgets.QPushButton('Play');layout.addWidget(self.button);self.button.clicked.connect(self.play)
+        self.slider.valueChanged.connect(self.apply);self.timer=QtCore.QTimer(self);self.timer.timeout.connect(self.tick)
+    def apply(self,value):
+        sample=pickup.interpolate(data['samples'],value/100);matrices=pickup.matrices(scene,data,sample)
+        for group,matrix in matrices.items():
+            obj=doc.getObject(group.replace('.','_'))
+            if obj:obj.Placement=App.Placement(App.Matrix(*[x for row in matrix for x in row]))
+        self.label.setText(sample['phase']);doc.recompute();Gui.updateGui()
+    def play(self):
+        if self.timer.isActive():self.timer.stop();self.button.setText('Play');return
+        if self.slider.value()==self.slider.maximum():self.slider.setValue(0)
+        self.started=time.monotonic()-self.slider.value()/100;self.timer.start(65);self.button.setText('Pause')
+    def tick(self):
+        self.slider.setValue(min(self.slider.maximum(),round((time.monotonic()-self.started)*100)))
+        if self.slider.value()==self.slider.maximum():self.timer.stop();self.button.setText('Replay')
+    def closeEvent(self,event):self.timer.stop();super().closeEvent(event)
+
+pickup_player=PickupPlayback();pickup_player.show()

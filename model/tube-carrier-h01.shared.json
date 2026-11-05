@@ -1,0 +1,62 @@
+{
+  "format": "solidcraftbot.tube-carrier/1",
+  "id": "TubeCarrier_H01",
+  "status": "Concept H01; article dimensions, fits, forces and thermal performance unqualified",
+  "units": {"length": "mm", "angle": "deg"},
+  "parameters": {
+    "module_pitch": {"expression": 92, "unit": "mm", "range": [88, 104], "description": "Separation of the two demonstration docks"},
+    "tube_radius": {"expression": 5.4, "unit": "mm", "range": [5.2, 5.6], "description": "Illustrative external body radius; not a manufacturer fit"},
+    "radial_clearance": {"expression": 0.2, "unit": "mm", "range": [0.15, 0.35], "description": "Nominal radial cavity clearance; must be tested on real tubes"},
+    "tube_bottom_z": {"expression": 10, "unit": "mm", "range": [10, 10], "description": "Illustrative external bottom reference"},
+    "collar_z": {"expression": 42, "unit": "mm", "range": [42, 42], "description": "Underside of collar and upper insert seat"},
+    "cone_join_z": {"expression": 24, "unit": "mm", "range": [24, 24], "description": "Illustrative conical-to-cylindrical transition"},
+    "collar_radius": {"expression": 7, "unit": "mm", "range": [7, 7], "description": "Collar envelope only"},
+    "insert_radius": {"expression": 8, "unit": "mm", "range": [8, 8], "description": "Common insert skirt radius"},
+    "carrier_bottom_z": {"expression": 8, "unit": "mm", "range": [8, 8], "description": "Common carrier/insert docking plane"},
+    "housing_top_z": {"expression": 38, "unit": "mm", "range": [38, 38], "description": "Insert flange support plane"},
+    "transfer_travel": {"expression": 55, "unit": "mm", "range": [50, 60], "description": "Illustrative outward slide along negative Y"},
+    "latch_travel": {"expression": 35, "unit": "mm", "range": [35, 40], "description": "Illustrative latch retraction along positive X"},
+    "grip_pad_z": {"expression": 26, "unit": "mm", "range": [25, 28], "description": "Bottom of common external grip pads"}
+  },
+  "variants": [
+    {"id": "V15", "nominal_volume_mL": 1.5, "bottom": "conical", "center_x": "-module_pitch/2", "insert_color": "#279d93"},
+    {"id": "V20", "nominal_volume_mL": 2.0, "bottom": "rounded", "center_x": "module_pitch/2", "insert_color": "#6095d6"}
+  ],
+  "recipe": "common_shell_keyed_front_dock_and_article_specific_insert_v1",
+  "rounded_profile_angles_deg": [0, 15, 30, 45, 60, 75, 90],
+  "interfaces": {
+    "carrier_foot_mm": [26, 24, 3],
+    "housing_mm": [22, 20, 27],
+    "grip_pad_outer_x_mm": [-17, 17],
+    "grip_pad_depth_mm": 10,
+    "grip_pad_height_mm": 8,
+    "mouth_reference_z": "collar_z+2",
+    "hinge_direction": [0, 1, 0],
+    "insert_outer_radius": "insert_radius",
+    "note": "These are common concept interfaces for the two variants, not measured tube dimensions or an industry standard"
+  },
+  "display_pose": "comparison",
+  "poses_mm": {
+    "comparison": {"SlideV15": 0, "LatchV15": 0, "SlideV20": "transfer_travel", "LatchV20": "latch_travel"},
+    "both_docked_locked": {"SlideV15": 0, "LatchV15": 0, "SlideV20": 0, "LatchV20": 0},
+    "both_docked_unlocked": {"SlideV15": 0, "LatchV15": "latch_travel", "SlideV20": 0, "LatchV20": "latch_travel"},
+    "both_outside": {"SlideV15": "transfer_travel", "LatchV15": "latch_travel", "SlideV20": "transfer_travel", "LatchV20": "latch_travel"}
+  },
+  "handoff_sequence": [
+    "Confirm lid closed and tube retained in carrier",
+    "Reserve dock; inhibit lid mechanism and retract dock latch",
+    "Approach from front while holding carrier grip pads",
+    "Confirm carrier seated, tube present and hinge orientation correct",
+    "Close latch and independently confirm retention before sender releases",
+    "Confirm receiver grasp before retracting latch and withdrawing carrier"
+  ],
+  "limitations": [
+    "Both tube shapes and cap/hinge envelopes are illustrative, not manufacturer CAD and not volume-accurate containers; rounded bottom is a six-segment revolved profile",
+    "Collar clips, hinge key and latch are contact/mechanism envelopes; no compliant mechanism, actuator or sensor is selected",
+    "Metal insert bottom is coplanar with dock floor as a proposed heat path; thermal contact and sample temperature are unverified",
+    "First prototype is manually loaded outside the lid station; loose-tube rack loading is a separate task",
+    "H01 is a separate demonstration dock, not an integrated replacement for the C01 cold insert",
+    "The gripper is a space envelope with nominal clearance, not a selected gripper or a validated grasp",
+    "Motion checks cover sampled slider poses, not full robot trajectories, swept volumes or physical safety"
+  ]
+}

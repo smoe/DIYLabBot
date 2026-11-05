@@ -1,0 +1,273 @@
+{
+  "part": "RMD-X4-P36-36-E-L",
+  "source_sha256": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
+  "method": "Drawing leader assignment checked against coaxial STEP cylindrical faces and locating sleeve solids",
+  "interfaces": {
+    "housing": {
+      "fastener_count": 6,
+      "bolt_circle_mm": 48,
+      "vendor_thread": "M3",
+      "cad_pattern_bore_diameter_mm": 2.5,
+      "cad_thread_core_diameter_mm": 2.5,
+      "matched_thread_core_count": 6,
+      "hole_centres_mm": [
+        [
+          -23.635,
+          -4.168
+        ],
+        [
+          -15.427,
+          18.385
+        ],
+        [
+          -8.208,
+          -22.553
+        ],
+        [
+          8.208,
+          22.553
+        ],
+        [
+          15.427,
+          -18.385
+        ],
+        [
+          23.635,
+          4.168
+        ]
+      ],
+      "cad_thread_core_z_ranges_mm": [
+        [
+          -9.7489,
+          -3.0
+        ]
+      ],
+      "locating_bores": {
+        "centres_mm": [
+          [
+            -10.142838,
+            21.751387
+          ],
+          [
+            10.142838,
+            -21.751387
+          ]
+        ],
+        "drawing_depth_mm": 4,
+        "cad_z_ranges_mm": [
+          [
+            -7.0,
+            -3.0
+          ]
+        ],
+        "physical_fit_verified": false
+      }
+    },
+    "output": {
+      "fastener_count": 6,
+      "bolt_circle_mm": 26,
+      "vendor_thread": "M3",
+      "cad_pattern_bore_diameter_mm": 2.5,
+      "cad_thread_core_diameter_mm": 2.5,
+      "matched_thread_core_count": 6,
+      "hole_centres_mm": [
+        [
+          -12.495,
+          -3.588
+        ],
+        [
+          -9.355,
+          9.027
+        ],
+        [
+          -3.14,
+          -12.615
+        ],
+        [
+          3.14,
+          12.615
+        ],
+        [
+          9.355,
+          -9.027
+        ],
+        [
+          12.495,
+          3.588
+        ]
+      ],
+      "cad_thread_core_z_ranges_mm": [
+        [
+          -6.7489,
+          0.0
+        ]
+      ],
+      "locating_bores": {
+        "centres_mm": [
+          [
+            -12.61497,
+            3.140467
+          ],
+          [
+            3.587761,
+            -12.495118
+          ],
+          [
+            9.027209,
+            9.354651
+          ]
+        ],
+        "drawing_depth_mm": 3,
+        "cad_z_ranges_mm": [
+          [
+            -3.0,
+            0.0
+          ]
+        ],
+        "physical_fit_verified": false
+      }
+    }
+  },
+  "passed": true,
+  "drawing": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf",
+  "drawing_sha256": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+  "interface_spec": {
+    "path": "model/x4-mounting-interface.json",
+    "sha256": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829"
+  },
+  "assembly_design_analysis": {
+    "status": "calculated_under_stated_assumptions_sample_pending",
+    "fasteners": {
+      "housing": {
+        "designation": "M3 x 8 ISO 4762 full thread, steel 8.8",
+        "quantity": 6,
+        "effective_plate_grip_mm": 2.9,
+        "nominal_axial_thread_overlap_mm": 5.1,
+        "axial_thread_overlap_range_mm": [
+          4.9,
+          5.299999999999999
+        ],
+        "assumed_available_thread_depth_min_mm": 5.8,
+        "minimum_tip_margin_mm": 0.5000000000000009,
+        "minimum_plate_floor_mm": 2.8000000000000003,
+        "minimum_head_recess_mm": 0.050000000000000266,
+        "minimum_measured_face_to_usable_thread_end_mm": 5.799999999999999,
+        "thread_depth_reference": "From named housing/output mating face; no unthreaded counterbore indicated",
+        "full_thread_engagement_verified": false,
+        "torque_nm": null
+      },
+      "output": {
+        "designation": "M3 x 8 ISO 4762 full thread, steel 8.8",
+        "quantity": 6,
+        "effective_plate_grip_mm": 2.9,
+        "nominal_axial_thread_overlap_mm": 5.1,
+        "axial_thread_overlap_range_mm": [
+          4.9,
+          5.299999999999999
+        ],
+        "assumed_available_thread_depth_min_mm": 5.8,
+        "minimum_tip_margin_mm": 0.5000000000000009,
+        "minimum_plate_floor_mm": 2.8000000000000003,
+        "minimum_head_recess_mm": 0.050000000000000266,
+        "minimum_measured_face_to_usable_thread_end_mm": 5.799999999999999,
+        "thread_depth_reference": "From named housing/output mating face; no unthreaded counterbore indicated",
+        "full_thread_engagement_verified": false,
+        "torque_nm": null
+      }
+    },
+    "locating": {
+      "housing": {
+        "scheme": "plate_retained_round_and_radially_relieved_pin",
+        "selected_centres_mm": [
+          [
+            -10.142838,
+            21.751387
+          ],
+          [
+            10.142838,
+            -21.751387
+          ]
+        ],
+        "span_mm": 47.999999963250545,
+        "vendor_bore_limits_mm": [
+          3,
+          3.03
+        ],
+        "head_diameter_limits_mm": [
+          2.994,
+          3
+        ],
+        "diametral_clearance_range_mm": [
+          0,
+          0.03599999999999959
+        ],
+        "retention_interference_range_mm": [
+          0.0040000000000000036,
+          0.016000000000000014
+        ],
+        "minimum_vendor_bore_tip_margin_mm": 1.3499999999999999,
+        "minimum_retention_bore_tip_margin_mm": 0.4000000000000002,
+        "relieved_tangential_width_limits_mm": [
+          2.988,
+          2.994
+        ],
+        "radial_relief_allowance_mm": 0.0900000000000001,
+        "assumed_pitch_and_thermal_budget_mm": 0.05611999998383024,
+        "worst_assumed_offset_including_primary_pin_float_mm": 0.07411999998383004,
+        "minimum_diamond_corner_clearance_mm": 0.0008432172054040343,
+        "assumed_relief_clocking_error_deg": 0.25,
+        "assembly_angular_free_play_half_range_deg": 0.04655282601204465,
+        "illustrative_400mm_lever_error_mm": 0.325000000248822,
+        "pin_retention_strength_verified": false,
+        "manufacturing_released": false
+      },
+      "output": {
+        "scheme": "plate_retained_round_and_radially_relieved_pin",
+        "selected_centres_mm": [
+          [
+            -12.61497,
+            3.140467
+          ],
+          [
+            3.587761,
+            -12.495118
+          ]
+        ],
+        "span_mm": 22.516660723797077,
+        "vendor_bore_limits_mm": [
+          3,
+          3.03
+        ],
+        "head_diameter_limits_mm": [
+          2.994,
+          3
+        ],
+        "diametral_clearance_range_mm": [
+          0,
+          0.03599999999999959
+        ],
+        "retention_interference_range_mm": [
+          0.0040000000000000036,
+          0.016000000000000014
+        ],
+        "minimum_vendor_bore_tip_margin_mm": 0.3499999999999999,
+        "minimum_retention_bore_tip_margin_mm": 0.4000000000000002,
+        "relieved_tangential_width_limits_mm": [
+          2.988,
+          2.994
+        ],
+        "radial_relief_allowance_mm": 0.0900000000000001,
+        "assumed_pitch_and_thermal_budget_mm": 0.044907330718470716,
+        "worst_assumed_offset_including_primary_pin_float_mm": 0.06290733071847052,
+        "minimum_diamond_corner_clearance_mm": 0.0014046117200647856,
+        "assumed_relief_clocking_error_deg": 0.25,
+        "assembly_angular_free_play_half_range_deg": 0.09923924980215987,
+        "illustrative_400mm_lever_error_mm": 0.6928203160921096,
+        "pin_retention_strength_verified": false,
+        "manufacturing_released": false
+      }
+    },
+    "manufacturing_released": false
+  },
+  "manufacturing_released": false
+}

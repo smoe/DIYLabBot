@@ -1,0 +1,422 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolidCraftBot servo and harness requirements v1",
+  "type": "object",
+  "required": [
+    "format",
+    "status",
+    "controller",
+    "actuators",
+    "harness"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.services/1"
+    },
+    "status": {
+      "const": "requirements_and_concept_topology"
+    },
+    "controller": {
+      "type": "object",
+      "required": [
+        "id",
+        "mounted_link"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "mounted_link": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "actuators": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "joint",
+          "mounted_link",
+          "envelope_body",
+          "kind",
+          "part",
+          "command_interfaces",
+          "required_feedback",
+          "feedback",
+          "transmission"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "joint": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "mounted_link": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "envelope_body": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "kind": {
+            "const": "servo"
+          },
+          "part": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "command_interfaces": {
+            "const": [
+              "position"
+            ]
+          },
+          "required_feedback": {
+            "const": [
+              "measured_position",
+              "sample_time",
+              "fault_status"
+            ]
+          },
+          "feedback": {
+            "type": "object",
+            "required": [
+              "measurement_location",
+              "position_reference",
+              "period_ms",
+              "max_sample_age_ms",
+              "latency_ms"
+            ],
+            "properties": {
+              "measurement_location": {
+                "enum": [
+                  null,
+                  "motor_shaft",
+                  "servo_output",
+                  "joint_output"
+                ]
+              },
+              "position_reference": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "period_ms": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "max_sample_age_ms": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "latency_ms": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              }
+            },
+            "additionalProperties": false
+          },
+          "transmission": {
+            "type": "object",
+            "required": [
+              "motor_revolutions_per_joint_revolution",
+              "direction",
+              "joint_zero_offset_deg"
+            ],
+            "properties": {
+              "motor_revolutions_per_joint_revolution": {
+                "type": [
+                  "number",
+                  "null"
+                ],
+                "exclusiveMinimum": 0
+              },
+              "direction": {
+                "enum": [
+                  null,
+                  -1,
+                  1
+                ]
+              },
+              "joint_zero_offset_deg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "minItems": 6,
+      "maxItems": 6
+    },
+    "harness": {
+      "type": "object",
+      "required": [
+        "topology",
+        "render_in_motion",
+        "flexible_dynamics",
+        "circuits",
+        "joint_passages"
+      ],
+      "properties": {
+        "topology": {
+          "const": "logical_connections_physical_topology_unselected"
+        },
+        "render_in_motion": {
+          "const": false
+        },
+        "flexible_dynamics": {
+          "const": false
+        },
+        "circuits": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "source",
+              "target",
+              "signals",
+              "route_links",
+              "cable",
+              "routing",
+              "electrical"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "source": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "target": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "signals": {
+                "const": [
+                  "power",
+                  "command",
+                  "position_feedback",
+                  "fault_status"
+                ]
+              },
+              "route_links": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              },
+              "cable": {
+                "type": "object",
+                "required": [
+                  "part",
+                  "outer_diameter_mm",
+                  "installed_length_mm",
+                  "minimum_dynamic_bend_radius_mm",
+                  "maximum_torsion_deg_per_m",
+                  "linear_mass_g_per_m"
+                ],
+                "properties": {
+                  "part": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "outer_diameter_mm": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "installed_length_mm": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "minimum_dynamic_bend_radius_mm": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "maximum_torsion_deg_per_m": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "linear_mass_g_per_m": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "additionalProperties": false
+              },
+              "routing": {
+                "type": "object",
+                "required": [
+                  "guide_points",
+                  "clamps_and_strain_relief",
+                  "service_slack_mm",
+                  "clearance_mm"
+                ],
+                "properties": {
+                  "guide_points": {
+                    "type": "null",
+                    "description": "Unresolved; geometric cable routing backend not implemented."
+                  },
+                  "clamps_and_strain_relief": {
+                    "type": "null",
+                    "description": "Unresolved; geometric cable routing backend not implemented."
+                  },
+                  "service_slack_mm": {
+                    "type": "null",
+                    "description": "Unresolved; geometric cable routing backend not implemented."
+                  },
+                  "clearance_mm": {
+                    "type": "null",
+                    "description": "Unresolved; geometric cable routing backend not implemented."
+                  }
+                },
+                "additionalProperties": false
+              },
+              "electrical": {
+                "type": "object",
+                "required": [
+                  "voltage_v",
+                  "peak_current_a",
+                  "protocol",
+                  "connector",
+                  "shielding"
+                ],
+                "properties": {
+                  "voltage_v": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "peak_current_a": {
+                    "type": [
+                      "number",
+                      "null"
+                    ],
+                    "exclusiveMinimum": 0
+                  },
+                  "protocol": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "connector": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "shielding": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          },
+          "minItems": 6,
+          "maxItems": 6
+        },
+        "joint_passages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "joint",
+              "scheme",
+              "neutral_deg",
+              "allowed_limits_deg"
+            ],
+            "properties": {
+              "joint": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "scheme": {
+                "enum": [
+                  null,
+                  "service_loop",
+                  "torsion_route",
+                  "slip_ring"
+                ]
+              },
+              "neutral_deg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "allowed_limits_deg": {
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 2,
+                "maxItems": 2
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

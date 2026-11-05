@@ -1,0 +1,343 @@
+{
+  "design": "Laborarm_6R_Konzept_A01",
+  "date": "2026-10-28",
+  "freecad_version": [
+    "27",
+    "1",
+    "0",
+    "20261020 (Git shallow)",
+    "Unknown",
+    "2026/10/20 22:15:52",
+    "(HEAD detached at 9946038aa)",
+    "9946038aace97af288eb28f2727a169f9d1158c7"
+  ],
+  "source_sha256": {
+    "cad/Laborarm_6R_Konzept_A01.solidcraft": "739ec28d5fcd9882cf90bce4efd76b89d055a8c0a1a71901976c7698aece10fc",
+    "exports/Laborarm_6R_Konzept_A01.step": "eb1e89e9234bd05ee0e3aeae5f42725eeaf9687099ca11e6dd58ac2bab2e2ee5"
+  },
+  "initial_pose_deg": [
+    20.0,
+    35.0,
+    65.0,
+    0.0,
+    80.0,
+    14.999999999999998
+  ],
+  "spinbox_checks": [
+    {
+      "axis": 1,
+      "pose_deg": [
+        25.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 2,
+      "pose_deg": [
+        20.0,
+        40.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 3,
+      "pose_deg": [
+        20.0,
+        35.0,
+        70.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 4,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        5.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 5,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        85.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 6,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        20.0
+      ],
+      "passed": true
+    }
+  ],
+  "slider_checks": [
+    {
+      "axis": 1,
+      "pose_deg": [
+        25.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 2,
+      "pose_deg": [
+        20.0,
+        40.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 3,
+      "pose_deg": [
+        20.0,
+        35.0,
+        70.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 4,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        5.0,
+        80.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 5,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        85.0,
+        14.999999999999998
+      ],
+      "passed": true
+    },
+    {
+      "axis": 6,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        20.0
+      ],
+      "passed": true
+    }
+  ],
+  "timer_checks": [
+    {
+      "mode": 0,
+      "pose_deg": [
+        23.420143520630845,
+        36.42505980026285,
+        66.42505980026286,
+        3.420143520630844,
+        81.42505980026286,
+        19.275179400788552
+      ],
+      "moved_axes": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "passed": true
+    },
+    {
+      "mode": 1,
+      "pose_deg": [
+        23.471499318560827,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "moved_axes": [
+        true,
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "mode": 2,
+      "pose_deg": [
+        20.0,
+        36.408419511555806,
+        65.0,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "moved_axes": [
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "mode": 3,
+      "pose_deg": [
+        20.0,
+        35.0,
+        66.40574629103871,
+        0.0,
+        80.0,
+        14.999999999999998
+      ],
+      "moved_axes": [
+        false,
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "mode": 4,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        3.4291907916976894,
+        80.0,
+        14.999999999999998
+      ],
+      "moved_axes": [
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "mode": 5,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        81.46907181429819,
+        14.999999999999998
+      ],
+      "moved_axes": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false
+      ],
+      "passed": true
+    },
+    {
+      "mode": 6,
+      "pose_deg": [
+        20.0,
+        35.0,
+        65.0,
+        0.0,
+        80.0,
+        19.37862180803823
+      ],
+      "moved_axes": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
+      ],
+      "passed": true
+    }
+  ],
+  "full_motion_envelope_checked": false,
+  "visible_reference_datums": [],
+  "final_pose_deg": [
+    20.0,
+    35.0,
+    65.0,
+    0.0,
+    80.0,
+    14.999999999999998
+  ],
+  "model_sha256": "7f757b6bda91c8bbab083eb19dfdac22e7366ae7808f32dcc2652436e3490a40",
+  "renders": {
+    "renders/Laborarm_6R_Konzept_A01_FreeCAD_nominal.png": "b1544e3f48fcb94402ca69b23d6dd618b581da4557e8ec5f9851cc48ead0333a",
+    "renders/Laborarm_6R_Konzept_A01_FreeCAD_demo.png": "a62758182fa5ead414ebd3eccd10d0c69adbd4dd39e7e4ff500ad23ff28d79bf"
+  },
+  "passed": true,
+  "notes": [
+    "Qt signals exercised on all six spinboxes and sliders",
+    "Real QTimer ran in combined and all six individual modes",
+    "Native FreeCAD view exports; desktop screen capture unavailable",
+    "Demonstration poses are not collision-certified"
+  ],
+  "visual_review": {
+    "date": "2026-10-28",
+    "status": "both native FreeCAD images inspected; full arm visible; reference datums hidden",
+    "note": "Desktop capture timed out; source images exported with the FreeCAD API"
+  }
+}

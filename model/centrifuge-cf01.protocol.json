@@ -1,0 +1,80 @@
+{
+  "format": "solidcraftbot.centrifuge-protocol/1",
+  "id": "CF01.robot_access_cycle",
+  "geometry_source": "model/centrifuge-cf01.shared.json",
+  "status": "draft_simulation_only",
+  "units": {"time": "s", "rotation": "deg", "translation": "mm"},
+  "animation": {
+    "duration_s": 33,
+    "timing_qualified": false,
+    "selected_slot": 1,
+    "return_mode": "reseat_same_tube",
+    "keyframes": [
+      {"time_s": 0, "phase": "Closed and locked", "pose": "closed"},
+      {"time_s": 1, "phase": "Retract both locking pins", "pose": "lid_unlocked"},
+      {"time_s": 11.5, "phase": "Open lid to 105 degrees", "pose": "open"},
+      {"time_s": 12.5, "phase": "Pusher reaches tube bottom", "pose": "open", "coordinates": {"Lift": "park_gap"}},
+      {"time_s": 14.5, "phase": "Elevate tube 01", "pose": "pickup"},
+      {"time_s": 18.5, "phase": "Tube held for robot pickup", "pose": "pickup"},
+      {"time_s": 20.5, "phase": "Lower tube back into pocket", "pose": "open", "coordinates": {"Lift": "park_gap"}},
+      {"time_s": 21.5, "phase": "Retract pusher to park", "pose": "open"},
+      {"time_s": 32, "phase": "Close lid", "pose": "lid_unlocked"},
+      {"time_s": 33, "phase": "Engage both locking pins", "pose": "closed"}
+    ],
+    "notes": "Illustrative kinematics; the rotor stays stopped and parking brake held. The tube is presented, held, and reseated to demonstrate a reversible cycle. No robot grasp or removal is simulated. Lift/pin times are illustrative; lid speed is the provisional 10 deg/s requirement."
+  },
+  "transport": {
+    "ros_namespace": "/cf01",
+    "ros_package": "solidcraftbot_cf01_interfaces",
+    "ros_target": "jazzy",
+    "sila_identifier": "CentrifugeControl",
+    "sila_originator": "org.solidcraftbot",
+    "sila_category": "centrifugation",
+    "sila_version": "1.1",
+    "feature_version": "1.0",
+    "registered_standard_feature": false,
+    "server_implemented": false
+  },
+  "commands": [
+    {"id":"status","name":"GetStatus","observable":false,"arguments":{},"description":"Read a coherent simulation snapshot; feedback validity and age remain explicit."},
+    {"id":"rotation_feedback","name":"GetRotationFeedback","observable":false,"arguments":{},"description":"Read spindle encoder feedback, validity, age, angle and speed; zero pulses alone never prove standstill."},
+    {"id":"events","name":"GetEvents","observable":false,"local_only":true,"arguments":{},"description":"Local diagnostic event trace, excluded from the network feature."},
+    {"id":"stop","name":"Stop","observable":false,"arguments":{},"description":"Priority controlled-stop request, available without the coordination token to an authenticated client. Successful acceptance does not mean standstill. Keep lid locked and parking brake released until independent standstill. Not an emergency stop."},
+    {"id":"acquire","name":"AcquireControl","observable":false,"arguments":{"client_id":"string"},"description":"Reserve the station exclusively; return a token scoped to the current boot and the heartbeat deadline. Coordination tokens are not authentication credentials."},
+    {"id":"heartbeat","name":"Heartbeat","observable":false,"arguments":{},"description":"Refresh the exclusive owner's watchdog. Loss latches a fault, requests deceleration and prohibits automatic resumption."},
+    {"id":"release","name":"ReleaseControl","observable":false,"arguments":{},"description":"Release only when stationary, robot clear, pusher parked and every present tube seated."},
+    {"id":"reset_fault","name":"ResetFault","observable":false,"arguments":{},"description":"Explicit recovery by the current owner with fresh standstill, parking brake, robot clearance and parked pusher. Never restart a run automatically."},
+    {"id":"open_lid","name":"OpenLid","observable":true,"arguments":{},"description":"Require fresh independent standstill, parking brake held and robot clear. Retract and confirm both pins, release lid holding brake, drive to open limit, re-engage holding brake. Completion requires confirmed open limit and held lid."},
+    {"id":"close_lid","name":"CloseLid","observable":true,"arguments":{},"description":"Require standstill, robot clear, pusher parked and all present tubes seated. Drive to closed limit, hold lid, extend and confirm both pins. Obstruction or failed confirmation blocks successful completion."},
+    {"id":"index","name":"IndexRotor","observable":true,"arguments":{"slot":"integer"},"description":"Slot 1..12. Require closed and locked lid, parked pusher, seated tubes and robot clear. Release parking brake, index at no more than 2 rpm, settle using the encoder and reapply parking brake only at confirmed standstill."},
+    {"id":"present_tube","name":"PresentTube","observable":true,"arguments":{},"description":"Require confirmed index at pickup, healthy fresh encoder, held rotor, fully open held lid, robot clear and occupied pocket. Raise selected tube along its tilted axis. Return a valid, uncalibrated station-local pickup frame only after confirmed presentation."},
+    {"id":"confirm_removed","name":"ConfirmRemoved","observable":false,"arguments":{"grasp_confirmed":"boolean","tube_absent":"boolean"},"description":"Require both robot grasp confirmation and tube-absence feedback. A command receipt alone is not proof of transfer. Preserve tube support on uncertain transfer."},
+    {"id":"confirm_seated","name":"ConfirmSeated","observable":false,"arguments":{"mass_g":"number","seated_confirmed":"boolean","cap_closed_confirmed":"boolean"},"description":"With pusher parked, record positive seating, cap closure and measured total tube mass. Nominal tube volume is not a balance measurement."},
+    {"id":"retract_lift","name":"RetractLift","observable":true,"arguments":{},"description":"After confirmed removal, require independent robot-clear feedback and held rotor, then park pusher. Robot withdrawal must precede any new station movement."},
+    {"id":"lower_tube","name":"LowerTube","observable":true,"arguments":{"seated_confirmed":"boolean"},"description":"Reversible demonstration/recovery route: robot clear, tube still present, lid fully open and rotor held. Lower tube and positively confirm seating before parking pusher."},
+    {"id":"start","name":"RunCentrifuge","observable":true,"arguments":{"rcf_x_g":"number","duration_s":"number"},"description":"Require qualified rotor/tube/drive/containment limits, measured balance, closed locked lid, parked pusher and robot clear. Default simulation refuses this command without an explicit fictitious fixture. Observable execution spans running AND braking; success only after standstill and held parking brake. Hardware operation is not implemented."}
+  ],
+  "errors": ["InvalidArgument","InvalidState","InvalidToken","OwnershipConflict","RecoveryRequired","StaleFeedback","RotationSensorFault","StaleRotationFeedback","ParkingBrakeFault","BrakeReleaseUnconfirmed","NotStationary","WorkspaceOccupied","TubeRaised","LidUnlocked","LidNotOpen","LidAccessFault","NotIndexed","IndexMismatch","LidDriveFault","LidObstructed","LatchReleaseUnconfirmed","LatchLockUnconfirmed","EmptySlot","UnconfirmedTransfer","UnqualifiedAssembly","LimitExceeded","UnbalancedLoad","InvalidLoad","Busy","UnknownCommand","OwnerTimeout","UnexpectedBackendError"],
+  "robot_pickup_sequence": [
+    {"command":"acquire","arguments":{"client_id":"robot-orchestrator"}},
+    {"command":"index","arguments":{"slot":1}},
+    {"command":"open_lid","arguments":{}},
+    {"command":"present_tube","arguments":{}},
+    {"external":"Robot uses valid pickup frame, grasps tube; station motion inhibited by independent occupied-workspace feedback."},
+    {"command":"confirm_removed","arguments":{"grasp_confirmed":true,"tube_absent":true}},
+    {"external":"Robot withdraws; independent workspace sensor confirms clear."},
+    {"command":"retract_lift","arguments":{}},
+    {"command":"close_lid","arguments":{}},
+    {"command":"release","arguments":{}}
+  ],
+  "execution_rules": {
+    "one_motion_at_a_time": true,
+    "heartbeat_required_during_observable_commands": true,
+    "state_and_command_result_are_distinct": true,
+    "cancel": "Request controlled stop, retain access/closure interlocks, and report canceled only after confirmed standstill. Do not equate a cancellation acknowledgement with physical standstill.",
+    "timeout_or_stale_feedback": "Latch recovery, request controlled stop, keep lid/access interlocks; do not invent encoder, seating, clearance or standstill feedback.",
+    "robot_clearance_source": "Independent feedback in a future driver. Never a remote client override. The current mock supplies synthetic values only.",
+    "coordinate_frames": "CAD mm/deg; ROS SI m/rad. Pickup frame is uncalibrated and invalid unless presentation and feedback conditions hold.",
+    "transport_security": "Authentication, authorization, TLS/discovery and deployment are not implemented. Control token is coordination only."
+  }
+}

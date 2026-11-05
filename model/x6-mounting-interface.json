@@ -1,0 +1,158 @@
+{
+  "format": "solidcraftbot.vendor-interface/1",
+  "part": "RMD-X6-P20-60-E",
+  "units": "mm",
+  "vendor_bundle_revision": "260920",
+  "drawing": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf",
+  "drawing_sha256": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+  "drawing_page": 1,
+  "status": "nominal_pin_fit_and_screw_stack_selected_sample_pending",
+  "housing": {
+    "bolt_circle_mm": 72.5,
+    "fastener_count": 10,
+    "vendor_thread": "M3",
+    "vendor_thread_depth_mm": 6,
+    "vendor_counterbore_diameter_mm": 3.4,
+    "vendor_counterbore_depth_mm": 3,
+    "cad_thread_core_diameter_mm": 2.5,
+    "plate_clearance_diameter_mm": 3.4,
+    "locating_pins": {
+      "count": 2,
+      "bolt_circle_mm": 72.5,
+      "outside_diameter_mm": 5,
+      "outside_diameter_tolerance_mm": [
+        -0.02,
+        0
+      ],
+      "length_mm": 8,
+      "protrusion_from_housing_face_mm": 2,
+      "axial_bore_diameter_mm": 3,
+      "associated_bottom_thread": "M3",
+      "associated_bottom_thread_depth_mm": 3,
+      "plate_nominal_bore_diameter_mm": 5,
+      "plate_fit": {
+        "scheme": "one_round_bore_one_radial_relief_slot",
+        "primary_round_centre_selector": "lexicographically_first_registered_pin",
+        "round_bore_class": "5 H7",
+        "round_bore_limits_mm": [
+          5,
+          5.012
+        ],
+        "slot_width_class": "5 H7 width",
+        "slot_width_limits_mm": [
+          5,
+          5.012
+        ],
+        "slot_total_length_mm": 5.2,
+        "slot_length_limits_mm": [
+          5.2,
+          5.25
+        ],
+        "slot_direction": "line joining the two registered sleeve centres",
+        "lead_in_chamfer_mm": 0.1,
+        "assumed_vendor_pitch_error_mm": 0.02,
+        "machined_pitch_error_allowance_mm": 0.02,
+        "assumed_plate_alpha_per_k": 2.3e-05,
+        "assumed_motor_pitch_alpha_per_k": 1.2e-05,
+        "assumed_temperature_change_k": 40,
+        "zero_clearance_hand_fit_check_required": true,
+        "geometric_lead_in_modeled": false,
+        "anodizing_in_fit_surfaces_permitted": false
+      }
+    },
+    "fastener_design": {
+      "designation": "M3 x 10 ISO 4762, full thread, steel 8.8",
+      "length_mm": 10,
+      "accepted_length_tolerance_mm": 0.1,
+      "accepted_length_is_measured_not_assumed_commercial_tolerance": true,
+      "head_diameter_max_mm": 5.7,
+      "head_height_max_mm": 3,
+      "property_class": "8.8",
+      "washer_stack_mm": 0,
+      "thread_depth_assumption_shortfall_mm": 0.2,
+      "minimum_axial_overlap_mm": 4,
+      "minimum_tip_margin_mm": 0.5,
+      "torque_nm": null,
+      "torque_requires_vendor_thread_material_and_trial_confirmation": true
+    },
+    "plate_head_recess": {
+      "diameter_mm": 6,
+      "depth_mm": 3.6,
+      "depth_tolerance_mm": 0.05,
+      "minimum_floor_mm": 2,
+      "minimum_diametral_head_clearance_mm": 0.2
+    },
+    "vendor_counterbore_depth_assumption_tolerance_mm": 0.1,
+    "thread_depth_reference": "Assumed 6 mm threaded zone beyond the 3 mm counterbore; vendor confirmation/physical depth gauge required before M3x10 installation"
+  },
+  "output": {
+    "bolt_circle_mm": 44,
+    "fastener_count": 12,
+    "vendor_thread": "M4",
+    "vendor_thread_depth_mm": 5,
+    "cad_thread_core_diameter_mm": 3.3,
+    "plate_clearance_diameter_mm": 4.5,
+    "fastener_design": {
+      "designation": "M4 x 6 ISO 4762, full thread, steel 8.8",
+      "length_mm": 6,
+      "accepted_length_tolerance_mm": 0.1,
+      "accepted_length_is_measured_not_assumed_commercial_tolerance": true,
+      "head_diameter_max_mm": 7.25,
+      "head_height_max_mm": 4,
+      "property_class": "8.8",
+      "washer_stack_mm": 0,
+      "thread_depth_assumption_shortfall_mm": 0.2,
+      "minimum_axial_overlap_mm": 3.8,
+      "minimum_tip_margin_mm": 0.5,
+      "torque_nm": null,
+      "torque_requires_vendor_thread_material_and_trial_confirmation": true
+    },
+    "plate_head_recess": {
+      "diameter_mm": 7.5,
+      "depth_mm": 4.1,
+      "depth_tolerance_mm": 0.05,
+      "minimum_floor_mm": 1.8,
+      "minimum_diametral_head_clearance_mm": 0.2
+    },
+    "thread_depth_reference": "5 mm from output mounting face; usable full thread and bottom depth must be measured"
+  },
+  "resolution": "Earlier integration assigned the M4 callout to the housing and M3 to the output; the leaders and STEP features show the opposite. Two housing locating pins are separate from the ten M3 fasteners.",
+  "manufacturing_released": false,
+  "physical_sample_verified": false,
+  "notes": [
+    "No generic H7/h6 designation: vendor sleeves have their own 4.980 to 5.000 mm diameter range.",
+    "H7 round bore and radial slot remove pitch overconstraint; stated free-play is not a TCP accuracy guarantee.",
+    "Thread overlap is an axial stack calculation; full-thread runout, thread stripping, preload and seat-floor strength need separate qualification.",
+    "Actual screw underhead lengths must pass the stated measurement window; no washers, gasket or coating stack may be silently added.",
+    "STEP housing core cylinders extend 7 mm beyond the 3 mm counterbore. This supports, but does not prove, the assumed 6 mm usable threaded zone; drawing depth datum and actual threads remain an inspection hold."
+  ],
+  "assembly_design": {
+    "status": "proposed_for_first_joint_trial_not_manufacturing_release",
+    "plate": {
+      "material_assumption": "EN AW-6082-T6 machined aluminium",
+      "nominal_thickness_mm": 6,
+      "thickness_tolerance_mm": 0.05,
+      "mating_face_flatness_mm": 0.02,
+      "mask_or_finish_bores_and_mating_faces_after_coating": true
+    },
+    "sources": {
+      "H7_limits": "https://www.schaeffler.com/remotemedien/media/_shared_media/08_media_library/01_publications/schaeffler_2/tpi/downloads_8/tpi_211_de_en.pdf",
+      "two_way_locating_principle": "https://in.misumi-ec.com/pr/blog/locating-fixtures/locating-pins-by-misumi/",
+      "M4_ISO4762_example": "https://eshop.wuerth.de/-/414964%206.sku/de/DE/EUR/",
+      "M3_ISO4762_dimensions": "https://www.accu.co.uk/metric-cap-head-screws/642446-SSCF-M3-10-HK-12-9"
+    },
+    "assembly_sequence": [
+      "Inspect and measure sleeve diameters, sleeve spacing and usable thread depths",
+      "Finish datum face and round bore; finish the opposite radial slot",
+      "Verify slip assembly without forcing the sleeves",
+      "Install motor-plate screws before adding the upper-arm coupling; tighten in a cross sequence to a vendor-approved trial torque",
+      "Calibrate and record the assembled joint frame"
+    ],
+    "torque_and_preload_verified": false,
+    "thread_material_verified": false,
+    "screw_tip_chamfer_and_thread_runout_verified": false,
+    "washer_policy": "No washers or unaccounted coatings/gaskets in the selected stack",
+    "housing_thread_depth_reference_verified": false,
+    "installation_hold": "Do not install M3x10 until housing usable thread end is measured at least 8.3 mm from mounting face and axial thread overlap is confirmed; a 6 mm TOTAL depth would invalidate this selection"
+  }
+}

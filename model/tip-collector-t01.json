@@ -1,0 +1,72 @@
+{
+  "format": "solidcraftbot.tip-collector/1",
+  "revision": "T01",
+  "date": "2026-10-28",
+  "status": "Review concept; no tip compatibility or manufacturing release",
+  "units": {"length": "mm", "angle": "deg", "force": "N"},
+  "coordinates": {"x": "across the three grooves", "y": "positive towards rear beam; robot enters from negative Y", "z": "up from base underside"},
+  "dimensions": {
+    "base_x": 240, "base_y": 184, "base_t": 8,
+    "bin_x": 184, "bin_y": 144, "bin_h": 150, "bin_wall": 4,
+    "rim_to_fork": 10, "fork_t": 4,
+    "fork_x": 48, "fork_front_y": -42, "fork_rear_y": 54,
+    "mouth_width": 20, "taper_end_y": -24, "slot_end_y": 5,
+    "beam_x": 232, "beam_y": 24, "beam_t": 8, "beam_center_y": 42,
+    "post_x": 12, "post_y": 36, "post_center_x": 106,
+    "insert_hole_d": 4.5, "insert_hole_dx": 16,
+    "table_hole_d": 6.6
+  },
+  "grooves": [
+    {"id": "S", "target_pipette_capacity_ul": 10, "x_mm": -56, "width_mm": 4, "color": "#f59e36", "qualified": false},
+    {"id": "M", "target_pipette_capacity_ul": 200, "x_mm": 0, "width_mm": 6, "color": "#26b7ad", "qualified": false},
+    {"id": "L", "target_pipette_capacity_ul": 1000, "x_mm": 56, "width_mm": 9, "color": "#538ce5", "qualified": false}
+  ],
+  "fit_rule": {
+    "shaft_diameter_max_mm": null,
+    "collar_diameter_min_mm": null,
+    "radial_running_clearance_mm": null,
+    "radial_capture_margin_mm": null,
+    "access_gap_above_collar_min_mm": null,
+    "inequality": "shaft_diameter_max + 2*running_clearance <= groove_width <= collar_diameter_min - 2*capture_margin",
+    "additional_requirement": "Fork thickness plus vertical clearance must fit between tip rim and pipette/ejector sleeve; assess the complete swept tool envelope. Nominal tip volume is not a groove dimension."
+  },
+  "illustrative_envelopes": {
+    "status": "Synthetic geometry checks, not measured articles or executable robot motion",
+    "collar_top_z_mm": 167,
+    "maximum_tip_length_below_collar_mm": 120,
+    "initial_bin_fill_limit_z_mm": 35,
+    "approach_y_mm": -54,
+    "capture_y_mm": 0,
+    "illustrative_lift_mm": 20,
+    "tool_axis": "+Z; vertical pipette",
+    "tip_collar_diameter_mm": {"S": 8, "M": 11, "L": 15},
+    "shaft_diameter_mm": {"S": 3, "M": 5, "L": 8}
+  },
+  "hardware": {
+    "fork_material": "Metal insert candidate; material and edge finish to be selected after force and contamination tests",
+    "bin_material": "Removable smooth-wall liner/bin candidate; prototype printing does not establish cleanability or leak tightness",
+    "frame_connections": "Clearance holes and blind pilot placeholders only; threads, screws and welded/bolted joint design unqualified",
+    "bin_present_sensor": null,
+    "bin_full_sensor": null,
+    "tip_release_sensor": null,
+    "force_limit_N": null,
+    "lift_stroke_mm": null,
+    "approach_speed_mm_s": null,
+    "selected_parts": []
+  },
+  "workflow": [
+    "Reserve collector workspace for one arm; confirm correct groove/article profile, bin seated and fill below qualified limit",
+    "Locate real tip collar and station datum; lower collar below fork underside while remaining above bin interior",
+    "Translate from negative Y into straight groove around the exposed shaft without dragging the tip rim sideways",
+    "Lift pipette vertically with qualified stroke, speed and force limit; tip rim bears against fork underside and tip drops into bin",
+    "Verify tip absent from pipette and cleared from fork; withdraw fully before releasing workspace reservation",
+    "Stop on jam, overload, missing bin, ambiguous detachment or stale observation; no blind retries"
+  ],
+  "scope": [
+    "Independent fixed station; arm source and its six rotary axes are unchanged",
+    "No pipette adapter, selected pipette model, robot inverse kinematics, live motion or SiLA server",
+    "Groove inserts are exchangeable in the mechanical concept; mounting holes alone do not define a qualified attachment",
+    "Static CAD and synthetic straight-line clearances do not establish full robot workspace, strength, aerosol containment or cleanability",
+    "One collector can be reserved by up to three arms sequentially; no simultaneous access"
+  ]
+}

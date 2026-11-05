@@ -1,0 +1,19 @@
+{
+  "format": "solidcraftbot.tube-station/1",
+  "revision": "C01",
+  "status": "concept only; no manufacturing or SiLA conformance release",
+  "units": {"length": "mm", "angle": "deg", "temperature": "degC", "time": "s"},
+  "dimensions": {"base_length": 200, "base_width": 160, "base_thickness": 8, "tube_mouth_z": 100, "pivot_y": 7, "pivot_z": 101},
+  "poses_deg": {
+    "pipetting": {"Opener": -135, "Closer": -145, "ReferenceLid": -115},
+    "closed_reference": {"Opener": 0, "Closer": 0, "ReferenceLid": 0}
+  },
+  "profiles": [
+    {"id": "Draft1p5", "nominal_volume_ml": 1.5, "qualified": false, "note": "Generic cylindrical reference only; no manufacturer article selected"},
+    {"id": "Future0p5", "nominal_volume_ml": 0.5, "qualified": false, "note": "Future insert and contact geometry; not modeled"},
+    {"id": "Future2p0", "nominal_volume_ml": 2.0, "qualified": false, "note": "Future insert and contact geometry; not modeled"}
+  ],
+  "cooling": {"source": "ordinary water ice and meltwater", "controlled_setpoint": false, "sample_temperature_limits_degC": null, "note": "Block sensing is proposed; sample temperature and wall-drop temperature require separate characterization"},
+  "interaction": {"heartbeat_period_s": 2, "watchdog_timeout_s": 6, "status_period_s": 1, "status_max_age_s": 3, "timings_status": "illustrative configuration for review, not measured or safety-rated"},
+  "limits": ["Motors, bearings, tube retainer and sensors are unselected envelopes", "Retainer capture detail and clamp actuation are not designed", "Reference lid has an independent visualization joint; it is not contact-driven", "No full motion collision, load, thermal, contamination or sealing qualification", "The six-axis arm and its model source are separate"]
+}

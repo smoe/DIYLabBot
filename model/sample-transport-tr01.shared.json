@@ -1,0 +1,109 @@
+{
+  "format": "solidcraftbot.sample-transport/2",
+  "id": "SampleTransport_TR01",
+  "status": "Floor-only transport concept; static CAD envelopes, not a manufacturing release or operating mobile robot",
+  "units": {"length": "mm", "angle": "deg", "time": "s", "mass": "kg"},
+  "requirements": {
+    "confirmed_on": "2026-10-28",
+    "routes": ["floor_between_arm_workstations", "between_laboratories_on_same_floor"],
+    "transport_architecture": "floor_driven_mobile_robot_only",
+    "track_required": false,
+    "station_access_goal": "serve every stationary robot arm by parking its load deck within that arm's verified reach",
+    "navigation_precision_policy": "track-level travel precision is not required; local sample reference and stationary holding are still required for handoff",
+    "multiple_differently_configured_cars_allowed": true,
+    "labware": ["microwell_plates", "1.5_mL_tubes", "2.0_mL_tubes", "other_labware_with_article_specific_cassette"],
+    "smallest_tube_interpretation": "Owner clarified 2 mL, not 2 uL",
+    "centrifuge_batch_target": true,
+    "centrifuge_article": null,
+    "rotor_article": null,
+    "required_tubes_per_batch": null,
+    "required_plates_per_batch": null,
+    "maximum_payload_kg": null,
+    "route_length_mm": null,
+    "travel_speed_mm_s": null,
+    "acceleration_mm_s2": null,
+    "floor_door_width_mm": null,
+    "floor_threshold_height_mm": null,
+    "station_handoff_height_mm": null,
+    "parking_tolerance_mm": null,
+    "local_registration_error_limit_mm": null,
+    "sample_temperature_limits_degC": null
+  },
+  "parameters": {
+    "deck_length": {"expression": 340, "range": [340, 380], "unit": "mm"},
+    "deck_width": {"expression": 190, "range": [190, 210], "unit": "mm"},
+    "floor_length": {"expression": 500, "range": [500, 550], "unit": "mm"},
+    "floor_width": {"expression": 400, "range": [400, 450], "unit": "mm"},
+    "floor_deck_z": {"expression": 800, "range": [700, 950], "unit": "mm"},
+    "cassette_length": {"expression": 140, "range": [140, 140], "unit": "mm"},
+    "cassette_width": {"expression": 104, "range": [104, 104], "unit": "mm"},
+    "bay_pitch": {"expression": 156, "range": [156, 156], "unit": "mm"},
+    "plate_length": {"expression": 127.76, "range": [127.76, 127.76], "unit": "mm"},
+    "plate_width": {"expression": 85.48, "range": [85.48, 85.48], "unit": "mm"},
+    "plate_height": {"expression": 15, "range": [15, 45], "unit": "mm"},
+    "tube_radius": {"expression": 5.4, "range": [5.4, 5.4], "unit": "mm"},
+    "tube_pitch": {"expression": 18, "range": [18, 18], "unit": "mm"}
+  },
+  "cassette_interface": {
+    "id": "TR01-C140x104-v1",
+    "origin": "cassette bottom centre; +X vehicle forward, +Y left, +Z up",
+    "bay_centres_x": ["-bay_pitch/2", "bay_pitch/2"],
+    "mount": "flat support, unequal diagonal locating pins and matching clearance bores",
+    "pin_pattern_mm": [{"xy": [-64, -46], "radius": 2}, {"xy": [64, 46], "radius": 3}],
+    "cassette_retention": "two latch envelopes per bay; contact, release and sensing not implemented",
+    "robot_grasp_interface": null,
+    "compatible_with_H01": false
+  },
+  "variants": [
+    {"id": "Floor_P2", "family": "floor", "bays": ["plate", "plate"], "color": "#369bc1"},
+    {"id": "Floor_T48", "family": "floor", "bays": ["tube24", "tube24"], "color": "#42a789"},
+    {"id": "Floor_Mixed", "family": "floor", "bays": ["plate", "tube24"], "color": "#dba64b"}
+  ],
+  "operations": ["floor_vehicle_envelopes", "keyed_two_bay_deck", "plate_nest_cassette", "tube_rack_cassette", "removable_transport_cover"],
+  "handoff_requirements": {
+    "status": "requirements only; no registered stations, calibrated frames, reach solution or physical dock",
+    "load_stays_on_vehicle": true,
+    "automatic_cassette_exchange_required": false,
+    "deck_frame_id": "TR01.LoadDeck",
+    "station_registry": [],
+    "required_per_station": ["arm base and tool frames", "vehicle parking pose relative to arm", "all intended sample pickup and place poses", "local load registration and uncertainty", "collision-checked approach and retreat with actual gripper", "stationary holding feedback"],
+    "local_reference_options": ["vision_registered_load_frame", "simple_mechanical_dock"],
+    "selected_local_reference": null,
+    "parking_verified": false,
+    "all_station_reaches_verified": false,
+    "stationary_holding_verified": false
+  },
+  "protocol": [
+    {"id": "TR01.reserve", "requires": ["vehicle and destination reserved", "route blocks reserved", "cassette identities and batch manifest known"]},
+    {"id": "TR01.load", "requires": ["vehicle stopped and stationary holding confirmed", "cover removed", "robot workspace reserved", "correct cassette and article fit qualified", "station-specific reach and local load reference verified"]},
+    {"id": "TR01.secure", "requires": ["tubes closed or plates sealed", "samples and cassettes retained", "cover installed", "manifest and presence agree", "robot clear"]},
+    {"id": "TR01.travel", "requires": ["secure feedback fresh", "route free", "charge and localization valid", "sample motion limits configured"]},
+    {"id": "TR01.dock", "requires": ["vehicle parked inside station approach region", "stationary holding confirmed and travel inhibited", "local load reference verified within station error limit", "all intended samples within verified arm/tool reach", "cover removed for arm access"]},
+    {"id": "TR01.handoff", "requires": ["receiver ready", "load remains stationary on vehicle", "station reach and collision checks accepted", "destination capacity available", "robot grasp confirmed before sample release", "manifest updated after observed transfer"]},
+    {"id": "TR01.fault", "requires": ["stop and retain load on lost localization, obstacle, stale feedback, retention fault or manifest mismatch", "manual recovery and sample reconciliation before restart"]}
+  ],
+  "future_services": {
+    "implementation": "requirements only; no driver, scheduler, navigation or server",
+    "floor": ["wheel drive and braking", "obstacle detection", "localization", "door access", "charging", "emergency stop", "station docking"],
+    "handoff": "arm accesses samples on parked vehicle; local reference, holding feedback, gripper and cover handling unresolved; no bench shuttle or cassette transfer required"
+  },
+  "references": [
+    {"url": "https://www.slas.org/SLAS/assets/File/public/standards/ANSI_SLAS_1-2004_FootprintDimensions.pdf", "use": "127.76 by 85.48 mm nominal plate footprint only; plate height and article geometry are not universal"},
+    {"url": "https://www.eppendorf.com/product-media/doc/en/11112106/General_Catalog_Main-Eppendorf-Catalog-UK-Version.pdf", "use": "24 by 1.5/2.0 mL rotor example motivates a 24-place cassette; no centrifuge selected"}
+  ],
+  "limitations": [
+    "Plate and tube bodies are closed solid reference envelopes, not manufacturer geometry or liquid volumes",
+    "Two plates or 48 tubes are concept capacities; full centrifuge batch coverage remains unknown until a rotor and labware manifest are chosen",
+    "Other labware requires additional measured inserts; anything is a design goal, not demonstrated universal compatibility",
+    "Floor_P2, Floor_T48 and Floor_Mixed share one floor platform; historical bench variants are retired from the active source",
+    "Floor geometry is a static envelope; no steering, wheel kinematics, navigation, dynamics, stability or door traversal is validated",
+    "Floor deck height is a concept parameter; no lift is implemented and reach from every arm is a requirement, not a verified capability",
+    "Parking precision, local load registration, stationary holding, dock and cover handling are unresolved; removing the track does not verify sample pickup accuracy",
+    "Pins, retainers, cover and bumper are concept geometry; no article fit, holding force, spill, vibration, cleaning or contamination qualification",
+    "Cover is not a sealed or aerosol-tight container and has no modeled release mechanism",
+    "Cassette keying is TR01-specific; H01 and C01 require explicit adapters and are not automatically compatible",
+    "No payload rating, range, runtime, speed, temperature performance or cost is established; transporter budget is additional to the arm estimate",
+    "No ROS, SiLA, hardware control, physical feedback or safety validation; protocol entries are requirements rather than executable actions",
+    "Native CAD edits do not update the shared source; change source and regenerate to keep dimensions and anchors together"
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "format": "solidcraftbot.vendor-assets/1",
+  "vendor": "MyActuator",
+  "units_for_import": "mm",
+  "status": "vendor_reference_geometry_not_integrated_into_robot",
+  "models": [
+    {
+      "part": "RMD-X2-P28-7-E",
+      "revision": "260920",
+      "url": "https://www.myactuator.com/_files/archives/cab28a_77b7670917e14f6b8256b4db4d912857.zip?dn=RMD-X2-P28-7+260920.zip",
+      "retrieved_on": "2026-10-28",
+      "download_page": "https://www.myactuator.com/downloads-xseries",
+      "archive": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-original.zip",
+      "archive_sha256": "422766c89d6bdc9abce4f656a119b3f253ab2928ab1d42c93eed516516767e73",
+      "archive_entries": [
+        {
+          "name": "RMD-X2-P28-7 电机组合图-A0.PDF",
+          "bytes": 213912
+        },
+        {
+          "name": "RMD-X2-P28-7 外形图 260920.STEP",
+          "bytes": 7126931
+        },
+        {
+          "name": "X2-7 Motor Parameter 260903.pdf",
+          "bytes": 118734
+        }
+      ],
+      "files": [
+        {
+          "kind": "pdf",
+          "archive_name": "RMD-X2-P28-7 电机组合图-A0.PDF",
+          "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf",
+          "sha256": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
+          "bytes": 213912
+        },
+        {
+          "kind": "step",
+          "archive_name": "RMD-X2-P28-7 外形图 260920.STEP",
+          "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step",
+          "sha256": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+          "bytes": 7126931
+        },
+        {
+          "kind": "pdf",
+          "archive_name": "X2-7 Motor Parameter 260903.pdf",
+          "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-2.pdf",
+          "sha256": "66d2e63668eff87b2e5761ab2a344170ca0544e478bc79ec0da6315914043b9b",
+          "bytes": 118734
+        }
+      ],
+      "cad_available": true
+    },
+    {
+      "part": "RMD-X4-P36-36-E-L",
+      "revision": "261019",
+      "url": "https://www.myactuator.com/_files/archives/cab28a_8106ede9e38f497b8c12545bab3f95d5.zip?dn=RMD-X4-P36-36-E-L+261019.zip",
+      "retrieved_on": "2026-10-28",
+      "download_page": "https://www.myactuator.com/downloads-xseries",
+      "archive": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-original.zip",
+      "archive_sha256": "edd53c23671858c969deb29b3da4db4af8bd99715e29fdafb50d058de33a90d9",
+      "archive_entries": [
+        {
+          "name": "RMD-X4-P36-36-E-L-中英文产品规格书 V1.0.pdf",
+          "bytes": 1907799
+        },
+        {
+          "name": "X4-36-L Motor Parameter  260820.pdf",
+          "bytes": 229559
+        },
+        {
+          "name": "RMD-X4-P36-36-E-L 外形图  261016.STEP",
+          "bytes": 12041938
+        }
+      ],
+      "files": [
+        {
+          "kind": "pdf",
+          "archive_name": "RMD-X4-P36-36-E-L-中英文产品规格书 V1.0.pdf",
+          "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf",
+          "sha256": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+          "bytes": 1907799
+        },
+        {
+          "kind": "pdf",
+          "archive_name": "X4-36-L Motor Parameter  260820.pdf",
+          "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-2.pdf",
+          "sha256": "e411f04bc8b18a744783dd34d421fe1a5c818c68ea04bc442ad492848687390a",
+          "bytes": 229559
+        },
+        {
+          "kind": "step",
+          "archive_name": "RMD-X4-P36-36-E-L 外形图  261016.STEP",
+          "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step",
+          "sha256": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+          "bytes": 12041938
+        }
+      ],
+      "cad_available": true
+    },
+    {
+      "part": "RMD-X6-P20-60-E",
+      "revision": "260920",
+      "url": "https://www.myactuator.com/_files/archives/cab28a_4231acdf891b41f3a56bb690f4c1d312.zip?dn=RMD-X6-P20-60+260920.zip",
+      "retrieved_on": "2026-10-28",
+      "download_page": "https://www.myactuator.com/downloads-xseries",
+      "archive": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-original.zip",
+      "archive_sha256": "187e10e14faff52a98c6caa9b938fcea059aa1d6ea87e339fc60a163aef09e79",
+      "archive_entries": [
+        {
+          "name": "RMD-X6-P20-60 2D-A0.PDF",
+          "bytes": 297183
+        },
+        {
+          "name": "RMD-X6-P20-60 外形图 260920.STEP",
+          "bytes": 8598351
+        },
+        {
+          "name": "X6-60 Motor Parameter 260903.pdf",
+          "bytes": 144839
+        }
+      ],
+      "files": [
+        {
+          "kind": "pdf",
+          "archive_name": "RMD-X6-P20-60 2D-A0.PDF",
+          "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf",
+          "sha256": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+          "bytes": 297183
+        },
+        {
+          "kind": "step",
+          "archive_name": "RMD-X6-P20-60 外形图 260920.STEP",
+          "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step",
+          "sha256": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+          "bytes": 8598351
+        },
+        {
+          "kind": "pdf",
+          "archive_name": "X6-60 Motor Parameter 260903.pdf",
+          "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-2.pdf",
+          "sha256": "421836cfee9c20996c14ba099b8b77b8f4e861acefa8b3c56a8b59615f873e1d",
+          "bytes": 144839
+        }
+      ],
+      "cad_available": true
+    }
+  ],
+  "rights": "Manufacturer assets retained with attribution; no redistribution licence has been established."
+}

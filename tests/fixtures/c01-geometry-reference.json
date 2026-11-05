@@ -1,0 +1,582 @@
+{
+  "source_sha256": "b740818ded51cf500f87d176e8068ccd81c93eeacd5ac77a500a7d525ef16b37",
+  "parts": [
+    {
+      "name": "Base",
+      "kind": "box",
+      "size": [
+        200,
+        160,
+        8
+      ],
+      "center": [
+        0,
+        0,
+        4
+      ],
+      "group": "Frame",
+      "color": "#334155",
+      "role": "concept structure",
+      "volume_mm3": 256000
+    },
+    {
+      "name": "IceReservoir",
+      "kind": "box",
+      "size": [
+        160,
+        120,
+        52
+      ],
+      "center": [
+        0,
+        0,
+        34
+      ],
+      "group": "Frame",
+      "color": "#e2e8f0",
+      "role": "concept structure",
+      "volume_mm3": 181248
+    },
+    {
+      "name": "IceWaterReference",
+      "kind": "box",
+      "size": [
+        150,
+        110,
+        35
+      ],
+      "center": [
+        0,
+        0,
+        31.5
+      ],
+      "group": "Frame",
+      "color": "#76c9ec",
+      "role": "coolant visualization only",
+      "volume_mm3": 573612
+    },
+    {
+      "name": "ColdInsert",
+      "kind": "box",
+      "size": [
+        36,
+        36,
+        48
+      ],
+      "center": [
+        0,
+        0,
+        70
+      ],
+      "group": "Frame",
+      "color": "#38b5c4",
+      "role": "concept structure",
+      "volume_mm3": 56779.327894596834
+    },
+    {
+      "name": "FramePostLeft",
+      "kind": "box",
+      "size": [
+        8,
+        70,
+        80
+      ],
+      "center": [
+        -88,
+        0,
+        48
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 44800
+    },
+    {
+      "name": "BearingSupportLeft",
+      "kind": "box",
+      "size": [
+        8,
+        18,
+        15
+      ],
+      "center": [
+        -28,
+        7,
+        98.5
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 2160
+    },
+    {
+      "name": "BearingEnvelopeLeft",
+      "kind": "cylinder",
+      "diameter": 14,
+      "height": 8,
+      "base": [
+        -32,
+        7,
+        101
+      ],
+      "axis": "X",
+      "group": "Frame",
+      "color": "#64748b",
+      "role": "unselected bearing envelope",
+      "volume_mm3": 1231.5043202071988
+    },
+    {
+      "name": "MotorEnvelopeLeft",
+      "kind": "cylinder",
+      "diameter": 24,
+      "height": 28,
+      "base": [
+        -64,
+        7,
+        101
+      ],
+      "axis": "X",
+      "group": "Frame",
+      "color": "#475569",
+      "role": "unselected geared motor envelope",
+      "volume_mm3": 12666.901579274047
+    },
+    {
+      "name": "RetainerEnvelopeLeft",
+      "kind": "box",
+      "size": [
+        8,
+        12,
+        8
+      ],
+      "center": [
+        -11,
+        0,
+        98
+      ],
+      "group": "Frame",
+      "color": "#df9b37",
+      "role": "retention mechanism envelope; capture and actuation TBD",
+      "volume_mm3": 768
+    },
+    {
+      "name": "FramePostRight",
+      "kind": "box",
+      "size": [
+        8,
+        70,
+        80
+      ],
+      "center": [
+        88,
+        0,
+        48
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 44800
+    },
+    {
+      "name": "BearingSupportRight",
+      "kind": "box",
+      "size": [
+        8,
+        18,
+        15
+      ],
+      "center": [
+        28,
+        7,
+        98.5
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 2160
+    },
+    {
+      "name": "BearingEnvelopeRight",
+      "kind": "cylinder",
+      "diameter": 14,
+      "height": 8,
+      "base": [
+        24,
+        7,
+        101
+      ],
+      "axis": "X",
+      "group": "Frame",
+      "color": "#64748b",
+      "role": "unselected bearing envelope",
+      "volume_mm3": 1231.5043202071988
+    },
+    {
+      "name": "MotorEnvelopeRight",
+      "kind": "cylinder",
+      "diameter": 24,
+      "height": 28,
+      "base": [
+        36,
+        7,
+        101
+      ],
+      "axis": "X",
+      "group": "Frame",
+      "color": "#475569",
+      "role": "unselected geared motor envelope",
+      "volume_mm3": 12666.901579274047
+    },
+    {
+      "name": "RetainerEnvelopeRight",
+      "kind": "box",
+      "size": [
+        8,
+        12,
+        8
+      ],
+      "center": [
+        11,
+        0,
+        98
+      ],
+      "group": "Frame",
+      "color": "#df9b37",
+      "role": "retention mechanism envelope; capture and actuation TBD",
+      "volume_mm3": 768
+    },
+    {
+      "name": "FrameBridgeFront",
+      "kind": "box",
+      "size": [
+        180,
+        6,
+        8
+      ],
+      "center": [
+        0,
+        -15,
+        88
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 8640
+    },
+    {
+      "name": "FrameBridgeRear",
+      "kind": "box",
+      "size": [
+        180,
+        6,
+        8
+      ],
+      "center": [
+        0,
+        15,
+        88
+      ],
+      "group": "Frame",
+      "color": "#a5aebc",
+      "role": "concept structure",
+      "volume_mm3": 8640
+    },
+    {
+      "name": "ControllerEnvelope",
+      "kind": "box",
+      "size": [
+        30,
+        38,
+        28
+      ],
+      "center": [
+        77,
+        45,
+        102
+      ],
+      "group": "Frame",
+      "color": "#475569",
+      "role": "unselected controller envelope",
+      "volume_mm3": 31920
+    },
+    {
+      "name": "ClampActuatorEnvelope",
+      "kind": "box",
+      "size": [
+        20,
+        14,
+        16
+      ],
+      "center": [
+        -40,
+        -18,
+        98
+      ],
+      "group": "Frame",
+      "color": "#df9b37",
+      "role": "unselected local retainer actuator envelope",
+      "volume_mm3": 4480
+    },
+    {
+      "name": "LidParkingGuideEnvelope",
+      "kind": "box",
+      "size": [
+        4,
+        3,
+        4
+      ],
+      "center": [
+        9,
+        14,
+        111
+      ],
+      "group": "Frame",
+      "color": "#c45a9f",
+      "role": "open-lid guide envelope; retention contact TBD",
+      "volume_mm3": 48
+    },
+    {
+      "name": "BlockSensorEnvelope",
+      "kind": "cylinder",
+      "diameter": 3,
+      "height": 20,
+      "base": [
+        12,
+        4,
+        72
+      ],
+      "axis": "Z",
+      "group": "Frame",
+      "color": "#db2777",
+      "role": "proposed block sensor; no sample temperature claim",
+      "volume_mm3": 141.3716694115407
+    },
+    {
+      "name": "ReferenceTube",
+      "kind": "cylinder",
+      "diameter": 11,
+      "height": 40,
+      "base": [
+        0,
+        0,
+        60
+      ],
+      "axis": "Z",
+      "group": "Frame",
+      "color": "#e7b6d6",
+      "role": "generic tube reference, not purchase geometry",
+      "volume_mm3": 1320.2543126711107
+    },
+    {
+      "name": "ReferenceCollar",
+      "kind": "cylinder",
+      "diameter": 14,
+      "height": 2,
+      "base": [
+        0,
+        0,
+        98
+      ],
+      "axis": "Z",
+      "group": "Frame",
+      "color": "#e7b6d6",
+      "role": "generic collar reference",
+      "volume_mm3": 117.80972450961721
+    },
+    {
+      "name": "ReferenceCap",
+      "kind": "cylinder",
+      "diameter": 14,
+      "height": 2,
+      "base": [
+        0,
+        0,
+        100
+      ],
+      "axis": "Z",
+      "group": "ReferenceLid",
+      "color": "#c45a9f",
+      "role": "generic cap reference",
+      "volume_mm3": 307.8760800517997
+    },
+    {
+      "name": "ReferenceCapTab",
+      "kind": "box",
+      "size": [
+        6,
+        4,
+        2
+      ],
+      "center": [
+        0,
+        -8,
+        101
+      ],
+      "group": "ReferenceLid",
+      "color": "#c45a9f",
+      "role": "generic tab reference",
+      "volume_mm3": 48
+    },
+    {
+      "name": "OpeningRail",
+      "kind": "box",
+      "size": [
+        4,
+        22,
+        4
+      ],
+      "center": [
+        -17,
+        -2,
+        99
+      ],
+      "group": "Opener",
+      "color": "#f29938",
+      "role": "concept structure",
+      "volume_mm3": 352
+    },
+    {
+      "name": "OpeningFinger",
+      "kind": "box",
+      "size": [
+        20,
+        3,
+        2
+      ],
+      "center": [
+        -7,
+        -8.5,
+        99
+      ],
+      "group": "Opener",
+      "color": "#f29938",
+      "role": "external tab finger, contact shape TBD",
+      "volume_mm3": 120
+    },
+    {
+      "name": "ClosingRail",
+      "kind": "box",
+      "size": [
+        4,
+        20,
+        4
+      ],
+      "center": [
+        17,
+        -1,
+        105
+      ],
+      "group": "Closer",
+      "color": "#6ab67d",
+      "role": "concept structure",
+      "volume_mm3": 320
+    },
+    {
+      "name": "ClosingBridge",
+      "kind": "box",
+      "size": [
+        20,
+        5,
+        3
+      ],
+      "center": [
+        7,
+        -2,
+        104.5
+      ],
+      "group": "Closer",
+      "color": "#6ab67d",
+      "role": "concept structure",
+      "volume_mm3": 300
+    },
+    {
+      "name": "ClosingPadEnvelope",
+      "kind": "box",
+      "size": [
+        6,
+        5,
+        1.2
+      ],
+      "center": [
+        0,
+        -2,
+        102.8
+      ],
+      "group": "Closer",
+      "color": "#6ab67d",
+      "role": "compliant pad envelope",
+      "volume_mm3": 36.0
+    }
+  ],
+  "cuts": [
+    {
+      "name": "ReservoirCavity",
+      "target": "IceReservoir",
+      "kind": "box",
+      "size": [
+        152,
+        112,
+        50
+      ],
+      "center": [
+        0,
+        0,
+        37
+      ]
+    },
+    {
+      "name": "CoolantDisplacement",
+      "target": "IceWaterReference",
+      "kind": "box",
+      "size": [
+        36,
+        36,
+        6
+      ],
+      "center": [
+        0,
+        0,
+        49
+      ]
+    },
+    {
+      "name": "InsertBore",
+      "target": "ColdInsert",
+      "kind": "cylinder",
+      "diameter": 12,
+      "height": 50,
+      "base": [
+        0,
+        0,
+        45
+      ],
+      "axis": "Z"
+    },
+    {
+      "name": "TubeInterior",
+      "target": "ReferenceTube",
+      "kind": "cylinder",
+      "diameter": 9,
+      "height": 41,
+      "base": [
+        0,
+        0,
+        61
+      ],
+      "axis": "Z"
+    },
+    {
+      "name": "CollarOpening",
+      "target": "ReferenceCollar",
+      "kind": "cylinder",
+      "diameter": 11,
+      "height": 4,
+      "base": [
+        0,
+        0,
+        97
+      ],
+      "axis": "Z"
+    }
+  ]
+}

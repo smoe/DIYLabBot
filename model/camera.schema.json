@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SolidCraftBot provisional camera operation v1",
+  "type": "object",
+  "required": ["id", "action", "purpose", "status", "manufacturing_released", "part", "frame", "body_size_mm", "lens", "mount_boxes", "view", "color", "connection", "aim_note"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$"},
+    "action": {"const": "camera"},
+    "purpose": {"enum": ["tip", "awareness"]},
+    "status": {"const": "provisional"},
+    "manufacturing_released": {"const": false},
+    "part": {"type": "null"},
+    "aim_note": {"type": "string"},
+    "frame": {
+      "type": "object", "required": ["origin", "axis", "x"], "additionalProperties": false,
+      "description": "Optical +Z forward, +X right, +Y down; uncalibrated frame in model zero coordinates, origin in mm.",
+      "properties": {"origin": {"$ref": "#/$defs/length3"}, "axis": {"$ref": "#/$defs/direction"}, "x": {"$ref": "#/$defs/direction"}}
+    },
+    "body_size_mm": {"$ref": "#/$defs/length3"},
+    "lens": {
+      "type": "object", "required": ["radius_mm", "length_mm"], "additionalProperties": false,
+      "properties": {"radius_mm": {"$ref": "#/$defs/length"}, "length_mm": {"$ref": "#/$defs/length"}}
+    },
+    "mount_boxes": {
+      "type": "array", "minItems": 1,
+      "description": "Unreleased bracket envelopes in zero-configuration link coordinates; mm.",
+      "items": {
+        "type": "object", "required": ["origin", "size"], "additionalProperties": false,
+        "properties": {"origin": {"$ref": "#/$defs/length3"}, "size": {"$ref": "#/$defs/length3"}}
+      }
+    },
+    "view": {
+      "type": "object", "required": ["kind", "range_mm", "far_radius_mm", "opacity", "occlusion_checked"], "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "illustrative_circular_cone"},
+        "range_mm": {"$ref": "#/$defs/length"},
+        "far_radius_mm": {"$ref": "#/$defs/length"},
+        "opacity": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+        "occlusion_checked": {"const": false}
+      }
+    },
+    "color": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "integer", "minimum": 0, "maximum": 255}},
+    "connection": {
+      "type": "object", "required": ["controller", "route_links", "interface", "cable", "strain_relief", "max_frame_age_ms"], "additionalProperties": false,
+      "properties": {
+        "controller": {"type": "string"}, "route_links": {"type": "array", "minItems": 1, "items": {"type": "string"}},
+        "interface": {"type": "null"}, "cable": {"type": "null"}, "strain_relief": {"type": "null"}, "max_frame_age_ms": {"type": "null"}
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "length": {"type": ["number", "string"]},
+    "length3": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"$ref": "#/$defs/length"}},
+    "direction": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}
+  }
+}

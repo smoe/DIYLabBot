@@ -1,0 +1,41 @@
+# Generated from the shared CF01 protocol; illustrative playback, no hardware I/O.
+import time
+import FreeCAD as App
+import FreeCADGui as Gui
+from PySide import QtCore, QtWidgets
+
+document_path = __DOCUMENT__
+keys = __KEYS__
+doc = App.openDocument(document_path)
+Gui.activeDocument().activeView().viewAxonometric()
+Gui.activeDocument().activeView().fitAll()
+
+class CF01Playback(QtWidgets.QDialog):
+    def __init__(self):
+        super().__init__(Gui.getMainWindow())
+        self.setWindowTitle('CF01 robot access — kinematic demonstration')
+        layout=QtWidgets.QVBoxLayout(self)
+        self.label=QtWidgets.QLabel('Closed and locked');layout.addWidget(self.label)
+        self.slider=QtWidgets.QSlider(QtCore.Qt.Horizontal);self.slider.setRange(0,round(keys[-1]['time_s']*100));layout.addWidget(self.slider)
+        self.button=QtWidgets.QPushButton('Play opening / tube lift / closing');layout.addWidget(self.button)
+        self.slider.valueChanged.connect(self.apply)
+        self.button.clicked.connect(self.play)
+        self.timer=QtCore.QTimer(self);self.timer.timeout.connect(self.tick)
+    def apply(self,value):
+        t=value/100
+        for a,b in zip(keys,keys[1:]):
+            if t<=b['time_s']:
+                u=(t-a['time_s'])/(b['time_s']-a['time_s'])
+                for name,start in a['values'].items():setattr(doc.Controller,name,start+(b['values'][name]-start)*u)
+                self.label.setText(b['phase']);doc.recompute();Gui.updateGui();break
+    def play(self):
+        if self.timer.isActive():self.timer.stop();self.button.setText('Play');return
+        if self.slider.value()==self.slider.maximum():self.slider.setValue(0)
+        self.started=time.monotonic()-self.slider.value()/100;self.timer.start(50);self.button.setText('Pause')
+    def tick(self):
+        self.slider.setValue(min(self.slider.maximum(),round((time.monotonic()-self.started)*100)))
+        if self.slider.value()==self.slider.maximum():self.timer.stop();self.button.setText('Replay')
+    def closeEvent(self,event):self.timer.stop();super().closeEvent(event)
+
+cf01_playback=CF01Playback()
+cf01_playback.show()

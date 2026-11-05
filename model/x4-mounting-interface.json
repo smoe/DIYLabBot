@@ -1,0 +1,289 @@
+{
+  "format": "solidcraftbot.vendor-interface/1",
+  "units": "mm",
+  "part": "RMD-X4-P36-36-E-L",
+  "vendor_bundle_revision": "261019",
+  "drawing": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf",
+  "drawing_sha256": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+  "drawing_page": 5,
+  "status": "nominal_fits_fasteners_selected_sample_pending",
+  "manufacturing_released": false,
+  "physical_sample_verified": false,
+  "assembly_design": {
+    "status": "proposed_for_first_joint_trial_not_manufacturing_release",
+    "plate": {
+      "material_assumption": "EN AW-6082-T6 machined aluminium",
+      "nominal_thickness_mm": 6,
+      "thickness_tolerance_mm": 0.05,
+      "mating_face_flatness_mm": 0.02,
+      "mask_or_finish_bores_and_mating_faces_after_coating": true
+    },
+    "sources": {
+      "H7_limits": "https://www.schaeffler.com/remotemedien/media/_shared_media/08_media_library/01_publications/schaeffler_2/tpi/downloads_8/tpi_211_de_en.pdf",
+      "two_way_locating_principle": "https://in.misumi-ec.com/pr/blog/locating-fixtures/locating-pins-by-misumi/",
+      "M4_ISO4762_example": "https://eshop.wuerth.de/-/414964%206.sku/de/DE/EUR/",
+      "M3_ISO4762_dimensions": "https://www.accu.co.uk/metric-cap-head-screws/642446-SSCF-M3-10-HK-12-9",
+      "fit_limits": "https://www.schaeffler.com/remotemedien/media/_shared_media/08_media_library/01_publications/schaeffler_2/catalogue_1/downloads_6/hg_1_de_en.pdf",
+      "low_head_screw": "https://eshop.wuerth.de/Hexagon-Socket-Head-Cap-Screw-with-low-Head-DIN-7984-steel-88-plain-SCR-CYL-DIN7984-088-HS2-M3X8/00853%20%208.sku/en/US/EUR/"
+    },
+    "assembly_sequence": [
+      "Measure vendor bore sizes, pitch and usable thread depth",
+      "Finish plate datums and blind retention bores; mask fits from coating",
+      "Press one round and one relieved locating pin into plate; relief follows selected-centre line",
+      "Hand slip-fit to motor without forcing; check pins and screws cannot bottom",
+      "Install plate screws before coupling/bracket; cross-tighten to separately qualified torque",
+      "Calibrate and record assembled joint frame"
+    ],
+    "torque_and_preload_verified": false,
+    "thread_material_verified": false,
+    "screw_tip_chamfer_and_thread_runout_verified": false,
+    "washer_policy": "No washers or unaccounted coatings/gaskets in the selected stack",
+    "datum_scheme": {
+      "A": "servo mating face",
+      "B": "primary round pin",
+      "C": "tangential constraint of relieved pin"
+    },
+    "custom_pin_material_assumption": "Hardened ground steel, 58 to 62 HRC; grade/process unqualified",
+    "custom_pin_retention": "Press stems into own plate from servo side; support plate; no vendor modification",
+    "qualification_notes": [
+      "Own stepped locating pins; workshop grinding/process and retention strength unqualified",
+      "DIN 7984 08.8 has reduced head load capacity; no full-load 8.8 claim",
+      "Vendor bore and pitch tolerances do not establish calibrated TCP accuracy"
+    ]
+  },
+  "notes": [
+    "Vendor locating bores are not H7. Explicit vendor limits govern.",
+    "Only two bores are used per interface; X4 third output bore stays unused to avoid overconstraint.",
+    "Own round/relieved stepped pins are custom parts, not supplied servo parts.",
+    "STEP core depth is not usable full thread depth.",
+    "Minimum plate-edge ligaments, head bearing area, preload, retention and load capacity need physical qualification.",
+    "Relieved head is a true convex rhombus, not a round pin with two flats. Tangential clearance and all vertices are checked at worst assumed pitch plus primary-pin float."
+  ],
+  "housing": {
+    "bolt_circle_mm": 48,
+    "fastener_count": 6,
+    "vendor_thread": "M3",
+    "vendor_thread_depth_mm": 6,
+    "thread_depth_reference": "From named housing/output mating face; no unthreaded counterbore indicated",
+    "cad_thread_core_diameter_mm": 2.5,
+    "plate_clearance_diameter_mm": 3.4,
+    "fastener_design": {
+      "designation": "M3 x 8 ISO 4762 full thread, steel 8.8",
+      "length_mm": 8,
+      "accepted_length_tolerance_mm": 0.1,
+      "accepted_length_is_measured_not_assumed_commercial_tolerance": true,
+      "head_diameter_max_mm": 5.7,
+      "head_height_max_mm": 3,
+      "property_class": "8.8",
+      "washer_stack_mm": 0,
+      "thread_depth_assumption_shortfall_mm": 0.2,
+      "minimum_axial_overlap_mm": 4.8,
+      "minimum_tip_margin_mm": 0.5,
+      "torque_nm": null,
+      "torque_requires_vendor_thread_material_and_trial_confirmation": true
+    },
+    "plate_head_recess": {
+      "diameter_mm": 6,
+      "depth_mm": 3.1,
+      "depth_tolerance_mm": 0.05,
+      "minimum_floor_mm": 2.8,
+      "minimum_diametral_head_clearance_mm": 0.2
+    },
+    "locating_bores": {
+      "count": 2,
+      "bolt_circle_mm": 48,
+      "diameter_limits_mm": [
+        3,
+        3.03
+      ],
+      "depth_mm": 4,
+      "assumed_depth_shortfall_mm": 0.1,
+      "expected_centres_mm": [
+        [
+          -10.142838,
+          21.751387
+        ],
+        [
+          10.142838,
+          -21.751387
+        ]
+      ]
+    },
+    "plate_locating_pins": {
+      "scheme": "plate_retained_round_and_diamond_pin",
+      "selected_centres_mm": [
+        [
+          -10.142838,
+          21.751387
+        ],
+        [
+          10.142838,
+          -21.751387
+        ]
+      ],
+      "unused_centres_mm": [],
+      "selection_rule": "Farthest registered pair, lexicographic tie break",
+      "head_fit": "3 h6, explicit limits govern",
+      "head_diameter_limits_mm": [
+        2.994,
+        3
+      ],
+      "head_nominal_diameter_mm": 2.997,
+      "projection_mm": 2.5,
+      "projection_tolerance_mm": 0.05,
+      "stem_diameter_limits_mm": [
+        3.01,
+        3.016
+      ],
+      "stem_nominal_diameter_mm": 3.013,
+      "stem_length_mm": 3.5,
+      "stem_length_tolerance_mm": 0.05,
+      "retention_bore_class": "3 H6",
+      "retention_bore_limits_mm": [
+        3,
+        3.006
+      ],
+      "retention_bore_nominal_diameter_mm": 3.003,
+      "retention_depth_mm": 4,
+      "retention_depth_tolerance_mm": 0.05,
+      "minimum_retention_interference_mm": 0.004,
+      "maximum_retention_interference_mm": 0.016,
+      "relieved_radial_width_mm": 2.8,
+      "relieved_width_tolerance_mm": 0.02,
+      "assumed_vendor_pitch_error_mm": 0.02,
+      "plate_pitch_error_allowance_mm": 0.015,
+      "assumed_plate_alpha_per_k": 2.3e-05,
+      "assumed_motor_pitch_alpha_per_k": 1.2e-05,
+      "assumed_temperature_change_k": 40,
+      "minimum_pin_tip_margin_mm": 0.25,
+      "lead_in_chamfer_mm": 0.15,
+      "geometric_lead_in_modeled": false,
+      "retention_strength_verified": false,
+      "relieved_profile": "convex_rhombus",
+      "relieved_tangential_width_mm": 2.991,
+      "relieved_tangential_width_limits_mm": [
+        2.988,
+        2.994
+      ],
+      "assumed_relief_clocking_error_deg": 0.25
+    }
+  },
+  "output": {
+    "bolt_circle_mm": 26,
+    "fastener_count": 6,
+    "vendor_thread": "M3",
+    "vendor_thread_depth_mm": 6,
+    "thread_depth_reference": "From named housing/output mating face; no unthreaded counterbore indicated",
+    "cad_thread_core_diameter_mm": 2.5,
+    "plate_clearance_diameter_mm": 3.4,
+    "fastener_design": {
+      "designation": "M3 x 8 ISO 4762 full thread, steel 8.8",
+      "length_mm": 8,
+      "accepted_length_tolerance_mm": 0.1,
+      "accepted_length_is_measured_not_assumed_commercial_tolerance": true,
+      "head_diameter_max_mm": 5.7,
+      "head_height_max_mm": 3,
+      "property_class": "8.8",
+      "washer_stack_mm": 0,
+      "thread_depth_assumption_shortfall_mm": 0.2,
+      "minimum_axial_overlap_mm": 4.8,
+      "minimum_tip_margin_mm": 0.5,
+      "torque_nm": null,
+      "torque_requires_vendor_thread_material_and_trial_confirmation": true
+    },
+    "plate_head_recess": {
+      "diameter_mm": 6,
+      "depth_mm": 3.1,
+      "depth_tolerance_mm": 0.05,
+      "minimum_floor_mm": 2.8,
+      "minimum_diametral_head_clearance_mm": 0.2
+    },
+    "locating_bores": {
+      "count": 3,
+      "bolt_circle_mm": 26,
+      "diameter_limits_mm": [
+        3,
+        3.03
+      ],
+      "depth_mm": 3,
+      "assumed_depth_shortfall_mm": 0.1,
+      "expected_centres_mm": [
+        [
+          -12.61497,
+          3.140467
+        ],
+        [
+          3.587761,
+          -12.495118
+        ],
+        [
+          9.027209,
+          9.354651
+        ]
+      ]
+    },
+    "plate_locating_pins": {
+      "scheme": "plate_retained_round_and_diamond_pin",
+      "selected_centres_mm": [
+        [
+          -12.61497,
+          3.140467
+        ],
+        [
+          3.587761,
+          -12.495118
+        ]
+      ],
+      "unused_centres_mm": [
+        [
+          9.027209,
+          9.354651
+        ]
+      ],
+      "selection_rule": "Farthest registered pair, lexicographic tie break",
+      "head_fit": "3 h6, explicit limits govern",
+      "head_diameter_limits_mm": [
+        2.994,
+        3
+      ],
+      "head_nominal_diameter_mm": 2.997,
+      "projection_mm": 2.5,
+      "projection_tolerance_mm": 0.05,
+      "stem_diameter_limits_mm": [
+        3.01,
+        3.016
+      ],
+      "stem_nominal_diameter_mm": 3.013,
+      "stem_length_mm": 3.5,
+      "stem_length_tolerance_mm": 0.05,
+      "retention_bore_class": "3 H6",
+      "retention_bore_limits_mm": [
+        3,
+        3.006
+      ],
+      "retention_bore_nominal_diameter_mm": 3.003,
+      "retention_depth_mm": 4,
+      "retention_depth_tolerance_mm": 0.05,
+      "minimum_retention_interference_mm": 0.004,
+      "maximum_retention_interference_mm": 0.016,
+      "relieved_radial_width_mm": 2.8,
+      "relieved_width_tolerance_mm": 0.02,
+      "assumed_vendor_pitch_error_mm": 0.02,
+      "plate_pitch_error_allowance_mm": 0.015,
+      "assumed_plate_alpha_per_k": 2.3e-05,
+      "assumed_motor_pitch_alpha_per_k": 1.2e-05,
+      "assumed_temperature_change_k": 40,
+      "minimum_pin_tip_margin_mm": 0.25,
+      "lead_in_chamfer_mm": 0.15,
+      "geometric_lead_in_modeled": false,
+      "retention_strength_verified": false,
+      "relieved_profile": "convex_rhombus",
+      "relieved_tangential_width_mm": 2.991,
+      "relieved_tangential_width_limits_mm": [
+        2.988,
+        2.994
+      ],
+      "assumed_relief_clocking_error_deg": 0.25
+    }
+  }
+}

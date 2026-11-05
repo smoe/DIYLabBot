@@ -1,0 +1,95 @@
+{
+  "format": "solidcraftbot.sample-transport/1",
+  "id": "SampleTransport_TR01",
+  "status": "Concept envelopes and sampled bench translation; not a manufacturing release or operating transport system",
+  "units": {"length": "mm", "angle": "deg", "time": "s", "mass": "kg"},
+  "requirements": {
+    "confirmed_on": "2026-10-28",
+    "routes": ["laboratory_benches_or_dedicated_track", "between_laboratories_on_same_floor"],
+    "multiple_differently_configured_cars_allowed": true,
+    "labware": ["microwell_plates", "1.5_mL_tubes", "2.0_mL_tubes", "other_labware_with_article_specific_cassette"],
+    "smallest_tube_interpretation": "Owner clarified 2 mL, not 2 uL",
+    "centrifuge_batch_target": true,
+    "centrifuge_article": null,
+    "rotor_article": null,
+    "required_tubes_per_batch": null,
+    "required_plates_per_batch": null,
+    "maximum_payload_kg": null,
+    "route_length_mm": null,
+    "travel_speed_mm_s": null,
+    "acceleration_mm_s2": null,
+    "floor_door_width_mm": null,
+    "floor_threshold_height_mm": null,
+    "bench_handoff_height_mm": null,
+    "docking_repeatability_mm": null,
+    "sample_temperature_limits_degC": null
+  },
+  "parameters": {
+    "bench_length": {"expression": 340, "range": [340, 380], "unit": "mm"},
+    "bench_width": {"expression": 190, "range": [190, 210], "unit": "mm"},
+    "bench_deck_z": {"expression": 64, "range": [64, 74], "unit": "mm"},
+    "bench_travel": {"expression": 600, "range": [600, 1000], "unit": "mm"},
+    "floor_length": {"expression": 500, "range": [500, 550], "unit": "mm"},
+    "floor_width": {"expression": 400, "range": [400, 450], "unit": "mm"},
+    "floor_deck_z": {"expression": 800, "range": [700, 950], "unit": "mm"},
+    "cassette_length": {"expression": 140, "range": [140, 140], "unit": "mm"},
+    "cassette_width": {"expression": 104, "range": [104, 104], "unit": "mm"},
+    "bay_pitch": {"expression": 156, "range": [156, 156], "unit": "mm"},
+    "plate_length": {"expression": 127.76, "range": [127.76, 127.76], "unit": "mm"},
+    "plate_width": {"expression": 85.48, "range": [85.48, 85.48], "unit": "mm"},
+    "plate_height": {"expression": 15, "range": [15, 45], "unit": "mm"},
+    "tube_radius": {"expression": 5.4, "range": [5.4, 5.4], "unit": "mm"},
+    "tube_pitch": {"expression": 18, "range": [18, 18], "unit": "mm"}
+  },
+  "cassette_interface": {
+    "id": "TR01-C140x104-v1",
+    "origin": "cassette bottom centre; +X travel, +Y left, +Z up",
+    "bay_centres_x": ["-bay_pitch/2", "bay_pitch/2"],
+    "mount": "flat support, unequal diagonal locating pins and matching clearance bores",
+    "pin_pattern_mm": [{"xy": [-64, -46], "radius": 2}, {"xy": [64, 46], "radius": 3}],
+    "cassette_retention": "two latch envelopes per bay; contact, release and sensing not implemented",
+    "robot_grasp_interface": null,
+    "compatible_with_H01": false
+  },
+  "variants": [
+    {"id": "Bench_P2", "family": "bench", "bays": ["plate", "plate"], "color": "#369bc1"},
+    {"id": "Bench_T48", "family": "bench", "bays": ["tube24", "tube24"], "color": "#42a789"},
+    {"id": "Floor_Mixed", "family": "floor", "bays": ["plate", "tube24"], "color": "#dba64b"}
+  ],
+  "operations": ["guided_bench_chassis", "floor_vehicle_envelopes", "keyed_two_bay_deck", "plate_nest_cassette", "tube_rack_cassette", "removable_transport_cover"],
+  "protocol": [
+    {"id": "TR01.reserve", "requires": ["vehicle and destination reserved", "route blocks reserved", "cassette identities and batch manifest known"]},
+    {"id": "TR01.load", "requires": ["vehicle stationary and dock retained", "cover removed", "robot workspace reserved", "correct cassette and article fit qualified"]},
+    {"id": "TR01.secure", "requires": ["tubes closed or plates sealed", "samples and cassettes retained", "cover installed", "manifest and presence agree", "robot clear"]},
+    {"id": "TR01.travel", "requires": ["secure feedback fresh", "route free", "charge and localization valid", "sample motion limits configured"]},
+    {"id": "TR01.dock", "requires": ["vehicle stopped", "station datum seated and latch confirmed", "travel inhibited", "handoff height compatible"]},
+    {"id": "TR01.handoff", "requires": ["receiver ready", "destination capacity available", "robot grasp confirmed before sample release", "manifest updated after observed transfer"]},
+    {"id": "TR01.fault", "requires": ["stop and retain load on lost localization, obstacle, stale feedback, retention fault or manifest mismatch", "manual recovery and sample reconciliation before restart"]}
+  ],
+  "future_services": {
+    "implementation": "requirements only; no driver, scheduler, navigation or server",
+    "bench": ["modular track", "block reservations", "end stops", "edge containment", "dock latch and presence feedback"],
+    "floor": ["wheel drive and braking", "obstacle detection", "localization", "door access", "charging", "emergency stop", "station docking"],
+    "handoff": "same cassette on both families; initial manual cassette transfer, automated transfer mechanism unresolved"
+  },
+  "references": [
+    {"url": "https://www.slas.org/SLAS/assets/File/public/standards/ANSI_SLAS_1-2004_FootprintDimensions.pdf", "use": "127.76 by 85.48 mm nominal plate footprint only; plate height and article geometry are not universal"},
+    {"url": "https://www.eppendorf.com/product-media/doc/en/11112106/General_Catalog_Main-Eppendorf-Catalog-UK-Version.pdf", "use": "24 by 1.5/2.0 mL rotor example motivates a 24-place cassette; no centrifuge selected"}
+  ],
+  "limitations": [
+    "Plate and tube bodies are closed solid reference envelopes, not manufacturer geometry or liquid volumes",
+    "Two plates or 48 tubes are concept capacities; full centrifuge batch coverage remains unknown until a rotor and labware manifest are chosen",
+    "Other labware requires additional measured inserts; anything is a design goal, not demonstrated universal compatibility",
+    "Floor_Mixed has one plate and 24 tubes; other floor configurations use the same bays but are not generated in this revision",
+    "Bench track is one straight demonstration segment; long routes, joints, curves, switches and multi-car scheduling are not implemented",
+    "Bench Travel is an ideal slider; wheel rolling, drive, guide contact, bearings and track tolerances are not modeled",
+    "Floor geometry is a static envelope; no steering, wheel kinematics, navigation, dynamics, stability or door traversal is validated",
+    "Floor deck height is a concept parameter; no lift or automatic cassette exchange between floor and bench is implemented",
+    "Pins, retainers, cover and bumper are concept geometry; no article fit, holding force, spill, vibration, cleaning or contamination qualification",
+    "Cover is not a sealed or aerosol-tight container and has no modeled release mechanism",
+    "Cassette keying is TR01-specific; H01 and C01 require explicit adapters and are not automatically compatible",
+    "No payload rating, range, runtime, speed, temperature performance or cost is established; transporter budget is additional to the arm estimate",
+    "No ROS, SiLA, hardware control, physical feedback or safety validation; protocol entries are requirements rather than executable actions",
+    "Native CAD edits do not update the shared source; change source and regenerate to keep dimensions and anchors together"
+  ]
+}

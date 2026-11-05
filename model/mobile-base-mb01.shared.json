@@ -1,0 +1,318 @@
+{
+  "format": "solidcraftbot.mobile-arm/1",
+  "id": "Laborarm_6R_MB01",
+  "status": "concept_not_for_manufacture",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "arm_source": "model/robot.json",
+  "parameters": {
+    "mb_length": {
+      "unit": "mm",
+      "expression": 400,
+      "range": [
+        380,
+        440
+      ]
+    },
+    "mb_width": {
+      "unit": "mm",
+      "expression": 340,
+      "range": [
+        320,
+        380
+      ]
+    },
+    "mb_wheel_radius": {
+      "unit": "mm",
+      "expression": 22,
+      "range": [
+        20,
+        26
+      ]
+    },
+    "mb_wheel_width": {
+      "unit": "mm",
+      "expression": 18,
+      "range": [
+        18,
+        22
+      ]
+    },
+    "mb_wheel_inset_y": {
+      "unit": "mm",
+      "expression": 80,
+      "range": [
+        75,
+        85
+      ]
+    },
+    "mb_deck_t": {
+      "unit": "mm",
+      "expression": 10,
+      "range": [
+        8,
+        12
+      ]
+    },
+    "mb_deck_z": {
+      "unit": "mm",
+      "expression": "2*mb_wheel_radius+2",
+      "range": [
+        42,
+        54
+      ]
+    },
+    "mb_mount_z": {
+      "unit": "mm",
+      "expression": "mb_deck_z+mb_deck_t",
+      "range": [
+        50,
+        66
+      ]
+    },
+    "mb_foot_clearance": {
+      "unit": "mm",
+      "expression": 8,
+      "range": [
+        6,
+        10
+      ]
+    },
+    "mb_wheel_lift": {
+      "unit": "mm",
+      "expression": 3,
+      "range": [
+        2,
+        4
+      ]
+    },
+    "mb_support_stroke": {
+      "unit": "mm",
+      "expression": "mb_foot_clearance+mb_wheel_lift",
+      "range": [
+        8,
+        14
+      ]
+    },
+    "mb_pad_radius": {
+      "unit": "mm",
+      "expression": 22,
+      "range": [
+        20,
+        24
+      ]
+    },
+    "mb_handle_height": {
+      "unit": "mm",
+      "expression": 130,
+      "range": [
+        120,
+        140
+      ]
+    }
+  },
+  "recipe": [
+    {
+      "id": "MB01.ManualBase",
+      "action": "manual_mobile_base",
+      "caster_count": 4,
+      "drive": "manual",
+      "part": null
+    },
+    {
+      "id": "MB01.Supports",
+      "action": "retractable_support_tripod",
+      "adjustment": "three_independent_manual_thumbwheels",
+      "part": null,
+      "screw_lead_mm": null
+    },
+    {
+      "id": "MB01.Handle",
+      "action": "repositioning_handle",
+      "side": "rear",
+      "part": null
+    }
+  ],
+  "poses": {
+    "working": {
+      "arm_deg": [
+        20,
+        35,
+        65,
+        0,
+        80,
+        15
+      ],
+      "supports": "deployed",
+      "manual_xy_yaw": [
+        0,
+        0,
+        0
+      ]
+    },
+    "parking_supported": {
+      "arm_deg": [
+        0,
+        0,
+        90,
+        0,
+        90,
+        0
+      ],
+      "supports": "deployed",
+      "manual_xy_yaw": [
+        0,
+        0,
+        0
+      ]
+    },
+    "manual_reposition": {
+      "arm_deg": [
+        0,
+        0,
+        90,
+        0,
+        90,
+        0
+      ],
+      "supports": "retracted",
+      "manual_xy_yaw": [
+        0,
+        0,
+        0
+      ]
+    },
+    "parked_aside": {
+      "arm_deg": [
+        0,
+        0,
+        90,
+        0,
+        90,
+        0
+      ],
+      "supports": "deployed",
+      "manual_xy_yaw": [
+        -300,
+        120,
+        25
+      ]
+    }
+  },
+  "protocol": {
+    "id": "MB01.YieldAndResume",
+    "status": "design_contract_no_hardware_execution",
+    "steps": [
+      {
+        "id": "MB01.Pause",
+        "requires": [
+          "operation_paused",
+          "tool_withdrawn",
+          "sample_state_reconciled"
+        ],
+        "pose": "working"
+      },
+      {
+        "id": "MB01.Fold",
+        "requires": [
+          "supports_confirmed",
+          "tool_clear",
+          "approach_path_clear"
+        ],
+        "pose": "parking_supported",
+        "duration_s": 6
+      },
+      {
+        "id": "MB01.Release",
+        "requires": [
+          "arm_held_in_parking_pose",
+          "handle_controlled",
+          "travel_corridor_clear"
+        ],
+        "pose": "manual_reposition",
+        "duration_s": 2
+      },
+      {
+        "id": "MB01.MoveAside",
+        "requires": [
+          "arm_motion_inhibited",
+          "base_manually_moved",
+          "tether_clear",
+          "table_edge_containment"
+        ],
+        "pose": "parked_aside",
+        "duration_s": null
+      },
+      {
+        "id": "MB01.Return",
+        "requires": [
+          "arm_motion_inhibited",
+          "base_manually_returned",
+          "supports_confirmed",
+          "wheel_clearance_confirmed"
+        ],
+        "pose": "parking_supported",
+        "duration_s": null
+      },
+      {
+        "id": "MB01.Relocalize",
+        "requires": [
+          "fresh_tip_and_tube_observation",
+          "depth_and_orientation_observable",
+          "image_age_acceptable",
+          "path_clear",
+          "operator_resume"
+        ],
+        "pose": "working",
+        "duration_s": 6
+      }
+    ],
+    "fault_response": "Inhibit arm motion, hold the load, reconcile tool/sample state, require fresh localization and deliberate resume; hardware implementation pending"
+  },
+  "vision": {
+    "controlled_relationship": "actual_pipette_tip_to_actual_tube_position_and_orientation",
+    "global_base_precision_required": false,
+    "precision_dock_required": false,
+    "localization_invalidated_by_manual_move": true,
+    "image_topics_implemented": false,
+    "visual_servo_implemented": false,
+    "position_tolerance_mm": null,
+    "orientation_tolerance_deg": null,
+    "maximum_image_age_s": null,
+    "reacquisition_time_s": null
+  },
+  "qualification": {
+    "actual_mass_kg": null,
+    "payload_kg": null,
+    "centre_of_mass_mm": null,
+    "support_stiffness_n_per_mm": null,
+    "tip_margin_mm": null,
+    "manual_push_force_n": null,
+    "parking_time_s": null,
+    "table_load_capacity_kg": null,
+    "edge_containment": null,
+    "tether_length_mm": null,
+    "tether_bend_radius_mm": null,
+    "caster_part": null,
+    "support_part": null,
+    "cost_eur": null,
+    "manufacturing_released": false
+  },
+  "checks": {
+    "fold_sample_step_deg": 5,
+    "overlap_threshold_mm3": 0.0001
+  },
+  "limitations": [
+    "No pipette tool or calibrated tip TCP; arm ends at its existing general flange",
+    "Casters, forks, tripod guides, thumbwheels and handle are unselected design geometry",
+    "Caster swivel and wheel rolling are not simulated; manual planar pose is an illustration",
+    "Support stroke and chassis lift are ideal geometric placements; load sharing, contact, friction and actual jack mechanisms are not simulated",
+    "No demonstrated load capacity, stiffness, tipping margin, camera accuracy or liquid performance",
+    "Manual moves invalidate task localization; camera acquisition and operator interlocks are requirements, not an implemented controller",
+    "No surveyed bench boundary, edge containment, navigation or collision avoidance",
+    "Parking clearance covers the current arm and camera envelopes; future pipette and cables require rechecking"
+  ]
+}

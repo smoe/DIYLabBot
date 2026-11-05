@@ -1,0 +1,95 @@
+{
+  "part": "RMD-X4-P36-36-E-L",
+  "bundle_revision": "261019",
+  "source": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step",
+  "source_sha256": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+  "step_timestamp": "2026-10-16T05:57:28",
+  "freecad_version": [
+    "27",
+    "1",
+    "0",
+    "20261020 (Git shallow)",
+    "Unknown",
+    "2026/10/20 22:15:52",
+    "(HEAD detached at 9946038aa)",
+    "9946038aace97af288eb28f2727a169f9d1158c7"
+  ],
+  "native_length_unit": "mm",
+  "step_declares_mm": true,
+  "shape_valid": false,
+  "solids": 43,
+  "invalid_solids": 2,
+  "faces": 4147,
+  "edges": 11237,
+  "geometric_volume_mm3": 40781.270772885335,
+  "cad_reference": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step",
+  "cad_reference_sha256": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
+  "cad_reference_valid": true,
+  "cad_reference_solids": 41,
+  "cad_reference_faces": 4115,
+  "omitted_invalid_micro_solids": [
+    {
+      "source_solid_index_zero_based": 21,
+      "volume_mm3": 3.948094296742161e-06,
+      "bbox_size_mm": [
+        0.03431230682754638,
+        0.0920612581726381,
+        0.14956917626221156
+      ],
+      "reason": "Microscopic invalid solid; self-intersecting/unorientable source geometry"
+    },
+    {
+      "source_solid_index_zero_based": 35,
+      "volume_mm3": 4.428895266119386e-06,
+      "bbox_size_mm": [
+        0.03431230682754638,
+        0.0920612581726381,
+        0.14956917626221156
+      ],
+      "reason": "Microscopic invalid solid; self-intersecting/unorientable source geometry"
+    }
+  ],
+  "reference_bbox_max_difference_mm": 4.298783551348606e-12,
+  "reference_volume_difference_mm3": 0.17404718316538492,
+  "reference_volume_relative_difference": 4.267821474584982e-06,
+  "validation_scope": "Assembly/reference geometry only; no manufacturing interface approval",
+  "acceptance": {
+    "bbox_max_difference_mm": 1e-05,
+    "volume_relative_difference": 1e-05,
+    "all_reference_solids_valid": true,
+    "reference_topology_preserved": true
+  },
+  "bbox_mm": {
+    "min": [
+      -27.979891382934234,
+      -27.674469388936483,
+      -28.501388980002247
+    ],
+    "max": [
+      27.979891382934234,
+      27.674469388936487,
+      32.500000000000014
+    ],
+    "size": [
+      55.95978276586847,
+      55.348938777872974,
+      61.00138898000226
+    ],
+    "centre": [
+      0.0,
+      1.7763568394002505e-15,
+      1.9993055099988837
+    ]
+  },
+  "conservative_box": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/conservative-box.step",
+  "clearance_margin_mm": 0,
+  "housing_and_rotor_partition_verified": false,
+  "mounting_interface_verified": false,
+  "import_elapsed_s": 24.83658160001505,
+  "notes": [
+    "Bounds include every supplied solid, including projecting connectors/fasteners if present.",
+    "Geometric volume is not a measured mass or inertia.",
+    "File origin and axes remain vendor-defined; housing/output frames need drawing-based registration."
+  ],
+  "passed": true
+}
