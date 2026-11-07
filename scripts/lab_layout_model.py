@@ -2,6 +2,8 @@
 from pathlib import Path
 import json
 import math
+import importlib
+import assembly_model as assembly
 import lab_room_model as room
 import robot_spec as robot
 
@@ -14,22 +16,30 @@ def load(*, validate_builds=True):
     """Validate source bindings; native build evidence is optional for source-only tests."""
     s=json.loads(SOURCE.read_text(encoding='utf-8'))
     if s['format']!='solidcraftbot.lab-layout/1' or s['units']!={'length':'mm','angle':'deg'}: raise ValueError('Layout contract')
-    for name,a in s['assets'].items():
-        bindings=[('source','source_sha256')]
-        if validate_builds: bindings.append(('native','native_sha256'))
-        for key,hkey in bindings:
-            if digest(ROOT/a[key])!=a[hkey]: raise ValueError('Pinned asset changed: '+name+' '+key)
-        if not validate_builds: continue
-        report=json.loads((ROOT/a['report']).read_text(encoding='utf-8'))
-        if not report['passed']: raise ValueError('Upstream build not passed: '+name)
-        if report.get('source_sha256',report.get('spec_sha256'))!=a['source_sha256']: raise ValueError('Upstream report/source mismatch: '+name)
+    for ref in s['assets'].values():
+        assembly.validate_reference(ref)
+        if validate_builds: assembly.resolve_artifact(ref)
+    context=parameters(s)
+    for item in s['instances']:
+        assembly.validate_instance(item,context)
+        source=instance_source(s,item)
+        if item['asset']=='arm':
+            if 'joints_deg' not in item or any(not j['limits_deg'][0]<=q<=j['limits_deg'][1] for j,q in zip(source['joints'],item['joints_deg'])):
+                raise ValueError('Arm instance pose outside source joint limits: '+item['id'])
+        if 'variant' in item:
+            if item['asset'] not in ['transporter','tube_rack']: raise ValueError('Named variants are currently supported for transporter cassettes only')
+            instance_variant(source,item)
+        if 'pose' in item and item['asset']!='centrifuge': raise ValueError('Named layout poses are currently supported for CF01 only')
     ids=[i['id'] for i in s['instances']]
     if len(ids)!=len(set(ids)): raise ValueError('Duplicate layout instance')
     if len([i for i in s['instances'] if i['asset']=='arm'])!=3: raise ValueError('Three arms required')
     return s
 
 
-def parameters(s): return {**room.parameters(room.load()),**s['parameters']}
+def parameters(s):
+    ref=s['assets']['room']
+    source=room.load(assembly.validate_reference(ref))
+    return {**room.parameters(source),**s['parameters']}
 def xyz(values,p): return [robot.evaluate(v,p) for v in values]
 
 
@@ -38,9 +48,40 @@ def matrix(item,p):
     return [[c,-q,0,x],[q,c,0,y],[0,0,1,z],[0,0,0,1]]
 
 
+def provider(kind):
+    modules={'arm':'robot_spec','room':'lab_room_model','centrifuge':'centrifuge_model',
+             'transporter':'sample_transport_model','tube_rack':'sample_transport_model','tip_collector':'tip_collector_model'}
+    if kind not in modules: raise ValueError('Unsupported layout asset: '+kind)
+    return importlib.import_module(modules[kind])
+
+
+def instance_source(s,item):
+    kind=item['asset']; key='transporter' if kind=='tube_rack' else kind
+    # Bench racks reuse the cassette variant of the actual transporter instance.
+    parent=next(i for i in s['instances'] if i['asset']=='transporter') if kind=='tube_rack' else item
+    overrides={**parent.get('overrides',{}),**item.get('overrides',{})}
+    return assembly.load_instance(provider(kind),s['assets'][key],overrides,parameters(s))
+
+
+def instance_variant(source,item):
+    name=item.get('variant','Floor_Mixed')
+    variants=[v for v in source['variants'] if v['id']==name]
+    if len(variants)!=1: raise ValueError('Unknown assembly variant: '+name)
+    if item['asset']=='tube_rack' and variants[0]['bays'][1]!='tube24':
+        raise ValueError('Bench rack variant must contain a tube cassette in bay 2')
+    return variants[0]
+
+
+
+def cassette_datum(source,item):
+    module=provider('transporter')
+    expanded=module.expanded(source,module.parameters(source),instance_variant(source,item))
+    return next(frame['origin_mm'] for frame in expanded['interfaces'] if frame['id']=='B2_CassetteDatum')
+
+
 def inverse_position_ik(s,instance,target):
     """Position-only planar 3-link screen of the actual arm flange reference."""
-    p=parameters(s); arm=robot.load(ROOT/s['assets']['arm']['source']); ap=robot.parameters(arm)
+    p=parameters(s); arm=instance_source(s,instance); ap=robot.parameters(arm)
     base=xyz(instance['xyz'],p); dx,dy,dz=[a-b for a,b in zip(target,base)]; rho=math.hypot(dx,dy)
     yaw=(math.degrees(math.atan2(dy,dx))-instance['yaw_deg']+180)%360-180
     l1=ap['upper_len']; l2=ap['fore_len']; l3=robot.evaluate(arm['flange_reference']['point'][2],ap)-ap['wrist_z']
@@ -64,6 +105,8 @@ def inverse_position_ik(s,instance,target):
 
 def reach_report(s):
     p=parameters(s); items={i['id']:i for i in s['instances']}; result=[]
+    for item in s['instances']:
+        p.update({item['id']+'_'+k:v for k,v in provider(item['asset']).parameters(instance_source(s,item)).items()})
     for target in s['reach_targets']:
         point=xyz(target['xyz'],p)
         for arm in target['arms']: result.append({'id':target['id'],'arm':arm,'target_mm':point,**inverse_position_ik(s,items[arm],point)})

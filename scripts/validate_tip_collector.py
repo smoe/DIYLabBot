@@ -40,6 +40,7 @@ def stl_check(path, reference):
 
 
 def main():
+    raise SystemExit("Historical validator retired; use python scripts/build_tip_collector.py")
     spec=read(SOURCE)
     source_hash=digest(SOURCE)
     refs=read(CAD/"geometry-reference.json")

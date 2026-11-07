@@ -21,6 +21,7 @@ def load(path=SOURCE):
     if any(b['component'] not in {c['id'] for c in spec['components']} for b in spec['bodies']): raise ValueError('Unknown group')
     asset=json.loads((ROOT/spec['marking_asset']).read_text(encoding='utf-8'))
     for g in spec['grooves']:
+        if {'x_mm','width_mm'} & set(g): raise ValueError('Groove dimensions belong only in parameters')
         if asset['profiles'][g['id']]['text']!=str(g['target_pipette_capacity_ul'])+' uL': raise ValueError('Capacity marking mismatch')
         if not 0<p['groove_'+g['id']]<p['mouth_width']<p['fork_x']: raise ValueError('Groove width order')
     if not p['fork_front_y']<p['taper_end_y']<p['slot_end_y']<p['beam_center_y']: raise ValueError('Groove length order')
@@ -47,6 +48,11 @@ def parameters(spec,overrides=None):
     if not p['fork_front_y']<p['taper_end_y']<p['slot_end_y']<p['beam_center_y']: raise ValueError('Groove length order')
     return p
 
+
+
+def grooves(spec,p):
+    """Derived view of lane positions and widths; the parameter table owns all dimensions."""
+    return [{**g,'x_mm':p['lane_'+g['id']+'_x'],'width_mm':p['groove_'+g['id']]} for g in spec['grooves']]
 
 def expanded(spec,p):
     result=copy.deepcopy(spec)

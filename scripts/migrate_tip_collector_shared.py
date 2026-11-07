@@ -20,7 +20,7 @@ def main():
     commands,refs,_=prepare(original)
     spec={k:copy.deepcopy(v) for k,v in original.items() if k!='dimensions'}
     spec.update(format='solidcraftbot.collector/1',id='TipCollector_T01_Shared',
-        historical_source='model/tip-collector-t01.json',
+        historical_source='model/history/tip-collector-t01.legacy.json',
         parameters={},components=[{'id':c,'fixed':True} for c in ['Frame','Bin','InsertS','InsertM','InsertL']],
         bodies=[],operations=[],marking_asset='model/tip-collector-t01-markings.json')
     for c in commands:

@@ -55,10 +55,10 @@ def boxes_overlap(a,b):
 
 
 def data(s,ls):
-    p=layout.parameters(ls); items={i['id']:i for i in ls['instances']}; arm=robot.load(); ap=robot.parameters(arm)
-    cs=cf.load();cp=cf.parameters(cs); ce=cf.expanded(cs,cp)
+    p=layout.parameters(ls); items={i['id']:i for i in ls['instances']}; arm=layout.instance_source(ls,items[s['arm']]); ap=robot.parameters(arm)
+    cs=layout.instance_source(ls,items['CF01']);cp=cf.parameters(cs); ce=cf.expanded(cs,cp)
     base=layout.matrix(items[s['arm']],p); station=layout.matrix(items['CF01'],p)
-    ts=tr.load();tp=tr.parameters(ts,{'floor_deck_z':p['vehicle_deck_z']});te=tr.expanded(ts,tp,next(v for v in ts['variants'] if v['id']=='Floor_Mixed'))
+    ts=layout.instance_source(ls,items['TR01']);tp=tr.parameters(ts);te=tr.expanded(ts,tp,layout.instance_variant(ts,items['TR01']))
     op=next(o for o in te['operations'] if o['body']==s['sample']['transporter_body'] and o['action']=='create')
     vehicle_bottom=robot.transform(layout.matrix(items['TR01'],p),op['shape']['origin'])
     bottom,axis=cf.pocket(cs,cp,s['sample']['centrifuge_slot']); cf_bottom=robot.transform(station,bottom); cf_axis=direction(station,axis)

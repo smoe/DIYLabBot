@@ -92,7 +92,7 @@ def prepare(path):
             ctx['dynamic'].append({'id':tag+'_'+group,'tag':tag,'group':group,'step':str(step) if objects else None,
                                    'matrix':layout.matrix(d['items'][tag],d['p']),'bodies':bodies,'grounded':not any(j['child']==group for j in joints)})
 
-    arm_doc=App.openDocument(str(layout.ROOT/ls['assets']['arm']['native']));baseline_docs.append(arm_doc)
+    arm_doc=static.source_document(ls,d['items'][s['arm']],assets/'TransferArm_source.FCStd');baseline_docs.append(arm_doc)
     for i in range(1,7):setattr(arm_doc.Controller,'J'+str(i),0)
     arm_doc.recompute();look=robot.appearances(d['arm']);records=[]
     for o in motion.features(arm_doc):
@@ -105,7 +105,7 @@ def prepare(path):
     for name,shape in [('ToolProxyShaft',shaft),('ToolProxyCollar',collar)]:records.append((name,d['arm']['flange_reference']['link'],shape,{'color':'#e8ac47','opacity':0.6},'assumed_handling_envelope'))
     arm_joints=[{'id':'J'+str(i),'parent':j['parent'],'child':j['child'],'type':'revolute','origin':layout.xyz(j['frame']['origin'],d['ap']),'axis':j['frame']['axis'],'reference_x':j['frame']['x'],'limits':j['limits_deg'],'unit':'deg'} for i,j in enumerate(d['arm']['joints'],1)]
     emit('ArmC',[l['id'] for l in d['arm']['links']],arm_joints,records)
-    cf_doc=App.openDocument(str(layout.ROOT/ls['assets']['centrifuge']['native']));baseline_docs.append(cf_doc)
+    cf_doc=static.source_document(ls,d['items']['CF01'],assets/'TransferCF_source.FCStd');baseline_docs.append(cf_doc)
     for j in d['ce']['joints']:setattr(cf_doc.Controller,j['id'],0)
     cf_doc.recompute();meta={b['id']:b for b in d['ce']['bodies']};records=[];sample_records=[]
     bottom,axis=cf.pocket(d['cs'],d['cp'],1);canonical_inv=robot.inverse(sample_matrix(bottom,axis))

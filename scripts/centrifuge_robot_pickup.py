@@ -3,6 +3,7 @@ import json
 import math
 from pathlib import Path
 import robot_spec as robot
+import assembly_model as assembly
 import centrifuge_model as cf
 import centrifuge_protocol as protocol
 
@@ -12,6 +13,9 @@ SOURCE=ROOT/'model/centrifuge-cf01.robot-pickup.shared.json'
 
 def validate(s):
     if s['format']!='solidcraftbot.centrifuge-robot-pickup/1':raise ValueError('Pickup scene contract required')
+    assembly.validate_reference({'source':s['sources']['robot']})
+    if s['sources']['centrifuge']!=str(cf.SOURCE.relative_to(ROOT)) or s['sources']['protocol']!=str(protocol.SOURCE.relative_to(ROOT)):
+        raise ValueError('This pickup backend supports the shared CF01 station and protocol only')
     if s['gripper']['operation']!='parallel_tube_gripper_envelope':raise ValueError('Supported gripper operation required')
     times=[k['time_s'] for k in s['timeline']]
     if times[0]!=0 or any(a>=b for a,b in zip(times,times[1:])):raise ValueError('Strictly ordered pickup timeline required')
@@ -98,15 +102,12 @@ def solve_linear(a,b):
 class Kinematics:
     def __init__(self,source,scene):
         self.arm=source;self.p=robot.parameters(source);self.base=placement(scene['arm_fixture']['position_mm'],scene['arm_fixture']['yaw_deg'])
-        self.frames=[robot.frame(j,self.p) for j in source['joints']];self.inverses=[robot.inverse(f) for f in self.frames]
+        self.frames=[robot.frame(j,self.p) for j in source['joints']]
         self.limits=[j['limits_deg'] for j in source['joints']]
         self.flange=[robot.evaluate(v,self.p) for v in source['flange_reference']['point']]
         self.length=scene['gripper']['flange_to_grip_mm']
     def forward(self,q):
-        t=self.base;result={self.arm['links'][0]['id']:t}
-        for j,f,inv,v in zip(self.arm['joints'],self.frames,self.inverses,q):
-            rz=placement([0,0,0],v);t=robot.multiply(robot.multiply(robot.multiply(t,f),rz),inv);result[j['child']]=t
-        return result
+        return {link:robot.multiply(self.base,frame) for link,frame in robot.forward(self.arm,q).items()}
     def tool(self,q):
         t=[row[:] for row in self.forward(q)[self.arm['flange_reference']['link']]]
         tip=robot.transform(t,[self.flange[0],self.flange[1],self.flange[2]+self.length])

@@ -27,34 +27,42 @@ def volume_center(shapes):
 def hexcolor(color): return color if isinstance(color,str) else '#'+''.join('%02x'%int(v) for v in color)
 
 
-def asset_meta(s,kind):
-    if kind=='arm':
-        import robot_spec as robot
-        source=robot.load(model.ROOT/s['assets']['arm']['source']); look=robot.appearances(source)
-        return source,look
-    if kind=='centrifuge':
-        import centrifuge_model as provider
-    elif kind=='tip_collector':
-        import tip_collector_model as provider
-    else:
-        import sample_transport_model as provider
-    source=provider.load(); p=provider.parameters(source)
-    if kind=='transporter' or kind=='tube_rack':
-        p=provider.parameters(source,{'floor_deck_z':model.parameters(s)['vehicle_deck_z']}); expanded=provider.expanded(source,p,next(v for v in source['variants'] if v['id']=='Floor_Mixed'))
-    else: expanded=provider.expanded(source,p)
+def asset_meta(s,kind,item):
+    provider=model.provider(kind); source=model.instance_source(s,item)
+    if kind=='arm': return source,provider.appearances(source)
+    p=provider.parameters(source)
+    expanded=provider.expanded(source,p,model.instance_variant(source,item)) if kind in ['transporter','tube_rack'] else provider.expanded(source,p)
     return source,{b['id']:b for b in expanded['bodies']}
+
+
+def source_document(s,item,path):
+    """Instantiate existing native adapters, preserving geometry/frame parameter coupling."""
+    kind=item['asset'];source=model.instance_source(s,item);provider=model.provider(kind);p=provider.parameters(source)
+    if kind=='arm':
+        from build_neutral_freecad import build
+        return build(source,path)
+    if kind in ['transporter','tube_rack']:
+        from build_sample_transport_freecad import build
+        return build(source,p,model.instance_variant(source,item),path)
+    if kind=='centrifuge':
+        from build_centrifuge_freecad import build
+    elif kind=='tip_collector':
+        from build_tip_collector_freecad import build
+    else: raise ValueError('Unsupported native layout instance: '+kind)
+    return build(source,p,path)
 
 
 def prepare(context):
     s=model.load(); p=model.parameters(s); out=Path(context['out']); cad=Path(context['cad']); assets=cad/'assets'; assets.mkdir(exist_ok=True)
-    doc=room_backend.build(room.load(),room.parameters(room.load()),cad/'LabLayout_L01.FCStd')
+    room_source=room.load(model.assembly.validate_reference(s['assets']['room']))
+    doc=room_backend.build(room_source,room.parameters(room_source),cad/'LabLayout_L01.FCStd')
     for key,value in s['parameters'].items():
         doc.ModelParameters.addProperty('App::PropertyDistance',key,'Layout study (mm)'); setattr(doc.ModelParameters,key,value)
     controller=doc.addObject('App::FeaturePython','LayoutController')
     for key,value in [('SourceFile',str(model.SOURCE.relative_to(model.ROOT))),('SpecSHA256',model.digest(model.SOURCE)),('Status',s['status'])]:
         controller.addProperty('App::PropertyString',key,'Layout source'); setattr(controller,key,value)
     cached={}; snapshots=[]; scene_styles={}; scene_meta={}; all_groups={}
-    room_expanded=room.expanded(room.load(),room.parameters(room.load()))
+    room_expanded=room.expanded(room_source,room.parameters(room_source))
     for b in room_expanded['bodies']: scene_styles[b['id']]=b['appearance']; scene_meta[b['id']]={'instance':'Room','role':b['role']}
     for obj in room_backend.objects(doc): obj.addProperty('App::PropertyString','LayoutInstance','Layout'); obj.LayoutInstance='Room'
 
@@ -81,19 +89,16 @@ def prepare(context):
             scene_styles[name]=style; scene_meta[name]={'instance':tag,'role':role}
             expected.append({'name':name,'role':role,'appearance':style})
         step=assets/(tag+'.step'); Import.export(export_objects,str(step)); App.closeDocument(export_doc.Name)
-        snapshots.append({'id':tag,'step':str(step),'matrix':model.matrix(item,p),'bodies':expected,'source_asset':item['asset']})
+        snapshots.append({'id':tag,'step':str(step),'matrix':model.matrix(item,p),'bodies':expected,'source_asset':item['asset'],'instance':item})
 
     for item in s['instances']:
         kind=item['asset']; lookup='transporter' if kind=='tube_rack' else kind
-        source,styles=asset_meta(s,kind)
-        if lookup not in cached:
-            if lookup=='transporter':
-                import sample_transport_model as tr
-                from build_sample_transport_freecad import build as build_tr
-                native=assets/'TR01_source_variant.FCStd'
-                cached[lookup]=build_tr(source,tr.parameters(source,{'floor_deck_z':p['vehicle_deck_z']}),next(v for v in source['variants'] if v['id']=='Floor_Mixed'),native)
-            else: cached[lookup]=App.openDocument(str(model.ROOT/s['assets'][lookup]['native']))
-        upstream=cached[lookup]
+        source,styles=asset_meta(s,kind,item)
+        cache_key=json.dumps({'asset':lookup,'parameters':model.provider(kind).parameters(source),'variant':item.get('variant','Floor_Mixed')},sort_keys=True)
+        if cache_key not in cached:
+            # Build each distinct source/parameter variant once; scene bodies are derived snapshots.
+            cached[cache_key]=source_document(s,item,assets/(item['id']+'_source.FCStd'))
+        upstream=cached[cache_key]
         if kind=='arm':
             for i,value in enumerate(item['joints_deg'],1): setattr(upstream.Controller,'J'+str(i),value)
         if kind=='centrifuge':
@@ -109,7 +114,7 @@ def prepare(context):
             else: style=styles.get(old,{}).get('appearance',{'color':'#b4bec8','opacity':1})
             if kind=='tube_rack':
                 if not (old in ['B2_Cassette','B2_Rack24'] or old.startswith('B2_Tube')): continue
-                shape.translate(App.Vector(-78,0,-p['vehicle_deck_z']-2)); old=old.removeprefix('B2_'); role='reused_tube_cassette'
+                shape.translate(App.Vector(*[-v for v in model.cassette_datum(source,item)])); old=old.removeprefix('B2_'); role='reused_tube_cassette'
             records.append((old,shape,style,role))
         add_snapshot(item,records)
         if kind=='centrifuge':

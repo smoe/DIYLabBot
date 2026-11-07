@@ -1,0 +1,13 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-layout.schema.json",
+  "title": "Laboratory assembly composition",
+  "type": "object",
+  "required": ["format", "assets", "parameters", "instances"],
+  "properties": {
+    "format": {"const": "solidcraftbot.lab-layout/1"},
+    "assets": {"type": "object", "additionalProperties": {"$ref": "assembly-reference.schema.json#/$defs/reference"}},
+    "parameters": {"type": "object", "additionalProperties": {"type": "number"}},
+    "instances": {"type": "array", "items": {"$ref": "assembly-reference.schema.json#/$defs/instance"}}
+  }
+}

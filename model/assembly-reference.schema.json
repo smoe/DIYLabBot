@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "assembly-reference.schema.json",
+  "title": "Shared assembly reference and driving parameter overrides",
+  "$ref": "#/$defs/reference",
+  "$defs": {
+    "reference": {
+      "type": "object", "required": ["source"], "additionalProperties": false,
+      "properties": {
+        "source": {"type": "string", "pattern": "^model/[A-Za-z0-9_./-]+\\.json$"},
+        "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "report": {"type": "string", "minLength": 1},
+        "case": {"type": "string", "minLength": 1}
+      }
+    },
+    "overrides": {
+      "description": "Driving parameters only, in the unit declared by the referenced source. Expressions resolve in scene parameters. No implicit unit conversion.",
+      "type": "object", "additionalProperties": {"type": ["number", "string"]}
+    },
+    "instance": {
+      "type": "object", "required": ["id", "asset", "xyz", "yaw_deg"], "additionalProperties": false,
+      "properties": {
+        "id": {"type": "string", "minLength": 1}, "asset": {"type": "string", "minLength": 1},
+        "host": {"type": "string"},
+        "xyz": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": ["number", "string"]}},
+        "yaw_deg": {"type": "number"}, "overrides": {"$ref": "#/$defs/overrides"},
+        "pose": {"type": "string"}, "variant": {"type": "string"},
+        "joints_deg": {"type": "array", "minItems": 6, "maxItems": 6, "items": {"type": "number"}},
+        "exclude_bodies": {"type": "array", "items": {"type": "string"}},
+        "riser_height": {"type": ["number", "string"]}
+      }
+    }
+  }
+}

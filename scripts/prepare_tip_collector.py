@@ -1,4 +1,6 @@
-"""Generate T01 portable CAD recipe and independent geometric review references.
+"""Historical migration support; direct generation is retired.
+
+Generate T01 portable CAD recipe and independent geometric review references.
 
 Run generated commands using SolidCraft MCP in an empty design. This script
 does not replace an open CAD document or move a robot.
@@ -9,7 +11,7 @@ import json
 import math
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "model/tip-collector-t01.json"
+SOURCE = ROOT / "model/history/tip-collector-t01.legacy.json"
 CAD = ROOT / "cad/tip-collector-t01"
 
 
@@ -35,7 +37,7 @@ def prepare(spec):
     for g in spec["grooves"]:
         add("parameters.add", name="groove_"+g["id"], expression=f'{g["width_mm"]} mm', unit="mm")
     add("document.metadata.set", values={"org.solidcraftbot.tip-collector": {
-        "revision": spec["revision"], "source": "model/tip-collector-t01.json",
+        "revision": spec["revision"], "source": "model/history/tip-collector-t01.legacy.json",
         "source_sha256": hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
         "status": spec["status"], "grooves_are_unqualified": True}})
 
@@ -170,18 +172,7 @@ def envelope_checks(spec):
 
 
 def main():
-    spec=json.loads(SOURCE.read_text(encoding="utf-8"))
-    commands,refs,stages=prepare(spec)
-    digest=hashlib.sha256(SOURCE.read_bytes()).hexdigest()
-    write_json(CAD/"build.commands.json",dict(source="model/tip-collector-t01.json",source_sha256=digest,
-        stage_end_indices=stages,commands=commands))
-    write_json(CAD/"geometry-reference.json",dict(source_sha256=digest,parts=list(refs.values())))
-    checks=envelope_checks(spec)
-    write_json(CAD/"envelope-checks.json",dict(source_sha256=digest,**checks))
-    if not checks["passed"] or any(r["volume_mm3"]<=0 for r in refs.values()):
-        raise SystemExit("Draft geometry check failed")
-    print(json.dumps(dict(bodies=len(refs),commands=len(commands),stage_end_indices=stages,
-                         envelope_checks=len(checks["checks"]),qualified_profiles=0)))
+    raise SystemExit("Historical generator retired; use python scripts/build_tip_collector.py")
 
 
 if __name__ == "__main__":

@@ -155,19 +155,16 @@ its existing general flange; no adapter or robot geometry has been changed.
 - [STEP assembly](../cad/tip-collector-t01/TipCollector_T01.step)
 - [Bin STL for dimensional prototype review](../cad/tip-collector-t01/TipCollector_T01_bin.review.stl)
 - [Top view](../cad/tip-collector-t01/collector-top.png)
-- [Original station dimensions and assumptions](../model/tip-collector-t01.json)
+- [Original station dimensions and assumptions](../model/history/tip-collector-t01.legacy.json)
 - [Original command generator](../scripts/prepare_tip_collector.py)
 - [Original validation and file hashes](../cad/tip-collector-t01/draft-validation.json)
 
-The original generator and `build.commands.json` reproduce the earlier
-SolidCraft-only review without UMR. Use the shared development command above for
-current work. The arm source remains `model/robot.json`. Old native body names
-retain a draft width after an interactive edit; current shared models use stable
+The original dimensions are historical evidence. Direct execution of the old
+command generator and validator is retired, so they cannot overwrite current
+outputs. Their helper functions remain only for guarded one-time migrations.
+Use `python scripts/build_tip_collector.py` for the current shared source.
+The arm source remains `model/robot.json`; current collector bodies use stable
 `Fork_S`, `Fork_M`, `Fork_L` identities.
-
-`python scripts/validate_tip_collector.py` audits the saved CAD evidence, native
-source association, exported bin mesh and artifact hashes. It does not rerun a
-CAD engine or perform a new physical test; capture fresh evidence after a rebuild.
 
 Core volumes and bounds are checked against analytic references before the
 0.3 mm-deep capacity engravings. Engravings are checked separately for closed

@@ -11,36 +11,31 @@
       "source": "model/lab-room-l01.shared.json",
       "source_sha256": "7f455f7221691476887c7c95f0c243f24956aeaefcf377011fdfeee93f3970e4",
       "report": "cad/lab-room-l01/shared-build-report.json",
-      "native": "cad/generated/lab-room-l01-7f455f722169/default.FCStd",
-      "native_sha256": "152ec1d6a9356fd6d26d4b2c57f7c2791c3030bb5dc3aeaa5e6cf9787126219b"
+      "case": "default"
     },
     "arm": {
       "source": "model/robot.json",
       "source_sha256": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
       "report": "exports/generated/build-report.json",
-      "native": "cad/generated/c7dd198799c0/Laborarm_6R_A01_Neutral.FCStd",
-      "native_sha256": "d557f212facc9ba062ecc39c0fe761c8ea0f0ab80b409008d77d73d46288007e"
+      "case": "default"
     },
     "centrifuge": {
       "source": "model/centrifuge-cf01.shared.json",
       "source_sha256": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
       "report": "cad/centrifuge-cf01/shared-build-report.json",
-      "native": "cad/generated/centrifuge-cf01-7a4eddd8ce4a/Centrifuge_CF01.FCStd",
-      "native_sha256": "0dc541addd7f81c43a16ef95b7dbaaa7ca44cb3427e2b65d159219ff54073ee2"
+      "case": "default"
     },
     "transporter": {
       "source": "model/sample-transport-tr01.shared.json",
       "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
       "report": "cad/sample-transport-tr01/shared-build-report.json",
-      "native": "cad/generated/sample-transport-tr01-4785a40b8bad/Floor_Mixed.FCStd",
-      "native_sha256": "858f6f864bea2e7ff4025f0f0900aec2448fda8830e64b10c96eb4ef10772dfb"
+      "case": "Floor_Mixed"
     },
     "tip_collector": {
       "source": "model/tip-collector-t01.shared.json",
-      "source_sha256": "be9cf1f341cc32d2852c7807b67c1c2d13ae6568ff19e80dfd9ec777c4e81608",
+      "source_sha256": "a1f83d3c3e0a9653406f728bf469964ea28b2bd6ffa83926662fd703d75da487",
       "report": "cad/tip-collector-t01/shared-build-report.json",
-      "native": "cad/generated/tip-collector-t01-be9cf1f341cc-r4/TipCollector_T01_Shared.FCStd",
-      "native_sha256": "99d7376c14b7b004df49f53c40833ec4d031178290fbaea5a40a5d4c236715f3"
+      "case": "default"
     }
   },
   "parameters": {
@@ -141,11 +136,12 @@
       ],
       "yaw_deg": 90,
       "overrides": {
-        "floor_deck_z": 900
+        "floor_deck_z": "vehicle_deck_z"
       },
       "exclude_bodies": [
         "TransportCover"
-      ]
+      ],
+      "variant": "Floor_Mixed"
     },
     {
       "id": "T01",
@@ -294,7 +290,7 @@
       "xyz": [
         "vehicle_x",
         "vehicle_y-78",
-        "vehicle_deck_z+160"
+        "TR01_floor_deck_z+160"
       ]
     },
     {
@@ -305,7 +301,7 @@
       "xyz": [
         "vehicle_x",
         "vehicle_y+78",
-        "vehicle_deck_z+160"
+        "TR01_floor_deck_z+160"
       ]
     }
   ],

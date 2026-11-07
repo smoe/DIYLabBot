@@ -468,3 +468,89 @@ Die Python-/JSONL-Mock-Schnittstelle verwendet die gemeinsamen Maße/Grenzwerte.
 Hochgeschwindigkeitsfreigaben bleiben ohne qualifizierte Daten gesperrt. ROS-Laufzeit,
 SiLA-Server, Kameradetektion und physische Prüfungen sind nicht implementiert.
 Details und Prüfgrenzen: [CF01](centrifuge-cf01.md).
+
+## Referenzierte Baugruppen und Parametervarianten
+
+Eine Baugruppe wird einmal konstruiert. Das Laborlayout referenziert ihre Quelle
+und beschreibt Instanzen mit ID, Aufstellung in mm/deg, Zustand und optionalen
+`overrides`. Der Vertrag liegt in `model/assembly-reference.schema.json`, die
+Layoutkomposition in `model/lab-layout.schema.json`. `scripts/assembly_model.py`
+prüft Pfade, Quellenbindungen und Parameter; die jeweiligen Modellmodule prüfen
+zusätzlich ihre geometrischen Grenzen. Die vorhandenen Formate werden damit
+konkretisiert, nicht durch ein allgemeines Roboterschema für alle Stationen ersetzt.
+
+Die formalen JSON-Schemas lassen sich zusätzlich mit dem optionalen
+Entwicklungswerkzeug prüfen (keine CAD-Laufzeit, keine Laufzeitabhängigkeit der
+Generatoren):
+
+```sh
+python3 -m pip install jsonschema
+python3 scripts/validate_assembly_schemas.py
+```
+
+Beispiel einer Instanz im Layout (die Assetreferenz enthält `source` und optional
+`source_sha256`, `report`, `case`):
+
+```json
+{
+  "id": "ArmA",
+  "asset": "arm",
+  "host": "IslandRight",
+  "xyz": [3500, 3000, 965],
+  "yaw_deg": 70,
+  "joints_deg": [20, 35, 65, 0, 80, 15],
+  "overrides": {"upper_len": 220}
+}
+```
+
+Overrides verwenden die Einheit der referenzierten Parameterdefinition; es gibt
+keine implizite Einheitenumrechnung. Zulässig sind endliche Zahlen oder
+arithmetische Ausdrücke über Szenenparameter, etwa
+`"floor_deck_z": "vehicle_deck_z"`. Unbekannte Parameter, Überschreibungen
+abhängiger Größen, fehlende Einheiten und verletzte deklarierte Wertebereiche
+werden abgewiesen. `elbow_z` bleibt beispielsweise aus `upper_len` abgeleitet.
+Einheitenlose Parameter müssen ausdrücklich mit `unit: ""` deklariert sein.
+
+Die Layoutadapter verwenden dieselbe ausgewertete Quelle für Geometrie,
+Gelenkrahmen, Darstellung und Reichweitenprüfung. Verschiedene Parameterstände
+werden getrennt erzeugt; identische Stände werden beim Szenenaufbau wiederverwendet.
+TR01 und die wiederverwendeten Kassetten beziehen ihre Maße aus der tatsächlichen
+Fahrzeuginstanz. Die Transferberechnung verwendet die ausgewählte Arminstanz und
+deren Maße statt unabhängig den Standardarm zu laden.
+
+Ein Asset bindet keine konkrete native Revisionsdatei mehr. `report` und der
+benannte `case` lösen die aktuelle geprüfte Datei und deren Prüfsumme auf. Der
+Bericht muss zur Quellprüfsumme passen und bestanden sein; die Datei wird erneut
+gegen die im Bericht aufgezeichnete Prüfsumme geprüft. Auf einem frischen Checkout
+sind zuerst die referenzierten Baugruppen zu bauen. Quellenbindungen bleiben
+bewusst über `source_sha256` versioniert; eine Quellrevision ist ausdrücklich zu
+übernehmen. Historische CAD-Berichte werden durch diese Umstellung nicht zu
+Nachweisen der neuen Generatoren oder Varianten.
+
+Aktuell unterstützt: Layout-Parameterstände der vorhandenen Arm-, CF01-, T01-
+und TR01-Adapter; benannte TR01-Kassettenvarianten; Gelenkstellungen des Arms und
+benannte CF01-Posen. Ein anderer Parameterstand erbt keine mechanische Freigabe
+und keine Kollisionsfreigabe des Standardstands. `robot_parameter_overrides_mm`
+der CF01-Entnahme nutzt dieselbe Parameterprüfung und hat einen ergänzenden
+Vertrag in `model/centrifuge-cf01.robot-pickup.schema.json`; deren Station und
+Protokoll bleiben ausdrücklich die vorhandenen CF01-Quellen.
+
+Die T01-Nutmetadaten enthalten keine zweite Maßtabelle mehr. `grooves(spec, p)`
+liefert eine abgeleitete Ansicht mit den tatsächlichen Positionen und Breiten.
+`actuator-selection.json` verweist auf die registrierte Komponentenbibliothek
+und die Schnittstellenquellen; Registrierungs- und Auslegungsergebnisse werden
+dort nicht nochmals kopiert. Die Bibliothek bleibt eine gekennzeichnete,
+prüfsummengebundene Ableitung. Die Gelenk-/Servo-Zuordnung steht in `robot.json`.
+
+Die alten C01-/T01-Quellen liegen ausschließlich unter `model/history/`.
+Ihre früheren Generator-Einstiege und der alte T01-Validator brechen vor dem
+Schreiben ab. Historische Test-Fixtures und README-Medien bleiben unverändert.
+
+Validierungsgrenze dieser Umstellung: Quell-, Parameter-, Kinematik- und
+Adapterprüfungen sind ohne CAD ausführbar. Ein neuer nativer Vergleich erfordert
+lauffähiges FreeCAD und SolidCraft. Bei der Umstellung am 7. November 2026
+fehlt auf diesem Mac SolidCraft; der
+FreeCAD-/Qt-Kern bricht beim Import mit der Prozessoranforderung `neon` ab.
+Es wurden daher keine neuen nativen CAD-Dateien oder qualifizierten
+Build-Berichte erzeugt. Die ausgewählte README-Demo ist weiterhin der explizit
+historische, mit Prüfsummen dokumentierte Stand.

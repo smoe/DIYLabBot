@@ -23,7 +23,8 @@ def prepare(args):
     validation=json.loads((out/'layout-validation.json').read_text(encoding='utf-8'))
     if model.digest(model.SOURCE)!=context['source_sha256']: raise ValueError('Layout source changed during preparation; rebuild')
     if not validation['passed']: raise ValueError('Layout checks failed; inspect '+str(out/'layout-validation.json'))
-    commands=room.solidcraft_commands(room.load(),room.parameters(room.load()))
+    room_source=room.load(model.assembly.validate_reference(s['assets']['room']))
+    commands=room.solidcraft_commands(room_source,room.parameters(room_source))
     for snapshot in context['snapshots']:
         commands.append({'command':'file.insert_step','params':{'path':snapshot['step'],'name':snapshot['id'],'names':'product','matrix':snapshot['matrix']}})
         for b in snapshot['bodies']:commands.append({'command':'appearance.assign','params':{'bodies':[b['name']],**b['appearance']}})
@@ -59,6 +60,9 @@ def finish(context,args):
         b=known[name];fc_geometry.append({'body':name,'bbox':b['bbox']})
     presentation=persist(context['scene_file'],style_spec,fc_geometry)
     paths=[model.SOURCE,model.ROOT/'scripts/lab_layout_model.py',Path(__file__),model.ROOT/'scripts/build_lab_layout_freecad.py',model.ROOT/'scripts/lab_room_model.py',model.ROOT/'scripts/build_lab_room_freecad.py']
+    paths += [model.ROOT/ref['source'] for ref in s['assets'].values()]
+    paths += [model.ROOT/'scripts'/name for name in ['assembly_model.py','robot_spec.py','robot_components.py','centrifuge_model.py','sample_transport_model.py','tip_collector_model.py','build_neutral_freecad.py','build_centrifuge_freecad.py','build_sample_transport_freecad.py','build_tip_collector_freecad.py']]
+    paths += [model.ROOT/'model/assembly-reference.schema.json',model.ROOT/'model/lab-layout.schema.json']
     report={'format':'solidcraftbot.lab-layout-build/1','revision':context['revision'],'source_sha256':context['source_sha256'],
         'passed':native['passed'] and all(c['passed'] for c in checks),'layout_validation':native,'instance_cross_cad':checks,'presentation':presentation,
         'source_files_sha256':{str(p.relative_to(model.ROOT)):model.digest(p) for p in paths},'asset_sources':s['assets'],

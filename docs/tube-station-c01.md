@@ -274,7 +274,7 @@ SiLA implementation later; no wire protocol or REST imitation is supplied here.
 - [Original C01 STEP layout](../cad/tube-station-c01/TubeStation_C01.step)
 - [Closed reference view](../cad/tube-station-c01/closed-reference.png)
 - [Current CAD-independent station source](../model/tube-station-c01.shared.json)
-- [Original C01 dimensions and assumptions](../model/tube-station-c01.json)
+- [Original C01 dimensions and assumptions](../model/history/tube-station-c01.legacy.json)
 - [Original recipe and FDL generator](../scripts/prepare_tube_station_draft.py)
 - [Original validation and source/artifact hashes](../cad/tube-station-c01/draft-validation.json)
 
@@ -300,8 +300,8 @@ python -m unittest discover -s tests -p test_station_model.py -v
 Each build uses a fresh generated folder and updates the cross-CAD report. The
 pipeline launches separate headless processes and does not replace a document
 open in either desktop application. The original `prepare_tube_station_draft.py`
-is retained to reproduce the historical C01 recipe/FDL, not as the current CAD
-source. Native exports represent the pipetting pose. The arm's leading source
+retains historical migration helpers, but direct generation is disabled so it
+cannot overwrite current outputs. Historical dimensions live under `model/history/`. Native exports represent the pipetting pose. The arm's leading source
 remains `model/robot.json`.
 
 The FreeCAD file contains native `Part::Box`, `Part::Cylinder`, `Part::Cut` and

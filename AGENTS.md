@@ -29,6 +29,31 @@ Die gewünschte Entwicklungsschleife lautet:
   Erzeugte CAD-, Mesh- und URDF-Dateien nicht als zusätzliche führende Quellen
   von Hand weiterentwickeln.
 
+## Redundanz vermeiden: Definition, Variante und Instanz trennen
+
+- Jede Baugruppe besitzt genau eine führende Konstruktionsquelle. Aufstellungen
+  referenzieren diese Quelle; sie enthalten nur Instanz-ID, Transformation,
+  Zustand und ausdrücklich benannte Parameterüberschreibungen. Glieder,
+  Gelenkrahmen, Lochbilder oder Bauteilgeometrie nicht für eine Szene kopieren.
+- Varianten aus derselben Quelle ableiten. Nur unabhängige Parameter mit
+  deklarierten Einheiten und gültigen Wertebereichen überschreiben; abhängige
+  Maße und Gelenkanker gemeinsam neu auswerten. Unterstützte Instanzverträge
+  stehen in `model/assembly-reference.schema.json`; keine unimplementierten
+  Variantenfelder als verfügbar darstellen.
+- Wiederholte Maßangaben durch Referenzen oder abgeleitete Ansichten ersetzen.
+  Berechnete Montage- und Prüfdaten gehören in Berichte beziehungsweise eine
+  eindeutig als abgeleitet markierte Bibliothek, nicht als zusätzliche
+  Handkopien in Auswahl- oder Aufstellungsdateien.
+- Gemeinsame Kinematik und semantische Operationen wiederverwenden. Ein
+  zielprogrammspezifischer Adapter ist keine zweite Konstruktionsquelle.
+- Native Ausgaben über geprüfte Build-Berichte auflösen. Revisionspfade und
+  Datei-Prüfsummen gehören in diese Berichte, nicht in die Instanzdefinition.
+  Quellen dürfen zur bewussten Revisionsbindung eine Quellprüfsumme tragen.
+- Historische Quellen nur unter `model/history/` führen; alte Generatoren dürfen
+  keine aktuellen Baugruppenausgaben überschreiben. Unabhängige Test-Fixtures
+  und kuratierte README-Medien sind bewusst erhaltene Momentaufnahmen und
+  werden nicht zur führenden Modellquelle.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

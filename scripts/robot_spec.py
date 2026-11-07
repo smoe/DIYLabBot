@@ -87,10 +87,13 @@ def parameters(spec, overrides=None):
 def load(path=SPEC, parameter_overrides=None):
     spec = json.loads(Path(path).read_text(encoding="utf-8"))
     if parameter_overrides:
-        # A scene may select a dimensional variant without duplicating the arm.
-        parameters(spec, parameter_overrides)  # Reject unknown/cyclic quantities.
-        for name,value in parameter_overrides.items():
-            spec['parameters'][name]['expression']=str(value)
+        from assembly_model import parameter_variant
+        spec = parameter_variant(spec, parameter_overrides)
+    return validate(spec)
+
+
+def validate(spec):
+    """Validate a materialized arm variant against the shared geometry and joint contract."""
     if spec["format"] != "solidcraftbot.robot/1": raise ValueError("Unsupported model format")
     if spec["units"] != {"length":"mm","angle":"deg","time":"s"}: raise ValueError("Unsupported units")
     if "mobile_base" in spec:

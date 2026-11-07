@@ -23,7 +23,7 @@ werden im [Geometriebericht](../cad/vendor/myactuator/geometry-check.json) gepr�
 Diese Prüfung erlaubt die Verwendung als Bauraum-/Montagereferenz; sie bestätigt
 keine Toleranzen, Schraubverbindungen oder Fertigungsmaße.
 
-Die Bibliothek und die [Gelenkzuordnungen](../model/actuator-selection.json)
+Die Bibliothek und die [Gelenkzuordnungen](../model/robot.json)
 sind inzwischen geometrisch integriert: `vendor_component` und `mount_plate`
 in `model/robot.json` erzeugen beide CADs und sechs RViz-Gehäusequader.
 Die bisherigen Antriebsplatzhalter sind ersetzt. Der aktuelle Stand, die

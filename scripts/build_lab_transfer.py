@@ -41,7 +41,8 @@ def prepare(args):
 
 
 def compile_commands(ctx,ls,s):
-    commands=room.solidcraft_commands(room.load(),room.parameters(room.load()));d=model.data(s,ls);p=d['p']
+    room_source=room.load(layout.assembly.validate_reference(ls['assets']['room']))
+    commands=room.solidcraft_commands(room_source,room.parameters(room_source));d=model.data(s,ls);p=d['p']
     def add(command,**params):commands.append({'command':command,'params':params})
     for snapshot in ctx['snapshots']+ctx['dynamic']:
         if snapshot['step']:
@@ -124,7 +125,7 @@ def finish(ctx,args):
                   files={'solidcraft':str(scene.relative_to(ROOT)),'freecad':str(Path(ctx['scene_file']).relative_to(ROOT)),
                          'timeline':str((out/'timeline.json').relative_to(ROOT)),'samples':str((out/'samples.json').relative_to(ROOT)),
                          'validation':str((out/'motion-validation.json').relative_to(ROOT))},
-                  source_files_sha256={str(p.relative_to(ROOT)):robot.digest(p) for p in [model.SOURCE,layout.SOURCE,Path(__file__),ROOT/'scripts/lab_transfer_model.py',ROOT/'scripts/build_lab_transfer_freecad.py']},
+                  source_files_sha256={str(p.relative_to(ROOT)):robot.digest(p) for p in [model.SOURCE,layout.SOURCE,Path(__file__),ROOT/'scripts/lab_transfer_model.py',ROOT/'scripts/build_lab_transfer_freecad.py',ROOT/'scripts/assembly_model.py',ROOT/'scripts/lab_layout_model.py',ROOT/'scripts/build_lab_layout_freecad.py',ROOT/'scripts/robot_spec.py',ROOT/'model/assembly-reference.schema.json',ROOT/'model/lab-layout.schema.json']},
                   artifact_sha256={'solidcraft':robot.digest(scene),'freecad':robot.digest(ctx['scene_file'])},renderings=[str(p.relative_to(ROOT)) for p in cad.glob('*.png')]+[str(p.relative_to(ROOT)) for p in cad.glob('*.gif')])
     report['files']['freecad_playback']=str(macro.relative_to(ROOT))
     write(out/'build-report.json',report);target=ROOT/'cad/lab-transfer-l01';target.mkdir(exist_ok=True);write(target/'shared-build-report.json',report)

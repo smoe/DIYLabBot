@@ -1,4 +1,6 @@
-"""Generate review-only CAD commands and a SiLA FDL draft. No hardware control."""
+"""Historical migration support; direct generation is retired.
+
+Generate review-only CAD commands and a SiLA FDL draft. No hardware control."""
 from pathlib import Path
 import hashlib
 import json
@@ -6,7 +8,7 @@ import math
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "model/tube-station-c01.json"
+SOURCE = ROOT / "model/history/tube-station-c01.legacy.json"
 CAD = ROOT / "cad/tube-station-c01"
 INTERFACE = ROOT / "interfaces/tube-station-c01"
 NS = "http://www.sila-standard.org"
@@ -183,18 +185,7 @@ def feature_definition():
 
 
 def main():
-    spec=json.loads(SOURCE.read_text(encoding="utf-8"))
-    parts,cuts=geometry(spec)
-    if len({p["name"] for p in parts}) != len(parts): raise ValueError("Duplicate body name")
-    if any(p["volume_mm3"]<=0 for p in parts): raise ValueError("Nonpositive reference volume")
-    CAD.mkdir(parents=True,exist_ok=True); INTERFACE.mkdir(parents=True,exist_ok=True)
-    commands=cad_commands(spec,parts,cuts)
-    write_json(CAD/"build.commands.json",dict(source="model/tube-station-c01.json",commands=commands))
-    write_json(CAD/"geometry-reference.json",dict(source_sha256=hashlib.sha256(SOURCE.read_bytes()).hexdigest(),parts=parts,cuts=cuts))
-    xml=feature_definition()
-    ET.fromstring(xml)
-    (INTERFACE/"TubeStationControl-v1_0.sila.xml").write_bytes(xml)
-    print(json.dumps(dict(bodies=len(parts),commands=len(commands),joints=3,fdl_commands=len(ET.fromstring(xml).findall("{"+NS+"}Command")),fdl_status="Draft; XML generated, no server implementation")))
+    raise SystemExit("Historical generator retired; use python scripts/build_tube_station.py")
 
 
 if __name__=="__main__": main()

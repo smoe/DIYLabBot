@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "centrifuge-cf01.robot-pickup.schema.json",
+  "title": "CF01 scene references and arm length variant",
+  "type": "object",
+  "required": [
+    "format",
+    "sources",
+    "robot_parameter_overrides_mm",
+    "arm_fixture"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.centrifuge-robot-pickup/1"
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "robot",
+        "centrifuge",
+        "protocol"
+      ],
+      "properties": {
+        "robot": {
+          "type": "string",
+          "pattern": "^model/[A-Za-z0-9_.-]+\\.json$"
+        },
+        "centrifuge": {
+          "const": "model/centrifuge-cf01.shared.json"
+        },
+        "protocol": {
+          "const": "model/centrifuge-cf01.protocol.json"
+        }
+      },
+      "additionalProperties": false
+    },
+    "robot_parameter_overrides_mm": {
+      "$ref": "assembly-reference.schema.json#/$defs/overrides"
+    },
+    "arm_fixture": {
+      "type": "object",
+      "required": [
+        "position_mm",
+        "yaw_deg"
+      ],
+      "properties": {
+        "position_mm": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "yaw_deg": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

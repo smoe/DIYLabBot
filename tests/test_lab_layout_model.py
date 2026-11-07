@@ -61,7 +61,7 @@ class LabLayoutTests(unittest.TestCase):
         self.assertEqual(len(racks), 3)
         self.assertNotIn('tube_rack', self.spec['assets'])
         self.assertEqual(self.items['TR01']['host'], 'Floor')
-        self.assertEqual(self.items['TR01']['overrides']['floor_deck_z'],
+        self.assertEqual(model.provider('transporter').parameters(model.instance_source(self.spec,self.items['TR01']))['floor_deck_z'],
                          self.spec['parameters']['vehicle_deck_z'])
 
 
