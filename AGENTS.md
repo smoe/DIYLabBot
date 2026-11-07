@@ -66,6 +66,15 @@ kopieren. Flur-/Mehrraumtopologie und allgemeine Gerätebindungen an Möbelrahme
 sind nächste Schritte, noch keine implementierten Funktionen. Vor entsprechenden
 Änderungen auch `ARCHITECTURE.md` lesen.
 
+Synthetische Minimalumgebungen sind ebenfalls Teil des Zielmodells: unbegrenzter
+Raum, eine Referenzbank und kompakte Geräteaufstellung für Kommunikations- und
+Ablauftests. Unbegrenzt, unbekannt und nur zur Darstellung begrenzt unterscheiden;
+keine riesigen Ersatzräume konstruieren. Geräte- und Protokollquellen zwischen
+realen und synthetischen Aufstellungen wiederverwenden. Mocks, Testzeit,
+Netzwerkkommunikation und Hardwareausführung getrennt nachweisen. Die README-
+Interaktion Arm/CF01/Rack ist der erste vorgesehene Ableitungsfall; dieses Profil
+ist noch nicht als Generator oder Laufzeit implementiert.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

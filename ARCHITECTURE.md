@@ -102,7 +102,88 @@ Durchgangsformeln beschreiben das nominale L01-Arrangement; frei versetzte Möbe
 benötigen neue räumliche Freiraumprüfungen. Die heutigen Durchgänge und Geräte-
 Betriebsbereiche sind weiterhin nicht sicherheitstechnisch qualifiziert.
 
+## Synthetische minimale Testumgebungen
+
+Neben einem realitätsbezogenen Labor ist ein ausdrücklich synthetisches
+Umgebungsprofil vorgesehen: ein unbegrenzter Raum ohne beschriebene Wände,
+Fenster, Türen oder lange Verkehrswege. Eine einzige Bank beziehungsweise
+Referenzarbeitsfläche liefert Orientierung, Maßstab und Aufstellrahmen. Dieses
+Profil gehört zur selben Vier-Ebenen-Architektur und benötigt keinen künstlich
+riesigen Laborgrundriss.
+
+Unbegrenztheit muss ein eigener, eindeutiger Modus sein. `null` bleibt einem
+unbekannten Wert vorbehalten; sehr große Raumabmessungen und nicht endliche
+Zahlen sind kein Ersatz für diesen Modus. Ein unbeschriebener Boden oder eine
+fehlende Wand erzeugt keinen CAD-Körper. Ein Ausschnitt, Kameraraster oder
+optional gezeichneter Boden dient nur der Darstellung und begrenzt die
+Testumgebung nicht.
+
+| Ebene | Kompakte Testumgebung |
+|---|---|
+| Arbeitsumgebung | Synthetischer unbegrenzter Raum mit eindeutigem Weltbezug; keine Gebäudevermessung oder Raumkontur |
+| Möbeltypen | Referenz auf eine Bank oder Arbeitsfläche aus dem gemeinsamen Katalog |
+| Möblierung | Eine Bankinstanz mit benanntem Arbeitsflächenrahmen |
+| Geräteausstattung | Dicht angeordnete Instanzen der zu prüfenden Geräte; dieselben Gerätequellen wie im realen Layout |
+
+Die Bank ist eine Referenz für die Anordnung, keine Voraussetzung für die
+Kommunikation. Geräte sollen für kurze Übergaben in einem gemeinsamen
+Arbeitsbereich angeordnet werden. Ein in der Realität bodengebundenes Gerät
+kann daneben stehen oder durch einen ausdrücklich gekennzeichneten Mock
+vertreten sein; seine Konstruktion wird dafür nicht in ein Tischgerät geändert.
+Ungeprüfte mechanische Erreichbarkeit oder abstrahierte Transportübergaben
+bleiben kenntlich.
+
+### Kommunikation und Testlauf getrennt beschreiben
+
+Ein Testprofil soll Geräte-IDs an Treiber oder Mocks binden und den Ablauf,
+Zeitmodell, erwartete Rückmeldungen sowie Fehlerfälle festlegen. Es referenziert
+die Umgebung und die bestehenden Protokollquellen; es besitzt keine eigene
+Raum-, Möbel- oder Gerätekonstruktion. Dieselbe Geräteausstattung kann dadurch
+mit lokalen Mocks, mit Netzwerkadaptern oder später mit Hardware geprüft werden.
+Jede dieser Betriebsarten benötigt ihren eigenen ausgeführten Nachweis.
+
+Für schnelle Tests sind insbesondere Befehlsreihenfolge, Besitzübergaben,
+Bestätigungen, Zeitüberschreitungen, Fehlerantworten und Wiederanlauf relevant.
+Lange Fahrwege entfallen in diesem Szenario. Simulierte Wartezeiten können in
+einem expliziten Testzeitmodell vorgerückt werden; sie dürfen nicht durch
+vorgegebene Erfolgsmeldungen ersetzt werden. Ein Ablauf soll auch bei fehlender
+Bestätigung oder Kommunikationsausfall korrekt anhalten.
+
+Ein geometrisch kurzer Weg allein prüft keine Kommunikation. Eine lokale
+Mock-Schnittstelle ist kein Netzwerkserver; eine Animation ist kein Nachweis
+von ROS-/SiLA-Interoperabilität, realer Latenz oder Hardwarefunktion. Die
+bestehenden Programm- und Protokollgrenzen bleiben auch im synthetischen Raum
+sichtbar. Die Testumgebung liefert keine Freigabe einer realen Laboraufstellung.
+
+### README Interaktion als erster Referenzfall
+
+Die im README gezeigte Entnahme aus CF01 mit Ablage im Rack ist der erste
+vorgesehene Integrationsfall für dieses Profil. Raum und Referenzbank sollen
+aus der minimalen Umgebung und Möblierung abgeleitet werden. Arm und CF01
+referenzieren weiterhin `model/robot.json` beziehungsweise
+`model/centrifuge-cf01.shared.json`; die Entnahme-, Greifer- und Rackbeziehungen
+bleiben an ihre vorhandene Szenenquelle und das CF01-Protokoll gebunden.
+Es entsteht keine zweite Beschreibung dieser Geräte oder des Ablaufs.
+
+Bei dieser Überführung sind zunächst die heutige Bankoberfläche, Geräteposen,
+Gelenkstellungen und Gefäßübergaben zu erhalten. Die Bankoberfläche liegt im
+bisherigen Szenenbezug bei Z = 0; ein neuer Welt- oder Bankrahmen darf die
+Darstellung nicht unbeabsichtigt verschieben. Anschließend kann dieselbe
+Interaktion mit einer anderen Aufstellung, etwa in L01, verbunden werden.
+Dort kommen die realen Wege und zusätzlichen räumlichen Randbedingungen hinzu.
+
+Der aktuelle Stand ist noch die eigenständige Szene
+`model/centrifuge-cf01.robot-pickup.shared.json` mit einem `bench_surface`-
+Bauraum. Das unbegrenzte Umgebungsprofil, seine Komposition und eine gemeinsame
+Testlaufkonfiguration sind hier als nächster Schritt beschrieben, noch nicht
+als Generatorformat oder Laufzeit implementiert. Die gespeicherten README-
+Medien behalten ihren dokumentierten historischen Quellstand, bis eine daraus
+abgeleitete neue Fassung erzeugt und geprüft wurde.
+
 ## Nächste Schritte
+
+Zuerst soll die README-Entnahmeszene aus dem synthetischen Profil mit einer
+Referenzbank abgeleitet werden, bei erhaltenen Positionen und Abläufen.
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden
 werden: Geschoss → Raum → Möbel → Arbeitsfläche → Gerät. Dann folgt ein Gerät

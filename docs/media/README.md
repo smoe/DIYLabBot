@@ -35,3 +35,11 @@ Chromium-/Chrome-Programm als erstes und zweites Argument übergebbar.
 Danach Vorschau und Videowiedergabe visuell prüfen und `provenance.json` auf den
 neuen Quellstand einschließlich Medienprüfsummen aktualisieren. GitHub zeigt
 HTML nur als Datei; für die interaktive Bedienung herunterladen und lokal öffnen.
+
+## Ableitung aus einer minimalen Testumgebung
+
+Die Referenzbank und Geräteaufstellung dieser Interaktion sollen künftig aus
+einer synthetischen, unbegrenzten Umgebung stammen. Geräte und Ablauf verwenden
+weiterhin ihre vorhandenen Quellen. Das Zielmodell und die noch ausstehende
+Integration stehen in [ARCHITECTURE.md](../../ARCHITECTURE.md#synthetische-minimale-testumgebungen).
+Die hier gespeicherten Medien und ihre Provenienz bleiben der bisherige Stand.
