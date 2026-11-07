@@ -1,0 +1,218 @@
+{
+  "id": "LabRoom_L01",
+  "status": "Abstract single-room layout; every dimension is provisional, not a measured floor plan",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "reference": {
+    "origin": "inside left corner of the entrance wall at finished floor level",
+    "x": "right when looking from doors toward windows",
+    "y": "toward windows",
+    "z": "up",
+    "building_frame_pose": null,
+    "floor_plan_reference": null
+  },
+  "facade": {
+    "recipe": "quadratic_bulge_polyline",
+    "segments": 12,
+    "equation": "y(t)=(1-t)*left_depth+t*right_depth+4*t*(1-t)*facade_bulge; x=t*room_width",
+    "wall_thickness_convention": "rear band measured along Y, not normal to curve"
+  },
+  "windows": [
+    {
+      "id": "W01",
+      "start_fraction": 0.08,
+      "end_fraction": 0.34
+    },
+    {
+      "id": "W02",
+      "start_fraction": 0.36,
+      "end_fraction": 0.64
+    },
+    {
+      "id": "W03",
+      "start_fraction": 0.66,
+      "end_fraction": 0.92
+    }
+  ],
+  "intended_use": {
+    "occupants": [
+      "humans",
+      "floor_sample_transporters",
+      "robot_arm_workstations"
+    ],
+    "equipment_placements": [],
+    "robot_routes": [],
+    "human_machine_clearance_qualified": false,
+    "egress_qualified": false
+  },
+  "limitations": [
+    "No room measurements, surveyed facade, verified door positions, exact window count or building coordinates",
+    "No full building is generated; floor-plan image will supply the later building reference",
+    "Faceted quadratic facade is an adjustable approximation of the oval exterior",
+    "Support and heating-cover dimensions/positions are illustrative; no concrete structure, heating performance, airflow, load capacity or object-retention qualification",
+    "No ceiling is modeled; translucent walls and all colours are inspection presentation, not measured material specifications",
+    "No utility, ventilation, fire protection, floor loading, structural, installation or safety validation",
+    "No arms, instruments, humans or vehicles are placed; reach, traffic and collision checks against them remain open",
+    "Native parameter edits do not return to the shared source; regenerate and revalidate to preserve the leading source"
+  ],
+  "format": "solidcraftbot.room-geometry/1",
+  "parameters": {
+    "room_width": {
+      "expression": 6600,
+      "unit": "mm",
+      "range": [
+        4000,
+        20000
+      ],
+      "measured_mm": null
+    },
+    "left_depth": {
+      "expression": 7000,
+      "unit": "mm",
+      "range": [
+        4000,
+        20000
+      ],
+      "measured_mm": null
+    },
+    "right_depth": {
+      "expression": 6600,
+      "unit": "mm",
+      "range": [
+        3500,
+        20000
+      ],
+      "measured_mm": null
+    },
+    "facade_bulge": {
+      "expression": 450,
+      "unit": "mm",
+      "range": [
+        0,
+        3000
+      ],
+      "measured_mm": null
+    },
+    "wall_t": {
+      "expression": 180,
+      "unit": "mm",
+      "range": [
+        80,
+        600
+      ],
+      "measured_mm": null
+    },
+    "room_height": {
+      "expression": 2800,
+      "unit": "mm",
+      "range": [
+        2400,
+        5000
+      ],
+      "measured_mm": null
+    },
+    "floor_t": {
+      "expression": 100,
+      "unit": "mm",
+      "range": [
+        40,
+        400
+      ],
+      "measured_mm": null
+    },
+    "door_a_x": {
+      "expression": 600,
+      "unit": "mm",
+      "range": [
+        100,
+        18000
+      ],
+      "measured_mm": null
+    },
+    "door_b_x": {
+      "expression": 5100,
+      "unit": "mm",
+      "range": [
+        100,
+        18000
+      ],
+      "measured_mm": null
+    },
+    "door_width": {
+      "expression": 900,
+      "unit": "mm",
+      "range": [
+        600,
+        2000
+      ],
+      "measured_mm": null
+    },
+    "door_height": {
+      "expression": 2150,
+      "unit": "mm",
+      "range": [
+        1900,
+        3000
+      ],
+      "measured_mm": null
+    },
+    "window_sill": {
+      "expression": 1100,
+      "unit": "mm",
+      "range": [
+        800,
+        1800
+      ],
+      "measured_mm": null
+    },
+    "window_top": {
+      "expression": 2400,
+      "unit": "mm",
+      "range": [
+        1800,
+        4000
+      ],
+      "measured_mm": null
+    },
+    "support_offset_x": {
+      "expression": 0,
+      "unit": "mm",
+      "range": [
+        -1000,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "support_width": {
+      "expression": 300,
+      "unit": "mm",
+      "range": [
+        250,
+        1200
+      ],
+      "measured_mm": null,
+      "reported_approx_mm": 300
+    },
+    "support_depth": {
+      "expression": 500,
+      "unit": "mm",
+      "range": [
+        250,
+        1000
+      ],
+      "measured_mm": null,
+      "reported_approx_mm": 500
+    },
+    "support_window_gap": {
+      "expression": 75,
+      "unit": "mm",
+      "range": [
+        10,
+        300
+      ],
+      "measured_mm": null
+    }
+  }
+}

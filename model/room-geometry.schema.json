@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "room-geometry.schema.json",
+  "title": "Building geometry without furniture",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "parameters",
+    "reference",
+    "facade",
+    "windows"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.room-geometry/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "room-geometry.schema.json#/$defs/dimension"
+      }
+    },
+    "reference": {
+      "type": "object"
+    },
+    "facade": {
+      "type": "object",
+      "required": [
+        "recipe",
+        "segments"
+      ],
+      "properties": {
+        "recipe": {
+          "const": "quadratic_bulge_polyline"
+        },
+        "segments": {
+          "const": 12
+        }
+      }
+    },
+    "windows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "start_fraction",
+          "end_fraction"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "start_fraction": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
+          },
+          "end_fraction": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "exclusiveMaximum": 1
+          }
+        }
+      }
+    },
+    "intended_use": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "dimension": {
+      "type": "object",
+      "required": [
+        "expression",
+        "unit",
+        "range",
+        "measured_mm"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "measured_mm": {
+          "type": [
+            "null",
+            "number"
+          ]
+        },
+        "reported_approx_mm": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

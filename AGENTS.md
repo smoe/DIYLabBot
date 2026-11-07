@@ -54,6 +54,18 @@ Die gewünschte Entwicklungsschleife lautet:
   und kuratierte README-Medien sind bewusst erhaltene Momentaufnahmen und
   werden nicht zur führenden Modellquelle.
 
+## Zielarchitektur für Arbeitsumgebungen
+
+Das Vier-Ebenen-Zielmodell steht in [ARCHITECTURE.md](ARCHITECTURE.md):
+Arbeitsumgebung → referenzierte Möbeltypen und deren Möblierung → Geräteausstattung.
+Für L01 sind Raumgeometrie, Möbelkatalog und Möblierung bereits getrennte Quellen;
+`model/lab-room-l01.shared.json` bindet ihre Revisionen als Komposition. Die
+bestehenden Körper-IDs, Bezugssysteme und Gerätepositionen sind zu erhalten.
+Gebäudekonturen nicht in Möbeltypen und Möbelrezepte nicht in Aufstellungen
+kopieren. Flur-/Mehrraumtopologie und allgemeine Gerätebindungen an Möbelrahmen
+sind nächste Schritte, noch keine implementierten Funktionen. Vor entsprechenden
+Änderungen auch `ARCHITECTURE.md` lesen.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

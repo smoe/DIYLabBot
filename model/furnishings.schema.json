@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "furnishings.schema.json",
+  "title": "Furniture instances and bindings within a room",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "parameters",
+    "anchors",
+    "expressions",
+    "instances"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.furnishings/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "room-geometry.schema.json#/$defs/dimension"
+      }
+    },
+    "anchors": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "frame",
+          "axis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "frame": {
+            "type": "string",
+            "minLength": 1
+          },
+          "axis": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 2
+          }
+        }
+      }
+    },
+    "expressions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "number",
+          "string"
+        ]
+      }
+    },
+    "instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "component",
+          "bindings",
+          "xyz",
+          "yaw_deg"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1
+          },
+          "bindings": {
+            "type": "object",
+            "additionalProperties": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "xyz": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "yaw_deg": {
+            "type": "number"
+          },
+          "frames": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1
+          },
+          "color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "enum": [
+                "floor_outline"
+              ]
+            }
+          },
+          "side": {
+            "enum": [
+              "Left",
+              "Right"
+            ]
+          }
+        }
+      }
+    },
+    "island_shelf": {
+      "type": "object"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

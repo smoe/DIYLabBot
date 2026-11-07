@@ -1,0 +1,689 @@
+{
+  "format": "solidcraftbot.furnishings/1",
+  "id": "L01.Furnishings",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {
+    "bench_depth": {
+      "expression": 700,
+      "unit": "mm",
+      "range": [
+        450,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "bench_height": {
+      "expression": 900,
+      "unit": "mm",
+      "range": [
+        650,
+        1100
+      ],
+      "measured_mm": null
+    },
+    "worktop_t": {
+      "expression": 40,
+      "unit": "mm",
+      "range": [
+        20,
+        80
+      ],
+      "measured_mm": null
+    },
+    "perimeter_start_y": {
+      "expression": 1000,
+      "unit": "mm",
+      "range": [
+        0,
+        2500
+      ],
+      "measured_mm": null
+    },
+    "island_start_y": {
+      "expression": 1700,
+      "unit": "mm",
+      "range": [
+        500,
+        3500
+      ],
+      "measured_mm": null
+    },
+    "island_length": {
+      "expression": 3400,
+      "unit": "mm",
+      "range": [
+        1500,
+        10000
+      ],
+      "measured_mm": null
+    },
+    "island_half_width": {
+      "expression": 750,
+      "unit": "mm",
+      "range": [
+        450,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "plinth_h": {
+      "expression": 100,
+      "unit": "mm",
+      "range": [
+        40,
+        200
+      ],
+      "measured_mm": null
+    },
+    "upper_depth": {
+      "expression": 320,
+      "unit": "mm",
+      "range": [
+        150,
+        600
+      ],
+      "measured_mm": null
+    },
+    "upper_bottom_z": {
+      "expression": 1550,
+      "unit": "mm",
+      "range": [
+        1200,
+        2200
+      ],
+      "measured_mm": null
+    },
+    "upper_height": {
+      "expression": 600,
+      "unit": "mm",
+      "range": [
+        300,
+        1200
+      ],
+      "measured_mm": null
+    },
+    "window_bench_depth": {
+      "expression": 500,
+      "unit": "mm",
+      "range": [
+        300,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "support_gap": {
+      "expression": 50,
+      "unit": "mm",
+      "range": [
+        10,
+        200
+      ],
+      "measured_mm": null
+    },
+    "heating_corner_gap": {
+      "expression": 75,
+      "unit": "mm",
+      "range": [
+        10,
+        300
+      ],
+      "measured_mm": null
+    },
+    "heating_cover_t": {
+      "expression": 20,
+      "unit": "mm",
+      "range": [
+        5,
+        60
+      ],
+      "measured_mm": null
+    },
+    "island_shelf_depth": {
+      "expression": 350,
+      "unit": "mm",
+      "range": [
+        150,
+        800
+      ],
+      "measured_mm": null
+    },
+    "island_shelf_top_z": {
+      "expression": 1500,
+      "unit": "mm",
+      "range": [
+        1000,
+        2300
+      ],
+      "measured_mm": null,
+      "reported_approx_mm": 1500
+    },
+    "island_shelf_t": {
+      "expression": 25,
+      "unit": "mm",
+      "range": [
+        15,
+        80
+      ],
+      "measured_mm": null
+    },
+    "island_shelf_end_inset": {
+      "expression": 150,
+      "unit": "mm",
+      "range": [
+        50,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "island_shelf_post": {
+      "expression": 40,
+      "unit": "mm",
+      "range": [
+        20,
+        100
+      ],
+      "measured_mm": null
+    },
+    "island_cupboard_bottom_z": {
+      "expression": 1750,
+      "unit": "mm",
+      "range": [
+        1550,
+        2300
+      ],
+      "measured_mm": null,
+      "reported_approx_mm": 1750
+    },
+    "island_cupboard_height": {
+      "expression": 600,
+      "unit": "mm",
+      "range": [
+        300,
+        1000
+      ],
+      "measured_mm": null
+    },
+    "island_cupboard_depth": {
+      "expression": 350,
+      "unit": "mm",
+      "range": [
+        200,
+        700
+      ],
+      "measured_mm": null
+    },
+    "island_cupboard_gap": {
+      "expression": 10,
+      "unit": "mm",
+      "range": [
+        2,
+        80
+      ],
+      "measured_mm": null
+    },
+    "window_bench_leg_size": {
+      "expression": 40,
+      "unit": "mm",
+      "range": [
+        25,
+        100
+      ],
+      "measured_mm": null
+    },
+    "window_bench_leg_inset": {
+      "expression": 75,
+      "unit": "mm",
+      "range": [
+        40,
+        150
+      ],
+      "measured_mm": null
+    }
+  },
+  "anchors": {
+    "support_center_x": {
+      "frame": "L01.ConcreteSupport",
+      "axis": 0
+    },
+    "support_front": {
+      "frame": "L01.ConcreteSupport",
+      "axis": 1
+    }
+  },
+  "expressions": {
+    "edge_left": "support_center_x-support_width/2-support_gap",
+    "edge_right": "support_center_x+support_width/2+support_gap"
+  },
+  "instances": [
+    {
+      "id": "LeftBench",
+      "type": "storage_bench",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "width": "bench_depth",
+        "length": "left_depth-window_bench_depth-heating_corner_gap-perimeter_start_y",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "plinth_h": "plinth_h"
+      },
+      "xyz": [
+        0,
+        "perimeter_start_y",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.LeftBench.Worktop"
+      }
+    },
+    {
+      "id": "RightBench",
+      "type": "storage_bench",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "width": "bench_depth",
+        "length": "right_depth-window_bench_depth-heating_corner_gap-perimeter_start_y",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "plinth_h": "plinth_h"
+      },
+      "xyz": [
+        "room_width-bench_depth",
+        "perimeter_start_y",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.RightBench.Worktop"
+      }
+    },
+    {
+      "id": "IslandLeft",
+      "type": "storage_bench",
+      "component": "Island",
+      "bindings": {
+        "width": "island_half_width",
+        "length": "island_length",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "plinth_h": "plinth_h"
+      },
+      "xyz": [
+        "room_width/2-island_half_width",
+        "island_start_y",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.IslandLeft.Worktop"
+      }
+    },
+    {
+      "id": "IslandRight",
+      "type": "storage_bench",
+      "component": "Island",
+      "bindings": {
+        "width": "island_half_width",
+        "length": "island_length",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "plinth_h": "plinth_h"
+      },
+      "xyz": [
+        "room_width/2",
+        "island_start_y",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.IslandRight.Worktop"
+      }
+    },
+    {
+      "id": "WindowBenchLeft",
+      "type": "open_shaped_bench",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "width": "edge_left",
+        "depth": "window_bench_depth",
+        "front_delta": "support_front-(left_depth-heating_corner_gap-window_bench_depth)",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "leg_size": "window_bench_leg_size",
+        "leg_inset": "window_bench_leg_inset"
+      },
+      "xyz": [
+        0,
+        "left_depth-heating_corner_gap-window_bench_depth",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.WindowBenchLeft.Worktop"
+      }
+    },
+    {
+      "id": "HeatingCoverLeft",
+      "type": "side_gap_cover",
+      "component": "BuildingServices",
+      "bindings": {
+        "room_width": "room_width",
+        "split_x": "edge_left",
+        "cut_depth": "left_depth+right_depth+4*facade_bulge+1",
+        "height": "bench_height",
+        "thickness": "heating_cover_t",
+        "start_x": 0,
+        "end_x": "edge_left",
+        "start_back": "left_depth-heating_corner_gap",
+        "end_back": "support_front+window_bench_depth"
+      },
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "yaw_deg": 0,
+      "inputs": {
+        "floor_outline": "floor_outline"
+      },
+      "side": "Left"
+    },
+    {
+      "id": "WindowBenchRight",
+      "type": "open_shaped_bench",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "width": "room_width-edge_right",
+        "depth": "window_bench_depth",
+        "front_delta": "(right_depth-heating_corner_gap-window_bench_depth)-support_front",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "leg_size": "window_bench_leg_size",
+        "leg_inset": "window_bench_leg_inset"
+      },
+      "xyz": [
+        "edge_right",
+        "support_front",
+        0
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Worktop": "L01.WindowBenchRight.Worktop"
+      }
+    },
+    {
+      "id": "HeatingCoverRight",
+      "type": "side_gap_cover",
+      "component": "BuildingServices",
+      "bindings": {
+        "room_width": "room_width",
+        "split_x": "edge_right",
+        "cut_depth": "left_depth+right_depth+4*facade_bulge+1",
+        "height": "bench_height",
+        "thickness": "heating_cover_t",
+        "start_x": "edge_right",
+        "end_x": "room_width",
+        "start_back": "support_front+window_bench_depth",
+        "end_back": "right_depth-heating_corner_gap"
+      },
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "yaw_deg": 0,
+      "inputs": {
+        "floor_outline": "floor_outline"
+      },
+      "side": "Right"
+    },
+    {
+      "id": "SupportGapCover",
+      "type": "support_gap_cover",
+      "component": "BuildingServices",
+      "bindings": {
+        "room_width": "room_width",
+        "left_x": "edge_left",
+        "right_x": "edge_right",
+        "cut_depth": "left_depth+right_depth+4*facade_bulge+1",
+        "height": "bench_height",
+        "thickness": "heating_cover_t",
+        "support_x": "support_center_x-support_width/2",
+        "support_y": "support_front",
+        "support_width": "support_width",
+        "support_depth": "support_depth"
+      },
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "yaw_deg": 0,
+      "inputs": {
+        "floor_outline": "floor_outline"
+      }
+    },
+    {
+      "id": "IslandShelf_Board",
+      "type": "shelf_board",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_depth",
+        "length": "island_length-2*island_shelf_end_inset",
+        "height": "island_shelf_t"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_depth/2",
+        "island_start_y+island_shelf_end_inset",
+        "island_shelf_top_z-island_shelf_t"
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "L01.IslandShelf.Top"
+      }
+    },
+    {
+      "id": "IslandShelf_Post1",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_shelf_top_z-island_shelf_t-bench_height"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(0)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "role": "central_shelf_upright_envelope"
+    },
+    {
+      "id": "IslandShelf_UpperPost1",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_cupboard_bottom_z-island_shelf_top_z"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(0)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "island_shelf_top_z"
+      ],
+      "yaw_deg": 0,
+      "role": "central_cupboard_upright_envelope"
+    },
+    {
+      "id": "IslandShelf_Post2",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_shelf_top_z-island_shelf_t-bench_height"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(0.5)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "role": "central_shelf_upright_envelope"
+    },
+    {
+      "id": "IslandShelf_UpperPost2",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_cupboard_bottom_z-island_shelf_top_z"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(0.5)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "island_shelf_top_z"
+      ],
+      "yaw_deg": 0,
+      "role": "central_cupboard_upright_envelope"
+    },
+    {
+      "id": "IslandShelf_Post3",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_shelf_top_z-island_shelf_t-bench_height"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(1)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "role": "central_shelf_upright_envelope"
+    },
+    {
+      "id": "IslandShelf_UpperPost3",
+      "type": "upright",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_shelf_post",
+        "length": "island_shelf_post",
+        "height": "island_cupboard_bottom_z-island_shelf_top_z"
+      },
+      "xyz": [
+        "room_width/2-island_shelf_post/2",
+        "island_start_y+island_shelf_end_inset+(1)*(island_length-2*island_shelf_end_inset-island_shelf_post)",
+        "island_shelf_top_z"
+      ],
+      "yaw_deg": 0,
+      "role": "central_cupboard_upright_envelope"
+    },
+    {
+      "id": "IslandCupboard1",
+      "type": "cupboard",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_cupboard_depth",
+        "length": "(island_length-2*island_shelf_end_inset-island_cupboard_gap)/2",
+        "height": "island_cupboard_height"
+      },
+      "xyz": [
+        "room_width/2-island_cupboard_depth/2",
+        "island_start_y+island_shelf_end_inset+(0)*(((island_length-2*island_shelf_end_inset-island_cupboard_gap)/2)+island_cupboard_gap)",
+        "island_cupboard_bottom_z"
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Bottom": "L01.IslandCupboard1.Bottom"
+      }
+    },
+    {
+      "id": "IslandCupboard2",
+      "type": "cupboard",
+      "component": "IslandShelf",
+      "bindings": {
+        "width": "island_cupboard_depth",
+        "length": "(island_length-2*island_shelf_end_inset-island_cupboard_gap)/2",
+        "height": "island_cupboard_height"
+      },
+      "xyz": [
+        "room_width/2-island_cupboard_depth/2",
+        "island_start_y+island_shelf_end_inset+(1)*(((island_length-2*island_shelf_end_inset-island_cupboard_gap)/2)+island_cupboard_gap)",
+        "island_cupboard_bottom_z"
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Bottom": "L01.IslandCupboard2.Bottom"
+      }
+    },
+    {
+      "id": "LeftUpperStorage",
+      "type": "cupboard",
+      "component": "UpperStorage",
+      "bindings": {
+        "width": "upper_depth",
+        "length": "left_depth-bench_depth-perimeter_start_y-250",
+        "height": "upper_height"
+      },
+      "xyz": [
+        0,
+        "perimeter_start_y",
+        "upper_bottom_z"
+      ],
+      "yaw_deg": 0,
+      "role": "shallow_upper_storage",
+      "color": "#a8b7c2"
+    },
+    {
+      "id": "RightUpperStorage",
+      "type": "cupboard",
+      "component": "UpperStorage",
+      "bindings": {
+        "width": "upper_depth",
+        "length": "right_depth-bench_depth-perimeter_start_y-250",
+        "height": "upper_height"
+      },
+      "xyz": [
+        "room_width-upper_depth",
+        "perimeter_start_y",
+        "upper_bottom_z"
+      ],
+      "yaw_deg": 0,
+      "role": "shallow_upper_storage",
+      "color": "#a8b7c2"
+    }
+  ],
+  "island_shelf": {
+    "load_rating_kg": null,
+    "upper_cupboards": {
+      "recipe": "two_closed_modules",
+      "open_back_below": true,
+      "load_rating_kg": null
+    }
+  },
+  "limitations": [
+    "No room measurements, surveyed facade, verified door positions, exact window count or building coordinates",
+    "No full building is generated; floor-plan image will supply the later building reference",
+    "Faceted quadratic facade is an adjustable approximation of the oval exterior",
+    "Support and heating-cover dimensions/positions are illustrative; no concrete structure, heating performance, airflow, load capacity or object-retention qualification",
+    "Heating covers are closed visual envelopes with no modeled grille slots or small-object retention test",
+    "Storage blocks are closed envelopes; doors, hinges, internal shelves, contents and opening sweeps are omitted",
+    "Upper cupboards are modeled on sidewalls and above the central shelf; actual door access and any additional tiers are unknown",
+    "No ceiling is modeled; translucent walls and all colours are inspection presentation, not measured material specifications",
+    "Aisle and head-setback numbers are geometric observations, not qualified human/robot access, egress or accessibility",
+    "No utility, ventilation, fire protection, floor loading, structural, installation or safety validation",
+    "No arms, instruments, humans or vehicles are placed; reach, traffic and collision checks against them remain open",
+    "Native parameter edits do not return to the shared source; regenerate and revalidate to preserve the leading source",
+    "Central shelf and uprights are abstract envelopes; load rating, fixings, rigidity, item retention, reach and head clearance are unverified",
+    "Reach-through band is checked with geometric line probes between uprights, not a human reach, hand-size or ergonomic qualification; cupboard and leg fixings/load capacity remain unverified"
+  ]
+}

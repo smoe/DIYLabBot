@@ -23,6 +23,35 @@ worktop. Actual reach, fixings and load capacity remain unverified.
 
 ![L01 room with benches and storage](../cad/generated/lab-room-l01-7f455f722169/room-iso.png)
 
+
+## Source layers for L01
+
+The entry point `model/lab-room-l01.shared.json` is now a pinned composition of
+`model/environments/l01.geometry.json`, `model/furniture/laboratory.catalog.json`
+and `model/furnishings/l01.furnishings.json`. The shell can be evaluated without
+furniture. The furnished room retains its body IDs, named frames and existing
+equipment positions. The four-level target and the current implementation scope
+are documented in [ARCHITECTURE.md](../ARCHITECTURE.md).
+
+The build entry remains `python scripts/build_lab_room.py`. Run
+`python scripts/validate_assembly_schemas.py` with the optional `jsonschema`
+development dependency to validate the source contracts. Furniture placement is
+currently translation plus yaw; general device attachments and multi-room or
+corridor topology remain future work.
+
+The native five-case build was also executed with the installed macOS runtimes
+(FreeCAD 27.1 and SolidCraft 0.40.0-rc.2):
+
+```sh
+PYTHONPATH=/Applications/FreeCAD.app/Contents/Resources/lib \
+python3 scripts/build_lab_room.py \
+  --freecad-python /Applications/FreeCAD.app/Contents/Resources/bin/python \
+  --solidcraft-cli /Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli
+```
+
+The old/new native comparison and current cross-CAD build are recorded locally
+in `cad/lab-room-l01/shared-build-report.json`; exports remain ignored by Git.
+
 ## Layout and orientation
 
 The origin is the inside left corner of the entrance wall at finished floor

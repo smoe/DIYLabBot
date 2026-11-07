@@ -316,7 +316,8 @@ nicht eingerichtet.
 ## Raumumgebung L01
 
 [model/lab-room-l01.shared.json](../model/lab-room-l01.shared.json), Format
-`solidcraftbot.lab-room/2`, beschreibt den ersten Laborraum unabhängig von CAD
+`solidcraftbot.lab-room-composition/1`, bindet die getrennten Quellen für Raumgeometrie,
+Möbeltypen und Möblierung (siehe [Architektur](../ARCHITECTURE.md)), unabhängig von CAD
 und Roboterkette. Parameter besitzen vorläufige Werte und unbekannte Messwerte.
 Semantische Operationen für Raumschale, Türöffnungen, Fassaden-/Fensterband,
 Randbänke, doppelte Mittelbank und geschlossenen Stauraum werden einmal in

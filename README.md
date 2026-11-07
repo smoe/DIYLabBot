@@ -75,6 +75,8 @@ keine herunterladbaren GitHub-Artefakte mehr.
 
 ## Baugruppen und Entwicklung
 
+- [Architektur: Arbeitsumgebung, Möbeltypen, Möblierung und Geräteausstattung](ARCHITECTURE.md)
+
 - [Gemeinsames Modell und Entwicklungsschleife](docs/shared-model.md)
 - [Anforderungen](docs/requirements.md), [Entwurf](docs/design.md), [Entwicklungsplan](docs/development-plan.md)
 - [FreeCAD](docs/freecad.md), [ROS 2/RViz und Prüfgrenzen](docs/ros2.md)

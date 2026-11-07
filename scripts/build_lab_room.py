@@ -63,6 +63,7 @@ def finish(context,args):
     paths=[model.SOURCE,Path(__file__),model.ROOT/'scripts/lab_room_model.py',model.ROOT/'scripts/build_lab_room_freecad.py',
         model.ROOT/'scripts/build_tube_carrier.py',model.ROOT/'scripts/build_tube_carrier_freecad.py',model.ROOT/'scripts/build_neutral_freecad.py',
         model.ROOT/'scripts/robot_spec.py',model.ROOT/'scripts/freecad/solidcraftbot_freecad.py',model.ROOT/'scripts/freecad/persist_station_view.py',model.ROOT/'scripts/freecad/persist_view.py']
+    paths+=model.source_dependencies(spec)
     report={'format':'solidcraftbot.room-cross-cad/1','revision':context['revision'],'source':str(model.SOURCE.relative_to(model.ROOT)),
         'source_sha256':model.digest(model.SOURCE),'source_files_sha256':{str(p.relative_to(model.ROOT)):model.digest(p) for p in paths},
         'passed':all(c['passed'] for c in cases+native),'cases':cases,'native_parameter_edits':native,

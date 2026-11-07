@@ -1,0 +1,347 @@
+{
+  "format": "solidcraftbot.furniture-catalog/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "types": {
+    "storage_bench": {
+      "recipe": "storage_bench",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "top_t": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "plinth_h": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      }
+    },
+    "open_shaped_bench": {
+      "recipe": "open_shaped_bench",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "depth": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "front_delta": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "top_t": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "leg_size": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "leg_inset": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "leg_fractions": [
+        0.1,
+        0.9
+      ]
+    },
+    "shelf_board": {
+      "recipe": "box_envelope",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "role": "shared_central_shelf",
+      "color": "#a8b7c2"
+    },
+    "upright": {
+      "recipe": "box_envelope",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "role": "central_shelf_upright_envelope",
+      "color": "#727d84"
+    },
+    "cupboard": {
+      "recipe": "box_envelope",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "role": "central_upper_cupboard",
+      "color": "#e3e0d8"
+    },
+    "side_gap_cover": {
+      "recipe": "side_gap_cover",
+      "parameters": {
+        "room_width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "split_x": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "cut_depth": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "thickness": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "start_x": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "end_x": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "start_back": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "end_back": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        }
+      },
+      "inputs": [
+        "floor_outline"
+      ],
+      "role": "heating_cover_envelope",
+      "color": "#a7adb0"
+    },
+    "support_gap_cover": {
+      "recipe": "support_gap_cover",
+      "parameters": {
+        "room_width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "left_x": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "right_x": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "cut_depth": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "thickness": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "support_x": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "support_y": {
+          "unit": "mm",
+          "range": [
+            -30000,
+            30000
+          ]
+        },
+        "support_width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "support_depth": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "inputs": [
+        "floor_outline"
+      ],
+      "role": "heating_cover_envelope",
+      "color": "#a7adb0"
+    }
+  },
+  "limitations": [
+    "Concept envelopes only; no selected furniture articles, loads or fixings qualified"
+  ]
+}

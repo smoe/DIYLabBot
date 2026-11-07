@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "room-composition.schema.json",
+  "title": "Pinned composition of room, furniture catalog and furnishings",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.lab-room-composition/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "geometry",
+        "furniture",
+        "furnishings"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "geometry": {
+          "type": "object",
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "string",
+              "pattern": "^model/[A-Za-z0-9_./-]+\\.json$"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "furniture": {
+          "type": "object",
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "string",
+              "pattern": "^model/[A-Za-z0-9_./-]+\\.json$"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "furnishings": {
+          "type": "object",
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "string",
+              "pattern": "^model/[A-Za-z0-9_./-]+\\.json$"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "confirmed": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

@@ -51,6 +51,8 @@ def build(spec,p,path):
         obj=doc.addObject('App::FeaturePython',f['id'].replace('.','_')); groups['RoomShell'].addObject(obj)
         obj.addProperty('App::PropertyString','FrameID','Source'); obj.FrameID=f['id']
         obj.addProperty('App::PropertyPlacement','Placement','Frame')
+        yaw=math.degrees(math.atan2(f['x_axis'][1],f['x_axis'][0]))
+        obj.Placement=App.Placement(App.Vector(),App.Rotation(App.Vector(0,0,1),yaw))
         for axis,value in zip('xyz',f['origin']): obj.setExpression('Placement.Base.'+axis,native_expression(value))
     doc.recompute()
     for name,obj in latest.items():

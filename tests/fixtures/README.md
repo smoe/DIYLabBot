@@ -10,3 +10,8 @@ keine aktuellen Build-Berichte. Nicht beim normalen Build überschreiben.
 
 Die Tests vergleichen die heutige gemeinsame Quelle mit diesen unabhängigen
 Referenzständen. Neue CAD-Ausgaben und ihre Prüfberichte bleiben lokal.
+
+- `l01-before-layer-split.json`: evaluated primitives, CSG order, appearances,
+  named frames and equipment/transfer poses from the pre-split L01 generator;
+  five parameter cases. This is regression evidence, not editable construction
+  intent. Native comparison is recorded separately in local build reports.

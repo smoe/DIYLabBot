@@ -9,7 +9,7 @@
   "assets": {
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "7f455f7221691476887c7c95f0c243f24956aeaefcf377011fdfeee93f3970e4",
+      "source_sha256": "4213ce4683f88708f5d8d7a1f5b778176bd441e15392f408c01d780d57daafd7",
       "report": "cad/lab-room-l01/shared-build-report.json",
       "case": "default"
     },
