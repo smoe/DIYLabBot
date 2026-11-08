@@ -11,21 +11,22 @@ import time
 import xml.etree.ElementTree as ET
 import mobile_base_model as model
 import robot_spec as robot
+import solidcraft_vendor as vendor
 
 
 def write(path,value):
     Path(path).write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 
 
-def compare(actual,expected):
+def compare(actual,expected,aliases=None):
     refs={b['body']:b for b in expected}
-    if set(refs)!={b['name'] for b in actual['bodies']}: raise AssertionError('MB01 body names/count mismatch')
+    bodies=vendor.semantic_bodies(actual['bodies'],[b['body'] for b in expected],aliases or {})
     result=[]
-    for b in actual['bodies']:
+    for b in bodies.values():
         ref=refs[b['name']]; vol=abs(b['volume_mm3']-ref['volume_mm3'])/ref['volume_mm3']
         com=math.dist(b['center_of_mass'],ref['world_center_of_mass_mm'])
         box=max(abs(a-c) for key in ['min','max'] for a,c in zip(b['bbox'][key],ref['bbox'][key]))
-        result.append({'body':b['name'],'relative_volume_error':vol,'com_error_mm':com,'bbox_error_mm':box,
+        result.append({'body':b['name'],'native_bodies':b['native_bodies'],'relative_volume_error':vol,'com_error_mm':com,'bbox_error_mm':box,
                        'passed':b['closed'] and vol<0.001 and com<0.01 and box<0.02})
     return result
 
@@ -118,7 +119,9 @@ def main():
     write(out/'mobile-source.json',spec); write(out/'arm-source.json',arm)
     sc=cad/(spec['id']+'.sc'); fc=cad/(spec['id']+'.FCStd')
     commands=out/'working.commands.json'; measurements=out/'working.solidcraft.json'; freport=out/'freecad-validation.json'
-    write(commands,{'commands':model.solidcraft_commands(spec,arm,p)})
+    sections,vendor_report=vendor.prepare(arm,args.solidcraft_cli,out/'solidcraft-vendor')
+    native_commands,aliases=vendor.replace_imports(model.solidcraft_commands(spec,arm,p),sections)
+    write(commands,{'commands':native_commands})
     print('MB01: building SolidCraft working assembly',flush=True)
     subprocess.run([args.solidcraft_cli,'run',str(commands),'--save',str(sc),'--out',str(out/'working.step'),'--json-out',str(measurements),'--quiet'],check=True,cwd=model.ROOT)
     print('MB01: building FreeCAD; checking fold, support transfer and parameter variants',flush=True)
@@ -143,7 +146,7 @@ def main():
         if name!='working':
             script=out/(name+'.commands.json'); write(script,{'commands':pose_commands(arm,model.state(spec,arm,p,name))})
             subprocess.run([args.solidcraft_cli,'run',str(script),'--in',str(sc),'--save',str(target),'--json-out',str(measured),'--quiet'],check=True,cwd=model.ROOT)
-        checks=compare(json.loads(measured.read_text()),fcr['state_geometry'][name])
+        checks=compare(json.loads(measured.read_text()),fcr['state_geometry'][name],aliases)
         view=persist(ftarget,styles,fcr['state_geometry'][name])
         results.append({'id':name,'passed':all(c['passed'] for c in checks) and view['passed'],'body_comparisons':checks,'presentation':view,
             'solidcraft':str(target.relative_to(model.ROOT)).replace('\\','/'),'freecad':str(ftarget.relative_to(model.ROOT)).replace('\\','/'),
@@ -160,9 +163,10 @@ def main():
     for case in fcr['native_parameter_changes']:
         overrides={case['parameter']:case['value_mm']}; changed=model.parameters(spec,overrides)
         script=out/('variant-'+case['parameter']+'.commands.json'); measured=out/('variant-'+case['parameter']+'.solidcraft.json')
-        write(script,{'commands':model.solidcraft_commands(spec,arm,changed)})
+        variant_commands,variant_aliases=vendor.replace_imports(model.solidcraft_commands(spec,arm,changed),sections)
+        write(script,{'commands':variant_commands})
         subprocess.run([args.solidcraft_cli,'run',str(script),'--json-out',str(measured),'--quiet'],check=True,cwd=model.ROOT)
-        checks=compare(json.loads(measured.read_text()),case['geometry'])
+        checks=compare(json.loads(measured.read_text()),case['geometry'],variant_aliases)
         variants.append({'overrides':overrides,'passed':all(c['passed'] for c in checks),'body_comparisons':checks})
     ros=[]
     if args.ros2:
@@ -174,7 +178,7 @@ def main():
     source_paths=[model.SOURCE,model.ROOT/spec['arm_source'],model.ROOT/'model/mobile-base.schema.json',Path(__file__),model.ROOT/'scripts/mobile_base_model.py',
         model.ROOT/'scripts/build_mobile_base_freecad.py',model.ROOT/'scripts/recheck_mobile_geometry.py',model.ROOT/'scripts/robot_spec.py',model.ROOT/'scripts/build_neutral_freecad.py',
         model.ROOT/'scripts/robot_components.py',model.ROOT/'scripts/robot_cameras.py',model.ROOT/'scripts/station_model.py',
-        model.ROOT/'scripts/freecad/solidcraftbot_freecad.py',model.ROOT/'scripts/freecad/persist_station_view.py']
+        model.ROOT/'scripts/freecad/solidcraftbot_freecad.py',model.ROOT/'scripts/freecad/persist_station_view.py',model.ROOT/'scripts/solidcraft_vendor.py']
     if source_hash!=model.digest(model.SOURCE) or arm_hash!=model.digest(model.ROOT/spec['arm_source']):
         raise RuntimeError('Shared source changed during MB01 build; preserve outputs and rebuild before publishing')
     report={'format':'solidcraftbot.mobile-arm-build/1','source':'model/mobile-base-mb01.shared.json','source_sha256':source_hash,
@@ -184,8 +188,10 @@ def main():
         'freecad_validation':str(freport.relative_to(model.ROOT)).replace('\\','/'),'solidcraft_joints_resolve':joint_pass,
         'solidcraft_joint_count':len(joints),'sample_count':len(fcr['samples']),'native_parameter_changes':[{k:v for k,v in c.items() if k!='geometry'} for c in fcr['native_parameter_changes']],
         'reused_collision_evidence':fcr.get('reused_collision_evidence'),
+        'solidcraft_vendor_report':str((out/'solidcraft-vendor/vendor-build-report.json').relative_to(model.ROOT)),
+        'solidcraft_body_aliases':aliases,'vendor_source_sha256':vendor_report['source_sha256'],
         'envelopes':fcr['envelopes'],'ros_descriptions':ros,'ros_runtime_tested':False,'elapsed_s':time.monotonic()-started,
-        'solidcraft_execution':'Reproducible CLI; MCP import refused by server allowed-folder configuration',
+        'solidcraft_execution':'Reproducible CLI; native shared-source commands',
         'renderings_visually_inspected':False,'limitations':spec['limitations']+['BRep collisions checked at sampled poses; no continuous swept-volume proof',
             'Support contact geometry is not physical load/stiffness/stability qualification','FreeCAD native placements; interactive GUI controls not separately validated']}
     write(out/'build-report.json',report)

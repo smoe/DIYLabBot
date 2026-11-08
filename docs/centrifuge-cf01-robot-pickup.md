@@ -287,8 +287,8 @@ Freigabequittungen ab. Bei erfolgreichen Läufen bleiben laufende Übergaben
 werden zentral erzeugt und ohne Textparsing nachgeschlagen. Die Testparameter
 für Masse und Übergabezeit stehen getrennt vom Anfangsinventar.
 
-Der allgemeine Arm-Neuaufbau nach der LF-Migration ist nicht bestanden:
-SolidCraft importiert fünf Servogehäuse offen und liefert dafür keine
+Der erste allgemeine Arm-Neuaufbau nach der LF-Migration ist nicht bestanden:
+SolidCraft importierte fünf Servogehäuse offen und lieferte dafür keine
 Schwerpunkte. Die FreeCAD-Prüfung dieses Versuchs besteht, aber der
 CAD-Quervergleich bricht ab. ROS-Ausgabe, MB01 und davon abhängige Neuaufbauten
 wurden danach nicht ausgeführt. Der lokale Bericht liegt unter
@@ -297,6 +297,14 @@ Buildberichte und README-Medien werden deshalb nicht als aktuelle Nachweise
 umgeschrieben. Die neuen HTML-/Mock-Prüfungen verwenden ausdrücklich die
 vorherigen Anzeigemeshe mit dokumentierter LF-Quelläquivalenz; dies ersetzt
 keinen neuen bestandenen nativen CAD-Aufbau.
+
+Die anschließende Importkorrektur verwendet die geschlossenen Hersteller-
+Einzelteile auch im Arm-Builder. Der frische native Armvergleich in Revision
+`2fa84f950446-r3` besteht einschließlich Gelenk- und Protokollstichproben;
+ROS-Dateien sind neu erzeugt. Details und Körperzuordnungen stehen in der
+[Servo-Integration](servo-integration.md#geschlossene-gehäuse-im-solidcraft-neuaufbau).
+Die obigen historischen Medien, HTML-Prüfungen und ihr Nachweisstand bleiben
+unverändert; der neue Armaufbau ist kein neuer Nachweis der CF01-Ladebahn.
 
 ### Historischer Nachweis des Restplans bis `95471df`
 
@@ -399,8 +407,10 @@ omitted as before. The selected pieces make a native SolidCraft STEP round trip
 with closure, volume, center and bounds checks. No hole patching or mesh
 replacement is accepted. The original files and registered library remain intact.
 
-The resulting scene has 235 CAD bodies for the same 223 semantic source bodies:
-each X4 housing uses four original pieces and each X2 housing three. A manifest
+The earlier reviewed scene has 235 CAD bodies for the same 223 semantic source
+bodies: each X4 housing uses four original pieces and each X2 housing three.
+New builds also isolate the seven X6 housing pieces, including both locating
+sleeves, giving 241 native bodies. The shared source geometry is unchanged. A manifest
 maps these parts to their original housing ID and arm link. Their original seam
 overlaps remain; summed case-piece volume differs slightly from the old fused
 representation. No claim about real mass or mechanical fits follows.
@@ -419,5 +429,6 @@ python3 scripts/export_centrifuge_robot_pickup_solidcraft.py --compare-freecad /
 The optional comparison uses the existing 0.1% volume and 0.02 mm center limits.
 Only the complete multi-backend builder passes `--context`; standalone generation
 does not require that context or FreeCAD. These checks do not validate a native
-SolidCraft motion study or the full loading path. The standalone arm builder and
-other legacy STEP-snapshot adapters have not been migrated by this CF01 change.
+SolidCraft motion study or the full loading path. The standalone arm and MB01
+builders now reuse the same vendor adapter; other legacy STEP-snapshot adapters
+remain separate.

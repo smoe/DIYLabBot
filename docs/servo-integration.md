@@ -81,6 +81,57 @@ python scripts/build_models.py --ros2
 python -m unittest discover -s tests -v
 ```
 
+### Geschlossene Gehäuse im SolidCraft-Neuaufbau
+
+Der SolidCraft-STEP-Importer verliert beim Import der vereinigten X2-/X4-
+Gehäuse Flächen. Betroffen sind `A1_housing`, `A3_housing`, `A4_housing`,
+`A5_housing` und `A6_housing`. Das vereinigte X6-Gehäuse ist zwar geschlossen,
+überschreitet beim Schwerpunktvergleich aber die bestehende 0,01-mm-Grenze.
+Arm und mobile Basis verwenden deshalb denselben Adapter
+`scripts/solidcraft_vendor.py` wie die unabhängigen CF01-Prüfstellungen.
+Er wählt anhand der gemeinsamen Außenkörperzuordnung die geschlossenen
+Einzelteile aus den archivierten Herstelleroriginalen aus. Wiederholte
+Teile wie die beiden X6-Zentrierhülsen werden über getrennte native STEP-
+Exporte in unveränderter Weltlage isoliert. Der Adapter prüft einen STEP-Export
+mit Wiederimport. FreeCAD und die registrierte Bibliothek
+werden dafür nicht verändert.
+
+Die ursprünglichen Gehäuse-IDs bleiben semantisch erhalten. SolidCraft führt
+ihre Einzelteile mit Suffixen `_Part01` usw. am selben starren Glied.
+Der lokale `solidcraft-vendor/vendor-build-report.json` bindet Originale,
+Registrierung, Auswahl und abgeleitete STEP-Dateien mit Prüfsummen;
+`solidcraft_body_aliases` im Baugruppenbericht ordnet die Körper zu.
+Fehlende, doppelte, zusätzliche oder offene Körper und fehlende beziehungsweise
+nicht endliche Schwerpunkte werden abgewiesen.
+
+Für den Vergleich mit FreeCAD werden die Teilvolumina summiert und deren
+Schwerpunkte volumengewichtet. Ursprüngliche Nahtüberlappungen sind darin
+enthalten; die Summe ist kein boolesches Vereinigungsvolumen und keine reale
+Masse. Die bisherigen Vergleichsgrenzen bleiben bestehen: unter 0,1 %
+Volumenabweichung und unter 0,01 mm Schwerpunktabweichung; MB01 prüft zusätzlich
+unter 0,02 mm Außenmaßabweichung. Gelenke, Komponentenrahmen und Importmatrizen
+bleiben erhalten. Neue Ausgaben entstehen in neuen lokalen Revisionen;
+historische Medien und ihre Provenienz werden nicht aktualisiert.
+
+Der native Arm-Neuaufbau vom 8. November 2026, Revision `2fa84f950446-r3`,
+besteht mit 110 geschlossenen SolidCraft-Körpern für 92 semantische Körper.
+Die maximale Schwerpunktabweichung gegenüber dem frisch erzeugten FreeCAD-
+Modell beträgt rund 0,001113 mm, die maximale relative Volumenabweichung rund 0,01038 %.
+Alle sechs SolidCraft-Achsen wurden um 5° bewegt und zurückgesetzt;
+FreeCAD-Standpose und Protokollstichproben bestehen ebenfalls. ROS-Dateien
+wurden erzeugt, eine ROS-/RViz-Laufzeit wurde nicht ausgeführt.
+Der revisionsbezogene Bericht liegt unter
+`exports/generated/2fa84f950446-r3/build-report.json`. Das neue Arbeitsrendering
+`cad/generated/2fa84f950446-r3/arm-review.png` ist visuell geprüft und ersetzt
+keine historischen Medien.
+
+Der mit demselben Einstieg frisch erzeugte MB01-Stand
+`mobile-base-mb01-a8cda21d42e9` besteht ebenfalls: drei Zustände, zwei native
+Maßvarianten, zwölf aufgelöste Baugruppengelenke und 14 FreeCAD-Kollisionsstichproben
+ohne erkannte Überschneidungen. Die 149 geschlossenen SolidCraft-Körper sind
+131 semantischen Körpern zugeordnet; die drei neuen Zustandsbilder wurden
+visuell geprüft. Vorherige Kollisionsberichte wurden nicht wiederverwendet.
+
 ## Motorplatten und offene Schnittstellen
 
 Die Platten sind 6 mm dick. Außenradien und zentrale Freiräume sind eigene

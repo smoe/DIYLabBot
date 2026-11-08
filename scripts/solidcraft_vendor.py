@@ -13,7 +13,7 @@ import robot_components as components
 import robot_spec as robot
 
 ROOT=robot.ROOT
-AFFECTED={"RMD-X2-P28-7-E","RMD-X4-P36-36-E-L"}
+AFFECTED={"RMD-X2-P28-7-E","RMD-X4-P36-36-E-L","RMD-X6-P20-60-E"}
 
 
 def run(cli,commands,script,measurement,**options):
@@ -50,8 +50,21 @@ def prepare(spec,cli,directory):
         selected_bodies=[next(b for b in measured['bodies'] if b['name']==n) for n in selected]
         body_names=['VendorHousingPart%02d'%(i+1) for i in range(len(selected))]
         target=folder/'housing.step'
-        commands=[insert,{'command':'solid.remove','params':{'bodies':[b['name'] for b in measured['bodies'] if b['name'] not in selected]}}]
-        commands += [{'command':'body.rename','params':{'body':old,'name':new}} for old,new in zip(selected,body_names)]
+        # A repeated manufacturer part shares one definition (X6 sleeves).
+        # Export each selected world body separately before assigning identities;
+        # renaming the original would rename all its occurrences. A native
+        # single-body STEP also avoids copy_bodies' placement error on this file.
+        pieces=[folder/(body_name+'.step') for body_name in body_names]
+        run(cli,[insert]+[{'command':'file.export_step','params':{'path':str(path),'bodies':[body]}}
+                         for path,body in zip(pieces,selected)],folder/'select.commands.json',folder/'select.json')
+        commands=[];piece_reports=[]
+        for path,body_name in zip(pieces,body_names):
+            imported=run(cli,[{'command':'file.insert_step','params':{'path':str(path)}}],
+                         folder/(body_name+'.commands.json'),folder/(body_name+'.json'))['bodies']
+            if len(imported)!=1:raise ValueError('Expected one isolated vendor body: '+str(path))
+            commands.extend([{'command':'file.insert_step','params':{'path':str(path),'name':body_name}},
+                             {'command':'body.rename','params':{'body':imported[0]['name'],'name':body_name}}])
+            piece_reports.append({'step':str(path),'sha256':robot.digest(path),'import_body_name':imported[0]['name']})
         commands.append({'command':'file.export_step','params':{'path':str(target),'bodies':body_names}})
         run(cli,commands,folder/'exterior.commands.json',folder/'exterior.json')
         roundtrip=run(cli,[{'command':'file.insert_step','params':{'path':str(target)}}],folder/'roundtrip.commands.json',folder/'roundtrip.json')
@@ -75,7 +88,7 @@ def prepare(spec,cli,directory):
         entry={'step':str(target),'body_names':body_names,'sha256':robot.digest(target)}
         replacements[str(ROOT/part['sections']['housing']['step'])]=entry
         reports.append({'part':name,'passed':True,'original':source,'registration':part['vendor_to_output_frame'],
-                        'selected_original_bodies':selected,'output':entry,'comparisons':comparisons,
+                        'selected_original_bodies':selected,'isolated_parts':piece_reports,'output':entry,'comparisons':comparisons,
                         'summed_volume_difference_from_registered_union':ve,
                         'representation':'Separate original closed case pieces; rigid together, not Boolean-unioned'})
     report={'passed':True,'freecad_required':False,'vendor_originals_modified':False,'parts':reports,
@@ -107,7 +120,35 @@ def replace_imports(commands,replacements):
 
 def aggregate(bodies,names):
     selected=[bodies[n] for n in names]
-    if any(not b.get('closed') or b.get('volume_mm3') is None or b['volume_mm3']<=0 for b in selected):
-        raise ValueError('Cannot measure open bodies: '+str(names))
+    if not selected or any(not b.get('closed') or not isinstance(b.get('volume_mm3'),(int,float))
+                          or not math.isfinite(b['volume_mm3']) or b['volume_mm3']<=0 for b in selected):
+        raise ValueError('Cannot measure open or invalid bodies: '+str(names))
+    for body in selected:
+        center=body.get('center_of_mass')
+        if not isinstance(center,list) or len(center)!=3 or any(not isinstance(v,(int,float)) or not math.isfinite(v) for v in center):
+            raise ValueError('Missing or invalid center_of_mass: '+body['name'])
     volume=sum(b['volume_mm3'] for b in selected)
     return {'volume_mm3':volume,'center_of_mass':[sum(b['center_of_mass'][i]*b['volume_mm3'] for b in selected)/volume for i in range(3)]}
+
+
+def semantic_bodies(measured,expected_names,aliases):
+    """Measure each semantic body, retaining every closed native case piece.
+
+    Case-piece volumes are summed (including original seam overlaps), not
+    claimed to be Boolean-union volumes. Cross-CAD tolerances remain unchanged.
+    Reject missing, duplicate and unexpected native bodies before aggregation.
+    """
+    expected_names=list(expected_names)
+    names=[n for name in expected_names for n in aliases.get(name,[name])]
+    actual={b['name']:b for b in measured}
+    if (len(set(expected_names))!=len(expected_names) or len(set(names))!=len(names)
+        or len(actual)!=len(measured) or set(actual)!=set(names) or set(aliases)-set(expected_names)):
+        raise ValueError('SolidCraft body identities/count mismatch')
+    result={}
+    for name in expected_names:
+        parts=aliases.get(name,[name]);metrics=aggregate(actual,parts)
+        boxes=[actual[n]['bbox'] for n in parts]
+        result[name]={'name':name,'closed':True,**metrics,'native_bodies':parts,
+                      'bbox':{key:[op(box[key][i] for box in boxes) for i in range(3)]
+                              for key,op in [('min',min),('max',max)]}}
+    return result

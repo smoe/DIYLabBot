@@ -6,6 +6,7 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import robot_spec as model
 from robot_components import library
 from check_servo_mountings import assembly_bindings,native_part_metadata
+from solidcraft_vendor import semantic_bodies
 
 @unittest.skipUnless((ROOT / "exports/generated/build-report.json").is_file() and (ROOT / "ros2_ws/src/solidcraftbot_ros/config/geometry.json").is_file(), "Requires local CAD/ROS build: python scripts/build_models.py --ros2")
 class RobotPartsIntegration(unittest.TestCase):
@@ -14,7 +15,9 @@ class RobotPartsIntegration(unittest.TestCase):
         cls.spec=model.load();cls.lib=library(cls.spec)
         build=json.loads((ROOT/'exports/generated/build-report.json').read_text())
         cls.native=native_part_metadata(ROOT/build['artifacts']['freecad'])
-        cls.sc={b['name'] for b in json.loads((ROOT/build['artifacts']['solidcraft_measurements']).read_text())['bodies']}
+        cls.measurements=json.loads((ROOT/build['artifacts']['solidcraft_measurements']).read_text())['bodies']
+        cls.aliases=build.get('solidcraft_body_aliases',{})
+        cls.sc=set(semantic_bodies(cls.measurements,cls.native,cls.aliases))
         cls.ros=json.loads((ROOT/'ros2_ws/src/solidcraftbot_ros/config/geometry.json').read_text())
 
     def test_actual_robot_uses_selected_joint_parts_and_hardware(self):
@@ -32,5 +35,12 @@ class RobotPartsIntegration(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'vendor part/revision'):assembly_bindings(self.spec,self.lib,native,self.sc,self.ros)
         bodies=self.sc-{'A1_output_plate'}
         with self.assertRaisesRegex(ValueError,'missing from CAD'):assembly_bindings(self.spec,self.lib,self.native,bodies,self.ros)
+
+    def test_missing_split_housing_piece_cannot_pass(self):
+        if not self.aliases:self.skipTest('Requires a build with split vendor housings')
+        part=self.aliases['A1_housing'][0]
+        bodies=[b for b in self.measurements if b['name']!=part]
+        with self.assertRaisesRegex(ValueError,'identities/count mismatch'):
+            semantic_bodies(bodies,self.native,self.aliases)
 
 if __name__=='__main__':unittest.main()

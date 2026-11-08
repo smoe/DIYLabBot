@@ -17,6 +17,7 @@ import time
 import robot_spec as model
 import robot_services
 import robot_cameras
+import solidcraft_vendor as vendor
 
 
 def main():
@@ -42,7 +43,9 @@ def main():
         from robot_components import audit
         component_report.write_text(json.dumps({"spec_sha256":digest,"library":spec["vendor_library"],**audit(spec)},indent=2)+"\n",encoding="utf-8")
     commands=export_dir/"solidcraft.commands.json"
-    commands.write_text(json.dumps({"spec_sha256":digest,"commands":model.solidcraft_commands(spec)},indent=2)+"\n",encoding="utf-8")
+    sections,vendor_report=vendor.prepare(spec,args.solidcraft_cli,export_dir/"solidcraft-vendor")
+    native_commands,aliases=vendor.replace_imports(model.solidcraft_commands(spec),sections)
+    commands.write_text(json.dumps({"spec_sha256":digest,"commands":native_commands},indent=2)+"\n",encoding="utf-8")
     trace={s["id"]:model.sample_scenario(spec,s["id"]) for s in spec["scenarios"]}
     (export_dir/"scenario-traces.json").write_text(json.dumps({"spec_sha256":digest,"scenarios":trace},indent=2)+"\n",encoding="utf-8")
     solidcraft=artifact_dir/(spec["id"]+".solidcraft"); freecad=artifact_dir/(spec["id"]+".FCStd")
@@ -60,12 +63,12 @@ def main():
     sc=json.loads(solid_measurements.read_text(encoding="utf-8")); fc=json.loads(free_report.read_text(encoding="utf-8"))
     fc["model_sha256"]=model.digest(freecad)
     free_report.write_text(json.dumps(fc,indent=2)+"\n",encoding="utf-8")
-    sc_bodies={b["name"]:b for b in sc["bodies"]}; comparisons=[]
+    sc_bodies=vendor.semantic_bodies(sc["bodies"],[b["body"] for b in fc["geometry"]],aliases); comparisons=[]
     for body in fc["geometry"]:
         other=sc_bodies[body["body"]]
         error=math.sqrt(sum((a-b)**2 for a,b in zip(body["world_center_of_mass_mm"],other["center_of_mass"])))
         volume_error=abs(body["volume_mm3"]-other["volume_mm3"])/body["volume_mm3"]
-        comparisons.append({"body":body["body"],"com_error_mm":error,"relative_volume_error":volume_error,"passed":error<0.01 and volume_error<0.001})
+        comparisons.append({"body":body["body"],"native_bodies":other["native_bodies"],"com_error_mm":error,"relative_volume_error":volume_error,"passed":error<0.01 and volume_error<0.001})
     report={"spec_sha256":digest,"spec":"model/robot.json","passed":bool(fc["passed"] and len(sc_bodies)==len(comparisons) and all(c["passed"] for c in comparisons)),
             "artifacts":{name:str(path.relative_to(model.ROOT)).replace("\\","/") for name,path in {"solidcraft":solidcraft,"freecad":freecad,"freecad_report":free_report,"freecad_presentation":view_report,"solidcraft_measurements":solid_measurements}.items()},
             "artifact_sha256":{name:model.digest(path) for name,path in {"solidcraft":solidcraft,"freecad":freecad}.items()},
@@ -75,9 +78,15 @@ def main():
             "cameras_report":str(camera_report.relative_to(model.ROOT)).replace("\\","/"),
             "components_report":str(component_report.relative_to(model.ROOT)).replace("\\","/") if component_report.exists() else None,
             "solidcraft_joint_report":str(joint_report.relative_to(model.ROOT)).replace("\\","/"),
+            "solidcraft_vendor_report":str((export_dir/"solidcraft-vendor/vendor-build-report.json").relative_to(model.ROOT)),
+            "solidcraft_body_aliases":aliases,"solidcraft_native_body_count":len(sc["bodies"]),
+            "solidcraft_all_bodies_closed":all(b.get("closed") for b in sc["bodies"]),
             "generator_sha256":{str(path.relative_to(model.ROOT)).replace("\\","/"):model.digest(path) for path in [Path(__file__),model.ROOT/"scripts/robot_spec.py",model.ROOT/"scripts/assembly_model.py",model.ROOT/"scripts/robot_components.py",model.ROOT/"scripts/servo_mounting_design.py",model.ROOT/"scripts/x6_mounting_design.py",model.ROOT/"scripts/prepare_servo_components.py",model.ROOT/"scripts/robot_cameras.py",model.ROOT/"scripts/build_neutral_freecad.py",model.ROOT/"scripts/build_ros2.py",model.ROOT/"scripts/check_solidcraft_joints.py",model.ROOT/"scripts/freecad/persist_view.py",model.ROOT/"scripts/freecad/solidcraftbot_freecad.py"]},
             "limitations":["Selected vendor exterior geometry; X2/X4/X6 nominal locating fits and screw stacks calculated under explicit assumptions; pin retention, physical fits, loads and X6 housing thread-depth reference remain unverified", "No dynamics, tooth contact, fluid simulation or hardware protocol execution", "Cable topology audited; physical routing, bend, torsion and feedback hardware not verified", "No manufacturing, load, stiffness or precision qualification"]}
     destination=model.ROOT/"exports/generated/build-report.json"
+    report["generator_sha256"]["scripts/solidcraft_vendor.py"]=model.digest(model.ROOT/"scripts/solidcraft_vendor.py")
+    report["vendor_source_sha256"]=vendor_report["source_sha256"]
+    (export_dir/"build-report.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     destination.write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
     if not report["passed"]: raise SystemExit("Cross-CAD validation failed; see "+str(destination))
     print("Both CADs and sampled protocol checks passed in %.2f s"%report["elapsed_s"],flush=True)
@@ -93,6 +102,7 @@ def main():
         subprocess.run(mobile_command,check=True,cwd=model.ROOT)
         report["mobile_base_report"]="cad/mobile-base-mb01/shared-build-report.json"
         destination.write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
+    (export_dir/"build-report.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
 
 
 if __name__=="__main__": main()

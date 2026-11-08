@@ -5,6 +5,7 @@ from pathlib import Path
 import robot_spec as model
 from robot_components import library
 from servo_mounting_design import analyse
+from solidcraft_vendor import semantic_bodies
 
 def assembly_bindings(spec,lib,native,solidcraft,ros):
     """Trace the selected hardware into actual CAD bodies and RViz link contents."""
@@ -62,7 +63,9 @@ def main():
     ros=json.loads(ros_path.read_text(encoding='utf-8'))
     if ros['spec_sha256']!=model.digest(model.SPEC):raise ValueError('RViz robot source is stale')
     sc=json.loads((model.ROOT/build['artifacts']['solidcraft_measurements']).read_text(encoding='utf-8'))
-    integration=assembly_bindings(spec,lib,native_part_metadata(model.ROOT/build['artifacts']['freecad']),{b['name'] for b in sc['bodies']},ros)
+    metadata=native_part_metadata(model.ROOT/build['artifacts']['freecad'])
+    measured=semantic_bodies(sc['bodies'],metadata,build.get('solidcraft_body_aliases',{}))
+    integration=assembly_bindings(spec,lib,metadata,set(measured),ros)
     urdf_path=model.ROOT/'ros2_ws/src/solidcraftbot_ros/urdf/robot.urdf'
     urdf=ET.parse(urdf_path).getroot()
     boxes={v.get('name','').removesuffix('_servo_box') for v in urdf.findall('link/visual') if v.get('name','').endswith('_servo_box') and v.find('geometry/box') is not None}
