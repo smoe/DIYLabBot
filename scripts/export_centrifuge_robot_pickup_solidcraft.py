@@ -8,7 +8,7 @@ import argparse
 import json
 import math
 from pathlib import Path
-import shutil
+import tool_paths
 import subprocess
 from concurrent.futures import ThreadPoolExecutor
 import centrifuge_model as cf
@@ -40,13 +40,17 @@ def validate_snapshot(base,actual,manifest,matrices):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    mac_cli=Path('/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli')
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or (str(mac_cli) if mac_cli.exists() else 'solidcraft-cli'))
+    tool_paths.add_tool_arguments(parser,freecad=False)
     parser.add_argument('--context',type=Path,help='Optional enclosing multi-backend build directories; geometry still comes from shared sources')
     parser.add_argument('--compare-freecad',type=Path,help='Optional snapshot-metrics.json cross-check, not a build input')
-    args=parser.parse_args();scene=pickup.load();data=pickup.trajectory(scene)
-    if args.context:
-        context=json.loads(args.context.read_text(encoding='utf-8'))
+    args=parser.parse_args()
+    context=json.loads(args.context.read_text(encoding='utf-8')) if args.context else None
+    # An explicit option overrides the enclosing build's recorded runtime.
+    # Standalone builds use the shared environment/PATH/install lookup.
+    args.solidcraft_cli=args.solidcraft_cli or (context or {}).get('solidcraft_cli') or tool_paths.solidcraft_cli()
+    tool_paths.resolve_tool_arguments(parser,args)
+    scene=pickup.load();data=pickup.trajectory(scene)
+    if context is not None:
         for name,sha in context['source_hashes'].items():
             if cf.digest(cf.ROOT/name)!=sha:raise ValueError('Enclosing build source changed: '+name)
     else:

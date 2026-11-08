@@ -4,6 +4,7 @@ Uses existing checked local builds. No CAD geometry is a new leading source.
 --check works on a fresh checkout, without either CAD application installed.
 """
 import argparse
+import tool_paths
 from datetime import datetime
 import hashlib
 import html
@@ -332,8 +333,8 @@ def check(require_review=True):
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--check',action='store_true')
     parser.add_argument('--resume',action='store_true',help='Reuse only previews whose image, sources, CAD inputs and view commands still match')
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or '/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli')
-    args=parser.parse_args()
+    tool_paths.add_tool_arguments(parser,freecad=False)
+    args=parser.parse_args();tool_paths.resolve_tool_arguments(parser,args,required=not args.check)
     if args.check:check();return
     WORK.mkdir(parents=True,exist_ok=True);records=[]
     previous={r['id']:r for r in read(WORK/'progress.json')} if args.resume and (WORK/'progress.json').exists() else {}

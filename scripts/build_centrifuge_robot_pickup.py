@@ -2,7 +2,7 @@
 import argparse
 import json
 from pathlib import Path
-import shutil
+import tool_paths
 import subprocess
 import sys
 import centrifuge_robot_pickup as pickup
@@ -12,10 +12,8 @@ from cf01_rack_batch import Runner, SOURCE as BATCH_SOURCE
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--prepare-only',action='store_true')
-    mac_python=Path('/Applications/FreeCAD.app/Contents/Resources/bin/python');mac_cli=Path('/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli')
-    parser.add_argument('--freecad-python',default=str(mac_python if mac_python.exists() else Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or (str(mac_cli) if mac_cli.exists() else 'solidcraft-cli'))
-    args=parser.parse_args()
+    tool_paths.add_tool_arguments(parser)
+    args=parser.parse_args();tool_paths.resolve_tool_arguments(parser,args,required=not args.prepare_only)
     scene=pickup.load();data=pickup.trajectory(scene);stem='centrifuge-cf01-robot-'+cf.digest(pickup.SOURCE)[:12];revision=stem;n=1
     while (cf.ROOT/'exports/generated'/revision).exists():n+=1;revision=stem+'-r'+str(n)
     paths={key:cf.ROOT/top/revision for key,top in [('cad','cad/generated'),('out','exports/generated'),('renders','renders')]}

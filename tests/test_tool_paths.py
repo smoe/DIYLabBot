@@ -7,6 +7,8 @@ import re
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -61,15 +63,41 @@ class ToolPathTest(unittest.TestCase):
         finally:
             tool_paths.default_solidcraft_cli = original
 
+    def test_gallery_check_does_not_require_a_cad_runtime(self):
+        import render_model_gallery as gallery
+        with patch.object(sys,'argv',['gallery','--check']),patch.object(tool_paths,'default_solidcraft_cli',return_value=None),patch.object(gallery,'check') as check:
+            gallery.main()
+        check.assert_called_once()
+
+    def test_pickup_prepare_does_not_require_runtimes(self):
+        import build_centrifuge_robot_pickup as builder
+        # Stop immediately after argument resolution; no generated files are touched.
+        class Resolved(Exception):pass
+        resolve=tool_paths.resolve_tool_arguments
+        def inspected(parser,args,required=True):
+            resolve(parser,args,required)
+            self.assertFalse(required);self.assertIsNone(args.freecad_python);self.assertIsNone(args.solidcraft_cli)
+            raise Resolved()
+        with patch.object(sys,'argv',['pickup','--prepare-only']),patch.object(tool_paths,'default_freecad_python',return_value=None),patch.object(tool_paths,'default_solidcraft_cli',return_value=None),patch.object(tool_paths,'resolve_tool_arguments',side_effect=inspected),self.assertRaises(Resolved):builder.main()
+
+    def test_native_pickup_explicit_option_then_context_then_shared_lookup(self):
+        import export_centrifuge_robot_pickup_solidcraft as exporter
+        class Resolved(Exception):pass
+        for explicit,context,expected in [('/explicit','/context','/explicit'),(None,'/context','/context'),(None,None,'/shared')]:
+            def inspected(parser,args,required=True):
+                self.assertEqual(args.solidcraft_cli,expected)
+                raise Resolved()
+            with tempfile.TemporaryDirectory() as tmp:
+                path=Path(tmp)/'context.json';path.write_text(json.dumps({'solidcraft_cli':context}))
+                argv=['exporter','--context',str(path)]+(['--solidcraft-cli',explicit] if explicit else [])
+                with patch.object(sys,'argv',argv),patch.object(tool_paths,'solidcraft_cli',return_value='/shared') as lookup,patch.object(tool_paths,'resolve_tool_arguments',side_effect=inspected),self.assertRaises(Resolved):exporter.main()
+                self.assertEqual(lookup.call_count,1 if explicit is None and context is None else 0)
+
     def test_generators_have_no_machine_specific_defaults(self):
         pattern = re.compile(r"AppData|Program Files|FreeCAD 27\.1/bin|/Applications/")
         offenders = [p.name for p in (ROOT / "scripts").rglob("*.py")
                      if p.name != "tool_paths.py" and pattern.search(p.read_text(encoding="utf-8"))]
-        # These still carry their own interim macOS/Windows defaults from a
-        # concurrent CF01 rework and should move to tool_paths once it lands.
-        pending = {"build_centrifuge_robot_pickup.py", "export_centrifuge_robot_pickup_solidcraft.py",
-                   "render_model_gallery.py"}
-        self.assertLessEqual(set(offenders), pending, sorted(set(offenders) - pending))
+        self.assertEqual(offenders, [])
 
 
 if __name__ == "__main__":
