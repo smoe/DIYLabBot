@@ -197,8 +197,10 @@ python3 scripts/run_cf01_rack_batch.py --transport sila2
 Beide Optionen führen lokale Vertragsdecoder aus. Die Berichte werden mit
 Profilhash und Zeitstempel unter `exports/generated/cf01-rack-batch-*/` abgelegt.
 Der Eingangszustand ist auf ein bereitgestelltes Rack und einen leeren Rotor
-beschränkt. Fiktive Massen und zeitlose Übergaben bleiben ausgewiesene
-Mock-Annahmen; nur Schleudern und Bremsen lassen die Testuhr fortschreiten.
+beschränkt. Fiktive Massen und zeitlose Roboterübergaben bleiben ausgewiesene
+Mock-Annahmen. `initial_state` enthält nur den Anfangszustand; Massenquelle und
+Roboterübergabezeit stehen getrennt in `mock_assumptions`. Die Testuhr wird beim
+Warten auf beobachtbare Befehle einschließlich Schleudern und Bremsen fortgeschrieben.
 Die Rotor-/Rackkapazität im Runner wird aus dem validierten Profil abgeleitet;
 der CF01-Vertrag verlangt weiterhin eine vollständige Zwölferbeladung.
 
@@ -206,10 +208,27 @@ der CF01-Vertrag verlangt weiterhin eine vollständige Zwölferbeladung.
 zwischen Greifer und Rotor zusätzlich die zugehörige Stationsbestätigung und
 Belegungsprüfung. Vor der Roboterquittung wird die ausstehende Übergabe erfasst.
 
-Für `confirm_seated` und `confirm_removed` zählt nur eine Antwort mit dem
-booleschen Feld `success: true`. Negative, fehlende oder ungültige Antworten
+Für alle nicht beobachtbaren Befehle zählt nur eine Antwort mit dem
+booleschen Feld `success: true`, einschließlich Reservierung, Heartbeat, Freigabe
+und den beiden Stationsquittungen `confirm_seated` / `confirm_removed`. Negative, fehlende oder ungültige Antworten
 lassen die Stationsquittung offen, auch wenn die Stationsaktion im Mock bereits
 ausgeführt wurde. Eine passende Belegung ersetzt diese positive Quittung nicht.
+
+Beobachtbare Befehle benötigen eine gültige Job-ID und eine bekannte Phase.
+Der Runner wartet bis `succeeded`, prüft bei jedem Poll dieselbe Job-ID, sendet
+Heartbeats und begrenzt die Wartezeit durch `command_execution` im Profil.
+Leere Antworten oder ein unkorreliertes `running` bestätigen keinen Abschluss.
+Während eines noch laufenden Deckel-/Index-/Heberbefehls beginnt keine Übergabe.
+Die Frist läuft auf der expliziten Testuhr; Zeitüberschreitungen blockierender
+SDK-/Netzwerkaufrufe müssten ein späterer echter Treiber zusätzlich behandeln.
+
+Der Spin muss weiterhin `running` → `braking` → `succeeded` mit bestätigtem
+Stillstand und gehaltener Bremse durchlaufen. Sein Fristbudget enthält die
+Profil-Laufzeit und synthetische Bremszeit zusätzlich zum Befehlszeitbudget.
+Der Trace kennzeichnet den angenommenen Spinauftrag als `submitted`; erst
+`spin_complete` meldet den geprüften Abschluss. Ein Stopp wird ebenfalls als angenommener Auftrag (`submitted`) dargestellt,
+weil seine Quittung keinen Stillstand belegt. Andere Befehle werden nach
+bestätigtem Abschluss als `completed` aufgezeichnet.
 
 Erst nach vollständiger Bestätigung wird die Buchführung weitergeführt:
 
@@ -219,7 +238,7 @@ Erst nach vollständiger Bestätigung wird die Buchführung weitergeführt:
 | `world_inventory` | Separate synthetische Ortsbeobachtung nach den positiven Roboterquittungen; keine reale Identitätssensorik. |
 | `pending_handoff` | Probe, Quelle, Ziel, Roboterquittung und Stationsquittung. `null` bei abgeschlossener Übergabe; `station_confirmation: null`, wenn keine Stationsquittung erforderlich ist. |
 | `inventory_consistent` | Stimmen Buchführung und synthetische Ortsbeobachtung überein? Auch bei Übereinstimmung kann noch eine Quittung fehlen. |
-| `ownership` | `unresolved` bei offener Übergabe oder widersprüchlichen Inventaren; sonst `confirmed`. Dies beschreibt die Zuordnung im Mock, keine Hardwarefreigabe. |
+| `ownership` | `pending` während der laufenden Übergabe, `unresolved` bei deren Abbruch oder widersprüchlichen Inventaren nach Fehler; nach abgeschlossenem Abgleich `confirmed`. Dies beschreibt die Zuordnung im Mock, keine Hardwarefreigabe. |
 | `failure` | Auslösende Operation, Probe, ursprünglicher Fehlertyp/-code und Stationsfehler vor dem Stoppversuch. Der Fehler wird nicht durch einen späteren Stoppfehler ersetzt. |
 | `stop_attempted` | Der Runner hat einen Stopp über den ausgewählten Vertragsdecoder versucht. |
 | `stop_via_contract` | Der Decoder hat den Stopp erfolgreich beantwortet. Bei normalen erfolgreichen Läufen und fehlgeschlagenem Stoppversand `false`; kein Nachweis realen Stillstands. |
@@ -234,7 +253,9 @@ weiterhin sicher gehaltenen Gegenstand. Dasselbe gilt umgekehrt bei einer
 unbestätigten Rotorentnahme. Der Lauf stoppt ohne weitere Übergabe; automatischer
 Wiederanlauf oder Abgleich mit einem realen Gerät sind nicht implementiert.
 
-Rackplätze werden als Instanz und relativer Platz ausgegeben, beispielsweise
+Lokale Platz-ID und Geometrie-ID werden gemeinsam von `rack_slots.places`
+erzeugt. Der Runner schlägt numerische Plätze in Tabellen nach und interpretiert
+keine Textpräfixe. Rackplätze werden als Instanz und relativer Platz ausgegeben, beispielsweise
 `rack_instance: Rack` und `place_id: Slot01`. Der vorhandene Geometriebezug
 `rack_place_id: CF01.OutputRack.Slot01` bleibt zusätzlich unverändert erhalten.
 Dies ist eine lokale CF01-Zuordnung; getrennte Gefäß-/Probenidentitäten und eine
@@ -256,7 +277,28 @@ Slot occupancy checks use mock internals, not a real ROS/SiLA driver contract.
 Required station acknowledgements must explicitly contain boolean `success: true`;
 negative, missing or malformed replies leave the handoff unresolved.
 
-### Prüfung dieses Restplans am 8. November 2026
+### Nachprüfung der Befehlsabschlüsse und LF-Migration
+
+Die aktuelle Software wartet bei beobachtbaren Befehlen auf den bestätigten
+Jobabschluss. Negative Tests decken `running` ohne Job-ID, leere Antworten,
+falsche Job-IDs, nie abgeschlossene Jobs sowie Heartbeat-/Reservierungs-/
+Freigabequittungen ab. Bei erfolgreichen Läufen bleiben laufende Übergaben
+`pending`; der Trace enthält keine `unresolved`-Einträge. Die lokalen Platznamen
+werden zentral erzeugt und ohne Textparsing nachgeschlagen. Die Testparameter
+für Masse und Übergabezeit stehen getrennt vom Anfangsinventar.
+
+Der allgemeine Arm-Neuaufbau nach der LF-Migration ist nicht bestanden:
+SolidCraft importiert fünf Servogehäuse offen und liefert dafür keine
+Schwerpunkte. Die FreeCAD-Prüfung dieses Versuchs besteht, aber der
+CAD-Quervergleich bricht ab. ROS-Ausgabe, MB01 und davon abhängige Neuaufbauten
+wurden danach nicht ausgeführt. Der lokale Bericht liegt unter
+`exports/generated/2fa84f950446/build-attempt-status.json`. Historische
+Buildberichte und README-Medien werden deshalb nicht als aktuelle Nachweise
+umgeschrieben. Die neuen HTML-/Mock-Prüfungen verwenden ausdrücklich die
+vorherigen Anzeigemeshe mit dokumentierter LF-Quelläquivalenz; dies ersetzt
+keinen neuen bestandenen nativen CAD-Aufbau.
+
+### Historischer Nachweis des Restplans bis `95471df`
 
 Der isolierte Stand aus `dc5df84` plus den Änderungen dieses Restplans besteht
 261 Tests, davon 20 mangels gespeicherter Buildartefakte übersprungen. Die
@@ -303,6 +345,11 @@ Die vorhandenen Geometriemeshe wurden nach Quellen- und Prüfsummenabgleich
 wiederverwendet. Diese Nachprüfung erzeugt keinen neuen nativen CAD-, Bahn-,
 Hardware- oder Netzwerknachweis; die oben dokumentierten Grenzen bleiben bestehen.
 
+Während erfolgreicher Läufe enthält der Trace keine `unresolved`-Einträge.
+Offene Quittungen einer gerade bearbeiteten Übergabe sind `pending`; eine
+fehlgeschlagene Bestätigung macht daraus `unresolved`. Die Anzeige unterscheidet
+„Übergabe läuft“ / „Handoff pending“ von der ungeklärten Zuordnung nach einem Fehler.
+
 ## Synthetic workspace and complete local batch
 
 `model/synthetic-cf01-workspace.shared.json` composes an explicitly unbounded
@@ -318,7 +365,7 @@ confirmations. A separate world inventory checks actual indexed slots and sample
 identities against the runner ledger and simulated station presence/mass. This
 is no physical sample identification. Polling uses the local MockProtocol API;
 commands and failure-stop requests pass through the selected contract decoder.
-Test time advances only during spin/braking. Failures retain confirmed ledger,
+The explicit test clock advances while awaiting observable command completion, including spin/braking. Failures retain confirmed ledger,
 synthetic observations and pending acknowledgements separately and produce a
 failed report; they do not claim restored sample order.
 

@@ -40,7 +40,8 @@ Zusätzlich enthält die HTML-Demo das aufgezeichnete **Chargenprotokoll für zw
 Proben**: Ein Transporter hat das Rack bereitgestellt; es wird in CF01 geladen,
 zentrifugiert und in ursprünglicher Reihenfolge zurück ins Rack entladen. Der
 Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldungen
-sind lokale Mocks ohne ausgeführte Bahn; Testzeit vergeht nur beim Spin und Bremsen.
+sind lokale Mocks ohne ausgeführte Bahn; Testzeit wird beim Warten auf bestätigte
+Befehlsabschlüsse einschließlich Spin und Bremsen fortgeschrieben.
 Neu erzeugte HTML-Demos starten auf Deutsch und lassen sich über
 **Sprache / Language** auf Englisch umschalten. Die ausgewählten Medien oben
 bleiben der historische Build ohne Sprachumschaltung. Aktuelle Bedienung,

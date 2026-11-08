@@ -19,8 +19,7 @@
   <details class="cf01-batch" data-batch-panel>
     <summary data-i18n="Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze">Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze</summary>
     <p data-i18n="batch_description">Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben
-    beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit
-    vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.</p>
+    beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Die Testuhr läuft beim Warten auf Befehlsabschlüsse, einschließlich Schleudern und Bremsen; der Transporter ist eine externe Vorbedingung.</p>
     <button type="button" data-batch-play data-i18n="Protokoll abspielen">Protokoll abspielen</button>
     <input type="range" data-batch-slider min="0" max="1" step="1" value="0" data-i18n-aria="Protokollschritt" aria-label="Protokollschritt">
     <p data-batch-stage aria-live="polite"></p>
@@ -45,6 +44,9 @@
     const mesh=JSON.parse(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
     const keys=mesh.trajectory.samples.map(s=>({...s,values:s.station}));
     const labels={
+      "command_submitted":["Auftrag angenommen", "Request accepted"],
+      "command_completed":["Abschluss bestätigt", "Completion confirmed"],
+      "Pending handoff":["Übergabe läuft", "Handoff pending"],
       "Unresolved handoff":["Zuordnung ungeklärt", "Ownership unresolved"],
       "Robot confirmed":["Roboter bestätigt", "Robot acknowledged"],
       "Robot unconfirmed":["Roboterquittung fehlt", "Robot acknowledgement missing"],
@@ -85,7 +87,7 @@
       "CF01-Befehl":["CF01-Befehl", "CF01 command"],
       "Abstrakte Übergabe":["Abstrakte Übergabe", "Abstract handoff"],
       "Ablaufzustand":["Ablaufzustand", "Sequence state"],
-      "Testzeit (Spin/Bremse)":["Testzeit (Schleudern/Bremsen)", "Test time (spin/braking)"],
+      "Testzeit (Spin/Bremse)":["Testzeit (Befehle)", "Test time (commands)"],
       "Batch panel unavailable":["Chargenanzeige nicht verfügbar; die Bewegungsansicht bleibt bedienbar.", "Batch panel unavailable"],
       "Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze":["Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze", "Complete batch: rack → CF01 → original rack slots"],
       "Simulation: keine Netzwerk- oder Hardwareausführung.":["Simulation: keine Netzwerk- oder Hardwareausführung.", "Simulation: no network or hardware execution."],
@@ -135,7 +137,7 @@
       "complete":["Abgeschlossen", "Complete"],
       "failed":["Fehlgeschlagen", "Failed"],
       "stop":["Stopp", "Stop"],
-      "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances only during spin and braking; rack delivery by a transporter is an external precondition."],
+      "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Die Testuhr läuft beim Warten auf Befehlsabschlüsse, einschließlich Schleudern und Bremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances while awaiting observable commands, including spin and braking; rack delivery by a transporter is an external precondition."],
       "motion_description":["Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.", "Preserved motion component: rotor slot 01 → rack slot 01. Independent timeline and mock acknowledgements; no coupling to batch playback."]
     };
     const language=root.querySelector("[data-language]");
@@ -245,8 +247,8 @@
       const pending=record.pending_handoff;
       function location(value){return value.instance_id+(value.place_id?':'+value.place_id:value.slot?':'+String(value.slot).padStart(2,'0'):'');}
       const handoff=root.querySelector('[data-batch-handoff]');
-      handoff.textContent=tr("Ledger only")+(pending?' '+tr("Unresolved handoff")+' · '+pending.sample_id+' · '+location(pending.source)+' → '+location(pending.destination)+' · '+tr(pending.robot_confirmation?"Robot confirmed":"Robot unconfirmed")+(pending.station_confirmation===null?'':' · '+tr(pending.station_confirmation?"Station confirmed":"Station unconfirmed")):'');
-      root.querySelector('[data-batch-stage]').textContent=`${tr("Schritt")} ${index+1}/${batch.trace.length}: ${record.contract?tr("CF01-Befehl"):record.stage.includes('gripper')||record.stage==='robot_clear'?tr("Abstrakte Übergabe"):tr("Ablaufzustand")} · ${tr(record.stage)}${record.sample_id?' · '+record.sample_id:''} · ${tr("Testzeit (Spin/Bremse)")} ${record.time_s.toFixed(1)} s`;
+      handoff.textContent=tr("Ledger only")+(pending?' '+tr(record.ownership==='pending'?"Pending handoff":"Unresolved handoff")+' · '+pending.sample_id+' · '+location(pending.source)+' → '+location(pending.destination)+' · '+tr(pending.robot_confirmation?"Robot confirmed":"Robot unconfirmed")+(pending.station_confirmation===null?'':' · '+tr(pending.station_confirmation?"Station confirmed":"Station unconfirmed")):'');
+      root.querySelector('[data-batch-stage]').textContent=`${tr("Schritt")} ${index+1}/${batch.trace.length}: ${record.contract?tr("CF01-Befehl"):record.stage.includes('gripper')||record.stage==='robot_clear'?tr("Abstrakte Übergabe"):tr("Ablaufzustand")} · ${tr(record.stage)}${record.command_state?' · '+tr('command_'+record.command_state):''}${record.sample_id?' · '+record.sample_id:''} · ${tr("Testzeit (Spin/Bremse)")} ${record.time_s.toFixed(1)} s`;
       for(const [key,selector] of [['rack','[data-batch-rack]'],['rotor','[data-batch-rotor]']]){
         const grid=root.querySelector(selector);grid.replaceChildren();
         record.inventory[key].forEach((id,i)=>{const cell=document.createElement('div');cell.className='cf01-batch-slot'+(id?' filled':'');cell.textContent=String(i+1).padStart(2,'0')+': '+(id||tr("leer"));grid.appendChild(cell)})

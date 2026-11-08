@@ -110,12 +110,19 @@
   ],
   "initial_state": {
     "rotor": "empty",
-    "rack": "samples",
-    "mass_source": "fictitious_profile",
-    "handoff_time_s": 0
+    "rack": "samples"
   },
   "handoff_policy": {
     "completion": "robot_and_required_station_confirmation",
-    "on_partial_confirmation": "unresolved"
+    "on_partial_confirmation": "unresolved",
+    "during_handoff": "pending"
+  },
+  "mock_assumptions": {
+    "mass_source": "fictitious_profile",
+    "handoff_time_s": 0
+  },
+  "command_execution": {
+    "poll_interval_s": 0.25,
+    "completion_timeout_s": 10.0
   }
 }

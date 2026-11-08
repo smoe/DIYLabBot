@@ -165,7 +165,8 @@ Bei falscher Probenidentität, fehlender Bestätigung, Eigentümer-Timeout oder
 unwuchtiger Testbeladung endet der Lauf ohne Erfolg. Bei einer unvollständigen
 Übergabe bleiben die letzte vollständig bestätigte Buchführung und die
 synthetische Ortsbeobachtung getrennt erhalten. `pending_handoff` nennt Probe,
-Quelle, Ziel und eingegangene Quittungen; `ownership: unresolved` verhindert
+Quelle, Ziel und eingegangene Quittungen. Während der Bearbeitung heißt die
+Zuordnung `pending`; erst nach einem Fehler `unresolved`. Dies verhindert
 eine behauptete eindeutige Zuordnung. Ein Greifereintrag in dieser Buchführung
 ist bei ungeklärter Übergabe keine gesicherte Aussage über den physischen Ort. Der Erfolg
 verlangt den abgeschlossenen Schleuderlauf, bestätigten Stillstand, einen leeren

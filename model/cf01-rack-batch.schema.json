@@ -17,7 +17,9 @@
     "simulation_qualification",
     "limitations",
     "initial_state",
-    "handoff_policy"
+    "handoff_policy",
+    "mock_assumptions",
+    "command_execution"
   ],
   "additionalProperties": false,
   "properties": {
@@ -154,15 +156,38 @@
     "initial_state": {
       "const": {
         "rotor": "empty",
-        "rack": "samples",
-        "mass_source": "fictitious_profile",
-        "handoff_time_s": 0
+        "rack": "samples"
       }
     },
     "handoff_policy": {
       "const": {
         "completion": "robot_and_required_station_confirmation",
-        "on_partial_confirmation": "unresolved"
+        "on_partial_confirmation": "unresolved",
+        "during_handoff": "pending"
+      }
+    },
+    "mock_assumptions": {
+      "const": {
+        "mass_source": "fictitious_profile",
+        "handoff_time_s": 0
+      }
+    },
+    "command_execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "poll_interval_s",
+        "completion_timeout_s"
+      ],
+      "properties": {
+        "poll_interval_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "completion_timeout_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
       }
     }
   }

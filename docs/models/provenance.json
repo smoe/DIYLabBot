@@ -1916,7 +1916,7 @@
       "id": "rack-batch",
       "image": "images/rack-batch.svg",
       "source_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "532bbf60298a7df815d229ff5041b0057f77c337cc00b4fbe4bb0e57b7348703"
+        "model/cf01-rack-batch.protocol.json": "e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0"
       },
       "representation": "Source-derived local mock protocol diagram",
       "batch_passed": true,
@@ -1926,7 +1926,7 @@
       "image_sha256": "dbfd322ce4bc3b477235dae9844ec5c8e5114edd86eebb474614093b40c80723",
       "bytes": 5158,
       "dependency_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "532bbf60298a7df815d229ff5041b0057f77c337cc00b4fbe4bb0e57b7348703",
+        "model/cf01-rack-batch.protocol.json": "e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0",
         "model/synthetic-cf01-workspace.shared.json": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
@@ -1956,11 +1956,6 @@
         "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
         "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
-      },
-      "line_ending_equivalence": {
-        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
-        "migration_report": "docs/line-ending-migration.json",
-        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     }
   ],
@@ -1992,6 +1987,12 @@
       "reviewed_image": "rack-batch",
       "image_byte_identical": true,
       "method": "Regenerated successful local batch diagram; previous visual review applies to identical bytes. No geometry views changed."
+    },
+    "command_completion_update": {
+      "image": "rack-batch",
+      "image_byte_identical": true,
+      "scope": "Successful mock command-completion flow re-executed; historical native views retain their LF-equivalence annotations",
+      "generator_sha256": "ada703d69c5b91c44d644f198baf6a1220094ad755f2580222ea8f7bef8e2069"
     }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

@@ -26,6 +26,7 @@ const { chromium } = require(process.argv[3] || 'playwright');
     await page.goto('file://' + target);
     await page.waitForSelector('[data-current-time]');
     assert.equal(await page.locator('html').getAttribute('lang'), 'de');
+    assert(!mesh.rack_batch.trace.some(record => record.ownership === 'unresolved'), 'Successful trace contains unresolved ownership');
     assert.match(await page.locator('[data-play]').textContent(), /Bewegung/);
     const ownership = [];
     for (const [time, owner] of [[0, 'station'], [15, 'station'], [30, 'gripper'], [45, 'gripper'], [60, 'rack']]) {
@@ -34,6 +35,13 @@ const { chromium } = require(process.argv[3] || 'playwright');
       ownership.push(owner);
     }
     await page.locator('[data-batch-panel]').evaluate(el => {el.open = true;});
+    const pendingIndex = mesh.rack_batch.trace.findIndex(record => record.ownership === 'pending');
+    assert(pendingIndex >= 0);
+    await page.locator('[data-batch-slider]').fill(String(pendingIndex));
+    assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-batch-ownership'), 'pending');
+    assert.match(await page.locator('[data-batch-handoff]').textContent(), /Übergabe läuft/);
+    assert(!/Zuordnung ungeklärt/.test(await page.locator('[data-batch-handoff]').textContent()));
+
     await page.locator('[data-batch-slider]').fill(String(mesh.rack_batch.trace.length - 1));
     assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-batch-order-restored'), 'true');
     assert.match(await page.locator('[data-batch-gripper]').textContent(), /wiederhergestellt: ja/);

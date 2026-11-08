@@ -95,6 +95,7 @@ class OrderedBatchTests(unittest.TestCase):
         self.assertEqual(report['trace'][-1]['stage'],'failed')
         for key,value in expected.items():self.assertEqual(report['trace'][-1][key],value)
         self.assertTrue(report['stop_attempted']);self.assertTrue(report['stop_via_contract'])
+        self.assertEqual(next(e for e in report['trace'] if e['stage']=='stop')['command_state'],'submitted')
 
     def assertConserved(self,report):
         expected=sorted(report['initial_order'])
@@ -111,10 +112,13 @@ class OrderedBatchTests(unittest.TestCase):
                 self.assertEqual(report['inventory'],report['world_inventory'])
                 self.assertTrue(report['inventory_consistent']);self.assertEqual(report['ownership'],'confirmed')
                 self.assertIsNone(report['pending_handoff']);self.assertIsNone(report['failure'])
+                self.assertNotIn('unresolved',[event['ownership'] for event in report['trace']])
+                self.assertIn('pending',[event['ownership'] for event in report['trace']])
                 self.assertFalse(report['stop_attempted']);self.assertFalse(report['stop_via_contract'])
                 self.assertTrue(report['station_inventory_check'].startswith('mock_internal'))
                 stages=[r['stage'] for r in report['trace']]
                 self.assertEqual(stages.count('gripper_to_rotor'),12);self.assertEqual(stages.count('gripper_to_original_rack_slot'),12)
+                self.assertLess(stages.index('start'),stages.index('centrifuging'));self.assertLess(stages.index('centrifuging'),stages.index('braking'))
                 self.assertLess(stages.index('braking'),stages.index('spin_complete'));self.assertLess(stages.index('spin_complete'),stages.index('rotor_to_gripper'))
                 self.assertFalse(report['network_executed']);self.assertFalse(report['hardware_executed']);self.assertFalse(report['transporter_executed'])
 
@@ -130,7 +134,7 @@ class OrderedBatchTests(unittest.TestCase):
         self.assertEqual(report['rack_instance'],'Rack')
         self.assertEqual([(s['rack_instance'],s['place_id']) for s in report['sample_mapping']],[('Rack','Slot%02d'%i) for i in range(1,13)])
         self.assertEqual([(r['rack_instance'],r['place_id']) for r in returned],[('Rack','Slot%02d'%i) for i in range(1,13)])
-        self.assertEqual(report['rack_places'][-1],{'id':'CF01.OutputRack.Slot12','slot':12,'row':2,'column':3})
+        self.assertEqual(report['rack_places'][-1],{'id':'CF01.OutputRack.Slot12','place_id':'Slot12','slot':12,'row':2,'column':3})
 
     def test_missing_confirmation_or_wrong_identity_halts_without_false_success(self):
         for event,changes in [('rack_ready',{'rack_present':False}),('pick_rack',{'grasp_confirmed':False}),('seat_rotor',{'released_confirmed':False}),('place_rack',{'sample_id':'WrongSample'})]:
@@ -225,7 +229,7 @@ class OrderedBatchTests(unittest.TestCase):
                     else:runner.sim.brake_engage_confirmed=False
                 advance(seconds)
             runner.advance=fail_advance
-            message='Expected explicit braking phase, got stopping' if defect=='encoder' else 'Centrifuge completion not confirmed'
+            message='Command did not complete: start'
             with self.subTest(defect=defect),self.assertRaisesRegex(BatchError,message) as failure:runner.run()
             self.assertFailure(failure.exception,'poll',None,station_fault={'stop':None,'encoder':'RotationSensorFault','brake':'ParkingBrakeFault'}[defect])
             report=failure.exception.report;self.assertFalse(report['spin_completed']);self.assertFalse(report['order_restored'])
@@ -302,6 +306,99 @@ class OrderedBatchTests(unittest.TestCase):
             self.assertTrue(report['stop_attempted']);self.assertFalse(report['stop_via_contract'])
             self.assertEqual(report['stop_error'],'Stop channel disconnected' if isinstance(response,Exception) else 'Stop acknowledgement missing')
             self.assertEqual(report['trace'][-1]['stage'],'failed')
+
+    def test_every_observable_handling_command_requires_a_confirmed_job(self):
+        for transport in ['ros2','sila2']:
+            for name in ['index','open_lid','close_lid','present_tube','retract_lift']:
+                for response in [None,{}, {'phase':None}, {'phase':'running'}]:
+                    runner=Runner(transport=transport);dispatch=runner.bridge.dispatch;observations=[]
+                    wire_name=name if transport=='ros2' else runner.bridge.commands[name]['name']
+                    def feedback(event,sample):
+                        observations.append(event);return synthetic_feedback(event,sample)
+                    runner.feedback=feedback
+                    def invalid(encoding,command,fields):
+                        if command==wire_name:return response
+                        return dispatch(encoding,command,fields)
+                    runner.bridge.dispatch=invalid
+                    with self.subTest(transport=transport,name=name,response=response),self.assertRaisesRegex(BatchError,'Invalid observable response during '+name) as failure:runner.run()
+                    self.assertFailure(failure.exception,name,'Sample01')
+                    if name in ('index','open_lid'):self.assertNotIn('seat_rotor',observations)
+                    self.assertConserved(failure.exception.report)
+
+    def test_nonobservable_reservation_heartbeat_and_release_require_positive_success(self):
+        for name in ['acquire','heartbeat','release']:
+            for response in [None,{}, {'success':False}, {'success':1}, {'phase':'running'}]:
+                runner=Runner();dispatch=runner.bridge.dispatch
+                def invalid(transport,command,fields):
+                    if command==name:return response
+                    return dispatch(transport,command,fields)
+                runner.bridge.dispatch=invalid
+                with self.subTest(name=name,response=response),self.assertRaisesRegex(BatchError,'Command acknowledgement missing or rejected during '+name) as failure:runner.run()
+                self.assertFailure(failure.exception,name,None)
+                self.assertConserved(failure.exception.report)
+
+    def test_async_handling_waits_with_heartbeats_then_completes(self):
+        runner=Runner();dispatch=runner.bridge.dispatch;poll=runner.bridge.poll;pending_job=None;polls=0
+        def delayed(transport,name,fields):
+            nonlocal pending_job
+            result=dispatch(transport,name,fields)
+            if name=='open_lid' and pending_job is None:pending_job=result['id'];return {**result,'phase':'running'}
+            return result
+        def delayed_poll(job):
+            nonlocal polls
+            if job==pending_job:
+                polls+=1
+                if polls==1:return {'id':job,'phase':'running'}
+            return poll(job)
+        runner.bridge.dispatch=delayed;runner.bridge.poll=delayed_poll
+        report=runner.run();self.assertTrue(report['passed']);self.assertGreaterEqual(polls,2)
+        first_pick=next(e for e in report['trace'] if e['stage']=='rack_to_gripper')
+        self.assertGreater(first_pick['time_s'],0)
+        self.assertTrue(any(e['stage']=='heartbeat' and e['sequence']<first_pick['sequence'] for e in report['trace']))
+        self.assertNotIn('unresolved',[e['ownership'] for e in report['trace']])
+
+    def test_never_completing_job_has_a_deadline_and_does_not_enter_the_station(self):
+        runner=Runner();dispatch=runner.bridge.dispatch;poll=runner.bridge.poll;pending_job=None
+        def delayed(transport,name,fields):
+            nonlocal pending_job
+            result=dispatch(transport,name,fields)
+            if name=='open_lid':pending_job=result['id'];return {**result,'phase':'running'}
+            return result
+        def forever(job):return {'id':job,'phase':'running'} if job==pending_job else poll(job)
+        runner.bridge.dispatch=delayed;runner.bridge.poll=forever
+        with self.assertRaisesRegex(BatchError,'Command completion deadline exceeded during open_lid') as failure:runner.run()
+        self.assertFailure(failure.exception,'open_lid','Sample01','TimeoutError')
+        report=failure.exception.report
+        self.assertNotIn('rack_to_gripper',[e['stage'] for e in report['trace']])
+        self.assertAlmostEqual(runner.now,runner.data['command_execution']['completion_timeout_s'])
+        self.assertGreater(sum(e['stage']=='heartbeat' for e in report['trace']),1)
+
+    def test_poll_cannot_complete_a_different_job(self):
+        runner=Runner();dispatch=runner.bridge.dispatch;poll=runner.bridge.poll;pending_job=None
+        def delayed(transport,name,fields):
+            nonlocal pending_job
+            result=dispatch(transport,name,fields)
+            if name=='open_lid':pending_job=result['id'];return {**result,'phase':'running'}
+            return result
+        runner.bridge.dispatch=delayed
+        runner.bridge.poll=lambda job:{'id':'another-job','phase':'succeeded'} if job==pending_job else poll(job)
+        with self.assertRaisesRegex(BatchError,'Invalid observable response during open_lid') as failure:runner.run()
+        self.assertFailure(failure.exception,'poll','Sample01')
+        self.assertNotIn('rack_to_gripper',[e['stage'] for e in failure.exception.report['trace']])
+
+    def test_rack_locations_use_local_ids_without_parsing_them(self):
+        import rack_slots
+        places=rack_slots.places
+        def renamed(rack):return [{**p,'place_id':'Cell-'+str(p['slot'])} for p in places(rack)]
+        with patch.object(rack_slots,'places',side_effect=renamed):
+            report=Runner().run()
+        self.assertTrue(report['passed']);self.assertEqual(report['sample_mapping'][0]['place_id'],'Cell-1')
+        self.assertEqual(report['sample_mapping'][0]['rack_place_id'],'CF01.OutputRack.Slot01')
+
+    def test_command_timing_is_explicit_and_validated(self):
+        for field,value in [('poll_interval_s',0),('completion_timeout_s',float('nan')),('poll_interval_s',20)]:
+            data=load();data['command_execution'][field]=value
+            with self.subTest(field=field,value=value),self.assertRaisesRegex(ValueError,'command timing|Polling interval'):validate(data)
 
     def test_handoff_policy_rejects_fabricated_completion(self):
         data=load();data['handoff_policy']['on_partial_confirmation']='assume_complete'
