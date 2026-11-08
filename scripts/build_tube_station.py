@@ -1,6 +1,7 @@
 """Build both native station models and compare analytic and STEP geometry."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -15,9 +16,8 @@ def write(path,data): Path(path).write_text(json.dumps(data,indent=2)+'\n',encod
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    args=parser.parse_args(); started=time.monotonic(); spec=model.load()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); started=time.monotonic(); spec=model.load()
     revision='tube-station-c01-'+model.digest(model.SOURCE)[:12]; name=revision; n=1
     while (model.ROOT/'cad/generated'/name).exists(): n+=1; name=revision+'-r'+str(n)
     cad=model.ROOT/'cad/generated'/name; exports=model.ROOT/'exports/generated'/name

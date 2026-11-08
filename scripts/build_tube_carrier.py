@@ -1,6 +1,7 @@
 """Generate native H01 models, compare kernels, and validate sampled handoff poses."""
 from pathlib import Path
 import argparse
+import tool_paths
 import ast
 import json
 import math
@@ -52,9 +53,8 @@ def analytic_checks(actual, spec, p):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--freecad-python', default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli', default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    args = parser.parse_args(); spec = model.load(); started = time.monotonic()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); spec = model.load(); started = time.monotonic()
     family = spec.get('family', 'tube-carrier-h01')
     stem = family+'-' + model.digest(model.SOURCE)[:12]; revision = stem; counter = 1
     while (model.ROOT/'cad/generated'/revision).exists():

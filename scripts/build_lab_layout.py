@@ -1,6 +1,7 @@
 """Reproducible scene build: native source snapshots, SolidCraft composition, QA."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import shutil
 import subprocess
@@ -76,8 +77,8 @@ def finish(context,args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--prepare-only',action='store_true');parser.add_argument('--finish',type=Path)
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'));args=parser.parse_args()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args, required={'freecad_python'} if args.prepare_only else True)
     context=json.loads(args.finish.read_text(encoding='utf-8')) if args.finish else prepare(args)
     if not args.prepare_only:finish(context,args)
 

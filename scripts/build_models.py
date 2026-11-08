@@ -6,6 +6,7 @@ separate headless process and never replaces a design open in the desktop app.
 """
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -20,10 +21,9 @@ import robot_cameras
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--freecad-python",default=str(Path.home()/"AppData/Local/Programs/FreeCAD 27.1/bin/python.exe"))
-    parser.add_argument("--solidcraft-cli",default=shutil.which("solidcraft-cli") or "solidcraft-cli")
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
     parser.add_argument("--ros2",action="store_true",help="Also generate ROS 2 meshes, description and protocol configuration")
-    args=parser.parse_args()
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args)
     started=time.monotonic(); spec=model.load(); digest=model.digest(model.SPEC)
     revision=digest[:12]; counter=1
     while (model.ROOT/"cad/generated"/revision).exists():

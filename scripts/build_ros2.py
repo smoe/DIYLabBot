@@ -1,6 +1,7 @@
 """Generate ROS 2 assets from the same neutral model and current CAD build."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import subprocess
@@ -123,8 +124,8 @@ def generate(spec,geometry,velocity=0.5,effort=1.0):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--freecad-python",default=str(Path.home()/"AppData/Local/Programs/FreeCAD 27.1/bin/python.exe"))
-    args=parser.parse_args(); spec=model.load()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=False)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); spec=model.load()
     build=json.loads((model.ROOT/"exports/generated/build-report.json").read_text(encoding="utf-8"))
     if build["spec_sha256"]!=model.digest(model.SPEC) or not build["passed"]: raise ValueError("Run scripts/build_models.py first")
     for folder in ["config","urdf","meshes"]: (PACKAGE/folder).mkdir(parents=True,exist_ok=True)

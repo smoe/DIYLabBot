@@ -1,6 +1,7 @@
 """Render H01's checked native SolidCraft model and record exact model provenance."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -11,8 +12,8 @@ import tube_carrier_model as model
 
 def main(plan_provider=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--solidcraft-cli', default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    args = parser.parse_args(); spec = model.load(); directory = model.ROOT/'cad'/spec.get('family', 'tube-carrier-h01')
+    tool_paths.add_tool_arguments(parser, freecad=False, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); spec = model.load(); directory = model.ROOT/'cad'/spec.get('family', 'tube-carrier-h01')
     report_path = directory/'shared-build-report.json'
     report = json.loads(report_path.read_text(encoding='utf-8'))
     if not report['passed'] or report['source_sha256'] != model.digest(model.SOURCE):

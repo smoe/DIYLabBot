@@ -1,6 +1,7 @@
 """Reproduce TR01 variants in both native CADs, or finish a SolidCraft MCP build."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import shutil
 import subprocess
@@ -94,10 +95,9 @@ def finish(context,args):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
     parser.add_argument('--prepare-only',action='store_true'); parser.add_argument('--finish',type=Path)
-    args=parser.parse_args()
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args)
     if args.finish: context=json.loads(args.finish.read_text(encoding='utf-8'))
     else: context,_=prepare()
     if not args.prepare_only: finish(context,args)

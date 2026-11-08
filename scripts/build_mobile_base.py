@@ -1,6 +1,7 @@
 """Build MB01 working/parking assemblies from one source and the referenced arm."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -103,11 +104,10 @@ def mobile_urdf(spec,arm,p,name,destination):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
     parser.add_argument('--ros2',action='store_true')
     parser.add_argument('--reuse-freecad-report',help='Reuse passed native files with identical source snapshots in a fresh revision')
-    args=parser.parse_args(); started=time.monotonic(); spec=model.load(); arm=robot.load(model.ROOT/spec['arm_source']); p=model.parameters(spec)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); started=time.monotonic(); spec=model.load(); arm=robot.load(model.ROOT/spec['arm_source']); p=model.parameters(spec)
     source_hash=model.digest(model.SOURCE); arm_hash=model.digest(model.ROOT/spec['arm_source'])
     import hashlib
     signature=hashlib.sha256((source_hash+arm_hash).encode()).hexdigest()

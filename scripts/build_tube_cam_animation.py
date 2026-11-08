@@ -1,5 +1,6 @@
 """Build an interactive H03 animation from a pinned cycle and checked native CAD."""
 import argparse
+import tool_paths
 import json
 from pathlib import Path
 import subprocess
@@ -10,8 +11,8 @@ import tube_cam_cycle as cycle
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--prepare-only',action='store_true')
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    args=parser.parse_args();spec=model.load();p=model.parameters(spec);data=cycle.load()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=False)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args);spec=model.load();p=model.parameters(spec);data=cycle.load()
     report_path=model.ROOT/'cad/tube-cam-h03/shared-build-report.json';build=json.loads(report_path.read_text())
     if not build['passed'] or build['source_sha256']!=model.digest(model.SOURCE):raise ValueError('Current checked H03 geometry required')
     case=build['cases'][0]

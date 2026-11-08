@@ -86,7 +86,8 @@ und anschließend neu abgeleitet werden.
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/build_models.py --ros2 --freecad-python /pfad/zum/FreeCAD-Python --solidcraft-cli /pfad/zu/solidcraft-cli
+python3 scripts/tool_paths.py          # zeigt die gefundenen CAD-Laufzeiten
+python3 scripts/build_models.py --ros2
 ```
 
 Die beiden CF01-SolidCraft-Prüfstellungen lassen sich unabhängig von FreeCAD
@@ -101,10 +102,17 @@ umgeht den dokumentierten STEP-Importfehler. Die historische Medien-Provenienz
 bleibt als damaliger Prüfstand erhalten.
 
 Python, FreeCAD mit importierbarem `FreeCAD`/`Part` und SolidCraft CLI müssen lokal
-vorhanden sein. Der gemeinsame Arm-Einstieg akzeptiert die Laufzeitpfade explizit;
-sein Standardpfad für FreeCAD stammt noch aus der Windows-Umgebung. Die komplette
-CAD-Kette wurde nach dem Mac-Checkout noch nicht neu ausgeführt. Weitere
-Stations-/Animationsgeneratoren enthalten ebenfalls noch Windows-Pfade.
+vorhanden sein. Alle Generatoren finden die Laufzeiten über
+[`scripts/tool_paths.py`](scripts/tool_paths.py), in dieser Reihenfolge:
+`--freecad-python`/`--solidcraft-cli`, dann die Umgebungsvariablen
+`SOLIDCRAFTBOT_FREECAD_PYTHON`/`SOLIDCRAFTBOT_SOLIDCRAFT_CLI`, dann
+`solidcraft-cli` im `PATH`, zuletzt die üblichen Installationsorte unter macOS
+(`/Applications/FreeCAD.app`, `/Applications/SolidCraft.app`) und Windows
+(neueste `FreeCAD */bin/python.exe` unter `%LOCALAPPDATA%\Programs` bzw.
+`%ProgramFiles%`). Unter Linux ist für FreeCAD die Umgebungsvariable oder die
+Option nötig. Fehlt eine Laufzeit, bricht der Aufruf vor dem Build mit einem
+Hinweis ab. Die komplette CAD-Kette wurde nach dem Mac-Checkout noch nicht neu
+ausgeführt.
 
 Auf einem frischen Checkout laufen die Quell- und Kinematiktests ohne CAD.
 Tests gespeicherter CAD-/ROS-Ausgaben melden **skipped**, bis die betreffenden

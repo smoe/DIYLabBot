@@ -1,5 +1,6 @@
 """Reproducible CF01 shared-source build, dual-CAD comparisons and renderings."""
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -34,10 +35,9 @@ def compare(actual,expected,step_geometry):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
     parser.add_argument('--finish-existing',action='store_true',help='Finish renders/reports for the last fully checked build, verifying its source, commands and artifact hashes')
-    args=parser.parse_args(); started=time.monotonic(); spec=model.load()
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); started=time.monotonic(); spec=model.load()
     context=json.loads((model.ROOT/'tmp/cf01-context.json').read_text(encoding='utf-8')) if args.finish_existing else model.prepare()
     if context['source_sha256']!=model.digest(model.SOURCE): raise ValueError('Build source changed; regenerate both CADs')
     cad,out=Path(context['cad']),Path(context['out']); reports=[]

@@ -1,6 +1,7 @@
 """Rebuild T01 from one source in SolidCraft and FreeCAD, then compare both."""
 from pathlib import Path
 import argparse
+import tool_paths
 import json
 import math
 import shutil
@@ -27,9 +28,8 @@ def compare(actual,expected,source_name):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli')
-    args=parser.parse_args(); spec=model.load(); started=time.monotonic()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args); spec=model.load(); started=time.monotonic()
     stem='tip-collector-t01-'+model.digest(model.SOURCE)[:12]; revision=stem; counter=1
     while (model.ROOT/'cad/generated'/revision).exists():
         counter+=1; revision=stem+'-r'+str(counter)

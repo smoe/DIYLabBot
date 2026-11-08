@@ -1,6 +1,7 @@
 """Build the common L01 roundtrip in native FreeCAD and SolidCraft."""
 from pathlib import Path
 import argparse
+import tool_paths
 import hashlib
 import json
 import shutil
@@ -162,8 +163,8 @@ def check_motion(native,timeline,s,ls):
 def main():
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--prepare-only',action='store_true');parser.add_argument('--finish',type=Path)
     parser.add_argument('--reuse-geometry',type=Path,help='Reuse unchanged checked source geometry for a new trajectory audit')
-    parser.add_argument('--freecad-python',default=str(Path.home()/'AppData/Local/Programs/FreeCAD 27.1/bin/python.exe'))
-    parser.add_argument('--solidcraft-cli',default=shutil.which('solidcraft-cli') or 'solidcraft-cli');args=parser.parse_args()
+    tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
+    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args, required={'freecad_python'} if args.prepare_only else True)
     ctx=json.loads(args.finish.read_text()) if args.finish else prepare(args)
     if not args.prepare_only:finish(ctx,args)
 

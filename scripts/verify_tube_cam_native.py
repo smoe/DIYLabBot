@@ -4,6 +4,7 @@ import argparse
 import json
 import shutil
 import subprocess
+import tool_paths
 import tube_cam_model as model
 
 
@@ -29,7 +30,7 @@ def main():
             commands += [{'command':'joint.solve','params':{}},{'command':'joint.list','params':{}}]
         script=folder/(case['id']+'-native-probes.commands.json');raw=folder/(case['id']+'-native-probes.raw.json')
         script.write_text(json.dumps({'commands':commands},indent=2)+'\n',encoding='utf-8')
-        subprocess.run([shutil.which('solidcraft-cli'),'run',str(script),'--in',str(model.ROOT/case['files']['solidcraft']),
+        subprocess.run([tool_paths.solidcraft_cli(),'run',str(script),'--in',str(model.ROOT/case['files']['solidcraft']),
                         '--results','--json-out',str(raw),'--quiet'],check=True,cwd=model.ROOT)
         snapshots=[r for r in json.loads(raw.read_text(encoding='utf-8')) if isinstance(r,dict) and 'joints' in r and 'links' in r]
         if len(snapshots)!=len(refs):raise AssertionError('Native joint snapshot count')

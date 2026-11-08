@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import shutil
 import subprocess
+import tool_paths
 import centrifuge_model as model
 import centrifuge_protocol as protocol
 
@@ -48,7 +49,7 @@ def main():
     context=prepare(); print(json.dumps(context),flush=True)
     if args.prepare_only:return
     out=Path(context['out']); cad=Path(context['cad'])
-    subprocess.run([shutil.which('solidcraft-cli') or 'solidcraft-cli','run',str(out/'animation.commands.json'),
+    subprocess.run([tool_paths.solidcraft_cli(),'run',str(out/'animation.commands.json'),
         '--in',context['baseline_solidcraft'],'--save',str(cad/'Centrifuge_CF01_Animated.sc'),'--quiet'],cwd=model.ROOT,check=True)
     print('Native CF01 animation exported',flush=True)
 
