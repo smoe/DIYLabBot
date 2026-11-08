@@ -1,0 +1,1000 @@
+{
+  "format": "solidcraftbot.nanodrop-manual-report/1",
+  "run_id": "SYN-ND-REGRESSION",
+  "attempt_id": "SYN-ND-REGRESSION.A01",
+  "mode": "synthetic_only",
+  "passed": true,
+  "status": "completed",
+  "order_restored": true,
+  "recovery_required": null,
+  "samples": {
+    "Sample01": {
+      "id": "Sample01",
+      "initial_volume_ul": 40,
+      "location": {
+        "kind": "rack",
+        "place_id": "CF01.OutputRack.Slot01",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "mass_confirmation_valid": false,
+      "original_place_id": "CF01.OutputRack.Slot01",
+      "rack_slot": 1,
+      "remaining_volume_ul": 38.5,
+      "return_confirmation": {
+        "actor_id": "SYN.Operator01",
+        "evidence": "synthetic_input",
+        "place_id": "CF01.OutputRack.Slot01",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "vessel_id": "Tube01",
+      "volume_uncertain": false
+    },
+    "Sample02": {
+      "id": "Sample02",
+      "initial_volume_ul": 40,
+      "location": {
+        "kind": "rack",
+        "place_id": "CF01.OutputRack.Slot02",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "mass_confirmation_valid": false,
+      "original_place_id": "CF01.OutputRack.Slot02",
+      "rack_slot": 2,
+      "remaining_volume_ul": 38.5,
+      "return_confirmation": {
+        "actor_id": "SYN.Operator01",
+        "evidence": "synthetic_input",
+        "place_id": "CF01.OutputRack.Slot02",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "vessel_id": "Tube02",
+      "volume_uncertain": false
+    },
+    "Sample03": {
+      "id": "Sample03",
+      "initial_volume_ul": null,
+      "location": {
+        "kind": "rack",
+        "place_id": "CF01.OutputRack.Slot03",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "mass_confirmation_valid": false,
+      "original_place_id": "CF01.OutputRack.Slot03",
+      "rack_slot": 3,
+      "remaining_volume_ul": null,
+      "return_confirmation": {
+        "actor_id": "SYN.Operator01",
+        "evidence": "synthetic_input",
+        "place_id": "CF01.OutputRack.Slot03",
+        "rack_id": "SYN.NanoDropRack01"
+      },
+      "vessel_id": "Tube03",
+      "volume_uncertain": false
+    }
+  },
+  "measurements": {
+    "SYN-ND-REGRESSION.A01.M001": {
+      "actor_id": "SYN.Operator01",
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M001.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "deviation_reason": null,
+      "disposition": "discarded_after_synthetic_cleanup",
+      "evidence": "synthetic_input",
+      "measurement_id": "SYN-ND-REGRESSION.A01.M001",
+      "parent_sample_id": "Sample01",
+      "sample_id": "Sample01",
+      "sop": {
+        "id": "SYN.NanoDrop.Microvolume",
+        "instructions": [
+          "Confirm the synthetic rack manifest and clear work area; claim the task.",
+          "Confirm a synthetic blank reference and clean measurement surfaces.",
+          "Take one original vessel, record measurement intent, then confirm the simulated withdrawal, measurement and cleanup.",
+          "Return each original vessel to its original rack place; retain responsibility until final handback.",
+          "Import synthetic named results, resolve quarantined imports, review results and explicitly release the clear work area."
+        ],
+        "revision": "1",
+        "synthetic": true
+      },
+      "source_vessel_id": "Tube01",
+      "withdrawn_volume": {
+        "unit": "uL",
+        "value": 1.5
+      }
+    },
+    "SYN-ND-REGRESSION.A01.M002": {
+      "actor_id": "SYN.Operator01",
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M002.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "deviation_reason": null,
+      "disposition": "discarded_after_synthetic_cleanup",
+      "evidence": "synthetic_input",
+      "measurement_id": "SYN-ND-REGRESSION.A01.M002",
+      "parent_sample_id": "Sample02",
+      "sample_id": "Sample02",
+      "sop": {
+        "id": "SYN.NanoDrop.Microvolume",
+        "instructions": [
+          "Confirm the synthetic rack manifest and clear work area; claim the task.",
+          "Confirm a synthetic blank reference and clean measurement surfaces.",
+          "Take one original vessel, record measurement intent, then confirm the simulated withdrawal, measurement and cleanup.",
+          "Return each original vessel to its original rack place; retain responsibility until final handback.",
+          "Import synthetic named results, resolve quarantined imports, review results and explicitly release the clear work area."
+        ],
+        "revision": "1",
+        "synthetic": true
+      },
+      "source_vessel_id": "Tube02",
+      "withdrawn_volume": {
+        "unit": "uL",
+        "value": 1.5
+      }
+    },
+    "SYN-ND-REGRESSION.A01.M003": {
+      "actor_id": "SYN.Operator01",
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M003.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "deviation_reason": null,
+      "disposition": "discarded_after_synthetic_cleanup",
+      "evidence": "synthetic_input",
+      "measurement_id": "SYN-ND-REGRESSION.A01.M003",
+      "parent_sample_id": "Sample03",
+      "sample_id": "Sample03",
+      "sop": {
+        "id": "SYN.NanoDrop.Microvolume",
+        "instructions": [
+          "Confirm the synthetic rack manifest and clear work area; claim the task.",
+          "Confirm a synthetic blank reference and clean measurement surfaces.",
+          "Take one original vessel, record measurement intent, then confirm the simulated withdrawal, measurement and cleanup.",
+          "Return each original vessel to its original rack place; retain responsibility until final handback.",
+          "Import synthetic named results, resolve quarantined imports, review results and explicitly release the clear work area."
+        ],
+        "revision": "1",
+        "synthetic": true
+      },
+      "source_vessel_id": "Tube03",
+      "withdrawn_volume": {
+        "unit": "uL",
+        "value": 1.5
+      }
+    }
+  },
+  "results": {
+    "SYN-ND-REGRESSION.A01.M001": {
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M001.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "concentration_basis": "reported; no additional dilution or purity correction applied",
+      "instrument": {
+        "id": "SYN.NanoDrop01",
+        "serial_number": "SYN-ND-ONE-001",
+        "software_version": null,
+        "type": "nanodrop_one_wifi"
+      },
+      "instrument_messages": {
+        "Warnings": "SYNTHETIC TEST DATA"
+      },
+      "measurement_id": "SYN-ND-REGRESSION.A01.M001",
+      "metadata": {},
+      "method": "dsDNA",
+      "method_source": "report",
+      "metrics": {
+        "a230": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "a260": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": 0.43000000000000005
+        },
+        "a260_a230": {
+          "unit": "1",
+          "value": 2.0
+        },
+        "a260_a280": {
+          "unit": "1",
+          "value": 1.8
+        },
+        "a280": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "concentration": {
+          "unit": "ng/uL",
+          "value": 23.0
+        },
+        "factor": {
+          "unit": null,
+          "value": 50.0
+        }
+      },
+      "origin": "synthetic_export",
+      "raw_cells": {
+        "A260": "0.43000000000000005",
+        "A260/A230": "2.0",
+        "A260/A280": "1.8",
+        "Factor": "50",
+        "Sample Name": "SYN-ND-REGRESSION.A01.M001",
+        "Warnings": "SYNTHETIC TEST DATA",
+        "ng/µL": "23"
+      },
+      "sample_id": "Sample01",
+      "serial_source": "report",
+      "source_row": 6
+    },
+    "SYN-ND-REGRESSION.A01.M002": {
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M002.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "concentration_basis": "reported; no additional dilution or purity correction applied",
+      "instrument": {
+        "id": "SYN.NanoDrop01",
+        "serial_number": "SYN-ND-ONE-001",
+        "software_version": null,
+        "type": "nanodrop_one_wifi"
+      },
+      "instrument_messages": {
+        "Warnings": "SYNTHETIC TEST DATA"
+      },
+      "measurement_id": "SYN-ND-REGRESSION.A01.M002",
+      "metadata": {},
+      "method": "dsDNA",
+      "method_source": "report",
+      "metrics": {
+        "a230": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "a260": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": 0.42000000000000004
+        },
+        "a260_a230": {
+          "unit": "1",
+          "value": 2.0
+        },
+        "a260_a280": {
+          "unit": "1",
+          "value": 1.8
+        },
+        "a280": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "concentration": {
+          "unit": "ng/uL",
+          "value": 22.0
+        },
+        "factor": {
+          "unit": null,
+          "value": 50.0
+        }
+      },
+      "origin": "synthetic_export",
+      "raw_cells": {
+        "A260": "0.42000000000000004",
+        "A260/A230": "2.0",
+        "A260/A280": "1.8",
+        "Factor": "50",
+        "Sample Name": "SYN-ND-REGRESSION.A01.M002",
+        "Warnings": "SYNTHETIC TEST DATA",
+        "ng/µL": "22"
+      },
+      "sample_id": "Sample02",
+      "serial_source": "report",
+      "source_row": 5
+    },
+    "SYN-ND-REGRESSION.A01.M003": {
+      "aliquot_id": "SYN-ND-REGRESSION.A01.M003.Aliquot",
+      "blank_id": "SYN-ND-REGRESSION.A01.B001",
+      "concentration_basis": "reported; no additional dilution or purity correction applied",
+      "instrument": {
+        "id": "SYN.NanoDrop01",
+        "serial_number": "SYN-ND-ONE-001",
+        "software_version": null,
+        "type": "nanodrop_one_wifi"
+      },
+      "instrument_messages": {
+        "Warnings": "SYNTHETIC TEST DATA"
+      },
+      "measurement_id": "SYN-ND-REGRESSION.A01.M003",
+      "metadata": {},
+      "method": "dsDNA",
+      "method_source": "report",
+      "metrics": {
+        "a230": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "a260": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": 0.41000000000000003
+        },
+        "a260_a230": {
+          "unit": "1",
+          "value": 2.0
+        },
+        "a260_a280": {
+          "unit": "1",
+          "value": 1.8
+        },
+        "a280": {
+          "normalization": "as reported; pathlength not established",
+          "unit": "1",
+          "value": null
+        },
+        "concentration": {
+          "unit": "ng/uL",
+          "value": 21.0
+        },
+        "factor": {
+          "unit": null,
+          "value": 50.0
+        }
+      },
+      "origin": "synthetic_export",
+      "raw_cells": {
+        "A260": "0.41000000000000003",
+        "A260/A230": "2.0",
+        "A260/A280": "1.8",
+        "Factor": "50",
+        "Sample Name": "SYN-ND-REGRESSION.A01.M003",
+        "Warnings": "SYNTHETIC TEST DATA",
+        "ng/µL": "21"
+      },
+      "sample_id": "Sample03",
+      "serial_source": "report",
+      "source_row": 4
+    }
+  },
+  "result_review": {
+    "actor_id": "SYN.Operator01",
+    "decision": "accepted",
+    "evidence": "synthetic_input",
+    "reason": "Explicit synthetic demo decision; no real QC qualification"
+  },
+  "network_executed": false,
+  "hardware_executed": false,
+  "robot_motion_executed": false,
+  "safety_function_qualified": false,
+  "real_export_validated": false,
+  "cf01_continuation_executed": false,
+  "trace": [
+    {
+      "kind": "created",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "rack_ready",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "workspace_clear",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "claim",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "blank",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "take",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "begin_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": true
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "confirm_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "place",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "take",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "begin_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 40,
+          "volume_uncertain": true
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "confirm_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "place",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "take",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "begin_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": true
+        }
+      }
+    },
+    {
+      "kind": "confirm_measurement",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "actor_id": "SYN.Operator01",
+            "kind": "operator"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "place",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "import_results",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "review_results",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    },
+    {
+      "kind": "release",
+      "samples": {
+        "Sample01": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot01",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample02": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot02",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": 38.5,
+          "volume_uncertain": false
+        },
+        "Sample03": {
+          "location": {
+            "kind": "rack",
+            "place_id": "CF01.OutputRack.Slot03",
+            "rack_id": "SYN.NanoDropRack01"
+          },
+          "remaining_volume_ul": null,
+          "volume_uncertain": false
+        }
+      }
+    }
+  ]
+}

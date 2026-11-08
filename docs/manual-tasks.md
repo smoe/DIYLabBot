@@ -1,11 +1,12 @@
 # Manuelle Aufgaben und Messgeräte
 
-**Status: Zielmodell mit implementiertem synthetischem NanoDrop-Durchstich.**
+**Status: Zielmodell mit implementierten synthetischen NanoDrop- und Qubit-4-Durchstichen.**
 Die konkrete Ausführung, Quellen, Zustände und Prüfgrenzen stehen in
-[NanoDrop: synthetischer manueller Ablauf](nanodrop-manual-workflow.md).
+[NanoDrop](nanodrop-manual-workflow.md) und
+[Qubit 4](qubit-4-manual-workflow.md).
 Auf Eigentümerwunsch sind zunächst sämtliche Eingaben, SOPs und CSV-Dateien
 synthetisch. Die nachfolgende übergreifende Planung umfasst auch spätere Schritte;
-Qubit, Netzwerkadapter, echte Exportqualifikation und reale Mensch-Maschine-
+Netzwerkadapter, echte Exportqualifikation und reale Mensch-Maschine-
 Übergaben sind noch nicht implementiert beziehungsweise geprüft.
 
 ## Ziel
@@ -29,7 +30,7 @@ soll später ohne Änderung in L01 laufen.
 |---|---|---|
 | NanoDrop One mit WLAN | Mikrovolumen-Absorption UV/Vis | Dateibasierter CSV-Berichtsimport, bisher synthetisch geprüft |
 | NanoDrop UltraC, NDULTRACGL | Mikrovolumen-Absorption und Küvette | Lesende Web-API laut Handbuch; Verfügbarkeit am konkreten Softwarestand prüfen |
-| Qubit 4 | Assayabhängige Fluoreszenzmessung einzelner Messgefäße gegen Standards | CSV-Export laut Handbuch |
+| Qubit 4 | Assayabhängige Fluoreszenzmessung einzelner Messgefäße gegen Standards | Eigener synthetischer Dateiimport, keine native Exportqualifikation |
 
 Das Verkaufspaket aus NanoDrop One und Qubit 4 wird als zwei eigenständige
 Geräte geführt.
@@ -55,10 +56,12 @@ werden einmal implementiert und von allen Messprotokollen verwendet.
 
 ### Übergabe als Besitzwechsel
 
-Eine Übergabe an eine Person ist ein Besitzwechsel im vorhandenen Inventar.
+Eine Übergabe an eine Person ändert die Verantwortlichkeit. Der physische
+Gefäßort wird davon getrennt geführt, etwa weiterhin ein Platz im übernommenen Rack.
 [cf01_rack_batch.py](../scripts/cf01_rack_batch.py) führt bereits Inventar für
 Rack, Rotor und Greifer und prüft die Probenidentität bei jeder Übergabe. Eine
-Person wird dort ein weiterer Halter.
+Person kann im gemeinsamen manuellen Kern auch ein einzelnes Gefäß halten;
+der CF01-Runner wird dafür nicht um menschliche Verzweigungen erweitert.
 
 - **Vorbedingung:** Vor der Übernahme liegt ein gemeldeter Zustand „Arbeitsbereich
   für Menschen frei“ vor, analog zu `robot_clear` im
@@ -124,10 +127,12 @@ und ist aus den Herstellerangaben zu übernehmen. Ein unbekanntes entnommenes
 Volumen bleibt `null`.
 
 Ein gemeinsames Modell beschreibt Quellgefäß, entnommenes Volumen und optional
-ein abgeleitetes Gefäß mit eigener ID und Verweis auf das Ausgangsgefäß. Beim
-NanoDrop wird nur entnommen. Beim Qubit entsteht zusätzlich ein Messgefäß. Das
-Modell wird schon im NanoDrop-Durchstich angelegt, damit Qubit kein Sonderfall
-wird.
+ein abgeleitetes Gefäß mit eigener ID und Verweis auf das Ausgangsgefäß.
+Bei NanoDrop sind Entnahme und Aliquotkennung dokumentiert. Qubit ergänzt einen
+ausdrücklichen Transferdatensatz und ein identifiziertes Messgefäß; ein weiterer
+physischer Aliquotbehälter wird nicht erfunden. Beide benutzen dieselbe
+Verbrauchsfunktion. Anfangsmengen bleiben pro Lauf deklariert; ein
+laufübergreifendes Volumenbuch ist noch nicht vorhanden.
 
 **Folge für CF01:** Nach einer Entnahme ändert sich die Probenmasse. Folgt danach
 ein Schleuderlauf, braucht jede Probe eine frische Massebestätigung. Der Vertrag
@@ -233,13 +238,16 @@ Gefäß, nicht zuordenbare und doppelte Messung sowie Unterbrechung mit Neustart
 - One und UltraC verwenden dieselbe Mikrovolumen-Protokollquelle und einen
   bisher ausschließlich synthetisch geprüften dateibasierten Ergebnisadapter.
 
-**Noch nicht enthalten:** Qubit, Netzwerk-API und die Fortsetzung in CF01, weil
+**Weiterer Durchstich:** Der [synthetische Qubit-4-Ablauf](qubit-4-manual-workflow.md)
+ergänzt Ansatz- und Kalibrierungszuordnung auf demselben Kern.
+
+**Noch nicht enthalten:** Netzwerk-API und die Fortsetzung in CF01, weil
 diese zuerst eine neue Massebestätigung je Probe braucht.
 
 ## Offene Punkte
 
 - Qualifikation unveränderter echter Exporte und Geräte-Softwarestände für One und UltraC.
-- Konkreter Qubit-Assay und zugehöriges Kit.
+- Reales Qubit-Assay und zugehöriges Kit; bisher ausschließlich ein fiktives Assay.
 - Identifikation der Gefäße: Barcode, Kamera oder Bestätigung durch die Person.
 - Kennzeichnung der Person als Rolle oder Pseudonym; Authentifizierung ist nicht
   vorgesehen.

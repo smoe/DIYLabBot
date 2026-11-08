@@ -88,17 +88,25 @@ ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
 ## Manuelle Aufgaben und Laufzeitdaten
 
-Der erste NanoDrop-Ablauf ist vollständig synthetisch. Vor Änderungen
-[docs/nanodrop-manual-workflow.md](docs/nanodrop-manual-workflow.md) lesen.
+NanoDrop- und Qubit-4-Abläufe sind vollständig synthetisch. Vor Änderungen
+[docs/nanodrop-manual-workflow.md](docs/nanodrop-manual-workflow.md) beziehungsweise
+[docs/qubit-4-manual-workflow.md](docs/qubit-4-manual-workflow.md) lesen.
 One und UltraC verwenden denselben Mikrovolumen-Vertrag in
 `model/nanodrop-manual.protocol.json`; Gerätetypen und Fähigkeiten stehen im
 Katalog, Instanzen und Testparameter im referenzierenden Laufprofil.
 Geräteaufstellung, Arbeitsanweisung und Ausführungszustand getrennt halten.
 Eine Katalogfähigkeit oder synthetische Testdatei ist kein geprüfter Geräteadapter.
+`scripts/manual_workflow.py` führt die gemeinsame Ablaufhülle; `manual_tasks.py`
+speichert deren Ereignisse und Originalartefakte. Beide Runner verwenden denselben
+Standard-Store. Laufart und gespeicherte Laufzeitquellen bei Wiederaufnahme prüfen;
+keine fremden Zustände oder stillen Migrationen zulassen.
 
 - Verantwortliche Person, physischer Ort, Rackinstanz und Platz-ID getrennt
   führen. Gefäßidentität und ursprünglichen Rackplatz bei jeder Übergabe prüfen.
   Personenbestätigung, synthetische Eingabe und tatsächlichen Scan unterscheiden.
+  Gefäß-IDs auch über unterschiedliche Racks hinweg reservieren. Qubit-Ansatz-
+  und Standardgefäße bereits bei der Absicht identifizieren und bis zur bestätigten
+  Entsorgung im Inventar behalten. Ein Aliquottransfer ist kein zusätzliches Gefäß.
 - Entnahmeabsichten vor der Durchführung speichern. Verbrauch und Abstammung
   einschließlich NanoDrop-Aliquots dokumentieren; unbekannte Mengen nicht
   schätzen. Eine Entnahme macht frühere Massenbestätigungen ungültig.
@@ -112,8 +120,14 @@ Eine Katalogfähigkeit oder synthetische Testdatei ist kein geprüfter Gerätead
 - Der Einstieg ist `python3 scripts/run_nanodrop_manual.py demo`. Die Tests
   enthalten einen Prozessabbruch mit Neustart. Reale SOP, Exportdateien,
   Mensch-Maschine-Schutzfunktion, Hardware und Netzwerk sind nicht geprüft.
-  Qubit und Netzwerkadapter bleiben spätere Schritte. CF01-Fortsetzung benötigt
+  Qubit startet mit `python3 scripts/run_qubit_manual.py demo`; Netzwerkadapter
+  bleiben spätere Schritte. CF01-Fortsetzung benötigt
   aktuelle gemessene Gesamtgefäßmassen und die bestehenden Stationsbedingungen.
+- Qubit-Prozesszeit nur durch protokollierte synthetische Zeitereignisse vorrücken.
+  Ansatz, Kalibrierung, Assayrevision und Chargen eindeutig verbinden. Der
+  Kalibrierungsbezug stammt aus dem Workflow, nicht aus einem geprüften Export.
+  Berichtete Originalkonzentrationen nicht nochmals verdünnungskorrigieren;
+  Ableitungen mit Formel, Volumina und Einheitenfaktoren ausweisen.
 
 ## Gemeinsame Quellen und Generatoren
 

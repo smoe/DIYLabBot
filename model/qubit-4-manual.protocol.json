@@ -1,0 +1,50 @@
+{
+  "format": "solidcraftbot.qubit-manual-protocol/1",
+  "id": "Qubit4.ManualConcentration",
+  "mode": "synthetic_only",
+  "capability": "fluorometric_assay",
+  "return_policy": "original_place",
+  "steps": ["rack_ready", "workspace_clear", "claim", "begin_preparation", "confirm_preparation", "place", "advance_time", "begin_measurement", "confirm_measurement", "approve_calibration", "dispose_vessel", "import_results", "review_results", "release"],
+  "parameters": {
+    "sample_volume_ul": {"unit": "uL", "exclusive_minimum": 0},
+    "standard_volume_ul": {"unit": "uL", "exclusive_minimum": 0},
+    "assay_total_volume_ul": {"unit": "uL", "exclusive_minimum": 0},
+    "incubation_min_s": {"unit": "s", "exclusive_minimum": 0},
+    "incubation_max_s": {"unit": "s", "exclusive_minimum": 0, "nullable": true},
+    "calibration_validity_s": {"unit": "s", "exclusive_minimum": 0},
+    "task_deadline_s": {"unit": "s", "exclusive_minimum": 0}
+  },
+  "assay": {
+    "id": "SYN.Fluorescence.Concentration",
+    "revision": "1",
+    "standards": [
+      {"id": "SYN.StandardLow", "stock_id": "SYN.StockLow"},
+      {"id": "SYN.StandardHigh", "stock_id": "SYN.StockHigh"}
+    ]
+  },
+  "result_contract": {
+    "format": "solidcraftbot.synthetic-qubit-report/1",
+    "identity_column": "Measurement ID",
+    "concentration_units": {"ng/uL": 1, "ng/mL": 0.001}
+  },
+  "sop": {
+    "id": "SYN.Qubit4.Manual",
+    "revision": "1",
+    "synthetic": true,
+    "instructions": [
+      "Confirm rack inventory, workspace clearance and responsibility.",
+      "Select identified empty standard tubes before preparation intent; confirm preparation and incubation.",
+      "Confirm standard measurements and explicitly approve one workflow-bound synthetic calibration.",
+      "For each original vessel, select an identified empty assay tube, save intent and confirm transfer once; return the original vessel.",
+      "Advance the recorded synthetic clock, confirm assay measurements and dispose of all standard and assay tubes explicitly.",
+      "Import synthetic sample and standard records; review results and confirm final workplace handback."
+    ]
+  },
+  "limitations": [
+    "Fictitious assay, SOP, volumes, times and calibration approval; not a laboratory procedure",
+    "One calibration per run, no cross-run calibration reuse or repeated completed measurements",
+    "Calibration binding comes from the workflow, not from verified device feedback",
+    "No calibration curve, external predilution or cross-run volume ledger",
+    "No native Qubit export qualification, network, hardware, scanner, CAD or CF01 continuation"
+  ]
+}

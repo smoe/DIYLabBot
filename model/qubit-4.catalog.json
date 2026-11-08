@@ -1,0 +1,12 @@
+{
+  "format": "solidcraftbot.instrument-catalog/1",
+  "types": {
+    "qubit_4": {
+      "manufacturer": "Thermo Fisher Scientific",
+      "name": "Qubit 4 Fluorometer",
+      "capabilities": ["fluorometric_assay"],
+      "documentation": "https://documents.thermofisher.com/TFS-Assets/LSG/manuals/MAN0017209_Qubit_4_Fluorometer_UG.pdf"
+    }
+  },
+  "limitations": ["Logical device type only; no hardware, network or CAD adapter"]
+}

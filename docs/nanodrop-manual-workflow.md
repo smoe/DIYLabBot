@@ -8,7 +8,8 @@ synthetisch.** Er führt keine Geräte-, Roboter- oder Netzwerkbefehle aus.
 NanoDrop One und UltraC verwenden dasselbe Protokoll für die Fähigkeit
 `microvolume_absorbance`. Der erste Ergebnisvertrag unterstützt die Methode
 `dsDNA`. Die Küvettenfähigkeit des UltraC ist eine Katalogangabe; ein
-Küvettenablauf ist damit noch nicht implementiert. Qubit folgt später.
+Küvettenablauf ist damit noch nicht implementiert. Der separate
+[Qubit-4-Ablauf](qubit-4-manual-workflow.md) nutzt denselben manuellen Kern.
 
 ## Quellen, Parameter und räumliche Bindung
 
@@ -19,9 +20,11 @@ Küvettenablauf ist damit noch nicht implementiert. Qubit folgt später.
 | `model/nanodrop-manual.synthetic.json` | Instanzen, drei Proben, Quellenbindungen und synthetische Parameter |
 | `model/nanodrop-manual.schema.json` | Formaler Vertrag des Laufprofils; der Lader prüft zusätzlich Semantik und Prüfsummen |
 | `scripts/manual_tasks.py` | Transaktionales Laufprotokoll, Originalartefakte und exklusive Ressourcen |
-| `scripts/nanodrop_manual.py` | NanoDrop-Zustandsübergänge, Inventar, Entnahmen und Ergebnisabgleich |
+| `scripts/manual_workflow.py` | Gemeinsame Profilbindung, Sitzung, Inventar, Verbrauch, Wiederaufnahme und Importhülle |
+| `scripts/nanodrop_manual.py` | NanoDrop-Blank, Messungs-/Entnahmebestätigung und Ergebnisabgleich |
 | `scripts/nanodrop_csv.py` | Eng begrenzter Offline-Berichtsadapter |
 | `scripts/run_nanodrop_manual.py` | Demo, Arbeitskarte, Sitzung, Bericht und Artefaktexport |
+| `scripts/manual_workflow_cli.py` | Gemeinsame CLI für NanoDrop und Qubit mit getrennten Laufarten |
 
 Das Profil referenziert die vorhandenen Quellen für unbegrenzten Raum,
 Referenzbank und Rack mit SHA-256. Es enthält keine kopierte Geometrie und keine
@@ -56,7 +59,9 @@ Standardmäßig liegen SQLite, Demo-CSV und JSON-Berichte unter
 keine zusätzliche Modellquelle. `--store` wählt eine andere SQLite-Datei innerhalb
 von `exports/`; CSV und Standardberichte liegen dann neben diesem Store im
 jeweiligen Laufunterordner. Der gemeinsame Store ist für gegenseitige Reservierungen nötig.
-Getrennte Datenbanken koordinieren ihre Ressourcen nicht miteinander.
+Getrennte Datenbanken koordinieren ihre Ressourcen nicht miteinander. Qubit
+verwendet denselben Standardpfad. Auch Originalgefäß-IDs sind nun reserviert,
+damit unterschiedliche Rack-IDs keine gleichzeitige Doppelzuteilung erlauben.
 
 ## Zustände und Übergaben
 
@@ -208,7 +213,11 @@ Die zweite Sitzung verlangt einen Abgleich. Nach einem harten Prozessabbruch
 bleibt zusätzlich die alte Sitzung offen; dann ist `session LAUF --resume`
 erforderlich. Eine alte Sitzung kann anschließend keine weiteren Bestätigungen
 abgeben. Ein geänderter Kern-Quellstand verlangt eine bewusste Migration; ein
-bereits begonnener Lauf wird damit nicht stillschweigend weitergeführt.
+bereits begonnener Lauf wird damit nicht stillschweigend weitergeführt. Die
+gespeicherte Laufzeitquellenliste umfasst nun auch den gemeinsamen Kern, die
+CLI und Text-Codecs. Ältere offene Läufe ohne diesen Quellenvertrag benötigen
+Prüfung beziehungsweise Migration; ihre alten Zustandsfelder und lesbaren
+Berichte bleiben erhalten. Die deklarierte NanoDrop-Uhr wird ebenfalls geprüft.
 
 `reconcile` braucht eine vollständige Beobachtung aller Gefäßidentitäten und
 Orte sowie ausdrückliche Aussagen zu Arbeitsplatz und weiter gültigem Blank.
@@ -254,5 +263,7 @@ Ungeprüft bleiben reale Bedienhandlungen, SOPs, Geräteexportvarianten, Mess-
 leistung, Netzwerkkommunikation und Hardware. Nach jeder Entnahme ist eine
 frühere Massenbestätigung überholt; eine CF01-Fortsetzung würde eine aktuelle
 gemessene Gesamtgefäßmasse und die bestehenden CF01-Vorbedingungen benötigen.
-Dieser Ablauf führt sie nicht aus. Geräte-CAD, Scan-Hardware, Qubit und
-Netzwerkadapter sind gesonderte spätere Schritte.
+Dieser Ablauf führt sie nicht aus. Geräte-CAD, Scan-Hardware und Netzwerkadapter
+sind gesonderte spätere Schritte. Qubit hat einen eigenen synthetischen Ablauf;
+eine automatische Verbindung beider Läufe mit gemeinsamer Volumenbilanz ist
+noch nicht implementiert. Anfangsmengen bleiben Profildeklarationen.

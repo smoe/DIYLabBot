@@ -17,3 +17,10 @@ Nachweis für alle Geräteversionen oder Exportlayouts. Ein unveränderter echte
 Export, dessen Bezeichnungslängen und Softwarestand wurden noch nicht geprüft.
 TSV wird in diesem Adapter nur als tabulatorgetrennte Ergebnistabelle gelesen;
 ein reiner Spektrenexport ist noch kein unterstützter Ergebnisimport.
+
+`before-qubit-extraction.json` wurde vor dem Herauslösen des gemeinsamen
+Workflow-Kerns aus einem vollständig ausgeführten synthetischen NanoDrop-Lauf
+aufgenommen. Die unabhängige Projektion in `tests/manual_workflow_snapshot.py`
+behält fachliche Ergebnisse und Inventarübergänge, entfernt jedoch zufällige
+Absichtskennungen, Dateiprüfsummen und den neu ergänzten Mengen-Herkunftshinweis.
+Sie ist eine historische Test-Fixture, keine zweite Protokollquelle.

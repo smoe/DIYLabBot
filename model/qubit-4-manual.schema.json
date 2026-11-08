@@ -1,0 +1,249 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "qubit-4-manual.schema.json",
+  "title": "Synthetic Qubit-4 preparations, calibration and manual workflow profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "protocol",
+    "catalog",
+    "workspace",
+    "instrument",
+    "rack",
+    "parameters",
+    "samples",
+    "reagents",
+    "logical_places"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.qubit-manual-profile/1"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "protocol": {
+      "$ref": "#/$defs/reference"
+    },
+    "catalog": {
+      "$ref": "#/$defs/reference"
+    },
+    "workspace": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "environment",
+        "furniture",
+        "furnishings",
+        "frame"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "frame": {
+          "$ref": "#/$defs/id"
+        },
+        "environment": {
+          "$ref": "#/$defs/reference"
+        },
+        "furniture": {
+          "$ref": "#/$defs/reference"
+        },
+        "furnishings": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "type",
+        "serial_number",
+        "software_version"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "type": {
+          "$ref": "#/$defs/id"
+        },
+        "serial_number": {
+          "$ref": "#/$defs/id"
+        },
+        "software_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "rack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "definition"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "definition": {
+          "$ref": "#/$defs/reference"
+        }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sample_volume_ul",
+        "standard_volume_ul",
+        "assay_total_volume_ul",
+        "incubation_min_s",
+        "incubation_max_s",
+        "calibration_validity_s",
+        "task_deadline_s"
+      ],
+      "properties": {
+        "sample_volume_ul": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "standard_volume_ul": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "assay_total_volume_ul": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "incubation_min_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "incubation_max_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "calibration_validity_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "task_deadline_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "vessel_id",
+          "rack_slot",
+          "initial_volume_ul"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/id"
+          },
+          "vessel_id": {
+            "$ref": "#/$defs/id"
+          },
+          "rack_slot": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "initial_volume_ul": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          }
+        }
+      }
+    },
+    "reagents": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kit_lot",
+        "standard_lot"
+      ],
+      "properties": {
+        "kit_lot": {
+          "$ref": "#/$defs/id"
+        },
+        "standard_lot": {
+          "$ref": "#/$defs/id"
+        }
+      }
+    },
+    "logical_places": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "holder_id",
+          "place_id"
+        ],
+        "properties": {
+          "holder_id": {
+            "$ref": "#/$defs/id"
+          },
+          "place_id": {
+            "$ref": "#/$defs/id"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/[A-Za-z0-9_./-]+\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}

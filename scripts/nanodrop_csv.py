@@ -5,15 +5,11 @@
 """
 import csv
 import io
-import math
-import unicodedata
 
 from manual_tasks import TaskError
+from manual_results import normalized, number, decode_report
 
 
-def normalized(value):
-    value = unicodedata.normalize('NFKC', value).replace('µ', 'u').replace('μ', 'u')
-    return ''.join(value.casefold().split()).rstrip(':')
 
 
 METRICS = {
@@ -27,19 +23,6 @@ METRICS = {
 }
 
 
-def number(value, decimal_comma=False):
-    value = value.strip()
-    if not value:
-        return None
-    if decimal_comma:
-        value = value.replace(',', '.')
-    try:
-        result = float(value)
-    except ValueError as error:
-        raise TaskError('Invalid numeric result: ' + value) from error
-    if not math.isfinite(result):
-        raise TaskError('Non-finite numeric result: ' + value)
-    return result
 
 
 def parse_report(content, identity_column='Sample Name'):
@@ -48,13 +31,7 @@ def parse_report(content, identity_column='Sample Name'):
     Only an ng/uL concentration column is supported in this first adapter.
     A column absent from the report is unknown, not a zero or a passed check.
     """
-    try:
-        encoding = 'utf-16' if content.startswith((b'\xff\xfe', b'\xfe\xff')) else 'utf-8-sig'
-        text = content.decode(encoding)
-    except UnicodeError as error:
-        raise TaskError('Report must be UTF-8 or BOM-marked UTF-16') from error
-    if '\x00' in text:
-        raise TaskError('Unexpected NUL in report')
+    text, encoding = decode_report(content)
     rows = None
     header_index = None
     delimiter = None

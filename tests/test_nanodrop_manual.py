@@ -146,7 +146,7 @@ class CommandLineTests(unittest.TestCase):
         self.assertIn('reconciliation', failure.stderr)
         status = json.loads(self.cli('status', 'SYN-ND-CLI-PAUSED').stdout)
         self.assertEqual(status['recovery_required'], 'session_restarted')
-        self.assertEqual(len(status['resources']), 3)
+        self.assertEqual(len(status['resources']), 6)
         self.assertEqual(status['pending_measurement']['intent_id'], intent)
 
     def test_cli_rejects_runtime_output_outside_exports(self):
@@ -228,7 +228,7 @@ class ManualTaskTests(unittest.TestCase):
 
     def test_full_run_maps_reordered_results_and_preserves_lineage_and_unknown_volume(self):
         self.claim()
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
         self.assertTrue(all(s['location']['kind'] == 'rack' for s in self.flow.state['samples'].values()))
         self.measure_all()
         checksum = self.import_content()
@@ -289,7 +289,7 @@ class ManualTaskTests(unittest.TestCase):
                           place_id=sample['original_place_id'], rack_id=sample['location']['rack_id'])
         self.assertEqual(self.flow.state['samples']['Sample01']['location'], original_location(self.flow.state, sample))
         self.assertEqual(self.flow.state['recovery_required'], 'observation_mismatch')
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
         with self.assertRaisesRegex(TaskError, 'reconciliation'):
             self.take()
         self.reconcile()
@@ -312,7 +312,7 @@ class ManualTaskTests(unittest.TestCase):
             with self.assertRaises(ObservationError):
                 self.reconcile(observations=broken)
             self.assertIsNotNone(self.flow.state['recovery_required'])
-            self.assertEqual(len(self.journal.owners()), 3)
+            self.assertEqual(len(self.journal.owners()), 6)
 
     def test_exact_file_reimport_is_idempotent_and_conflicting_import_is_quarantined(self):
         self.claim()
@@ -364,7 +364,7 @@ class ManualTaskTests(unittest.TestCase):
         self.review()
         with self.assertRaises(ObservationError):
             self.flow.act('release', ACTOR, workspace_clear=False)
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
         self.assertFalse(self.flow.report()['passed'])
 
     def test_deadline_is_a_reconciliation_hold_and_does_not_release_or_repeat(self):
@@ -373,7 +373,7 @@ class ManualTaskTests(unittest.TestCase):
         self.flow.act('check_deadline', ACTOR)
         self.assertEqual(self.flow.state['recovery_required'], 'deadline_exceeded')
         self.assertEqual(self.flow.state['measurements'], {})
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
         with self.assertRaises(TaskError):
             self.take()
         self.reconcile()
@@ -385,7 +385,7 @@ class ManualTaskTests(unittest.TestCase):
         self.take()
         self.flow.act('cancel', ACTOR, reason='Synthetic operator interruption')
         self.assertEqual(self.flow.state['status'], 'cancelling')
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
         self.reconcile()
         with self.assertRaises(TaskError):
             self.flow.act('finish_cancel', ACTOR, workspace_clear=True)
@@ -442,7 +442,7 @@ class ManualTaskTests(unittest.TestCase):
         observations[0]['location'] = None
         with self.assertRaises(ObservationError):
             self.reconcile(observations=observations)
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
 
     def test_row_metadata_is_checked_and_manual_entry_has_explicit_origin(self):
         self.claim()
@@ -474,7 +474,7 @@ class ManualTaskTests(unittest.TestCase):
             self.review()
         with self.assertRaises(TaskError):
             self.flow.report()
-        self.assertEqual(len(self.journal.owners()), 3)
+        self.assertEqual(len(self.journal.owners()), 6)
 
     def test_stale_revision_from_second_connection_cannot_overwrite_new_events(self):
         state, revision = self.journal.state(RUN_ID)
@@ -527,9 +527,11 @@ class ManualTaskTests(unittest.TestCase):
         profile['rack']['id'] = 'SYN.Rack02'
         profile['instrument']['id'] = 'SYN.NanoDrop02'
         profile['workspace']['id'] = 'SYN.WorkArea02'
+        for sample in profile['samples']:
+            sample['vessel_id'] += '-independent'
         independent = Workflow.create(self.journal, profile, 'SYN-ND-INDEPENDENT')
         self.claim(independent)
-        self.assertEqual(len(self.journal.owners()), 6)
+        self.assertEqual(len(self.journal.owners()), 12)
         self.assertEqual(self.flow.state['samples']['Sample01']['original_place_id'],
                          independent.state['samples']['Sample01']['original_place_id'])
         self.assertNotEqual(original_location(self.flow.state, self.flow.state['samples']['Sample01']),
@@ -595,7 +597,7 @@ os._exit(23)
                 Workflow.open(journal, 'SYN-ND-CRASH')
             flow = Workflow.open(journal, 'SYN-ND-CRASH', resume=True)
             self.assertEqual(flow.state['recovery_required'], 'session_restarted')
-            self.assertEqual(len(journal.owners()), 3)
+            self.assertEqual(len(journal.owners()), 6)
             intent = flow.state['pending_measurement']['intent_id']
             with self.assertRaisesRegex(TaskError, 'reconciliation'):
                 self.confirm(flow=flow)

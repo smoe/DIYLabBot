@@ -136,7 +136,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Zentrifuge CF01](docs/centrifuge-cf01.md), [Roboterentnahme](docs/centrifuge-cf01-robot-pickup.md)
 - [Gefäßträger H01](docs/tube-carrier-h01.md), [Rahmen H02](docs/tube-frame-h02.md), [Drehantrieb H03](docs/tube-cam-h03.md)
 - [Laborraum](docs/lab-room-l01.md), [Aufstellung](docs/lab-layout-l01.md), [Transfersequenz](docs/lab-transfer-l01.md)
-- [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [synthetischer NanoDrop-Ablauf](docs/nanodrop-manual-workflow.md)
+- [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
 
 ## Repository beziehen
 

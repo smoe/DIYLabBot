@@ -242,8 +242,10 @@ sind nach Entnahmen überholt.
 `scripts/manual_tasks.py` speichert Ereignisse, Zustandsansichten, exklusive
 Ressourcen und unveränderte Importdateien transaktional in SQLite unter dem
 ignorierten `exports/manual-workflows/`. Laufzeitdaten gehören nicht nach
-`model/`. `scripts/nanodrop_manual.py` prüft Übernahme, Blank, Entnahmen,
-platzweise Rückgabe und Ergebnisabgleich. Dateiimporte werden über eindeutige
+`model/`. `scripts/manual_workflow.py` bündelt Profilbindung, Sitzung, Gewahrsam,
+Gefäßreservierungen, Verbrauch, Wiederaufnahme und Importhülle. NanoDrop und Qubit
+verwenden gerätespezifische Adapter auf diesem Kern; die gemeinsame CLI liegt in
+`scripts/manual_workflow_cli.py`. Dateiimporte werden über eindeutige
 laufbezogene Messungsnamen zugeordnet; fremde, fehlende oder doppelte Messungen
 blockieren den Abschluss. Originalmeldungen und ausdrückliche Bewertungen bleiben
 getrennt. Nach Neustart, widersprüchlicher Beobachtung oder Aufgabenfrist bleiben
@@ -254,8 +256,39 @@ Der Einstieg `python3 scripts/run_nanodrop_manual.py demo` erzeugt ausschließli
 synthetische Eingaben und eine synthetische CSV-Datei. Tests prüfen auch einen
 harten Prozessabbruch mit anschließendem Neustart. Ein echter Geräteexport,
 eine reale SOP, Scanner, Schutzfunktion, Hardware- oder Netzwerkkommunikation
-sind nicht validiert. Qubit, Netzwerkadapter und eine Fortsetzung in CF01 folgen
+sind nicht validiert. Netzwerkadapter und eine Fortsetzung in CF01 folgen
 später; der bestehende CF01-Chargenrunner wird hierfür nicht erweitert.
+
+### Synthetischer Qubit-4-Ablauf
+
+Der [Qubit-4-Durchstich](docs/qubit-4-manual-workflow.md) verwendet einen eigenen
+Gerätetypenkatalog und die führenden Quellen `model/qubit-4-manual.protocol.json`
+sowie `model/qubit-4-manual.synthetic.json`. Der Profilvertrag steht in
+`model/qubit-4-manual.schema.json`. Bestehende NanoDrop-Quellenpins, Rack- und
+Raumdefinitionen bleiben erhalten. Ansatz- und Standardgefäße besitzen deklarierte
+logische Plätze ohne erfundene Geometrie.
+
+Eine Ansatzabsicht identifiziert das ausgewählte leere Gefäß vor dem Transfer.
+Die Bestätigung erzeugt einen Transferdatensatz; nur dort wird die Originalprobe
+einmalig belastet. Die spätere Messung verbraucht nicht noch einmal dieselbe
+Probe. Alle Gefäße sind Teil des Wiederaufnahmeinventars. Nicht durchgeführte
+Ansatzversuche benötigen bestätigte Entsorgung und neue IDs für einen erneuten
+Versuch. Originalgefäße müssen an ihre ursprünglichen Plätze zurückkehren.
+
+Die synthetische Prozesszeit ist im Lauf gebunden und schreitet ausschließlich
+durch Ereignisse voran. Derselbe Zeitbezug prüft Inkubation, Kalibrierungsablauf
+und Aufgabenfrist. Eine Kalibrierung pro Lauf wird nach bestätigten Standards
+ausdrücklich freigegeben und an Gerät, Assayrevision, Chargen und Messungs-IDs
+gebunden. Jede Probenmessabsicht friert diesen Bezug als `workflow_record` ein.
+Eine außerhalb des Ablaufs erfolgte Gerätekalibrierung wäre nicht erkennbar.
+
+Der finale Dateiimport verlangt sowohl Proben- als auch Standardmessungen.
+Berichtete Ansatz- und Originalkonzentrationen bleiben getrennt. Fehlt die
+Originalkonzentration, wird sie mit dokumentierter Formel und Einheitenumrechnung
+aus dem bestätigten Ansatz abgeleitet. Fehlende Gefäße, ungeklärte Absichten,
+ungültige Messungen oder nicht bestätigte Entsorgung verhindern die Freigabe.
+Ein neues Laufprofil deklariert eigene Anfangsmengen; ein laufübergreifendes
+Volumenbuch und echte Kalibrierkurven sind nicht implementiert.
 
 ## Nächste Schritte
 
@@ -275,7 +308,7 @@ Möbelauswertung wird wiederverwendet.
 
 Das weitergehende Zielmodell für manuelle Arbeitsschritte und Messgeräte steht
 in [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md). Der synthetische
-NanoDrop-Durchstich ist oben beschrieben; Qubit und Netzwerkadapter bleiben
+NanoDrop- und Qubit-Durchstich sind oben beschrieben; Netzwerkadapter bleiben
 geplant. Messgerätetypen deklarieren Fähigkeiten im Katalog, Protokolle verlangen
 Fähigkeiten statt Gerätetypen. Verantwortlichkeit und physischer Ort bleiben
 getrennt; Aufgaben und Bestätigungen sind Laufzeitzustand außerhalb von `model/`.

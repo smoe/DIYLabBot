@@ -27,10 +27,11 @@ class Journal:
     file. Hashes detect accidental corruption, not malicious database modification.
     """
 
-    def __init__(self, path, clock=time.time):
+    def __init__(self, path, clock=time.time, clock_mode=None):
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.clock = clock
+        self.clock_mode = clock_mode or ('wall_clock' if clock is time.time else 'injected')
         self.connection = sqlite3.connect(self.path, timeout=10)
         try:
             self._initialize()

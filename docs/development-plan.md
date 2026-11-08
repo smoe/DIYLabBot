@@ -245,8 +245,11 @@ transaktionales Laufprotokoll, Entnahmen und Abstammung, Dateiimport sowie
 platzweise bestätigte Rückgabe. Handarbeit und Datenübernahme, Verantwortlichkeit
 und physischer Ort sind getrennt. Tests prüfen auch Prozessabbruch und Neustart.
 Sämtliche SOPs, Bedienhandlungen und Messdateien sind vorerst synthetisch.
-Echte Exportqualifikation, Qubit, Netzwerkadapter und eine Fortsetzung in CF01
-folgen später. Das weitergehende Zielmodell steht unter
+Der [synthetische Qubit-4-Ablauf](qubit-4-manual-workflow.md) ergänzt inzwischen
+Ansatzgefäße, Transfers, Standards, eine laufbezogene Kalibrierung und explizite
+synthetische Zeit. Beide Abläufe verwenden denselben Kern und Store.
+Echte Exportqualifikation, Netzwerkadapter, ein laufübergreifendes Volumenbuch
+und eine Fortsetzung in CF01 folgen später. Das weitergehende Zielmodell steht unter
 [Manuelle Aufgaben und Messgeräte](manual-tasks.md).
 
 ## Budgetansatz
