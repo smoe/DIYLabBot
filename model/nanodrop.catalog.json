@@ -1,0 +1,25 @@
+{
+  "format": "solidcraftbot.instrument-catalog/1",
+  "types": {
+    "nanodrop_one_wifi": {
+      "manufacturer": "Thermo Fisher Scientific",
+      "name": "NanoDrop One with WiFi",
+      "capabilities": ["microvolume_absorbance"],
+      "identity_column": "Sample Name",
+      "documentation": "https://assets.thermofisher.com/TFS-Assets/CAD/Specification-Sheets/NanoDrop-One-Specifications.pdf"
+    },
+    "nanodrop_ultrac": {
+      "manufacturer": "Thermo Fisher Scientific",
+      "name": "NanoDrop UltraC",
+      "part_number": "NDULTRACGL",
+      "capabilities": ["microvolume_absorbance", "cuvette_absorbance"],
+      "identity_column": "Sample Name",
+      "documentation": "https://assets.thermofisher.com/TFS-Assets/CAD/brochures/nanodrop-ultra-mcs-br1239-en.pdf"
+    }
+  },
+  "limitations": [
+    "Logical instrument types; no CAD geometry or device driver",
+    "CSV column selection is qualified against synthetic fixtures only",
+    "Cuvette capability is descriptive; this workflow executes microvolume tasks only"
+  ]
+}

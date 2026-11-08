@@ -237,6 +237,18 @@ reserviert gemeinsame Arbeitsbereiche für zwei oder drei Arme.
 Werkzeugpose, Gefäßbelegung und Flüssigkeitstransfer werden als definierte Zustände
 geführt; Wiederanlauf nach Unterbrechungen braucht einen geprüften Ablauf.
 
+### Manuelle Aufgaben und Messgeräte
+
+Der erste [synthetische NanoDrop-Ablauf](nanodrop-manual-workflow.md) ist
+implementiert: gemeinsame Mikrovolumen-Protokollquelle für One und UltraC,
+transaktionales Laufprotokoll, Entnahmen und Abstammung, Dateiimport sowie
+platzweise bestätigte Rückgabe. Handarbeit und Datenübernahme, Verantwortlichkeit
+und physischer Ort sind getrennt. Tests prüfen auch Prozessabbruch und Neustart.
+Sämtliche SOPs, Bedienhandlungen und Messdateien sind vorerst synthetisch.
+Echte Exportqualifikation, Qubit, Netzwerkadapter und eine Fortsetzung in CF01
+folgen später. Das weitergehende Zielmodell steht unter
+[Manuelle Aufgaben und Messgeräte](manual-tasks.md).
+
 ## Budgetansatz
 
 Für die [Raumumgebung L01](lab-room-l01.md) den angekündigten Grundriss mit Maßstab

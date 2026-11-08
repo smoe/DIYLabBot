@@ -86,6 +86,35 @@ sind abstrahiert; eine native Ladebahn, Transporterausführung und Netzwerk- ode
 Hardwarekommunikation sind damit nicht implementiert. Proben-IDs und
 ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
+## Manuelle Aufgaben und Laufzeitdaten
+
+Der erste NanoDrop-Ablauf ist vollständig synthetisch. Vor Änderungen
+[docs/nanodrop-manual-workflow.md](docs/nanodrop-manual-workflow.md) lesen.
+One und UltraC verwenden denselben Mikrovolumen-Vertrag in
+`model/nanodrop-manual.protocol.json`; Gerätetypen und Fähigkeiten stehen im
+Katalog, Instanzen und Testparameter im referenzierenden Laufprofil.
+Geräteaufstellung, Arbeitsanweisung und Ausführungszustand getrennt halten.
+Eine Katalogfähigkeit oder synthetische Testdatei ist kein geprüfter Geräteadapter.
+
+- Verantwortliche Person, physischer Ort, Rackinstanz und Platz-ID getrennt
+  führen. Gefäßidentität und ursprünglichen Rackplatz bei jeder Übergabe prüfen.
+  Personenbestätigung, synthetische Eingabe und tatsächlichen Scan unterscheiden.
+- Entnahmeabsichten vor der Durchführung speichern. Verbrauch und Abstammung
+  einschließlich NanoDrop-Aliquots dokumentieren; unbekannte Mengen nicht
+  schätzen. Eine Entnahme macht frühere Massenbestätigungen ungültig.
+- Messungen über lauf-/versuchsbezogene Kennungen zuordnen. Zeilenfolge und
+  Zeitstempel sind keine Identitätsnachweise. Originaldateien und Meldungen
+  erhalten; fachliche Bewertung von Messende und Arbeitsplatzrückgabe trennen.
+- Laufereignisse, Bestätigungen, Reservierungen und Importe gehören außerhalb
+  von `model/` in den ignorierten Laufzeitbereich. Nach Unterbrechung oder Frist
+  keine Durchführung, Rückgabe oder Freigabe annehmen. Offene Entnahmen und
+  Inventar ausdrücklich abgleichen; Reservierungen bis dahin erhalten.
+- Der Einstieg ist `python3 scripts/run_nanodrop_manual.py demo`. Die Tests
+  enthalten einen Prozessabbruch mit Neustart. Reale SOP, Exportdateien,
+  Mensch-Maschine-Schutzfunktion, Hardware und Netzwerk sind nicht geprüft.
+  Qubit und Netzwerkadapter bleiben spätere Schritte. CF01-Fortsetzung benötigt
+  aktuelle gemessene Gesamtgefäßmassen und die bestehenden Stationsbedingungen.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

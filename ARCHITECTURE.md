@@ -220,6 +220,43 @@ Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
 Das kurze Video zeigt weiterhin den Entnahmebaustein; die physische Beladung
 aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
 
+## Manuelle Aufgaben als eigene Ausführungsebene
+
+Der [erste NanoDrop-Ablauf](docs/nanodrop-manual-workflow.md) ergänzt die räumlichen
+Ebenen um einen lokalen, vollständig synthetischen Arbeitsablauf. Gerätetypen und
+Fähigkeiten stehen in `model/nanodrop.catalog.json`; One und UltraC referenzieren
+dasselbe Protokoll `model/nanodrop-manual.protocol.json` für Mikrovolumen-
+Absorption. `model/nanodrop-manual.synthetic.json` bindet eine logische Geräte-
+instanz, Rackinstanz und Proben an die vorhandenen Quellen für unbegrenzten Raum,
+Referenzbank und Rack. Neue CAD-Geometrie oder Gerätepositionen entstehen nicht.
+Der formale Profilvertrag steht in `model/nanodrop-manual.schema.json`.
+
+Verantwortliche Person, physischer Gefäßort und reservierte Ressource sind
+getrennte Informationen. Platzkennungen aus der gemeinsamen Rackquelle werden
+zusammen mit der Rackinstanz verwendet. Entnahmen verbinden Originalprobe,
+Quellgefäß, Aliquot, berichtetes Volumen und die Messungskennung. Eine gespeicherte
+Messabsicht muss vor Wiederholung oder Wiederaufnahme ausdrücklich aufgelöst
+werden. Unbekannte Restvolumina bleiben unbekannt; frühere Massenbestätigungen
+sind nach Entnahmen überholt.
+
+`scripts/manual_tasks.py` speichert Ereignisse, Zustandsansichten, exklusive
+Ressourcen und unveränderte Importdateien transaktional in SQLite unter dem
+ignorierten `exports/manual-workflows/`. Laufzeitdaten gehören nicht nach
+`model/`. `scripts/nanodrop_manual.py` prüft Übernahme, Blank, Entnahmen,
+platzweise Rückgabe und Ergebnisabgleich. Dateiimporte werden über eindeutige
+laufbezogene Messungsnamen zugeordnet; fremde, fehlende oder doppelte Messungen
+blockieren den Abschluss. Originalmeldungen und ausdrückliche Bewertungen bleiben
+getrennt. Nach Neustart, widersprüchlicher Beobachtung oder Aufgabenfrist bleiben
+Reservierungen bis zum bestätigten Abgleich bestehen. Rückgabe, Ergebnisfreigabe
+und abschließende Arbeitsplatzfreigabe sind eigene Bedingungen.
+
+Der Einstieg `python3 scripts/run_nanodrop_manual.py demo` erzeugt ausschließlich
+synthetische Eingaben und eine synthetische CSV-Datei. Tests prüfen auch einen
+harten Prozessabbruch mit anschließendem Neustart. Ein echter Geräteexport,
+eine reale SOP, Scanner, Schutzfunktion, Hardware- oder Netzwerkkommunikation
+sind nicht validiert. Qubit, Netzwerkadapter und eine Fortsetzung in CF01 folgen
+später; der bestehende CF01-Chargenrunner wird hierfür nicht erweitert.
+
 ## Nächste Schritte
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden
@@ -235,3 +272,12 @@ ohne Möbel oder Geräte erneut zu konstruieren.
 Der Referenzbanktyp liegt in einem eigenen Möbelkatalog, damit die unveränderte
 L01-Komposition ihre bisherige Katalogrevision behält. Die gemeinsame
 Möbelauswertung wird wiederverwendet.
+
+Das weitergehende Zielmodell für manuelle Arbeitsschritte und Messgeräte steht
+in [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md). Der synthetische
+NanoDrop-Durchstich ist oben beschrieben; Qubit und Netzwerkadapter bleiben
+geplant. Messgerätetypen deklarieren Fähigkeiten im Katalog, Protokolle verlangen
+Fähigkeiten statt Gerätetypen. Verantwortlichkeit und physischer Ort bleiben
+getrennt; Aufgaben und Bestätigungen sind Laufzeitzustand außerhalb von `model/`.
+Die bestehende CF01-Szene bleibt auf Arm, CF01 und Rack beschränkt;
+Messgeräte verwenden eine eigene logische Bindung.

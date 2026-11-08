@@ -1,0 +1,35 @@
+{
+  "format": "solidcraftbot.nanodrop-manual-protocol/1",
+  "id": "NanoDrop.ManualMicrovolume",
+  "mode": "synthetic_only",
+  "capability": "microvolume_absorbance",
+  "method": "dsDNA",
+  "parameters": {
+    "sample_volume_ul": {"unit": "uL", "exclusive_minimum": 0},
+    "task_deadline_s": {"unit": "s", "exclusive_minimum": 0}
+  },
+  "steps": [
+    "rack_ready", "workspace_clear", "claim", "blank",
+    "begin_measurement", "confirm_measurement", "place",
+    "import_results", "review_results", "release"
+  ],
+  "return_policy": "original_place",
+  "sop": {
+    "id": "SYN.NanoDrop.Microvolume",
+    "revision": "1",
+    "synthetic": true,
+    "instructions": [
+      "Confirm the synthetic rack manifest and clear work area; claim the task.",
+      "Confirm a synthetic blank reference and clean measurement surfaces.",
+      "Take one original vessel, record measurement intent, then confirm the simulated withdrawal, measurement and cleanup.",
+      "Return each original vessel to its original rack place; retain responsibility until final handback.",
+      "Import synthetic named results, resolve quarantined imports, review results and explicitly release the clear work area."
+    ]
+  },
+  "limitations": [
+    "Fictitious SOP and parameters, not a laboratory operating procedure",
+    "Synthetic human confirmations, no barcode reader or sensor feedback",
+    "No network, NanoDrop hardware, Qubit, robot motion or CF01 continuation",
+    "One measurement per sample per run; remeasurement requires a new run"
+  ]
+}
