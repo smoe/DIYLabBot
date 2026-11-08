@@ -205,6 +205,12 @@ der CF01-Vertrag verlangt weiterhin eine vollständige Zwölferbeladung.
 `handoff_policy` verlangt eine positive Roboterquittung und bei Übergaben
 zwischen Greifer und Rotor zusätzlich die zugehörige Stationsbestätigung und
 Belegungsprüfung. Vor der Roboterquittung wird die ausstehende Übergabe erfasst.
+
+Für `confirm_seated` und `confirm_removed` zählt nur eine Antwort mit dem
+booleschen Feld `success: true`. Negative, fehlende oder ungültige Antworten
+lassen die Stationsquittung offen, auch wenn die Stationsaktion im Mock bereits
+ausgeführt wurde. Eine passende Belegung ersetzt diese positive Quittung nicht.
+
 Erst nach vollständiger Bestätigung wird die Buchführung weitergeführt:
 
 | Berichtsfeld | Bedeutung |
@@ -247,6 +253,8 @@ required station acknowledgement leaves `pending_handoff` and
 `ownership: unresolved`; neither view is asserted to be a verified physical
 location. Stop attempts and accepted stop responses are reported separately.
 Slot occupancy checks use mock internals, not a real ROS/SiLA driver contract.
+Required station acknowledgements must explicitly contain boolean `success: true`;
+negative, missing or malformed replies leave the handoff unresolved.
 
 ### Prüfung dieses Restplans am 8. November 2026
 
@@ -269,6 +277,31 @@ Die CAD-Geometriequellen sind unverändert. Für diese HTML-Prüfung wurden die
 vorhandenen nativen Anzeigemeshe mit dokumentierter Prüfsumme wiederverwendet;
 ein neuer nativer CAD-Aufbau und eine erneute mechanische Prüfung wurden nicht
 ausgeführt. Die Bewegung bleibt vom Chargenfehler entkoppelt.
+
+### Ergänzende unabhängige Prüfung am 8. November 2026
+
+Die Nachprüfung von `95471df` zeigte eine fehlende Erfolgsprüfung für
+Stationsquittungen: Nach einer bereits ausgeführten Aktion konnte eine Antwort
+mit `success: false` dennoch zum erfolgreichen Chargenabschluss führen. Die
+Korrektur verlangt das boolesche `success: true` vor der Übernahme der Quittung.
+Der ergänzte Regressionstest prüft 32 Fälle: beide Decoder, beide
+Übergaberichtungen, Antworten mit und ohne vorherige Stationsausführung sowie
+fehlende, leere, negative und nicht boolesche Antworten. Der Fehler wurde vor
+der Korrektur reproduziert; danach bleiben solche Übergaben ungeklärt und der
+Chargenlauf meldet keinen Erfolg.
+
+Der korrigierte Gesamtstand besteht 291 Offline-Tests einschließlich aller
+22 gezielten CF01-Umgebungs-/Chargentests. Die 13 Schema-Dokumentprüfungen und
+die Galerieprüfung bestehen ebenfalls. Die Browserprüfung auf Deutsch und
+Englisch verwendet vier Fehlerberichte für fehlende und negative Quittungen in
+beiden Richtungen; Sprachwechsel, optionale Panelfehler und 320/600/960 px
+werden ohne Konsolenfehler geprüft. Die Fehleransichten wurden visuell geprüft.
+Der lokale Nachweis steht in
+`exports/generated/cf01-review-95471df-20261108T190137002745Z/independent-review.json`;
+die zugehörige HTML-Demo liegt im gleichnamigen Ordner unter `renders/`.
+Die vorhandenen Geometriemeshe wurden nach Quellen- und Prüfsummenabgleich
+wiederverwendet. Diese Nachprüfung erzeugt keinen neuen nativen CAD-, Bahn-,
+Hardware- oder Netzwerknachweis; die oben dokumentierten Grenzen bleiben bestehen.
 
 ## Synthetic workspace and complete local batch
 

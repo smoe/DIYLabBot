@@ -263,6 +263,30 @@ class OrderedBatchTests(unittest.TestCase):
                         self.assertNotIn('gripper_to_original_rack_slot',[t['stage'] for t in report['trace']])
                     self.assertConserved(report)
 
+    def test_station_handoff_requires_a_positive_acknowledgement(self):
+        for transport in ['ros2','sila2']:
+            for name in ['confirm_seated','confirm_removed']:
+                for applied in [False,True]:
+                    for response in [None,{}, {'success':False}, {'success':1}]:
+                        runner=Runner(transport=transport);dispatch=runner.bridge.dispatch
+                        wire_name=name if transport=='ros2' else runner.bridge.commands[name]['name']
+                        def reject_dispatch(encoding,command,fields):
+                            if command==wire_name:
+                                if applied:dispatch(encoding,command,fields)
+                                return response
+                            return dispatch(encoding,command,fields)
+                        runner.bridge.dispatch=reject_dispatch
+                        with self.subTest(transport=transport,name=name,applied=applied,response=response),self.assertRaisesRegex(BatchError,'Station acknowledgement missing or rejected during '+name) as failure:runner.run()
+                        self.assertFailure(failure.exception,name,'Sample01')
+                        report=failure.exception.report
+                        self.assertEqual(report['ownership'],'unresolved')
+                        self.assertTrue(report['pending_handoff']['robot_confirmation'])
+                        self.assertFalse(report['pending_handoff']['station_confirmation'])
+                        self.assertFalse(report['inventory_consistent'])
+                        incomplete='gripper_to_rotor' if name=='confirm_seated' else 'rotor_to_gripper'
+                        self.assertNotIn(incomplete,[event['stage'] for event in report['trace']])
+                        self.assertConserved(report)
+
     def test_failed_stop_is_not_reported_as_successful_contract_stop(self):
         for response in [ConnectionError('Stop channel disconnected'),None,{'success':False}]:
             runner=Runner(feedback=lambda event,sample:None);dispatch=runner.bridge.dispatch

@@ -140,12 +140,15 @@ class Runner:
         fields={protocol.wire(self.transport,k):v for k,v in fields.items()}
         if name=='stop':self.stop_attempted=True
         result=self.bridge.dispatch(self.transport,name if self.transport=='ros2' else contract['name'],fields)
+        station_handoff=self.pending_handoff and self.pending_handoff['event']=={'confirm_seated':'seat_rotor','confirm_removed':'take_rotor'}.get(name)
+        if station_handoff and (not isinstance(result,dict) or result.get('success') is not True):
+            raise ValueError('Station acknowledgement missing or rejected during '+name)
         if name=='stop':
             if not isinstance(result,dict) or result.get('success') is not True:raise ValueError('Stop acknowledgement missing')
             self.stop_via_contract=True
         if name=='acquire':self.token=result['control_token']
         if result.get('phase') in ['failed','canceled','stopping']:raise ValueError('Command did not complete: '+name)
-        if self.pending_handoff and self.pending_handoff['event']=={'confirm_seated':'seat_rotor','confirm_removed':'take_rotor'}.get(name):
+        if station_handoff:
             self.pending_handoff['station_confirmation']=True
         self.record(name,contract=self.transport,job_phase=result.get('phase'))
         return result
