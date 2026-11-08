@@ -1,0 +1,26 @@
+{
+  "format": "solidcraftbot.synthetic-workspace/1",
+  "id": "SYN.CF01",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "sources": {
+    "environment": {
+      "source": "model/environments/synthetic-unbounded.json",
+      "source_sha256": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604"
+    },
+    "furniture": {
+      "source": "model/furniture/reference-bench.catalog.json",
+      "source_sha256": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7"
+    },
+    "furnishings": {
+      "source": "model/furnishings/cf01-reference-bench.json",
+      "source_sha256": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9"
+    },
+    "equipment": {
+      "source": "model/equipment/cf01-workspace.json",
+      "source_sha256": "d1d52e0cba2e3c627c1a5f66b69d4822cbb41c0efaabde65e9d54b0008dda4ad"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "format": "solidcraftbot.furnishings/1",
+  "id": "SYN.CF01.Bench",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {},
+  "anchors": {},
+  "expressions": {},
+  "instances": [
+    {
+      "id": "BenchSurface",
+      "type": "reference_worktop",
+      "component": "Scene",
+      "bindings": {
+        "width": 1000,
+        "length": 700,
+        "height": 18
+      },
+      "xyz": [
+        -550,
+        -400,
+        -18
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "SYN.Bench.Worktop"
+      }
+    }
+  ],
+  "limitations": [
+    "Unbounded scene, finite reference surface; transporter delivery is external"
+  ]
+}

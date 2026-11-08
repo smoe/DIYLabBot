@@ -47,12 +47,13 @@ class Simulator:
     Tests may inject synthetic ratings; these NEVER qualify a real assembly.
     Sensor values and ownership are separate: an owner cannot bypass feedback.
     """
-    def __init__(self,spec=None,clock=time.monotonic,qualification=None,auto_feedback=True):
+    def __init__(self,spec=None,clock=time.monotonic,qualification=None,auto_feedback=True,initial_slots=None):
         self.spec=spec or model.load(); self.p=model.parameters(self.spec); self.clock=clock
         self.boot_id=str(uuid.uuid4()); self.owner=None; self.deadline=0; self.fault=None
         self.lid='closed'; self.locked=True; self.rpm=0; self.zero_speed=True; self.brake=True
         self.robot_clear=True; self.indexed_slot=None; self.encoder_deg=0; self.index_ok=False; self.lift_mm=0
         self.slots={i:{'present':True,'seated':True,'mass_g':None} for i in range(1,13)}
+        if initial_slots is not None:self.slots=copy.deepcopy(initial_slots)
         self.run=None; self.qualification=copy.deepcopy(qualification); self.auto_feedback=auto_feedback
         self.feedback_time=self.clock(); self.encoder_feedback_time=self.clock(); self.encoder_healthy=True; self.encoder_homed=False; self.events=[]
         self.stopping=None; self.parking_brake_healthy=True; self.brake_release_confirmed=True; self.brake_engage_confirmed=True

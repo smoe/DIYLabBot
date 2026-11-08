@@ -2,44 +2,50 @@
 
 Bewusst versionierte Medienauswahl, keine zusätzliche Konstruktionsquelle:
 
-- `robot-demo.html`: lokal ausführbare CF01-Entnahmeszene, ohne Netzabhängigkeit.
-- `robot-demo.mp4`: kurzer, beschleunigter Überblick des vollständigen 60-s-Zyklus.
-- `robot-demo.png`: Vorschau bei 30,5 s, Gefäß am Greifer außerhalb der Zentrifuge.
-- `provenance.json`: Quell- und Medienprüfsummen, historischer Prüfstand und Grenzen.
+- `robot-demo.html`: unabhängige Bewegungsansicht und lokales Chargenprotokoll.
+- `robot-demo.mp4`: beschleunigter 60-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01.
+- `robot-demo.png`: Vorschau bei 30,5 s mit Gefäß am Greifer.
+- `provenance.json`: aktuelle Quellen, Medienprüfsummen, Prüfungen und Grenzen.
 
-Die Geometrie und Bewegung stammen unverändert aus der bereits erzeugten Szene
-`centrifuge-cf01-robot-05dba7428daa`. Die eigenständige HTML-Hülle ergänzt das
-Farbschema der früheren Einbettung. Die frühere native Prüfung ist historische
-Evidenz; bei dieser Repository-Bereinigung wurde kein neues CAD erzeugt.
-Die Browserprüfung kontrolliert station → gripper → rack und Konsolenfehler.
-Konzeptgreifer, synthetische Rückmeldungen und modellierte Zeiten belegen keine
-reale Roboterfunktion, Sicherheit oder Dosierleistung.
+Die Szene stammt aus `model/synthetic-cf01-workspace.shared.json`: unbegrenzter
+Raum, Referenzbank, referenzierter Roboter, CF01 und Rack. Bankmaße, Weltpositionen
+und alle 241 Bewegungssamples bleiben gegenüber `05dba7428daa` erhalten.
+
+Das Chargenpanel zeigt zwölf Proben vom bereitgestellten Rack durch den
+vollständigen lokalen Schleuderablauf zurück in ihre ursprünglichen Rackplätze.
+Alle Roboterübergaben sind abstrahiert; Testzeit vergeht nur für Spin und Bremse.
+Der Bewegungsbaustein hat eine eigene Zeitachse und wird vom Chargenrunner nicht
+aufgerufen. Transporter, Netzwerk und Hardware werden nicht ausgeführt.
+
+## Prüfnachweise und Grenzen
+
+211 Offline-Tests und 13 Schema-Prüfungen bestehen. FreeCAD: sieben native
+Snapshots mit 223 Körpern und adaptive Prüfung mit 1601 angeforderten Frames
+bestehen. Körper-IDs und aggregierte Volumina stimmen mit dem bisherigen Stand
+überein. Die Browserprüfung kontrolliert Bewegung, Protokollende, ursprüngliche
+Rackreihenfolge und schmale Ansichten ohne Konsolenfehler.
+
+SolidCraft importiert die 223 Körper, lässt jedoch Rotor und fünf Servogehäuse
+offen. Seine strenge Gesamtprüfung schlägt fehl; die Referenzbank besteht die
+Maß- und Volumenprüfung. Der Gesamt-Buildbericht meldet deshalb `passed: false`.
+Die Medien belegen keine reale Funktion, Sicherheit oder mechanische Qualifikation.
 
 ## Aktualisieren
 
-Die Szene aus `model/centrifuge-cf01.robot-pickup.shared.json` mit dem bestehenden
-`scripts/build_centrifuge_robot_pickup.py` erzeugen und nativ prüfen. Dieser
-Build-Einstieg enthält derzeit Windows-Laufzeitpfade; eine vollständige
-Mac-Portierung ist noch offen. Das geprüfte HTML aus `renders/` übernehmen und
-die eigenständige Hülle mit ihren CSS-Farbvariablen erhalten. Die Medienauswahl
-wird bewusst aktualisiert, nicht bei jedem CAD-Build automatisch überschrieben.
+`python3 scripts/build_centrifuge_robot_pickup.py` erzeugt eine neue lokale
+Revision. Installierte macOS-Programme werden erkannt; abweichende Programme
+können mit `--freecad-python` und `--solidcraft-cli` angegeben werden. FreeCADs
+Bibliothek muss für dessen Python über `PYTHONPATH` verfügbar sein. Die strenge
+SolidCraft-Prüfung darf bei Importfehlern weiterhin fehlschlagen.
 
-Mit Node, Playwright und dessen Chromium vom Repository-Stamm aus:
+Nach Prüfung das erzeugte HTML aus `renders/` bewusst übernehmen. Mit Node,
+Playwright und Chromium vom Repository-Stamm aus:
 
 ```sh
 node scripts/export_readme_video.cjs
 ```
 
-Optional sind der Pfad zum installierten Playwright-Modul und ein
-Chromium-/Chrome-Programm als erstes und zweites Argument übergebbar.
-Danach Vorschau und Videowiedergabe visuell prüfen und `provenance.json` auf den
-neuen Quellstand einschließlich Medienprüfsummen aktualisieren. GitHub zeigt
-HTML nur als Datei; für die interaktive Bedienung herunterladen und lokal öffnen.
-
-## Ableitung aus einer minimalen Testumgebung
-
-Die Referenzbank und Geräteaufstellung dieser Interaktion sollen künftig aus
-einer synthetischen, unbegrenzten Umgebung stammen. Geräte und Ablauf verwenden
-weiterhin ihre vorhandenen Quellen. Das Zielmodell und die noch ausstehende
-Integration stehen in [ARCHITECTURE.md](../../ARCHITECTURE.md#synthetische-minimale-testumgebungen).
-Die hier gespeicherten Medien und ihre Provenienz bleiben der bisherige Stand.
+Optional sind Playwright-Modul und Chrome-Programm als erstes und zweites
+Argument übergebbar. Danach Medien prüfen und die Provenienz einschließlich
+aller Medienprüfsummen gemeinsam aktualisieren. GitHub zeigt HTML als Datei;
+für interaktive Bedienung herunterladen und lokal öffnen.

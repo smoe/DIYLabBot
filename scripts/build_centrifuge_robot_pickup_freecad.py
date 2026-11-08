@@ -67,7 +67,8 @@ def build(context):
         for cut in b['cuts']:shape=shape.cut(primitive(cut))
         add(b['id'],b['group'],shape,'#61b99a',1,b['role'],'rack')
     bench=scene['bench_surface']
-    add('BenchSurface','Scene',Part.makeBox(*bench['size_mm'],App.Vector(*bench['origin_mm'])),'#8a959d',.38,bench['role'],'bench')
+    appearance=scene['_workspace']['bench']['bodies'][0]['appearance']
+    add('BenchSurface','Scene',Part.makeBox(*bench['size_mm'],App.Vector(*bench['origin_mm'])),appearance['color'],appearance['opacity'],bench['role'],'bench')
     doc.recompute()
     mesh={'bodies':meshes,'robot_joints':arm['joints'],'robot_parameters':robot.parameters(arm),'robot_flange':pickup.Kinematics(arm,scene).flange,
         'station_joints':cf.expanded(spec,p)['joints'],'scene':scene,'trajectory':data,

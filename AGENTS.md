@@ -72,8 +72,12 @@ Ablauftests. Unbegrenzt, unbekannt und nur zur Darstellung begrenzt unterscheide
 keine riesigen Ersatzräume konstruieren. Geräte- und Protokollquellen zwischen
 realen und synthetischen Aufstellungen wiederverwenden. Mocks, Testzeit,
 Netzwerkkommunikation und Hardwareausführung getrennt nachweisen. Die README-
-Interaktion Arm/CF01/Rack ist der erste vorgesehene Ableitungsfall; dieses Profil
-ist noch nicht als Generator oder Laufzeit implementiert.
+Interaktion Arm/CF01/Rack wird aus `model/synthetic-cf01-workspace.shared.json`
+abgeleitet. `model/cf01-rack-batch.protocol.json` beschreibt den ausgeführten
+lokalen Mock-Lauf Rack → CF01 → ursprüngliche Rackplätze. Sämtliche Roboterübergaben
+sind abstrahiert; eine native Ladebahn, Transporterausführung und Netzwerk- oder
+Hardwarekommunikation sind damit nicht implementiert. Proben-IDs und
+ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
 ## Gemeinsame Quellen und Generatoren
 

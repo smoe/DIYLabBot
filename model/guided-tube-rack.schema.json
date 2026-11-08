@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "guided-tube-rack.schema.json",
+  "title": "Guided rack definition without installation pose",
+  "type": "object",
+  "required": [
+    "operation",
+    "id",
+    "rows",
+    "columns",
+    "pitch_mm",
+    "size_mm",
+    "base_thickness_mm",
+    "guide_bottom_mm",
+    "guide_thickness_mm",
+    "bore_radius_mm",
+    "entry_radius_mm",
+    "entry_depth_mm",
+    "rail_width_mm",
+    "material",
+    "calibrated",
+    "support_confirmation",
+    "format"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "operation": {
+      "const": "guided_tube_rack"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rows": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "columns": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "pitch_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "size_mm": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "base_thickness_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "guide_bottom_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "guide_thickness_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "bore_radius_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "entry_radius_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "entry_depth_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "rail_width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "material": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "calibrated": {
+      "type": "boolean"
+    },
+    "support_confirmation": {
+      "type": "string",
+      "minLength": 1
+    },
+    "format": {
+      "const": "solidcraftbot.guided-tube-rack/1"
+    }
+  }
+}

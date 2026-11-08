@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cf01-rack-batch.schema.json",
+  "title": "Local mock ordered rack batch with explicit fictitious ratings",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "workspace",
+    "station_contract",
+    "preconditions",
+    "sample_order",
+    "return_policy",
+    "samples",
+    "spin",
+    "simulation_qualification",
+    "limitations",
+    "initial_state"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cf01-rack-batch/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "const": "local_mock_only"
+    },
+    "workspace": {
+      "$ref": "assembly-reference.schema.json#/$defs/reference"
+    },
+    "station_contract": {
+      "$ref": "assembly-reference.schema.json#/$defs/reference"
+    },
+    "preconditions": {
+      "const": {
+        "rack_delivered_by_transporter": true,
+        "transporter_modeled": false
+      }
+    },
+    "sample_order": {
+      "const": "ascending_rack_slot"
+    },
+    "return_policy": {
+      "const": "original_rack_slot"
+    },
+    "samples": {
+      "type": "array",
+      "minItems": 12,
+      "maxItems": 12,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "rack_slot",
+          "rotor_slot",
+          "mass_g"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rack_slot": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "rotor_slot": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          },
+          "mass_g": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        }
+      }
+    },
+    "spin": {
+      "type": "object",
+      "required": [
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rcf_x_g": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "duration_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "simulation_qualification": {
+      "type": "object",
+      "required": [
+        "simulation_fixture",
+        "rotor_rpm",
+        "drive_rpm",
+        "assembly_rcf_x_g",
+        "tube_rcf_x_g",
+        "tube_mass_limit_g",
+        "pair_tolerance_g"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "simulation_fixture": {
+          "const": true
+        },
+        "rotor_rpm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "drive_rpm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "assembly_rcf_x_g": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tube_rcf_x_g": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tube_mass_limit_g": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "pair_tolerance_g": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "initial_state": {
+      "const": {
+        "rotor": "empty",
+        "rack": "samples",
+        "mass_source": "fictitious_profile",
+        "handoff_time_s": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "format": "solidcraftbot.equipment-layout/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "assets": {
+    "arm": {
+      "source": "model/robot.json",
+      "source_sha256": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08"
+    },
+    "centrifuge": {
+      "source": "model/centrifuge-cf01.shared.json",
+      "source_sha256": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb"
+    },
+    "rack": {
+      "source": "model/guided-tube-rack.shared.json",
+      "source_sha256": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74"
+    }
+  },
+  "instances": [
+    {
+      "id": "Arm",
+      "asset": "arm",
+      "parent_frame": "SYN.Bench.Worktop",
+      "xyz": [
+        -280,
+        130,
+        0
+      ],
+      "yaw_deg": -50,
+      "overrides": {
+        "upper_len": 280,
+        "fore_len": 250
+      }
+    },
+    {
+      "id": "CF01",
+      "asset": "centrifuge",
+      "parent_frame": "SYN.Bench.Worktop",
+      "xyz": [
+        50,
+        50,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "Rack",
+      "asset": "rack",
+      "parent_frame": "SYN.Bench.Worktop",
+      "xyz": [
+        -210,
+        -230,
+        0
+      ],
+      "yaw_deg": 0
+    }
+  ]
+}

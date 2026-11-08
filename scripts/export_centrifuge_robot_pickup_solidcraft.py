@@ -10,6 +10,7 @@ import subprocess
 import math
 from concurrent.futures import ThreadPoolExecutor
 import centrifuge_model as cf
+import centrifuge_robot_pickup as pickup
 
 
 def main():
@@ -28,20 +29,28 @@ def main():
         commands.append({'command':'document.metadata.set','params':{'values':{'org.solidcraftbot.cf01-pickup':{'scene_source':'model/centrifuge-cf01.robot-pickup.shared.json','source_hashes':context['source_hashes'],'phase':label,'representation':'posed review snapshot, no live handoff constraints'}}}})
         path=out/(label+'.solidcraft.commands.json');cf.write(path,{'commands':commands})
         target=cad/('CF01_Robot_'+label+'.sc');measurement=out/(label+'.solidcraft.json')
-        subprocess.run([shutil.which('solidcraft-cli') or 'solidcraft-cli','run',str(path),'--save',str(target),'--json-out',str(measurement),'--quiet'],check=True,cwd=cf.ROOT)
+        subprocess.run([context.get('solidcraft_cli') or shutil.which('solidcraft-cli') or 'solidcraft-cli','run',str(path),'--save',str(target),'--json-out',str(measurement),'--quiet'],check=True,cwd=cf.ROOT)
         actual=json.loads(measurement.read_text());names={b['name'] for b in actual['bodies']};expected={b['id'].replace('.','_') for b in mesh['bodies']}
-        assert len(actual['bodies'])==len(expected)
-        assert all(b['closed'] and b['volume_mm3']>0 for b in actual['bodies'])
+        bad=[b['name'] for b in actual['bodies'] if not b['closed'] or b['volume_mm3'] is None or b['volume_mm3']<=0]
+        bench=next(b for b in actual['bodies'] if b['name']=='BenchSurface');source_bench=pickup.load()['bench_surface']
+        volume_expected=math.prod(source_bench['size_mm'])
+        bounds={'min':source_bench['origin_mm'],'max':[a+b for a,b in zip(source_bench['origin_mm'],source_bench['size_mm'])]}
+        bench_passed=bench['closed'] and bench['volume_mm3'] is not None and abs(bench['volume_mm3']-volume_expected)<1e-3 and all(abs(a-b)<1e-6 for key in ['min','max'] for a,b in zip(bench['bbox'][key],bounds[key]))
+        if bad or len(actual['bodies'])!=len(expected):
+            return {'phase':label,'passed':False,'body_count':len(actual['bodies']),'expected_body_count':len(expected),'solidcraft':str(target),
+                    'invalid_or_open_bodies':bad,'workspace_bench_passed':bench_passed,
+                    'limitation':'Current SolidCraft STEP import leaves these complex bodies open; source geometry is unchanged. No closure check was waived.'}
         reference=json.loads((out/'snapshot-metrics.json').read_text())[label]
         volume=sum(b['volume_mm3'] for b in actual['bodies']);center=[sum(b['center_of_mass'][i]*b['volume_mm3'] for b in actual['bodies'])/volume for i in range(3)]
         ve=abs(volume-reference['volume_mm3'])/reference['volume_mm3'];ce=math.dist(center,reference['center_mm'])
         assert ve<.001 and ce<.02,(ve,ce)
         return {'phase':label,'passed':True,'body_count':len(expected),'solidcraft':str(target),'source':'derived named STEP snapshot of native shared scene',
-            'relative_volume_error':ve,'center_error_mm':ce,'source_ids_with_STEP_aliases':sorted(expected-names),
+            'workspace_bench_passed':bench_passed,'relative_volume_error':ve,'center_error_mm':ce,'source_ids_with_STEP_aliases':sorted(expected-names),
             'appearance_scope':'functional unique bodies retain source appearances; repeated prototype palette simplified'}
     with ThreadPoolExecutor(max_workers=2) as pool:reports=list(pool.map(export,['Grasp','RackReleased']))
-    cf.write(out/'solidcraft-scene-validation.json',{'passed':True,'snapshots':reports,'dynamic_handoff_supported_in_this_export':False})
+    cf.write(out/'solidcraft-scene-validation.json',{'passed':all(r['passed'] for r in reports),'snapshots':reports,'dynamic_handoff_supported_in_this_export':False})
     print(json.dumps(reports))
+    if not all(r['passed'] for r in reports):raise SystemExit('SolidCraft snapshot validation failed; see solidcraft-scene-validation.json')
 
 
 if __name__=='__main__':main()

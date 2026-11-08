@@ -18,6 +18,7 @@ def validate_catalog(catalog):
     if catalog['format']!='solidcraftbot.furniture-catalog/1' or catalog['units']!={'length':'mm','angle':'deg'}:
         raise ValueError('Furniture catalog contract or units')
     for name,definition in catalog['types'].items():
+        if type(definition.get('opacity',1)) not in (int,float) or not 0<=definition.get('opacity',1)<=1:raise ValueError('Invalid furniture opacity')
         recipe=definition['recipe']
         if recipe not in RECIPES or set(definition['parameters'])!=RECIPES[recipe]:
             raise ValueError('Unsupported furniture recipe or dimensions: '+name)
@@ -78,7 +79,7 @@ def instantiate(catalog,item,p,aliases=None,inputs=None):
         return [f'({origin[0]})+({c})*({x})-({s})*({y})',f'({origin[1]})+({s})*({x})+({c})*({y})']
     def body(part,role,color):
         name=item['id']+('_'+part if part else '')
-        result['bodies'].append({'id':name,'component':item['component'],'role':role,'appearance':{'color':color,'opacity':1}})
+        result['bodies'].append({'id':name,'component':item['component'],'role':role,'appearance':{'color':color,'opacity':definition.get('opacity',1)}})
         return name
     def operation(name,target,shape,action='create'):
         shape=copy.deepcopy(shape)

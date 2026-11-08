@@ -45,7 +45,7 @@ earlier centrifuge-only demonstration, which deliberately reseated the tube.
 
 The same six joint definitions, limits, vendor components and camera envelopes
 are reused with **280 mm upper arm and 250 mm forearm** (previously 200/175 mm).
-The scene stores only parameter overrides of `model/robot.json`; it does not
+The synthetic equipment layout stores only parameter overrides of `model/robot.json`; it does not
 duplicate the arm design. Native geometry, vendor mounting positions and joint
 anchors follow those same dimensions. The generated `CF01_LongLink_Arm.FCStd`
 retains the native parametric history of the arm variant. Full-pose inverse kinematics finds
@@ -164,3 +164,32 @@ networked ROS/SiLA deployment. [Protocol/runtime boundaries](centrifuge-cf01-pro
 SolidCraft MCP inspection was attempted, but its allowed paths exclude this
 project directory. The existing reproducible local SolidCraft CLI adapter was
 used for the two source-derived review scenes and cross-CAD measurements.
+
+## Synthetic workspace and complete local batch
+
+`model/synthetic-cf01-workspace.shared.json` composes an explicitly unbounded
+space, reference-bank catalogue, furnishing instance and equipment layout.
+There is no room shell. The standalone rack source is
+`model/guided-tube-rack.shared.json`. The former bank dimensions, device world
+poses and all 241 trajectory samples remain unchanged.
+
+Run `python3 scripts/run_cf01_rack_batch.py` (optionally `--transport sila2`) for
+the twelve-sample local fixture. The profile declares an initially empty rotor,
+a delivered rack and fictitious masses. All robot handoffs are abstract synthetic
+confirmations. A separate world inventory checks actual indexed slots and sample
+identities against the runner ledger and simulated station presence/mass. This
+is no physical sample identification. Polling uses the local MockProtocol API;
+commands and failure-stop requests pass through the selected contract decoder.
+Test time advances only during spin/braking. Failures retain partial inventory
+and produce a failed report; they do not claim restored sample order.
+
+The 60-second motion component (rotor slot 01 → rack slot 01) has its own timeline
+and mock confirmations. The batch runner does not execute that component or
+any loading/return path. The README HTML presents the two independently.
+
+On the current macOS build, seven FreeCAD snapshots and the adaptive motion audit
+pass. The SolidCraft snapshot import fails strict closure validation for Rotor
+and Arm_A1/A3/A4/A5/A6_housing; all 223 body entries are imported and BenchSurface
+passes its dimensions and volume check. No closure check is waived. See local
+`solidcraft-scene-validation.json` and the overall build report (`passed: false`).
+No network, hardware, live FreeCAD macro or transporter execution is established.

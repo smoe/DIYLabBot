@@ -6,8 +6,9 @@
   "required": [
     "format",
     "sources",
-    "robot_parameter_overrides_mm",
-    "arm_fixture"
+    "arm_fixture",
+    "environment",
+    "rack"
   ],
   "properties": {
     "format": {
@@ -34,28 +35,56 @@
       },
       "additionalProperties": false
     },
-    "robot_parameter_overrides_mm": {
-      "$ref": "assembly-reference.schema.json#/$defs/overrides"
-    },
     "arm_fixture": {
       "type": "object",
       "required": [
-        "position_mm",
-        "yaw_deg"
+        "mounting",
+        "calibrated",
+        "changes_lab_layout",
+        "fastening_qualified"
       ],
+      "additionalProperties": false,
       "properties": {
-        "position_mm": {
-          "type": "array",
-          "minItems": 3,
-          "maxItems": 3,
-          "items": {
-            "type": "number"
-          }
+        "mounting": {
+          "const": "direct_to_bench"
         },
-        "yaw_deg": {
-          "type": "number"
+        "calibrated": {
+          "const": false
+        },
+        "changes_lab_layout": {
+          "const": false
+        },
+        "fastening_qualified": {
+          "const": false
+        }
+      }
+    },
+    "environment": {
+      "$ref": "assembly-reference.schema.json#/$defs/reference"
+    },
+    "rack": {
+      "type": "object",
+      "required": [
+        "selected_slot",
+        "approach_grip_height_mm"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "selected_slot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "approach_grip_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
         }
       }
     }
+  },
+  "not": {
+    "required": [
+      "bench_surface"
+    ]
   }
 }

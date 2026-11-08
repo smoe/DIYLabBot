@@ -18,13 +18,29 @@ des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
 [Interaktive Demo herunterladen](docs/media/robot-demo.html) ·
 [Modellstand und Herkunft](docs/media/README.md)
 
-Die Demo zeigt den vollständigen Ablauf mit sechs bewegten Armachsen,
-Konzeptgreifer und Gefäßübergabe von CF01 in ein Rack. Die HTML-Datei lokal im
-Browser öffnen: **Play cycle**, Zeitschieber und drei Ansichten funktionieren
-ohne CAD-Installation oder Netzwerk. GitHub führt die HTML-Datei nicht direkt aus.
-Das Video zeigt den 60-s-Modellzyklus beschleunigt. Dies ist eine geometrische
-Animation mit synthetischer Rückmeldung; Hardware und Flüssigkeitstransfer sind
-nicht implementiert oder durch das Video nachgewiesen.
+Die Szene wird aus einer synthetischen, unbegrenzten Umgebung mit einer
+Referenzbank abgeleitet. Die Bewegungsansicht und das Video zeigen den bisherigen
+60-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01, im Video beschleunigt.
+Er besitzt eine eigene Zeitachse und ist nicht mit der Chargenwiedergabe gekoppelt.
+Die HTML-Datei lokal öffnen: Wiedergabe, Zeitschieber und drei Ansichten
+funktionieren ohne CAD-Installation oder Netzwerk.
+
+Zusätzlich enthält die HTML-Demo das aufgezeichnete **Chargenprotokoll für zwölf
+Proben**: Ein Transporter hat das Rack bereitgestellt; es wird in CF01 geladen,
+zentrifugiert und in ursprünglicher Reihenfolge zurück ins Rack entladen. Der
+Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldungen
+sind lokale Mocks ohne ausgeführte Bahn; Testzeit vergeht nur beim Spin und Bremsen.
+Die bisherige Entnahmebewegung bleibt als eigener Baustein erhalten. Der vollständige
+Lauf ist auch reproduzierbar ausführbar:
+
+```sh
+python3 scripts/run_cf01_rack_batch.py
+python3 scripts/run_cf01_rack_batch.py --transport sila2
+```
+
+Die Transportauswahl prüft lokale ROS-/SiLA-Vertragsdecoder, keine Netzwerkserver.
+Massen, Laufzeiten und Qualifikationswerte sind ausdrücklich fiktive Testdaten.
+Eine native Ladebahn und Hardwarebetrieb sind damit nicht nachgewiesen.
 
 ## Quellen und lokale Ausgaben
 

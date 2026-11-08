@@ -105,7 +105,7 @@ Betriebsbereiche sind weiterhin nicht sicherheitstechnisch qualifiziert.
 ## Synthetische minimale Testumgebungen
 
 Neben einem realitätsbezogenen Labor ist ein ausdrücklich synthetisches
-Umgebungsprofil vorgesehen: ein unbegrenzter Raum ohne beschriebene Wände,
+Umgebungsprofil implementiert: ein unbegrenzter Raum ohne beschriebene Wände,
 Fenster, Türen oder lange Verkehrswege. Eine einzige Bank beziehungsweise
 Referenzarbeitsfläche liefert Orientierung, Maßstab und Aufstellrahmen. Dieses
 Profil gehört zur selben Vier-Ebenen-Architektur und benötigt keinen künstlich
@@ -135,12 +135,29 @@ bleiben kenntlich.
 
 ### Kommunikation und Testlauf getrennt beschreiben
 
-Ein Testprofil soll Geräte-IDs an Treiber oder Mocks binden und den Ablauf,
-Zeitmodell, erwartete Rückmeldungen sowie Fehlerfälle festlegen. Es referenziert
-die Umgebung und die bestehenden Protokollquellen; es besitzt keine eigene
-Raum-, Möbel- oder Gerätekonstruktion. Dieselbe Geräteausstattung kann dadurch
-mit lokalen Mocks, mit Netzwerkadaptern oder später mit Hardware geprüft werden.
-Jede dieser Betriebsarten benötigt ihren eigenen ausgeführten Nachweis.
+`model/cf01-rack-batch.protocol.json` bindet die Umgebung und den vorhandenen
+CF01-Befehlsvertrag an einen lokalen Mock-Testlauf. Die zwölf Proben haben stabile
+IDs und eine explizite Zuordnung von Rack- zu Rotorplätzen. Die Rückgabe erfolgt
+an den ursprünglichen Rackplatz, unabhängig von der gewählten Rotorplatzfolge.
+Der Transporter ist ausschließlich die externe Vorbedingung „Rack bereitgestellt“.
+
+`scripts/run_cf01_rack_batch.py` führt den vollständigen Ablauf mit den
+vorhandenen CF01-Simulator- und Protokollklassen aus: beladen, starten, Lauf und
+Abbremsen abwarten, entnehmen und zurückstellen. `--transport ros2` und
+`--transport sila2` wählen die bereits vorhandenen lokalen Vertragsdecoder.
+Es werden keine Netzwerkserver oder Hardware angesprochen. Roboterrückmeldungen
+für Greifen, Freigeben und Absetzen sind ausdrücklich synthetische Eingaben;
+der Chargenlauf führt weder Beladungs- noch Rückgabebahnen aus.
+Der bestehende Bewegungsbaustein Rotorplatz 01 → Rackplatz 01 besitzt eine
+eigene Zeitachse und wird vom Chargenrunner nicht aufgerufen.
+
+Bei falscher Probenidentität, fehlender Bestätigung, Eigentümer-Timeout oder
+unwuchtiger Testbeladung endet der Lauf ohne Erfolg. Eine bei einem Fehler noch
+gehaltene Probe bleibt im Inventar als im Greifer befindlich erfasst. Der Erfolg
+verlangt den abgeschlossenen Schleuderlauf, bestätigten Stillstand, einen leeren
+Rotor und exakt dieselbe Rackreihenfolge wie am Anfang. Testmassen und
+Qualifikationsgrenzen stehen nur im explizit fiktiven Testprofil; die reale
+CF01-Quelle erhält dadurch keine Freigabe.
 
 Für schnelle Tests sind insbesondere Befehlsreihenfolge, Besitzübergaben,
 Bestätigungen, Zeitüberschreitungen, Fehlerantworten und Wiederanlauf relevant.
@@ -172,18 +189,28 @@ Darstellung nicht unbeabsichtigt verschieben. Anschließend kann dieselbe
 Interaktion mit einer anderen Aufstellung, etwa in L01, verbunden werden.
 Dort kommen die realen Wege und zusätzlichen räumlichen Randbedingungen hinzu.
 
-Der aktuelle Stand ist noch die eigenständige Szene
-`model/centrifuge-cf01.robot-pickup.shared.json` mit einem `bench_surface`-
-Bauraum. Das unbegrenzte Umgebungsprofil, seine Komposition und eine gemeinsame
-Testlaufkonfiguration sind hier als nächster Schritt beschrieben, noch nicht
-als Generatorformat oder Laufzeit implementiert. Die gespeicherten README-
-Medien behalten ihren dokumentierten historischen Quellstand, bis eine daraus
-abgeleitete neue Fassung erzeugt und geprüft wurde.
+Die Quelle `model/synthetic-cf01-workspace.shared.json` bindet die vier Ebenen:
+
+| Quelle | Inhalt |
+|---|---|
+| `model/environments/synthetic-unbounded.json` | Unbegrenztheit ohne Raumschale oder Ersatzabmessungen |
+| `model/furniture/reference-bench.catalog.json` | Referenzarbeitsfläche über das vorhandene Möbelrezept |
+| `model/furnishings/cf01-reference-bench.json` | Eine Bankinstanz und ihr Arbeitsflächenrahmen |
+| `model/equipment/cf01-workspace.json` | Referenzierte Geräte und lokale Posen am Bankrahmen |
+
+Die Rackkonstruktion steht einmal in `model/guided-tube-rack.shared.json`.
+Die Entnahmeszene referenziert die Umgebung; Bankgeometrie, Gerätepositionen und
+Armvariante sind daraus abgeleitete Ansichten. Die bisherige Bankoberfläche,
+Geräteposen und alle 241 Bewegungsschritte bleiben erhalten. Der ursprüngliche
+60-s-Entnahmebaustein wird nach dem abgeschlossenen Schleuderlauf eingeordnet.
+
+Die interaktive README-Demo zeigt diesen Bewegungsausschnitt und zusätzlich die
+Aufzeichnung des vollständigen lokalen Chargenprotokolls mit Rack-, Rotor- und
+Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
+Das kurze Video zeigt weiterhin den Entnahmebaustein; die physische Beladung
+aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
 
 ## Nächste Schritte
-
-Zuerst soll die README-Entnahmeszene aus dem synthetischen Profil mit einer
-Referenzbank abgeleitet werden, bei erhaltenen Positionen und Abläufen.
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden
 werden: Geschoss → Raum → Möbel → Arbeitsfläche → Gerät. Dann folgt ein Gerät
@@ -194,3 +221,7 @@ keine Geräte und führt noch keinen allgemeinen Montagegraphen ein.
 Danach können weitere Raumgeometrien, Flure und gemeinsame Türverbindungen
 folgen. Neue Räume und Aufstellungen sollen den Möbelkatalog wiederverwenden,
 ohne Möbel oder Geräte erneut zu konstruieren.
+
+Der Referenzbanktyp liegt in einem eigenen Möbelkatalog, damit die unveränderte
+L01-Komposition ihre bisherige Katalogrevision behält. Die gemeinsame
+Möbelauswertung wird wiederverwendet.

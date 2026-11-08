@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "synthetic-environment.schema.json",
+  "title": "Explicit unbounded synthetic environment without shell",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "extent",
+    "geometry",
+    "world_frame"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.synthetic-environment/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "extent": {
+      "const": "unbounded"
+    },
+    "geometry": {
+      "const": "none"
+    },
+    "world_frame": {
+      "type": "string",
+      "minLength": 1
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

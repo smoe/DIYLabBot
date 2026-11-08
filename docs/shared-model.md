@@ -555,3 +555,17 @@ FreeCAD-/Qt-Kern bricht beim Import mit der Prozessoranforderung `neon` ab.
 Es wurden daher keine neuen nativen CAD-Dateien oder qualifizierten
 Build-Berichte erzeugt. Die ausgewählte README-Demo ist weiterhin der explizit
 historische, mit Prüfsummen dokumentierte Stand.
+
+
+### Synthetic CF01 composition
+
+`model/synthetic-cf01-workspace.shared.json` pins the unbounded environment,
+reference-bank catalogue, furnishings and equipment layout. The equipment
+`parent_frame` names a composed furniture frame; this narrow contract is not a
+general assembly-host resolver. Arm overrides use the existing robot parameter
+validation (`robot_spec.load` / `parameter_variant`); no second parameter engine
+is introduced. The pickup adapter materializes compatibility views, preserving
+the old positions and motion. `model/cf01-rack-batch.protocol.json` supplies a
+separate local mock batch, with explicit empty-rotor initialization, fictitious
+masses and original-rack-slot returns. All batch robot handoffs are abstract;
+the existing animated motion component is independent.

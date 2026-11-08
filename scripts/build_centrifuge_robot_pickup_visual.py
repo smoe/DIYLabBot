@@ -17,6 +17,7 @@ def prepare_mesh(context):
     mesh['tube_attachment_from_tool']=robot.multiply(robot.inverse(kin.tool(attach['joints_deg'])),pickup.rigid_from_cf(source,'PresentedTube',attach['station']))
     mesh['tube_seated_matrix']=pickup.SceneEvaluator(scene,mesh['trajectory']).seated_tube
     rack=pickup.rack_geometry(scene,p);mesh['rack_frame']=rack['frame'];mesh['rack_slots']=rack['slots']
+    mesh['rack_batch']=json.loads((Path(context['out'])/'rack-batch-trace.json').read_text())
     bottom,axis=cf.pocket(spec,p,1);mesh['grip_reference']=cf.plus(bottom,axis,p['tube_length']-8)
     # Only viewport vendor detail is clustered; native source and BRep QA keep all geometry.
     for b in mesh['bodies']:
@@ -42,10 +43,11 @@ def main():
     assert mesh['trajectory']['scene_sha256']==cf.digest(pickup.SOURCE)
     packed=base64.b64encode(gzip.compress(json.dumps(mesh,separators=(',',':')).encode(),compresslevel=9,mtime=0)).decode()
     template=(cf.ROOT/'scripts/templates/centrifuge_robot_pickup.html').read_text(encoding='utf-8')
-    target=Path(context['renders'])/'cf01-robot-pickup.html';target.write_text(template.replace('__MESH__',packed),encoding='utf-8')
+    target=Path(context['renders'])/'cf01-robot-pickup.html';header=(cf.ROOT/'scripts/templates/robot_demo_header.html').read_text(encoding='utf-8')
+    target.write_text(header+template.replace('__MESH__',packed)+'\n</html>\n',encoding='utf-8')
     cf.write(Path(context['out'])/'visualization-mesh-summary.json',{'body_count':len(mesh['bodies']),'triangles':sum(len(b['f']) for b in mesh['bodies']),
         'bytes':target.stat().st_size,'vendor_mesh_cluster_mm':1,'geometry_for_native_checks':'full source BRep, no clustering'})
-    if target.stat().st_size>1_000_000:raise ValueError('Inline animation exceeds 1 MB')
+    if target.stat().st_size>2_000_000:raise ValueError('Inline animation exceeds 2 MB')
     print(json.dumps({'path':str(target),'bytes':target.stat().st_size,'triangles':sum(len(b['f']) for b in mesh['bodies'])}))
 
 

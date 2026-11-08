@@ -4,6 +4,7 @@ import math
 from pathlib import Path
 import robot_spec as robot
 import assembly_model as assembly
+import synthetic_workspace as workspace
 import centrifuge_model as cf
 import centrifuge_protocol as protocol
 
@@ -44,7 +45,7 @@ def validate(s):
     return s
 
 
-def load():return validate(json.loads(SOURCE.read_text(encoding='utf-8')))
+def load():return validate(workspace.materialize_scene(json.loads(SOURCE.read_text(encoding='utf-8'))))
 
 
 def arm_source(scene):return robot.load(ROOT/scene['sources']['robot'],scene.get('robot_parameter_overrides_mm'))

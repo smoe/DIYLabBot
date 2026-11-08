@@ -88,6 +88,11 @@
           "color": {
             "type": "string",
             "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "opacity": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
           }
         },
         "allOf": [

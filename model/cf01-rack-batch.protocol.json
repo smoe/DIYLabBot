@@ -1,0 +1,117 @@
+{
+  "format": "solidcraftbot.cf01-rack-batch/1",
+  "id": "SYN.CF01.RackRoundtrip",
+  "mode": "local_mock_only",
+  "workspace": {
+    "source": "model/synthetic-cf01-workspace.shared.json",
+    "source_sha256": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517"
+  },
+  "station_contract": {
+    "source": "model/centrifuge-cf01.protocol.json",
+    "source_sha256": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+  },
+  "preconditions": {
+    "rack_delivered_by_transporter": true,
+    "transporter_modeled": false
+  },
+  "sample_order": "ascending_rack_slot",
+  "return_policy": "original_rack_slot",
+  "samples": [
+    {
+      "id": "Sample01",
+      "rack_slot": 1,
+      "rotor_slot": 1,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample02",
+      "rack_slot": 2,
+      "rotor_slot": 2,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample03",
+      "rack_slot": 3,
+      "rotor_slot": 3,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample04",
+      "rack_slot": 4,
+      "rotor_slot": 4,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample05",
+      "rack_slot": 5,
+      "rotor_slot": 5,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample06",
+      "rack_slot": 6,
+      "rotor_slot": 6,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample07",
+      "rack_slot": 7,
+      "rotor_slot": 7,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample08",
+      "rack_slot": 8,
+      "rotor_slot": 8,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample09",
+      "rack_slot": 9,
+      "rotor_slot": 9,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample10",
+      "rack_slot": 10,
+      "rotor_slot": 10,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample11",
+      "rack_slot": 11,
+      "rotor_slot": 11,
+      "mass_g": 2.0
+    },
+    {
+      "id": "Sample12",
+      "rack_slot": 12,
+      "rotor_slot": 12,
+      "mass_g": 2.0
+    }
+  ],
+  "spin": {
+    "rcf_x_g": 1000,
+    "duration_s": 2
+  },
+  "simulation_qualification": {
+    "simulation_fixture": true,
+    "rotor_rpm": 15000,
+    "drive_rpm": 15000,
+    "assembly_rcf_x_g": 16000,
+    "tube_rcf_x_g": 16000,
+    "tube_mass_limit_g": 3.0,
+    "pair_tolerance_g": 0.01
+  },
+  "limitations": [
+    "All masses, confirmations, qualification limits and times are fictitious test inputs",
+    "All robot handoffs are abstract synthetic confirmations, not executed motion paths; the separate 60 s motion excerpt is not called by this runner",
+    "No network server, hardware spin or transporter execution"
+  ],
+  "initial_state": {
+    "rotor": "empty",
+    "rack": "samples",
+    "mass_source": "fictitious_profile",
+    "handoff_time_s": 0
+  }
+}

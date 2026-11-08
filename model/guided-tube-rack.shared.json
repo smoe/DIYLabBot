@@ -1,0 +1,22 @@
+{
+  "operation": "guided_tube_rack",
+  "id": "CF01.OutputRack",
+  "rows": 3,
+  "columns": 4,
+  "pitch_mm": 24,
+  "size_mm": [
+    112,
+    84
+  ],
+  "base_thickness_mm": 4,
+  "guide_bottom_mm": 18,
+  "guide_thickness_mm": 6,
+  "bore_radius_mm": 6.9,
+  "entry_radius_mm": 9,
+  "entry_depth_mm": 3,
+  "rail_width_mm": 6,
+  "material": null,
+  "calibrated": false,
+  "support_confirmation": "synthetic; real rack presence and seating sensing required",
+  "format": "solidcraftbot.guided-tube-rack/1"
+}

@@ -1,0 +1,12 @@
+{
+  "format": "solidcraftbot.synthetic-environment/1",
+  "id": "SYN.Unbounded",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "extent": "unbounded",
+  "geometry": "none",
+  "world_frame": "SYN.World",
+  "purpose": "Synthetic communication and workflow testing; not a surveyed room"
+}

@@ -1,0 +1,41 @@
+{
+  "format": "solidcraftbot.furniture-catalog/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "types": {
+    "reference_worktop": {
+      "recipe": "box_envelope",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            0.001,
+            30000
+          ]
+        }
+      },
+      "role": "local_bench_envelope_not_a_furniture_design",
+      "color": "#8a959d",
+      "opacity": 0.38
+    }
+  },
+  "limitations": [
+    "Reference surface only; no selected furniture article or support/load qualification"
+  ]
+}

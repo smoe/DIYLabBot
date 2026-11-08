@@ -1,69 +1,215 @@
 {
   "format": "solidcraftbot.readme-media/1",
-  "prepared_on": "2026-11-06",
-  "source_animation": "renders/centrifuge-cf01-robot-05dba7428daa/cf01-robot-pickup.html",
-  "source_animation_sha256": "7bcfd933d703bdb88f6ae4233ed883745a998972fa28770ba15e26cdd22529a9",
+  "prepared_on": "2026-11-08",
+  "source_animation": "renders/centrifuge-cf01-robot-bd2b09988abf-r2/cf01-robot-pickup.html",
+  "source_animation_sha256": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
   "source_files_sha256": {
-    "model/centrifuge-cf01.robot-pickup.shared.json": "05dba7428daa6540441847d3845dc4d744e4346530ee41798bae0945f7acc8f7",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bd2b09988abf4a5228208f0c4e17c4bc25e1cbb6815012526e80612da2951557",
     "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
     "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
     "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-    "scripts/centrifuge_robot_pickup.py": "9fd5e447d981ce4ea6a7f59d495d4851003e49aea7e2d5e7de17c70db394d698",
-    "scripts/build_centrifuge_robot_pickup.py": "89114a0e092a4a341df2143532db71495a3c7f1bbf828cdd79c71a4958c90ecd",
-    "scripts/build_centrifuge_robot_pickup_freecad.py": "1cebaf44efa70960452f76b899fcd5670a3e25f5a0dec81ca062c673563c6593",
-    "scripts/export_centrifuge_robot_pickup_solidcraft.py": "3a64393a0706cb1cb2af58586d08b1dbacd12d8bb8284d65335b0fb73ad235c8",
-    "scripts/build_centrifuge_robot_pickup_visual.py": "56225419e991b9bfda61cdfdbd657f0d06344d1bd0d9701a2406ca4c675775c3",
-    "scripts/report_centrifuge_robot_pickup.py": "c665e1942829f18cd0386c6c085a23fa5bfe0398414da6e31b125143e43b81ee",
+    "scripts/centrifuge_robot_pickup.py": "ceb04a5e7e2b9e98ebddb338720c662195c009908e3672cfa25699bb82bbafe4",
+    "scripts/build_centrifuge_robot_pickup.py": "c95552abc8d4462425531a0117441007a6ce0a1006d6cba79b650b86e656da07",
+    "scripts/build_centrifuge_robot_pickup_freecad.py": "e6048a04c8b52dc4b45e1b4c4efa4ac4312eaaf88376ddaf8926afb0f6391161",
+    "scripts/export_centrifuge_robot_pickup_solidcraft.py": "040b85586e24beaa8e90e25a4f2c665a8f9246aa90608c2afb4a0a67030273fe",
+    "scripts/build_centrifuge_robot_pickup_visual.py": "00f6c82f1708813dd2487297823695621b18ba9e38567e2f58f1e4089b31209f",
+    "scripts/report_centrifuge_robot_pickup.py": "aa0b83c702bd70d35d52d63f9b7f91047f846d293a9efefb7db779d6eccae960",
     "scripts/check_centrifuge_robot_motion.py": "c9edb19195674cdf12009e3cf85c31f3cce42210231866c7b4784995faeb465c",
-    "scripts/robot_spec.py": "239198f376c7467f10f1eb8903bef2783f24e305d8ef85f221303b44bff52fb3",
-    "scripts/lab_transfer_model.py": "ce4ef26ea0f5e1a4e829722f4fd8bdca1b6720d30d873cd17aef88488b5dbfd5",
-    "scripts/templates/centrifuge_robot_pickup.html": "1efacec216cc4fef45c96f734e4137027ef402b7e63861f119ae8e812c8646fe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/lab_transfer_model.py": "b7e16e6d91f1889211ca6c641cfc7f789ebf3ed26df03b06c2e4c131dce6f85f",
+    "scripts/templates/centrifuge_robot_pickup.html": "f39dd72fe09c284dcf8b959ca93c5503b25b1ae0e983cc8ed35f575a60867ed8",
     "scripts/templates/centrifuge_robot_pickup.FCMacro": "8909c35b5d69db11d434a36a7a2d9dd5f010f5c16ef5a80ee32bb68fa498d97a",
-    "tests/test_centrifuge_robot_pickup.py": "897291a8405e52d579f0e3a7f33555b8c8f9c9a874ac66add3d959a47581c14a"
+    "tests/test_centrifuge_robot_pickup.py": "897291a8405e52d579f0e3a7f33555b8c8f9c9a874ac66add3d959a47581c14a",
+    "model/synthetic-cf01-workspace.shared.json": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+    "model/equipment/cf01-workspace.json": "d1d52e0cba2e3c627c1a5f66b69d4822cbb41c0efaabde65e9d54b0008dda4ad",
+    "model/guided-tube-rack.shared.json": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74",
+    "scripts/synthetic_workspace.py": "d1bd7ab8fa2459ece270bcc43f9c35c963fa1b5ab64a97dbf66214f12f4e5bb0",
+    "scripts/cf01_rack_batch.py": "69bfc9da4d19a6a1753c67070f88a0ca00f80d1f6c1a6f2d7e88a1373c7cf554",
+    "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b",
+    "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+    "scripts/centrifuge_protocol.py": "9c1238770f29d3f23e210d311a4d5966655977a88572aefa898fd3788dca4a37",
+    "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+    "model/cf01-rack-batch.protocol.json": "651ca82d6b48717e5826c6c763d8c767cb57134f9491b9a42ec620043fca1ab2",
+    "scripts/templates/robot_demo_header.html": "14ceab677ff190e1d64cd1e43dca337c89f7a6f39482ec1387b22df50f1dd11c",
+    "scripts/run_cf01_rack_batch.py": "17ee9c6ff740f31adcfa518d56b2b3dc03f7565df074e565807bee45faaf2d48",
+    "scripts/export_readme_video.cjs": "eb0040161d2390cd58160c78147cd6e8e8dbb81faaf899c9940b1ebc70b6a191",
+    "tests/test_synthetic_workspace.py": "5b0c0bb7109fcb36e36996354b36e6fdc61ff3936d5421ad8473667684f8041a",
+    "tests/fixtures/cf01-before-workspace.json": "0e91846af3f9e1d4a8d6ac7959b0a4dc97a0198bb00eafb8a544ccdce6a87dd0",
+    "model/furnishings.schema.json": "c7ccac55a1ca59202b050789f5567e94fc0097012cf8f0dee443c350e3b42012",
+    "model/furniture-catalog.schema.json": "37e48ec167cf101ffaad4c0b0fc034cf6d7415f5824969bd2a430e5fb14b053f",
+    "model/centrifuge-cf01.robot-pickup.schema.json": "484effb3e63f58dc4d6b8e2354cc2504c2be33d68a492f79e6586984141290e3",
+    "model/camera.schema.json": "06d24aaa7e32249e8c8a127a461e5b4ada0ee14ec3541ece67066634228b7eda",
+    "model/room-composition.schema.json": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d",
+    "model/synthetic-workspace.schema.json": "b47547a956703bfb29ccac17aceb5c706fbd68f9cba7313e9b8effc0f66645b1",
+    "model/room-geometry.schema.json": "5254848d0091cb2da6ba67e38f26d75a939811d44ce43ce08e13fd60ec63ec26",
+    "model/assembly-reference.schema.json": "6720eb5e839bef8fae0123c028f9f612c95e962a85e0f7d49fcb004a930c26dd",
+    "model/equipment-layout.schema.json": "2670dc358051e4ee8efcbbad1603f78aeb6173c9a996c9d732e8dc5675081d7f",
+    "model/guided-tube-rack.schema.json": "1607ea63c13628019a2af66177027e328b8f2e140ea5b853b843f412ae7382d6",
+    "model/synthetic-environment.schema.json": "988269476443b4c8131cd33047dde9de0e60db2c3796b17485f6e076af230b1d",
+    "model/lab-layout.schema.json": "7af1357e9e7218c61ad8faff7602b48eda4fd068468cfd61fee35cb1c93d99db",
+    "model/mobile-base.schema.json": "d44f9e887433a79de884a3ddb3605f9d3287de4f38b6f2289cc99bff11fc082d",
+    "model/cf01-rack-batch.schema.json": "a782574cd1d3ca7f18a366a0d1403a5504f7aa169f62e93106734d2288ec8960",
+    "model/robot.schema.json": "7bc5f53b7b9d6e175fde7f8e32672b44361574f93574f4381b6194b06177b7ba",
+    "model/services.schema.json": "78b147dfc643219144883bf39ab24a653a33f345fe42263247a201e3973af292"
   },
   "source_cycle_s": 60,
-  "historical_build_passed": true,
-  "historical_visual_review": {
+  "video_target_duration_s": 20,
+  "current_build_passed": false,
+  "build_limitation": "SolidCraft STEP import leaves Rotor and five servo housings open; strict closure checks fail, no checks waived",
+  "offline_tests": {
     "passed": true,
-    "scene_sha256": "05dba7428daa6540441847d3845dc4d744e4346530ee41798bae0945f7acc8f7",
+    "count": 211,
+    "log": "exports/generated/centrifuge-cf01-robot-bd2b09988abf-r2/offline-tests.log"
+  },
+  "schema_documents_passed": 13,
+  "native_freecad": {
+    "snapshots": 7,
+    "bodies": 223,
+    "scene_passed": true,
+    "self_and_grip_passed": true,
+    "motion_passed": true,
+    "motion_frames_requested": 1601,
+    "regression": {
+      "passed": true,
+      "body_ids_preserved": true,
+      "snapshots": [
+        {
+          "phase": "Closed",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 2.3990196767073562e-11
+        },
+        {
+          "phase": "Grasp",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 1.0515379687855127e-11
+        },
+        {
+          "phase": "Extracted",
+          "body_count_preserved": true,
+          "volume_difference_mm3": -3.725290298461914e-09,
+          "center_difference_mm": 1.4736957071068108e-11
+        },
+        {
+          "phase": "Withdrawn",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 7.731175366947925e-12
+        },
+        {
+          "phase": "ClosedAfterPickup",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 7.730640473904607e-12
+        },
+        {
+          "phase": "RackSeated",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 4.090288739354344e-11
+        },
+        {
+          "phase": "RackReleased",
+          "body_count_preserved": true,
+          "volume_difference_mm3": 0.0,
+          "center_difference_mm": 8.971780336915039e-13
+        }
+      ],
+      "baseline": "centrifuge-cf01-robot-05dba7428daa",
+      "scope": "Seven native snapshot aggregate volumes/centers and all body IDs; not a physical qualification"
+    },
+    "live_macro_executed": false
+  },
+  "solidcraft_snapshots": {
+    "passed": false,
+    "snapshots": [
+      {
+        "phase": "Grasp",
+        "passed": false,
+        "body_count": 223,
+        "expected_body_count": 223,
+        "solidcraft": "/Users/u005069/GitHub/DIYLabBot/cad/generated/centrifuge-cf01-robot-bd2b09988abf-r2/CF01_Robot_Grasp.sc",
+        "invalid_or_open_bodies": [
+          "Rotor",
+          "Arm_A1_housing",
+          "Arm_A3_housing",
+          "Arm_A4_housing",
+          "Arm_A5_housing",
+          "Arm_A6_housing"
+        ],
+        "workspace_bench_passed": true,
+        "limitation": "Current SolidCraft STEP import leaves these complex bodies open; source geometry is unchanged. No closure check was waived."
+      },
+      {
+        "phase": "RackReleased",
+        "passed": false,
+        "body_count": 223,
+        "expected_body_count": 223,
+        "solidcraft": "/Users/u005069/GitHub/DIYLabBot/cad/generated/centrifuge-cf01-robot-bd2b09988abf-r2/CF01_Robot_RackReleased.sc",
+        "invalid_or_open_bodies": [
+          "Rotor",
+          "Arm_A1_housing",
+          "Arm_A3_housing",
+          "Arm_A4_housing",
+          "Arm_A5_housing",
+          "Arm_A6_housing"
+        ],
+        "workspace_bench_passed": true,
+        "limitation": "Current SolidCraft STEP import leaves these complex bodies open; source geometry is unchanged. No closure check was waived."
+      }
+    ],
+    "dynamic_handoff_supported_in_this_export": false
+  },
+  "visual_review": {
+    "passed": true,
+    "scene_sha256": "bd2b09988abf4a5228208f0c4e17c4bc25e1cbb6815012526e80612da2951557",
     "checks": [
-      "Bench-mounted base and long links visible in assembly",
-      "Revised fingers grasp tube body below cap",
-      "Robot and tube clear with lid fully open at 30.5 s",
-      "Lid closed while tube retained outside at 42 s",
-      "Rack support confirmed with fingers closed at 55 s",
-      "At 60 s tube stays in slot 01 and empty open fingers are withdrawn",
-      "Grasp and rack close-ups fit their content",
-      "Play/pause, scrub and view switching work",
-      "Final console contains no warnings or errors"
+      "source-derived bench and scene visible",
+      "playback and ownership key states",
+      "batch loading, centrifugation, braking and completion visible",
+      "original twelve-place rack order restored",
+      "responsive 320/600/960 without overflow"
     ],
     "reviewed_times_s": [
+      0,
       21.5,
       30.5,
       42,
       55,
       60
     ],
-    "browser_console_warnings": [],
     "browser_console_errors": [],
-    "freecad_live_macro_executed": false,
-    "display_mesh": {
-      "body_count": 223,
-      "triangles": 95920,
-      "bytes": 838525,
-      "vendor_mesh_cluster_mm": 1,
-      "geometry_for_native_checks": "full source BRep, no clustering"
-    }
+    "browser_console_warnings": []
   },
-  "current_verification": "Standalone browser runtime and sampled ownership states; no new CAD build or hardware validation",
-  "adaptation": "Standalone HTML wrapper with explicit theme colors; same embedded geometry, trajectory and playback code",
+  "video_check": {
+    "duration_s": 19.999588,
+    "width": 920,
+    "height": 490,
+    "decoded": true,
+    "error": null
+  },
+  "rack_batch": {
+    "passed": true,
+    "sample_count": 12,
+    "original_slots_restored": true,
+    "local_command_decoders": [
+      "ros2",
+      "sila2"
+    ],
+    "polling": "local MockProtocol API",
+    "robot_motion_checked": false,
+    "identity_check": "Separate synthetic world inventory; no physical identity sensor",
+    "initial_state": "Delivered rack, empty rotor; profile masses are fictitious",
+    "time_semantics": "Zero-time handoffs, test clock for spin/braking only"
+  },
+  "adaptation": "Source-derived composition, preserved 241-sample motion; independent batch panel, no coupled robot paths",
+  "network_executed": false,
   "hardware_connected": false,
-  "media_sha256": {
-    "robot-demo.html": "c9321e7b80c28167697b52ba435bc637be2a8a95af5d40e77a4b4bd7ffa93084",
-    "robot-demo.png": "10f32cf32b5a167f481f79b995d3a739fa66d36fde9cc593a24d304cf289d96c",
-    "robot-demo.mp4": "590f1f0a781a653310b503654127ce85883d1a5c1bef519ded508f35b3971b5f"
-  },
-  "video_target_duration_s": 20,
+  "transporter_executed": false,
   "browser_check": {
     "console_errors": [],
     "ownership_at_0_15_30_45_60_s": [
@@ -73,5 +219,10 @@
       "gripper",
       "rack"
     ]
+  },
+  "media_sha256": {
+    "robot-demo.html": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
+    "robot-demo.png": "6cf417bf6bdea2d37fb90368eb3fc20ebc869bc96892c20d6b6170a52656943e",
+    "robot-demo.mp4": "da38a7eab9617bc4c47d9c1edd2616cbf39c94e42ea8f24d0ee95169e3143d5e"
   }
 }

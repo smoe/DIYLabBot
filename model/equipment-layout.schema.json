@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "equipment-layout.schema.json",
+  "title": "Device sources and poses relative to named support frames",
+  "type": "object",
+  "required": [
+    "format",
+    "units",
+    "assets",
+    "instances"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.equipment-layout/1"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "assembly-reference.schema.json#/$defs/reference"
+      }
+    },
+    "instances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "asset",
+          "parent_frame",
+          "xyz",
+          "yaw_deg"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "asset": {
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_frame": {
+            "type": "string",
+            "minLength": 1
+          },
+          "xyz": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number"
+            }
+          },
+          "yaw_deg": {
+            "type": "number"
+          },
+          "overrides": {
+            "$ref": "assembly-reference.schema.json#/$defs/overrides"
+          }
+        }
+      }
+    }
+  }
+}

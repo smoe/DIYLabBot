@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "synthetic-workspace.schema.json",
+  "title": "Reference bench and equipment in an unbounded workspace",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.synthetic-workspace/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "environment",
+        "furniture",
+        "furnishings",
+        "equipment"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "furniture": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "furnishings": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "equipment": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

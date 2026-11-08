@@ -5,6 +5,7 @@
     #cf01-bench-rack .cf01-timeline {width:100%;margin:.5em 0}
     @media(max-width:480px){#cf01-bench-rack .cf01-scene{height:340px}}
   </style>
+  <p>Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und Mock-Quittungen; keine Kopplung an die Chargenwiedergabe.</p>
   <div class="viz-controls">
     <button type="button" class="btn btn-primary" data-play>Play cycle</button>
     <label class="form-label">View <select class="form-select" data-view><option value="assembly">Robot, centrifuge and rack</option><option value="tube">Tube handling close-up</option><option value="rack">Rack placement</option></select></label>
@@ -14,6 +15,26 @@
   <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite">Closed and locked</span><span data-values></span></div>
   <label class="form-label">Cycle time <span class="tabular-nums" data-time>0.0 / 60.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="60" step="0.05" value="0" aria-label="Cycle time in seconds"></label>
   <div class="viz-row text-small"><span data-lift>Tube supported by centrifuge</span><span>Bench mounting · 1 mm transport target</span></div>
+  <details class="cf01-batch" data-batch-panel>
+    <summary>Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze</summary>
+    <p>Aufzeichnung des lokalen Mock-Protokolls für zwölf Proben. Roboterübergaben
+    beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit
+    vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.</p>
+    <button type="button" data-batch-play>Protokoll abspielen</button>
+    <input type="range" data-batch-slider min="0" max="1" step="1" value="0" aria-label="Protokollschritt">
+    <p data-batch-stage aria-live="polite"></p>
+    <div class="cf01-batch-grids"><div><strong>Rackplätze</strong><div data-batch-rack></div></div><div><strong>Rotorplätze (logische Reihenfolge)</strong><div data-batch-rotor></div></div></div>
+    <p data-batch-gripper></p><p>Simulation: keine Netzwerk- oder Hardwareausführung.</p>
+  </details>
+  <style>
+    .cf01-batch{margin-top:16px;border-top:1px solid #b6c7d2;padding-top:10px}
+    .cf01-batch input{display:block;width:100%;margin-top:12px}
+    .cf01-batch-grids{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+    [data-batch-rack],[data-batch-rotor]{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:8px}
+    .cf01-batch-slot{padding:6px;border:1px solid #b6c7d2;border-radius:4px;font-size:12px;overflow-wrap:anywhere;min-height:32px}
+    .cf01-batch-slot.filled{background:#dcebe3;color:#18334a}
+    @media(max-width:320px){.cf01-batch-grids{grid-template-columns:minmax(0,1fr)}}
+  </style>
   <script type="application/json" data-mesh>__MESH__</script>
   <script>
   (async()=>{
@@ -110,6 +131,28 @@
     new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
     window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);readTheme()});
     readTheme();restore(window.openai?.widgetState);
+    function initializeBatch(){
+    const batch=mesh.rack_batch;
+    if(!batch?.trace?.length){root.querySelector('[data-batch-panel]').hidden=true;return;}
+    const batchSlider=root.querySelector('[data-batch-slider]'),batchButton=root.querySelector('[data-batch-play]');
+    let batchTimer=null;
+    function batchAt(index){
+      index=Math.max(0,Math.min(batch.trace.length-1,index));batchSlider.value=index;
+      const record=batch.trace[index];root.dataset.batchIndex=String(index);root.dataset.batchOrderRestored=String(index===batch.trace.length-1&&batch.order_restored);
+      root.querySelector('[data-batch-stage]').textContent=`Schritt ${index+1}/${batch.trace.length}: ${record.contract?'CF01-Befehl':record.stage.includes('gripper')||record.stage==='robot_clear'?'Abstrakte Übergabe':'Ablaufzustand'} · ${record.stage}${record.sample_id?' · '+record.sample_id:''} · Testzeit (Spin/Bremse) ${record.time_s.toFixed(1)} s`;
+      for(const [key,selector] of [['rack','[data-batch-rack]'],['rotor','[data-batch-rotor]']]){
+        const grid=root.querySelector(selector);grid.replaceChildren();
+        record.inventory[key].forEach((id,i)=>{const cell=document.createElement('div');cell.className='cf01-batch-slot'+(id?' filled':'');cell.textContent=String(i+1).padStart(2,'0')+': '+(id||'leer');grid.appendChild(cell)})
+      }
+      root.querySelector('[data-batch-gripper]').textContent='Greifer: '+(record.inventory.gripper||'leer')+(index===batch.trace.length-1?' · Reihenfolge wiederhergestellt: '+(batch.order_restored?'ja':'nein'):'');
+    }
+    batchSlider.max=batch.trace.length-1;batchSlider.addEventListener('input',()=>batchAt(Number(batchSlider.value)));
+    batchButton.addEventListener('click',()=>{if(batchTimer){clearInterval(batchTimer);batchTimer=null;batchButton.textContent='Protokoll abspielen';return}
+      if(Number(batchSlider.value)>=batch.trace.length-1)batchAt(0);batchButton.textContent='Pause';
+      batchTimer=setInterval(()=>{const next=Number(batchSlider.value)+1;batchAt(next);if(next>=batch.trace.length-1){clearInterval(batchTimer);batchTimer=null;batchButton.textContent='Protokoll abspielen'}},100)
+    });batchAt(0);
+    }
+    initializeBatch();
     if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.openai?.widgetState?.modelContent?.scene_id!==mesh.trajectory.scene_sha256){playing=true;button.textContent='Pause';requestAnimationFrame(tick)}
   })();
   </script>
