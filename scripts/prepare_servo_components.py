@@ -12,6 +12,7 @@ import json
 import math
 import re
 from servo_mounting_design import analyse
+from robot_components import exterior_sections
 
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = {
@@ -60,20 +61,16 @@ def prepare():
         for shape in leaves(original):
             if shape.ShapeType=="Shell" and shape.isClosed(): shape=Part.makeSolid(shape)
             if shape.ShapeType=="Solid" and shape.isValid(): solids.append(shape)
-        case=[s for s in solids if s.BoundBox.XLength>1.8*cfg["radius"] and s.BoundBox.YLength>1.8*cfg["radius"] and s.BoundBox.ZLength>2.5 and s.Volume>1000]
-        pins=[]
-        if interface_spec and "locating_pins" in interface_spec["housing"]:
-            pin_spec=interface_spec["housing"]["locating_pins"]
-            for solid in solids:
-                b=solid.BoundBox; centre=solid.CenterOfMass
-                if (abs(b.XLength-pin_spec["outside_diameter_mm"])<0.01 and abs(b.YLength-pin_spec["outside_diameter_mm"])<0.01
-                    and abs(b.ZLength-pin_spec["length_mm"])<0.01
-                    and abs(b.ZMax-cfg["front"]-pin_spec["protrusion_from_housing_face_mm"])<0.01
-                    and abs(math.hypot(centre.x,centre.y)-pin_spec["bolt_circle_mm"]/2)<0.02):pins.append(solid)
-            if len(pins)!=pin_spec["count"]:raise ValueError("Locating pin geometry does not match drawing")
-            case.extend(pins)
-        output=[s for s in solids if abs(s.BoundBox.ZMax)<0.01 and abs(s.BoundBox.XLength-2*cfg["boss"])<0.1 and s.Volume>1000]
-        if len(output)!=1 or not case: raise ValueError("Ambiguous exterior partition: "+name)
+        measurements=[]
+        for i,solid in enumerate(solids):
+            b=solid.BoundBox
+            measurements.append({"name":i,"bbox":{"min":[b.XMin,b.YMin,b.ZMin],"max":[b.XMax,b.YMax,b.ZMax]},
+                                 "volume_mm3":solid.Volume,"center_of_mass":list(solid.CenterOfMass),"closed":solid.isClosed()})
+        partition=exterior_sections({"part":name,"nominal_radius_mm":cfg["radius"],"output_boss_radius_mm":cfg["boss"],
+            "interfaces":{"housing":{"z_mm":cfg["front"],**({"locating_pins":interface_spec["housing"]["locating_pins"]}
+            if interface_spec and "locating_pins" in interface_spec["housing"] else {})}}},measurements)
+        case=[solids[i] for i in partition["housing"]];pins=[solids[i] for i in partition["pins"]];output=[solids[i] for i in partition["output"]]
+        if pins:pin_spec=interface_spec["housing"]["locating_pins"]
         housing=case[0].multiFuse(case[1:]).removeSplitter() if len(case)>1 else case[0]
         if not housing.isValid() or len(housing.Solids)!=1: raise ValueError("Housing union needs review: "+name)
         folder=source.parent/cfg.get("derivative_revision","registered-v1"); folder.mkdir(exist_ok=True)

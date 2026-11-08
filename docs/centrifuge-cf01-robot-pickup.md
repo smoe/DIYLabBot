@@ -5,8 +5,10 @@ combines the existing six-axis [robot](../model/robot.json),
 [centrifuge](../model/centrifuge-cf01.shared.json) and
 [command contract](../model/centrifuge-cf01.protocol.json). A provisional
 parallel tube gripper is attached to the arm's existing flange reference.
-The [current pickup report](../cad/centrifuge-cf01/robot-pickup-build-report.json)
+The [combined pickup report](../cad/centrifuge-cf01/robot-pickup-build-report.json)
 lists the generated animation, native CAD views, playback macro and evidence.
+The independent SolidCraft result is recorded separately in
+`cad/centrifuge-cf01/solidcraft-pickup-build-report.json`.
 
 The 60-second illustrative sequence opens the lid, raises tube 01, approaches
 with open jaws, closes them around the tube body, extracts the tube along its
@@ -104,10 +106,10 @@ python scripts/build_centrifuge_robot_pickup.py
 python -m unittest discover -s tests -v
 ```
 
-The builder creates a new revision. It checks the upstream native-model source
-and artifact hashes, generates the constrained trajectory, builds the native
-FreeCAD scene and tests it, exports SolidCraft review snapshots, then writes the
-interactive animation. Source dimensions and protocol intent remain in JSON;
+The combined builder creates a new revision. It checks the upstream native-model
+source and artifact hashes, generates the constrained trajectory, builds and
+tests the FreeCAD scene, writes the animation, and independently constructs
+the SolidCraft review poses from the shared sources. Source dimensions and protocol intent remain in JSON;
 native snapshots are derived review files rather than additional master models.
 
 - FreeCAD: seven posed scenes (`Closed`, `Grasp`, `Extracted`, `Withdrawn`,
@@ -115,12 +117,11 @@ native snapshots are derived review files rather than additional master models.
   and `CF01_Robot_Pickup.FCMacro`. Run the macro to play or
   scrub all six robot axes, lid, pusher, jaws and carried tube. Its live GUI is
   prepared but has not been run here; the underlying native placements were checked.
-- SolidCraft: `Grasp` and `RackReleased` review snapshots derived from the
-  same native scene. Their body count, total volume and center of mass are
-  compared with FreeCAD. These are frozen posed STEP instances, **not a native
-  SolidCraft handoff motion study**. Repeated glyph prototypes can have import
-  aliases and the repeated-part display palette is simplified. The original arm
-  and centrifuge CAD constructions retain their own joints and feature histories.
+- SolidCraft: `Grasp` and `RackReleased` review poses built using the existing
+  native arm and centrifuge recipes, shared gripper/rack primitives and shared
+  kinematics. These are **frozen review poses, not a native handoff motion study**.
+  Per-body closure, identities, volumes and transformed centers are checked.
+  A FreeCAD comparison is optional; it never provides geometry to this adapter.
 - Interactive playback: meshes tessellated from the same native bodies plus the
   shared joint hierarchy and sampled joint trajectory. Vendor detail is clustered
   at 1 mm only for responsive display; exact BRep geometry remains in CAD checks.
@@ -187,9 +188,51 @@ The 60-second motion component (rotor slot 01 → rack slot 01) has its own time
 and mock confirmations. The batch runner does not execute that component or
 any loading/return path. The README HTML presents the two independently.
 
-On the current macOS build, seven FreeCAD snapshots and the adaptive motion audit
-pass. The SolidCraft snapshot import fails strict closure validation for Rotor
-and Arm_A1/A3/A4/A5/A6_housing; all 223 body entries are imported and BenchSurface
-passes its dimensions and volume check. No closure check is waived. See local
-`solidcraft-scene-validation.json` and the overall build report (`passed: false`).
+The earlier macOS STEP-snapshot build failed strict SolidCraft closure validation
+for Rotor and Arm_A1/A3/A4/A5/A6_housing. That historical report remains failed;
+the README media provenance continues to record that build honestly.
 No network, hardware, live FreeCAD macro or transporter execution is established.
+
+## Independent SolidCraft build and importer workaround
+
+```sh
+python3 scripts/export_centrifuge_robot_pickup_solidcraft.py
+```
+
+This entry needs Python, SolidCraft CLI and the versioned shared sources/vendor
+library. It does not read an FCStd, FreeCAD-generated scene STEP, display mesh,
+or any previous CAD build report. It creates its own revision under
+`cad/generated/centrifuge-cf01-solidcraft-*` and `exports/generated/`.
+`cad/centrifuge-cf01/solidcraft-pickup-build-report.json` locates the result.
+
+The rotor and other own geometry are constructed natively. For X2/X4 housings,
+the current importer loses faces from the registered, fused STEP derivatives.
+`solidcraft_vendor.py` instead imports the unchanged archived manufacturer STEP,
+selects its exterior with the same CAD-independent partition used by the vendor
+preparer, and retains the original closed case pieces. Internal parts are
+omitted as before. The selected pieces make a native SolidCraft STEP round trip
+with closure, volume, center and bounds checks. No hole patching or mesh
+replacement is accepted. The original files and registered library remain intact.
+
+The resulting scene has 235 CAD bodies for the same 223 semantic source bodies:
+each X4 housing uses four original pieces and each X2 housing three. A manifest
+maps these parts to their original housing ID and arm link. Their original seam
+overlaps remain; summed case-piece volume differs slightly from the old fused
+representation. No claim about real mass or mechanical fits follows.
+
+Both review poses check every body's identity, closure, volume and world center
+against the unposed native construction and the shared transforms. Closure is
+mandatory; relative volume integration error must stay below 0.01% and center
+error below 0.001 mm (1 µm). These numerical integration tolerances are not
+hardware accuracy claims. To add a
+comparison with an independently generated FreeCAD metrics report:
+
+```sh
+python3 scripts/export_centrifuge_robot_pickup_solidcraft.py --compare-freecad /path/to/snapshot-metrics.json
+```
+
+The optional comparison uses the existing 0.1% volume and 0.02 mm center limits.
+Only the complete multi-backend builder passes `--context`; standalone generation
+does not require that context or FreeCAD. These checks do not validate a native
+SolidCraft motion study or the full loading path. The standalone arm builder and
+other legacy STEP-snapshot adapters have not been migrated by this CF01 change.

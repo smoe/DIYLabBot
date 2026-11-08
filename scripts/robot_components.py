@@ -7,6 +7,34 @@ import math
 
 ROOT=Path(__file__).resolve().parents[1]
 
+def exterior_sections(part, bodies):
+    """Select vendor case/output pieces geometrically, in the output frame.
+
+    Both CAD adapters use this partition; IDs only address the measured pieces,
+    never select a particular vendor face or an ordinal in a STEP file.
+    """
+    case=[]; output=[]; pins=[]
+    pin_spec=part.get("interfaces",{}).get("housing",{}).get("locating_pins")
+    front=part["interfaces"]["housing"]["z_mm"]
+    for body in bodies:
+        lo,hi=body["bbox"]["min"],body["bbox"]["max"]
+        size=[b-a for a,b in zip(lo,hi)]; volume=body.get("volume_mm3") or 0
+        if min(size[:2])>1.8*part["nominal_radius_mm"] and size[2]>2.5 and volume>1000:
+            case.append(body["name"])
+        if abs(hi[2])<.01 and abs(size[0]-2*part["output_boss_radius_mm"])<.1 and volume>1000:
+            output.append(body["name"])
+        if pin_spec and body.get("center_of_mass"):
+            centre=body["center_of_mass"]
+            if (abs(size[0]-pin_spec["outside_diameter_mm"])<.01 and abs(size[1]-pin_spec["outside_diameter_mm"])<.01
+                and abs(size[2]-pin_spec["length_mm"])<.01
+                and abs(hi[2]-front-pin_spec["protrusion_from_housing_face_mm"])<.01
+                and abs(math.hypot(*centre[:2])-pin_spec["bolt_circle_mm"]/2)<.02):pins.append(body["name"])
+    if len(output)!=1 or not case or (pin_spec and len(pins)!=pin_spec["count"]):
+        raise ValueError("Ambiguous exterior partition: "+part.get("part","vendor"))
+    selected=set(case+pins+output)
+    if any(not b["closed"] for b in bodies if b["name"] in selected):raise ValueError("Selected vendor exterior is not closed")
+    return {"housing":case+pins,"output":output,"pins":pins}
+
 def library(spec):
     ref=spec["vendor_library"]
     path=(ROOT/ref["path"]).resolve()

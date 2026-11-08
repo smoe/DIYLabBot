@@ -1,0 +1,474 @@
+{
+  "format": "solidcraftbot.documentation-gallery/1",
+  "entries": [
+    {
+      "id": "l01-geometry",
+      "title": "L01 · Raumgeometrie",
+      "group": "umgebungen",
+      "sources": [
+        "model/environments/l01.geometry.json"
+      ],
+      "image": "images/l01-geometry.png",
+      "render": {
+        "kind": "room",
+        "scope": "geometry"
+      },
+      "caption": "Raumhülle, Fenster und Betonstütze. Die Maße sind vorläufig.",
+      "documentation": "docs/lab-room-l01.md"
+    },
+    {
+      "id": "unbounded-space",
+      "title": "Synthetischer unbegrenzter Raum",
+      "group": "umgebungen",
+      "sources": [
+        "model/environments/synthetic-unbounded.json"
+      ],
+      "image": "images/unbounded-space.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "unbounded"
+      },
+      "caption": "Symbolische Darstellung: Die Quelle erzeugt keinen Raumkörper und keine künstliche Raumgrenze.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-storage-bench",
+      "title": "Stauraumbank",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-storage-bench.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "storage_bench",
+        "instance": "IslandLeft"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz IslandLeft. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-open-shaped-bench",
+      "title": "Offene angepasste Bank",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-open-shaped-bench.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "open_shaped_bench",
+        "instance": "WindowBenchLeft"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz WindowBenchLeft. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-shelf-board",
+      "title": "Regalbrett",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-shelf-board.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "shelf_board",
+        "instance": "IslandShelf_Board"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz IslandShelf_Board. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-upright",
+      "title": "Stütze",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-upright.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "upright",
+        "instance": "IslandShelf_Post1"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz IslandShelf_Post1. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-cupboard",
+      "title": "Schrank",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-cupboard.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "cupboard",
+        "instance": "IslandCupboard1"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz IslandCupboard1. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-side-gap-cover",
+      "title": "Seitliche Abdeckung",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-side-gap-cover.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "side_gap_cover",
+        "instance": "HeatingCoverLeft"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz HeatingCoverLeft. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "furniture-support-gap-cover",
+      "title": "Abdeckung an der Betonstütze",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-support-gap-cover.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "support_gap_cover",
+        "instance": "SupportGapCover"
+      },
+      "caption": "Typbeispiel aus der L01-Instanz SupportGapCover. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "reference-bench",
+      "title": "Referenzbank",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/reference-bench.catalog.json",
+        "model/furnishings/cf01-reference-bench.json"
+      ],
+      "image": "images/reference-bench.png",
+      "render": {
+        "kind": "bench"
+      },
+      "caption": "Referenzfläche der synthetischen Umgebung; keine ausgearbeitete tragende Tischkonstruktion.",
+      "documentation": "ARCHITECTURE.md"
+    },
+    {
+      "id": "l01-furnished",
+      "title": "L01 · Möblierung",
+      "group": "moeblierung",
+      "sources": [
+        "model/furnishings/l01.furnishings.json",
+        "model/lab-room-l01.shared.json"
+      ],
+      "image": "images/l01-furnished.png",
+      "render": {
+        "kind": "room",
+        "scope": "all"
+      },
+      "caption": "Die Möbeltypen werden mehrfach aufgestellt. Die Raumkomposition bindet die Quellen zusammen.",
+      "documentation": "docs/lab-room-l01.md"
+    },
+    {
+      "id": "l01-equipment",
+      "title": "L01 · Geräteausstattung",
+      "group": "ausstattung",
+      "sources": [
+        "model/lab-layout-l01.shared.json"
+      ],
+      "image": "images/l01-equipment.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "layout"
+      },
+      "caption": "Aktueller schematischer Aufstellungsplan. Nummern markieren Gerätebezugspunkte; die Symbole sind keine Kollisionshüllen.",
+      "documentation": "docs/lab-layout-l01.md"
+    },
+    {
+      "id": "synthetic-workspace",
+      "title": "Minimalumgebung · Arm, CF01 und Rack",
+      "group": "ausstattung",
+      "sources": [
+        "model/synthetic-cf01-workspace.shared.json",
+        "model/equipment/cf01-workspace.json",
+        "model/centrifuge-cf01.robot-pickup.shared.json"
+      ],
+      "image": "images/synthetic-workspace.png",
+      "render": {
+        "kind": "native",
+        "phase": "Grasp",
+        "scope": "all"
+      },
+      "caption": "Referenzbank im unbegrenzten Raum. Native SolidCraft-Prüfstellung des Greifens; die lange Armvariante wird aus derselben Armquelle abgeleitet.",
+      "documentation": "docs/centrifuge-cf01-robot-pickup.md"
+    },
+    {
+      "id": "robot",
+      "title": "Sechsachsiger Laborarm",
+      "group": "baugruppen",
+      "sources": [
+        "model/robot.json"
+      ],
+      "image": "images/robot.png",
+      "render": {
+        "kind": "robot"
+      },
+      "caption": "Arm mit registrierten Servos, Montageplatten und zwei provisorischen Kameras. Sichtkegel sind illustrative Modellgeometrie.",
+      "documentation": "docs/design.md"
+    },
+    {
+      "id": "mobile-base",
+      "title": "Mobile Armbasis MB01",
+      "group": "baugruppen",
+      "sources": [
+        "model/mobile-base-mb01.shared.json"
+      ],
+      "image": "images/mobile-base.png",
+      "render": {
+        "kind": "state",
+        "family": "mobile-base-mb01",
+        "state": "working"
+      },
+      "caption": "Der referenzierte Arm auf einer manuell versetzbaren, abgestützten Basis.",
+      "documentation": "docs/mobile-base-mb01.md"
+    },
+    {
+      "id": "cap-station",
+      "title": "Deckelstation C01",
+      "group": "baugruppen",
+      "sources": [
+        "model/tube-station-c01.shared.json"
+      ],
+      "image": "images/cap-station.png",
+      "render": {
+        "kind": "case",
+        "family": "tube-station-c01",
+        "case": "default"
+      },
+      "caption": "Gemeinsame Stationskonstruktion für geführte Gefäß- und Deckelhandhabung.",
+      "documentation": "docs/tube-station-c01.md"
+    },
+    {
+      "id": "tip-collector",
+      "title": "Spitzenabwurf T01",
+      "group": "baugruppen",
+      "sources": [
+        "model/tip-collector-t01.shared.json"
+      ],
+      "image": "images/tip-collector.png",
+      "render": {
+        "kind": "case",
+        "family": "tip-collector-t01",
+        "case": "default"
+      },
+      "caption": "Abstreifgabel mit drei beschrifteten Nuten und Auffangbehälter.",
+      "documentation": "docs/tip-collector-t01.md"
+    },
+    {
+      "id": "centrifuge",
+      "title": "Zentrifuge CF01",
+      "group": "baugruppen",
+      "sources": [
+        "model/centrifuge-cf01.shared.json"
+      ],
+      "image": "images/centrifuge.png",
+      "render": {
+        "kind": "case",
+        "family": "centrifuge-cf01",
+        "case": "default"
+      },
+      "caption": "Rotor, geneigte Probenaufnahmen, Deckelmechanik und Übergabestelle.",
+      "documentation": "docs/centrifuge-cf01.md"
+    },
+    {
+      "id": "carrier",
+      "title": "Gefäßträger H01",
+      "group": "baugruppen",
+      "sources": [
+        "model/tube-carrier-h01.shared.json"
+      ],
+      "image": "images/carrier.png",
+      "render": {
+        "kind": "checked-render",
+        "family": "tube-carrier-h01",
+        "view": "overview"
+      },
+      "caption": "Die Varianten für 1,5 und 2,0 ml werden gemeinsam gezeigt.",
+      "documentation": "docs/tube-carrier-h01.md"
+    },
+    {
+      "id": "frame",
+      "title": "Offener Gefäßrahmen H02",
+      "group": "baugruppen",
+      "sources": [
+        "model/tube-frame-h02.shared.json"
+      ],
+      "image": "images/frame.png",
+      "render": {
+        "kind": "checked-render",
+        "family": "tube-frame-h02",
+        "view": "optical"
+      },
+      "caption": "Offener Rahmen mit Sicht auf das Gefäß; Flüssigkeit ist eine illustrative Referenz.",
+      "documentation": "docs/tube-frame-h02.md"
+    },
+    {
+      "id": "cam",
+      "title": "Kurvenantrieb H03",
+      "group": "baugruppen",
+      "sources": [
+        "model/tube-cam-h03.shared.json"
+      ],
+      "image": "images/cam.png",
+      "render": {
+        "kind": "checked-render",
+        "family": "tube-cam-h03",
+        "view": "mechanism"
+      },
+      "caption": "Kurven, Rollenfolger und Verriegelungsmechanik aus der gemeinsamen Quelle.",
+      "documentation": "docs/tube-cam-h03.md"
+    },
+    {
+      "id": "guided-rack",
+      "title": "Geführtes Probenrack",
+      "group": "baugruppen",
+      "sources": [
+        "model/guided-tube-rack.shared.json"
+      ],
+      "image": "images/guided-rack.png",
+      "render": {
+        "kind": "native",
+        "phase": "RackReleased",
+        "scope": "rack"
+      },
+      "caption": "Eigenständige Rackquelle mit zwölf geführten, am Boden abgestützten Probenplätzen. Das Bild blendet Probe und Greifer aus.",
+      "documentation": "docs/centrifuge-cf01-robot-pickup.md"
+    },
+    {
+      "id": "transport-floor-p2",
+      "title": "TR01 · zwei Platten",
+      "group": "transport",
+      "sources": [
+        "model/sample-transport-tr01.shared.json"
+      ],
+      "image": "images/transport-floor-p2.png",
+      "render": {
+        "kind": "case",
+        "family": "sample-transport-tr01",
+        "case": "Floor_P2"
+      },
+      "caption": "Zwei Plattenplätze. Benannte Variante derselben Konstruktion.",
+      "documentation": "docs/sample-transport-tr01.md"
+    },
+    {
+      "id": "transport-floor-t48",
+      "title": "TR01 · 48 Gefäße",
+      "group": "transport",
+      "sources": [
+        "model/sample-transport-tr01.shared.json"
+      ],
+      "image": "images/transport-floor-t48.png",
+      "render": {
+        "kind": "case",
+        "family": "sample-transport-tr01",
+        "case": "Floor_T48"
+      },
+      "caption": "Zwei Kassetten mit jeweils 24 Gefäßen. Benannte Variante derselben Konstruktion.",
+      "documentation": "docs/sample-transport-tr01.md"
+    },
+    {
+      "id": "transport-floor-mixed",
+      "title": "TR01 · gemischte Beladung",
+      "group": "transport",
+      "sources": [
+        "model/sample-transport-tr01.shared.json"
+      ],
+      "image": "images/transport-floor-mixed.png",
+      "render": {
+        "kind": "case",
+        "family": "sample-transport-tr01",
+        "case": "Floor_Mixed"
+      },
+      "caption": "Platte und Gefäßkassette auf demselben Fahrzeugtyp. Benannte Variante derselben Konstruktion.",
+      "documentation": "docs/sample-transport-tr01.md"
+    },
+    {
+      "id": "cam-cycle",
+      "title": "H03 · Übergabe und Rückstellung",
+      "group": "ablaeufe",
+      "sources": [
+        "model/tube-cam-h03-cycle.shared.json"
+      ],
+      "image": "images/cam-cycle.png",
+      "render": {
+        "kind": "cycle"
+      },
+      "caption": "Ansicht aus der geprüften geometrischen Ablaufdarstellung. Ein erfolgreicher Modellzyklus ist kein Hardwareversuch.",
+      "documentation": "docs/tube-cam-h03.md"
+    },
+    {
+      "id": "rack-batch",
+      "title": "Rack → CF01 → ursprüngliche Rackplätze",
+      "group": "ablaeufe",
+      "sources": [
+        "model/cf01-rack-batch.protocol.json"
+      ],
+      "image": "images/rack-batch.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "batch"
+      },
+      "caption": "Lokaler Mock-Chargenlauf mit zwölf Proben. Alle Roboterübergaben sind abstrahiert; der Transporter ist nur Vorbedingung.",
+      "documentation": "docs/centrifuge-cf01-robot-pickup.md"
+    }
+  ],
+  "groups": [
+    {
+      "id": "umgebungen",
+      "title": "1 · Arbeitsumgebungen",
+      "description": "L01 besitzt eine vorläufige Raumgeometrie. Die synthetische Umgebung ist ausdrücklich unbegrenzt. Weitere Räume und Flure gehören zum Zielmodell der Architektur."
+    },
+    {
+      "id": "moebeltypen",
+      "title": "2 · Möbeltypen",
+      "description": "Ein Typ enthält das wiederverwendbare Rezept. Die Beispiele zeigen Abmessungen und Einpassungen aus benannten L01-Instanzen; diese Instanzen sind keine zusätzlichen Möbelkonstruktionen. Die Referenzbank ergänzt den Katalog für die Minimalumgebung."
+    },
+    {
+      "id": "moeblierung",
+      "title": "3 · Möblierung",
+      "description": "Hier werden die Typen mehrfach verwendet und im Raum aufgestellt. Raumgeometrie, Katalog und Möblierung bleiben getrennte Quellen."
+    },
+    {
+      "id": "ausstattung",
+      "title": "4 · Geräteausstattung",
+      "description": "Die Ausstattung referenziert Gerätequellen und ordnet ihre Instanzen an. Der aktuelle L01-Plan stammt direkt aus den heutigen Quellen; er ersetzt die inzwischen überholte ältere Gesamtansicht. Die Minimalumgebung zeigt eine native SolidCraft-Prüfstellung."
+    },
+    {
+      "id": "baugruppen",
+      "title": "Wiederverwendbare Baugruppen",
+      "description": "Diese Konstruktionen lassen sich in realen und synthetischen Aufstellungen referenzieren. Parameter und Gelenke bleiben in ihrer jeweiligen gemeinsamen Quelle."
+    },
+    {
+      "id": "transport",
+      "title": "Benannte Transportvarianten",
+      "description": "Drei Beladungen derselben TR01-Konstruktion. Es handelt sich nicht um drei unabhängig gepflegte Fahrzeugmodelle."
+    },
+    {
+      "id": "ablaeufe",
+      "title": "Prüfstellungen und Abläufe",
+      "description": "Die geometrische H03-Darstellung und das lokale CF01-Mock-Protokoll zeigen unterschiedliche Prüfebenen. Die [README-Demo](../media/README.md) ergänzt den unabhängigen 60-s-Bewegungsbaustein des Arms."
+    }
+  ]
+}

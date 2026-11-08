@@ -23,3 +23,8 @@ Referenzständen. Neue CAD-Ausgaben und ihre Prüfberichte bleiben lokal.
   Szene `05dba7428daa`; erzeugt mit der bisherigen Szenenauswertung. Der exakte
   Vergleich ist bewusst streng, da diese Umstellung keine Bewegungsänderung
   zulässt.
+
+- `solidcraft-vendor-exterior.json`: native SolidCraft-Messungen der archivierten
+  X2-/X4-Herstellerdateien, in den registrierten Ausgangsrahmen umgerechnet.
+  Erwartete Gehäuse-/Ausgangsteile sind unabhängige Regressionsevidenz für die
+  gemeinsame geometrische Partition; keine zusätzliche Konstruktionsquelle.

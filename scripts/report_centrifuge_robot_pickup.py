@@ -35,7 +35,8 @@ def main():
     macro=cad/'CF01_Robot_Pickup.FCMacro';macro_ast=ast.parse(macro.read_text(encoding='utf-8'));assert any(isinstance(n,ast.Constant) and n.value==str(out/'context.json') for n in ast.walk(macro_ast))
     source_paths=[pickup.SOURCE,cf.SOURCE,pickup.protocol.SOURCE,cf.ROOT/'model/robot.json',*[cf.ROOT/'scripts'/n for n in [
         'centrifuge_robot_pickup.py','build_centrifuge_robot_pickup.py','build_centrifuge_robot_pickup_freecad.py',
-        'export_centrifuge_robot_pickup_solidcraft.py','build_centrifuge_robot_pickup_visual.py','report_centrifuge_robot_pickup.py',
+        'export_centrifuge_robot_pickup_solidcraft.py','centrifuge_pickup_solidcraft.py','solidcraft_vendor.py','robot_components.py',
+        'build_centrifuge_robot_pickup_visual.py','report_centrifuge_robot_pickup.py',
         'check_centrifuge_robot_motion.py','robot_spec.py','lab_transfer_model.py']],
         cf.ROOT/'scripts/templates/centrifuge_robot_pickup.html',cf.ROOT/'scripts/templates/centrifuge_robot_pickup.FCMacro',cf.ROOT/'tests/test_centrifuge_robot_pickup.py']
     batch=json.loads((out/'rack-batch-trace.json').read_text());assert batch['passed'] and batch['order_restored']
@@ -62,10 +63,10 @@ def main():
             'documentation':'docs/centrifuge-cf01-robot-pickup.md'},
         'visual_review':{**review,'freecad_live_macro_executed':False,'display_mesh':visual},
         'backend_capabilities':{'interactive':'Full coupled six-axis motion, jaw closure, carried tube and supported rack handoff','freecad':'Seven native snapshots, parametric long-link arm variant and generated placement-playback macro; GUI not run',
-            'solidcraft':'Two generated review scenes; strict import validation recorded separately, no live native handoff motion study'},
+            'solidcraft':'Two native source-derived review scenes, independently buildable without FreeCAD; frozen poses, no live native handoff motion study'},
         'hardware_connected':False,'robot_frame_calibrated':False,'gripper_qualified':False,'limitations':scene['limitations']+[
             'Adaptive motion audit and native snapshots remain discrete checks, not a continuous swept-volume proof.',
-            'STEP shares some repeated glyph prototypes; aliasing and display-palette limits are recorded per SolidCraft snapshot.',
+            'SolidCraft keeps original X2/X4 case pieces as rigid assemblies; their source-body mapping and original seam overlaps are recorded separately.',
             'No hardware ROS/SiLA server or physical grasp/sensor/force validation is supplied.']}
     cf.write(out/'robot-pickup-build-report.json',result);cf.write(cf.ROOT/'cad/centrifuge-cf01/robot-pickup-build-report.json',result)
     print(json.dumps({'passed':result['passed'],'revision':context['revision'],'tests':tests,'samples':len(data['samples']),'native_station_poses':len(station['samples']),

@@ -10,6 +10,17 @@ Tragfähigkeit, Steifigkeit, Präzision, Dosierleistung und Sicherheit sind noch
 nicht nachgewiesen. Die austauschbare Pipettenaufnahme ist zunächst außerhalb
 des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
 
+## Modelle entdecken
+
+[**Zur Modellgalerie →**](docs/models/README.md) · Baugruppen, Varianten und Abläufe mit Bildern und Quellenlinks.
+
+| 1 · Arbeitsumgebung | 2 · Möbeltypen | 3 · Möblierung | 4 · Geräteausstattung |
+|---|---|---|---|
+| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-equipment.svg" alt="Aktueller schematischer L01-Aufstellungsplan" width="180"></a> |
+
+Die Galerie verbindet die vier Ebenen mit den einzelnen Konstruktionen und der
+synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
+
 ## Roboter in Bewegung
 
 [![Roboter entnimmt ein Gefäß aus der Zentrifuge und legt es im Rack ab](docs/media/robot-demo.png)](docs/media/robot-demo.mp4)
@@ -73,6 +84,17 @@ und anschließend neu abgeleitet werden.
 python3 -m unittest discover -s tests -v
 python3 scripts/build_models.py --ros2 --freecad-python /pfad/zum/FreeCAD-Python --solidcraft-cli /pfad/zu/solidcraft-cli
 ```
+
+Die beiden CF01-SolidCraft-Prüfstellungen lassen sich unabhängig von FreeCAD
+direkt aus den gemeinsamen Quellen erzeugen:
+
+```sh
+python3 scripts/export_centrifuge_robot_pickup_solidcraft.py
+```
+
+Der [native CF01-Adapter](docs/centrifuge-cf01-robot-pickup.md#independent-solidcraft-build-and-importer-workaround)
+umgeht den dokumentierten STEP-Importfehler. Die historische Medien-Provenienz
+bleibt als damaliger Prüfstand erhalten.
 
 Python, FreeCAD mit importierbarem `FreeCAD`/`Part` und SolidCraft CLI müssen lokal
 vorhanden sein. Der gemeinsame Arm-Einstieg akzeptiert die Laufzeitpfade explizit;

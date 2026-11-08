@@ -13,6 +13,13 @@ Die gewünschte Entwicklungsschleife lautet:
 **Idee und Anforderungen → gemeinsame Modellquelle und Protokoll → Generatoren
 → CAD/Visualisierung/Prüfung → Rückmeldung in die gemeinsame Quelle.**
 
+Jedes CAD-Ziel muss seine Geometrie direkt aus den gemeinsamen Quellen und der
+Herstellerbibliothek erzeugen können. Ein anderes CAD ist keine notwendige
+Build-Abhängigkeit; CAD-übergreifende Prüfungen sind zusätzliche Vergleiche.
+Die CF01-SolidCraft-Prüfstellungen haben dafür einen eigenständigen Einstieg
+`scripts/export_centrifuge_robot_pickup_solidcraft.py`. Abgeleitete Hersteller-
+Teildateien und Körperzuordnungen gehören in den lokalen Build-Bericht.
+
 - Änderungen zuerst in der passenden gemeinsamen Quelle formulieren. Maße,
   Bauteilrollen, Schnittstellen, Gelenke und Abläufe einmal beschreiben;
   zielprogrammspezifische Details gehören in die Adapter unter `scripts/`.
@@ -220,3 +227,11 @@ SolidCraft `source: model` verwenden.
 
 Anforderungen, Konstruktionsentscheidungen und Grenzen zusammen mit dem CAD
 aktualisieren. Exportdateien und Renderings dem zugehörigen Modellstand zuordnen.
+
+Die kuratierte Modellgalerie unter `docs/models/` ist bewusst versionierte
+Dokumentation. Ihre Auswahl steht in `catalog.json`; Bilder und Quellen sind
+über `provenance.json` gebunden. Nach Änderungen betroffene Ansichten erneuern
+und visuell prüfen; `python3 scripts/render_model_gallery.py --check` prüft
+Abdeckung, Quell-/Bildprüfsummen und das Bildbudget von 4 MB. Schematische
+Darstellungen ausdrücklich benennen; keine CAD- oder Funktionsprüfung aus einem
+Bild ableiten. Native Modelle und vollständige Arbeitsrenderings bleiben lokal.

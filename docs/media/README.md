@@ -30,6 +30,11 @@ offen. Seine strenge Gesamtprüfung schlägt fehl; die Referenzbank besteht die
 Maß- und Volumenprüfung. Der Gesamt-Buildbericht meldet deshalb `passed: false`.
 Die Medien belegen keine reale Funktion, Sicherheit oder mechanische Qualifikation.
 
+Diese Provenienz bleibt der festgehaltene Stand dieses Medien-Builds. Der spätere
+[native CF01-SolidCraft-Adapter](../centrifuge-cf01-robot-pickup.md#independent-solidcraft-build-and-importer-workaround)
+erzeugt die Prüfstellungen unabhängig von FreeCAD. Sein eigener Bericht führt
+die erneuten Prüfungen; er überschreibt diese historische Medienprüfung nicht.
+
 ## Aktualisieren
 
 `python3 scripts/build_centrifuge_robot_pickup.py` erzeugt eine neue lokale

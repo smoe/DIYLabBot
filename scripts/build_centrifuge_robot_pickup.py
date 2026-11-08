@@ -43,8 +43,10 @@ def main():
     subprocess.run([args.freecad_python,str(cf.ROOT/'scripts/build_centrifuge_robot_pickup_freecad.py')],check=True,cwd=cf.ROOT)
     subprocess.run([args.freecad_python,str(cf.ROOT/'scripts/check_centrifuge_robot_motion.py')],check=True,cwd=cf.ROOT)
     cf.write(paths['out']/'protocol-transfer-trace.json',pickup.mock_transfer_trace())
-    for script in ['build_centrifuge_robot_pickup_visual.py','export_centrifuge_robot_pickup_solidcraft.py']:
-        subprocess.run([sys.executable,str(cf.ROOT/'scripts'/script)],check=True,cwd=cf.ROOT)
+    subprocess.run([sys.executable,str(cf.ROOT/'scripts/build_centrifuge_robot_pickup_visual.py')],check=True,cwd=cf.ROOT)
+    subprocess.run([sys.executable,str(cf.ROOT/'scripts/export_centrifuge_robot_pickup_solidcraft.py'),
+        '--context',str(cf.ROOT/'tmp/cf01-robot-pickup-context.json'),'--solidcraft-cli',args.solidcraft_cli,
+        '--compare-freecad',str(paths['out']/'snapshot-metrics.json')],check=True,cwd=cf.ROOT)
 
 
 if __name__=='__main__':main()

@@ -1,9 +1,19 @@
 # Architektur der Arbeitsumgebungen und Ausstattung
 
+Die [Modellgalerie](docs/models/README.md) führt mit Bildern durch diese Ebenen
+und verknüpft jede Ansicht mit den gemeinsamen Quellen und der Fachdokumentation.
+
 Das Zielmodell trennt Arbeitsumgebung, Möbeltypen, Möblierung und
 Geräteausstattung. Jede Konstruktion besitzt eine führende Quelle. Ein Standort
 referenziert diese Quelle und beschreibt seine Instanzen mit Parametern,
 Transformationen und benannten Bezugssystemen. CAD-Dateien bleiben Ableitungen.
+
+FreeCAD und SolidCraft erzeugen ihre Geometrie unabhängig aus diesen Quellen.
+Der Vergleich beider Ergebnisse ist eine zusätzliche Prüfung. Insbesondere
+erzeugt der eigenständige CF01-SolidCraft-Adapter native Konstruktionsfeatures
+und gemeinsame Protokollstellungen ohne FreeCAD-Dateien als Eingabe. Erhaltene
+Hersteller-Gehäuseteile können unter einer gemeinsamen semantischen Geräte-ID
+mehrere starre CAD-Körper bilden; ihre Zuordnung wird im Build-Bericht geführt.
 
 ## Vier Beschreibungsebenen
 
