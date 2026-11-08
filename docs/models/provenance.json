@@ -951,53 +951,58 @@
       "id": "l01-equipment",
       "image": "images/l01-equipment.svg",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "58c37e569c95c8bd3a4e7ea3c3f842333b49ac94c6c38aea4716d7b4895d18c4"
+        "model/lab-layout-l01.shared.json": "73d25c6a99ca30a44ade72ae6bf16f5f1836836ccd4a7f7381584aa88f04ed18"
       },
       "representation": "Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render",
       "instances": 9,
       "image_sha256": "f501746b2853c4f083a67fd8e66fcb4a78f20132816b9034530ca56515d98306",
       "bytes": 7846,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "58c37e569c95c8bd3a4e7ea3c3f842333b49ac94c6c38aea4716d7b4895d18c4",
+        "model/lab-layout-l01.shared.json": "73d25c6a99ca30a44ade72ae6bf16f5f1836836ccd4a7f7381584aa88f04ed18",
         "model/lab-room-l01.shared.json": "4213ce4683f88708f5d8d7a1f5b778176bd441e15392f408c01d780d57daafd7",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "dcdb21a2917fc4d886ee634a13ed930c06ee35517c2107a25f8a6369526689b6",
         "model/furnishings/l01.furnishings.json": "30f5a0e4985a53d4ced669e3ecd9d70f60e3a195005a7ba7a040636117b44e01",
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
-        "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
-        "model/x2-mounting-interface.json": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
-        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
-        "model/x4-mounting-interface.json": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
-        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
-        "model/x6-mounting-interface.json": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
-        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
-        "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
         "model/sample-transport-tr01.shared.json": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
-        "model/tip-collector-t01.shared.json": "a1f83d3c3e0a9653406f728bf469964ea28b2bd6ffa83926662fd703d75da487",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
-        "model/tip-collector-t01-markings.json": "60d22dafd9b676b86d4d541be08955d82d6397a28ed0170a3a257cd1d96c8384"
+        "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "synthetic-workspace",
       "image": "images/synthetic-workspace.png",
       "source_files_sha256": {
-        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
-        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "19cf33001d731dadacc86d8b59e69a158e38dcf21f7a92901d30c1820c1d2455"
+        "model/synthetic-cf01-workspace.shared.json": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e",
+        "model/equipment/cf01-workspace.json": "aacadc47311ad097a04b21a6dd60c244308a103aa8369ebda37850d8b8b225cf",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "9a5123d6f11d4ba817335005af899186a8c415d9773fb9c69a51abf9e44d67d5"
       },
       "build_report": "cad/centrifuge-cf01/solidcraft-pickup-build-report.json",
       "build_report_sha256": "c9f6aec2a6870a243fd6295d1c493cf7c7cb9a470b41570ed73cfb505aebef21",
@@ -1044,43 +1049,48 @@
       "image_sha256": "bb99b0b3902453ae090a0977dfb31469816e1a8b89f0ee184a1433a34ce9a729",
       "bytes": 139150,
       "dependency_files_sha256": {
-        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
+        "model/synthetic-cf01-workspace.shared.json": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
         "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
-        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
-        "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+        "model/equipment/cf01-workspace.json": "aacadc47311ad097a04b21a6dd60c244308a103aa8369ebda37850d8b8b225cf",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
-        "model/x2-mounting-interface.json": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
-        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
-        "model/x4-mounting-interface.json": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
-        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
-        "model/x6-mounting-interface.json": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
-        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
-        "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
         "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "19cf33001d731dadacc86d8b59e69a158e38dcf21f7a92901d30c1820c1d2455",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "9a5123d6f11d4ba817335005af899186a8c415d9773fb9c69a51abf9e44d67d5",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "robot",
       "image": "images/robot.png",
       "source_files_sha256": {
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08"
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
       },
       "build_report": "exports/generated/build-report.json",
       "build_report_sha256": "3b8f969c1a0c7daeb4eb08bbcd770116279c783ff392075404a9c6036c1300a3",
@@ -1115,34 +1125,39 @@
       "image_sha256": "6e92001b988103fca75bdfe15ade271071139a8d1d89f19bc5c9b3b2293d9455",
       "bytes": 127036,
       "dependency_files_sha256": {
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
-        "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
-        "model/x2-mounting-interface.json": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
-        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
-        "model/x4-mounting-interface.json": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
-        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
-        "model/x6-mounting-interface.json": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
-        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd"
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "mobile-base",
       "image": "images/mobile-base.png",
       "source_files_sha256": {
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d"
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573"
       },
       "build_report": "cad/mobile-base-mb01/shared-build-report.json",
       "build_report_sha256": "117aa560f5d98cc0ce40eac89d611eaf3ccf907a9bc547b4b665502e6439ce82",
@@ -1178,34 +1193,39 @@
       "image_sha256": "a40634a880e5d93e070950372f3659438c1842156cd6be37c0526cdaf9f0f90f",
       "bytes": 124797,
       "dependency_files_sha256": {
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-        "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
-        "model/x2-mounting-interface.json": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
-        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
-        "model/x4-mounting-interface.json": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
-        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
-        "model/x6-mounting-interface.json": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
-        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd"
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "cap-station",
       "image": "images/cap-station.png",
       "source_files_sha256": {
-        "model/tube-station-c01.shared.json": "2d9bb38563f82ae099231124376906f9cd70e758a2fc171e7c94b4f213c64b8b"
+        "model/tube-station-c01.shared.json": "8a34b893612c03488b43a1ea64c355defad521018f38250f51482bd8f1054dfa"
       },
       "build_report": "cad/tube-station-c01/shared-build-report.json",
       "build_report_sha256": "0a9a10a80d0976b70425f26613eb716bdcc83a6dfd3cb3aeac96494f63c03b19",
@@ -1242,14 +1262,19 @@
       "image_sha256": "8f2cde3d8aec6b368b0e93fc0cc34fafb2f784d75377331575e734ba4f195502",
       "bytes": 111562,
       "dependency_files_sha256": {
-        "model/tube-station-c01.shared.json": "2d9bb38563f82ae099231124376906f9cd70e758a2fc171e7c94b4f213c64b8b"
+        "model/tube-station-c01.shared.json": "8a34b893612c03488b43a1ea64c355defad521018f38250f51482bd8f1054dfa"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "tip-collector",
       "image": "images/tip-collector.png",
       "source_files_sha256": {
-        "model/tip-collector-t01.shared.json": "a1f83d3c3e0a9653406f728bf469964ea28b2bd6ffa83926662fd703d75da487"
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a"
       },
       "build_report": "cad/tip-collector-t01/shared-build-report.json",
       "build_report_sha256": "df4afb7a1fb35e6f0579082f7e07dfd169c98e2890ee8a4fefd67bfe41566623",
@@ -1291,16 +1316,21 @@
       "image_sha256": "9ca28386e56624bd1bd70e21d7f33249f7f2fa5033b131dab78c8cab029aee4e",
       "bytes": 97212,
       "dependency_files_sha256": {
-        "model/tip-collector-t01.shared.json": "a1f83d3c3e0a9653406f728bf469964ea28b2bd6ffa83926662fd703d75da487",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
-        "model/tip-collector-t01-markings.json": "60d22dafd9b676b86d4d541be08955d82d6397a28ed0170a3a257cd1d96c8384"
+        "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
       "id": "centrifuge",
       "image": "images/centrifuge.png",
       "source_files_sha256": {
-        "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb"
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
       },
       "build_report": "cad/centrifuge-cf01/shared-build-report.json",
       "build_report_sha256": "ec5b7bd7bfaec8bbea842aa7e675f5cb212bccaad5fa48e2ff72eed1f56f36ce",
@@ -1337,7 +1367,12 @@
       "image_sha256": "749b6cbe192626a37f585f4423aea8e3e2b17a9c13a6117152394d54da287d68",
       "bytes": 143581,
       "dependency_files_sha256": {
-        "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb"
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
@@ -1881,7 +1916,7 @@
       "id": "rack-batch",
       "image": "images/rack-batch.svg",
       "source_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "b091627460b9e3a4c69b6d9e855729a62490a2b8953e7e879e56ad00dc9125e4"
+        "model/cf01-rack-batch.protocol.json": "532bbf60298a7df815d229ff5041b0057f77c337cc00b4fbe4bb0e57b7348703"
       },
       "representation": "Source-derived local mock protocol diagram",
       "batch_passed": true,
@@ -1891,36 +1926,41 @@
       "image_sha256": "dbfd322ce4bc3b477235dae9844ec5c8e5114edd86eebb474614093b40c80723",
       "bytes": 5158,
       "dependency_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "b091627460b9e3a4c69b6d9e855729a62490a2b8953e7e879e56ad00dc9125e4",
-        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
+        "model/cf01-rack-batch.protocol.json": "532bbf60298a7df815d229ff5041b0057f77c337cc00b4fbe4bb0e57b7348703",
+        "model/synthetic-cf01-workspace.shared.json": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
         "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
-        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
-        "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
-        "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
-        "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+        "model/equipment/cf01-workspace.json": "aacadc47311ad097a04b21a6dd60c244308a103aa8369ebda37850d8b8b225cf",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
-        "model/x2-mounting-interface.json": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
-        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
-        "model/x4-mounting-interface.json": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
         "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
-        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
-        "model/x6-mounting-interface.json": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
-        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
-        "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
         "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+      },
+      "line_ending_equivalence": {
+        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+        "migration_report": "docs/line-ending-migration.json",
+        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     }
   ],

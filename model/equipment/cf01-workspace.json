@@ -7,11 +7,11 @@
   "assets": {
     "arm": {
       "source": "model/robot.json",
-      "source_sha256": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08"
+      "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
     },
     "centrifuge": {
       "source": "model/centrifuge-cf01.shared.json",
-      "source_sha256": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb"
+      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
     },
     "rack": {
       "source": "model/guided-tube-rack.shared.json",

@@ -1,0 +1,362 @@
+{
+  "format": "solidcraftbot.lf-migration/1",
+  "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
+  "scope": "LF in repository and checkout; current full source pins only",
+  "files": [
+    {
+      "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/geometry-check.json",
+      "old_sha256": "d4a66b0db9a1f268482c25a0ebc0fc47dca5bd1649a4e00b242631258017fead",
+      "new_sha256": "ec7a19ecf2a626ccc5991f2586fca053e2384bdc195095c17d3b006dd880809b",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json",
+      "old_sha256": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd",
+      "new_sha256": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/geometry-check.json",
+      "old_sha256": "513ab1360f484047994440061cd4b9c3a00d31835ed109143acdba8fb22134c7",
+      "new_sha256": "c3ef7a761c40898d904904cfbf916f4a5200f97391ab614548d489677fdd0131",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json",
+      "old_sha256": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f",
+      "new_sha256": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/geometry-check.json",
+      "old_sha256": "b9ddebd353533948a959b7308b0d92d32dfaac1f1dc88836c1c7953afb903c46",
+      "new_sha256": "839076aea2aa6c9f571ca161796b32692dbd95622d4f4654864cfce496a844c3",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json",
+      "old_sha256": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
+      "new_sha256": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check.json",
+      "old_sha256": "2b19763470a69d4640f588fba97cecb7becfde9024dd527f81f536e389999bf8",
+      "new_sha256": "49f331e136e9abe4d073713e67598423b1030613144d7151d35e045d75fb3414",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/component-library.json",
+      "old_sha256": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
+      "new_sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/geometry-check.json",
+      "old_sha256": "0fb744485f248c37f05870c2510acaff105e65ec4b129dd75ab8c86a608dea0e",
+      "new_sha256": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+      "line_endings_changed": true
+    },
+    {
+      "path": "cad/vendor/myactuator/manifest.json",
+      "old_sha256": "4a76ae3ae9fdbaff8e2e655a58d5e81b8409a2405f8b0100306318a1ca2a2119",
+      "new_sha256": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/Laborarm_6R_Konzept_A01.freecad-gui-validation.json",
+      "old_sha256": "ee83399c5c6065f3f1a0afc8f4419c35401afeb1a83d5ec0c06f4c8640d974f8",
+      "new_sha256": "b59bcb56e1a456335430a7ed17437ab8c5162f9885a28324743f4dddfb9c1417",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/Laborarm_6R_Konzept_A01.freecad-validation.json",
+      "old_sha256": "ef13f642676e5e5f33b57deeba6c40f5813c5a035ad620a7907d346cb438eedb",
+      "new_sha256": "cdfcca0a2bb41cee58d79dcbec4198ac535173e1291a447f36ce8dd32fa7fd91",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/design.md",
+      "old_sha256": "2eac254fb34d5ce2375b152ba32f997eb39cd2b297a4c680ecbdca281cbb15f8",
+      "new_sha256": "30c21e7cacfb8b52c5bc597cbb0f6040d63ba5b1ba39ccc2a4c452869146da02",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/development-plan.md",
+      "old_sha256": "0c1ae06efb9e269874b99ba18ffd1b4fc0a30ec5d7723602ac4109652bd2c513",
+      "new_sha256": "15a49d4c8cf1ffbd6c0956c122788e26c8c8ead57e07a0d75cccae308ed9d014",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/freecad.md",
+      "old_sha256": "9726a79173f8545c85feaf9bd854efca341f978c9d355c4490c60772dc2877ff",
+      "new_sha256": "30d7b99edbc236be9de8bde3b2e4adc1bdd51b930f52409d68375f373861aa93",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/lab-layout-l01.md",
+      "old_sha256": "6247389487adccb7f53b81922eccc361d8a69dfe335b6b907c0e666ca8f4fa8c",
+      "new_sha256": "c5160ca6c4f2555dae8ec8346cf4f90f6d4c6a26d36e2b52ae3b00fdacd623f7",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/lab-room-l01.md",
+      "old_sha256": "f27f33a82c2ca2ba576fcf00dc91d9250fee7de09d0425bff9aab6058fa4f988",
+      "new_sha256": "7eadef34ac7e4e9a750aa61f8692a88d30554a51a802dbfc2697031f125b0745",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/mobile-base-mb01.md",
+      "old_sha256": "f14a3c64db175891b4c9cc2e0cd37bbb355293d18cf1dd23ff5b5c64ac992faf",
+      "new_sha256": "ab247f035cc2cf7263bd19328c2c9514a5b9d8c7f15c5cba471f37e28d7a7f99",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/models/provenance.json",
+      "old_sha256": "221d12f5c8b9229a0650ddf5464a505022a04f0ccbfd159461032fd57246711c",
+      "new_sha256": "ce1ec0bbdafbbb28802946b5a5e247d68ad3621f2e50b702f7f31da28550c2fe",
+      "line_endings_changed": false
+    },
+    {
+      "path": "docs/neutral-freecad-validation.json",
+      "old_sha256": "58b3da42a97fde3693b3a9fc8dd0c1c4843ca9ad0d927b1c0909e8a6678eeff3",
+      "new_sha256": "260ff3eb71780d478b35136280d9527d3a04f581e099bd4ed552a8e553b7a9c0",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/ros2-validation.json",
+      "old_sha256": "954e801578cc9beffe185ffca340d76ac4c37b31fed361482f8285d2e70544e1",
+      "new_sha256": "1a4af1dbf7c80cfd7e7d2010df2d361cb75a7762fdb74c4f7d23f12f256931af",
+      "line_endings_changed": true
+    },
+    {
+      "path": "docs/shared-model.md",
+      "old_sha256": "9561ba7770ab253acbfd067598c96f2b9eb45ed81e738ebfec676b2aea16e3af",
+      "new_sha256": "8660ed3b83d12d9855b2e7e6c30061fb7dcdfa7923b576d439dba9f92e60689f",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/actuator-selection.json",
+      "old_sha256": "835fcece1f7d1bbffea5f2c4292d6a7a8be21544259e0ef368363dd89efd4625",
+      "new_sha256": "c1fa98452af47f02aa2f7dc5534b34f5886106a6a2064a6237822734910bb900",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/baseline.json",
+      "old_sha256": "a5ab53145035f65d6f94b0a15c4bae856fc5ac8771d9483304ee36b580ca05f2",
+      "new_sha256": "f59d5e6daf1daa5dafd7e8c3fad9559f1f7bf78bc50b5bd2e5cefd7fe0217766",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/centrifuge-cf01.robot-pickup.shared.json",
+      "old_sha256": "19cf33001d731dadacc86d8b59e69a158e38dcf21f7a92901d30c1820c1d2455",
+      "new_sha256": "9a5123d6f11d4ba817335005af899186a8c415d9773fb9c69a51abf9e44d67d5",
+      "line_endings_changed": false
+    },
+    {
+      "path": "model/centrifuge-cf01.shared.json",
+      "old_sha256": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
+      "new_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/cf01-rack-batch.protocol.json",
+      "old_sha256": "b091627460b9e3a4c69b6d9e855729a62490a2b8953e7e879e56ad00dc9125e4",
+      "new_sha256": "532bbf60298a7df815d229ff5041b0057f77c337cc00b4fbe4bb0e57b7348703",
+      "line_endings_changed": false
+    },
+    {
+      "path": "model/equipment/cf01-workspace.json",
+      "old_sha256": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
+      "new_sha256": "aacadc47311ad097a04b21a6dd60c244308a103aa8369ebda37850d8b8b225cf",
+      "line_endings_changed": false
+    },
+    {
+      "path": "model/kinematic-reference.json",
+      "old_sha256": "bd5511ffd0616ab4268b0114a57c175731f4e49fe11c32402a221003984c80d1",
+      "new_sha256": "20554ed2d1beac64b61fc9fe60edbdb3f0ed871a055f47dda10f8242d505ce16",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/lab-layout-l01.shared.json",
+      "old_sha256": "58c37e569c95c8bd3a4e7ea3c3f842333b49ac94c6c38aea4716d7b4895d18c4",
+      "new_sha256": "73d25c6a99ca30a44ade72ae6bf16f5f1836836ccd4a7f7381584aa88f04ed18",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/lab-transfer-l01.protocol.json",
+      "old_sha256": "03cc8e71d8e79482aea86dfcfca8fc3a18c820fbc13727b36255d31a931f9065",
+      "new_sha256": "6b89beb6a8b3a574806e3017b973a24b55b0d7be3e9bb11075bc2224ba08c176",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/mobile-base-mb01.shared.json",
+      "old_sha256": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
+      "new_sha256": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/robot.json",
+      "old_sha256": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
+      "new_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/robot.schema.json",
+      "old_sha256": "7bc5f53b7b9d6e175fde7f8e32672b44361574f93574f4381b6194b06177b7ba",
+      "new_sha256": "3b1ed9283aff43cc119d02a72116fae2a2ede3eea99f90298851760afda79d1d",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/services.schema.json",
+      "old_sha256": "78b147dfc643219144883bf39ab24a653a33f345fe42263247a201e3973af292",
+      "new_sha256": "6f50f08ec384d1121d672bd82fd926401389558e67a6e0e7707a511454e09bba",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/synthetic-cf01-workspace.shared.json",
+      "old_sha256": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
+      "new_sha256": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e",
+      "line_endings_changed": false
+    },
+    {
+      "path": "model/tip-collector-t01-markings.json",
+      "old_sha256": "60d22dafd9b676b86d4d541be08955d82d6397a28ed0170a3a257cd1d96c8384",
+      "new_sha256": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/tip-collector-t01.shared.json",
+      "old_sha256": "a1f83d3c3e0a9653406f728bf469964ea28b2bd6ffa83926662fd703d75da487",
+      "new_sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/tube-station-c01.shared.json",
+      "old_sha256": "2d9bb38563f82ae099231124376906f9cd70e758a2fc171e7c94b4f213c64b8b",
+      "new_sha256": "8a34b893612c03488b43a1ea64c355defad521018f38250f51482bd8f1054dfa",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/x2-mounting-interface.json",
+      "old_sha256": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71",
+      "new_sha256": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/x4-mounting-interface.json",
+      "old_sha256": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829",
+      "new_sha256": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
+      "line_endings_changed": true
+    },
+    {
+      "path": "model/x6-mounting-interface.json",
+      "old_sha256": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce",
+      "new_sha256": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
+      "line_endings_changed": true
+    },
+    {
+      "path": "scripts/freecad/persist_view.py",
+      "old_sha256": "2aa23c66647ef3583a1202965bf0b8c6057d7adcd710d81d1f47c9c7f45a58bc",
+      "new_sha256": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+      "line_endings_changed": true
+    },
+    {
+      "path": "scripts/servo_mounting_design.py",
+      "old_sha256": "d98a77d3d1ea4f0aa2fdcef87641877514a73a8afdae0bc182209c8cc7205e7f",
+      "new_sha256": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+      "line_endings_changed": true
+    },
+    {
+      "path": "scripts/templates/centrifuge_robot_pickup.html",
+      "old_sha256": "301eccd96b3a9af43b2c6d1a56418f76ad239807a0a9a15bf5b3466c5c4ae0de",
+      "new_sha256": "3e1451730a0c270832a3d2f430c0882f5396a2d44bb5ec1cc40ef8d154246c89",
+      "line_endings_changed": true
+    },
+    {
+      "path": "scripts/x6_mounting_design.py",
+      "old_sha256": "9fecff755220ff36c2fdac34e293355e9e450181b8e751b63322ebc440d9a89c",
+      "new_sha256": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927",
+      "line_endings_changed": true
+    }
+  ],
+  "preserved_files_sha256": {
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/conservative-box.step": "3fb715a08df1e94dc3c9a3fd1402a248f5e40d9eee5eb45a0947098ec41a5a7e",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-2.pdf": "66d2e63668eff87b2e5761ab2a344170ca0544e478bc79ec0da6315914043b9b",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/conservative-box.step": "f4527bce785b4965d09df11874d9e02391e3a1ffd9653e0a4fb8da4b0bc0abfb",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-2.pdf": "e411f04bc8b18a744783dd34d421fe1a5c818c68ea04bc442ad492848687390a",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/conservative-box.step": "b14fd716255704578ce0c0546c61c3f8e4ed94f5755d83ce9d355b784a507769",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v1/housing.step": "53b41fc519aea1b10e3831f533b14f9583b2ed215b0868bf3a44d14a4fef8a8e",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v1/output.step": "921da7f40c113359f71920a3e046f7100c03e141b48a92cacaad55e610b477d8",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-2.pdf": "421836cfee9c20996c14ba099b8b77b8f4e861acefa8b3c56a8b59615f873e1d",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+    "docs/media/README.md": "f120f87b47f71af132fdadfc2da49b4c1684cf61bc4f54185d1ed61339380adc",
+    "docs/media/provenance.json": "80e954c9b2b7a4a16ee40f280382e0a134702b9edcefa6d01b6d267e45e5160c",
+    "docs/media/robot-demo.html": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
+    "docs/media/robot-demo.mp4": "da38a7eab9617bc4c47d9c1edd2616cbf39c94e42ea8f24d0ee95169e3143d5e",
+    "docs/media/robot-demo.png": "6cf417bf6bdea2d37fb90368eb3fc20ebc869bc96892c20d6b6170a52656943e",
+    "docs/models/images/cam-cycle.png": "40970f227c171f4409898e80c4fb90612a2c8c558d678de9f8feb9030a1fe718",
+    "docs/models/images/cam.png": "2d968e2c2b04dd43c2bf93884b657dae8392118134cd11de697bbaa68fc1491b",
+    "docs/models/images/cap-station.png": "8f2cde3d8aec6b368b0e93fc0cc34fafb2f784d75377331575e734ba4f195502",
+    "docs/models/images/carrier.png": "279300abdca2557c5cfc0d6ccd148eeb1b9a9f13c38090e38e9cc9143f930327",
+    "docs/models/images/centrifuge.png": "749b6cbe192626a37f585f4423aea8e3e2b17a9c13a6117152394d54da287d68",
+    "docs/models/images/frame.png": "1d290320be57901d6ee00e557b5098e2fefa3e0aa41225d3139b2db91dbea05d",
+    "docs/models/images/furniture-cupboard.png": "3e4857e41e7c5c5825013232004e49922b1c4309dfe67273cbef539211de8267",
+    "docs/models/images/furniture-open-shaped-bench.png": "aa140160929b600e914f6d92125b16f044cdb3aa813f55e209b000e5cf95f27a",
+    "docs/models/images/furniture-shelf-board.png": "3b0ad432f77b178a37da99cf787d6f168441966ad247ef51393a538d133d56d6",
+    "docs/models/images/furniture-side-gap-cover.png": "c0a69c33a0411796c19f4d46ae3959bd8c65a73ac5f60517e7b95f5cbe38b044",
+    "docs/models/images/furniture-storage-bench.png": "cf9ec7c83fb60fa2513cf8475713e3ca3c07ca6e19a33e1dec1aaaf19caafe4c",
+    "docs/models/images/furniture-support-gap-cover.png": "ab9a1725e07ef8cfae2b0cbae6ffddc40077baa975413ee5fb5c666cbf950f90",
+    "docs/models/images/furniture-upright.png": "e537df8fddc053eeea9a747bf7fe9e7db6929d8518289f24de64e9774c39e180",
+    "docs/models/images/guided-rack.png": "f6b5a2728f866671b72641009e6adc1b4911cdcf59ae2e384f7be89b4065a22b",
+    "docs/models/images/l01-furnished.png": "f3ecafa2f04a3b0772f3cb085e40f8fafd4fb6454135fc5530c20d8806e0d32d",
+    "docs/models/images/l01-geometry.png": "2583cd3815b1d7428d42d957ea4dac8c14927a9e95dd3127d6218f0c283f1192",
+    "docs/models/images/mobile-base.png": "a40634a880e5d93e070950372f3659438c1842156cd6be37c0526cdaf9f0f90f",
+    "docs/models/images/reference-bench.png": "c4dbaf81b4ed85e023e44c4da3ba4c2132c59768697a7fbadf81f02366445ba6",
+    "docs/models/images/robot.png": "6e92001b988103fca75bdfe15ade271071139a8d1d89f19bc5c9b3b2293d9455",
+    "docs/models/images/synthetic-workspace.png": "bb99b0b3902453ae090a0977dfb31469816e1a8b89f0ee184a1433a34ce9a729",
+    "docs/models/images/tip-collector.png": "9ca28386e56624bd1bd70e21d7f33249f7f2fa5033b131dab78c8cab029aee4e",
+    "docs/models/images/transport-floor-mixed.png": "dbf1f1b9b67a072d157c96ca54737ca94e374100638c2a5c172168e71f9309fb",
+    "docs/models/images/transport-floor-p2.png": "5c3c5785a61bfb658d1181541be2dd031cf2a00647ea7557616e2e9e53a82a42",
+    "docs/models/images/transport-floor-t48.png": "472cfe16e23ce2944cc0385d0352ad038e35e7b88336d6b4f24006044fbf05ce",
+    "model/history/lab-room-l01-4eaa89234708.shared.json": "4eaa89234708186c40d9a8989ceee2cffc0e6d8d0f43e9398951f5a3c2b434ae",
+    "model/history/lab-room-l01-65ad4dc34441.shared.json": "65ad4dc34441786425d1c8d96eebefef141c42e72d1cb951cf17dcdad9b71171",
+    "model/history/lab-room-l01-d0663dce4ba6.shared.json": "d0663dce4ba6de46ce3d0122ead8d9ad336fc78e3dd317ba25385244f0ca60ef",
+    "model/history/sample-transport-tr01-a93faaa97c19.shared.json": "a93faaa97c19308ba411a99c7b92e067a7415abed58168f77d61610b3986c79a",
+    "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
+    "model/history/tube-station-c01.legacy.json": "b740818ded51cf500f87d176e8068ccd81c93eeacd5ac77a500a7d525ef16b37",
+    "tests/fixtures/README.md": "8a172cf2fb146f14fe388c39ce0c313b5b2856929b7a29a328e17eb1f0c22806",
+    "tests/fixtures/c01-geometry-reference.json": "2e2a48da1266412e5ebdcc874f9867af054024c998859206f853adad2e895f9a",
+    "tests/fixtures/cf01-before-workspace.json": "0e91846af3f9e1d4a8d6ac7959b0a4dc97a0198bb00eafb8a544ccdce6a87dd0",
+    "tests/fixtures/l01-before-layer-split.json": "98f8b397e0d33089fa1fa23714e323b12aaa3ef610c7536dcdbf17d495998a49",
+    "tests/fixtures/nanodrop/README.md": "47bedffb754c2d996fb1d31155f9882547811c262492f22013fd2a48e79da943",
+    "tests/fixtures/nanodrop/before-qubit-extraction.json": "5ff4f8c8b81a1eef41998df50206eabd3a4362cb4ec0732721477545ee92fabd",
+    "tests/fixtures/nanodrop/one-synthetic.csv": "873e9f5d96b3e2bd74a4af93a16710e44d38ab3fd1740355c983eb88dd5d583c",
+    "tests/fixtures/nanodrop/ultrac-synthetic.csv": "8680342313dba977211c653157caa426a9e7cd079e937a77ae45006f27ee207f",
+    "tests/fixtures/qubit-4/README.md": "ef2b48ef1b14b08bdc325c6964165719eaa5ea7fc149c1f5fb694b1edc0f4b50",
+    "tests/fixtures/qubit-4/synthetic-report.csv": "d9839b99a7960499bbc4963b179db090fc16d69fb0c5e5a4015911e4b21ab768",
+    "tests/fixtures/solidcraft-vendor-exterior.json": "93ba0e4bab0d3214fe5a4f84e4fe9b8974ae5870a4bc6abab417243319e71061",
+    "tests/fixtures/t01-cad-check-evidence.json": "b5ffdfe5d66935618a1df462d9258db5d6885d788edd968c0a36832014c50404"
+  },
+  "gallery_build_evidence_retained": true,
+  "note": "Historical build hashes, revision prefixes, images and frozen inputs retain their original meaning; no new CAD validation is claimed.",
+  "removed_local_manifest": {
+    "was_tracked": false,
+    "archive": "exports/history/MANIFEST-19930226e78f.sha256",
+    "sha256": "19930226e78f488f90dbd80138ae23a417b8df80db8c99c06a5a29772f7436f1"
+  }
+}

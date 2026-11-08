@@ -113,7 +113,7 @@
   "drawing_sha256": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
   "interface_spec": {
     "path": "model/x2-mounting-interface.json",
-    "sha256": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71"
+    "sha256": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b"
   },
   "assembly_design_analysis": {
     "status": "calculated_under_stated_assumptions_sample_pending",

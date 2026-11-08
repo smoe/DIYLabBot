@@ -133,7 +133,7 @@
   "drawing_sha256": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
   "interface_spec": {
     "path": "model/x4-mounting-interface.json",
-    "sha256": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829"
+    "sha256": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c"
   },
   "assembly_design_analysis": {
     "status": "calculated_under_stated_assumptions_sample_pending",

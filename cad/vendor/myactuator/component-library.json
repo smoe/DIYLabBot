@@ -388,7 +388,7 @@
       "closed_shells_promoted_to_solids": 0,
       "interface_spec": {
         "path": "model/x2-mounting-interface.json",
-        "sha256": "12f89d4361179c3003fcae4157b8f1800434cb384393f2026e5b56dd8f978a71"
+        "sha256": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b"
       },
       "assembly_design_analysis": {
         "status": "calculated_under_stated_assumptions_sample_pending",
@@ -527,7 +527,7 @@
       "drawing": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf",
       "interface_check": {
         "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json",
-        "sha256": "cbdc639de67484bdeb9dbad8592cb455f8d3bcc45a91fbdcc5b9a2df50654fbd"
+        "sha256": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9"
       }
     },
     "RMD-X4-P36-36-E-L": {
@@ -939,7 +939,7 @@
       "closed_shells_promoted_to_solids": 9,
       "interface_spec": {
         "path": "model/x4-mounting-interface.json",
-        "sha256": "56138f0726840b65027c0d5f66c8a074d794f1fef4a9e0551163a07a68d88829"
+        "sha256": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c"
       },
       "assembly_design_analysis": {
         "status": "calculated_under_stated_assumptions_sample_pending",
@@ -1078,7 +1078,7 @@
       "drawing": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf",
       "interface_check": {
         "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json",
-        "sha256": "cbac2fd0369d4b2aef1d128ba68026fd173d4571dbe8021d0ba9366133a9329f"
+        "sha256": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c"
       }
     },
     "RMD-X6-P20-60-E": {
@@ -1422,7 +1422,7 @@
       "closed_shells_promoted_to_solids": 0,
       "interface_spec": {
         "path": "model/x6-mounting-interface.json",
-        "sha256": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce"
+        "sha256": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0"
       },
       "assembly_design_analysis": {
         "status": "calculated_under_stated_assumptions_sample_pending",
@@ -1489,7 +1489,7 @@
       "drawing": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf",
       "interface_check": {
         "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json",
-        "sha256": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd"
+        "sha256": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67"
       }
     }
   }

@@ -153,7 +153,7 @@
   "drawing_sha256": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
   "interface_spec": {
     "path": "model/x6-mounting-interface.json",
-    "sha256": "1843f27e1cdcca80cb32eb7412b1ede7ccca4a205a97bc37301dfa78400b6cce"
+    "sha256": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0"
   },
   "assembly_design_analysis": {
     "status": "calculated_under_stated_assumptions_sample_pending",

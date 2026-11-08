@@ -1,12 +1,22 @@
-# Preserve exact bytes across Windows/Linux clones: model and vendor references
-# use SHA-256 checksums, so automatic line-ending conversion would invalidate them.
-* -text
+# LF in both repository and checkout keeps SHA-256 input bytes identical on all OSes.
+# Any future active CRLF exception must explicitly declare eol=crlf here.
+* text=auto eol=lf
 
-# Review construction intent in model/*.json; native/generated CAD files use
-# the CAD viewers and validation reports rather than large text diffs.
-*.step -diff
-*.stp -diff
-*.sc -diff
-*.solidcraft -diff
-*.FCStd -diff
-*.stl -diff
+# Archived originals, historical sources, fixtures and curated README media:
+# preserve exact bytes, including existing CRLF in these frozen inputs.
+*.step -text -diff
+*.stp -text -diff
+cad/vendor/**/vendor-model-* -text
+cad/vendor/**/vendor-document-* -text
+model/history/** -text
+tests/fixtures/** -text
+docs/media/** -text
+
+# Native CAD, meshes and media are byte-preserved binary artifacts.
+*.sc -text -diff
+*.solidcraft -text -diff
+*.stl -text -diff
+*.FCStd binary
+*.pdf binary
+*.png binary
+*.mp4 binary

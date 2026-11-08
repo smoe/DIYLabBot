@@ -60,6 +60,15 @@ Eine native Ladebahn und Hardwarebetrieb sind damit nicht nachgewiesen.
 
 ## Quellen und lokale Ausgaben
 
+Aktive Textquellen verwenden LF im Repository und auf allen Rechnern beim
+Auschecken; `.gitattributes` schaltet lokale CRLF-Konvertierung ausdrücklich ab.
+Herstelleroriginale, Historie, Test-Fixtures und die historischen README-Medien
+bleiben bytegenau erhalten. Die einmalige Umstellung steht im
+[Migrationsbericht](docs/line-ending-migration.json). Dessen Prüfsummen gehören
+zum damaligen Migrationsstand; spätere fachliche Änderungen erzeugen neue
+Quellstände. Alte Build-Prüfsummen und Bilder bleiben historische Nachweise.
+
+
 Versioniert werden Konstruktionsabsicht, Generatoren, Dokumentation, Tests und
 Laufzeitcode. Eigene FreeCAD-/SolidCraft-Dateien, STEP-/Mesh-Exporte,
 Build-Berichte und Arbeitsrenderings werden lokal erzeugt und ignoriert.

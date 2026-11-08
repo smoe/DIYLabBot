@@ -61,6 +61,17 @@ Teildateien und Körperzuordnungen gehören in den lokalen Build-Bericht.
   und kuratierte README-Medien sind bewusst erhaltene Momentaufnahmen und
   werden nicht zur führenden Modellquelle.
 
+## Zeilenenden und bytegebundene Quellen
+
+Aktive Textdateien verwenden LF im Repository und beim Auschecken
+(`.gitattributes`: `text=auto eol=lf`). Herstelleroriginale, `model/history/`,
+`tests/fixtures/` und `docs/media/` bleiben bytegenau erhalten. Etwaige aktive
+CRLF-Ausnahmen müssten ausdrücklich mit `eol=crlf` deklariert werden.
+`docs/line-ending-migration.json` hält die einmalige Umstellung und die
+Prüfsummenkette fest. Historische Build-Prüfsummen und Revisionsnamen nicht
+auf heutige Bytes umschreiben; Äquivalenz separat dokumentieren. Der Bericht
+ist ein historischer Migrationsstand, keine neue Geometrieprüfung.
+
 ## Zielarchitektur für Arbeitsumgebungen
 
 Das Vier-Ebenen-Zielmodell steht in [ARCHITECTURE.md](ARCHITECTURE.md):

@@ -3297,6 +3297,6 @@
   },
   "vendor_library": {
     "path": "cad/vendor/myactuator/component-library.json",
-    "sha256": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78"
+    "sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa"
   }
 }
