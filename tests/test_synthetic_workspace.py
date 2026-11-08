@@ -2,6 +2,7 @@
 from pathlib import Path
 import copy
 import json
+import math
 import sys
 import unittest
 from unittest.mock import patch
@@ -12,6 +13,40 @@ from cf01_rack_batch import load,validate,Runner,BatchError,synthetic_feedback
 
 
 class SyntheticWorkspaceTests(unittest.TestCase):
+    def assertGeometryClose(self,actual,expected,path='scene'):
+        # Tolerance covers numerical evaluation, not a change in construction intent.
+        if type(expected) in (int,float):
+            self.assertTrue(math.isclose(actual,expected,rel_tol=1e-12,abs_tol=1e-8),path)
+        elif isinstance(expected,dict):
+            self.assertEqual(set(actual),set(expected),path)
+            for key in expected:self.assertGeometryClose(actual[key],expected[key],path+'.'+key)
+        elif isinstance(expected,list):
+            self.assertEqual(len(actual),len(expected),path)
+            for i,(a,b) in enumerate(zip(actual,expected)):self.assertGeometryClose(a,b,path+'['+str(i)+']')
+        else:self.assertEqual(actual,expected,path)
+
+    def test_generic_workspace_does_not_require_cf01_devices(self):
+        read=workspace.read
+        def fixture(ref):
+            value=read(ref)
+            if value.get('format')=='solidcraftbot.equipment-layout/1':value['instances']=[]
+            return value
+        with patch.object(workspace,'read',side_effect=fixture):
+            self.assertEqual(workspace.load()['devices'],{})
+            with self.assertRaisesRegex(ValueError,'CF01 workspace requires'):pickup.load()
+
+    def test_exportable_scene_has_no_internal_context_or_duplicate_leading_sources(self):
+        scene=pickup.load()
+        self.assertNotIn('_workspace',json.dumps(scene))
+        self.assertEqual(set(json.loads(pickup.SOURCE.read_text())['sources']),{'protocol'})
+        self.assertEqual(pickup.arm_source(scene)['format'],'solidcraftbot.robot/1')
+
+    def test_equipment_overrides_use_common_parameter_validation(self):
+        scene=pickup.load()
+        for overrides in [{'missing_parameter':1},{'upper_len':-1},{'elbow_z':300}]:
+            scene['robot_parameter_overrides_mm']=overrides
+            with self.subTest(overrides=overrides),self.assertRaises(ValueError):pickup.arm_source(scene)
+
     def test_unbounded_space_has_no_finite_room_or_shell_and_one_reference_surface(self):
         w=workspace.load()
         self.assertEqual(w['environment']['extent'],'unbounded')
@@ -34,8 +69,12 @@ class SyntheticWorkspaceTests(unittest.TestCase):
     def test_previous_positions_dimensions_and_all_motion_samples_are_preserved(self):
         expected=json.loads((workspace.ROOT/'tests/fixtures/cf01-before-workspace.json').read_text())
         scene=pickup.load()
-        for key in ['bench_surface','arm_fixture','rack','robot_parameter_overrides_mm']:self.assertEqual(scene[key],expected[key],key)
-        self.assertEqual(pickup.trajectory(scene)['samples'],expected['samples'])
+        self.assertEqual(scene['rack']['slot_order'],'row_major')
+        for key in ['bench_surface','arm_fixture','rack','robot_parameter_overrides_mm']:
+            actual=scene[key]
+            if key=='rack':actual={k:v for k,v in actual.items() if k!='slot_order'}
+            self.assertGeometryClose(actual,expected[key],key)
+        self.assertGeometryClose(pickup.trajectory(scene)['samples'],expected['samples'],'samples')
 
     def test_leading_scene_has_references_instead_of_duplicate_bank_and_device_coordinates(self):
         scene=json.loads(pickup.SOURCE.read_text());self.assertIn('environment',scene)
@@ -70,6 +109,9 @@ class OrderedBatchTests(unittest.TestCase):
         report=Runner(data).run();self.assertTrue(report['order_restored']);self.assertConserved(report)
         returned=[r for r in report['trace'] if r['stage']=='gripper_to_original_rack_slot']
         self.assertEqual([r['rack_slot'] for r in returned],list(range(1,13)))
+        self.assertEqual([r['rack_place_id'] for r in returned],[p['id'] for p in report['rack_places']])
+        self.assertEqual([s['rack_place_id'] for s in report['sample_mapping']],[p['id'] for p in report['rack_places']])
+        self.assertEqual(report['rack_places'][-1],{'id':'CF01.OutputRack.Slot12','slot':12,'row':2,'column':3})
 
     def test_missing_confirmation_or_wrong_identity_halts_without_false_success(self):
         for event,changes in [('rack_ready',{'rack_present':False}),('pick_rack',{'grasp_confirmed':False}),('seat_rotor',{'released_confirmed':False}),('place_rack',{'sample_id':'WrongSample'})]:

@@ -29,43 +29,7 @@
     "instances": {
       "type": "array",
       "items": {
-        "type": "object",
-        "required": [
-          "id",
-          "asset",
-          "parent_frame",
-          "xyz",
-          "yaw_deg"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "asset": {
-            "type": "string",
-            "minLength": 1
-          },
-          "parent_frame": {
-            "type": "string",
-            "minLength": 1
-          },
-          "xyz": {
-            "type": "array",
-            "minItems": 3,
-            "maxItems": 3,
-            "items": {
-              "type": "number"
-            }
-          },
-          "yaw_deg": {
-            "type": "number"
-          },
-          "overrides": {
-            "$ref": "assembly-reference.schema.json#/$defs/overrides"
-          }
-        }
+        "$ref": "assembly-reference.schema.json#/$defs/equipment_instance"
       }
     }
   }

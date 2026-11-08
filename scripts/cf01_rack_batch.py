@@ -12,6 +12,7 @@ import assembly_model as assembly
 import centrifuge_model as cf
 import centrifuge_protocol as protocol
 import synthetic_workspace as workspace
+import rack_slots
 from centrifuge_control import Simulator, ControlError
 
 ROOT=cf.ROOT
@@ -70,6 +71,8 @@ class Runner:
                            initial_slots={i:{'present':False,'seated':False,'mass_g':None} for i in range(1,13)})
         self.bridge=protocol.MockProtocol(self.sim)
         self.samples=sorted(self.data['samples'],key=lambda s:s['rack_slot'])
+        rack=workspace.read(workspace.load(assembly.validate_reference(self.data['workspace']))['devices']['Rack']['source'])
+        self.rack_places=rack_slots.places(rack)
         self.initial=[s['id'] for s in self.samples];self.rack=self.initial[:];self.rotor=[None]*12;self.gripper=None
         self.world={'rack':self.initial[:],'rotor':[None]*12,'gripper':None}
         self.stop_error=None;self.spin_completed=False
@@ -78,6 +81,7 @@ class Runner:
         return {'rack':self.rack[:],'rotor':self.rotor[:],'gripper':self.gripper}
 
     def record(self,stage,**details):
+        if 'rack_slot' in details:details['rack_place_id']=self.rack_places[details['rack_slot']-1]['id']
         self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':stage,**details,
                            'inventory':self.snapshot(),'world_inventory':copy.deepcopy(self.world),'station':protocol.state_si(self.sim.execute('status'))})
 
@@ -85,8 +89,7 @@ class Runner:
         contract=next(c for c in self.bridge.contract['commands'] if c['id']==name)
         fields=dict(args)
         if name not in protocol.PUBLIC:fields['control_token']=self.token
-        if self.transport=='sila2':
-            fields={''.join(w.capitalize() for w in k.split('_')):v for k,v in fields.items()}
+        fields={protocol.wire(self.transport,k):v for k,v in fields.items()}
         result=self.bridge.dispatch(self.transport,name if self.transport=='ros2' else contract['name'],fields)
         if name=='acquire':self.token=result['control_token']
         if result.get('phase') in ['failed','canceled','stopping']:raise ValueError('Command did not complete: '+name)
@@ -145,10 +148,10 @@ class Runner:
                 'polling':'local MockProtocol.poll, no transport serialization','stop_via_contract':True,'stop_error':self.stop_error,
                 'initial_state':self.data['initial_state'],'time_semantics':'Zero-time abstract handoffs; test clock advances only during spin and braking',
                 'effective_profile_sha256':hashlib.sha256(json.dumps(self.data,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
-                'effective_profile':self.data,'sample_mapping':self.samples,'initial_order':self.initial,'final_order':self.rack[:],
+                'effective_profile':self.data,'sample_mapping':[{**s,'rack_place_id':self.rack_places[s['rack_slot']-1]['id']} for s in self.samples],'rack_places':self.rack_places,'initial_order':self.initial,'final_order':self.rack[:],
                 'order_restored':passed and self.spin_completed and self.rack==self.initial and all(x is None for x in self.rotor) and self.gripper is None,
                 'spin_completed':self.spin_completed,'inventory':self.snapshot(),'error':error,'trace':self.trace,
-                'source_files_sha256':{str(p.relative_to(ROOT)):cf.digest(p) for p in [Path(__file__),protocol.SOURCE,ROOT/'scripts/centrifuge_control.py',ROOT/'scripts/centrifuge_protocol.py',ROOT/'scripts/centrifuge_model.py',ROOT/'scripts/synthetic_workspace.py',*workspace.source_dependencies(workspace.load(assembly.validate_reference(self.data['workspace'])))]},
+                'source_files_sha256':{str(p.relative_to(ROOT)):cf.digest(p) for p in [Path(__file__),protocol.SOURCE,ROOT/'scripts/centrifuge_control.py',ROOT/'scripts/centrifuge_protocol.py',ROOT/'scripts/centrifuge_model.py',ROOT/'scripts/synthetic_workspace.py',ROOT/'scripts/rack_slots.py',*workspace.source_dependencies(workspace.load(assembly.validate_reference(self.data['workspace'])))]},
                 'limitations':self.data['limitations']}
 
     def run(self):

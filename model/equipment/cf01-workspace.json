@@ -15,14 +15,13 @@
     },
     "rack": {
       "source": "model/guided-tube-rack.shared.json",
-      "source_sha256": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74"
+      "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
     }
   },
   "instances": [
     {
       "id": "Arm",
       "asset": "arm",
-      "parent_frame": "SYN.Bench.Worktop",
       "xyz": [
         -280,
         130,
@@ -32,29 +31,30 @@
       "overrides": {
         "upper_len": 280,
         "fore_len": 250
-      }
+      },
+      "host": "SYN.Bench.Worktop"
     },
     {
       "id": "CF01",
       "asset": "centrifuge",
-      "parent_frame": "SYN.Bench.Worktop",
       "xyz": [
         50,
         50,
         0
       ],
-      "yaw_deg": 0
+      "yaw_deg": 0,
+      "host": "SYN.Bench.Worktop"
     },
     {
       "id": "Rack",
       "asset": "rack",
-      "parent_frame": "SYN.Bench.Worktop",
       "xyz": [
         -210,
         -230,
         0
       ],
-      "yaw_deg": 0
+      "yaw_deg": 0,
+      "host": "SYN.Bench.Worktop"
     }
   ]
 }

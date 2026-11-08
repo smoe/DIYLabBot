@@ -73,6 +73,11 @@ def state_si(status):
         'locking_pin_retraction_m':[v/1000 for v in m['locking_pin_retraction_mm']]}
 
 
+def wire(transport,key):
+    if transport not in ('ros2','sila2'):raise ValueError('ros2 or sila2 transport required')
+    return key if transport=='ros2' else ''.join(v[:1].upper()+v[1:] for v in key.split('_'))
+
+
 class MockProtocol:
     """Executable adapter logic for future ROS actions / SiLA observable commands.
 
@@ -89,11 +94,10 @@ class MockProtocol:
         if transport not in ('ros2','sila2'):raise ValueError('ros2 or sila2 transport required')
         c=next((c for c in self.commands.values() if (c['id'] if transport=='ros2' else c['name'])==name),None)
         if c is None or c.get('local_only'):raise ControlError('UnknownCommand','Command is not in the transport contract')
-        def wire(key):return key if transport=='ros2' else ''.join(v[:1].upper()+v[1:] for v in key.split('_'))
-        expected={wire(k) for k in c['arguments']}
-        if c['id'] not in PUBLIC:expected.add(wire('control_token'))
+        expected={wire(transport,k) for k in c['arguments']}
+        if c['id'] not in PUBLIC:expected.add(wire(transport,'control_token'))
         if set(parameters)!=expected:raise ControlError('InvalidArgument','Exactly the declared typed fields are required')
-        args={k:parameters[wire(k)] for k in c['arguments']};token=parameters.get(wire('control_token'))
+        args={k:parameters[wire(transport,k)] for k in c['arguments']};token=parameters.get(wire(transport,'control_token'))
         if c['observable']:return self.begin(c['id'],token,**args)
         result=self.invoke(c['id'],token,**args)
         response={'success':True,'error_code':'','message':'','state':state_si(self.sim.execute('status'))}

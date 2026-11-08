@@ -43,12 +43,14 @@ def load(path=SOURCE):
         frames[frame['id']]=t
     devices={}
     for item in equipment['instances']:
+        assembly.validate_instance(item)
+        if set(item)-{'id','asset','host','xyz','yaw_deg','overrides'} or 'host' not in item:
+            raise ValueError('Equipment requires a framed common assembly instance')
         if item['id'] in devices:raise ValueError('Duplicate equipment instance')
         ref=equipment['assets'][item['asset']];assembly.validate_reference(ref)
-        if item['parent_frame'] not in frames:raise ValueError('Unknown equipment support frame')
-        matrix=robot.multiply(frames[item['parent_frame']],pose(item['xyz'],item['yaw_deg']))
+        if item['host'] not in frames:raise ValueError('Unknown equipment support frame')
+        matrix=robot.multiply(frames[item['host']],pose(item['xyz'],item['yaw_deg']))
         devices[item['id']]={**item,'source':ref,'matrix':matrix}
-    if set(devices)!={'Arm','CF01','Rack'}:raise ValueError('CF01 workspace requires arm, centrifuge and rack')
     return {'spec':spec,'environment':env,'bench':bench,'frames':frames,'devices':devices,'equipment':equipment}
 
 
@@ -57,12 +59,14 @@ def source_dependencies(workspace):
 
 
 def materialize_scene(scene):
+    if set(scene['sources'])!={'protocol'}:raise ValueError('Device sources must come from equipment assets')
     if 'bench_surface' in scene or 'robot_parameter_overrides_mm' in scene or {'position_mm','yaw_deg'}&set(scene['arm_fixture']) or set(scene['rack'])!={'selected_slot','approach_grip_height_mm'}:
         raise ValueError('Scene geometry and device poses must come from the workspace')
     result=copy.deepcopy(scene);path=assembly.validate_reference(scene['environment']);w=load(path)
+    if set(w['devices'])!={'Arm','CF01','Rack'}:raise ValueError('CF01 workspace requires arm, centrifuge and rack')
     arm,station,rack=(w['devices'][key] for key in ['Arm','CF01','Rack'])
     if station['matrix']!=robot.identity():raise ValueError('Current pickup adapter requires station at workspace origin')
-    if scene['sources']['robot']!=arm['source']['source'] or scene['sources']['centrifuge']!=station['source']['source']:raise ValueError('Scene and equipment sources disagree')
+    result['sources'].update(robot=arm['source']['source'],centrifuge=station['source']['source'])
     def xyzyaw(item):
         m=item['matrix'];return [m[i][3] for i in range(3)],math.degrees(math.atan2(m[1][0],m[0][0]))
     xyz,yaw=xyzyaw(arm);result['arm_fixture'].update(position_mm=xyz,yaw_deg=yaw)
@@ -72,5 +76,4 @@ def materialize_scene(scene):
     result['rack']={**definition,**scene['rack'],'position_mm':xyz,'yaw_deg':yaw}
     shape=w['bench']['operations'][0]['shape'];body=w['bench']['bodies'][0]
     result['bench_surface']={'origin_mm':[robot.evaluate(v,{}) for v in shape['origin']],'size_mm':[robot.evaluate(v,{}) for v in shape['size']],'role':body['role']}
-    result['_workspace']=w
     return result

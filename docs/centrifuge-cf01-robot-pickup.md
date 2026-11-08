@@ -166,6 +166,26 @@ SolidCraft MCP inspection was attempted, but its allowed paths exclude this
 project directory. The existing reproducible local SolidCraft CLI adapter was
 used for the two source-derived review scenes and cross-CAD measurements.
 
+## Zweisprachige Bedienung / Bilingual controls
+
+Neu erzeugte HTML-Demos starten auf Deutsch. Über **Sprache / Language** lässt
+sich jederzeit auf Englisch wechseln. Erklärungen, Bedienelemente, barrierefreie
+Beschriftungen, Bewegungsphasen und Chargenzustände wechseln gemeinsam; Zeit,
+Probenbesitz und eine laufende Wiedergabe bleiben erhalten. Proben-IDs wie
+`Sample01` und die maschinenlesbaren Protokoll-IDs bleiben sprachunabhängig.
+Das optionale Chargenpanel darf bei fehlenden oder fehlerhaften Daten ausfallen,
+ohne die Bewegungsansicht zu blockieren.
+
+Newly generated demos default to German. **Sprache / Language** switches all
+explanations, controls, accessibility labels, motion phases and batch states
+to English while preserving playback and sample ownership. Machine-readable
+identifiers stay unchanged. An unavailable optional batch panel does not block
+the motion view.
+
+Die ausgewählten Medien unter `docs/media/` bleiben der historische Build.
+Aktuelle Generatoren, Prüfungen und die Zuordnung zu dessen Quellrevision
+stehen im [Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
+
 ## Synthetic workspace and complete local batch
 
 `model/synthetic-cf01-workspace.shared.json` composes an explicitly unbounded

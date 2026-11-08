@@ -131,7 +131,7 @@ Testumgebung nicht.
 | Ebene | Kompakte Testumgebung |
 |---|---|
 | Arbeitsumgebung | Synthetischer unbegrenzter Raum mit eindeutigem Weltbezug; keine Gebäudevermessung oder Raumkontur |
-| Möbeltypen | Referenz auf eine Bank oder Arbeitsfläche aus dem gemeinsamen Katalog |
+| Möbeltypen | Referenz auf eine Bank oder Arbeitsfläche über den gemeinsamen Möbelvertrag |
 | Möblierung | Eine Bankinstanz mit benanntem Arbeitsflächenrahmen |
 | Geräteausstattung | Dicht angeordnete Instanzen der zu prüfenden Geräte; dieselben Gerätequellen wie im realen Layout |
 
@@ -185,15 +185,15 @@ sichtbar. Die Testumgebung liefert keine Freigabe einer realen Laboraufstellung.
 ### README Interaktion als erster Referenzfall
 
 Die im README gezeigte Entnahme aus CF01 mit Ablage im Rack ist der erste
-vorgesehene Integrationsfall für dieses Profil. Raum und Referenzbank sollen
-aus der minimalen Umgebung und Möblierung abgeleitet werden. Arm und CF01
+implementierte Integrationsfall für dieses Profil. Raum und Referenzbank werden
+aus der minimalen Umgebung und Möblierung abgeleitet. Arm und CF01
 referenzieren weiterhin `model/robot.json` beziehungsweise
 `model/centrifuge-cf01.shared.json`; die Entnahme-, Greifer- und Rackbeziehungen
 bleiben an ihre vorhandene Szenenquelle und das CF01-Protokoll gebunden.
 Es entsteht keine zweite Beschreibung dieser Geräte oder des Ablaufs.
 
-Bei dieser Überführung sind zunächst die heutige Bankoberfläche, Geräteposen,
-Gelenkstellungen und Gefäßübergaben zu erhalten. Die Bankoberfläche liegt im
+Die Überführung erhält Bankoberfläche, Geräteposen,
+Gelenkstellungen und Gefäßübergaben. Die Bankoberfläche liegt im
 bisherigen Szenenbezug bei Z = 0; ein neuer Welt- oder Bankrahmen darf die
 Darstellung nicht unbeabsichtigt verschieben. Anschließend kann dieselbe
 Interaktion mit einer anderen Aufstellung, etwa in L01, verbunden werden.

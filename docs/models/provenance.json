@@ -995,18 +995,18 @@
       "id": "synthetic-workspace",
       "image": "images/synthetic-workspace.png",
       "source_files_sha256": {
-        "model/synthetic-cf01-workspace.shared.json": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517",
-        "model/equipment/cf01-workspace.json": "d1d52e0cba2e3c627c1a5f66b69d4822cbb41c0efaabde65e9d54b0008dda4ad",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "bd2b09988abf4a5228208f0c4e17c4bc25e1cbb6815012526e80612da2951557"
+        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
+        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "19cf33001d731dadacc86d8b59e69a158e38dcf21f7a92901d30c1820c1d2455"
       },
       "build_report": "cad/centrifuge-cf01/solidcraft-pickup-build-report.json",
-      "build_report_sha256": "0b9e54f01c77607867609dc32afe7f6db3aa1d2ebc59d834411a7a9d605e4d24",
+      "build_report_sha256": "c9f6aec2a6870a243fd6295d1c493cf7c7cb9a470b41570ed73cfb505aebef21",
       "build_passed": true,
       "freecad_required": false,
       "phase": "Grasp",
       "cad_body_count": 235,
-      "native_model": "cad/generated/centrifuge-cf01-solidcraft-bd2b09988abf-r2/CF01_Robot_Grasp.sc",
-      "native_model_sha256": "2d7711333f78df07c1df10cff7e0fd53225c32884430b861c130251705d77f52",
+      "native_model": "cad/generated/centrifuge-cf01-robot-19cf33001d73-r2/CF01_Robot_Grasp.sc",
+      "native_model_sha256": "5c45a482beed0edfad96bb0fdba7d09860c438aeddba059382d3db9f4ffcc434",
       "renderer_result": {
         "bytes": 139150,
         "height": 700,
@@ -1029,7 +1029,7 @@
         "snapshot",
         "tmp/model-gallery/synthetic-workspace.commands.json",
         "--in",
-        "cad/generated/centrifuge-cf01-solidcraft-bd2b09988abf-r2/CF01_Robot_Grasp.sc",
+        "cad/generated/centrifuge-cf01-robot-19cf33001d73-r2/CF01_Robot_Grasp.sc",
         "--out",
         "docs/models/images/synthetic-workspace.png",
         "--width",
@@ -1044,11 +1044,11 @@
       "image_sha256": "bb99b0b3902453ae090a0977dfb31469816e1a8b89f0ee184a1433a34ce9a729",
       "bytes": 139150,
       "dependency_files_sha256": {
-        "model/synthetic-cf01-workspace.shared.json": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517",
+        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
         "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
-        "model/equipment/cf01-workspace.json": "d1d52e0cba2e3c627c1a5f66b69d4822cbb41c0efaabde65e9d54b0008dda4ad",
+        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
         "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
         "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
         "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
@@ -1071,8 +1071,8 @@
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
         "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
-        "model/guided-tube-rack.shared.json": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "bd2b09988abf4a5228208f0c4e17c4bc25e1cbb6815012526e80612da2951557",
+        "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "19cf33001d731dadacc86d8b59e69a158e38dcf21f7a92901d30c1820c1d2455",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
       }
     },
@@ -1430,7 +1430,7 @@
       "id": "guided-rack",
       "image": "images/guided-rack.png",
       "source_files_sha256": {
-        "model/guided-tube-rack.shared.json": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74"
+        "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
       },
       "visible_bodies": [
         "Rack_Base",
@@ -1440,13 +1440,13 @@
         "Rack_OrientationKey"
       ],
       "build_report": "cad/centrifuge-cf01/solidcraft-pickup-build-report.json",
-      "build_report_sha256": "0b9e54f01c77607867609dc32afe7f6db3aa1d2ebc59d834411a7a9d605e4d24",
+      "build_report_sha256": "c9f6aec2a6870a243fd6295d1c493cf7c7cb9a470b41570ed73cfb505aebef21",
       "build_passed": true,
       "freecad_required": false,
       "phase": "RackReleased",
       "cad_body_count": 235,
-      "native_model": "cad/generated/centrifuge-cf01-solidcraft-bd2b09988abf-r2/CF01_Robot_RackReleased.sc",
-      "native_model_sha256": "d955fe9372f9f7a1c3aeb362ced7605d21f3678981f63dcc63de9952cbc90f8b",
+      "native_model": "cad/generated/centrifuge-cf01-robot-19cf33001d73-r2/CF01_Robot_RackReleased.sc",
+      "native_model_sha256": "947551fd30279c400cf83207367e393e6c95a1ad2b4a71372a1cb7a5d89720da",
       "renderer_result": {
         "bytes": 118219,
         "height": 700,
@@ -1707,7 +1707,7 @@
         "snapshot",
         "tmp/model-gallery/guided-rack.commands.json",
         "--in",
-        "cad/generated/centrifuge-cf01-solidcraft-bd2b09988abf-r2/CF01_Robot_RackReleased.sc",
+        "cad/generated/centrifuge-cf01-robot-19cf33001d73-r2/CF01_Robot_RackReleased.sc",
         "--out",
         "docs/models/images/guided-rack.png",
         "--width",
@@ -1722,7 +1722,7 @@
       "image_sha256": "f6b5a2728f866671b72641009e6adc1b4911cdcf59ae2e384f7be89b4065a22b",
       "bytes": 118219,
       "dependency_files_sha256": {
-        "model/guided-tube-rack.shared.json": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74"
+        "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
       }
     },
     {
@@ -1881,7 +1881,7 @@
       "id": "rack-batch",
       "image": "images/rack-batch.svg",
       "source_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "651ca82d6b48717e5826c6c763d8c767cb57134f9491b9a42ec620043fca1ab2"
+        "model/cf01-rack-batch.protocol.json": "6d0bb9bb5d6e91179dff69bdcf988633ff49d7a51d5134f61deca6b69363e87c"
       },
       "representation": "Source-derived local mock protocol diagram",
       "batch_passed": true,
@@ -1891,12 +1891,12 @@
       "image_sha256": "dbfd322ce4bc3b477235dae9844ec5c8e5114edd86eebb474614093b40c80723",
       "bytes": 5158,
       "dependency_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "651ca82d6b48717e5826c6c763d8c767cb57134f9491b9a42ec620043fca1ab2",
-        "model/synthetic-cf01-workspace.shared.json": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517",
+        "model/cf01-rack-batch.protocol.json": "6d0bb9bb5d6e91179dff69bdcf988633ff49d7a51d5134f61deca6b69363e87c",
+        "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
         "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
-        "model/equipment/cf01-workspace.json": "d1d52e0cba2e3c627c1a5f66b69d4822cbb41c0efaabde65e9d54b0008dda4ad",
+        "model/equipment/cf01-workspace.json": "b2bc83668097b7398c0ce083176c2610ee02525e1943aa7591034122e78e138e",
         "model/robot.json": "c7dd198799c008a03dcdcb16bde143158864fd0dc49aca36898fae6934409b08",
         "model/mobile-base-mb01.shared.json": "6dcbdda1d2af349f141cdc19a676fc655190cf8eb577e44a6baa873d83fb4d4d",
         "cad/vendor/myactuator/component-library.json": "0748bef176b9df47b4f799bd173d33164cda21a598e6a57aff7f14a373216e78",
@@ -1919,7 +1919,7 @@
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "e21462de8c71bd888d3151cd63d8aa570e7e1f6ec3e501f9b2e903900582b6fd",
         "model/centrifuge-cf01.shared.json": "7a4eddd8ce4a8115627a7d2e671a2a6e9d18a8317a5fab865e092cdf914ef2cb",
-        "model/guided-tube-rack.shared.json": "e7c00fe5f0388beaf704294bbf690279a037b0a24f4e020b85a52a41f9f90f74",
+        "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
       }
     }
@@ -1937,7 +1937,17 @@
       "No unintended model cropping or blank images"
     ],
     "browser_images_loaded": 27,
-    "browser_page_errors": []
+    "browser_page_errors": [],
+    "current_source_update": {
+      "reviewed_images": [
+        "synthetic-workspace",
+        "guided-rack",
+        "rack-batch"
+      ],
+      "method": "Regenerated only these three views; both native PNGs and the rasterized SVG were visually inspected. All three image files are byte-identical to the previous gallery.",
+      "source_revision": "19cf33001d73",
+      "previous_gallery_commit": "ad94615"
+    }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

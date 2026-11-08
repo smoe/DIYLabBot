@@ -5,7 +5,7 @@ Bewusst versionierte Medienauswahl, keine zusätzliche Konstruktionsquelle:
 - `robot-demo.html`: unabhängige Bewegungsansicht und lokales Chargenprotokoll.
 - `robot-demo.mp4`: beschleunigter 60-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01.
 - `robot-demo.png`: Vorschau bei 30,5 s mit Gefäß am Greifer.
-- `provenance.json`: aktuelle Quellen, Medienprüfsummen, Prüfungen und Grenzen.
+- `provenance.json`: Quellen, Medienprüfsummen, Prüfungen und Grenzen dieses historischen Medien-Builds.
 
 Die Szene stammt aus `model/synthetic-cf01-workspace.shared.json`: unbegrenzter
 Raum, Referenzbank, referenzierter Roboter, CF01 und Rack. Bankmaße, Weltpositionen
@@ -34,6 +34,15 @@ Diese Provenienz bleibt der festgehaltene Stand dieses Medien-Builds. Der späte
 [native CF01-SolidCraft-Adapter](../centrifuge-cf01-robot-pickup.md#independent-solidcraft-build-and-importer-workaround)
 erzeugt die Prüfstellungen unabhängig von FreeCAD. Sein eigener Bericht führt
 die erneuten Prüfungen; er überschreibt diese historische Medienprüfung nicht.
+
+## Historischer Quellstand
+
+Alle 50 Quellprüfsummen in `provenance.json` gehören exakt zu Commit
+`e5eedc828a2bb1ae4e903378ec9359644bd8a467`. Sie werden nicht auf heutige
+Generatoren umgeschrieben. HTML, Video, Vorschaubild und diese Provenienz bleiben
+als historischer Medien-Build erhalten. Die neu erzeugte, deutsch/englisch
+umschaltbare Demo und ihre aktuellen Prüfungen sind separat im
+[Nachtrag zur Claude-Prüfung](../cf01-claude-review.md) beschrieben.
 
 ## Aktualisieren
 

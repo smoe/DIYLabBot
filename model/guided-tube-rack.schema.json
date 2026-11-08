@@ -20,7 +20,8 @@
     "material",
     "calibrated",
     "support_confirmation",
-    "format"
+    "format",
+    "slot_order"
   ],
   "additionalProperties": false,
   "properties": {
@@ -95,6 +96,9 @@
     },
     "format": {
       "const": "solidcraftbot.guided-tube-rack/1"
+    },
+    "slot_order": {
+      "const": "row_major"
     }
   }
 }

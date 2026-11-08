@@ -13,6 +13,15 @@
         "case": {"type": "string", "minLength": 1}
       }
     },
+    "equipment_instance": {
+      "description": "Supported equipment subset of the common assembly instance; host names a composed frame.",
+      "allOf": [
+        {"$ref": "#/$defs/instance"},
+        {"required": ["host"],
+         "propertyNames": {"enum": ["id", "asset", "host", "xyz", "yaw_deg", "overrides"]},
+         "properties": {"host": {"minLength": 1}, "xyz": {"items": {"type": "number"}}}}
+      ]
+    },
     "overrides": {
       "description": "Driving parameters only, in the unit declared by the referenced source. Expressions resolve in scene parameters. No implicit unit conversion.",
       "type": "object", "additionalProperties": {"type": ["number", "string"]}

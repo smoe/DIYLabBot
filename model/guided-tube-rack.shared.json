@@ -18,5 +18,6 @@
   "material": null,
   "calibrated": false,
   "support_confirmation": "synthetic; real rack presence and seating sensing required",
-  "format": "solidcraftbot.guided-tube-rack/1"
+  "format": "solidcraftbot.guided-tube-rack/1",
+  "slot_order": "row_major"
 }

@@ -17,18 +17,9 @@
     "sources": {
       "type": "object",
       "required": [
-        "robot",
-        "centrifuge",
         "protocol"
       ],
       "properties": {
-        "robot": {
-          "type": "string",
-          "pattern": "^model/[A-Za-z0-9_.-]+\\.json$"
-        },
-        "centrifuge": {
-          "const": "model/centrifuge-cf01.shared.json"
-        },
         "protocol": {
           "const": "model/centrifuge-cf01.protocol.json"
         }

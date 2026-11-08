@@ -46,7 +46,7 @@ def construction(scene,vendor_sections):
                 args.update(base=shape['origin'],axis=[0,0,1],radius=shape['radius'],height=shape['height'])
                 if shape['kind']=='cone':args['top_radius']=shape['top_radius']
             add('solid.'+shape['kind'],**args)
-        appearance=scene['_workspace']['bench']['bodies'][0]['appearance'] if body['group']=='Scene' else {'color':'#61b99a' if body['group']=='Rack' else '#d5a03a','opacity':1}
+        appearance=pickup.workspace.load(pickup.assembly.validate_reference(scene['environment']))['bench']['bodies'][0]['appearance'] if body['group']=='Scene' else {'color':'#61b99a' if body['group']=='Rack' else '#d5a03a','opacity':1}
         add('appearance.assign',bodies=[name],**appearance)
         manifest.append({'id':body['id'],'group':body['group'],'names':[name],'asset':'scene'})
     for group in sorted({b['group'] for b in parts}):

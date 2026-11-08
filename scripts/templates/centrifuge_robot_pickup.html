@@ -5,26 +5,27 @@
     #cf01-bench-rack .cf01-timeline {width:100%;margin:.5em 0}
     @media(max-width:480px){#cf01-bench-rack .cf01-scene{height:340px}}
   </style>
-  <p>Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und Mock-Quittungen; keine Kopplung an die Chargenwiedergabe.</p>
+  <p data-i18n="motion_description">Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.</p>
   <div class="viz-controls">
-    <button type="button" class="btn btn-primary" data-play>Play cycle</button>
-    <label class="form-label">View <select class="form-select" data-view><option value="assembly">Robot, centrifuge and rack</option><option value="tube">Tube handling close-up</option><option value="rack">Rack placement</option></select></label>
-    <label class="form-label">Playback <select class="form-select" data-speed><option value="1">1×</option><option value="2" selected>2×</option><option value="0.5">0.5×</option></select></label>
+    <label>Sprache / Language <select data-language><option value="de">Deutsch</option><option value="en">English</option></select></label>
+    <button type="button" class="btn btn-primary" data-play data-i18n="Play cycle">Bewegung abspielen</button>
+    <label class="form-label"><span data-i18n="View">Ansicht</span> <select class="form-select" data-view><option value="assembly" data-i18n="Robot, centrifuge and rack">Roboter, Zentrifuge und Rack</option><option value="tube" data-i18n="Tube handling close-up">Gefäßübergabe im Detail</option><option value="rack" data-i18n="Rack placement">Ablage im Rack</option></select></label>
+    <label class="form-label"><span data-i18n="Playback">Geschwindigkeit</span> <select class="form-select" data-speed><option value="1">1×</option><option value="2" selected>2×</option><option value="0.5">0.5×</option></select></label>
   </div>
-  <canvas class="cf01-scene" data-scene role="img" aria-label="Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper"></canvas>
-  <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite">Closed and locked</span><span data-values></span></div>
-  <label class="form-label">Cycle time <span class="tabular-nums" data-time>0.0 / 60.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="60" step="0.05" value="0" aria-label="Cycle time in seconds"></label>
-  <div class="viz-row text-small"><span data-lift>Tube supported by centrifuge</span><span>Bench mounting · 1 mm transport target</span></div>
+  <canvas class="cf01-scene" data-scene role="img" data-i18n-aria="Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper" aria-label="Sechsachsiger Roboter entnimmt Gefäß 01, zieht es aus dem Deckelbereich zurück, legt es in Rackplatz 01 ab und zieht den leeren Greifer zurück"></canvas>
+  <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite" data-i18n="Closed and locked">Geschlossen und verriegelt</span><span data-values></span></div>
+  <label class="form-label"><span data-i18n="Cycle time">Bewegungszeit</span> <span class="tabular-nums" data-time>0.0 / 60.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="60" step="0.05" value="0" data-i18n-aria="Cycle time in seconds" aria-label="Bewegungszeit in Sekunden"></label>
+  <div class="viz-row text-small"><span data-lift data-i18n="Tube supported by centrifuge">Gefäß durch Zentrifuge gestützt</span><span data-i18n="Bench mounting · 1 mm transport target">Bankmontage · Transportziel 1 mm</span></div>
   <details class="cf01-batch" data-batch-panel>
-    <summary>Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze</summary>
-    <p>Aufzeichnung des lokalen Mock-Protokolls für zwölf Proben. Roboterübergaben
+    <summary data-i18n="Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze">Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze</summary>
+    <p data-i18n="batch_description">Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben
     beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit
     vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.</p>
-    <button type="button" data-batch-play>Protokoll abspielen</button>
-    <input type="range" data-batch-slider min="0" max="1" step="1" value="0" aria-label="Protokollschritt">
+    <button type="button" data-batch-play data-i18n="Protokoll abspielen">Protokoll abspielen</button>
+    <input type="range" data-batch-slider min="0" max="1" step="1" value="0" data-i18n-aria="Protokollschritt" aria-label="Protokollschritt">
     <p data-batch-stage aria-live="polite"></p>
-    <div class="cf01-batch-grids"><div><strong>Rackplätze</strong><div data-batch-rack></div></div><div><strong>Rotorplätze (logische Reihenfolge)</strong><div data-batch-rotor></div></div></div>
-    <p data-batch-gripper></p><p>Simulation: keine Netzwerk- oder Hardwareausführung.</p>
+    <div class="cf01-batch-grids"><div><strong data-i18n="Rackplätze">Rackplätze</strong><div data-batch-rack></div></div><div><strong data-i18n="Rotorplätze (logische Reihenfolge)">Rotorplätze (logische Reihenfolge)</strong><div data-batch-rotor></div></div></div>
+    <p data-batch-gripper></p><p data-i18n="Simulation: keine Netzwerk- oder Hardwareausführung.">Simulation: keine Netzwerk- oder Hardwareausführung.</p>
   </details>
   <style>
     .cf01-batch{margin-top:16px;border-top:1px solid #b6c7d2;padding-top:10px}
@@ -42,6 +43,98 @@
     const compressed=Uint8Array.from(atob(root.querySelector('[data-mesh]').textContent.trim()),c=>c.charCodeAt(0));
     const mesh=JSON.parse(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
     const keys=mesh.trajectory.samples.map(s=>({...s,values:s.station}));
+    const labels={
+      "Play cycle":["Bewegung abspielen", "Play cycle"],
+      "Replay cycle":["Bewegung erneut abspielen", "Replay cycle"],
+      "Pause":["Pause", "Pause"],
+      "View":["Ansicht", "View"],
+      "Robot, centrifuge and rack":["Roboter, Zentrifuge und Rack", "Robot, centrifuge and rack"],
+      "Tube handling close-up":["Gefäßübergabe im Detail", "Tube handling close-up"],
+      "Rack placement":["Ablage im Rack", "Rack placement"],
+      "Playback":["Geschwindigkeit", "Playback"],
+      "Closed and locked":["Geschlossen und verriegelt", "Closed and locked"],
+      "Cycle time":["Bewegungszeit", "Cycle time"],
+      "Cycle time in seconds":["Bewegungszeit in Sekunden", "Cycle time in seconds"],
+      "Tube supported by centrifuge":["Gefäß durch Zentrifuge gestützt", "Tube supported by centrifuge"],
+      "Bench mounting · 1 mm transport target":["Bankmontage · Transportziel 1 mm", "Bench mounting · 1 mm transport target"],
+      "Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper":["Sechsachsiger Roboter entnimmt Gefäß 01, zieht es aus dem Deckelbereich zurück, legt es in Rackplatz 01 ab und zieht den leeren Greifer zurück", "Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper"],
+      "Tube supported in rack slot 01":["Gefäß in Rackplatz 01 gestützt", "Tube supported in rack slot 01"],
+      "Tube held by gripper":["Gefäß im Greifer", "Tube held by gripper"],
+      "Tube 01":["Gefäß 01", "Tube 01"],
+      "Lid ":["Deckel ", "Lid "],
+      "° · jaw gap ":["° · Greiferspalt ", "° · jaw gap "],
+      "Tube in rack slot 01 · gripper released":["Gefäß in Rackplatz 01 · Greifer geöffnet", "Tube in rack slot 01 · gripper released"],
+      "Tube supported in rack slot 01 · fingers still closed":["Gefäß in Rackplatz 01 gestützt · Finger noch geschlossen", "Tube supported in rack slot 01 · fingers still closed"],
+      "Robot and tube clear of centrifuge":["Roboter und Gefäß außerhalb der Zentrifuge", "Robot and tube clear of centrifuge"],
+      "Tube moves with gripper":["Gefäß bewegt sich mit Greifer", "Tube moves with gripper"],
+      "Rotor stopped · tube supported by station":["Rotor steht · Gefäß durch Station gestützt", "Rotor stopped · tube supported by station"],
+      "Protokoll abspielen":["Protokoll abspielen", "Play protocol"],
+      "leer":["leer", "empty"],
+      "ja":["ja", "yes"],
+      "nein":["nein", "no"],
+      "Greifer: ":["Greifer: ", "Gripper: "],
+      " · Reihenfolge wiederhergestellt: ":[" · Reihenfolge wiederhergestellt: ", " · Original order restored: "],
+      "Schritt":["Schritt", "Step"],
+      "CF01-Befehl":["CF01-Befehl", "CF01 command"],
+      "Abstrakte Übergabe":["Abstrakte Übergabe", "Abstract handoff"],
+      "Ablaufzustand":["Ablaufzustand", "Sequence state"],
+      "Testzeit (Spin/Bremse)":["Testzeit (Schleudern/Bremsen)", "Test time (spin/braking)"],
+      "Batch panel unavailable":["Chargenanzeige nicht verfügbar; die Bewegungsansicht bleibt bedienbar.", "Batch panel unavailable"],
+      "Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze":["Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze", "Complete batch: rack → CF01 → original rack slots"],
+      "Simulation: keine Netzwerk- oder Hardwareausführung.":["Simulation: keine Netzwerk- oder Hardwareausführung.", "Simulation: no network or hardware execution."],
+      "Rotorplätze (logische Reihenfolge)":["Rotorplätze (logische Reihenfolge)", "Rotor slots (logical order)"],
+      "Protokollschritt":["Protokollschritt", "Protocol step"],
+      "Rackplätze":["Rackplätze", "Rack slots"],
+      "Closed and locked; robot waits clear":["Geschlossen und verriegelt; Roboter wartet außerhalb", "Closed and locked; robot waits clear"],
+      "Unlock centrifuge lid":["Zentrifugendeckel entriegeln", "Unlock centrifuge lid"],
+      "Open and hold lid":["Deckel öffnen und halten", "Open and hold lid"],
+      "Pusher reaches tube bottom":["Heber erreicht Gefäßboden", "Pusher reaches tube bottom"],
+      "Elevate tube 01":["Gefäß 01 anheben", "Elevate tube 01"],
+      "Robot approaches above the tube":["Roboter nähert sich oberhalb des Gefäßes", "Robot approaches above the tube"],
+      "Align open fingers around tube":["Offene Finger am Gefäß ausrichten", "Align open fingers around tube"],
+      "Close gripper and confirm grasp":["Greifer schließen und Griff bestätigen", "Close gripper and confirm grasp"],
+      "Extract tube along its axis":["Gefäß entlang seiner Achse entnehmen", "Extract tube along its axis"],
+      "Withdraw robot and carried tube":["Roboter mit Gefäß zurückziehen", "Withdraw robot and carried tube"],
+      "Confirm robot and tube clear":["Freien Arbeitsraum bestätigen", "Confirm robot and tube clear"],
+      "Retract empty pusher":["Leeren Heber zurückziehen", "Retract empty pusher"],
+      "Close lid after withdrawal":["Deckel nach Rückzug schließen", "Close lid after withdrawal"],
+      "Lock lid; robot retains tube":["Deckel verriegeln; Roboter hält Gefäß", "Lock lid; robot retains tube"],
+      "Turn tube upright outside centrifuge":["Gefäß außerhalb der Zentrifuge aufrichten", "Turn tube upright outside centrifuge"],
+      "Move above empty rack slot 01":["Über leeren Rackplatz 01 fahren", "Move above empty rack slot 01"],
+      "Lower tube into guided rack slot":["Gefäß in geführten Rackplatz absenken", "Lower tube into guided rack slot"],
+      "Confirm tube supported by rack":["Unterstützung durch Rack bestätigen", "Confirm tube supported by rack"],
+      "Open fingers and leave tube in rack":["Finger öffnen; Gefäß bleibt im Rack", "Open fingers and leave tube in rack"],
+      "Withdraw empty gripper; tube stays in slot 01":["Leeren Greifer zurückziehen; Gefäß bleibt in Platz 01", "Withdraw empty gripper; tube stays in slot 01"],
+      "rack_ready":["Rack bereitgestellt", "Rack ready"],
+      "acquire":["Steuerung übernehmen", "Acquire control"],
+      "index":["Rotorplatz anfahren", "Index rotor slot"],
+      "open_lid":["Deckel öffnen", "Open lid"],
+      "rack_to_gripper":["Rack → Greifer", "Rack → gripper"],
+      "confirm_seated":["Sitz im Rotor bestätigen", "Confirm seated in rotor"],
+      "gripper_to_rotor":["Greifer → Rotor", "Gripper → rotor"],
+      "robot_clear":["Arbeitsraum frei", "Workspace clear"],
+      "close_lid":["Deckel schließen", "Close lid"],
+      "start":["Zentrifugation starten", "Start centrifugation"],
+      "centrifuging":["Zentrifugieren", "Centrifuging"],
+      "heartbeat":["Steuerverbindung bestätigen", "Control heartbeat"],
+      "braking":["Abbremsen", "Braking"],
+      "spin_complete":["Zentrifugation abgeschlossen", "Spin complete"],
+      "present_tube":["Gefäß zur Entnahme anheben", "Present tube"],
+      "confirm_removed":["Entnahme bestätigen", "Confirm removed"],
+      "rotor_to_gripper":["Rotor → Greifer", "Rotor → gripper"],
+      "retract_lift":["Heber zurückziehen", "Retract lift"],
+      "gripper_to_original_rack_slot":["Greifer → ursprünglicher Rackplatz", "Gripper → original rack slot"],
+      "release":["Steuerung freigeben", "Release control"],
+      "complete":["Abgeschlossen", "Complete"],
+      "failed":["Fehlgeschlagen", "Failed"],
+      "stop":["Stopp", "Stop"],
+      "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben\r\n    beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit\r\n    vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances only during spin and braking; rack delivery by a transporter is an external precondition."],
+      "motion_description":["Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.", "Preserved motion component: rotor slot 01 → rack slot 01. Independent timeline and mock acknowledgements; no coupling to batch playback."]
+    };
+    const language=root.querySelector("[data-language]");
+    function tr(key){return labels[key]?.[language.value==='en'?1:0]??key;}
+    function localize(){document.documentElement.lang=language.value;root.querySelectorAll("[data-i18n]").forEach(el=>el.textContent=tr(el.dataset.i18n));root.querySelectorAll("[data-i18n-aria]").forEach(el=>el.setAttribute("aria-label",tr(el.dataset.i18nAria)));}
+    localize();
     const canvas=root.querySelector('[data-scene]'),ctx=canvas.getContext('2d'),slider=root.querySelector('[data-time-slider]'),button=root.querySelector('[data-play]'),view=root.querySelector('[data-view]'),speed=root.querySelector('[data-speed]');
     const duration=keys[keys.length-1].time_s;
     slider.max=duration;
@@ -112,48 +205,52 @@
       for(const tri of triangles){ctx.globalAlpha=tri.alpha;ctx.fillStyle=rgb(tri.color);ctx.beginPath();tri.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();ctx.fill()}
       ctx.globalAlpha=1;ctx.fillStyle=rgb(theme.text);ctx.font=getComputedStyle(root).font;
       const seated=t>=mesh.scene.checks.rack_handoff_time_s,carried=t>=mesh.scene.checks.attachment_time_s&&!seated,clear=t>=mesh.scene.checks.robot_clear_confirmed_s;
-      if(detail)ctx.fillText(seated?'Tube supported in rack slot 01':carried?'Tube held by gripper':'Tube 01',12,24);
+      if(detail)ctx.fillText(seated?tr("Tube supported in rack slot 01"):carried?tr("Tube held by gripper"):tr("Tube 01"),12,24);
       if(rackView){ctx.textAlign='center';for(const slot of mesh.rack_slots){const q=project(apply(rackFrame,[slot.grip_mm[0],slot.grip_mm[1]-10,25]));ctx.fillText(String(slot.slot).padStart(2,'0'),q[0],q[1])}ctx.textAlign='start'}
-      root.querySelector('[data-values]').textContent='Lid '+frame.values.Lid.toFixed(0)+'° · jaw gap '+frame.jaw_gap_mm.toFixed(1)+' mm';
+      root.querySelector('[data-values]').textContent=tr("Lid ")+frame.values.Lid.toFixed(0)+tr("° · jaw gap ")+frame.jaw_gap_mm.toFixed(1)+' mm';
       root.querySelector('[data-time]').textContent=t.toFixed(1)+' / '+duration.toFixed(1)+' s';
-      root.querySelector('[data-lift]').textContent=seated?(t>=mesh.scene.checks.release_complete_time_s?'Tube in rack slot 01 · gripper released':'Tube supported in rack slot 01 · fingers still closed'):clear?'Robot and tube clear of centrifuge':carried?'Tube moves with gripper':'Rotor stopped · tube supported by station';
-      if(lastPhase!==frame.phase){lastPhase=frame.phase;root.querySelector('[data-phase]').textContent=frame.phase}
+      root.querySelector('[data-lift]').textContent=seated?(t>=mesh.scene.checks.release_complete_time_s?tr("Tube in rack slot 01 · gripper released"):tr("Tube supported in rack slot 01 · fingers still closed")):clear?tr("Robot and tube clear of centrifuge"):carried?tr("Tube moves with gripper"):tr("Rotor stopped · tube supported by station");
+      if(lastPhase!==frame.phase){lastPhase=frame.phase;root.querySelector('[data-phase]').textContent=tr(frame.phase)}
       slider.value=t;
       root.dataset.currentTime=t.toFixed(3);root.dataset.lidAngle=frame.values.Lid.toFixed(3);root.dataset.tubeOwner=seated?'rack':carried?'gripper':'station';root.dataset.robotClear=String(clear);
     }
     function save(){window.openai?.setWidgetState?.({modelContent:{scene_id:mesh.trajectory.scene_sha256,cycle_time_s:t,view:view.value},privateContent:{speed:speed.value}})?.catch(()=>{})}
     function restore(state){const data=state?.modelContent,priv=state?.privateContent;if(data&&data.scene_id===mesh.trajectory.scene_sha256){t=Math.max(0,Math.min(duration,Number(data.cycle_time_s)||0));if(['assembly','tube','rack'].includes(data.view))view.value=data.view}if(priv&&['0.5','1','2'].includes(priv.speed))speed.value=priv.speed;draw()}
-    function tick(now){if(!playing)return;if(last)t=Math.min(duration,t+(now-last)/1000*Number(speed.value));last=now;draw();if(t>=duration){playing=false;button.textContent='Replay cycle';save();return}requestAnimationFrame(tick)}
-    button.addEventListener('click',()=>{playing=!playing;if(playing){if(t>=duration)t=0;last=0;requestAnimationFrame(tick)}button.textContent=playing?'Pause':'Play cycle';save()});
-    slider.addEventListener('input',()=>{playing=false;button.textContent='Play cycle';t=Number(slider.value);draw()});slider.addEventListener('change',save);
+    function tick(now){if(!playing)return;if(last)t=Math.min(duration,t+(now-last)/1000*Number(speed.value));last=now;draw();if(t>=duration){playing=false;button.textContent=tr("Replay cycle");save();return}requestAnimationFrame(tick)}
+    button.addEventListener('click',()=>{playing=!playing;if(playing){if(t>=duration)t=0;last=0;requestAnimationFrame(tick)}button.textContent=playing?tr("Pause"):tr("Play cycle");save()});
+    slider.addEventListener('input',()=>{playing=false;button.textContent=tr("Play cycle");t=Number(slider.value);draw()});slider.addEventListener('change',save);
     view.addEventListener('change',()=>{draw();save()});speed.addEventListener('change',save);
     new ResizeObserver(draw).observe(canvas);
     new MutationObserver(readTheme).observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
     window.addEventListener('openai:set_globals',e=>{if(e.detail?.globals?.widgetState)restore(e.detail.globals.widgetState);readTheme()});
     readTheme();restore(window.openai?.widgetState);
+    let refreshBatch=()=>{};
     function initializeBatch(){
     const batch=mesh.rack_batch;
     if(!batch?.trace?.length){root.querySelector('[data-batch-panel]').hidden=true;return;}
+    if(!batch.trace.every(record=>Number.isFinite(record.time_s)&&typeof record.stage==='string'&&['rack','rotor'].every(key=>Array.isArray(record.inventory?.[key])&&record.inventory[key].length===12))){throw new Error('Invalid batch trace');}
     const batchSlider=root.querySelector('[data-batch-slider]'),batchButton=root.querySelector('[data-batch-play]');
     let batchTimer=null;
     function batchAt(index){
       index=Math.max(0,Math.min(batch.trace.length-1,index));batchSlider.value=index;
       const record=batch.trace[index];root.dataset.batchIndex=String(index);root.dataset.batchOrderRestored=String(index===batch.trace.length-1&&batch.order_restored);
-      root.querySelector('[data-batch-stage]').textContent=`Schritt ${index+1}/${batch.trace.length}: ${record.contract?'CF01-Befehl':record.stage.includes('gripper')||record.stage==='robot_clear'?'Abstrakte Übergabe':'Ablaufzustand'} · ${record.stage}${record.sample_id?' · '+record.sample_id:''} · Testzeit (Spin/Bremse) ${record.time_s.toFixed(1)} s`;
+      root.querySelector('[data-batch-stage]').textContent=`${tr("Schritt")} ${index+1}/${batch.trace.length}: ${record.contract?tr("CF01-Befehl"):record.stage.includes('gripper')||record.stage==='robot_clear'?tr("Abstrakte Übergabe"):tr("Ablaufzustand")} · ${tr(record.stage)}${record.sample_id?' · '+record.sample_id:''} · ${tr("Testzeit (Spin/Bremse)")} ${record.time_s.toFixed(1)} s`;
       for(const [key,selector] of [['rack','[data-batch-rack]'],['rotor','[data-batch-rotor]']]){
         const grid=root.querySelector(selector);grid.replaceChildren();
-        record.inventory[key].forEach((id,i)=>{const cell=document.createElement('div');cell.className='cf01-batch-slot'+(id?' filled':'');cell.textContent=String(i+1).padStart(2,'0')+': '+(id||'leer');grid.appendChild(cell)})
+        record.inventory[key].forEach((id,i)=>{const cell=document.createElement('div');cell.className='cf01-batch-slot'+(id?' filled':'');cell.textContent=String(i+1).padStart(2,'0')+': '+(id||tr("leer"));grid.appendChild(cell)})
       }
-      root.querySelector('[data-batch-gripper]').textContent='Greifer: '+(record.inventory.gripper||'leer')+(index===batch.trace.length-1?' · Reihenfolge wiederhergestellt: '+(batch.order_restored?'ja':'nein'):'');
+      root.querySelector('[data-batch-gripper]').textContent=tr("Greifer: ")+(record.inventory.gripper||tr("leer"))+(index===batch.trace.length-1?tr(" · Reihenfolge wiederhergestellt: ")+(batch.order_restored?tr("ja"):tr("nein")):'');
     }
     batchSlider.max=batch.trace.length-1;batchSlider.addEventListener('input',()=>batchAt(Number(batchSlider.value)));
-    batchButton.addEventListener('click',()=>{if(batchTimer){clearInterval(batchTimer);batchTimer=null;batchButton.textContent='Protokoll abspielen';return}
-      if(Number(batchSlider.value)>=batch.trace.length-1)batchAt(0);batchButton.textContent='Pause';
-      batchTimer=setInterval(()=>{const next=Number(batchSlider.value)+1;batchAt(next);if(next>=batch.trace.length-1){clearInterval(batchTimer);batchTimer=null;batchButton.textContent='Protokoll abspielen'}},100)
-    });batchAt(0);
+    batchButton.addEventListener('click',()=>{if(batchTimer){clearInterval(batchTimer);batchTimer=null;batchButton.textContent=tr("Protokoll abspielen");return}
+      if(Number(batchSlider.value)>=batch.trace.length-1)batchAt(0);batchButton.textContent=tr("Pause");
+      batchTimer=setInterval(()=>{const next=Number(batchSlider.value)+1;batchAt(next);if(next>=batch.trace.length-1){clearInterval(batchTimer);batchTimer=null;batchButton.textContent=tr("Protokoll abspielen")}},100)
+    });batchAt(0);refreshBatch=()=>{batchAt(Number(batchSlider.value));batchButton.textContent=batchTimer?tr("Pause"):tr("Protokoll abspielen");};
     }
-    initializeBatch();
-    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.openai?.widgetState?.modelContent?.scene_id!==mesh.trajectory.scene_sha256){playing=true;button.textContent='Pause';requestAnimationFrame(tick)}
+    if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches&&window.openai?.widgetState?.modelContent?.scene_id!==mesh.trajectory.scene_sha256){playing=true;button.textContent=tr("Pause");requestAnimationFrame(tick)}
+    function safeInitializeBatch(){try{initializeBatch();}catch{const panel=root.querySelector("[data-batch-panel]");if(panel){panel.hidden=false;panel.dataset.i18n="Batch panel unavailable";panel.textContent=tr("Batch panel unavailable");}}}
+    safeInitializeBatch();
+    language.addEventListener("change",()=>{localize();lastPhase=null;draw();button.textContent=playing?tr("Pause"):tr("Play cycle");refreshBatch();});
   })();
   </script>
 </div>

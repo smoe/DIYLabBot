@@ -86,10 +86,10 @@ def main():
     with ThreadPoolExecutor(max_workers=2) as pool:
         reports=list(pool.map(export_pose,[('Grasp',21.5),('RackReleased',60)]))
     sources=[pickup.SOURCE,cf.SOURCE,pickup.protocol.SOURCE,cf.ROOT/scene['sources']['robot'],
-             *pickup.workspace.source_dependencies(scene['_workspace']),
+             *pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment']))),
              *[cf.ROOT/'scripts'/p for p in ['export_centrifuge_robot_pickup_solidcraft.py','centrifuge_pickup_solidcraft.py',
                 'solidcraft_vendor.py','centrifuge_robot_pickup.py','centrifuge_model.py','robot_spec.py','robot_components.py',
-                'robot_cameras.py','servo_mounting_design.py','synthetic_workspace.py','furniture_model.py','assembly_model.py']]]
+                'robot_cameras.py','servo_mounting_design.py','synthetic_workspace.py','rack_slots.py','furniture_model.py','assembly_model.py']]]
     library=robot_components.library(pickup.arm_source(scene))
     sources += [cf.ROOT/p['step'] for part in library['parts'].values() for p in part['sections'].values()]
     hashes={str(p.relative_to(cf.ROOT)):cf.digest(p) for p in sources}

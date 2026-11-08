@@ -7,9 +7,7 @@
     "time": "s"
   },
   "sources": {
-    "centrifuge": "model/centrifuge-cf01.shared.json",
-    "protocol": "model/centrifuge-cf01.protocol.json",
-    "robot": "model/robot.json"
+    "protocol": "model/centrifuge-cf01.protocol.json"
   },
   "status": "Bench-mounted long-link six-axis concept; centrifuge retrieval and supported rack placement, no hardware execution or calibrated path",
   "ik_seed_deg": [
@@ -305,6 +303,6 @@
   ],
   "environment": {
     "source": "model/synthetic-cf01-workspace.shared.json",
-    "source_sha256": "52e0f48db8bc5ca6bf345e55d8497e6ae29d0c5831cc37309925a070d232d517"
+    "source_sha256": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18"
   }
 }

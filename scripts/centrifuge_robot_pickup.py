@@ -5,6 +5,7 @@ from pathlib import Path
 import robot_spec as robot
 import assembly_model as assembly
 import synthetic_workspace as workspace
+import rack_slots
 import centrifuge_model as cf
 import centrifuge_protocol as protocol
 
@@ -65,11 +66,11 @@ def rack_geometry(scene,p):
     def body(name,shape,role='rack_structure',cuts=None):parts.append({'id':'Rack.'+name,'group':'Rack','shape':shape,'cuts':cuts or [],'role':role})
     body('Base',{'kind':'box','origin':[-sx/2,-sy/2,0],'size':[sx,sy,base]})
     for sign,tag in [(-1,'Left'),(1,'Right')]:body(tag+'Rail',{'kind':'box','origin':[sign*(sx/2-rail/2)-rail/2,-sy/2,base],'size':[rail,sy,low-base]})
-    slots=[];cuts=[]
+    slots=[];cuts=[];places=rack_slots.places(r)
     for row in range(r['rows']):
         for col in range(r['columns']):
             x=(col-(r['columns']-1)/2)*r['pitch_mm'];y=(row-(r['rows']-1)/2)*r['pitch_mm'];slot=row*r['columns']+col+1
-            slots.append({'id':'CF01.OutputRack.Slot%02d'%slot,'slot':slot,'tube_bottom_mm':[x,y,base],'grip_mm':[x,y,base+p['tube_length']-8]})
+            slots.append({**places[slot-1],'tube_bottom_mm':[x,y,base],'grip_mm':[x,y,base+p['tube_length']-8]})
             cuts.extend([{'kind':'cylinder','radius':r['bore_radius_mm'],'height':thick+2,'origin':[x,y,low-1]},
                 {'kind':'cone','radius':r['bore_radius_mm'],'top_radius':r['entry_radius_mm'],'height':r['entry_depth_mm']+.01,'origin':[x,y,low+thick-r['entry_depth_mm']]}])
     body('Guide',{'kind':'box','origin':[-sx/2,-sy/2,low],'size':[sx,sy,thick]},cuts=cuts)

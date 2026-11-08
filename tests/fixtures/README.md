@@ -20,9 +20,9 @@ Referenzständen. Neue CAD-Ausgaben und ihre Prüfberichte bleiben lokal.
   Entnahmeschritte vor der Ableitung aus der synthetischen Umgebung. Unabhängige
   Regressionsevidenz; keine zusätzliche führende Gerätebeschreibung.
   Herkunft: letzter Stand vor der Umstellung, Commit `ad9de56`, bestehende
-  Szene `05dba7428daa`; erzeugt mit der bisherigen Szenenauswertung. Der exakte
-  Vergleich ist bewusst streng, da diese Umstellung keine Bewegungsänderung
-  zulässt.
+  Szene `05dba7428daa`; erzeugt mit der bisherigen Szenenauswertung. Der Vergleich prüft Struktur und IDs exakt, numerische Geometrie- und
+  Bewegungswerte mit 1e-8 absoluter und 1e-12 relativer Toleranz gegen
+  Rundungsunterschiede. Die Umstellung erlaubt keine Bewegungsänderung.
 
 - `solidcraft-vendor-exterior.json`: native SolidCraft-Messungen der archivierten
   X2-/X4-Herstellerdateien, in den registrierten Ausgangsrahmen umgerechnet.

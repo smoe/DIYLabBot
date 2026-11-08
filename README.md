@@ -41,6 +41,10 @@ Proben**: Ein Transporter hat das Rack bereitgestellt; es wird in CF01 geladen,
 zentrifugiert und in ursprünglicher Reihenfolge zurück ins Rack entladen. Der
 Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldungen
 sind lokale Mocks ohne ausgeführte Bahn; Testzeit vergeht nur beim Spin und Bremsen.
+Neu erzeugte HTML-Demos starten auf Deutsch und lassen sich über
+**Sprache / Language** auf Englisch umschalten. Die ausgewählten Medien oben
+bleiben der historische Build; aktuelle Bedienung und Prüfungen stehen im
+[Nachtrag zur Claude-Prüfung](docs/cf01-claude-review.md).
 Die bisherige Entnahmebewegung bleibt als eigener Baustein erhalten. Der vollständige
 Lauf ist auch reproduzierbar ausführbar:
 
