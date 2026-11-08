@@ -16,7 +16,8 @@
     "spin",
     "simulation_qualification",
     "limitations",
-    "initial_state"
+    "initial_state",
+    "handoff_policy"
   ],
   "additionalProperties": false,
   "properties": {
@@ -156,6 +157,12 @@
         "rack": "samples",
         "mass_source": "fictitious_profile",
         "handoff_time_s": 0
+      }
+    },
+    "handoff_policy": {
+      "const": {
+        "completion": "robot_and_required_station_confirmation",
+        "on_partial_confirmation": "unresolved"
       }
     }
   }

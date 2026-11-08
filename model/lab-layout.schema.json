@@ -8,6 +8,6 @@
     "format": {"const": "solidcraftbot.lab-layout/1"},
     "assets": {"type": "object", "additionalProperties": {"$ref": "assembly-reference.schema.json#/$defs/reference"}},
     "parameters": {"type": "object", "additionalProperties": {"type": "number"}},
-    "instances": {"type": "array", "items": {"$ref": "assembly-reference.schema.json#/$defs/instance"}}
+    "instances": {"description": "lab-layout/1: host names a supporting surface for placement checks; xyz is in laboratory world coordinates and yaw_deg is relative to the world axes. host does not transform coordinates.", "type": "array", "items": {"$ref": "assembly-reference.schema.json#/$defs/instance"}}
   }
 }

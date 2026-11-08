@@ -14,7 +14,7 @@
       }
     },
     "equipment_instance": {
-      "description": "Supported equipment subset of the common assembly instance; host names a composed frame.",
+      "description": "Equipment-layout subset: host is the named parent frame; xyz and yaw_deg are local to that frame. This differs from lab-layout/1 world coordinates.",
       "allOf": [
         {"$ref": "#/$defs/instance"},
         {"required": ["host"],
@@ -30,7 +30,7 @@
       "type": "object", "required": ["id", "asset", "xyz", "yaw_deg"], "additionalProperties": false,
       "properties": {
         "id": {"type": "string", "minLength": 1}, "asset": {"type": "string", "minLength": 1},
-        "host": {"type": "string"},
+        "host": {"type": "string", "description": "Meaning is defined by the consuming composition contract; see equipment_instance and lab-layout.schema.json."},
         "xyz": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": ["number", "string"]}},
         "yaw_deg": {"type": "number"}, "overrides": {"$ref": "#/$defs/overrides"},
         "pose": {"type": "string"}, "variant": {"type": "string"},

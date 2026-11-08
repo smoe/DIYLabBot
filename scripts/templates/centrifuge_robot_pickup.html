@@ -24,6 +24,7 @@
     <button type="button" data-batch-play data-i18n="Protokoll abspielen">Protokoll abspielen</button>
     <input type="range" data-batch-slider min="0" max="1" step="1" value="0" data-i18n-aria="Protokollschritt" aria-label="Protokollschritt">
     <p data-batch-stage aria-live="polite"></p>
+    <p data-batch-handoff aria-live="polite"></p>
     <div class="cf01-batch-grids"><div><strong data-i18n="Rackplätze">Rackplätze</strong><div data-batch-rack></div></div><div><strong data-i18n="Rotorplätze (logische Reihenfolge)">Rotorplätze (logische Reihenfolge)</strong><div data-batch-rotor></div></div></div>
     <p data-batch-gripper></p><p data-i18n="Simulation: keine Netzwerk- oder Hardwareausführung.">Simulation: keine Netzwerk- oder Hardwareausführung.</p>
   </details>
@@ -44,6 +45,12 @@
     const mesh=JSON.parse(await new Response(new Blob([compressed]).stream().pipeThrough(new DecompressionStream('gzip'))).text());
     const keys=mesh.trajectory.samples.map(s=>({...s,values:s.station}));
     const labels={
+      "Unresolved handoff":["Zuordnung ungeklärt", "Ownership unresolved"],
+      "Robot confirmed":["Roboter bestätigt", "Robot acknowledged"],
+      "Robot unconfirmed":["Roboterquittung fehlt", "Robot acknowledgement missing"],
+      "Station confirmed":["Station bestätigt", "Station acknowledged"],
+      "Station unconfirmed":["Stationsquittung fehlt", "Station acknowledgement missing"],
+      "Ledger only":["Inventarfelder: letzte vollständig bestätigte Übergaben; keine gesicherte Ortsangabe.", "Inventory fields: last fully confirmed handoffs; not an assured physical location."],
       "Play cycle":["Bewegung abspielen", "Play cycle"],
       "Replay cycle":["Bewegung erneut abspielen", "Replay cycle"],
       "Pause":["Pause", "Pause"],
@@ -72,7 +79,7 @@
       "leer":["leer", "empty"],
       "ja":["ja", "yes"],
       "nein":["nein", "no"],
-      "Greifer: ":["Greifer: ", "Gripper: "],
+      "Greifer: ":["Greifer (Buchführung): ", "Gripper (ledger): "],
       " · Reihenfolge wiederhergestellt: ":[" · Reihenfolge wiederhergestellt: ", " · Original order restored: "],
       "Schritt":["Schritt", "Step"],
       "CF01-Befehl":["CF01-Befehl", "CF01 command"],
@@ -82,9 +89,9 @@
       "Batch panel unavailable":["Chargenanzeige nicht verfügbar; die Bewegungsansicht bleibt bedienbar.", "Batch panel unavailable"],
       "Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze":["Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze", "Complete batch: rack → CF01 → original rack slots"],
       "Simulation: keine Netzwerk- oder Hardwareausführung.":["Simulation: keine Netzwerk- oder Hardwareausführung.", "Simulation: no network or hardware execution."],
-      "Rotorplätze (logische Reihenfolge)":["Rotorplätze (logische Reihenfolge)", "Rotor slots (logical order)"],
+      "Rotorplätze (logische Reihenfolge)":["Rotorplätze (Buchführung)", "Rotor slots (ledger)"],
       "Protokollschritt":["Protokollschritt", "Protocol step"],
-      "Rackplätze":["Rackplätze", "Rack slots"],
+      "Rackplätze":["Rackplätze (Buchführung)", "Rack slots (ledger)"],
       "Closed and locked; robot waits clear":["Geschlossen und verriegelt; Roboter wartet außerhalb", "Closed and locked; robot waits clear"],
       "Unlock centrifuge lid":["Zentrifugendeckel entriegeln", "Unlock centrifuge lid"],
       "Open and hold lid":["Deckel öffnen und halten", "Open and hold lid"],
@@ -128,7 +135,7 @@
       "complete":["Abgeschlossen", "Complete"],
       "failed":["Fehlgeschlagen", "Failed"],
       "stop":["Stopp", "Stop"],
-      "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben\r\n    beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit\r\n    vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances only during spin and braking; rack delivery by a transporter is an external precondition."],
+      "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Testzeit vergeht nur beim Zentrifugieren und Abbremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances only during spin and braking; rack delivery by a transporter is an external precondition."],
       "motion_description":["Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.", "Preserved motion component: rotor slot 01 → rack slot 01. Independent timeline and mock acknowledgements; no coupling to batch playback."]
     };
     const language=root.querySelector("[data-language]");
@@ -234,6 +241,11 @@
     function batchAt(index){
       index=Math.max(0,Math.min(batch.trace.length-1,index));batchSlider.value=index;
       const record=batch.trace[index];root.dataset.batchIndex=String(index);root.dataset.batchOrderRestored=String(index===batch.trace.length-1&&batch.order_restored);
+      root.dataset.batchOwnership=record.ownership??'confirmed';
+      const pending=record.pending_handoff;
+      function location(value){return value.instance_id+(value.place_id?':'+value.place_id:value.slot?':'+String(value.slot).padStart(2,'0'):'');}
+      const handoff=root.querySelector('[data-batch-handoff]');
+      handoff.textContent=tr("Ledger only")+(pending?' '+tr("Unresolved handoff")+' · '+pending.sample_id+' · '+location(pending.source)+' → '+location(pending.destination)+' · '+tr(pending.robot_confirmation?"Robot confirmed":"Robot unconfirmed")+(pending.station_confirmation===null?'':' · '+tr(pending.station_confirmation?"Station confirmed":"Station unconfirmed")):'');
       root.querySelector('[data-batch-stage]').textContent=`${tr("Schritt")} ${index+1}/${batch.trace.length}: ${record.contract?tr("CF01-Befehl"):record.stage.includes('gripper')||record.stage==='robot_clear'?tr("Abstrakte Übergabe"):tr("Ablaufzustand")} · ${tr(record.stage)}${record.sample_id?' · '+record.sample_id:''} · ${tr("Testzeit (Spin/Bremse)")} ${record.time_s.toFixed(1)} s`;
       for(const [key,selector] of [['rack','[data-batch-rack]'],['rotor','[data-batch-rotor]']]){
         const grid=root.querySelector(selector);grid.replaceChildren();

@@ -85,6 +85,17 @@ class SyntheticWorkspaceTests(unittest.TestCase):
 
 
 class OrderedBatchTests(unittest.TestCase):
+    def assertFailure(self,error,operation,sample_id,error_type='ValueError',error_code=None,station_fault=None):
+        report=error.report
+        self.assertFalse(report['passed']);self.assertFalse(report['order_restored'])
+        expected={'operation':operation,'sample_id':sample_id,'error_type':error_type,
+                  'error_code':error_code,'station_fault':station_fault}
+        self.assertEqual(report['failure'],expected)
+        self.assertEqual(type(error.__cause__).__name__,error_type)
+        self.assertEqual(report['trace'][-1]['stage'],'failed')
+        for key,value in expected.items():self.assertEqual(report['trace'][-1][key],value)
+        self.assertTrue(report['stop_attempted']);self.assertTrue(report['stop_via_contract'])
+
     def assertConserved(self,report):
         expected=sorted(report['initial_order'])
         for event in report['trace']:
@@ -97,6 +108,11 @@ class OrderedBatchTests(unittest.TestCase):
                 report=Runner(transport=transport).run()
                 self.assertTrue(report['passed']);self.assertTrue(report['order_restored']);self.assertTrue(report['spin_completed'])
                 self.assertEqual(report['initial_order'],report['final_order']);self.assertConserved(report)
+                self.assertEqual(report['inventory'],report['world_inventory'])
+                self.assertTrue(report['inventory_consistent']);self.assertEqual(report['ownership'],'confirmed')
+                self.assertIsNone(report['pending_handoff']);self.assertIsNone(report['failure'])
+                self.assertFalse(report['stop_attempted']);self.assertFalse(report['stop_via_contract'])
+                self.assertTrue(report['station_inventory_check'].startswith('mock_internal'))
                 stages=[r['stage'] for r in report['trace']]
                 self.assertEqual(stages.count('gripper_to_rotor'),12);self.assertEqual(stages.count('gripper_to_original_rack_slot'),12)
                 self.assertLess(stages.index('braking'),stages.index('spin_complete'));self.assertLess(stages.index('spin_complete'),stages.index('rotor_to_gripper'))
@@ -111,6 +127,9 @@ class OrderedBatchTests(unittest.TestCase):
         self.assertEqual([r['rack_slot'] for r in returned],list(range(1,13)))
         self.assertEqual([r['rack_place_id'] for r in returned],[p['id'] for p in report['rack_places']])
         self.assertEqual([s['rack_place_id'] for s in report['sample_mapping']],[p['id'] for p in report['rack_places']])
+        self.assertEqual(report['rack_instance'],'Rack')
+        self.assertEqual([(s['rack_instance'],s['place_id']) for s in report['sample_mapping']],[('Rack','Slot%02d'%i) for i in range(1,13)])
+        self.assertEqual([(r['rack_instance'],r['place_id']) for r in returned],[('Rack','Slot%02d'%i) for i in range(1,13)])
         self.assertEqual(report['rack_places'][-1],{'id':'CF01.OutputRack.Slot12','slot':12,'row':2,'column':3})
 
     def test_missing_confirmation_or_wrong_identity_halts_without_false_success(self):
@@ -120,13 +139,16 @@ class OrderedBatchTests(unittest.TestCase):
                 if name==event:result.update(changes)
                 return result
             runner=Runner(feedback=feedback)
-            with self.subTest(event=event),self.assertRaises(BatchError) as failure:runner.run()
+            message='Observed sample identity mismatch' if 'sample_id' in changes else 'Missing positive confirmation'
+            with self.subTest(event=event),self.assertRaisesRegex(BatchError,message+' during '+event) as failure:runner.run()
+            self.assertFailure(failure.exception,event,None if event=='rack_ready' else 'Sample01')
             report=failure.exception.report;self.assertFalse(report['passed']);self.assertFalse(report['order_restored']);self.assertConserved(report)
             if event=='place_rack':self.assertEqual(report['inventory']['gripper'],'Sample01');self.assertIsNone(report['inventory']['rack'][0])
 
     def test_unbalanced_fictitious_load_is_refused_by_existing_station_protocol(self):
         data=load();data['samples'][0]['mass_g']=2.5
-        with self.assertRaises(BatchError) as failure:Runner(data).run()
+        with self.assertRaisesRegex(BatchError,'Pair mass mismatch or excessive mass') as failure:Runner(data).run()
+        self.assertFailure(failure.exception,'start',None,'ControlError','UnbalancedLoad')
         report=failure.exception.report;self.assertFalse(report['spin_completed']);self.assertFalse(report['order_restored']);self.assertConserved(report)
         self.assertEqual(report['inventory']['rotor'][0],'Sample01')
 
@@ -136,15 +158,20 @@ class OrderedBatchTests(unittest.TestCase):
             if event=='seat_rotor':runner.now+=runner.sim.spec['handling']['owner_timeout_s']+1
             return synthetic_feedback(event,sample)
         runner.feedback=feedback
-        with self.assertRaises(BatchError) as failure:runner.run()
-        report=failure.exception.report;self.assertFalse(report['passed']);self.assertFalse(report['spin_completed']);self.assertConserved(report)
+        with self.assertRaisesRegex(BatchError,'Latched fault requires explicit recovery') as failure:runner.run()
+        self.assertFailure(failure.exception,'confirm_seated','Sample01','ControlError','RecoveryRequired','OwnerTimeout')
+        report=failure.exception.report;self.assertFalse(report['spin_completed']);self.assertConserved(report)
+        self.assertEqual(report['ownership'],'unresolved');self.assertFalse(report['inventory_consistent'])
+        self.assertEqual(report['world_inventory']['rotor'][0],'Sample01');self.assertIsNone(report['world_inventory']['gripper'])
+        self.assertTrue(report['pending_handoff']['robot_confirmation']);self.assertFalse(report['pending_handoff']['station_confirmation'])
         self.assertEqual(report['inventory']['gripper'],'Sample01')
 
     def test_robot_timeout_during_return_preserves_held_sample(self):
         def feedback(event,sample):
             if event=='place_rack':raise TimeoutError('Rack seating confirmation timed out')
             return synthetic_feedback(event,sample)
-        with self.assertRaises(BatchError) as failure:Runner(feedback=feedback).run()
+        with self.assertRaisesRegex(BatchError,'Rack seating confirmation timed out') as failure:Runner(feedback=feedback).run()
+        self.assertFailure(failure.exception,'place_rack','Sample01','TimeoutError')
         self.assertEqual(failure.exception.report['inventory']['gripper'],'Sample01');self.assertFalse(failure.exception.report['order_restored']);self.assertConserved(failure.exception.report)
 
     def test_feedback_failures_always_produce_failed_report_and_contract_stop(self):
@@ -155,7 +182,9 @@ class OrderedBatchTests(unittest.TestCase):
                     return response
                 return synthetic_feedback(event,sample)
             runner=Runner(feedback=feedback)
-            with self.subTest(response=response),self.assertRaises(BatchError) as failure:runner.run()
+            message='Feedback must be an object during pick_rack' if response is None else str(response).strip("'")
+            with self.subTest(response=response),self.assertRaisesRegex(BatchError,message) as failure:runner.run()
+            self.assertFailure(failure.exception,'pick_rack','Sample01','ValueError' if response is None else type(response).__name__)
             report=failure.exception.report
             self.assertFalse(report['passed']);self.assertFalse(report['order_restored'])
             self.assertEqual(report['trace'][-1]['stage'],'failed')
@@ -167,7 +196,9 @@ class OrderedBatchTests(unittest.TestCase):
                 result=synthetic_feedback(name,sample)
                 if name==event:result.update(changes)
                 return result
-            with self.subTest(event=event,changes=changes),self.assertRaises(BatchError) as failure:Runner(feedback=feedback).run()
+            message='Observed sample identity mismatch' if 'sample_id' in changes else 'Missing positive confirmation'
+            with self.subTest(event=event,changes=changes),self.assertRaisesRegex(BatchError,message+' during '+event) as failure:Runner(feedback=feedback).run()
+            self.assertFailure(failure.exception,event,'Sample01')
             self.assertFalse(failure.exception.report['order_restored']);self.assertConserved(failure.exception.report)
 
     def test_station_index_and_world_inventory_disagreement_are_detected(self):
@@ -180,8 +211,9 @@ class OrderedBatchTests(unittest.TestCase):
                 if name=='confirm_seated' and defect=='mass':runner.sim.slots[1]['mass_g']=3
                 return result
             runner.command=command
-            with self.subTest(defect=defect),self.assertRaises(BatchError) as failure:runner.run()
-            self.assertFalse(failure.exception.report['passed']);self.assertFalse(failure.exception.report['order_restored'])
+            message={'index':'Station index confirmation disagrees','identity':'Synthetic world identity mismatch during take_rotor','mass':'Station seating or fixture mass mismatch'}[defect]
+            with self.subTest(defect=defect),self.assertRaisesRegex(BatchError,message) as failure:runner.run()
+            self.assertFailure(failure.exception,'take_rotor' if defect=='identity' else 'check_station','Sample01')
 
     def test_spin_stop_encoder_and_brake_fault_prevent_return(self):
         for defect in ['stop','encoder','brake']:
@@ -193,9 +225,63 @@ class OrderedBatchTests(unittest.TestCase):
                     else:runner.sim.brake_engage_confirmed=False
                 advance(seconds)
             runner.advance=fail_advance
-            with self.subTest(defect=defect),self.assertRaises(BatchError) as failure:runner.run()
+            message='Expected explicit braking phase, got stopping' if defect=='encoder' else 'Centrifuge completion not confirmed'
+            with self.subTest(defect=defect),self.assertRaisesRegex(BatchError,message) as failure:runner.run()
+            self.assertFailure(failure.exception,'poll',None,station_fault={'stop':None,'encoder':'RotationSensorFault','brake':'ParkingBrakeFault'}[defect])
             report=failure.exception.report;self.assertFalse(report['spin_completed']);self.assertFalse(report['order_restored'])
             self.assertNotIn('rotor_to_gripper',[e['stage'] for e in report['trace']]);self.assertConserved(report)
+
+    def test_unacknowledged_station_handoffs_keep_location_and_responsibility_separate(self):
+        for transport in ['ros2','sila2']:
+            for name in ['confirm_seated','confirm_removed']:
+                for response_lost in [False,True]:
+                    runner=Runner(transport=transport);dispatch=runner.bridge.dispatch
+                    wire_name=name if transport=='ros2' else runner.bridge.commands[name]['name']
+                    def fail_dispatch(encoding,command,fields):
+                        if command==wire_name:
+                            if response_lost:dispatch(encoding,command,fields)
+                            raise ConnectionError('Missing station acknowledgement: '+name)
+                        return dispatch(encoding,command,fields)
+                    runner.bridge.dispatch=fail_dispatch
+                    with self.subTest(transport=transport,name=name,response_lost=response_lost),self.assertRaisesRegex(BatchError,'Missing station acknowledgement: '+name) as failure:runner.run()
+                    self.assertFailure(failure.exception,name,'Sample01','ConnectionError')
+                    report=failure.exception.report;pending=report['pending_handoff']
+                    self.assertEqual(pending['sample_id'],'Sample01');self.assertTrue(pending['robot_confirmation']);self.assertFalse(pending['station_confirmation'])
+                    self.assertEqual(report['ownership'],'unresolved');self.assertFalse(report['inventory_consistent'])
+                    self.assertEqual(report['trace'][-1]['pending_handoff'],pending)
+                    if name=='confirm_seated':
+                        self.assertEqual(pending['source'],{'kind':'gripper','instance_id':'Arm'})
+                        self.assertEqual(pending['destination'],{'kind':'rotor','instance_id':'CF01','slot':1})
+                        self.assertEqual(report['inventory']['gripper'],'Sample01');self.assertIsNone(report['world_inventory']['gripper'])
+                        self.assertEqual(report['world_inventory']['rotor'][0],'Sample01')
+                        self.assertNotIn('gripper_to_rotor',[t['stage'] for t in report['trace']])
+                    else:
+                        self.assertEqual(pending['source'],{'kind':'rotor','instance_id':'CF01','slot':1})
+                        self.assertEqual(pending['destination'],{'kind':'gripper','instance_id':'Arm'})
+                        self.assertEqual(report['inventory']['rotor'][0],'Sample01');self.assertIsNone(report['world_inventory']['rotor'][0])
+                        self.assertEqual(report['world_inventory']['gripper'],'Sample01')
+                        self.assertNotIn('gripper_to_original_rack_slot',[t['stage'] for t in report['trace']])
+                    self.assertConserved(report)
+
+    def test_failed_stop_is_not_reported_as_successful_contract_stop(self):
+        for response in [ConnectionError('Stop channel disconnected'),None,{'success':False}]:
+            runner=Runner(feedback=lambda event,sample:None);dispatch=runner.bridge.dispatch
+            def disconnect_stop(transport,name,fields):
+                if name=='stop':
+                    if isinstance(response,Exception):raise response
+                    return response
+                return dispatch(transport,name,fields)
+            runner.bridge.dispatch=disconnect_stop
+            with self.subTest(response=response),self.assertRaisesRegex(BatchError,'Feedback must be an object during rack_ready') as failure:runner.run()
+            report=failure.exception.report
+            self.assertEqual(report['failure']['operation'],'rack_ready');self.assertEqual(report['failure']['error_type'],'ValueError')
+            self.assertTrue(report['stop_attempted']);self.assertFalse(report['stop_via_contract'])
+            self.assertEqual(report['stop_error'],'Stop channel disconnected' if isinstance(response,Exception) else 'Stop acknowledgement missing')
+            self.assertEqual(report['trace'][-1]['stage'],'failed')
+
+    def test_handoff_policy_rejects_fabricated_completion(self):
+        data=load();data['handoff_policy']['on_partial_confirmation']='assume_complete'
+        with self.assertRaisesRegex(ValueError,'Explicit unresolved-handoff policy required'):validate(data)
 
     def test_duplicate_ids_slots_and_wrong_return_policy_are_rejected(self):
         for defect in ['id','rack_slot','rotor_slot','policy','nan']:

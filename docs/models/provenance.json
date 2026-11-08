@@ -1881,7 +1881,7 @@
       "id": "rack-batch",
       "image": "images/rack-batch.svg",
       "source_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "6d0bb9bb5d6e91179dff69bdcf988633ff49d7a51d5134f61deca6b69363e87c"
+        "model/cf01-rack-batch.protocol.json": "b091627460b9e3a4c69b6d9e855729a62490a2b8953e7e879e56ad00dc9125e4"
       },
       "representation": "Source-derived local mock protocol diagram",
       "batch_passed": true,
@@ -1891,7 +1891,7 @@
       "image_sha256": "dbfd322ce4bc3b477235dae9844ec5c8e5114edd86eebb474614093b40c80723",
       "bytes": 5158,
       "dependency_files_sha256": {
-        "model/cf01-rack-batch.protocol.json": "6d0bb9bb5d6e91179dff69bdcf988633ff49d7a51d5134f61deca6b69363e87c",
+        "model/cf01-rack-batch.protocol.json": "b091627460b9e3a4c69b6d9e855729a62490a2b8953e7e879e56ad00dc9125e4",
         "model/synthetic-cf01-workspace.shared.json": "765dd217726b7c414d62d6d941a94243a17286d1c34d08aa67698b992b0e3b18",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
@@ -1947,6 +1947,11 @@
       "method": "Regenerated only these three views; both native PNGs and the rasterized SVG were visually inspected. All three image files are byte-identical to the previous gallery.",
       "source_revision": "19cf33001d73",
       "previous_gallery_commit": "ad94615"
+    },
+    "handoff_policy_update": {
+      "reviewed_image": "rack-batch",
+      "image_byte_identical": true,
+      "method": "Regenerated successful local batch diagram; previous visual review applies to identical bytes. No geometry views changed."
     }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

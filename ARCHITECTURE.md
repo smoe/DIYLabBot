@@ -162,8 +162,12 @@ Der bestehende Bewegungsbaustein Rotorplatz 01 → Rackplatz 01 besitzt eine
 eigene Zeitachse und wird vom Chargenrunner nicht aufgerufen.
 
 Bei falscher Probenidentität, fehlender Bestätigung, Eigentümer-Timeout oder
-unwuchtiger Testbeladung endet der Lauf ohne Erfolg. Eine bei einem Fehler noch
-gehaltene Probe bleibt im Inventar als im Greifer befindlich erfasst. Der Erfolg
+unwuchtiger Testbeladung endet der Lauf ohne Erfolg. Bei einer unvollständigen
+Übergabe bleiben die letzte vollständig bestätigte Buchführung und die
+synthetische Ortsbeobachtung getrennt erhalten. `pending_handoff` nennt Probe,
+Quelle, Ziel und eingegangene Quittungen; `ownership: unresolved` verhindert
+eine behauptete eindeutige Zuordnung. Ein Greifereintrag in dieser Buchführung
+ist bei ungeklärter Übergabe keine gesicherte Aussage über den physischen Ort. Der Erfolg
 verlangt den abgeschlossenen Schleuderlauf, bestätigten Stillstand, einen leeren
 Rotor und exakt dieselbe Rackreihenfolge wie am Anfang. Testmassen und
 Qualifikationsgrenzen stehen nur im explizit fiktiven Testprofil; die reale
@@ -212,13 +216,30 @@ Die Rackkonstruktion steht einmal in `model/guided-tube-rack.shared.json`.
 Die Entnahmeszene referenziert die Umgebung; Bankgeometrie, Gerätepositionen und
 Armvariante sind daraus abgeleitete Ansichten. Die bisherige Bankoberfläche,
 Geräteposen und alle 241 Bewegungsschritte bleiben erhalten. Der ursprüngliche
-60-s-Entnahmebaustein wird nach dem abgeschlossenen Schleuderlauf eingeordnet.
+60-s-Entnahmebaustein besitzt eine eigene Zeitachse; er wird vom Chargenrunner
+nicht aufgerufen und ist nicht an dessen Schleuderlauf gekoppelt.
 
 Die interaktive README-Demo zeigt diesen Bewegungsausschnitt und zusätzlich die
 Aufzeichnung des vollständigen lokalen Chargenprotokolls mit Rack-, Rotor- und
 Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
 Das kurze Video zeigt weiterhin den Entnahmebaustein; die physische Beladung
 aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
+
+### Koordinatenverträge und spätere Migration
+
+Im bestehenden `lab-layout/1` bezeichnet `host` eine unterstützende Fläche für
+Aufstellungsprüfungen. `xyz` und `yaw_deg` beziehen sich auf das Labor-Weltsystem;
+`host` transformiert diese Werte nicht. Im `equipment-layout/1` mit
+`equipment_instance` benennt `host` dagegen den Elternrahmen; Position und
+Drehung sind lokal zu diesem Rahmen. Die Schemas beschreiben beide Bedeutungen
+an den jeweiligen Verträgen. Die L01- und CF01-Posen werden dadurch nicht geändert.
+
+Eine spätere allgemeine Gerätebindung muss Unterstützungsfläche und
+Koordinatenbezug in einem versionierten Vertrag ausdrücklich unterscheiden.
+`host` darf dafür nicht global umgedeutet werden; bestehende Weltposen müssten
+gezielt in lokale Posen überführt und geometrisch erneut geprüft werden.
+Diese Migration und die gemeinsame CF01-/NanoDrop-Komposition sind separate
+Aufgaben.
 
 ## Manuelle Aufgaben als eigene Ausführungsebene
 

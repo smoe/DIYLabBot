@@ -43,8 +43,9 @@ Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldung
 sind lokale Mocks ohne ausgeführte Bahn; Testzeit vergeht nur beim Spin und Bremsen.
 Neu erzeugte HTML-Demos starten auf Deutsch und lassen sich über
 **Sprache / Language** auf Englisch umschalten. Die ausgewählten Medien oben
-bleiben der historische Build; aktuelle Bedienung und Prüfungen stehen im
-[Nachtrag zur Claude-Prüfung](docs/cf01-claude-review.md).
+bleiben der historische Build ohne Sprachumschaltung. Aktuelle Bedienung,
+Berichtsfelder und Prüfgrenzen stehen in der
+[Baugruppendokumentation](docs/centrifuge-cf01-robot-pickup.md).
 Die bisherige Entnahmebewegung bleibt als eigener Baustein erhalten. Der vollständige
 Lauf ist auch reproduzierbar ausführbar:
 

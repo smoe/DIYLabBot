@@ -36,6 +36,7 @@ def validate(data):
     if data['return_policy']!='original_rack_slot' or data['sample_order']!='ascending_rack_slot':raise ValueError('Stable rack order required')
     if data['preconditions']!={'rack_delivered_by_transporter':True,'transporter_modeled':False}:raise ValueError('External rack delivery is a precondition only')
     if data['initial_state']!={'rotor':'empty','rack':'samples','mass_source':'fictitious_profile','handoff_time_s':0}:raise ValueError('Explicit synthetic initial state required')
+    if data['handoff_policy']!={'completion':'robot_and_required_station_confirmation','on_partial_confirmation':'unresolved'}:raise ValueError('Explicit unresolved-handoff policy required')
     samples=data['samples'];capacity=cf.load()['rotor']['slots']
     if len(samples)!=capacity:raise ValueError('Current batch profile requires a complete balanced twelve-place rotor')
     for field in ['rack_slot','rotor_slot']:
@@ -67,36 +68,90 @@ class Runner:
         self.data=copy.deepcopy(data or load());validate(self.data)
         if transport not in ['ros2','sila2']:raise ValueError('Supported local contract decoding: ros2 or sila2')
         self.transport=transport;self.feedback=feedback;self.now=0.;self.trace=[];self.token=None
+        self.capacity=len(self.data['samples']);self.pending_handoff=None
+        self.current_sample=None;self.operation=None;self.failure=None
+        self.stop_attempted=False;self.stop_via_contract=False
         self.sim=Simulator(clock=lambda:self.now,qualification=self.data['simulation_qualification'],
-                           initial_slots={i:{'present':False,'seated':False,'mass_g':None} for i in range(1,13)})
+                           initial_slots={i:{'present':False,'seated':False,'mass_g':None} for i in range(1,self.capacity+1)})
         self.bridge=protocol.MockProtocol(self.sim)
         self.samples=sorted(self.data['samples'],key=lambda s:s['rack_slot'])
-        rack=workspace.read(workspace.load(assembly.validate_reference(self.data['workspace']))['devices']['Rack']['source'])
+        devices=workspace.load(assembly.validate_reference(self.data['workspace']))['devices']
+        self.rack_instance=devices['Rack']['id'];self.station_instance=devices['CF01']['id'];self.arm_instance=devices['Arm']['id']
+        rack=workspace.read(devices['Rack']['source'])
         self.rack_places=rack_slots.places(rack)
-        self.initial=[s['id'] for s in self.samples];self.rack=self.initial[:];self.rotor=[None]*12;self.gripper=None
-        self.world={'rack':self.initial[:],'rotor':[None]*12,'gripper':None}
+        self.initial=[s['id'] for s in self.samples];self.rack=self.initial[:];self.rotor=[None]*self.capacity;self.gripper=None
+        self.world={'rack':self.initial[:],'rotor':[None]*self.capacity,'gripper':None}
         self.stop_error=None;self.spin_completed=False
 
     def snapshot(self):
         return {'rack':self.rack[:],'rotor':self.rotor[:],'gripper':self.gripper}
 
+    def rack_location(self,slot):
+        return {'kind':'rack','instance_id':self.rack_instance,'place_id':'Slot%02d'%slot}
+
+    def handoff_state(self):
+        consistent=self.snapshot()==self.world
+        return {'pending_handoff':copy.deepcopy(self.pending_handoff),
+                'world_inventory':copy.deepcopy(self.world),'inventory_consistent':consistent,
+                'ownership':'confirmed' if consistent and self.pending_handoff is None else 'unresolved'}
+
+    def begin_handoff(self,event,sample):
+        if self.pending_handoff is not None:raise ValueError('Previous handoff remains unresolved')
+        rack=self.rack_location(sample['rack_slot'])
+        rotor={'kind':'rotor','instance_id':self.station_instance,'slot':sample['rotor_slot']}
+        gripper={'kind':'gripper','instance_id':self.arm_instance}
+        source,destination={'pick_rack':(rack,gripper),'seat_rotor':(gripper,rotor),
+                            'take_rotor':(rotor,gripper),'place_rack':(gripper,rack)}[event]
+        self.pending_handoff={'event':event,'sample_id':sample['id'],'source':source,'destination':destination,
+                              'robot_confirmation':False,'station_confirmation':False if event in ('seat_rotor','take_rotor') else None}
+
+    def complete_handoff(self):
+        self.operation='complete_handoff'
+        pending=self.pending_handoff
+        if not pending or not pending['robot_confirmation'] or pending['station_confirmation'] is False:
+            raise ValueError('Handoff confirmations incomplete')
+        # Update responsibility only after the requested handoff is fully confirmed.
+        # The synthetic world is a separate observation, not a replacement ledger.
+        candidate=self.snapshot()
+        def position(location):
+            if location['kind']=='gripper':return candidate,'gripper'
+            if location['kind']=='rotor':return candidate['rotor'],location['slot']-1
+            return candidate['rack'],int(location['place_id'][4:])-1
+        source,source_key=position(pending['source']);destination,destination_key=position(pending['destination'])
+        if source[source_key]!=pending['sample_id'] or destination[destination_key] is not None:
+            raise ValueError('Handoff ledger source or destination mismatch')
+        source[source_key]=None;destination[destination_key]=pending['sample_id']
+        if candidate!=self.world:raise ValueError('Handoff ledger disagrees with synthetic world inventory')
+        self.rack=candidate['rack'];self.rotor=candidate['rotor'];self.gripper=candidate['gripper']
+        self.pending_handoff=None
+
     def record(self,stage,**details):
-        if 'rack_slot' in details:details['rack_place_id']=self.rack_places[details['rack_slot']-1]['id']
+        if 'rack_slot' in details:
+            details.update(rack_place_id=self.rack_places[details['rack_slot']-1]['id'],
+                           rack_instance=self.rack_instance,place_id=self.rack_location(details['rack_slot'])['place_id'])
         self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':stage,**details,
-                           'inventory':self.snapshot(),'world_inventory':copy.deepcopy(self.world),'station':protocol.state_si(self.sim.execute('status'))})
+                           'inventory':self.snapshot(),**self.handoff_state(),'station':protocol.state_si(self.sim.execute('status'))})
 
     def command(self,name,**args):
+        self.operation=name
         contract=next(c for c in self.bridge.contract['commands'] if c['id']==name)
         fields=dict(args)
         if name not in protocol.PUBLIC:fields['control_token']=self.token
         fields={protocol.wire(self.transport,k):v for k,v in fields.items()}
+        if name=='stop':self.stop_attempted=True
         result=self.bridge.dispatch(self.transport,name if self.transport=='ros2' else contract['name'],fields)
+        if name=='stop':
+            if not isinstance(result,dict) or result.get('success') is not True:raise ValueError('Stop acknowledgement missing')
+            self.stop_via_contract=True
         if name=='acquire':self.token=result['control_token']
         if result.get('phase') in ['failed','canceled','stopping']:raise ValueError('Command did not complete: '+name)
+        if self.pending_handoff and self.pending_handoff['event']=={'confirm_seated':'seat_rotor','confirm_removed':'take_rotor'}.get(name):
+            self.pending_handoff['station_confirmation']=True
         self.record(name,contract=self.transport,job_phase=result.get('phase'))
         return result
 
     def check_station(self,slot=None):
+        self.operation='check_station'
         state=self.sim.execute('status')
         if slot is not None and (state['indexed_slot']!=slot or not state['index_confirmed']):
             raise ValueError('Station index confirmation disagrees with requested slot')
@@ -110,6 +165,8 @@ class Runner:
     def observe(self,event,sample=None,fields=()):
         # Independent fixture inventory uses the ACTUAL indexed slot, not the
         # requested sample ID. This is still synthetic, not physical identification.
+        self.operation=event
+        if event in ('pick_rack','seat_rotor','take_rotor','place_rack'):self.begin_handoff(event,sample)
         actual=None
         if sample:
             if event=='pick_rack':actual=self.world['rack'][sample['rack_slot']-1]
@@ -128,11 +185,16 @@ class Runner:
             elif event=='place_rack':
                 if self.world['rack'][sample['rack_slot']-1] is not None:raise ValueError('Synthetic world rack slot occupied')
                 self.world['rack'][sample['rack_slot']-1]=actual;self.world['gripper']=None
+            if event in ('pick_rack','seat_rotor','take_rotor','place_rack'):self.pending_handoff['robot_confirmation']=True
         return data
 
     def clear(self,sample):
         self.observe('withdraw',sample,('workspace_clear',));self.sim.robot_clear=True
         self.record('robot_clear',sample_id=sample['id'])
+
+    def poll(self,job_id):
+        self.operation='poll'
+        return self.bridge.poll(job_id)
 
     def advance(self,seconds):
         target=self.now+seconds
@@ -145,10 +207,14 @@ class Runner:
         return {'format':'solidcraftbot.cf01-batch-report/1','passed':passed,'mode':'local_mock_only',
                 'transport_contract':self.transport,'network_executed':False,'hardware_executed':False,
                 'transporter_executed':False,'robot_motion_for_loading_checked':False,'robot_motion_checked':False,
-                'polling':'local MockProtocol.poll, no transport serialization','stop_via_contract':True,'stop_error':self.stop_error,
+                'polling':'local MockProtocol.poll, no transport serialization',
+                'station_inventory_check':'mock_internal: Simulator.slots; not available in state_si or a hardware contract',
+                'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,'stop_error':self.stop_error,
+                'inventory_semantics':'Ledger of fully confirmed handoffs, not an assertion of physical location',
+                'handoff_policy':self.data['handoff_policy'],**self.handoff_state(),'failure':self.failure,
                 'initial_state':self.data['initial_state'],'time_semantics':'Zero-time abstract handoffs; test clock advances only during spin and braking',
                 'effective_profile_sha256':hashlib.sha256(json.dumps(self.data,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
-                'effective_profile':self.data,'sample_mapping':[{**s,'rack_place_id':self.rack_places[s['rack_slot']-1]['id']} for s in self.samples],'rack_places':self.rack_places,'initial_order':self.initial,'final_order':self.rack[:],
+                'effective_profile':self.data,'rack_instance':self.rack_instance,'sample_mapping':[{**s,'rack_place_id':self.rack_places[s['rack_slot']-1]['id'],'rack_instance':self.rack_instance,'place_id':self.rack_location(s['rack_slot'])['place_id']} for s in self.samples],'rack_places':self.rack_places,'initial_order':self.initial,'final_order':self.rack[:],
                 'order_restored':passed and self.spin_completed and self.rack==self.initial and all(x is None for x in self.rotor) and self.gripper is None,
                 'spin_completed':self.spin_completed,'inventory':self.snapshot(),'error':error,'trace':self.trace,
                 'source_files_sha256':{str(p.relative_to(ROOT)):cf.digest(p) for p in [Path(__file__),protocol.SOURCE,ROOT/'scripts/centrifuge_control.py',ROOT/'scripts/centrifuge_protocol.py',ROOT/'scripts/centrifuge_model.py',ROOT/'scripts/synthetic_workspace.py',ROOT/'scripts/rack_slots.py',*workspace.source_dependencies(workspace.load(assembly.validate_reference(self.data['workspace'])))]},
@@ -160,50 +226,55 @@ class Runner:
             self.record('rack_ready',external_delivery=True)
             self.command('acquire',client_id='synthetic-rack-batch')
             for sample in self.samples:
+                self.current_sample=sample['id']
                 r,c=sample['rack_slot']-1,sample['rotor_slot']-1
                 if self.rack[r]!=sample['id'] or self.rotor[c] is not None or self.gripper is not None:raise ValueError('Loading inventory mismatch')
                 self.command('index',slot=c+1);self.check_station(c+1);self.command('open_lid')
                 self.observe('pick_rack',sample,('grasp_confirmed','source_empty'))
-                self.rack[r]=None;self.gripper=sample['id'];self.sim.robot_clear=False
+                self.complete_handoff();self.sim.robot_clear=False
                 self.record('rack_to_gripper',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
                 seat=self.observe('seat_rotor',sample,('seated_confirmed','cap_closed_confirmed','released_confirmed'))
                 self.command('confirm_seated',mass_g=sample['mass_g'],seated_confirmed=seat['seated_confirmed'],cap_closed_confirmed=seat['cap_closed_confirmed'])
-                self.check_station(c+1)
-                self.rotor[c]=self.gripper;self.gripper=None
+                self.check_station(c+1);self.complete_handoff()
                 self.record('gripper_to_rotor',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
                 self.clear(sample);self.command('close_lid')
             if any(self.rack) or self.gripper is not None or any(x is None for x in self.rotor):raise ValueError('Batch not completely loaded')
+            self.current_sample=None
             job=self.command('start',**self.data['spin']);self.record('centrifuging',job_phase=job['phase'])
             self.advance(self.data['spin']['duration_s'])
-            braking=self.bridge.poll(job['id']);self.record('braking',job_phase=braking['phase'])
+            braking=self.poll(job['id']);self.record('braking',job_phase=braking['phase'])
             if braking['phase']!='braking':raise ValueError('Expected explicit braking phase, got '+braking['phase'])
             self.advance(self.sim.spec['mechanisms']['braking']['simulation_stop_s'])
-            done=self.bridge.poll(job['id'])
+            done=self.poll(job['id'])
             if done['phase']!='succeeded' or not done['state']['standstill_confirmed'] or not done['state']['parking_brake_held']:raise ValueError('Centrifuge completion not confirmed')
             self.spin_completed=True;self.record('spin_complete',job_phase=done['phase'])
             for sample in self.samples:
+                self.current_sample=sample['id']
                 r,c=sample['rack_slot']-1,sample['rotor_slot']-1
                 if self.rotor[c]!=sample['id'] or self.rack[r] is not None or self.gripper is not None:raise ValueError('Return inventory mismatch')
                 self.command('index',slot=c+1);self.check_station(c+1);self.command('open_lid');self.command('present_tube')
                 take=self.observe('take_rotor',sample,('grasp_confirmed','source_empty'));self.sim.robot_clear=False
                 self.command('confirm_removed',grasp_confirmed=take['grasp_confirmed'],tube_absent=take['source_empty'])
-                self.check_station(c+1)
-                self.rotor[c]=None;self.gripper=sample['id']
+                self.check_station(c+1);self.complete_handoff()
                 self.record('rotor_to_gripper',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
                 self.clear(sample);self.command('retract_lift');self.command('close_lid')
                 self.observe('place_rack',sample,('seated_confirmed','released_confirmed'))
                 if self.rack[r] is not None:raise ValueError('Original rack slot is occupied')
-                self.rack[r]=self.gripper;self.gripper=None
+                self.complete_handoff()
                 self.record('gripper_to_original_rack_slot',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
             if self.rack!=self.initial or any(self.rotor) or self.gripper is not None:raise ValueError('Original sample order not restored')
             if any(s['present'] for s in self.sim.slots.values()):raise ValueError('Station sensor inventory disagrees with ledger')
+            self.current_sample=None
             self.command('release');self.record('complete')
             return self.report(True)
         except Exception as error:
+            self.failure={'operation':self.operation,'sample_id':self.current_sample,
+                          'error_type':type(error).__name__,'error_code':getattr(error,'code',None),
+                          'station_fault':self.sim.fault}
             # Preserve the failure report even if the stop or status channel fails.
             try:self.command('stop')
             except Exception as stop_error:self.stop_error=str(stop_error)
-            try:self.record('failed',reason=str(error))
+            try:self.record('failed',reason=str(error),**self.failure)
             except Exception:
-                self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':'failed','reason':str(error),'inventory':self.snapshot(),'station':None})
+                self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':'failed','reason':str(error),**self.failure,'inventory':self.snapshot(),**self.handoff_state(),'station':None})
             raise BatchError(str(error),self.report(False,str(error))) from error

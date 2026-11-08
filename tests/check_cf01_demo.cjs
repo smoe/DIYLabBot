@@ -1,4 +1,4 @@
-// Usage: node tests/check_cf01_demo.cjs <generated.html> [playwright-module] [chrome-executable]
+// Usage: node tests/check_cf01_demo.cjs <generated.html> [playwright-module] [chrome-executable] [failed-batch-report ...]
 // Exercise the current template with real meshes, and optional-panel failures.
 const fs = require('node:fs');
 const path = require('node:path');
@@ -81,8 +81,30 @@ const { chromium } = require(process.argv[3] || 'playwright');
       await page.locator('[data-play]').click();
       await page.waitForFunction(() => Number(document.querySelector('#cf01-bench-rack').dataset.currentTime) > 30, null, {timeout: 10000});
     }
+    const failedReports = process.argv.slice(5);
+    for (const reportPath of failedReports) {
+      const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+      assert.equal(report.ownership, 'unresolved');
+      assert.equal(report.pending_handoff.robot_confirmation, true);
+      assert.equal(report.pending_handoff.station_confirmation, false);
+      const data = structuredClone(mesh); data.rack_batch = report;
+      const replacement = zlib.gzipSync(JSON.stringify(data)).toString('base64');
+      await page.goto('about:blank');
+      await page.setContent(html.replace(packed[0], packed[1] + replacement + packed[3]));
+      await page.waitForSelector('[data-current-time]');
+      await page.locator('[data-batch-panel]').evaluate(el => {el.open = true;});
+      await page.locator('[data-batch-slider]').fill(String(report.trace.length - 1));
+      assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-batch-ownership'), 'unresolved');
+      assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-batch-order-restored'), 'false');
+      assert.match(await page.locator('[data-batch-handoff]').textContent(), /Zuordnung ungeklärt.*Sample01.*Stationsquittung fehlt/);
+      assert.match(await page.locator('[data-batch-handoff]').textContent(), /keine gesicherte Ortsangabe/);
+      await page.screenshot({path: path.join(path.dirname(target), 'browser-check-unresolved-'+report.failure.operation+'-de.png'), fullPage: true});
+      await page.locator('[data-language]').selectOption('en');
+      assert.match(await page.locator('[data-batch-handoff]').textContent(), /Ownership unresolved.*Sample01.*Station acknowledgement missing/);
+      assert.match(await page.locator('[data-batch-handoff]').textContent(), /not an assured physical location/);
+    }
     assert.deepEqual(errors, []);
     console.log(JSON.stringify({passed: true, languages: ['de','en'], ownership_at_0_15_30_45_60_s: ownership,
-      batch_order_restored: true, optional_panel_failures: Object.keys(variants), widths: [320,600,960], console_errors: errors}, null, 2));
+      batch_order_restored: true, unresolved_handoff_reports: failedReports.length, optional_panel_failures: Object.keys(variants), widths: [320,600,960], console_errors: errors}, null, 2));
   } finally {await browser.close();}
 })().catch(error => {console.error(error); process.exitCode = 1;});

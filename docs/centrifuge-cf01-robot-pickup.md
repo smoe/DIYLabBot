@@ -183,8 +183,92 @@ identifiers stay unchanged. An unavailable optional batch panel does not block
 the motion view.
 
 Die ausgewählten Medien unter `docs/media/` bleiben der historische Build.
-Aktuelle Generatoren, Prüfungen und die Zuordnung zu dessen Quellrevision
-stehen im [Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
+Die Zuordnung dieses historischen Builds zu seiner Quellrevision und frühere
+Prüfungen stehen im [Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
+Die aktuelle Berichtssemantik ist nachfolgend beschrieben.
+
+## Aktueller lokaler Chargenlauf: Buchführung und offene Übergaben
+
+```sh
+python3 scripts/run_cf01_rack_batch.py
+python3 scripts/run_cf01_rack_batch.py --transport sila2
+```
+
+Beide Optionen führen lokale Vertragsdecoder aus. Die Berichte werden mit
+Profilhash und Zeitstempel unter `exports/generated/cf01-rack-batch-*/` abgelegt.
+Der Eingangszustand ist auf ein bereitgestelltes Rack und einen leeren Rotor
+beschränkt. Fiktive Massen und zeitlose Übergaben bleiben ausgewiesene
+Mock-Annahmen; nur Schleudern und Bremsen lassen die Testuhr fortschreiten.
+Die Rotor-/Rackkapazität im Runner wird aus dem validierten Profil abgeleitet;
+der CF01-Vertrag verlangt weiterhin eine vollständige Zwölferbeladung.
+
+`handoff_policy` verlangt eine positive Roboterquittung und bei Übergaben
+zwischen Greifer und Rotor zusätzlich die zugehörige Stationsbestätigung und
+Belegungsprüfung. Vor der Roboterquittung wird die ausstehende Übergabe erfasst.
+Erst nach vollständiger Bestätigung wird die Buchführung weitergeführt:
+
+| Berichtsfeld | Bedeutung |
+|---|---|
+| `inventory` | Buchführung der letzten vollständig bestätigten Übergaben; bei einer Störung keine Zusicherung des physischen Orts. |
+| `world_inventory` | Separate synthetische Ortsbeobachtung nach den positiven Roboterquittungen; keine reale Identitätssensorik. |
+| `pending_handoff` | Probe, Quelle, Ziel, Roboterquittung und Stationsquittung. `null` bei abgeschlossener Übergabe; `station_confirmation: null`, wenn keine Stationsquittung erforderlich ist. |
+| `inventory_consistent` | Stimmen Buchführung und synthetische Ortsbeobachtung überein? Auch bei Übereinstimmung kann noch eine Quittung fehlen. |
+| `ownership` | `unresolved` bei offener Übergabe oder widersprüchlichen Inventaren; sonst `confirmed`. Dies beschreibt die Zuordnung im Mock, keine Hardwarefreigabe. |
+| `failure` | Auslösende Operation, Probe, ursprünglicher Fehlertyp/-code und Stationsfehler vor dem Stoppversuch. Der Fehler wird nicht durch einen späteren Stoppfehler ersetzt. |
+| `stop_attempted` | Der Runner hat einen Stopp über den ausgewählten Vertragsdecoder versucht. |
+| `stop_via_contract` | Der Decoder hat den Stopp erfolgreich beantwortet. Bei normalen erfolgreichen Läufen und fehlgeschlagenem Stoppversand `false`; kein Nachweis realen Stillstands. |
+| `stop_error` | Fehler beim Stoppversuch bzw. dessen Protokollierung, falls vorhanden. |
+| `station_inventory_check` | `mock_internal`: Belegung, Sitz und Masse werden aus `Simulator.slots` gelesen. Diese Prüfung ist nicht im gemeinsamen ROS-/SiLA-Zustand verfügbar. |
+
+Beispiel: Der Roboter quittiert das Absetzen und Freigeben von `Sample01`, aber
+die Stationsbestätigung schlägt fehl. Die synthetische Beobachtung führt die
+Probe im Rotor, die letzte bestätigte Buchführung noch beim Greifer. Der Bericht
+zeigt die offene Übergabe mit `ownership: unresolved` und behauptet keinen
+weiterhin sicher gehaltenen Gegenstand. Dasselbe gilt umgekehrt bei einer
+unbestätigten Rotorentnahme. Der Lauf stoppt ohne weitere Übergabe; automatischer
+Wiederanlauf oder Abgleich mit einem realen Gerät sind nicht implementiert.
+
+Rackplätze werden als Instanz und relativer Platz ausgegeben, beispielsweise
+`rack_instance: Rack` und `place_id: Slot01`. Der vorhandene Geometriebezug
+`rack_place_id: CF01.OutputRack.Slot01` bleibt zusätzlich unverändert erhalten.
+Dies ist eine lokale CF01-Zuordnung; getrennte Gefäß-/Probenidentitäten und eine
+Anbindung an NanoDrop bleiben eigenständige Aufgaben.
+
+Die HTML-Chargenanzeige benennt ihre Inventarfelder als Buchführung und zeigt
+offene Übergaben samt fehlenden Quittungen auf Deutsch und Englisch. Die
+unabhängige 60-s-Bewegung stellt solche Fehlerzustände nicht räumlich nach.
+Historische Downloads unter `docs/media/` bleiben unverändert und enthalten
+diese aktuelle Fehlerdarstellung nicht. Neu erzeugte lokale Demos verwenden
+die aktuelle Vorlage; ein bestandener CAD-Aufbau ersetzt keine Geräteprüfung.
+
+English: `inventory` records fully acknowledged handoffs, while
+`world_inventory` records synthetic robot observations. A missing robot or
+required station acknowledgement leaves `pending_handoff` and
+`ownership: unresolved`; neither view is asserted to be a verified physical
+location. Stop attempts and accepted stop responses are reported separately.
+Slot occupancy checks use mock internals, not a real ROS/SiLA driver contract.
+
+### Prüfung dieses Restplans am 8. November 2026
+
+Der isolierte Stand aus `dc5df84` plus den Änderungen dieses Restplans besteht
+261 Tests, davon 20 mangels gespeicherter Buildartefakte übersprungen. Die
+21 gezielten CF01-Umgebungs-/Chargentests bestehen vollständig. Sie prüfen
+Fehlertext, ursprünglichen Fehlertyp/-code, Operation und Probe sowie beide
+halb bestätigten Übergaberichtungen, verlorene Stationsantworten und
+fehlgeschlagene bzw. unbestätigte Stoppantworten. Alle 13 Schema-Dokumentprüfungen
+und die Galerieprüfung bestehen. Das erneut erzeugte Chargendiagramm ist
+bytegleich; nur seine aktuelle Quellenbindung wurde erneuert.
+
+Die Browserprüfung besteht auf Deutsch und Englisch einschließlich zweier
+echter Fehlerberichte, Sprachwechsel, optionaler Panelfehler und Breiten von
+320/600/960 px ohne Konsolenfehler. Die neuen Fehleransichten wurden zusätzlich
+visuell geprüft. Die lokale Demo und ihre Berichte liegen in der Revision
+`cf01-batch-handoffs-64cd218f4b8a-20261108T173343413919Z` unter `renders/` und
+`exports/generated/`; `batch-handoff-validation.json` bindet den Prüfstand.
+Die CAD-Geometriequellen sind unverändert. Für diese HTML-Prüfung wurden die
+vorhandenen nativen Anzeigemeshe mit dokumentierter Prüfsumme wiederverwendet;
+ein neuer nativer CAD-Aufbau und eine erneute mechanische Prüfung wurden nicht
+ausgeführt. Die Bewegung bleibt vom Chargenfehler entkoppelt.
 
 ## Synthetic workspace and complete local batch
 
@@ -201,8 +285,9 @@ confirmations. A separate world inventory checks actual indexed slots and sample
 identities against the runner ledger and simulated station presence/mass. This
 is no physical sample identification. Polling uses the local MockProtocol API;
 commands and failure-stop requests pass through the selected contract decoder.
-Test time advances only during spin/braking. Failures retain partial inventory
-and produce a failed report; they do not claim restored sample order.
+Test time advances only during spin/braking. Failures retain confirmed ledger,
+synthetic observations and pending acknowledgements separately and produce a
+failed report; they do not claim restored sample order.
 
 The 60-second motion component (rotor slot 01 → rack slot 01) has its own timeline
 and mock confirmations. The batch runner does not execute that component or

@@ -5,6 +5,14 @@ README-Mediendemo. Die Prüfung betrifft die synthetische Umgebung und den lokal
 Chargenlauf; sie erweitert weder Hardware- noch Netzwerk- oder Bahnunterstützung.
 Die angebotene erneute Claude-Konsultation wurde auf Eigentümerwunsch ausgelassen.
 
+Dieser Nachtrag hält den Prüfstand von Commit `b80461d` fest. Die damaligen
+Erfolgstests belegten noch keine eindeutige Zuordnung bei halb bestätigten
+Übergaben; die zweite Claude-Prüfung hat diese Lücke aufgezeigt. Die korrigierte
+aktuelle Semantik steht in der
+[Baugruppendokumentation](centrifuge-cf01-robot-pickup.md#aktueller-lokaler-chargenlauf-buchführung-und-offene-übergaben).
+Die nachfolgenden damaligen Build- und Mediennachweise bleiben historische
+Nachweise und werden nicht als erneute Prüfung der neuen Fehlersemantik ausgegeben.
+
 ## Abgleich der Hinweise
 
 | Claude-Punkt | Berücksichtigung |
