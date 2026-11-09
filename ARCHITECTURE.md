@@ -371,6 +371,12 @@ Unabhängige Gesamtläufe übernehmen Bestände nicht automatisch. Reagenzvorrä
 Netzwerkadapter, Hardware, echte Exporte, neue Geometrie, Roboterbahnen und
 qualifizierte Schutzfunktionen sind damit nicht implementiert oder nachgewiesen.
 
+Der [Plan zur laufübergreifenden Bestandsführung](docs/stock-continuation.md)
+beschreibt den nächsten Ausbau: einmalige Einführung oder geprüfte Übernahme
+eines abgeschlossenen Laufs, fortgeschriebene Restmengen und Inhaltsrevisionen
+sowie ein atomarer Root-/Stock-Schreibpfad mit exklusiver persistenter Lease,
+Kopfvergleich und Fencing. Diese Verträge und Befehle sind noch nicht implementiert.
+
 ## Nächste Schritte
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden

@@ -179,6 +179,11 @@ Geometrie, bisherige Gerätepositionen und Standalone-Fixtures nicht kopieren.
 Die Bilanz gilt innerhalb eines Gesamtlaufs. Globale Bestandsübernahme zwischen
 unabhängigen Läufen, Reagenzvorräte, aktive CF01-Jobfortsetzung, Netzwerk,
 Hardware, neue CAD-Geometrie und Sicherheitsqualifikation bleiben unimplementiert.
+Vor dem Ausbau der laufübergreifenden Bilanz
+[docs/stock-continuation.md](docs/stock-continuation.md) lesen. Der dortige Plan
+ist noch kein Laufzeitvertrag: Mengen nicht durch Profilkopien zurücksetzen,
+Root-/Stockbuchungen atomar speichern und parallele Fortsetzungen über denselben
+Bestandskopf und persistente, gegen veraltete Schreiber abgesicherte Leases führen.
 
 ## Gemeinsame Quellen und Generatoren
 
