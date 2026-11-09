@@ -4,7 +4,7 @@
   "mode": "synthetic_only",
   "protocol": {
     "source": "model/qubit-4-manual.protocol.json",
-    "source_sha256": "f77ddddfc3072bb3a691d74fcd472ce8252d2f92605d8bfa535c8dc4bc2e525f"
+    "source_sha256": "816e96c75bbe0dc398de3152446820e3278123dbe20d8ebe43712e222d1e67ca"
   },
   "catalog": {
     "source": "model/qubit-4.catalog.json",

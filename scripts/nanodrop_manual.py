@@ -1,4 +1,5 @@
 """Synthetic NanoDrop adapter on the common manual workflow core."""
+import inspect
 import uuid
 from pathlib import Path
 
@@ -159,7 +160,12 @@ class Workflow(ManualWorkflow):
                 state['recovery_required'] = 'measurement_outcome_unknown'
                 return False
             if outcome == 'performed':
-                self._finish_measurement(state, **{k: v for k, v in pending_resolution.items() if k != 'outcome'})
+                data = {k: v for k, v in pending_resolution.items() if k != 'outcome'}
+                try:
+                    inspect.signature(self._finish_measurement).bind(state, **data)
+                except TypeError as error:
+                    raise TaskError('Invalid pending resolution: ' + str(error)) from error
+                self._finish_measurement(state, **data)
             elif outcome == 'not_performed':
                 keys(pending_resolution, 'intent_id outcome', 'pending measurement resolution')
                 state['samples'][pending['sample_id']]['volume_uncertain'] = False

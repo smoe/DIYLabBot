@@ -35,7 +35,7 @@ dem Store. Sämtliche Laufzeitdaten bleiben über die bestehende Regel ignoriert
 | `model/qubit-4.catalog.json` | Logischer Qubit-4-Typ mit Fähigkeit `fluorometric_assay` |
 | `model/qubit-4-manual.protocol.json` | Ein fiktives Assay, seine Standards, Parameterverträge und synthetische SOP |
 | `model/qubit-4-manual.synthetic.json` | Geräteinstanz, Quellenpins, Originalproben, Chargen und logische Gefäßplätze |
-| `model/qubit-4-manual.schema.json` | Formaler Profilvertrag; zusätzliche semantische Prüfungen im Lader |
+| `model/qubit-4-manual.schema.json` | Profilvertrag und `$defs.result_contract` für den referenzierten Ergebnisvertrag; semantische Prüfungen im Lader |
 | `scripts/manual_tasks.py` | Transaktionales SQLite-Journal, Originalbytes und Ressourcenbesitz |
 | `scripts/manual_workflow.py` | Gemeinsame Sitzung, Profilbindung, Inventar, Verbrauch, Wiederaufnahme, Importhülle und Freigabe |
 | `scripts/manual_workflow_cli.py` | Gemeinsame Arbeitskarte, JSONL-Sitzung, Berichts- und Artefaktausgabe |
@@ -44,7 +44,10 @@ dem Store. Sämtliche Laufzeitdaten bleiben über die bestehende Regel ignoriert
 
 Die vorhandenen Raum-, Bank- und Rackquellen werden mit Prüfsummen referenziert.
 Das Beispiel nutzt dasselbe Originalrack und dieselbe Referenzarbeitsfläche wie
-das NanoDrop-Profil. Deren bestehende Instanzkennungen bleiben erhalten.
+das NanoDrop-Profil. Die Instanzkennungen `SYN.NanoDropRack01` und `SYN.NanoDrop.WorkArea` sind
+bewusst gemeinsam: Die beiden Abläufe nutzen Rack und Arbeitsfläche nacheinander.
+Im selben Store verhindern Reservierungen eine parallele Nutzung; Gefäß-IDs
+bleiben auch über unterschiedliche Racks hinweg exklusiv.
 Ansatz- und Standardplätze sind ausdrücklich logische Identitätsorte mit
 `holder_id` und `place_id`; sie besitzen keine CAD-Geometrie und belegen keine
 reale mechanische Eignung des Racks oder Geräts.
@@ -135,8 +138,12 @@ Messungen bleiben historisch gültig, wenn die Kalibrierung erst danach abläuft
 Der interne Testvertrag beginnt mit
 `Format,solidcraftbot.synthetic-qubit-report/1`. Er kennt Standard- und Proben-
 zeilen, laufbezogene `Measurement ID`, Ansatzkonzentration und ausdrückliche
-Einheiten. Optionale Felder liefern Originalkonzentration, Probenvolumen und
-Metadaten für Konsistenzprüfungen. Die Testdatei enthält bewusst keine als
+Einheiten (`Tube Concentration`, `Tube Unit`). `Original Concentration` und
+`Original Unit` sind optional. Bei berichteter Originalkonzentration müssen
+in derselben Probenzeile `Sample Volume uL` und `Assay Total Volume uL` stehen
+und dem bestätigten Ansatz entsprechen. Fehlende Volumina oder ein abweichendes
+Probenvolumen ergeben `dilution_basis_unverified`; ein abweichendes Gesamtvolumen
+ergibt `assay_total_volume_mismatch`. Metadaten dienen Konsistenzprüfungen. Die Testdatei enthält bewusst keine als
 Geräteaussage ausgegebene Kalibrierungs-ID.
 
 Die Zeilenfolge ist beliebig. Erwartet werden genau die Messungen der bestätigten
@@ -148,7 +155,11 @@ diese Originalbytes mit SHA-256; Entscheidungen zum Verwerfen verlangen Gründe.
 Gleiche Datei-Inhalte werden nicht doppelt verbucht.
 
 `ng/µL` beziehungsweise `ng/uL` und `ng/mL` werden mit ausdrücklichem Faktor
-auf `ng/uL` abgebildet. Eine berichtete Originalkonzentration bleibt als
+auf `ng/uL` abgebildet. Kommagetrennte Dateien verlangen einen Dezimalpunkt;
+auch ein gequotetes `"1,250"` wird zurückgehalten. Semikolon- und tabulatorgetrennte
+Dateien erlauben Dezimalkomma, beispielsweise `1,5`. Dies gilt für Konzentrationen
+und Volumina gleichermaßen. Es gibt keinen Konzentrationsvergleich mit einer
+erfundenen Toleranz. Eine berichtete Originalkonzentration bleibt als
 `basis: reported` erhalten und wird nicht nochmals verdünnungskorrigiert.
 Fehlt sie, wird ausschließlich folgende Größe abgeleitet:
 
@@ -174,7 +185,19 @@ je Zeile; alternativ `--actions DATEI.jsonl`. `status` zeigt den Stand, `quit`
 beendet die Sitzung. Ein harter Prozessabbruch erfordert zusätzlich `--resume`.
 Nach Wiederaufnahme bleiben alle Original-, Ansatz- und Standardgefäße im
 vollständigen Abgleich erforderlich. Der Qubit-Abgleich nennt
-`calibration_still_valid`; NanoDrop behält `blank_still_valid`.
+`calibration_still_valid`; NanoDrop behält `blank_still_valid`. Ein bestehender
+Klärungsgrund bleibt bei Fristablauf und Neustart erhalten; die zusätzliche
+Ursache wird als `additional_cause` im Ereignis-Payload festgehalten. Das
+NanoDrop-Zustandslayout und sein JSONL-Befehlsformat bleiben unverändert.
+
+Ein als `discarded` beobachtetes Gefäß erhält durch den Abgleich keine neue
+Verwerfungsbestätigung. Eine vorhandene Bestätigung mit Grund bleibt erhalten.
+Für ein bislang unbestätigtes, bereits verworfen beobachtetes Gefäß verlangt
+`dispose_vessel` weiterhin Identität und ausdrücklichen Grund; dies ergänzt die
+Begründung ohne eine erneute physische Entsorgung anzunehmen. Bis dahin bleiben
+Abschluss und Abbruchfreigabe gesperrt. Taucht ein bestätigt verworfenes Gefäß
+wieder an einem logischen Platz auf, wird seine Bestätigung entfernt und
+`disposal_observation_mismatch` verlangt einen weiteren ausdrücklichen Abgleich.
 
 Bei einem offenen Vorgang nennt `pending_resolution` die gespeicherte
 `intent_id` und `performed`, `not_performed` oder `unknown`:

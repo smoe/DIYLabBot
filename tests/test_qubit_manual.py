@@ -1,5 +1,7 @@
 """Synthetic Qubit preparations, calibration, import and cross-device recovery."""
 import copy
+import csv
+import io
 import json
 import subprocess
 import sys
@@ -99,6 +101,133 @@ class QubitTests(unittest.TestCase):
     def sample_preparation(self, flow=None):
         flow = flow or self.flow
         return flow.state['preparations'][flow.state['active_preparations']['sample:Sample01']]
+
+    def table(self, *, sample_volume='2', total_volume='100', omit_volumes=False, delimiter=',', concentration=None):
+        rows = list(csv.reader(io.StringIO(FIXTURE.read_text())))
+        if 'Assay Total Volume uL' not in rows[1]:
+            rows[1].append('Assay Total Volume uL')
+            for row in rows[2:]:
+                row.append('100')
+        for row in rows[2:]:
+            if row[1] == 'sample':
+                row[rows[1].index('Sample Volume uL')] = sample_volume
+                row[rows[1].index('Assay Total Volume uL')] = total_volume
+                if concentration is not None:
+                    row[rows[1].index('Tube Concentration')] = concentration
+        if omit_volumes:
+            for index in sorted([rows[1].index('Sample Volume uL'), rows[1].index('Assay Total Volume uL')], reverse=True):
+                for row in rows[1:]:
+                    row.pop(index)
+        stream = io.StringIO(newline='')
+        csv.writer(stream, delimiter=delimiter).writerows(rows)
+        return stream.getvalue().encode()
+
+    def test_reported_original_requires_both_confirmed_volumes(self):
+        self.measured()
+        for content, issue in [(self.table(omit_volumes=True), 'dilution_basis_unverified'),
+                               (self.table(total_volume='200'), 'assay_total_volume_mismatch'),
+                               (self.table(sample_volume=''), 'dilution_basis_unverified'),
+                               (self.table(total_volume=''), 'dilution_basis_unverified')]:
+            with self.subTest(issue=issue):
+                checksum = self.import_content(content)
+                record = self.flow.state['imports'][checksum]
+                self.assertEqual(record['status'], 'quarantined')
+                self.assertIn(issue, record['issues'])
+
+    def test_deviating_preparation_rejects_nominal_report_basis(self):
+        self.claim()
+        prepare_standards(self.flow)
+        for sample_id in self.flow.state['samples']:
+            self.take(sample_id)
+            pending = begin_preparation(self.flow, 'sample', sample_id)
+            self.flow.act('confirm_preparation', ACTOR, intent_id=pending['intent_id'],
+                          observed_vessel_id=pending['vessel_id'], observed_sample_id=sample_id,
+                          volume_ul=1, assay_total_volume_ul=100, mixed=True,
+                          deviation_reason='Synthetic half volume')
+            self.place(sample_id)
+        self.measure_samples()
+        checksum = self.import_content(self.table())
+        record = self.flow.state['imports'][checksum]
+        self.assertEqual(record['status'], 'quarantined')
+        self.assertIn('dilution_basis_unverified', record['issues'])
+
+    def test_quoted_comma_concentration_is_quarantined(self):
+        self.measured()
+        checksum = self.import_content(self.table(concentration='1,250'))
+        record = self.flow.state['imports'][checksum]
+        self.assertEqual(record['status'], 'quarantined')
+
+    def test_semicolon_and_tab_allow_decimal_comma(self):
+        for delimiter in [';', '\t']:
+            with self.subTest(delimiter=delimiter):
+                report = parse_report(self.table(delimiter=delimiter, concentration='1,5'))
+                self.assertEqual(report['rows'][0]['tube_concentration']['value'], 1.5)
+
+    def test_recovery_cause_survives_time_and_restart(self):
+        self.claim()
+        self.flow.act('cancel', ACTOR, reason='Synthetic stop')
+        self.flow.act('advance_time', ACTOR, seconds=201)
+        self.assertEqual(self.flow.state['recovery_required'], 'cancel_inventory_check')
+        self.assertIn('deadline_exceeded', str(self.journal.history(RUN_ID)[-1]['payload']))
+        self.flow.close()
+        self.flow = Workflow.open(self.journal, RUN_ID)
+        self.assertEqual(self.flow.state['recovery_required'], 'cancel_inventory_check')
+        self.assertIn('session_restarted', str(self.journal.history(RUN_ID)[-1]['payload']))
+
+    def test_restart_preserves_existing_observation_reason(self):
+        self.claim()
+        with self.assertRaises(ObservationError):
+            self.flow.act('take', ACTOR, sample_id='Sample01', observed_sample_id='FOREIGN',
+                          rack_id=self.flow.state['definition']['profile']['rack']['id'],
+                          place_id=self.flow.state['samples']['Sample01']['original_place_id'])
+        self.flow.close()
+        self.flow = Workflow.open(self.journal, RUN_ID)
+        self.assertEqual(self.flow.state['recovery_required'], 'observation_mismatch')
+        self.assertEqual(self.journal.history(RUN_ID)[-1]['payload']['additional_cause'], 'session_restarted')
+
+    def test_unknown_operation_reason_survives_deadline(self):
+        self.claim()
+        pending = begin_preparation(self.flow, 'standard', 'SYN.StandardLow')
+        self.flow.close()
+        self.flow = Workflow.open(self.journal, RUN_ID)
+        self.reconcile(pending_resolution={'intent_id': pending['intent_id'], 'outcome': 'unknown'})
+        self.flow.act('advance_time', ACTOR, seconds=201)
+        self.assertEqual(self.flow.state['recovery_required'], 'operation_outcome_unknown')
+        self.assertEqual(self.journal.history(RUN_ID)[-1]['payload']['additional_cause'], 'deadline_exceeded')
+
+    def test_reconcile_discarded_preserves_reason_and_requires_new_confirmation(self):
+        self.measured()
+        ids = list(self.flow.state['derived_vessels'])
+        first, second = ids[:2]
+        self.flow.act('dispose_vessel', ACTOR, vessel_id=first, observed_vessel_id=first, reason='Original reason')
+        confirmation = self.flow.state['derived_vessels'][first]['disposition_confirmation']
+        self.flow.act('cancel', ACTOR, reason='Synthetic stop')
+        observations = inventory_observations(self.flow.state)
+        next(o for o in observations if o['vessel_id'] == second)['location'] = {'kind': 'discarded'}
+        self.reconcile(observations=observations)
+        self.assertEqual(self.flow.state['derived_vessels'][first]['disposition_confirmation'], confirmation)
+        self.assertIsNone(self.flow.state['derived_vessels'][second]['disposition_confirmation'])
+        self.dispose()
+        with self.assertRaisesRegex(TaskError, 'derived vessel'):
+            self.flow.act('finish_cancel', ACTOR, workspace_clear=True)
+        self.flow.act('dispose_vessel', ACTOR, vessel_id=second, observed_vessel_id=second, reason='Observed disposal explained')
+        self.flow.act('finish_cancel', ACTOR, workspace_clear=True)
+        self.assertEqual(self.flow.state['status'], 'cancelled')
+
+    def test_disposed_vessel_reappearing_requires_explicit_clarification(self):
+        self.measured()
+        first = next(iter(self.flow.state['derived_vessels']))
+        location = self.flow.state['derived_vessels'][first]['location']
+        self.flow.act('dispose_vessel', ACTOR, vessel_id=first, observed_vessel_id=first, reason='Synthetic disposal')
+        self.flow.act('cancel', ACTOR, reason='Synthetic stop')
+        observations = inventory_observations(self.flow.state)
+        next(o for o in observations if o['vessel_id'] == first)['location'] = location
+        self.reconcile(observations=observations)
+        self.assertIsNone(self.flow.state['derived_vessels'][first]['disposition_confirmation'])
+        self.assertEqual(self.flow.state['recovery_required'], 'disposal_observation_mismatch')
+        self.assertTrue(self.journal.owners())
+        self.reconcile()
+        self.assertIsNone(self.flow.state['recovery_required'])
 
     def test_full_run_preserves_original_slots_and_uses_each_transfer_once(self):
         self.measured()
@@ -470,6 +599,20 @@ class SharedWorkflowTests(unittest.TestCase):
                 expected = json.loads((ROOT / 'tests/fixtures/nanodrop/before-qubit-extraction.json').read_text())
                 self.assertEqual(project(flow.report()), expected)
 
+    def test_report_and_card_load_history_once_and_card_avoids_artifact_checks(self):
+        from manual_workflow_cli import work_card
+        with tempfile.TemporaryDirectory() as folder, Journal(Path(folder) / 'tasks.sqlite3') as store:
+            for adapter in [NanoDrop, Workflow]:
+                flow = adapter.create(store)
+                with patch.object(store, 'history', wraps=store.history) as history:
+                    report = flow.report()
+                    self.assertEqual(history.call_count, 1)
+                with patch.object(store, 'history', wraps=store.history) as history, patch.object(flow, '_verify_artifacts') as verify:
+                    card = work_card(flow)
+                    self.assertEqual(history.call_count, 1)
+                    verify.assert_not_called()
+                self.assertEqual(card['samples'], report['samples'])
+
     def test_runner_format_guards_and_changed_core_source_apply_to_both_adapters(self):
         with tempfile.TemporaryDirectory() as folder, Journal(Path(folder) / 'tasks.sqlite3') as store:
             nano = NanoDrop.create(store, run_id='SYN-ND-FORMAT')
@@ -554,6 +697,13 @@ class QubitProfileAndParserTests(unittest.TestCase):
             with self.subTest(key=key), self.assertRaises(TaskError):
                 load_profile(data)
 
+    def test_result_contract_schema_matches_bound_protocol(self):
+        definition = load_profile()
+        schema = json.loads((ROOT / 'model/qubit-4-manual.schema.json').read_text())
+        self.assertEqual(schema['$defs']['result_contract']['const'], definition['protocol']['result_contract'])
+        self.assertEqual(definition['protocol']['result_contract']['reported_original_required_volumes'],
+                         ['Sample Volume uL', 'Assay Total Volume uL'])
+
     def test_synthetic_marker_units_and_finite_values_are_required(self):
         content = FIXTURE.read_bytes()
         for invalid in [content.replace(b'solidcraftbot.synthetic-qubit-report/1', b'native-export'),
@@ -568,9 +718,9 @@ class QubitProfileAndParserTests(unittest.TestCase):
 
 class QubitCommandLineTests(unittest.TestCase):
     def test_demo_and_cross_runner_status_report_session_rejection(self):
-        from run_nanodrop_manual import DEFAULT_STORE as nd_store
-        from run_qubit_manual import DEFAULT_STORE as qb_store
-        self.assertEqual(nd_store, qb_store)
+        from manual_workflow_cli import DEFAULT_STORE
+        from manual_workflow import DEFAULT_STORE as core_store
+        self.assertEqual(DEFAULT_STORE, core_store)
         with tempfile.TemporaryDirectory(prefix='qb-cli-', dir=ROOT / 'exports') as folder:
             folder = Path(folder)
             db = folder / 'tasks.sqlite3'

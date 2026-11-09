@@ -25,7 +25,8 @@
   "result_contract": {
     "format": "solidcraftbot.synthetic-qubit-report/1",
     "identity_column": "Measurement ID",
-    "concentration_units": {"ng/uL": 1, "ng/mL": 0.001}
+    "concentration_units": {"ng/uL": 1, "ng/mL": 0.001},
+    "reported_original_required_volumes": ["Sample Volume uL", "Assay Total Volume uL"]
   },
   "sop": {
     "id": "SYN.Qubit4.Manual",

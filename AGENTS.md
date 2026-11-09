@@ -138,7 +138,9 @@ keine fremden Zustände oder stillen Migrationen zulassen.
   Ansatz, Kalibrierung, Assayrevision und Chargen eindeutig verbinden. Der
   Kalibrierungsbezug stammt aus dem Workflow, nicht aus einem geprüften Export.
   Berichtete Originalkonzentrationen nicht nochmals verdünnungskorrigieren;
-  Ableitungen mit Formel, Volumina und Einheitenfaktoren ausweisen.
+  Berichtete Originalkonzentrationen erfordern beide bestätigten Ansatzvolumina
+  in derselben synthetischen Ergebniszeile. Ableitungen mit Formel, Volumina und
+  Einheitenfaktoren ausweisen.
 
 ## Gemeinsame Quellen und Generatoren
 

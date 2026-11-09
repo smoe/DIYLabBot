@@ -1,7 +1,7 @@
 Format,solidcraftbot.synthetic-qubit-report/1
-Measurement ID,Record Type,Vessel ID,Assay ID,Assay Revision,Kit Lot,Standard Lot,Instrument Serial,Tube Concentration,Tube Unit,Original Concentration,Original Unit,Sample Volume uL,Warnings
-SYN-QB-FIXTURE.A01.P0005.M01,sample,SYN-QB-FIXTURE.A01.P0005.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.1,ng/uL,,,2,SYNTHETIC TEST DATA
-SYN-QB-FIXTURE.A01.P0004.M01,sample,SYN-QB-FIXTURE.A01.P0004.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,200.0,ng/mL,10000.0,ng/mL,2,SYNTHETIC TEST DATA
-SYN-QB-FIXTURE.A01.P0003.M01,sample,SYN-QB-FIXTURE.A01.P0003.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.30000000000000004,ng/uL,,,2,SYNTHETIC TEST DATA
-SYN-QB-FIXTURE.A01.P0002.M01,standard,SYN-QB-FIXTURE.A01.P0002.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,400.0,ng/mL,,,5,SYNTHETIC TEST DATA
-SYN-QB-FIXTURE.A01.P0001.M01,standard,SYN-QB-FIXTURE.A01.P0001.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.5,ng/uL,,,5,SYNTHETIC TEST DATA
+Measurement ID,Record Type,Vessel ID,Assay ID,Assay Revision,Kit Lot,Standard Lot,Instrument Serial,Tube Concentration,Tube Unit,Original Concentration,Original Unit,Sample Volume uL,Warnings,Assay Total Volume uL
+SYN-QB-FIXTURE.A01.P0005.M01,sample,SYN-QB-FIXTURE.A01.P0005.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.1,ng/uL,,,2,SYNTHETIC TEST DATA,100
+SYN-QB-FIXTURE.A01.P0004.M01,sample,SYN-QB-FIXTURE.A01.P0004.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,200.0,ng/mL,10000.0,ng/mL,2,SYNTHETIC TEST DATA,100
+SYN-QB-FIXTURE.A01.P0003.M01,sample,SYN-QB-FIXTURE.A01.P0003.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.30000000000000004,ng/uL,,,2,SYNTHETIC TEST DATA,100
+SYN-QB-FIXTURE.A01.P0002.M01,standard,SYN-QB-FIXTURE.A01.P0002.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,400.0,ng/mL,,,5,SYNTHETIC TEST DATA,100
+SYN-QB-FIXTURE.A01.P0001.M01,standard,SYN-QB-FIXTURE.A01.P0001.Tube,SYN.Fluorescence.Concentration,1,SYN.KIT.001,SYN.STD.001,SYN-QB-4-001,0.5,ng/uL,,,5,SYNTHETIC TEST DATA,100

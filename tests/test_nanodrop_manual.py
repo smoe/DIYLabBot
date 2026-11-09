@@ -226,6 +226,20 @@ class ManualTaskTests(unittest.TestCase):
                 'workspace_clear': False, 'blank_still_valid': True}
         return flow.act('reconcile', ACTOR, **{**data, **changes})
 
+    def test_performed_resolution_invalid_fields_are_task_errors(self):
+        self.claim()
+        self.take()
+        intent = self.begin()
+        self.flow.close()
+        self.flow = Workflow.open(self.journal, RUN_ID)
+        resolution = {'outcome': 'performed', 'intent_id': intent,
+                      'observed_sample_id': 'Sample01', 'volume_ul': 1.5, 'cleaned': True}
+        for data in [{k: v for k, v in resolution.items() if k != 'volume_ul'},
+                     {**resolution, 'unexpected': True}]:
+            with self.subTest(data=data), self.assertRaises(TaskError):
+                self.reconcile(pending_resolution=data)
+        self.assertEqual(self.flow.state['measurements'], {})
+
     def test_full_run_maps_reordered_results_and_preserves_lineage_and_unknown_volume(self):
         self.claim()
         self.assertEqual(len(self.journal.owners()), 6)
