@@ -1,6 +1,11 @@
 # Manuelle Aufgaben und Messgeräte
 
 **Status: Synthetische NanoDrop-/Qubit-Einzelabläufe und ein gemeinsamer CF01–NanoDrop–Qubit-Gesamtlauf.**
+
+Separat steht ein [lesender UltraC-Netzwerkadapter mit synthetischem Gerätemodell](nanodrop-ultra-network.md)
+bereit. Lokales HTTP ist geprüft; fachlicher Ergebnisdecoder, Workflow-Netzwerkimport
+und Prüfung am Originalgerät stehen noch aus.
+
 Die konkrete Ausführung, Quellen, Zustände und Prüfgrenzen stehen in
 [NanoDrop](nanodrop-manual-workflow.md) und
 [Qubit 4](qubit-4-manual-workflow.md).

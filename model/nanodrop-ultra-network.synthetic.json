@@ -1,0 +1,99 @@
+{
+  "format": "solidcraftbot.nanodrop-ultra-network-model/1",
+  "id": "SYN.NanoDrop.UltraC.Network",
+  "instrument_type": "nanodrop_ultrac",
+  "catalog": {
+    "path": "model/nanodrop.catalog.json",
+    "sha256": "957af06ed1959fb1139842322eed64ca028dddc3bb4241413a0959bf8caca04e"
+  },
+  "protocol": {
+    "path": "model/nanodrop-ultra-network.protocol.json",
+    "sha256": "f7ee85ec1f2b731382decb39ad0cbf2fe05f446380719510cca36d2f5e14a025"
+  },
+  "synthetic": true,
+  "synthetic_semantics": {
+    "experiment_page_origin": 0,
+    "experiment_default_page_size": 100,
+    "measurement_page_origin": 0,
+    "measurement_page_size": 2,
+    "timestamp_unit": "unix_milliseconds",
+    "name_filter": "casefold_substring",
+    "application_filter": "casefold_exact",
+    "response_envelopes": "bare arrays for queries, objects for individual records; synthetic choice only"
+  },
+  "system": {
+    "Synthetic": true,
+    "Model": "NanoDrop UltraC",
+    "SerialNumber": "SYN.ULTRAC.NET.001",
+    "SoftwareVersion": "SYNTHETIC-M024-01-25"
+  },
+  "experiments": [
+    {
+      "Id": "11111111-1111-4111-8111-111111111111",
+      "Name": "SYN.UltraC.Batch A",
+      "Application": "dsDNA",
+      "CreatedTime": "2026-01-01T12:00:00Z"
+    },
+    {
+      "Id": "22222222-2222-4222-8222-222222222222",
+      "Name": "SYN.UltraC.Batch B",
+      "Application": "RNA",
+      "CreatedTime": "2026-01-02T12:00:00Z"
+    }
+  ],
+  "measurements": [
+    {
+      "Id": "aaaaaaaa-aaaa-4aaa-8aaa-000000000001",
+      "ExperimentId": "11111111-1111-4111-8111-111111111111",
+      "Type": "SYNTHETIC",
+      "SampleName": "SYN.UltraC.Sample01",
+      "MeasuredTime": "2026-01-01T12:00:01Z",
+      "LocalMeasuredTime": "2026-01-01T12:00:01Z",
+      "OriginMeasuredTime": "2026-01-01T12:00:01Z",
+      "TimeOffset": "+00:00",
+      "Location": "SYN.UltraC",
+      "SettingJson": "{\"synthetic_only\":true}",
+      "DataJson": "{\"synthetic_only\":true,\"example_concentration_ng_per_ul\":21}",
+      "ExtraJson": "{}",
+      "MeasurementBatch": 9007199254740993,
+      "IsDiscarded": false
+    },
+    {
+      "Id": "aaaaaaaa-aaaa-4aaa-8aaa-000000000002",
+      "ExperimentId": "11111111-1111-4111-8111-111111111111",
+      "Type": "SYNTHETIC",
+      "SampleName": "SYN.UltraC.Sample02",
+      "MeasuredTime": "2026-01-01T12:00:02Z",
+      "LocalMeasuredTime": "2026-01-01T12:00:02Z",
+      "OriginMeasuredTime": "2026-01-01T12:00:02Z",
+      "TimeOffset": "+00:00",
+      "Location": "SYN.UltraC",
+      "SettingJson": "{\"synthetic_only\":true}",
+      "DataJson": "{\"synthetic_only\":true,\"example_concentration_ng_per_ul\":22}",
+      "ExtraJson": "{}",
+      "MeasurementBatch": 9007199254740993,
+      "IsDiscarded": false
+    },
+    {
+      "Id": "aaaaaaaa-aaaa-4aaa-8aaa-000000000003",
+      "ExperimentId": "22222222-2222-4222-8222-222222222222",
+      "Type": "SYNTHETIC",
+      "SampleName": "SYN.UltraC.Sample03",
+      "MeasuredTime": "2026-01-02T12:00:03Z",
+      "LocalMeasuredTime": "2026-01-02T12:00:03Z",
+      "OriginMeasuredTime": "2026-01-02T12:00:03Z",
+      "TimeOffset": "+00:00",
+      "Location": "SYN.UltraC",
+      "SettingJson": "{\"synthetic_only\":true}",
+      "DataJson": "{\"synthetic_only\":true,\"example_concentration_ng_per_ul\":23}",
+      "ExtraJson": "{}",
+      "MeasurementBatch": 9007199254740993,
+      "IsDiscarded": false
+    }
+  ],
+  "limitations": [
+    "All data and response shapes are synthetic examples, not captured device responses",
+    "Pagination, timestamp and filter semantics are explicit model choices, not manufacturer guarantees",
+    "Five read endpoints only; no measurements, writes, network discovery or workflow mutations"
+  ]
+}

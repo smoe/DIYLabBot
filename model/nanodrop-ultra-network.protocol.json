@@ -1,0 +1,57 @@
+{
+  "format": "solidcraftbot.nanodrop-ultra-network-protocol/1",
+  "documentation": {
+    "url": "https://assets.thermofisher.com/TFS-Assets/CAD/manuals/nanodrop-ultra-api-reference-manual-m024.pdf",
+    "revision": "M024 01/25",
+    "authentication_url": "https://documents.thermofisher.com/TFS-Assets/CAD/Product-Guides/scivault-2-user-guide-en.pdf",
+    "authentication_revision": "M023 Revision E, August 2025, pages 50-51"
+  },
+  "default_port": 54011,
+  "authentication": "Optional Bearer token; required when SciVault 2 is enabled",
+  "endpoints": {
+    "system": {"path": "/System", "query": {}},
+    "query_experiments": {
+      "path": "/Experiment/Query",
+      "query": {
+        "NameFilter": "string",
+        "ApplicationFilter": "string",
+        "PageNumber": "int32",
+        "PageSize": "int32",
+        "StartTimeStamp": "int64",
+        "EndTimeStamp": "int64",
+        "StartTime": "date-time",
+        "EndTime": "date-time"
+      }
+    },
+    "experiment": {"path": "/Experiment/Id/{id}", "query": {}},
+    "experiment_detail": {"path": "/Experiment/Detail/Id/{id}", "query": {}},
+    "measurements": {
+      "path": "/Measurement",
+      "query": {"experimentId": "uuid", "startPage": "int32", "pageCount": "int32"}
+    }
+  },
+  "measurement_fields": {
+    "Id": "uuid",
+    "ExperimentId": "uuid",
+    "Type": "string",
+    "SampleName": "string",
+    "MeasuredTime": "date-time",
+    "LocalMeasuredTime": "date-time",
+    "OriginMeasuredTime": "date-time",
+    "TimeOffset": "string",
+    "Location": "string",
+    "SettingJson": "string",
+    "DataJson": "string",
+    "ExtraJson": "string",
+    "MeasurementBatch": "int64",
+    "IsDiscarded": "boolean"
+  },
+  "limits": [
+    "Supported read subset only, not the complete manufacturer API",
+    "System, Experiment and success response envelopes are not specified by M024",
+    "Pagination origins/defaults and timestamp units are not specified by M024",
+    "SettingJson, DataJson and ExtraJson inner structures are not specified by M024",
+    "Measurement fields do not establish physical sample identity, consumption or disposal",
+    "No NanoDrop One API compatibility inferred from the shared manual workflow"
+  ]
+}
