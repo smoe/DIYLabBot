@@ -223,6 +223,21 @@
     }
   },
   "$defs": {
+    "result_contract": {
+      "description": "Synthetic report contract in the referenced protocol; reported original concentrations require both confirmed preparation volumes in the same row.",
+      "const": {
+        "format": "solidcraftbot.synthetic-qubit-report/1",
+        "identity_column": "Measurement ID",
+        "concentration_units": {
+          "ng/uL": 1,
+          "ng/mL": 0.001
+        },
+        "reported_original_required_volumes": [
+          "Sample Volume uL",
+          "Assay Total Volume uL"
+        ]
+      }
+    },
     "id": {
       "type": "string",
       "minLength": 1

@@ -1,11 +1,9 @@
 """Run a purely synthetic NanoDrop task; all persistent output stays in exports/."""
 import csv
 import io
-from pathlib import Path
 
-from nanodrop_manual import ROOT, SOURCE, Workflow, inventory_observations
-from manual_workflow import DEFAULT_STORE
-from manual_workflow_cli import output_path, work_card, session, run_cli
+from nanodrop_manual import SOURCE, Workflow, inventory_observations
+from manual_workflow_cli import output_path, run_cli
 
 DEMO_ACTOR = 'SYN.Operator01'
 

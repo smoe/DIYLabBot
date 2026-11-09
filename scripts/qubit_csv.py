@@ -10,7 +10,7 @@ FORMAT = 'solidcraftbot.synthetic-qubit-report/1'
 UNITS = {'ng/ul': 1.0, 'ng/ml': 0.001}
 
 
-def concentration(value, unit, optional=False):
+def concentration(value, unit, delimiter, optional=False):
     if not value.strip():
         if optional and not unit.strip():
             return None
@@ -18,7 +18,7 @@ def concentration(value, unit, optional=False):
     factor = UNITS.get(normalized(unit))
     if factor is None:
         raise TaskError('Unsupported concentration unit: ' + unit)
-    numeric = number(value, decimal_comma=True)
+    numeric = number(value, decimal_comma=delimiter != ',')
     converted = numeric * factor
     if not math.isfinite(converted):
         raise TaskError('Non-finite converted concentration')
@@ -56,12 +56,16 @@ def parse_report(content):
             volume = number(cell('samplevolumeul'), decimal_comma=delimiter != ',')
             if volume is not None and volume <= 0:
                 raise TaskError('Positive reported sample volume required')
+            total_volume = number(cell('assaytotalvolumeul'), decimal_comma=delimiter != ',')
+            if total_volume is not None and total_volume <= 0:
+                raise TaskError('Positive reported assay total volume required')
             raw = dict(zip(header, row))
             parsed.append({
                 'measurement_id': identity, 'record_type': kind,
-                'tube_concentration': concentration(cell('tubeconcentration'), cell('tubeunit')),
-                'original_concentration': concentration(cell('originalconcentration'), cell('originalunit'), optional=True),
+                'tube_concentration': concentration(cell('tubeconcentration'), cell('tubeunit'), delimiter),
+                'original_concentration': concentration(cell('originalconcentration'), cell('originalunit'), delimiter, optional=True),
                 'reported_sample_volume_ul': volume,
+                'reported_assay_total_volume_ul': total_volume,
                 'metadata': {key: cell(key) for key in ['assayid', 'assayrevision', 'kitlot',
                     'standardlot', 'instrumentserial', 'vesselid'] if cell(key)},
                 'instrument_messages': {key: value for key, value in raw.items()

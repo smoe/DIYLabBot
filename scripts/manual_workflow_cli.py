@@ -23,7 +23,7 @@ def work_card(flow):
             'instrument': state['definition']['profile']['instrument'],
             'parameters': state['definition']['profile']['parameters'],
             'planned_measurements': state['planned_measurements'],
-            'samples': flow.report()['samples'], 'resources': state['resources'],
+            'samples': flow.report_samples(state), 'resources': state['resources'],
             'imports': {key: {k: record[k] for k in ['file_name','status','issues']}
                         for key, record in state['imports'].items()},
             **flow.card_extra(state)}
@@ -106,8 +106,9 @@ def run_cli(workflow, source, run_demo, description):
                         print(json.dumps(work_card(flow), ensure_ascii=False))
                     else:
                         file = output_path(args.out or journal.path.parent / args.run_id / 'report.json')
-                        file.write_text(json.dumps(flow.report(), ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-                        print(json.dumps({'report': str(file), 'passed': flow.report()['passed']}))
+                        report = flow.report()
+                        file.write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+                        print(json.dumps({'report': str(file), 'passed': report['passed']}))
             finally:
                 if flow is not None:
                     flow.close()

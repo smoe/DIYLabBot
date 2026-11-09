@@ -304,7 +304,9 @@ gebunden. Jede Probenmessabsicht friert diesen Bezug als `workflow_record` ein.
 Eine außerhalb des Ablaufs erfolgte Gerätekalibrierung wäre nicht erkennbar.
 
 Der finale Dateiimport verlangt sowohl Proben- als auch Standardmessungen.
-Berichtete Ansatz- und Originalkonzentrationen bleiben getrennt. Fehlt die
+Berichtete Ansatz- und Originalkonzentrationen bleiben getrennt. Eine berichtete
+Originalkonzentration verlangt Proben- und Gesamtvolumen derselben Zeile passend
+zum bestätigten Ansatz; sonst bleibt der Import in Quarantäne. Fehlt die
 Originalkonzentration, wird sie mit dokumentierter Formel und Einheitenumrechnung
 aus dem bestätigten Ansatz abgeleitet. Fehlende Gefäße, ungeklärte Absichten,
 ungültige Messungen oder nicht bestätigte Entsorgung verhindern die Freigabe.

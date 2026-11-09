@@ -66,7 +66,8 @@ def load_profile(source=SOURCE):
         raise TaskError('Duplicate logical place')
     if protocol['result_contract'] != {
             'format': FORMAT, 'identity_column': 'Measurement ID',
-            'concentration_units': {'ng/uL': 1, 'ng/mL': 0.001}}:
+            'concentration_units': {'ng/uL': 1, 'ng/mL': 0.001},
+            'reported_original_required_volumes': ['Sample Volume uL', 'Assay Total Volume uL']}:
         raise TaskError('Unsupported synthetic Qubit report contract')
     return definition
 
@@ -90,6 +91,8 @@ class Workflow(ManualWorkflow):
     SOURCE = SOURCE
     RUN_PREFIX = 'SYN-QB-'
     DEADLINE_FIELD = 'deadline_s'
+    RECOVERY_COMMANDS = ManualWorkflow.RECOVERY_COMMANDS | {'advance_time'}
+    CANCELLING_COMMANDS = ManualWorkflow.CANCELLING_COMMANDS | {'dispose_vessel', 'advance_time'}
     EVENT_CLOCK = True
     load_profile = staticmethod(load_profile)
 
@@ -204,10 +207,16 @@ class Workflow(ManualWorkflow):
         state['planned_measurements'][preparation['kind'] + ':' + preparation['target_id']] = preparation['measurement_id']
         state['pending_operation'] = None
 
-    def _confirm_preparation(self, state, actor_id, intent_id, observed_vessel_id, volume_ul,
-                             assay_total_volume_ul, mixed, observed_sample_id=None, deviation_reason=None):
-        self._finish_preparation(state, intent_id, observed_vessel_id, volume_ul,
-                                 assay_total_volume_ul, mixed, observed_sample_id, deviation_reason)
+    def _confirm_operation(self, state, handler, data):
+        self._claimed(state)
+        try:
+            inspect.signature(handler).bind(state, **data)
+        except TypeError as error:
+            raise TaskError('Invalid confirmation arguments: ' + str(error)) from error
+        handler(state, **data)
+
+    def _confirm_preparation(self, state, actor_id, **data):
+        self._confirm_operation(state, self._finish_preparation, data)
 
     def _calibration_valid(self, state):
         calibration = state['calibration']
@@ -272,8 +281,8 @@ class Workflow(ManualWorkflow):
         preparation['status'] = 'measured'
         state['pending_operation'] = None
 
-    def _confirm_measurement(self, state, actor_id, intent_id, observed_vessel_id, returned_to_holder):
-        self._finish_measurement(state, intent_id, observed_vessel_id, returned_to_holder)
+    def _confirm_measurement(self, state, actor_id, **data):
+        self._confirm_operation(state, self._finish_measurement, data)
 
     def _approve_calibration(self, state, actor_id, binding, standard_measurements, confirmed, reason):
         self._claimed(state)
@@ -392,6 +401,13 @@ class Workflow(ManualWorkflow):
             original = None
             if preparation['kind'] == 'sample':
                 if row['original_concentration'] is not None:
+                    total_volume = row['reported_assay_total_volume_ul']
+                    if (volume is None or total_volume is None
+                            or not math.isclose(volume, preparation['sample_volume_ul'], rel_tol=1e-9)):
+                        issues.append('dilution_basis_unverified')
+                    if (total_volume is not None and not math.isclose(
+                            total_volume, preparation['assay_total_volume_ul'], rel_tol=1e-9)):
+                        issues.append('assay_total_volume_mismatch')
                     original = {**row['original_concentration'], 'basis': 'reported'}
                 else:
                     concentration = row['tube_concentration']['value'] * preparation['assay_total_volume_ul'] / preparation['sample_volume_ul']
@@ -423,9 +439,8 @@ class Workflow(ManualWorkflow):
         if any(not measurement['valid'] for measurement in state['measurements'].values()):
             raise TaskError('Invalid completed measurement blocks result acceptance')
 
-    def report(self):
-        report = super().report()
-        state = self.state
+    def _report(self, state, trace):
+        report = super()._report(state, trace)
         report.update(clock_mode='synthetic_events/1', logical_time_s=state['logical_time_s'],
                       derived_vessels=state['derived_vessels'], preparations=state['preparations'],
                       transfers=state['transfers'], calibration=state['calibration'],

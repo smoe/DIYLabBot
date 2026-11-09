@@ -2,8 +2,8 @@
 import csv
 import io
 
-from manual_workflow import DEFAULT_STORE, ROOT, inventory_observations
-from manual_workflow_cli import output_path, work_card, session, run_cli
+from manual_workflow import inventory_observations
+from manual_workflow_cli import output_path, run_cli
 from qubit_manual import Workflow, SOURCE, calibration_binding, next_preparation
 from qubit_csv import FORMAT
 
@@ -65,7 +65,7 @@ def synthetic_report(state):
     writer.writerow(['Format', FORMAT])
     writer.writerow(['Measurement ID', 'Record Type', 'Vessel ID', 'Assay ID', 'Assay Revision',
                      'Kit Lot', 'Standard Lot', 'Instrument Serial', 'Tube Concentration', 'Tube Unit',
-                     'Original Concentration', 'Original Unit', 'Sample Volume uL', 'Warnings'])
+                     'Original Concentration', 'Original Unit', 'Sample Volume uL', 'Warnings', 'Assay Total Volume uL'])
     binding = calibration_binding(state)
     for index, measurement in enumerate(reversed(list(state['measurements'].values())), 1):
         preparation = state['preparations'][measurement['preparation_id']]
@@ -80,7 +80,7 @@ def synthetic_report(state):
                          binding['assay_id'], binding['assay_revision'], binding['kit_lot'],
                          binding['standard_lot'], binding['instrument_serial'], reported_tube, unit,
                          original * 1000 if supplied else '', 'ng/mL' if supplied else '',
-                         preparation['sample_volume_ul'], 'SYNTHETIC TEST DATA'])
+                         preparation['sample_volume_ul'], 'SYNTHETIC TEST DATA', preparation['assay_total_volume_ul']])
     return stream.getvalue().encode('utf-8')
 
 

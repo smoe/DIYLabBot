@@ -145,6 +145,8 @@ class ManualWorkflow:
     DEADLINE_FIELD = 'deadline_unix_s'
     EVENT_CLOCK = False
     PREPLAN_MEASUREMENTS = False
+    RECOVERY_COMMANDS = {'reconcile', 'cancel', 'check_deadline'}
+    CANCELLING_COMMANDS = {'reconcile', 'take', 'place', 'finish_cancel', 'check_deadline'}
 
     def __init__(self, journal, run_id, session):
         self.journal, self.run_id, self.session = journal, run_id, session
@@ -215,10 +217,13 @@ class ManualWorkflow:
             raise TaskError('Previous session is open; explicit resume and reconciliation required')
         session = uuid.uuid4().hex
         if state['resources'] or state['actor_id']:
-            state['recovery_required'] = 'session_restarted'
+            state['recovery_required'] = state['recovery_required'] or 'session_restarted'
             state['workspace_clear'] = False
         state['session'] = session
-        journal.append(run_id, revision, 'session_opened', {'explicit_resume': resume}, state)
+        payload = {'explicit_resume': resume}
+        if state['resources'] or state['actor_id']:
+            payload['additional_cause'] = 'session_restarted'
+        journal.append(run_id, revision, 'session_opened', payload, state)
         return cls(journal, run_id, session)
 
     def close(self):
@@ -254,9 +259,9 @@ class ManualWorkflow:
         allowed = set(self.STEPS) | {'take', 'reconcile', 'cancel', 'finish_cancel', 'discard_import', 'check_deadline'}
         if command not in allowed:
             raise TaskError('Unknown task command: ' + command)
-        if state['recovery_required'] and command not in {'reconcile', 'cancel', 'check_deadline', 'advance_time'}:
+        if state['recovery_required'] and command not in self.RECOVERY_COMMANDS:
             raise TaskError('Physical reconciliation required: ' + state['recovery_required'])
-        if state['status'] == 'cancelling' and command not in {'reconcile', 'take', 'place', 'finish_cancel', 'check_deadline', 'dispose_vessel', 'advance_time'}:
+        if state['status'] == 'cancelling' and command not in self.CANCELLING_COMMANDS:
             raise TaskError('Only reconciliation and return are allowed while cancelling')
         before = copy.deepcopy(state)
         payload = {**data, 'actor_id': actor_id, 'evidence': 'synthetic_input'}
@@ -278,6 +283,9 @@ class ManualWorkflow:
             return state
         if artifact is not None:
             payload['artifact_sha256'] = digest(artifact)
+        if (command == 'advance_time' and state[self.DEADLINE_FIELD] is not None
+                and self._now(state) >= state[self.DEADLINE_FIELD]):
+            payload['additional_cause'] = 'deadline_exceeded'
         self.journal.append(self.run_id, revision, command, payload, state, artifact=artifact)
         return state
 
@@ -469,12 +477,19 @@ class ManualWorkflow:
             sample['return_confirmation'] = (
                 {'actor_id': actor_id, 'evidence': 'synthetic_input', **sample['location']}
                 if sample['location'] == original_location(state, sample) else None)
+        disposal_mismatch = False
         for vessel_id, vessel in state.get('derived_vessels', {}).items():
+            confirmation = vessel['disposition_confirmation']
             vessel['location'] = locations[vessel_id]
-            vessel['disposition_confirmation'] = (
-                {'actor_id': actor_id, 'evidence': 'synthetic_input'}
-                if vessel['location']['kind'] == 'discarded' else None)
-        if self._reconcile_device(state, actor_id, **device_data) is False:
+            if vessel['location']['kind'] != 'discarded':
+                disposal_mismatch |= bool(confirmation)
+                vessel['disposition_confirmation'] = None
+        device_resolved = self._reconcile_device(state, actor_id, **device_data)
+        if disposal_mismatch:
+            state['recovery_required'] = 'disposal_observation_mismatch'
+            state['workspace_clear'] = False
+            return
+        if device_resolved is False:
             return
         state['recovery_required'] = None
         state['workspace_clear'] = workspace_clear
@@ -489,8 +504,8 @@ class ManualWorkflow:
         vessel = state.get('derived_vessels', {}).get(vessel_id)
         if not vessel or vessel_id != observed_vessel_id:
             raise ObservationError('Derived vessel disposal identity mismatch')
-        if vessel['location']['kind'] == 'discarded':
-            raise TaskError('Vessel was already discarded')
+        if vessel['disposition_confirmation']:
+            raise TaskError('Vessel disposal was already confirmed')
         vessel['location'] = {'kind': 'discarded'}
         vessel['disposition_confirmation'] = {'actor_id': actor_id, 'reason': reason,
                                              'evidence': 'synthetic_input'}
@@ -503,7 +518,7 @@ class ManualWorkflow:
         positive(following, 'resulting synthetic time')
         state['logical_time_s'] = following
         if state[self.DEADLINE_FIELD] is not None and self._now(state) >= state[self.DEADLINE_FIELD]:
-            state['recovery_required'] = 'deadline_exceeded'
+            state['recovery_required'] = state['recovery_required'] or 'deadline_exceeded'
             state['workspace_clear'] = False
 
     def _discard_import(self, state, actor_id, sha256, reason):
@@ -574,16 +589,26 @@ class ManualWorkflow:
             if len(self.journal.artifact(checksum)) != record['byte_count']:
                 raise TaskError('Artifact size mismatch: ' + checksum)
 
-    def report(self):
-        state = self.state
-        self._verify_artifacts(state)
-        restored = all(s['location'] == original_location(state, s) and s['return_confirmation']
-                       for s in state['samples'].values()) and self._pending(state) is None
+    @staticmethod
+    def report_samples(state):
         samples = copy.deepcopy(state['samples'])
         for sample in samples.values():
             sample['initial_volume_source'] = 'profile_declaration; no cross-run volume ledger'
             if sample['volume_uncertain']:
                 sample['remaining_volume_ul'] = None
+        return samples
+
+    def report(self):
+        trace = self.journal.history(self.run_id)
+        state = trace[-1]['state']
+        self._validate_format(state)
+        self._verify_artifacts(state)
+        return self._report(state, trace)
+
+    def _report(self, state, trace):
+        restored = all(s['location'] == original_location(state, s) and s['return_confirmation']
+                       for s in state['samples'].values()) and self._pending(state) is None
+        samples = self.report_samples(state)
         return {'format': self.REPORT_FORMAT,
                 'run_id': self.run_id, 'attempt_id': state['attempt_id'], 'mode': 'synthetic_only',
                 'passed': state['status'] == 'completed', 'status': state['status'],
@@ -598,4 +623,4 @@ class ManualWorkflow:
                 'real_export_validated': False, 'cf01_continuation_executed': False,
                 'evidence': 'synthetic human inputs and synthetic report files',
                 'limitations': state['definition']['protocol']['limitations'],
-                'trace': self.journal.history(self.run_id)}
+                'trace': trace}
