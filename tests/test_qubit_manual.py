@@ -511,6 +511,21 @@ class QubitTests(unittest.TestCase):
             self.reconcile(observations=observed[:-1], pending_resolution={'intent_id': pending['intent_id'], 'outcome': 'not_performed'})
         self.assertIsNotNone(self.flow.state['recovery_required'])
 
+    def test_observed_disposal_without_confirmation_cannot_enable_another_preparation(self):
+        self.claim();self.take()
+        pending=begin_preparation(self.flow,'sample','Sample01')
+        self.flow.close();self.flow=Workflow.open(self.journal,RUN_ID)
+        observations=inventory_observations(self.flow.state)
+        next(o for o in observations if o['vessel_id']==pending['vessel_id'])['location']={'kind':'discarded'}
+        self.reconcile(observations=observations,
+                       pending_resolution={'intent_id':pending['intent_id'],'outcome':'not_performed'})
+        with self.assertRaisesRegex(TaskError,'Discard'):
+            begin_preparation(self.flow,'sample','Sample01')
+        self.flow.act('dispose_vessel',ACTOR,vessel_id=pending['vessel_id'],
+                      observed_vessel_id=pending['vessel_id'],reason='Explicit synthetic disposal confirmation')
+        new=begin_preparation(self.flow,'sample','Sample01')
+        self.assertNotEqual(new['vessel_id'],pending['vessel_id'])
+
     def test_clock_mode_and_event_time_survive_restart(self):
         self.claim()
         self.flow.act('advance_time', ACTOR, seconds=1)

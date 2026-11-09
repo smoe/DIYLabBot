@@ -15,7 +15,7 @@ def main():
         from referencing import Registry, Resource
     except ImportError:
         raise SystemExit('Install the optional schema validator: python -m pip install jsonschema')
-    names = ['assembly-reference.schema.json','lab-layout.schema.json','centrifuge-cf01.robot-pickup.schema.json','room-composition.schema.json','room-geometry.schema.json','furniture-catalog.schema.json','furnishings.schema.json','synthetic-environment.schema.json','synthetic-workspace.schema.json','equipment-layout.schema.json','guided-tube-rack.schema.json','cf01-rack-batch.schema.json']
+    names = ['assembly-reference.schema.json','lab-layout.schema.json','centrifuge-cf01.robot-pickup.schema.json','room-composition.schema.json','room-geometry.schema.json','furniture-catalog.schema.json','furnishings.schema.json','synthetic-environment.schema.json','synthetic-workspace.schema.json','equipment-layout.schema.json','guided-tube-rack.schema.json','cf01-rack-batch.schema.json','synthetic-lab-workflow.schema.json']
     schemas = {}
     for name in names:
         path = ROOT/'model'/name
@@ -25,10 +25,17 @@ def main():
         schema['$id'] = path.as_uri()
         schemas[name] = schema
     registry = Registry().with_resources((schema['$id'],Resource.from_contents(schema)) for schema in schemas.values())
-    for document, name in [('lab-layout-l01.shared.json','lab-layout.schema.json'),('centrifuge-cf01.robot-pickup.shared.json','centrifuge-cf01.robot-pickup.schema.json'),('lab-room-l01.shared.json','room-composition.schema.json'),('environments/l01.geometry.json','room-geometry.schema.json'),('furniture/laboratory.catalog.json','furniture-catalog.schema.json'),('furnishings/l01.furnishings.json','furnishings.schema.json'),('environments/synthetic-unbounded.json','synthetic-environment.schema.json'),('synthetic-cf01-workspace.shared.json','synthetic-workspace.schema.json'),('furniture/reference-bench.catalog.json','furniture-catalog.schema.json'),('furnishings/cf01-reference-bench.json','furnishings.schema.json'),('equipment/cf01-workspace.json','equipment-layout.schema.json'),('guided-tube-rack.shared.json','guided-tube-rack.schema.json'),('cf01-rack-batch.protocol.json','cf01-rack-batch.schema.json')]:
+    for document, name in [('lab-layout-l01.shared.json','lab-layout.schema.json'),('centrifuge-cf01.robot-pickup.shared.json','centrifuge-cf01.robot-pickup.schema.json'),('lab-room-l01.shared.json','room-composition.schema.json'),('environments/l01.geometry.json','room-geometry.schema.json'),('furniture/laboratory.catalog.json','furniture-catalog.schema.json'),('furnishings/l01.furnishings.json','furnishings.schema.json'),('environments/synthetic-unbounded.json','synthetic-environment.schema.json'),('synthetic-cf01-workspace.shared.json','synthetic-workspace.schema.json'),('furniture/reference-bench.catalog.json','furniture-catalog.schema.json'),('furnishings/cf01-reference-bench.json','furnishings.schema.json'),('equipment/cf01-workspace.json','equipment-layout.schema.json'),('guided-tube-rack.shared.json','guided-tube-rack.schema.json'),('cf01-rack-batch.protocol.json','cf01-rack-batch.schema.json'),('synthetic-lab-workflow.shared.json','synthetic-lab-workflow.schema.json')]:
         data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
         Draft202012Validator(schemas[name],registry=registry).validate(data)
         print(document+': schema passed')
+    workflow_schema = schemas['synthetic-lab-workflow.schema.json']
+    manifest = json.loads((ROOT/'model/synthetic-lab-workflow.manifest.json').read_text())
+    manifest_schema = {'$schema':workflow_schema['$schema'], '$id':workflow_schema['$id']+'?manifest-check',
+                       '$defs':workflow_schema['$defs'], '$ref':'#/$defs/manifest'}
+    Draft202012Validator.check_schema(manifest_schema)
+    Draft202012Validator(manifest_schema,registry=registry).validate(manifest)
+    print('synthetic-lab-workflow.manifest.json: schema passed')
 
 
 if __name__ == '__main__':

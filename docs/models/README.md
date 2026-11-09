@@ -133,6 +133,14 @@ Lokaler Mock-Chargenlauf mit zwölf Proben. Alle Roboterübergaben sind abstrahi
 
 [Quelle](../../model/cf01-rack-batch.protocol.json) · [Details](../../docs/centrifuge-cf01-robot-pickup.md)
 
+### CF01 → NanoDrop → Qubit 4
+
+[![CF01 → NanoDrop → Qubit 4](images/lab-workflow.svg)](images/lab-workflow.svg)
+
+Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.
+
+[Quelle 1](../../model/synthetic-lab-workflow.shared.json) · [Quelle 2](../../model/synthetic-lab-workflow.manifest.json) · [Quelle 3](../../model/synthetic-lab-workflow.schema.json) · [Details](../../docs/synthetic-lab-workflow.md)
+
 
 
 ## Herkunft und Aktualisierung

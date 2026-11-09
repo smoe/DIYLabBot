@@ -248,6 +248,10 @@ Sämtliche SOPs, Bedienhandlungen und Messdateien sind vorerst synthetisch.
 Der [synthetische Qubit-4-Ablauf](qubit-4-manual-workflow.md) ergänzt inzwischen
 Ansatzgefäße, Transfers, Standards, eine laufbezogene Kalibrierung und explizite
 synthetische Zeit. Beide Abläufe verwenden denselben Kern und Store.
+Der [gemeinsame synthetische Gesamtlauf](synthetic-lab-workflow.md) führt zwölf
+Originalgefäße durch CF01, NanoDrop und Qubit auf einem Inventar mit dauerhaften
+Entnahmebuchungen und getrennten Stufenzuständen. Aktive CF01-Jobs werden nach
+Absturz nicht neu gestartet; ein synthetischer Abbruchabgleich ist erforderlich.
 Echte Exportqualifikation, Netzwerkadapter, ein laufübergreifendes Volumenbuch
 und eine Fortsetzung in CF01 folgen später. Das weitergehende Zielmodell steht unter
 [Manuelle Aufgaben und Messgeräte](manual-tasks.md).

@@ -68,10 +68,16 @@ def synthetic_feedback(event,sample):
 
 
 class Runner:
-    def __init__(self,data=None,transport='ros2',feedback=None):
+    def __init__(self,data=None,transport='ros2',feedback=None,clock=None,advance_clock=None,checkpoint=None):
         self.data=copy.deepcopy(data or load());validate(self.data)
         if transport not in ['ros2','sila2']:raise ValueError('Supported local contract decoding: ros2 or sila2')
-        self.transport=transport;self.feedback=feedback;self.now=0.;self.trace=[];self.token=None
+        if (clock is None)!=(advance_clock is None):raise ValueError('External clock and advance_clock must be provided together')
+        if any(callback is not None and not callable(callback) for callback in (clock,advance_clock,checkpoint)):
+            raise ValueError('Clock and checkpoint callbacks must be callable')
+        self._local_now=0.;self._clock=clock;self._advance_clock=advance_clock;self._checkpoint=checkpoint
+        self._checkpoint_failed=False;self._checkpoint_sequence=0;self._command_sequence=0
+        self._last_station=None;self._station_time=None;self._last_job=None;self._job_signature=None;self._heartbeat_count=0
+        self.transport=transport;self.feedback=feedback;self.trace=[];self.token=None
         self.capacity=len(self.data['samples']);self.pending_handoff=None
         self.current_sample=None;self.operation=None;self.failure=None
         self.stop_attempted=False;self.stop_via_contract=False
@@ -89,6 +95,54 @@ class Runner:
         self.world={'rack':self.initial[:],'rotor':[None]*self.capacity,'gripper':None}
         self.stop_error=None;self.spin_completed=False
 
+    @property
+    def now(self):
+        if self._clock is None:return self._local_now
+        try:value=self._clock()
+        except BaseException:
+            self._checkpoint_failed=True
+            raise
+        if type(value) not in (int,float) or not math.isfinite(value) or value<0:
+            raise ValueError('External clock must return finite nonnegative seconds')
+        return value
+
+    @now.setter
+    def now(self,value):
+        if self._clock is not None:raise ValueError('External clock advances only through advance_clock')
+        self._local_now=value
+
+    def _checkpoint_healthy(self):
+        if self._checkpoint_failed:raise RuntimeError('Checkpoint failure invalidated this CF01 execution')
+
+    def checkpoint_view(self):
+        """Last observed compact state; this is not a resumable simulator snapshot."""
+        return {'inventory':self.snapshot(),**self.handoff_state(),'time_s':self.now,
+                'operation':self.operation,'sample_id':self.current_sample,'spin_completed':self.spin_completed,
+                'station':copy.deepcopy(self._last_station),'station_observed_at_s':self._station_time,
+                'job':copy.deepcopy(self._last_job),'heartbeat_count':self._heartbeat_count,
+                'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,
+                'stop_error':self.stop_error,'failure':copy.deepcopy(self.failure)}
+
+    def _emit(self,kind,payload):
+        if self._checkpoint is None:return
+        self._checkpoint_healthy()
+        self._checkpoint_sequence+=1
+        try:
+            self._checkpoint(kind,copy.deepcopy({**payload,'checkpoint_sequence':self._checkpoint_sequence}),self.checkpoint_view())
+        except BaseException:
+            # A failed durable write leaves the last intent uncertain. Do not
+            # continue actions or turn the persistence failure into a device reply.
+            self._checkpoint_failed=True
+            raise
+
+    def _remember_reply(self,result):
+        if not isinstance(result,dict):return
+        if isinstance(result.get('state'),dict):
+            self._last_station=copy.deepcopy(result['state']);self._station_time=self.now
+        if 'id' in result and 'phase' in result:
+            self._last_job={key:copy.deepcopy(result[key]) for key in ('id','command','phase','error_code') if key in result}
+            self._job_signature=(result['id'],result['phase'])
+
     def snapshot(self):
         return {'rack':self.rack[:],'rotor':self.rotor[:],'gripper':self.gripper}
 
@@ -102,6 +156,7 @@ class Runner:
                 'ownership':('confirmed' if consistent and self.pending_handoff is None else 'unresolved' if self.failure is not None else 'pending')}
 
     def begin_handoff(self,event,sample):
+        self._checkpoint_healthy()
         if self.pending_handoff is not None:raise ValueError('Previous handoff remains unresolved')
         rack=self.rack_location(sample['rack_slot'])
         rotor={'kind':'rotor','instance_id':self.station_instance,'slot':sample['rotor_slot']}
@@ -110,8 +165,10 @@ class Runner:
                             'take_rotor':(rotor,gripper),'place_rack':(gripper,rack)}[event]
         self.pending_handoff={'event':event,'sample_id':sample['id'],'source':source,'destination':destination,
                               'robot_confirmation':False,'station_confirmation':False if event in ('seat_rotor','take_rotor') else None}
+        self._emit('handoff_intent',self.pending_handoff)
 
     def complete_handoff(self):
+        self._checkpoint_healthy()
         self.operation='complete_handoff'
         pending=self.pending_handoff
         if not pending or not pending['robot_confirmation'] or pending['station_confirmation'] is False:
@@ -130,29 +187,47 @@ class Runner:
         if candidate!=self.world:raise ValueError('Handoff ledger disagrees with synthetic world inventory')
         self.rack=candidate['rack'];self.rotor=candidate['rotor'];self.gripper=candidate['gripper']
         self.pending_handoff=None
+        self._emit('handoff_completed',pending)
 
     def record(self,stage,**details):
         if 'rack_slot' in details:
             details.update(rack_place_id=self.rack_places[details['rack_slot']-1]['id'],
                            rack_instance=self.rack_instance,place_id=self.rack_location(details['rack_slot'])['place_id'])
+        station=protocol.state_si(self.sim.execute('status'))
+        self._last_station=copy.deepcopy(station);self._station_time=self.now
         self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':stage,**details,
-                           'inventory':self.snapshot(),**self.handoff_state(),'station':protocol.state_si(self.sim.execute('status'))})
+                           'inventory':self.snapshot(),**self.handoff_state(),'station':station})
+        if stage!='heartbeat':self._emit('state_observed',{'stage':stage,**details})
 
     def command(self,name,**args):
+        self._checkpoint_healthy()
         self.operation=name
+        self._command_sequence+=1;sequence=self._command_sequence
         contract=next(c for c in self.bridge.contract['commands'] if c['id']==name)
         fields=dict(args)
         if name not in protocol.PUBLIC:fields['control_token']=self.token
         fields={protocol.wire(self.transport,k):v for k,v in fields.items()}
-        if name=='stop':self.stop_attempted=True
+        intent={'command':name,'command_sequence':sequence,'arguments':args,'transport':self.transport}
+        # Successful heartbeat detail is coalesced into the next compact view.
+        # The enclosing observable command intent and external clock advances
+        # remain durable; a failed heartbeat is always reported below.
+        if name!='heartbeat':self._emit('command_intent',intent)
+        if name=='stop':
+            self._emit('stop_requested',intent)
+            self.stop_attempted=True
         submitted_at=self.now
         result=self.bridge.dispatch(self.transport,name if self.transport=='ros2' else contract['name'],fields)
+        self._remember_reply(result)
+        if name!='heartbeat' or not isinstance(result,dict) or result.get('success') is not True:
+            self._emit('command_reply',{'command':name,'command_sequence':sequence,'response':result})
+        else:self._heartbeat_count+=1
         station_handoff=self.pending_handoff and self.pending_handoff['event']=={'confirm_seated':'seat_rotor','confirm_removed':'take_rotor'}.get(name)
         if station_handoff and (not isinstance(result,dict) or result.get('success') is not True):
             raise ValueError('Station acknowledgement missing or rejected during '+name)
         if name=='stop':
             if not isinstance(result,dict) or result.get('success') is not True:raise ValueError('Stop acknowledgement missing')
             self.stop_via_contract=True
+            self._emit('stop_accepted',{'command_sequence':sequence,'response':result})
         if contract['observable']:
             result=self.wait_observable(name,result,submitted_at)
         elif not isinstance(result,dict) or result.get('success') is not True:
@@ -163,6 +238,7 @@ class Runner:
         if station_handoff:
             self.pending_handoff['station_confirmation']=True
         if name!='start':self.record(name,contract=self.transport,job_phase=result.get('phase'),command_state='submitted' if name=='stop' else 'completed')
+        if name not in ('heartbeat','stop'):self._emit('command_completed',{'command':name,'command_sequence':sequence,'response':result})
         return result
 
     def wait_observable(self,name,result,submitted_at):
@@ -217,7 +293,7 @@ class Runner:
     def observe(self,event,sample=None,fields=()):
         # Independent fixture inventory uses the ACTUAL indexed slot, not the
         # requested sample ID. This is still synthetic, not physical identification.
-        self.operation=event
+        self._checkpoint_healthy();self.operation=event
         if event in ('pick_rack','seat_rotor','take_rotor','place_rack'):self.begin_handoff(event,sample)
         actual=None
         if sample:
@@ -238,6 +314,7 @@ class Runner:
                 if self.world['rack'][sample['rack_slot']-1] is not None:raise ValueError('Synthetic world rack slot occupied')
                 self.world['rack'][sample['rack_slot']-1]=actual;self.world['gripper']=None
             if event in ('pick_rack','seat_rotor','take_rotor','place_rack'):self.pending_handoff['robot_confirmation']=True
+        self._emit('robot_observed',{'event':event,'sample_id':sample['id'] if sample else None,'feedback':data})
         return data
 
     def clear(self,sample):
@@ -245,14 +322,32 @@ class Runner:
         self.record('robot_clear',sample_id=sample['id'])
 
     def poll(self,job_id):
+        self._checkpoint_healthy()
         self.operation='poll'
-        return self.bridge.poll(job_id)
+        result=self.bridge.poll(job_id);previous=self._job_signature
+        self._remember_reply(result)
+        valid=(isinstance(result,dict) and isinstance(result.get('id'),str)
+               and result.get('phase') in ('running','braking','succeeded','failed','canceled','stopping'))
+        if not valid or self._job_signature!=previous:
+            self._emit('job_observed',{'job_id':job_id,'response':result})
+        return result
 
     def advance(self,seconds):
+        self._checkpoint_healthy()
         target=self.now+seconds
         interval=min(1.,self.sim.spec['handling']['owner_timeout_s']/2)
         while self.now<target:
-            self.now=min(target,self.now+interval)
+            before=self.now;following=min(target,before+interval)
+            if self._advance_clock is None:self.now=following
+            else:
+                try:self._advance_clock(following-before)
+                except BaseException:
+                    self._checkpoint_failed=True
+                    raise
+                actual=self.now
+                if actual<=before or not math.isclose(actual-before,following-before,rel_tol=1e-12,abs_tol=1e-9):
+                    self._checkpoint_failed=True
+                    raise ValueError('External clock did not advance by the requested duration')
             self.command('heartbeat')
 
     def report(self,passed,error=None):
@@ -274,6 +369,7 @@ class Runner:
                 'limitations':self.data['limitations']}
 
     def run(self):
+        self._checkpoint_healthy()
         try:
             self.observe('rack_ready',None,('rack_present',))
             self.record('rack_ready',external_delivery=True)
@@ -315,13 +411,18 @@ class Runner:
             self.command('release');self.record('complete')
             return self.report(True)
         except Exception as error:
+            if self._checkpoint_failed:raise
             self.failure={'operation':self.operation,'sample_id':self.current_sample,
                           'error_type':type(error).__name__,'error_code':getattr(error,'code',None),
                           'station_fault':self.sim.fault}
+            self._emit('failed',{'reason':str(error),**self.failure})
             # Preserve the failure report even if the stop or status channel fails.
             try:self.command('stop')
-            except Exception as stop_error:self.stop_error=str(stop_error)
+            except Exception as stop_error:
+                if self._checkpoint_failed:raise
+                self.stop_error=str(stop_error)
             try:self.record('failed',reason=str(error),**self.failure)
             except Exception:
+                if self._checkpoint_failed:raise
                 self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':'failed','reason':str(error),**self.failure,'inventory':self.snapshot(),**self.handoff_state(),'station':None})
             raise BatchError(str(error),self.report(False,str(error))) from error

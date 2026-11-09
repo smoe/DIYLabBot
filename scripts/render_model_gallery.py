@@ -146,6 +146,32 @@ def svg_document(title,content,width=1150,height=850):
 
 def diagram(entry):
     view=entry['render']['view'];text=lambda x,y,t,size=20:f'<text x="{x}" y="{y}" font-size="{size}">{html.escape(str(t))}</text>'
+    if view=='integrated_workflow':
+        from lab_workflow_sources import load
+        definition=load();samples=definition['manifest']['samples'];count=len(samples)
+        nd=definition['stages']['nanodrop']['profile']['parameters']['sample_volume_ul']
+        qb=definition['stages']['qubit']['profile']['parameters']['sample_volume_ul']
+        initial=next(s['initial_volume_ul'] for s in samples if s['initial_volume_ul'] is not None)
+        number=lambda value:('%g'%value).replace('.',',')
+        content=text(45,60,'CF01 → NanoDrop → Qubit 4',32)
+        content+=text(45,105,'Schematischer Ablaufplan · ein Bestand · synthetische Eingaben',22)
+        labels=[(str(count)+' Originale','Manifest / Rackplätze'),('CF01','beladen / Spin / zurück'),
+                ('NanoDrop','Entnahme / Ergebnis'),('Qubit 4','Ansatz / Messung'),('Gesamtfreigabe','Rückgabe / Entsorgung')]
+        for i,(title,caption) in enumerate(labels):
+            x=35+i*222
+            content+=f'<rect x="{x}" y="175" width="200" height="130" rx="12" fill="#d9e6ed" stroke="#496d83"/>'
+            content+=text(x+12,215,title,22)+text(x+12,260,caption,14)
+            if i<4:content+=text(x+202,250,'→',25)
+        content+=text(45,385,'Eine Probe · ein Originalgefäß · derselbe Ursprungsplatz',25)
+        content+=text(45,455,'Originalbestand: '+number(initial)+' µl → '+number(initial-nd)+' µl → '+number(initial-nd-qb)+' µl',26)
+        content+=text(45,500,'Geplanter Beispielsaldo; unbekannte Anfangsmengen bleiben unbekannt.',20)
+        standards=len(definition['stages']['qubit']['protocol']['assay']['standards'])
+        content+=text(45,565,'Qubit: '+str(standards)+' Standards und '+str(count)+' serielle Probenansätze.',22)
+        content+=text(45,610,'Ansatzgefäße besitzen eigene IDs und werden ausdrücklich entsorgt.',20)
+        content+=text(45,710,'Quelle und Ablaufplan sind kein Mess- oder Funktionsnachweis.',22)
+        content+=text(45,755,'Keine Netzwerk-, Hardware- oder Roboterbahnausführung.',20)
+        return svg_document(entry['title'],content),{'representation':'Source-derived synthetic workflow plan; not execution evidence',
+            'workflow_executed':False,'original_vessels':count,'network_executed':False,'hardware_executed':False}
     if view=='unbounded':
         import synthetic_workspace as workspace
         env=workspace.load()['environment'];assert env['extent']=='unbounded' and env['geometry']=='none'

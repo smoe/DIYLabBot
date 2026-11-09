@@ -1,0 +1,122 @@
+{
+  "format": "solidcraftbot.synthetic-lab-workflow/1",
+  "id": "SYN.CF01.NanoDrop.Qubit4",
+  "mode": "synthetic_only",
+  "units": {
+    "volume": "uL",
+    "mass": "g",
+    "time": "s"
+  },
+  "clock_mode": "synthetic_events/1",
+  "task_deadline_s": 10000,
+  "manifest": {
+    "source": "model/synthetic-lab-workflow.manifest.json",
+    "source_sha256": "d14c0b5985d1049278f77ca46ace1246e98fe03ebd7b9aed2fc3bc03330eca4b"
+  },
+  "workspace": {
+    "source": "model/synthetic-cf01-workspace.shared.json",
+    "source_sha256": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e"
+  },
+  "bindings": {
+    "rack_instance": "Rack",
+    "arm_instance": "Arm",
+    "station_instance": "CF01",
+    "work_area": {
+      "id": "SYN.NanoDrop.WorkArea",
+      "frame": "SYN.Bench.Worktop"
+    }
+  },
+  "stage_order": [
+    "cf01",
+    "nanodrop",
+    "qubit"
+  ],
+  "stage_profiles": {
+    "cf01": {
+      "source": "model/cf01-rack-batch.protocol.json",
+      "source_sha256": "e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0"
+    },
+    "nanodrop": {
+      "source": "model/nanodrop-manual.synthetic.json",
+      "source_sha256": "e98579a7c04096b072284fe3a3fb8b5774f196ac56acc27abd54878381fa64ad"
+    },
+    "qubit": {
+      "source": "model/qubit-4-manual.synthetic.json",
+      "source_sha256": "2ed5735251c032631247db698f3f377b416526182ffe103f49be5cb05ed7c795"
+    }
+  },
+  "qubit_place_roles": [
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P01",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P02",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P03",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P04",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P05",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P06",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P07",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P08",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P09",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P10",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P11",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit.TubeHolder",
+      "place_id": "P12",
+      "role": "holder_slot"
+    },
+    {
+      "holder_id": "SYN.Qubit401",
+      "place_id": "Chamber",
+      "role": "measurement_chamber"
+    }
+  ],
+  "limitations": [
+    "All SOPs, measurements, quantities, masses, qualification values and times are synthetic test inputs",
+    "One shared logical work area on the existing reference bench; NanoDrop and Qubit have no generated CAD positions",
+    "Twelve original vessels follow CF01 then NanoDrop then serial Qubit preparations; no network, hardware or full robot-path qualification",
+    "Mass confirmations are runtime evidence tied to vessel content revisions, never derived from liquid volume",
+    "Continuous accounting covers one root workflow; independent subsequent workflows require an explicit stock-continuation contract"
+  ]
+}

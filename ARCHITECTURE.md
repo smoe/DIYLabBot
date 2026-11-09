@@ -314,6 +314,63 @@ ungültige Messungen oder nicht bestätigte Entsorgung verhindern die Freigabe.
 Ein neues Laufprofil deklariert eigene Anfangsmengen; ein laufübergreifendes
 Volumenbuch und echte Kalibrierkurven sind nicht implementiert.
 
+### Integrierter synthetischer Gesamtlauf
+
+Der [gemeinsame Ablauf](docs/synthetic-lab-workflow.md) verbindet zwölf Originale
+in der festen Folge CF01 → NanoDrop → Qubit 4. Führend ist das Manifest
+`model/synthetic-lab-workflow.manifest.json`; die Komposition und ihr Schema
+binden Aufstellung, Geräteprotokolle, Parameter, Uhrmodus und Platzrollen.
+Die alten drei beziehungsweise zwölf Proben umfassenden Einzeldemos sind
+unabhängige Fixtures, keine zusätzlich zu synchronisierenden Bestände.
+
+Ein Rootzustand enthält Inventar, Buchungen, Massenbestätigungen, Reservierungen
+und die ereignisgesteuerte Prozesszeit. Unter `stages[stage_id]` stehen getrennte
+Gerätezustände mit Messungen, Importen, Bewertungen, Akteuren und Fristen.
+`scripts/lab_workflow_stages.py` bindet die gemeinsamen Geräteoperationen über
+ausdrückliche Ansichten an Root und Stufe. Alte Laufartprüfungen werden nicht
+durch Umschreiben von Formaten umgangen. Die Restmenge ist eine Projektion aus
+Anfangsmenge und eindeutig zugeordneten bestätigten Entnahmen. Unsichere
+Durchführungen bleiben gesperrt; die geplante Entnahme ist keine Obergrenze.
+
+Der Gesamtlauf verwendet die bestehende Rackinstanz `Rack` und lokale Plätze
+wie `Slot01`. Historische geometrische IDs bleiben abgeleitete Referenzen.
+Die gemeinsame Bankfläche wird über `SYN.Bench.Worktop` gebunden; der logische
+Arbeitsbereich bleibt `SYN.NanoDrop.WorkArea`. Daraus entsteht kein zusätzlicher
+Racktransport. NanoDrop und Qubit besitzen weiterhin logische Gerätebindungen
+ohne neue CAD-Positionen. Der Root hält Rack, Gefäße und Arbeitsfläche über die
+Gerätewechsel; Station, Arm und Messgeräte sind zusätzliche Stufenressourcen.
+Ort, Akteursverantwortung und Ressourcenbesitz sind getrennte Informationen.
+
+Neue synthetische Massenbestätigungen sind an Gefäß und Inhaltsrevision gebunden.
+Entnahmeabsichten und Verbrauch entwerten sie; CF01 bekommt nur aktuelle Werte.
+Qubit verarbeitet zwölf Proben seriell, sodass Halterplätze nach bestätigter
+Entsorgung wiederverwendbar sind. Die Messkammer ist kein Vorbereitungsplatz.
+NanoDrop-Blank und Qubit-Kalibrierung bleiben gerätespezifische Voraussetzungen;
+der Kalibrierungsbezug ist weiterhin `workflow_record`.
+
+Der CF01-Runner verwendet dieselbe Ausführung mit optionalen synchronen
+Checkpoint- und Uhr-Callbacks. Absicht, rohe Antwort, Roboterbeobachtung und
+vollständige Übergabe werden getrennt gespeichert. Wiederholte Heartbeatdetails
+werden gezählt; der vollständige CF01-Bericht liegt einmal als Originalartefakt
+vor. Rootzustände enthalten die letzte kompakte Ansicht, keine wiederholte
+vollständige CF01-Trace. Bei Speicherfehlern wird nicht normal weitergearbeitet.
+Der Journal-Präfixpfad vergleicht aktuellen Datenbank-Tail und Revision unter
+derselben Schreibtransaktion; Öffnen, Bericht und Endabschluss prüfen die
+gesamte Kette. Auch die Artefakte früherer Stufen werden beim Abschluss geprüft.
+
+Nach Neustart innerhalb CF01 bleibt der Versuch gehalten; ein neuer Simulator
+ist keine Wiederaufnahme. Die erste Fassung setzt aktive Mock-Jobs nicht fort.
+Ein vollständiger Abbruchabgleich bestätigt alle Gefäße, Rotorplätze, Greifer,
+Stillstand, Parkbremse, geparkten Heber und freien Arbeitsbereich ausdrücklich
+als `synthetic_operator_confirmation`. Der alte Versuch wird mit seinen offenen
+Quittungen stillgelegt, nicht nachträglich erfolgreich gemacht. An bestätigten
+Stufengrenzen ist die manuelle Fortsetzung nach Abgleich möglich.
+
+Die Runtime liegt im bisherigen gemeinsamen SQLite-Store unter `exports/`.
+Unabhängige Gesamtläufe übernehmen Bestände nicht automatisch. Reagenzvorräte,
+Netzwerkadapter, Hardware, echte Exporte, neue Geometrie, Roboterbahnen und
+qualifizierte Schutzfunktionen sind damit nicht implementiert oder nachgewiesen.
+
 ## Nächste Schritte
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden

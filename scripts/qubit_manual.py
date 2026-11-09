@@ -5,7 +5,7 @@ import math
 import uuid
 
 from manual_tasks import TaskError, digest
-from manual_workflow import (ROOT, ManualWorkflow, ObservationError, compile_profile,
+from manual_workflow import (ROOT, ManualWorkflow, ManualOperations, ObservationError, compile_profile,
                              keys, positive, text, inventory_observations)
 from qubit_csv import FORMAT, parse_report
 
@@ -84,18 +84,7 @@ def next_preparation(state):
     return state['run_id'] + '.A01.P%04d' % (len(state['preparations']) + 1)
 
 
-class Workflow(ManualWorkflow):
-    STATE_FORMAT = 'solidcraftbot.qubit-manual-state/1'
-    REPORT_FORMAT = 'solidcraftbot.qubit-manual-report/1'
-    STEPS = STEPS
-    SOURCE = SOURCE
-    RUN_PREFIX = 'SYN-QB-'
-    DEADLINE_FIELD = 'deadline_s'
-    RECOVERY_COMMANDS = ManualWorkflow.RECOVERY_COMMANDS | {'advance_time'}
-    CANCELLING_COMMANDS = ManualWorkflow.CANCELLING_COMMANDS | {'dispose_vessel', 'advance_time'}
-    EVENT_CLOCK = True
-    load_profile = staticmethod(load_profile)
-
+class QubitOperations(ManualOperations):
     @staticmethod
     def _initial_extra(run_id, definition):
         return {'logical_time_s': 0.0, 'derived_vessels': {}, 'preparations': {},
@@ -132,7 +121,8 @@ class Workflow(ManualWorkflow):
         if previous:
             if previous['status'] != 'not_performed':
                 raise TaskError('A completed preparation cannot be repeated in this run')
-            if state['derived_vessels'][previous['vessel_id']]['location']['kind'] != 'discarded':
+            if (state['derived_vessels'][previous['vessel_id']]['location']['kind'] != 'discarded'
+                    or not state['derived_vessels'][previous['vessel_id']]['disposition_confirmation']):
                 raise TaskError('Discard the previous unused tube before a new preparation attempt')
         preparation_id = next_preparation(state)
         expected_vessel = preparation_id + '.Tube'
@@ -447,3 +437,16 @@ class Workflow(ManualWorkflow):
                       calibration_curve_computed=False, cross_run_volume_ledger=False,
                       external_device_recalibration_detectable=False)
         return report
+
+
+class Workflow(QubitOperations, ManualWorkflow):
+    STATE_FORMAT = 'solidcraftbot.qubit-manual-state/1'
+    REPORT_FORMAT = 'solidcraftbot.qubit-manual-report/1'
+    STEPS = STEPS
+    SOURCE = SOURCE
+    RUN_PREFIX = 'SYN-QB-'
+    DEADLINE_FIELD = 'deadline_s'
+    RECOVERY_COMMANDS = ManualWorkflow.RECOVERY_COMMANDS | {'advance_time'}
+    CANCELLING_COMMANDS = ManualWorkflow.CANCELLING_COMMANDS | {'dispose_vessel', 'advance_time'}
+    EVENT_CLOCK = True
+    load_profile = staticmethod(load_profile)

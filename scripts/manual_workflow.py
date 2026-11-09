@@ -138,157 +138,7 @@ def compile_profile(source, profile_format, runtime_sources, extra_fields=()):
             'effective_profile_sha256': digest(encoded(profile).encode())}
 
 
-class ManualWorkflow:
-    STATE_FORMAT = None
-    REPORT_FORMAT = None
-    STEPS = ()
-    DEADLINE_FIELD = 'deadline_unix_s'
-    EVENT_CLOCK = False
-    PREPLAN_MEASUREMENTS = False
-    RECOVERY_COMMANDS = {'reconcile', 'cancel', 'check_deadline'}
-    CANCELLING_COMMANDS = {'reconcile', 'take', 'place', 'finish_cancel', 'check_deadline'}
-
-    def __init__(self, journal, run_id, session):
-        self.journal, self.run_id, self.session = journal, run_id, session
-        self._validate_format(journal.state(run_id)[0])
-
-    @classmethod
-    def _validate_format(cls, state):
-        if state.get('format') != cls.STATE_FORMAT:
-            raise TaskError('Wrong workflow format; expected ' + str(cls.STATE_FORMAT))
-
-    @classmethod
-    def create(cls, journal, source=None, run_id=None):
-        definition = cls.load_profile(cls.SOURCE if source is None else source)
-        definition['clock_mode'] = 'synthetic_events/1' if cls.EVENT_CLOCK else journal.clock_mode
-        run_id = run_id or cls.RUN_PREFIX + uuid.uuid4().hex[:12]
-        if not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', run_id):
-            raise TaskError('Run id must contain 1-64 ASCII letters, digits, dots, hyphens or underscores')
-        session = uuid.uuid4().hex
-        state = {'format': cls.STATE_FORMAT, 'run_id': run_id, 'attempt_id': run_id + '.A01',
-                 'definition': definition, 'status': 'created', 'session': session,
-                 'actor_id': None, 'resources': [], 'rack_ready': False, 'workspace_clear': False,
-                 'recovery_required': None, cls.DEADLINE_FIELD: None, 'samples': {},
-                 'planned_measurements': {}, 'measurements': {}, 'results': {},
-                 'imports': {}, 'result_review': None, **cls._initial_extra(run_id, definition)}
-        for index, sample in enumerate(sorted(definition['profile']['samples'], key=lambda s: s['rack_slot']), 1):
-            value = {**sample, 'original_place_id': definition['places'][sample['rack_slot'] - 1]['id'],
-                     'remaining_volume_ul': sample['initial_volume_ul'], 'volume_uncertain': False,
-                     'mass_confirmation_valid': False, 'return_confirmation': None}
-            value['location'] = original_location(state, value)
-            state['samples'][sample['id']] = value
-            if cls.PREPLAN_MEASUREMENTS:
-                state['planned_measurements'][sample['id']] = run_id + '.A01.M%03d' % index
-        journal.create(run_id, state)
-        return cls(journal, run_id, session)
-
-    @staticmethod
-    def _initial_extra(run_id, definition):
-        return {}
-
-    def _now(self, state):
-        return state['logical_time_s'] if self.EVENT_CLOCK else self.journal.clock()
-
-    def _pending(self, state):
-        return state.get('pending_measurement')
-
-    @classmethod
-    def _clock_matches(cls, journal, state, clock_mode=None):
-        expected = 'synthetic_events/1' if cls.EVENT_CLOCK else journal.clock_mode
-        stored = state['definition'].get('clock_mode', expected)
-        if stored != expected or (clock_mode is not None and clock_mode != expected):
-            raise TaskError('Clock mode mismatch: ' + stored + ' versus ' + str(clock_mode or expected))
-
-    @classmethod
-    def open(cls, journal, run_id, resume=False, clock_mode=None):
-        state, revision = journal.state(run_id)
-        cls._validate_format(state)
-        cls._clock_matches(journal, state, clock_mode)
-        if state['status'] in TERMINAL:
-            return cls(journal, run_id, None)
-        runtime = state['definition'].get('runtime_source_files')
-        if not runtime:
-            raise TaskError('Runtime source manifest missing; inspect the pinned run before migration')
-        for file in runtime:
-            path = (ROOT / file).resolve()
-            if not path.is_relative_to(ROOT) or digest(path.read_bytes()) != state['definition']['source_files_sha256'].get(file):
-                raise TaskError('Runtime source changed; inspect the pinned run before migration: ' + file)
-        if state['session'] and not resume:
-            raise TaskError('Previous session is open; explicit resume and reconciliation required')
-        session = uuid.uuid4().hex
-        if state['resources'] or state['actor_id']:
-            state['recovery_required'] = state['recovery_required'] or 'session_restarted'
-            state['workspace_clear'] = False
-        state['session'] = session
-        payload = {'explicit_resume': resume}
-        if state['resources'] or state['actor_id']:
-            payload['additional_cause'] = 'session_restarted'
-        journal.append(run_id, revision, 'session_opened', payload, state)
-        return cls(journal, run_id, session)
-
-    def close(self):
-        state, revision = self.journal.state(self.run_id)
-        if state['session'] == self.session and self.session is not None:
-            state['session'] = None
-            self.journal.append(self.run_id, revision, 'session_closed', {}, state)
-        self.session = None
-
-    @property
-    def state(self):
-        state = self.journal.state(self.run_id)[0]
-        self._validate_format(state)
-        return state
-
-    def act(self, command, actor_id, artifact=None, **data):
-        text(actor_id, 'synthetic actor id')
-        state, revision = self.journal.state(self.run_id)
-        self._validate_format(state)
-        self._clock_matches(self.journal, state)
-        if state['status'] in TERMINAL:
-            raise TaskError('Run is terminal')
-        if self.session is None or state['session'] != self.session:
-            raise TaskError('Stale task session; reload and reconcile')
-        if state['actor_id'] is not None and state['actor_id'] != actor_id:
-            raise TaskError('Task is held by another synthetic actor')
-        if (state[self.DEADLINE_FIELD] is not None and self._now(state) >= state[self.DEADLINE_FIELD]
-                and not state['recovery_required']):
-            state['recovery_required'] = 'deadline_exceeded'
-            state['workspace_clear'] = False
-            self.journal.append(self.run_id, revision, 'deadline_exceeded', {}, state)
-            revision += 1
-        allowed = set(self.STEPS) | {'take', 'reconcile', 'cancel', 'finish_cancel', 'discard_import', 'check_deadline'}
-        if command not in allowed:
-            raise TaskError('Unknown task command: ' + command)
-        if state['recovery_required'] and command not in self.RECOVERY_COMMANDS:
-            raise TaskError('Physical reconciliation required: ' + state['recovery_required'])
-        if state['status'] == 'cancelling' and command not in self.CANCELLING_COMMANDS:
-            raise TaskError('Only reconciliation and return are allowed while cancelling')
-        before = copy.deepcopy(state)
-        payload = {**data, 'actor_id': actor_id, 'evidence': 'synthetic_input'}
-        handler = getattr(self, '_' + command)
-        arguments = {'artifact': artifact, **data} if command == 'import_results' else {'actor_id': actor_id, **data}
-        try:
-            inspect.signature(handler).bind(state, **arguments)
-        except TypeError as error:
-            raise TaskError('Invalid arguments for ' + command + ': ' + str(error)) from error
-        try:
-            changed = handler(state, **arguments)
-        except ObservationError as error:
-            before['recovery_required'] = 'observation_mismatch'
-            before['workspace_clear'] = False
-            self.journal.append(self.run_id, revision, 'observation_rejected',
-                                {**payload, 'command': command, 'error': str(error)}, before)
-            raise
-        if changed is False:
-            return state
-        if artifact is not None:
-            payload['artifact_sha256'] = digest(artifact)
-        if (command == 'advance_time' and state[self.DEADLINE_FIELD] is not None
-                and self._now(state) >= state[self.DEADLINE_FIELD]):
-            payload['additional_cause'] = 'deadline_exceeded'
-        self.journal.append(self.run_id, revision, command, payload, state, artifact=artifact)
-        return state
-
+class ManualOperations:
     @staticmethod
     def _claimed(state):
         if state['actor_id'] is None:
@@ -562,7 +412,7 @@ class ManualWorkflow:
             raise TaskError('Quarantined imports block completion')
         self._verify_artifacts(state)
         self._scientific_ready(state)
-        state.update(status='completed', workspace_clear=True, resources=[], session=None)
+        self._finish_lifecycle(state, 'completed')
 
     def _cancel(self, state, actor_id, reason):
         text(reason, 'cancellation reason')
@@ -578,7 +428,11 @@ class ManualWorkflow:
             raise TaskError('No cancellation pending')
         self._require(workspace_clear, 'Cancellation handback clearance missing')
         self._restored(state)
-        state.update(status='cancelled', workspace_clear=True, resources=[], session=None)
+        self._finish_lifecycle(state, 'cancelled')
+
+    @staticmethod
+    def _finish_lifecycle(state, status):
+        state.update(status=status, workspace_clear=True, resources=[], session=None)
 
     @staticmethod
     def _check_deadline(state, actor_id):
@@ -588,6 +442,158 @@ class ManualWorkflow:
         for checksum, record in state['imports'].items():
             if len(self.journal.artifact(checksum)) != record['byte_count']:
                 raise TaskError('Artifact size mismatch: ' + checksum)
+
+
+class ManualWorkflow(ManualOperations):
+    STATE_FORMAT = None
+    REPORT_FORMAT = None
+    STEPS = ()
+    DEADLINE_FIELD = 'deadline_unix_s'
+    EVENT_CLOCK = False
+    PREPLAN_MEASUREMENTS = False
+    RECOVERY_COMMANDS = {'reconcile', 'cancel', 'check_deadline'}
+    CANCELLING_COMMANDS = {'reconcile', 'take', 'place', 'finish_cancel', 'check_deadline'}
+
+    def __init__(self, journal, run_id, session):
+        self.journal, self.run_id, self.session = journal, run_id, session
+        self._validate_format(journal.state(run_id)[0])
+
+    @classmethod
+    def _validate_format(cls, state):
+        if state.get('format') != cls.STATE_FORMAT:
+            raise TaskError('Wrong workflow format; expected ' + str(cls.STATE_FORMAT))
+
+    @classmethod
+    def create(cls, journal, source=None, run_id=None):
+        definition = cls.load_profile(cls.SOURCE if source is None else source)
+        definition['clock_mode'] = 'synthetic_events/1' if cls.EVENT_CLOCK else journal.clock_mode
+        run_id = run_id or cls.RUN_PREFIX + uuid.uuid4().hex[:12]
+        if not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', run_id):
+            raise TaskError('Run id must contain 1-64 ASCII letters, digits, dots, hyphens or underscores')
+        session = uuid.uuid4().hex
+        state = {'format': cls.STATE_FORMAT, 'run_id': run_id, 'attempt_id': run_id + '.A01',
+                 'definition': definition, 'status': 'created', 'session': session,
+                 'actor_id': None, 'resources': [], 'rack_ready': False, 'workspace_clear': False,
+                 'recovery_required': None, cls.DEADLINE_FIELD: None, 'samples': {},
+                 'planned_measurements': {}, 'measurements': {}, 'results': {},
+                 'imports': {}, 'result_review': None, **cls._initial_extra(run_id, definition)}
+        for index, sample in enumerate(sorted(definition['profile']['samples'], key=lambda s: s['rack_slot']), 1):
+            value = {**sample, 'original_place_id': definition['places'][sample['rack_slot'] - 1]['id'],
+                     'remaining_volume_ul': sample['initial_volume_ul'], 'volume_uncertain': False,
+                     'mass_confirmation_valid': False, 'return_confirmation': None}
+            value['location'] = original_location(state, value)
+            state['samples'][sample['id']] = value
+            if cls.PREPLAN_MEASUREMENTS:
+                state['planned_measurements'][sample['id']] = run_id + '.A01.M%03d' % index
+        journal.create(run_id, state)
+        return cls(journal, run_id, session)
+
+    @staticmethod
+    def _initial_extra(run_id, definition):
+        return {}
+
+    def _now(self, state):
+        return state['logical_time_s'] if self.EVENT_CLOCK else self.journal.clock()
+
+    def _pending(self, state):
+        return state.get('pending_measurement')
+
+    @classmethod
+    def _clock_matches(cls, journal, state, clock_mode=None):
+        expected = 'synthetic_events/1' if cls.EVENT_CLOCK else journal.clock_mode
+        stored = state['definition'].get('clock_mode', expected)
+        if stored != expected or (clock_mode is not None and clock_mode != expected):
+            raise TaskError('Clock mode mismatch: ' + stored + ' versus ' + str(clock_mode or expected))
+
+    @classmethod
+    def open(cls, journal, run_id, resume=False, clock_mode=None):
+        state, revision = journal.state(run_id)
+        cls._validate_format(state)
+        cls._clock_matches(journal, state, clock_mode)
+        if state['status'] in TERMINAL:
+            return cls(journal, run_id, None)
+        runtime = state['definition'].get('runtime_source_files')
+        if not runtime:
+            raise TaskError('Runtime source manifest missing; inspect the pinned run before migration')
+        for file in runtime:
+            path = (ROOT / file).resolve()
+            if not path.is_relative_to(ROOT) or digest(path.read_bytes()) != state['definition']['source_files_sha256'].get(file):
+                raise TaskError('Runtime source changed; inspect the pinned run before migration: ' + file)
+        if state['session'] and not resume:
+            raise TaskError('Previous session is open; explicit resume and reconciliation required')
+        session = uuid.uuid4().hex
+        if state['resources'] or state['actor_id']:
+            state['recovery_required'] = state['recovery_required'] or 'session_restarted'
+            state['workspace_clear'] = False
+        state['session'] = session
+        payload = {'explicit_resume': resume}
+        if state['resources'] or state['actor_id']:
+            payload['additional_cause'] = 'session_restarted'
+        journal.append(run_id, revision, 'session_opened', payload, state)
+        return cls(journal, run_id, session)
+
+    def close(self):
+        state, revision = self.journal.state(self.run_id)
+        if state['session'] == self.session and self.session is not None:
+            state['session'] = None
+            self.journal.append(self.run_id, revision, 'session_closed', {}, state)
+        self.session = None
+
+    @property
+    def state(self):
+        state = self.journal.state(self.run_id)[0]
+        self._validate_format(state)
+        return state
+
+    def act(self, command, actor_id, artifact=None, **data):
+        text(actor_id, 'synthetic actor id')
+        state, revision = self.journal.state(self.run_id)
+        self._validate_format(state)
+        self._clock_matches(self.journal, state)
+        if state['status'] in TERMINAL:
+            raise TaskError('Run is terminal')
+        if self.session is None or state['session'] != self.session:
+            raise TaskError('Stale task session; reload and reconcile')
+        if state['actor_id'] is not None and state['actor_id'] != actor_id:
+            raise TaskError('Task is held by another synthetic actor')
+        if (state[self.DEADLINE_FIELD] is not None and self._now(state) >= state[self.DEADLINE_FIELD]
+                and not state['recovery_required']):
+            state['recovery_required'] = 'deadline_exceeded'
+            state['workspace_clear'] = False
+            self.journal.append(self.run_id, revision, 'deadline_exceeded', {}, state)
+            revision += 1
+        allowed = set(self.STEPS) | {'take', 'reconcile', 'cancel', 'finish_cancel', 'discard_import', 'check_deadline'}
+        if command not in allowed:
+            raise TaskError('Unknown task command: ' + command)
+        if state['recovery_required'] and command not in self.RECOVERY_COMMANDS:
+            raise TaskError('Physical reconciliation required: ' + state['recovery_required'])
+        if state['status'] == 'cancelling' and command not in self.CANCELLING_COMMANDS:
+            raise TaskError('Only reconciliation and return are allowed while cancelling')
+        before = copy.deepcopy(state)
+        payload = {**data, 'actor_id': actor_id, 'evidence': 'synthetic_input'}
+        handler = getattr(self, '_' + command)
+        arguments = {'artifact': artifact, **data} if command == 'import_results' else {'actor_id': actor_id, **data}
+        try:
+            inspect.signature(handler).bind(state, **arguments)
+        except TypeError as error:
+            raise TaskError('Invalid arguments for ' + command + ': ' + str(error)) from error
+        try:
+            changed = handler(state, **arguments)
+        except ObservationError as error:
+            before['recovery_required'] = 'observation_mismatch'
+            before['workspace_clear'] = False
+            self.journal.append(self.run_id, revision, 'observation_rejected',
+                                {**payload, 'command': command, 'error': str(error)}, before)
+            raise
+        if changed is False:
+            return state
+        if artifact is not None:
+            payload['artifact_sha256'] = digest(artifact)
+        if (command == 'advance_time' and state[self.DEADLINE_FIELD] is not None
+                and self._now(state) >= state[self.DEADLINE_FIELD]):
+            payload['additional_cause'] = 'deadline_exceeded'
+        self.journal.append(self.run_id, revision, command, payload, state, artifact=artifact)
+        return state
 
     @staticmethod
     def report_samples(state):

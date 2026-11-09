@@ -1,0 +1,79 @@
+{
+  "format": "solidcraftbot.synthetic-lab-manifest/1",
+  "id": "SYN.LabBatch01",
+  "rack_instance": "Rack",
+  "samples": [
+    {
+      "sample_id": "Sample01",
+      "vessel_id": "Tube01",
+      "rack_place_id": "Slot01",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample02",
+      "vessel_id": "Tube02",
+      "rack_place_id": "Slot02",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample03",
+      "vessel_id": "Tube03",
+      "rack_place_id": "Slot03",
+      "initial_volume_ul": null
+    },
+    {
+      "sample_id": "Sample04",
+      "vessel_id": "Tube04",
+      "rack_place_id": "Slot04",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample05",
+      "vessel_id": "Tube05",
+      "rack_place_id": "Slot05",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample06",
+      "vessel_id": "Tube06",
+      "rack_place_id": "Slot06",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample07",
+      "vessel_id": "Tube07",
+      "rack_place_id": "Slot07",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample08",
+      "vessel_id": "Tube08",
+      "rack_place_id": "Slot08",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample09",
+      "vessel_id": "Tube09",
+      "rack_place_id": "Slot09",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample10",
+      "vessel_id": "Tube10",
+      "rack_place_id": "Slot10",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample11",
+      "vessel_id": "Tube11",
+      "rack_place_id": "Slot11",
+      "initial_volume_ul": 40
+    },
+    {
+      "sample_id": "Sample12",
+      "vessel_id": "Tube12",
+      "rack_place_id": "Slot12",
+      "initial_volume_ul": 40
+    }
+  ]
+}

@@ -1,9 +1,12 @@
 # Manuelle Aufgaben und Messgeräte
 
-**Status: Zielmodell mit implementierten synthetischen NanoDrop- und Qubit-4-Durchstichen.**
+**Status: Synthetische NanoDrop-/Qubit-Einzelabläufe und ein gemeinsamer CF01–NanoDrop–Qubit-Gesamtlauf.**
 Die konkrete Ausführung, Quellen, Zustände und Prüfgrenzen stehen in
 [NanoDrop](nanodrop-manual-workflow.md) und
 [Qubit 4](qubit-4-manual-workflow.md).
+Der [Gesamtlauf](synthetic-lab-workflow.md) führt zwölf Originale auf einem
+gemeinsamen Inventar mit einmaligen Anfangsmengen, Buchungen und Reservierungen.
+Die drei Gerätestufen verwenden getrennte Zustände und dieselbe Prozessuhr.
 Auf Eigentümerwunsch sind zunächst sämtliche Eingaben, SOPs und CSV-Dateien
 synthetisch. Die nachfolgende übergreifende Planung umfasst auch spätere Schritte;
 Netzwerkadapter, echte Exportqualifikation und reale Mensch-Maschine-

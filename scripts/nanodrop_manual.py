@@ -4,7 +4,7 @@ import uuid
 from pathlib import Path
 
 from manual_tasks import Journal, TaskError, digest, encoded
-from manual_workflow import (ManualWorkflow, ObservationError, text, positive, keys,
+from manual_workflow import (ManualWorkflow, ManualOperations, ObservationError, text, positive, keys,
                              original_location, inventory_observations, compile_profile)
 from nanodrop_csv import parse_report
 
@@ -33,14 +33,7 @@ def load_profile(source=SOURCE):
     return definition
 
 
-class Workflow(ManualWorkflow):
-    STATE_FORMAT = 'solidcraftbot.nanodrop-manual-state/1'
-    REPORT_FORMAT = 'solidcraftbot.nanodrop-manual-report/1'
-    STEPS = STEPS
-    SOURCE = SOURCE
-    RUN_PREFIX = 'SYN-ND-'
-    PREPLAN_MEASUREMENTS = True
-    load_profile = staticmethod(load_profile)
+class NanoDropOperations(ManualOperations):
     @staticmethod
     def _initial_extra(run_id, definition):
         return {'blanks': {}, 'active_blank': None, 'pending_measurement': None}
@@ -177,3 +170,13 @@ class Workflow(ManualWorkflow):
         if not blank_still_valid:
             state['active_blank'] = None
         return True
+
+
+class Workflow(NanoDropOperations, ManualWorkflow):
+    STATE_FORMAT = 'solidcraftbot.nanodrop-manual-state/1'
+    REPORT_FORMAT = 'solidcraftbot.nanodrop-manual-report/1'
+    STEPS = STEPS
+    SOURCE = SOURCE
+    RUN_PREFIX = 'SYN-ND-'
+    PREPLAN_MEASUREMENTS = True
+    load_profile = staticmethod(load_profile)

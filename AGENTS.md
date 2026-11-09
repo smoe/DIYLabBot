@@ -138,9 +138,47 @@ keine fremden Zustände oder stillen Migrationen zulassen.
   Ansatz, Kalibrierung, Assayrevision und Chargen eindeutig verbinden. Der
   Kalibrierungsbezug stammt aus dem Workflow, nicht aus einem geprüften Export.
   Berichtete Originalkonzentrationen nicht nochmals verdünnungskorrigieren;
-  Berichtete Originalkonzentrationen erfordern beide bestätigten Ansatzvolumina
+  Sie erfordern beide bestätigten Ansatzvolumina
   in derselben synthetischen Ergebniszeile. Ableitungen mit Formel, Volumina und
   Einheitenfaktoren ausweisen.
+
+## Gemeinsamer synthetischer Laborablauf
+
+`python3 scripts/run_lab_workflow.py demo` führt zwölf Originale durch CF01,
+NanoDrop und Qubit 4. Vor Änderungen
+[docs/synthetic-lab-workflow.md](docs/synthetic-lab-workflow.md) lesen.
+`model/synthetic-lab-workflow.manifest.json` ist die einmalige Quelle für
+Originalproben, Gefäße, Ursprungsplätze und Anfangsmengen. Die Komposition
+`model/synthetic-lab-workflow.shared.json` referenziert die vorhandenen Quellen.
+Geometrie, bisherige Gerätepositionen und Standalone-Fixtures nicht kopieren.
+
+- Inventar, Buchungen, Prozessuhr und Ressourcen gehören zum Gesamtlauf;
+  Geräteergebnisse, Akteure, Fristen und offene Operationen zu `stages[stage_id]`.
+  `ManualOperations`, `NanoDropOperations` und `QubitOperations` wiederverwenden.
+  Kompatibilitätsansichten sind keine zweite führende Bilanz.
+- Plätze als Rackinstanz plus lokale Platz-ID führen. Die Rackinstanz aus der
+  Aufstellung referenzieren. Geometrie-IDs und historische Standalone-Orte an
+  der Adaptergrenze übersetzen; bestehende Fixtures nicht still neu binden.
+- Entnahmen mit eindeutiger Absicht buchen; Restvolumen aus Manifest und
+  bestätigten Buchungen ableiten. Unbekannt ist kein Nullverbrauch und die
+  Sollmenge keine Obergrenze. Qubit-Messung und Entsorgung belasten das
+  Originalgefäß nicht ein zweites Mal.
+- Gesamtgefäßmassen mit aktueller Inhaltsrevision und ausdrücklich synthetischer
+  Evidenz bestätigen. Bereits offene Entnahmeabsichten entwerten die Freigabe.
+  Keine Masse aus Restvolumen ableiten. Qubit-Kammer und Halterplätze sind
+  verschiedene Rollen; nur Halterplätze für Vorbereitung/Ablage verwenden.
+- CF01-Checkpoints vor Effekten synchron speichern. Negative, fehlende oder
+  unvollständige Quittungen, Speicherfehler und Fristen sperren Folgeschritte.
+  Aktive CF01-Versuche nach Neustart nicht mit leerem Simulator neu ausführen.
+  Abbruchabgleich ist synthetische Personenbestätigung, keine Stationsmessung.
+- Root hält Rack, Gefäße und Bankbereich über Stufengrenzen. Gesamtabschluss und
+  Abbruchfreigabe prüfen Journal und sämtliche Stufenartefakte vollständig.
+  Den geprüften Journal-Präfixpfad nur mit seinen dokumentierten Grenzen nutzen;
+  fremde Änderungen, Rollback und getrennte Zustandskopien berücksichtigen.
+
+Die Bilanz gilt innerhalb eines Gesamtlaufs. Globale Bestandsübernahme zwischen
+unabhängigen Läufen, Reagenzvorräte, aktive CF01-Jobfortsetzung, Netzwerk,
+Hardware, neue CAD-Geometrie und Sicherheitsqualifikation bleiben unimplementiert.
 
 ## Gemeinsame Quellen und Generatoren
 

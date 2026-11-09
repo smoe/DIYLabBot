@@ -432,6 +432,23 @@
       },
       "caption": "Lokaler Mock-Chargenlauf mit zwölf Proben. Alle Roboterübergaben sind abstrahiert; der Transporter ist nur Vorbedingung.",
       "documentation": "docs/centrifuge-cf01-robot-pickup.md"
+    },
+    {
+      "id": "lab-workflow",
+      "title": "CF01 → NanoDrop → Qubit 4",
+      "group": "ablaeufe",
+      "sources": [
+        "model/synthetic-lab-workflow.shared.json",
+        "model/synthetic-lab-workflow.manifest.json",
+        "model/synthetic-lab-workflow.schema.json"
+      ],
+      "image": "images/lab-workflow.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "integrated_workflow"
+      },
+      "caption": "Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.",
+      "documentation": "docs/synthetic-lab-workflow.md"
     }
   ],
   "groups": [
