@@ -15,7 +15,7 @@
   },
   "workspace": {
     "source": "model/synthetic-cf01-workspace.shared.json",
-    "source_sha256": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e"
+    "source_sha256": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2"
   },
   "bindings": {
     "rack_instance": "Rack",
@@ -34,7 +34,7 @@
   "stage_profiles": {
     "cf01": {
       "source": "model/cf01-rack-batch.protocol.json",
-      "source_sha256": "e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0"
+      "source_sha256": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681"
     },
     "nanodrop": {
       "source": "model/nanodrop-manual.synthetic.json",
@@ -114,7 +114,7 @@
   ],
   "limitations": [
     "All SOPs, measurements, quantities, masses, qualification values and times are synthetic test inputs",
-    "One shared logical work area on the existing reference bench; NanoDrop and Qubit have no generated CAD positions",
+    "One shared logical work area; independent NanoDrop and Qubit concept geometry is placed on the reference bench without robot-path or instrument-actuation coupling",
     "Twelve original vessels follow CF01 then NanoDrop then serial Qubit preparations; no network, hardware or full robot-path qualification",
     "Mass confirmations are runtime evidence tied to vessel content revisions, never derived from liquid volume",
     "Continuous accounting covers one root workflow; independent subsequent workflows require an explicit stock-continuation contract"

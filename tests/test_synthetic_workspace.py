@@ -55,7 +55,7 @@ class SyntheticWorkspaceTests(unittest.TestCase):
         self.assertEqual(len(w['bench']['bodies']),1)
         frame=w['frames']['SYN.Bench.Worktop']
         self.assertEqual([frame[i][3] for i in range(3)],[-50,-50,0])
-        self.assertEqual(set(w['devices']),{'Arm','CF01','Rack'})
+        self.assertEqual(set(w['devices']),{'Arm','CF01','Rack','SYN.NanoDrop01','SYN.Qubit401'})
 
     def test_unbounded_unknown_and_large_finite_room_are_not_interchangeable(self):
         read=workspace.read

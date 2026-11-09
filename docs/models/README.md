@@ -81,9 +81,9 @@ Aktueller schematischer Aufstellungsplan. Nummern markieren Gerätebezugspunkte;
 
 [![Minimalumgebung · Arm, CF01 und Rack](images/synthetic-workspace.png)](images/synthetic-workspace.png)
 
-Referenzbank im unbegrenzten Raum. Native SolidCraft-Prüfstellung des Greifens; die lange Armvariante wird aus derselben Armquelle abgeleitet.
+Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei native CAD-Fassungen; statische TCP-Reichweite und Annäherungen geprüft, keine ausgelegten Messwerkzeuge oder verbindenden Roboterbahnen.
 
-[Quelle 1](../../model/synthetic-cf01-workspace.shared.json) · [Quelle 2](../../model/equipment/cf01-workspace.json) · [Quelle 3](../../model/centrifuge-cf01.robot-pickup.shared.json) · [Details](../../docs/centrifuge-cf01-robot-pickup.md)
+[Quelle 1](../../model/synthetic-cf01-workspace.shared.json) · [Quelle 2](../../model/equipment/cf01-workspace.json) · [Quelle 3](../../model/centrifuge-cf01.robot-pickup.shared.json) · [Quelle 4](../../model/nanodrop-concept.shared.json) · [Quelle 5](../../model/qubit-4-concept.shared.json) · [Details](../../docs/synthetic-lab-workflow.md)
 
 
 

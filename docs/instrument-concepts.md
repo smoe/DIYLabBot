@@ -93,7 +93,7 @@ Bilder stammen aus den nativen SolidCraft-Modellen.
 
 Die bestehenden NanoDrop- und Qubit-Kataloge, Profile und Protokolle bleiben
 logische Laufzeitverträge. Diese Anschauungsmodelle ergänzen eigenständige
-Geometriequellen. Es werden keine Gerätepositionen, Rackplätze, laufenden
-Zustände oder Quellenbindungen der Abläufe geändert. Ein Modellröhrchen ist kein
-zusätzliches Laufzeitgefäß. Eine Platzierung in der Arbeitsumgebung oder Kopplung
-von Gerätehebeln an Protokollschritte ist hier nicht implementiert.
+Geometriequellen. Die [synthetische Laboraufstellung](synthetic-lab-workflow.md#geometrische-aufstellung)
+referenziert beide Geräte inzwischen als Instanzen auf der Referenzbank.
+Ein Modellröhrchen ist kein zusätzliches Laufzeitgefäß. Die Gerätehebel sind
+nicht an Protokollschritte gekoppelt; neue Roboterwege sind nicht implementiert.

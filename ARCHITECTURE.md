@@ -292,8 +292,11 @@ logische Plätze ohne erfundene Geometrie.
 
 Die separaten [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md)
 besitzen nun eigene gemeinsame Geometriequellen und zwei native CAD-Ableitungen.
-Ihre Maße sind Annahmen; sie ergänzen weder Gerätepositionen noch Bindungen der
-logischen Messabläufe an CAD-Gelenke.
+Ihre Maße sind Annahmen. Die synthetische Geräteaufstellung referenziert sie nun
+als Instanzen auf der Armseite der Referenzbank. Statische Referenz-TCP-Ziele
+an beiden Messpunkten und native Annäherungsstellungen werden daraus geprüft;
+Werkzeugauslegung, Bindungen der logischen Messabläufe an CAD-Gelenke und
+verbindende Roboterwege zu den Messgeräten sind nicht implementiert.
 
 Eine Ansatzabsicht identifiziert das ausgewählte leere Gefäß vor dem Transfer.
 Die Bestätigung erzeugt einen Transferdatensatz; nur dort wird die Originalprobe
@@ -341,8 +344,9 @@ Der Gesamtlauf verwendet die bestehende Rackinstanz `Rack` und lokale Plätze
 wie `Slot01`. Historische geometrische IDs bleiben abgeleitete Referenzen.
 Die gemeinsame Bankfläche wird über `SYN.Bench.Worktop` gebunden; der logische
 Arbeitsbereich bleibt `SYN.NanoDrop.WorkArea`. Daraus entsteht kein zusätzlicher
-Racktransport. NanoDrop und Qubit besitzen weiterhin logische Gerätebindungen
-ohne neue CAD-Positionen. Der Root hält Rack, Gefäße und Arbeitsfläche über die
+Racktransport. NanoDrop und Qubit besitzen zusätzlich referenzierte CAD-Positionen
+auf der bestehenden Bank; die Gesamtansicht entsteht mit
+`python3 scripts/build_synthetic_lab_scene.py`. Der Root hält Rack, Gefäße und Arbeitsfläche über die
 Gerätewechsel; Station, Arm und Messgeräte sind zusätzliche Stufenressourcen.
 Ort, Akteursverantwortung und Ressourcenbesitz sind getrennte Informationen.
 

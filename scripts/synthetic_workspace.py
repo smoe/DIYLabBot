@@ -63,7 +63,7 @@ def materialize_scene(scene):
     if 'bench_surface' in scene or 'robot_parameter_overrides_mm' in scene or {'position_mm','yaw_deg'}&set(scene['arm_fixture']) or set(scene['rack'])!={'selected_slot','approach_grip_height_mm'}:
         raise ValueError('Scene geometry and device poses must come from the workspace')
     result=copy.deepcopy(scene);path=assembly.validate_reference(scene['environment']);w=load(path)
-    if set(w['devices'])!={'Arm','CF01','Rack'}:raise ValueError('CF01 workspace requires arm, centrifuge and rack')
+    if not {'Arm','CF01','Rack'}<=set(w['devices']):raise ValueError('CF01 workspace requires arm, centrifuge and rack')
     arm,station,rack=(w['devices'][key] for key in ['Arm','CF01','Rack'])
     if station['matrix']!=robot.identity():raise ValueError('Current pickup adapter requires station at workspace origin')
     result['sources'].update(robot=arm['source']['source'],centrifuge=station['source']['source'])

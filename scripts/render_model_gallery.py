@@ -60,6 +60,17 @@ def checked_case(family,case='default'):
 
 def input_for(entry):
     render=entry['render'];kind=render['kind'];commands=[];evidence={}
+    if kind=='synthetic-lab':
+        path=ROOT/'cad/synthetic-lab-scene/shared-build-report.json';report=read(path)
+        if not report['passed']:raise ValueError('Checked five-device scene required')
+        for source in entry['sources']:
+            if report['source_files_sha256'].get(source)!=sha(ROOT/source):raise ValueError('Synthetic lab source changed: '+source)
+        snapshot=next(s for s in report['snapshots'] if s['id']==render['phase'])
+        model=project(snapshot['files']['solidcraft']);image=project(report['renders'][render['view']])
+        if sha(model)!=snapshot['artifact_sha256']['solidcraft'] or sha(image)!=report['render_sha256'][render['view']]:
+            raise ValueError('Changed synthetic lab model or render')
+        return model,commands,image,{'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True,
+                                    'phase':render['phase'],'representation':'Native source-referenced five-device scene on the unchanged reference bench'}
     if kind in ['case','room']:
         family=render.get('family','lab-room-l01');model,evidence,case=checked_case(family,render.get('case','default'))
         if kind=='room' and render['scope']!='all':

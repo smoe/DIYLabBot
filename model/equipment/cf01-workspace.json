@@ -16,6 +16,14 @@
     "rack": {
       "source": "model/guided-tube-rack.shared.json",
       "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
+    },
+    "nanodrop": {
+      "source": "model/nanodrop-concept.shared.json",
+      "source_sha256": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02"
+    },
+    "qubit": {
+      "source": "model/qubit-4-concept.shared.json",
+      "source_sha256": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
     }
   },
   "instances": [
@@ -55,6 +63,28 @@
       ],
       "yaw_deg": 0,
       "host": "SYN.Bench.Worktop"
+    },
+    {
+      "id": "SYN.NanoDrop01",
+      "asset": "nanodrop",
+      "host": "SYN.Bench.Worktop",
+      "xyz": [
+        -395,
+        -87.5,
+        0
+      ],
+      "yaw_deg": 90
+    },
+    {
+      "id": "SYN.Qubit401",
+      "asset": "qubit",
+      "host": "SYN.Bench.Worktop",
+      "xyz": [
+        -382.5,
+        -262.5,
+        0
+      ],
+      "yaw_deg": 90
     }
   ]
 }

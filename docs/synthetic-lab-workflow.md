@@ -78,8 +78,83 @@ Die bisherigen Standalone-Rack-/Platzbezeichnungen werden an der Adaptergrenze
 übersetzt; es entsteht keine dritte physische Rackinstanz. Der gemeinsame
 Arbeitsbereich `SYN.NanoDrop.WorkArea` bindet `SYN.Bench.Worktop` auf der bereits
 vorhandenen Referenzbank. `SYN.CF01` ist die räumliche Kompositions-ID. Zwischen
-den Stufen wird kein Racktransport eingeführt. NanoDrop und Qubit sind weiterhin
-logische Gerätebindungen ohne neue CAD-Geometrie oder behauptete Erreichbarkeit.
+den Stufen wird kein Racktransport eingeführt. NanoDrop und Qubit besitzen nun
+zusätzlich geometrische Instanzen. Ihre statische Erreichbarkeit wird getrennt
+vom manuellen Ablauf geprüft, wie im folgenden Abschnitt beschrieben.
+
+## Geometrische Aufstellung
+
+![Arm, CF01, Rack, NanoDrop und Qubit auf der Referenzbank](models/images/synthetic-workspace.png)
+
+`model/equipment/cf01-workspace.json` referenziert die vorhandenen Gerätekonstruktionen
+und bindet alle fünf Instanzen an `SYN.Bench.Worktop`. `SYN.NanoDrop01` und
+`SYN.Qubit401` verwenden dieselben IDs wie die logischen Messprofile. Ihre
+Geometrie stammt aus den [eigenständigen Anschauungsmodellen](instrument-concepts.md).
+Es gibt keine zweite Gerätebeschreibung in der Aufstellung.
+
+```sh
+python3 scripts/build_synthetic_lab_scene.py
+python3 -m unittest discover -s tests -p 'test_synthetic_lab_scene.py' -v
+```
+
+Der Build erzeugt neue native FreeCAD- und SolidCraft-Gesamtmodelle in zwei
+bestehenden CF01-/Arm-Prüfstellungen sowie eine Gesamt- und Draufsicht.
+Bank, Arm, CF01 und Rack behalten ihre bisherigen Maße und Positionen. NanoDrop
+und Qubit stehen auf der Armseite links vor CF01. NanoDrop ist von oben gesehen
+um 90° nach links gedreht, sodass sich der Hebel seitlich zum Arm öffnet. Auch
+Qubit besitzt eine 90°-Ausrichtung. Die Gerätepositionen berücksichtigen die
+gedrehte Stellfläche und die Gelenkgrenzen des Arms.
+Ihre Hebel beziehungsweise Deckel bleiben in der geöffneten Referenzpose der
+jeweiligen Quelle. Der Einstieg verwendet
+die vorhandenen nativen CAD-Adapter beziehungsweise deren geprüfte Build-Berichte.
+Auf einem frischen Checkout zuerst Arm und die Anschauungsmodelle mit ihren
+bestehenden Build-Einstiegen erzeugen. FreeCAD erzeugt CF01 beim Gesamtbuild
+direkt aus dessen Quelle. Kein CAD verwendet Dateien des anderen CADs als
+notwendige Geometriequelle.
+
+`--core-report PFAD` kann eine vorhandene geprüfte native CF01-Aufstellung
+wiederverwenden. Artefakte und Geometriequellen müssen passen. Bei geänderten
+Kompositionsreferenzen müssen zusätzlich sämtliche Konstruktionsbefehle und
+Körper-IDs gleich sein sowie die Matrizen der beiden alten Prüfstellungen
+numerisch übereinstimmen. Diese Äquivalenz steht getrennt im neuen Bericht;
+historische Quellenprüfsummen und Dateien werden nicht umgeschrieben.
+
+`cad/synthetic-lab-scene/shared-build-report.json` löst die aktuellen Gesamtmodelle,
+Bilder, Quellen und Prüfsummen auf. Die Prüfung vergleicht Volumen und Schwerpunkt
+je Instanz zwischen beiden CADs. Für beide Prüfstellungen werden die neuen Geräte
+gegen die übrigen Gerätekörper auf BRep-Überschneidungen geprüft; ihre Begrenzungen
+liegen innerhalb der bestehenden Bankfläche und die Füße auf deren Oberfläche.
+Zusätzlich leitet der Build die Messfläche und Kammerachse aus den jeweiligen
+Gerätequellen ab. Der vorhandene sechsgelenkige Arm erreicht beide Messpunkte
+mit senkrechtem Referenz-TCP innerhalb seiner Gelenkgrenzen. Je eine
+Annäherungsstellung 150 mm darüber wird in FreeCAD gegen Geräte, Rack und Bank
+sowie auf Überschneidungen nicht benachbarter Armglieder geprüft. Die zugehörigen
+Gelenkwinkel, Zielmatrizen, Restfehler und nativen Prüfmodelle stehen im Bericht
+unter `instrument_reachability` und `approach_geometry_checks`.
+
+`instrument_motion_validation` prüft außerdem sämtliche 241 Stellungen der
+bestehenden CF01-Bewegungsfolge gegen beide Messgeräte. Für diese Stellungen
+und die beiden Annäherungen wird der Abstand der NanoDrop-Hebelkörper zum Arm
+zusätzlich in 5°-Schritten von geschlossen bis zur maximalen Quellenöffnung
+gemessen. Der erforderliche Abstand stammt aus dem vorhandenen CF01-Prüfvertrag.
+Getrennte Hüllboxen liefern konservative Abstandsuntergrenzen; können sie den
+Mindestabstand nicht belegen, wird der native BRep-Abstand berechnet. Der Bericht
+nennt die kleinste belegte Untergrenze, kein exaktes globales Minimum.
+Das sind diskrete Geometrieprüfungen, kein kontinuierlicher Hüllraumnachweis.
+
+Der TCP verwendet den vorhandenen illustrativen Gefäßgreifer als Bezug; dieser
+ist keine Pipette und kein qualifiziertes Qubit-Ladewerkzeug. Die Messpunkte
+selbst erhalten nur den kinematischen Nachweis, keinen Kontakt- oder
+Kollisionsnachweis mit diesem Greifer. Die Prüfung umfasst weder kontinuierliche
+Bewegungen noch Bedienfreiräume, verbindende Roboterbahnen zu den Messgeräten,
+Traglast, Messoptik oder Hardwarequalifikation.
+Die bisherige CF01-Bewegungsdarstellung bleibt ein eigener Baustein mit Arm,
+Station und Rack; die neue Gesamtansicht ist eine separate statische Komposition.
+
+Die neue Aufstellungsrevision ist in CF01-Profil, Entnahmeszene und Gesamtprofil
+neu mit SHA-256 gebunden. Der geänderte räumliche Lader gehört zum Laufzeitmanifest
+des Gesamtlaufs; ältere offene Gesamtläufe werden bei abweichenden gespeicherten
+Quellen weiterhin zur ausdrücklichen Prüfung zurückgewiesen. Es gibt keine stille Migration.
 
 ## Ablauf und Verbrauch
 

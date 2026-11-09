@@ -203,16 +203,18 @@
       "sources": [
         "model/synthetic-cf01-workspace.shared.json",
         "model/equipment/cf01-workspace.json",
-        "model/centrifuge-cf01.robot-pickup.shared.json"
+        "model/centrifuge-cf01.robot-pickup.shared.json",
+        "model/nanodrop-concept.shared.json",
+        "model/qubit-4-concept.shared.json"
       ],
       "image": "images/synthetic-workspace.png",
       "render": {
-        "kind": "native",
+        "kind": "synthetic-lab",
         "phase": "Grasp",
-        "scope": "all"
+        "view": "overview"
       },
-      "caption": "Referenzbank im unbegrenzten Raum. Native SolidCraft-Prüfstellung des Greifens; die lange Armvariante wird aus derselben Armquelle abgeleitet.",
-      "documentation": "docs/centrifuge-cf01-robot-pickup.md"
+      "caption": "Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei native CAD-Fassungen; statische TCP-Reichweite und Annäherungen geprüft, keine ausgelegten Messwerkzeuge oder verbindenden Roboterbahnen.",
+      "documentation": "docs/synthetic-lab-workflow.md"
     },
     {
       "id": "robot",

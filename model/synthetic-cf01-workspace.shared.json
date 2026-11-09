@@ -20,7 +20,7 @@
     },
     "equipment": {
       "source": "model/equipment/cf01-workspace.json",
-      "source_sha256": "aacadc47311ad097a04b21a6dd60c244308a103aa8369ebda37850d8b8b225cf"
+      "source_sha256": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120"
     }
   }
 }

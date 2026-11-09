@@ -4,7 +4,7 @@
   "mode": "local_mock_only",
   "workspace": {
     "source": "model/synthetic-cf01-workspace.shared.json",
-    "source_sha256": "556cc2de9b1cd22f26845a534ca475061ef59b419472bcfd46c99e343dd9115e"
+    "source_sha256": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2"
   },
   "station_contract": {
     "source": "model/centrifuge-cf01.protocol.json",
