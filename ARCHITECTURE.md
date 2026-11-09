@@ -368,7 +368,8 @@ Stufengrenzen ist die manuelle Fortsetzung nach Abgleich möglich.
 
 Die Runtime liegt im bisherigen gemeinsamen SQLite-Store unter `exports/`.
 Unabhängige Gesamtläufe übernehmen Bestände nicht automatisch. Reagenzvorräte,
-Netzwerkadapter, Hardware, echte Exporte, neue Geometrie, Roboterbahnen und
+Netzwerkimport in diesen Gesamtlauf, Hardware, echte Exporte, neue Geometrie,
+Roboterbahnen und
 qualifizierte Schutzfunktionen sind damit nicht implementiert oder nachgewiesen.
 
 Der [Plan zur laufübergreifenden Bestandsführung](docs/stock-continuation.md)
@@ -376,6 +377,24 @@ beschreibt den nächsten Ausbau: einmalige Einführung oder geprüfte Übernahme
 eines abgeschlossenen Laufs, fortgeschriebene Restmengen und Inhaltsrevisionen
 sowie ein atomarer Root-/Stock-Schreibpfad mit exklusiver persistenter Lease,
 Kopfvergleich und Fencing. Diese Verträge und Befehle sind noch nicht implementiert.
+
+## Lesende NanoDrop-UltraC-Netzwerkschnittstelle
+
+Der [UltraC-Netzwerkadapter](docs/nanodrop-ultra-network.md) trennt den einmalig
+beschriebenen Hersteller-Lesevertrag in
+`model/nanodrop-ultra-network.protocol.json`, ein kataloggebundenes synthetisches
+Gerätemodell und dessen HTTP-Adapter. Derselbe Client verwendet die fünf
+ausgewählten GET-Routen am Modellserver oder an einer expliziten Geräte-URL.
+Der lokale Netzwerkverkehr ist geprüft; ein Originalgerät ist noch nicht qualifiziert.
+FreeCAD und SolidCraft sind keine Laufzeitabhängigkeiten dieses Geräteverhaltens.
+
+Requestpfade und Parametertypen folgen M024 01/25. Nicht dokumentierte
+Antwortformen, Filter- und Paging-Regeln bleiben ausdrücklich synthetische
+Modellentscheidungen. Originalantworten werden unverändert mit Prüfsumme
+archiviert. Ein Abruf erzeugt weder Verbrauch noch Ergebnisfreigabe und ist noch
+nicht in den manuellen oder gemeinsamen Laborablauf eingebunden. Ein fachlicher
+Decoder benötigt zunächst echte versionierte Geräteantworten und einen expliziten
+Identitätsvertrag; die Ultra-API wird nicht auf NanoDrop One übertragen.
 
 ## Nächste Schritte
 
@@ -395,7 +414,8 @@ Möbelauswertung wird wiederverwendet.
 
 Das weitergehende Zielmodell für manuelle Arbeitsschritte und Messgeräte steht
 in [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md). Der synthetische
-NanoDrop- und Qubit-Durchstich sind oben beschrieben; Netzwerkadapter bleiben
+NanoDrop- und Qubit-Durchstich sowie der getrennte UltraC-Leseadapter sind oben
+beschrieben; ihre Workflow-Netzwerkintegration und weitere Adapter bleiben
 geplant. Messgerätetypen deklarieren Fähigkeiten im Katalog, Protokolle verlangen
 Fähigkeiten statt Gerätetypen. Verantwortlichkeit und physischer Ort bleiben
 getrennt; Aufgaben und Bestätigungen sind Laufzeitzustand außerhalb von `model/`.

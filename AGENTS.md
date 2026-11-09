@@ -177,13 +177,34 @@ Geometrie, bisherige Gerätepositionen und Standalone-Fixtures nicht kopieren.
   fremde Änderungen, Rollback und getrennte Zustandskopien berücksichtigen.
 
 Die Bilanz gilt innerhalb eines Gesamtlaufs. Globale Bestandsübernahme zwischen
-unabhängigen Läufen, Reagenzvorräte, aktive CF01-Jobfortsetzung, Netzwerk,
+unabhängigen Läufen, Reagenzvorräte, aktive CF01-Jobfortsetzung, Workflow-Netzwerkimport,
 Hardware, neue CAD-Geometrie und Sicherheitsqualifikation bleiben unimplementiert.
 Vor dem Ausbau der laufübergreifenden Bilanz
 [docs/stock-continuation.md](docs/stock-continuation.md) lesen. Der dortige Plan
 ist noch kein Laufzeitvertrag: Mengen nicht durch Profilkopien zurücksetzen,
 Root-/Stockbuchungen atomar speichern und parallele Fortsetzungen über denselben
 Bestandskopf und persistente, gegen veraltete Schreiber abgesicherte Leases führen.
+
+## NanoDrop-UltraC-Netzwerkmodell
+
+Vor Änderungen [docs/nanodrop-ultra-network.md](docs/nanodrop-ultra-network.md)
+lesen. `model/nanodrop-ultra-network.protocol.json` führt den ausgewählten
+Hersteller-GET-Vertrag einmalig; Client und synthetischer HTTP-Modelladapter
+verwenden ihn gemeinsam. Die separate synthetische Modellquelle pinnt Vertrag
+und UltraC-Katalogtyp. Keine CAD-Datei ist Netzwerk-Laufzeitabhängigkeit.
+
+- Dokumentierte Pfade und Querytypen von synthetisch gewählten Antwortformen,
+  Filterregeln und Pagination unterscheiden. Keine Ultra-Unterstützung für One
+  allein aus dem gemeinsamen manuellen Protokoll ableiten.
+- Unveränderte Antwortbytes mit Status und Prüfsumme erhalten. Token nicht in
+  Quellen, Logs oder Metadaten übernehmen; Redirects nicht verfolgen.
+- Abruf, fachlichen Decoder und Workflowwirkung trennen. `SampleName`, Zeit,
+  Reihenfolge oder `IsDiscarded` beweisen keine Probenidentität oder Entsorgung.
+  Netzwerkabruf bucht keinen Verbrauch und nimmt kein Ergebnis automatisch an.
+- `python3 scripts/run_nanodrop_ultra_network.py serve` stellt das synthetische
+  Modell bereit; `read` verwendet denselben Client wie eine konfigurierte
+  Original-URL. Loopback-HTTP ist geprüft, reale Geräteantworten, Ergebnisdecoder
+  und Hardware nicht. Modellkennzeichen sind Selbstauskunft, keine Authentifizierung.
 
 ## Gemeinsame Quellen und Generatoren
 
