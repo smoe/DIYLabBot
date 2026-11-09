@@ -472,6 +472,15 @@ Details und Prüfgrenzen: [CF01](centrifuge-cf01.md).
 
 ## Referenzierte Baugruppen und Parametervarianten
 
+Die [NanoDrop- und Qubit-Anschauungsmodelle](instrument-concepts.md) verwenden
+`model/nanodrop-concept.shared.json` und `model/qubit-4-concept.shared.json` als
+jeweils führende Quelle. Die semantischen Rezepte für Messsäule/Hebel und
+Einzelröhrchenkammer/Deckel senkt `scripts/instrument_concept.py` in die vorhandenen
+portablen Operationen ab. `python3 scripts/build_instrument_concepts.py` erzeugt
+beide nativen CADs und prüft drei Maßfälle einschließlich gemeinsam abgeleiteter
+Gelenkanker. Die Geometrie bleibt eine eigenständige, unvermessen angenommene
+Darstellung; bestehende Geräteprofile und Aufstellungen werden nicht umgebunden.
+
 Eine Baugruppe wird einmal konstruiert. Das Laborlayout referenziert ihre Quelle
 und beschreibt Instanzen mit ID, Aufstellung in mm/deg, Zustand und optionalen
 `overrides`. Der Vertrag liegt in `model/assembly-reference.schema.json`, die

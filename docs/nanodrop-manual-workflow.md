@@ -5,6 +5,10 @@ Mikrovolumenmessungen, Dateiimport und bestätigte Rückgabe an die ursprünglic
 Rackplätze. **Alle Bedienhandlungen, Proben, Volumina, SOPs und Messdateien sind
 synthetisch.** Er führt keine Geräte-, Roboter- oder Netzwerkbefehle aus.
 
+Ein separates [NanoDrop-Anschauungsmodell](instrument-concepts.md#nanodrop-konzept)
+ergänzt inzwischen Hebel und Tropfenmessfläche in FreeCAD und SolidCraft. Seine
+angenommene Geometrie ist nicht an Gerätepositionen oder Laufzustände gekoppelt.
+
 NanoDrop One und UltraC verwenden dasselbe Protokoll für die Fähigkeit
 `microvolume_absorbance`. Der erste Ergebnisvertrag unterstützt die Methode
 `dsDNA`. Die Küvettenfähigkeit des UltraC ist eine Katalogangabe; ein

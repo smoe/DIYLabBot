@@ -357,6 +357,38 @@
       "documentation": "docs/centrifuge-cf01-robot-pickup.md"
     },
     {
+      "id": "nanodrop-concept",
+      "title": "NanoDrop · Hebel und Tropfenmessfläche",
+      "group": "baugruppen",
+      "sources": [
+        "model/nanodrop-concept.shared.json"
+      ],
+      "image": "images/nanodrop-concept.png",
+      "render": {
+        "kind": "case",
+        "family": "nanodrop-concept",
+        "case": "default"
+      },
+      "caption": "Eigenständiges Anschauungsmodell mit schwenkbarem Hebel, ebenen Messsäulen und separatem 1,5-µl-Tropfen. Maße und Optik unqualifiziert.",
+      "documentation": "docs/instrument-concepts.md"
+    },
+    {
+      "id": "qubit-4-concept",
+      "title": "Qubit · Einzelröhrchenkammer",
+      "group": "baugruppen",
+      "sources": [
+        "model/qubit-4-concept.shared.json"
+      ],
+      "image": "images/qubit-4-concept.png",
+      "render": {
+        "kind": "case",
+        "family": "qubit-4-concept",
+        "case": "default"
+      },
+      "caption": "Eigenständiges Anschauungsmodell mit Display, einzelner Messkammer, Referenzröhrchen und Klappdeckel. Keine geprüfte Gerätegeometrie.",
+      "documentation": "docs/instrument-concepts.md"
+    },
+    {
       "id": "transport-floor-p2",
       "title": "TR01 · zwei Platten",
       "group": "transport",

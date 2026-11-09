@@ -1,0 +1,31 @@
+{
+  "format": "solidcraftbot.instrument-concept/1",
+  "id": "ND01_MicrovolumeConcept",
+  "family": "nanodrop-concept",
+  "recipe": "microvolume_pedestal_and_hinged_arm_v1",
+  "status": "Independent illustrative concept; not a manufacturer CAD model or a working instrument",
+  "units": {"length": "mm", "angle": "deg"},
+  "parameters": {
+    "width": {"expression": 180, "unit": "mm", "range": [170, 195], "description": "Assumed housing width"},
+    "depth": {"expression": 200, "unit": "mm", "range": [190, 215], "description": "Assumed housing depth"},
+    "base_h": {"expression": 32, "unit": "mm", "range": [28, 38], "description": "Assumed housing height above the feet"},
+    "sample_x": {"expression": "width / 4 - 13", "unit": "mm", "range": [29.5, 35.75], "description": "Shared lateral pedestal and upper probe reference"},
+    "sample_y": {"expression": "3 - depth / 4", "unit": "mm", "range": [-50.75, -44.5], "description": "Shared front pedestal and upper probe reference"},
+    "sample_z": {"expression": "base_h + 16", "unit": "mm", "range": [44, 54], "description": "Top of the lower optical pedestal"},
+    "hinge_y": {"expression": "depth / 2 - 38", "unit": "mm", "range": [57, 69.5], "description": "Rear hinge position"},
+    "hinge_z": {"expression": "sample_z + 13", "unit": "mm", "range": [57, 67], "description": "Lever pivot height derived from the measurement surface"},
+    "max_open": {"expression": 75, "unit": "deg", "range": [70, 85], "description": "Illustrative upper lever limit"}
+  },
+  "sample_reference": {"kind": "hemispherical_drop", "volume_ul": 1.5, "volume_range_ul": [1, 2], "evidence": "Illustration only; no wetting or liquid-column simulation"},
+  "poses_deg": {"closed": 0, "loading": 65},
+  "default_pose": "loading",
+  "design": {"housing": "Rectangular slate enclosure with separate teal lever and left inclined display", "manufacturer_geometry_used": false, "manufacturer_logos_used": false, "dimensions_measured": false},
+  "references": [{"url": "https://tools.thermofisher.com/content/sfs/manuals/3091-NanoDrop-One-Help-UG-en.pdf", "scope": "Functional principle only: lower pedestal, upper measurement arm and 1-2 uL sample"}],
+  "limitations": [
+    "All dimensions and hinge limits are design assumptions, not measurements of a NanoDrop product",
+    "The lower sample support is a flat pedestal, not a cup; the blue 1.5 uL hemisphere is a separate illustrative body",
+    "The idealized closed gap is 1.2 mm; no variable optical path, capillarity, droplet deformation, optical performance or cleaning validation",
+    "No manufacturer geometry or logos; independent appearance does not constitute a legal clearance assessment",
+    "Standalone geometry only; no new workspace placement, device driver, protocol execution or robot reach qualification"
+  ]
+}

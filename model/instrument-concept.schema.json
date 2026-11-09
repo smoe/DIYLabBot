@@ -1,0 +1,321 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "instrument-concept.schema.json",
+  "title": "Independent illustrative laboratory instrument concept",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "family",
+    "recipe",
+    "status",
+    "units",
+    "parameters",
+    "sample_reference",
+    "poses_deg",
+    "default_pose",
+    "design",
+    "references",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.instrument-concept/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family": {
+      "enum": [
+        "nanodrop-concept",
+        "qubit-4-concept"
+      ]
+    },
+    "recipe": {
+      "enum": [
+        "microvolume_pedestal_and_hinged_arm_v1",
+        "single_tube_chamber_and_hinged_cover_v1"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "width",
+        "depth",
+        "base_h",
+        "sample_x",
+        "sample_y",
+        "sample_z",
+        "hinge_y",
+        "hinge_z",
+        "max_open"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/length_parameter"
+      },
+      "propertyNames": {
+        "enum": [
+          "width",
+          "depth",
+          "base_h",
+          "sample_x",
+          "sample_y",
+          "sample_z",
+          "hinge_y",
+          "hinge_z",
+          "max_open"
+        ]
+      },
+      "properties": {
+        "max_open": {
+          "$ref": "#/$defs/angle_parameter"
+        }
+      }
+    },
+    "sample_reference": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "volume_ul",
+            "volume_range_ul",
+            "evidence"
+          ],
+          "properties": {
+            "kind": {
+              "const": "hemispherical_drop"
+            },
+            "volume_ul": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 2
+            },
+            "volume_range_ul": {
+              "const": [
+                1,
+                2
+              ]
+            },
+            "evidence": {
+              "type": "string"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "nominal_capacity_ml",
+            "evidence"
+          ],
+          "properties": {
+            "kind": {
+              "const": "generic_capped_tube"
+            },
+            "nominal_capacity_ml": {
+              "const": 0.5
+            },
+            "evidence": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "poses_deg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "closed",
+        "loading"
+      ],
+      "properties": {
+        "closed": {
+          "const": 0
+        },
+        "loading": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 110
+        }
+      }
+    },
+    "default_pose": {
+      "enum": [
+        "closed",
+        "loading"
+      ]
+    },
+    "design": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "housing",
+        "manufacturer_geometry_used",
+        "manufacturer_logos_used",
+        "dimensions_measured"
+      ],
+      "properties": {
+        "housing": {
+          "type": "string"
+        },
+        "manufacturer_geometry_used": {
+          "const": false
+        },
+        "manufacturer_logos_used": {
+          "const": false
+        },
+        "dimensions_measured": {
+          "const": false
+        }
+      }
+    },
+    "references": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "url",
+          "scope"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "unit",
+        "range",
+        "description"
+      ],
+      "properties": {
+        "expression": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "mm",
+            "deg"
+          ]
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "description": {
+          "type": "string"
+        }
+      }
+    },
+    "length_parameter": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/parameter"
+        },
+        {
+          "properties": {
+            "unit": {
+              "const": "mm"
+            }
+          }
+        }
+      ]
+    },
+    "angle_parameter": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/parameter"
+        },
+        {
+          "properties": {
+            "unit": {
+              "const": "deg"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "family": {
+            "const": "nanodrop-concept"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "recipe": {
+            "const": "microvolume_pedestal_and_hinged_arm_v1"
+          },
+          "sample_reference": {
+            "properties": {
+              "kind": {
+                "const": "hemispherical_drop"
+              }
+            }
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "recipe": {
+            "const": "single_tube_chamber_and_hinged_cover_v1"
+          },
+          "sample_reference": {
+            "properties": {
+              "kind": {
+                "const": "generic_capped_tube"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

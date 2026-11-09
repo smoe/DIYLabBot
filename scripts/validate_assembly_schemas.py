@@ -16,6 +16,7 @@ def main():
     except ImportError:
         raise SystemExit('Install the optional schema validator: python -m pip install jsonschema')
     names = ['assembly-reference.schema.json','lab-layout.schema.json','centrifuge-cf01.robot-pickup.schema.json','room-composition.schema.json','room-geometry.schema.json','furniture-catalog.schema.json','furnishings.schema.json','synthetic-environment.schema.json','synthetic-workspace.schema.json','equipment-layout.schema.json','guided-tube-rack.schema.json','cf01-rack-batch.schema.json','synthetic-lab-workflow.schema.json']
+    names.append('instrument-concept.schema.json')
     schemas = {}
     for name in names:
         path = ROOT/'model'/name
@@ -29,6 +30,11 @@ def main():
         data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
         Draft202012Validator(schemas[name],registry=registry).validate(data)
         print(document+': schema passed')
+    for family in ['nanodrop-concept', 'qubit-4-concept']:
+        document = family + '.shared.json'
+        data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
+        Draft202012Validator(schemas['instrument-concept.schema.json'], registry=registry).validate(data)
+        print(document + ': schema passed')
     workflow_schema = schemas['synthetic-lab-workflow.schema.json']
     manifest = json.loads((ROOT/'model/synthetic-lab-workflow.manifest.json').read_text())
     manifest_schema = {'$schema':workflow_schema['$schema'], '$id':workflow_schema['$id']+'?manifest-check',

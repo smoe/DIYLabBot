@@ -6,6 +6,10 @@ eine laufbezogene Kalibrierung, Messungsbestätigungen und einen Dateiimport.
 Es wird weder ein Qubit noch ein Netzwerkadapter angesprochen. Die ausdrücklich
 synthetische CSV ist kein qualifizierter nativer Qubit-Export.
 
+Ein separates [Qubit-Anschauungsmodell](instrument-concepts.md#qubit-konzept)
+ergänzt inzwischen Display, Röhrchenkammer und Deckel in FreeCAD und SolidCraft.
+Seine angenommene Geometrie ist nicht an Gerätepositionen oder Laufzustände gekoppelt.
+
 ## Einstieg
 
 ```bash

@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-08",
-  "catalog_sha256": "e1a119cd0fd8486c8da93b215ef2e597080c0725420d8fca7c5628dccc1d3840",
+  "catalog_sha256": "e2badd76b78f33ddb8a9d406c4cf56c4fb37644e849972436c07f3a6bc684835",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "0604e8e9cbb502c9c9820d1bb3c291cfb42932793eb827c32e04d6f03361b959",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -2016,6 +2016,96 @@
       },
       "render_generator_sha256": "28135ede9e66f3f6ff05379b83103b1ad9fc67082361acab878b28faa821f3fd",
       "prepared_on": "2026-11-09"
+    },
+    {
+      "id": "nanodrop-concept",
+      "image": "images/nanodrop-concept.png",
+      "source_files_sha256": {
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02"
+      },
+      "build_report": "cad/nanodrop-concept/shared-build-report.json",
+      "build_report_sha256": "31d62a3e9171e65d2ad8420909856648e8fd2aaea5d17217a278ad81033444c2",
+      "build_passed": true,
+      "build_source_sha256": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "source_equivalence": null,
+      "native_model": "cad/generated/nanodrop-concept-4919cfacf4cd-r4/ND01_MicrovolumeConcept_default.sc",
+      "native_model_sha256": "b9f4de24296495857deca170725aa35f1b1e405f725a3a7c3cb9fb80ace20609",
+      "renderer_result": {
+        "bytes": 72457,
+        "height": 700,
+        "path": "docs/models/images/nanodrop-concept.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 1000
+      },
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/nanodrop-concept-4919cfacf4cd-r4/ND01_MicrovolumeConcept_default.sc",
+        "--out",
+        "docs/models/images/nanodrop-concept.png",
+        "--width",
+        "1000",
+        "--height",
+        "700",
+        "--view",
+        "iso",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "10e0bba604b928f40a20fe2af6e498266d55b06d7f98f2701a4e9e2188204c84",
+      "bytes": 72457,
+      "dependency_files_sha256": {
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02"
+      },
+      "prepared_on": "2026-11-09"
+    },
+    {
+      "id": "qubit-4-concept",
+      "image": "images/qubit-4-concept.png",
+      "source_files_sha256": {
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+      },
+      "build_report": "cad/qubit-4-concept/shared-build-report.json",
+      "build_report_sha256": "8b6aae61604f1ca1187696d0058a4f26fa2664d4e959b6b30e39d073936a5e54",
+      "build_passed": true,
+      "build_source_sha256": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "source_equivalence": null,
+      "native_model": "cad/generated/qubit-4-concept-f41063a1a099-r3/QB01_FluorometerConcept_default.sc",
+      "native_model_sha256": "6fb2a8760a5cba402e47967bea00b7f969dbd3fc9570b3ad4fac3dd7306c9109",
+      "renderer_result": {
+        "bytes": 83887,
+        "height": 700,
+        "path": "docs/models/images/qubit-4-concept.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 1000
+      },
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/qubit-4-concept-f41063a1a099-r3/QB01_FluorometerConcept_default.sc",
+        "--out",
+        "docs/models/images/qubit-4-concept.png",
+        "--width",
+        "1000",
+        "--height",
+        "700",
+        "--view",
+        "iso",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "8a8e2f9a323926190d8722c4ba3a4cbd1de4685a19b9b9e508bb1e281ae7934c",
+      "bytes": 83887,
+      "dependency_files_sha256": {
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+      },
+      "prepared_on": "2026-11-09"
     }
   ],
   "visual_review": {
@@ -2059,6 +2149,19 @@
       "method": "Rendered the source-derived SVG in local Chrome and visually checked labels, sequence, balances and explicit schematic/qualification limits. Existing images and historical README media unchanged.",
       "review_date": "2026-11-09",
       "preview_sha256": "34e05200efe38088186899a71f4581d43641219c8bb98e33d1c0ea4454ea6b7c"
+    },
+    "instrument_concepts_update": {
+      "passed": true,
+      "reviewed_images": [
+        "nanodrop-concept",
+        "qubit-4-concept"
+      ],
+      "method": "Visually inspected both native SolidCraft gallery previews plus full-size open views and measurement-area closeups; checked distinctive lever, pedestal, actual drop, single-tube chamber, lid and independent logo-free appearance. Also inspected both closed reference poses.",
+      "review_date": "2026-11-09",
+      "image_sha256": {
+        "nanodrop-concept": "10e0bba604b928f40a20fe2af6e498266d55b06d7f98f2701a4e9e2188204c84",
+        "qubit-4-concept": "8a8e2f9a323926190d8722c4ba3a4cbd1de4685a19b9b9e508bb1e281ae7934c"
+      }
     }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

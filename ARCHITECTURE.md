@@ -290,6 +290,11 @@ sowie `model/qubit-4-manual.synthetic.json`. Der Profilvertrag steht in
 Raumdefinitionen bleiben erhalten. Ansatz- und Standardgefäße besitzen deklarierte
 logische Plätze ohne erfundene Geometrie.
 
+Die separaten [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md)
+besitzen nun eigene gemeinsame Geometriequellen und zwei native CAD-Ableitungen.
+Ihre Maße sind Annahmen; sie ergänzen weder Gerätepositionen noch Bindungen der
+logischen Messabläufe an CAD-Gelenke.
+
 Eine Ansatzabsicht identifiziert das ausgewählte leere Gefäß vor dem Transfer.
 Die Bestätigung erzeugt einen Transferdatensatz; nur dort wird die Originalprobe
 einmalig belastet. Die spätere Messung verbraucht nicht noch einmal dieselbe

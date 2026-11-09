@@ -1,0 +1,31 @@
+{
+  "format": "solidcraftbot.instrument-concept/1",
+  "id": "QB01_FluorometerConcept",
+  "family": "qubit-4-concept",
+  "recipe": "single_tube_chamber_and_hinged_cover_v1",
+  "status": "Independent illustrative concept; not a manufacturer CAD model or a working instrument",
+  "units": {"length": "mm", "angle": "deg"},
+  "parameters": {
+    "width": {"expression": 160, "unit": "mm", "range": [150, 175], "description": "Assumed housing width"},
+    "depth": {"expression": 225, "unit": "mm", "range": [215, 240], "description": "Assumed housing depth"},
+    "base_h": {"expression": 44, "unit": "mm", "range": [40, 50], "description": "Assumed housing height above the feet"},
+    "sample_x": {"expression": "width / 4 - 10", "unit": "mm", "range": [27.5, 33.75], "description": "Measurement chamber and reference tube axis"},
+    "sample_y": {"expression": "depth / 4 - 8", "unit": "mm", "range": [45.75, 52], "description": "Measurement chamber position behind the display"},
+    "sample_z": {"expression": "base_h + 16", "unit": "mm", "range": [56, 66], "description": "Top of the chamber collar"},
+    "hinge_y": {"expression": "sample_y + 29", "unit": "mm", "range": [74.75, 81], "description": "Rear cover pivot position"},
+    "hinge_z": {"expression": "sample_z + 8", "unit": "mm", "range": [64, 74], "description": "Cover pivot height derived from the chamber"},
+    "max_open": {"expression": 100, "unit": "deg", "range": [95, 110], "description": "Illustrative upper cover limit"}
+  },
+  "sample_reference": {"kind": "generic_capped_tube", "nominal_capacity_ml": 0.5, "evidence": "Generic visual reference only; no selected article or verified fit"},
+  "poses_deg": {"closed": 0, "loading": 95},
+  "default_pose": "loading",
+  "design": {"housing": "Wide slate enclosure, inclined front display and circular single-tube chamber with a teal cover", "manufacturer_geometry_used": false, "manufacturer_logos_used": false, "dimensions_measured": false},
+  "references": [{"url": "https://documents.thermofisher.com/TFS-Assets/LSG/manuals/MAN0017209-Qubit4Fluorometer-UG.pdf", "scope": "Functional principle only: touchscreen, one assay-tube chamber and closable lid"}],
+  "limitations": [
+    "All dimensions and hinge limits are design assumptions, not measurements of a Qubit product",
+    "The separate translucent reference tube is illustrative; no 0.5 mL article fit or chamber light-tightness qualification",
+    "No excitation optics, detector, assay chemistry, temperature model or measurement performance",
+    "No manufacturer geometry or logos; independent appearance does not constitute a legal clearance assessment",
+    "Standalone geometry only; no new workspace placement, device driver, protocol execution or robot reach qualification"
+  ]
+}
