@@ -6,6 +6,14 @@ with the existing rack-batch runner as its first consumer and an independent
 hardware, CAD, NanoDrop/Qubit network feature or historical-media change belongs
 to this work.
 
+The [SiLA/GENtle architecture](../ARCHITECTURE.md) describes a separate future
+capability/resource binding. That binding is not implemented by this simulator
+server. The shared CF01 → NanoDrop → Qubit workflow remains a local synthetic
+workflow with durable CF01 checkpoints before effects. Its local `sila2`
+decoder selection is not a network execution. The `batch` command documented
+here is the separate TLS/gRPC consumer and retains its own durable client
+intents and handoff checkpoints.
+
 ## Sources and reproducibility
 
 - `model/cf01-sila2.shared.json` references the existing CF01 protocol, station and batch fixture
@@ -42,6 +50,12 @@ unit test injects a manual process clock. Neither passwords nor tokens are CLI
 arguments or ordinary log output.
 
 ## Ownership, time and recovery
+
+The implemented server uses the archived `LockController-v1_0.sila.xml`,
+FeatureVersion `1.0`, maturity `Verified`, with FQI
+`org.silastandard/core/LockController/v1`. The GENtle target architecture instead
+selects the separate v2 Draft contract. Neither an implicit version conversion
+nor implemented GENtle resource binding follows from the current v1 server.
 
 `LockController.LockIdentifier` is metadata. Its lease is separate from the
 core's boot-scoped process ownership and watchdog. A standard lease expiry or
@@ -227,6 +241,51 @@ Final verification on 2026-11-09:
   `exports/generated/cf01-sila2/acceptance-report.json` and its referenced logs.
   These results establish bounded simulator interoperability; they are not
   formal SiLA certification, LAN qualification or hardware safety evidence.
+
+## Historical rebase verification on 2026-11-10
+
+The original SiLA commit was rebased without conflict onto master `7b7f581` as
+`0bb3874`. The earlier acceptance results above describe the pre-rebase source
+revision and must not be used as proof that this rebased composition passes.
+The documentation alignment does not change server behavior, model pins or the
+architecture's proposed LockController version.
+
+The following findings describe that rebased revision, before the later master
+integration; they remain part of the historical evidence:
+
+- `network_batch.source_sha256` still pins `e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0`,
+  while the current shared batch source is
+  `da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681`.
+  Contract loading rejects the mismatch before server startup. Tests failing
+  there do not prove network, process-recovery or .NET interoperability on this
+  rebased stand. This rebase/documentation task leaves the model pin unchanged;
+  any subsequent update must preserve the source binding of existing journals.
+- `render_model_gallery.py --check` currently treats
+  `model/cf01-sila2.shared.json` as a model source requiring an image and rejects
+  its missing gallery coverage. It is a transport profile. No image, catalog or
+  historical provenance was added or rewritten to conceal this failure.
+
+The offline and network/.NET-enabled project runs, per-file SiLA results with
+skip reasons, gallery check and shared-workflow demo are recorded locally in
+`exports/generated/sila-rebase-7b7f581/verification-report.json` and its logs.
+Skipped checks and failures before transport startup are not passed network
+acceptance gates.
+
+## Master integration on 2026-11-10
+
+The integration combines review follow-up `52120c5` with the documentation from
+`fee2413`. It restores `network_batch.source_sha256` to
+`da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681`,
+the current shared batch source binding retained by the follow-up. Existing
+journals keep their original source signature and are not migrated.
+
+This source-binding correction does not turn the failed `0bb3874` rebase checks
+into successful acceptance results. The integrated batch pin was compared with
+the current source bytes and matches. That source check alone does not establish
+network/.NET acceptance; no passed integration run is claimed here.
+The historical gallery failure above remains
+an explicit verification item, not a claimed gallery pass. No native BRep or
+hardware qualification follows from this merge.
 
 Commands for the current checks:
 

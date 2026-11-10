@@ -77,12 +77,16 @@ and is validated against the archived official XSD files under
 `exports/research/sila2-schema/`. Schema validity is distinct from server
 conformance and client interoperability.
 
-**No ROS node/action server or SiLA gRPC server is implemented.** ROS 2, colcon,
-SiLA SDK and real hardware are unavailable on this Windows environment, so the
-ROS package has not been compiled or run and no live SiLA client/server has
-been tested. Authentication, TLS, discovery, deployment, qualified drive I/O
-and independent feedback are future work. The originator namespace is a
-provisional project identifier, not a registered standard SiLA feature.
+The v1 definitions and `MockProtocol` above remain local contracts and mocks.
+**No ROS node/action server is implemented.** The original Windows checks did
+not compile or run the ROS package or exercise live SiLA networking.
+A separate [CF01 v2 TLS/gRPC server](sila2-network.md) now implements the network
+boundary to the same simulator core, with authentication and feature discovery.
+Its historical checks, current integration status and explicit acceptance gates
+are documented separately; local v1 decoding is not evidence of network success.
+The network adapter does not qualify real drive I/O, independent feedback, LAN
+deployment, hardware or safety. The originator namespace remains a provisional
+project identifier, not a registered standard SiLA feature.
 The local mock always reports `simulation_only=true`, `hardware_qualified=false`.
 
 To compile the prepared definitions in an installed ROS 2 Jazzy environment:
@@ -140,8 +144,8 @@ seating, brake and health feedback before completing each operation.
 `RunCentrifuge` remains active through both dwell and deceleration. `Stop` is a
 short priority stop request; successful acceptance is **not standstill**.
 The local `cancel(job_id)` requests stop and reports `stopping` until standstill
-and held parking brake are confirmed, then reports `canceled`. An external SiLA
-implementation must map its custom `Stop` command and execution status to this
+and held parking brake are confirmed, then reports `canceled`. The separate
+[network v2 adapter](sila2-network.md) maps its `CancelController` to this core
 behavior; do not assume ROS action cancellation is a universal built-in SiLA
 command. Owner expiry or sensor faults latch recovery and never auto-restart.
 Heartbeats and status remain available while one observable job is active.

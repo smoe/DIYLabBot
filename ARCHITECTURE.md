@@ -155,7 +155,10 @@ Der Transporter ist ausschließlich die externe Vorbedingung „Rack bereitgeste
 vorhandenen CF01-Simulator- und Protokollklassen aus: beladen, starten, Lauf und
 Abbremsen abwarten, entnehmen und zurückstellen. `--transport ros2` und
 `--transport sila2` wählen die bereits vorhandenen lokalen Vertragsdecoder.
-Es werden keine Netzwerkserver oder Hardware angesprochen. Roboterrückmeldungen
+Es werden dabei keine Netzwerkserver oder Hardware angesprochen. Der separate
+[CF01-SiLA-Netzwerk-Chargenrunner](docs/sila2-network.md) verwendet denselben
+Simulator-/Protokollkern über tatsächliches TLS/gRPC; er bindet den gemeinsamen
+CF01/NanoDrop/Qubit-Laborablauf noch nicht an das Netzwerk an. Roboterrückmeldungen
 für Greifen, Freigeben und Absetzen sind ausdrücklich synthetische Eingaben;
 der Chargenlauf führt weder Beladungs- noch Rückgabebahnen aus.
 Der bestehende Bewegungsbaustein Rotorplatz 01 → Rackplatz 01 besitzt eine
@@ -407,13 +410,20 @@ Identitätsvertrag; die Ultra-API wird nicht auf NanoDrop One übertragen.
 
 ## SiLA-Fähigkeiten und GENtle-Ressourcenbindung
 
-**Status: dokumentierte Zielarchitektur, noch nicht implementiert.** Dieser
-Vertrag ergänzt die vier räumlichen Ebenen um eine Bindung für Gerätefähigkeiten
-und ihre aktuelle Belegung. Er führt keine neuen Schemas, Endpoints, Dienste oder
-Runtime-Daten ein. Die vorhandenen lokalen SiLA-Vertragsdecoder und Mocks sind
-keine laufenden SiLA-Netzwerkserver und kein Hardwarebeleg. Auch der getrennte
-UltraC-HTTP-Leseadapter ist kein SiLA-Adapter. Alle bisherigen Sicherheits-,
-Metrologie-, biologischen und Fertigungsgrenzen gelten unverändert weiter.
+**Status: Die hier beschriebene GENtle-Fähigkeits- und Ressourcenbindung ist
+dokumentierte Zielarchitektur, noch nicht implementiert.** Dieser Vertrag
+ergänzt die vier räumlichen Ebenen um eine Bindung für Gerätefähigkeiten und
+ihre aktuelle Belegung; er führt selbst keine neuen Schemas, Endpoints, Dienste
+oder Runtime-Daten ein. Davon getrennt ist ein
+[TLS/gRPC-SiLA-Server für den CF01-Simulator](docs/sila2-network.md) implementiert.
+Sein Netzwerk-Chargenrunner ist nicht mit den bisherigen lokalen
+Vertragsdecodern oder dem gemeinsamen synthetischen Laborablauf gleichzusetzen.
+Implementierung und aktueller Prüferfolg bleiben getrennte Aussagen; historische
+Rebase-Ergebnisse und der Integrationsstand stehen in der verlinkten Dokumentation.
+Hardwarebetrieb,
+formale SiLA-Zertifizierung und LAN-Qualifikation sind nicht nachgewiesen.
+Auch der getrennte UltraC-HTTP-Leseadapter ist kein SiLA-Adapter. Alle bisherigen
+Sicherheits-, Metrologie-, biologischen und Fertigungsgrenzen gelten weiter.
 
 Referenzen sind [SiLA 2](https://sila-standard.com/), die
 [offiziellen Featuredefinitionen in `sila_base`](https://gitlab.com/SiLA2/sila_base)
@@ -512,6 +522,12 @@ aus `sila_base`-Revision `58290aab68172dcab4ce52d74478b9b97910964f`.
 Das ist kein normatives, bereits qualifiziertes Reservierungssystem. Die
 ausgewertete FDL-Revision muss im jeweiligen Snapshot gebunden bleiben;
 ein späterer Entwurf wird nicht still als gleichwertig behandelt.
+
+Der bereits implementierte CF01-Simulatorserver verwendet davon getrennt
+[`LockController` v1.0, Status `Verified`](interfaces/sila2/standard/LockController-v1_0.sila.xml),
+mit FQI `org.silastandard/core/LockController/v1`. Diese vorhandene Schnittstelle
+implementiert weder den hier vorgesehenen v2-Draft-Vertrag noch die GENtle-Bindung;
+Versionen und ihre Semantik werden nicht still gleichgesetzt.
 
 - `IsLocked` ist eine beobachtbare, nicht lockgeschützte Zustandsauskunft,
   kein Eigentumsnachweis.

@@ -433,7 +433,10 @@ Argumenttypen, Interaktionsregeln und die animierte Deckel-/Heberfolge.
 GIF und FreeCAD-Posenmakro auf Basis der geprüften Geometrie.
 `build_centrifuge_interfaces.py` erzeugt ROS-Actions/Services und eine SiLA-FDL;
 `centrifuge_protocol.py` prüft deren gemeinsame Mock-Ausführungssemantik.
-Eine ROS-/SiLA-Netzwerklaufzeit ist noch nicht implementiert.
+Diese lokalen v1-Decoder bleiben Mocks. Der getrennte
+[CF01-v2-Netzwerkadapter](sila2-network.md) stellt inzwischen einen TLS/gRPC-Server
+für denselben Simulator bereit; eine ROS-Netzwerklaufzeit oder reale
+Geräteanbindung ist damit nicht implementiert.
 
 [centrifuge-cf01.shared.json](../model/centrifuge-cf01.shared.json), Format
 `solidcraftbot.centrifuge/1`, führt Maße, Festwinkel-Lochmuster, Beschriftung,
@@ -467,7 +470,9 @@ Sensorschnittstellen sind nicht implementiert.
 
 Die Python-/JSONL-Mock-Schnittstelle verwendet die gemeinsamen Maße/Grenzwerte.
 Hochgeschwindigkeitsfreigaben bleiben ohne qualifizierte Daten gesperrt. ROS-Laufzeit,
-SiLA-Server, Kameradetektion und physische Prüfungen sind nicht implementiert.
+Kameradetektion und physische Prüfungen sind nicht implementiert. Auch der
+separate SiLA-Server liefert ausschließlich simulierte Stationsrückmeldung;
+er ist kein Hardware- oder Sicherheitsnachweis.
 Details und Prüfgrenzen: [CF01](centrifuge-cf01.md).
 
 ## Referenzierte Baugruppen und Parametervarianten
