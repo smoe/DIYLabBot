@@ -70,14 +70,19 @@ def build(spec, p, path):
         group = groups[meta[target]['component']]
         if kind=='polygon_prism':
             profile=doc.addObject('Sketcher::SketchObject',name+'_Sketch');group.addObject(profile)
-            if s['plane']=='XZ':
+            if s['plane']=='XY':
+                profile.setExpression('Placement.Base.z',native_expression(s['offset']))
+                points=s['points'];direction=[0,0,1]
+            elif s['plane']=='XZ':
                 profile.Placement=App.Placement(App.Vector(),App.Rotation(App.Vector(1,0,0),-90))
                 profile.setExpression('Placement.Base.y',native_expression(s['offset']))
                 points=[[x,f'-({z})'] for x,z in s['points']];direction=[0,1,0]
-            else:
+            elif s['plane']=='YZ':
                 profile.Placement=App.Placement(App.Vector(),App.Rotation(App.Vector(0,1,0),App.Vector(0,0,1),App.Vector(1,0,0),'ZXY'))
                 profile.setExpression('Placement.Base.x',native_expression(s['offset']))
                 points=s['points'];direction=[1,0,0]
+            else:
+                raise ValueError('Unsupported polygon prism plane')
             geometry=[];constraints=[];expressions=[]
             for i,(a,b) in enumerate(zip(points,points[1:]+points[:1])):
                 geometry.append(Part.LineSegment(App.Vector(*(model.evaluate(v,p) for v in a),0),App.Vector(*(model.evaluate(v,p) for v in b),0)))

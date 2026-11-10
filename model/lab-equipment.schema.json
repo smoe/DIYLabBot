@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-equipment.schema.json",
+  "title": "Portable laboratory balance and cold-storage equipment",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "units", "status", "families", "profiles", "references", "limitations"],
+  "properties": {
+    "format": {"const": "solidcraftbot.lab-equipment/1"},
+    "id": {"type": "string", "minLength": 1},
+    "status": {"type": "string", "minLength": 1},
+    "units": {"const": {"length": "mm", "angle": "deg", "temperature": "degC"}},
+    "families": {
+      "type": "object", "additionalProperties": false, "required": ["cold_storage", "analytical_balance"],
+      "properties": {
+        "cold_storage": {"$ref": "#/$defs/family"},
+        "analytical_balance": {"$ref": "#/$defs/family"}
+      }
+    },
+    "profiles": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/profile"}},
+    "references": {"type": "object", "additionalProperties": {"$ref": "#/$defs/reference"}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object", "additionalProperties": false,
+      "required": ["expression", "unit", "range", "description"],
+      "properties": {
+        "expression": {"type": ["number", "string"]},
+        "unit": {"enum": ["mm", "deg"]},
+        "range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "family": {
+      "type": "object", "additionalProperties": false, "required": ["recipe", "parameters"],
+      "properties": {
+        "recipe": {"enum": ["cabinet_with_hinged_door_and_storage_insert/1", "weighing_pan_with_openable_glass_draft_shield/1"]},
+        "parameters": {"type": "object", "minProperties": 1, "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"}, "additionalProperties": {"$ref": "#/$defs/parameter"}}
+      }
+    },
+    "insert": {
+      "oneOf": [
+        {"type": "null"},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "levels"],
+         "properties": {"kind": {"enum": ["open_shelves", "plastic_drawers"]}, "levels": {"type": "integer", "minimum": 2, "maximum": 8}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "compartment_heights_mm"],
+         "properties": {"kind": {"const": "inner_doors"}, "compartment_heights_mm": {"type": "array", "minItems": 2, "maxItems": 8, "items": {"type": "number", "exclusiveMinimum": 0}}}}
+      ]
+    },
+    "profile": {
+      "type": "object", "additionalProperties": false,
+      "required": ["family", "label", "overrides", "insert", "reference_setpoint_c", "reported_temperature_c", "nominal_storage_l", "capacity_g", "readability_g", "handling", "location_hint", "reference"],
+      "properties": {
+        "family": {"enum": ["cold_storage", "analytical_balance"]},
+        "label": {"type": "string", "minLength": 1},
+        "overrides": {"type": "object", "additionalProperties": {"type": "number"}},
+        "insert": {"$ref": "#/$defs/insert"},
+        "reference_setpoint_c": {"type": ["number", "null"]},
+        "reported_temperature_c": {"type": "null"},
+        "nominal_storage_l": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "capacity_g": {"type": "null"},
+        "readability_g": {"type": "null"},
+        "handling": {"enum": ["manual_model", "manual_only"]},
+        "location_hint": {"type": ["string", "null"]},
+        "reference": {"type": ["string", "null"]}
+      },
+      "allOf": [{"if": {"properties": {"family": {"const": "analytical_balance"}}},
+        "then": {"properties": {"insert": {"type": "null"}, "reference_setpoint_c": {"type": "null"}}},
+        "else": {"properties": {"insert": {"type": "object"}, "reference_setpoint_c": {"type": "number"}}}}]
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false, "required": ["requested_url", "verified_url", "scope"],
+      "properties": {
+        "requested_url": {"type": "string", "pattern": "^https://"},
+        "verified_url": {"type": "string", "pattern": "^https://"},
+        "manual_url": {"type": "string", "pattern": "^https://"},
+        "scope": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

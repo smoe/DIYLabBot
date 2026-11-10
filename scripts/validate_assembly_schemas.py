@@ -18,6 +18,7 @@ def main():
     names = ['assembly-reference.schema.json','lab-layout.schema.json','centrifuge-cf01.robot-pickup.schema.json','room-composition.schema.json','room-geometry.schema.json','furniture-catalog.schema.json','furnishings.schema.json','synthetic-environment.schema.json','synthetic-workspace.schema.json','equipment-layout.schema.json','guided-tube-rack.schema.json','cf01-rack-batch.schema.json','synthetic-lab-workflow.schema.json']
     names.append('instrument-concept.schema.json')
     names.append('lab-glassware.schema.json')
+    names.append('lab-equipment.schema.json')
     schemas = {}
     for name in names:
         path = ROOT/'model'/name
@@ -39,6 +40,10 @@ def main():
     document = 'lab-glassware.shared.json'
     data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
     Draft202012Validator(schemas['lab-glassware.schema.json'], registry=registry).validate(data)
+    print(document + ': schema passed')
+    document = 'lab-equipment.shared.json'
+    data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
+    Draft202012Validator(schemas['lab-equipment.schema.json'], registry=registry).validate(data)
     print(document + ': schema passed')
     workflow_schema = schemas['synthetic-lab-workflow.schema.json']
     manifest = json.loads((ROOT/'model/synthetic-lab-workflow.manifest.json').read_text())

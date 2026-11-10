@@ -1,0 +1,129 @@
+{
+  "format": "solidcraftbot.lab-equipment/1",
+  "id": "LaboratoryBalanceAndColdStorage",
+  "units": {"length": "mm", "angle": "deg", "temperature": "degC"},
+  "status": "Parametric equipment/access models; no weighing, refrigeration or hardware execution",
+  "families": {
+    "cold_storage": {
+      "recipe": "cabinet_with_hinged_door_and_storage_insert/1",
+      "parameters": {
+        "width": {"expression": 597, "unit": "mm", "range": [450, 1100], "description": "Overall planning width"},
+        "depth": {"expression": 654, "unit": "mm", "range": [500, 1100], "description": "Closed planning depth including the modeled handle"},
+        "height": {"expression": 1684, "unit": "mm", "range": [1200, 2200], "description": "Overall height including feet"},
+        "inner_width": {"expression": 460, "unit": "mm", "range": [300, 800], "description": "Clear interior width"},
+        "inner_depth": {"expression": 423, "unit": "mm", "range": [300, 750], "description": "Clear interior depth"},
+        "inner_height": {"expression": 1460, "unit": "mm", "range": [900, 1700], "description": "Clear interior height"},
+        "opening_bottom": {"expression": 120, "unit": "mm", "range": [90, 500], "description": "Bottom of the storage opening above the floor"},
+        "foot_height": {"expression": 55, "unit": "mm", "range": [35, 90], "description": "Assumed leveling-foot height"},
+        "door_bottom": {"expression": 90, "unit": "mm", "range": [60, 450], "description": "Lower edge of the outer door"},
+        "door_thickness": {"expression": 50, "unit": "mm", "range": [35, 100], "description": "Assumed outer door thickness"},
+        "door_gap": {"expression": 2, "unit": "mm", "range": [1, 5], "description": "Nominal door/frame clearance"},
+        "header_height": {"expression": 50, "unit": "mm", "range": [40, 130], "description": "Assumed fixed display/header height"},
+        "handle_depth": {"expression": 35, "unit": "mm", "range": [25, 75], "description": "Assumed handle projection"},
+        "shelf_thickness": {"expression": 5, "unit": "mm", "range": [3, 15], "description": "Assumed shelf/separator thickness"},
+        "inner_door_thickness": {"expression": 25, "unit": "mm", "range": [15, 45], "description": "Assumed insulated inner-door thickness"},
+        "drawer_wall": {"expression": 3, "unit": "mm", "range": [2, 6], "description": "Assumed plastic drawer wall and bottom thickness"},
+        "drawer_gap": {"expression": 10, "unit": "mm", "range": [6, 18], "description": "Clearance of drawers from the interior walls"},
+        "drawer_travel": {"expression": 350, "unit": "mm", "range": [220, 450], "description": "Concept full drawer extension"},
+        "max_open": {"expression": 110, "unit": "deg", "range": [100, 120], "description": "Outer and inner door opening limit"},
+        "access_angle": {"expression": 100, "unit": "deg", "range": [95, 110], "description": "Minimum modeled outer-door access angle"},
+        "body_depth": {"expression": "depth-door_thickness-handle_depth", "unit": "mm", "range": [350, 1000], "description": "Derived depth behind the outer door"},
+        "door_width": {"expression": "width-2*door_gap", "unit": "mm", "range": [440, 1100], "description": "Derived width of the outer door"},
+        "door_height": {"expression": "height-header_height-door_bottom", "unit": "mm", "range": [900, 2000], "description": "Derived outer door height"},
+        "hinge_x": {"expression": "width/2", "unit": "mm", "range": [225, 550], "description": "Right outer-door hinge derived from the cabinet width"},
+        "hinge_y": {"expression": "-door_gap", "unit": "mm", "range": [-5, -1], "description": "Assumed front hinge plane ahead of the cabinet reveal for outer and inner doors"},
+        "drawer_width": {"expression": "inner_width-2*drawer_gap", "unit": "mm", "range": [250, 800], "description": "Derived outside drawer width"},
+        "drawer_depth": {"expression": "inner_depth-2*drawer_gap", "unit": "mm", "range": [250, 750], "description": "Derived outside drawer depth"}
+      }
+    },
+    "analytical_balance": {
+      "recipe": "weighing_pan_with_openable_glass_draft_shield/1",
+      "parameters": {
+        "width": {"expression": 240, "unit": "mm", "range": [220, 300], "description": "Assumed balance base width"},
+        "depth": {"expression": 340, "unit": "mm", "range": [310, 400], "description": "Assumed balance base depth"},
+        "base_height": {"expression": 80, "unit": "mm", "range": [70, 110], "description": "Assumed base height above the feet"},
+        "foot_height": {"expression": 8, "unit": "mm", "range": [5, 15], "description": "Assumed leveling-foot height"},
+        "pan_radius": {"expression": 45, "unit": "mm", "range": [35, 55], "description": "Assumed weighing-pan radius"},
+        "pan_mount": {"expression": 7, "unit": "mm", "range": [5, 15], "description": "Height of the isolated pan mount"},
+        "pan_thickness": {"expression": 3, "unit": "mm", "range": [2, 5], "description": "Weighing-pan thickness"},
+        "pan_y": {"expression": 25, "unit": "mm", "range": [-10, 40], "description": "Pan position relative to the base"},
+        "shield_width": {"expression": 200, "unit": "mm", "range": [185, 240], "description": "Clear draft-shield width"},
+        "shield_depth": {"expression": 220, "unit": "mm", "range": [200, 260], "description": "Draft-shield depth"},
+        "shield_height": {"expression": 235, "unit": "mm", "range": [200, 280], "description": "Clear height above the pan"},
+        "glass_thickness": {"expression": 2, "unit": "mm", "range": [1.5, 3], "description": "Assumed glass-pane thickness"},
+        "side_travel": {"expression": "shield_depth/2", "unit": "mm", "range": [100, 130], "description": "Travel of each front half-pane"},
+        "top_angle": {"expression": 75, "unit": "deg", "range": [70, 85], "description": "Open top-cover limit"},
+        "pan_z": {"expression": "foot_height+base_height+pan_mount+pan_thickness", "unit": "mm", "range": [80, 150], "description": "Derived upper weighing-pan surface"},
+        "hinge_y": {"expression": "pan_y+shield_depth/2", "unit": "mm", "range": [80, 180], "description": "Rear top-cover hinge position"},
+        "hinge_z": {"expression": "pan_z+shield_height+4", "unit": "mm", "range": [250, 450], "description": "Derived top-cover hinge height"}
+      }
+    }
+  },
+  "profiles": {
+    "analytical_balance": {
+      "family": "analytical_balance",
+      "label": "Analytical balance with draft shield",
+      "overrides": {},
+      "insert": null,
+      "reference_setpoint_c": null,
+      "reported_temperature_c": null,
+      "nominal_storage_l": null,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_model",
+      "location_hint": null,
+      "reference": "balances"
+    },
+    "fridge_4c": {
+      "family": "cold_storage",
+      "label": "4 C laboratory refrigerator, SRFvg 3501 reference",
+      "overrides": {},
+      "insert": {"kind": "open_shelves", "levels": 5},
+      "reference_setpoint_c": 4,
+      "reported_temperature_c": null,
+      "nominal_storage_l": 261,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_model",
+      "location_hint": "laboratory",
+      "reference": "srfvg3501"
+    },
+    "freezer_minus20": {
+      "family": "cold_storage",
+      "label": "Generic -20 C freezer with plastic drawers",
+      "overrides": {"width": 600, "depth": 650, "height": 1700, "inner_width": 450, "inner_depth": 450, "inner_height": 1320, "opening_bottom": 180, "door_bottom": 130},
+      "insert": {"kind": "plastic_drawers", "levels": 6},
+      "reference_setpoint_c": -20,
+      "reported_temperature_c": null,
+      "nominal_storage_l": null,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_model",
+      "location_hint": "laboratory",
+      "reference": null
+    },
+    "cellar_ult_f440n": {
+      "family": "cold_storage",
+      "label": "Manual cellar ULT storage, CryoCube F440n reference",
+      "overrides": {"width": 955, "depth": 898, "height": 1950, "inner_width": 616, "inner_depth": 600, "inner_height": 1265, "opening_bottom": 465, "door_bottom": 390, "door_thickness": 80, "header_height": 100, "handle_depth": 55, "shelf_thickness": 12, "drawer_travel": 400},
+      "insert": {
+        "kind": "inner_doors",
+        "compartment_heights_mm": [245.5, 242, 242, 242, 245.5]
+      },
+      "reference_setpoint_c": -80,
+      "reported_temperature_c": null,
+      "nominal_storage_l": 440,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_only",
+      "location_hint": "cellar",
+      "reference": "f440n"
+    }
+  },
+  "references": {
+    "balances": {"requested_url": "https://www.sigmaaldrich.com/DE/de/products/labware/laboratory-equipment/laboratory-balances", "verified_url": "https://www.sigmaaldrich.com/RS/en/products/labware/laboratory-equipment/laboratory-balances", "scope": "Category and draft-shield principle only; no selected balance article, measured dimensions, capacity or readability"},
+    "srfvg3501": {"requested_url": "https://lt-laborhandel.de/liebherr-srfvg-3501-labor-kuehlgeraet-261-l-umluftkuehlung-mit-safetydevice-993870251", "verified_url": "https://assets-cdn.liebherr.com/assets/api/954b8562-8914-4137-b8d4-d10cb2b6fed5/Original/", "scope": "Manufacturer datasheet: 597/654/1684 mm outside and 460/423/1460 mm inside, 261 l net, four adjustable shelves plus floor; shelf elevations and mechanism details assumed"},
+    "f440n": {"requested_url": "https://www.sigmaaldrich.com/DE/de/product/sigma/epf440400035", "verified_url": "https://www.eppendorf.com/ca-en/Products/Cold-Storage/ULT-Freezers/CryoCube-F440-Series-p-PF-996668", "manual_url": "https://www.eppendorf.com/product-media/doc/en/1025273/Freezers_Operating-manual_CryoCube-F440-series.pdf", "scope": "Family table: 955/898/1950 mm overall planning envelope, 440 l and five inner doors. Manual pp. 62-63: 876 mm cabinet width, 68 mm side projection, interior 616/600/1265 mm and compartment heights. Overall envelope is used; detailed body/handle allocation assumed. Local electrical variant and serial numbers unknown."}
+  },
+  "limitations": ["Models describe physical equipment types and access poses, not installed room coordinates or a second laboratory layout.", "Published reference envelopes are separated from assumed doors, handles, clearances, inserts and the generic analytical-balance/-20 C designs.", "Temperature setpoints are planning labels, not measured temperatures or refrigeration simulation. Empty mass readings, balance capacity and readability remain unknown.", "The cellar ULT is manual-only. No robotic retrieval, device driver, network integration, inventory movement or handover confirmation is implemented.", "Opening doors and extending drawers are idealized native kinematics. Discrete collision checks do not qualify hinges, seals, glass strength, loads or safe operating paths."]
+}
