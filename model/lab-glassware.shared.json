@@ -1,0 +1,94 @@
+{
+  "format": "solidcraftbot.lab-glassware/1",
+  "id": "LaboratoryGlassware",
+  "units": {"length": "mm", "angle": "deg", "volume": "mL"},
+  "status": "Parametric planning models; dimensions assumed and not measured",
+  "material": {"family": "borosilicate_glass", "measured_density_g_per_ml": null, "measured_empty_mass_g": null},
+  "references": {
+    "Z740576": {
+      "url": "https://www.sigmaaldrich.com/DE/de/product/aldrich/z740576",
+      "accessed": "2026-11-10",
+      "manufacturer": "Sigma-Aldrich",
+      "part": "Z740576",
+      "description": "Low-form Griffin beaker with pour spout and flat bottom",
+      "nominal_volume_ml": 250,
+      "reference_graduations_ml": {"first": 25, "last": 200, "step": 25},
+      "outer_dimensions_mm": null
+    }
+  },
+  "families": {
+    "beaker": {
+      "recipe": "hollow_beaker_with_pour_spout/1",
+      "parameters": {
+        "diameter": {"expression": 70, "unit": "mm", "range": [35, 160], "description": "Assumed outside diameter"},
+        "height": {"expression": 95, "unit": "mm", "range": [40, 220], "description": "Height of the cylindrical rim"},
+        "wall": {"expression": 2, "unit": "mm", "range": [1, 4], "description": "Radial wall thickness"},
+        "bottom": {"expression": 3, "unit": "mm", "range": [2, 6], "description": "Bottom thickness"},
+        "spout_length": {"expression": 8, "unit": "mm", "range": [4, 18], "description": "Pouring lip projection beyond the cylindrical wall"},
+        "spout_width": {"expression": 14, "unit": "mm", "range": [8, 24], "description": "Outside width of the pouring lip"},
+        "spout_depth": {"expression": 6, "unit": "mm", "range": [4, 12], "description": "Depth of the spout root below the rim"},
+        "outer_radius": {"expression": "diameter/2", "unit": "mm", "range": [17.5, 80], "description": "Derived outside radius"},
+        "inner_radius": {"expression": "outer_radius-wall", "unit": "mm", "range": [1, 79], "description": "Derived clear inside radius"}
+      }
+    },
+    "funnel": {
+      "recipe": "open_conical_funnel_with_continuous_stem/1",
+      "parameters": {
+        "diameter": {"expression": 60, "unit": "mm", "range": [35, 140], "description": "Outside diameter at the inlet"},
+        "bowl_height": {"expression": 40, "unit": "mm", "range": [20, 100], "description": "Height of the conical bowl"},
+        "stem_length": {"expression": 50, "unit": "mm", "range": [25, 120], "description": "Length of the straight outlet stem"},
+        "stem_diameter": {"expression": 8, "unit": "mm", "range": [6, 20], "description": "Outside diameter of the stem"},
+        "wall": {"expression": 1.2, "unit": "mm", "range": [1, 3], "description": "Radial wall thickness; not a normal-to-cone thickness"},
+        "outer_radius": {"expression": "diameter/2", "unit": "mm", "range": [17.5, 70], "description": "Derived bowl radius"},
+        "inner_radius": {"expression": "outer_radius-wall", "unit": "mm", "range": [1, 69], "description": "Derived clear inlet radius"},
+        "stem_radius": {"expression": "stem_diameter/2", "unit": "mm", "range": [3, 10], "description": "Derived stem radius"},
+        "outlet_radius": {"expression": "stem_radius-wall", "unit": "mm", "range": [0.5, 9], "description": "Derived clear outlet radius"},
+        "height": {"expression": "stem_length+bowl_height", "unit": "mm", "range": [45, 220], "description": "Derived total height"}
+      }
+    },
+    "bottle": {
+      "recipe": "hollow_shoulder_bottle_with_removable_closure/1",
+      "parameters": {
+        "diameter": {"expression": 70, "unit": "mm", "range": [40, 130], "description": "Assumed outside diameter of the body"},
+        "body_height": {"expression": 75, "unit": "mm", "range": [40, 180], "description": "Height of the cylindrical body"},
+        "shoulder_height": {"expression": 22, "unit": "mm", "range": [12, 45], "description": "Height of the tapered shoulder"},
+        "neck_height": {"expression": 20, "unit": "mm", "range": [14, 35], "description": "Straight neck height"},
+        "neck_diameter": {"expression": 32, "unit": "mm", "range": [20, 50], "description": "Outside neck diameter; not a standard thread designation"},
+        "wall": {"expression": 2, "unit": "mm", "range": [1, 4], "description": "Radial glass wall thickness"},
+        "bottom": {"expression": 3, "unit": "mm", "range": [2, 6], "description": "Glass bottom thickness"},
+        "cap_skirt": {"expression": 12, "unit": "mm", "range": [8, 20], "description": "Length of the cap around the neck"},
+        "cap_wall": {"expression": 2, "unit": "mm", "range": [1, 4], "description": "Cap skirt and roof thickness"},
+        "cap_clearance": {"expression": 0.4, "unit": "mm", "range": [0.1, 1], "description": "Illustrative radial clearance; no thread or fit specification"},
+        "seal_gap": {"expression": 0.2, "unit": "mm", "range": [0.1, 1], "description": "Visible nominal axial gap; no qualified seal"},
+        "stopper_depth": {"expression": 10, "unit": "mm", "range": [6, 18], "description": "Illustrative stopper insertion"},
+        "stopper_grip_height": {"expression": 10, "unit": "mm", "range": [6, 18], "description": "Height of the stopper handle"},
+        "outer_radius": {"expression": "diameter/2", "unit": "mm", "range": [20, 65], "description": "Derived outside body radius"},
+        "inner_radius": {"expression": "outer_radius-wall", "unit": "mm", "range": [1, 64], "description": "Derived clear body radius"},
+        "neck_radius": {"expression": "neck_diameter/2", "unit": "mm", "range": [10, 25], "description": "Derived outside neck radius"},
+        "mouth_radius": {"expression": "neck_radius-wall", "unit": "mm", "range": [1, 24], "description": "Derived clear mouth radius"},
+        "shoulder_top": {"expression": "body_height+shoulder_height", "unit": "mm", "range": [52, 225], "description": "Derived top of the shoulder"},
+        "height": {"expression": "shoulder_top+neck_height", "unit": "mm", "range": [66, 260], "description": "Derived mouth height"},
+        "cap_radius": {"expression": "neck_radius+cap_clearance+cap_wall", "unit": "mm", "range": [11, 30], "description": "Derived cap radius"}
+      }
+    }
+  },
+  "items": {
+    "beaker_100": {"family": "beaker", "label": "Becherglas 100 ml", "nominal_volume_ml": 100, "closure": "none", "reference": null, "overrides": {"diameter": 50, "height": 70, "wall": 1.5, "bottom": 2.5, "spout_length": 6, "spout_width": 10, "spout_depth": 5}},
+    "beaker_250": {"family": "beaker", "label": "Becherglas 250 ml", "nominal_volume_ml": 250, "closure": "none", "reference": "Z740576", "overrides": {}},
+    "beaker_500": {"family": "beaker", "label": "Becherglas 500 ml", "nominal_volume_ml": 500, "closure": "none", "reference": null, "overrides": {"diameter": 90, "height": 120, "spout_length": 9, "spout_width": 16, "spout_depth": 7}},
+    "funnel_60": {"family": "funnel", "label": "Glastrichter 60 mm", "nominal_volume_ml": null, "closure": "none", "reference": null, "overrides": {}},
+    "funnel_80": {"family": "funnel", "label": "Glastrichter 80 mm", "nominal_volume_ml": null, "closure": "none", "reference": null, "overrides": {"diameter": 80, "bowl_height": 55, "stem_length": 65, "stem_diameter": 10, "wall": 1.5}},
+    "screw_bottle_100": {"family": "bottle", "label": "Glasflasche 100 ml mit Schraubdeckel", "nominal_volume_ml": 100, "closure": "screw_cap", "reference": null, "overrides": {"diameter": 50, "body_height": 60, "shoulder_height": 15, "neck_height": 18, "neck_diameter": 25}},
+    "screw_bottle_250": {"family": "bottle", "label": "Glasflasche 250 ml mit Schraubdeckel", "nominal_volume_ml": 250, "closure": "screw_cap", "reference": null, "overrides": {}},
+    "screw_bottle_500": {"family": "bottle", "label": "Glasflasche 500 ml mit Schraubdeckel", "nominal_volume_ml": 500, "closure": "screw_cap", "reference": null, "overrides": {"diameter": 86, "body_height": 100, "shoulder_height": 25, "neck_height": 22, "neck_diameter": 36, "wall": 2.2, "bottom": 3.5}},
+    "stopper_bottle_250": {"family": "bottle", "label": "Glasflasche 250 ml mit Glasstopfen", "nominal_volume_ml": 250, "closure": "glass_stopper", "reference": null, "overrides": {}}
+  },
+  "limitations": [
+    "All geometry dimensions are explicit modeling assumptions. The linked beaker supplies nominal volume, material, form and reference graduations only, not measured geometry.",
+    "Reference graduations are not calibrated volumetric measurements. Geometric cavity volumes are separate from nominal capacity.",
+    "The pour spout is a simplified open trough. The funnel has a continuous bore and requires a holder; no free-standing stability is claimed.",
+    "The screw cap is a separate hollow closure envelope without helical threads. The glass stopper has illustrative clearance, not a ground-glass fit.",
+    "Open and closed are static model configurations with the closure parked beside the bottle; no unscrewing, removal path or robot execution is implemented.",
+    "Liquid contents, flow, wetting, contamination, sealing, glass strength, heating and hardware performance are not simulated or qualified. No runtime inventory is created."
+  ]
+}

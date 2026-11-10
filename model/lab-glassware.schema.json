@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-glassware.schema.json",
+  "title": "Portable laboratory glassware library with shared family recipes",
+  "type": "object", "additionalProperties": false,
+  "required": ["format", "id", "units", "status", "material", "references", "families", "items", "limitations"],
+  "properties": {
+    "format": {"const": "solidcraftbot.lab-glassware/1"},
+    "id": {"type": "string", "minLength": 1},
+    "units": {"const": {"length": "mm", "angle": "deg", "volume": "mL"}},
+    "status": {"type": "string", "minLength": 1},
+    "material": {
+      "type": "object", "additionalProperties": false,
+      "required": ["family", "measured_density_g_per_ml", "measured_empty_mass_g"],
+      "properties": {"family": {"const": "borosilicate_glass"}, "measured_density_g_per_ml": {"type": "null"}, "measured_empty_mass_g": {"type": "null"}}
+    },
+    "references": {"type": "object", "additionalProperties": {"$ref": "#/$defs/reference"}},
+    "families": {
+      "type": "object", "additionalProperties": false, "required": ["beaker", "funnel", "bottle"],
+      "properties": {"beaker": {"$ref": "#/$defs/family"}, "funnel": {"$ref": "#/$defs/family"}, "bottle": {"$ref": "#/$defs/family"}}
+    },
+    "items": {"type": "object", "minProperties": 1, "propertyNames": {"pattern": "^[A-Za-z][A-Za-z0-9_]*$"}, "additionalProperties": {"$ref": "#/$defs/item"}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object", "additionalProperties": false, "required": ["expression", "unit", "range", "description"],
+      "properties": {
+        "expression": {"type": ["number", "string"]}, "unit": {"const": "mm"},
+        "range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+        "description": {"type": "string", "minLength": 1}
+      }
+    },
+    "family": {
+      "type": "object", "additionalProperties": false, "required": ["recipe", "parameters"],
+      "properties": {
+        "recipe": {"enum": ["hollow_beaker_with_pour_spout/1", "open_conical_funnel_with_continuous_stem/1", "hollow_shoulder_bottle_with_removable_closure/1"]},
+        "parameters": {"type": "object", "minProperties": 1, "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"}, "additionalProperties": {"$ref": "#/$defs/parameter"}}
+      }
+    },
+    "item": {
+      "type": "object", "additionalProperties": false,
+      "required": ["family", "label", "nominal_volume_ml", "closure", "reference", "overrides"],
+      "properties": {
+        "family": {"enum": ["beaker", "funnel", "bottle"]}, "label": {"type": "string", "minLength": 1},
+        "nominal_volume_ml": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "closure": {"enum": ["none", "screw_cap", "glass_stopper"]},
+        "reference": {"type": ["string", "null"]},
+        "overrides": {"type": "object", "additionalProperties": {"type": "number"}}
+      }
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["url", "accessed", "manufacturer", "part", "description", "nominal_volume_ml", "reference_graduations_ml", "outer_dimensions_mm"],
+      "properties": {
+        "url": {"type": "string", "pattern": "^https://"}, "accessed": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "manufacturer": {"type": "string", "minLength": 1}, "part": {"type": "string", "minLength": 1}, "description": {"type": "string", "minLength": 1},
+        "nominal_volume_ml": {"type": "number", "exclusiveMinimum": 0}, "outer_dimensions_mm": {"type": "null"},
+        "reference_graduations_ml": {"type": "object", "additionalProperties": false, "required": ["first", "last", "step"], "properties": {"first": {"type": "number", "exclusiveMinimum": 0}, "last": {"type": "number", "exclusiveMinimum": 0}, "step": {"type": "number", "exclusiveMinimum": 0}}}
+      }
+    }
+  }
+}
