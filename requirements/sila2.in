@@ -1,0 +1,3 @@
+# Production network adapter. The optional independent client uses another SDK.
+unitelabs-sila==0.14.0
+cryptography==50.0.2

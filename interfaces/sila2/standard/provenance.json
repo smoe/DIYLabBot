@@ -1,0 +1,43 @@
+{
+  "repository": "https://gitlab.com/SiLA2/sila_base.git",
+  "revision": "58290aab68172dcab4ce52d74478b9b97910964f",
+  "license": "MIT",
+  "files": [
+    {
+      "identifier": "SiLAService",
+      "source": "interfaces/sila2/standard/SiLAService-v1_0.sila.xml",
+      "source_sha256": "4425f329c907bdb0ed757a9efc35fcc47d9caa7f2f8f6eecaf9842c1f9d674ec",
+      "upstream_path": "feature_definitions/org/silastandard/core/SiLAService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "LockController",
+      "source": "interfaces/sila2/standard/LockController-v1_0.sila.xml",
+      "source_sha256": "3d6b6499b024d802d8d13471239d88cad36e8a940b328f2f69a35609437247cb",
+      "upstream_path": "feature_definitions/org/silastandard/core/LockController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "CancelController",
+      "source": "interfaces/sila2/standard/CancelController-v1_0.sila.xml",
+      "source_sha256": "d1ac2002e1ff38f752debe59c667ebd2a9a6a65c0a11664643f83d33ad60a7e4",
+      "upstream_path": "feature_definitions/org/silastandard/core/commands/CancelController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "SimulationController",
+      "source": "interfaces/sila2/standard/SimulationController-v1_0.sila.xml",
+      "source_sha256": "f96abd91e60cef32cdf8d515665f5f3d53b9018d9f4799ceae7d81d86c04a543",
+      "upstream_path": "feature_definitions/org/silastandard/core/SimulationController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthenticationService",
+      "source": "interfaces/sila2/standard/AuthenticationService-v1_0.sila.xml",
+      "source_sha256": "d1c3752a23b56f0464bf1511d84e0a39f107c17290cba4568e0b6015b52dddb6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthenticationService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthorizationService",
+      "source": "interfaces/sila2/standard/AuthorizationService-v1_0.sila.xml",
+      "source_sha256": "cf7dd469fd034b1a32e14782853ff6cdd95af323dffc08a1887958d5cd73f3f6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthorizationService-v1_0.sila.xml"
+    }
+  ]
+}
