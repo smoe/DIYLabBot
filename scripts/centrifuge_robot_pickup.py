@@ -11,6 +11,24 @@ import centrifuge_protocol as protocol
 
 ROOT=cf.ROOT
 SOURCE=ROOT/'model/centrifuge-cf01.robot-pickup.shared.json'
+SPARSE_TIMELINE='independent_sparse_channels'
+TIMELINE_CHANNELS=('robot_pose','station_pose','jaw','tube_owner','workspace_clear','rack_seated')
+
+
+def channel_keys(scene,name):
+    """Only explicit keys anchor a channel; other events never pause its motion."""
+    return [key for key in scene['timeline'] if name in key]
+
+
+def channel_value(scene,name,t,default=None):
+    """Discrete confirmations and ownership take effect at their event time."""
+    return next((key[name] for key in reversed(channel_keys(scene,name)) if key['time_s']<=t),default)
+
+
+def robot_holds_pose(scene,t,name):
+    a,b,u=segment(channel_keys(scene,'robot_pose'),t)
+    return (a['robot_pose']==name if u==0 else b['robot_pose']==name if u==1
+            else a['robot_pose']==b['robot_pose']==name)
 
 
 def validate(s):
@@ -19,25 +37,66 @@ def validate(s):
     if s['sources']['centrifuge']!=str(cf.SOURCE.relative_to(ROOT)) or s['sources']['protocol']!=str(protocol.SOURCE.relative_to(ROOT)):
         raise ValueError('This pickup backend supports the shared CF01 station and protocol only')
     if s['gripper']['operation']!='parallel_tube_gripper_envelope':raise ValueError('Supported gripper operation required')
+    sparse=s.get('timeline_semantics')==SPARSE_TIMELINE
+    if 'timeline_semantics' in s and not sparse:raise ValueError('Unsupported pickup timeline semantics')
     times=[k['time_s'] for k in s['timeline']]
-    if times[0]!=0 or any(a>=b for a,b in zip(times,times[1:])):raise ValueError('Strictly ordered pickup timeline required')
-    spec=cf.load();p=cf.parameters(spec);checks=s['checks'];attach=next(k for k in s['timeline'] if k['tube_owner']=='gripper')
-    if attach['time_s']!=checks['attachment_time_s'] or attach['jaw']!='closed' or attach['robot_pose']!='grasp':raise ValueError('Handoff requires closed gripper at the grasp pose')
+    if (len(times)<2 or any(type(t) not in (int,float) or not math.isfinite(t) for t in times)
+            or times[0]!=0 or any(a>=b for a,b in zip(times,times[1:]))):raise ValueError('Strictly ordered pickup timeline required')
+    spec=cf.load();p=cf.parameters(spec);checks=s['checks']
+    for key in s['timeline']:
+        if not isinstance(key.get('phase'),str) or not key['phase']:raise ValueError('Named timeline event required')
+        if sparse:
+            if set(key)-{'time_s','phase','coordinates',*TIMELINE_CHANNELS} or not any(name in key for name in TIMELINE_CHANNELS):raise ValueError('Explicit sparse channel event required')
+        elif not {'robot_pose','station_pose','jaw','tube_owner'}<=set(key):raise ValueError('Sparse events require explicit timeline semantics')
+        if 'coordinates' in key and 'station_pose' not in key:raise ValueError('Coordinate overrides require their own station pose')
+        if 'robot_pose' in key and key['robot_pose'] not in s['poses']:raise ValueError('Unknown robot pose')
+        if 'station_pose' in key and key['station_pose'] not in spec['poses']:raise ValueError('Unknown station pose')
+        if 'jaw' in key and key['jaw'] not in {'open','closed'}:raise ValueError('Unknown jaw state')
+        if 'tube_owner' in key and key['tube_owner'] not in {'station','gripper','rack'}:raise ValueError('Unknown tube owner')
+        if any(name in key and type(key[name]) is not bool for name in ('workspace_clear','rack_seated')):raise ValueError('Explicit Boolean confirmation required')
+    for name in TIMELINE_CHANNELS if sparse else TIMELINE_CHANNELS[:4]:
+        keys=channel_keys(s,name)
+        if not keys or keys[0]['time_s']!=0:raise ValueError('Every timeline channel needs an initial value at zero')
+    owners=[]
+    for key in channel_keys(s,'tube_owner'):
+        if not owners or owners[-1]['tube_owner']!=key['tube_owner']:owners.append(key)
+    if [key['tube_owner'] for key in owners]!=['station','gripper','rack']:raise ValueError('Tube ownership must pass once from station through gripper to rack')
+    attach,handoff=owners[1:]
+    if (attach['time_s']!=checks['attachment_time_s'] or channel_value(s,'jaw',attach['time_s'])!='closed'
+            or not robot_holds_pose(s,attach['time_s'],'grasp')):raise ValueError('Handoff requires closed gripper at the grasp pose')
     if not checks['attachment_time_s']<checks['extraction_time_s']<checks['robot_clear_confirmed_s']<=checks['closing_starts_s']:raise ValueError('Grasp, extraction, withdrawal and closure must stay ordered')
-    carried=False;seated=False
-    for a,b in zip(s['timeline'],s['timeline'][1:]):
-        if a['tube_owner']=='gripper':carried=True
-        if b['tube_owner']=='rack':
-            if not carried or b['robot_pose']!='rack_seated' and not seated or not b.get('rack_seated'):raise ValueError('Rack handoff requires supported tube at seated pose')
-            if not seated and (b['time_s']!=checks['rack_handoff_time_s'] or b['jaw']!='closed'):raise ValueError('Confirm rack support before releasing fingers')
-            seated=True
-        elif seated:raise ValueError('Tube stays supported in rack after release')
-        elif carried and b['tube_owner']!='gripper':raise ValueError('Unsupported tube ownership change')
-        before=cf.pose(spec,p,a['station_pose']);after=cf.pose(spec,p,b['station_pose'])
+    clear=checks['robot_clear_confirmed_s']
+    clear_keys=channel_keys(s,'workspace_clear');first_clear=next((key['time_s'] for key in clear_keys if key['workspace_clear']),None)
+    if first_clear!=clear or not robot_holds_pose(s,clear,'withdrawn'):raise ValueError('Robot and tube clearance requires its confirmed withdrawn event')
+    if any(not key['workspace_clear'] for key in clear_keys if key['time_s']>=clear):raise ValueError('Confirmed robot and tube clearance must remain true')
+    support=next((key['time_s'] for key in channel_keys(s,'rack_seated') if key['rack_seated']),None)
+    if (handoff['time_s']!=checks['rack_handoff_time_s'] or support!=handoff['time_s']
+            or channel_value(s,'jaw',handoff['time_s'])!='closed'
+            or not robot_holds_pose(s,handoff['time_s'],'rack_seated')):raise ValueError('Rack handoff requires supported tube at seated pose with closed jaws')
+    if any(not key['rack_seated'] for key in channel_keys(s,'rack_seated') if key['time_s']>=support):raise ValueError('Tube stays supported in rack after release')
+    jaws=channel_keys(s,'jaw');release=None
+    for a,b in zip(jaws,jaws[1:]):
+        if a['jaw']=='closed' and b['jaw']=='open':
+            if a['time_s']<handoff['time_s'] or not robot_holds_pose(s,a['time_s'],'rack_seated'):raise ValueError('Rack support must be confirmed before opening jaws')
+            release=b['time_s']
+        if b['jaw']=='open' and attach['time_s']<=b['time_s']<handoff['time_s']:raise ValueError('Carried tube requires closed jaws until rack support')
+    if release!=checks['release_complete_time_s']:raise ValueError('Jaw release time must match its confirmation')
+    station=station_frames(s,spec,p);expanded=cf.expanded(spec,p);closing=[]
+    for key in station:cf.validate_pose(expanded,key['values'])
+    for a,b in zip(station,station[1:]):
+        before,after=a['values'],b['values']
+        if after['Lift']<before['Lift'] or after['Lid']<before['Lid']:
+            if a['time_s']<clear or channel_value(s,'workspace_clear',a['time_s'],False) is not True:raise ValueError('Station withdrawal/closure requires confirmed robot and tube clearance')
         if after['Lid']<before['Lid']:
-            if a['time_s']<checks['robot_clear_confirmed_s'] or not a.get('workspace_clear') or not b.get('workspace_clear') or a['robot_pose']!='withdrawn' or b['robot_pose']!='withdrawn':raise ValueError('Lid closure requires confirmed withdrawn robot and tube')
-        if a['robot_pose']!=b['robot_pose'] and a['time_s']<checks['robot_clear_confirmed_s'] and (before['Lid']!=105 or after['Lid']!=105):raise ValueError('Robot access requires fully open lid')
-        if a['jaw']=='closed' and b['jaw']=='open' and (not a.get('rack_seated') or a['tube_owner']!='rack'):raise ValueError('Rack support must be confirmed before opening jaws')
+            closing.append(a['time_s'])
+            if before['Lift']!=0 or after['Lift']!=0:raise ValueError('Lid closure requires a parked pusher')
+    if not closing or min(closing)!=checks['closing_starts_s']:raise ValueError('Lid closure start must match its checked event')
+    robots=channel_keys(s,'robot_pose')
+    for a,b in zip(robots,robots[1:]):
+        if a['robot_pose']!=b['robot_pose'] and a['time_s']<clear:
+            end=min(b['time_s'],clear)
+            checkpoints=[a['time_s'],end,*[key['time_s'] for key in station if a['time_s']<key['time_s']<end]]
+            if any(protocol.at_time(station,t)['values']['Lid']!=105 for t in checkpoints):raise ValueError('Robot access requires fully open lid')
     g=s['gripper']
     if s['arm_fixture']['position_mm'][2]!=0 or s['arm_fixture']['mounting']!='direct_to_bench':raise ValueError('Direct bench mounting required; no riser')
     if any(type(v) not in (int,float) or not math.isfinite(v) or v<=0 for v in [g['flange_to_grip_mm'],g['open_gap_mm'],*g['body_size_mm'],*g['finger_stem_size_mm'],*g['finger_pad_size_mm']]):raise ValueError('Positive finite gripper dimensions required')
@@ -79,7 +138,7 @@ def rack_geometry(scene,p):
 
 
 def tube_owner(scene,t):
-    return 'station' if t<scene['checks']['attachment_time_s'] else 'gripper' if t<scene['checks']['rack_handoff_time_s'] else 'rack'
+    return channel_value(scene,'tube_owner',t,'station')
 
 
 def placement(position,yaw):
@@ -165,20 +224,22 @@ def tool_target(position,tilt_deg,roll_deg=0):
 
 
 def target_at(scene,spec,p,t,goals=None):
-    goals=goals or targets(scene,spec,p);a,b,u=segment(scene['timeline'],t)
+    goals=goals or targets(scene,spec,p);a,b,u=segment(channel_keys(scene,'robot_pose'),t)
     ta,tb=goals[a['robot_pose']],goals[b['robot_pose']]
     aa=scene['poses'][a['robot_pose']].get('tool_tilt_from_vertical_deg',spec['rotor']['tilt_from_vertical_deg']);ab=scene['poses'][b['robot_pose']].get('tool_tilt_from_vertical_deg',spec['rotor']['tilt_from_vertical_deg'])
     return tool_target([ta[i][3]+u*(tb[i][3]-ta[i][3]) for i in range(3)],aa+u*(ab-aa),scene['gripper'].get('roll_about_tube_deg',0))
 
 
 def segment(keys,t):
+    if t<=keys[0]['time_s']:return keys[0],keys[0],0
+    if t>=keys[-1]['time_s']:return keys[-1],keys[-1],0
     index=next((k for k in range(1,len(keys)) if t<=keys[k]['time_s']),len(keys)-1)
     a,b=keys[index-1:index+1];return a,b,(t-a['time_s'])/(b['time_s']-a['time_s'])
 
 
 def station_frames(scene,spec,p):
     keys=[]
-    for k in scene['timeline']:
+    for k in channel_keys(scene,'station_pose'):
         values={**cf.pose(spec,p,k['station_pose']),**{n:cf.evaluate(v,p) for n,v in k.get('coordinates',{}).items()}}
         keys.append({'time_s':k['time_s'],'phase':k['phase'],'values':values})
     return keys
@@ -201,16 +262,17 @@ def trajectory(scene=None):
     kin=Kinematics(arm,scene);goals=targets(scene,spec,p);keys=station_frames(scene,spec,p)
     duration=scene['timeline'][-1]['time_s'];dt=scene['checks']['sample_period_s'];count=round(duration/dt)
     seed=kin.inverse(goals['grasp'],scene['ik_seed_deg']);seed=kin.inverse(goals['withdrawn'],seed)
-    result=[];max_error=0
+    result=[];max_error=0;jaws=channel_keys(scene,'jaw')
     for i in range(count+1):
         t=i*dt;a,b,u=segment(scene['timeline'],t);target=target_at(scene,spec,p,t,goals)
         seed=kin.inverse(target,seed);error=kin.residual(seed,target);max_error=max(max_error,max(abs(v) for v in error[:3]))
         cf_values=protocol.at_time(keys,t)['values'];cf.validate_pose(cf.expanded(spec,p),cf_values)
-        ga=scene['gripper']['open_gap_mm'] if a['jaw']=='open' else 2*p['tube_radius']
-        gb=scene['gripper']['open_gap_mm'] if b['jaw']=='open' else 2*p['tube_radius']
+        ja,jb,ju=segment(jaws,t)
+        ga=scene['gripper']['open_gap_mm'] if ja['jaw']=='open' else 2*p['tube_radius']
+        gb=scene['gripper']['open_gap_mm'] if jb['jaw']=='open' else 2*p['tube_radius']
         result.append({'time_s':t,'phase':a['phase'] if t==0 else b['phase'],'joints_deg':seed[:],
-            'station':cf_values,'jaw_gap_mm':ga+u*(gb-ga),'tube_owner':tube_owner(scene,t),
-            'workspace_clear':t>=scene['checks']['robot_clear_confirmed_s']})
+            'station':cf_values,'jaw_gap_mm':ga+ju*(gb-ga),'tube_owner':tube_owner(scene,t),
+            'workspace_clear':channel_value(scene,'workspace_clear',t,False)})
     if any(max(abs(x-y) for x,y in zip(a['joints_deg'],b['joints_deg']))>10 for a,b in zip(result,result[1:])):raise ValueError('Discontinuous IK branch; revise grasp roll, path or seed before playback')
     return {'scene_sha256':robot.digest(SOURCE),'robot_sha256':robot.digest(ROOT/scene['sources']['robot']),
         'geometry_sha256':robot.digest(cf.SOURCE),'protocol_sha256':robot.digest(protocol.SOURCE),'samples':result,

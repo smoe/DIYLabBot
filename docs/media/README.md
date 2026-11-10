@@ -1,5 +1,30 @@
 # README-Demo
 
+## Aktuelle Fassung: Roboter und Deckel parallel
+
+`robot-demo-overlap.html`, `robot-demo-overlap.mp4` und
+`robot-demo-overlap.png` zeigen den überarbeiteten Bewegungsbaustein über
+47,5 s, im Video auf 20 s beschleunigt. Der Arm fährt nach der synthetischen
+Freigabe von Arm und Gefäß bei 29,5 s weiter. Parallel parkt der Heber;
+der Deckel schließt von 30,5 bis 41 s und verriegelt bis 42 s. Das Vorschaubild
+zeigt 35 s. Geometrie, bisherige Einzelbewegungsdauern und Gefäßübergaben
+bleiben erhalten.
+
+[Eigene Provenienz](robot-demo-overlap.provenance.json) bindet diese Medien an
+die aktuelle Quelle und die ausgeführten Prüfungen. Die native adaptive
+FreeCAD-Prüfung umfasst auch den getragenen Probenkörper und seine Kappe
+gegen den bewegten Deckel nach der Freigabe. SolidCraft erzeugt seine
+Prüfstellungen unabhängig aus den Quellen; das bleibt eine Prüfung statischer
+Posen. Geometrische Stichproben und synthetische Bestätigungen ersetzen keine
+Kollisionssensorik, Prozess-/Qualitätsrückmeldungen oder Hardwarequalifikation.
+
+Das Armprogramm ist zusätzlich für den bestehenden ROS-Trajektorienclient
+exportierbar, mit unveränderten Gelenkwinkeln und Zeiten. Export und Dry-run
+im Client sind Datenprüfungen; ROS-Laufzeit, passende Live-Roboterbeschreibung
+und die integrierte Greifer-/Stationssteuerung sind nicht nachgewiesen.
+
+## Historische Fassung
+
 Bewusst versionierte Medienauswahl, keine zusätzliche Konstruktionsquelle:
 
 - `robot-demo.html`: unabhängige Bewegungsansicht und lokales Chargenprotokoll.
@@ -52,14 +77,19 @@ können mit `--freecad-python` und `--solidcraft-cli` angegeben werden. FreeCADs
 Bibliothek muss für dessen Python über `PYTHONPATH` verfügbar sein. Die strenge
 SolidCraft-Prüfung darf bei Importfehlern weiterhin fehlschlagen.
 
-Nach Prüfung das erzeugte HTML aus `renders/` bewusst übernehmen. Mit Node,
-Playwright und Chromium vom Repository-Stamm aus:
+Nach Prüfung das erzeugte HTML aus `renders/` als neue Medienrevision
+übernehmen. Historische Dateien nicht überschreiben. Mit Node, Playwright und
+Chromium vom Repository-Stamm aus:
 
 ```sh
-node scripts/export_readme_video.cjs
+node scripts/export_readme_video.cjs \
+  --input docs/media/robot-demo-overlap.html \
+  --output-base docs/media/robot-demo-overlap --screenshot-time 35
 ```
 
 Optional sind Playwright-Modul und Chrome-Programm als erstes und zweites
-Argument übergebbar. Danach Medien prüfen und die Provenienz einschließlich
-aller Medienprüfsummen gemeinsam aktualisieren. GitHub zeigt HTML als Datei;
+Argument oder mit `--playwright` und `--chrome` übergebbar. Dauer und
+Besitzwechsel stammen aus den eingebetteten Quellen; ohne MP4-Unterstützung
+bricht der Export ab. Danach Medien prüfen und eine eigene Provenienz
+einschließlich aller Medienprüfsummen festhalten. GitHub zeigt HTML als Datei;
 für interaktive Bedienung herunterladen und lokal öffnen.

@@ -43,7 +43,7 @@ def main():
     hashes = {str(p.relative_to(model.ROOT)): robot.digest(p) for p in source_files}
     context = {'revision': revision, 'out': str(out), 'cad': str(cad),
                'solidcraft_cli': args.solidcraft_cli, 'source_hashes': hashes,
-               'poses': [['Grasp', 21.5], ['RackReleased', 60]],
+               'poses': [['Grasp', scene['checks']['attachment_time_s']], ['RackReleased', data['duration_s']]],
                'instrument_reachability': model.instrument_reachability(scene, entries)}
     if not context['instrument_reachability']['passed']:
         raise AssertionError('Instrument reference-TCP reach failed')

@@ -8,6 +8,7 @@ import ast
 import centrifuge_robot_pickup as pickup
 import centrifuge_model as cf
 import robot_spec as robot
+from cf01_collision_scope import collision_scope
 
 
 def main():
@@ -43,7 +44,7 @@ def main():
     source_paths += [*pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment']))),cf.ROOT/'scripts/synthetic_workspace.py',cf.ROOT/'scripts/rack_slots.py',cf.ROOT/'scripts/cf01_rack_batch.py',cf.ROOT/'scripts/furniture_model.py',cf.ROOT/'scripts/centrifuge_control.py',cf.ROOT/'scripts/centrifuge_protocol.py',cf.ROOT/'scripts/centrifuge_model.py',cf.ROOT/'model/cf01-rack-batch.protocol.json',cf.ROOT/'scripts/templates/robot_demo_header.html']
     def relative(p):return str(p.relative_to(cf.ROOT)).replace('\\','/')
     artifacts=[p for folder in [cad,out,renders] for p in folder.iterdir() if p.is_file() and p.name!='robot-pickup-build-report.json']
-    result={'format':'solidcraftbot.centrifuge-robot-pickup-build/1',**context,'passed':bool(sc['passed']),
+    result={'format':'solidcraftbot.centrifuge-robot-pickup-build/1',**context,'collision_scope':collision_scope(scene,data),'passed':bool(sc['passed']),
         'source_files_sha256':{relative(p):cf.digest(p) for p in source_paths},
         'workspace':{'source':scene['environment'],'extent':'unbounded','reference_surface_only':True},
         'rack_batch':{'path':relative(out/'rack-batch-trace.json'),'passed':True,'order_restored':True,'sample_count':12,'network_executed':False,'hardware_executed':False,'robot_motion_checked':False},

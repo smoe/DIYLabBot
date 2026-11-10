@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
-  "prepared_on": "2026-11-08",
+  "prepared_on": "2026-11-10",
   "catalog_sha256": "46fa2262355455bc0a4b8732fa4ad8549fdd63c3196550f799002b40fa763028",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "c3eda20568dab66e709f7d9c933ea22cbe5ef26c7696e442419986983368fcf9",
+  "render_generator_sha256": "9b7ff5dddcdf1cdf6f54d48d37755cadfebcfc83f9071fed624aec1bdfc09bf2",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -1002,18 +1002,18 @@
       "source_files_sha256": {
         "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
         "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
         "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
       },
       "build_report": "cad/synthetic-lab-scene/shared-build-report.json",
-      "build_report_sha256": "432dd177d9fe963c870288821b6a0ad9c753f1f6917fb7cef55c1fe8e24a92cc",
+      "build_report_sha256": "5b10f90ed9e615bfe8ab1e223ad9b94ab3423209c17a0373bc1ab5f6c6c2e850",
       "build_passed": true,
       "phase": "Grasp",
       "representation": "Native source-referenced five-device scene on the unchanged reference bench",
-      "native_model": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r3/SyntheticLab_Grasp.sc",
-      "native_model_sha256": "7815dad6bd1c1f5cca1e46e3c1af5c33d6897a2fb496439cc0873e67f9cbf323",
-      "reused_render": "renders/synthetic-lab-scene-a3853d4f9bf1-r3/overview.png",
+      "native_model": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r4/SyntheticLab_Grasp.sc",
+      "native_model_sha256": "c0cbeeda520f186e0cfa7f80ac01723c5617e32039b389a3982a66f100c4e930",
+      "reused_render": "renders/synthetic-lab-scene-a3853d4f9bf1-r4/overview.png",
       "reused_render_sha256": "4571b89038f6d21f081cfd56c9272e97dfecf4b3149634f8a21af6d2aba1a28c",
       "image_sha256": "4571b89038f6d21f081cfd56c9272e97dfecf4b3149634f8a21af6d2aba1a28c",
       "bytes": 386502,
@@ -1048,7 +1048,7 @@
         "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
         "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
       }
     },
@@ -2079,32 +2079,32 @@
       "id": "two-arm-analytics",
       "image": "images/two-arm-analytics.png",
       "source_files_sha256": {
-        "model/two-arm-analytics.shared.json": "7da30cc04b00f43584864e88ce2076046da80904975ed3d19051dc08590222af",
+        "model/two-arm-analytics.shared.json": "1f0ba0354e58766822e149b1bee809ebaae25bb3fe9d032604140e47e0dc4cb6",
         "model/analytics-tools.shared.json": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
         "model/synthetic-analytics-workspace.shared.json": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982",
         "model/furnishings/analytics-reference-bench.json": "722e333cc89f47c8806698042d04ad20e9a35c42ab2e8f4500b9f5eea6d85a5b",
         "model/equipment/analytics-workspace.json": "777771e9d0dbe4455e06174df5d3a3fad2e67e5a9b5b494e919f72ff3b2e5873"
       },
       "render_manifest": "cad/two-arm-analytics/render-manifest.json",
-      "render_manifest_sha256": "f4cd4e8ec15d5d94e06c66f891c0cbb00c742fbf26d1cb67568751effa5aa5ed",
+      "render_manifest_sha256": "74a81703c0c01650a19b0761408b90e2f241f82d7e9998c0a9831e76f57df67b",
       "original_visual_review": {
         "passed": true,
-        "review_date": "2026-11-09",
-        "reviewed_views": [
+        "reviewed_on": "2026-11-10",
+        "reviewer": "Codex",
+        "views": [
           "overview",
-          "analytics",
-          "analytics-detail"
+          "analytics"
         ],
-        "method": "Inspected the full three-arm native overview and both analytical views. All three arms and two reference benches are visible in the overview. The additional detail hides the CF01 context; instruments, conceptual pipette, racks, bottles, tips and passive holders are present. Static geometry only; no dosing or cooperative-motion qualification."
+        "scope": "Overview shows all three arms and both reference benches; analytical close-up retains all QC fixtures and instruments. Static conceptual views; no cooperative execution or liquid-handling qualification."
       },
-      "native_model": "cad/generated/two-arm-analytics-7da30cc04b00/TwoArmAnalytics.sc",
-      "native_model_sha256": "b33aa5014efb1251d73224bd886ecc82616ded53daaddf5eedd1f1d7894bd630",
-      "reused_render": "renders/two-arm-analytics-7da30cc04b00/overview.png",
+      "native_model": "cad/generated/two-arm-analytics-1f0ba0354e58-r2/TwoArmAnalytics.sc",
+      "native_model_sha256": "887711a3db9c003a71230b450a09ebffbd3ea4c6a2ab2d68884ae13bafab45cd",
+      "reused_render": "renders/two-arm-analytics-1f0ba0354e58-r2/overview.png",
       "reused_render_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
       "image_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
       "bytes": 338779,
       "dependency_files_sha256": {
-        "model/two-arm-analytics.shared.json": "7da30cc04b00f43584864e88ce2076046da80904975ed3d19051dc08590222af",
+        "model/two-arm-analytics.shared.json": "1f0ba0354e58766822e149b1bee809ebaae25bb3fe9d032604140e47e0dc4cb6",
         "model/synthetic-analytics-workspace.shared.json": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982",
         "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
         "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
@@ -2142,7 +2142,7 @@
         "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
         "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
         "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
-        "model/centrifuge-cf01.robot-pickup.shared.json": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
         "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
       }
     }
@@ -2231,6 +2231,16 @@
       "previous_gallery_images_unchanged": true,
       "native_overview_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
       "native_analytics_detail_sha256": "d55c55229388f2e794da9a82292235e407120b36c1ac8c4c9f4497c16b5221b9"
+    },
+    "motion_overlap_update": {
+      "passed": true,
+      "reviewed_on": "2026-11-10",
+      "reviewed_entries": [
+        "synthetic-workspace",
+        "two-arm-analytics"
+      ],
+      "image_bytes_unchanged": true,
+      "scope": "Regenerated the two affected native views from current source-bound builds and inspected them visually. All other curated snapshots and prior evidence are retained; no new hardware or process qualification."
     }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

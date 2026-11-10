@@ -66,7 +66,7 @@ class SyntheticWorkspaceTests(unittest.TestCase):
                 return d
             with self.subTest(changes=changes),patch.object(workspace,'read',side_effect=fixture),self.assertRaises(ValueError):workspace.load()
 
-    def test_previous_positions_dimensions_and_all_motion_samples_are_preserved(self):
+    def test_previous_geometry_preclear_motion_and_station_timing_are_preserved(self):
         expected=json.loads((workspace.ROOT/'tests/fixtures/cf01-before-workspace.json').read_text())
         scene=pickup.load()
         self.assertEqual(scene['rack']['slot_order'],'row_major')
@@ -74,7 +74,11 @@ class SyntheticWorkspaceTests(unittest.TestCase):
             actual=scene[key]
             if key=='rack':actual={k:v for k,v in actual.items() if k!='slot_order'}
             self.assertGeometryClose(actual,expected[key],key)
-        self.assertGeometryClose(pickup.trajectory(scene)['samples'],expected['samples'],'samples')
+        actual=pickup.trajectory(scene)['samples'];clear=scene['checks']['robot_clear_confirmed_s']
+        self.assertGeometryClose([s for s in actual if s['time_s']<=clear],
+                                 [s for s in expected['samples'] if s['time_s']<=clear],'preclear_samples')
+        previous={s['time_s']:s['station'] for s in expected['samples']}
+        for sample in actual:self.assertGeometryClose(sample['station'],previous[sample['time_s']],'station')
 
     def test_leading_scene_has_references_instead_of_duplicate_bank_and_device_coordinates(self):
         scene=json.loads(pickup.SOURCE.read_text());self.assertIn('environment',scene)

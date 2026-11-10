@@ -23,16 +23,20 @@ synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
 ## Roboter in Bewegung
 
-[![Roboter entnimmt ein Gefäß aus der Zentrifuge und legt es im Rack ab](docs/media/robot-demo.png)](docs/media/robot-demo.mp4)
+[![Roboter entnimmt ein Gefäß aus der Zentrifuge und legt es im Rack ab](docs/media/robot-demo-overlap.png)](docs/media/robot-demo-overlap.mp4)
 
-[Kurzes Video ansehen](docs/media/robot-demo.mp4) ·
-[Interaktive Demo herunterladen](docs/media/robot-demo.html) ·
+[Kurzes Video ansehen](docs/media/robot-demo-overlap.mp4) ·
+[Interaktive Demo herunterladen](docs/media/robot-demo-overlap.html) ·
 [Modellstand und Herkunft](docs/media/README.md)
 
 Die Szene wird aus einer synthetischen, unbegrenzten Umgebung mit einer
-Referenzbank abgeleitet. Die Bewegungsansicht und das Video zeigen den bisherigen
-60-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01, im Video beschleunigt.
-Er besitzt eine eigene Zeitachse und ist nicht mit der Chargenwiedergabe gekoppelt.
+Referenzbank abgeleitet. Die Bewegungsansicht und das Video zeigen den
+47,5-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01, im Video beschleunigt.
+Nach der Freigabe von Arm und Gefäß bei 29,5 s fährt der Arm zum Rack weiter;
+parallel parkt der Heber und der Deckel schließt. Eine Wartezeit bis zur
+Deckelverriegelung ist dafür nicht erforderlich.
+Der Bewegungsbaustein besitzt eine eigene Zeitachse und ist nicht mit der
+Chargenwiedergabe gekoppelt.
 Die HTML-Datei lokal öffnen: Wiedergabe, Zeitschieber und drei Ansichten
 funktionieren ohne CAD-Installation oder Netzwerk.
 
@@ -42,9 +46,9 @@ zentrifugiert und in ursprünglicher Reihenfolge zurück ins Rack entladen. Der
 Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldungen
 sind lokale Mocks ohne ausgeführte Bahn; Testzeit wird beim Warten auf bestätigte
 Befehlsabschlüsse einschließlich Spin und Bremsen fortgeschrieben.
-Neu erzeugte HTML-Demos starten auf Deutsch und lassen sich über
-**Sprache / Language** auf Englisch umschalten. Die ausgewählten Medien oben
-bleiben der historische Build ohne Sprachumschaltung. Aktuelle Bedienung,
+Die HTML-Demo startet auf Deutsch und lässt sich über
+**Sprache / Language** auf Englisch umschalten. Die vorherigen Medien bleiben
+als historische Fassung mit eigener Provenienz erhalten. Aktuelle Bedienung,
 Berichtsfelder und Prüfgrenzen stehen in der
 [Baugruppendokumentation](docs/centrifuge-cf01-robot-pickup.md).
 Die bisherige Entnahmebewegung bleibt als eigener Baustein erhalten. Der vollständige
@@ -64,6 +68,53 @@ Für echte TLS/gRPC-Kommunikation mit dem CF01-Simulator gibt es zusätzlich den
 Chargenrunner, einen separaten v2-Vertrag und ein dauerhaftes Übergabejournal.
 Die Anleitung führt durch Anmeldung, Serverstart und Netzwerk-Chargenlauf auf
 Deutsch und Englisch; historische Medien bleiben unverändert.
+
+```mermaid
+flowchart TB
+    Q["Gemeinsame CAD-unabhängige Quellen<br/>Modelle, Schnittstellen und Protokolle"]
+    Q --> F["FreeCAD<br/>Konstruktion und Prüfung"]
+    Q --> S["SolidCraft<br/>Konstruktion und Prüfung"]
+    Q --> R["ROS 2 / RViz<br/>Armprogramm über Trajektorienschnittstelle"]
+    Q --> W["DIYLabBot<br/>synthetischer Gesamtlauf und Inventar"]
+    Q --> C["Separater CF01-Netzwerk-Chargenrunner"]
+    C -->|"TLS/gRPC geprüft"| I["SiLA 2<br/>CF01-Simulator"]
+    W -.->|"Gesamtlauf-Anbindung geplant"| R
+    W -.->|"Netzwerkintegration geplant"| I
+    G["GENtle · Zielbild<br/>biologische Versuchsabsicht"] -.->|"Fähigkeitsbindung geplant"| W
+    R -.->|"Hardwaretreiber geplant"| H["Reale Roboter und Geräte<br/>Anbindung und Qualifikation offen"]
+    I -.->|"Gerätehardware geplant"| H
+```
+
+FreeCAD und SolidCraft erzeugen ihre Modelle unabhängig aus denselben Quellen.
+**Die gezeigte Armbewegung ist bereits für die ROS-Trajektorienschnittstelle
+programmiert.** Der
+[Exporter](scripts/export_centrifuge_robot_pickup_ros2.py) übernimmt dieselben
+Gelenkwinkel und Zeitpunkte für den vorhandenen `FollowJointTrajectory`-Client.
+Exportiert wird der Armkanal; Greifer und CF01 benötigen eigene Steuerkanäle.
+Vor Ausführung müssen Roboterbeschreibung, 280/250-mm-Armvariante, Aufstellung
+und Werkzeugbezug übereinstimmen; der Client prüft diese Geometriebindung nicht.
+ROS-Laufzeit und Hardwareausführung sind ungeprüft; reale Kollisions-, Sensor-,
+Qualitäts- und Schutzrückmeldungen bleiben einzubinden. Beim separaten
+CF01-Chargenrunner ist dagegen TLS/gRPC zum Simulator geprüft. Gestrichelte
+Verbindungen sind geplant; der gemeinsame CF01–NanoDrop–Qubit-Ablauf arbeitet
+bislang lokal und synthetisch. Export und Datenprüfung ohne ROS-Installation:
+
+```sh
+python3 scripts/export_centrifuge_robot_pickup_ros2.py
+PYTHONPATH=ros2_ws/src/solidcraftbot_ros python3 -m solidcraftbot_ros.demo \
+  --config exports/generated/cf01-robot-pickup-ros2/scenarios.json \
+  --scenario cf01_robot_to_rack --dry-run
+```
+
+Biologische Versuche sollen im Zielbild in GENtle oder einem anderen
+Versuchsplaner gepflegt werden: wissenschaftliche Absicht, Proben- und
+Materialsemantik, benötigte Fähigkeiten, Randbedingungen und Freigabe.
+DIYLabBot führt die operative Umsetzung mit Gefäßidentitäten, Orten, Verbrauch
+und Reservierungen. Ein anderer Roboter erhält eine passende Modellbeschreibung
+und operative Anbindung; die biologische Absicht soll über benötigte Fähigkeiten
+wiederverwendbar bleiben. Diese automatische Fähigkeits- und Ressourcenbindung
+ist noch nicht implementiert; Einzelheiten stehen in
+[ARCHITECTURE.md](ARCHITECTURE.md#sila-fähigkeiten-und-gentle-ressourcenbindung).
 
 ## Quellen und lokale Ausgaben
 

@@ -5,7 +5,7 @@
     #cf01-bench-rack .cf01-timeline {width:100%;margin:.5em 0}
     @media(max-width:480px){#cf01-bench-rack .cf01-scene{height:340px}}
   </style>
-  <p data-i18n="motion_description">Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.</p>
+  <p data-i18n="motion_description">Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Nach der Freigabe bewegen sich Arm und Deckel parallel. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.</p>
   <div class="viz-controls">
     <label>Sprache / Language <select data-language><option value="de">Deutsch</option><option value="en">English</option></select></label>
     <button type="button" class="btn btn-primary" data-play data-i18n="Play cycle">Bewegung abspielen</button>
@@ -14,7 +14,7 @@
   </div>
   <canvas class="cf01-scene" data-scene role="img" data-i18n-aria="Bench-mounted six-axis robot retrieves tube 01, clears the lid, places the tube in rack slot 01 and withdraws its empty gripper" aria-label="Sechsachsiger Roboter entnimmt Gefäß 01, zieht es aus dem Deckelbereich zurück, legt es in Rackplatz 01 ab und zieht den leeren Greifer zurück"></canvas>
   <div class="cf01-readouts tabular-nums"><span data-phase aria-live="polite" data-i18n="Closed and locked">Geschlossen und verriegelt</span><span data-values></span></div>
-  <label class="form-label"><span data-i18n="Cycle time">Bewegungszeit</span> <span class="tabular-nums" data-time>0.0 / 60.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="60" step="0.05" value="0" data-i18n-aria="Cycle time in seconds" aria-label="Bewegungszeit in Sekunden"></label>
+  <label class="form-label"><span data-i18n="Cycle time">Bewegungszeit</span> <span class="tabular-nums" data-time>0.0 s</span><input class="form-range cf01-timeline" type="range" data-time-slider min="0" max="0" step="0.05" value="0" data-i18n-aria="Cycle time in seconds" aria-label="Bewegungszeit in Sekunden"></label>
   <div class="viz-row text-small"><span data-lift data-i18n="Tube supported by centrifuge">Gefäß durch Zentrifuge gestützt</span><span data-i18n="Bench mounting · 1 mm transport target">Bankmontage · Transportziel 1 mm</span></div>
   <details class="cf01-batch" data-batch-panel>
     <summary data-i18n="Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze">Vollständiger Chargenlauf: Rack → CF01 → ursprüngliche Rackplätze</summary>
@@ -138,7 +138,7 @@
       "failed":["Fehlgeschlagen", "Failed"],
       "stop":["Stopp", "Stop"],
       "batch_description":["Aufzeichnung des lokalen simulierten Protokolls für zwölf Proben. Roboterübergaben beim Beladen und bei der Rückgabe sind abstrahiert, ohne ausgeführte Bahn. Die Testuhr läuft beim Warten auf Befehlsabschlüsse, einschließlich Schleudern und Bremsen; der Transporter ist eine externe Vorbedingung.", "Recorded local mock protocol for twelve samples. Loading and return handoffs are abstract, without executed paths. Test time advances while awaiting observable commands, including spin and braking; rack delivery by a transporter is an external precondition."],
-      "motion_description":["Unveränderter Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.", "Preserved motion component: rotor slot 01 → rack slot 01. Independent timeline and mock acknowledgements; no coupling to batch playback."]
+      "motion_description":["Bewegungsbaustein: Rotorplatz 01 → Rackplatz 01. Nach der Freigabe bewegen sich Arm und Deckel parallel. Eigene Zeitachse und simulierte Quittungen; keine Kopplung an die Chargenwiedergabe.", "Motion component: rotor slot 01 → rack slot 01. Arm travel and lid closure overlap after clearance. Independent timeline and mock acknowledgements; no coupling to batch playback."]
     };
     const language=root.querySelector("[data-language]");
     function tr(key){return labels[key]?.[language.value==='en'?1:0]??key;}
@@ -200,7 +200,7 @@
       function raw(v){return [v.reduce((s,a,i)=>s+a*right[i],0),v.reduce((s,a,i)=>s+a*up[i],0),v.reduce((s,a,i)=>s+a*eye[i],0)]}
       if(!boundsCache.has(view.value)){const lo=[Infinity,Infinity],hi=[-Infinity,-Infinity];for(const key of keys){const ms=transforms(key);for(const [group,corners] of Object.entries(mesh.group_bounds)){if(group==='Scene')continue;for(const v of corners){const q=raw(apply(ms.get(group)||ident,v));for(let i=0;i<2;i++){lo[i]=Math.min(lo[i],q[i]);hi[i]=Math.max(hi[i],q[i])}}}}boundsCache.set(view.value,{lo,hi})}
       const bounds=boundsCache.get(view.value);let center=bounds.lo.map((v,i)=>(v+bounds.hi[i])/2),scale=Math.min((w-32)/(bounds.hi[0]-bounds.lo[0]),(h-48)/(bounds.hi[1]-bounds.lo[1]));
-      if(detail){let focus=apply(matrices.get('Tool'),[0,0,-20]);if(t<17.5||t>=55)focus=apply(matrices.get('PresentedTube'),mesh.grip_reference);if(rackView){focus=apply(rackFrame,[-20,-5,90]);scale=Math.min((w-50)/230,(h-48)/260)}else scale=Math.min((w-70)/140,(h-48)/150);center=raw(focus)}
+      if(detail){let focus=apply(matrices.get('Tool'),[0,0,-20]);if(t<17.5||t>=mesh.scene.checks.rack_handoff_time_s)focus=apply(matrices.get('PresentedTube'),mesh.grip_reference);if(rackView){focus=apply(rackFrame,[-20,-5,90]);scale=Math.min((w-50)/230,(h-48)/260)}else scale=Math.min((w-70)/140,(h-48)/150);center=raw(focus)}
       function project(v){const p=raw(v);return [w/2+scale*(p[0]-center[0]),h/2-scale*(p[1]-center[1]),p[2]]}
       const triangles=[];
       for(const b of mesh.bodies){if(detail&&(rackView||t>=29.5)&&['RetractablePusher','LiftActuatorEnvelope'].includes(b.id))continue;if(detail&&!detailKeep.has(b.id)&&!(b.asset==='rack'&&(rackView||t>=46)))continue;const matrix=matrices.get(b.group)||ident,points=b.v.map(v=>project(apply(matrix,v))),base=bodyColor(b);

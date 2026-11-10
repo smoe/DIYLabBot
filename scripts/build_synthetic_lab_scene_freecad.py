@@ -66,7 +66,7 @@ def instrument_motion_validation(records, scene, data, reachability):
     states = [(dict(sample), 'CF01') for sample in data['samples']]
     for check in reachability['checks']:
         if check['kind'] == 'approach':
-            sample = pickup.interpolate(data['samples'], 60)
+            sample = pickup.interpolate(data['samples'], data['duration_s'])
             sample['joints_deg'] = check['joints_deg']
             states.append((sample, check['id']))
     seen, hits, exact, distances = set(), [], 0, 0
@@ -192,7 +192,7 @@ def main(context_path):
         App.closeDocument(upstream.Name)
     results = []
     evaluations = [{'id': label, 'time_s': time_s} for label, time_s in context['poses']]
-    evaluations.extend({'id': check['id'], 'time_s': 60, 'joints_deg': check['joints_deg']}
+    evaluations.extend({'id': check['id'], 'time_s': data['duration_s'], 'joints_deg': check['joints_deg']}
                        for check in context.get('instrument_reachability', {}).get('checks', [])
                        if check['kind'] == 'approach')
     indices = {'Arm.'+link['id']: i for i, link in enumerate(arm['links'])}

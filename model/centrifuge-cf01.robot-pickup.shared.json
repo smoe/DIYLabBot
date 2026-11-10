@@ -108,23 +108,19 @@
       "station_pose": "closed",
       "robot_pose": "withdrawn",
       "jaw": "open",
-      "tube_owner": "station"
+      "tube_owner": "station",
+      "workspace_clear": false,
+      "rack_seated": false
     },
     {
       "time_s": 1,
       "phase": "Unlock centrifuge lid",
-      "station_pose": "lid_unlocked",
-      "robot_pose": "withdrawn",
-      "jaw": "open",
-      "tube_owner": "station"
+      "station_pose": "lid_unlocked"
     },
     {
       "time_s": 11.5,
       "phase": "Open and hold lid",
-      "station_pose": "open",
-      "robot_pose": "withdrawn",
-      "jaw": "open",
-      "tube_owner": "station"
+      "station_pose": "open"
     },
     {
       "time_s": 12.5,
@@ -132,39 +128,28 @@
       "station_pose": "open",
       "coordinates": {
         "Lift": "park_gap"
-      },
-      "robot_pose": "withdrawn",
-      "jaw": "open",
-      "tube_owner": "station"
+      }
     },
     {
       "time_s": 14.5,
       "phase": "Elevate tube 01",
       "station_pose": "pickup",
-      "robot_pose": "withdrawn",
-      "jaw": "open",
-      "tube_owner": "station"
+      "robot_pose": "withdrawn"
     },
     {
       "time_s": 17.5,
       "phase": "Robot approaches above the tube",
-      "station_pose": "pickup",
-      "robot_pose": "pregrasp",
-      "jaw": "open",
-      "tube_owner": "station"
+      "robot_pose": "pregrasp"
     },
     {
       "time_s": 20.5,
       "phase": "Align open fingers around tube",
-      "station_pose": "pickup",
       "robot_pose": "grasp",
-      "jaw": "open",
-      "tube_owner": "station"
+      "jaw": "open"
     },
     {
       "time_s": 21.5,
       "phase": "Close gripper and confirm grasp",
-      "station_pose": "pickup",
       "robot_pose": "grasp",
       "jaw": "closed",
       "tube_owner": "gripper"
@@ -172,111 +157,67 @@
     {
       "time_s": 24.5,
       "phase": "Extract tube along its axis",
-      "station_pose": "pickup",
-      "robot_pose": "extracted",
-      "jaw": "closed",
-      "tube_owner": "gripper"
+      "robot_pose": "extracted"
     },
     {
       "time_s": 28.5,
       "phase": "Withdraw robot and carried tube",
-      "station_pose": "pickup",
-      "robot_pose": "withdrawn",
-      "jaw": "closed",
-      "tube_owner": "gripper"
+      "robot_pose": "withdrawn"
     },
     {
       "time_s": 29.5,
       "phase": "Confirm robot and tube clear",
       "station_pose": "pickup",
       "robot_pose": "withdrawn",
-      "jaw": "closed",
-      "tube_owner": "gripper",
       "workspace_clear": true
     },
     {
       "time_s": 30.5,
       "phase": "Retract empty pusher",
-      "station_pose": "open",
-      "robot_pose": "withdrawn",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
+      "station_pose": "open"
+    },
+    {
+      "time_s": 33.5,
+      "phase": "Turn tube upright outside centrifuge",
+      "robot_pose": "upright"
+    },
+    {
+      "time_s": 37.5,
+      "phase": "Move above empty rack slot 01",
+      "robot_pose": "rack_approach"
     },
     {
       "time_s": 41,
       "phase": "Close lid after withdrawal",
-      "station_pose": "lid_unlocked",
-      "robot_pose": "withdrawn",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
+      "station_pose": "lid_unlocked"
+    },
+    {
+      "time_s": 41.5,
+      "phase": "Lower tube into guided rack slot",
+      "robot_pose": "rack_seated"
     },
     {
       "time_s": 42,
       "phase": "Lock lid; robot retains tube",
-      "station_pose": "closed",
-      "robot_pose": "withdrawn",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
+      "station_pose": "closed"
     },
     {
-      "time_s": 46,
-      "phase": "Turn tube upright outside centrifuge",
-      "station_pose": "closed",
-      "robot_pose": "upright",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
-    },
-    {
-      "time_s": 50,
-      "phase": "Move above empty rack slot 01",
-      "station_pose": "closed",
-      "robot_pose": "rack_approach",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
-    },
-    {
-      "time_s": 54,
-      "phase": "Lower tube into guided rack slot",
-      "station_pose": "closed",
-      "robot_pose": "rack_seated",
-      "jaw": "closed",
-      "tube_owner": "gripper",
-      "workspace_clear": true
-    },
-    {
-      "time_s": 55,
+      "time_s": 42.5,
       "phase": "Confirm tube supported by rack",
-      "station_pose": "closed",
-      "robot_pose": "rack_seated",
       "jaw": "closed",
       "tube_owner": "rack",
-      "rack_seated": true,
-      "workspace_clear": true
+      "rack_seated": true
     },
     {
-      "time_s": 56,
+      "time_s": 43.5,
       "phase": "Open fingers and leave tube in rack",
-      "station_pose": "closed",
       "robot_pose": "rack_seated",
-      "jaw": "open",
-      "tube_owner": "rack",
-      "rack_seated": true,
-      "workspace_clear": true
+      "jaw": "open"
     },
     {
-      "time_s": 60,
+      "time_s": 47.5,
       "phase": "Withdraw empty gripper; tube stays in slot 01",
-      "station_pose": "closed",
-      "robot_pose": "rack_approach",
-      "jaw": "open",
-      "tube_owner": "rack",
-      "rack_seated": true,
-      "workspace_clear": true
+      "robot_pose": "rack_approach"
     }
   ],
   "checks": {
@@ -287,8 +228,8 @@
     "robot_clear_confirmed_s": 29.5,
     "attachment_time_s": 21.5,
     "extraction_time_s": 24.5,
-    "rack_handoff_time_s": 55,
-    "release_complete_time_s": 56,
+    "rack_handoff_time_s": 42.5,
+    "release_complete_time_s": 43.5,
     "clearance_margin_mm": 5,
     "minimum_robot_equipment_clearance_mm": 5,
     "collision_max_joint_step_deg": 1,
@@ -304,5 +245,6 @@
   "environment": {
     "source": "model/synthetic-cf01-workspace.shared.json",
     "source_sha256": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2"
-  }
+  },
+  "timeline_semantics": "independent_sparse_channels"
 }

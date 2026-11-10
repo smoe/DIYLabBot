@@ -130,7 +130,12 @@ class SyntheticLabBuildEvidenceTests(unittest.TestCase):
         motion = report['instrument_motion_validation']
         self.assertTrue(motion['passed'])
         self.assertFalse(motion['collisions'])
-        self.assertEqual(motion['cf01_path_samples'], 241)
+        trajectory_path=ROOT/report['cf01_trajectory']['path']
+        self.assertEqual(robot.digest(trajectory_path),report['cf01_trajectory']['sha256'])
+        trajectory=json.loads(trajectory_path.read_text())
+        self.assertEqual(trajectory['scene_sha256'],robot.digest(pickup.SOURCE))
+        self.assertEqual(trajectory['duration_s'],pickup.load()['timeline'][-1]['time_s'])
+        self.assertEqual(motion['cf01_path_samples'],len(trajectory['samples']))
         self.assertEqual(motion['approach_configurations'], 2)
         nd = model.instrument_instances()[0]
         self.assertEqual(motion['nanodrop_hinge_angles_deg'][0], 0)
@@ -152,7 +157,7 @@ class SyntheticLabBuildEvidenceTests(unittest.TestCase):
             trajectory = pickup.trajectory(scene)
             scene['arm_fixture']['position_mm'][0] += 5
             with self.assertRaisesRegex(ValueError, 'Core pose changed'):
-                model.verify_core_geometry(original, scene, trajectory, [('Grasp', 21.5), ('RackReleased', 60)])
+                model.verify_core_geometry(original, scene, trajectory, [('Grasp', scene['checks']['attachment_time_s']), ('RackReleased', trajectory['duration_s'])])
 
 
 if __name__ == '__main__':

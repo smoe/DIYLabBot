@@ -53,7 +53,7 @@ def main():
             raise ValueError('Context artifact changed: '+file)
     scene = pickup.load()
     data = pickup.trajectory(scene)
-    equivalence = scene_model.verify_core_geometry(core, scene, data, [('Grasp', 21.5), ('RackReleased', 60)])
+    equivalence = scene_model.verify_core_geometry(core, scene, data, [('Grasp', scene['checks']['attachment_time_s']), ('RackReleased', data['duration_s'])])
     library = robot_components.library(pickup.arm_source(scene))
     sections = {}
     for part in core['vendor_exterior']['parts']:

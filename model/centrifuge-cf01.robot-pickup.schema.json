@@ -8,7 +8,8 @@
     "sources",
     "arm_fixture",
     "environment",
-    "rack"
+    "rack",
+    "timeline"
   ],
   "properties": {
     "format": {
@@ -71,11 +72,140 @@
           "exclusiveMinimum": 0
         }
       }
+    },
+    "timeline_semantics": {
+      "const": "independent_sparse_channels",
+      "description": "Explicit sparse event semantics: robot_pose, station_pose plus its coordinate overrides, and jaw interpolate independently between their own keys and hold at channel endpoints. Missing fields do not add motion anchors. tube_owner, workspace_clear and rack_seated are discrete confirmations effective at the event time. Every channel starts at time zero. Station overrides apply only to that station key, not subsequent poses. Without this field the historical dense timeline requires all four motion/ownership fields at every event."
+    },
+    "timeline": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/timeline_event"
+      }
     }
   },
   "not": {
     "required": [
       "bench_surface"
     ]
-  }
+  },
+  "$defs": {
+    "timeline_event": {
+      "type": "object",
+      "required": [
+        "time_s",
+        "phase"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "time_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "phase": {
+          "type": "string",
+          "minLength": 1
+        },
+        "robot_pose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "station_pose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "coordinates": {
+          "type": "object",
+          "additionalProperties": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        "jaw": {
+          "enum": [
+            "open",
+            "closed"
+          ]
+        },
+        "tube_owner": {
+          "enum": [
+            "station",
+            "gripper",
+            "rack"
+          ]
+        },
+        "workspace_clear": {
+          "type": "boolean"
+        },
+        "rack_seated": {
+          "type": "boolean"
+        }
+      },
+      "anyOf": [
+        {
+          "required": [
+            "robot_pose"
+          ]
+        },
+        {
+          "required": [
+            "station_pose"
+          ]
+        },
+        {
+          "required": [
+            "jaw"
+          ]
+        },
+        {
+          "required": [
+            "tube_owner"
+          ]
+        },
+        {
+          "required": [
+            "workspace_clear"
+          ]
+        },
+        {
+          "required": [
+            "rack_seated"
+          ]
+        }
+      ],
+      "dependentRequired": {
+        "coordinates": [
+          "station_pose"
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "not": {
+          "required": [
+            "timeline_semantics"
+          ]
+        }
+      },
+      "then": {
+        "properties": {
+          "timeline": {
+            "items": {
+              "required": [
+                "robot_pose",
+                "station_pose",
+                "jaw",
+                "tube_owner"
+              ]
+            }
+          }
+        }
+      }
+    }
+  ]
 }

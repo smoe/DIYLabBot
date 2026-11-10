@@ -88,7 +88,7 @@ def main():
             check['passed']=check['passed'] and check['freecad_comparison']['passed']
         return check
     with ThreadPoolExecutor(max_workers=2) as pool:
-        reports=list(pool.map(export_pose,[('Grasp',21.5),('RackReleased',60)]))
+        reports=list(pool.map(export_pose,[('Grasp',scene['checks']['attachment_time_s']),('RackReleased',data['duration_s'])]))
     sources=[pickup.SOURCE,cf.SOURCE,pickup.protocol.SOURCE,cf.ROOT/scene['sources']['robot'],
              *pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment']))),
              *[cf.ROOT/'scripts'/p for p in ['export_centrifuge_robot_pickup_solidcraft.py','centrifuge_pickup_solidcraft.py',

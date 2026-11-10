@@ -16,7 +16,7 @@
     },
     "pickup": {
       "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-      "source_sha256": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112"
+      "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
     },
     "device_ids": [
       "Arm",
@@ -30,7 +30,7 @@
       "role": "tube_handling",
       "tool": {
         "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-        "source_sha256": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112"
+        "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
       },
       "target_instance": "QC.Originals",
       "target_interface": "grip_01",

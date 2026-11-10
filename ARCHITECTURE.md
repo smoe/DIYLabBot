@@ -218,10 +218,16 @@ Die Quelle `model/synthetic-cf01-workspace.shared.json` bindet die vier Ebenen:
 
 Die Rackkonstruktion steht einmal in `model/guided-tube-rack.shared.json`.
 Die Entnahmeszene referenziert die Umgebung; Bankgeometrie, Gerätepositionen und
-Armvariante sind daraus abgeleitete Ansichten. Die bisherige Bankoberfläche,
-Geräteposen und alle 241 Bewegungsschritte bleiben erhalten. Der ursprüngliche
-60-s-Entnahmebaustein besitzt eine eigene Zeitachse; er wird vom Chargenrunner
-nicht aufgerufen und ist nicht an dessen Schleuderlauf gekoppelt.
+Armvariante sind daraus abgeleitete Ansichten. Bankoberfläche, Geräteposen und
+Bewegungsziele bleiben erhalten. Die aktuelle Entnahme nutzt unabhängig
+interpolierte Roboter-, Stations- und Greiferkanäle: Nach der synthetischen
+Freigabe von Arm und Gefäß bei 29,5 s fährt der Arm weiter, während Heber und
+Deckel ihren Ablauf abschließen. Dadurch dauert der Baustein 47,5 s mit 191
+Samples; die früheren 60 s mit 241 Samples bleiben in den historischen Medien
+erhalten. Die eigene Bewegungszeitachse wird vom Chargenrunner nicht aufgerufen
+und ist nicht an dessen Schleuderlauf gekoppelt. Ein ROS-Export übernimmt den
+Armkanal für den vorhandenen Trajektorienclient. Integrierte Greifer- und
+Stationssteuerung, ROS-Laufzeit und reale Sensor-/Qualitätsrückmeldungen sind ungeprüft.
 
 Die interaktive README-Demo zeigt diesen Bewegungsausschnitt und zusätzlich die
 Aufzeichnung des vollständigen lokalen Chargenprotokolls mit Rack-, Rotor- und

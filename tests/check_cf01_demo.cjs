@@ -13,6 +13,16 @@ const { chromium } = require(process.argv[3] || 'playwright');
   assert(packed, 'Inline mesh required');
   const mesh = JSON.parse(zlib.gunzipSync(Buffer.from(packed[2], 'base64')));
   assert(!('_workspace' in mesh.scene), 'Internal workspace leaked into HTML');
+  const duration = mesh.trajectory.samples.at(-1).time_s;
+  const attachment = mesh.scene.checks.attachment_time_s, handoff = mesh.scene.checks.rack_handoff_time_s;
+  assert([duration, attachment, handoff].every(Number.isFinite), 'Finite source event times required');
+  assert(duration > 0 && attachment > 0 && attachment < handoff && handoff <= duration, 'Ordered source event times required');
+  assert.equal(mesh.trajectory.duration_s, duration);
+  const epsilon = Math.min(0.05, attachment / 2, (handoff - attachment) / 4);
+  const ownershipChecks = [[0, 'station'], [attachment - epsilon, 'station'], [attachment, 'gripper'],
+    [handoff - epsilon, 'gripper'], [handoff, 'rack'], [duration, 'rack']];
+  const carriedTime = (attachment + handoff) / 2;
+  const finalPhase = mesh.trajectory.samples.at(-1).phase;
   const labels = JSON.parse(html.match(/const labels=(\{[\s\S]*?\});/)[1]);
   for (const key of [...mesh.trajectory.samples.map(record => record.phase), ...mesh.rack_batch.trace.map(record => record.stage)]) {
     assert(labels[key]?.length === 2 && labels[key].every(text => typeof text === 'string' && text.length), `Missing bilingual description: ${key}`);
@@ -25,14 +35,18 @@ const { chromium } = require(process.argv[3] || 'playwright');
     page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
     await page.goto('file://' + target);
     await page.waitForSelector('[data-current-time]');
+    assert.equal(Number(await page.locator('[data-time-slider]').getAttribute('max')), duration);
     assert.equal(await page.locator('html').getAttribute('lang'), 'de');
     assert(!mesh.rack_batch.trace.some(record => record.ownership === 'unresolved'), 'Successful trace contains unresolved ownership');
     assert.match(await page.locator('[data-play]').textContent(), /Bewegung/);
     const ownership = [];
-    for (const [time, owner] of [[0, 'station'], [15, 'station'], [30, 'gripper'], [45, 'gripper'], [60, 'rack']]) {
-      await page.locator('[data-time-slider]').fill(String(time));
+    for (const [time, owner] of ownershipChecks) {
+      await page.locator('[data-time-slider]').evaluate((slider, value) => {
+        slider.value = value; slider.dispatchEvent(new Event('input', {bubbles: true}));
+      }, time);
       assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-tube-owner'), owner);
-      ownership.push(owner);
+      assert(Math.abs(Number(await page.locator('#cf01-bench-rack').getAttribute('data-current-time')) - time) <= 0.001);
+      ownership.push({time_s: time, owner});
     }
     await page.locator('[data-batch-panel]').evaluate(el => {el.open = true;});
     const pendingIndex = mesh.rack_batch.trace.findIndex(record => record.ownership === 'pending');
@@ -45,12 +59,12 @@ const { chromium } = require(process.argv[3] || 'playwright');
     await page.locator('[data-batch-slider]').fill(String(mesh.rack_batch.trace.length - 1));
     assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-batch-order-restored'), 'true');
     assert.match(await page.locator('[data-batch-gripper]').textContent(), /wiederhergestellt: ja/);
-    assert.match(await page.locator('[data-phase]').textContent(), /Leeren Greifer/);
+    assert.equal(await page.locator('[data-phase]').textContent(), labels[finalPhase][0]);
     await page.screenshot({path: path.join(path.dirname(target), 'browser-check-de.png'), fullPage: true});
     await page.locator('[data-language]').selectOption('en');
     assert.match(await page.locator('[data-i18n="batch_description"]').textContent(), /Recorded local mock protocol/);
     assert.match(await page.locator('[data-batch-gripper]').textContent(), /restored: yes/);
-    assert.match(await page.locator('[data-phase]').textContent(), /Withdraw empty gripper/);
+    assert.equal(await page.locator('[data-phase]').textContent(), labels[finalPhase][1]);
     assert.match(await page.locator('[data-play]').textContent(), /Play cycle/);
     await page.screenshot({path: path.join(path.dirname(target), 'browser-check-en.png'), fullPage: true});
     // A language change must preserve a running batch timer, its position and pause control.
@@ -77,7 +91,9 @@ const { chromium } = require(process.argv[3] || 'playwright');
       const replacement = zlib.gzipSync(JSON.stringify(data)).toString('base64');
       await page.setContent(html.replace(packed[0], packed[1] + replacement + packed[3]));
       await page.waitForSelector('[data-current-time]');
-      await page.locator('[data-time-slider]').fill('30');
+      await page.locator('[data-time-slider]').evaluate((slider, value) => {
+        slider.value = value; slider.dispatchEvent(new Event('input', {bubbles: true}));
+      }, carriedTime);
       assert.equal(await page.locator('#cf01-bench-rack').getAttribute('data-tube-owner'), 'gripper', name);
       if (name === 'absent') assert(await page.locator('[data-batch-panel]').isHidden());
       else {
@@ -87,7 +103,7 @@ const { chromium } = require(process.argv[3] || 'playwright');
       }
       // Actual playback must also survive an optional-panel failure.
       await page.locator('[data-play]').click();
-      await page.waitForFunction(() => Number(document.querySelector('#cf01-bench-rack').dataset.currentTime) > 30, null, {timeout: 10000});
+      await page.waitForFunction(value => Number(document.querySelector('#cf01-bench-rack').dataset.currentTime) > value, carriedTime, {timeout: 10000});
     }
     const failedReports = process.argv.slice(5);
     for (const reportPath of failedReports) {
@@ -112,7 +128,7 @@ const { chromium } = require(process.argv[3] || 'playwright');
       assert.match(await page.locator('[data-batch-handoff]').textContent(), /not an assured physical location/);
     }
     assert.deepEqual(errors, []);
-    console.log(JSON.stringify({passed: true, languages: ['de','en'], ownership_at_0_15_30_45_60_s: ownership,
+    console.log(JSON.stringify({passed: true, languages: ['de','en'], source_duration_s: duration, ownership_checks: ownership,
       batch_order_restored: true, unresolved_handoff_reports: failedReports.length, optional_panel_failures: Object.keys(variants), widths: [320,600,960], console_errors: errors}, null, 2));
   } finally {await browser.close();}
 })().catch(error => {console.error(error); process.exitCode = 1;});

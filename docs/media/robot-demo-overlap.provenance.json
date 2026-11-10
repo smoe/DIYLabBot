@@ -1,0 +1,506 @@
+{
+  "format": "solidcraftbot.readme-media/2",
+  "prepared_on": "2026-11-10",
+  "revision": "centrifuge-cf01-robot-bca7acca63a4-r2",
+  "base_commit": "c57bd9d26a29429b259c81dd22e944d51f12a098",
+  "source_binding": "Generated from the working tree; source file hashes identify the implementation, not the base commit alone.",
+  "source_animation": "renders/centrifuge-cf01-robot-bca7acca63a4-r2/cf01-robot-pickup.html",
+  "source_animation_sha256": "fe6798b434e4dc0ff74d0ede4074fc711a184bcf52f29db728954b22c45a6d62",
+  "source_files_sha256": {
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+    "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/build_centrifuge_robot_pickup.py": "659e22ea4c16e0dd2d6f2bc3d36b982a6a6620ec8d6cf4219570d08a9ca128b9",
+    "scripts/build_centrifuge_robot_pickup_freecad.py": "622b95942730a3021bef6677742132de4f7c0d57d4000ddf38b9425954284806",
+    "scripts/export_centrifuge_robot_pickup_solidcraft.py": "dd0607ceaef90fe5e09acac33f7482343ca76b5047b0266733cd83acea4704ce",
+    "scripts/centrifuge_pickup_solidcraft.py": "aa3e177dc6bdf570877eeb6433a7214497e339f7ae14ee72ef67929a97205715",
+    "scripts/solidcraft_vendor.py": "8126506c70eecca56f222f8a158b9de23557b9abb5dfb6bc7938e4153ec8f27e",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/build_centrifuge_robot_pickup_visual.py": "00f6c82f1708813dd2487297823695621b18ba9e38567e2f58f1e4089b31209f",
+    "scripts/report_centrifuge_robot_pickup.py": "1c325747a3dbf03e26994b5def9cf9b2d8c243208ccd452a388a171c01a79019",
+    "scripts/check_centrifuge_robot_motion.py": "02c8f119319ee18c74f352941526a6cddef67f359689316354b2fbb639ae7d9b",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/lab_transfer_model.py": "b7e16e6d91f1889211ca6c641cfc7f789ebf3ed26df03b06c2e4c131dce6f85f",
+    "scripts/templates/centrifuge_robot_pickup.html": "0f9adf164ecb9de499cff6221b004e2c01d281a04d42c51ddc2bb876a4fa2198",
+    "scripts/templates/centrifuge_robot_pickup.FCMacro": "8909c35b5d69db11d434a36a7a2d9dd5f010f5c16ef5a80ee32bb68fa498d97a",
+    "tests/test_centrifuge_robot_pickup.py": "8974c3fab00052dcfce019e6014d90ac9a8e70c8db58e681252f123cda365288",
+    "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+    "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+    "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+    "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+    "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+    "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+    "scripts/rack_slots.py": "2b48e8e2926ddbb6b42993cc7ddfa465bef97b050621e838383b71ac8982c89c",
+    "scripts/cf01_rack_batch.py": "cbcafd738554857413ec9a11841fe82b4b04f6b8867c3c46cfc3e9f697bc9269",
+    "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b",
+    "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+    "scripts/centrifuge_protocol.py": "62932cb5deeb03a8409084c47513c9c5210eb2676c18f6bc23549ed54c70ac6c",
+    "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+    "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "scripts/templates/robot_demo_header.html": "b738bdba34a1688632891680041b8fb8ffaad9b2f077b2b8193b4da8a470e701",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/cf01_collision_scope.py": "2e6a5516e1a21e7f95f5b6c4b5ca34edba949f248e1aac78fadea3aeff1d2ab5",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+    "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+    "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+    "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+    "model/centrifuge-cf01.robot-pickup.schema.json": "86eb3092c7a71b19b566ae96443ee86f6475d5ed8027241d680ecbc91293014a",
+    "scripts/export_readme_video.cjs": "9110c495c0649b77e601a86a106221155fb7b358c264898d040e0b57e62e09ac",
+    "scripts/export_centrifuge_robot_pickup_ros2.py": "fe9ff20a439fa99a28183ca09f1ce58b7320647857f61b173b7fbe38c3393797",
+    "tests/check_cf01_demo.cjs": "72108c3b05cc0c924598476c66f5bf02ba0e32a594d45172619271a0e174b020",
+    "tests/test_centrifuge_robot_pickup_ros2.py": "1b5912fa36066308a255d1d8b8e9b7658a9bd82591df7bfb15eddf4cd812d67e",
+    "tests/test_synthetic_workspace.py": "f39d2c6d988f63d4fd6c9705fe9b59a8622dd196fab8a14b17fb44d5365e5fba",
+    "tests/test_synthetic_lab_scene.py": "0f88aeff0a56e16c6396d1465bd5cb7cb6b9ab9ac2aedd04d1da451c327be6ff"
+  },
+  "documentation_files_sha256": {
+    "README.md": "bdc7fd68b39fbf491627ba32807e325e9df9e9e7fabca6add1c0aeb615f04c31",
+    "ARCHITECTURE.md": "6ed2cb7d58775c094cc4cd494e7fdd42b7e8ddac07a289aa6871c935ed2909b5",
+    "docs/centrifuge-cf01-robot-pickup.md": "0463de2942f46fb8cf6a3eb78a05e4e370653943a3f4ecbc9b92f307422d50c6",
+    "docs/media/README.md": "a321011a04d6e9f531ee30e0ad085a6a654bc94c54d20a2487aa70e3781215fc"
+  },
+  "media": {
+    "robot-demo-overlap.html": {
+      "path": "docs/media/robot-demo-overlap.html",
+      "sha256": "fe6798b434e4dc0ff74d0ede4074fc711a184bcf52f29db728954b22c45a6d62",
+      "bytes": 868829
+    },
+    "robot-demo-overlap.mp4": {
+      "path": "docs/media/robot-demo-overlap.mp4",
+      "sha256": "f53f06fba151f02b43ced3f840bd4f6426bd7169a5251f2ed76df058f58c855a",
+      "bytes": 1324932
+    },
+    "robot-demo-overlap.png": {
+      "path": "docs/media/robot-demo-overlap.png",
+      "sha256": "afdc480fe67f1c08538d8ba42f5f1ac33df654b1707399cc335183e5145716aa",
+      "bytes": 122930
+    }
+  },
+  "native_build_report": {
+    "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/robot-pickup-build-report.json",
+    "sha256": "f5fb182d31e8766856e652218262a295f64424fbfc36a43ac64c923aa40234d0"
+  },
+  "workspace_build_report": {
+    "path": "cad/synthetic-lab-scene/shared-build-report.json",
+    "sha256": "5b10f90ed9e615bfe8ab1e223ad9b94ab3423209c17a0373bc1ab5f6c6c2e850"
+  },
+  "trajectory": {
+    "samples": 191,
+    "duration_s": 47.5,
+    "joint_count": 6,
+    "all_joint_limits_checked": true,
+    "max_tip_position_error_mm": 0.00032565031273179557,
+    "max_orientation_error_deg": 0.0005335272434668797,
+    "max_original_fk_difference_mm": 0,
+    "handoff_time_s": 21.5,
+    "clear_confirmed_s": 29.5,
+    "closure_starts_s": 30.5
+  },
+  "timing": {
+    "robot_and_sample_clear_s": 29.5,
+    "robot_upright_s": 33.5,
+    "rack_approach_s": 37.5,
+    "rack_seated_s": 41.5,
+    "rack_support_confirmed_s": 42.5,
+    "jaws_open_s": 43.5,
+    "station_pusher_parked_s": 30.5,
+    "lid_closing_interval_s": [
+      30.5,
+      41
+    ],
+    "lid_locked_s": 42,
+    "cycle_end_s": 47.5,
+    "confirmation_kind": "Synthetic; no physical sensor evidence"
+  },
+  "checks": {
+    "offline_tests": {
+      "passed": true,
+      "count": 87,
+      "log": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/offline-tests.log"
+    },
+    "schemas": {
+      "passed": true,
+      "documents": 17,
+      "log": {
+        "path": "tmp/cf01-overlap-schema-check.log",
+        "sha256": "47c15b007dab88c36fac74676e59d9b14672f67440f2788ad6dbd15f3f532b08"
+      }
+    },
+    "native_motion": {
+      "passed": true,
+      "requested_frames": 1343,
+      "unique_states_checked": 1338,
+      "spacing": {
+        "maximum_body_bound_corner_step_mm": 1.9402055043496225,
+        "maximum_joint_or_lid_step_deg": 0.5055227674940852,
+        "maximum_time_step_s": 0.25
+      },
+      "minimum_robot_equipment_distance_mm": 5.476993253937962,
+      "post_clearance_lid": {
+        "minimum_distance_lower_bound_mm": 70.69389559766228,
+        "nearest_bound_pair": {
+          "a": "CommandLid",
+          "b": "Arm.A3_housing",
+          "time_s": 35.8125,
+          "phase": "Move above empty rack slot 01",
+          "method": "aabb_lower_bound"
+        },
+        "conservative_bound_tests": 299782,
+        "exact_distance_tests": 0,
+        "required_mm": 5,
+        "from_time_s": 29.5,
+        "coverage": [
+          "arm",
+          "tool",
+          "carried tube",
+          "cap"
+        ],
+        "scope": "Conservative body-bound separation from the instantaneous moving lid at adaptive samples, refined by exact BRep distance where the bound is below the required margin; not a continuous swept-volume or physical sensor proof."
+      },
+      "coverage": [
+        "robot and tool versus complete centrifuge including moving lid",
+        "robot/tool versus rack and bench",
+        "carried tube versus remaining centrifuge, rack, bench and arm",
+        "nonadjacent arm self collisions",
+        "cap and non-pad tool clearance"
+      ],
+      "exclusions": [
+        "within each rigid link and adjacent arm joint interfaces",
+        "tool/flange mounting interface",
+        "internal tool assembly",
+        "intended tube/contact-pad grasp contact"
+      ],
+      "scope": "Adaptive discrete BRep intersections of the exact joint-interpolated playback path. Spacing bounds apply to sampled body-bounds corners, not a continuous swept-volume proof."
+    },
+    "native_snapshots": {
+      "passed": true,
+      "freecad_count": 7,
+      "solidcraft_count": 2,
+      "solidcraft_freecad_required": false,
+      "live_gui_macro_executed": false,
+      "scope": "Source-derived frozen native poses, including optional cross-CAD measurement comparison; no live native handoff motion study"
+    },
+    "workspace_instruments": {
+      "passed": true,
+      "cf01_path_samples": 191,
+      "approach_configurations": 2,
+      "nanodrop_hinge_angles_deg": [
+        0,
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75
+      ],
+      "minimum_nanodrop_lever_arm_distance_lower_bound_mm": 27.824211669384297,
+      "nearest_pair": {
+        "arm_body": "Arm.Upper_plate_L",
+        "lever_body": "SYN.NanoDrop01.FingerGrip",
+        "hinge_deg": 30,
+        "pose": "SYN.Qubit401.approach",
+        "cf01_time_s": 47.5,
+        "method": "aabb_lower_bound"
+      },
+      "required_lever_arm_distance_mm": 5,
+      "collisions": [],
+      "exact_overlap_tests": 0,
+      "exact_distance_tests": 0,
+      "scope": "Discrete CF01 path and two approach configurations versus both instruments in their default poses; NanoDrop lever clearance also sampled from closed to maximum opening in 5 degree steps. Conservative world AABB separation proves distant pairs; native BRep distances resolve pairs below the required clearance. The reported minimum is a clearance lower bound, not the exact global minimum. No continuous swept-volume or connecting-path qualification."
+    },
+    "browser": {
+      "passed": true,
+      "languages": [
+        "de",
+        "en"
+      ],
+      "source_duration_s": 47.5,
+      "ownership_checks": [
+        {
+          "time_s": 0,
+          "owner": "station"
+        },
+        {
+          "time_s": 21.45,
+          "owner": "station"
+        },
+        {
+          "time_s": 21.5,
+          "owner": "gripper"
+        },
+        {
+          "time_s": 42.45,
+          "owner": "gripper"
+        },
+        {
+          "time_s": 42.5,
+          "owner": "rack"
+        },
+        {
+          "time_s": 47.5,
+          "owner": "rack"
+        }
+      ],
+      "batch_order_restored": true,
+      "unresolved_handoff_reports": 0,
+      "optional_panel_failures": [
+        "absent",
+        "malformed"
+      ],
+      "widths": [
+        320,
+        600,
+        960
+      ],
+      "console_errors": []
+    },
+    "mp4_decode": {
+      "passed": true,
+      "duration_s": 19.999809,
+      "width": 920,
+      "height": 490,
+      "decoded_frame_times_s": [
+        12.5,
+        14.75,
+        17.5,
+        19.9
+      ]
+    },
+    "visual_review": {
+      "passed": true,
+      "scene_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "reviewed_on": "2026-11-10",
+      "reviewer": "Codex visual inspection",
+      "views": [
+        "full assembly at 35 s: arm outside centrifuge while lid at 60 degrees",
+        "decoded MP4 frames at 12.5, 14.75, 17.5 and 19.9 s",
+        "final rack placement with empty gripper withdrawn",
+        "README Mermaid roles diagram"
+      ],
+      "limits": [
+        "Visual review only; native geometry and motion are checked separately",
+        "No hardware, sensor feedback or ROS runtime validation"
+      ]
+    },
+    "gallery": {
+      "passed": true,
+      "images": 31,
+      "covered_model_sources": 30,
+      "image_bytes": 2975847,
+      "visual_reviewed": true,
+      "provenance": {
+        "path": "docs/models/provenance.json",
+        "sha256": "d9438e89e7c96a520e13d8253603e8f5fe510f3e8aebebfe4c0696a9915ec1f2"
+      },
+      "updated_entries": [
+        "synthetic-workspace",
+        "two-arm-analytics"
+      ],
+      "scope": "Only the affected source bindings were refreshed; all other curated snapshots and their existing evidence were retained."
+    },
+    "additional_tests": {
+      "analytics": {
+        "passed": true,
+        "count": 9,
+        "log": {
+          "path": "tmp/cf01-overlap-analytics-tests.log",
+          "sha256": "949ea47e04173984cd9ffb43ee140c8aefc2f7bd48fbc636d97756446bc553f7"
+        }
+      },
+      "gallery": {
+        "passed": true,
+        "count": 8,
+        "log": {
+          "path": "tmp/cf01-overlap-gallery-tests.log",
+          "sha256": "d25a13e52df60d8faeafdd9332e997807e6f5b0bb726c92ba5ee5dcfb6c806bb"
+        }
+      }
+    },
+    "total_focused_tests": 104
+  },
+  "ros_arm_program": {
+    "path": "exports/generated/cf01-robot-pickup-ros2/scenarios.json",
+    "sha256": "1a2ff7c248a9379915b3f51182497b2235053f75b148e9631cb1e5a1dc8af0be",
+    "points": 191,
+    "duration_s": 47.5,
+    "client_dry_run_passed": true,
+    "included_channels": [
+      "six_arm_joints"
+    ],
+    "excluded_channels": [
+      "gripper",
+      "CF01 station commands",
+      "live collision, sensor and quality feedback"
+    ],
+    "robot_description_requirements": {
+      "robot_source": "model/robot.json",
+      "robot_source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "parameter_overrides_mm": {
+        "upper_len": 280,
+        "fore_len": 250
+      },
+      "base_position_m": [
+        -0.33,
+        0.08,
+        0.0
+      ],
+      "base_yaw_rad": -0.8726646259971648,
+      "tcp_parent_link": "l6_bareflange",
+      "tcp_position_in_parent_m": [
+        0.0,
+        0.0,
+        0.071
+      ],
+      "compatibility_verified": false,
+      "compatibility_check": "Required before execution; not performed by the trajectory client"
+    },
+    "verification": {
+      "ros_runtime": false,
+      "hardware_execution": false,
+      "integrated_CF01_cycle": false
+    }
+  },
+  "capture": {
+    "source_scene_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "source_duration_s": 47.5,
+    "video_target_duration_s": 20,
+    "screenshot_time_s": 35,
+    "mime": "video/mp4;codecs=avc1.42001f",
+    "frames": 401,
+    "ownership_checks": [
+      {
+        "time_s": 0,
+        "owner": "station"
+      },
+      {
+        "time_s": 21.45,
+        "owner": "station"
+      },
+      {
+        "time_s": 21.5,
+        "owner": "gripper"
+      },
+      {
+        "time_s": 42.45,
+        "owner": "gripper"
+      },
+      {
+        "time_s": 42.5,
+        "owner": "rack"
+      },
+      {
+        "time_s": 47.5,
+        "owner": "rack"
+      }
+    ],
+    "states": [
+      {
+        "currentTime": "0.000",
+        "lidAngle": "0.000",
+        "tubeOwner": "station",
+        "robotClear": "false",
+        "batchIndex": "0",
+        "batchOrderRestored": "false",
+        "batchOwnership": "confirmed"
+      },
+      {
+        "currentTime": "11.900",
+        "lidAngle": "105.000",
+        "tubeOwner": "station",
+        "robotClear": "false",
+        "batchIndex": "0",
+        "batchOrderRestored": "false",
+        "batchOwnership": "confirmed"
+      },
+      {
+        "currentTime": "23.750",
+        "lidAngle": "105.000",
+        "tubeOwner": "gripper",
+        "robotClear": "false",
+        "batchIndex": "0",
+        "batchOrderRestored": "false",
+        "batchOwnership": "confirmed"
+      },
+      {
+        "currentTime": "35.650",
+        "lidAngle": "53.500",
+        "tubeOwner": "gripper",
+        "robotClear": "true",
+        "batchIndex": "0",
+        "batchOrderRestored": "false",
+        "batchOwnership": "confirmed"
+      },
+      {
+        "currentTime": "47.500",
+        "lidAngle": "0.000",
+        "tubeOwner": "rack",
+        "robotClear": "true",
+        "batchIndex": "0",
+        "batchOrderRestored": "false",
+        "batchOwnership": "confirmed"
+      }
+    ],
+    "errors": []
+  },
+  "runtime": {
+    "freecad": {
+      "FreeCAD": [
+        "27",
+        "1",
+        "0",
+        "20261103 (Git shallow)",
+        "Unknown",
+        "2026/11/03 22:26:40",
+        "(HEAD detached at 33b9f353e)",
+        "33b9f353e6fae0a3a5a03196428fde1c5d8da628"
+      ],
+      "python": "3.13.18 | packaged by conda-forge | (main, Oct 26 2026, 11:32:30) [Clang 21.1.8 ]"
+    },
+    "solidcraft": "0.40.0-rc.2",
+    "chrome": "157.0.8103.39",
+    "playwright": "1.62.1"
+  },
+  "historical_media_sha256": {
+    "docs/media/robot-demo.mp4": "da38a7eab9617bc4c47d9c1edd2616cbf39c94e42ea8f24d0ee95169e3143d5e",
+    "docs/media/robot-demo.png": "6cf417bf6bdea2d37fb90368eb3fc20ebc869bc96892c20d6b6170a52656943e",
+    "docs/media/robot-demo.html": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
+    "docs/media/provenance.json": "80e954c9b2b7a4a16ee40f280382e0a134702b9edcefa6d01b6d267e45e5160c"
+  },
+  "historical_solidcraft_limit": "Original robot-demo media/provenance retain the failed STEP snapshot import. The current independent native adapter passes its frozen-pose checks; this does not rewrite that historical failure.",
+  "limitations": [
+    "The same six-axis arm source is instantiated with longer links; torque, stiffness, stability and fastening of the bench mount are not qualified.",
+    "The flange gripper and guided rack are concepts, not selected or qualified hardware; this is not the excluded pipette tool.",
+    "The local bench scene does not update or qualify the L01 room layout.",
+    "Grasp, tube absence, rack support and workspace-clear signals are synthetic; friction, sensing and hardware timing remain open.",
+    "Sampled geometry and joint checks do not prove continuous collision avoidance, payload or hardware safety. The 1 mm transport target is not measured performance.",
+    "Adaptive motion audit and native snapshots remain discrete checks, not a continuous swept-volume proof.",
+    "SolidCraft keeps original X2/X4 case pieces as rigid assemblies; their source-body mapping and original seam overlaps are recorded separately.",
+    "No hardware ROS/SiLA server or physical grasp/sensor/force validation is supplied.",
+    "The browser renders the common motion directly; the MP4 was not captured from a running ROS system.",
+    "ROS export/client dry-run checks the six-axis arm channel only. Matching live URDF, gripper/station integration and real collision/quality/protective feedback remain unverified.",
+    "The twelve-sample batch trace has its own clock and abstract robot handoffs; it does not execute this animation or a physical loading path."
+  ]
+}

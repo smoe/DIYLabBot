@@ -10,12 +10,13 @@ lists the generated animation, native CAD views, playback macro and evidence.
 The independent SolidCraft result is recorded separately in
 `cad/centrifuge-cf01/solidcraft-pickup-build-report.json`.
 
-The 60-second illustrative sequence opens the lid, raises tube 01, approaches
+The 47.5-second illustrative sequence opens the lid, raises tube 01, approaches
 with open jaws, closes them around the tube body, extracts the tube along its
 35° axis, and withdraws the robot with the tube. The pusher retracts and the lid
 closes only after the robot and carried tube have cleared the centrifuge.
-After the lid locks, the robot turns the tube upright in clear space, lowers it
-into output rack slot 01, confirms support, opens its fingers and lifts away.
+After clearance confirmation, the robot turns the tube upright and travels to
+output rack slot 01 while the station parks its pusher and closes/locks its lid.
+The robot confirms rack support, opens its fingers and lifts away.
 The tube stays in the rack. Playback can be paused/scrubbed; tube-handling and
 rack-placement close-ups supplement the full assembly view.
 
@@ -30,14 +31,14 @@ rack-placement close-ups supplement the full assembly view.
 | 28.5 s | Arm and retained tube at the withdrawal pose |
 | 29.5 s | Synthetic independent workspace-clear confirmation |
 | 30.5 s | Empty pusher parked; lid may start closing |
+| 33.5 s | Tube upright outside the centrifuge; lid is closing |
+| 37.5 s | Tube above empty output rack slot 01; lid is still closing |
 | 41 s | Lid closed |
-| 42 s | Lid pins engaged; robot still holds the removed tube |
-| 46 s | Tube upright outside the centrifuge |
-| 50 s | Tube above empty output rack slot 01 |
-| 54 s | Tube bottom reaches the rack base through the guide bore |
-| 55 s | Synthetic rack-support confirmation; ownership transfers without a jump |
-| 56 s | Fingers open after support confirmation |
-| 60 s | Empty gripper withdrawn; tube remains in slot 01 |
+| 41.5 s | Tube bottom reaches the rack base through the guide bore |
+| 42 s | Lid pins engaged independently of robot travel |
+| 42.5 s | Synthetic rack-support confirmation; ownership transfers without a jump |
+| 43.5 s | Fingers open after support confirmation |
+| 47.5 s | Empty gripper withdrawn; tube remains in slot 01 |
 
 Times, grasp and clearance confirmations are illustrative. They are not physical
 sensor data or hardware timing predictions. The new scene is separate from the
@@ -126,8 +127,11 @@ native snapshots are derived review files rather than additional master models.
   shared joint hierarchy and sampled joint trajectory. Vendor detail is clustered
   at 1 mm only for responsive display; exact BRep geometry remains in CAD checks.
 
-The report distinguishes these backend capabilities. No ROS scene, hardware
-trajectory execution, or SiLA server was added by this animation update.
+The report distinguishes these backend capabilities. The same sampled arm
+channel can now be exported for the existing ROS `FollowJointTrajectory` client;
+see [the README instructions](../README.md#roboter-in-bewegung). This is not an integrated ROS scene or
+hardware execution of the gripper/lid cycle. The separate SiLA simulator adapter
+retains its own network tests and limits.
 
 ## Executed checks and limits
 
@@ -182,9 +186,11 @@ to English while preserving playback and sample ownership. Machine-readable
 identifiers stay unchanged. An unavailable optional batch panel does not block
 the motion view.
 
-Die ausgewählten Medien unter `docs/media/` bleiben der historische Build.
-Die Zuordnung dieses historischen Builds zu seiner Quellrevision und frühere
-Prüfungen stehen im [Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
+Die ursprünglichen `robot-demo.*` unter `docs/media/` bleiben der historische
+Build. Das README verweist jetzt auf `robot-demo-overlap.*` mit eigener
+Provenienz und überlappender Arm-/Deckelbewegung. Die Zuordnung des älteren
+Builds zu seiner Quellrevision und frühere Prüfungen stehen im
+[Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
 Die aktuelle Berichtssemantik ist nachfolgend beschrieben.
 
 Neue native Einzelberichte führen unter `collision_scope` die im Workspace
@@ -272,7 +278,7 @@ Anbindung an NanoDrop bleiben eigenständige Aufgaben.
 
 Die HTML-Chargenanzeige benennt ihre Inventarfelder als Buchführung und zeigt
 offene Übergaben samt fehlenden Quittungen auf Deutsch und Englisch. Die
-unabhängige 60-s-Bewegung stellt solche Fehlerzustände nicht räumlich nach.
+unabhängige 47,5-s-Bewegung stellt solche Fehlerzustände nicht räumlich nach.
 Historische Downloads unter `docs/media/` bleiben unverändert und enthalten
 diese aktuelle Fehlerdarstellung nicht. Neu erzeugte lokale Demos verwenden
 die aktuelle Vorlage; ein bestandener CAD-Aufbau ersetzt keine Geräteprüfung.
@@ -373,7 +379,9 @@ fehlgeschlagene Bestätigung macht daraus `unresolved`. Die Anzeige unterscheide
 space, reference-bank catalogue, furnishing instance and equipment layout.
 There is no room shell. The standalone rack source is
 `model/guided-tube-rack.shared.json`. The former bank dimensions, device world
-poses and all 241 trajectory samples remain unchanged.
+poses are unchanged. The original 241-sample/60-second timing is preserved in
+the historical media; the current independent-channel timing uses 191 samples
+over 47.5 seconds.
 
 Run `python3 scripts/run_cf01_rack_batch.py` (optionally `--transport sila2`) for
 the twelve-sample local fixture. The profile declares an initially empty rotor,
@@ -386,7 +394,7 @@ The explicit test clock advances while awaiting observable command completion, i
 synthetic observations and pending acknowledgements separately and produce a
 failed report; they do not claim restored sample order.
 
-The 60-second motion component (rotor slot 01 → rack slot 01) has its own timeline
+The 47.5-second motion component (rotor slot 01 → rack slot 01) has its own timeline
 and mock confirmations. The batch runner does not execute that component or
 any loading/return path. The README HTML presents the two independently.
 
@@ -441,3 +449,31 @@ does not require that context or FreeCAD. These checks do not validate a native
 SolidCraft motion study or the full loading path. The standalone arm and MB01
 builders now reuse the same vendor adapter; other legacy STEP-snapshot adapters
 remain separate.
+
+## Concurrent withdrawal and lid closure
+
+The pickup source declares `timeline_semantics: independent_sparse_channels`.
+Robot poses, station poses/coordinates and jaw settings each interpolate only
+between their own keyframes. Ownership, rack support and workspace-clear events
+are confirmations, not interpolated sensor readings. A station-only event does
+not stop robot travel, and a robot-only event does not interrupt lid closure.
+
+The arm starts its existing upright/rack path at 29.5 s after the synthetic
+clearance confirmation. The pusher must still be parked before closure starts
+at 30.5 s; lid motion ends at 41 s and locking at 42 s. There is no requirement
+to hold the arm at the withdrawal pose until locking completes. Existing poses,
+move durations, grasp and rack ownership rules are retained. The adaptive native
+audit additionally checks the arm, tool, carried tube and cap against the moving
+lid after clearance, including the declared 5 mm margin. This remains a discrete
+geometric check, not a real safety sensor or continuous swept-volume proof.
+
+The current native audit passed all 1,343 requested frames (1,338 distinct
+geometric states). Its closest robot/equipment gap is 5.477 mm. After clearance,
+the conservative arm/tool/tube/cap-to-lid distance bound is at least 70.694 mm;
+all 299,782 relevant sampled pairs exceed the 5 mm requirement without needing
+exact near-field refinement. These figures describe the nominal model only.
+
+Current README media use a separate `robot-demo-overlap` revision. The original
+`robot-demo` files and their failed historical SolidCraft import result remain
+unchanged. The independent native SolidCraft adapter remains the supported
+source-derived route; its frozen poses do not demonstrate live native motion.

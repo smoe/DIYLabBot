@@ -36,17 +36,24 @@ def adaptive_frames(scene,data,evaluate,records):
             m=state((a['sample']['time_s']+b['sample']['time_s'])/2);append(a,m,depth+1);append(m,b,depth+1)
         else:max_point=max(max_point,step);max_joint=max(max_joint,angle);frames.append(b)
     previous=state(0);frames.append(previous)
-    for sample in data['samples'][1:]:
-        current=state(sample['time_s']);append(previous,current);previous=current
+    times=sorted({sample['time_s'] for sample in data['samples']}|{scene['checks']['robot_clear_confirmed_s']})
+    for time_s in times[1:]:
+        current=state(time_s);append(previous,current);previous=current
     for frame in frames:del frame['points']
     return frames,{'maximum_body_bound_corner_step_mm':max_point,'maximum_joint_or_lid_step_deg':max_joint,
         'maximum_time_step_s':max(b['sample']['time_s']-a['sample']['time_s'] for a,b in zip(frames,frames[1:]))}
 
 
 def audit(scene,data,records):
+    ids={record['id'] for record in records};groups={record['group'] for record in records}
+    required={'Tube01','ClosedCap01',*[part['id'] for part in pickup.gripper_parts(scene,cf.parameters(cf.load()))]}
+    arm_groups={'Arm.'+link['id'] for link in pickup.arm_source(scene)['links']}
+    if not required<=ids or not arm_groups<=groups or not any(record['group']=='LidGroup' for record in records):
+        raise ValueError('Complete arm, tool, tube, cap and lid records required for clearance audit')
     evaluate=pickup.SceneEvaluator(scene,data);arm=pickup.arm_source(scene);indices={'Arm.'+l['id']:i for i,l in enumerate(arm['links'])}
     frames,spacing=adaptive_frames(scene,data,evaluate,records);seen=set();pair_cache={};collisions=[];checks=[];exact=0;distance_tests=0
     nearest=None;best=float('inf');unique=0
+    nearest_lid=None;lid_clearance=float('inf');lid_distance_tests=0;lid_bound_tests=0
     def category(a,b,t):
         ak,bk=a['kind'],b['kind'];an,bn=a['id'],b['id']
         tubea=an in ('Tube01','ClosedCap01');tubeb=bn in ('Tube01','ClosedCap01')
@@ -61,7 +68,8 @@ def audit(scene,data,records):
         return None
     for index,frame in enumerate(frames):
         sample=frame['sample'];t=sample['time_s'];matrices=frame['matrices']
-        signature=tuple(round(v,8) for matrix in matrices.values() for row in matrix for v in row)
+        signature=(t>=scene['checks']['robot_clear_confirmed_s'],
+                   tuple(round(v,8) for matrix in matrices.values() for row in matrix for v in row))
         if signature in seen:continue
         seen.add(signature);unique+=1;items=[];hits=[]
         for r in records:
@@ -74,6 +82,23 @@ def audit(scene,data,records):
             for b in items[i+1:]:
                 cat=category(a,b,t)
                 if not cat:continue
+                # Once clearance is confirmed, both robot and carried sample
+                # must keep the declared margin from the moving lid. Intended
+                # tube/rack contacts must not suppress this separate check.
+                lid_pair=t>=scene['checks']['robot_clear_confirmed_s'] and (
+                    a['group']=='LidGroup' and (b['kind'] in ('arm','gripper') or b['id'] in ('Tube01','ClosedCap01')) or
+                    b['group']=='LidGroup' and (a['kind'] in ('arm','gripper') or a['id'] in ('Tube01','ClosedCap01')))
+                if lid_pair:
+                    lower=math.sqrt(sum(max(0,a['box']['min'][j]-b['box']['max'][j],b['box']['min'][j]-a['box']['max'][j])**2 for j in range(3)))
+                    lid_bound_tests+=1;distance=lower;method='aabb_lower_bound'
+                    # A conservative bound already above the required margin
+                    # proves separation. Avoid expensive exact far-field extrema
+                    # on vendor surfaces; refine only an inconclusive bound.
+                    if lower<scene['checks']['clearance_margin_mm']:
+                        distance=actual(a).distToShape(actual(b))[0];lid_distance_tests+=1;method='native_brep_distance'
+                    if not math.isfinite(distance) or distance<0:raise ValueError('Finite nonnegative lid clearance evidence required')
+                    if distance<lid_clearance:
+                        lid_clearance=distance;nearest_lid={'a':a['id'],'b':b['id'],'time_s':t,'phase':sample['phase'],'method':method}
                 # Exact nearest robot-to-station/rack clearance, excluding handled
                 # tube contacts. Bench/base support is a separate contact pair.
                 equipment=cat=='robot_environment' and (a['kind'] in ('station','rack') or b['kind'] in ('station','rack')) and a['id'] not in ('Tube01','ClosedCap01') and b['id'] not in ('Tube01','ClosedCap01')
@@ -92,11 +117,14 @@ def audit(scene,data,records):
         checks.append({'time_s':t,'phase':sample['phase'],'passed':not hits,'collision_count':len(hits)})
         if index%50==0 or hits:print(json.dumps({'audit_frame':index,'of':len(frames),'time_s':t,'hits':hits,'exact_overlap_tests':exact}),flush=True)
         if len(collisions)>=12:break
-    return {'passed':not collisions and index==len(frames)-1 and best>=scene['checks']['minimum_robot_equipment_clearance_mm'],'requested_frames':len(frames),'unique_states_checked':unique,'samples':checks,
+    return {'passed':not collisions and index==len(frames)-1 and best>=scene['checks']['minimum_robot_equipment_clearance_mm'] and lid_bound_tests>0 and math.isfinite(lid_clearance) and lid_clearance>=scene['checks']['clearance_margin_mm'],'requested_frames':len(frames),'unique_states_checked':unique,'samples':checks,
         'collision_scope':collision_scope(scene,data),
         'spacing':spacing,'collisions':collisions,'exact_overlap_tests':exact,'exact_distance_tests':distance_tests,
         'minimum_robot_equipment_distance_mm':best,'nearest_pair':nearest,
         'minimum_robot_equipment_clearance_required_mm':scene['checks']['minimum_robot_equipment_clearance_mm'],
+        'post_clearance_lid':{'minimum_distance_lower_bound_mm':lid_clearance,'nearest_bound_pair':nearest_lid,'conservative_bound_tests':lid_bound_tests,'exact_distance_tests':lid_distance_tests,
+            'required_mm':scene['checks']['clearance_margin_mm'],'from_time_s':scene['checks']['robot_clear_confirmed_s'],
+            'coverage':['arm','tool','carried tube','cap'],'scope':'Conservative body-bound separation from the instantaneous moving lid at adaptive samples, refined by exact BRep distance where the bound is below the required margin; not a continuous swept-volume or physical sensor proof.'},
         'coverage':['robot and tool versus complete centrifuge including moving lid','robot/tool versus rack and bench','carried tube versus remaining centrifuge, rack, bench and arm','nonadjacent arm self collisions','cap and non-pad tool clearance'],
         'exclusions':['within each rigid link and adjacent arm joint interfaces','tool/flange mounting interface','internal tool assembly','intended tube/contact-pad grasp contact'],
         'scope':'Adaptive discrete BRep intersections of the exact joint-interpolated playback path. Spacing bounds apply to sampled body-bounds corners, not a continuous swept-volume proof.'}

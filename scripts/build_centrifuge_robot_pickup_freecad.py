@@ -76,7 +76,9 @@ def build(context):
     (Path(context['out'])/'scene-mesh.json').write_text(json.dumps(mesh,separators=(',',':')),encoding='utf-8')
     # Snapshot states are generated from the exact same group transforms as playback.
     snapshots=[]
-    for time_s,label in [(0,'Closed'),(21.5,'Grasp'),(24.5,'Extracted'),(29.5,'Withdrawn'),(42,'ClosedAfterPickup'),(55,'RackSeated'),(60,'RackReleased')]:
+    checks=scene['checks']
+    locked_time=next(k['time_s'] for k in scene['timeline'] if k['time_s']>checks['closing_starts_s'] and k.get('station_pose')=='closed')
+    for time_s,label in [(0,'Closed'),(checks['attachment_time_s'],'Grasp'),(checks['extraction_time_s'],'Extracted'),(checks['robot_clear_confirmed_s'],'Withdrawn'),(locked_time,'ClosedAfterPickup'),(checks['rack_handoff_time_s'],'RackSeated'),(data['duration_s'],'RackReleased')]:
         sample=pickup.interpolate(data['samples'],time_s);matrices=pickup.matrices(scene,data,sample)
         for name,group in groups.items():group.Placement=app_placement(matrices[name])
         doc.recompute();filename=Path(context['cad'])/('CF01_Robot_'+label+'.FCStd');doc.saveAs(str(filename))
