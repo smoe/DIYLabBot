@@ -1,0 +1,102 @@
+{
+  "format": "solidcraftbot.analytics-tools/1",
+  "id": "QC.ConceptTools",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "robot_mount": {
+    "source": "model/robot.json",
+    "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+  },
+  "cases": {
+    "pipette": {
+      "operation": "flange_pipette_envelope",
+      "tcp_length_mm": 190,
+      "color": "#3c84ad"
+    },
+    "originals": {
+      "operation": "tube_holder_grid",
+      "rows": 3,
+      "columns": 4,
+      "pitch_mm": 24,
+      "plate_height_mm": 24,
+      "tube_radius_mm": 6.2,
+      "tube_height_mm": 50,
+      "closed": true,
+      "color": "#55a68a"
+    },
+    "dilutions": {
+      "operation": "tube_holder_grid",
+      "rows": 3,
+      "columns": 4,
+      "pitch_mm": 24,
+      "plate_height_mm": 24,
+      "tube_radius_mm": 6.2,
+      "tube_height_mm": 50,
+      "closed": false,
+      "color": "#dfa844"
+    },
+    "assays": {
+      "operation": "tube_holder_grid",
+      "rows": 2,
+      "columns": 4,
+      "pitch_mm": 20,
+      "plate_height_mm": 20,
+      "tube_radius_mm": 4.2,
+      "tube_height_mm": 35,
+      "closed": true,
+      "color": "#5d92c6"
+    },
+    "workpiece": {
+      "operation": "tube_holder_grid",
+      "rows": 1,
+      "columns": 1,
+      "pitch_mm": 24,
+      "plate_height_mm": 18,
+      "tube_radius_mm": 6.2,
+      "tube_height_mm": 50,
+      "closed": false,
+      "color": "#74adb2"
+    },
+    "buffer": {
+      "operation": "reagent_bottle",
+      "radius_mm": 22,
+      "height_mm": 78,
+      "color": "#51b5c2"
+    },
+    "reagent": {
+      "operation": "reagent_bottle",
+      "radius_mm": 16,
+      "height_mm": 68,
+      "color": "#a476bd"
+    },
+    "tips": {
+      "operation": "fresh_tip_grid",
+      "rows": 4,
+      "columns": 5,
+      "pitch_mm": 15,
+      "color": "#59788d"
+    },
+    "cleaning": {
+      "operation": "wipe_cartridge",
+      "size_mm": [
+        80,
+        65,
+        18
+      ],
+      "color": "#e0dfd6"
+    },
+    "riser": {
+      "operation": "corner_post_mount",
+      "height_mm": 65,
+      "color": "#647b8a"
+    }
+  },
+  "status": "Unmeasured illustrative tools and passive fixtures; no selected pipette, tube article, dosing accuracy or actuation qualification",
+  "limitations": [
+    "All dimensions are concept assumptions. Tube volumes, sealing and fits are not qualified.",
+    "The pipette contains a visible actuator envelope and tip; neither dispenses liquid in this model.",
+    "Fixture tubes illustrate roles and are not runtime inventory or measured concentration data."
+  ]
+}

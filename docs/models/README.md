@@ -85,6 +85,14 @@ Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei 
 
 [Quelle 1](../../model/synthetic-cf01-workspace.shared.json) · [Quelle 2](../../model/equipment/cf01-workspace.json) · [Quelle 3](../../model/centrifuge-cf01.robot-pickup.shared.json) · [Quelle 4](../../model/nanodrop-concept.shared.json) · [Quelle 5](../../model/qubit-4-concept.shared.json) · [Details](../../docs/synthetic-lab-workflow.md)
 
+### Analytikstation · zwei zusätzliche Arme und Verdünnung
+
+[![Analytikstation · zwei zusätzliche Arme und Verdünnung](images/two-arm-analytics.png)](images/two-arm-analytics.png)
+
+Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.
+
+[Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../docs/development-plan.md)
+
 
 
 <a id="baugruppen"></a>

@@ -1,0 +1,245 @@
+{
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "robot_mount",
+    "cases",
+    "status",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.analytics-tools/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "robot_mount": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ]
+        }
+      ]
+    },
+    "cases": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "tcp_length_mm",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "flange_pipette_envelope"
+              },
+              "tcp_length_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "rows",
+              "columns",
+              "pitch_mm",
+              "plate_height_mm",
+              "tube_radius_mm",
+              "tube_height_mm",
+              "closed",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "tube_holder_grid"
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "columns": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "pitch_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "plate_height_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "tube_radius_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "tube_height_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "closed": {
+                "type": "boolean"
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "radius_mm",
+              "height_mm",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "reagent_bottle"
+              },
+              "radius_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "height_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "rows",
+              "columns",
+              "pitch_mm",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "fresh_tip_grid"
+              },
+              "rows": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "columns": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 12
+              },
+              "pitch_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "size_mm",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "wipe_cartridge"
+              },
+              "size_mm": {
+                "type": "array",
+                "minItems": 3,
+                "maxItems": 3,
+                "items": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                }
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "operation",
+              "height_mm",
+              "color"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "operation": {
+                "const": "corner_post_mount"
+              },
+              "height_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "status": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "analytics-tools.schema.json",
+  "title": "Portable unqualified analytical tools and fixture cases"
+}

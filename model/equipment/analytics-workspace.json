@@ -1,0 +1,256 @@
+{
+  "format": "solidcraftbot.equipment-layout/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "assets": {
+    "arm": {
+      "source": "model/robot.json",
+      "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+    },
+    "nanodrop": {
+      "source": "model/nanodrop-concept.shared.json",
+      "source_sha256": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02"
+    },
+    "qubit": {
+      "source": "model/qubit-4-concept.shared.json",
+      "source_sha256": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+    },
+    "waste": {
+      "source": "model/tip-collector-t01.shared.json",
+      "source_sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a"
+    },
+    "originals": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "originals"
+    },
+    "dilutions": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "dilutions"
+    },
+    "assays": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "assays"
+    },
+    "workpiece": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "workpiece"
+    },
+    "buffer": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "buffer"
+    },
+    "reagent": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "reagent"
+    },
+    "tips": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "tips"
+    },
+    "cleaning": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "cleaning"
+    },
+    "riser": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+      "case": "riser"
+    }
+  },
+  "instances": [
+    {
+      "id": "QC.Handle",
+      "asset": "arm",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        -330,
+        230,
+        65
+      ],
+      "yaw_deg": -90,
+      "overrides": {
+        "upper_len": 280,
+        "fore_len": 250
+      }
+    },
+    {
+      "id": "QC.Pipette",
+      "asset": "arm",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        350,
+        230,
+        65
+      ],
+      "yaw_deg": -140,
+      "overrides": {
+        "upper_len": 280,
+        "fore_len": 250
+      }
+    },
+    {
+      "id": "QC.HandleMount",
+      "asset": "riser",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        -330,
+        230,
+        0
+      ],
+      "yaw_deg": -90
+    },
+    {
+      "id": "QC.PipetteMount",
+      "asset": "riser",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        350,
+        230,
+        0
+      ],
+      "yaw_deg": -140
+    },
+    {
+      "id": "SYN.NanoDrop01",
+      "asset": "nanodrop",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        710,
+        110,
+        0
+      ],
+      "yaw_deg": 90
+    },
+    {
+      "id": "SYN.Qubit401",
+      "asset": "qubit",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        540,
+        -150,
+        0
+      ],
+      "yaw_deg": 90
+    },
+    {
+      "id": "QC.Originals",
+      "asset": "originals",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        -470,
+        -200,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Dilutions",
+      "asset": "dilutions",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        -210,
+        -240,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Assays",
+      "asset": "assays",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        320,
+        -250,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.SourceNest",
+      "asset": "workpiece",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        0,
+        -50,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.DestinationNest",
+      "asset": "workpiece",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        80,
+        -50,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Buffer",
+      "asset": "buffer",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        100,
+        -240,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Reagent",
+      "asset": "reagent",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        180,
+        -240,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.FreshTips",
+      "asset": "tips",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        450,
+        -20,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Cleaning",
+      "asset": "cleaning",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        740,
+        -30,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "QC.Waste",
+      "asset": "waste",
+      "host": "SYN.Analytics.Worktop",
+      "xyz": [
+        240,
+        -70,
+        0
+      ],
+      "yaw_deg": 0
+    }
+  ]
+}

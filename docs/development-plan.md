@@ -237,6 +237,76 @@ reserviert gemeinsame Arbeitsbereiche für zwei oder drei Arme.
 Werkzeugpose, Gefäßbelegung und Flüssigkeitstransfer werden als definierte Zustände
 geführt; Wiederanlauf nach Unterbrechungen braucht einen geprüften Ablauf.
 
+### Analytikstation: zwei zusätzliche Arme und Probenvorverdünnung
+
+Die [neue Zielrichtung](requirements.md#gewünschte-analytikstation-mit-zwei-kooperierenden-armen)
+verwendet zwei zusätzliche, weitgehend baugleiche Sechsachsarme neben dem
+CF01-Arm. Als erster Prüfaufbau übernimmt ein Arm Gefäße und Deckel, der andere
+eine betätigbare Pipette. Damit soll die separate Pipettierpositionierapparatur
+entfallen können. Passive Gefäßhalter, Werkzeugablagen, Spitzenvorrat,
+Reagenzplätze, Abfall und die NanoDrop-Reinigung gehören zur Auslegung.
+
+1. Vorhandene Pipetten, passende Spitzen, Original-/Verdünnungsgefäße und
+   Qubit-Ansatzgefäße bestimmen. DNA- und RNA-Assays, Konzentrationsbereiche,
+   Probenverbrauch, Durchsatz sowie Dosier- und Verschleppungskriterien festlegen.
+2. Ein gemeinsames Werkzeugkonzept mit Halterung, Dosierbetätigung,
+   Spitzenaufnahme/-abwurf und optischem Spitzenbezug ausarbeiten. Masse,
+   Betätigungskräfte und Werkzeugverformung am vorhandenen Arm prüfen.
+3. Zunächst an einem ruhenden Gefäß in passiver Aufnahme Dosierabweichung,
+   Streuung und Verschleppung messen. Die optische Feinanfahrt und die
+   Volumenprüfung gesondert nachweisen; einen zweiten bewegten Gefäßbezug erst
+   nach dieser Referenzprüfung untersuchen.
+4. Zwei Instanzen derselben Armquelle samt unterschiedlichen Werkzeugen aus
+   gemeinsamen Quellen aufbauen. Gemeinsame Rahmen, Arbeitszonen, Übergaben,
+   gegenseitige Sperren und Parallelaufgaben entwickeln und in beiden CADs
+   einschließlich der Werkzeuge und Gerätedeckel prüfen.
+5. Im bestehenden Inventar-/Ablaufkern eine eigene Vorverdünnungsoperation
+   ergänzen: identifiziertes Zielgefäß, gespeicherte Transferabsichten,
+   bestätigte Probe-/Verdünnungsmittelvolumina, Mischung und Herkunftskette.
+   Weitere Qubit-Entnahmen belasten das Verdünnungsgefäß; das Original wird
+   durch denselben Transfer nicht erneut belastet. Unterbrechungen erfordern
+   den Abgleich offener Transfers und Gefäße.
+6. NanoDrop-Direktmessung und Qubit-Messung nach optionaler Vorverdünnung
+   integrieren. Ergebnisbasis und externe Verdünnungsfaktoren prüfen; eine
+   bereits vom Gerät berücksichtigte Assayverdünnung nicht doppelt anwenden.
+   DNA- und RNA-Profile getrennt qualifizieren, anschließend Parallelbetrieb
+   und Wiederanlauf der beiden Arme prüfen.
+
+Die erste statische Konzeptaufstellung wird inzwischen aus
+`model/two-arm-analytics.shared.json` erzeugt. Sie referenziert die bisherige
+CF01-Bank mit ihrem Arm und eine separate Analytikbank mit zwei identischen
+Armvarianten aus `model/robot.json`. Möbeltyp, Möblierung und Geräteausstattung
+bleiben getrennte Quellen. `model/analytics-tools.shared.json` beschreibt die
+neuen unvermessen gezeichneten Pipetten-, Gefäßhalter- und Verbrauchsteilmodelle.
+Originale, Vorverdünnungen und Qubit-Ansätze besitzen getrennte Ablagen; zwei
+passive Einzelaufnahmen stehen zwischen den Analytikarmen. Der Pipettierarm
+zeigt sein Werkzeug über der Zielaufnahme, während der Handhabungsarm über dem
+Originalrack steht.
+
+```sh
+python3 scripts/build_analytics_concept.py
+python3 -m unittest discover -s tests -p 'test_analytics_concept.py' -v
+```
+
+Der Einstieg verwendet geprüfte native Ursprungsmodelle und den bestehenden
+unabhängigen SolidCraft-CF01-Bericht. Dessen Pfad lässt sich mit `--core-report`
+angeben; die vorhandenen CAD-Adapter erzeugen diese Eingaben auf einem frischen
+Checkout. Quell- und Artefaktprüfsummen sowie die Gleichheit der ursprünglichen
+CF01-Konstruktion und Prüfstellungen werden vor Wiederverwendung geprüft.
+`cad/two-arm-analytics/shared-build-report.json` löst die neuen FreeCAD- und
+SolidCraft-Gesamtmodelle, Gesamtansicht, Analytikdetail und Geometrieprüfungen auf.
+Beide CADs verwenden ihre eigenen nativen Geometrien. Die Prüfung vergleicht
+Instanzvolumen und Schwerpunkte, Gelenkgrenzen, die dargestellten Werkzeugziele,
+statische Überschneidungen und die Stellflächen der neuen Ausstattung.
+
+Die bestehenden manuellen Runner führen keine externe Probenvorverdünnung aus;
+das aktuelle Qubit-Assay ist synthetisch. Die neue Ansicht enthält Konzeptkörper
+für die Werkzeuge; mechanische Pipettenauslegung, Dosierfunktion, kooperative
+Armsteuerung und durchgehende Bewegungen sind weiterhin zu entwickeln. Aus der
+statischen Darstellung folgen keine geprüften Gefäßpassungen, Dosiermengen,
+Traglasten oder sichere Zusammenarbeit. Bestehende Abläufe sind nicht an die
+neuen Konzeptgefäße gekoppelt.
+
 ### Manuelle Aufgaben und Messgeräte
 
 Der erste [synthetische NanoDrop-Ablauf](nanodrop-manual-workflow.md) ist

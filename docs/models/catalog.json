@@ -217,6 +217,26 @@
       "documentation": "docs/synthetic-lab-workflow.md"
     },
     {
+      "id": "two-arm-analytics",
+      "group": "ausstattung",
+      "title": "Analytikstation · zwei zusätzliche Arme und Verdünnung",
+      "sources": [
+        "model/two-arm-analytics.shared.json",
+        "model/analytics-tools.shared.json",
+        "model/synthetic-analytics-workspace.shared.json",
+        "model/furnishings/analytics-reference-bench.json",
+        "model/equipment/analytics-workspace.json"
+      ],
+      "image": "images/two-arm-analytics.png",
+      "render": {
+        "kind": "checked-render",
+        "family": "two-arm-analytics",
+        "view": "overview"
+      },
+      "caption": "Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.",
+      "documentation": "docs/development-plan.md"
+    },
+    {
       "id": "robot",
       "title": "Sechsachsiger Laborarm",
       "group": "baugruppen",

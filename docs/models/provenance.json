@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-08",
-  "catalog_sha256": "dc87b73ae19ccf686312320bf48b21f7532c0a374ec48ef29a5a270ef235fce3",
+  "catalog_sha256": "46fa2262355455bc0a4b8732fa4ad8549fdd63c3196550f799002b40fa763028",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "c3eda20568dab66e709f7d9c933ea22cbe5ef26c7696e442419986983368fcf9",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -2074,6 +2074,77 @@
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
       },
       "prepared_on": "2026-11-09"
+    },
+    {
+      "id": "two-arm-analytics",
+      "image": "images/two-arm-analytics.png",
+      "source_files_sha256": {
+        "model/two-arm-analytics.shared.json": "7da30cc04b00f43584864e88ce2076046da80904975ed3d19051dc08590222af",
+        "model/analytics-tools.shared.json": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+        "model/synthetic-analytics-workspace.shared.json": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982",
+        "model/furnishings/analytics-reference-bench.json": "722e333cc89f47c8806698042d04ad20e9a35c42ab2e8f4500b9f5eea6d85a5b",
+        "model/equipment/analytics-workspace.json": "777771e9d0dbe4455e06174df5d3a3fad2e67e5a9b5b494e919f72ff3b2e5873"
+      },
+      "render_manifest": "cad/two-arm-analytics/render-manifest.json",
+      "render_manifest_sha256": "f4cd4e8ec15d5d94e06c66f891c0cbb00c742fbf26d1cb67568751effa5aa5ed",
+      "original_visual_review": {
+        "passed": true,
+        "review_date": "2026-11-09",
+        "reviewed_views": [
+          "overview",
+          "analytics",
+          "analytics-detail"
+        ],
+        "method": "Inspected the full three-arm native overview and both analytical views. All three arms and two reference benches are visible in the overview. The additional detail hides the CF01 context; instruments, conceptual pipette, racks, bottles, tips and passive holders are present. Static geometry only; no dosing or cooperative-motion qualification."
+      },
+      "native_model": "cad/generated/two-arm-analytics-7da30cc04b00/TwoArmAnalytics.sc",
+      "native_model_sha256": "b33aa5014efb1251d73224bd886ecc82616ded53daaddf5eedd1f1d7894bd630",
+      "reused_render": "renders/two-arm-analytics-7da30cc04b00/overview.png",
+      "reused_render_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
+      "image_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
+      "bytes": 338779,
+      "dependency_files_sha256": {
+        "model/two-arm-analytics.shared.json": "7da30cc04b00f43584864e88ce2076046da80904975ed3d19051dc08590222af",
+        "model/synthetic-analytics-workspace.shared.json": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982",
+        "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+        "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+        "model/furnishings/analytics-reference-bench.json": "722e333cc89f47c8806698042d04ad20e9a35c42ab2e8f4500b9f5eea6d85a5b",
+        "model/equipment/analytics-workspace.json": "777771e9d0dbe4455e06174df5d3a3fad2e67e5a9b5b494e919f72ff3b2e5873",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
+        "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
+        "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
+        "model/analytics-tools.shared.json": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+        "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+        "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+        "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+        "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112",
+        "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+      }
     }
   ],
   "visual_review": {
@@ -2149,6 +2220,17 @@
         "top": "2fff1246c2338f31769a6074105c3e3e46f083e04c247ee33844301602230af7"
       },
       "minimum_sampled_lever_clearance_lower_bound_mm": 27.824211669384297
+    },
+    "two_arm_analytics_update": {
+      "passed": true,
+      "review_date": "2026-11-09",
+      "reviewed_images": [
+        "two-arm-analytics"
+      ],
+      "method": "Inspected the full three-arm native overview and both analytical views. All three arms and two reference benches are visible in the overview. The additional detail hides the CF01 context; instruments, conceptual pipette, racks, bottles, tips and passive holders are present. Static geometry only; no dosing or cooperative-motion qualification.",
+      "previous_gallery_images_unchanged": true,
+      "native_overview_sha256": "8039d0a78d3f1dac6d88a3c2a04765ee17de5458675bed3be60ab44dca4c0a3f",
+      "native_analytics_detail_sha256": "d55c55229388f2e794da9a82292235e407120b36c1ac8c4c9f4497c16b5221b9"
     }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

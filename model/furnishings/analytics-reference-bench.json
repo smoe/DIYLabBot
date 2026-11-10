@@ -1,0 +1,35 @@
+{
+  "format": "solidcraftbot.furnishings/1",
+  "id": "SYN.Analytics.Bench",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {},
+  "anchors": {},
+  "expressions": {},
+  "instances": [
+    {
+      "id": "AnalyticsBench",
+      "type": "reference_worktop",
+      "component": "AnalyticsScene",
+      "bindings": {
+        "width": 1800,
+        "length": 900,
+        "height": 18
+      },
+      "xyz": [
+        500,
+        -450,
+        -18
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "SYN.Analytics.Worktop"
+      }
+    }
+  ],
+  "limitations": [
+    "Reference worktop only; no load or fastening qualification"
+  ]
+}

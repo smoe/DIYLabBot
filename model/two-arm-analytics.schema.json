@@ -1,0 +1,145 @@
+{
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "workspace",
+    "context",
+    "arm_tasks",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.two-arm-analytics/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "workspace": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ]
+        }
+      ]
+    },
+    "context": {
+      "type": "object",
+      "required": [
+        "workspace",
+        "pickup",
+        "device_ids",
+        "time_s"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "workspace": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "pickup": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "device_ids": {
+          "const": [
+            "Arm",
+            "CF01",
+            "Rack"
+          ]
+        },
+        "time_s": {
+          "const": 21.5
+        }
+      }
+    },
+    "arm_tasks": {
+      "type": "object",
+      "minProperties": 2,
+      "maxProperties": 2,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "role",
+          "tool",
+          "target_instance",
+          "target_interface",
+          "offset_mm"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "role": {
+            "enum": [
+              "tube_handling",
+              "pipetting"
+            ]
+          },
+          "tool": {
+            "allOf": [
+              {
+                "$ref": "assembly-reference.schema.json#/$defs/reference"
+              },
+              {
+                "required": [
+                  "source_sha256"
+                ]
+              }
+            ]
+          },
+          "target_instance": {
+            "type": "string"
+          },
+          "target_interface": {
+            "type": "string"
+          },
+          "offset_mm": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "two-arm-analytics.schema.json",
+  "title": "Static concept of two additional analytical arms beside the existing CF01 station"
+}

@@ -12,6 +12,7 @@
 | Lokale Präzision | Tatsächliche Spitze relativ zum Gefäß in Lage, Tiefe und Orientierung kamerageregelt; keine präzise Rückkehr der Basis oder Pflicht zum Präzisionsdock |
 | Gemeinsame Banknutzung | Mitarbeitende sollen den angehaltenen, gefalteten Arm leicht zur Seite stellen können; Bedienkraft, Parkzeit und Platzgewinn noch messen |
 | Ausbau | Ein Arm zu Beginn, später möglicherweise drei Arme an einer Station |
+| Analytikstation | Zwei zusätzliche, weitgehend baugleiche Sechsachsarme für Tube-Handhabung, Pipettieren, Verdünnung, NanoDrop und Qubit; zusammen mit dem CF01-Arm drei Arme im Zielaufbau |
 | Langfristiger Volumenbereich | 1–1000 µl mit verschiedenen Werkzeugen |
 | Gefäße | Eppendorf-Gefäße, 96-Well- und 384-Well-Platten |
 | Erster begrenzter Prototyp | Budgetziel 3.000–5.000 EUR |
@@ -19,7 +20,7 @@
 | Erster Präzisionsversuch | 1 µl Wasser am Gefäßrand ablegen und wieder aufnehmen |
 | Überwachung | Mehrere stationäre Laborkameras sowie zwei Kameras am Arm vorgesehen; Lageerkennung soll die Feinanfahrt unterstützen |
 | Kameras am Arm | Untere Nahkamera und obere Übersichtskamera; seit V02 als provisorische Bauräume auf L6 beziehungsweise L1 in allen drei Ableitungen, endgültige Montageorte noch offen |
-| Werkzeugaufnahme | Austauschbar; Pipettenaufnahme zunächst aus dem Entwurf herauslassen |
+| Werkzeugaufnahme | Austauschbar; der bestehende Arm-CAD-Stand endet am allgemeinen Flansch. Für die Analytikstation sind Pipettenhalterung und Betätigung als neue Werkzeuge zu entwickeln |
 | Visualisierung | CAD-Modellansichten und Speicherung am 28.10.2026 ausdrücklich erlaubt |
 | FreeCAD-Fassung | Parallel zum SolidCraft-Stand; sechs Achsen über Python und interaktive Bewegungsdarstellung, am 28.10.2026 gewünscht |
 | Gemeinsame Quelle | CAD-unabhängige Beschreibung als führender Stand; beide CAD-Fassungen daraus ableiten |
@@ -62,6 +63,56 @@ konkreter Gefäßartikel mit reproduzierbarer Halterung festzulegen.
 Optisches Verschwinden allein gilt nicht als Volumennachweis. Verdunstung,
 Wandbenetzung, Wasser an der Spitzenaußenseite und Messunsicherheit müssen bei
 der Wiederfindungsrate berücksichtigt werden.
+
+## Gewünschte Analytikstation mit zwei kooperierenden Armen
+
+Die am 9. November 2026 präzisierte Zielrichtung umfasst zwei zusätzliche,
+weitgehend baugleiche Sechsachsarme an einer eigenen Analytikstation. Der Arm
+der CF01-Station kommt hinzu; der Zielaufbau besitzt damit drei Arme. Die beiden
+Analytikarme sollen gemeinsam Gefäße handhaben, Proben bei Bedarf vorverdünnen
+und NanoDrop- sowie Qubit-Abläufe bedienen. Bevorzugt wird untersucht, ob sie
+eine separate Pipettierpositioniermaschine ersetzen können. Diese Fähigkeit ist
+noch nicht nachgewiesen.
+
+- Ein Handhabungsarm stellt identifizierte Original-, Verdünnungs- und
+  Ansatzgefäße bereit und übernimmt Deckel-, Geräte- und Rückgabeaufgaben.
+  Ein Pipettierarm führt eine ansteuerbare Pipette einschließlich Dosierung,
+  Spitzenaufnahme und Spitzenabwurf. Die Rollen sind der erste Prüfaufbau;
+  Werkzeugwechsel und ein späterer Rollentausch bleiben Auslegungsaufgaben.
+- Beide referenzieren dieselbe Armkonstruktion; unterschiedliche Werkzeuge
+  werden als eigene Baugruppen ausgelegt. Ein Pipettenantrieb oder eine
+  elektronisch ansteuerbare Pipette am Werkzeug bleibt erforderlich. Eine
+  zusätzliche aktive XYZ-Pipettierapparatur gehört zunächst nicht zum
+  bevorzugten Prüfaufbau.
+- Während der Spitzenimmersion ruht das Gefäß zunächst in einer passiven,
+  artikelgeeigneten Aufnahme. Parallelaufgaben finden außerhalb der belegten
+  Pipettierzone statt. Gemeinsame Zugriffe benötigen eine koordinierte Freigabe,
+  aktuelle Werkzeug-/Gefäßbezüge und einen definierten Wiederanlauf.
+- NanoDrop soll eine direkte Entnahme aus dem Original erlauben, soweit Probe
+  und Messbereich dies zulassen; Blank, Hebelbetätigung und Reinigung beider
+  Messflächen gehören zum Ablauf. Qubit benötigt zusätzlich Vorbereitung,
+  Standards, Mischung, Inkubation und Handhabung seiner Ansatzgefäße.
+- Eine Probenvorverdünnung ist ein eigener Transfer vor dem Qubit-Assayansatz.
+  Original-, Verdünnungs- und Ansatzgefäße erhalten getrennte Identitäten;
+  bestätigte Entnahmen und Verdünnungsmittelzugaben bestimmen ihre Bilanz und
+  Abstammung. Die Verdünnungsentscheidung hängt vom gewählten Assay,
+  Probenvolumen und einer belastbaren Konzentrationseinordnung ab. NanoDrop-
+  und Qubit-Ergebnisse bleiben methodenspezifische Messungen.
+
+Für jeden Vorverdünnungsschritt gilt bei bekannten, bestätigten Volumina
+`D_vor = (V_Probe + V_Verdünnungsmittel) / V_Probe`; mehrere Schritte bilden das
+Produkt ihrer Faktoren. Die Verdünnung beim Assayansatz wird getrennt geführt.
+Ein bereits auf die in den Assay eingesetzte Probe zurückgerechnetes Qubit-
+Ergebnis wird nur noch um deren externe Vorverdünnung korrigiert. Ist die
+Ergebnisbasis oder ein Transfer unklar, bleibt die Rückrechnung offen.
+
+Der Hersteller beschreibt die Abhängigkeit des Qubit-Messbereichs vom
+eingesetzten Probenvolumen und die auf die Probe zurückgerechnete Anzeige im
+[dsDNA-HS-Handbuch](https://documents.thermofisher.com/TFS-Assets/LSG/manuals/Qubit_dsDNA_HS_Assay_UG.pdf).
+Ein [Forschungsaufbau mit Sechsachsarm und betätigter Pipette](https://arxiv.org/abs/2207.01214)
+belegt das Integrationsprinzip; er ist kein Nachweis unserer Armmechanik oder
+der geforderten Mikroliterleistung. Die konkreten Pipetten, Spitzen, Gefäße,
+Assays, Dosiergrenzen, Rückmeldungen und Abnahmekriterien sind noch auszuwählen.
 
 ## Gewünschte Erweiterung: Pipettieren auf Eis
 

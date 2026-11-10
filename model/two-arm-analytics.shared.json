@@ -1,0 +1,65 @@
+{
+  "format": "solidcraftbot.two-arm-analytics/1",
+  "id": "QC.TwoArms",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "workspace": {
+    "source": "model/synthetic-analytics-workspace.shared.json",
+    "source_sha256": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982"
+  },
+  "context": {
+    "workspace": {
+      "source": "model/synthetic-cf01-workspace.shared.json",
+      "source_sha256": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2"
+    },
+    "pickup": {
+      "source": "model/centrifuge-cf01.robot-pickup.shared.json",
+      "source_sha256": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112"
+    },
+    "device_ids": [
+      "Arm",
+      "CF01",
+      "Rack"
+    ],
+    "time_s": 21.5
+  },
+  "arm_tasks": {
+    "QC.Handle": {
+      "role": "tube_handling",
+      "tool": {
+        "source": "model/centrifuge-cf01.robot-pickup.shared.json",
+        "source_sha256": "d434785ed9c9e41373b8d5c51aaab363f3aab185a6e1ac33c70069d0a3dea112"
+      },
+      "target_instance": "QC.Originals",
+      "target_interface": "grip_01",
+      "offset_mm": [
+        0,
+        0,
+        90
+      ]
+    },
+    "QC.Pipette": {
+      "role": "pipetting",
+      "tool": {
+        "source": "model/analytics-tools.shared.json",
+        "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+        "case": "pipette"
+      },
+      "target_instance": "QC.DestinationNest",
+      "target_interface": "mouth_01",
+      "offset_mm": [
+        0,
+        0,
+        45
+      ]
+    }
+  },
+  "limitations": [
+    "Static concept showing three arms on two reference benches; no cooperative controller or executable liquid handling.",
+    "Both analytical arms share the same source and driving dimensions. Tools and unmeasured fixtures are separate referenced concepts.",
+    "The pipette tip is shown above a passive tube holder; this is not a measured 1-2 uL transfer or an implemented dilution.",
+    "NanoDrop/Qubit retain independent illustrative geometry. Their physical adapters, cleaning, dosing and tube fits remain to be developed."
+  ]
+}
