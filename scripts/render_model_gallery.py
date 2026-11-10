@@ -24,6 +24,11 @@ CATALOG=DIRECTORY/'catalog.json'
 PROVENANCE=DIRECTORY/'provenance.json'
 WORK=ROOT/'tmp/model-gallery'
 
+# These exact, versioned formats describe transport contracts rather than new
+# geometry. Their referenced station models remain subject to image coverage.
+# Unknown formats and future revisions retain the default image requirement.
+NON_GEOMETRIC_SHARED_FORMATS=frozenset({'solidcraftbot.cf01-sila2/1'})
+
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8'))
 def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -336,6 +341,18 @@ def write_documentation():
     (DIRECTORY/'README.md').write_text(template.replace('__MODEL_GROUPS__','\n'.join(sections)),encoding='utf-8')
 
 
+def required_model_sources():
+    """Classify top-level shared sources; composition layers always need images."""
+    expected={'model/robot.json'}
+    for path in (ROOT/'model').glob('*.shared.json'):
+        source=read(path)
+        if not isinstance(source,dict) or source.get('format') not in NON_GEOMETRIC_SHARED_FORMATS:
+            expected.add(str(path.relative_to(ROOT)))
+    for directory in ['environments','furniture','furnishings','equipment']:
+        expected|={str(p.relative_to(ROOT)) for p in (ROOT/'model'/directory).glob('*.json')}
+    return expected
+
+
 def check(require_review=True):
     catalog=read(CATALOG);provenance=read(PROVENANCE);records={r['id']:r for r in provenance['images']};covered=set()
     if len(records)!=len(provenance['images']):raise ValueError('Duplicate image identity')
@@ -357,9 +374,7 @@ def check(require_review=True):
             assert not any(e.tag.endswith('script') or e.tag.endswith('image') for e in svg.iter())
         if not (ROOT/entry['documentation']).is_file():raise ValueError('Broken documentation link')
         if entry['image'] not in page or any('../../'+s not in page for s in entry['sources']):raise ValueError('Model missing from gallery page')
-    expected={str(p.relative_to(ROOT)) for p in (ROOT/'model').glob('*.shared.json')}|{'model/robot.json'}
-    for directory in ['environments','furniture','furnishings','equipment']:
-        expected|={str(p.relative_to(ROOT)) for p in (ROOT/'model'/directory).glob('*.json')}
+    expected=required_model_sources()
     if expected-covered:raise ValueError('Model source without image: '+str(sorted(expected-covered)))
     if total>4_000_000:raise ValueError('Curated gallery exceeds 4 MB image budget')
     if require_review and not provenance.get('visual_review',{}).get('passed'):raise ValueError('Visual review pending')
