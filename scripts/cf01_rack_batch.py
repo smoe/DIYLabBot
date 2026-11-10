@@ -23,6 +23,10 @@ class BatchError(ValueError):
     def __init__(self,message,report):super().__init__(message);self.report=report
 
 
+class ProcessHold(RuntimeError):
+    """A durably recorded hold: stop/observation remain possible, unlike failed storage."""
+
+
 def load(path=SOURCE):
     data=json.loads(Path(path).read_text(encoding='utf-8'))
     validate(data)
@@ -68,7 +72,7 @@ def synthetic_feedback(event,sample):
 
 
 class Runner:
-    def __init__(self,data=None,transport='ros2',feedback=None,clock=None,advance_clock=None,checkpoint=None,station_backend=None):
+    def __init__(self,data=None,transport='ros2',feedback=None,clock=None,advance_clock=None,checkpoint=None,station_backend=None,advance_hold_clock=None):
         self.data=copy.deepcopy(data or load());validate(self.data)
         self.station_backend=station_backend
         if station_backend is not None:
@@ -77,9 +81,10 @@ class Runner:
             clock,advance_clock=station_backend.now,station_backend.advance
         if transport not in ['ros2','sila2']:raise ValueError('Supported local contract decoding: ros2 or sila2')
         if (clock is None)!=(advance_clock is None):raise ValueError('External clock and advance_clock must be provided together')
-        if any(callback is not None and not callable(callback) for callback in (clock,advance_clock,checkpoint)):
+        if any(callback is not None and not callable(callback) for callback in (clock,advance_clock,checkpoint,advance_hold_clock)):
             raise ValueError('Clock and checkpoint callbacks must be callable')
         self._local_now=0.;self._clock=clock;self._advance_clock=advance_clock;self._checkpoint=checkpoint
+        self._advance_hold_clock=advance_hold_clock;self._held=False
         self._checkpoint_failed=False;self._checkpoint_sequence=0;self._command_sequence=0
         self._last_station=None;self._station_time=None;self._last_job=None;self._job_signature=None;self._heartbeat_count=0
         self.transport=transport;self.feedback=feedback;self.trace=[];self.token=None
@@ -149,6 +154,9 @@ class Runner:
         self._checkpoint_sequence+=1
         try:
             self._checkpoint(kind,copy.deepcopy({**payload,'checkpoint_sequence':self._checkpoint_sequence}),self.checkpoint_view())
+        except ProcessHold:
+            self._held=True
+            raise
         except BaseException:
             # A failed durable write leaves the last intent uncertain. Do not
             # continue actions or turn the persistence failure into a device reply.
@@ -221,6 +229,8 @@ class Runner:
 
     def command(self,name,**args):
         self._checkpoint_healthy()
+        if self._held and name not in {'stop','heartbeat','status','rotation_feedback'}:
+            raise ProcessHold('CF01 is held; only stop and observation are permitted')
         self.operation=name
         self._command_sequence+=1;sequence=self._command_sequence
         contract=next(c for c in self.bridge.contract['commands'] if c['id']==name)
@@ -362,7 +372,11 @@ class Runner:
             before=self.now;following=min(target,before+interval)
             if self._advance_clock is None:self.now=following
             else:
-                try:self._advance_clock(following-before)
+                callback=self._advance_hold_clock if self._held and self._advance_hold_clock is not None else self._advance_clock
+                try:callback(following-before)
+                except ProcessHold:
+                    self._held=True
+                    raise
                 except BaseException:
                     self._checkpoint_failed=True
                     raise
@@ -372,6 +386,18 @@ class Runner:
                     self._checkpoint_failed=True
                     raise ValueError('External clock did not advance by the requested duration')
             self.command('heartbeat')
+
+    def wait_for_stop(self):
+        """Observe braking under a recorded hold; do not infer stillness from receipt."""
+        deadline=self.now+self.station_spec['mechanisms']['braking']['simulation_stop_s']+self.data['command_execution']['completion_timeout_s']
+        interval=self.data['command_execution']['poll_interval_s']
+        while True:
+            self.record('stop_observed')
+            if self._last_job is not None:self.poll(self._last_job['id'])
+            state=self._last_station
+            if state['standstill_confirmed'] is True and state['parking_brake_held'] is True:return
+            if self.now>=deadline:raise TimeoutError('Controlled stop completion deadline exceeded')
+            self.advance(min(interval,deadline-self.now))
 
     def report(self,passed,error=None):
         network=self.station_backend is not None
@@ -442,7 +468,9 @@ class Runner:
                           'station_fault':(self._last_station or {}).get('fault_code') if self.station_backend is not None else self.sim.fault}
             self._emit('failed',{'reason':str(error),**self.failure})
             # Preserve the failure report even if the stop or status channel fails.
-            try:self.command('stop')
+            try:
+                self.command('stop')
+                if self._held:self.wait_for_stop()
             except Exception as stop_error:
                 if self._checkpoint_failed:raise
                 self.stop_error=str(stop_error)

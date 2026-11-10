@@ -93,13 +93,15 @@ def main():
              *pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment']))),
              *[cf.ROOT/'scripts'/p for p in ['export_centrifuge_robot_pickup_solidcraft.py','centrifuge_pickup_solidcraft.py',
                 'solidcraft_vendor.py','centrifuge_robot_pickup.py','centrifuge_model.py','robot_spec.py','robot_components.py',
-                'robot_cameras.py','servo_mounting_design.py','synthetic_workspace.py','rack_slots.py','furniture_model.py','assembly_model.py']]]
+                'robot_cameras.py','servo_mounting_design.py','synthetic_workspace.py','rack_slots.py','furniture_model.py','assembly_model.py','cf01_collision_scope.py']]]
     library=robot_components.library(pickup.arm_source(scene))
     sources += [cf.ROOT/p['step'] for part in library['parts'].values() for p in part['sections'].values()]
     hashes={str(p.relative_to(cf.ROOT)):cf.digest(p) for p in sources}
     hashes.update(vendor_report['source_sha256'])
     for part in vendor_report['parts']:hashes[part['original']['path']]=part['original']['sha256']
+    from cf01_collision_scope import collision_scope
     result={'format':'solidcraftbot.native-cf01-review/1','passed':all(r['passed'] for r in reports),'revision':context['revision'],
+            'collision_scope':collision_scope(scene,data),
             'freecad_required':False,'native_recipes':True,'dynamic_handoff_supported_in_this_export':False,
             'solidcraft_version':subprocess.check_output([cli,'--version'],text=True).strip(),
             'source_files_sha256':hashes,
