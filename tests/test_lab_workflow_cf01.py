@@ -148,6 +148,8 @@ class IntegratedCF01Tests(unittest.TestCase):
                         failed_report = json.loads(journal.artifact(stage['report_artifact_sha256']))
                         self.assertFalse(failed_report['passed'])
                         self.assertFalse(failed_report['order_restored'])
+                        self.assertTrue(failed_report['stop_observed'])
+                        self.assertTrue(stage['view']['stop_observed'])
                         self.assertFalse(flow.report()['passed'])
 
     def test_station_failure_mid_spin_observes_stop_before_archiving_failure(self):
@@ -238,6 +240,8 @@ class IntegratedCF01Tests(unittest.TestCase):
                 self.assertFalse(report['passed']);self.assertFalse(report['spin_completed'])
                 self.assertFalse(report['order_restored']);self.assertTrue(report['stop_via_contract'])
                 self.assertIsNone(report['stop_error'])
+                self.assertTrue(report['stop_observed'])
+                self.assertTrue(state['stages']['cf01']['view']['stop_observed'])
                 observations=[row['station'] for row in report['trace'] if row['stage']=='stop_observed']
                 self.assertFalse(observations[0]['standstill_confirmed'])
                 self.assertTrue(observations[-1]['standstill_confirmed'])
@@ -250,6 +254,87 @@ class IntegratedCF01Tests(unittest.TestCase):
                 self.assertTrue(all(report['inventory']['rotor']))
                 self.assertIn('instrument:CF01',journal.owners())
                 self.assertEqual(state['active_stage'],'cf01')
+
+    def test_hold_stop_observation_timeout_preserves_original_failure_and_ownership(self):
+        for transport in ['ros2', 'sila2']:
+            with self.subTest(transport=transport):
+                journal, flow = self.prepared()
+                flow.advance_time(ACTOR, flow.state['deadline_s'] - .5)
+                owners = journal.owners()
+                captured = []
+
+                def configure(runner):
+                    captured.append(runner)
+                    status = runner.sim.status
+
+                    def missing_brake_confirmation():
+                        observed = status()
+                        if runner.stop_attempted:
+                            observed['brake_held'] = False
+                        return observed
+
+                    runner.sim.status = missing_brake_confirmation
+
+                with self.assertRaises(BatchError) as caught:
+                    flow.run_cf01(ACTOR, transport=transport, configure=configure)
+                report = caught.exception.report
+                stage = flow.state['stages']['cf01']
+                self.assertIn('deadline or reconciliation hold', report['error'])
+                self.assertEqual(str(caught.exception), report['error'])
+                self.assertEqual(report['failure']['error_type'], 'ProcessHold')
+                self.assertEqual(report['stop_error'], 'Controlled stop completion deadline exceeded')
+                self.assertTrue(report['stop_via_contract'])
+                self.assertFalse(report['stop_observed'])
+                self.assertFalse(stage['view']['stop_observed'])
+                self.assertFalse(stage['view']['station']['parking_brake_held'])
+                self.assertEqual(json.loads(journal.artifact(stage['report_artifact_sha256'])), report)
+                self.assertEqual(flow.state['status'], 'held')
+                self.assertEqual(stage['status'], 'held')
+                self.assertEqual(flow.state['recovery_required'], 'workflow_deadline_exceeded')
+                self.assertEqual(stage['recovery_required'], 'workflow_deadline_exceeded')
+                self.assertIsNotNone(captured[0].sim.owner)
+                self.assertEqual(journal.owners(), owners)
+                self.assertEqual(journal.history(flow.run_id)[-1]['kind'], 'cf01.stage_failed')
+
+    def test_clock_storage_failure_during_hold_stop_observation_propagates_unchanged(self):
+        for transport in ['ros2', 'sila2']:
+            with self.subTest(transport=transport):
+                journal, flow = self.prepared()
+                flow.advance_time(ACTOR, flow.state['deadline_s'] - .5)
+                append = journal.append
+                captured, dispatched, commands_at_failure = [], [], []
+                storage_error = OSError('Stop observation clock journal unavailable')
+
+                def configure(runner):
+                    captured.append(runner)
+                    dispatch = runner.bridge.dispatch
+
+                    def track(encoding, command, fields):
+                        dispatched.append(command)
+                        return dispatch(encoding, command, fields)
+
+                    runner.bridge.dispatch = track
+
+                def fail_stop_clock(run_id, revision, kind, payload, state, artifact=None):
+                    if kind == 'time_advanced' and captured[0].stop_attempted:
+                        commands_at_failure.extend(dispatched)
+                        raise storage_error
+                    return append(run_id, revision, kind, payload, state, artifact)
+
+                with patch.object(journal, 'append', side_effect=fail_stop_clock):
+                    with self.assertRaises(OSError) as caught:
+                        flow.run_cf01(ACTOR, transport=transport, configure=configure)
+                self.assertIs(caught.exception, storage_error)
+                self.assertTrue(commands_at_failure)
+                self.assertEqual(dispatched, commands_at_failure)
+                self.assertEqual(dispatched[-1], 'stop' if transport == 'ros2' else 'Stop')
+                self.assertFalse(captured[0].stop_observed)
+                self.assertIsNone(flow.state['stages']['cf01']['report_artifact_sha256'])
+                self.assertNotIn('cf01.stage_failed', [event['kind'] for event in journal.history(flow.run_id)])
+                self.assertEqual(flow.state['status'], 'held')
+                self.assertEqual(flow.state['recovery_required'], 'workflow_deadline_exceeded')
+                self.assertIsNotNone(captured[0].sim.owner)
+                self.assertIn('instrument:CF01', journal.owners())
 
     def test_clock_journal_failure_during_spin_does_not_send_unjournaled_stop(self):
         journal,flow=self.prepared();append=journal.append;captured=[];dispatched=[]

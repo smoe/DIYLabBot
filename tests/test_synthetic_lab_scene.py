@@ -1,10 +1,14 @@
 """Referenced instrument placement, frozen CAD commands and scene evidence."""
+import ast
 import copy
 import json
+import math
 from pathlib import Path
 import re
 import sys
 import unittest
+from types import SimpleNamespace
+from unittest.mock import Mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
@@ -158,6 +162,57 @@ class SyntheticLabBuildEvidenceTests(unittest.TestCase):
             scene['arm_fixture']['position_mm'][0] += 5
             with self.assertRaisesRegex(ValueError, 'Core pose changed'):
                 model.verify_core_geometry(original, scene, trajectory, [('Grasp', scene['checks']['attachment_time_s']), ('RackReleased', trajectory['duration_s'])])
+
+
+class InstrumentMotionScopeTests(unittest.TestCase):
+    def test_report_scope_uses_the_same_selected_bodies_as_the_pair_checks(self):
+        # Exercise the producer without importing a CAD runtime. These separated
+        # box doubles test selection/reporting only, not native geometry.
+        source=ROOT/'scripts/build_synthetic_lab_scene_freecad.py'
+        function=next(node for node in ast.parse(source.read_text()).body
+                      if isinstance(node,ast.FunctionDef) and node.name=='instrument_motion_validation')
+        placement=SimpleNamespace(multiply=lambda other:other)
+
+        class Shape:
+            def __init__(self,x):
+                self.x=x;self.Placement=placement
+                self.BoundBox=SimpleNamespace(XMin=x,YMin=0,ZMin=0,XMax=x+1,YMax=1,ZMax=1)
+            def copy(self):return Shape(self.x)
+            def common(self,other):raise AssertionError('Separated boxes need no exact overlap test')
+            def distToShape(self,other):raise AssertionError('Separated boxes already prove clearance')
+
+        entry={'instance':{'id':'ND','asset':'nanodrop'},'spec':{},'parameters':{'max_open':10}}
+        instruments=Mock()
+        instruments.expanded.return_value={'bodies':[{'id':'Lever','component':'MovingArm'}]}
+        instruments.pose.return_value={'Hinge':0}
+        model=Mock();model.instrument_instances.return_value=[entry]
+        robot=Mock()
+        identity=[[int(i==j) for j in range(4)] for i in range(4)]
+        pickup=Mock();pickup.SceneEvaluator.return_value=lambda sample:{'Arm.Link':identity,'Tool':identity}
+        namespace={'math':math,'json':json,'model':model,'instruments':instruments,
+                   'robot':robot,'pickup':pickup,'placement':lambda matrix:placement,'print':Mock()}
+        exec(compile(ast.Module(body=[function],type_ignores=[]),str(source),'exec'),namespace)
+        records=[{'instance':'Arm','name':'Arm.LinkBody','group':'Arm.Link','shape':Shape(0)},
+                 {'instance':'Arm','name':'ToolBody','group':'Tool','shape':Shape(0)},
+                 {'instance':'CF01','name':'CarriedVessel','group':'PresentedTube','shape':None},
+                 {'instance':'CF01','name':'CarriedCap','group':'PresentedTube','shape':None},
+                 {'instance':'ND','name':'ND.Lever','group':'FixedInstrument','shape':Shape(100)},
+                 {'instance':'ND','name':'ND.Frame','group':'FixedInstrument','shape':Shape(200)},
+                 {'instance':'QB','name':'QB.Frame','group':'FixedInstrument','shape':Shape(300)}]
+        result=namespace['instrument_motion_validation'](records,
+            {'checks':{'minimum_robot_equipment_clearance_mm':5}},
+            {'samples':[{'time_s':0}],'duration_s':0},{'checks':[]})
+        self.assertTrue(result['passed'])
+        self.assertEqual(result['coverage']['moving_bodies'],['Arm.LinkBody','ToolBody'])
+        self.assertEqual(result['coverage']['overlap'],{
+            'fixed_instrument_bodies':['ND.Lever','ND.Frame','QB.Frame'],'maximum_volume_mm3':1e-3})
+        self.assertEqual(result['coverage']['clearance'],{
+            'nanodrop_lever_bodies':['ND.Lever'],'minimum_distance_mm':5,'hinge_angles_deg':[0,5,10]})
+        self.assertEqual(result['exclusions']['carried_bodies'],['CarriedVessel','CarriedCap'])
+        self.assertEqual(result['exclusions']['minimum_clearance_against_other_instrument_bodies'],
+                         ['ND.Frame','QB.Frame'])
+        self.assertEqual(result['exact_overlap_tests'],0)
+        self.assertEqual(result['exact_distance_tests'],0)
 
 
 if __name__ == '__main__':

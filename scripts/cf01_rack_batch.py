@@ -90,7 +90,7 @@ class Runner:
         self.transport=transport;self.feedback=feedback;self.trace=[];self.token=None
         self.capacity=len(self.data['samples']);self.pending_handoff=None
         self.current_sample=None;self.operation=None;self.failure=None
-        self.stop_attempted=False;self.stop_via_contract=False
+        self.stop_attempted=False;self.stop_via_contract=False;self.stop_observed=False
         self.sim=None if station_backend is not None else Simulator(clock=lambda:self.now,qualification=self.data['simulation_qualification'],
                            initial_slots={i:{'present':False,'seated':False,'mass_g':None} for i in range(1,self.capacity+1)})
         self.bridge=station_backend if station_backend is not None else protocol.MockProtocol(self.sim)
@@ -146,7 +146,7 @@ class Runner:
                 'station':copy.deepcopy(self._last_station),'station_observed_at_s':self._station_time,
                 'job':copy.deepcopy(self._last_job),'heartbeat_count':self._heartbeat_count,
                 'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,
-                'stop_error':self.stop_error,'failure':copy.deepcopy(self.failure)}
+                'stop_observed':self.stop_observed,'stop_error':self.stop_error,'failure':copy.deepcopy(self.failure)}
 
     def _emit(self,kind,payload):
         if self._checkpoint is None:return
@@ -229,7 +229,7 @@ class Runner:
 
     def command(self,name,**args):
         self._checkpoint_healthy()
-        if self._held and name not in {'stop','heartbeat','status','rotation_feedback'}:
+        if self._held and name not in {'stop','heartbeat'}:
             raise ProcessHold('CF01 is held; only stop and observation are permitted')
         self.operation=name
         self._command_sequence+=1;sequence=self._command_sequence
@@ -406,7 +406,8 @@ class Runner:
                 'transporter_executed':False,'robot_motion_for_loading_checked':False,'robot_motion_checked':False,
                 'polling':'SiLA TLS/gRPC observable execution and typed status' if network else 'local MockProtocol.poll, no transport serialization',
                 'station_inventory_check':'SiLA v2 typed RotorSlots; synthetic observations, no physical sensor evidence' if network else 'mock_internal: Simulator.slots; not available in state_si or a hardware contract',
-                'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,'stop_error':self.stop_error,
+                'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,
+                'stop_observed':self.stop_observed,'stop_error':self.stop_error,
                 'inventory_semantics':'Ledger of fully confirmed handoffs, not an assertion of physical location',
                 'handoff_policy':self.data['handoff_policy'],**self.handoff_state(),'failure':self.failure,
                 'initial_state':self.data['initial_state'],'mock_assumptions':self.data['mock_assumptions'],
@@ -472,6 +473,7 @@ class Runner:
             try:
                 self.command('stop')
                 self.wait_for_stop()
+                self.stop_observed=True
             except Exception as stop_error:
                 if self._checkpoint_failed:raise
                 self.stop_error=str(stop_error)
