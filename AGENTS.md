@@ -99,6 +99,42 @@ Hardwarekommunikation sind damit nicht implementiert. Der separate
 die lokale Auswahl `--transport sila2` bleibt ein Mock-Vertragsdecoder. Proben-IDs
 und ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
+Vor Änderungen an geglätteten CF01-Entnahmebahnen
+[docs/cf01-smooth-unloading.md](docs/cf01-smooth-unloading.md) lesen.
+`model/cf01-unload-demo.motion.json` referenziert vorhandene Geometrie und
+Chargenquellen; Kurven, Eigentümerereignisse und Grenzwerte einmal kompilieren
+und in nativer Prüfung, Browser und ROS-Armexport gemeinsam auswerten.
+C2-PVA mit begrenztem, gegebenenfalls springendem Ruck nicht als C3 oder
+biologisch qualifiziert bezeichnen. Geometriecaches nur mit gültigen Quellen-
+und Artefaktpins wiederverwenden; geänderte Bahnen benötigen neue native
+Bewegungsnachweise einschließlich aller Gefäße, belegter Rackplätze und
+Nachbargeräte. Diskrete Prüfung, ROS-Dry-run, Netzwerk und Hardware getrennt
+ausweisen; Stations-/Greiferbefehle sind kein Bestandteil des ROS-Armexports.
+Historische Medien und SolidCraft-Importgrenzen unverändert erhalten.
+
+Die beladene Drei-Proben-Fahrt wird vom bestätigten Griff bis zur Rackankunft
+als eine durchgehende Bahn kompiliert. Keine Zwischenhalte an Entnahme-,
+Freiraum- oder Transitmarken einfügen. Entnahme und Freiraum aus der tatsächlichen
+FK bestätigen; Ruhe nur an Griff und Ablage, Bestätigungszeiten anschließend
+getrennt führen. Das Kein-Halt-Kriterium und die Grenzen auch zwischen den
+Kurvenknoten sowie nach ROS-Zeitquantisierung prüfen. Die Grenzwerte im
+Motionprofil nicht zur Verkürzung der Vorführung anheben; biologische Toleranz,
+globale Zeitoptimalität und reale Sicherheit bleiben ungeprüft.
+Bei adaptiver FK-Verfeinerung bleiben Intervallhüllen die oberen Grenzen;
+Abtastwerte nur zur Verfeinerungsentscheidung verwenden. Start-/Höchstauflösung
+und Abbruchgrund aus dem Profil beziehungsweise Prüfbericht ausweisen.
+
+Offene Rotorindexierung ist eine additive Opt-in-Simulation aus
+`model/cf01-open-lid-index.protocol.json` und `scripts/cf01_open_lid_index.py`.
+Basisquellen, Standardbefehle und deren Prüfsummen beibehalten; `index` und
+Schleuderstart benötigen weiterhin den verriegelten Deckel. `index_open_lid`
+nicht still in MockProtocol, ROS, SiLA, bisherigen Chargenrunner oder gemeinsamen
+Workflow aufnehmen. Die neue Befehlsfolge separat mit den vorhandenen
+Stationsprädikaten abspielen. Eine logische Uhr beweist keinen Watchdog; der
+zeitgebundene Armkanal enthält noch keinen stations-/sensorabhängigen
+Abbruchzweig. Geänderte Bahn- und Stationsfenster benötigen neue native
+Prüfungen aller jeweils bewegten Gruppen, auch bei durchgehend offenem Deckel.
+
 ## Manuelle Aufgaben und Laufzeitdaten
 
 NanoDrop- und Qubit-4-Abläufe sind vollständig synthetisch. Vor Änderungen

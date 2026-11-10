@@ -156,3 +156,51 @@ concurrent motion, transfer uncertainty, occupied workspace, owner timeout,
 normal run completion through braking and cancellation through standstill.
 Default spinning remains rejected without the explicit fictitious test fixture;
 tests cannot qualify the 16,000 × g target.
+
+## Opt-in synthetic indexing with an open lid
+
+The separate [open-lid contract](../model/cf01-open-lid-index.protocol.json) and
+[its schema](../model/cf01-open-lid-index.schema.json) add exactly one command,
+`index_open_lid(slot)`. They pin the existing CF01 station and v1 protocol bytes;
+the index-speed limit is a reference to the station's
+`handling.index_limit_rpm`, rather than a second independent setting.
+`scripts/cf01_open_lid_index.py` implements it only in the explicitly constructed
+`OpenLidIndexSimulator` subclass. The standard `Simulator`, its JSON request
+schema, `MockProtocol` command definitions and dispatch, ROS and SiLA bindings
+are unchanged. In particular, the existing `index` and `start` still reject an
+open or unlocked lid.
+
+The new command requires a valid owner, no latched fault, fresh feedback,
+confirmed standstill and held parking brake (`_still`), a clear robot workspace
+(`_clear`), and a parked pusher with every present tube seated (`_parked`). The
+lid must be at its open limit with a healthy holding brake engaged. Rotor,
+encoder and parking-brake effects match the existing idealized `index`; the lid
+stays open. It uses existing error codes, including `LidNotOpen`,
+`LidAccessFault`, `TubeRaised`, `WorkspaceOccupied`, `NotStationary`,
+`StaleFeedback` and `RecoveryRequired`. These are synthetic guards, not a
+qualified permission to index physical equipment with its lid open.
+
+`replay_station_commands(program)` (also named `replay_program`) checks the
+explicit started/confirmed station-command events of the compiled three-sample
+unloading program against this opt-in simulator. It begins with all twelve
+original samples seated after the synthetic spin and preserves their original
+rotor/rack identities. The first index uses the closed-lid base command; one
+opening is followed by open-lid indexing, explicit tube-removal confirmations,
+clearance and pusher retractions, and one final closure. The next sample cannot
+become active or index before the preceding sample has rack support and complete
+jaw release. Numerical station coordinates and their resting derivatives are
+synthetic boundary observations; the separate motion validator checks actual
+curve geometry, velocities and event thresholds.
+
+The frozen simulator applies a lid command instantly and consumes pin
+acknowledgements inside that idealized operation. Replay therefore checks the
+explicit command-completion endpoint to supply its synthetic pin acknowledgement
+and compares the resulting state with that endpoint. This is not feedback
+available at the earlier physical start time. The replay's logical event clock
+and injected local heartbeats retain mock ownership only: they do not test a
+watchdog, communication latency, execution time or independently measured
+feedback. A passing replay is no ROS/SiLA registration, hardware integration,
+mechanical or biological qualification, or safety proof. The arm trajectory has
+no implemented interruption/recovery branch. See
+[the smooth unloading description](cf01-smooth-unloading.md) for the derived
+preview and its other validation limits.

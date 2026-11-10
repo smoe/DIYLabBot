@@ -4,7 +4,7 @@ import json
 import time
 from pathlib import Path
 
-from .protocol import scenario,duration_parts
+from .protocol import scenario,message_point
 
 
 def main():
@@ -39,9 +39,7 @@ def main():
             raise RuntimeError("Current pose differs from protocol start; return to the declared home pose first")
         goal=FollowJointTrajectory.Goal(); goal.trajectory.joint_names=config["joint_names"]
         for point in selected["points"]:
-            message=JointTrajectoryPoint(); message.positions=point["positions_rad"]
-            message.time_from_start.sec,message.time_from_start.nanosec=duration_parts(point["time_s"])
-            goal.trajectory.points.append(message)
+            goal.trajectory.points.append(message_point(point,JointTrajectoryPoint))
         future=client.send_goal_async(goal); rclpy.spin_until_future_complete(node,future,timeout_sec=10)
         if not future.done() or future.result() is None: raise RuntimeError("No action goal response")
         handle=future.result()

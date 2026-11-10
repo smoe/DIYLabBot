@@ -1,0 +1,336 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cf01-unload-demo.schema.json",
+  "title": "Synthetic source-referenced CF01 unloading motion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "sources",
+    "initial_state",
+    "selected_samples",
+    "routes",
+    "interpolation",
+    "holds_s",
+    "limits",
+    "limitations",
+    "lid_policy"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cf01-unload-demo/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pickup",
+        "batch",
+        "open_lid_index"
+      ],
+      "properties": {
+        "pickup": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "batch": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "open_lid_index": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        }
+      }
+    },
+    "initial_state": {
+      "const": "full_rotor_after_spin"
+    },
+    "selected_samples": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 12,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "routes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "loaded_transfer",
+        "empty_return",
+        "axial_exit_mm",
+        "vertical_entry_mm",
+        "axial_blend_mm",
+        "vertical_blend_mm",
+        "clearance_pose",
+        "clearance_axis",
+        "stop_speed_mm_s",
+        "stop_joint_speed_rad_s",
+        "blend_time_weight"
+      ],
+      "properties": {
+        "loaded_transfer": {
+          "const": "axial_bezier7_vertical"
+        },
+        "empty_return": {
+          "const": "direct"
+        },
+        "clearance_pose": {
+          "const": "withdrawn"
+        },
+        "clearance_axis": {
+          "const": "world_x"
+        },
+        "axial_exit_mm": {
+          "$ref": "#/$defs/positive"
+        },
+        "vertical_entry_mm": {
+          "$ref": "#/$defs/positive"
+        },
+        "axial_blend_mm": {
+          "$ref": "#/$defs/positive"
+        },
+        "vertical_blend_mm": {
+          "$ref": "#/$defs/positive"
+        },
+        "stop_speed_mm_s": {
+          "$ref": "#/$defs/positive"
+        },
+        "stop_joint_speed_rad_s": {
+          "$ref": "#/$defs/positive"
+        },
+        "blend_time_weight": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 8
+        }
+      }
+    },
+    "interpolation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tcp_path",
+        "joint_curve",
+        "ik_points_per_path",
+        "sample_bound_subdivisions",
+        "path_tolerance_mm",
+        "loaded_ik_points",
+        "path_check_subdivisions",
+        "sample_bound_max_subdivisions"
+      ],
+      "properties": {
+        "tcp_path": {
+          "const": "plateau_s_curve"
+        },
+        "joint_curve": {
+          "const": "C2_quintic"
+        },
+        "ik_points_per_path": {
+          "enum": [
+            33,
+            65
+          ]
+        },
+        "sample_bound_subdivisions": {
+          "enum": [
+            4,
+            8
+          ]
+        },
+        "path_tolerance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 0.05
+        },
+        "loaded_ik_points": {
+          "enum": [
+            257,
+            513
+          ]
+        },
+        "path_check_subdivisions": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 16
+        },
+        "sample_bound_max_subdivisions": {
+          "enum": [
+            16,
+            32,
+            64,
+            128,
+            256
+          ]
+        }
+      }
+    },
+    "holds_s": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "presentation",
+        "grasp",
+        "rack_support"
+      ],
+      "properties": {
+        "presentation": {
+          "type": "number",
+          "minimum": 0.6
+        },
+        "grasp": {
+          "$ref": "#/$defs/positive"
+        },
+        "rack_support": {
+          "$ref": "#/$defs/positive"
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "qualified",
+        "biological_tolerance",
+        "arm_loaded",
+        "arm_empty",
+        "sample_translation",
+        "sample_rotation",
+        "station_lid",
+        "station_rotor",
+        "station_linear"
+      ],
+      "properties": {
+        "qualified": {
+          "const": false
+        },
+        "biological_tolerance": {
+          "type": "null"
+        },
+        "arm_loaded": {
+          "$ref": "#/$defs/angular_rad"
+        },
+        "arm_empty": {
+          "$ref": "#/$defs/angular_rad"
+        },
+        "sample_translation": {
+          "$ref": "#/$defs/linear"
+        },
+        "sample_rotation": {
+          "$ref": "#/$defs/angular_deg"
+        },
+        "station_lid": {
+          "$ref": "#/$defs/angular_deg"
+        },
+        "station_linear": {
+          "$ref": "#/$defs/linear"
+        },
+        "station_rotor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "velocity_rpm",
+            "acceleration_deg_s2",
+            "jerk_deg_s3"
+          ],
+          "properties": {
+            "velocity_rpm": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 2
+            },
+            "acceleration_deg_s2": {
+              "$ref": "#/$defs/positive"
+            },
+            "jerk_deg_s3": {
+              "$ref": "#/$defs/positive"
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "lid_policy": {
+      "const": "open_between_unloads"
+    }
+  },
+  "$defs": {
+    "positive": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "angular_rad": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "velocity_rad_s",
+        "acceleration_rad_s2",
+        "jerk_rad_s3"
+      ],
+      "properties": {
+        "velocity_rad_s": {
+          "$ref": "#/$defs/positive"
+        },
+        "acceleration_rad_s2": {
+          "$ref": "#/$defs/positive"
+        },
+        "jerk_rad_s3": {
+          "$ref": "#/$defs/positive"
+        }
+      }
+    },
+    "angular_deg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "velocity_deg_s",
+        "acceleration_deg_s2",
+        "jerk_deg_s3"
+      ],
+      "properties": {
+        "velocity_deg_s": {
+          "$ref": "#/$defs/positive"
+        },
+        "acceleration_deg_s2": {
+          "$ref": "#/$defs/positive"
+        },
+        "jerk_deg_s3": {
+          "$ref": "#/$defs/positive"
+        }
+      }
+    },
+    "linear": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "velocity_mm_s",
+        "acceleration_mm_s2",
+        "jerk_mm_s3"
+      ],
+      "properties": {
+        "velocity_mm_s": {
+          "$ref": "#/$defs/positive"
+        },
+        "acceleration_mm_s2": {
+          "$ref": "#/$defs/positive"
+        },
+        "jerk_mm_s3": {
+          "$ref": "#/$defs/positive"
+        }
+      }
+    }
+  }
+}

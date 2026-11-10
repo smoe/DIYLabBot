@@ -19,6 +19,11 @@ def prepare_mesh(context):
     rack=pickup.rack_geometry(scene,p);mesh['rack_frame']=rack['frame'];mesh['rack_slots']=rack['slots']
     mesh['rack_batch']=json.loads((Path(context['out'])/'rack-batch-trace.json').read_text())
     bottom,axis=cf.pocket(spec,p,1);mesh['grip_reference']=cf.plus(bottom,axis,p['tube_length']-8)
+    return compact_mesh(mesh)
+
+
+def compact_mesh(mesh):
+    """Shared viewport compaction; never used by native geometry audits."""
     # Only viewport vendor detail is clustered; native source and BRep QA keep all geometry.
     for b in mesh['bodies']:
         if not b['role'].startswith('vendor_'):continue

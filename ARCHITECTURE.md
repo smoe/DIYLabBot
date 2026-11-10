@@ -219,7 +219,7 @@ Die Quelle `model/synthetic-cf01-workspace.shared.json` bindet die vier Ebenen:
 Die Rackkonstruktion steht einmal in `model/guided-tube-rack.shared.json`.
 Die Entnahmeszene referenziert die Umgebung; Bankgeometrie, Gerätepositionen und
 Armvariante sind daraus abgeleitete Ansichten. Bankoberfläche, Geräteposen und
-Bewegungsziele bleiben erhalten. Die aktuelle Entnahme nutzt unabhängig
+Bewegungsziele bleiben erhalten. Die bisherige Einzelentnahme nutzt unabhängig
 interpolierte Roboter-, Stations- und Greiferkanäle: Nach der synthetischen
 Freigabe von Arm und Gefäß bei 29,5 s fährt der Arm weiter, während Heber und
 Deckel ihren Ablauf abschließen. Dadurch dauert der Baustein 47,5 s mit 191
@@ -229,11 +229,52 @@ und ist nicht an dessen Schleuderlauf gekoppelt. Ein ROS-Export übernimmt den
 Armkanal für den vorhandenen Trajektorienclient. Integrierte Greifer- und
 Stationssteuerung, ROS-Laufzeit und reale Sensor-/Qualitätsrückmeldungen sind ungeprüft.
 
-Die interaktive README-Demo zeigt diesen Bewegungsausschnitt und zusätzlich die
+Die historische interaktive README-Demo zeigt diesen Bewegungsausschnitt und zusätzlich die
 Aufzeichnung des vollständigen lokalen Chargenprotokolls mit Rack-, Rotor- und
 Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
-Das kurze Video zeigt weiterhin den Entnahmebaustein; die physische Beladung
+Das damalige kurze Video zeigt den Entnahmebaustein; die physische Beladung
 aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
+
+Die aktuelle [geglättete Entnahme](docs/cf01-smooth-unloading.md) ergänzt mit
+`model/cf01-unload-demo.motion.json` eine eigene, referenzierende Bewegungsquelle:
+zwölf Gefäße nach dem synthetischen Spin, Sample01–03 in ursprünglicher
+Rackreihenfolge zurück, neun verbleiben im Rotor. Ein gemeinsames kompiliertes
+Programm liefert separate Arm-/Stations-/Greiferkanäle, Eigentümerereignisse
+und C2-Quintiken mit Position, Geschwindigkeit und Beschleunigung für native
+Prüfung, Browser und ROS-Armexport. Die gesamte beladene Fahrt vom bestätigten
+Griff zur Rackankunft erhält einen IK-Durchlauf, einen Kurvenfit und eine
+gemeinsame Zeitskalierung; axiale Entnahme und vertikale Ablage sind durch
+krümmungsstetige Übergänge verbunden. Zwischen ihnen gibt es keinen Ruhepunkt.
+Entnahme- und Freiraumbestätigung werden aus der tatsächlichen FK-Kurve
+abgeleitet, statt dafür Haltezeiten einzufügen. Ruck bleibt begrenzt, kann an Knoten springen;
+biologische Toleranzen sind unbekannt. Geometrie wird nur mit gültigen Quellen-
+und Artefaktbindungen übernommen; die neue Bahn erhält eine eigene diskrete
+native Prüfung einschließlich Nachbargeräten und belegter Rackplätze.
+Konservative FK-Intervallhüllen werden adaptiv vom Profilstart mit vier bis
+höchstens 256 Teilintervallen im jeweils begrenzenden Abschnitt verfeinert.
+Tatsächliche Auswertungen steuern diese Auswahl; sie ersetzen keine obere
+Grenze. Der Abbruchgrund und die verwendeten Auflösungen stehen im Bericht.
+Das neue Programm umfasst 1.565 Armknoten und 80,759 s Animationszeit;
+der erste Griff bis zur bestätigten Rackabstützung dauert 11,611 s.
+Build und Provenienz binden diese Modellzeiten; sie sind kein Chargenrunner-
+oder Hardwarebenchmark. Die
+Prüfung ersetzt weder einen kontinuierlichen Kollisionsnachweis noch ROS-/
+Hardwareausführung; eine neue native SolidCraft-Bewegungsstudie liegt nicht vor.
+
+Für diesen Entnahmeausschnitt bleibt der Deckel zwischen den Proben offen.
+`model/cf01-open-lid-index.protocol.json` pinnt dafür eine additive,
+simulationsgebundene Erweiterung. Nur der ausdrücklich gewählte
+`OpenLidIndexSimulator` kennt `index_open_lid`; er verwendet die vorhandenen
+Stillstands-, Brems-, Sitz-, Heber- und Freiraumprädikate sowie die
+Indexgrenze der Stationsquelle. Der Basisbefehl `index` und der Schleuderstart
+verlangen weiter den geschlossenen, verriegelten Deckel. Der neue Befehl wird
+nicht in Standardsimulator, MockProtocol, ROS-Interfaces oder SiLA registriert.
+Der vorhandene Zwölferlauf liefert ausschließlich einen Identitäts- und
+Reihenfolgenbeleg; die neue Stationsfolge wird separat im Opt-in-Simulator
+abgespielt. Weder bisheriger Chargenrunner noch gemeinsamer Laborworkflow
+führen diese Erweiterung aus. Die logische Replay-Uhr ist kein Watchdog-Nachweis;
+Hardware-, Sicherheitsqualifikation und ein bedingter Abbruchzweig des
+Armprogramms bleiben offen.
 
 ### Koordinatenverträge und spätere Migration
 

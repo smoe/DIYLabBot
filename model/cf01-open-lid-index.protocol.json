@@ -1,0 +1,63 @@
+{
+  "format": "solidcraftbot.cf01-open-lid-index-protocol/1",
+  "id": "CF01.index_open_lid",
+  "sources": {
+    "station": {
+      "source": "model/centrifuge-cf01.shared.json",
+      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+    },
+    "protocol": {
+      "source": "model/centrifuge-cf01.protocol.json",
+      "source_sha256": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+    }
+  },
+  "simulation_only": true,
+  "safety_qualified": false,
+  "command": {
+    "id": "index_open_lid",
+    "arguments": {
+      "slot": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum_reference": {
+          "source": "station",
+          "path": [
+            "rotor",
+            "slots"
+          ]
+        }
+      }
+    },
+    "preconditions": [
+      "owner",
+      "no_latched_fault",
+      "_still",
+      "_clear",
+      "_parked",
+      "open_lid_held"
+    ],
+    "effect": "Same rotor/encoder/parking-brake indexing effect as the existing index command; preserve the open held lid."
+  },
+  "limits": {
+    "index_speed_rpm": {
+      "source": "station",
+      "path": [
+        "handling",
+        "index_limit_rpm"
+      ],
+      "unit": "rpm"
+    }
+  },
+  "bindings": {
+    "standard_simulator": false,
+    "MockProtocol": false,
+    "ros2": false,
+    "sila2": false,
+    "hardware": false
+  },
+  "limitations": [
+    "Opt-in synthetic Simulator subclass only; no transport registration or physical controller.",
+    "Existing index and start keep their closed-and-locked-lid guards unchanged.",
+    "A synthetic command receipt or replay is not measured motion, a watchdog test, SiLA conformance or a safety qualification."
+  ]
+}

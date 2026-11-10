@@ -39,6 +39,23 @@ function timing(html) {
   const packed = html.match(/<script type="application\/json" data-mesh>([^<]+)<\/script>/);
   assert(packed, 'Inline source mesh required');
   const mesh = JSON.parse(zlib.gunzipSync(Buffer.from(packed[1], 'base64')));
+  if (mesh.unload_program) {
+    const program=mesh.unload_program,duration=program.duration_s,checks=[];
+    assert(duration>0&&program.transfers.length>=2,'Consecutive unload program required');
+    for(const transfer of program.transfers){
+      const epsilon=Math.min(.01,(transfer.support_s-transfer.gripped_s)/4);
+      checks.push([transfer.gripped_s-epsilon,'rotor',transfer.sample_id],
+        [transfer.gripped_s,'gripper',transfer.sample_id],
+        [transfer.support_s-epsilon,'gripper',transfer.sample_id],
+        [transfer.support_s,'rack',transfer.sample_id],
+        [duration,'rack',transfer.sample_id]);
+    }
+    const shown=program.transfers[1];
+    return {duration,checks,screenshot:shown.presented_s+.1,multiSample:true,
+      sampleIds:program.samples.map(sample=>sample.id),
+      transfers:program.transfers.map(({sample_id,gripped_s,support_s})=>({sample_id,gripped_s,support_s})),
+      sceneSha256:mesh.trajectory.scene_sha256};
+  }
   const duration = mesh.trajectory.samples.at(-1).time_s;
   const attachment = mesh.scene.checks.attachment_time_s, handoff = mesh.scene.checks.rack_handoff_time_s;
   assert([duration, attachment, handoff].every(Number.isFinite), 'Finite source event times required');
@@ -50,6 +67,21 @@ function timing(html) {
   const clear = mesh.scene.checks.robot_clear_confirmed_s;
   const screenshot = Number.isFinite(clear) && clear + 1 < handoff ? Math.max(attachment, clear + 1) : (attachment + handoff) / 2;
   return {duration, attachment, handoff, checks, screenshot, sceneSha256: mesh.trajectory.scene_sha256};
+}
+
+function assertStateOwnership(state,source) {
+  const time=state.sourceTimeS??Number(state.currentTime);
+  if(!source.multiSample){
+    assert.equal(state.tubeOwner,time>=source.handoff?'rack':time>=source.attachment?'gripper':'station');
+    return;
+  }
+  const owners=JSON.parse(state.sampleOwners);
+  assert.deepEqual(Object.keys(owners).sort(),[...source.sampleIds].sort());
+  for(const id of source.sampleIds){
+    const transfer=source.transfers.find(item=>item.sample_id===id);
+    const expected=transfer&&time>=transfer.support_s?'rack':transfer&&time>=transfer.gripped_s?'gripper':'rotor';
+    assert.equal(owners[id],expected,id+' ownership at '+time);
+  }
 }
 
 // Normalize recording time: rendering speed varies with host CPU.
@@ -102,12 +134,13 @@ async function main(argv = process.argv.slice(2)) {
       const slider = root.querySelector('[data-time-slider]'), duration = Number(slider.max);
       if (duration !== source.duration) throw new Error('Browser/source duration mismatch');
       function show(time) {slider.value = time; slider.dispatchEvent(new Event('input', {bubbles: true}));}
-      const ownership = source.checks.map(([time, owner]) => {
+      const ownership = source.checks.map(([time, owner, sampleId]) => {
         show(time);
-        if (Math.abs(Number(root.dataset.currentTime) - time) > 0.001 || root.dataset.tubeOwner !== owner) {
+        const actual=sampleId?JSON.parse(root.dataset.sampleOwners)[sampleId]:root.dataset.tubeOwner;
+        if (Math.abs(Number(root.dataset.currentTime) - time) > 0.001 || actual !== owner) {
           throw new Error('Unexpected tube ownership at source time ' + time);
         }
-        return {time_s: time, owner};
+        return {time_s: time, owner,...(sampleId?{sample_id:sampleId}:{})};
       });
       const mime = ['video/mp4;codecs=avc1.42001E', 'video/mp4'].find(type => MediaRecorder.isTypeSupported(type));
       if (!mime) throw new Error('MP4 MediaRecorder support required; refusing a WebM replacement');
@@ -124,7 +157,7 @@ async function main(argv = process.argv.slice(2)) {
       recorder.start();
       for (let i = 0; i <= frames; i++) {
         show(i * duration / frames);
-        if (i % Math.max(1, Math.round(frames / 4)) === 0 || i === frames) states.push({...root.dataset});
+        if (i % Math.max(1, Math.round(frames / 4)) === 0 || i === frames) states.push({...root.dataset,sourceTimeS:i*duration/frames});
         await new Promise(resolve => setTimeout(resolve, 1000 / fps));
       }
       recorder.stop();
@@ -135,8 +168,7 @@ async function main(argv = process.argv.slice(2)) {
       return {mime: recorder.mimeType, data: btoa(binary), states, ownership, frames: frames + 1};
     }, {source, seconds: config.recordSeconds});
     for (const state of result.states) {
-      const time = Number(state.currentTime);
-      assert.equal(state.tubeOwner, time >= source.handoff ? 'rack' : time >= source.attachment ? 'gripper' : 'station');
+      assertStateOwnership(state,source);
     }
     const video = shortMp4(Buffer.from(result.data, 'base64'), config.recordSeconds);
     await page.locator('[data-time-slider]').evaluate((slider, time) => {
@@ -154,5 +186,5 @@ async function main(argv = process.argv.slice(2)) {
   } finally {await browser.close();}
 }
 
-module.exports = {options, timing, shortMp4};
+module.exports = {options, timing, shortMp4, assertStateOwnership};
 if (require.main === module) main().catch(error => {console.error(error); process.exitCode = 1;});

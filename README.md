@@ -23,36 +23,50 @@ synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
 ## Roboter in Bewegung
 
-https://github.com/user-attachments/assets/9b987f94-7fb4-4c59-af2a-e7aaa822e924
+[![Drei aufeinanderfolgende CF01-Entnahmen bei offenem Deckel](docs/media/robot-demo-smooth-batch.png)](docs/media/robot-demo-smooth-batch.mp4)
 
-[Kurzes Video ansehen](docs/media/robot-demo-overlap.mp4) ·
-[Interaktive Demo herunterladen](docs/media/robot-demo-overlap.html) ·
+[Kurzes Video ansehen](docs/media/robot-demo-smooth-batch.mp4) ·
+[Interaktive Demo herunterladen](docs/media/robot-demo-smooth-batch.html) ·
+[Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
 [Modellstand und Herkunft](docs/media/README.md)
 
 Die Szene wird aus einer synthetischen, unbegrenzten Umgebung mit einer
-Referenzbank abgeleitet. Die Bewegungsansicht und das Video zeigen den
-47,5-s-Bewegungsbaustein Rotorplatz 01 → Rackplatz 01, im Video beschleunigt.
-Nach der Freigabe von Arm und Gefäß bei 29,5 s fährt der Arm zum Rack weiter;
-parallel parkt der Heber und der Deckel schließt. Eine Wartezeit bis zur
-Deckelverriegelung ist dafür nicht erforderlich.
-Der Bewegungsbaustein besitzt eine eigene Zeitachse und ist nicht mit der
-Chargenwiedergabe gekoppelt.
-Die HTML-Datei lokal öffnen: Wiedergabe, Zeitschieber und drei Ansichten
-funktionieren ohne CAD-Installation oder Netzwerk.
+Referenzbank abgeleitet. Sie zeigt **drei aufeinanderfolgende Entnahmen** nach
+einem Zwölferlauf: Sample01–03 gelangen in ihre ursprünglichen Rackplätze,
+neun Gefäße bleiben im Rotor. Eine Detailansicht zeigt den vorhandenen
+16-mm-Hub entlang der Gefäßachse, bevor der Greifer zugreift.
 
-Zusätzlich enthält die HTML-Demo das aufgezeichnete **Chargenprotokoll für zwölf
-Proben**: Ein Transporter hat das Rack bereitgestellt; es wird in CF01 geladen,
-zentrifugiert und in ursprünglicher Reihenfolge zurück ins Rack entladen. Der
-Transporter ist nicht dargestellt. Sämtliche Roboterübergaben und Rückmeldungen
-sind lokale Mocks ohne ausgeführte Bahn; Testzeit wird beim Warten auf bestätigte
-Befehlsabschlüsse einschließlich Spin und Bremsen fortgeschrieben.
-Die HTML-Demo startet auf Deutsch und lässt sich über
-**Sprache / Language** auf Englisch umschalten. Die vorherigen Medien bleiben
-als historische Fassung mit eigener Provenienz erhalten. Aktuelle Bedienung,
-Berichtsfelder und Prüfgrenzen stehen in der
-[Baugruppendokumentation](docs/centrifuge-cf01-robot-pickup.md).
-Die bisherige Entnahmebewegung bleibt als eigener Baustein erhalten. Der vollständige
-Lauf ist auch reproduzierbar ausführbar:
+Vom bestätigten Griff bis zur Rackablage fährt das getragene Gefäß ohne
+Zwischenhalt: axiale Entnahme, gerundeter Transit und vertikale Ablage gehören
+zu einer gemeinsamen glatten Bahn. Der Deckel bleibt zwischen den drei
+Entnahmen offen und schließt erst nach der letzten Freigabe und dem
+Heberrückzug. Eine ausdrücklich aktivierte Simulatorerweiterung erlaubt dafür
+die langsame Rotorindexierung bei offenem, gehaltenem Deckel; der bestehende
+Stationsvertrag bleibt unverändert.
+
+Geschwindigkeit, Beschleunigung und Ruck bleiben durch dieselben vorläufigen
+Grenzen beschränkt; Position, Geschwindigkeit und Beschleunigung sind stetig.
+Das Programm enthält 1.565 Armknoten und dauert 80,759 s: rund 29,7 % weniger
+Modellzeit als die vorherige lokale Fassung mit Deckelzyklen je Probe.
+Vom ersten Griff bis zur bestätigten Rackabstützung sind es 11,611 s,
+rund 1,0 % weniger als zuvor. Ein beschleunigter Videoclip ändert die
+Programmzeit nicht. Biologische Belastbarkeit, Flüssigkeitsbewegung und reale
+Antriebsgrenzen sind noch nicht bestimmt;
+die vorläufigen Grenzwerte sind keine Freigabe für biologische Proben.
+
+Die HTML-Datei lokal öffnen: Wiedergabe, Zeitschieber, automatische Hubansicht
+und Deutsch/Englisch funktionieren ohne CAD-Installation oder Netzwerk.
+Die Bewegungsansicht besitzt eine eigene Zeitachse. Sie ruft weder den
+Chargenrunner noch Geräte oder Hardware auf. Der vollständige lokale
+**Rack → CF01 → Rack-Lauf für zwölf Proben** bleibt separat ausführbar.
+Ein Transporter hat das Rack bereitgestellt; seine Fahrt und die native
+Ladebahn sind nicht dargestellt. Bisherige Medien bleiben als historische
+Fassungen mit eigener Provenienz erhalten.
+
+Die offene Indexierung ist ausschließlich eine zusätzliche Simulation. Sie
+ist weder ein neuer ROS-/SiLA-Befehl noch eine Ausführung des bisherigen
+Chargenrunners oder des gemeinsamen Laborworkflows. Eine sensorabhängige
+Abbruch- und Rückführstrategie des Armprogramms ist noch nicht implementiert.
 
 ```sh
 python3 scripts/run_cf01_rack_batch.py
@@ -88,8 +102,9 @@ flowchart TB
 FreeCAD und SolidCraft erzeugen ihre Modelle unabhängig aus denselben Quellen.
 **Die gezeigte Armbewegung ist bereits für die ROS-Trajektorienschnittstelle
 programmiert.** Der
-[Exporter](scripts/export_centrifuge_robot_pickup_ros2.py) übernimmt dieselben
-Gelenkwinkel und Zeitpunkte für den vorhandenen `FollowJointTrajectory`-Client.
+[Exporter](scripts/export_cf01_unload_ros2.py) übernimmt dieselben
+Gelenkpositionen, Geschwindigkeiten und Beschleunigungen für die quintische
+Interpolation des vorhandenen `FollowJointTrajectory`-Clients.
 Exportiert wird der Armkanal; Greifer und CF01 benötigen eigene Steuerkanäle.
 Vor Ausführung müssen Roboterbeschreibung, 280/250-mm-Armvariante, Aufstellung
 und Werkzeugbezug übereinstimmen; der Client prüft diese Geometriebindung nicht.
@@ -100,10 +115,10 @@ Verbindungen sind geplant; der gemeinsame CF01–NanoDrop–Qubit-Ablauf arbeite
 bislang lokal und synthetisch. Export und Datenprüfung ohne ROS-Installation:
 
 ```sh
-python3 scripts/export_centrifuge_robot_pickup_ros2.py
+python3 scripts/export_cf01_unload_ros2.py
 PYTHONPATH=ros2_ws/src/solidcraftbot_ros python3 -m solidcraftbot_ros.demo \
-  --config exports/generated/cf01-robot-pickup-ros2/scenarios.json \
-  --scenario cf01_robot_to_rack --dry-run
+  --config exports/generated/cf01-unload-ros2/scenarios.json \
+  --scenario cf01_unload_three_samples --dry-run
 ```
 
 Biologische Versuche sollen im Zielbild in GENtle oder einem anderen

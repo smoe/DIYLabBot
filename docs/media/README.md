@@ -1,6 +1,69 @@
 # README-Demo
 
-## Aktuelle Fassung: Roboter und Deckel parallel
+## Aktuelle Fassung: drei durchgehende Entnahmen bei offenem Deckel
+
+`robot-demo-smooth-batch.html`, `robot-demo-smooth-batch.mp4` und
+`robot-demo-smooth-batch.png` zeigen Sample01–03 nach einem vollständigen
+synthetischen Zwölferlauf. Alle drei Gefäße gelangen in ihre ursprünglichen
+Rackplätze; neun verbleiben im Rotor. Die automatische Detailansicht zeigt den
+unveränderten 16-mm-Präsentationshub entlang der Gefäßachse. Zwischen Griff und
+Rackankunft gibt es keinen Zwischenhalt. Der Deckel bleibt zwischen den
+Entnahmen offen; nach der letzten Freigabe und dem Heberrückzug schließt und
+verriegelt er.
+Die Modellzeit beträgt 80,759 s bei 1.565 Armknoten, rund 29,7 % weniger als
+bei der vorherigen lokalen Fassung mit Deckelzyklen je Probe. Der erste
+Griff bis zur bestätigten Rackabstützung benötigt 11,611 s, rund 1,0 % weniger
+als zuvor. Dies sind Modellzeiten, kein Hardware-Durchsatzbenchmark.
+Das Video zeigt diese Modellzeit auf 45 s beschleunigt.
+
+[Profil, Aufbau und Prüfgrenzen](../cf01-smooth-unloading.md) und die
+[eigene Provenienz](robot-demo-smooth-batch.provenance.json) führen die
+vorläufigen Geschwindigkeits-, Beschleunigungs- und Ruckgrenzen, Quellen,
+Artefaktprüfsummen und ausgeführten Prüfungen. Browser, native Prüfung und
+ROS-Armexport evaluieren dieselben quintischen PVA-Kurven. Position,
+Geschwindigkeit und Beschleunigung sind stetig; Ruck kann an Segmentgrenzen
+springen. Die Grenzwerte sind synthetisch, biologische Toleranzen unbekannt.
+
+Die native diskrete Prüfung besteht mit 10.026 angeforderten Frames und
+9.979 unterschiedlichen Zuständen, ohne Kollisions- oder Abstandsfehler.
+Der Browser besteht 112 Python-/JS-Vergleiche einschließlich
+Gelenkgeschwindigkeiten und aller drei Hübe, Deutsch/Englisch und drei
+Fensterbreiten. Export und ROS-Client-Dry-run bestehen mit 1.565 PVA-Knoten
+über 80,759156872 s; das bleibt eine Datenprüfung ohne ROS-Laufzeit und Hardware.
+
+Die 145 gezielten Bewegungs-, Mathematik-, Opt-in- und ROS-Prüfungen bestehen.
+Die Gesamtsuite ist dennoch nicht vollständig grün: Vorhandene Mehrarm- und
+Instrumenten-Aufstellungsberichte enthalten veraltete Cacheverweise. Die
+Galerieprüfung meldet fehlende Bilder für `model/lab-glassware.shared.json`
+und die parallel hinzugekommene `model/lab-equipment.shared.json`. Diese
+unabhängigen Befunde gehören nicht zum neuen CF01-Bewegungsnachweis.
+Die zunächst an der Sandbox gescheiterten Loopback-Tests bestehen nach separater
+Wiederholung außerhalb der Sandbox (33 Tests); Netzwerk-Skips bleiben Skips.
+
+Nur unveränderte Geometrie wird aus quellgebundenen CAD-Berichten übernommen;
+die neue Bahn erhält eine eigene native diskrete Kollisions-/Abstandsprüfung.
+Sie berücksichtigt alle zwölf Gefäße und Kappen, das zunehmend belegte Rack,
+NanoDrop und Qubit sowie den gesamten NanoDrop-Hebelbereich. Daraus folgen
+keine kontinuierliche Kollisionsgarantie, biologische Verträglichkeit oder
+Hardwarequalifikation. Eine neue native SolidCraft-Bewegungsstudie und eine
+ROS-Laufzeitausführung wurden nicht durchgeführt. Die historischen
+SolidCraft-Importgrenzen unten bleiben erhalten.
+
+Die offene Indexierung verwendet einen neuen, ausdrücklich aktivierten
+Simulatorvertrag. Der Standardsimulator, ROS-/SiLA-Verträge und der bisherige
+Chargenrunner erhalten diesen Befehl nicht. Ein Replay bestätigt die neue
+Befehlsfolge nur im Opt-in-Simulator mit logischer Uhr; es ersetzt keine
+Watchdog- oder Sicherheitsprüfung. Ein sensorabhängiger Abbruchzweig des
+Armprogramms ist nicht implementiert.
+
+Diese Bewegungszeitachse ist unabhängig vom vollständigen Chargenprotokoll;
+sie startet weder eine Zentrifugation noch Netzwerk-/Hardwarebefehle. Das
+historische Chargenpanel ist in dieser Bewegungsansicht ausgeblendet.
+Der Armkanal ist mit Position, Geschwindigkeit und Beschleunigung für den
+bestehenden ROS-Client exportierbar; Greifer-/Stationssteuerung, Sensorik und
+Qualitätsrückmeldungen bleiben getrennte Integrationsaufgaben.
+
+## Historische Fassung: Roboter und Deckel parallel
 
 `robot-demo-overlap.html`, `robot-demo-overlap.mp4` und
 `robot-demo-overlap.png` zeigen den überarbeiteten Bewegungsbaustein über
@@ -11,7 +74,7 @@ zeigt 35 s. Geometrie, bisherige Einzelbewegungsdauern und Gefäßübergaben
 bleiben erhalten.
 
 [Eigene Provenienz](robot-demo-overlap.provenance.json) bindet diese Medien an
-die aktuelle Quelle und die ausgeführten Prüfungen. Die native adaptive
+die damalige Quelle und die ausgeführten Prüfungen. Die native adaptive
 FreeCAD-Prüfung umfasst auch den getragenen Probenkörper und seine Kappe
 gegen den bewegten Deckel nach der Freigabe. SolidCraft erzeugt seine
 Prüfstellungen unabhängig aus den Quellen; das bleibt eine Prüfung statischer
@@ -23,7 +86,7 @@ exportierbar, mit unveränderten Gelenkwinkeln und Zeiten. Export und Dry-run
 im Client sind Datenprüfungen; ROS-Laufzeit, passende Live-Roboterbeschreibung
 und die integrierte Greifer-/Stationssteuerung sind nicht nachgewiesen.
 
-## Historische Fassung
+## Historische Fassung: ursprünglicher Einzeltransfer
 
 Bewusst versionierte Medienauswahl, keine zusätzliche Konstruktionsquelle:
 
@@ -42,7 +105,7 @@ Alle Roboterübergaben sind abstrahiert; Testzeit vergeht nur für Spin und Brem
 Der Bewegungsbaustein hat eine eigene Zeitachse und wird vom Chargenrunner nicht
 aufgerufen. Transporter, Netzwerk und Hardware werden nicht ausgeführt.
 
-## Prüfnachweise und Grenzen
+## Prüfnachweise und Grenzen des ursprünglichen Medien-Builds
 
 211 Offline-Tests und 13 Schema-Prüfungen bestehen. FreeCAD: sieben native
 Snapshots mit 223 Körpern und adaptive Prüfung mit 1601 angeforderten Frames
@@ -83,8 +146,8 @@ Chromium vom Repository-Stamm aus:
 
 ```sh
 node scripts/export_readme_video.cjs \
-  --input docs/media/robot-demo-overlap.html \
-  --output-base docs/media/robot-demo-overlap --screenshot-time 35
+  --input renders/<neue-revision>/cf01-unload-demo.html \
+  --output-base docs/media/robot-demo-smooth-batch --record-seconds 45
 ```
 
 Optional sind Playwright-Modul und Chrome-Programm als erstes und zweites

@@ -1,0 +1,4483 @@
+{
+  "format": "solidcraftbot.readme-media/4",
+  "prepared_at_utc": "2026-11-10T23:22:55.342394+00:00",
+  "revision": "cf01-unload-smooth-dced269cf0b0",
+  "base_commit": "8d7426153db6edf04e4d7db1f6db45211e265eba",
+  "source_binding": "Current source bytes, compiled payload and native artifact hashes. Historical media and reports retain their original source bindings.",
+  "source_files_sha256": {
+    "model/cf01-unload-demo.motion.json": "dced269cf0b0b909bb12dee0e11c0f5bdabb1938bb8d793e63acbd96fffe47bd",
+    "model/cf01-unload-demo.schema.json": "08c16e155e50bb744eae3b720eb665f2512cac87d76265cfa94dc082edf627af",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+    "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+    "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+    "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+    "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+    "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+    "scripts/cf01_unload_motion.py": "efa33b3bc96065afdec9636f43bf1a9d1733d1424da1a7501e1624a81ed865b9",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+    "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+    "scripts/cf01_rack_batch.py": "5789ae91ae4ceada2b359bc214e62dd802d2fab08a4177bbcb061f12388d9c07",
+    "scripts/export_centrifuge_robot_pickup_ros2.py": "8b5652f3fa430bd49f996b567d3be4d84b729379e8bc3a0c47c61db6824c58f7",
+    "scripts/cf01_unload_path.py": "61a0f5b8a1b09f2c531ea96a32ebb84d70d2857645275398823d69b7aa4635d5",
+    "model/cf01-open-lid-index.protocol.json": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f",
+    "model/cf01-open-lid-index.schema.json": "0022c4ce4ff170b991a4d61fda1f068e29184e94b72f06aeb8e264d7e3ce3fb3",
+    "scripts/cf01_open_lid_index.py": "c1049b5b38e156518ef75484c25f34fa75ee145860ef2f0168300ca53106553d",
+    "scripts/build_cf01_unload_demo.py": "c0b670f3d930958cb0e60a1360e62cc116b5b6bd0687a626d23202e4ea7fbff4",
+    "scripts/cf01_unload_geometry.py": "b89f390e4a82d4bec856d569e36510ddfb50aef7ad325c3d231494ba32c8fb94",
+    "scripts/check_cf01_unload_motion.py": "d73b7142343d570139fbeaea4804d2054f18c32e2c5306950fc1cab5a257d0d5",
+    "scripts/lab_transfer_model.py": "b7e16e6d91f1889211ca6c641cfc7f789ebf3ed26df03b06c2e4c131dce6f85f",
+    "scripts/templates/quintic_motion.js": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30",
+    "scripts/templates/centrifuge_robot_pickup.html": "cdb16513b9294097cf77b1fa8d779d83decef73720c092d5ed9dc88c756b776a",
+    "scripts/templates/robot_demo_header.html": "b738bdba34a1688632891680041b8fb8ffaad9b2f077b2b8193b4da8a470e701",
+    "scripts/cf01_unload_validation.py": "c953ff6eb1afcde0cb0259e5495baa5c37bfe86f668d572710e9bcc7cc2c1fe1",
+    "scripts/build_centrifuge_robot_pickup_visual.py": "66c16417c35ecd2f0bdce06187b05f401ea72eb720ba1d6ded540e15d63a215f",
+    "scripts/build_centrifuge_robot_pickup_freecad.py": "622b95942730a3021bef6677742132de4f7c0d57d4000ddf38b9425954284806",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+    "scripts/rack_slots.py": "2b48e8e2926ddbb6b42993cc7ddfa465bef97b050621e838383b71ac8982c89c",
+    "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+    "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+    "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+    "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+    "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
+    "scripts/centrifuge_mechanisms.py": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/synthetic_lab_scene.py": "c945ace92c40e013e9d4624ff9c20419cc4459699ec108748c9b934a34f715d1",
+    "scripts/build_synthetic_lab_scene_freecad.py": "802f7a666b4122bffb2e2754f970a056e4d60a5403180443e4c3aef6eff4a69e",
+    "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
+    "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+    "scripts/export_cf01_unload_ros2.py": "c1dc7dabeb2110fb27df97a2562e22b337c91db5e1a1d06efdfa3b89a4c9efe2",
+    "scripts/export_readme_video.cjs": "16a9b5d4c5fecdaaec34183c198966f251f99d9b1010fe4bf0f8a13299d0d8d4",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/demo.py": "225370cfe38e76b040f62f184c66ca509d9f1c8c69d55a9635d7dab175289b5c",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/protocol.py": "0441de217a17a8cad6a4eebd126d87f286559c3fdc47d19c43829151038185c2",
+    "tests/test_cf01_unload_build.py": "0718ac3fa360fe678a802098a44356870c69566ebc5e59d4222a5172b7860739",
+    "tests/test_cf01_unload_motion.py": "fcb79f7d816b0fd6bc7c97fd02cd99282a728f0e0db4af653e370a939f88e80e",
+    "tests/test_cf01_unload_native_contracts.py": "0301e9e0800219e0af3920622bc3a0027b06832482d5b0ffd315c37d8adab049",
+    "tests/test_cf01_unload_path.py": "ec3baf034067fc94d8abe217b5ce2a12e3020c78265e9a671336edf2bbc7a27f",
+    "tests/test_cf01_unload_ros2.py": "139aeed4178ae48da01b3bc5ee63a73e258b65e7da7f7c0e0e9ce320351759ff",
+    "tests/test_cf01_unload_validation.py": "7a6d7a5a879faa526438f304e4434f5c2203ca3daf96a1638a6178722fdbb346",
+    "tests/test_smooth_motion.py": "4630cbc067dc109b5458c649fd668006dce865090d8cbfd2ad9dc6717710fdd7",
+    "tests/test_motion_accuracy.py": "943d9d44aa36132081263a706f4efd8373e0513ef038594192d4edfb3583e697",
+    "tests/test_adaptive_motion_bounds.py": "8cd1afc03b56f925cc8acce31c027af2a5e7707ac8c25db72723a6103ddf149a",
+    "tests/test_cf01_open_lid_index.py": "9c8a358b287d602df25053d7ff503bc1184e1f0789e19d8a7918ccdf0e3565f6",
+    "tests/check_cf01_unload_demo.cjs": "ca13b44e8b883655482dd426f79fe26effa2513fcaf2f0de5051dd35531589e7",
+    "tests/check_readme_video_export.cjs": "ce8beeea329e7c0fc36932caaa6325700552de77baede66ff38f7791af21c4c0"
+  },
+  "documentation_files_sha256": {
+    "README.md": "8f3e839a40242c7ed4e3aca43ad41b9a49f47f89434bc60c0b29d83aca28cb98",
+    "ARCHITECTURE.md": "eded9ee28cdce903c54cabeb4dbf256187bdf817f4f940024c4519e8bed0d1ee",
+    "AGENTS.md": "6b790e7a9627b0625ffcd6f1668b08053631b9094cdd012d07f7349181c6fe11",
+    "docs/cf01-smooth-unloading.md": "34eebf6ab5e50bffa6d1b5217cf1c1d0e0ec26c4b1e12cee01bfb5836f7b0135",
+    "docs/centrifuge-cf01-protocol.md": "21aad97403596a31aa29ed56ad0dd76c84c7098e942cf7f04eb59934160ffc4d",
+    "docs/media/README.md": "6506a846029f2689e2754bc0f639dcb8f3984505ea44c76016c6e79ce2a17e4a"
+  },
+  "media": {
+    "html": {
+      "path": "docs/media/robot-demo-smooth-batch.html",
+      "sha256": "a35ae0d7fe80506a8d2befc5aece1ee291209a062da6b0dde4362058d2d9a698",
+      "bytes": 1745033
+    },
+    "video": {
+      "path": "docs/media/robot-demo-smooth-batch.mp4",
+      "sha256": "599a33f9e7f02c52a45727c287d96325b7efa4a40684d9df4ea713ee1dd7309e",
+      "bytes": 3525497
+    },
+    "poster": {
+      "path": "docs/media/robot-demo-smooth-batch.png",
+      "sha256": "bc171940e0b2b49e5a2ea1df3ae630806a75bc411128b2aebc8363b10d18b069",
+      "bytes": 83120
+    }
+  },
+  "compiled_program": {
+    "path": "exports/generated/cf01-unload-smooth-dced269cf0b0/program.json",
+    "sha256": "6ad3641919251dbead356af3bf226f4658ee7f2639f434a748f798d780e948ed",
+    "bytes": 1652269,
+    "canonical_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1"
+  },
+  "native_build_report": {
+    "path": "exports/generated/cf01-unload-smooth-dced269cf0b0/build-report.json",
+    "sha256": "077f7ef9ad2d6ccd593768fe0f5bb958cdee09c139f9f0404f8df7d31714379a",
+    "bytes": 143287
+  },
+  "native_motion_report": {
+    "path": "exports/generated/cf01-unload-smooth-dced269cf0b0/native-motion-validation.json",
+    "sha256": "e174b56417ff8f8c03683528c5a5ac1bc3351063d29de0639b0d9d82d27924d6",
+    "bytes": 2006662
+  },
+  "geometry_reuse": {
+    "report": "cad/centrifuge-cf01/robot-pickup-build-report.json",
+    "report_sha256": "f5fb182d31e8766856e652218262a295f64424fbfc36a43ac64c923aa40234d0",
+    "station_report": "exports/generated/centrifuge-cf01-f880ad47f670/build-report.json",
+    "station_report_sha256": "f7b16f9d0f05b3a0c571d6070b08ef6083a90687a8d478e4ec6d7fe518d990d5",
+    "station_native": "cad/generated/centrifuge-cf01-f880ad47f670/Centrifuge_CF01.FCStd",
+    "station_native_sha256": "7d3556d299153d3e2779ce2e9f65b09db473a0af3b569038db6d5f8952c3f07d",
+    "geometry_sources_sha256": {
+      "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+      "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+      "scripts/build_centrifuge_robot_pickup_freecad.py": "622b95942730a3021bef6677742132de4f7c0d57d4000ddf38b9425954284806",
+      "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+      "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+      "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+      "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+      "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+      "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+      "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+      "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+      "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+      "scripts/rack_slots.py": "2b48e8e2926ddbb6b42993cc7ddfa465bef97b050621e838383b71ac8982c89c",
+      "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b",
+      "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+      "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+      "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+      "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+      "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+      "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+      "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+      "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+      "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
+      "scripts/centrifuge_mechanisms.py": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b",
+      "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84"
+    },
+    "artifacts": {
+      "mesh": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/scene-mesh.json",
+        "sha256": "2259e9fb11e9c687321034834ba1006f7260ae7a160f56323c20eb5a2ce16190"
+      },
+      "old_scene": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/scene-source.json",
+        "sha256": "95fa0b113c41d29388efa163db1d9fb1ffa83f235449d60869253c7752bd63a4"
+      },
+      "old_trajectory": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/trajectory.json",
+        "sha256": "7015d63cb87b82724aae8e8d703fe151cb5ad9397b13c0dd8f88b841205fe342"
+      },
+      "native": {
+        "path": "cad/generated/centrifuge-cf01-robot-bca7acca63a4-r2/CF01_Robot_Closed.FCStd",
+        "sha256": "9493ec63d364cb770b24a916ece99a83e08a1a2be2f1f214d3a9ea18aaae157c"
+      }
+    },
+    "scope": "Reuse of unchanged source-bound construction geometry only. Old trajectory, clearance and motion reports are not evidence for the new program."
+  },
+  "instruments": {
+    "report": "cad/synthetic-lab-scene/shared-build-report.json",
+    "report_sha256": "a3849ab577470024efa1bdd257d6cde80f122e053dc67d93bf5722bb34a94e5d",
+    "geometry_sources_sha256": {
+      "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+      "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+      "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+      "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+      "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+      "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+      "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "scripts/synthetic_lab_scene.py": "c945ace92c40e013e9d4624ff9c20419cc4459699ec108748c9b934a34f715d1",
+      "scripts/build_synthetic_lab_scene_freecad.py": "802f7a666b4122bffb2e2754f970a056e4d60a5403180443e4c3aef6eff4a69e",
+      "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
+      "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+      "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+      "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+      "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b"
+    },
+    "native": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r5/SyntheticLab_Grasp.FCStd",
+    "native_sha256": "35bf26b9c06e987d09df08685cde83aafa41bff6587de30ab18c2d0284103de9",
+    "body_count": 45,
+    "poses": {
+      "SYN.NanoDrop01": {
+        "hinge_deg": 65,
+        "hinge_limits_deg": [
+          0.0,
+          75.0
+        ],
+        "asset": "nanodrop"
+      },
+      "SYN.Qubit401": {
+        "hinge_deg": 95,
+        "hinge_limits_deg": [
+          0.0,
+          100.0
+        ],
+        "asset": "qubit"
+      }
+    },
+    "scope": "Unchanged native instrument geometry and placements only; old reachability and motion results do not validate the new unloading path."
+  },
+  "frozen_base_sources_sha256": {
+    "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+    "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+    "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/cf01-sila2.shared.json": "52c0a5a560f1562ab4d31bd645ce7e41a9fbf567493f9aa528906257f19a1f47",
+    "model/synthetic-lab-workflow.shared.json": "2475fce315f97ed211807aad2ff6ba99ef011a1f921393caabee164cbd1f181b",
+    "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+    "scripts/centrifuge_protocol.py": "62932cb5deeb03a8409084c47513c9c5210eb2676c18f6bc23549ed54c70ac6c",
+    "scripts/cf01_rack_batch.py": "5789ae91ae4ceada2b359bc214e62dd802d2fab08a4177bbcb061f12388d9c07"
+  },
+  "unchanged_limits_literal_sha256": "66e355b620eb3eef7c61c8e1bb7dc71fd13f4e458a0db738a89b8dedee80059a",
+  "motion": {
+    "duration_s": 80.7591568724187,
+    "arm_pva_knots": 1565,
+    "selected_samples": [
+      "Sample01",
+      "Sample02",
+      "Sample03"
+    ],
+    "initial_state": "Full twelve-sample rotor after a synthetic spin; only the three-sample unloading prefix is animated and checked.",
+    "loaded_arrival_s": [
+      11.361257620535966,
+      11.326939825325653,
+      11.407806313548498
+    ],
+    "loaded_support_s": [
+      11.611257620535966,
+      11.576939825325653,
+      11.657806313548498
+    ],
+    "limits": {
+      "qualified": false,
+      "biological_tolerance": null,
+      "arm_loaded": {
+        "velocity_rad_s": 0.5,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "arm_empty": {
+        "velocity_rad_s": 1,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "sample_translation": {
+        "velocity_mm_s": 200,
+        "acceleration_mm_s2": 500,
+        "jerk_mm_s3": 5000
+      },
+      "sample_rotation": {
+        "velocity_deg_s": 30,
+        "acceleration_deg_s2": 90,
+        "jerk_deg_s3": 900
+      },
+      "station_lid": {
+        "velocity_deg_s": 10,
+        "acceleration_deg_s2": 180,
+        "jerk_deg_s3": 1800
+      },
+      "station_rotor": {
+        "velocity_rpm": 2,
+        "acceleration_deg_s2": 30,
+        "jerk_deg_s3": 300
+      },
+      "station_linear": {
+        "velocity_mm_s": 50,
+        "acceleration_mm_s2": 200,
+        "jerk_mm_s3": 2000
+      }
+    },
+    "dynamics_revalidation": {
+      "format": "solidcraftbot.cf01-unload-dynamics-validation/2",
+      "passed": true,
+      "canonical_program_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1",
+      "duration_s": 80.7591568724187,
+      "arm_bounds": {
+        "positions_rad": {
+          "min": [
+            -0.6098204380398438,
+            -0.19201574048600195,
+            1.1171558886757278,
+            -0.6172516205425079,
+            0.9131278052047812,
+            1.2227752767082254
+          ],
+          "max": [
+            0.8891551860749753,
+            0.7549086718047736,
+            1.6147724959159397,
+            9.81029808552488e-09,
+            1.7237154513637052,
+            2.665370654581154
+          ],
+          "max_abs": [
+            0.8891551860749753,
+            0.7549086718047736,
+            1.6147724959159397,
+            0.6172516205425079,
+            1.7237154513637052,
+            2.665370654581154
+          ]
+        },
+        "velocities_rad_s": {
+          "min": [
+            -0.38577786450019597,
+            -0.967055000190546,
+            -0.4662397699530649,
+            -0.47703143450831964,
+            -0.3977201041629577,
+            -0.3524932870610857
+          ],
+          "max": [
+            0.9999900001001113,
+            0.5513839947216668,
+            0.5284772795590716,
+            0.1843904383461478,
+            0.653079529552945,
+            0.985601186123316
+          ],
+          "max_abs": [
+            0.9999900001001113,
+            0.967055000190546,
+            0.5284772795590716,
+            0.47703143450831964,
+            0.653079529552945,
+            0.985601186123316
+          ]
+        },
+        "accelerations_rad_s2": {
+          "min": [
+            -1.4765369079532902,
+            -1.999960000604131,
+            -1.5370714172851176,
+            -0.9522486492827154,
+            -1.9999600006233988,
+            -1.4864111122399328
+          ],
+          "max": [
+            1.7448166360640518,
+            1.7510167721530778,
+            1.6897943018064367,
+            1.240018150665067,
+            1.9490902820105491,
+            1.7429446187330142
+          ],
+          "max_abs": [
+            1.7448166360640518,
+            1.999960000604131,
+            1.6897943018064367,
+            1.240018150665067,
+            1.9999600006233988,
+            1.7429446187330142
+          ]
+        },
+        "jerks_rad_s3": {
+          "min": [
+            -8.353668653288903,
+            -9.96385346892311,
+            -16.772359998862225,
+            -4.9292109860439135,
+            -16.515198755899362,
+            -7.0821551924904895
+          ],
+          "max": [
+            9.575127504202436,
+            8.809708278003544,
+            17.713962770128614,
+            6.6952494312614395,
+            19.999400018105266,
+            5.309215918672291
+          ],
+          "max_abs": [
+            9.575127504202436,
+            9.96385346892311,
+            17.713962770128614,
+            6.6952494312614395,
+            19.999400018105266,
+            7.0821551924904895
+          ]
+        }
+      },
+      "loaded_transfers": [
+        {
+          "sample_id": "Sample01",
+          "start_s": 17.840652732300335,
+          "end_s": 29.4519103528363,
+          "joint_bounds": {
+            "positions_rad": {
+              "min": [
+                -0.6098204380398438,
+                -0.08441912317578934,
+                1.1171819473200817,
+                -0.6172512386221161,
+                0.9131278052047812,
+                1.2227752767082254
+              ],
+              "max": [
+                0.8891551860749753,
+                0.7344367603539955,
+                1.5151385743532135,
+                4.1683727719163995e-09,
+                1.7236894974276127,
+                2.665370654581154
+              ],
+              "max_abs": [
+                0.8891551860749753,
+                0.7344367603539955,
+                1.5151385743532135,
+                0.6172512386221161,
+                1.7236894974276127,
+                2.665370654581154
+              ]
+            },
+            "velocities_rad_s": {
+              "min": [
+                -0.38577786450019597,
+                -0.24873455893152335,
+                -0.24282788381188924,
+                -0.017331639243660334,
+                -0.27663945536764056,
+                -0.3524932870610857
+              ],
+              "max": [
+                0.11166433415704007,
+                0.23299097451539905,
+                0.247685542521947,
+                0.1843904383461478,
+                0.24377191554208347,
+                1.5088527640359541e-05
+              ],
+              "max_abs": [
+                0.38577786450019597,
+                0.24873455893152335,
+                0.247685542521947,
+                0.1843904383461478,
+                0.27663945536764056,
+                0.3524932870610857
+              ]
+            },
+            "accelerations_rad_s2": {
+              "min": [
+                -0.578944334511395,
+                -0.6756829341248566,
+                -0.224170581232117,
+                -0.07188110429471592,
+                -0.7429778873240688,
+                -0.16872448968008555
+              ],
+              "max": [
+                0.11420915654883636,
+                0.1493940221298978,
+                1.1885363340093067,
+                0.17030065244647105,
+                0.20619086239464499,
+                0.11240824221665803
+              ],
+              "max_abs": [
+                0.578944334511395,
+                0.6756829341248566,
+                1.1885363340093067,
+                0.17030065244647105,
+                0.7429778873240688,
+                0.16872448968008555
+              ]
+            },
+            "jerks_rad_s3": {
+              "min": [
+                -8.278206599540194,
+                -9.87286036772144,
+                -10.870801419368604,
+                -0.30227355199806644,
+                -11.03858437993731,
+                -2.376826451070786
+              ],
+              "max": [
+                5.171951931131525,
+                6.300525686331139,
+                17.552628112404676,
+                1.0165863276453442,
+                6.7228115090385625,
+                1.6366989193825143
+              ],
+              "max_abs": [
+                8.278206599540194,
+                9.87286036772144,
+                17.552628112404676,
+                1.0165863276453442,
+                11.03858437993731,
+                2.376826451070786
+              ]
+            }
+          },
+          "sample_bounds": {
+            "velocity_mm_s": 105.09144144772003,
+            "acceleration_mm_s2": 424.7954852708194,
+            "jerk_mm_s3": 4999.850003151702,
+            "angular_velocity_rad_s": 0.12016247007113023,
+            "angular_acceleration_rad_s2": 0.12106868926120944,
+            "angular_jerk_rad_s3": 1.6914014107516024
+          },
+          "sample_bound_scope": "conservative_numeric_interval",
+          "enclosing_reference_points": 11,
+          "adaptive_refinement": {
+            "maximum_subdivisions": 256,
+            "segment_subdivisions": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              128,
+              128,
+              32,
+              8,
+              4,
+              4,
+              8,
+              8,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              8,
+              16,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "evaluated_intervals": 1656,
+            "actual_evaluations": 2966,
+            "sampled_peaks": {
+              "velocity_mm_s": 92.36564516382309,
+              "acceleration_mm_s2": 259.34149240737014,
+              "jerk_mm_s3": 3848.51376385415,
+              "angular_velocity_rad_s": 0.1181412317057428,
+              "angular_acceleration_rad_s2": 0.10780574703296583,
+              "angular_jerk_rad_s3": 0.5346836830524638
+            },
+            "sampled_factor_lower": 0.9164476880027257,
+            "factor_upper": 0.9999900001101161,
+            "target_factor_ratio": 1.1,
+            "stop_reason": "sampled_factor_gap",
+            "scope": "Actual sample values guide refinement only; returned bounds remain interval upper enclosures."
+          },
+          "actual_geometry": {
+            "passed": true,
+            "no_stop": {
+              "passed": true,
+              "range_s": [
+                17.840652732300335,
+                29.2019103528363
+              ],
+              "quiet_intervals_s": [
+                [
+                  17.840652732300335,
+                  17.843805876911507
+                ],
+                [
+                  29.19900989704812,
+                  29.2019103528363
+                ]
+              ],
+              "joint_norm_threshold_rad_s": 1e-06,
+              "sample_speed_threshold_mm_s": 0.01,
+              "quiet_sample_speed_upper_bound_mm_s": 0.005907637554522984,
+              "scope": "Numerical squared-joint-speed polynomial roots plus conservative serial-chain lever-arm bound; no continuous Cartesian path or formal floating-point certificate."
+            },
+            "removed_first_crossing_s": 19.839626252392435,
+            "clear_first_crossing_s": 24.480721702883706,
+            "path_checks": 1048,
+            "between_knot_subdivisions": 4,
+            "maximum_path_deviation_mm": 0.0003595558840509677,
+            "maximum_orientation_deviation_deg": 3.4150945850063763e-06,
+            "maximum_axial_error_mm": 0.00012247501669318572,
+            "maximum_vertical_error_mm": 9.35301953722835e-05,
+            "scope": "Actual quintic FK at every knot, between-knot subdivisions and independent first-predicate bisections; Cartesian path tolerance is discrete, not a formal continuous certificate."
+          }
+        },
+        {
+          "sample_id": "Sample02",
+          "start_s": 39.437219496198836,
+          "end_s": 51.01415932152449,
+          "joint_bounds": {
+            "positions_rad": {
+              "min": [
+                -0.5482232420262559,
+                -0.0763816171392911,
+                1.1171689343913023,
+                -0.6172514295453199,
+                0.9208383808238321,
+                1.2843724728087955
+              ],
+              "max": [
+                0.8891550881458776,
+                0.7425544973076662,
+                1.5050976570457277,
+                7.045595349890871e-09,
+                1.7237024615518282,
+                2.665370654581154
+              ],
+              "max_abs": [
+                0.8891550881458776,
+                0.7425544973076662,
+                1.5050976570457277,
+                0.6172514295453199,
+                1.7237024615518282,
+                2.665370654581154
+              ]
+            },
+            "velocities_rad_s": {
+              "min": [
+                -0.3785530629807488,
+                -0.24794197367891643,
+                -0.2435635943543088,
+                -0.017384166146594757,
+                -0.27631286911198805,
+                -0.34385653902243796
+              ],
+              "max": [
+                0.1120026491268604,
+                0.23218847952049998,
+                0.24642736433232315,
+                0.18225540540159565,
+                0.24451048493762798,
+                1.0964677607212684e-05
+              ],
+              "max_abs": [
+                0.3785530629807488,
+                0.24794197367891643,
+                0.24642736433232315,
+                0.18225540540159565,
+                0.27631286911198805,
+                0.34385653902243796
+              ]
+            },
+            "accelerations_rad_s2": {
+              "min": [
+                -0.5824714276832876,
+                -0.6787676718088639,
+                -0.22553027212503263,
+                -0.06922451773090094,
+                -0.7472285104629756,
+                -0.16959336965572938
+              ],
+              "max": [
+                0.11500210796831234,
+                0.15127139200189973,
+                1.1943989162581279,
+                0.1712821910697006,
+                0.20738258650140967,
+                0.1020843217158014
+              ],
+              "max_abs": [
+                0.5824714276832876,
+                0.6787676718088639,
+                1.1943989162581279,
+                0.1712821910697006,
+                0.7472285104629756,
+                0.16959336965572938
+              ]
+            },
+            "jerks_rad_s3": {
+              "min": [
+                -8.353668653288903,
+                -9.96385346892311,
+                -10.972139363260293,
+                -0.30502783045943915,
+                -11.139482614646067,
+                -2.398298052135356
+              ],
+              "max": [
+                5.2190899109125795,
+                6.359641636120686,
+                17.713962770128614,
+                1.0257396791676396,
+                6.784547799652535,
+                1.6512858499149978
+              ],
+              "max_abs": [
+                8.353668653288903,
+                9.96385346892311,
+                17.713962770128614,
+                1.0257396791676396,
+                11.139482614646067,
+                2.398298052135356
+              ]
+            }
+          },
+          "sample_bounds": {
+            "velocity_mm_s": 104.94441726393718,
+            "acceleration_mm_s2": 427.2148290566045,
+            "jerk_mm_s3": 4999.850003216034,
+            "angular_velocity_rad_s": 0.12044312853550308,
+            "angular_acceleration_rad_s2": 0.12181123089463246,
+            "angular_jerk_rad_s3": 1.700768320036266
+          },
+          "sample_bound_scope": "conservative_numeric_interval",
+          "enclosing_reference_points": 11,
+          "adaptive_refinement": {
+            "maximum_subdivisions": 256,
+            "segment_subdivisions": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              128,
+              128,
+              32,
+              8,
+              4,
+              4,
+              8,
+              8,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              8,
+              16,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "evaluated_intervals": 1656,
+            "actual_evaluations": 2966,
+            "sampled_peaks": {
+              "velocity_mm_s": 92.13340775347308,
+              "acceleration_mm_s2": 260.751212879419,
+              "jerk_mm_s3": 3883.7590111460318,
+              "angular_velocity_rad_s": 0.11849917185318143,
+              "angular_acceleration_rad_s2": 0.1084598472084827,
+              "angular_jerk_rad_s3": 0.5395660632129761
+            },
+            "sampled_factor_lower": 0.9192368443729136,
+            "factor_upper": 0.9999900001144049,
+            "target_factor_ratio": 1.1,
+            "stop_reason": "sampled_factor_gap",
+            "scope": "Actual sample values guide refinement only; returned bounds remain interval upper enclosures."
+          },
+          "actual_geometry": {
+            "passed": true,
+            "no_stop": {
+              "passed": true,
+              "range_s": [
+                39.437219496198836,
+                50.76415932152449
+              ],
+              "quiet_intervals_s": [
+                [
+                  39.437219496198836,
+                  39.44035836510821
+                ],
+                [
+                  50.76126242282131,
+                  50.76415932152449
+                ]
+              ],
+              "joint_norm_threshold_rad_s": 1e-06,
+              "sample_speed_threshold_mm_s": 0.01,
+              "quiet_sample_speed_upper_bound_mm_s": 0.005907637554522991,
+              "scope": "Numerical squared-joint-speed polynomial roots plus conservative serial-chain lever-arm bound; no continuous Cartesian path or formal floating-point certificate."
+            },
+            "removed_first_crossing_s": 41.430154920317364,
+            "clear_first_crossing_s": 46.34032224088423,
+            "path_checks": 1047,
+            "between_knot_subdivisions": 4,
+            "maximum_path_deviation_mm": 0.00035956845065109397,
+            "maximum_orientation_deviation_deg": 3.1945284701301985e-06,
+            "maximum_axial_error_mm": 0.0001224699783186515,
+            "maximum_vertical_error_mm": 8.821348539322079e-05,
+            "scope": "Actual quintic FK at every knot, between-knot subdivisions and independent first-predicate bisections; Cartesian path tolerance is discrete, not a formal continuous certificate."
+          }
+        },
+        {
+          "sample_id": "Sample03",
+          "start_s": 60.99946846488702,
+          "end_s": 72.65727477843552,
+          "joint_bounds": {
+            "positions_rad": {
+              "min": [
+                -0.4877499057232967,
+                -0.06844644660940694,
+                1.1171558886757278,
+                -0.6172516205425079,
+                0.9326168463951184,
+                1.3448458091585314
+              ],
+              "max": [
+                0.8891549902222382,
+                0.7549086718047736,
+                1.4949669390383595,
+                9.81029808552488e-09,
+                1.7237154513637052,
+                2.665370654581154
+              ],
+              "max_abs": [
+                0.8891549902222382,
+                0.7549086718047736,
+                1.4949669390383595,
+                0.6172516205425079,
+                1.7237154513637052,
+                2.665370654581154
+              ]
+            },
+            "velocities_rad_s": {
+              "min": [
+                -0.36810240427786856,
+                -0.24466905993396226,
+                -0.24183704847002632,
+                -0.01726095130669915,
+                -0.27242721026740163,
+                -0.33241835575627443
+              ],
+              "max": [
+                0.11120869618781516,
+                0.23125115999340298,
+                0.2426980321169012,
+                0.17843839272502077,
+                0.24277722551166714,
+                6.814425863143639e-06
+              ],
+              "max_abs": [
+                0.36810240427786856,
+                0.24466905993396226,
+                0.2426980321169012,
+                0.17843839272502077,
+                0.27242721026740163,
+                0.33241835575627443
+              ]
+            },
+            "accelerations_rad_s2": {
+              "min": [
+                -0.5742562415268093,
+                -0.6681779849493591,
+                -0.22234345500818847,
+                -0.06541982607712084,
+                -0.7364177114102001,
+                -0.16706524131015746
+              ],
+              "max": [
+                0.11372399217474136,
+                0.15036619248031938,
+                1.176195075263452,
+                0.16881118697670167,
+                0.2044726811929581,
+                0.10064111364190653
+              ],
+              "max_abs": [
+                0.5742562415268093,
+                0.6681779849493591,
+                1.176195075263452,
+                0.16881118697670167,
+                0.7364177114102001,
+                0.16706524131015746
+              ]
+            },
+            "jerks_rad_s3": {
+              "min": [
+                -8.177266457595572,
+                -9.754423004016045,
+                -10.74263873107272,
+                -0.29858549174931553,
+                -10.90452063211463,
+                -2.347462989604367
+              ],
+              "max": [
+                5.108871726917555,
+                6.226993197714905,
+                17.34120297005078,
+                1.0039682192817099,
+                6.641723599986257,
+                1.616090300594136
+              ],
+              "max_abs": [
+                8.177266457595572,
+                9.754423004016045,
+                17.34120297005078,
+                1.0039682192817099,
+                10.90452063211463,
+                2.347462989604367
+              ]
+            }
+          },
+          "sample_bounds": {
+            "velocity_mm_s": 104.09784058467856,
+            "acceleration_mm_s2": 421.02315691281643,
+            "jerk_mm_s3": 4999.850003021336,
+            "angular_velocity_rad_s": 0.11951655683897651,
+            "angular_acceleration_rad_s2": 0.12009817312990649,
+            "angular_jerk_rad_s3": 1.697541546319234
+          },
+          "sample_bound_scope": "conservative_numeric_interval",
+          "enclosing_reference_points": 11,
+          "adaptive_refinement": {
+            "maximum_subdivisions": 256,
+            "segment_subdivisions": [
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              128,
+              128,
+              32,
+              8,
+              4,
+              4,
+              8,
+              8,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              8,
+              16,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4,
+              4
+            ],
+            "evaluated_intervals": 1656,
+            "actual_evaluations": 2966,
+            "sampled_peaks": {
+              "velocity_mm_s": 91.262112500389,
+              "acceleration_mm_s2": 256.9058744567476,
+              "jerk_mm_s3": 3801.9064319751915,
+              "angular_velocity_rad_s": 0.11765916862510684,
+              "angular_acceleration_rad_s2": 0.10692748327739932,
+              "angular_jerk_rad_s3": 0.5281803552757712
+            },
+            "sampled_factor_lower": 0.9127331132031926,
+            "factor_upper": 0.9999900001014248,
+            "target_factor_ratio": 1.1,
+            "stop_reason": "sampled_factor_gap",
+            "scope": "Actual sample values guide refinement only; returned bounds remain interval upper enclosures."
+          },
+          "actual_geometry": {
+            "passed": true,
+            "no_stop": {
+              "passed": true,
+              "range_s": [
+                60.99946846488702,
+                72.40727477843552
+              ],
+              "quiet_intervals_s": [
+                [
+                  60.99946846488702,
+                  61.002641007550295
+                ],
+                [
+                  72.40433236337061,
+                  72.40727477843552
+                ]
+              ],
+              "joint_norm_threshold_rad_s": 1e-06,
+              "sample_speed_threshold_mm_s": 0.01,
+              "quiet_sample_speed_upper_bound_mm_s": 0.005907637554522984,
+              "scope": "Numerical squared-joint-speed polynomial roots plus conservative serial-chain lever-arm bound; no continuous Cartesian path or formal floating-point certificate."
+            },
+            "removed_first_crossing_s": 63.0066320646195,
+            "clear_first_crossing_s": 68.41007332484753,
+            "path_checks": 1047,
+            "between_knot_subdivisions": 4,
+            "maximum_path_deviation_mm": 0.00035958101689939935,
+            "maximum_orientation_deviation_deg": 3.4150945850063763e-06,
+            "maximum_axial_error_mm": 0.00012246494009112512,
+            "maximum_vertical_error_mm": 8.610042263743321e-05,
+            "scope": "Actual quintic FK at every knot, between-knot subdivisions and independent first-predicate bisections; Cartesian path tolerance is discrete, not a formal continuous certificate."
+          }
+        }
+      ],
+      "station_bounds": {
+        "joint_names": [
+          "Lid",
+          "Rotor",
+          "Lift",
+          "TubeLift",
+          "BrakeUpper",
+          "BrakeLower",
+          "LatchLeft",
+          "LatchRight"
+        ],
+        "units": [
+          "deg",
+          "deg",
+          "mm",
+          "mm",
+          "mm",
+          "mm",
+          "mm",
+          "mm"
+        ],
+        "p": {
+          "min": [
+            -1.1102230246251568e-16,
+            -60.00000000000001,
+            0.0,
+            -3.33066907387547e-16,
+            -1.1102230246251568e-16,
+            -1.1102230246251568e-16,
+            0.0,
+            0.0
+          ],
+          "max": [
+            105.00000000000001,
+            0.0,
+            28.000000000000004,
+            16.000000000000004,
+            1.5000000000000004,
+            1.5000000000000004,
+            22.000000000000004,
+            22.000000000000004
+          ],
+          "max_abs": [
+            105.00000000000001,
+            60.00000000000001,
+            28.000000000000004,
+            16.000000000000004,
+            1.5000000000000004,
+            1.5000000000000004,
+            22.000000000000004,
+            22.000000000000004
+          ]
+        },
+        "v": {
+          "min": [
+            -9.999990000010014,
+            -11.999988000012019,
+            -49.99995000005138,
+            -28.57140000002936,
+            -10.400408714850812,
+            -10.400408714850812,
+            -49.99995000005003,
+            -49.99995000005003
+          ],
+          "max": [
+            9.999990000010008,
+            0.0,
+            47.445579019801286,
+            47.445579019801286,
+            10.400408714850812,
+            10.400408714850812,
+            49.9999500000501,
+            49.9999500000501
+          ],
+          "max_abs": [
+            9.999990000010014,
+            11.999988000012019,
+            49.99995000005138,
+            47.445579019801286,
+            10.400408714850812,
+            10.400408714850812,
+            49.9999500000501,
+            49.9999500000501
+          ]
+        },
+        "a": {
+          "min": [
+            -134.1638103222328,
+            -29.99994000009021,
+            -199.99960000066022,
+            -199.99960000062637,
+            -144.2246685812601,
+            -144.2246685812601,
+            -199.9996000006259,
+            -199.9996000006259
+          ],
+          "max": [
+            134.1638103222328,
+            29.99994000009297,
+            199.9996000006609,
+            199.9996000006231,
+            144.22466858126035,
+            144.22466858126035,
+            199.99960000065656,
+            199.99960000065656
+          ],
+          "max_abs": [
+            134.1638103222328,
+            29.99994000009297,
+            199.9996000006609,
+            199.99960000062637,
+            144.22466858126035,
+            144.22466858126035,
+            199.99960000065656,
+            199.99960000065656
+          ]
+        },
+        "j": {
+          "min": [
+            -1799.994600012514,
+            -299.9991000020045,
+            -1999.994000019141,
+            -1999.994000019141,
+            -1999.9940000142146,
+            -1999.9940000142146,
+            -1999.9940000140139,
+            -1999.9940000140139
+          ],
+          "max": [
+            1799.9946000126567,
+            299.99910000353424,
+            1999.994000029089,
+            1999.994000012957,
+            1999.9940000131983,
+            1999.9940000131983,
+            1999.994000029101,
+            1999.994000029101
+          ],
+          "max_abs": [
+            1799.9946000126567,
+            299.99910000353424,
+            1999.994000029089,
+            1999.994000019141,
+            1999.9940000142146,
+            1999.9940000142146,
+            1999.994000029101,
+            1999.994000029101
+          ]
+        }
+      },
+      "station_sample_bounds": {
+        "velocity_mm_s": 65.46141301053147,
+        "acceleration_mm_s2": 245.19691601230335,
+        "jerk_mm_s3": 2452.065826004783,
+        "angular_velocity_rad_s": 0.20943930080001907,
+        "angular_acceleration_rad_s2": 0.5235977284023703,
+        "angular_jerk_rad_s3": 5.235972048081405,
+        "scope": "conservative rotating-envelope and axial-lift derivative bounds"
+      },
+      "jaw_bounds": {
+        "joint_names": [
+          "jaw_gap"
+        ],
+        "units": [
+          "mm"
+        ],
+        "p": {
+          "min": [
+            10.799999999999999
+          ],
+          "max": [
+            22.000000000000004
+          ],
+          "max_abs": [
+            22.000000000000004
+          ]
+        },
+        "v": {
+          "min": [
+            -38.37350811628319
+          ],
+          "max": [
+            38.37350811628319
+          ],
+          "max_abs": [
+            38.37350811628319
+          ]
+        },
+        "a": {
+          "min": [
+            -199.99960000065147
+          ],
+          "max": [
+            199.99960000074498
+          ],
+          "max_abs": [
+            199.99960000074498
+          ]
+        },
+        "j": {
+          "min": [
+            -1999.9940000179686
+          ],
+          "max": [
+            1999.9940000179686
+          ],
+          "max_abs": [
+            1999.9940000179686
+          ]
+        }
+      },
+      "c2_maximum_knot_errors": {
+        "Arm": {
+          "positions_rad": 0.0,
+          "velocities_rad_s": 0.0,
+          "accelerations_rad_s2": 0.0
+        },
+        "Station": {
+          "positions_rad": 0.0,
+          "velocities_rad_s": 0.0,
+          "accelerations_rad_s2": 0.0
+        },
+        "Jaw": {
+          "positions_rad": 0.0,
+          "velocities_rad_s": 0.0,
+          "accelerations_rad_s2": 0.0
+        }
+      },
+      "station_commands": {
+        "numeric_preconditions_passed": true,
+        "commands": [
+          {
+            "command": "index",
+            "sample_id": "Sample01",
+            "start_s": 0.0,
+            "end_s": 0.5769004050227916
+          },
+          {
+            "command": "open_lid",
+            "sample_id": "Sample01",
+            "start_s": 0.5769004050227916,
+            "end_s": 12.015983042593975
+          },
+          {
+            "command": "present_tube",
+            "sample_id": "Sample01",
+            "start_s": 12.015983042593975,
+            "end_s": 13.290440581704042
+          },
+          {
+            "command": "confirm_removed",
+            "sample_id": "Sample01",
+            "start_s": 19.839626252392435,
+            "end_s": 19.839626252392435
+          },
+          {
+            "command": "retract_lift",
+            "sample_id": "Sample01",
+            "start_s": 24.480721702883702,
+            "end_s": 25.390722612883703
+          },
+          {
+            "command": "index_open_lid",
+            "sample_id": "Sample02",
+            "start_s": 30.035646401469677,
+            "end_s": 33.612549806492474
+          },
+          {
+            "command": "present_tube",
+            "sample_id": "Sample02",
+            "start_s": 33.612549806492474,
+            "end_s": 34.88700734560254
+          },
+          {
+            "command": "confirm_removed",
+            "sample_id": "Sample02",
+            "start_s": 41.43015492031736,
+            "end_s": 41.43015492031736
+          },
+          {
+            "command": "retract_lift",
+            "sample_id": "Sample02",
+            "start_s": 46.34032224088422,
+            "end_s": 47.25032315088422
+          },
+          {
+            "command": "index_open_lid",
+            "sample_id": "Sample03",
+            "start_s": 51.597895370157865,
+            "end_s": 55.17479877518066
+          },
+          {
+            "command": "present_tube",
+            "sample_id": "Sample03",
+            "start_s": 55.17479877518066,
+            "end_s": 56.44925631429073
+          },
+          {
+            "command": "confirm_removed",
+            "sample_id": "Sample03",
+            "start_s": 63.006632064619495,
+            "end_s": 63.006632064619495
+          },
+          {
+            "command": "retract_lift",
+            "sample_id": "Sample03",
+            "start_s": 68.41007332484753,
+            "end_s": 69.32007423484752
+          },
+          {
+            "command": "close_lid",
+            "sample_id": "Sample03",
+            "start_s": 69.32007423484752,
+            "end_s": 80.7591568724187
+          }
+        ],
+        "replay": {
+          "passed": true,
+          "mode": "simulation_only",
+          "command_count": 14,
+          "commands": [
+            {
+              "sample_id": "Sample01",
+              "command": "index",
+              "started_s": 0.0,
+              "start": {
+                "lid": "closed",
+                "lid_locked": true,
+                "lid_angle_deg": 0.0,
+                "latch_positions_mm": [
+                  0.0,
+                  0.0
+                ],
+                "indexed_slot": null,
+                "encoder_deg": 0.0,
+                "index_confirmed": false,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 0.5769004050227916,
+              "confirmed": {
+                "lid": "closed",
+                "lid_locked": true,
+                "lid_angle_deg": 0.0,
+                "latch_positions_mm": [
+                  0.0,
+                  0.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample01",
+              "command": "open_lid",
+              "started_s": 0.5769004050227916,
+              "start": {
+                "lid": "closed",
+                "lid_locked": true,
+                "lid_angle_deg": 0.0,
+                "latch_positions_mm": [
+                  0.0,
+                  0.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 12.015983042593975,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample01",
+              "command": "present_tube",
+              "started_s": 12.015983042593975,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 13.290440581704042,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample01",
+              "command": "confirm_removed",
+              "started_s": 19.839626252392435,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "confirmed_s": 19.839626252392435,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample01",
+              "command": "retract_lift",
+              "started_s": 24.480721702883702,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 25.390722612883703,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample02",
+              "command": "index_open_lid",
+              "started_s": 30.035646401469677,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 1,
+                "encoder_deg": 0.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 33.612549806492474,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample02",
+              "command": "present_tube",
+              "started_s": 33.612549806492474,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 34.88700734560254,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample02",
+              "command": "confirm_removed",
+              "started_s": 41.43015492031736,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "confirmed_s": 41.43015492031736,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample02",
+              "command": "retract_lift",
+              "started_s": 46.34032224088422,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 47.25032315088422,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample03",
+              "command": "index_open_lid",
+              "started_s": 51.597895370157865,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 2,
+                "encoder_deg": -30.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 55.17479877518066,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample03",
+              "command": "present_tube",
+              "started_s": 55.17479877518066,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 56.44925631429073,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample03",
+              "command": "confirm_removed",
+              "started_s": 63.006632064619495,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "confirmed_s": 63.006632064619495,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": false
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample03",
+              "command": "retract_lift",
+              "started_s": 68.41007332484753,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 16.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 69.32007423484752,
+              "confirmed": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            },
+            {
+              "sample_id": "Sample03",
+              "command": "close_lid",
+              "started_s": 69.32007423484752,
+              "start": {
+                "lid": "open",
+                "lid_locked": false,
+                "lid_angle_deg": 105.0,
+                "latch_positions_mm": [
+                  22.0,
+                  22.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "confirmed_s": 80.7591568724187,
+              "confirmed": {
+                "lid": "closed",
+                "lid_locked": true,
+                "lid_angle_deg": 0.0,
+                "latch_positions_mm": [
+                  0.0,
+                  0.0
+                ],
+                "indexed_slot": 3,
+                "encoder_deg": -60.0,
+                "index_confirmed": true,
+                "brake_held": true,
+                "lift_mm": 0.0,
+                "robot_clear": true
+              },
+              "evidence": "synthetic_program_state"
+            }
+          ],
+          "selected_samples": [
+            "Sample01",
+            "Sample02",
+            "Sample03"
+          ],
+          "owners": {
+            "Sample01": "rack",
+            "Sample02": "rack",
+            "Sample03": "rack",
+            "Sample04": "rotor",
+            "Sample05": "rotor",
+            "Sample06": "rotor",
+            "Sample07": "rotor",
+            "Sample08": "rotor",
+            "Sample09": "rotor",
+            "Sample10": "rotor",
+            "Sample11": "rotor",
+            "Sample12": "rotor"
+          },
+          "final_station": {
+            "lid": "closed",
+            "lid_locked": true,
+            "lid_angle_deg": 0.0,
+            "latch_positions_mm": [
+              0.0,
+              0.0
+            ],
+            "indexed_slot": 3,
+            "encoder_deg": -60.0,
+            "index_confirmed": true,
+            "brake_held": true,
+            "lift_mm": 0.0,
+            "robot_clear": true
+          },
+          "source_files_sha256": {
+            "model/cf01-open-lid-index.protocol.json": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f",
+            "model/cf01-open-lid-index.schema.json": "0022c4ce4ff170b991a4d61fda1f068e29184e94b72f06aeb8e264d7e3ce3fb3",
+            "scripts/cf01_open_lid_index.py": "c1049b5b38e156518ef75484c25f34fa75ee145860ef2f0168300ca53106553d",
+            "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+            "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+            "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+            "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+          },
+          "program_semantic_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1",
+          "synthetic_owner_heartbeats": 70,
+          "watchdog_tested": false,
+          "clock": "Logical program event clock; injected synthetic heartbeats only retain mock ownership",
+          "limits": "Synthetic predicate replay only; no physical observations, timing qualification, transport binding or safety proof"
+        }
+      },
+      "limits_source": "current motion definition, not copied program audits",
+      "qualified": false,
+      "scope": "Recomputed exact polynomial extrema and conservative numerical FK interval bounds; no formal floating-point certificate, biological or hardware qualification."
+    },
+    "interpolation": "Actual C2 quintic PVA, finite one-sided jerk may jump; no intermediate loaded rest, positive monotone reference progress.",
+    "comparison": {
+      "historical_program": {
+        "path": "exports/generated/cf01-unload-smooth-b21b3b5e0a08-r2/program.json",
+        "sha256": "757740763ad0c6cf0b103180d43ebccfdeb47edffe3ed6a232f275cdbb23293f",
+        "bytes": 1490234
+      },
+      "historical_duration_s": 114.82337380031392,
+      "total_time_reduction_fraction": 0.29666622570362144,
+      "old_first_grip_to_support_s": 11.730840097865638,
+      "scope": "Same endpoints and unchanged motion caps; continuous loaded path and open-lid handling index change the choreography. Synthetic programmed times, not measured hardware throughput."
+    },
+    "presentation_axial_mm": 16.0,
+    "presentation_vertical_mm": 13.106432708623856
+  },
+  "station_replay": {
+    "passed": true,
+    "mode": "simulation_only",
+    "command_count": 14,
+    "commands": [
+      {
+        "sample_id": "Sample01",
+        "command": "index",
+        "started_s": 0.0,
+        "start": {
+          "lid": "closed",
+          "lid_locked": true,
+          "lid_angle_deg": 0.0,
+          "latch_positions_mm": [
+            0.0,
+            0.0
+          ],
+          "indexed_slot": null,
+          "encoder_deg": 0.0,
+          "index_confirmed": false,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 0.5769004050227916,
+        "confirmed": {
+          "lid": "closed",
+          "lid_locked": true,
+          "lid_angle_deg": 0.0,
+          "latch_positions_mm": [
+            0.0,
+            0.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample01",
+        "command": "open_lid",
+        "started_s": 0.5769004050227916,
+        "start": {
+          "lid": "closed",
+          "lid_locked": true,
+          "lid_angle_deg": 0.0,
+          "latch_positions_mm": [
+            0.0,
+            0.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 12.015983042593975,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample01",
+        "command": "present_tube",
+        "started_s": 12.015983042593975,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 13.290440581704042,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample01",
+        "command": "confirm_removed",
+        "started_s": 19.839626252392435,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "confirmed_s": 19.839626252392435,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample01",
+        "command": "retract_lift",
+        "started_s": 24.480721702883702,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 25.390722612883703,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample02",
+        "command": "index_open_lid",
+        "started_s": 30.035646401469677,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 1,
+          "encoder_deg": 0.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 33.612549806492474,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample02",
+        "command": "present_tube",
+        "started_s": 33.612549806492474,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 34.88700734560254,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample02",
+        "command": "confirm_removed",
+        "started_s": 41.43015492031736,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "confirmed_s": 41.43015492031736,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample02",
+        "command": "retract_lift",
+        "started_s": 46.34032224088422,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 47.25032315088422,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample03",
+        "command": "index_open_lid",
+        "started_s": 51.597895370157865,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 2,
+          "encoder_deg": -30.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 55.17479877518066,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample03",
+        "command": "present_tube",
+        "started_s": 55.17479877518066,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 56.44925631429073,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample03",
+        "command": "confirm_removed",
+        "started_s": 63.006632064619495,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "confirmed_s": 63.006632064619495,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": false
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample03",
+        "command": "retract_lift",
+        "started_s": 68.41007332484753,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 16.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 69.32007423484752,
+        "confirmed": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      },
+      {
+        "sample_id": "Sample03",
+        "command": "close_lid",
+        "started_s": 69.32007423484752,
+        "start": {
+          "lid": "open",
+          "lid_locked": false,
+          "lid_angle_deg": 105.0,
+          "latch_positions_mm": [
+            22.0,
+            22.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "confirmed_s": 80.7591568724187,
+        "confirmed": {
+          "lid": "closed",
+          "lid_locked": true,
+          "lid_angle_deg": 0.0,
+          "latch_positions_mm": [
+            0.0,
+            0.0
+          ],
+          "indexed_slot": 3,
+          "encoder_deg": -60.0,
+          "index_confirmed": true,
+          "brake_held": true,
+          "lift_mm": 0.0,
+          "robot_clear": true
+        },
+        "evidence": "synthetic_program_state"
+      }
+    ],
+    "selected_samples": [
+      "Sample01",
+      "Sample02",
+      "Sample03"
+    ],
+    "owners": {
+      "Sample01": "rack",
+      "Sample02": "rack",
+      "Sample03": "rack",
+      "Sample04": "rotor",
+      "Sample05": "rotor",
+      "Sample06": "rotor",
+      "Sample07": "rotor",
+      "Sample08": "rotor",
+      "Sample09": "rotor",
+      "Sample10": "rotor",
+      "Sample11": "rotor",
+      "Sample12": "rotor"
+    },
+    "final_station": {
+      "lid": "closed",
+      "lid_locked": true,
+      "lid_angle_deg": 0.0,
+      "latch_positions_mm": [
+        0.0,
+        0.0
+      ],
+      "indexed_slot": 3,
+      "encoder_deg": -60.0,
+      "index_confirmed": true,
+      "brake_held": true,
+      "lift_mm": 0.0,
+      "robot_clear": true
+    },
+    "source_files_sha256": {
+      "model/cf01-open-lid-index.protocol.json": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f",
+      "model/cf01-open-lid-index.schema.json": "0022c4ce4ff170b991a4d61fda1f068e29184e94b72f06aeb8e264d7e3ce3fb3",
+      "scripts/cf01_open_lid_index.py": "c1049b5b38e156518ef75484c25f34fa75ee145860ef2f0168300ca53106553d",
+      "scripts/centrifuge_control.py": "61bf739416f92f991318f371de8b557deacfe2e0d5c00f74afb15d07e8c5bb18",
+      "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+    },
+    "program_semantic_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1",
+    "synthetic_owner_heartbeats": 70,
+    "watchdog_tested": false,
+    "clock": "Logical program event clock; injected synthetic heartbeats only retain mock ownership",
+    "limits": "Synthetic predicate replay only; no physical observations, timing qualification, transport binding or safety proof",
+    "program_file": "exports/generated/cf01-continuous-program-dced269cf0b0/program.json",
+    "program_file_sha256": "6ad3641919251dbead356af3bf226f4658ee7f2639f434a748f798d780e948ed",
+    "program_source_files_sha256": {
+      "model/cf01-unload-demo.motion.json": "dced269cf0b0b909bb12dee0e11c0f5bdabb1938bb8d793e63acbd96fffe47bd",
+      "model/cf01-unload-demo.schema.json": "08c16e155e50bb744eae3b720eb665f2512cac87d76265cfa94dc082edf627af",
+      "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+      "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+      "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+      "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+      "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+      "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+      "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+      "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "scripts/cf01_unload_motion.py": "efa33b3bc96065afdec9636f43bf1a9d1733d1424da1a7501e1624a81ed865b9",
+      "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+      "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+      "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+      "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+      "scripts/cf01_rack_batch.py": "5789ae91ae4ceada2b359bc214e62dd802d2fab08a4177bbcb061f12388d9c07",
+      "scripts/export_centrifuge_robot_pickup_ros2.py": "8b5652f3fa430bd49f996b567d3be4d84b729379e8bc3a0c47c61db6824c58f7",
+      "scripts/cf01_unload_path.py": "61a0f5b8a1b09f2c531ea96a32ebb84d70d2857645275398823d69b7aa4635d5",
+      "model/cf01-open-lid-index.protocol.json": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f",
+      "model/cf01-open-lid-index.schema.json": "0022c4ce4ff170b991a4d61fda1f068e29184e94b72f06aeb8e264d7e3ce3fb3",
+      "scripts/cf01_open_lid_index.py": "c1049b5b38e156518ef75484c25f34fa75ee145860ef2f0168300ca53106553d"
+    },
+    "program_sources_current": true
+  },
+  "checks": {
+    "targeted_motion_ros_opt_in_tests": {
+      "modules": [
+        "test_smooth_motion",
+        "test_motion_accuracy",
+        "test_adaptive_motion_bounds",
+        "test_cf01_open_lid_index",
+        "test_cf01_unload_build",
+        "test_cf01_unload_motion",
+        "test_cf01_unload_native_contracts",
+        "test_cf01_unload_path",
+        "test_cf01_unload_ros2",
+        "test_cf01_unload_validation",
+        "test_centrifuge_robot_pickup_ros2"
+      ],
+      "tests": 145,
+      "passed": 145,
+      "skipped": 0,
+      "unresolved": 0,
+      "source_log": "tmp/cf01-continuous-full-tests.log",
+      "interpretation": "Completed whole-suite result has no FAIL/ERROR/skip for these test identifiers; two status lines contain unrelated ResourceWarning/native diagnostic output."
+    },
+    "whole_suite": {
+      "run": 729,
+      "failures": 3,
+      "errors": 23,
+      "skipped": 22,
+      "passed": false,
+      "log": {
+        "path": "tmp/cf01-continuous-full-tests.log",
+        "sha256": "c9ed8e8d7b0e1fc84d39cb02d9b4887f5c569f6868583358642ce64a47690123",
+        "bytes": 167429
+      }
+    },
+    "loopback_retry": {
+      "run": 33,
+      "passed": true,
+      "skipped": 0,
+      "log": {
+        "path": "tmp/cf01-continuous-loopback-retry.log",
+        "sha256": "d1d8bee8d339c38a984112d59cce4a92f44af39d03aa2a9d77f1ca959fbcbc14",
+        "bytes": 5696
+      },
+      "scope": "Separate retry outside sandbox resolves localhost bind denials and the affected server-start assertion; no real instrument communication."
+    },
+    "remaining_repository_findings": {
+      "native_cache_failures": [
+        "test_analytics_concept.AnalyticalNativeEvidenceTests.test_current_native_models_and_geometry_evidence",
+        "test_synthetic_lab_scene.SyntheticLabBuildEvidenceTests.test_both_cads_and_added_device_clearances_match_current_sources"
+      ],
+      "gallery_check_passed": false,
+      "gallery_missing_sources": [
+        "model/lab-glassware.shared.json",
+        "model/lab-equipment.shared.json"
+      ],
+      "details": {
+        "base_commit": "fa8de73187c6ce068b25ca222cca5393977f100e",
+        "analytics_cached_report": "cad/two-arm-analytics/shared-build-report.json",
+        "analytics_mismatches": [
+          {
+            "path": "scripts/cf01_collision_scope.py",
+            "cached_sha256": "2e6a5516e1a21e7f95f5b6c4b5ca34edba949f248e1aac78fadea3aeff1d2ab5",
+            "current_sha256": "9c5ef5a889a03b4e1a3503a27d3e21088c396c03e6fca7ea31ce4a29b6dfdd87",
+            "head_sha256": "9c5ef5a889a03b4e1a3503a27d3e21088c396c03e6fca7ea31ce4a29b6dfdd87",
+            "worktree_matches_HEAD": true
+          },
+          {
+            "path": "cad/synthetic-lab-scene/shared-build-report.json",
+            "cached_sha256": "5b10f90ed9e615bfe8ab1e223ad9b94ab3423209c17a0373bc1ab5f6c6c2e850",
+            "current_sha256": "a3849ab577470024efa1bdd257d6cde80f122e053dc67d93bf5722bb34a94e5d",
+            "head_sha256": null,
+            "worktree_matches_HEAD": false
+          },
+          {
+            "path": "cad/nanodrop-concept/shared-build-report.json",
+            "cached_sha256": "31d62a3e9171e65d2ad8420909856648e8fd2aaea5d17217a278ad81033444c2",
+            "current_sha256": "6ed0d42ccd12757e19d5a1e1b49180b6a7078e98fe572c20d58f775c9f61d1ae",
+            "head_sha256": null,
+            "worktree_matches_HEAD": false
+          },
+          {
+            "path": "cad/qubit-4-concept/shared-build-report.json",
+            "cached_sha256": "8b6aae61604f1ca1187696d0058a4f26fa2664d4e959b6b30e39d073936a5e54",
+            "current_sha256": "352fb5092d84a83bcc49e5d596871463b6f5b9db000289fc8a9cdbd0eddd1156",
+            "head_sha256": null,
+            "worktree_matches_HEAD": false
+          }
+        ],
+        "gallery_missing_sources": [
+          "model/lab-glassware.shared.json",
+          "model/lab-equipment.shared.json"
+        ],
+        "scope": "Separate cached native evidence and gallery coverage findings, outside the continuous CF01 motion source set."
+      }
+    },
+    "native": {
+      "passed": true,
+      "requested_frames": 10026,
+      "unique_states_checked": 9979,
+      "collisions": [],
+      "distance_failures": [],
+      "spacing": {
+        "maximum_body_bound_corner_step_mm": 1.9999999999999951,
+        "maximum_joint_rotor_or_lid_step_deg": 0.6367158151121828,
+        "maximum_time_step_s": 0.30000000000000426,
+        "all_channel_knots": 1722,
+        "event_times": 36,
+        "ownership_sides_checked": [
+          {
+            "time_s": 0.5769004050227916,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 12.015983042593975,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 13.290440581704042,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 13.890440581704041,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 16.31192790697962,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 17.840652732300335,
+            "maximum_body_corner_jump_mm": 5.865340917345583e-14
+          },
+          {
+            "time_s": 19.839626252392435,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 24.480721702883702,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 25.390722612883703,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 29.4519103528363,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 30.035646401469677,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 31.19634079039511,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 33.612549806492474,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 34.88700734560254,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 35.48700734560254,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 37.90849467087812,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 39.437219496198836,
+            "maximum_body_corner_jump_mm": 6.117641170904669e-14
+          },
+          {
+            "time_s": 41.43015492031736,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 46.34032224088422,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 47.25032315088422,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 51.01415932152449,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 51.597895370157865,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 52.756678961207236,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 55.17479877518066,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 56.44925631429073,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 57.04925631429073,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 59.47074363956631,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 60.99946846488702,
+            "maximum_body_corner_jump_mm": 6.084022174945858e-14
+          },
+          {
+            "time_s": 63.006632064619495,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 68.41007332484753,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 69.32007423484752,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 72.65727477843552,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 73.2410108270689,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 74.39706793018594,
+            "maximum_body_corner_jump_mm": 0.0
+          },
+          {
+            "time_s": 80.7591568724187,
+            "maximum_body_corner_jump_mm": 0.0
+          }
+        ],
+        "scope": "Actual quintics at all channel knots, event sides and recursive midpoints; discrete body-bound spacing, not continuous swept-volume proof."
+      },
+      "body_coverage": {
+        "total": 272,
+        "construction": 223,
+        "fixed_instruments": 45,
+        "nanodrop_swept_envelopes": 4,
+        "sample_bodies": [
+          "ClosedCap01",
+          "ClosedCap02",
+          "ClosedCap03",
+          "ClosedCap04",
+          "ClosedCap05",
+          "ClosedCap06",
+          "ClosedCap07",
+          "ClosedCap08",
+          "ClosedCap09",
+          "ClosedCap10",
+          "ClosedCap11",
+          "ClosedCap12",
+          "Tube01",
+          "Tube02",
+          "Tube03",
+          "Tube04",
+          "Tube05",
+          "Tube06",
+          "Tube07",
+          "Tube08",
+          "Tube09",
+          "Tube10",
+          "Tube11",
+          "Tube12"
+        ],
+        "nanodrop_envelopes": [
+          {
+            "id": "SYN.NanoDrop01.Lever.FullHingeEnvelope",
+            "minimum_mm": [
+              -518.3137085089874,
+              -114.50000000999997,
+              49.68629149101632
+            ],
+            "maximum_mm": [
+              -388.7291244542211,
+              -96.49999998999992,
+              177.04979987292987
+            ],
+            "hinge_interval_deg": [
+              0.0,
+              75.0
+            ]
+          },
+          {
+            "id": "SYN.NanoDrop01.FingerGrip.FullHingeEnvelope",
+            "minimum_mm": [
+              -490.4491843634177,
+              -119.00000000999997,
+              64.9999999900024
+            ],
+            "maximum_mm": [
+              -385.9999999900011,
+              -91.99999998999998,
+              180.72403448710457
+            ],
+            "hinge_interval_deg": [
+              0.0,
+              75.0
+            ]
+          },
+          {
+            "id": "SYN.NanoDrop01.UpperProbe.FullHingeEnvelope",
+            "minimum_mm": [
+              -473.6143348443395,
+              -107.90000000999999,
+              49.199999990002425
+            ],
+            "maximum_mm": [
+              -394.97678810960576,
+              -103.09999999,
+              167.05122278798666
+            ],
+            "hinge_interval_deg": [
+              0.0,
+              75.0
+            ]
+          },
+          {
+            "id": "SYN.NanoDrop01.UpperOpticalFace.FullHingeEnvelope",
+            "minimum_mm": [
+              -467.98168651107756,
+              -106.85000000999999,
+              49.19999999000243
+            ],
+            "maximum_mm": [
+              -396.0208915956734,
+              -104.14999998999998,
+              164.60055497006414
+            ],
+            "hinge_interval_deg": [
+              0.0,
+              75.0
+            ]
+          }
+        ],
+        "roles": [
+          "actuator_envelope",
+          "balanced_encoder_target_envelope",
+          "bistable_caliper_actuator_envelope",
+          "braking_resistor_envelope",
+          "camera_envelope",
+          "camera_mount",
+          "chamber_cover",
+          "closed_cap_envelope",
+          "concept_enclosure",
+          "concept_geometry",
+          "concept_structure",
+          "conservative_full_hinge_sweep",
+          "cord_connector_envelope",
+          "cover_grip",
+          "custom_station_landmark",
+          "drive_and_brake_chopper_envelope",
+          "earth_bond_envelope",
+          "earth_lead_envelope",
+          "ejector_contact_concept",
+          "encoder_readhead_envelope",
+          "flat_sample_surface",
+          "friction_pad_envelope",
+          "fuse_envelope",
+          "illustrative_display",
+          "illustrative_fluid",
+          "illustrative_gripper_body",
+          "illustrative_gripper_finger",
+          "illustrative_gripper_mount",
+          "illustrative_gripper_pad",
+          "illustrative_tube",
+          "interface",
+          "isolated_control_and_drive_envelope",
+          "lever_grip",
+          "lid_gearbox_envelope",
+          "lid_lock_actuator_envelope",
+          "lid_lock_pin",
+          "lid_motor_envelope",
+          "lid_motor_holding_brake_envelope",
+          "local_bench_envelope_not_a_furniture_design",
+          "locating_pin",
+          "lower_measurement_pedestal",
+          "marking",
+          "motor_bearing_envelope",
+          "motor_power_cable_envelope",
+          "motor_rotor_envelope",
+          "motor_stator_envelope",
+          "motor_terminal_envelope",
+          "mount_plate",
+          "parking_caliper_envelope",
+          "power_cable_envelope",
+          "power_entry_envelope",
+          "powered_lid_lock_housing",
+          "rack_orientation_marker",
+          "rack_structure",
+          "sample_chamber",
+          "sample_chamber_rim",
+          "sampling_lever",
+          "sensor_signal_cable_envelope",
+          "spindle_bearing_envelope",
+          "steel_brake_support",
+          "steel_chamber_floor",
+          "steel_chamber_wall",
+          "steel_floor_support",
+          "steel_hinge_bearing_housing",
+          "steel_hinge_support",
+          "steel_housing",
+          "steel_lid",
+          "steel_lid_drive_support",
+          "steel_lid_hinge_arm",
+          "steel_lid_hinge_shaft",
+          "steel_lid_lock_support",
+          "steel_lid_output_coupling",
+          "steel_lid_strike",
+          "steel_motor_mount",
+          "steel_sensor_support",
+          "strain_relief_envelope",
+          "structure",
+          "surface_marking_visual_only",
+          "switch_envelope",
+          "tube_shape_reference",
+          "unqualified_brake_disc",
+          "unqualified_rotor",
+          "unselected_spindle",
+          "upper_measurement_probe",
+          "upper_sample_surface",
+          "vendor_housing",
+          "vendor_output"
+        ]
+      },
+      "coverage": [
+        "complete source-bound native arm and tool",
+        "all twelve distinct tubes and caps versus rotor, frame, lid, rack, neighbors and robot",
+        "all occupied rack positions remain obstacles",
+        "fixed source-selected NanoDrop and Qubit native bodies",
+        "conservative NanoDrop MovingArm envelopes over its entire source-defined hinge interval"
+      ],
+      "exclusions": [
+        "within each rigid station or robot assembly; adjacent arm joints; flange/tool mounting interface; internal gripper assembly",
+        "same-vessel tube/cap designed interface",
+        "only active sample tube versus the two intended pads, through release",
+        "Rack.Base top-plane contact only within the explicit 0.001 mm native-intersection boundary tolerance"
+      ],
+      "minimum_robot_equipment_distance_lower_bound_mm": 5.001474293165899,
+      "moving_station_clearance": {
+        "required_mm": 5.0,
+        "windows": [
+          {
+            "id": "station_motion_001",
+            "start_s": 0.0,
+            "end_s": 0.5769004050227916,
+            "changed_coordinates": [
+              "BrakeUpper",
+              "BrakeLower"
+            ],
+            "station_groups": [
+              "BrakePadLowerGroup",
+              "BrakePadUpperGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 203.80060182381555,
+            "nearest_pair": {
+              "a": "BrakePadLower",
+              "b": "Arm.Base_plate",
+              "time_s": 0.2884502025113958,
+              "phase": "station_index",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 200,
+            "exact_distance_tests": 0,
+            "frames": 18
+          },
+          {
+            "id": "station_motion_002",
+            "start_s": 0.5769004050227916,
+            "end_s": 1.3669011950227916,
+            "changed_coordinates": [
+              "LatchLeft",
+              "LatchRight"
+            ],
+            "station_groups": [
+              "LatchLeftGroup",
+              "LatchRightGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 116.76819338681317,
+            "nearest_pair": {
+              "a": "LidLockPinLeft",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 0.5769004050227916,
+              "phase": "station_index",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 820,
+            "exact_distance_tests": 0,
+            "frames": 42
+          },
+          {
+            "id": "station_motion_003",
+            "start_s": 1.3669011950227916,
+            "end_s": 12.015983042593975,
+            "changed_coordinates": [
+              "Lid"
+            ],
+            "station_groups": [
+              "LidGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 5.796385768488989,
+            "nearest_pair": {
+              "a": "CommandLid",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 2.1932312566689083,
+              "phase": "station_open_lid",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 10370,
+            "exact_distance_tests": 0,
+            "frames": 1038
+          },
+          {
+            "id": "station_motion_004",
+            "start_s": 12.015983042593975,
+            "end_s": 12.615983642593974,
+            "changed_coordinates": [
+              "Lift"
+            ],
+            "station_groups": [
+              "EjectorGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 177.9958760216536,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 12.615983642593974,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 190,
+            "exact_distance_tests": 0,
+            "frames": 20
+          },
+          {
+            "id": "station_motion_005",
+            "start_s": 12.615983642593974,
+            "end_s": 13.290440581704042,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 150.90922302522526,
+            "nearest_pair": {
+              "a": "Tube01",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 13.290440581704042,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 660,
+            "exact_distance_tests": 0,
+            "frames": 34
+          },
+          {
+            "id": "station_motion_006",
+            "start_s": 24.480721702883702,
+            "end_s": 25.390722612883703,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 164.05935899019644,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 24.480721702883702,
+              "phase": "station_confirm_removed_confirmed",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 1133,
+            "exact_distance_tests": 0,
+            "frames": 105
+          },
+          {
+            "id": "station_motion_007",
+            "start_s": 30.035646401469677,
+            "end_s": 30.324096603981072,
+            "changed_coordinates": [
+              "BrakeUpper",
+              "BrakeLower"
+            ],
+            "station_groups": [
+              "BrakePadLowerGroup",
+              "BrakePadUpperGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 203.65903913554342,
+            "nearest_pair": {
+              "a": "BrakePadUpper",
+              "b": "Arm.J2_rotating_hub",
+              "time_s": 30.035646401469677,
+              "phase": "rack_support_confirmed",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 800,
+            "exact_distance_tests": 0,
+            "frames": 40
+          },
+          {
+            "id": "station_motion_008",
+            "start_s": 30.324096603981072,
+            "end_s": 33.324099603981075,
+            "changed_coordinates": [
+              "Rotor"
+            ],
+            "station_groups": [
+              "PresentedTube",
+              "RotorGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 39.784086019578275,
+            "nearest_pair": {
+              "a": "MotorRotor",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 32.25800338951846,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 83400,
+            "exact_distance_tests": 0,
+            "frames": 696
+          },
+          {
+            "id": "station_motion_009",
+            "start_s": 33.324099603981075,
+            "end_s": 33.612549806492474,
+            "changed_coordinates": [
+              "BrakeUpper",
+              "BrakeLower"
+            ],
+            "station_groups": [
+              "BrakePadLowerGroup",
+              "BrakePadUpperGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 203.80060182381555,
+            "nearest_pair": {
+              "a": "BrakePadLower",
+              "b": "Arm.Base_plate",
+              "time_s": 33.324099603981075,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 180,
+            "exact_distance_tests": 0,
+            "frames": 10
+          },
+          {
+            "id": "station_motion_010",
+            "start_s": 33.612549806492474,
+            "end_s": 34.212550406492475,
+            "changed_coordinates": [
+              "Lift"
+            ],
+            "station_groups": [
+              "EjectorGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 177.99587602200432,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 34.212550406492475,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 190,
+            "exact_distance_tests": 0,
+            "frames": 20
+          },
+          {
+            "id": "station_motion_011",
+            "start_s": 34.212550406492475,
+            "end_s": 34.88700734560254,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 141.9079275535767,
+            "nearest_pair": {
+              "a": "Tube02",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 34.88700734560254,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 660,
+            "exact_distance_tests": 0,
+            "frames": 34
+          },
+          {
+            "id": "station_motion_012",
+            "start_s": 46.34032224088422,
+            "end_s": 47.25032315088422,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 166.69508847148865,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 46.34032224088422,
+              "phase": "station_confirm_removed_confirmed",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 1067,
+            "exact_distance_tests": 0,
+            "frames": 99
+          },
+          {
+            "id": "station_motion_013",
+            "start_s": 51.597895370157865,
+            "end_s": 51.88634557266926,
+            "changed_coordinates": [
+              "BrakeUpper",
+              "BrakeLower"
+            ],
+            "station_groups": [
+              "BrakePadLowerGroup",
+              "BrakePadUpperGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 189.75433905210986,
+            "nearest_pair": {
+              "a": "BrakePadUpper",
+              "b": "Arm.J2_rotating_hub",
+              "time_s": 51.597895370157865,
+              "phase": "rack_support_confirmed",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 800,
+            "exact_distance_tests": 0,
+            "frames": 40
+          },
+          {
+            "id": "station_motion_014",
+            "start_s": 51.88634557266926,
+            "end_s": 54.88634857266926,
+            "changed_coordinates": [
+              "Rotor"
+            ],
+            "station_groups": [
+              "PresentedTube",
+              "RotorGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 18.238890089636712,
+            "nearest_pair": {
+              "a": "MotorRotor",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 53.73748995090453,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 75570,
+            "exact_distance_tests": 0,
+            "frames": 688
+          },
+          {
+            "id": "station_motion_015",
+            "start_s": 54.88634857266926,
+            "end_s": 55.17479877518066,
+            "changed_coordinates": [
+              "BrakeUpper",
+              "BrakeLower"
+            ],
+            "station_groups": [
+              "BrakePadLowerGroup",
+              "BrakePadUpperGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 203.80060182381555,
+            "nearest_pair": {
+              "a": "BrakePadLower",
+              "b": "Arm.Base_plate",
+              "time_s": 54.88634857266926,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 180,
+            "exact_distance_tests": 0,
+            "frames": 10
+          },
+          {
+            "id": "station_motion_016",
+            "start_s": 55.17479877518066,
+            "end_s": 55.77479937518066,
+            "changed_coordinates": [
+              "Lift"
+            ],
+            "station_groups": [
+              "EjectorGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 177.99587602195905,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 55.77479937518066,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 190,
+            "exact_distance_tests": 0,
+            "frames": 20
+          },
+          {
+            "id": "station_motion_017",
+            "start_s": 55.77479937518066,
+            "end_s": 56.44925631429073,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 143.48519549214828,
+            "nearest_pair": {
+              "a": "Tube03",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 56.44925631429073,
+              "phase": "station_present_tube",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 660,
+            "exact_distance_tests": 0,
+            "frames": 34
+          },
+          {
+            "id": "station_motion_018",
+            "start_s": 68.41007332484753,
+            "end_s": 69.32007423484752,
+            "changed_coordinates": [
+              "Lift",
+              "TubeLift"
+            ],
+            "station_groups": [
+              "EjectorGroup",
+              "PresentedTube"
+            ],
+            "minimum_distance_lower_bound_mm": 173.72603453845824,
+            "nearest_pair": {
+              "a": "RetractablePusher",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 68.41007332484753,
+              "phase": "station_confirm_removed_confirmed",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 1155,
+            "exact_distance_tests": 0,
+            "frames": 107
+          },
+          {
+            "id": "station_motion_019",
+            "start_s": 69.32007423484752,
+            "end_s": 79.9691560824187,
+            "changed_coordinates": [
+              "Lid"
+            ],
+            "station_groups": [
+              "LidGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 5.796385768949506,
+            "nearest_pair": {
+              "a": "CommandLid",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 76.22267268228687,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 14411,
+            "exact_distance_tests": 0,
+            "frames": 1405
+          },
+          {
+            "id": "station_motion_020",
+            "start_s": 79.9691560824187,
+            "end_s": 80.7591568724187,
+            "changed_coordinates": [
+              "LatchLeft",
+              "LatchRight"
+            ],
+            "station_groups": [
+              "LatchLeftGroup",
+              "LatchRightGroup"
+            ],
+            "minimum_distance_lower_bound_mm": 116.76819338713044,
+            "nearest_pair": {
+              "a": "LidLockPinLeft",
+              "b": "Arm.Bare_tool_flange",
+              "time_s": 79.9691560824187,
+              "phase": "arm_withdrawn",
+              "method": "aabb_lower_bound"
+            },
+            "bound_tests": 820,
+            "exact_distance_tests": 0,
+            "frames": 42
+          }
+        ],
+        "coverage": [
+          "all arm links",
+          "complete tool",
+          "currently carried tube and cap"
+        ],
+        "moving_groups": "All actual nonconstant station coordinates and descendants; rotor-owned samples move with Rotor; only active rotor-owned sample follows TubeLift.",
+        "window_source": "Recomputed from actual station PVA polynomials, including index, lift, brakes, latches and final lid movement."
+      },
+      "scope": "Adaptive discrete native BRep intersections and conservative distance lower bounds, with exact BRep refinement below required margins. Actual C2 quintics, all knots and event sides; no continuous swept-volume, hardware, biology or safety qualification. Qubit stays in its source-selected frozen cover pose; NanoDrop full hinge envelopes conservatively overestimate actual occupied volume."
+    },
+    "browser": {
+      "passed": true,
+      "python_browser_transform_checks": 112,
+      "python_browser_joint_velocity_checks": 112,
+      "loaded_interior_times_per_transfer": 3,
+      "sample_count": 12,
+      "rack_count": 3,
+      "rotor_count": 9,
+      "lift_checks": [
+        {
+          "sample_id": "Sample01",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        },
+        {
+          "sample_id": "Sample02",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        },
+        {
+          "sample_id": "Sample03",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        }
+      ],
+      "languages": [
+        "de",
+        "en"
+      ],
+      "widths": [
+        320,
+        600,
+        1000
+      ],
+      "console_errors": []
+    },
+    "browser_report": {
+      "path": "renders/cf01-unload-smooth-dced269cf0b0/browser-validation.json",
+      "sha256": "698af05e0aedb4b35dc70bde6137815a7d5fc4d2d1f599c6c521484f8a9fac52",
+      "bytes": 744
+    },
+    "video_decode": {
+      "passed": true,
+      "duration_s": 44.999358,
+      "width": 920,
+      "height": 490,
+      "decoded_frame_times_s": [
+        5,
+        12,
+        20,
+        27,
+        36,
+        44.8
+      ]
+    },
+    "schema": {
+      "passed": true,
+      "sources": [
+        "model/cf01-unload-demo.motion.json",
+        "model/cf01-open-lid-index.protocol.json"
+      ],
+      "draft": "2020-12"
+    }
+  },
+  "ros_arm_program": {
+    "path": "exports/generated/cf01-unload-ros2/scenarios.json",
+    "sha256": "d0d0cd626556cedb456fe6632c105c1f39100ed83272672c8fc52c13ae04e426",
+    "bytes": 1234951,
+    "scenario": "cf01_unload_three_samples",
+    "pva_knots": 1565,
+    "duration_s": 80.759156872,
+    "canonical_program_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1",
+    "nanosecond_quantization": {
+      "passed": true,
+      "maximum_knot_shift_s": 4.999236580260913e-10,
+      "maximum_error_bounds": {
+        "positions_rad": 9.945434999248707e-10,
+        "velocities_rad_s": 1.975324228737578e-09,
+        "accelerations_rad_s2": 1.9199797344696284e-08
+      },
+      "tolerances": {
+        "positions_rad": 1e-07,
+        "velocities_rad_s": 1e-06,
+        "accelerations_rad_s2": 1e-05
+      },
+      "knot_values": "Interior P/V/A evaluated at rounded reference times; exact rest endpoint jets retained",
+      "method": "Numerical polynomial extrema of normalized quintic differences plus knot-shift/global derivative bounds; actual wire extrema checked independently"
+    },
+    "dry_run": {
+      "path": "exports/generated/cf01-unload-ros2/dry-run.json",
+      "sha256": "7e36a3c1117dc7ed2c2d324a55d9c047c289cd49aecdd83d8b4125819bff11e7",
+      "bytes": 1143205
+    },
+    "verification": {
+      "ros_runtime": false,
+      "hardware_execution": false,
+      "integrated_CF01_cycle": false,
+      "biological_tolerance": false
+    },
+    "robot_description_requirements": {
+      "robot_source": "model/robot.json",
+      "robot_source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "parameter_overrides_mm": {
+        "upper_len": 280,
+        "fore_len": 250
+      },
+      "base_position_m": [
+        -0.33,
+        0.08,
+        0.0
+      ],
+      "base_yaw_rad": -0.8726646259971648,
+      "tcp_parent_link": "l6_bareflange",
+      "tcp_position_in_parent_m": [
+        0.0,
+        0.0,
+        0.071
+      ],
+      "compatibility_verified": false,
+      "compatibility_check": "Required before execution; not performed by the trajectory client"
+    },
+    "interpolation": {
+      "method": "quintic",
+      "controller_interpolation": "splines",
+      "live_configuration_verified": false,
+      "requirement": "The running joint_trajectory_controller must use spline interpolation for P/V/A knots; not inspected by this client"
+    }
+  },
+  "capture": {
+    "input": "/Users/u005069/GitHub/DIYLabBot/docs/media/robot-demo-smooth-batch.html",
+    "video": "/Users/u005069/GitHub/DIYLabBot/docs/media/robot-demo-smooth-batch.mp4",
+    "screenshot": "/Users/u005069/GitHub/DIYLabBot/docs/media/robot-demo-smooth-batch.png",
+    "source_scene_sha256": "b33c1ede631ecb071ee480898ab2821a92d2676a5f4d085096efced2737902c1",
+    "source_duration_s": 80.7591568724187,
+    "video_target_duration_s": 45,
+    "screenshot_time_s": 34.98700734560254,
+    "mime": "video/mp4;codecs=avc1.42001f",
+    "frames": 901,
+    "ownership_checks": [
+      {
+        "time_s": 17.830652732300333,
+        "owner": "rotor",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 17.840652732300335,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 29.4419103528363,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 29.4519103528363,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 80.7591568724187,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 39.42721949619884,
+        "owner": "rotor",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 39.437219496198836,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 51.00415932152449,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 51.01415932152449,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 80.7591568724187,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 60.989468464887025,
+        "owner": "rotor",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 60.99946846488702,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 72.64727477843552,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 72.65727477843552,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 80.7591568724187,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      }
+    ],
+    "states": [
+      {
+        "currentTime": "0.000",
+        "lidAngle": "0.000",
+        "tubeOwner": "station",
+        "robotClear": "true",
+        "activeSample": "Sample01",
+        "sampleOwners": "{\"Sample01\":\"rotor\",\"Sample02\":\"rotor\",\"Sample03\":\"rotor\",\"Sample04\":\"rotor\",\"Sample05\":\"rotor\",\"Sample06\":\"rotor\",\"Sample07\":\"rotor\",\"Sample08\":\"rotor\",\"Sample09\":\"rotor\",\"Sample10\":\"rotor\",\"Sample11\":\"rotor\",\"Sample12\":\"rotor\"}",
+        "liftMm": "0.000000",
+        "rotorAngle": "0.000000",
+        "sourceTimeS": 0
+      },
+      {
+        "currentTime": "20.190",
+        "lidAngle": "105.000",
+        "tubeOwner": "gripper",
+        "robotClear": "false",
+        "activeSample": "Sample01",
+        "sampleOwners": "{\"Sample01\":\"gripper\",\"Sample02\":\"rotor\",\"Sample03\":\"rotor\",\"Sample04\":\"rotor\",\"Sample05\":\"rotor\",\"Sample06\":\"rotor\",\"Sample07\":\"rotor\",\"Sample08\":\"rotor\",\"Sample09\":\"rotor\",\"Sample10\":\"rotor\",\"Sample11\":\"rotor\",\"Sample12\":\"rotor\"}",
+        "liftMm": "16.000000",
+        "rotorAngle": "0.000000",
+        "sourceTimeS": 20.189789218104675
+      },
+      {
+        "currentTime": "40.380",
+        "lidAngle": "105.000",
+        "tubeOwner": "gripper",
+        "robotClear": "false",
+        "activeSample": "Sample02",
+        "sampleOwners": "{\"Sample01\":\"rack\",\"Sample02\":\"gripper\",\"Sample03\":\"rotor\",\"Sample04\":\"rotor\",\"Sample05\":\"rotor\",\"Sample06\":\"rotor\",\"Sample07\":\"rotor\",\"Sample08\":\"rotor\",\"Sample09\":\"rotor\",\"Sample10\":\"rotor\",\"Sample11\":\"rotor\",\"Sample12\":\"rotor\"}",
+        "liftMm": "16.000000",
+        "rotorAngle": "-30.000000",
+        "sourceTimeS": 40.37957843620935
+      },
+      {
+        "currentTime": "60.569",
+        "lidAngle": "105.000",
+        "tubeOwner": "station",
+        "robotClear": "false",
+        "activeSample": "Sample03",
+        "sampleOwners": "{\"Sample01\":\"rack\",\"Sample02\":\"rack\",\"Sample03\":\"rotor\",\"Sample04\":\"rotor\",\"Sample05\":\"rotor\",\"Sample06\":\"rotor\",\"Sample07\":\"rotor\",\"Sample08\":\"rotor\",\"Sample09\":\"rotor\",\"Sample10\":\"rotor\",\"Sample11\":\"rotor\",\"Sample12\":\"rotor\"}",
+        "liftMm": "16.000000",
+        "rotorAngle": "-60.000000",
+        "sourceTimeS": 60.56936765431402
+      },
+      {
+        "currentTime": "80.759",
+        "lidAngle": "0.000",
+        "tubeOwner": "rack",
+        "robotClear": "true",
+        "activeSample": "Sample03",
+        "sampleOwners": "{\"Sample01\":\"rack\",\"Sample02\":\"rack\",\"Sample03\":\"rack\",\"Sample04\":\"rotor\",\"Sample05\":\"rotor\",\"Sample06\":\"rotor\",\"Sample07\":\"rotor\",\"Sample08\":\"rotor\",\"Sample09\":\"rotor\",\"Sample10\":\"rotor\",\"Sample11\":\"rotor\",\"Sample12\":\"rotor\"}",
+        "liftMm": "0.000000",
+        "rotorAngle": "-60.000000",
+        "sourceTimeS": 80.7591568724187
+      }
+    ],
+    "errors": []
+  },
+  "historical_media_sha256": {
+    "docs/media/provenance.json": "80e954c9b2b7a4a16ee40f280382e0a134702b9edcefa6d01b6d267e45e5160c",
+    "docs/media/robot-demo-overlap.html": "fe6798b434e4dc0ff74d0ede4074fc711a184bcf52f29db728954b22c45a6d62",
+    "docs/media/robot-demo-overlap.mp4": "f53f06fba151f02b43ced3f840bd4f6426bd7169a5251f2ed76df058f58c855a",
+    "docs/media/robot-demo-overlap.png": "afdc480fe67f1c08538d8ba42f5f1ac33df654b1707399cc335183e5145716aa",
+    "docs/media/robot-demo-overlap.provenance.json": "7d2804ab49d745d5d51094b7ac2666871c76e24bb61730566731292d5e854c05",
+    "docs/media/robot-demo.html": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
+    "docs/media/robot-demo.mp4": "da38a7eab9617bc4c47d9c1edd2616cbf39c94e42ea8f24d0ee95169e3143d5e",
+    "docs/media/robot-demo.png": "6cf417bf6bdea2d37fb90368eb3fc20ebc869bc96892c20d6b6170a52656943e"
+  },
+  "historical_solidcraft_limit": "The original full STEP import left rotor and five servo housings open and failed strict overall validation. Historical media provenance remains unchanged; later independent SolidCraft static poses are not a new native motion study.",
+  "limitations": [
+    "Synthetic provisional limits; biological_tolerance is null. No fluid, pellet, grip force, drive/load, resonance or shared-bench vibration qualification.",
+    "No global time-optimality claim; adaptive conservative numerical intervals are not a formal floating-point certificate.",
+    "Native adaptive discrete BRep checking is not a continuous swept-volume certificate, live collision control or safety qualification.",
+    "Opt-in open-lid indexing has no standard Simulator, MockProtocol, ROS, SiLA, batch-runner or combined-workflow binding. Existing index/start contracts remain unchanged.",
+    "Replay uses synthetic program-state observations, future latch confirmations and injected logical heartbeats; no measured sensor, command duration or watchdog evidence.",
+    "The arm program has no station/sensor-dependent abort or recovery branch. Gripper/station control is not included in the ROS arm export.",
+    "ROS data export and dry-run only; live spline configuration, robot-model compatibility, ROS runtime and hardware execution remain unverified.",
+    "No transporter, native loading path, physical spin, hardware quality feedback or new native SolidCraft motion study.",
+    "Motion time, old batch-test time and accelerated video time are distinct. Only the default three-sample prefix was executed and checked.",
+    "Whole-repository checks retain the recorded unrelated cached evidence and gallery gaps; skipped tests are not counted as passed."
+  ]
+}

@@ -28,6 +28,24 @@ def source_hashes(scene):
     return {str(path.relative_to(pickup.ROOT)):pickup.robot.digest(path) for path in paths}
 
 
+def robot_description_requirements(scene,arm=None,robot_sha256=None):
+    """Share variant/fixture/TCP metadata without evaluating a motion program."""
+    arm=arm or pickup.arm_source(scene)
+    fixture=scene['arm_fixture'];kin=pickup.Kinematics(arm,scene)
+    flange_link=arm['flange_reference']['link']
+    flange_frame=pickup.robot.frame(next(joint for joint in arm['joints'] if joint['child']==flange_link),pickup.robot.parameters(arm))
+    # URDF link origins are joint frames, not the source construction origin.
+    tcp=pickup.robot.transform(pickup.robot.inverse(flange_frame),[kin.flange[0],kin.flange[1],kin.flange[2]+kin.length])
+    return {'robot_source':scene['sources']['robot'],
+            'robot_source_sha256':robot_sha256 or pickup.robot.digest(pickup.ROOT/scene['sources']['robot']),
+            'parameter_overrides_mm':copy.deepcopy(scene.get('robot_parameter_overrides_mm',{})),
+            'base_position_m':[value/1000 for value in fixture['position_mm']],
+            'base_yaw_rad':math.radians(fixture['yaw_deg']),
+            'tcp_parent_link':flange_link.lower(),'tcp_position_in_parent_m':[value/1000 for value in tcp],
+            'compatibility_verified':False,
+            'compatibility_check':'Required before execution; not performed by the trajectory client'}
+
+
 def configuration():
     """Preserve every source sample; validate with the existing client contract."""
     scene_digest=pickup.robot.digest(pickup.SOURCE)
@@ -38,11 +56,6 @@ def configuration():
     points=[{'time_s':sample['time_s'],
              'positions_rad':[math.radians(value) for value in sample['joints_deg']]}
             for sample in data['samples']]
-    fixture=scene['arm_fixture'];kin=pickup.Kinematics(arm,scene)
-    flange_link=arm['flange_reference']['link']
-    flange_frame=pickup.robot.frame(next(joint for joint in arm['joints'] if joint['child']==flange_link),pickup.robot.parameters(arm))
-    # URDF link origins are joint frames, not the source construction origin.
-    tcp=pickup.robot.transform(pickup.robot.inverse(flange_frame),[kin.flange[0],kin.flange[1],kin.flange[2]+kin.length])
     config={'joint_names':[joint['id'].lower() for joint in arm['joints']],
             'limits_rad':[[math.radians(value) for value in joint['limits_deg']] for joint in arm['joints']],
             'scenarios':[{'id':SCENARIO,'points':points}],
@@ -53,16 +66,7 @@ def configuration():
             'exporter_sha256':pickup.robot.digest(Path(__file__)),
             'included_channels':['six_arm_joints'],
             'excluded_channels':['gripper','CF01 station commands','live collision, sensor and quality feedback'],
-            'robot_description_requirements':{
-                'robot_source':scene['sources']['robot'],
-                'robot_source_sha256':data['robot_sha256'],
-                'parameter_overrides_mm':copy.deepcopy(scene.get('robot_parameter_overrides_mm',{})),
-                'base_position_m':[value/1000 for value in fixture['position_mm']],
-                'base_yaw_rad':math.radians(fixture['yaw_deg']),
-                'tcp_parent_link':flange_link.lower(),
-                'tcp_position_in_parent_m':[value/1000 for value in tcp],
-                'compatibility_verified':False,
-                'compatibility_check':'Required before execution; not performed by the trajectory client'},
+            'robot_description_requirements':robot_description_requirements(scene,arm,data['robot_sha256']),
             'verification':{'ros_runtime':False,'hardware_execution':False,
                             'integrated_CF01_cycle':False}}
     if source_hashes(scene)!=before:raise ValueError('Pickup sources changed during ROS export; retry from a stable source revision')
