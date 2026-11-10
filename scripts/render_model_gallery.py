@@ -336,6 +336,16 @@ def write_documentation():
     (DIRECTORY/'README.md').write_text(template.replace('__MODEL_GROUPS__','\n'.join(sections)),encoding='utf-8')
 
 
+def expected_model_sources():
+    # This exact format is a transport contract, not geometry. Unknown shared
+    # formats remain image-required so new models cannot silently lose coverage.
+    expected={str(p.relative_to(ROOT)) for p in (ROOT/'model').glob('*.shared.json')
+              if read(p).get('format')!='solidcraftbot.cf01-sila2/1'}|{'model/robot.json'}
+    for directory in ['environments','furniture','furnishings','equipment']:
+        expected|={str(p.relative_to(ROOT)) for p in (ROOT/'model'/directory).glob('*.json')}
+    return expected
+
+
 def check(require_review=True):
     catalog=read(CATALOG);provenance=read(PROVENANCE);records={r['id']:r for r in provenance['images']};covered=set()
     if len(records)!=len(provenance['images']):raise ValueError('Duplicate image identity')
@@ -357,9 +367,7 @@ def check(require_review=True):
             assert not any(e.tag.endswith('script') or e.tag.endswith('image') for e in svg.iter())
         if not (ROOT/entry['documentation']).is_file():raise ValueError('Broken documentation link')
         if entry['image'] not in page or any('../../'+s not in page for s in entry['sources']):raise ValueError('Model missing from gallery page')
-    expected={str(p.relative_to(ROOT)) for p in (ROOT/'model').glob('*.shared.json')}|{'model/robot.json'}
-    for directory in ['environments','furniture','furnishings','equipment']:
-        expected|={str(p.relative_to(ROOT)) for p in (ROOT/'model'/directory).glob('*.json')}
+    expected=expected_model_sources()
     if expected-covered:raise ValueError('Model source without image: '+str(sorted(expected-covered)))
     if total>4_000_000:raise ValueError('Curated gallery exceeds 4 MB image budget')
     if require_review and not provenance.get('visual_review',{}).get('passed'):raise ValueError('Visual review pending')
