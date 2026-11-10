@@ -1,0 +1,404 @@
+{
+  "format": "solidcraftbot.cf01-sila2/1",
+  "id": "CF01.SiLA2",
+  "journal_format": "solidcraftbot.cf01-intents/1",
+  "protocol": {
+    "source": "model/centrifuge-cf01.protocol.json",
+    "source_sha256": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+  },
+  "station": {
+    "source": "model/centrifuge-cf01.shared.json",
+    "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+  },
+  "feature": {
+    "identifier": "CentrifugeControl",
+    "originator": "org.solidcraftbot",
+    "category": "centrifugation",
+    "version": "2.0",
+    "sila_version": "1.1",
+    "locale": "en-us",
+    "maturity": "Draft"
+  },
+  "excluded_commands": [
+    "events",
+    "acquire",
+    "heartbeat",
+    "release"
+  ],
+  "command_errors": {
+    "status": [],
+    "rotation_feedback": [],
+    "stop": [
+      "DuplicateRequest",
+      "PersistenceFailure"
+    ],
+    "reset_fault": [
+      "Busy",
+      "DuplicateRequest",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "WorkspaceOccupied"
+    ],
+    "open_lid": [
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "LatchReleaseUnconfirmed",
+      "LidDriveFault",
+      "LidObstructed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "WorkspaceOccupied"
+    ],
+    "close_lid": [
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "LatchLockUnconfirmed",
+      "LidDriveFault",
+      "LidObstructed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "WorkspaceOccupied"
+    ],
+    "index": [
+      "BrakeReleaseUnconfirmed",
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "LidUnlocked",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "WorkspaceOccupied"
+    ],
+    "present_tube": [
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "EmptySlot",
+      "IndexMismatch",
+      "LidAccessFault",
+      "LidNotOpen",
+      "NotIndexed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "WorkspaceOccupied"
+    ],
+    "confirm_removed": [
+      "Busy",
+      "DuplicateRequest",
+      "IndexMismatch",
+      "InvalidState",
+      "LidAccessFault",
+      "LidNotOpen",
+      "NotIndexed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "UnconfirmedTransfer"
+    ],
+    "confirm_seated": [
+      "Busy",
+      "DuplicateRequest",
+      "IndexMismatch",
+      "LidAccessFault",
+      "LidNotOpen",
+      "NotIndexed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "UnconfirmedTransfer"
+    ],
+    "retract_lift": [
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "IndexMismatch",
+      "LidAccessFault",
+      "LidNotOpen",
+      "NotIndexed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "UnconfirmedTransfer",
+      "WorkspaceOccupied"
+    ],
+    "lower_tube": [
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "IndexMismatch",
+      "InvalidState",
+      "LidAccessFault",
+      "LidNotOpen",
+      "NotIndexed",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "UnconfirmedTransfer",
+      "WorkspaceOccupied"
+    ],
+    "start": [
+      "BrakeReleaseUnconfirmed",
+      "Busy",
+      "CommandCanceled",
+      "DuplicateRequest",
+      "InvalidLoad",
+      "LidUnlocked",
+      "LimitExceeded",
+      "NotStationary",
+      "OwnerTimeout",
+      "ParkingBrakeFault",
+      "PersistenceFailure",
+      "RecoveryRequired",
+      "RotationSensorFault",
+      "StaleFeedback",
+      "StaleRotationFeedback",
+      "TubeRaised",
+      "UnbalancedLoad",
+      "UnqualifiedAssembly",
+      "WorkspaceOccupied"
+    ]
+  },
+  "framework_error_mapping": {
+    "InvalidArgument": "ValidationError",
+    "UnknownCommand": "FrameworkError",
+    "UnexpectedBackendError": "UndefinedExecutionError",
+    "InvalidToken": "RecoveryRequired"
+  },
+  "parameters": {
+    "slot": {
+      "minimum": 1,
+      "maximum_reference": [
+        "rotor",
+        "slots"
+      ]
+    },
+    "rcf_x_g": {
+      "exclusive_minimum": 0,
+      "maximum_reference": [
+        "rotor",
+        "target_rcf_x_g"
+      ],
+      "unit": {
+        "label": "x g",
+        "factor": 1,
+        "components": [
+          [
+            "Dimensionless",
+            1
+          ]
+        ]
+      },
+      "meaning": "Dimensionless ratio to standard gravity, not a mass unit."
+    },
+    "duration_s": {
+      "exclusive_minimum": 0,
+      "unit": {
+        "label": "s",
+        "factor": 1,
+        "components": [
+          [
+            "Second",
+            1
+          ]
+        ]
+      }
+    },
+    "mass_g": {
+      "exclusive_minimum": 0,
+      "unit": {
+        "label": "g",
+        "factor": 0.001,
+        "components": [
+          [
+            "Kilogram",
+            1
+          ]
+        ]
+      }
+    }
+  },
+  "clock": {
+    "default_mode": "monotonic_realtime",
+    "default_rate": 1.0,
+    "test_mode": "injected_manual",
+    "publish_interval_s": 0.1,
+    "network_deadlines": "monotonic_wall_time"
+  },
+  "coordination": {
+    "standard_lock": "org.silastandard/core/LockController/v1",
+    "lock_expiry": "Controlled stop and latched process recovery; standard lock expiry never releases unresolved physical ownership.",
+    "request_identifier": "Required unique UUID metadata for each state-changing intent; duplicate intent never re-executes.",
+    "restart": "New boot ID; unresolved persisted intents require explicit reconciliation, never automatic job restart."
+  },
+  "simulation": {
+    "only_mode": "simulation",
+    "hardware_available": false,
+    "qualification_source": "model/cf01-rack-batch.protocol.json"
+  },
+  "standard_features": [
+    {
+      "identifier": "SiLAService",
+      "source": "interfaces/sila2/standard/SiLAService-v1_0.sila.xml",
+      "source_sha256": "4425f329c907bdb0ed757a9efc35fcc47d9caa7f2f8f6eecaf9842c1f9d674ec",
+      "upstream_path": "feature_definitions/org/silastandard/core/SiLAService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "LockController",
+      "source": "interfaces/sila2/standard/LockController-v1_0.sila.xml",
+      "source_sha256": "3d6b6499b024d802d8d13471239d88cad36e8a940b328f2f69a35609437247cb",
+      "upstream_path": "feature_definitions/org/silastandard/core/LockController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "CancelController",
+      "source": "interfaces/sila2/standard/CancelController-v1_0.sila.xml",
+      "source_sha256": "d1ac2002e1ff38f752debe59c667ebd2a9a6a65c0a11664643f83d33ad60a7e4",
+      "upstream_path": "feature_definitions/org/silastandard/core/commands/CancelController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "SimulationController",
+      "source": "interfaces/sila2/standard/SimulationController-v1_0.sila.xml",
+      "source_sha256": "f96abd91e60cef32cdf8d515665f5f3d53b9018d9f4799ceae7d81d86c04a543",
+      "upstream_path": "feature_definitions/org/silastandard/core/SimulationController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthenticationService",
+      "source": "interfaces/sila2/standard/AuthenticationService-v1_0.sila.xml",
+      "source_sha256": "d1c3752a23b56f0464bf1511d84e0a39f107c17290cba4568e0b6015b52dddb6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthenticationService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthorizationService",
+      "source": "interfaces/sila2/standard/AuthorizationService-v1_0.sila.xml",
+      "source_sha256": "cf7dd469fd034b1a32e14782853ff6cdd95af323dffc08a1887958d5cd73f3f6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthorizationService-v1_0.sila.xml"
+    }
+  ],
+  "presentation": {
+    "fdl_language": "en-us",
+    "operator_languages": [
+      "de",
+      "en"
+    ]
+  },
+  "network_batch": {
+    "source": "model/cf01-rack-batch.protocol.json",
+    "source_sha256": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "runner": "scripts/cf01_rack_batch.py",
+    "limitations": [
+      "Real TLS/gRPC against one synthetic station; no hardware spin or transporter execution",
+      "Robot handoffs are explicit synthetic observations, not native trajectories, physical scans or qualified sensor feedback",
+      "Masses and station qualification come from the fictitious batch fixture",
+      "Interrupted or uncertain client runs require explicit reconciliation; no automatic job or sample-ledger replay"
+    ]
+  },
+  "simulation_feature": {
+    "identifier": "SyntheticRobotObservation",
+    "version": "1.0",
+    "description": "Simulation-only robot access observations. No hardware feedback override, motion execution or physical identity verification. There is no network clock control.",
+    "command": "ObserveRobotAccess",
+    "events": ["begin_loading", "begin_removal", "withdraw"],
+    "parameters": [
+      {"name": "boot_id", "type": "string", "description": "Expected current station boot UUID."},
+      {"name": "observation_id", "type": "string", "description": "Unique UUID durably recorded before applying this synthetic observation."},
+      {"name": "actor_id", "type": "string", "description": "Authenticated operator asserting the synthetic observation."},
+      {"name": "sample_id", "type": "string", "description": "Echoed fixture identity, not a scan or sensor identification."},
+      {"name": "slot", "type": "int64", "description": "Selected rotor slot; must match the confirmed station index."},
+      {"name": "event", "type": "string", "description": "begin_loading, begin_removal or withdraw. Withdrawal requires matching access and completed station confirmation."}
+    ],
+    "errors": ["InvalidObservation", "DuplicateRequest", "RecoveryRequired", "PersistenceFailure"]
+  },
+  "state_fields": [
+    {
+      "name": "process_time_s",
+      "type": "float64",
+      "description": "Station process time in seconds from the current boot; the mock uses monotonic real time by default."
+    },
+    {
+      "name": "recovery_required",
+      "type": "bool",
+      "description": "Explicit reconciliation or fault recovery is required before further process motion."
+    },
+    {
+      "name": "clock_mode",
+      "type": "string",
+      "description": "monotonic_realtime or injected_manual; never a hardware timing claim."
+    },
+    {
+      "name": "run_phase",
+      "type": "string",
+      "description": "Current centrifuge core run phase, or idle. Success follows braking and confirmed standstill."
+    },
+    {
+      "name": "rotor_slots",
+      "type": "list",
+      "description": "Derived simulator slot observations, not a sample identity ledger or physical sensor evidence.",
+      "element": {
+        "type": "structure",
+        "fields": [
+          {"name": "slot", "type": "int64", "description": "One-based station slot."},
+          {"name": "present", "type": "bool", "description": "Simulated tube presence."},
+          {"name": "seated", "type": "bool", "description": "Simulated seated confirmation."},
+          {"name": "mass_valid", "type": "bool", "description": "Whether MassG contains a known simulated mass."},
+          {"name": "mass_g", "type": "float64", "description": "Simulated total tube mass in grams; zero is a placeholder only when MassValid is false."}
+        ]
+      }
+    }
+  ]
+}

@@ -34,6 +34,7 @@ def main():
         path.mkdir(parents=True)
     source_files = [*workspace.source_dependencies(spatial), pickup.SOURCE,
                     model.ROOT/'scripts/synthetic_lab_scene.py', Path(__file__),
+                    model.ROOT/'scripts/cf01_collision_scope.py',
                     model.ROOT/'scripts/build_synthetic_lab_scene_freecad.py',
                     model.ROOT/'scripts/instrument_concept.py', model.ROOT/'scripts/build_instrument_concepts.py',
                     model.ROOT/'scripts/build_tube_carrier.py', model.ROOT/'scripts/tube_carrier_model.py',
@@ -122,7 +123,11 @@ def main():
     for file in ['exports/generated/build-report.json', 'scripts/build_centrifuge_freecad.py',
                  *['cad/'+e['spec']['family']+'/shared-build-report.json' for e in entries]]:
         hashes[file] = robot.digest(model.ROOT/file)
+    from cf01_collision_scope import trajectory_signature
     report = {'format': 'solidcraftbot.synthetic-lab-scene/1',
+              'cf01_trajectory': {'path': str((out/'trajectory.json').relative_to(model.ROOT)),
+                                  'sha256': robot.digest(out/'trajectory.json'),
+                                  'semantic_sha256': trajectory_signature(data)},
               'passed': all(s['passed'] for s in snapshots+approach_checks) and context['instrument_reachability']['passed'] and instrument_motion['passed'],
               'workspace_source': str(workspace.SOURCE.relative_to(model.ROOT)),
               'workspace_sha256': robot.digest(workspace.SOURCE), 'source_files_sha256': hashes,

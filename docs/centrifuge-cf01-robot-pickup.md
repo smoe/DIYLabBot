@@ -187,6 +187,15 @@ Die Zuordnung dieses historischen Builds zu seiner Quellrevision und frühere
 Prüfungen stehen im [Nachtrag zur Claude-Prüfung](cf01-claude-review.md).
 Die aktuelle Berichtssemantik ist nachfolgend beschrieben.
 
+Neue native Einzelberichte führen unter `collision_scope` die im Workspace
+vorhandenen, aber nicht modellierten Geräte auf. NanoDrop und Qubit sind damit
+nicht stillschweigend durch den CF01-Einzelbuild geprüft. Der Verweis auf den
+Gesamtbericht zählt nur mit aktuellen Quellen und derselben gebundenen
+Trajektorie; andernfalls bleibt `overall_workspace_validation_required` wahr.
+Die genaue [Prüfumfangs- und Trajektorienbindung](synthetic-lab-workflow.md)
+unterscheidet modellierte Körper von tatsächlich geprüften Paaren. Historische
+Berichte und Medien bleiben unverändert.
+
 ## Aktueller lokaler Chargenlauf: Buchführung und offene Übergaben
 
 ```sh

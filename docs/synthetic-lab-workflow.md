@@ -142,6 +142,26 @@ Mindestabstand nicht belegen, wird der native BRep-Abstand berechnet. Der Berich
 nennt die kleinste belegte Untergrenze, kein exaktes globales Minimum.
 Das sind diskrete Geometrieprüfungen, kein kontinuierlicher Hüllraumnachweis.
 
+Der eigenständige CF01-Entnahmebuild modelliert weiterhin nur Arm, CF01, Rack
+und Referenzbank. Seine neuen Berichte führen unter `collision_scope` alle
+ausgeschlossenen Workspace-Geräte auf, derzeit NanoDrop und Qubit. Welche Paare
+der modellierten Körper tatsächlich geprüft wurden, steht weiterhin in
+`scope`/`coverage` des jeweiligen Teilberichts; ein modellierter Körper ist noch
+keine Kollisionsprüfung. Ein positives Einzelprüfergebnis deckt die zusätzlichen
+Geräte nicht ab.
+
+`overall_report` verweist auf
+`cad/synthetic-lab-scene/shared-build-report.json`. Er wird nur als aktuell
+anerkannt, wenn Quellen und Workspace unverändert sind, alle ausgeschlossenen
+Geräte enthalten sind und die gebundene Trajektoriendatei sowohl bytegenau als
+auch inhaltlich zur aktuellen CF01-Trajektorie passt. Der Gesamtbuilder schreibt
+dazu `cf01_trajectory` mit Pfad, Datei- und semantischer Prüfsumme. Fehlende,
+fehlgeschlagene, veraltete oder noch nicht so gebundene Gesamtberichte lassen
+`overall_workspace_validation_required` auf `true`. Alte Berichte und Medien
+werden dafür nicht umgeschrieben. Diese Ergänzung ändert Berichtsmetadaten,
+keine Gerätegeometrie; die neuen Bindungsprüfungen sind keine erneute native
+BRep-Ausführung.
+
 Der TCP verwendet den vorhandenen illustrativen Gefäßgreifer als Bezug; dieser
 ist keine Pipette und kein qualifiziertes Qubit-Ladewerkzeug. Die Messpunkte
 selbst erhalten nur den kinematischen Nachweis, keinen Kontakt- oder
@@ -227,6 +247,31 @@ eigene Checkpoints. Jobphasen und die letzte Stationssicht werden kompakt
 gespeichert; erfolgreiche Heartbeatdetails sind als Zähler gebündelt. Der
 vollständige CF01-Endbericht wird einmal als unverändertes Artefakt archiviert.
 Fehlgeschlagene Journal-Checkpoints sperren die weitere Runner-Ausführung.
+
+Eine bereits gespeicherte Fristüberschreitung oder ein Workflow-Hold ist davon
+getrennt (`ProcessHold`): Der CF01-Runner sendet den Stopp über den bestehenden
+Vertrag und lässt nur Heartbeat, Status und Polling bis zum bestätigten Stillstand
+mit gehaltener Bremse zu. Dafür werden weitere synthetische Zeitereignisse im
+gehaltenen Lauf gespeichert; die ursprüngliche Frist und ihr Fehlergrund bleiben
+erhalten. Anschließend wird ein `BatchError` mit unverändertem Fehlerbericht
+archiviert. Weder Probenrückgabe noch Ressourcenfreigabe oder Stufenabschluss
+folgen daraus. Der Regressionstest setzt die Frist mitten in den Schleuderlauf
+und prüft beide lokalen Decoder einschließlich der beobachteten Bremsphase.
+
+Bei einem echten Journal-/Speicherfehler gilt bewusst die strengere Regel:
+keine weiteren Runner-Effekte und auch kein unjournalierter Best-Effort-Stopp.
+Die letzte gespeicherte Absicht bleibt unklar; nach Wiederaufnahme ist der
+ausdrückliche Abbruchabgleich erforderlich. Ein unabhängiger Stations-Watchdog
+muss diesen Kommunikationsverlust auffangen. Beim SiLA-Simulator läuft dessen
+Uhr unabhängig vom Client; im rein lokalen, an die Root-Testuhr gekoppelten Mock
+ist dagegen ohne weitere Zeitereignisse kein automatisch beobachteter Stillstand
+belegt. Daraus folgt keine geprüfte Schutzfunktion für Hardware.
+
+CF01-Orts- und Ressourcenprojektionen beziehen Stations- und Arminstanz aus den
+deklarierten Bindungen sowie die Kapazität aus der geprüften Stufendefinition.
+Der Quellcompiler verlangt weiterhin die bestehenden Szeneninstanzen und den
+Zwölferaufbau; eine allgemeine Umbenennung oder andere Rotorkapazität ist damit
+nicht als neue Ausführungsvariante implementiert.
 
 Nach Neustart wird ein aktiver CF01-Versuch nicht durch `Runner()` mit leerem
 Rotor ersetzt. Er bleibt gehalten. Ein noch nicht gestarteter CF01-Schritt kann

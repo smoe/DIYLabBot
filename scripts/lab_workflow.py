@@ -10,7 +10,7 @@ import re
 import uuid
 from pathlib import Path
 
-from cf01_rack_batch import Runner, BatchError
+from cf01_rack_batch import Runner, BatchError, ProcessHold
 from manual_tasks import TaskError, digest, encoded
 from manual_workflow import ROOT, ObservationError, positive, text
 from lab_workflow_sources import load, SOURCE, STAGES, build_cf01_profile, validate_mass_confirmation
@@ -127,7 +127,8 @@ class Workflow:
         resources = ['workspace:' + definition['work_area']['id'], 'rack:' + definition['rack_instance']]
         resources += ['vessel:' + identity for identity in state['inventory']['vessels']]
         if state['active_stage'] == 'cf01':
-            resources += ['instrument:CF01', 'arm:Arm']
+            bindings=definition['profile']['bindings']
+            resources += ['instrument:'+bindings['station_instance'], 'arm:'+bindings['arm_instance']]
         else:
             resources += ['instrument:' + definition['stages'][state['active_stage']]['profile']['instrument']['id']]
         return sorted(set(resources))
@@ -346,13 +347,15 @@ class Workflow:
 
     @staticmethod
     def _cf_locations(state, inventory):
+        definition=state['definition'];bindings=definition['profile']['bindings']
+        capacity=definition['stages']['cf01']['required_capacity']
         if (not isinstance(inventory,dict) or set(inventory)!={'rack','rotor','gripper'}
-                or any(not isinstance(inventory[key],list) or len(inventory[key])!=12 for key in ['rack','rotor'])):
-            raise ObservationError('CF01 requires twelve rack and rotor places')
+                or any(not isinstance(inventory[key],list) or len(inventory[key])!=capacity for key in ['rack','rotor'])):
+            raise ObservationError('CF01 inventory must match the bound rack and rotor capacity')
         identities=[identity for identity in [*inventory['rack'],*inventory['rotor'],inventory['gripper']]
                     if identity is not None]
-        if (any(not isinstance(identity,str) for identity in identities) or len(identities)!=12
-                or len(set(identities))!=12 or set(identities)!=set(manifest_samples(state))):
+        if (any(not isinstance(identity,str) for identity in identities) or len(identities)!=capacity
+                or len(set(identities))!=capacity or set(identities)!=set(manifest_samples(state))):
             raise ObservationError('CF01 inventory must contain every original exactly once')
         result = {}
         for index, sample_id in enumerate(inventory['rack']):
@@ -361,9 +364,9 @@ class Workflow:
                                      'place_id':state['definition']['rack_places'][index]['place_id']}
         for index, sample_id in enumerate(inventory['rotor']):
             if sample_id is not None:
-                result[sample_id] = {'kind':'rotor','instance_id':'CF01','slot':index+1}
+                result[sample_id] = {'kind':'rotor','instance_id':bindings['station_instance'],'slot':index+1}
         if inventory['gripper'] is not None:
-            result[inventory['gripper']] = {'kind':'gripper','instance_id':'Arm'}
+            result[inventory['gripper']] = {'kind':'gripper','instance_id':bindings['arm_instance']}
         if set(result) != set(manifest_samples(state)):
             raise ObservationError('CF01 inventory does not conserve the manifest samples')
         return result
@@ -374,7 +377,7 @@ class Workflow:
             stage = state['stages']['cf01']
             if kind in {'command_intent','handoff_intent'} and payload.get('command') != 'stop':
                 if state['status'] in {'held','cancelling'} or state['recovery_required'] or stage['status'] != 'working':
-                    raise TaskError('CF01 is held; no new side effects are permitted')
+                    raise ProcessHold('CF01 is held; no new side effects are permitted')
             converted = copy.deepcopy(view)
             samples = manifest_samples(state)
             for field in ['inventory','world_inventory']:
@@ -389,7 +392,7 @@ class Workflow:
                         else: vessel['return_confirmation'] = None
                         vessel['responsibility'] = ({'kind':'workflow','run_id':self.run_id}
                             if location['kind']=='rack' else {'kind':'device','instance_id':
-                            'Arm' if location['kind']=='gripper' else 'CF01'})
+                            location['instance_id']})
                     else:
                         vessel['observed_location'] = {'location':location,'time_s':state['logical_time_s'],
                                                        'evidence':'synthetic_robot_observation'}
@@ -407,14 +410,20 @@ class Workflow:
             elif kind in {'command_completed','stop_accepted'}:
                 stage['pending_command'] = None
             elif kind == 'failed':
-                stage.update(status='held', recovery_required='cf01_failure')
+                stage.update(status='held', recovery_required=stage['recovery_required'] or 'cf01_failure')
                 state.update(status='held', recovery_required=state['recovery_required'] or 'cf01_failure')
         return self._transition('cf01.'+kind, 'SYN.CF01.Driver', update, payload)
 
     def _advance_cf_clock(self, seconds):
         state = self.advance_time('SYN.CF01.Driver', seconds)
         if state['recovery_required'] or state['status'] != 'running':
-            raise TaskError('CF01 process deadline or reconciliation hold reached')
+            raise ProcessHold('CF01 process deadline or reconciliation hold reached')
+
+    def _advance_cf_hold_clock(self, seconds):
+        state=self.state
+        if state['active_stage']!='cf01' or state['status'] not in {'held','cancelling'}:
+            raise TaskError('CF01 stop observation requires a held or cancelling CF01 stage')
+        self.advance_time('SYN.CF01.Driver',seconds)
 
     def run_cf01(self, actor_id, transport='ros2', configure=None):
         if transport not in {'ros2','sila2'}: raise TaskError('Local decoder must be ros2 or sila2')
@@ -429,6 +438,7 @@ class Workflow:
         runner=Runner(self.cf01_profile(self.state), transport=transport,
                       clock=lambda:self.state['logical_time_s'],
                       advance_clock=self._advance_cf_clock,
+                      advance_hold_clock=self._advance_cf_hold_clock,
                       checkpoint=self._cf_checkpoint)
         if configure is not None: configure(runner)
         try:
@@ -436,7 +446,7 @@ class Workflow:
         except BatchError as error:
             artifact=encoded(error.report).encode()
             def fail(state):
-                state['stages']['cf01'].update(status='held',recovery_required='cf01_failure',
+                state['stages']['cf01'].update(status='held',recovery_required=state['stages']['cf01']['recovery_required'] or 'cf01_failure',
                                                report_artifact_sha256=digest(artifact))
                 state.update(status='held', recovery_required=state['recovery_required'] or 'cf01_failure')
             self._transition('cf01.stage_failed',actor_id,fail,{'error':str(error)},artifact)

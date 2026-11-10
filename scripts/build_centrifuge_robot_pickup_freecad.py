@@ -116,7 +116,9 @@ def build(context):
                     volume=ash.common(bsh).Volume
                     if volume>1e-3:collisions.append({'a':a.SourceBody,'b':b.SourceBody,'volume_mm3':volume})
         checks.append({'time_s':time_s,'collisions':collisions,'passed':not collisions});print(json.dumps(checks[-1]),flush=True)
+    from cf01_collision_scope import collision_scope
     cf.write(Path(context['out'])/'native-scene-validation.json',{'passed':all(c['passed'] for c in checks),'samples':checks,'bodies':len(meshes),
+        'collision_scope':collision_scope(scene,data),
         'scope':'Exact sampled arm/tool versus station intersections and carried tube versus remaining station; intended pad/tube contact omitted. Not continuous collision or force validation.'})
     App.closeDocument(doc.Name)
     print(json.dumps({'bodies':len(meshes),'triangles':sum(len(m['f']) for m in meshes),'mesh_bytes':(Path(context['out'])/'scene-mesh.json').stat().st_size}),flush=True)

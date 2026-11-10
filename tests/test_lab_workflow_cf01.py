@@ -165,17 +165,94 @@ class IntegratedCF01Tests(unittest.TestCase):
 
             runner.bridge.dispatch = delay
 
-        with self.assertRaisesRegex(TaskError, 'deadline|reconciliation hold'):
+        with self.assertRaisesRegex(BatchError, 'deadline|reconciliation hold') as caught:
             flow.run_cf01(ACTOR, configure=configure)
         state = flow.state
         self.assertEqual(state['logical_time_s'], state['deadline_s'])
         self.assertEqual(state['status'], 'held')
         self.assertEqual(state['recovery_required'], 'workflow_deadline_exceeded')
-        self.assertEqual(dispatched, ['acquire', 'index', 'open_lid'])
-        self.assertEqual(state['stages']['cf01']['pending_command']['command'], 'open_lid')
+        self.assertEqual(dispatched, ['acquire', 'index', 'open_lid', 'stop'])
+        self.assertEqual(state['stages']['cf01']['unresolved_command']['command'], 'open_lid')
+        self.assertIsNone(state['stages']['cf01']['pending_command'])
+        self.assertTrue(caught.exception.report['stop_via_contract'])
+        self.assertIsNotNone(state['stages']['cf01']['report_artifact_sha256'])
         self.assertIn('arm:Arm', journal.owners())
-        self.assertEqual(journal.history(flow.run_id)[-1]['kind'], 'time_advanced')
+        self.assertEqual(journal.history(flow.run_id)[-1]['kind'], 'cf01.stage_failed')
         self.assertFalse(flow.report()['passed'])
+
+    def test_deadline_mid_spin_stops_and_observes_braking_without_return_or_release(self):
+        for transport in ['ros2','sila2']:
+            with self.subTest(transport=transport):
+                journal,flow=self.prepared()
+                flow.advance_time(ACTOR,flow.state['deadline_s']-.5)
+                captured=[];dispatched=[]
+                def configure(runner):
+                    captured.append(runner)
+                    dispatch=runner.bridge.dispatch
+                    def track(encoding,command,fields):
+                        dispatched.append(command)
+                        return dispatch(encoding,command,fields)
+                    runner.bridge.dispatch=track
+                with self.assertRaises(BatchError) as caught:
+                    flow.run_cf01(ACTOR,transport=transport,configure=configure)
+                report=caught.exception.report;runner=captured[0];state=flow.state
+                stop='stop' if transport=='ros2' else 'Stop'
+                heartbeat='heartbeat' if transport=='ros2' else 'Heartbeat'
+                after_stop=dispatched[dispatched.index(stop)+1:]
+                self.assertTrue(all(command==heartbeat for command in after_stop))
+                self.assertTrue(after_stop)
+                self.assertFalse(report['passed']);self.assertFalse(report['spin_completed'])
+                self.assertFalse(report['order_restored']);self.assertTrue(report['stop_via_contract'])
+                self.assertIsNone(report['stop_error'])
+                observations=[row['station'] for row in report['trace'] if row['stage']=='stop_observed']
+                self.assertFalse(observations[0]['standstill_confirmed'])
+                self.assertTrue(observations[-1]['standstill_confirmed'])
+                self.assertTrue(observations[-1]['parking_brake_held'])
+                self.assertGreaterEqual(state['logical_time_s'],state['deadline_s']+runner.station_spec['mechanisms']['braking']['simulation_stop_s'])
+                self.assertEqual(state['status'],'held');self.assertEqual(state['stages']['cf01']['status'],'held')
+                self.assertEqual(state['recovery_required'],'workflow_deadline_exceeded')
+                self.assertIsNotNone(state['stages']['cf01']['report_artifact_sha256'])
+                self.assertIsNotNone(runner.sim.owner)
+                self.assertTrue(all(report['inventory']['rotor']))
+                self.assertIn('instrument:CF01',journal.owners())
+                self.assertEqual(state['active_stage'],'cf01')
+
+    def test_clock_journal_failure_during_spin_does_not_send_unjournaled_stop(self):
+        journal,flow=self.prepared();append=journal.append;captured=[];dispatched=[]
+        def configure(runner):
+            captured.append(runner);dispatch=runner.bridge.dispatch
+            def track(transport,command,fields):
+                dispatched.append(command)
+                return dispatch(transport,command,fields)
+            runner.bridge.dispatch=track
+        def fail_clock(run_id,revision,kind,payload,state,artifact=None):
+            if kind=='time_advanced':raise OSError('Clock journal unavailable')
+            return append(run_id,revision,kind,payload,state,artifact)
+        with patch.object(journal,'append',side_effect=fail_clock):
+            with self.assertRaisesRegex(OSError,'Clock journal unavailable'):
+                flow.run_cf01(ACTOR,configure=configure)
+        state=flow.state
+        self.assertNotIn('stop',dispatched)
+        self.assertEqual(state['stages']['cf01']['pending_command']['command'],'start')
+        self.assertIsNone(state['stages']['cf01']['report_artifact_sha256'])
+        self.assertIsNotNone(captured[0].sim.owner)
+        self.assertIn('instrument:CF01',journal.owners())
+
+    def test_cf01_location_and_resource_projection_use_declared_bindings(self):
+        _,flow=self.prepared(masses=False);state=flow.state
+        bindings=state['definition']['profile']['bindings']
+        bindings.update(station_instance='BoundStation',arm_instance='BoundArm')
+        samples=[sample['sample_id'] for sample in state['definition']['manifest']['samples']]
+        capacity=state['definition']['stages']['cf01']['required_capacity']
+        inventory={'rack':[None,None,*samples[2:]],'rotor':[None,samples[1],*[None]*(capacity-2)],'gripper':samples[0]}
+        locations=Workflow._cf_locations(state,inventory)
+        self.assertEqual(locations[samples[0]],{'kind':'gripper','instance_id':'BoundArm'})
+        self.assertEqual(locations[samples[1]],{'kind':'rotor','instance_id':'BoundStation','slot':2})
+        resources=Workflow._resources(state)
+        self.assertIn('arm:BoundArm',resources);self.assertIn('instrument:BoundStation',resources)
+        self.assertNotIn('arm:Arm',resources);self.assertNotIn('instrument:CF01',resources)
+        inventory['rotor'].pop()
+        with self.assertRaises(ObservationError):Workflow._cf_locations(state,inventory)
 
     def test_journal_write_error_keeps_intent_and_open_never_reinitializes_cf01(self):
         journal, flow = self.prepared()

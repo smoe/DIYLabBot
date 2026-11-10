@@ -59,6 +59,12 @@ Die Transportauswahl prüft lokale ROS-/SiLA-Vertragsdecoder, keine Netzwerkserv
 Massen, Laufzeiten und Qualifikationswerte sind ausdrücklich fiktive Testdaten.
 Eine native Ladebahn und Hardwarebetrieb sind damit nicht nachgewiesen.
 
+Für echte TLS/gRPC-Kommunikation mit dem CF01-Simulator gibt es zusätzlich den
+[SiLA-2-Netzwerkeinstieg](docs/sila2-network.md). Er verwendet denselben
+Chargenrunner, einen separaten v2-Vertrag und ein dauerhaftes Übergabejournal.
+Die Anleitung führt durch Anmeldung, Serverstart und Netzwerk-Chargenlauf auf
+Deutsch und Englisch; historische Medien bleiben unverändert.
+
 ## Quellen und lokale Ausgaben
 
 Aktive Textquellen verwenden LF im Repository und auf allen Rechnern beim

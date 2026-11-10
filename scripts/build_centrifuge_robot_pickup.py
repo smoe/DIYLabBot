@@ -8,6 +8,7 @@ import sys
 import centrifuge_robot_pickup as pickup
 import centrifuge_model as cf
 from cf01_rack_batch import Runner, SOURCE as BATCH_SOURCE
+from cf01_collision_scope import collision_scope
 
 
 def main():
@@ -27,10 +28,12 @@ def main():
     station=cf_report['cases'][0]
     if cf.digest(cf.ROOT/station['files']['freecad'])!=station['artifact_sha256']['freecad']:raise ValueError('Centrifuge artifact changed')
     context={'revision':revision,'solidcraft_cli':args.solidcraft_cli,**{k:str(v) for k,v in paths.items()},'arm_native':str(arm_file),
+        'collision_scope':collision_scope(scene,data),
         'centrifuge_native':str(cf.ROOT/cf_report['cases'][0]['files']['freecad']),
-        'source_hashes':{str(p.relative_to(cf.ROOT)).replace('\\','/'):cf.digest(p) for p in [pickup.SOURCE,cf.SOURCE,pickup.protocol.SOURCE,cf.ROOT/scene['sources']['robot'],BATCH_SOURCE,*pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment'])))]}}
+        'source_hashes':{str(p.relative_to(cf.ROOT)).replace('\\','/'):cf.digest(p) for p in [pickup.SOURCE,cf.SOURCE,pickup.protocol.SOURCE,cf.ROOT/scene['sources']['robot'],BATCH_SOURCE,cf.ROOT/'scripts/cf01_collision_scope.py',*pickup.workspace.source_dependencies(pickup.workspace.load(pickup.assembly.validate_reference(scene['environment'])))]}}
     cf.write(paths['out']/'rack-batch-trace.json',Runner().run())
     cf.write(paths['out']/'trajectory.json',data)
+    cf.write(paths['out']/'collision-scope.json',context['collision_scope'])
     cf.write(paths['out']/'scene-source.json',scene)
     cf.write(cf.ROOT/'tmp/cf01-robot-pickup-context.json',context)
     cf.write(paths['out']/'context.json',context)

@@ -1,4 +1,4 @@
-"""Order-preserving Rack -> CF01 -> original Rack slots, using local protocol mocks.
+"""Order-preserving Rack -> CF01 -> original Rack slots, with an injected station.
 
 Robot handoffs are explicit synthetic confirmations, not loading motion plans.
 The transporter is only the external rack-ready precondition.
@@ -21,6 +21,10 @@ SOURCE=ROOT/'model/cf01-rack-batch.protocol.json'
 
 class BatchError(ValueError):
     def __init__(self,message,report):super().__init__(message);self.report=report
+
+
+class ProcessHold(RuntimeError):
+    """A durably recorded hold: stop/observation remain possible, unlike failed storage."""
 
 
 def load(path=SOURCE):
@@ -68,22 +72,29 @@ def synthetic_feedback(event,sample):
 
 
 class Runner:
-    def __init__(self,data=None,transport='ros2',feedback=None,clock=None,advance_clock=None,checkpoint=None):
+    def __init__(self,data=None,transport='ros2',feedback=None,clock=None,advance_clock=None,checkpoint=None,station_backend=None,advance_hold_clock=None):
         self.data=copy.deepcopy(data or load());validate(self.data)
+        self.station_backend=station_backend
+        if station_backend is not None:
+            if transport!='sila2' or clock is not None or advance_clock is not None:
+                raise ValueError('Network station supplies its own SiLA transport and monotonic clock')
+            clock,advance_clock=station_backend.now,station_backend.advance
         if transport not in ['ros2','sila2']:raise ValueError('Supported local contract decoding: ros2 or sila2')
         if (clock is None)!=(advance_clock is None):raise ValueError('External clock and advance_clock must be provided together')
-        if any(callback is not None and not callable(callback) for callback in (clock,advance_clock,checkpoint)):
+        if any(callback is not None and not callable(callback) for callback in (clock,advance_clock,checkpoint,advance_hold_clock)):
             raise ValueError('Clock and checkpoint callbacks must be callable')
         self._local_now=0.;self._clock=clock;self._advance_clock=advance_clock;self._checkpoint=checkpoint
+        self._advance_hold_clock=advance_hold_clock;self._held=False
         self._checkpoint_failed=False;self._checkpoint_sequence=0;self._command_sequence=0
         self._last_station=None;self._station_time=None;self._last_job=None;self._job_signature=None;self._heartbeat_count=0
         self.transport=transport;self.feedback=feedback;self.trace=[];self.token=None
         self.capacity=len(self.data['samples']);self.pending_handoff=None
         self.current_sample=None;self.operation=None;self.failure=None
         self.stop_attempted=False;self.stop_via_contract=False
-        self.sim=Simulator(clock=lambda:self.now,qualification=self.data['simulation_qualification'],
+        self.sim=None if station_backend is not None else Simulator(clock=lambda:self.now,qualification=self.data['simulation_qualification'],
                            initial_slots={i:{'present':False,'seated':False,'mass_g':None} for i in range(1,self.capacity+1)})
-        self.bridge=protocol.MockProtocol(self.sim)
+        self.bridge=station_backend if station_backend is not None else protocol.MockProtocol(self.sim)
+        self.station_spec=station_backend.spec if station_backend is not None else self.sim.spec
         self.samples=sorted(self.data['samples'],key=lambda s:s['rack_slot'])
         devices=workspace.load(assembly.validate_reference(self.data['workspace']))['devices']
         self.rack_instance=devices['Rack']['id'];self.station_instance=devices['CF01']['id'];self.arm_instance=devices['Arm']['id']
@@ -94,6 +105,20 @@ class Runner:
         self.initial=[s['id'] for s in self.samples];self.rack=self.initial[:];self.rotor=[None]*self.capacity;self.gripper=None
         self.world={'rack':self.initial[:],'rotor':[None]*self.capacity,'gripper':None}
         self.stop_error=None;self.spin_completed=False
+
+    def station_state(self):
+        return self.station_backend.state() if self.station_backend is not None else protocol.state_si(self.sim.execute('status'))
+
+    def station_slots(self, state=None):
+        if self.station_backend is None:return self.sim.slots
+        state=state or self.station_state()
+        return {value['slot']:{'present':value['present'],'seated':value['seated'],
+                              'mass_g':value['mass_g'] if value['mass_valid'] else None}
+                for value in state['rotor_slots']}
+
+    def robot_access(self,event,sample):
+        if self.station_backend is not None:self.station_backend.observe_robot(event,sample)
+        else:self.sim.robot_clear=event=='withdraw'
 
     @property
     def now(self):
@@ -129,6 +154,9 @@ class Runner:
         self._checkpoint_sequence+=1
         try:
             self._checkpoint(kind,copy.deepcopy({**payload,'checkpoint_sequence':self._checkpoint_sequence}),self.checkpoint_view())
+        except ProcessHold:
+            self._held=True
+            raise
         except BaseException:
             # A failed durable write leaves the last intent uncertain. Do not
             # continue actions or turn the persistence failure into a device reply.
@@ -193,7 +221,7 @@ class Runner:
         if 'rack_slot' in details:
             details.update(rack_place_id=self.rack_places[details['rack_slot']-1]['id'],
                            rack_instance=self.rack_instance,place_id=self.rack_location(details['rack_slot'])['place_id'])
-        station=protocol.state_si(self.sim.execute('status'))
+        station=self.station_state()
         self._last_station=copy.deepcopy(station);self._station_time=self.now
         self.trace.append({'sequence':len(self.trace)+1,'time_s':self.now,'stage':stage,**details,
                            'inventory':self.snapshot(),**self.handoff_state(),'station':station})
@@ -201,6 +229,8 @@ class Runner:
 
     def command(self,name,**args):
         self._checkpoint_healthy()
+        if self._held and name not in {'stop','heartbeat','status','rotation_feedback'}:
+            raise ProcessHold('CF01 is held; only stop and observation are permitted')
         self.operation=name
         self._command_sequence+=1;sequence=self._command_sequence
         contract=next(c for c in self.bridge.contract['commands'] if c['id']==name)
@@ -242,14 +272,14 @@ class Runner:
         return result
 
     def wait_observable(self,name,result,submitted_at):
-        """Wait on the local observable contract, never infer command completion.
+        """Wait on the observable contract, never infer command completion.
 
-        Deadlines use the explicit test clock. A real SDK must separately bound
-        its blocking transport calls; this runner provides no network driver.
+        Local deadlines use the test clock. An injected network station uses
+        monotonic wall time and separately bounds its blocking transport calls.
         """
         interval=self.data['command_execution']['poll_interval_s']
         timeout=self.data['command_execution']['completion_timeout_s']
-        if name=='start':timeout+=self.data['spin']['duration_s']+self.sim.spec['mechanisms']['braking']['simulation_stop_s']
+        if name=='start':timeout+=self.data['spin']['duration_s']+self.station_spec['mechanisms']['braking']['simulation_stop_s']
         deadline=submitted_at+timeout;job_id=None;braking_seen=False;running_seen=False
         while True:
             if self.now>deadline:
@@ -280,11 +310,12 @@ class Runner:
 
     def check_station(self,slot=None):
         self.operation='check_station'
-        state=self.sim.execute('status')
+        state=self.station_state()
         if slot is not None and (state['indexed_slot']!=slot or not state['index_confirmed']):
             raise ValueError('Station index confirmation disagrees with requested slot')
+        slots=self.station_slots(state)
         for i,identity in enumerate(self.world['rotor'],1):
-            sensed=self.sim.slots[i]
+            sensed=slots[i]
             if sensed['present']!=(identity is not None):raise ValueError('Station presence disagrees with synthetic world inventory')
             if identity is not None:
                 sample=next(s for s in self.samples if s['id']==identity)
@@ -297,9 +328,10 @@ class Runner:
         if event in ('pick_rack','seat_rotor','take_rotor','place_rack'):self.begin_handoff(event,sample)
         actual=None
         if sample:
+            indexed=self.station_state()['indexed_slot']
             if event=='pick_rack':actual=self.world['rack'][sample['rack_slot']-1]
-            elif event=='withdraw':actual=self.world['gripper'] or self.world['rotor'][self.sim.indexed_slot-1]
-            elif event=='take_rotor':actual=self.world['rotor'][self.sim.indexed_slot-1]
+            elif event=='withdraw':actual=self.world['gripper'] or self.world['rotor'][indexed-1]
+            elif event=='take_rotor':actual=self.world['rotor'][indexed-1]
             else:actual=self.world['gripper']
             if actual!=sample['id']:raise ValueError('Synthetic world identity mismatch during '+event)
         data=self.feedback(event,copy.deepcopy(sample)) if self.feedback else {**synthetic_feedback(event,None),'sample_id':actual}
@@ -308,8 +340,8 @@ class Runner:
         if any(data.get(field) is not True for field in fields):raise ValueError('Missing positive confirmation during '+event)
         if sample:
             if event=='pick_rack':self.world['rack'][sample['rack_slot']-1]=None;self.world['gripper']=actual
-            elif event=='seat_rotor':self.world['rotor'][self.sim.indexed_slot-1]=actual;self.world['gripper']=None
-            elif event=='take_rotor':self.world['rotor'][self.sim.indexed_slot-1]=None;self.world['gripper']=actual
+            elif event=='seat_rotor':self.world['rotor'][indexed-1]=actual;self.world['gripper']=None
+            elif event=='take_rotor':self.world['rotor'][indexed-1]=None;self.world['gripper']=actual
             elif event=='place_rack':
                 if self.world['rack'][sample['rack_slot']-1] is not None:raise ValueError('Synthetic world rack slot occupied')
                 self.world['rack'][sample['rack_slot']-1]=actual;self.world['gripper']=None
@@ -318,7 +350,7 @@ class Runner:
         return data
 
     def clear(self,sample):
-        self.observe('withdraw',sample,('workspace_clear',));self.sim.robot_clear=True
+        self.observe('withdraw',sample,('workspace_clear',));self.robot_access('withdraw',sample)
         self.record('robot_clear',sample_id=sample['id'])
 
     def poll(self,job_id):
@@ -335,38 +367,57 @@ class Runner:
     def advance(self,seconds):
         self._checkpoint_healthy()
         target=self.now+seconds
-        interval=min(1.,self.sim.spec['handling']['owner_timeout_s']/2)
+        interval=min(1.,self.station_spec['handling']['owner_timeout_s']/2)
         while self.now<target:
             before=self.now;following=min(target,before+interval)
             if self._advance_clock is None:self.now=following
             else:
-                try:self._advance_clock(following-before)
+                callback=self._advance_hold_clock if self._held and self._advance_hold_clock is not None else self._advance_clock
+                try:callback(following-before)
+                except ProcessHold:
+                    self._held=True
+                    raise
                 except BaseException:
                     self._checkpoint_failed=True
                     raise
                 actual=self.now
-                if actual<=before or not math.isclose(actual-before,following-before,rel_tol=1e-12,abs_tol=1e-9):
+                valid=(actual>=following if self.station_backend is not None else math.isclose(actual-before,following-before,rel_tol=1e-12,abs_tol=1e-9))
+                if actual<=before or not valid:
                     self._checkpoint_failed=True
                     raise ValueError('External clock did not advance by the requested duration')
             self.command('heartbeat')
 
+    def wait_for_stop(self):
+        """Observe braking under a recorded hold; do not infer stillness from receipt."""
+        deadline=self.now+self.station_spec['mechanisms']['braking']['simulation_stop_s']+self.data['command_execution']['completion_timeout_s']
+        interval=self.data['command_execution']['poll_interval_s']
+        while True:
+            self.record('stop_observed')
+            if self._last_job is not None:self.poll(self._last_job['id'])
+            state=self._last_station
+            if state['standstill_confirmed'] is True and state['parking_brake_held'] is True:return
+            if self.now>=deadline:raise TimeoutError('Controlled stop completion deadline exceeded')
+            self.advance(min(interval,deadline-self.now))
+
     def report(self,passed,error=None):
-        return {'format':'solidcraftbot.cf01-batch-report/1','passed':passed,'mode':'local_mock_only',
-                'transport_contract':self.transport,'network_executed':False,'hardware_executed':False,
+        network=self.station_backend is not None
+        return {'format':'solidcraftbot.cf01-batch-report/1','passed':passed,'mode':'network_mock_only' if network else 'local_mock_only',
+                'transport_contract':self.transport,'network_executed':network,'hardware_executed':False,
                 'transporter_executed':False,'robot_motion_for_loading_checked':False,'robot_motion_checked':False,
-                'polling':'local MockProtocol.poll, no transport serialization',
-                'station_inventory_check':'mock_internal: Simulator.slots; not available in state_si or a hardware contract',
+                'polling':'SiLA TLS/gRPC observable execution and typed status' if network else 'local MockProtocol.poll, no transport serialization',
+                'station_inventory_check':'SiLA v2 typed RotorSlots; synthetic observations, no physical sensor evidence' if network else 'mock_internal: Simulator.slots; not available in state_si or a hardware contract',
                 'stop_attempted':self.stop_attempted,'stop_via_contract':self.stop_via_contract,'stop_error':self.stop_error,
                 'inventory_semantics':'Ledger of fully confirmed handoffs, not an assertion of physical location',
                 'handoff_policy':self.data['handoff_policy'],**self.handoff_state(),'failure':self.failure,
                 'initial_state':self.data['initial_state'],'mock_assumptions':self.data['mock_assumptions'],
-                'command_execution':self.data['command_execution'],'time_semantics':'Zero-time robot handoffs; explicit test clock during observable command waits, including spin and braking',
+                'command_execution':self.data['command_execution'],'time_semantics':'Server monotonic real time at 1x; client deadlines use monotonic wall time; synthetic robot observations' if network else 'Zero-time robot handoffs; explicit test clock during observable command waits, including spin and braking',
                 'effective_profile_sha256':hashlib.sha256(json.dumps(self.data,sort_keys=True,separators=(',',':')).encode()).hexdigest(),
                 'effective_profile':self.data,'rack_instance':self.rack_instance,'sample_mapping':[{**s,'rack_place_id':self.rack_places[s['rack_slot']-1]['id'],'rack_instance':self.rack_instance,'place_id':self.rack_location(s['rack_slot'])['place_id']} for s in self.samples],'rack_places':self.rack_places,'initial_order':self.initial,'final_order':self.rack[:],
                 'order_restored':passed and self.spin_completed and self.rack==self.initial and all(x is None for x in self.rotor) and self.gripper is None,
                 'spin_completed':self.spin_completed,'inventory':self.snapshot(),'error':error,'trace':self.trace,
                 'source_files_sha256':{str(p.relative_to(ROOT)):cf.digest(p) for p in [Path(__file__),protocol.SOURCE,ROOT/'scripts/centrifuge_control.py',ROOT/'scripts/centrifuge_protocol.py',ROOT/'scripts/centrifuge_model.py',ROOT/'scripts/synthetic_workspace.py',ROOT/'scripts/rack_slots.py',*workspace.source_dependencies(workspace.load(assembly.validate_reference(self.data['workspace'])))]},
-                'limitations':self.data['limitations']}
+                'limitations':self.station_backend.profile['network_batch']['limitations'] if network else self.data['limitations'],
+                **({'network':self.station_backend.evidence()} if network else {})}
 
     def run(self):
         self._checkpoint_healthy()
@@ -380,7 +431,7 @@ class Runner:
                 if self.rack[r]!=sample['id'] or self.rotor[c] is not None or self.gripper is not None:raise ValueError('Loading inventory mismatch')
                 self.command('index',slot=c+1);self.check_station(c+1);self.command('open_lid')
                 self.observe('pick_rack',sample,('grasp_confirmed','source_empty'))
-                self.complete_handoff();self.sim.robot_clear=False
+                self.complete_handoff();self.robot_access('begin_loading',sample)
                 self.record('rack_to_gripper',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
                 seat=self.observe('seat_rotor',sample,('seated_confirmed','cap_closed_confirmed','released_confirmed'))
                 self.command('confirm_seated',mass_g=sample['mass_g'],seated_confirmed=seat['seated_confirmed'],cap_closed_confirmed=seat['cap_closed_confirmed'])
@@ -396,7 +447,7 @@ class Runner:
                 r,c=sample['rack_slot']-1,sample['rotor_slot']-1
                 if self.rotor[c]!=sample['id'] or self.rack[r] is not None or self.gripper is not None:raise ValueError('Return inventory mismatch')
                 self.command('index',slot=c+1);self.check_station(c+1);self.command('open_lid');self.command('present_tube')
-                take=self.observe('take_rotor',sample,('grasp_confirmed','source_empty'));self.sim.robot_clear=False
+                take=self.observe('take_rotor',sample,('grasp_confirmed','source_empty'));self.robot_access('begin_removal',sample)
                 self.command('confirm_removed',grasp_confirmed=take['grasp_confirmed'],tube_absent=take['source_empty'])
                 self.check_station(c+1);self.complete_handoff()
                 self.record('rotor_to_gripper',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
@@ -406,7 +457,7 @@ class Runner:
                 self.complete_handoff()
                 self.record('gripper_to_original_rack_slot',sample_id=sample['id'],rack_slot=r+1,rotor_slot=c+1)
             if self.rack!=self.initial or any(self.rotor) or self.gripper is not None:raise ValueError('Original sample order not restored')
-            if any(s['present'] for s in self.sim.slots.values()):raise ValueError('Station sensor inventory disagrees with ledger')
+            if any(s['present'] for s in self.station_slots().values()):raise ValueError('Station sensor inventory disagrees with ledger')
             self.current_sample=None
             self.command('release');self.record('complete')
             return self.report(True)
@@ -414,10 +465,12 @@ class Runner:
             if self._checkpoint_failed:raise
             self.failure={'operation':self.operation,'sample_id':self.current_sample,
                           'error_type':type(error).__name__,'error_code':getattr(error,'code',None),
-                          'station_fault':self.sim.fault}
+                          'station_fault':(self._last_station or {}).get('fault_code') if self.station_backend is not None else self.sim.fault}
             self._emit('failed',{'reason':str(error),**self.failure})
             # Preserve the failure report even if the stop or status channel fails.
-            try:self.command('stop')
+            try:
+                self.command('stop')
+                if self._held:self.wait_for_stop()
             except Exception as stop_error:
                 if self._checkpoint_failed:raise
                 self.stop_error=str(stop_error)

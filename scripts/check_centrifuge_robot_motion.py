@@ -12,6 +12,7 @@ import centrifuge_robot_pickup as pickup
 import centrifuge_model as cf
 import robot_spec as robot
 from lab_transfer_model import obb,boxes_overlap
+from cf01_collision_scope import collision_scope
 
 
 def app(m):return App.Placement(App.Matrix(*[v for row in m for v in row]))
@@ -92,6 +93,7 @@ def audit(scene,data,records):
         if index%50==0 or hits:print(json.dumps({'audit_frame':index,'of':len(frames),'time_s':t,'hits':hits,'exact_overlap_tests':exact}),flush=True)
         if len(collisions)>=12:break
     return {'passed':not collisions and index==len(frames)-1 and best>=scene['checks']['minimum_robot_equipment_clearance_mm'],'requested_frames':len(frames),'unique_states_checked':unique,'samples':checks,
+        'collision_scope':collision_scope(scene,data),
         'spacing':spacing,'collisions':collisions,'exact_overlap_tests':exact,'exact_distance_tests':distance_tests,
         'minimum_robot_equipment_distance_mm':best,'nearest_pair':nearest,
         'minimum_robot_equipment_clearance_required_mm':scene['checks']['minimum_robot_equipment_clearance_mm'],
