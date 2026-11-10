@@ -14,7 +14,7 @@ from manual_tasks import Journal, TaskError, digest
 from manual_workflow import ObservationError, inventory_observations
 from nanodrop_manual import Workflow as NanoDrop
 from lab_workflow import Workflow
-from lab_workflow_ledger import original_location
+from lab_workflow_ledger import original_location, remaining
 from lab_workflow_sources import SOURCE
 from cf01_rack_batch import BatchError
 from run_lab_workflow import ACTOR, run_demo, run_nanodrop, run_qubit
@@ -194,6 +194,75 @@ class IntegratedWorkflowTests(unittest.TestCase):
         self.assertEqual(self.journal.get_current(self.flow.run_id)[1], revision)
         self.assertEqual(self.flow.report()['samples']['Sample01']['remaining_volume_ul'], 38.5)
         self.assertEqual(len(self.flow.state['bookings']), 1)
+
+    def assert_withdrawal_observation_rejected(self, before, revision, stage_id, intent, command):
+        state, current_revision = self.journal.get_current(self.flow.run_id)
+        expected = copy.deepcopy(before)
+        expected['status'] = 'held'
+        expected['recovery_required'] = before['recovery_required'] or 'observation_mismatch'
+        expected['stages'][stage_id]['recovery_required'] = 'observation_mismatch'
+        self.assertEqual(state, expected)
+        self.assertEqual(current_revision, revision + 1)
+        self.assertEqual(state['bookings'][intent]['outcome'], 'intent')
+        self.assertIsNone(state['bookings'][intent]['actual_volume_ul'])
+        self.assertEqual(remaining(state, 'Sample01'), remaining(before, 'Sample01'))
+        event = self.journal.history(self.flow.run_id)[-1]
+        self.assertEqual(event['kind'], 'observation_rejected')
+        self.assertEqual(event['payload']['command'], stage_id + '.' + command)
+        self.assertIn('Withdrawal exceeds remaining volume', event['payload']['error'])
+        observed = event['payload'].get('pending_resolution', event['payload'])
+        self.assertEqual(observed['volume_ul'], 50)
+
+    def test_nanodrop_confirmed_withdrawal_over_balance_requires_reconciliation(self):
+        stage = self.start_nd()
+        intent = self.begin_nd(stage)
+        before, revision = self.journal.get_current(self.flow.run_id)
+        with self.assertRaisesRegex(ObservationError, 'Withdrawal exceeds remaining volume'):
+            self.confirm_nd(stage, intent, volume_ul=50, deviation_reason='Synthetic reported over-withdrawal')
+        self.assert_withdrawal_observation_rejected(before, revision, 'nanodrop', intent, 'confirm_measurement')
+        with self.assertRaisesRegex(TaskError, 'reconciliation required'):
+            self.confirm_nd(stage, intent)
+        self.assertEqual(self.journal.get_current(self.flow.run_id)[1], revision + 1)
+        self.reconcile_nd(stage, pending_resolution={
+            'intent_id': intent, 'outcome': 'performed', 'observed_sample_id': 'Sample01',
+            'volume_ul': 1.5, 'cleaned': True,
+            'deviation_reason': 'Corrected synthetic observation after explicit inventory reconciliation'})
+        self.assertEqual(self.flow.state['status'], 'running')
+        self.assertIsNone(self.flow.state['recovery_required'])
+        self.assertEqual(self.flow.state['bookings'][intent]['outcome'], 'performed')
+        self.assertEqual(remaining(self.flow.state, 'Sample01'), 38.5)
+
+    def test_qubit_confirmed_withdrawal_over_balance_requires_reconciliation(self):
+        self.cf01()
+        run_nanodrop(self.flow)
+        self.flow.handover(ACTOR, observations=self.flow.inventory_observations(),
+                           workspace_clear=True, arm_clear=True, gripper_empty=True)
+        stage = self.flow.stage('qubit')
+        stage.act('claim', ACTOR)
+        prepare_standards(stage)
+        stage.act('take', ACTOR, sample_id='Sample01', observed_sample_id='Sample01', rack_id='Rack', place_id='Slot01')
+        pending = begin_preparation(stage, 'sample', 'Sample01')
+        before, revision = self.journal.get_current(self.flow.run_id)
+        with self.assertRaisesRegex(ObservationError, 'Withdrawal exceeds remaining volume'):
+            stage.act('confirm_preparation', ACTOR, intent_id=pending['intent_id'],
+                      observed_vessel_id=pending['vessel_id'], observed_sample_id='Sample01',
+                      volume_ul=50, assay_total_volume_ul=200, mixed=True,
+                      deviation_reason='Synthetic reported over-withdrawal')
+        self.assert_withdrawal_observation_rejected(before, revision, 'qubit', pending['intent_id'], 'confirm_preparation')
+
+    def test_performed_reconciliation_over_balance_keeps_the_withdrawal_open(self):
+        stage = self.start_nd()
+        intent = self.begin_nd(stage)
+        self.flow.close()
+        self.flow = Workflow.open(self.journal, self.flow.run_id)
+        stage = self.flow.stage('nanodrop')
+        before, revision = self.journal.get_current(self.flow.run_id)
+        with self.assertRaisesRegex(ObservationError, 'Withdrawal exceeds remaining volume'):
+            self.reconcile_nd(stage, pending_resolution={
+                'intent_id': intent, 'outcome': 'performed', 'observed_sample_id': 'Sample01',
+                'volume_ul': 50, 'cleaned': True, 'deviation_reason': 'Synthetic reported over-withdrawal'})
+        self.assert_withdrawal_observation_rejected(before, revision, 'nanodrop', intent, 'reconcile')
+        self.assertEqual(self.flow.state['recovery_required'], 'session_restarted')
 
     def test_unknown_outcome_can_be_resolved_later_without_estimated_upper_bound(self):
         stage = self.start_nd()

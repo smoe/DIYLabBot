@@ -8,7 +8,7 @@ import copy
 import math
 
 from manual_tasks import TaskError
-from manual_workflow import positive
+from manual_workflow import ObservationError, positive
 
 
 def manifest_samples(root):
@@ -72,7 +72,7 @@ def confirm_withdrawal(root, stage_id, pending, sample_id, volume_ul, reason):
         raise TaskError('Reason for volume deviation required')
     available = remaining(root, sample_id, exclude_intent=record['id'])
     if available is not None and volume_ul > available:
-        raise TaskError('Withdrawal exceeds remaining volume')
+        raise ObservationError('Withdrawal exceeds remaining volume')
     record.update(outcome='performed', actual_volume_ul=volume_ul,
                   confirmed_at_s=root['logical_time_s'], deviation_reason=reason)
     vessel = root['inventory']['vessels'][record['source_vessel_id']]
@@ -112,7 +112,7 @@ class SampleView(MutableMapping):
                      'mass_confirmation_valid', 'return_confirmation'])
 
     def __len__(self):
-        return 11
+        return sum(1 for _ in self)
 
 
 class SamplesView(MutableMapping):

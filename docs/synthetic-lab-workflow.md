@@ -205,7 +205,18 @@ Entnahmen dokumentiert sind. Reagenz-/Standardvorräte werden nicht bilanziert.
 
 Eine Buchung ist an Gesamtlauf, Stufe, Versuch und Absicht gebunden. Erneute
 Bestätigungen erledigter Absichten werden abgelehnt. Identische Importbytes sind
-ohne zusätzliche Buchung wiederholbar. Eine unbekannte Durchführung bleibt mit
+ohne zusätzliche Buchung wiederholbar. Überschreitet eine bestätigte Entnahme
+den bilanzierten bekannten Rest, löst sie einen `ObservationError` aus: Der Lauf
+wird gehalten und die Stufe verlangt mit `observation_mismatch` einen Abgleich.
+Ein bestehender Klärungsgrund des Gesamtlaufs bleibt erhalten. Das Ereignis
+`observation_rejected` speichert die gemeldete Menge und den Widerspruch, auch
+bei `pending_resolution` mit `outcome: performed` im Abgleich. Die Absicht bleibt
+offen; Buchung und bilanzierter Rest ändern sich nicht. Eine korrigierte direkte
+Bestätigung umgeht den Halt nicht: Erst `reconcile` darf die Absicht ausdrücklich
+auflösen. Fremde oder erledigte Absichten und eine fehlende erforderliche
+Abweichungsbegründung bleiben `TaskError`.
+
+Eine unbekannte Durchführung bleibt mit
 unbekanntem Istvolumen gesperrt; die Sollmenge ist keine behauptete Obergrenze.
 Eine spätere explizite Auflösung als `performed` oder `not_performed` ist möglich.
 Ein dauerhaft unbekannter Entnahmeausgang lässt sich nicht durch einen einfachen

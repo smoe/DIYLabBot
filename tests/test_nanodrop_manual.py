@@ -430,6 +430,29 @@ class ManualTaskTests(unittest.TestCase):
         self.confirm()
         self.assertEqual(self.flow.state['samples']['Sample01']['remaining_volume_ul'], 38.5)
 
+    def test_confirmed_withdrawal_over_balance_preserves_the_pending_measurement(self):
+        self.claim()
+        self.take()
+        intent = self.begin()
+        before, revision = self.journal.state(RUN_ID)
+        with self.assertRaisesRegex(ObservationError, 'Withdrawal exceeds recorded remaining volume'):
+            self.confirm(volume_ul=50, deviation_reason='Synthetic reported over-withdrawal')
+        state, current_revision = self.journal.state(RUN_ID)
+        expected = copy.deepcopy(before)
+        expected.update(recovery_required='observation_mismatch', workspace_clear=False)
+        self.assertEqual(state, expected)
+        self.assertEqual(state['status'], 'working')
+        self.assertEqual(current_revision, revision + 1)
+        self.assertEqual(state['pending_measurement']['intent_id'], intent)
+        self.assertEqual(state['samples']['Sample01']['remaining_volume_ul'], 40)
+        self.assertIsNone(self.flow.report()['samples']['Sample01']['remaining_volume_ul'])
+        event = self.journal.history(RUN_ID)[-1]
+        self.assertEqual(event['kind'], 'observation_rejected')
+        self.assertEqual(event['payload']['command'], 'confirm_measurement')
+        self.assertEqual(event['payload']['intent_id'], intent)
+        self.assertEqual(event['payload']['volume_ul'], 50)
+        self.assertIn('Withdrawal exceeds recorded remaining volume', event['payload']['error'])
+
     def test_reconciliation_records_a_wrong_actual_place_but_requires_original_place_for_completion(self):
         self.claim()
         self.measure_all()

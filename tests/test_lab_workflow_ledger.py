@@ -48,6 +48,37 @@ class LedgerInvariants(unittest.TestCase):
         self.assertTrue(vessel['volume_uncertain'])
         self.assertEqual(vessel['content_revision'],0)
 
+    def test_confirmed_withdrawal_over_balance_is_an_observation_error(self):
+        root=self.state;pending={'intent_id':'over-withdrawal'}
+        begin_withdrawal(root,'nanodrop',pending,'Sample01',{'kind':'discarded_after_cleanup'})
+        before=copy.deepcopy(root)
+        with self.assertRaisesRegex(ObservationError,'Withdrawal exceeds remaining volume'):
+            confirm_withdrawal(root,'nanodrop',pending,'Sample01',50,'Synthetic reported over-withdrawal')
+        self.assertEqual(root,before)
+        self.assertEqual(root['bookings'][pending['intent_id']]['outcome'],'intent')
+        self.assertEqual(remaining(root,'Sample01'),40)
+
+    def test_invalid_withdrawal_intents_and_missing_reason_remain_task_errors(self):
+        for defect in ['unknown','foreign_stage','foreign_sample','resolved','missing_reason']:
+            root=copy.deepcopy(self.state);pending={'intent_id':'withdrawal'}
+            begin_withdrawal(root,'nanodrop',pending,'Sample01',{'kind':'discarded_after_cleanup'})
+            stage_id,sample_id,reason='nanodrop','Sample01','Synthetic deviation'
+            if defect=='unknown':pending={'intent_id':'unknown'}
+            elif defect=='foreign_stage':stage_id='qubit'
+            elif defect=='foreign_sample':sample_id='Sample02'
+            elif defect=='resolved':root['bookings']['withdrawal']['outcome']='performed'
+            else:reason=None
+            before=copy.deepcopy(root)
+            with self.subTest(defect=defect):
+                with self.assertRaises(TaskError) as caught:
+                    confirm_withdrawal(root,stage_id,pending,sample_id,50,reason)
+                self.assertIs(type(caught.exception),TaskError)
+                self.assertEqual(root,before)
+
+    def test_sample_view_length_matches_its_iterated_keys(self):
+        view=StageState(self.state,'nanodrop')['samples']['Sample01']
+        self.assertEqual(len(view),len(list(view)))
+
     def test_cf01_inventory_conserves_each_original_once_before_projection(self):
         inventory={'rack':[s['sample_id'] for s in self.state['definition']['manifest']['samples']],
                    'rotor':[None]*12,'gripper':None}
