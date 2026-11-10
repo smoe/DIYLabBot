@@ -50,10 +50,13 @@ class SiLAContractTests(unittest.TestCase):
         profile = copy.deepcopy(self.data[0])
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'profile.json'
-            profile['protocol']['source_sha256'] = '0' * 64
-            path.write_text(json.dumps(profile))
-            with self.assertRaisesRegex(ValueError, 'Changed shared source'):
-                contract.load(path)
+            for source in ['protocol', 'network_batch']:
+                with self.subTest(source=source):
+                    profile = copy.deepcopy(self.data[0])
+                    profile[source]['source_sha256'] = '0' * 64
+                    path.write_text(json.dumps(profile))
+                    with self.assertRaisesRegex(ValueError, 'Changed shared source'):
+                        contract.load(path)
             profile = copy.deepcopy(self.data[0])
             del profile['command_errors']['status']
             path.write_text(json.dumps(profile))

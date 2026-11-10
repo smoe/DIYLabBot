@@ -242,7 +242,7 @@ Final verification on 2026-11-09:
   These results establish bounded simulator interoperability; they are not
   formal SiLA certification, LAN qualification or hardware safety evidence.
 
-## Historical rebase verification on 2026-11-10
+## Initial rebase verification on 2026-11-10
 
 The original SiLA commit was rebased without conflict onto master `7b7f581` as
 `0bb3874`. The earlier acceptance results above describe the pre-rebase source
@@ -250,20 +250,17 @@ revision and must not be used as proof that this rebased composition passes.
 The documentation alignment does not change server behavior, model pins or the
 architecture's proposed LockController version.
 
-The following findings describe that rebased revision, before the later master
-integration; they remain part of the historical evidence:
+Two integration findings were recorded before the corrections below:
 
-- `network_batch.source_sha256` still pins `e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0`,
-  while the current shared batch source is
+- `network_batch.source_sha256` pinned `e3c40b6ca0636968b56b230b67ed2bce4670749ef9e884bdf8fe72133a2cf7d0`,
+  while the rebased shared batch source was
   `da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681`.
-  Contract loading rejects the mismatch before server startup. Tests failing
-  there do not prove network, process-recovery or .NET interoperability on this
-  rebased stand. This rebase/documentation task leaves the model pin unchanged;
-  any subsequent update must preserve the source binding of existing journals.
-- `render_model_gallery.py --check` currently treats
-  `model/cf01-sila2.shared.json` as a model source requiring an image and rejects
-  its missing gallery coverage. It is a transport profile. No image, catalog or
-  historical provenance was added or rewritten to conceal this failure.
+  Contract loading rejected the mismatch before server startup. Those failures
+  do not prove network, process-recovery or .NET interoperability. The initial
+  rebase/documentation task left the model pin unchanged.
+- `render_model_gallery.py --check` treated
+  `model/cf01-sila2.shared.json` as a model source requiring an image and rejected
+  its missing gallery coverage, despite it being a transport profile.
 
 The offline and network/.NET-enabled project runs, per-file SiLA results with
 skip reasons, gallery check and shared-workflow demo are recorded locally in
@@ -271,7 +268,46 @@ skip reasons, gallery check and shared-workflow demo are recorded locally in
 Skipped checks and failures before transport startup are not passed network
 acceptance gates.
 
+## Source-pin and gallery correction on 2026-11-10
+
+This verification snapshot belongs to the SiLA branch incorporated by
+`7378a04`; it is a separate source composition from the master-integration
+snapshot below. Its test counts are not the final combined-tree counts.
+
+The owner-authorized correction pins the current shared batch source
+(`da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681`).
+It does not change that batch, device geometry or protocol semantics. The
+station source signature changes intentionally: existing journals remain bound
+to their original sources and are not silently migrated or reset.
+
+Gallery coverage now excludes only the exact transport format
+`solidcraftbot.cf01-sila2/1`, regardless of its filename. All other shared
+formats, including unknown/new geometry, still require image coverage. Image
+hashes, dependencies, catalog coverage and budget checks remain in force.
+Images, gallery catalog/README and historical provenance are unchanged. The
+stored `render_generator_sha256` continues to identify the historical image
+generator, not this later checker revision.
+
+LockController remains the archived v1.0 definition. The correction does not
+select or claim v2.0 support. New verification logs and per-file results are
+kept separately under
+`exports/generated/sila-pin-gallery-fix/verification-report.json`; the earlier
+failed rebase evidence above is retained unchanged.
+
+Both project runs completed without failures: 515 tests with 43 skips in the
+offline baseline, and 515 tests with 24 skips when network and .NET gates were
+enabled. The enabled run passed all 47 SiLA tests without skips, including the
+15 network, two process and two independent .NET tests. The offline baseline
+skipped those 19 gated tests; the remaining 24 skips in each run concern other
+optional/native checks. The gallery check passed for 31 unchanged images and
+30 model sources (2,975,847 bytes); all three gallery regression tests passed.
+The shared-workflow demo completed at 33 synthetic seconds.
+
 ## Master integration on 2026-11-10
+
+The following snapshot was recorded at `304e7c5`, before the final merge of
+`7378a04` and its additional regression tests. It does not claim verification
+of that later combined tree.
 
 The integration combines review follow-up `52120c5` with the documentation from
 `fee2413`. It restores `network_batch.source_sha256` to
@@ -304,6 +340,14 @@ The integration worktree retains the local log and source-bound report under
 integration results, not replacements for the historical rebase evidence.
 No new native BRep collision run, hardware, LAN, safety or formal SiLA
 qualification follows from this merge; GENtle resource binding remains planned.
+
+The final merge of `7378a04` preserves both snapshots above and uses one gallery
+classification implementation. Post-merge checks passed all eight gallery
+regression tests and all five CF01 contract tests, including the additional
+batch-pin corruption case; the actual gallery check also passed. CF01 server,
+runtime and profile bytes remain identical to the `304e7c5` snapshot. The full
+suite was not repeated after the gallery-helper naming and test/documentation
+merge; these targeted results supplement, rather than replace, that full run.
 
 Commands for the current checks:
 

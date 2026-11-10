@@ -341,7 +341,7 @@ def write_documentation():
     (DIRECTORY/'README.md').write_text(template.replace('__MODEL_GROUPS__','\n'.join(sections)),encoding='utf-8')
 
 
-def required_model_sources():
+def expected_model_sources():
     """Classify top-level shared sources; composition layers always need images."""
     expected={'model/robot.json'}
     for path in (ROOT/'model').glob('*.shared.json'):
@@ -374,7 +374,7 @@ def check(require_review=True):
             assert not any(e.tag.endswith('script') or e.tag.endswith('image') for e in svg.iter())
         if not (ROOT/entry['documentation']).is_file():raise ValueError('Broken documentation link')
         if entry['image'] not in page or any('../../'+s not in page for s in entry['sources']):raise ValueError('Model missing from gallery page')
-    expected=required_model_sources()
+    expected=expected_model_sources()
     if expected-covered:raise ValueError('Model source without image: '+str(sorted(expected-covered)))
     if total>4_000_000:raise ValueError('Curated gallery exceeds 4 MB image budget')
     if require_review and not provenance.get('visual_review',{}).get('passed'):raise ValueError('Visual review pending')
