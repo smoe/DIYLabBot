@@ -405,6 +405,202 @@ nicht in den manuellen oder gemeinsamen Laborablauf eingebunden. Ein fachlicher
 Decoder benötigt zunächst echte versionierte Geräteantworten und einen expliziten
 Identitätsvertrag; die Ultra-API wird nicht auf NanoDrop One übertragen.
 
+## SiLA-Fähigkeiten und GENtle-Ressourcenbindung
+
+**Status: dokumentierte Zielarchitektur, noch nicht implementiert.** Dieser
+Vertrag ergänzt die vier räumlichen Ebenen um eine Bindung für Gerätefähigkeiten
+und ihre aktuelle Belegung. Er führt keine neuen Schemas, Endpoints, Dienste oder
+Runtime-Daten ein. Die vorhandenen lokalen SiLA-Vertragsdecoder und Mocks sind
+keine laufenden SiLA-Netzwerkserver und kein Hardwarebeleg. Auch der getrennte
+UltraC-HTTP-Leseadapter ist kein SiLA-Adapter. Alle bisherigen Sicherheits-,
+Metrologie-, biologischen und Fertigungsgrenzen gelten unverändert weiter.
+
+Referenzen sind [SiLA 2](https://sila-standard.com/), die
+[offiziellen Featuredefinitionen in `sila_base`](https://gitlab.com/SiLA2/sila_base)
+und [GENtle](https://github.com/smoe/gentle_rs). Die folgende Aufgabenteilung ist
+der künftige Integrationsvertrag, keine Zusage bereits vorhandener Schnittstellen
+in einem der beiden Projekte.
+
+### Verantwortlichkeiten und Identitäten
+
+DIYLabBot führt stabile Labor-, Umgebungs- und Geräteinstanz-IDs, referenzierte
+Gerätetypen und deren genaue Quellenrevisionen beziehungsweise Prüfsummen.
+Aufstellung, Koordinatenrahmen und modellierte Geometrie bleiben in ihren
+bestehenden Quellen. Hinzu kommen künftig die Inventarbindung einer Instanz an
+eine SiLA-Serveridentität, deren angekündigte Featuredefinitionen oder ein
+zeitlich gebundener Cache sowie lokale Betriebszustände und Richtlinien aus
+einer Runtime-/Privatüberlagerung. Modellidentität und beobachteter Zustand
+bleiben getrennt: CAD-Präsenz, Aussehen, Hersteller-/Modellname oder eine
+Ontologieklasse belegen keine erreichbare, steuerbare Fähigkeit.
+
+GENtle oder ein anderer Versuchsplaner besitzt die wissenschaftliche Versuchs-
+und Protokollabsicht, Proben-/Materialsemantik, benötigte Fähigkeiten und
+Randbedingungen. Dort liegen Kandidatenvergleich, Zuordnungsvorschau, Freigabe
+und der Beleg für das tatsächlich verwendete Gerät. DIYLabBot dupliziert diese
+Protokollsemantik nicht und entscheidet keinen biologischen Erfolg. Das vorhandene
+operative Lauf-Inventar mit Gefäßidentität, Ort, Gewahrsam, belegtem Verbrauch und
+Reservierungen bleibt erhalten; eine spätere GENtle-Bindung referenziert die
+wissenschaftlichen Proben-/Materialkennungen, statt einen zweiten Bestand zu
+erfinden oder bestehende synthetische IDs still umzuschreiben.
+
+### SiLA-Featuredefinitionen als Ausführungsvertrag
+
+SiLA 2 Feature Definition Language (FDL) ist das primäre operative Vokabular.
+SiLA ist keine OWL-Ontologie. Optionale semantische Annotationen, etwa OBI-Terme
+für Zentrifuge oder Zentrifugation, dienen der fachlichen Einordnung; sie ersetzen
+kein implementiertes, angekündigtes SiLA-Feature und keinen Kompatibilitätsnachweis.
+
+Der künftige Bindungsweg lautet:
+
+1. Die Geräteinstanz löst eine private Endpoint-Konfiguration auf. Die dort
+   beobachtete Identität der normativen `SiLAService`, insbesondere die stabile
+   `ServerUUID`, muss mit der Inventarbindung übereinstimmen. Eine Netzwerkadresse
+   oder ein Anzeigename ist keine stabile Geräteidentität; eine UUID allein ist
+   kein Nachweis physischer Identität oder authentisierter Kommunikation.
+2. `ImplementedFeatures` liefert die angekündigten Features;
+   `GetFeatureDefinition` liefert für jedes benötigte Feature die genaue FDL.
+   Maßgeblich sind vollständig qualifizierter Feature-Identifier (FQI), volle
+   `FeatureVersion` und Digest der exakten Definitionsbytes. Der FQI enthält die
+   Major-Version; beispielsweise ist `org.silastandard/core/LockController/v2`
+   nicht mit einer vollständigen Versionsangabe `2.0` gleichzusetzen.
+3. Definitionen werden mit SHA-256, Quelle/Revisionsbezug, beobachteter
+   Serveridentität, Beobachtungszeit und Frischefrist gebunden. Befehle,
+   Properties, Datentypen, Einheiten, Constraints und Ausführungsfehler bleiben
+   aus genau dieser FDL erhalten. Zusätzlich wird die vom Server angekündigte
+   Liste der von Metadata betroffenen Calls an den Snapshot gebunden. Ein
+   gemeinsamer Anzeigename oder gleicher
+   FQI bei geändertem Digest genügt nicht zur Wiederverwendung eines Matches.
+4. GENtle vergleicht diese Evidenz mit seinen Anforderungen und stellt die
+   Zuordnung zur Freigabe dar. Unerreichbare, veraltete, widersprüchliche oder
+   unvollständige Angaben bleiben unbekannt, nicht verfügbar. Eine kompatible
+   Ankündigung ist noch keine bestätigte Belegung und keine Ausführung.
+
+Referenz für die Serveridentität ist die normative
+[`SiLAService`-FDL, Featureversion 1.0](https://gitlab.com/SiLA2/sila_base/-/blob/58290aab68172dcab4ce52d74478b9b97910964f/feature_definitions/org/silastandard/core/SiLAService-v1_0.sila.xml).
+Der FQI-Vergleich folgt den SiLA-Regeln einschließlich ignorierter Groß-/
+Kleinschreibung; die vollständige Version und der Byte-Digest bleiben zusätzliche
+Bindungen, siehe [Core-Spezifikation v1.1](https://sila-standard.com/wp-content/uploads/2022/03/SiLA-2-Part-A-Overview-Concepts-and-Core-Specification-v1.1.pdf).
+
+### Getrennte künftige Datensätze
+
+Die folgenden Rollen beschreiben benötigte künftige Verträge, keine heute
+unterstützten Schemafelder oder implementierten Datenbanken:
+
+| Datensatz | Inhalt und Eigentümergrenze |
+|---|---|
+| Geräteinstanz | Stabile DIYLabBot-ID, Labor-/Umgebungsbezug, Gerätetyp-/Quellenrevision und Vertrauensklasse `synthetic`, `simulator`, `physical` oder ausdrücklich unbekannt |
+| SiLA-Endpointbindung | Geräteinstanz-ID, erwartete `ServerUUID` und private Referenz auf lokale Endpoint-Konfiguration; keine Zugangsdaten oder sensible Topologie in öffentlichen Dateien |
+| Capability-Advertisement-Snapshot | Angekündigte FQIs und volle Versionen, exakte FDL-Digests, Herkunft, beobachtete Identität, Beobachtungszeit, Erreichbarkeit und Frische |
+| Runtime-Allokation | Beobachtete Sperre, bestätigte lokale Zuordnung, Besitzer-/Sitzungsbezug und lokale Richtlinie in geschütztem Laufzeitspeicher beziehungsweise privater Überlagerung |
+| Zuordnungs-/Belegreferenz | GENtle-Plan-/Freigabereferenz, tatsächlich gewählte Instanz, `ServerUUID` und verwendete Feature-Digests; nicht geheime Allokations-/Journalreferenz statt Locktoken |
+
+Die eindeutige Instanz-/Server-/Endpointzuordnung ist eine DIYLabBot-Inventarregel,
+keine Behauptung, dass jeder SiLA-Server ein einzelnes physisches Gerät darstellt;
+SiLA-Server können auch Softwarerollen erfüllen.
+
+Vorhandene `host`-, Raum-, Platzierungs- und CAD-Verträge erhalten dadurch keine
+Endpoint-, Capability- oder Reservierungsbedeutung. Insbesondere bleiben die
+oben unterschiedenen Welt-/Elternrahmen unverändert. Ohne konfigurierte
+SiLA-Bindung bleibt das bisherige Modell- und Workflowverhalten unverändert.
+
+### Aktuelle Belegung mit LockController
+
+Erster vorgesehener Mechanismus für exklusive unmittelbare Nutzung ist der
+offizielle **`LockController` v2 im Status Draft**, hier die
+[FDL mit Featureversion 2.0](https://gitlab.com/SiLA2/sila_base/-/blob/58290aab68172dcab4ce52d74478b9b97910964f/feature_definitions/org/silastandard/core/LockController-v2_0.sila.xml)
+aus `sila_base`-Revision `58290aab68172dcab4ce52d74478b9b97910964f`.
+Das ist kein normatives, bereits qualifiziertes Reservierungssystem. Die
+ausgewertete FDL-Revision muss im jeweiligen Snapshot gebunden bleiben;
+ein späterer Entwurf wird nicht still als gleichwertig behandelt.
+
+- `IsLocked` ist eine beobachtbare, nicht lockgeschützte Zustandsauskunft,
+  kein Eigentumsnachweis.
+  Erst die bestätigte erfolgreiche `LockServer`-Anforderung entscheidet, welcher
+  konkurrierende Client die Ressource erhalten hat. Eine frühere Beobachtung
+  „frei“ reserviert nichts. `ServerAlreadyLocked` bedeutet Konkurrenz, keinen
+  Geräteausfall; eine andere kompatible Instanz kann als Kandidat geprüft werden.
+- Der Client setzt den geheimen `LockIdentifier`; der Server liefert keinen
+  neuen Locktoken zurück. `UnlockServer` und die dokumentierten Fehler werden
+  gegen genau diesen Vertrag behandelt. Lock-Identifier gehören ausschließlich
+  in geschützten geheimen Laufzeitzustand, nie in Modellquellen, Berichte, Logs,
+  öffentliche Fixtures oder GENtle-Belege. Eine Beleg-ID ist kein Lock-Identifier.
+- Der Draft-Timeout in Sekunden begrenzt Inaktivität seit einem gültigen Request
+  mit Lock-Identifier; `0` bedeutet kein Timeout. Das ist keine Buchungsfrist.
+  Nicht jeder Call ist lockgeschützt; Schutzumfang und Metadata-Verwendung
+  ergeben sich aus der exakten FDL und der vom Server angekündigten Liste
+  betroffener Calls. Insbesondere darf späteres Polling eines laufenden
+  Observable-Kommandos nicht pauschal als Lock-Verlängerung gelten.
+- Fehlt das Feature, bleibt das Gerät auffindbar, seine exklusive
+  Reservierbarkeit aber ununterstützt beziehungsweise unbekannt. Eine lokale
+  SQLite-Reservierung darf diese fehlende Serverfähigkeit nicht ersetzen.
+- Timeout, fehlende Quittung, Abbruch oder Neustart erfordern einen expliziten
+  Besitz-/Zustandsabgleich. Lokale Belegung wird nicht allein wegen Servertimeout
+  als frei erklärt; ein früherer Besitzer darf ohne erneute bestätigte
+  Berechtigung keine weiteren Schritte ausführen. Unlock oder Timeout belegen
+  weder das Ende eines laufenden Gerätebefehls noch sichere physische Zustände.
+- Ein Lock belegt nur Allokation, nicht Ausführung, wissenschaftlichen Abschluss,
+  Sicherheit oder biologische Gültigkeit. Zukunftsbuchungen, Warteschlangen und
+  erwartete Freigabezeiten benötigen einen getrennten Schedulervertrag.
+
+Die Trennung von verantwortlichem Akteur, physischem Ort, Ressourcenbesitz und
+persistiertem Zustand aus den [manuellen Aufgaben](docs/manual-tasks.md) und dem
+[synthetischen Gesamtlauf](docs/synthetic-lab-workflow.md) bleibt maßgeblich.
+Deren lokale SQLite-Reservierungen sind keine vorhandenen SiLA-Serverlocks und
+schützen keine unabhängig zugreifenden Netzwerkclients. Es entsteht keine zweite
+Reservierungsführung in Geometriequellen; ein künftiger Adapter muss bestätigte
+Serverallokation und lokale Laufzustände ausdrücklich aufeinander beziehen.
+
+### Generische Features und öffentliche/private Grenze
+
+IEGT ist die vorgesehene erste reale Laborumgebung, keine Grundlage für
+Sonderlogik im Vertrag. Künftige Schemas, Featureprofile und Mappings bleiben
+labor-, raum-, hersteller- und geräteinstanzunabhängig; weder TP, IEGT noch CF01
+definieren deren Semantik. Zuerst ist ein geeignetes versioniertes Upstream-
+Feature zu suchen und wiederzuverwenden. Fehlt ein ausreichend generisches
+Feature, etwa für eine herstellerübergreifende Zentrifugationssteuerung, folgt
+die kleinste neutrale, wiederverwendbare Definition unter projektkontrolliertem
+Namespace mit expliziten Einheiten und Constraints. Lokal/Draft und normativ
+Upstream bleiben unterscheidbar. Herstelleraliase sind kein Nachweis äquivalenter
+Fähigkeiten; eine Upstream-Beitragsprüfung folgt erst nach Bewährung des gemeinsamen
+Vertrags an mehreren Geräten.
+
+Das öffentliche Repository darf synthetische Fixtures, bereinigte Instanz-IDs,
+Gerätetypdefinitionen, Feature-Mappings und spätere Schemas enthalten. Reale
+Endpoints, Zugangsdaten, sensible Netz-/Raummetadaten, Betriebszustand und lokale
+Richtlinien gehören in eine private IEGT-Überlagerung. Beide Ebenen referenzieren
+dieselben stabilen, nicht sensiblen IDs. Öffentliche Serialisierung braucht eine
+ausdrückliche Feldfreigabe; bei unklarer Klassifikation oder privaten Feldern
+wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
+
+### Künftige Abnahmeszenarien
+
+**Diese Kriterien sind noch zu implementieren und nicht als bestanden geprüft:**
+
+1. Zwei generische Zentrifugen kündigen dasselbe benötigte SiLA-Feature an;
+   ist eine gesperrt, kann die andere kompatible Instanz tatsächlich allokiert werden.
+2. Fehlen beim freien Ersatz erforderliche RCF, Temperatur, Kapazität oder
+   Gefäßkompatibilität, wird er nicht als äquivalenter Ersatz angeboten.
+3. Unerreichbare, veraltete, widersprüchliche oder unvollständige Ankündigungen
+   bleiben unbekannt und werden nicht als verfügbar dargestellt.
+4. Ein Gerät ohne `LockController` ist auffindbar, aber nicht als exklusiv
+   reservierbar ausgewiesen.
+5. Zwei Clients konkurrieren um dasselbe Gerät; nur der bestätigt erfolgreiche
+   Lockinhaber erhält die Zuordnung, nicht beide aufgrund einer früheren Freimeldung.
+6. Timeout, Abbruch, Neustart und Freigabe bewahren einen eindeutigen bestätigten
+   Besitzer oder ausdrücklich ungeklärten Zustand; sie erfinden keinen Laufabschluss.
+7. Eine geänderte Featureversion oder Definitionsprüfsumme entwertet das
+   bisherige Cache-Matching und verlangt erneuten Abgleich.
+8. Doppelte Geräteinstanz-IDs, doppelte/widersprüchliche `ServerUUID`-Bindungen
+   und ein Endpoint für zwei physische Geräte werden abgelehnt.
+9. `synthetic`, `simulator`, `physical` und unbekannte Vertrauensklassen werden
+   niemals still gegeneinander ausgetauscht.
+10. Öffentliche Ausgaben enthalten weder Endpoint-Zugangsdaten noch Locktoken
+    oder private IEGT-Netz-/Raumdetails; unklare Exporte werden gesperrt.
+11. Ohne SiLA-Bindung bleiben Bytes und Semantik vorhandener Raum-, Möbel-,
+    Geräteaufstellungs-, CAD- und synthetischer Workflowquellen unverändert.
+12. Ein GENtle-Beleg referenziert die gewählte DIYLabBot-Instanz, `ServerUUID`
+    und Featuredefinition-Digests, ohne DIYLabBot-Geometrie zu kopieren.
+
 ## Nächste Schritte
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden
