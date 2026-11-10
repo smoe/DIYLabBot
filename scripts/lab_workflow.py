@@ -489,7 +489,7 @@ class Workflow:
             if evidence!='synthetic_operator_confirmation':
                 raise TaskError('CF01 abort evidence must be explicitly synthetic operator input')
             if (not isinstance(rotor_empty,list) or any(type(slot) is not int for slot in rotor_empty)
-                    or rotor_empty != list(range(1,13))):
+                    or rotor_empty != list(range(1,state['definition']['stages']['cf01']['required_capacity']+1))):
                 raise ObservationError('Explicit empty observation for all twelve rotor places required')
             if any(flag is not True for flag in [gripper_empty,standstill_confirmed,parking_brake_held,
                                                 lift_parked,arm_clear,workspace_clear,retire_attempt]):

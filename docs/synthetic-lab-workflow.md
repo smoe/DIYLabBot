@@ -132,14 +132,22 @@ sowie auf Überschneidungen nicht benachbarter Armglieder geprüft. Die zugehör
 Gelenkwinkel, Zielmatrizen, Restfehler und nativen Prüfmodelle stehen im Bericht
 unter `instrument_reachability` und `approach_geometry_checks`.
 
-`instrument_motion_validation` prüft außerdem sämtliche 241 Stellungen der
-bestehenden CF01-Bewegungsfolge gegen beide Messgeräte. Für diese Stellungen
+`instrument_motion_validation` prüft außerdem sämtliche Stützpunkte der
+bestehenden CF01-Bewegungsfolge gegen beide Messgeräte. Dabei werden nur
+Armglieder und Werkzeug bewegt geprüft; getragenes Gefäß und Deckel sind
+ausgeschlossen. Gegen die festen Gerätekörper gilt ein Überlappungsgrenzwert
+von 1e-3 mm³, kein allgemeines Abstandssoll. Für diese Stellungen
 und die beiden Annäherungen wird der Abstand der NanoDrop-Hebelkörper zum Arm
 zusätzlich in 5°-Schritten von geschlossen bis zur maximalen Quellenöffnung
 gemessen. Der erforderliche Abstand stammt aus dem vorhandenen CF01-Prüfvertrag.
 Getrennte Hüllboxen liefern konservative Abstandsuntergrenzen; können sie den
 Mindestabstand nicht belegen, wird der native BRep-Abstand berechnet. Der Bericht
 nennt die kleinste belegte Untergrenze, kein exaktes globales Minimum.
+Das Abstandssoll gilt ausschließlich gegen die NanoDrop-Hebelkörper, nicht
+gegen Qubit oder die übrigen festen NanoDrop-Körper. Der native Prüfer gibt
+die tatsächlich ausgewählten Körper, Kriterien und Ausschlüsse selbst unter
+`coverage`, `exclusions` und `scope` aus; die Zähler der exakten Prüfungen
+bleiben daneben erhalten.
 Das sind diskrete Geometrieprüfungen, kein kontinuierlicher Hüllraumnachweis.
 
 Der eigenständige CF01-Entnahmebuild modelliert weiterhin nur Arm, CF01, Rack
@@ -155,7 +163,13 @@ Geräte nicht ab.
 anerkannt, wenn Quellen und Workspace unverändert sind, alle ausgeschlossenen
 Geräte enthalten sind und die gebundene Trajektoriendatei sowohl bytegenau als
 auch inhaltlich zur aktuellen CF01-Trajektorie passt. Der Gesamtbuilder schreibt
-dazu `cf01_trajectory` mit Pfad, Datei- und semantischer Prüfsumme. Fehlende,
+dazu `cf01_trajectory` mit Pfad, Datei- und semantischer Prüfsumme. Der
+Gesamtbericht muss außerdem den Prüfumfang ausdrücklich deklarieren;
+`collision_scope()` übernimmt ihn unverändert unter `overall_report`.
+Ein fehlender oder falsch geformter Umfang beziehungsweise Bericht ergibt
+`unverified` mit Begründung. Auch `current` und
+`overall_workspace_validation_required: false` sind nur zusammen mit diesem
+Umfang zu lesen und bedeuten keine vollständige Workspace-Abdeckung. Fehlende,
 fehlgeschlagene, veraltete oder noch nicht so gebundene Gesamtberichte lassen
 `overall_workspace_validation_required` auf `true`. Alte Berichte und Medien
 werden dafür nicht umgeschrieben. Diese Ergänzung ändert Berichtsmetadaten,
@@ -268,6 +282,16 @@ erhalten. Anschließend wird ein `BatchError` mit unverändertem Fehlerbericht
 archiviert. Weder Probenrückgabe noch Ressourcenfreigabe oder Stufenabschluss
 folgen daraus. Der Regressionstest setzt die Frist mitten in den Schleuderlauf
 und prüft beide lokalen Decoder einschließlich der beobachteten Bremsphase.
+
+`stop_observed` im CF01-Bericht und in der kompakten Checkpointansicht wird
+erst nach erfolgreicher Rückkehr aus `wait_for_stop()` wahr: Stillstand und
+gehaltene Parkbremse wurden nach dem Stopp beobachtet. `stop_via_contract`
+bestätigt dagegen nur die Stoppquittung. Bei gewöhnlichen Fehlern ohne Hold
+wird weiterhin kein Stillstand abgewartet; `stop_observed` bleibt dann falsch.
+Auch bei einer fehlgeschlagenen Stoppbeobachtung bleibt es falsch, während
+`stop_error` den zusätzlichen Fehler nennt und der ursprüngliche Fehlergrund
+erhalten bleibt. Alte gespeicherte Ansichten und Berichte werden nicht ergänzt;
+ein dort fehlendes Feld ist kein Stillstandsnachweis.
 
 Bei einem echten Journal-/Speicherfehler gilt bewusst die strengere Regel:
 keine weiteren Runner-Effekte und auch kein unjournalierter Best-Effort-Stopp.

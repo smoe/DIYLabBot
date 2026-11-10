@@ -49,6 +49,7 @@ def instrument_motion_validation(records, scene, data, reachability):
     def lower_distance(a, b):
         return math.sqrt(sum(max(0, a[0][i]-b[1][i], b[0][i]-a[1][i])**2 for i in range(3)))
 
+    arm_records = [r for r in records if r['instance'] == 'Arm']
     fixed = [(r, r['shape'], bounds(r['shape'])) for r in records if r['group'] == 'FixedInstrument']
     levers = []
     for record, shape, _ in fixed:
@@ -72,11 +73,10 @@ def instrument_motion_validation(records, scene, data, reachability):
     seen, hits, exact, distances = set(), [], 0, 0
     minimum, nearest = float('inf'), None
     required = scene['checks']['minimum_robot_equipment_clearance_mm']
+    overlap_tolerance = 1e-3
     for index, (sample, label) in enumerate(states):
         matrices = evaluate(sample)
-        for record in records:
-            if record['instance'] != 'Arm':
-                continue
+        for record in arm_records:
             matrix = matrices[record['group']]
             signature = (record['name'], tuple(round(v, 8) for row in matrix for v in row))
             if signature in seen:
@@ -90,7 +90,7 @@ def instrument_motion_validation(records, scene, data, reachability):
                     continue
                 exact += 1
                 volume = actual.common(shape).Volume
-                if volume > 1e-3:
+                if volume > overlap_tolerance:
                     hits.append({'a': record['name'], 'b': other['name'], 'pose': label,
                                  'cf01_time_s': sample['time_s'], 'volume_mm3': volume})
             for name, angle, lever, lever_box in levers:
@@ -112,7 +112,20 @@ def instrument_motion_validation(records, scene, data, reachability):
             'minimum_nanodrop_lever_arm_distance_lower_bound_mm': minimum, 'nearest_pair': nearest,
             'required_lever_arm_distance_mm': required, 'collisions': hits,
             'exact_overlap_tests': exact, 'exact_distance_tests': distances,
-            'scope': 'Discrete CF01 path and two approach configurations versus both instruments in their default poses; NanoDrop lever clearance also sampled from closed to maximum opening in 5 degree steps. Conservative world AABB separation proves distant pairs; native BRep distances resolve pairs below the required clearance. The reported minimum is a clearance lower bound, not the exact global minimum. No continuous swept-volume or connecting-path qualification.'}
+            'coverage': {
+                'moving_bodies': [r['name'] for r in arm_records],
+                'moving_body_groups': sorted({r['group'] for r in arm_records}),
+                'overlap': {'fixed_instrument_bodies': [r['name'] for r, _, _ in fixed],
+                            'maximum_volume_mm3': overlap_tolerance},
+                'clearance': {'nanodrop_lever_bodies': sorted({name for name, _, _, _ in levers}),
+                              'minimum_distance_mm': required, 'hinge_angles_deg': angles}},
+            'exclusions': {
+                'carried_bodies': [r['name'] for r in records
+                                   if r['group'] == 'PresentedTube' and r not in arm_records],
+                'minimum_clearance_against_other_instrument_bodies': [
+                    r['name'] for r, _, _ in fixed if r['name'] not in {name for name, _, _, _ in levers}],
+                'continuous_swept_volume': True, 'connecting_paths': True},
+            'scope': 'Only the selected arm links and tool bodies are moved through the discrete CF01 path and two approach configurations against the fixed instrument bodies; carried tube and cap are excluded. Fixed instrument bodies have an overlap-volume criterion, not a minimum-clearance requirement. Only the selected NanoDrop lever bodies receive the required clearance, sampled from closed to maximum opening in 5 degree steps. Conservative world AABB separation proves distant pairs; native BRep distances resolve pairs below the required clearance. The reported minimum is a clearance lower bound, not the exact global minimum. No continuous swept-volume or connecting-path qualification.'}
 
 
 def main(context_path):
