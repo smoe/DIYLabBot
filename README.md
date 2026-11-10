@@ -23,7 +23,7 @@ synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
 ## Roboter in Bewegung
 
-[![Roboter entnimmt ein Gefäß aus der Zentrifuge und legt es im Rack ab](docs/media/robot-demo-overlap.png)](docs/media/robot-demo-overlap.mp4)
+https://github.com/user-attachments/assets/9b987f94-7fb4-4c59-af2a-e7aaa822e924
 
 [Kurzes Video ansehen](docs/media/robot-demo-overlap.mp4) ·
 [Interaktive Demo herunterladen](docs/media/robot-demo-overlap.html) ·
