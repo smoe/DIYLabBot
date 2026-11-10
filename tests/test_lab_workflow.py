@@ -428,20 +428,29 @@ class IntegratedWorkflowTests(unittest.TestCase):
             NanoDrop(self.journal, self.flow.run_id, None)
 
     def test_later_stage_cannot_withdraw_more_than_the_previous_stage_left(self):
-        with tempfile.TemporaryDirectory(prefix='lab-source-test-', dir=ROOT / 'model') as folder:
-            profile = json.loads(SOURCE.read_text())
-            manifest = json.loads((ROOT / profile['manifest']['source']).read_text())
-            manifest['samples'][0]['initial_volume_ul'] = 3
-            source = Path(folder) / 'manifest.json'
-            source.write_text(json.dumps(manifest))
-            profile['manifest'] = {'source': str(source.relative_to(ROOT)), 'source_sha256': digest(source.read_bytes())}
+        profile = json.loads(SOURCE.read_text())
+        source = ROOT / profile['manifest']['source']
+        original = source.read_bytes()
+        manifest = json.loads(original)
+        manifest['samples'][0]['initial_volume_ul'] = 3
+        content = json.dumps(manifest).encode()
+        profile['manifest']['source_sha256'] = digest(content)
+        read_bytes, read_text = Path.read_bytes, Path.read_text
+        # Keep the source compiler and checksum validation intact, supplying a
+        # synthetic in-memory source rather than writing into model/.
+        def fixture_bytes(path):
+            return content if path.resolve() == source.resolve() else read_bytes(path)
+        def fixture_text(path, *args, **kwargs):
+            return content.decode() if path.resolve() == source.resolve() else read_text(path, *args, **kwargs)
+        with patch.object(Path, 'read_bytes', fixture_bytes), patch.object(Path, 'read_text', fixture_text):
             flow = Workflow.create(self.journal, source=profile, run_id='SYN.LAB.LOWVOLUME')
-            self.cf01(flow)
-            run_nanodrop(flow)
-            with self.assertRaisesRegex(TaskError, 'Insufficient'):
-                run_qubit(flow)
-            self.assertEqual(flow.report()['samples']['Sample01']['remaining_volume_ul'], 1.5)
-            self.assertFalse(any(b['stage_id'] == 'qubit' for b in flow.state['bookings'].values()))
+        self.cf01(flow)
+        run_nanodrop(flow)
+        with self.assertRaisesRegex(TaskError, 'Insufficient'):
+            run_qubit(flow)
+        self.assertEqual(flow.report()['samples']['Sample01']['remaining_volume_ul'], 1.5)
+        self.assertFalse(any(b['stage_id'] == 'qubit' for b in flow.state['bookings'].values()))
+        self.assertEqual(source.read_bytes(), original)
 
     def test_root_clock_and_deadline_do_not_reset_at_stage_boundaries(self):
         self.ready_cf01()

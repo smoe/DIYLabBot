@@ -60,8 +60,12 @@ Ergebnisbewertung ist eine dokumentierte synthetische Entscheidung.
 
 Standardmäßig liegen SQLite, Demo-CSV und JSON-Berichte unter
 `exports/manual-workflows/`. Dieser bereits ignorierte Ordner ist Laufzeitdaten,
-keine zusätzliche Modellquelle. `--store` wählt eine andere SQLite-Datei innerhalb
-von `exports/`; CSV und Standardberichte liegen dann neben diesem Store im
+keine zusätzliche Modellquelle. Neue Installationen verwenden `workflows.sqlite3`.
+Ein allein vorhandener historischer Store `nanodrop.sqlite3` bleibt der gemeinsame
+Standard; bei zwei verschiedenen Dateien verlangt die Auswahl ausdrücklich
+`--store`. Die [gemeinsame Store-Regel](manual-tasks.md#laufprotokoll-und-wiederaufnahme)
+verhindert eine stille Aufteilung der Reservierungen. `--store` wählt eine andere
+SQLite-Datei innerhalb von `exports/`; CSV und Standardberichte liegen dann neben diesem Store im
 jeweiligen Laufunterordner. Der gemeinsame Store ist für gegenseitige Reservierungen nötig.
 Getrennte Datenbanken koordinieren ihre Ressourcen nicht miteinander. Qubit
 verwendet denselben Standardpfad. Auch Originalgefäß-IDs sind nun reserviert,

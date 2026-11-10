@@ -123,6 +123,10 @@ def main(argv=None):
     server.add_argument('--discovery', action='store_true')
     inspect = sub.add_parser('inspect', help='Gespeicherten Prüfpunkt lesen' if language == 'de' else 'Read stored checkpoint')
     inspect.add_argument('--store', required=True, type=Path)
+    status = sub.add_parser('status', help='Station lesend erneut verbinden' if language == 'de' else 'Reconnect for live station status')
+    status.add_argument('--ready-file', required=True, type=Path)
+    status.add_argument('--login-input', required=True, type=Path)
+    status.add_argument('--out', required=True, type=Path)
     reconcile = sub.add_parser('reconcile', help='Synthetischen Wiederanlaufabgleich bestätigen' if language == 'de' else 'Confirm synthetic restart reconciliation')
     reconcile.add_argument('--store', required=True, type=Path)
     reconcile.add_argument('--observation', required=True, type=Path)
@@ -151,6 +155,14 @@ def main(argv=None):
         elif args.command == 'batch':
             if not run_batch(args):
                 raise SystemExit(1)
+        elif args.command == 'status':
+            from cf01_sila2_client import read_station_status
+            ready = json.loads(runtime_path(args.ready_file).read_text())
+            login = json.loads(runtime_path(args.login_input).read_text())
+            observed = asyncio.run(read_station_status(ready, login['username'], login['password']))
+            private_json(args.out, observed)
+            print(json.dumps({'observation': observed['observation'], 'boot_changed': observed['boot_changed'],
+                              'process_effects_dispatched': False, 'snapshot': str(runtime_path(args.out))}))
         elif args.command == 'inspect':
             path = runtime_path(args.store)
             if not path.is_file():

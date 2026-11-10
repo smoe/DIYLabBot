@@ -1,6 +1,68 @@
 """Network client primitives. A receipt is not an observable command result."""
 import asyncio
+import math
+from pathlib import Path
+import re
 import time
+
+
+def from_wire(value):
+    if isinstance(value, dict):
+        return {re.sub(r'(?<!^)(?=[A-Z])', '_', key).lower(): from_wire(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [from_wire(item) for item in value]
+    return value
+
+
+async def connect_station(ready, username, password, timeout_s=5.):
+    """Verify server identity and authenticate without acquiring a process lock."""
+    from sila.client import Client, ClientConfig
+    if (ready.get('tls') is not True or ready.get('simulation_only') is not True
+            or ready.get('hardware_available') is not False):
+        raise ValueError('Explicit TLS simulation-only endpoint required')
+    if type(timeout_s) not in (int, float) or not math.isfinite(timeout_s) or timeout_s <= 0:
+        raise ValueError('Finite positive RPC timeout required')
+    client = Client(ClientConfig(hostname=ready['bind'], port=ready['port'], tls=True,
+                    root_certificates=Path(ready['certificate']).read_bytes(), default_timeout=timeout_s * 1000))
+    try:
+        await client.open()
+        if await client.SiLAService.ServerUUID.read() != ready['server_uuid']:
+            raise ValueError('SiLA server identity mismatch')
+        response = await client.AuthenticationService.Login(UserIdentification=username, Password=password,
+                        RequestedServer=ready['server_uuid'], RequestedFeatures=[])
+        auth = await client.AuthorizationService.AccessToken.from_native(client, response.AccessToken)
+        return client, auth
+    except BaseException:
+        await asyncio.wait_for(client.close(), timeout=timeout_s)
+        raise
+
+
+async def read_station_status(ready, username, password, timeout_s=5.):
+    """Reconnect for a bounded observation, including changed boots or held work.
+
+    No lock, heartbeat, command replay or client process journal is created.
+    Station and client times remain separate observations.
+    """
+    client = None
+    started = time.monotonic()
+    try:
+        async with asyncio.timeout(timeout_s):
+            client, auth = await connect_station(ready, username, password, timeout_s)
+            state = from_wire(await client.CentrifugeControl.Status.read(metadata=[auth], timeout=timeout_s * 1000))
+            if state.get('simulation_only') is not True or state.get('hardware_qualified') is not False:
+                raise ValueError('Observed station is not the declared synthetic endpoint')
+            return {'observation': 'authenticated_live_status', 'server_uuid': ready['server_uuid'],
+                    'expected_boot_id': ready.get('boot_id'), 'observed_boot_id': state['boot_id'],
+                    'boot_changed': state['boot_id'] != ready.get('boot_id'), 'tls': True,
+                    'client_request_started_monotonic_s': started,
+                    'client_response_received_monotonic_s': time.monotonic(),
+                    'workflow_clock_advanced': False, 'process_effects_dispatched': False,
+                    'state': state}
+    except Exception as error:
+        raise RuntimeError('Could not read authenticated CF01 station status') from error
+    finally:
+        if client is not None:
+            await asyncio.wait_for(client.close(), timeout=timeout_s)
 
 
 class UncertainExecution(RuntimeError):

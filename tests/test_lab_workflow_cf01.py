@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / 'scripts'))
 
 from cf01_rack_batch import BatchError, Runner
 from lab_workflow import Workflow
-from manual_tasks import Journal, TaskError
+from manual_tasks import Journal, TaskError, digest, encoded
 from manual_workflow import ObservationError
 
 ACTOR = 'SYN.Operator01'
@@ -150,6 +150,40 @@ class IntegratedCF01Tests(unittest.TestCase):
                         self.assertFalse(failed_report['order_restored'])
                         self.assertFalse(flow.report()['passed'])
 
+    def test_station_failure_mid_spin_observes_stop_before_archiving_failure(self):
+        for transport in ['ros2', 'sila2']:
+            with self.subTest(transport=transport):
+                journal, flow = self.prepared()
+                dispatched = []
+                def configure(runner):
+                    dispatch = runner.bridge.dispatch
+                    start = 'start' if transport == 'ros2' else runner.bridge.commands['start']['name']
+                    def fail_start(encoding, command, fields):
+                        dispatched.append(command)
+                        response = dispatch(encoding, command, fields)
+                        return {**response, 'phase': 'failed'} if command == start else response
+                    runner.bridge.dispatch = fail_start
+                with self.assertRaises(BatchError) as caught:
+                    flow.run_cf01(ACTOR, transport=transport, configure=configure)
+                report = caught.exception.report
+                observed = [entry['station'] for entry in report['trace'] if entry['stage'] == 'stop_observed']
+                self.assertTrue(observed)
+                self.assertFalse(observed[0]['standstill_confirmed'])
+                self.assertTrue(observed[-1]['standstill_confirmed'])
+                self.assertTrue(observed[-1]['parking_brake_held'])
+                self.assertIsNone(report['stop_error'])
+                self.assertFalse(report['passed'])
+                self.assertFalse(report['spin_completed'])
+                self.assertEqual(flow.state['status'], 'held')
+                self.assertEqual(flow.state['recovery_required'], 'cf01_failure')
+                self.assertIn('instrument:CF01', journal.owners())
+                self.assertTrue(all(flow.state['stages']['cf01']['view']['inventory']['rotor']))
+                archived = json.loads(journal.artifact(flow.state['stages']['cf01']['report_artifact_sha256']))
+                self.assertEqual(archived, report)
+                stop = 'stop' if transport == 'ros2' else 'Stop'
+                heartbeat = 'heartbeat' if transport == 'ros2' else 'Heartbeat'
+                self.assertTrue(all(command == heartbeat for command in dispatched[dispatched.index(stop) + 1:]))
+
     def test_cf01_clock_deadline_commits_hold_before_further_dispatch(self):
         journal, flow = self.prepared()
         flow.advance_time(ACTOR, flow.state['deadline_s'] - 0.25)
@@ -283,7 +317,7 @@ class IntegratedCF01Tests(unittest.TestCase):
         self.assertEqual(journal.owners(), owners)
         self.assertFalse(reopened.report()['passed'])
 
-    def test_hard_process_exit_retains_committed_command_intent_and_requires_abort(self):
+    def test_hard_process_exit_retains_committed_intent_until_explicit_reconciliation(self):
         path = self.folder / 'crash.sqlite3'
         script = '''
 import os, sys
@@ -324,6 +358,10 @@ f.run_cf01(actor)
                          [event['sha256'] for event in before])
         self.assertIn('arm:Arm', journal.owners())
         self.assertFalse(flow.report()['passed'])
+        flow.restart_cf01(RECOVERY_ACTOR, **self.restart_data(flow))
+        self.assertEqual(flow.state['stages']['cf01']['status'], 'ready')
+        self.assertEqual(flow.state['stages']['cf01']['attempt_id'], flow.run_id + '.cf01.A02')
+        self.assertEqual(len(flow.state['stages']['cf01']['retired_attempts']), 1)
 
     def test_cf01_abort_rejects_incomplete_rotor_flags_foreign_vessels_and_false_evidence(self):
         invalid = [('rotor_empty', list(range(1, 12))), ('evidence', 'station_telemetry'),
@@ -347,6 +385,127 @@ f.run_cf01(actor)
                 self.assertIsNotNone(flow.state['recovery_required'])
                 self.assertEqual(journal.owners(), owners)
                 self.assertFalse(flow.report()['passed'])
+
+    def restart_data(self, flow):
+        return {**self.abort_data(flow), 'expected_attempt_id': flow.state['stages']['cf01']['attempt_id']}
+
+    def test_crash_before_first_effect_can_restart_same_run_after_reconciliation(self):
+        from run_lab_workflow import run_nanodrop, run_qubit
+        journal, flow = self.prepared()
+        flow.advance_time(ACTOR, 3)
+        with patch('lab_workflow.Runner', side_effect=OSError('Synthetic crash before first dispatch')):
+            with self.assertRaises(OSError):
+                flow.run_cf01(ACTOR)
+        flow.close()
+        flow = Workflow.open(journal, flow.run_id)
+        before = flow.state
+        prefix = journal.history(flow.run_id)
+        owners = journal.owners()
+        flow.restart_cf01(RECOVERY_ACTOR, **self.restart_data(flow))
+        state = flow.state
+        self.assertEqual(state['status'], 'running')
+        self.assertEqual(state['active_stage'], 'cf01')
+        self.assertEqual(state['stages']['cf01']['status'], 'ready')
+        self.assertNotEqual(state['stages']['cf01']['attempt_id'], before['stages']['cf01']['attempt_id'])
+        self.assertNotEqual(state['session'], before['session'])
+        for field in ['logical_time_s', 'deadline_s', 'bookings', 'mass_confirmations']:
+            self.assertEqual(state[field], before[field])
+        self.assertEqual(journal.owners(), owners)
+        self.assertTrue(all(not vessel['mass_confirmation_valid'] for vessel in state['inventory']['vessels'].values()))
+        with self.assertRaisesRegex(TaskError, 'Fresh total vessel mass'):
+            flow.run_cf01(ACTOR)
+        for sample in state['definition']['manifest']['samples']:
+            flow.confirm_mass(RECOVERY_ACTOR, sample['vessel_id'], mass_g=2.0, content_revision=0)
+        flow.run_cf01(ACTOR)
+        run_nanodrop(flow)
+        run_qubit(flow)
+        self.assertTrue(flow.report()['passed'])
+        self.assertEqual(flow.report()['samples']['Sample01']['remaining_volume_ul'], 36.5)
+        self.assertEqual([event['sha256'] for event in journal.history(flow.run_id)[:len(prefix)]],
+                         [event['sha256'] for event in prefix])
+
+    def test_restart_archives_failed_attempt_and_fences_its_callbacks(self):
+        journal, flow = self.prepared()
+        captured = []
+        reject = self.reject_confirmation('confirm_seated', {'success': False}, 'ros2')
+        def configure(runner):
+            captured.append(runner)
+            reject(runner)
+        with self.assertRaises(BatchError):
+            flow.run_cf01(ACTOR, configure=configure)
+        before = flow.state
+        prior_stage = before['stages']['cf01']
+        data = self.restart_data(flow)
+        flow.restart_cf01(RECOVERY_ACTOR, **data)
+        retired = flow.state['stages']['cf01']['retired_attempts'][-1]
+        self.assertEqual(retired['attempt_id'], prior_stage['attempt_id'])
+        self.assertEqual(json.loads(journal.artifact(retired['stage_artifact_sha256'])), prior_stage)
+        self.assertIsNotNone(journal.artifact(prior_stage['report_artifact_sha256']))
+        current, revision = journal.get_current(flow.run_id)
+        from run_lab_workflow import card
+        self.assertEqual(card(flow)['stages']['cf01']['attempt_id'], current['stages']['cf01']['attempt_id'])
+        self.assertEqual(card(flow)['deadline_s'], current['deadline_s'])
+        old_runner = captured[0]
+        with self.assertRaises(TaskError):
+            old_runner._advance_hold_clock(1)
+        with patch.object(old_runner.bridge, 'dispatch', side_effect=AssertionError('Retired runner must not dispatch')):
+            with self.assertRaises(TaskError):
+                old_runner.command('stop')
+        self.assertEqual(journal.get_current(flow.run_id), (current, revision))
+        with self.assertRaises(TaskError):
+            flow.restart_cf01(RECOVERY_ACTOR, **data)
+        journal.connection.execute('UPDATE artifacts SET content=? WHERE sha256=?',
+                                   (b'SYN.CORRUPTED.RETIRED', retired['stage_artifact_sha256']))
+        journal.connection.commit()
+        with self.assertRaisesRegex(TaskError, 'corrupt artifact'):
+            flow.report()
+
+    def test_restart_requires_explicit_complete_observations_and_does_not_extend_deadline(self):
+        journal, flow = self.prepared()
+        with patch('lab_workflow.Runner', side_effect=OSError('Synthetic crash')):
+            with self.assertRaises(OSError):
+                flow.run_cf01(ACTOR)
+        flow.close()
+        flow = Workflow.open(journal, flow.run_id)
+        for field, value in [('retire_attempt', False), ('rotor_empty', [1]), ('standstill_confirmed', False),
+                             ('evidence', 'station_telemetry'), ('expected_attempt_id', 'SYN.StaleAttempt'),
+                             ('observations', []), ('reason', '')]:
+            with self.subTest(field=field):
+                data = {**self.restart_data(flow), field: value}
+                attempt = flow.state['stages']['cf01']['attempt_id']
+                owners = journal.owners()
+                with self.assertRaises(TaskError):
+                    flow.restart_cf01(RECOVERY_ACTOR, **data)
+                self.assertEqual(flow.state['stages']['cf01']['attempt_id'], attempt)
+                self.assertEqual(journal.owners(), owners)
+        flow.advance_time(ACTOR, flow.state['deadline_s'])
+        with self.assertRaisesRegex(TaskError, 'deadline'):
+            flow.restart_cf01(RECOVERY_ACTOR, **self.restart_data(flow))
+
+    def test_restart_write_failure_keeps_old_session_attempt_and_archive_atomic(self):
+        journal, flow = self.prepared()
+        with patch('lab_workflow.Runner', side_effect=OSError('Synthetic crash')):
+            with self.assertRaises(OSError):
+                flow.run_cf01(ACTOR)
+        flow.close()
+        flow = Workflow.open(journal, flow.run_id)
+        before = flow.state
+        owners = journal.owners()
+        event = journal._event
+        def fail_restart(run_id, sequence, previous, kind, payload, state, **kwargs):
+            if kind == 'cf01.attempt_restarted':
+                raise OSError('Synthetic restart disk failure')
+            return event(run_id, sequence, previous, kind, payload, state, **kwargs)
+        with patch.object(journal, '_event', side_effect=fail_restart):
+            with self.assertRaisesRegex(OSError, 'restart disk failure'):
+                flow.restart_cf01(RECOVERY_ACTOR, **self.restart_data(flow))
+        self.assertEqual(flow.state, before)
+        self.assertEqual(flow.session, before['session'])
+        self.assertEqual(journal.owners(), owners)
+        with self.assertRaises(TaskError):
+            journal.artifact(digest(encoded(before['stages']['cf01']).encode()))
+        flow.restart_cf01(RECOVERY_ACTOR, **self.restart_data(flow))
+        self.assertEqual(flow.state['stages']['cf01']['status'], 'ready')
 
     def test_cf01_abort_allows_corrected_observations_without_a_second_cancel(self):
         journal, flow = self.prepared()

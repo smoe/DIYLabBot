@@ -236,5 +236,108 @@ class ManualJournalTests(unittest.TestCase):
         self.assertFalse(self.journal.connection.in_transaction)
 
 
+class ImmutableDefinitionTests(unittest.TestCase):
+    """The opt-in storage format must preserve the shared journal guarantees."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='compact-journal-')
+        self.path = Path(self.temp.name) / 'tasks.sqlite3'
+        self.journal = Journal(self.path)
+        self.initial = {'resources': [], 'counter': 0}
+        self.journal.create(RUN, self.initial)
+        self.definition = {'synthetic': True, 'source': 'SYNTHETIC-' * 6000,
+                           'nested': {'samples': ['Sample01', 'Sample02']}}
+        self.initial['definition'] = copy.deepcopy(self.definition)
+        self.journal.create('SYN.Compact', self.initial, immutable_definition=True)
+
+    def tearDown(self):
+        self.journal.close()
+        self.temp.cleanup()
+
+    def compact_advance(self):
+        state, revision = self.journal.get_current('SYN.Compact')
+        state['counter'] += 1
+        self.journal.append('SYN.Compact', revision, 'advanced', {}, state)
+
+    def test_definition_is_stored_once_and_history_rehydrates_detached_states(self):
+        for _ in range(20):
+            self.compact_advance()
+        rows = self.journal.connection.execute(
+            'SELECT document FROM events WHERE run_id=? ORDER BY sequence', ('SYN.Compact',)).fetchall()
+        self.assertLess(sum(len(row[0]) for row in rows), len(encoded(self.definition)))
+        references = {json.loads(row[0])['definition_sha256'] for row in rows}
+        self.assertEqual(len(references), 1)
+        self.assertTrue(all('definition' not in json.loads(row[0])['state'] for row in rows))
+        self.assertEqual(json.loads(self.journal.artifact(references.pop())), self.definition)
+        history = self.journal.history('SYN.Compact')
+        self.assertTrue(all(event['state']['definition'] == self.definition for event in history))
+        history[0]['state']['definition']['nested']['samples'].clear()
+        self.assertEqual(history[-1]['state']['definition'], self.definition)
+        self.assertEqual(self.journal.get_current('SYN.Compact')[0]['definition'], self.definition)
+        with Journal(self.path) as reopened:
+            self.assertEqual(reopened.get_current('SYN.Compact')[0]['definition'], self.definition)
+
+    def test_definition_change_rolls_back_resources_artifacts_and_event(self):
+        state, revision = self.journal.get_current('SYN.Compact')
+        state['definition']['nested']['samples'].append('Foreign')
+        state['resources'] = ['vessel:NEW']
+        with self.assertRaisesRegex(TaskError, 'Immutable definition'):
+            self.journal.append('SYN.Compact', revision, 'invalid', {}, state, artifact=b'SYN.INVALID')
+        self.assertEqual(self.journal.get_current('SYN.Compact')[1], revision)
+        self.assertEqual(self.journal.owners(), {})
+        with self.assertRaises(TaskError):
+            self.journal.artifact(digest(b'SYN.INVALID'))
+
+    def test_definition_blob_corruption_invalidates_a_warm_prefix(self):
+        self.compact_advance()
+        checksum = digest(encoded(self.definition).encode())
+        with sqlite3.connect(self.path) as writer:
+            writer.execute('UPDATE artifacts SET content=? WHERE sha256=?', (b'SYN.CORRUPTED', checksum))
+        with self.assertRaisesRegex(TaskError, 'corrupt|Corrupt'):
+            self.journal.get_current('SYN.Compact')
+
+    def test_rehashed_reference_change_and_unknown_storage_version_are_rejected(self):
+        self.compact_advance()
+        original, checksum = self.journal.connection.execute(
+            'SELECT document, sha256 FROM events WHERE run_id=? AND sequence=2', ('SYN.Compact',)).fetchone()
+        foreign = encoded({'synthetic': 'foreign definition'}).encode()
+        foreign_checksum = digest(foreign)
+        self.journal.connection.execute('INSERT INTO artifacts VALUES (?, ?)', (foreign_checksum, foreign))
+        self.journal.connection.commit()
+        for change in [{'definition_sha256': foreign_checksum}, {'storage_format': 'unknown/99'}]:
+            with self.subTest(change=change):
+                event = {**json.loads(original), **change}
+                document = encoded(event)
+                self.journal.connection.execute('UPDATE events SET document=?, sha256=? WHERE run_id=? AND sequence=2',
+                                                (document, digest(document.encode()), 'SYN.Compact'))
+                self.journal.connection.commit()
+                with self.assertRaisesRegex(TaskError, 'Corrupt task journal'):
+                    self.journal.history('SYN.Compact')
+                self.journal.connection.execute('UPDATE events SET document=?, sha256=? WHERE run_id=? AND sequence=2',
+                                                (original, checksum, 'SYN.Compact'))
+                self.journal.connection.commit()
+
+    def test_failed_compact_create_does_not_leave_a_definition_or_run(self):
+        definition = {'synthetic': 'unique failed definition'}
+        state = {'resources': [], 'definition': definition}
+        with patch.object(self.journal, '_event', side_effect=OSError('Synthetic disk error')):
+            with self.assertRaises(OSError):
+                self.journal.create('SYN.Failed', state, immutable_definition=True)
+        self.assertIsNone(self.journal.connection.execute('SELECT id FROM runs WHERE id=?', ('SYN.Failed',)).fetchone())
+        with self.assertRaises(TaskError):
+            self.journal.artifact(digest(encoded(definition).encode()))
+
+    def test_legacy_rows_are_never_rewritten_and_keep_their_storage_format(self):
+        before = self.journal.connection.execute('SELECT * FROM events WHERE run_id=?', (RUN,)).fetchall()
+        self.compact_advance()
+        self.assertEqual(self.journal.connection.execute('SELECT * FROM events WHERE run_id=?', (RUN,)).fetchall(), before)
+        state, revision = self.journal.get_current(RUN)
+        state['counter'] += 1
+        self.journal.append(RUN, revision, 'advanced', {}, state)
+        legacy = json.loads(self.journal.connection.execute(
+            'SELECT document FROM events WHERE run_id=? ORDER BY sequence DESC LIMIT 1', (RUN,)).fetchone()[0])
+        self.assertNotIn('storage_format', legacy)
+
+
 if __name__ == '__main__':
     unittest.main()

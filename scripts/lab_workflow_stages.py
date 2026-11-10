@@ -71,6 +71,14 @@ class QubitStage(StageAdapter, QubitOperations):
 ADAPTERS = {'nanodrop': NanoDropStage, 'qubit': QubitStage}
 
 
+def initial_cf01_stage(root_id, attempt_number=1):
+    return {'status': 'waiting', 'actor_id': None,
+            'attempt_id': root_id + '.cf01.A%02d' % attempt_number,
+            'deadline_s': None, 'recovery_required': None, 'view': None,
+            'report_artifact_sha256': None, 'pending_command': None,
+            'retired_attempts': []}
+
+
 def initial_stage(root_id, definition, stage_id):
     prefix = root_id + '.' + stage_id
     adapter = ADAPTERS[stage_id]

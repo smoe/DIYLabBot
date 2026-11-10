@@ -79,6 +79,12 @@ class LedgerInvariants(unittest.TestCase):
         view=StageState(self.state,'nanodrop')['samples']['Sample01']
         self.assertEqual(len(view),len(list(view)))
 
+    def test_sample_view_slot_comes_from_the_bound_place_mapping(self):
+        self.state['definition']['manifest']['samples'][0]['rack_place_id']='Origin-A'
+        self.state['definition']['rack_places'][0]['place_id']='Origin-A'
+        view=StageState(self.state,'nanodrop')['samples']['Sample01']
+        self.assertEqual(view['rack_slot'],self.state['definition']['rack_places'][0]['slot'])
+
     def test_cf01_inventory_conserves_each_original_once_before_projection(self):
         inventory={'rack':[s['sample_id'] for s in self.state['definition']['manifest']['samples']],
                    'rotor':[None]*12,'gripper':None}

@@ -1,7 +1,7 @@
 """One durable, entirely synthetic CF01 -> NanoDrop -> Qubit workflow.
 
 No transport or hardware adapter is imported. CF01 callbacks persist intent and
-observations; interrupted CF01 attempts require cancellation reconciliation.
+observations; interrupted CF01 attempts require explicit restart or abort reconciliation.
 """
 import copy
 import inspect
@@ -16,7 +16,7 @@ from manual_workflow import ROOT, ObservationError, positive, text
 from lab_workflow_sources import load, SOURCE, STAGES, build_cf01_profile, validate_mass_confirmation
 from lab_workflow_ledger import (initial_inventory, manifest_samples, original_location,
                                  remaining, StageState, begin_withdrawal)
-from lab_workflow_stages import ADAPTERS, StageHandle, initial_stage
+from lab_workflow_stages import ADAPTERS, StageHandle, initial_stage, initial_cf01_stage
 
 FORMAT = 'solidcraftbot.synthetic-lab-state/1'
 RUNTIME = ['scripts/lab_workflow.py', 'scripts/lab_workflow_ledger.py',
@@ -53,14 +53,11 @@ class Workflow:
                  'deadline_s': definition['profile']['task_deadline_s'],
                  'resources': [], 'recovery_required': None, 'bookings': {},
                  'mass_confirmations': {}, 'inventory': initial_inventory(definition),
-                 'stages': {'cf01': {'status': 'waiting', 'actor_id': None,
-                     'attempt_id': run_id + '.cf01.A01', 'deadline_s': None,
-                     'recovery_required': None, 'view': None, 'report_artifact_sha256': None,
-                     'pending_command': None}},
+                 'stages': {'cf01': initial_cf01_stage(run_id)},
                  'cancel_reason': None}
         for stage_id in ['nanodrop', 'qubit']:
             state['stages'][stage_id] = initial_stage(run_id, definition['stages'][stage_id], stage_id)
-        journal.create(run_id, state)
+        journal.create(run_id, state, immutable_definition=True)
         return cls(journal, run_id, session)
 
     @classmethod
@@ -194,7 +191,7 @@ class Workflow:
             if evidence!='synthetic_operator_confirmation':
                 raise TaskError('Explicit synthetic operator evidence required')
             if (not isinstance(rotor_empty,list) or any(type(slot) is not int for slot in rotor_empty)
-                    or rotor_empty!=list(range(1,13)) or any(flag is not True for flag in
+                    or rotor_empty!=self._cf01_empty_slots(state) or any(flag is not True for flag in
                     [gripper_empty,standstill_confirmed,parking_brake_held,lift_parked,arm_clear,workspace_clear])):
                 raise ObservationError('Complete initial CF01 and work-area reconciliation required')
             self._observations(state,observations)
@@ -205,6 +202,60 @@ class Workflow:
                 'parking_brake_held':parking_brake_held,'lift_parked':lift_parked,
                 'arm_clear':arm_clear,'workspace_clear':workspace_clear,'time_s':state['logical_time_s']}
         return self._transition('cf01.initial_reconciled',actor_id,update,{'observations':observations})
+
+    def restart_cf01(self, actor_id, observations, rotor_empty, gripper_empty,
+                     standstill_confirmed, parking_brake_held, lift_parked,
+                     arm_clear, workspace_clear, retire_attempt, reason, expected_attempt_id,
+                     evidence='synthetic_operator_confirmation'):
+        """Retire an interrupted execution after explicit recovery; never replay it."""
+        text(reason, 'restart reconciliation reason')
+        text(expected_attempt_id, 'expected CF01 attempt')
+        before = self.state
+        previous_stage = before['stages']['cf01']
+        artifact = encoded(previous_stage).encode()
+        session = uuid.uuid4().hex
+        proof = {'actor_id': actor_id, 'reason': reason, 'evidence': evidence,
+                 'observations': observations, 'rotor_empty': rotor_empty,
+                 'gripper_empty': gripper_empty, 'standstill_confirmed': standstill_confirmed,
+                 'parking_brake_held': parking_brake_held, 'lift_parked': lift_parked,
+                 'arm_clear': arm_clear, 'workspace_clear': workspace_clear,
+                 'retire_attempt': retire_attempt, 'expected_attempt_id': expected_attempt_id}
+        def update(state):
+            stage = state['stages']['cf01']
+            if state != before:
+                raise TaskError('Workflow changed; repeat the CF01 recovery observation')
+            if (state['active_stage'] != 'cf01' or state['status'] != 'held'
+                    or stage['status'] not in {'working', 'held'} or not state['recovery_required']
+                    or expected_attempt_id != stage['attempt_id']):
+                raise TaskError('A matching interrupted CF01 attempt on hold is required')
+            if state['logical_time_s'] >= state['deadline_s']:
+                raise TaskError('The original workflow deadline has expired')
+            if evidence != 'synthetic_operator_confirmation':
+                raise TaskError('Explicit synthetic operator evidence required')
+            if (not isinstance(rotor_empty, list) or any(type(slot) is not int for slot in rotor_empty)
+                    or rotor_empty != self._cf01_empty_slots(state)
+                    or any(flag is not True for flag in [gripper_empty, standstill_confirmed,
+                       parking_brake_held, lift_parked, arm_clear, workspace_clear, retire_attempt])):
+                raise ObservationError('Complete CF01 restart reconciliation and attempt retirement required')
+            locations = self._observations(state, observations)
+            self._audit(state)
+            retired = [*stage.get('retired_attempts', []), {
+                'attempt_id': stage['attempt_id'], 'stage_artifact_sha256': digest(artifact),
+                'outcome': 'retired_after_synthetic_reconciliation',
+                'reconciliation': {**proof, 'time_s': state['logical_time_s']}}]
+            replacement = initial_cf01_stage(self.run_id, len(retired) + 1)
+            replacement.update(status='ready', retired_attempts=retired)
+            state['stages']['cf01'] = replacement
+            for identity, location in locations.items():
+                vessel = state['inventory']['vessels'][identity]
+                vessel.update(location=location, responsibility={'kind': 'workflow', 'run_id': self.run_id},
+                              observed_location={'location': location, 'time_s': state['logical_time_s'], 'evidence': evidence},
+                              return_confirmation={'actor_id': actor_id, 'evidence': evidence},
+                              mass_confirmation_valid=False, mass_confirmation_id=None)
+            state.update(status='running', recovery_required=None, session=session)
+        state = self._transition('cf01.attempt_restarted', actor_id, update, proof, artifact)
+        self.session = session
+        return state
 
     def confirm_mass(self, actor_id, vessel_id, mass_g, content_revision, confirmation_id=None):
         text(vessel_id,'original vessel identity')
@@ -375,6 +426,9 @@ class Workflow:
         def update(state):
             if state['active_stage'] != 'cf01': raise TaskError('Inactive CF01 checkpoint')
             stage = state['stages']['cf01']
+            if (payload.get('attempt_id', stage['attempt_id']) != stage['attempt_id']
+                    or payload.get('execution_session', state['session']) != state['session']):
+                raise TaskError('Retired CF01 execution cannot write checkpoints or dispatch effects')
             if kind in {'command_intent','handoff_intent'} and payload.get('command') != 'stop':
                 if state['status'] in {'held','cancelling'} or state['recovery_required'] or stage['status'] != 'working':
                     raise ProcessHold('CF01 is held; no new side effects are permitted')
@@ -434,12 +488,17 @@ class Workflow:
             self._observations(state, self.inventory_observations())
             self.cf01_profile(state)
             stage.update(status='working',actor_id=actor_id,deadline_s=state['deadline_s'],transport=transport)
-        self._transition('cf01.stage_started',actor_id,start,{'transport':transport})
-        runner=Runner(self.cf01_profile(self.state), transport=transport,
-                      clock=lambda:self.state['logical_time_s'],
-                      advance_clock=self._advance_cf_clock,
-                      advance_hold_clock=self._advance_cf_hold_clock,
-                      checkpoint=self._cf_checkpoint)
+        started = self._transition('cf01.stage_started',actor_id,start,{'transport':transport})
+        execution = Workflow(self.journal, self.run_id, started['session'])
+        checkpoint = self._cf_checkpoint
+        def execution_checkpoint(kind, payload, view):
+            return checkpoint(kind, {**payload, 'attempt_id': started['stages']['cf01']['attempt_id'],
+                                      'execution_session': started['session']}, view)
+        runner=Runner(self.cf01_profile(started), transport=transport,
+                      clock=lambda:execution.state['logical_time_s'],
+                      advance_clock=execution._advance_cf_clock,
+                      advance_hold_clock=execution._advance_cf_hold_clock,
+                      checkpoint=execution_checkpoint)
         if configure is not None: configure(runner)
         try:
             report=runner.run()
@@ -449,7 +508,7 @@ class Workflow:
                 state['stages']['cf01'].update(status='held',recovery_required=state['stages']['cf01']['recovery_required'] or 'cf01_failure',
                                                report_artifact_sha256=digest(artifact))
                 state.update(status='held', recovery_required=state['recovery_required'] or 'cf01_failure')
-            self._transition('cf01.stage_failed',actor_id,fail,{'error':str(error)},artifact)
+            execution._transition('cf01.stage_failed',actor_id,fail,{'error':str(error)},artifact)
             raise
         # Storage failures intentionally propagate. The persisted active attempt
         # is held by open(); neither a new Simulator nor success is fabricated.
@@ -466,7 +525,7 @@ class Workflow:
             self._observations(state,self.inventory_observations())
             stage.update(status='completed', report_artifact_sha256=digest(artifact))
             self._next_stage(state)
-        self._transition('cf01.stage_completed',actor_id,finish,{'artifact_sha256':digest(artifact)},artifact)
+        execution._transition('cf01.stage_completed',actor_id,finish,{'artifact_sha256':digest(artifact)},artifact)
         return report
 
     def cancel(self, actor_id, reason):
@@ -489,7 +548,7 @@ class Workflow:
             if evidence!='synthetic_operator_confirmation':
                 raise TaskError('CF01 abort evidence must be explicitly synthetic operator input')
             if (not isinstance(rotor_empty,list) or any(type(slot) is not int for slot in rotor_empty)
-                    or rotor_empty != list(range(1,13))):
+                    or rotor_empty != self._cf01_empty_slots(state)):
                 raise ObservationError('Explicit empty observation for all twelve rotor places required')
             if any(flag is not True for flag in [gripper_empty,standstill_confirmed,parking_brake_held,
                                                 lift_parked,arm_clear,workspace_clear,retire_attempt]):
@@ -517,8 +576,19 @@ class Workflow:
         return self._transition('cf01.abort_reconciled',actor_id,update,
                                 {'observations':observations,'reason':reason,'evidence':evidence})
 
+    @staticmethod
+    def _cf01_empty_slots(state):
+        return list(range(1, state['definition']['stages']['cf01']['required_capacity'] + 1))
+
+    def _verify_retired_cf01(self, state):
+        for retired in state['stages']['cf01'].get('retired_attempts', []):
+            stage = json.loads(self.journal.artifact(retired['stage_artifact_sha256']))
+            if stage.get('report_artifact_sha256'):
+                self.journal.artifact(stage['report_artifact_sha256'])
+
     def _audit(self, state, completing=False):
         self.journal.history(self.run_id)
+        self._verify_retired_cf01(state)
         for stage in state['stages'].values():
             for checksum,record in stage.get('imports',{}).items():
                 if len(self.journal.artifact(checksum)) != record['byte_count']:
@@ -537,6 +607,7 @@ class Workflow:
     def report(self):
         trace=self.journal.history(self.run_id)
         state=trace[-1]['state'];self._format(state)
+        self._verify_retired_cf01(state)
         for stage in state['stages'].values():
             for checksum in stage.get('imports',{}):self.journal.artifact(checksum)
             if stage.get('report_artifact_sha256'):self.journal.artifact(stage['report_artifact_sha256'])
@@ -572,4 +643,4 @@ class Workflow:
                 'CF01 observations use mock internals; no physical identity sensor',
                 'No network, hardware, new CAD geometry or executed robot paths',
                 'No reagent stock ledger or automatic inventory carryover between root runs',
-                'Interrupted CF01 attempts require explicit abort inventory reconciliation']}
+                'Interrupted CF01 attempts require explicit restart or abort inventory reconciliation; active jobs are never replayed']}

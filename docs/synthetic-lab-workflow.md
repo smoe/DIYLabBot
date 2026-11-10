@@ -14,7 +14,9 @@ python3 scripts/run_lab_workflow.py report SYN.LAB.DEMO01
 
 `--transport sila2` am Demobefehl wählt den anderen lokalen CF01-Vertragsdecoder.
 Es wird kein Netzwerkserver gestartet. Die CLI verwendet denselben historischen
-Standard-Store `exports/manual-workflows/nanodrop.sqlite3` wie die Einzelabläufe.
+Standard-Store wie die Einzelabläufe: neu `exports/manual-workflows/workflows.sqlite3`,
+bei allein vorhandenem Altbestand weiterhin `nanodrop.sqlite3`. Sind beide Dateien
+verschiedene Datenbanken, ist eine ausdrückliche Auswahl mit `--store` nötig.
 Eine eigene Datei wählt `--store exports/manual-workflows/lab-demo.sqlite3` vor
 dem Unterbefehl. Nur Läufe im selben Store koordinieren ihre Reservierungen.
 
@@ -40,7 +42,7 @@ Ein Stufenbefehl sieht beispielsweise so aus:
 
 Rootbefehle lassen `stage_id` weg. Unterstützt sind `accept_rack`,
 `confirm_mass`, `run_cf01`, `handover`, `advance_time`, `cancel`,
-`reconcile_initial_cf01` und `finish_cf01_abort`. Der Dateiimport nennt
+`reconcile_initial_cf01`, `restart_cf01` und `finish_cf01_abort`. Der Dateiimport nennt
 `stage_id`, `command: import_results`, `actor_id` und `file`. Die Gerätebefehle
 verwenden weiterhin die dokumentierten NanoDrop-/Qubit-Datenfelder; im Gesamtlauf
 sind Rackplätze lokale IDs wie `Slot01`. Ein Arbeitsbereich wird durch den
@@ -269,6 +271,13 @@ archiviert. Weder Probenrückgabe noch Ressourcenfreigabe oder Stufenabschluss
 folgen daraus. Der Regressionstest setzt die Frist mitten in den Schleuderlauf
 und prüft beide lokalen Decoder einschließlich der beobachteten Bremsphase.
 
+Auch nach einer negativen oder ungültigen Stationsantwort wird zunächst der
+Fehler dauerhaft gespeichert. Danach bleiben Stopp und Beobachtung bis zum
+bestätigten Stillstand mit gehaltener Bremse erlaubt. Der archivierte Bericht
+enthält diese Beobachtungen. Ein nicht bestätigbarer Stopp bleibt als `stop_error`
+erhalten; die ursprüngliche Fehlerursache, offene Übergaben und Reservierungen
+werden dadurch nicht aufgelöst. Die strengere Regel bei Speicherfehlern bleibt bestehen.
+
 Bei einem echten Journal-/Speicherfehler gilt bewusst die strengere Regel:
 keine weiteren Runner-Effekte und auch kein unjournalierter Best-Effort-Stopp.
 Die letzte gespeicherte Absicht bleibt unklar; nach Wiederaufnahme ist der
@@ -285,11 +294,35 @@ Zwölferaufbau; eine allgemeine Umbenennung oder andere Rotorkapazität ist dami
 nicht als neue Ausführungsvariante implementiert.
 
 Nach Neustart wird ein aktiver CF01-Versuch nicht durch `Runner()` mit leerem
-Rotor ersetzt. Er bleibt gehalten. Ein noch nicht gestarteter CF01-Schritt kann
+Rotor automatisch ersetzt. Er bleibt gehalten. Ein noch nicht gestarteter CF01-Schritt kann
 über `reconcile_initial_cf01` mit vollständigen synthetischen Bestätigungen erneut
 für seine erste Ausführung freigegeben werden. Nach vollständig bestätigter
 CF01-Stufengrenze ist die manuelle Folge nach Inventarabgleich fortsetzbar.
 Die Fortsetzung eines unterbrochenen CF01-Jobs selbst ist nicht implementiert.
+
+`restart_cf01` erlaubt stattdessen einen neuen CF01-Versuch innerhalb desselben
+Gesamtlaufs. Er verlangt den passenden `expected_attempt_id`, Grund und
+`retire_attempt: true`, die vollständige beobachtete Rückgabe aller Originale,
+alle leer bestätigten Rotorplätze, leeren Greifer, Stillstand, gehaltene Bremse,
+geparkten Heber sowie freien Arm und Arbeitsplatz. Die Evidenz ist ausschließlich
+`synthetic_operator_confirmation`. Ein abgebrochener oder abgelaufener Gesamtlauf
+wird damit nicht wieder eröffnet. Eine unklare Durchführung wird nicht zum Erfolg.
+
+Der vorherige Stufenzustand einschließlich offener Befehle und Fehlerberichtbezug
+wird unverändert als Artefakt archiviert und in `retired_attempts` gebunden.
+Der neue Versuch erhält eine neue Kennung und Sitzung; alte Runner verlieren
+ihren Schreib- und Ausführungszugriff. Bestände, Buchungen, Inhaltsrevisionen,
+Prozesszeit und ursprüngliche Frist bleiben erhalten. Vor dem neuen Start sind
+alle Gesamtgefäßmassen erneut zu bestätigen. Wiederanlaufereignis, Archiv und
+Zustandswechsel sind atomar; Abschluss und Bericht prüfen auch die Archive.
+Damit ist auch ein Abbruch direkt nach `cf01.stage_started` ohne Gesamt-Abbruch
+auflösbar. Die alte Ausführung wird weiterhin niemals automatisch wiederholt.
+
+Eine lebende Netzwerkstation lässt sich unabhängig vom lokalen Gesamtlauf über
+den [lesenden SiLA-Statuszugriff](sila2-network.md#read-only-reconnection-and-workflow-boundary)
+erneut kontaktieren. Er erlaubt auch eine geänderte Boot-Kennung oder gehaltene
+Arbeit, ohne die Sperre zu übernehmen oder Befehle erneut zu senden. Der laufende
+CF01-Netzwerkjob wird damit nicht in diesen lokalen Workflow eingebunden.
 
 Für einen Abbruch während CF01 gilt zunächst `cancel` mit Grund. Anschließend
 verlangt `finish_cf01_abort` die vollständigen Originalplätze, eine Liste aller
@@ -323,6 +356,17 @@ und endgültigen Abschluss. Fremde SQLite-Änderungen und Rollbacks invalidieren
 den Cache; Zustandskopien sind voneinander getrennt. Eine unbemerkte direkte
 Rohdateimanipulation außerhalb von SQLite ist kein gleichwertig überwachter
 Live-Schreibpfad; vollständige Audits bleiben erforderlich.
+
+Neue Gesamtläufe speichern ihre unveränderliche Definition einmalig über das
+[v2-Speicherformat](manual-tasks.md#laufprotokoll-und-wiederaufnahme). Alte
+Ereignisse und Prüfsummen bleiben unverändert; ältere offene Läufe benötigen
+wegen der geänderten Laufzeitquellen einen ausdrücklichen Quellabgleich.
+Die historischen 64-MB-/Laufzeitangaben unten gehören zur Erstimplementierung.
+Aktuelle Vergleichsmessungen liegen lokal unter
+`exports/claude-followup-20261110/storage-comparison.json`: derselbe aktuelle
+Zwölferlauf mit 951 Ereignissen benötigt rund 64,1 MB mit v1-Speicherung und
+23,0 MB mit Definitionsreferenzen (64,1 % weniger). Die einmalig beobachteten
+36,0 beziehungsweise 37,1 s unter paralleler Testlast belegen keinen Laufzeitgewinn.
 
 Belastungsberichte messen den echten Zwölferablauf und enthalten Ereigniszahl,
 Datenbank-/Artefaktgröße, Laufzeit und Quellenprüfsummen. Vergleichsmessungen

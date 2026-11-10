@@ -467,10 +467,11 @@ class Runner:
                           'error_type':type(error).__name__,'error_code':getattr(error,'code',None),
                           'station_fault':(self._last_station or {}).get('fault_code') if self.station_backend is not None else self.sim.fault}
             self._emit('failed',{'reason':str(error),**self.failure})
+            self._held=True
             # Preserve the failure report even if the stop or status channel fails.
             try:
                 self.command('stop')
-                if self._held:self.wait_for_stop()
+                self.wait_for_stop()
             except Exception as stop_error:
                 if self._checkpoint_failed:raise
                 self.stop_error=str(stop_error)

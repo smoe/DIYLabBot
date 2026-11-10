@@ -10,24 +10,15 @@ import json
 import math
 import os
 from pathlib import Path
-import re
 import threading
 import time
 import uuid
 
 import build_cf01_sila2 as contract
 import cf01_rack_batch as batch
-from cf01_sila2_client import UncertainExecution, wait_for_execution
+from cf01_sila2_client import UncertainExecution, wait_for_execution, connect_station, from_wire
 from centrifuge_control import ControlError
 import centrifuge_protocol as protocol
-
-
-def from_wire(value):
-    if isinstance(value, dict):
-        return {re.sub(r'(?<!^)(?=[A-Z])', '_', key).lower(): from_wire(item) for key, item in value.items()}
-    if isinstance(value, list):
-        return [from_wire(item) for item in value]
-    return value
 
 
 class ClientJournal:
@@ -116,16 +107,7 @@ class NetworkStation:
             raise UncertainExecution(None, 'Transport deadline expired; retain the client journal and do not repeat effects') from error
 
     async def _open(self, password):
-        from sila.client import Client, ClientConfig
-        self.client = Client(ClientConfig(hostname=self.ready['bind'], port=self.ready['port'], tls=True,
-                             root_certificates=Path(self.ready['certificate']).read_bytes(),
-                             default_timeout=self.rpc_timeout_s * 1000))
-        await self.client.open()
-        if await self.client.SiLAService.ServerUUID.read() != self.ready['server_uuid']:
-            raise ValueError('SiLA server identity mismatch')
-        response = await self.client.AuthenticationService.Login(UserIdentification=self.username, Password=password,
-                        RequestedServer=self.ready['server_uuid'], RequestedFeatures=[])
-        self.auth = await self.client.AuthorizationService.AccessToken.from_native(self.client, response.AccessToken)
+        self.client, self.auth = await connect_station(self.ready, self.username, password, self.rpc_timeout_s)
         self.unlocked_metadata = await self.client.LockController.LockIdentifier.from_native(self.client, '')
         state = await self._state()
         if state['boot_id'] != self.ready['boot_id'] or state['clock_mode'] != 'monotonic_realtime':

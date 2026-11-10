@@ -25,10 +25,12 @@ Ergebnisabgleich und einer ausdrücklichen synthetischen Bewertung, wird der
 Arbeitsplatz freigegeben. Ein Aliquot ist ein Transferdatensatz, kein zusätzlich
 erfundenes physisches Gefäß.
 
-Beide Instrumentabläufe verwenden standardmäßig denselben bestehenden Store
-`exports/manual-workflows/nanodrop.sqlite3`. Der historische Dateiname bleibt
-erhalten; eine Datenbank wird nicht automatisch verschoben. `--store` wählt eine
-andere Datei innerhalb von `exports/`. Nur Läufe im selben Store koordinieren
+Beide Instrumentabläufe und der Gesamtlauf verwenden denselben ausgewählten Store.
+Der neue Standardname ist `exports/manual-workflows/workflows.sqlite3`; ein allein
+vorhandener historischer Store `nanodrop.sqlite3` wird weiterverwendet. Bei zwei
+verschiedenen Datenbanken verlangt die [gemeinsame Auswahlregel](manual-tasks.md#laufprotokoll-und-wiederaufnahme)
+ausdrücklich `--store`. Eine Datenbank wird nicht automatisch verschoben.
+`--store` wählt eine andere Datei innerhalb von `exports/`. Nur Läufe im selben Store koordinieren
 ihre Reservierungen. CSV und Standardberichte liegen im Laufunterordner neben
 dem Store. Sämtliche Laufzeitdaten bleiben über die bestehende Regel ignoriert.
 

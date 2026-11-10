@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 from manual_tasks import Journal, TaskError
-from manual_workflow import ROOT, DEFAULT_STORE
+from manual_workflow import ROOT, DEFAULT_STORE, resolve_store
 
 def output_path(value):
     path = Path(value).resolve()
@@ -64,7 +64,7 @@ def session(flow, actions=None):
 
 def run_cli(workflow, source, run_demo, description):
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--store', type=Path, default=DEFAULT_STORE)
+    parser.add_argument('--store', type=Path, help='Shared store; defaults to workflows.sqlite3 or an existing legacy nanodrop.sqlite3')
     sub = parser.add_subparsers(dest='command', required=True)
     for name in ['demo', 'create']:
         child = sub.add_parser(name)
@@ -86,7 +86,7 @@ def run_cli(workflow, source, run_demo, description):
     args = parser.parse_args()
     flow = None
     try:
-        with Journal(output_path(args.store)) as journal:
+        with Journal(output_path(resolve_store(args.store))) as journal:
             try:
                 if args.command in {'demo', 'create'}:
                     flow = workflow.create(journal, args.profile, args.run_id)

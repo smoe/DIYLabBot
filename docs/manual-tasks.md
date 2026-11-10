@@ -117,6 +117,31 @@ und einzelnen Freigabebedingungen stehen in der verlinkten Ausführungsdokumenta
 - Die dauerhafte Speicherung gilt erst als geprüft, wenn ein Test mit Abbruch und
   Neustart bestanden ist.
 
+Neue Gesamtläufe verwenden das Speicherformat `solidcraftbot.task-event/2`:
+Die unveränderliche `definition` liegt einmal als kanonisches JSON-Artefakt mit
+SHA-256 vor. Jedes Ereignis bindet dieselbe `definition_sha256`; sein gespeicherter
+Zustand enthält die übrigen Felder. Ereignis, Definition, Ergebnisartefakte und
+Reservierungen werden weiterhin atomar geschrieben. Eine Definitionsänderung
+während des Laufs wird abgelehnt. Fehlende oder beschädigte Definitionsartefakte,
+abweichende Referenzen und unbekannte Speicherformate sperren das Lesen.
+
+`history`, `state` und `get_current` liefern vollständig rekonstruierte, getrennte
+Zustandskopien. Die Ereignisprüfsumme gehört zur gespeicherten Form mit Referenz;
+zum erneuten Berechnen bei v2 die ergänzte `state.definition` und das ausgegebene
+`sha256` entfernen. Das referenzierte Originalartefakt bleibt separat prüfbar.
+Bestehende v1-Ereignisse und deren Prüfsummen werden nicht umgeschrieben. Auch
+NanoDrop-/Qubit-Einzelläufe behalten ihre bisherige Speicherung. Neue und alte
+Speicherformen können in derselben Datenbank für unterschiedliche Läufe liegen.
+
+Der gemeinsame Standardname ist `exports/manual-workflows/workflows.sqlite3`.
+Existiert ausschließlich der historische Store `nanodrop.sqlite3`, verwenden
+alle drei Runner weiterhin diesen. Existieren zwei verschiedene Datenbanken,
+ist `--store` erforderlich. Es gibt keine automatische Umbenennung, Kopie oder
+Zusammenführung; Reservierungen bleiben auf den ausgewählten Store begrenzt.
+Die geänderten gemeinsamen Laufzeitquellen blockieren die Wiederaufnahme älterer
+offener Läufe durch die bestehende Quellenprüfung. Historische Daten bleiben
+lesbar; eine Quellmigration ist ein ausdrücklicher separater Schritt.
+
 ### Fehlerfälle
 
 Mindestens zu behandeln und zu testen:

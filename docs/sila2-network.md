@@ -109,6 +109,46 @@ After a partial handoff or connection loss, retain both journals and reconcile
 the station and the runner's pending sample responsibility explicitly. Station
 reconciliation alone does not close or reconstruct the client sample ledger.
 
+## Read-only reconnection and workflow boundary
+
+`status` reconnects to a live server using its trusted TLS certificate and UUID,
+with credentials from a private input file. It reads the authenticated `Status`
+property without a process lock, heartbeat or effect request. An observer can
+read held work and a changed boot; the snapshot reports `boot_changed` instead
+of replaying an old execution or renewing another client's lease. The command
+creates a new private observation file, without creating a batch journal:
+
+```sh
+.venv/bin/python scripts/run_cf01_sila2.py --language de status \
+  --ready-file exports/cf01-sila2/ready.json \
+  --login-input exports/cf01-sila2/observer-login.json \
+  --out exports/cf01-sila2/status-001.json
+```
+
+The file distinguishes live status from the stored checkpoint returned by
+`inspect`. It retains station process time, clock mode and boot, plus separate
+client monotonic request/response bounds. Authentication does not establish
+sample identity, actual vessel masses or disposal. Contact alone does not
+release reservations or authorize another process effect. An unreachable server
+produces a bounded error, without inventing a current observation.
+
+For the future effectful CF01/NanoDrop/Qubit integration, the authority split is:
+the root workflow owns sample inventory, volumes, resources and business intents;
+the client journal records transmission and execution receipts for those intents;
+the station store owns device effects and their outcomes. A shared request UUID
+must bind root attempt, client receipt, server identity and boot before dispatch.
+These records have different roles and must not become three sample ledgers.
+The current independent batch still creates its own requests and is not that
+integrated consumer.
+
+The root's `synthetic_events/1` remains unchanged. A live status observation never
+advances it or converts station monotonic time into workflow time. Effectful
+network integration requires a separately versioned clock contract covering
+elapsed time, deadlines, lost contact and new station boots. That execution mode
+and reattachment to an active network job remain unimplemented. The current
+runner therefore continues to reject a network backend combined with an external
+synthetic workflow clock; the new read-only path does not bypass that guard.
+
 ## Deutsch: Bedienung und Grenzen
 
 Abhängigkeiten in einer eigenen Python-Umgebung installieren:

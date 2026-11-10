@@ -1,9 +1,11 @@
 """Actual TLS/gRPC tests; opt in explicitly, never substitute local dispatch."""
 import asyncio
 import importlib.util
+import json
 import os
 from pathlib import Path
 import sys
+import subprocess
 import tempfile
 import unittest
 import uuid
@@ -89,6 +91,60 @@ class NetworkTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.application.runtime.lock_id)
         observed = await self.client.CentrifugeControl.Status.read(metadata=[observer], timeout=5000)
         self.assertTrue(observed.SimulationOnly)
+
+    def status_endpoint(self):
+        return {'tls': True, 'simulation_only': True, 'hardware_available': False,
+                'bind': '127.0.0.1', 'port': self.application.port,
+                'server_uuid': self.application.runtime.store.server_uuid,
+                'boot_id': self.application.runtime.sim.boot_id,
+                'certificate': str(Path(self.directory.name) / 'tls/server.crt')}
+
+    async def test_read_only_reconnect_observes_held_work_and_changed_boot_without_touching_lease(self):
+        from cf01_sila2_client import read_station_status
+        lock = await self.lock()
+        await self.command('IndexRotor', lock, Slot=2)
+        runtime = self.application.runtime
+        runtime.needs_reconciliation = True
+        deadline, owner = runtime.lock_deadline, runtime.sim.owner
+        ready = {**self.status_endpoint(), 'boot_id': str(uuid.uuid4())}
+        observed = await read_station_status(ready, 'observer', 'test-only-observer-password')
+        self.assertTrue(observed['boot_changed'])
+        self.assertTrue(observed['state']['recovery_required'])
+        self.assertEqual(observed['observed_boot_id'], runtime.sim.boot_id)
+        self.assertEqual(observed['state']['indexed_slot'], 2)
+        self.assertFalse(observed['process_effects_dispatched'])
+        self.assertFalse(observed['workflow_clock_advanced'])
+        self.assertEqual(runtime.lock_deadline, deadline)
+        self.assertEqual(runtime.sim.owner, owner)
+        self.assertLessEqual(observed['client_request_started_monotonic_s'], observed['client_response_received_monotonic_s'])
+
+    async def test_read_only_reconnect_checks_server_identity_and_does_not_echo_credentials(self):
+        from cf01_sila2_client import read_station_status
+        for ready, password in [(self.status_endpoint(), 'SYN.WrongSecret'),
+                                ({**self.status_endpoint(), 'server_uuid': str(uuid.uuid4())}, 'SYN.Secret')]:
+            with self.subTest(server=ready['server_uuid']):
+                with self.assertRaisesRegex(RuntimeError, 'Could not read authenticated CF01') as caught:
+                    await read_station_status(ready, 'observer', password)
+                self.assertNotIn(password, str(caught.exception))
+        self.assertIsNone(self.application.runtime.lock_id)
+
+    async def test_status_cli_reconnects_without_creating_a_batch_journal(self):
+        from run_cf01_sila2 import private_json
+        (ROOT / 'exports').mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='cf01-status-', dir=ROOT / 'exports') as folder:
+            root = Path(folder)
+            ready, login, output = root / 'ready.json', root / 'login.json', root / 'status.json'
+            private_json(ready, self.status_endpoint())
+            private_json(login, {'username': 'observer', 'password': 'test-only-observer-password'})
+            args = [sys.executable, str(ROOT / 'scripts/run_cf01_sila2.py'), '--language', 'en',
+                    'status', '--ready-file', str(ready), '--login-input', str(login), '--out', str(output)]
+            result = await asyncio.to_thread(subprocess.run, args, cwd=ROOT, capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertFalse(json.loads(result.stdout)['process_effects_dispatched'])
+            observed = json.loads(output.read_text())
+            self.assertEqual(observed['observation'], 'authenticated_live_status')
+            self.assertFalse(observed['boot_changed'])
+            self.assertEqual(set(path.name for path in root.iterdir()), {'ready.json', 'login.json', 'status.json'})
 
     async def test_no_real_mode_or_unvalidated_slot(self):
         from sila.client import SiLAError

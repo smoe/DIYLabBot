@@ -13,8 +13,19 @@ import rack_slots
 from manual_tasks import Journal, TaskError, digest, encoded
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_STORE = ROOT / 'exports/manual-workflows/nanodrop.sqlite3'
+DEFAULT_STORE = ROOT / 'exports/manual-workflows/workflows.sqlite3'
 TERMINAL = {'completed', 'cancelled'}
+
+
+def resolve_store(requested=None):
+    """Keep all runners on one store; never silently fork a legacy inventory."""
+    if requested is not None:
+        return Path(requested)
+    legacy = DEFAULT_STORE.with_name('nanodrop.sqlite3')
+    if DEFAULT_STORE.exists() and legacy.exists() and not DEFAULT_STORE.samefile(legacy):
+        raise TaskError('Both workflows.sqlite3 and nanodrop.sqlite3 exist; select the shared store with --store')
+    return legacy if legacy.exists() and not DEFAULT_STORE.exists() else DEFAULT_STORE
+
 
 class ObservationError(TaskError):
     """An observed discrepancy requires reconciliation, preserving reservations."""

@@ -89,7 +89,8 @@ class SampleView(MutableMapping):
 
     def __getitem__(self, key):
         fixed = {'id': self.sample_id, 'vessel_id': self.sample['vessel_id'],
-                 'rack_slot': int(self.sample['rack_place_id'][4:]),
+                 'rack_slot': next(place['slot'] for place in self.root['definition']['rack_places']
+                                   if place['place_id'] == self.sample['rack_place_id']),
                  'original_place_id': self.sample['rack_place_id'],
                  'initial_volume_ul': self.sample['initial_volume_ul']}
         if key == 'remaining_volume_ul':

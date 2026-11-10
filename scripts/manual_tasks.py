@@ -33,7 +33,8 @@ class Journal:
     while SQLite's data_version, total_changes and the actual tail still match.
     Any unexpected write requires a new full check. ``history`` always verifies
     every event; callers should retain it for open, reports and final acceptance.
-    There are no schema changes, persistent cache files or mutable state aliases.
+    New callers may opt into definition references. Legacy event bytes are never
+    rewritten; both formats expose detached, fully reconstructed state views.
     """
 
     def __init__(self, path, clock=time.time, clock_mode=None):
@@ -106,6 +107,33 @@ class Journal:
             'row': row, 'state': copy.deepcopy(state),
             'stamp': stamp if self._stamp() == stamp else None}
 
+    @staticmethod
+    def _definition_reference(event):
+        if 'storage_format' not in event and 'definition_sha256' not in event:
+            return None
+        checksum = event.get('definition_sha256')
+        if (event.get('storage_format') != 'solidcraftbot.task-event/2'
+                or not isinstance(checksum, str) or len(checksum) != 64
+                or any(character not in '0123456789abcdef' for character in checksum)
+                or not isinstance(event.get('state'), dict) or 'definition' in event['state']):
+            raise TaskError('Corrupt task journal definition reference')
+        return checksum
+
+    def _expanded(self, event, definitions=None):
+        checksum = self._definition_reference(event)
+        if checksum is None:
+            return event
+        definitions = {} if definitions is None else definitions
+        if checksum not in definitions:
+            try:
+                definition = json.loads(self.artifact(checksum))
+            except (TypeError, ValueError) as error:
+                raise TaskError('Missing or corrupt immutable definition: ' + checksum) from error
+            if not isinstance(definition, dict):
+                raise TaskError('Corrupt task journal definition')
+            definitions[checksum] = definition
+        return {**event, 'state': {**event['state'], 'definition': copy.deepcopy(definitions[checksum])}}
+
     def history(self, run_id):
         """Fully verify the chain, even when a current-state cache is warm."""
         self._verified.pop(run_id, None)
@@ -117,6 +145,8 @@ class Journal:
             if not rows:
                 raise TaskError('Unknown run: ' + run_id)
             previous = None
+            definition_reference = None
+            definitions = {}
             events = []
             for expected, (sequence, document, checksum) in enumerate(rows, 1):
                 try:
@@ -128,9 +158,12 @@ class Journal:
                              and event['sequence'] == sequence and event['run_id'] == run_id)
                 except (ValueError, KeyError, TypeError):
                     valid = False
-                if not valid:
+                reference = self._definition_reference(event) if valid else None
+                if expected == 1:
+                    definition_reference = reference
+                if not valid or reference != definition_reference:
                     raise TaskError('Corrupt task journal: ' + run_id)
-                events.append({**event, 'sha256': checksum})
+                events.append({**self._expanded(event, definitions), 'sha256': checksum})
                 previous = checksum
             self._remember(run_id, rows[-1], events[-1]['state'], stamp)
             return events
@@ -177,14 +210,24 @@ class Journal:
             raise TaskError('Missing or corrupt artifact: ' + checksum)
         return bytes(row[0])
 
-    def create(self, run_id, state):
+    def create(self, run_id, state, *, immutable_definition=False):
+        if type(immutable_definition) is not bool:
+            raise TaskError('Explicit immutable-definition storage option required')
         try:
             self.connection.execute('BEGIN IMMEDIATE')
             self.connection.execute('INSERT INTO runs VALUES (?)', (run_id,))
-            row = self._event(run_id, 1, None, 'created', {}, state)
+            reference = None
+            if immutable_definition:
+                if not isinstance(state.get('definition'), dict):
+                    raise TaskError('Immutable definition must be an object')
+                content = encoded(state['definition']).encode()
+                reference = digest(content)
+                self.connection.execute('INSERT OR IGNORE INTO artifacts VALUES (?, ?)', (reference, content))
+            row = self._event(run_id, 1, None, 'created', {}, state, definition_sha256=reference)
+            persisted = self._expanded(json.loads(row[1]))['state']
             stamp = self._stamp()
             self.connection.commit()
-            self._remember(run_id, row, json.loads(row[1])['state'], stamp)
+            self._remember(run_id, row, persisted, stamp)
         except sqlite3.IntegrityError as error:
             self.connection.rollback()
             self._verified.clear()
@@ -220,20 +263,31 @@ class Journal:
             if artifact is not None:
                 self.connection.execute('INSERT OR IGNORE INTO artifacts VALUES (?, ?)',
                                         (digest(artifact), artifact))
-            row = self._event(run_id, revision + 1, previous, kind, payload, state)
+            reference = self._definition_reference(json.loads(self._verified[run_id]['row'][1]))
+            row = self._event(run_id, revision + 1, previous, kind, payload, state,
+                              definition_sha256=reference)
+            persisted = self._expanded(json.loads(row[1]))['state']
             stamp = self._stamp()
             self.connection.commit()
-            self._remember(run_id, row, json.loads(row[1])['state'], stamp)
+            self._remember(run_id, row, persisted, stamp)
         except Exception:
             self.connection.rollback()
             self._verified.clear()
             raise
 
-    def _event(self, run_id, sequence, previous, kind, payload, state):
+    def _event(self, run_id, sequence, previous, kind, payload, state, *, definition_sha256=None):
+        metadata = {}
+        if definition_sha256 is not None:
+            if ('definition' not in state
+                    or digest(encoded(state['definition']).encode()) != definition_sha256):
+                raise TaskError('Immutable definition cannot change during a run')
+            state = {key: value for key, value in state.items() if key != 'definition'}
+            metadata = {'storage_format': 'solidcraftbot.task-event/2',
+                        'definition_sha256': definition_sha256}
         document = encoded({'run_id': run_id, 'sequence': sequence,
                             'event_id': str(uuid.uuid4()), 'time_unix_s': self.clock(),
                             'previous_sha256': previous, 'kind': kind,
-                            'payload': payload, 'state': state})
+                            'payload': payload, 'state': state, **metadata})
         row = (sequence, document, digest(document.encode()))
         self.connection.execute('INSERT INTO events VALUES (?, ?, ?, ?)',
                                 (run_id, *row))

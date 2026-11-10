@@ -8,7 +8,7 @@ import time
 from pathlib import Path
 
 from manual_tasks import Journal, TaskError
-from manual_workflow import DEFAULT_STORE
+from manual_workflow import DEFAULT_STORE, resolve_store
 from manual_workflow_cli import output_path
 from lab_workflow import Workflow, SOURCE
 from run_nanodrop_manual import synthetic_report as nanodrop_report
@@ -85,9 +85,9 @@ def run_demo(flow,transport='ros2',pause_after=None):
 def card(flow):
     state=flow.state
     return {'run_id':flow.run_id,'status':state['status'],'active_stage':state['active_stage'],
-            'logical_time_s':state['logical_time_s'],'clock_mode':state['clock_mode'],
+            'logical_time_s':state['logical_time_s'],'clock_mode':state['clock_mode'],'deadline_s':state['deadline_s'],
             'recovery_required':state['recovery_required'],'resources':state['resources'],
-            'stages':{k:{field:v.get(field) for field in ['status','actor_id','deadline_s','recovery_required',
+            'stages':{k:{field:v.get(field) for field in ['status','attempt_id','actor_id','deadline_s','recovery_required',
                         'pending_operation','pending_measurement','view']} for k,v in state['stages'].items()},
             'inventory':state['inventory'],'bookings':state['bookings']}
 
@@ -107,7 +107,7 @@ def session(flow,actions=None):
                     flow.stage(request['stage_id']).import_content(Path(request['file']).read_bytes(),actor,Path(request['file']).name)
                 else:flow.stage_act(request['stage_id'],command,actor,**data)
             else:
-                if command not in {'accept_rack','confirm_mass','run_cf01','handover','advance_time','cancel','finish_cf01_abort','reconcile_initial_cf01'}:
+                if command not in {'accept_rack','confirm_mass','run_cf01','handover','advance_time','cancel','finish_cf01_abort','reconcile_initial_cf01','restart_cf01'}:
                     raise TaskError('Unknown root command')
                 if command=='run_cf01' and 'configure' in data:
                     raise TaskError('The CLI does not accept test injection callbacks')
@@ -123,7 +123,7 @@ def session(flow,actions=None):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--store',type=Path,default=DEFAULT_STORE)
+    parser.add_argument('--store',type=Path,help='Shared store; defaults to workflows.sqlite3 or an existing legacy nanodrop.sqlite3')
     sub=parser.add_subparsers(dest='command',required=True)
     for name in ['create','demo']:
         child=sub.add_parser(name);child.add_argument('--profile',type=Path,default=SOURCE);child.add_argument('--run-id')
@@ -136,7 +136,7 @@ def main():
         if name=='session':child.add_argument('--resume',action='store_true');child.add_argument('--actions',type=Path)
     args=parser.parse_args();flow=None
     try:
-        with Journal(output_path(args.store)) as journal:
+        with Journal(output_path(resolve_store(args.store))) as journal:
             try:
                 if args.command in {'create','demo'}:
                     flow=Workflow.create(journal,args.profile,args.run_id)
