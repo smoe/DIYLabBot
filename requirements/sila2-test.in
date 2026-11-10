@@ -1,0 +1,4 @@
+-r sila2.in
+sila2==0.14.0
+pytest==9.2.0
+jsonschema==4.26.0

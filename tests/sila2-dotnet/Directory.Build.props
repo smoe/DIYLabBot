@@ -1,0 +1,6 @@
+<Project>
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)../../exports/generated/cf01-sila2/dotnet/bin/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../../exports/generated/cf01-sila2/dotnet/obj/</BaseIntermediateOutputPath>
+  </PropertyGroup>
+</Project>
