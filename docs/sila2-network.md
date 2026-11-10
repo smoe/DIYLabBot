@@ -280,12 +280,30 @@ the current shared batch source binding retained by the follow-up. Existing
 journals keep their original source signature and are not migrated.
 
 This source-binding correction does not turn the failed `0bb3874` rebase checks
-into successful acceptance results. The integrated batch pin was compared with
-the current source bytes and matches. That source check alone does not establish
-network/.NET acceptance; no passed integration run is claimed here.
-The historical gallery failure above remains
-an explicit verification item, not a claimed gallery pass. No native BRep or
-hardware qualification follows from this merge.
+into successful acceptance results. A separate integrated run on Python 3.13.12
+with .NET SDK 10.0.403 produced the following evidence:
+
+- Full project suite with both network/.NET switches enabled: 524 tests,
+  500 passed, 24 skipped because native CAD/ROS build evidence was unavailable
+  in the isolated checkout; no failures or errors.
+- All 47 dedicated CF01 SiLA tests executed and passed, without skips, including
+  TLS/gRPC, discovery, process recovery and independent Tecan interoperability.
+- The integrated batch pin matches its current source bytes. The generated
+  v2 FDL and synthetic-observation FDL pass the SDK and official schema checks.
+- Gallery check: 31 images, 30 required geometric model sources and 2,975,847
+  image bytes. Only the exact versioned non-geometric transport profile is
+  exempt from a CAD image; unknown formats/versions retain image coverage.
+  Historical images, catalog and provenance were not regenerated.
+- All 17 existing assembly/schema documents pass. The 95 protected files checked
+  against `7b7f581` remain byte-identical: historical media, gallery, fixtures,
+  vendor originals, model history and the `.gitattributes` preservation policy.
+
+The integration worktree retains the local log and source-bound report under
+`exports/validation/all-branches-tests.log` and
+`exports/validation/all-branches-integration-report.json`. These are fresh
+integration results, not replacements for the historical rebase evidence.
+No new native BRep collision run, hardware, LAN, safety or formal SiLA
+qualification follows from this merge; GENtle resource binding remains planned.
 
 Commands for the current checks:
 
