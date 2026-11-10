@@ -407,13 +407,19 @@ Identitätsvertrag; die Ultra-API wird nicht auf NanoDrop One übertragen.
 
 ## SiLA-Fähigkeiten und GENtle-Ressourcenbindung
 
-**Status: dokumentierte Zielarchitektur, noch nicht implementiert.** Dieser
-Vertrag ergänzt die vier räumlichen Ebenen um eine Bindung für Gerätefähigkeiten
-und ihre aktuelle Belegung. Er führt keine neuen Schemas, Endpoints, Dienste oder
-Runtime-Daten ein. Die vorhandenen lokalen SiLA-Vertragsdecoder und Mocks sind
-keine laufenden SiLA-Netzwerkserver und kein Hardwarebeleg. Auch der getrennte
-UltraC-HTTP-Leseadapter ist kein SiLA-Adapter. Alle bisherigen Sicherheits-,
-Metrologie-, biologischen und Fertigungsgrenzen gelten unverändert weiter.
+**Status: Die hier beschriebene GENtle-Fähigkeits- und Ressourcenbindung ist
+dokumentierte Zielarchitektur, noch nicht implementiert.** Dieser Vertrag
+ergänzt die vier räumlichen Ebenen um eine Bindung für Gerätefähigkeiten und
+ihre aktuelle Belegung; er führt selbst keine neuen Schemas, Endpoints, Dienste
+oder Runtime-Daten ein. Davon getrennt ist ein
+[TLS/gRPC-SiLA-Server für den CF01-Simulator](docs/sila2-network.md) implementiert.
+Sein Netzwerk-Chargenrunner ist nicht mit den bisherigen lokalen
+Vertragsdecodern oder dem gemeinsamen synthetischen Laborablauf gleichzusetzen.
+Implementierung und aktueller Prüferfolg bleiben getrennte Aussagen; der
+Rebase-Prüfstand steht in der verlinkten Dokumentation. Hardwarebetrieb,
+formale SiLA-Zertifizierung und LAN-Qualifikation sind nicht nachgewiesen.
+Auch der getrennte UltraC-HTTP-Leseadapter ist kein SiLA-Adapter. Alle bisherigen
+Sicherheits-, Metrologie-, biologischen und Fertigungsgrenzen gelten weiter.
 
 Referenzen sind [SiLA 2](https://sila-standard.com/), die
 [offiziellen Featuredefinitionen in `sila_base`](https://gitlab.com/SiLA2/sila_base)

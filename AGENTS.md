@@ -206,6 +206,32 @@ und UltraC-Katalogtyp. Keine CAD-Datei ist Netzwerk-Laufzeitabhängigkeit.
   Original-URL. Loopback-HTTP ist geprüft, reale Geräteantworten, Ergebnisdecoder
   und Hardware nicht. Modellkennzeichen sind Selbstauskunft, keine Authentifizierung.
 
+## CF01-SiLA-Netzwerkmodell
+
+Vor Änderungen [docs/sila2-network.md](docs/sila2-network.md) lesen.
+`model/cf01-sila2.shared.json` führt den separaten CF01-v2-Netzwerkvertrag und
+pinnt Stations-, Protokoll- und Chargenquellen. Der Adapter verwendet denselben
+Simulator-/Protokollkern; keine zweite Prozesszustandsmaschine oder Probenbilanz
+anlegen. Standard-FDLs und deren Provenienz unverändert erhalten; Versionen
+nicht stillschweigend wechseln.
+
+- Einstieg: `python3 scripts/run_cf01_sila2.py --language de --help`.
+  `init`, `serve` und `batch` verwenden private Laufzeitdaten unter `exports/`.
+  TLS und explizites Zertifikatsvertrauen beibehalten; Zugangsdaten nicht loggen.
+- Quellenpins vor dem Start prüfen. Absichten vor Effekten dauerhaft speichern;
+  Sperrablauf, Stoppquittung und bestätigten Stillstand getrennt behandeln.
+  Unklare Übergaben und alte Ausführungen nach Neustart nicht automatisch
+  wiederholen oder freigeben. Bestehende Journale nicht still migrieren.
+- Tests aus `requirements/sila2-test.lock` ausführen. Ohne Schalter bleiben
+  Netzwerk-/Prozessprüfungen aus; `SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1` aktiviert
+  diese. `SOLIDCRAFTBOT_SILA_DOTNET_TESTS=1` setzt die gebaute unabhängige
+  .NET-Probe voraus. Übersprungene Tests sind kein bestandener Netzwerknachweis.
+- Ausschließlich Simulator, synthetische Roboterbeobachtungen und lokale
+  Netzwerkprüfung: keine Hardware, native Ladebahn, Sicherheitsqualifikation,
+  formale SiLA-Zertifizierung oder LAN-Qualifikation. Eine GENtle-Bindung und
+  die Netzwerkanbindung des gemeinsamen CF01/NanoDrop/Qubit-Workflows sind damit
+  nicht implementiert; dessen Checkpointvertrag vor Effekten bleibt bestehen.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |
