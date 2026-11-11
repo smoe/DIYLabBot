@@ -10,7 +10,7 @@ import lab_room_model as room
 import room_geometry_model as geometry
 import furniture_model as furniture
 import lab_layout_model as layout
-import lab_transfer_model as transfer
+import lab_transfer_motion as transfer
 
 BASELINE=room.ROOT/'tests/fixtures/l01-before-layer-split.json'
 

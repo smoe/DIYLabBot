@@ -16,7 +16,7 @@ import centrifuge_robot_pickup as pickup
 from cf01_rack_batch import Runner, load as load_batch, SOURCE as BATCH_SOURCE
 from export_centrifuge_robot_pickup_ros2 import robot_description_requirements
 import sample_motion
-from cf01_unload_path import LoadedPath
+from cf01_unload_path import LoadedPath, CornerPath
 
 sys.path.insert(0,str(pickup.ROOT/'ros2_ws/src/solidcraftbot_ros'))
 from solidcraftbot_ros import motion
@@ -44,14 +44,17 @@ def _validate(definition):
     chosen=definition['selected_samples']
     if not isinstance(chosen,list) or not 3<=len(chosen)<=12 or chosen!=[s['id'] for s in ordered[:len(chosen)]]:raise ValueError('Choose an ordered unloading prefix of at least three samples')
     route=definition['routes']
-    route_keys={'loaded_transfer','empty_return','axial_exit_mm','vertical_entry_mm','axial_blend_mm','vertical_blend_mm','clearance_pose','clearance_axis','blend_time_weight','stop_speed_mm_s','stop_joint_speed_rad_s'}
-    if (set(route)!=route_keys or route['loaded_transfer']!='axial_bezier7_vertical' or route['empty_return']!='direct'
+    route_keys={'loaded_transfer','empty_return','empty_corner_trim_mm','axial_exit_mm','vertical_entry_mm','axial_blend_mm','vertical_blend_mm','clearance_pose','clearance_axis','blend_time_weight','stop_speed_mm_s','stop_joint_speed_rad_s'}
+    if (set(route)!=route_keys or route['loaded_transfer']!='axial_bezier7_vertical' or route['empty_return']!='rounded_corner'
             or route['clearance_pose']!='withdrawn' or route['clearance_axis']!='world_x'
             or any(not _positive(route[k]) for k in route_keys if k.endswith('_mm') or k.startswith('stop_') or k=='blend_time_weight') or route['blend_time_weight']>8):raise ValueError('Supported continuous source-referenced route required')
     interpolation=definition['interpolation']
-    if (set(interpolation)!={'tcp_path','joint_curve','ik_points_per_path','loaded_ik_points','path_check_subdivisions','sample_bound_subdivisions','sample_bound_max_subdivisions','path_tolerance_mm'} or interpolation['tcp_path']!='plateau_s_curve' or interpolation['joint_curve']!='C2_quintic' or interpolation['ik_points_per_path'] not in (33,65) or interpolation['loaded_ik_points'] not in (257,513) or type(interpolation['path_check_subdivisions']) is not int or not 4<=interpolation['path_check_subdivisions']<=16 or interpolation['sample_bound_subdivisions'] not in (4,8) or interpolation['sample_bound_max_subdivisions'] not in (16,32,64,128,256) or not _positive(interpolation['path_tolerance_mm']) or interpolation['path_tolerance_mm']>.05):raise ValueError('Supported smooth path and tolerance required')
+    if (set(interpolation)!={'tcp_path','joint_curve','ik_points_per_path','empty_ik_points','loaded_ik_points','path_check_subdivisions','sample_bound_subdivisions','sample_bound_max_subdivisions','path_tolerance_mm'} or interpolation['tcp_path']!='plateau_s_curve' or interpolation['joint_curve']!='C2_quintic' or interpolation['ik_points_per_path'] not in (33,65) or interpolation['empty_ik_points'] not in (513,1025) or interpolation['loaded_ik_points'] not in (257,513) or type(interpolation['path_check_subdivisions']) is not int or not 4<=interpolation['path_check_subdivisions']<=16 or interpolation['sample_bound_subdivisions'] not in (4,8) or interpolation['sample_bound_max_subdivisions'] not in (16,32,64,128,256) or not _positive(interpolation['path_tolerance_mm']) or interpolation['path_tolerance_mm']>.05):raise ValueError('Supported smooth path and tolerance required')
     holds=definition['holds_s']
-    if set(holds)!={'presentation','grasp','rack_support'} or any(not _positive(v) for v in holds.values()) or holds['presentation']<.6:raise ValueError('Positive confirmations and visible presentation hold required')
+    if (set(holds)!={'presentation','grasp','rack_support'}
+            or type(holds['presentation']) not in (int,float) or holds['presentation']!=0
+            or any(not _positive(holds[key]) for key in ('grasp','rack_support'))):
+        raise ValueError('Only functional grasp/support confirmations may introduce holds')
     keys={'arm_loaded':('velocity_rad_s','acceleration_rad_s2','jerk_rad_s3'),'arm_empty':('velocity_rad_s','acceleration_rad_s2','jerk_rad_s3'),
           'sample_translation':('velocity_mm_s','acceleration_mm_s2','jerk_mm_s3'),'sample_rotation':('velocity_deg_s','acceleration_deg_s2','jerk_deg_s3'),
           'station_lid':('velocity_deg_s','acceleration_deg_s2','jerk_deg_s3'),'station_rotor':('velocity_rpm','acceleration_deg_s2','jerk_deg_s3'),
@@ -237,12 +240,29 @@ def _arm_path(kin,a,b,seed,loaded,points_mm,definition,cache,control=None):
     key=(tuple(a['position']),a['tilt'],tuple(b['position']),b['tilt'],tuple(round(v,7) for v in seed),loaded,tuple(control) if control else None)
     if key in cache:return copy.deepcopy(cache[key])
     count=definition['interpolation']['ik_points_per_path'];roll=definition['_roll'];positions=[];q=seed[:]
-    reference=lambda t:_target(a,b,t,roll,control)
-    for i in range(count):
-        target=reference(i/(count-1));q=_refine(kin,target,kin.inverse(target,q));positions.append([math.radians(v) for v in q])
+    times=[i/(count-1) for i in range(count)]
+    if control:
+        path=CornerPath(a['position'],control,b['position'],a['tilt'],b['tilt'],definition['routes']['empty_corner_trim_mm'])
+        def reference(t):
+            pose=path.pose(motion.septic(t))
+            return pickup.tool_target(pose['position'],pose['tilt'],roll)
+        count=definition['interpolation']['empty_ik_points'];step=1/(count-1);critical={0.,1.}
+        # Include each spatial C2 join exactly in the derived PVA fit.
+        for boundary in path.boundaries:
+            lo,hi=0.,1.
+            for _ in range(60):
+                mid=(lo+hi)/2
+                if motion.septic(mid)<boundary:lo=mid
+                else:hi=mid
+            critical.add((lo+hi)/2)
+        times=sorted({i/(count-1) for i in range(count)
+                      if all(abs(i/(count-1)-t)>step/4 for t in critical)}|critical)
+    else:reference=lambda t:_target(a,b,t,roll)
+    for t in times:
+        target=reference(t);q=_refine(kin,target,kin.inverse(target,q));positions.append([math.radians(v) for v in q])
     positions[0]=[math.radians(v) for v in seed]
-    normalized=motion.from_positions([i/(count-1) for i in range(count)],positions)
-    curve,audit,_=_curve_audit(kin,normalized,reference,loaded,points_mm,definition,'quadratic_bezier' if control else 'straight')
+    normalized=motion.from_positions(times,positions)
+    curve,audit,_=_curve_audit(kin,normalized,reference,loaded,points_mm,definition,'rounded_corner' if control else 'straight')
     result=(curve,[math.degrees(v) for v in normalized[-1][FIELDS[0]]],audit)
     cache[key]=copy.deepcopy(result);return result
 
@@ -412,8 +432,9 @@ def compile(definition=None):
         transfer['lift_start_s']=t;t=station_move(t,{'Lift':p['park_gap']});transfer['docked_s']=t
         t=station_move(t,{'Lift':p['park_gap']+p['lift_travel'],'TubeLift':p['lift_travel']});transfer['presented_s']=t
         command(transfer['lift_start_s'],t,'present_tube',sample);event(t,'tube_presented',sample)
-        arm.hold(max(arm.end,t+definition['holds_s']['presentation']));event(arm.end,'approach',sample,'workspace',workspace_clear=False)
-        arm_move('pregrasp',sample,False);arm_move('grasp',sample,False)
+        # Synchronize with the physical lift; the close-up camera needs no dwell.
+        arm.hold(max(arm.end,t));event(arm.end,'approach',sample,'workspace',workspace_clear=False)
+        arm_move('grasp',sample,False,control_name='pregrasp')
         jaw_caps=[[limits['station_linear'][field]] for field in ['velocity_mm_s','acceleration_mm_s2','jerk_mm_s3']]
         jaw.hold(arm.end);closed_jaw=jaw.move(arm.end,[2*p['tube_radius']],jaw_caps,minimum=.25)
         arm.hold(closed_jaw+definition['holds_s']['grasp']);transfer['gripped_s']=arm.end
@@ -450,7 +471,7 @@ def compile(definition=None):
         event(arm.end,'rack_support_confirmed',sample,'owner',owner='rack');previous_support=arm.end
         jaw.hold(arm.end);opened_jaw=jaw.move(arm.end,[scene['gripper']['open_gap_mm']],jaw_caps,minimum=.25)
         arm.hold(opened_jaw);transfer['released_s']=arm.end;event(arm.end,'jaws_released',sample);previous_support=arm.end
-        arm_move('rack_approach',sample,False);arm_move('withdrawn',sample,False)
+        arm_move('withdrawn',sample,False,control_name='rack_approach')
         transfer['end_s']=arm.end;transfers.append(transfer)
     end=max(arm.end,station.end,jaw.end)
     for track in [arm,station,jaw]:track.hold(end)

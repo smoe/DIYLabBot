@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "7e04d66e6b16516f0379af4210f07244886e8d60ec099ab02ef82a1f6a579b3d",
+  "catalog_sha256": "9b84dc2bd8f37304b8c67abc464dd38f65cdd02eb4d3b701393888e304f1fa6a",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "9f7bb2b7ca4b439b43a1666ca77b37cd38a0ae89c8350b2ecee420b904aa781f",
+  "render_generator_sha256": "0b503b6a0ccd3c21dcfd2829f9e03d8992f6cfa4bd88b4529f7e672c97576d64",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -1970,6 +1970,223 @@
       "prepared_on": "2026-11-09"
     },
     {
+      "id": "lab-glassware-base",
+      "image": "images/lab-glassware.png",
+      "source_files_sha256": {
+        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
+      },
+      "build_report": "cad/lab-glassware/shared-build-report.json",
+      "build_report_sha256": "343a03d585a5d95800790d3028a42819bf8e779817b44ffd415a8a971e5d14d2",
+      "build_passed": true,
+      "case": "overview",
+      "backends": "both",
+      "cross_cad_checked": true,
+      "representation": "Native source-referenced library case; no operational placement or hardware qualification",
+      "native_model": "cad/generated/lab-glassware-3cb59075bdb9-r7/overview.sc",
+      "native_model_sha256": "b30f492d51faacdc6cea6aa4bb17c43b1f6d143fa9c3ce364bac412909ca74dd",
+      "reused_render": "renders/lab-glassware-3cb59075bdb9-r7/overview.png",
+      "reused_render_sha256": "e63664825a413aa35b28227ba049a5bfadb7ebb2baf4f1bea771663e97f234bf",
+      "image_sha256": "e63664825a413aa35b28227ba049a5bfadb7ebb2baf4f1bea771663e97f234bf",
+      "bytes": 272152,
+      "dependency_files_sha256": {
+        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
+      }
+    },
+    {
+      "id": "analytical-balance",
+      "image": "images/analytical-balance.png",
+      "source_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      },
+      "build_report": "cad/lab-equipment/shared-build-report.json",
+      "build_report_sha256": "b1140405d512eb9dc0420e956a910d45e0fbff2844a16c33085c53095510d1fe",
+      "build_passed": true,
+      "case": "analytical_balance_default",
+      "backends": "both",
+      "cross_cad_checked": true,
+      "representation": "Native source-referenced library case; no operational placement or hardware qualification",
+      "native_model": "cad/generated/lab-equipment-0f2c2a1f3afb/analytical_balance_default.sc",
+      "native_model_sha256": "fc7833cb424cdd2516a66c5634a2ff31e280382b0e6a37f38241a9063193bf56",
+      "reused_render": "renders/lab-equipment-0f2c2a1f3afb/analytical_balance_default.png",
+      "reused_render_sha256": "57c01e5d79d2f0bef589fa1309ecdde5aa290a801ba49f02ed5abb4835d6fba5",
+      "image_sha256": "57c01e5d79d2f0bef589fa1309ecdde5aa290a801ba49f02ed5abb4835d6fba5",
+      "bytes": 121441,
+      "dependency_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      }
+    },
+    {
+      "id": "lab-fridge",
+      "image": "images/lab-fridge.png",
+      "source_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      },
+      "build_report": "cad/lab-equipment/shared-build-report.json",
+      "build_report_sha256": "b1140405d512eb9dc0420e956a910d45e0fbff2844a16c33085c53095510d1fe",
+      "build_passed": true,
+      "case": "fridge_4c_default",
+      "backends": "both",
+      "cross_cad_checked": true,
+      "representation": "Native source-referenced library case; no operational placement or hardware qualification",
+      "camera": {
+        "target": [
+          135.61793425211658,
+          3.941445316192244,
+          842.0
+        ],
+        "yaw": 0.0,
+        "pitch": 0.13,
+        "distance": 3941.216041749472,
+        "fov": 0.6
+      },
+      "native_model": "cad/generated/lab-equipment-0f2c2a1f3afb/fridge_4c_default.sc",
+      "native_model_sha256": "31f0aa09cef231987343487f93ce5b7a58c01859e9b139dd162c486696eeb6df",
+      "renderer_result": {
+        "bytes": 39064,
+        "height": 700,
+        "path": "docs/models/images/lab-fridge.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 1000
+      },
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/lab-equipment-0f2c2a1f3afb/fridge_4c_default.sc",
+        "--out",
+        "docs/models/images/lab-fridge.png",
+        "--width",
+        "1000",
+        "--height",
+        "700",
+        "--camera",
+        "{\"target\": [135.61793425211658, 3.941445316192244, 842.0], \"yaw\": 0.0, \"pitch\": 0.13, \"distance\": 3941.216041749472, \"fov\": 0.6}",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "cc959413cc9ccbc04932d49fece876b6bed0d83963280b1d346fdfb9bd92c066",
+      "bytes": 39064,
+      "dependency_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      }
+    },
+    {
+      "id": "lab-freezer",
+      "image": "images/lab-freezer.png",
+      "source_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      },
+      "build_report": "cad/lab-equipment/shared-build-report.json",
+      "build_report_sha256": "b1140405d512eb9dc0420e956a910d45e0fbff2844a16c33085c53095510d1fe",
+      "build_passed": true,
+      "case": "freezer_minus20_default",
+      "backends": "both",
+      "cross_cad_checked": true,
+      "representation": "Native source-referenced library case; no operational placement or hardware qualification",
+      "camera": {
+        "target": [
+          136.13096446710512,
+          0.5319063850133716,
+          850.0
+        ],
+        "yaw": 0.0,
+        "pitch": 0.13,
+        "distance": 3969.83115853326,
+        "fov": 0.6
+      },
+      "native_model": "cad/generated/lab-equipment-0f2c2a1f3afb/freezer_minus20_default.sc",
+      "native_model_sha256": "092729ac512b967e8dff7c0fbd60200ab4df21e85d57bca4df1c1ed09845f2e7",
+      "renderer_result": {
+        "bytes": 44981,
+        "height": 700,
+        "path": "docs/models/images/lab-freezer.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 1000
+      },
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/lab-equipment-0f2c2a1f3afb/freezer_minus20_default.sc",
+        "--out",
+        "docs/models/images/lab-freezer.png",
+        "--width",
+        "1000",
+        "--height",
+        "700",
+        "--camera",
+        "{\"target\": [136.13096446710512, 0.5319063850133716, 850.0], \"yaw\": 0.0, \"pitch\": 0.13, \"distance\": 3969.83115853326, \"fov\": 0.6}",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "48f6420796d4bdda67d8c3908923fae0599c65e76fafa8ece16f3ac510af541a",
+      "bytes": 44981,
+      "dependency_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      }
+    },
+    {
+      "id": "cellar-ult",
+      "image": "images/cellar-ult.png",
+      "source_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      },
+      "build_report": "cad/lab-equipment/shared-build-report.json",
+      "build_report_sha256": "b1140405d512eb9dc0420e956a910d45e0fbff2844a16c33085c53095510d1fe",
+      "build_passed": true,
+      "case": "cellar_ult_f440n_default",
+      "backends": "both",
+      "cross_cad_checked": true,
+      "representation": "Native source-referenced library case; no operational placement or hardware qualification",
+      "camera": {
+        "target": [
+          205.9545956951098,
+          -67.2635338044854,
+          975.0
+        ],
+        "yaw": 0.0,
+        "pitch": 0.13,
+        "distance": 4824.5055647435665,
+        "fov": 0.6
+      },
+      "native_model": "cad/generated/lab-equipment-0f2c2a1f3afb/cellar_ult_f440n_default.sc",
+      "native_model_sha256": "32fbaca8a52d186bff54f46a47a5eaadb0e611ae70f1fbf4b764abc0ce0018ed",
+      "renderer_result": {
+        "bytes": 37376,
+        "height": 700,
+        "path": "docs/models/images/cellar-ult.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 1000
+      },
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/lab-equipment-0f2c2a1f3afb/cellar_ult_f440n_default.sc",
+        "--out",
+        "docs/models/images/cellar-ult.png",
+        "--width",
+        "1000",
+        "--height",
+        "700",
+        "--camera",
+        "{\"target\": [205.9545956951098, -67.2635338044854, 975.0], \"yaw\": 0.0, \"pitch\": 0.13, \"distance\": 4824.5055647435665, \"fov\": 0.6}",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "f2f42592ca035b65c6e34eaae0653c9752abee7b3f6a5d578629a7ce651f73e3",
+      "bytes": 37376,
+      "dependency_files_sha256": {
+        "model/lab-equipment.shared.json": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3"
+      }
+    },
+    {
       "id": "transport-floor-p2",
       "image": "images/transport-floor-p2.png",
       "source_files_sha256": {
@@ -2227,56 +2444,26 @@
         "model/qubit-4.catalog.json": "b6533a57f335aa6e206aff42109319e8f2ca2208efac39e1629cf545931f4c76",
         "model/synthetic-lab-workflow.schema.json": "80b753ec37b6919bd91946243b93487aa576b3eb4768a467f33e3de256deade2"
       }
-    },
-    {
-      "id": "lab-glassware-base",
-      "image": "images/lab-glassware-base.png",
-      "source_files_sha256": {
-        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
-      },
-      "build_report": "cad/lab-glassware/shared-build-report.json",
-      "build_report_sha256": "018f7a339a71d948d875bf5057bcff9413a623777eb9d7ee873b1054bdeffe44",
-      "build_passed": true,
-      "build_source_sha256": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d",
-      "source_equivalence": null,
-      "native_model": "cad/generated/lab-glassware-3cb59075bdb9-r6/overview.sc",
-      "native_model_sha256": "2684dd68523a3393d72f41357dd7cfac45b726a71414ca923b4326cb1bf44892",
-      "renderer_result": {
-        "bytes": 60090,
-        "height": 700,
-        "path": "docs/models/images/lab-glassware-base.png",
-        "renderer": "cpu",
-        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
-        "width": 1000
-      },
-      "commands": [],
-      "command_line": [
-        "solidcraft-cli",
-        "snapshot",
-        "--in",
-        "cad/generated/lab-glassware-3cb59075bdb9-r6/overview.sc",
-        "--out",
-        "docs/models/images/lab-glassware-base.png",
-        "--width",
-        "1000",
-        "--height",
-        "700",
-        "--view",
-        "iso",
-        "--no-grid",
-        "--no-axes"
-      ],
-      "image_sha256": "3d4d6601defa5dc27f01c40dd0866b2e9a4dded7ff488b2d4ac9336ba4ce1203",
-      "bytes": 60090,
-      "dependency_files_sha256": {
-        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
-      }
     }
   ],
   "visual_review": {
     "passed": true,
     "reviewed_on": "2026-11-11",
-    "notes": "Updated L01 room, equipment plan and native overview reviewed at their current source revisions. The original glassware baseline preview was rendered from its source-pinned checked model and visually reviewed. Existing unaffected previews retain their previous visual review."
+    "updated_views": [
+      "l01-overview",
+      "l01-furnished",
+      "l01-equipment"
+    ],
+    "method": "Inspected revised native room/equipment renders and rasterized placement SVG; other images retain their previous review.",
+    "limits": "Documentation views and discrete geometric checks; no operational or hardware qualification.",
+    "baseline_glassware_update": {
+      "passed": true,
+      "reviewed_image": "lab-glassware-base",
+      "source_sha256": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d",
+      "image_sha256": "e63664825a413aa35b28227ba049a5bfadb7ebb2baf4f1bea771663e97f234bf",
+      "build_report_sha256": "343a03d585a5d95800790d3028a42819bf8e779817b44ffd415a8a971e5d14d2",
+      "method": "Fresh both-backend native build of the versioned Laborglas/1 source; original producer and artifact pins verified without equivalence exceptions. Native PNG inspected at full size: beaker spout, through-funnel, closed/open screw bottle and open stopper bottle all visible, with no clipping."
+    }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

@@ -1,5 +1,5 @@
 {
-  "format": "solidcraftbot.lab-transfer/1",
+  "format": "solidcraftbot.lab-transfer/2",
   "id": "L01.TR01_CF01_roundtrip",
   "units": {
     "length": "mm",
@@ -43,6 +43,7 @@
     "cf_vertical_clearance_mm": 20
   },
   "checks": {
+    "minimum_furniture_distance_mm": 5,
     "max_joint_step_deg": 2,
     "max_tcp_step_mm": 5,
     "max_lid_step_deg": 3,
@@ -322,11 +323,60 @@
       "sample_owner": "TR01"
     }
   ],
+  "motion": {
+    "layout_sha256": "6720f431f0b70dcd62620fa0d621e1edfb9105c82d39c5ea60cae4a19c77a394",
+    "limits_reference": {
+      "source": "model/cf01-unload-demo.motion.json",
+      "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",
+      "pointer": "/limits"
+    },
+    "joint_curve": "C2_quintic",
+    "non_axial_path": "quintic_through_named_source_poses",
+    "path_progress": {"velocity_s1": 1, "acceleration_s2": 2, "jerk_s3": 20},
+    "joint_limit_tangents": "bounded_coordinate_damping",
+    "sample_bound_subdivisions": 4,
+    "sample_bound_max_subdivisions": 256,
+    "path_check_subdivisions": 4,
+    "cartesian_stages": ["vehicle_grasp", "vehicle_extract", "cf_insert", "cf_withdraw", "return_grasp", "return_extract", "vehicle_replace", "vehicle_withdraw"],
+    "retained_stages": {
+      "orient_before_lid": "source_joint_linear",
+      "pass_inside_lid": "source_lateral_curve",
+      "above_chamber": "source_cartesian",
+      "cf_approach": "source_cartesian",
+      "lift_above_chamber": "source_cartesian",
+      "withdraw_inside_lid": "source_cartesian",
+      "leave_lid_region": "source_lateral_curve",
+      "return_inside_lid": "source_lateral_curve",
+      "return_above_chamber": "source_cartesian",
+      "return_approach": "source_cartesian",
+      "return_lift_above_chamber": "source_cartesian",
+      "return_clear_lid": "source_cartesian",
+      "return_leave_lid": "source_lateral_curve"
+    },
+    "lid_passage": {
+      "from_pose": "cf_pre", "to_pose": "cf_side", "axis": "world_y", "reference_points": 257,
+      "offset_curve": [
+        {"u": 0, "p_mm": 0, "v_mm_per_u": 0, "a_mm_per_u2": 0},
+        {"u": 0.2, "p_mm": 0, "v_mm_per_u": 0, "a_mm_per_u2": 0},
+        {"u": 0.25, "p_mm": -10, "v_mm_per_u": -200, "a_mm_per_u2": 0},
+        {"u": 0.5, "p_mm": -30, "v_mm_per_u": -100, "a_mm_per_u2": 0},
+        {"u": 0.75, "p_mm": -50, "v_mm_per_u": 0, "a_mm_per_u2": 0},
+        {"u": 1, "p_mm": 0, "v_mm_per_u": 0, "a_mm_per_u2": 0}
+      ]
+    },
+    "necessary_waits": {
+      "cf_release": "supported_handoff",
+      "station_dwell": "stationary_process",
+      "vehicle_release": "supported_handoff"
+    },
+    "overlap_station_stage": {"id": "park_pusher", "clearance_pose": "transit", "axis": "world_x"},
+    "preview_error_mm": 0.01
+  },
   "limitations": [
     "Illustrative timing and synthetic transfer confirmations",
     "Assumed handling envelope, no selected or calibrated gripper",
     "Sampled geometry, not continuous swept-volume certification",
-    "No dynamics, cable routing, payload or human detection validated",
+    "C2 PVA and conservative synthetic motion bounds are not hardware dynamics, biological, cable, payload or human-detection qualification",
     "Rotor remains stopped; no balance or centrifugation performance claim"
   ],
   "ik_preference": {

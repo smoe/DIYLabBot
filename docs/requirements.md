@@ -30,6 +30,7 @@
 | Antriebe | Sechs Servoantriebe mit für die Steuerung auslesbarer gemessener Position; Messort, Referenz und Rückmeldezeit festlegen |
 | Flexible Leitungen | Versorgung und Rückmeldung aller Motoren in der gemeinsamen Quelle modellieren, auch bei ausgeblendeter Darstellung; Führung, Reserve, Biegung, Torsion und Zugentlastung auslegen |
 | Genauigkeit und Geschwindigkeit | Hohe Positioniergenauigkeit bei kurzen Prozesszeiten; messbare TCP-, Last-, Einschwing- und Zykluszeitziele noch festzulegen |
+| Probentransport | Projektweit fließende beladene Bewegung ohne unnötige Zwischenhalte; Geschwindigkeit, Beschleunigung und Ruck innerhalb ausdrücklich benannter Grenzen |
 | Zusammenarbeit mehrerer Arme | Bis zu drei Arme sollen Aufgaben parallelisieren und Übergaben unterstützen; gemeinsame Arbeitsbereiche und Referenzen koordinieren |
 | Kaufteilgeometrie | Hersteller-Servomodelle wiederverwenden; eigene Motorplatten als parametrische Schnittstellen entwickeln |
 | ROS-Darstellung der Servos | Einfache Quader für die optische Darstellung in RViz; mechanische Detailgeometrie getrennt halten |
@@ -39,6 +40,38 @@ Die [bevorzugte Antriebsauswahl](actuator-selection.md) ist als Prototypbasis
 bestätigt. Sie ersetzt keine Prüfung der geforderten Präzision, Last oder
 Geschwindigkeit. Insbesondere die X4-L-Angabe von 0,3° Wiederholgenauigkeit
 muss gegen die noch festzulegenden TCP-Ziele bewertet werden.
+
+## Fließender Probentransport
+
+Die fließende Planung gilt auch für leere Roboterfahrten und Raumsondierung.
+Ein geometrischer Wegpunkt ist keine Anweisung zum Anhalten. Notwendige
+Synchronisation benennt die konkrete Bedingung, auf die gewartet wird; eine
+abgeschlossene zweite Bewegung kann eine solche Bedingung sein.
+
+Jeder neu entwickelte oder erneuerte Probentransport soll das Gefäß nach dem
+bestätigten Griff durchgehend bis zur Ablage oder Übergabe bewegen. Wegpunkte
+für Entnahme, Freiraum, Aufrichtung und Annäherung beschreiben den Weg und
+erforderliche Ereignisse; sie erzwingen keinen Halt. Die schnellste zulässige
+Fahrt ist innerhalb der gewählten Grenzen zu suchen, ohne diese für eine
+kürzere Vorführung anzuheben. Globale Zeitoptimalität ist damit nicht belegt.
+
+Position, Geschwindigkeit und Beschleunigung sollen stetig sein; Ruck ist
+zu begrenzen. Zu prüfen sind die tatsächliche Gelenkkurve, Werkzeug und
+vollständiges getragenes Gefäß sowie die exportierte Fassung. Einzelfeatures
+oder wenige angefahrene Posen ersetzen keinen Nachweis zwischen den Knoten.
+
+Griff und Ablage, eine Messung am ruhenden Gefäß, Inkubation, bestätigte
+Übergaben und Schutzreaktionen können einen Halt erfordern. Solche Zustände
+werden als funktionale Prozess-/Bestätigungszustände getrennt geführt und
+begründet. Bei fehlender Freigabe darf die Bewegung nicht allein zugunsten
+der Zykluszeit fortgesetzt werden. Biologische Belastbarkeit, Flüssigkeits-
+bewegung und reale Antriebsgrenzen bleiben zu bestimmen; synthetische
+Grenzwerte werden als unqualifiziert gekennzeichnet.
+
+Die aktuelle CF01-Drei-Proben-Bahn weist diesen Grundsatz im synthetischen
+Modell nach. Ältere lineare Wegpunktstudien und statische Aufstellungen sind
+damit nicht automatisch migriert oder als Transportprogramme freigegeben;
+der jeweilige Stand steht in [ARCHITECTURE.md](../ARCHITECTURE.md).
 
 ## Zielversuch
 

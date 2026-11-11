@@ -9,9 +9,9 @@
   "initial_state": "full_rotor_after_spin",
   "lid_policy": "open_between_unloads",
   "selected_samples": ["Sample01", "Sample02", "Sample03"],
-  "routes": {"loaded_transfer": "axial_bezier7_vertical", "empty_return": "direct", "axial_exit_mm": 60, "vertical_entry_mm": 60, "axial_blend_mm": 30, "blend_time_weight": 3, "vertical_blend_mm": 45, "clearance_pose": "withdrawn", "clearance_axis": "world_x", "stop_speed_mm_s": 0.01, "stop_joint_speed_rad_s": 0.000001},
-  "interpolation": {"tcp_path": "plateau_s_curve", "joint_curve": "C2_quintic", "ik_points_per_path": 65, "loaded_ik_points": 257, "path_check_subdivisions": 4, "sample_bound_subdivisions": 4, "sample_bound_max_subdivisions": 256, "path_tolerance_mm": 0.05},
-  "holds_s": {"presentation": 0.6, "grasp": 0.25, "rack_support": 0.25},
+  "routes": {"loaded_transfer": "axial_bezier7_vertical", "empty_return": "rounded_corner", "empty_corner_trim_mm": 10, "axial_exit_mm": 60, "vertical_entry_mm": 60, "axial_blend_mm": 30, "blend_time_weight": 3, "vertical_blend_mm": 45, "clearance_pose": "withdrawn", "clearance_axis": "world_x", "stop_speed_mm_s": 0.01, "stop_joint_speed_rad_s": 0.000001},
+  "interpolation": {"tcp_path": "plateau_s_curve", "joint_curve": "C2_quintic", "ik_points_per_path": 65, "empty_ik_points": 513, "loaded_ik_points": 257, "path_check_subdivisions": 4, "sample_bound_subdivisions": 4, "sample_bound_max_subdivisions": 256, "path_tolerance_mm": 0.05},
+  "holds_s": {"presentation": 0, "grasp": 0.25, "rack_support": 0.25},
   "limits": {
     "qualified": false,
     "biological_tolerance": null,

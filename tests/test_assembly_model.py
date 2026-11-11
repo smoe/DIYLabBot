@@ -11,7 +11,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import assembly_model as assembly
 import robot_spec as robot
 import lab_layout_model as layout
-import lab_transfer_model as transfer
+import lab_transfer_motion as transfer
 import centrifuge_robot_pickup as pickup
 import robot_components as components
 import tip_collector_model as collector

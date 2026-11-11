@@ -64,6 +64,7 @@
       "required": [
         "loaded_transfer",
         "empty_return",
+        "empty_corner_trim_mm",
         "axial_exit_mm",
         "vertical_entry_mm",
         "axial_blend_mm",
@@ -79,7 +80,10 @@
           "const": "axial_bezier7_vertical"
         },
         "empty_return": {
-          "const": "direct"
+          "const": "rounded_corner"
+        },
+        "empty_corner_trim_mm": {
+          "$ref": "#/$defs/positive"
         },
         "clearance_pose": {
           "const": "withdrawn"
@@ -119,6 +123,7 @@
         "tcp_path",
         "joint_curve",
         "ik_points_per_path",
+        "empty_ik_points",
         "sample_bound_subdivisions",
         "path_tolerance_mm",
         "loaded_ik_points",
@@ -155,6 +160,9 @@
             513
           ]
         },
+        "empty_ik_points": {
+          "enum": [513, 1025]
+        },
         "path_check_subdivisions": {
           "type": "integer",
           "minimum": 4,
@@ -182,7 +190,8 @@
       "properties": {
         "presentation": {
           "type": "number",
-          "minimum": 0.6
+          "const": 0,
+          "description": "No presentation-only pause; approach begins when the lift is complete."
         },
         "grasp": {
           "$ref": "#/$defs/positive"

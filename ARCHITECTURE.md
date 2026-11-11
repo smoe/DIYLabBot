@@ -15,6 +15,45 @@ und gemeinsame Protokollstellungen ohne FreeCAD-Dateien als Eingabe. Erhaltene
 Hersteller-Gehäuseteile können unter einer gemeinsamen semantischen Geräte-ID
 mehrere starre CAD-Körper bilden; ihre Zuordnung wird im Build-Bericht geführt.
 
+## Projektweite Bewegungsvorgabe
+
+Fließende Bewegung ist eine allgemeine Anforderung, auch bei leeren Fahrten
+und Raumsondierung. Ein Wegpunkt erzeugt keine Pause. Eine notwendige
+Wartebedingung benennt die erwartete Beobachtung beziehungsweise den Abschluss
+eines anderen Vorgangs. Jeder neu entwickelte oder erneuerte
+beladene Transport verbindet Griff und Ablage beziehungsweise Übergabe ohne
+unnötige Zwischenhalte. Durchgangsziele, Freiraumereignisse und Stations-
+quittungen werden von erforderlichen Prozess- und Schutzhalten getrennt.
+Ein Sicherheitsstopp darf nicht zur Einhaltung dieser Bewegungsregel entfallen.
+
+Die gemeinsamen PVA-Kurven und FK-Ableitungen unter
+`solidcraftbot_ros/motion.py` und `scripts/sample_motion.py` bilden den vorhandenen
+Rechenkern für die Sechsachs-Armbahnen. Grenzen und Kein-Halt-Kriterium werden
+an der tatsächlichen Kurve und nach Export geprüft; die wissenschaftliche
+Belastbarkeit der Proben bleibt eine gesonderte Qualifikationsaufgabe. Es gibt
+keinen automatischen Glätter beliebiger Szenen und kein neues universelles
+Transportschema. Weitere Programme müssen ihre unterstützten Quellen und
+Adapter entsprechend erweitern und neu nachweisen.
+
+Die aktuelle Drei-Proben-Entnahme erfüllt die numerischen synthetischen
+Prüfkriterien für beladene und leere Fahrten. Die L01-Umstellung beschreibt
+sechs durchgehende Bewegungsepisoden mit demselben PVA-/FK-Kern statt der
+älteren linearen Wegpunktillustration. Ihr Heberrückzug läuft nach geprüfter
+Gefäßfreigabe parallel zum Transport. FreeCAD wertet die tatsächlichen Kurven
+aus; die native SolidCraft-Studie bleibt ausdrücklich eine diskrete lineare
+Vorschau ohne PVA-Schnittstelle. Die Nachweise und Grenzen stehen in
+[docs/lab-transfer-l01.md](docs/lab-transfer-l01.md).
+
+Die historische CF01-Einzelbahn und statische Zweiarm-Prüfstellungen sind
+kein solcher Bewegungsnachweis. Die alte nackte Arm-Demo
+`base_sweep_return` in `model/robot.json` verwendet weiterhin `joint_linear`;
+sie ist keine nach dieser Vorgabe freigegebene Sondierungsbahn. Ihre Migration
+einschließlich der abhängigen Arm-/CAD-Revisionen ist gesonderte Folgearbeit.
+Abstrakte manuelle Übergaben führen keine Roboterbahn aus. Notwendige Mess-,
+Pipettier-, Inkubations- und Übernahmehalte bleiben Prozesszustände.
+Die [Anforderungen](docs/requirements.md#fließender-probentransport) gelten vor
+der Überführung dieser Altstände in aktuelle Transportprogramme.
+
 ## Vier Beschreibungsebenen
 
 | Ebene | Verantwortung | Abgrenzung |
@@ -272,8 +311,14 @@ Konservative FK-Intervallhüllen werden adaptiv vom Profilstart mit vier bis
 höchstens 256 Teilintervallen im jeweils begrenzenden Abschnitt verfeinert.
 Tatsächliche Auswertungen steuern diese Auswahl; sie ersetzen keine obere
 Grenze. Der Abbruchgrund und die verwendeten Auflösungen stehen im Bericht.
-Das neue Programm umfasst 1.565 Armknoten und 80,759 s Animationszeit;
-der erste Griff bis zur bestätigten Rackabstützung dauert 11,611 s.
+Auch leere Anfahrten und Rückzüge besitzen durchgehende verrundete Bahnen;
+eine reine Präsentationspause entfällt. Die letzten 25 mm der Anfahrt bleiben
+axial, die ersten 96 mm des Rückzugs senkrecht. Das aktuelle Programm umfasst
+3.876 Armknoten und 99,674 s Animationszeit; der erste Griff bis zur bestätigten
+Rackabstützung dauert unverändert 11,611 s. Gegenüber der ersten durchgehenden
+Fassung mit 80,759 s dauert das Gesamtprogramm durch die nun ebenfalls
+verrundeten leeren Fahrten bei unveränderten Grenzen länger. Daraus folgt kein
+Geschwindigkeits- oder Optimalitätsnachweis.
 Build und Provenienz binden diese Modellzeiten; sie sind kein Chargenrunner-
 oder Hardwarebenchmark. Die
 Prüfung ersetzt weder einen kontinuierlichen Kollisionsnachweis noch ROS-/

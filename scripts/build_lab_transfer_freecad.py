@@ -7,11 +7,12 @@ import sys
 import FreeCAD as App
 import Part
 import Import
-import lab_transfer_model as model
+import lab_transfer_motion as model
 import lab_layout_model as layout
 import robot_spec as robot
 import centrifuge_model as cf
 import build_lab_layout_freecad as static
+from build_lab_transfer import check_pins,geometry_artifacts,furniture_distance_lower_bound,verify_geometry_contract
 sys.path.insert(0,str(layout.ROOT/'scripts/freecad'))
 import solidcraftbot_freecad as motion
 
@@ -29,6 +30,7 @@ def sample_matrix(bottom,axis):
 
 def prepare(path):
     ctx=json.loads(Path(path).read_text());s=model.load();ls=layout.load();d=model.data(s,ls)
+    check_pins(ctx['build_sources_sha256'],'Source');check_pins(ctx['geometry_inputs_sha256'],'Geometry input');verify_geometry_contract(ctx,s,ls)
     if ctx.get('reuse_scene'):
         reuse(ctx,s,ls,d);return
     cad=Path(ctx['cad']);out=Path(ctx['out']);assets=cad/'assets';assets.mkdir(exist_ok=True)
@@ -144,9 +146,10 @@ def reuse(ctx,s,ls,d):
 
 
 def complete(ctx,doc,cache,s,ls,d):
+    verify_geometry_contract(ctx,s,ls)
     out=Path(ctx['out']);controllers={tag:doc.getObject(tag+'Control') for tag in ['ArmC','CF01']}
     native_groups={'ArmC':{l['id']:doc.getObject('ArmC_'+l['id']) for l in d['arm']['links']}}
-    timeline=model.compile(s,ls);frames=model.samples(timeline,s,ls)
+    timeline=model.compile(s,ls);frames,ctx['preview_validation']=model.samples(timeline,s,ls,return_audit=True);ev=model.Evaluator(timeline,s,ls,d)
     (out/'timeline.json').write_text(json.dumps(timeline,indent=2)+'\n');(out/'samples.json').write_text(json.dumps(frames,separators=(',',':')))
 
     def apply(frame):
@@ -161,19 +164,25 @@ def complete(ctx,doc,cache,s,ls,d):
         ctx['presentation_bounds'].append({'body':obj.SourceBody,'bbox':{'min':[b.XMin,b.YMin,b.ZMin],'max':[b.XMax,b.YMax,b.ZMax]}})
     # Compare native expression hierarchy with independent common-source FK.
     native_errors=[]
-    for frame in [model.at_time(timeline,k['time_s'],s,ls,d) for k in timeline['keyframes'] if k['id'] in ['ready','vehicle_grasp','cf_insert','return_grasp','vehicle_replace','complete']]:
+    for frame in [ev(k['time_s']) for k in timeline['keyframes'] if k['id'] in ['ready','vehicle_grasp','cf_insert','return_grasp','vehicle_replace','complete']]:
         apply(frame);poses=robot.forward(d['arm'],frame['q'])
         for group,obj in native_groups['ArmC'].items():
             expected=robot.multiply(d['base'],poses[group]);actual=motion.global_placement(obj).Matrix
             error=max(abs(actual.A[i*4+j]-expected[i][j]) for i in range(4) for j in range(4));native_errors.append(error)
     apply(frames[0]);doc.save()
+    ctx['native_input_sha256']={str((out/name).resolve().relative_to(layout.ROOT)):robot.digest(out/name) for name in ('timeline.json','samples.json')}
     (out/'context.json').write_text(json.dumps(ctx,indent=2)+'\n')
     endpoints={k['id']:k for k in timeline['keyframes']}
-    probe=audit(doc,cache,[model.at_time(timeline,k['time_s'],s,ls,d) for k in endpoints.values()],s,ls,d)
+    probe=audit(doc,cache,[ev(k['time_s']) for k in endpoints.values()],s,ls,d)
     report=audit(doc,cache,frames,s,ls,d) if probe['passed'] else probe
     report['endpoint_precheck_passed']=probe['passed']
     report['native_arm_frame_max_error']=max(native_errors);report['passed']=report['passed'] and max(native_errors)<1e-7
+    report['format']='solidcraftbot.lab-transfer-native/2';report['native_input_sha256']=ctx['native_input_sha256']
+    check_pins(ctx['native_input_sha256'],'Native input');check_pins(ctx['build_sources_sha256'],'Source');check_pins(ctx['geometry_inputs_sha256'],'Geometry input')
+    verify_geometry_contract(ctx,s,ls)
     (out/'motion-validation.json').write_text(json.dumps(report,indent=2)+'\n');ctx['passed']=report['passed']
+    ctx['native_report_sha256']=robot.digest(out/'motion-validation.json')
+    ctx['geometry_artifacts_sha256']={str(p.resolve().relative_to(layout.ROOT)):robot.digest(p) for p in geometry_artifacts(ctx)}
     (out/'context.json').write_text(json.dumps(ctx,indent=2)+'\n');print(json.dumps({'passed':report['passed'],'samples':report['samples_checked'],'collisions':report['collisions'][:8],'native_frame_error':max(native_errors)}),flush=True)
 
 
@@ -193,11 +202,12 @@ def audit(doc,cache,frames,s,ls,d):
     for o in motion.features(doc):
         if o.LayoutInstance in ['ArmC','CF01','Sample','Guides']:continue
         item=fixed(o.SourceBody,motion.world_shape(o),o.ModelRole);environment.append(item)
-        if o.LayoutInstance=='Room' and any(k in o.ModelRole for k in ['storage','work_surface','shelf','cupboard']):furniture.append(item)
+        if (o.LayoutInstance=='Room' and any(k in o.ModelRole for k in ['storage','work_surface','shelf','cupboard'])
+                or o.LayoutInstance in d['items'] and d['items'][o.LayoutInstance]['asset'] in layout.EQUIPMENT_PROFILES):furniture.append(item)
     for record in cache:
         b=record['shape'].BoundBox;record['minimum']=[b.XMin,b.YMin,b.ZMin];record['maximum']=[b.XMax,b.YMax,b.ZMax]
     collisions=[];best=1e9;nearest=None;seen={};checked=0;self_pairs=set();threshold=s['checks']['volume_threshold_mm3'];groups=[l['id'] for l in d['arm']['links']]
-    exact_tests=0;pair_cache={}
+    exact_tests=0;pair_cache={};exact_distance_tests=0;aabb_distance_tests=0
     def actual(entry):
         if entry['shape'] is None:entry['shape']=shape_at(entry['record']['shape'],entry['matrix'])
         return entry['shape']
@@ -227,9 +237,9 @@ def audit(doc,cache,frames,s,ls,d):
             for b in station:test(a,b,'centrifuge')
             if a['record']['tag']=='ArmC' or frame['sample_owner']=='arm':
                 for b in furniture:
-                    lower=math.sqrt(sum(max(0,a['box']['min'][i]-b['box']['max'][i],b['box']['min'][i]-a['box']['max'][i])**2 for i in range(3)))
-                    if lower>=best-1e-7:continue
-                    distance=actual(a).distToShape(actual(b))[0]
+                    distance,refined=furniture_distance_lower_bound(a['box'],b['box'],s['checks']['minimum_furniture_distance_mm'],lambda:actual(a).distToShape(actual(b))[0])
+                    if refined:exact_distance_tests+=1
+                    else:aabb_distance_tests+=1
                     if distance<best:best=distance;nearest={'a':a['name'],'b':b['name'],'phase':frame['phase'],'time_s':frame['time_s']}
         # Adjacent rigid links meet at their real joint interfaces. Audit all
         # non-adjacent link pairs, plus carried sample vs arm except the tool.
@@ -245,9 +255,11 @@ def audit(doc,cache,frames,s,ls,d):
         checked+=1
         if index%20==0:print(json.dumps({'audit_sample':index,'of':len(frames),'phase':frame['phase'],'hits':len(collisions),'exact_tests':exact_tests}),flush=True)
         if len(collisions)>=20:break
-    return {'passed':checked==len(frames) and not collisions,'samples_checked':checked,'requested_samples':len(frames),'unique_states_checked':len(seen),
-            'collisions':collisions,'minimum_furniture_distance_mm':best,'nearest_furniture_pair':nearest,
+    return {'passed':checked==len(frames) and not collisions and best>=s['checks']['minimum_furniture_distance_mm'],'samples_checked':checked,'requested_samples':len(frames),'unique_states_checked':len(seen),
+            'collisions':collisions,'minimum_furniture_distance_lower_bound_mm':best,'nearest_furniture_pair':nearest,
             'broad_phase':'Conservative oriented body bounds with 15-axis separation; BRep overlap refinement','exact_overlap_tests':exact_tests,
+            'aabb_distance_tests':aabb_distance_tests,'exact_distance_tests':exact_distance_tests,
+            'furniture_distance_method':'AABB distance lower bound at or above the unchanged 5 mm requirement; exact BRep distance below it. Reported global minimum is a conservative lower bound, not an exact minimum.',
             'cache':'Exact overlap results reused only for identical body-pair relative transforms, rounded to 1e-8',
             'checks':s['checks'],'excluded_pairs':['within each rigid link','adjacent arm link interfaces','assumed tool/sample grasp contact'],
             'scope':'sampled BRep overlap and furniture distance; no continuous swept-volume guarantee'}

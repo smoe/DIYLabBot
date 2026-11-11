@@ -79,6 +79,37 @@ class ModelGalleryCoverageTests(unittest.TestCase):
             self.check()
 
 
+class LibraryBuildVersionTests(unittest.TestCase):
+    def library(self,source_format,report_format):
+        directory=tempfile.TemporaryDirectory();self.addCleanup(directory.cleanup)
+        root=Path(directory.name).resolve();source=root/'model/lab-glassware.shared.json'
+        source.parent.mkdir();source.write_text(json.dumps({'format':source_format}))
+        native=root/'cad/native.sc';native.parent.mkdir();native.write_bytes(b'unit-test native artifact')
+        image=root/'renders/overview.png';image.parent.mkdir();image.write_bytes(b'unit-test checked image')
+        report=root/'cad/lab-glassware/shared-build-report.json';report.parent.mkdir()
+        report.write_text(json.dumps({'format':report_format,'passed':True,'backends':'both','cross_cad_checked':True,
+            'source_sha256':gallery.sha(source),'source_files_sha256':{'model/lab-glassware.shared.json':gallery.sha(source)},
+            'cases':[{'id':'overview','passed':True,'files':{'solidcraft':'cad/native.sc'},'artifact_sha256':{'solidcraft':gallery.sha(native)}}],
+            'renders':{'overview':{'path':'renders/overview.png','sha256':gallery.sha(image)}}}))
+        entry={'sources':['model/lab-glassware.shared.json'],'render':{'kind':'library-case','family':'lab-glassware','case':'overview'}}
+        return root,entry,native,image
+
+    def test_matching_glassware_source_and_native_build_versions_are_supported(self):
+        for version in [1,2]:
+            root,entry,native,image=self.library('solidcraftbot.lab-glassware/'+str(version),'solidcraftbot.lab-glassware-build/'+str(version))
+            with self.subTest(version=version),patch.object(gallery,'ROOT',root):
+                model,_,render,evidence=gallery.input_for(entry)
+                self.assertEqual(model,native);self.assertEqual(render,image);self.assertTrue(evidence['build_passed'])
+
+    def test_crossed_missing_or_future_build_versions_are_rejected(self):
+        for source_version,build_version in [(1,2),(2,1),(3,3),(None,None)]:
+            source_format='solidcraftbot.lab-glassware/'+str(source_version) if source_version else None
+            build_format='solidcraftbot.lab-glassware-build/'+str(build_version) if build_version else None
+            root,entry,_,_=self.library(source_format,build_format)
+            with self.subTest(source=source_version,build=build_version),patch.object(gallery,'ROOT',root):
+                with self.assertRaisesRegex(ValueError,'Current checked library build required'):gallery.input_for(entry)
+
+
 class ExistingModelGalleryTests(unittest.TestCase):
     def test_repository_gallery_checks_without_rendering_or_artifact_changes(self):
         paths=[gallery.CATALOG,gallery.PROVENANCE,gallery.DIRECTORY/'README.md']

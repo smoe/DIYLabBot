@@ -77,7 +77,7 @@ def verify_native_context(context,program,native,audit_sources):
 def preview_samples(program):
     """Bounds/framing samples only: actual playback evaluates PVA polynomials."""
     times={0.,program['duration_s']}
-    for channel in ['arm','station','jaw']:
+    for channel in ['station','jaw']:
         times.update(point['time_s'] for point in program[channel]['points'])
     times.update(event['time_s'] for event in program['events'])
     count=math.ceil(program['duration_s']/.1)
@@ -94,6 +94,9 @@ def render_html(program,bundle,target):
     program_id=hashlib.sha256(json.dumps(program,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
     display={**program,'preview_samples':preview_samples(program)}
     mesh=geometry.mesh_for_program(bundle,display);mesh['trajectory']['scene_sha256']=program_id
+    # Framing samples already live in trajectory.samples. Keep one copy and
+    # preserve the complete, unmodified PVA program for actual playback.
+    mesh['unload_program']=program
     packed=base64.b64encode(gzip.compress(json.dumps(mesh,separators=(',',':'),allow_nan=False).encode(),compresslevel=9,mtime=0)).decode()
     template=(ROOT/'scripts/templates/centrifuge_robot_pickup.html').read_text()
     header=(ROOT/'scripts/templates/robot_demo_header.html').read_text()

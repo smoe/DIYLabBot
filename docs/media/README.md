@@ -2,43 +2,53 @@
 
 ## Aktuelle Fassung: drei durchgehende Entnahmen bei offenem Deckel
 
-`robot-demo-smooth-batch.html`, `robot-demo-smooth-batch.mp4` und
-`robot-demo-smooth-batch.png` zeigen Sample01–03 nach einem vollständigen
+`robot-demo-continuous-cfr.html`, `robot-demo-continuous-cfr.mp4` und
+`robot-demo-continuous-cfr.png` zeigen Sample01–03 nach einem vollständigen
 synthetischen Zwölferlauf. Alle drei Gefäße gelangen in ihre ursprünglichen
 Rackplätze; neun verbleiben im Rotor. Die automatische Detailansicht zeigt den
 unveränderten 16-mm-Präsentationshub entlang der Gefäßachse. Zwischen Griff und
 Rackankunft gibt es keinen Zwischenhalt. Der Deckel bleibt zwischen den
 Entnahmen offen; nach der letzten Freigabe und dem Heberrückzug schließt und
 verriegelt er.
-Die Modellzeit beträgt 80,759 s bei 1.565 Armknoten, rund 29,7 % weniger als
+Die Modellzeit beträgt 99,674 s bei 3.876 Armknoten, rund 13,2 % weniger als
 bei der vorherigen lokalen Fassung mit Deckelzyklen je Probe. Der erste
-Griff bis zur bestätigten Rackabstützung benötigt 11,611 s, rund 1,0 % weniger
-als zuvor. Dies sind Modellzeiten, kein Hardware-Durchsatzbenchmark.
-Das Video zeigt diese Modellzeit auf 45 s beschleunigt.
+Griff bis zur bestätigten Rackabstützung benötigt 11,611 s statt 11,731 s in
+der älteren Fassung mit Zwischenhalten. Dies sind Modellzeiten, kein Hardware-Durchsatzbenchmark.
+Das Video zeigt diese Modellzeit auf 45 s beschleunigt. Gegenüber der ersten
+durchgehenden Fassung mit 80,759 s sind die nun ebenfalls verrundeten leeren
+Fahrten langsamer; die beladene Fahrt ist unverändert. Globale Zeitoptimalität
+ist nicht nachgewiesen.
 
 [Profil, Aufbau und Prüfgrenzen](../cf01-smooth-unloading.md) und die
-[eigene Provenienz](robot-demo-smooth-batch.provenance.json) führen die
+[eigene Provenienz](robot-demo-continuous-cfr.provenance.json) führen die
 vorläufigen Geschwindigkeits-, Beschleunigungs- und Ruckgrenzen, Quellen,
 Artefaktprüfsummen und ausgeführten Prüfungen. Browser, native Prüfung und
-ROS-Armexport evaluieren dieselben quintischen PVA-Kurven. Position,
+ROS-Armexport evaluieren dieselben quintischen PVA-Kurven. Leere An- und
+Rückfahrten verrunden die Richtungswechsel bei `pregrasp` beziehungsweise
+`rack_approach`; gerader axialer Anflug und vertikales Abheben bleiben erhalten. Position,
 Geschwindigkeit und Beschleunigung sind stetig; Ruck kann an Segmentgrenzen
 springen. Die Grenzwerte sind synthetisch, biologische Toleranzen unbekannt.
 
-Die native diskrete Prüfung besteht mit 10.026 angeforderten Frames und
-9.979 unterschiedlichen Zuständen, ohne Kollisions- oder Abstandsfehler.
+Die native diskrete Prüfung besteht mit 12.082 angeforderten Frames und
+12.044 unterschiedlichen Zuständen, ohne Kollisions- oder Abstandsfehler.
 Der Browser besteht 112 Python-/JS-Vergleiche einschließlich
 Gelenkgeschwindigkeiten und aller drei Hübe, Deutsch/Englisch und drei
-Fensterbreiten. Export und ROS-Client-Dry-run bestehen mit 1.565 PVA-Knoten
-über 80,759156872 s; das bleibt eine Datenprüfung ohne ROS-Laufzeit und Hardware.
+Fensterbreiten. Export und ROS-Client-Dry-run bestehen mit 3.876 PVA-Knoten
+über 99,673878165 s; das bleibt eine Datenprüfung ohne ROS-Laufzeit und Hardware.
 
-Die 145 gezielten Bewegungs-, Mathematik-, Opt-in- und ROS-Prüfungen bestehen.
-Die Gesamtsuite ist dennoch nicht vollständig grün: Vorhandene Mehrarm- und
-Instrumenten-Aufstellungsberichte enthalten veraltete Cacheverweise. Die
-Galerieprüfung meldet fehlende Bilder für `model/lab-glassware.shared.json`
-und die parallel hinzugekommene `model/lab-equipment.shared.json`. Diese
-unabhängigen Befunde gehören nicht zum neuen CF01-Bewegungsnachweis.
-Die zunächst an der Sandbox gescheiterten Loopback-Tests bestehen nach separater
-Wiederholung außerhalb der Sandbox (33 Tests); Netzwerk-Skips bleiben Skips.
+Die zuvor veralteten Instrumenten- und Mehrarm-Aufstellungsnachweise wurden
+durch neue native Builds erneuert; die historischen Berichte bleiben erhalten.
+Die Galerie enthält jetzt auch Laborglas, Analysenwaage und Kaltlagerung.
+Ausgeführte Prüfungen und verbleibende Skips stehen mit ihrem jeweiligen
+Quellstand in der neuen Medienprovenienz. Übersprungene Netzwerkprüfungen sind
+kein bestandener Netzwerknachweis.
+
+Der Videoexport zeichnet die Bildfolge aus festen Modellzeiten auf, unabhängig
+von der Renderdauer. 900 Bilder liegen im MP4 mit genau 50 ms Abstand; der
+letzte Modellzustand wird im letzten Bild erreicht. Sobald Präsentationshub
+und vorherige Armrückfahrt beendet sind, beginnt die nächste Anfahrt ohne
+zusätzliche Vorführpause. Greiferbewegung,
+Griff- und Ablagebestätigung besitzen weiterhin ihre eigenen Bedingungen.
 
 Nur unveränderte Geometrie wird aus quellgebundenen CAD-Berichten übernommen;
 die neue Bahn erhält eine eigene native diskrete Kollisions-/Abstandsprüfung.
@@ -62,6 +72,16 @@ historische Chargenpanel ist in dieser Bewegungsansicht ausgeblendet.
 Der Armkanal ist mit Position, Geschwindigkeit und Beschleunigung für den
 bestehenden ROS-Client exportierbar; Greifer-/Stationssteuerung, Sensorik und
 Qualitätsrückmeldungen bleiben getrennte Integrationsaufgaben.
+
+## Historische Fassung: erste durchgehende Drei-Proben-Entnahme
+
+`robot-demo-smooth-batch.html`, `.mp4`, `.png` und die
+[zugehörige Provenienz](robot-demo-smooth-batch.provenance.json) bleiben
+unverändert erhalten. Dieser Build hatte bereits eine durchgehende beladene
+Bahn und den zwischen den Entnahmen offenen Deckel. Vor jeder Anfahrt enthielt
+er noch 0,6 s reine Vorführpause; die damalige Videoaufnahme besaß variable
+Bildabstände. Die dort protokollierten veralteten CAD-Verweise und fehlenden
+Galeriebilder beschreiben den damaligen Teststand, nicht die erneuerten Builds.
 
 ## Historische Fassung: Roboter und Deckel parallel
 
@@ -147,12 +167,16 @@ Chromium vom Repository-Stamm aus:
 ```sh
 node scripts/export_readme_video.cjs \
   --input renders/<neue-revision>/cf01-unload-demo.html \
-  --output-base docs/media/robot-demo-smooth-batch --record-seconds 45
+  --output-base docs/media/<neue-medienrevision> --record-seconds 45 --fps 20
 ```
 
 Optional sind Playwright-Modul und Chrome-Programm als erstes und zweites
-Argument oder mit `--playwright` und `--chrome` übergebbar. Dauer und
-Besitzwechsel stammen aus den eingebetteten Quellen; ohne MP4-Unterstützung
-bricht der Export ab. Danach Medien prüfen und eine eigene Provenienz
+Argument oder mit `--playwright` und `--chrome` übergebbar. ffmpeg mit
+libx264 ist erforderlich (`--ffmpeg` oder `SOLIDCRAFTBOT_FFMPEG`). Dauer und
+Besitzwechsel stammen aus den eingebetteten Quellen. Der Export verwendet
+verlustfreie Canvas-Einzelbilder als Encoder-Eingabe, feste Bildzeiten und
+H.264/YUV420p im MP4; er protokolliert die Quellzeiten und Bildprüfsummen unter
+`tmp/readme-video/`. Ein Encoder- oder Browserfehler ersetzt keine bestehende
+Videodatei. Danach Medien prüfen und eine eigene Provenienz
 einschließlich aller Medienprüfsummen festhalten. GitHub zeigt HTML als Datei;
 für interaktive Bedienung herunterladen und lokal öffnen.

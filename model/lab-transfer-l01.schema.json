@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-transfer-l01.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "units", "layout_source", "arm", "sample", "tool", "path", "checks", "sequence", "limitations", "ik_preference", "motion"],
+  "properties": {
+    "format": {"const": "solidcraftbot.lab-transfer/2"},
+    "id": {"type": "string", "minLength": 1},
+    "units": {"const": {"length": "mm", "angle": "deg", "time": "s"}},
+    "layout_source": {"const": "model/lab-layout-l01.shared.json"},
+    "arm": {"const": "ArmC"},
+    "sample": {"type": "object", "additionalProperties": false, "required": ["transporter_body", "centrifuge_slot", "geometry_source", "cap_grip_clearance_mm"], "properties": {
+      "transporter_body": {"const": "B2_Tube01"}, "centrifuge_slot": {"const": 1}, "geometry_source": {"type": "string"}, "cap_grip_clearance_mm": {"type": "number", "exclusiveMinimum": 0}
+    }},
+    "tool": {"type": "object"},
+    "path": {"type": "object"},
+    "checks": {"type": "object", "required": ["minimum_furniture_distance_mm"], "properties": {"minimum_furniture_distance_mm": {"const": 5}}},
+    "sequence": {"type": "array", "minItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["id", "duration_s", "arm_pose", "station_pose", "sample_owner"], "properties": {
+      "id": {"type": "string", "minLength": 1}, "duration_s": {"type": "number", "minimum": 0}, "arm_pose": {"type": "string"}, "station_pose": {"type": "string"}, "sample_owner": {"enum": ["TR01", "arm", "CF01"]}, "action": {"type": "string"}
+    }}},
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "ik_preference": {"type": "object"},
+    "motion": {"type": "object", "additionalProperties": false,
+      "required": ["layout_sha256", "limits_reference", "joint_curve", "non_axial_path", "path_progress", "joint_limit_tangents", "sample_bound_subdivisions", "sample_bound_max_subdivisions", "path_check_subdivisions", "cartesian_stages", "retained_stages", "lid_passage", "necessary_waits", "overlap_station_stage", "preview_error_mm"],
+      "properties": {
+        "layout_sha256": {"$ref": "#/$defs/sha256"},
+        "limits_reference": {"type": "object", "additionalProperties": false, "required": ["source", "source_sha256", "pointer"], "properties": {"source": {"const": "model/cf01-unload-demo.motion.json"}, "source_sha256": {"$ref": "#/$defs/sha256"}, "pointer": {"const": "/limits"}}},
+        "joint_curve": {"const": "C2_quintic"},
+        "non_axial_path": {"const": "quintic_through_named_source_poses"},
+        "path_progress": {"type": "object", "additionalProperties": false, "required": ["velocity_s1", "acceleration_s2", "jerk_s3"], "properties": {"velocity_s1": {"type": "number", "exclusiveMinimum": 0}, "acceleration_s2": {"type": "number", "exclusiveMinimum": 0}, "jerk_s3": {"type": "number", "exclusiveMinimum": 0}}},
+        "joint_limit_tangents": {"const": "bounded_coordinate_damping"},
+        "sample_bound_subdivisions": {"enum": [4, 8]},
+        "sample_bound_max_subdivisions": {"enum": [16, 32, 64, 128, 256]},
+        "path_check_subdivisions": {"type": "integer", "minimum": 4, "maximum": 16},
+        "cartesian_stages": {"const": ["vehicle_grasp", "vehicle_extract", "cf_insert", "cf_withdraw", "return_grasp", "return_extract", "vehicle_replace", "vehicle_withdraw"]},
+        "retained_stages": {"const": {
+          "orient_before_lid": "source_joint_linear", "pass_inside_lid": "source_lateral_curve", "above_chamber": "source_cartesian",
+          "cf_approach": "source_cartesian", "lift_above_chamber": "source_cartesian", "withdraw_inside_lid": "source_cartesian",
+          "leave_lid_region": "source_lateral_curve", "return_inside_lid": "source_lateral_curve", "return_above_chamber": "source_cartesian",
+          "return_approach": "source_cartesian", "return_lift_above_chamber": "source_cartesian", "return_clear_lid": "source_cartesian",
+          "return_leave_lid": "source_lateral_curve"
+        }},
+        "lid_passage": {"type": "object", "additionalProperties": false, "required": ["from_pose", "to_pose", "axis", "reference_points", "offset_curve"], "properties": {
+          "from_pose": {"const": "cf_pre"}, "to_pose": {"const": "cf_side"}, "axis": {"const": "world_y"}, "reference_points": {"const": 257},
+          "offset_curve": {"type": "array", "minItems": 2, "items": {"type": "object", "additionalProperties": false, "required": ["u", "p_mm", "v_mm_per_u", "a_mm_per_u2"], "properties": {
+            "u": {"type": "number", "minimum": 0, "maximum": 1}, "p_mm": {"type": "number"}, "v_mm_per_u": {"type": "number"}, "a_mm_per_u2": {"type": "number"}
+          }}}
+        }},
+        "necessary_waits": {"const": {"cf_release": "supported_handoff", "station_dwell": "stationary_process", "vehicle_release": "supported_handoff"}},
+        "overlap_station_stage": {"const": {"id": "park_pusher", "clearance_pose": "transit", "axis": "world_x"}},
+        "preview_error_mm": {"type": "number", "exclusiveMinimum": 0, "maximum": 0.01}
+      }
+    }
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}

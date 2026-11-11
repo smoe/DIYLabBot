@@ -164,6 +164,27 @@ class NoStopContractTests(unittest.TestCase):
         self.assertEqual(result['quiet_intervals_s'][-1][-1],2.)
         self.assertLess(result['quiet_sample_speed_upper_bound_mm_s'],self.route['stop_speed_mm_s'])
 
+    def test_small_end_quiet_band_survives_squared_velocity_cancellation(self):
+        # Numerical fixture reduced from a coarse, otherwise flowing six-axis
+        # interval. Forward expansion loses the threshold root near u=1;
+        # reverse PVA retains it near zero. No threshold is enlarged.
+        position=[-.45766761461452465,.06534505956408188,1.789360578112748,-.26592076175983587,1.8384770449765118,.2617993877991494]
+        velocity=[.9727637598608506,.5905201124386478,-.6078511057257772,.18252959492713125,.11636736925112788,0.]
+        acceleration=[.22485161382228178,.2594649181416561,-.30435445968350044,.03191869942632981,.02823558405574671,0.]
+        end=7.393235953506208
+        points=[{'time_s':0.,FIELDS[0]:[x-v for x,v in zip(position,velocity)],FIELDS[1]:[0.]*6,FIELDS[2]:[0.]*6},
+                {'time_s':1.,FIELDS[0]:position,FIELDS[1]:velocity,FIELDS[2]:acceleration},
+                {'time_s':end,FIELDS[0]:[.3490658503988659,.4363323129985824,1.1344640137963142,0.,0.,.2617993877991494],FIELDS[1]:[0.]*6,FIELDS[2]:[0.]*6}]
+        curve=motion.Curve(points)
+        norm=lambda t:math.sqrt(sum(v*v for v in motion.evaluate(curve,t)[FIELDS[1]]))
+        self.assertLess(norm(end-.001),self.route['stop_joint_speed_rad_s'])
+        self.assertGreater(norm(end-.01),self.route['stop_joint_speed_rad_s'])
+        result=self.check(points)
+        self.assertEqual(len(result['quiet_intervals_s']),2)
+        self.assertLess(result['quiet_intervals_s'][-1][0],end-.001)
+        self.assertGreater(result['quiet_intervals_s'][-1][0],end-.01)
+        self.assertEqual(result['joint_norm_threshold_rad_s'],1e-6)
+
     def test_inserted_resting_knot_is_rejected(self):
         points=motion.from_positions([0.,1.,2.],[[0.],[.5],[1.]])
         points[1][FIELDS[1]]=[0.];points[1][FIELDS[2]]=[0.]

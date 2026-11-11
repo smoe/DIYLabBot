@@ -61,6 +61,33 @@ Teildateien und Körperzuordnungen gehören in den lokalen Build-Bericht.
   und kuratierte README-Medien sind bewusst erhaltene Momentaufnahmen und
   werden nicht zur führenden Modellquelle.
 
+## Projektweite Vorgabe: fließende Bewegungen
+
+Die Vorgabe gilt für jede neu entwickelte oder erneuerte Roboterbewegung,
+auch für leere Fahrten und Raumsondierung. Wegpunkte erzwingen keinen Halt.
+Bei Probentransport vom bestätigten Griff bis zur Ablage beziehungsweise
+Übergabe eine durchgehende Bewegung ohne unnötige Zwischenhalte planen.
+Entnahme-, Freiraum- und Transitmarken sind Durchgangs- oder Ereignispunkte,
+keine automatischen Ruhepunkte. Geschwindigkeit,
+Beschleunigung und Ruck an der tatsächlich ausgewerteten Kurve begrenzen;
+Gelenke, Werkzeug und getragenes Gefäß einschließlich Orientierung prüfen.
+
+Notwendige Griff-, Ablage-, Mess-, Prozess- und Schutzhalte ausdrücklich
+begründen und von der Transportbahn trennen. Eine Wartebedingung benennt den
+benötigten Abschluss oder die erforderliche Beobachtung, zum Beispiel die
+beendete Bewegung einer anderen Achse. Reine Vorführpausen sind keine solche
+Bedingung. Eine erforderliche Rückmeldung
+nicht durch eine angenommene Freigabe ersetzen. Die gemeinsame PVA-/FK-
+Mathematik wiederverwenden; Kein-Halt- und Grenzprüfungen auch zwischen Knoten
+und nach Export durchführen. Synthetische Grenzwerte sind keine biologische
+oder mechanische Qualifikation; ein sicherheitsbedingter Stopp bleibt möglich.
+
+Ältere Wegpunktillustrationen und statische CAD-Prüfstellungen nicht als
+konforme Transportprogramme ausgeben. Bei ihrer Überführung in ein aktuelles
+Transportprogramm die Bahn zuerst migrieren und neu prüfen. Einzelheiten und
+bekannte Altstände stehen in [ARCHITECTURE.md](ARCHITECTURE.md) und
+[docs/requirements.md](docs/requirements.md#fließender-probentransport).
+
 ## Zeilenenden und bytegebundene Quellen
 
 Aktive Textdateien verwenden LF im Repository und beim Auschecken

@@ -19,6 +19,7 @@ def main():
     names.append('instrument-concept.schema.json')
     names.append('lab-glassware.schema.json')
     names.append('lab-equipment.schema.json')
+    names.extend(['lab-transfer-l01.schema.json','cf01-unload-demo.schema.json'])
     schemas = {}
     for name in names:
         path = ROOT/'model'/name
@@ -46,6 +47,11 @@ def main():
     Draft202012Validator(schemas['lab-equipment.schema.json'], registry=registry).validate(data)
     print(document + ': schema passed')
     workflow_schema = schemas['synthetic-lab-workflow.schema.json']
+    for document,name in [('lab-transfer-l01.protocol.json','lab-transfer-l01.schema.json'),
+                          ('cf01-unload-demo.motion.json','cf01-unload-demo.schema.json')]:
+        data=json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
+        Draft202012Validator(schemas[name],registry=registry).validate(data)
+        print(document+': schema passed')
     manifest = json.loads((ROOT/'model/synthetic-lab-workflow.manifest.json').read_text())
     manifest_schema = {'$schema':workflow_schema['$schema'], '$id':workflow_schema['$id']+'?manifest-check',
                        '$defs':workflow_schema['$defs'], '$ref':'#/$defs/manifest'}

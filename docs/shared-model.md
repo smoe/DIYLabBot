@@ -10,13 +10,19 @@ die Ausrüstung aus vorhandenen nativen Modellen ab; das ist keine zweite
 führende Bauteilkonstruktion. Bewegungssteuerung und ROS-Szene sind nicht
 implementiert.
 
-`model/lab-transfer-l01.protocol.json`, Format `solidcraftbot.lab-transfer/1`,
+`model/lab-transfer-l01.protocol.json`, Format `solidcraftbot.lab-transfer/2`,
 ergänzt Besitzwechsel des Gefäßes, Werkzeugannahmen, orientierte Anfahrziele,
 gerade axiale Ein-/Ausfahrten und geometrische Prüfschritte. ArmC und CF01
 behalten in der abgeleiteten Transferbaugruppe native Gelenkhierarchien in
 beiden CADs. Die Sequenz läuft mit stehendem Rotor. Der gemeinsame Einstieg
 ist `python scripts/build_lab_transfer.py`; Grenzen und Nachweise stehen im
 [Transferentwurf](lab-transfer-l01.md).
+Das Schema `model/lab-transfer-l01.schema.json` und der Lader prüfen den
+unterstützten Vertrag. Die aktuelle Timeline/2 verwendet gemeinsame C2-PVA-
+Kurven für durchgehende beladene und leere Fahrten; notwendige Prozesshalte
+und parallele Stationsbewegungen sind getrennte Ereignisse. FreeCAD wertet
+diese Kurven direkt aus. Die native SolidCraft-Studie ist eine gesondert
+geprüfte diskrete Vorschau, da deren Schnittstelle keine PVA-Knoten übernimmt.
 
 Die führende Quelle ist [model/robot.json](../model/robot.json), Format
 `solidcraftbot.robot/1`. Das [Schema](../model/robot.schema.json) beschreibt die

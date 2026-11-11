@@ -1,9 +1,12 @@
 """Offline fail-closed guards for linked geometry and native-evidence finishing."""
 import copy
+import base64
 import contextlib
+import gzip
 import hashlib
 import io
 import json
+import re
 from pathlib import Path
 import sys
 import tempfile
@@ -120,6 +123,25 @@ class GeometryCacheTests(unittest.TestCase):
             else:self.station_native.write_bytes(b'changed station native input\n')
             self.write(self.station_path,self.station_report)
             with self.subTest(mutation=mutation),self.assertRaises(ValueError):geometry.load_bundle(self.report_path)
+
+
+class PreviewPayloadTests(unittest.TestCase):
+    def test_framing_samples_are_stored_once_and_full_pva_is_preserved(self):
+        program={'duration_s':1.,'arm':{'points':[{'time_s':0.,'positions_rad':[.1234567890123456],
+                   'velocities_rad_s':[.2345678901234567],'accelerations_rad_s2':[.3456789012345678]}]}}
+        framing=[{'time_s':0.},{'time_s':1.}]
+        def mesh(bundle,display):
+            return {'bodies':[],'unload_program':display,'trajectory':{'samples':display['preview_samples']}}
+        (ROOT/'tmp').mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=ROOT/'tmp') as folder,\
+             patch.object(build,'preview_samples',return_value=framing),\
+             patch.object(geometry,'mesh_for_program',side_effect=mesh):
+            target=Path(folder)/'demo.html';build.render_html(program,{},target)
+            packed=re.search(r'<script type="application/json" data-mesh>([^<]+)</script>',target.read_text())[1]
+            payload=json.loads(gzip.decompress(base64.b64decode(packed)))
+        self.assertEqual(payload['unload_program'],program)
+        self.assertNotIn('preview_samples',payload['unload_program'])
+        self.assertEqual(payload['trajectory']['samples'],framing)
 
 
 class ProgramSourceTests(unittest.TestCase):

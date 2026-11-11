@@ -79,6 +79,29 @@ def _c2(curve,label):
     return errors
 
 
+def _speed_threshold_roots(a,b,threshold):
+    """Isolate in both directions so a tiny end band is not lost at u=1.
+
+    Expanding squared velocity near the far endpoint can cancel coefficients
+    much larger than the squared quiet threshold. Reversing the endpoint PVA
+    puts that same boundary at u=0 without changing the physical threshold.
+    """
+    dt=b['time_s']-a['time_s']
+    reverse=[{'time_s':t,FIELDS[0]:point[FIELDS[0]],
+              FIELDS[1]:[-v for v in point[FIELDS[1]]],FIELDS[2]:point[FIELDS[2]]}
+             for t,point in ((0.,b),(dt,a))]
+    roots=set()
+    for first,last,backward in ((a,b,False),(*reverse,True)):
+        squared=[0.]*9
+        for coefficients in motion.coefficients(first,last):
+            velocity=[v/dt for v in motion.derivative(coefficients)]
+            for i,x in enumerate(velocity):
+                for j,y in enumerate(velocity):squared[i+j]+=x*y
+        squared[0]-=threshold**2
+        roots.update(1.-u if backward else u for u in _roots(squared))
+    return sorted(roots)
+
+
 def no_stop(curve,start,end,jets,references,route):
     """Prove exactly endpoint quiet bands from actual joint polynomials.
 
@@ -99,13 +122,8 @@ def no_stop(curve,start,end,jets,references,route):
                  'Loaded motion contains repeated joint positions or a resting plateau')
     intervals=[]
     for a,b in zip(points,points[1:]):
-        dt=b['time_s']-a['time_s'];squared=[0.]*9
-        for coefficients in motion.coefficients(a,b):
-            velocity=[v/dt for v in motion.derivative(coefficients)]
-            for i,x in enumerate(velocity):
-                for j,y in enumerate(velocity):squared[i+j]+=x*y
-        squared[0]-=joint_threshold**2
-        cuts=sorted({0.,1.,*_roots(squared)})
+        dt=b['time_s']-a['time_s']
+        cuts=sorted({0.,1.,*_speed_threshold_roots(a,b,joint_threshold)})
         for left,right in zip(cuts,cuts[1:]):
             state=motion.evaluate(points,a['time_s']+(left+right)*dt/2)
             if math.sqrt(sum(v*v for v in state[FIELDS[1]]))>joint_threshold*(1+1e-8):continue
@@ -123,7 +141,7 @@ def no_stop(curve,start,end,jets,references,route):
     return {'passed':True,'range_s':[start,end],'quiet_intervals_s':intervals,
             'joint_norm_threshold_rad_s':joint_threshold,'sample_speed_threshold_mm_s':linear_threshold,
             'quiet_sample_speed_upper_bound_mm_s':quiet_speed_upper,
-            'scope':'Numerical squared-joint-speed polynomial roots plus conservative serial-chain lever-arm bound; no continuous Cartesian path or formal floating-point certificate.'}
+            'scope':'Numerical squared-joint-speed polynomial roots in forward and reversed interval coordinates plus conservative serial-chain lever-arm bound; no continuous Cartesian path or formal floating-point certificate.'}
 
 
 def _joint_limits(bounds,limits,label):

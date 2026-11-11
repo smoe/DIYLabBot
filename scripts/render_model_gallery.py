@@ -126,6 +126,40 @@ def input_for(entry):
         review=manifest['visual_review']
         if not (review.get('passed') or review.get('reviewed')):raise ValueError('Original visual review missing')
         return model,commands,image,{'render_manifest':rel(path),'render_manifest_sha256':sha(path),'original_visual_review':review}
+    if kind=='library-case':
+        family=render['family']
+        formats={'lab-glassware':{'solidcraftbot.lab-glassware/1':'solidcraftbot.lab-glassware-build/1',
+                                 'solidcraftbot.lab-glassware/2':'solidcraftbot.lab-glassware-build/2'},
+                 'lab-equipment':{'solidcraftbot.lab-equipment/1':'solidcraftbot.lab-equipment-build/1'}}
+        if family not in formats or entry['sources']!=['model/'+family+'.shared.json']:raise ValueError('Supported source-bound library required')
+        expected_format=formats[family].get(read(ROOT/entry['sources'][0]).get('format'))
+        path=ROOT/'cad'/family/'shared-build-report.json';report=read(path)
+        if (expected_format is None or report.get('format')!=expected_format or not report.get('passed')
+                or report.get('source_sha256')!=sha(ROOT/entry['sources'][0])):raise ValueError('Current checked library build required: '+family)
+        if not report.get('source_files_sha256'):raise ValueError('Library build dependency pins required')
+        for source,digest in report['source_files_sha256'].items():
+            if sha(project(source))!=digest:raise ValueError('Library build source changed: '+source)
+        case=next(item for item in report['cases'] if item['id']==render['case'])
+        model=project(case['files']['solidcraft'])
+        if not case['passed'] or sha(model)!=case['artifact_sha256']['solidcraft']:raise ValueError('Changed or unchecked library CAD')
+        evidence={'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True,
+                  'case':case['id'],'backends':report['backends'],'cross_cad_checked':report['cross_cad_checked'],
+                  'representation':'Native source-referenced library case; no operational placement or hardware qualification'}
+        view=report.get('renders',{}).get(render['case'])
+        if view:
+            image=project(view['path'])
+            if sha(image)!=view['sha256']:raise ValueError('Changed library render')
+            return model,commands,image,evidence
+        # Cold-storage cases need a shallow front view to show their access
+        # compartments; fit it from measured CAD bounds, not copied geometry.
+        bodies=read(project(case['files']['solidcraft_measurements']))['bodies']
+        lo=[min(body['bbox']['min'][i] for body in bodies) for i in range(3)]
+        hi=[max(body['bbox']['max'][i] for body in bodies) for i in range(3)]
+        width,depth,height=[b-a for a,b in zip(lo,hi)];pitch,fov=.13,.6
+        distance=max(width/(1000/700),height*math.cos(pitch)+depth*math.sin(pitch))
+        evidence['camera']={'target':[(a+b)/2 for a,b in zip(lo,hi)],'yaw':0.,'pitch':pitch,
+                            'distance':distance*1.15/(2*math.tan(fov/2))+depth/2,'fov':fov}
+        return model,commands,None,evidence
     if kind=='native':
         path=ROOT/'cad/centrifuge-cf01/solidcraft-pickup-build-report.json';report=read(path)
         if not report['passed'] or report['freecad_required']:raise ValueError('Checked independent CF01 build required')
@@ -318,8 +352,9 @@ def reusable(entry,record):
     if entry['render']['kind']=='diagram':
         content,_=diagram(entry)
         return hashlib.sha256(content.encode()).hexdigest()==record['image_sha256']
-    model,commands,image,_=input_for(entry)
+    model,commands,image,evidence=input_for(entry)
     if model and (rel(model)!=record.get('native_model') or sha(model)!=record.get('native_model_sha256')):return False
+    if entry['render']['kind']=='library-case' and evidence.get('camera')!=record.get('camera'):return False
     if image:return sha(image)==record.get('reused_render_sha256')
     return commands==record.get('commands')
 

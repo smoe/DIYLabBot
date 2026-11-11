@@ -16,6 +16,18 @@ import cf01_unload_validation as dynamics
 
 
 class UnloadDefinitionTests(unittest.TestCase):
+    def test_presentation_only_pauses_are_rejected_but_confirmation_holds_remain(self):
+        original=unload.load()
+        self.assertEqual(original['holds_s']['presentation'],0)
+        for pause in (-1,.6,True,float('nan')):
+            value=copy.deepcopy(original);value['holds_s']['presentation']=pause
+            with self.subTest(pause=pause),self.assertRaisesRegex(ValueError,'functional'):
+                unload._validate(value)
+        for key in ('grasp','rack_support'):
+            value=copy.deepcopy(original);value['holds_s'][key]=0
+            with self.subTest(confirmation=key),self.assertRaisesRegex(ValueError,'functional'):
+                unload._validate(value)
+
     def test_motion_limits_remain_byte_identical_to_the_authorized_baseline(self):
         text=unload.SOURCE.read_text(encoding='utf-8');start=text.index('{',text.index('"limits"'))
         _,length=json.JSONDecoder().raw_decode(text[start:])
@@ -55,6 +67,34 @@ class UnloadProgramTests(unittest.TestCase):
         cls.kin=unload.pickup.Kinematics(unload.pickup.arm_source(cls.scene),cls.scene)
         cls.jets=unload.sample_motion.KinematicJets(cls.kin)
 
+    def test_empty_approach_and_return_have_no_waypoint_rest(self):
+        curve=unload.motion.Curve(self.program['arm']['points'])
+        for transfer in self.program['transfers']:
+            empty=[segment for segment in self.program['segment_audits']
+                   if segment['sample_id']==transfer['sample_id'] and not segment['loaded']]
+            self.assertEqual([segment['target'] for segment in empty],['grasp','withdrawn'])
+            scene=copy.deepcopy(self.scene)
+            for name in ('rack_approach','rack_seated'):
+                scene['poses'][name]['rack_slot']=transfer['rack_slot']
+            goals=unload.pickup.targets(scene,self.spec,self.p)
+            for segment in empty:
+                self.assertEqual(segment['path_kind'],'rounded_corner')
+                proof=dynamics.no_stop(curve,segment['start_s'],segment['end_s'],
+                                       self.jets,[[0.,0.,0.]],self.program['definition']['routes'])
+                self.assertTrue(proof['passed'])
+                names=('withdrawn','pregrasp','grasp') if segment['target']=='grasp' else ('rack_seated','rack_approach','withdrawn')
+                a,c,b=[[goals[name][i][3] for i in range(3)] for name in names]
+                angle=self.spec['rotor']['tilt_from_vertical_deg']
+                tilt=(angle,angle) if segment['target']=='grasp' else (0.,angle)
+                reference=unload.CornerPath(a,c,b,*tilt,self.program['definition']['routes']['empty_corner_trim_mm'])
+                for fraction in (.125,.375,.625,.875):
+                    u=unload.motion.septic(fraction)
+                    expected=reference.pose(u)['position']
+                    time=segment['start_s']+(segment['end_s']-segment['start_s'])*fraction
+                    joints=unload.motion.evaluate(curve,time)[unload.FIELDS[0]]
+                    actual=self.kin.tool([math.degrees(value) for value in joints])
+                    self.assertLess(math.dist(expected,[actual[i][3] for i in range(3)]),.05)
+
     def test_three_returns_are_an_observed_prefix_of_the_full_twelve_sample_run(self):
         evidence=self.program['evidence']
         self.assertTrue(evidence['full_batch_identity_order_passed']);self.assertTrue(evidence['full_batch_order_restored'])
@@ -81,7 +121,7 @@ class UnloadProgramTests(unittest.TestCase):
     def test_each_sample_is_indexed_to_the_fixed_lift_and_visibly_elevated(self):
         expected_bottom,_=unload.pickup.cf.pocket(self.spec,self.p,1)
         _,axis=unload.pickup.cf.pocket(self.spec,self.p,1)
-        for transfer in self.program['transfers']:
+        for index,transfer in enumerate(self.program['transfers']):
             with self.subTest(sample=transfer['sample_id']):
                 docked=self.evaluate(transfer['docked_s']);raised=self.evaluate(transfer['presented_s'])
                 bottom,_=unload.pickup.cf.pocket(self.spec,self.p,transfer['rotor_slot'])
@@ -91,7 +131,11 @@ class UnloadProgramTests(unittest.TestCase):
                 self.assertLess(math.dist(a,expected_bottom),1e-7)
                 self.assertLess(math.dist([y-x for x,y in zip(a,b)],[v*self.p['lift_travel'] for v in axis]),1e-7)
                 self.assertEqual(raised['owners'][transfer['sample_id']],'rotor')
-                self.assertGreaterEqual(transfer['gripped_s']-transfer['presented_s'],.6)
+                approach=next(event for event in self.program['events']
+                              if event['phase_key']=='approach' and event['sample_id']==transfer['sample_id'])
+                returned=self.program['transfers'][index-1]['end_s'] if index else 0.
+                self.assertAlmostEqual(approach['time_s'],max(transfer['presented_s'],returned))
+                self.assertGreater(transfer['gripped_s'],transfer['presented_s'])
                 self.assertAlmostEqual(raised['station']['Rotor'],-30*(transfer['rotor_slot']-1))
 
     def test_first_index_is_closed_and_later_opt_in_indexes_keep_the_lid_open(self):

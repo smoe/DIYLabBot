@@ -426,6 +426,86 @@
       "documentation": "docs/instrument-concepts.md"
     },
     {
+      "id": "lab-glassware-base",
+      "title": "Laborgefäße · drei Familien",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-glassware.shared.json"
+      ],
+      "image": "images/lab-glassware.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-glassware",
+        "case": "overview"
+      },
+      "caption": "Drei parametrische Familien: Becher, Trichter und Flaschen mit getrenntem Schraubdeckel oder Glasstopfen. Native Kontaktansicht der versionierten Bibliothek in offenen und geschlossenen Zuständen; keine Laboraufstellung.",
+      "documentation": "docs/lab-glassware.md"
+    },
+    {
+      "id": "analytical-balance",
+      "title": "Analysenwaage · offener Windschutz",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/analytical-balance.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "analytical_balance_default"
+      },
+      "caption": "Generische Analysenwaage mit freiem Wägeteller, verschiebbaren Seitenpaneelen und aufgeklapptem Oberteil. Maße angenommen; keine Messleistung oder reale Waage qualifiziert.",
+      "documentation": "docs/lab-equipment.md"
+    },
+    {
+      "id": "lab-fridge",
+      "title": "Laborkühlschrank · offene Ebenen",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/lab-fridge.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "fridge_4c_default"
+      },
+      "caption": "Vier Ablagen und Bodenebene sind bei geöffneter Tür direkt zugänglich. +4 °C ist ein Planungswert; die Ansicht ist keine gemessene Geräte- oder Raumaufstellung.",
+      "documentation": "docs/lab-equipment.md"
+    },
+    {
+      "id": "lab-freezer",
+      "title": "Gefrierschrank · offene Schublade",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/lab-freezer.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "freezer_minus20_default"
+      },
+      "caption": "Generischer −20-°C-Schrank mit sechs hohlen Kunststoffschubladen; die vierte ist für den Zugriff ausgezogen. Kühlleistung, reale Temperatur und Robotik ungeprüft.",
+      "documentation": "docs/lab-equipment.md"
+    },
+    {
+      "id": "cellar-ult",
+      "title": "Keller-Tiefkühllager · manuell",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/cellar-ult.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "cellar_ult_f440n_default"
+      },
+      "caption": "Vereinfachtes Modell nach CryoCube F440n mit fünf getrennten Innentüren und geöffnetem mittlerem Fach. Manuelle Bedienung; −80 °C ist ein Planungswert, keine Beobachtung.",
+      "documentation": "docs/lab-equipment.md"
+    },
+    {
       "id": "transport-floor-p2",
       "title": "TR01 · zwei Platten",
       "group": "transport",
@@ -518,22 +598,6 @@
       },
       "caption": "Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.",
       "documentation": "docs/synthetic-lab-workflow.md"
-    },
-    {
-      "id": "lab-glassware-base",
-      "title": "Laborglas · Grundbibliothek",
-      "group": "baugruppen",
-      "sources": [
-        "model/lab-glassware.shared.json"
-      ],
-      "image": "images/lab-glassware-base.png",
-      "render": {
-        "kind": "case",
-        "family": "lab-glassware",
-        "case": "overview"
-      },
-      "caption": "Native Übersicht der bereits eingeführten Grundbibliothek: hohle Becher, durchgängige Trichter und Flaschen mit separaten Schraub- beziehungsweise Stopfenverschlüssen. Keine Laboraufstellung.",
-      "documentation": "docs/lab-glassware.md"
     }
   ],
   "groups": [
@@ -561,6 +625,11 @@
       "id": "baugruppen",
       "title": "Wiederverwendbare Baugruppen",
       "description": "Diese Konstruktionen lassen sich in realen und synthetischen Aufstellungen referenzieren. Parameter und Gelenke bleiben in ihrer jeweiligen gemeinsamen Quelle."
+    },
+    {
+      "id": "bibliotheken",
+      "title": "Gefäß- und Gerätebibliotheken",
+      "description": "Wiederverwendbare Gefäßfamilien und Gerätetypen werden unabhängig von ihrer späteren Aufstellung gezeigt. Die nativen Ansichten stammen aus den jeweils quellgebundenen Bibliotheksmodellen; Bedienzustand, angenommene Maße und offene Qualifikation bleiben ausdrücklich benannt."
     },
     {
       "id": "transport",

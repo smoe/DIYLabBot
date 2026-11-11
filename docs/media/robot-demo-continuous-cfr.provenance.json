@@ -1,0 +1,1151 @@
+{
+  "format": "solidcraftbot.readme-media/5",
+  "prepared_at_utc": "2026-11-11T02:24:22.364941+00:00",
+  "revision": "cf01-unload-smooth-f3823710ef89-r2",
+  "base_commit": "b1a34520c06288db21ae51db81abde62a88d0476",
+  "source_binding": "Explicit CF01/native/media source bytes and exact compiled payload; publication-tree suite and baseline gallery are separately bound below. Historical runs retain their original source bindings.",
+  "source_files_sha256": {
+    "model/cf01-unload-demo.motion.json": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",
+    "model/cf01-unload-demo.schema.json": "4ff37d7d29c0d7b1f0924340a4a5c42ec1ae75b938bb2569220b7a43f8d96853",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+    "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+    "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+    "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+    "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+    "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+    "scripts/cf01_unload_motion.py": "25e9931004534845d70a9c3cf5b0ba34a0f3822064a08c0c9cf52bab9446bcf1",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+    "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+    "scripts/cf01_rack_batch.py": "5789ae91ae4ceada2b359bc214e62dd802d2fab08a4177bbcb061f12388d9c07",
+    "scripts/export_centrifuge_robot_pickup_ros2.py": "8b5652f3fa430bd49f996b567d3be4d84b729379e8bc3a0c47c61db6824c58f7",
+    "scripts/cf01_unload_path.py": "9ea588a5fc65a931a5397bcb83691854a463619ac51e4b8a1d4ea268ef64d9cb",
+    "model/cf01-open-lid-index.protocol.json": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f",
+    "model/cf01-open-lid-index.schema.json": "0022c4ce4ff170b991a4d61fda1f068e29184e94b72f06aeb8e264d7e3ce3fb3",
+    "scripts/cf01_open_lid_index.py": "c1049b5b38e156518ef75484c25f34fa75ee145860ef2f0168300ca53106553d",
+    "scripts/build_cf01_unload_demo.py": "a60971688e5842cfe4f019215dc16b00b4d2c1869dcde297f311d6f997f24bcf",
+    "scripts/cf01_unload_geometry.py": "b89f390e4a82d4bec856d569e36510ddfb50aef7ad325c3d231494ba32c8fb94",
+    "scripts/check_cf01_unload_motion.py": "d73b7142343d570139fbeaea4804d2054f18c32e2c5306950fc1cab5a257d0d5",
+    "scripts/lab_transfer_model.py": "d844bf826fce853a9e701b1b5da54b5bb81f8ef9d57f938531bdb07f5e24da7b",
+    "scripts/templates/quintic_motion.js": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30",
+    "scripts/templates/centrifuge_robot_pickup.html": "cdb16513b9294097cf77b1fa8d779d83decef73720c092d5ed9dc88c756b776a",
+    "scripts/templates/robot_demo_header.html": "b738bdba34a1688632891680041b8fb8ffaad9b2f077b2b8193b4da8a470e701",
+    "scripts/cf01_unload_validation.py": "cd9aa469728401b423503b27ef4d46f212e6c88d60345c16beebde6b84a7a347",
+    "scripts/build_centrifuge_robot_pickup_visual.py": "66c16417c35ecd2f0bdce06187b05f401ea72eb720ba1d6ded540e15d63a215f",
+    "scripts/export_readme_video.cjs": "0814161689ff24d321f5332a330c577932f779af88cf5994e4fca0be0f3b7479",
+    "tests/check_readme_video_export.cjs": "010d4e15b455f136058db7356a0432187eb9f2caf664f125fdc09f26dc97e007",
+    "tests/check_cf01_unload_demo.cjs": "ca13b44e8b883655482dd426f79fe26effa2513fcaf2f0de5051dd35531589e7",
+    "tests/test_cf01_unload_motion.py": "0375b35e2f6477e74e82c1920bd67008c54d145d087186d47e8c21e7b1f0ea5f",
+    "tests/test_cf01_unload_path.py": "158dc63758fc6270c088fc27f4acfe860f1d629d10915acda22b48e2d64118d1",
+    "tests/test_cf01_unload_validation.py": "cc3d2c4d6a45b9e7e4b1754c4091d51f08d1f2ec2b7af0f23b904126178f54b0",
+    "tests/test_cf01_unload_build.py": "10b5c7eea72a7247d4520a4324e60181dbfd1b2437447039dfe2887448d954f7"
+  },
+  "documentation_files_sha256": {
+    "README.md": "f4be0d1dcf05801d33ccab464ee8124bff9adaaa7d842af2aef6d90a13e714a9",
+    "docs/media/README.md": "973d65b55fe06102b36ebb58aa3796c5b661d6cf79482e3fcac642577eca88c2",
+    "docs/cf01-smooth-unloading.md": "12b7eacec6341695327f9408c45e46be87740e8a774713ec0e066957694ba65d",
+    "AGENTS.md": "e92cebbf8add793f0e62a7b1b311e68e97056f62032ad84ca5dd779d1ed64bd6",
+    "ARCHITECTURE.md": "cd0136b7e5c21c45f35c2c8167c16fcc0b464ee2674d99d099ffcffbdb47e003",
+    "docs/requirements.md": "a3eb59b44a6b557b4d685b87f19be1d570d1f62fba8da3f411520db6b19a231c"
+  },
+  "media": {
+    "html": {
+      "path": "docs/media/robot-demo-continuous-cfr.html",
+      "sha256": "7da5d83eb62d647927e17e9e4ea2a41cd070aa2651ddcc04392cd2580b4e3583",
+      "bytes": 1929681
+    },
+    "video": {
+      "path": "docs/media/robot-demo-continuous-cfr.mp4",
+      "sha256": "cd60ebd65190fdbcc73a2b1da03e3f4c1859d5609fafa7407a0e530cdb3e4c82",
+      "bytes": 1372889
+    },
+    "poster": {
+      "path": "docs/media/robot-demo-continuous-cfr.png",
+      "sha256": "c8ff7c4d160e948d57b5467c11ba99392d50497a2e6a7618247faa67182f43ca",
+      "bytes": 83042
+    }
+  },
+  "compiled_program": {
+    "path": "exports/generated/cf01-unload-smooth-f3823710ef89-r2/program.json",
+    "sha256": "41daece13253b8bc1b520e6eb05d5a79e1ebc922a95717ff5f7157e862fb1053",
+    "bytes": 3348715,
+    "canonical_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216"
+  },
+  "native_build_report": {
+    "path": "exports/generated/cf01-unload-smooth-f3823710ef89-r2/build-report.json",
+    "sha256": "86655b227ea3a9d66ab159b612391a13361794a050c563b3fb4100d6cda39d64",
+    "bytes": 121829
+  },
+  "native_motion_report": {
+    "path": "exports/generated/cf01-unload-smooth-f3823710ef89-r2/native-motion-validation.json",
+    "sha256": "5a8490ff5dac2b3d79d90b63d0fa8c691839c47efbd73b693d029d77ec64540f",
+    "bytes": 2397421
+  },
+  "native_summary": {
+    "passed": true,
+    "complete": true,
+    "requested_frames": 12082,
+    "unique_states_checked": 12044,
+    "minimum_robot_equipment_distance_lower_bound_mm": 5.001474293165984,
+    "minimum_robot_equipment_clearance_required_mm": 5.0,
+    "scope": "Adaptive discrete native BRep intersections and conservative distance lower bounds, with exact BRep refinement below required margins. Actual C2 quintics, all knots and event sides; no continuous swept-volume, hardware, biology or safety qualification. Qubit stays in its source-selected frozen cover pose; NanoDrop full hinge envelopes conservatively overestimate actual occupied volume."
+  },
+  "native_collision_count": 0,
+  "native_distance_failure_count": 0,
+  "posed_models": [
+    {
+      "path": "cad/generated/cf01-unload-smooth-f3823710ef89-r2/CF01_Unload_PresentedSample2.FCStd",
+      "sha256": "9b61f04cfbbf8048d9bf5e0fb94c1863788d4ce72ed36b9562b8958a9251cfc6",
+      "time_s": 37.69554150519254,
+      "phase": "tube_presented",
+      "owners": {
+        "Sample01": "rack",
+        "Sample02": "rotor",
+        "Sample03": "rotor",
+        "Sample04": "rotor",
+        "Sample05": "rotor",
+        "Sample06": "rotor",
+        "Sample07": "rotor",
+        "Sample08": "rotor",
+        "Sample09": "rotor",
+        "Sample10": "rotor",
+        "Sample11": "rotor",
+        "Sample12": "rotor"
+      },
+      "active_sample_id": "Sample02",
+      "program_sha256": "41daece13253b8bc1b520e6eb05d5a79e1ebc922a95717ff5f7157e862fb1053",
+      "presentation": {
+        "passed": true,
+        "visible_final_bodies": 268,
+        "geometry_bytes_unchanged": true,
+        "gui_render_checked": false,
+        "method": "Saved native presentation metadata; no GUI process"
+      }
+    },
+    {
+      "path": "cad/generated/cf01-unload-smooth-f3823710ef89-r2/CF01_Unload_Final.FCStd",
+      "sha256": "90b99978d1370f033d18fcce2623f502f8c8aa077c17ab26f40ff79e0c824a14",
+      "time_s": 99.67387816519029,
+      "phase": "preview_complete",
+      "owners": {
+        "Sample01": "rack",
+        "Sample02": "rack",
+        "Sample03": "rack",
+        "Sample04": "rotor",
+        "Sample05": "rotor",
+        "Sample06": "rotor",
+        "Sample07": "rotor",
+        "Sample08": "rotor",
+        "Sample09": "rotor",
+        "Sample10": "rotor",
+        "Sample11": "rotor",
+        "Sample12": "rotor"
+      },
+      "active_sample_id": "Sample03",
+      "program_sha256": "41daece13253b8bc1b520e6eb05d5a79e1ebc922a95717ff5f7157e862fb1053",
+      "presentation": {
+        "passed": true,
+        "visible_final_bodies": 268,
+        "geometry_bytes_unchanged": true,
+        "gui_render_checked": false,
+        "method": "Saved native presentation metadata; no GUI process"
+      }
+    }
+  ],
+  "geometry": {
+    "report": "cad/centrifuge-cf01/robot-pickup-build-report.json",
+    "report_sha256": "f5fb182d31e8766856e652218262a295f64424fbfc36a43ac64c923aa40234d0",
+    "station_report": "exports/generated/centrifuge-cf01-f880ad47f670/build-report.json",
+    "station_report_sha256": "f7b16f9d0f05b3a0c571d6070b08ef6083a90687a8d478e4ec6d7fe518d990d5",
+    "station_native": "cad/generated/centrifuge-cf01-f880ad47f670/Centrifuge_CF01.FCStd",
+    "station_native_sha256": "7d3556d299153d3e2779ce2e9f65b09db473a0af3b569038db6d5f8952c3f07d",
+    "geometry_sources_sha256": {
+      "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+      "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+      "scripts/build_centrifuge_robot_pickup_freecad.py": "622b95942730a3021bef6677742132de4f7c0d57d4000ddf38b9425954284806",
+      "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+      "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+      "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+      "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+      "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+      "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+      "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+      "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+      "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+      "scripts/rack_slots.py": "2b48e8e2926ddbb6b42993cc7ddfa465bef97b050621e838383b71ac8982c89c",
+      "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b",
+      "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+      "model/cf01-rack-batch.protocol.json": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+      "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+      "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+      "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+      "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+      "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+      "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+      "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+      "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+      "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+      "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
+      "scripts/centrifuge_mechanisms.py": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b",
+      "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84"
+    },
+    "artifacts": {
+      "mesh": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/scene-mesh.json",
+        "sha256": "2259e9fb11e9c687321034834ba1006f7260ae7a160f56323c20eb5a2ce16190"
+      },
+      "old_scene": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/scene-source.json",
+        "sha256": "95fa0b113c41d29388efa163db1d9fb1ffa83f235449d60869253c7752bd63a4"
+      },
+      "old_trajectory": {
+        "path": "exports/generated/centrifuge-cf01-robot-bca7acca63a4-r2/trajectory.json",
+        "sha256": "7015d63cb87b82724aae8e8d703fe151cb5ad9397b13c0dd8f88b841205fe342"
+      },
+      "native": {
+        "path": "cad/generated/centrifuge-cf01-robot-bca7acca63a4-r2/CF01_Robot_Closed.FCStd",
+        "sha256": "9493ec63d364cb770b24a916ece99a83e08a1a2be2f1f214d3a9ea18aaae157c"
+      }
+    },
+    "scope": "Reuse of unchanged source-bound construction geometry only. Old trajectory, clearance and motion reports are not evidence for the new program."
+  },
+  "instruments": {
+    "report": "cad/synthetic-lab-scene/shared-build-report.json",
+    "report_sha256": "0963e9bb2bd0afb763adf165ac261d84020d2f8f77af5d58bede708d0011ce13",
+    "geometry_sources_sha256": {
+      "model/synthetic-cf01-workspace.shared.json": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2",
+      "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+      "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+      "model/furnishings/cf01-reference-bench.json": "f4f2980d7714938162501ad1f8fd617628ebe5afb790be17afa9c745832379a9",
+      "model/equipment/cf01-workspace.json": "326abb742d41250e2fd1f075e1c504dfabfceb6425645011505aa4a62102c120",
+      "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+      "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+      "scripts/synthetic_lab_scene.py": "c945ace92c40e013e9d4624ff9c20419cc4459699ec108748c9b934a34f715d1",
+      "scripts/build_synthetic_lab_scene_freecad.py": "802f7a666b4122bffb2e2754f970a056e4d60a5403180443e4c3aef6eff4a69e",
+      "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
+      "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+      "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+      "model/centrifuge-cf01.protocol.json": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c",
+      "scripts/synthetic_workspace.py": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+      "scripts/furniture_model.py": "8c11eef1bed6835115d458bcf692f3280818b14c30af3727376195e1cdae0a0b"
+    },
+    "native": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r6/SyntheticLab_Grasp.FCStd",
+    "native_sha256": "bdc471719597f59f5bb08bfc6782be0f0b62a31dbd85b262e9a31957470d26f6",
+    "body_count": 45,
+    "poses": {
+      "SYN.NanoDrop01": {
+        "hinge_deg": 65,
+        "hinge_limits_deg": [
+          0.0,
+          75.0
+        ],
+        "asset": "nanodrop"
+      },
+      "SYN.Qubit401": {
+        "hinge_deg": 95,
+        "hinge_limits_deg": [
+          0.0,
+          100.0
+        ],
+        "asset": "qubit"
+      }
+    },
+    "scope": "Unchanged native instrument geometry and placements only; old reachability and motion results do not validate the new unloading path."
+  },
+  "motion": {
+    "duration_s": 99.67387816519029,
+    "arm_pva_knots": 3876,
+    "selected_samples": [
+      "Sample01",
+      "Sample02",
+      "Sample03"
+    ],
+    "limits": {
+      "qualified": false,
+      "biological_tolerance": null,
+      "arm_loaded": {
+        "velocity_rad_s": 0.5,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "arm_empty": {
+        "velocity_rad_s": 1,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "sample_translation": {
+        "velocity_mm_s": 200,
+        "acceleration_mm_s2": 500,
+        "jerk_mm_s3": 5000
+      },
+      "sample_rotation": {
+        "velocity_deg_s": 30,
+        "acceleration_deg_s2": 90,
+        "jerk_deg_s3": 900
+      },
+      "station_lid": {
+        "velocity_deg_s": 10,
+        "acceleration_deg_s2": 180,
+        "jerk_deg_s3": 1800
+      },
+      "station_rotor": {
+        "velocity_rpm": 2,
+        "acceleration_deg_s2": 30,
+        "jerk_deg_s3": 300
+      },
+      "station_linear": {
+        "velocity_mm_s": 50,
+        "acceleration_mm_s2": 200,
+        "jerk_mm_s3": 2000
+      }
+    },
+    "limits_literal_sha256": "0ef39bd99199957d4991a895108d895d1d3ff8f8bb5de50890b2460dce47099d",
+    "loaded_grip_to_arrival_s": [
+      11.361257620436625,
+      11.326939824893707,
+      11.407806313512353
+    ],
+    "loaded_grip_to_support_s": [
+      11.611257620436625,
+      11.576939824893707,
+      11.657806313512353
+    ],
+    "comparison": {
+      "baseline": "cf01-unload-smooth-dced269cf0b0",
+      "baseline_duration_s": 80.7591568724187,
+      "delta_s": 18.91472129277159,
+      "delta_percent": 23.421147551914878,
+      "meaning": "Current flow-preserving empty corner paths are slower than the prior stopped-empty baseline with the same caps. Not a hardware or global-optimality benchmark.",
+      "motion_limits_equal": true
+    },
+    "presentation_pause_s": 0,
+    "empty_path": "C2 rounded corners with retained straight axial approach and vertical withdrawal"
+  },
+  "checks": {
+    "whole_suite": {
+      "tests": 788,
+      "passed": true,
+      "successful_test_count": 766,
+      "skipped": [
+        {
+          "test_id": "test_cf01_sila2_dotnet.DotnetTests.test_existing_runner_roundtrip_over_independent_tecan_transport",
+          "reason": "Build the Tecan probe and set SOLIDCRAFTBOT_SILA_DOTNET_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_dotnet.DotnetTests.test_independent_tecan_tls_client",
+          "reason": "Build the Tecan probe and set SOLIDCRAFTBOT_SILA_DOTNET_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_actual_multicast_discovery_and_explicit_tls_trust",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_cancellation_ack_precedes_confirmed_stop_and_execution_error",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_disconnect_and_lease_expiry_brake_without_releasing_process",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_duplicate_network_intent_does_not_repeat_effect",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_execution_deadline_does_not_retry_or_claim_completion",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_existing_batch_runner_roundtrip_uses_only_network_station",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_identity_feature_discovery_and_confirmed_command",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_lost_network_response_preserves_one_durable_effect",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_lower_tube_reset_and_rotation_feedback_typed_commands",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_no_real_mode_or_unvalidated_slot",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_normal_spin_and_braking_finish_without_client_advancing_time",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_partial_network_handoff_keeps_inventory_and_station_owned",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_read_only_reconnect_checks_server_identity_and_does_not_echo_credentials",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_read_only_reconnect_observes_held_work_and_changed_boot_without_touching_lease",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_server_clock_progresses_while_client_is_idle",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_status_cli_reconnects_without_creating_a_batch_journal",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_unauthenticated_and_observer_changes_are_rejected",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_network.NetworkTests.test_wrong_certificate_and_plaintext_cannot_connect",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_process.ProcessTests.test_cli_batch_and_live_store_fencing",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        },
+        {
+          "test_id": "test_cf01_sila2_process.ProcessTests.test_hard_restart_preserves_identity_and_pending_job_without_replay",
+          "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+        }
+      ],
+      "skipped_count": 22,
+      "seconds": 784.6099629589589,
+      "changed_during_run": [],
+      "scope": "Complete isolated publication-tree discovery covered by groups A and B. Fourteen initial cache-dependent skips were then executed successfully after source-identical ROS build artifacts were copied locally; only the listed opt-in skips remain. Actual CF01 interval-FK dynamics enabled; no ROS runtime or hardware execution.",
+      "coverage": {
+        "all_discovered_count": 788,
+        "group_a": 764,
+        "group_b": 24,
+        "rerun_initial_cache_skips": 14,
+        "all_ids_covered": true,
+        "group_a_b_disjoint": true
+      },
+      "groups": {
+        "main": {
+          "path": "tmp/publication-main-tests.json",
+          "sha256": "f93915d9e9fd3db64df76b2836701e4198a926e051896774630be924c22395cb",
+          "bytes": 486929
+        },
+        "gallery": {
+          "path": "tmp/publication-gallery-tests.json",
+          "sha256": "76902d309e836478c0a00027223f80436d9694362b2b9915d7120f6bcc4a8d00",
+          "bytes": 13076
+        },
+        "ros_cache_follow_up": {
+          "path": "tmp/publication-ros-followup-tests.json",
+          "sha256": "dbe1c71f0a9eeb6cb44b47917095e36f32e17dbdaee24ea6c814b290867afd6d",
+          "bytes": 112962
+        }
+      }
+    },
+    "whole_suite_record": {
+      "path": "tmp/publication-full-tests.json",
+      "sha256": "3cef7fa756b74d0ddbee2296a1505ab9d7cde8c2eee7b39aa87406bc2d61e26b",
+      "bytes": 222693
+    },
+    "browser": {
+      "passed": true,
+      "python_browser_transform_checks": 112,
+      "python_browser_joint_velocity_checks": 112,
+      "loaded_interior_times_per_transfer": 3,
+      "sample_count": 12,
+      "rack_count": 3,
+      "rotor_count": 9,
+      "lift_checks": [
+        {
+          "sample_id": "Sample01",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        },
+        {
+          "sample_id": "Sample02",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        },
+        {
+          "sample_id": "Sample03",
+          "axial_lift_mm": 15.999999999999988,
+          "vertical_lift_mm": 13.106432708623856
+        }
+      ],
+      "languages": [
+        "de",
+        "en"
+      ],
+      "widths": [
+        320,
+        600,
+        1000
+      ],
+      "console_errors": []
+    },
+    "video_timing": {
+      "passed": true,
+      "frames": 900,
+      "frame_delta_s": [
+        "0.050000"
+      ],
+      "first_pts_s": "0.000000",
+      "last_pts_s": "44.950000",
+      "stream": {
+        "codec_name": "h264",
+        "width": 920,
+        "height": 490,
+        "r_frame_rate": "20/1",
+        "avg_frame_rate": "20/1",
+        "duration": "45.000000",
+        "nb_frames": "900",
+        "disposition": {
+          "default": 1,
+          "dub": 0,
+          "original": 0,
+          "comment": 0,
+          "lyrics": 0,
+          "karaoke": 0,
+          "forced": 0,
+          "hearing_impaired": 0,
+          "visual_impaired": 0,
+          "clean_effects": 0,
+          "attached_pic": 0,
+          "timed_thumbnails": 0,
+          "non_diegetic": 0,
+          "captions": 0,
+          "descriptions": 0,
+          "metadata": 0,
+          "dependent": 0,
+          "still_image": 0,
+          "multilayer": 0
+        },
+        "tags": {
+          "language": "und",
+          "handler_name": "VideoHandler",
+          "encoder": "Lavc63.1.102 libx264"
+        }
+      },
+      "format": {
+        "duration": "45.000000",
+        "tags": {
+          "major_brand": "isom",
+          "minor_version": "512",
+          "compatible_brands": "isomiso2avc1mp41",
+          "encoder": "Lavf63.1.102"
+        }
+      }
+    },
+    "video_decode": {
+      "passed": true,
+      "duration_s": 45,
+      "width": 920,
+      "height": 490,
+      "decoded_frame_times_s": [
+        5,
+        12,
+        20,
+        27,
+        36,
+        44.8
+      ]
+    },
+    "visual_review": {
+      "passed": true,
+      "frames_s": [
+        12,
+        27,
+        36
+      ],
+      "poster": true,
+      "scope": "Reviewed the three decoded carried-sample views and the elevated-tube poster; no additional CAD or hardware qualification."
+    },
+    "empty_arm_curves": {
+      "path": "tmp/cf01-flowing-empty-validation.json",
+      "sha256": "df1bb580761a8503d4b943a74ce728633c9bddf7d09966b7993034ebc6fc37d1",
+      "bytes": 26630
+    },
+    "empty_ros_curves": {
+      "path": "tmp/cf01-flowing-empty-ros-validation.json",
+      "sha256": "287acb4beca878fc64d5108c098e212f5a5a1cadbcd7c9f937ae3c3f632308c2",
+      "bytes": 4771
+    },
+    "gallery": {
+      "passed": true,
+      "images": 37,
+      "covered_model_sources": 32,
+      "image_bytes": 3768027,
+      "visual_reviewed": true
+    },
+    "static_cad_refresh": {
+      "synthetic_lab": {
+        "revision": "synthetic-lab-scene-a3853d4f9bf1-r6",
+        "passed": true,
+        "report": "exports/generated/synthetic-lab-scene-a3853d4f9bf1-r6/build-report.json",
+        "report_sha256": "0963e9bb2bd0afb763adf165ac261d84020d2f8f77af5d58bede708d0011ce13",
+        "source_count": 53,
+        "snapshots": [
+          [
+            "Grasp",
+            true
+          ],
+          [
+            "RackReleased",
+            true
+          ]
+        ],
+        "minimum_nanodrop_lever_clearance_lower_bound_mm": 27.824211669384297,
+        "renders": {
+          "overview": "renders/synthetic-lab-scene-a3853d4f9bf1-r6/overview.png",
+          "top": "renders/synthetic-lab-scene-a3853d4f9bf1-r6/top.png"
+        },
+        "guarded_source_changes": []
+      },
+      "two_arm_analytics": {
+        "revision": "two-arm-analytics-1f0ba0354e58-r3",
+        "passed": true,
+        "report": "exports/generated/two-arm-analytics-1f0ba0354e58-r3/build-report.json",
+        "report_sha256": "32498ed33163ac00e6090f2b2d7c319988f717181b8b604b83af6260f49bd5a0",
+        "source_count": 56,
+        "native_instances": 23,
+        "cross_cad_instances": 23,
+        "collisions": 0,
+        "files": {
+          "solidcraft": "cad/generated/two-arm-analytics-1f0ba0354e58-r3/TwoArmAnalytics.sc",
+          "freecad": "cad/generated/two-arm-analytics-1f0ba0354e58-r3/TwoArmAnalytics.FCStd"
+        },
+        "renders": {
+          "overview": "renders/two-arm-analytics-1f0ba0354e58-r3/overview.png",
+          "analytics": "renders/two-arm-analytics-1f0ba0354e58-r3/analytics.png"
+        },
+        "guarded_source_changes": [],
+        "visual_review": {
+          "performed": true,
+          "images": [
+            "renders/two-arm-analytics-1f0ba0354e58-r3/overview.png",
+            "renders/two-arm-analytics-1f0ba0354e58-r3/analytics.png"
+          ],
+          "scope": "Visual inspection of fresh SolidCraft overview and analytics detail; three arms, two banks and analytical equipment visible. No additional geometry or function claim."
+        }
+      },
+      "targeted_static_tests": {
+        "synthetic_lab": {
+          "passed": 10,
+          "skipped": 0,
+          "log": "tmp/cad-refresh-synthetic-tests.log"
+        },
+        "two_arm_analytics": {
+          "passed": 9,
+          "skipped": 0,
+          "log": "tmp/cad-refresh-analytics-tests.log"
+        }
+      }
+    },
+    "l01_follow_up": {
+      "record": {
+        "path": "tmp/lab-transfer-final-checks.json",
+        "sha256": "e0731092ea0edacb2c3951458631a4e80abd7108b91f8146c2da8861e2d39f16",
+        "bytes": 8455
+      },
+      "summary": {
+        "format": "solidcraftbot.lab-transfer-final-checks/1",
+        "scope": "Fresh targeted checks after L01 changes; the repository-wide suite is recorded separately by the parent task.",
+        "modules": [
+          {
+            "module": "test_lab_transfer_model",
+            "tests_run": 23,
+            "skips": 0,
+            "passed": true,
+            "log": "tmp/lab-transfer-final-runtime-tests.log",
+            "log_sha256": "462e51e12f27cfc4577e6509acfe2274a696979dd2f082480eded164fcab8ac5"
+          },
+          {
+            "module": "test_lab_transfer_build",
+            "tests_run": 17,
+            "skips": 0,
+            "passed": true,
+            "log": "tmp/lab-transfer-final-build-guard-tests.log",
+            "log_sha256": "c3c7ad0397fd50bd2c05c1cf6389a4e0e69dbb10da327b7fd8452ab52f9254ea"
+          },
+          {
+            "module": "test_assembly_model",
+            "tests_run": 12,
+            "skips": 0,
+            "passed": true,
+            "log": "tmp/lab-transfer-final-assembly-tests.log",
+            "log_sha256": "73557c7f82600a497627e17865c24edb2420a128b672792f55a11308415324df"
+          },
+          {
+            "module": "test_room_layers",
+            "tests_run": 8,
+            "skips": 0,
+            "passed": true,
+            "log": "tmp/lab-transfer-final-room-layer-tests.log",
+            "log_sha256": "77b58847c6ebf9d257d9b306c05cd9cd3739aa86b44a993d33caf051296d84f3"
+          },
+          {
+            "module": "test_cf01_unload_validation",
+            "tests_run": 17,
+            "skips": 1,
+            "passed": true,
+            "log": "tmp/lab-transfer-final-shared-validation-tests.log",
+            "log_sha256": "330774f3e10917cfa504e4d253bbe6a46583200e877bef4d7d305009fe1b6e4c"
+          }
+        ],
+        "tests_run": 77,
+        "skips": 1,
+        "targeted_tests_passed": true,
+        "l01_targeted_tests_run": 60,
+        "sources_sha256": {
+          "model/lab-transfer-l01.protocol.json": "a12243382e5190d2abd8a7562b8f3f7ed7ace9c4923f7662f8d16130f40a8ea5",
+          "model/lab-transfer-l01.schema.json": "e95bacead6e9c0c47724269765928b7d7e14b8c221798e673177f25cd4b79546",
+          "scripts/lab_transfer_motion.py": "fa2fb238ea1aef3b488b3691aea6c11a2b0f29a6c995409846ed4c79ee3c378b",
+          "scripts/build_lab_transfer.py": "d55928c51c3875136d0bbb7f13a74a0ed318a89bf226afbd28623ac579800b02",
+          "scripts/build_lab_transfer_freecad.py": "e11aa8d71b2835d102eeab1331263da567aa09c7059a22c563a15fd48a26a97a",
+          "scripts/templates/lab_transfer_playback.FCMacro": "04022efdd63d76b540e6bdded0a0f7ae4fd40c062fb00ba3d0227a382b6aa0f2",
+          "scripts/cf01_unload_validation.py": "cd9aa469728401b423503b27ef4d46f212e6c88d60345c16beebde6b84a7a347",
+          "tests/test_lab_transfer_model.py": "569e570a3c7bd2236dff8e77a39e074ab8e9a8aa10bf723003c3afd730cb2578",
+          "tests/test_lab_transfer_build.py": "36f861b9643a0daebe9e796655a62e20068d220be4695fd53700300929559f16",
+          "tests/test_assembly_model.py": "8a2e02af71fcad0b75cf04fb98de086208a69003c5465ec22ea8560422eccc71",
+          "tests/test_room_layers.py": "16b998c7624c258b4d5c8482383eafc346712fb1ab5bf868ef0e6e2879c276a0",
+          "tests/test_cf01_unload_validation.py": "cc3d2c4d6a45b9e7e4b1754c4091d51f08d1f2ec2b7af0f23b904126178f54b0",
+          "docs/lab-transfer-l01.md": "54aab316c8c03d571cd713325778a010a28affaa48366502d4b9899fed4ba5f7",
+          "model/lab-room-l01.shared.json": "314220ea9d48a047fcd7eb97a588e9d6e7dbd24b4e729276e593a807f147465a",
+          "model/lab-layout-l01.shared.json": "6720f431f0b70dcd62620fa0d621e1edfb9105c82d39c5ea60cae4a19c77a394",
+          "model/cf01-unload-demo.motion.json": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+        },
+        "canonical_motion": {
+          "path": "exports/generated/lab-transfer-l01-a03566b376d0-r2/timeline.json",
+          "sha256": "1cbd9c10f54597a0f5f2baab9123ee76562e76421009638e2b18d48e00121025",
+          "duration_s": 1248.6944343822122,
+          "arm_knots": 1742,
+          "sample_envelope": {
+            "radius_mm": 7.000000000000008,
+            "axial_min_mm": 0.0,
+            "axial_max_mm": 41.599999999999994,
+            "source_operation_ids": [
+              "TubeCone01",
+              "TubeWall01",
+              "TubeCollar01",
+              "Cap01"
+            ]
+          }
+        },
+        "native": {
+          "status": "passed",
+          "context": "exports/generated/lab-transfer-l01-a03566b376d0-r2/context.json",
+          "report": "exports/generated/lab-transfer-l01-a03566b376d0-r2/motion-validation.json",
+          "log": "tmp/lab-transfer-continuous-native.log",
+          "passed": true,
+          "samples_checked": 4594,
+          "requested_samples": 4594,
+          "collisions": 0,
+          "report_sha256": "35f7ccd45ee27beb8bd36b9539e1164b988b9d97a62543dbb6254d07516db16a",
+          "native_input_sha256": {
+            "exports/generated/lab-transfer-l01-a03566b376d0-r2/timeline.json": "1cbd9c10f54597a0f5f2baab9123ee76562e76421009638e2b18d48e00121025",
+            "exports/generated/lab-transfer-l01-a03566b376d0-r2/samples.json": "9535a419351fa4fca103fe4de033c50f93ddcea77bc4fa455d4b73daf3168d47"
+          },
+          "minimum_furniture_distance_lower_bound_mm": 124.17991658492183
+        },
+        "solidcraft": {
+          "status": "passed",
+          "scope": "Derived linear preview only; native C2/PVA interpolation is unsupported.",
+          "report": "exports/generated/lab-transfer-l01-a03566b376d0-r2/build-report.json",
+          "report_sha256": "0c0b18e8b5aef053bfedcba3d819ccff62594c111c718616f1adfede5c7e3f3f",
+          "passed": true,
+          "frames": 257,
+          "missing": [],
+          "max_position_error_mm": 0.028051005440384948,
+          "max_rotation_element_error": 4.898175055437215e-05,
+          "checks": 4369,
+          "preview": {
+            "study": "L01SampleRoundtripPreview",
+            "interpolation": "linear",
+            "native_pva_interpolation_supported": false,
+            "clock": {
+              "steps": 100000,
+              "duration_s": 1248.6944343822122,
+              "seconds_per_step": 0.012486944343822122
+            },
+            "scope": "Derived display preview only; planning and dynamics use the canonical PVA timeline, not these keys.",
+            "frame_count": 4594,
+            "maximum_sampled_reference_error_mm": 0.009982822354907005,
+            "reference_checks": 13779,
+            "sampling": "All PVA knots/events plus uniform timeline points and adaptive quarter/midpoint checks, including the displayed sample yaw/tilt axis; not a continuous preview-error certificate."
+          }
+        },
+        "diagnostics": {
+          "failed_native_reports": [
+            "exports/generated/lab-transfer-l01-4975902a3a09-r5/motion-validation.json",
+            "exports/generated/lab-transfer-l01-0a33bdd5bdae/motion-validation.json"
+          ],
+          "four_episode_screen": "tmp/lab-transfer-cf-episodes-native-probe.json",
+          "scope": "Diagnostic screens do not replace the bound full native audit."
+        },
+        "dynamics": {
+          "path": "exports/generated/lab-transfer-l01-a03566b376d0-r2/build-report.json",
+          "pointer": "/dynamics_validation",
+          "sha256": "0c0b18e8b5aef053bfedcba3d819ccff62594c111c718616f1adfede5c7e3f3f",
+          "passed": true,
+          "pusher_overlap": {
+            "passed": true,
+            "actual_start_s": 1123.3027611402563,
+            "actual_end_s": 1125.3027611402563,
+            "first_vessel_clear_s": 1123.3027611402563,
+            "minimum_vessel_x_at_start_mm": 800.0,
+            "source_clearance_x_mm": 800.0,
+            "scope": "Actual station PVA window and FK enclosure-point crossing, checked at knots and interval quarters; synthetic, not measured feedback or a continuous swept-volume proof."
+          }
+        },
+        "passed": true,
+        "archives": {
+          "prior_full_native": {
+            "path": "exports/generated/lab-transfer-l01-a03566b376d0/motion-validation.json",
+            "status": "historical_passed_not_current",
+            "sha256": "674728e34b276792274fb50d2b8a49c172dc0da05d43265605470864e2f9df4f"
+          },
+          "slow_local_fit_prototype": {
+            "path": "exports/generated/lab-transfer-c2-retained-local-prototype/timeline.json",
+            "status": "historical_prototype_not_current",
+            "sha256": "cd9417f29bd5c0c464771d56506ffe75c5d463454d3c112758ff8520eea49039"
+          },
+          "solidcraft_probe": {
+            "path": "tmp/lab-transfer-solidcraft-probe-5-comparison.json",
+            "status": "diagnostic_passed_not_current",
+            "sha256": "7ca6c55cc6af1ede5698ab1c933fda2d7a44c3c9e191962b062ee7774e90f255"
+          },
+          "physical_curve_equality": {
+            "path": "tmp/lab-transfer-final-physical-curve-equality.json",
+            "status": "passed",
+            "sha256": "8e139bdb26eadb88a3be6cf8e4f6e5a7af333658ccf0c09ea33e7a5adb03cd55"
+          }
+        },
+        "artifact_checks": {
+          "passed": true,
+          "source_pins": 64,
+          "geometry_sources": 50,
+          "artifact_pins": 7,
+          "macro_syntax": true,
+          "build_report_sha256": "0c0b18e8b5aef053bfedcba3d819ccff62594c111c718616f1adfede5c7e3f3f",
+          "log": "tmp/lab-transfer-final-artifact-checks.log",
+          "log_sha256": "b9525b6c2942137bfc2a45a7206687a7fa254deb7f06621e9ce44d8ebcbf477f"
+        }
+      }
+    },
+    "historical_whole_suite": {
+      "summary": {
+        "tests": 767,
+        "passed": true,
+        "seconds": 640.1310190419899,
+        "skipped": [
+          {
+            "test": "test_existing_runner_roundtrip_over_independent_tecan_transport (test_cf01_sila2_dotnet.DotnetTests.test_existing_runner_roundtrip_over_independent_tecan_transport)",
+            "reason": "Build the Tecan probe and set SOLIDCRAFTBOT_SILA_DOTNET_TESTS=1"
+          },
+          {
+            "test": "test_independent_tecan_tls_client (test_cf01_sila2_dotnet.DotnetTests.test_independent_tecan_tls_client)",
+            "reason": "Build the Tecan probe and set SOLIDCRAFTBOT_SILA_DOTNET_TESTS=1"
+          },
+          {
+            "test": "test_actual_multicast_discovery_and_explicit_tls_trust (test_cf01_sila2_network.NetworkTests.test_actual_multicast_discovery_and_explicit_tls_trust)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_cancellation_ack_precedes_confirmed_stop_and_execution_error (test_cf01_sila2_network.NetworkTests.test_cancellation_ack_precedes_confirmed_stop_and_execution_error)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_disconnect_and_lease_expiry_brake_without_releasing_process (test_cf01_sila2_network.NetworkTests.test_disconnect_and_lease_expiry_brake_without_releasing_process)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_duplicate_network_intent_does_not_repeat_effect (test_cf01_sila2_network.NetworkTests.test_duplicate_network_intent_does_not_repeat_effect)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_execution_deadline_does_not_retry_or_claim_completion (test_cf01_sila2_network.NetworkTests.test_execution_deadline_does_not_retry_or_claim_completion)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_existing_batch_runner_roundtrip_uses_only_network_station (test_cf01_sila2_network.NetworkTests.test_existing_batch_runner_roundtrip_uses_only_network_station)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_identity_feature_discovery_and_confirmed_command (test_cf01_sila2_network.NetworkTests.test_identity_feature_discovery_and_confirmed_command)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_lost_network_response_preserves_one_durable_effect (test_cf01_sila2_network.NetworkTests.test_lost_network_response_preserves_one_durable_effect)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_lower_tube_reset_and_rotation_feedback_typed_commands (test_cf01_sila2_network.NetworkTests.test_lower_tube_reset_and_rotation_feedback_typed_commands)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_no_real_mode_or_unvalidated_slot (test_cf01_sila2_network.NetworkTests.test_no_real_mode_or_unvalidated_slot)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_normal_spin_and_braking_finish_without_client_advancing_time (test_cf01_sila2_network.NetworkTests.test_normal_spin_and_braking_finish_without_client_advancing_time)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_partial_network_handoff_keeps_inventory_and_station_owned (test_cf01_sila2_network.NetworkTests.test_partial_network_handoff_keeps_inventory_and_station_owned)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_read_only_reconnect_checks_server_identity_and_does_not_echo_credentials (test_cf01_sila2_network.NetworkTests.test_read_only_reconnect_checks_server_identity_and_does_not_echo_credentials)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_read_only_reconnect_observes_held_work_and_changed_boot_without_touching_lease (test_cf01_sila2_network.NetworkTests.test_read_only_reconnect_observes_held_work_and_changed_boot_without_touching_lease)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_server_clock_progresses_while_client_is_idle (test_cf01_sila2_network.NetworkTests.test_server_clock_progresses_while_client_is_idle)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_status_cli_reconnects_without_creating_a_batch_journal (test_cf01_sila2_network.NetworkTests.test_status_cli_reconnects_without_creating_a_batch_journal)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_unauthenticated_and_observer_changes_are_rejected (test_cf01_sila2_network.NetworkTests.test_unauthenticated_and_observer_changes_are_rejected)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_wrong_certificate_and_plaintext_cannot_connect (test_cf01_sila2_network.NetworkTests.test_wrong_certificate_and_plaintext_cannot_connect)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_cli_batch_and_live_store_fencing (test_cf01_sila2_process.ProcessTests.test_cli_batch_and_live_store_fencing)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          },
+          {
+            "test": "test_hard_restart_preserves_identity_and_pending_job_without_replay (test_cf01_sila2_process.ProcessTests.test_hard_restart_preserves_identity_and_pending_job_without_replay)",
+            "reason": "Install SiLA dependencies and set SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1"
+          }
+        ],
+        "changed_during_run": [
+          "scripts/build_lab_transfer.py",
+          "scripts/build_lab_transfer_freecad.py",
+          "scripts/lab_transfer_motion.py",
+          "tests/test_lab_transfer_model.py"
+        ],
+        "scope": "Whole repository suite with actual CF01 interval-FK validation enabled; separate opt-in SiLA network/.NET flags remain unset.",
+        "skipped_count": 22
+      },
+      "record": {
+        "path": "tmp/cad-refresh-full-tests.json",
+        "sha256": "a9b6c3f998051371c57b750fbe1eb2d990df0fdb28168f143a19620abaceb0f1",
+        "bytes": 43076
+      },
+      "scope": "Preserved previous 767-test run, which included a parallel glassware revision and subsequent L01 follow-ups. Not the publication-tree gate."
+    },
+    "publication_glassware": {
+      "source_revision": "Committed baseline catalogue, without parallel size/cylinder/marker extensions",
+      "source_sha256": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d",
+      "native_build_report": {
+        "path": "exports/generated/lab-glassware-3cb59075bdb9-r7/build-report.json",
+        "sha256": "343a03d585a5d95800790d3028a42819bf8e779817b44ffd415a8a971e5d14d2",
+        "bytes": 69200
+      },
+      "cases": 15,
+      "passed": true
+    }
+  },
+  "ros_arm_program": {
+    "path": "exports/generated/cf01-unload-ros2/scenarios.json",
+    "sha256": "ed2b26fb0046cfddfed390f7f109be1850de727d14beb28395a2c001ef3c8797",
+    "bytes": 3067044,
+    "canonical_program_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+    "pva_knots": 3876,
+    "duration_s": 99.673878165,
+    "nanosecond_quantization": {
+      "passed": true,
+      "maximum_knot_shift_s": 4.997300351305967e-10,
+      "maximum_error_bounds": {
+        "positions_rad": 4.036202281429516e-10,
+        "velocities_rad_s": 1.785787291188335e-09,
+        "accelerations_rad_s2": 1.6901623141278068e-08
+      },
+      "tolerances": {
+        "positions_rad": 1e-07,
+        "velocities_rad_s": 1e-06,
+        "accelerations_rad_s2": 1e-05
+      },
+      "knot_values": "Interior P/V/A evaluated at rounded reference times; exact rest endpoint jets retained",
+      "method": "Numerical polynomial extrema of normalized quintic differences plus knot-shift/global derivative bounds; actual wire extrema checked independently"
+    },
+    "dry_run": {
+      "path": "exports/generated/cf01-unload-ros2/dry-run.json",
+      "sha256": "40af9fb7ecf821582ad4b92415b7b70a5a119a977e46c125222201dcc3147f76",
+      "bytes": 2850504
+    },
+    "verification": {
+      "ros_runtime": false,
+      "hardware_execution": false,
+      "integrated_CF01_cycle": false,
+      "biological_tolerance": false
+    }
+  },
+  "capture": {
+    "input": "docs/media/robot-demo-continuous-cfr.html",
+    "video": "docs/media/robot-demo-continuous-cfr.mp4",
+    "screenshot": "docs/media/robot-demo-continuous-cfr.png",
+    "source_scene_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+    "source_duration_s": 99.67387816519029,
+    "video_target_duration_s": 45,
+    "screenshot_time_s": 37.79554150519254,
+    "mime": "video/mp4",
+    "frames": 900,
+    "encoding": {
+      "codec": "libx264",
+      "pixel_format": "yuv420p",
+      "fps_mode": "cfr",
+      "fps": 20,
+      "frames": 900,
+      "duration_s": 45,
+      "first_pts_s": 0,
+      "last_pts_s": 44.95
+    },
+    "frame_manifest": "tmp/readme-video/robot-demo-continuous-cfr.frames.json",
+    "frame_manifest_sha256": "a81d49f61bc224a3df0b351d6a8e3e57386bcbe3917ba86925c4c17fb4908ab2",
+    "ownership_checks": [
+      {
+        "time_s": 20.63918689198967,
+        "owner": "rotor",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 20.64918689198967,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2504445124263,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2604445124263,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 49.48878734264693,
+        "owner": "rotor",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 49.49878734264693,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.065727167540636,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.075727167540634,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 78.29352784443284,
+        "owner": "rotor",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 78.30352784443285,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9513341579452,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9613341579452,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      }
+    ],
+    "errors": []
+  },
+  "historical_media_sha256": {
+    "docs/media/provenance.json": "80e954c9b2b7a4a16ee40f280382e0a134702b9edcefa6d01b6d267e45e5160c",
+    "docs/media/robot-demo-overlap.html": "fe6798b434e4dc0ff74d0ede4074fc711a184bcf52f29db728954b22c45a6d62",
+    "docs/media/robot-demo-overlap.mp4": "f53f06fba151f02b43ced3f840bd4f6426bd7169a5251f2ed76df058f58c855a",
+    "docs/media/robot-demo-overlap.png": "afdc480fe67f1c08538d8ba42f5f1ac33df654b1707399cc335183e5145716aa",
+    "docs/media/robot-demo-overlap.provenance.json": "7d2804ab49d745d5d51094b7ac2666871c76e24bb61730566731292d5e854c05",
+    "docs/media/robot-demo-smooth-batch.html": "a35ae0d7fe80506a8d2befc5aece1ee291209a062da6b0dde4362058d2d9a698",
+    "docs/media/robot-demo-smooth-batch.mp4": "599a33f9e7f02c52a45727c287d96325b7efa4a40684d9df4ea713ee1dd7309e",
+    "docs/media/robot-demo-smooth-batch.png": "bc171940e0b2b49e5a2ea1df3ae630806a75bc411128b2aebc8363b10d18b069",
+    "docs/media/robot-demo-smooth-batch.provenance.json": "62aaddc96c322fd7b326096e50e5df6235b0291d3b18ee996533eb4397e79555",
+    "docs/media/robot-demo.html": "f4d5616c24f083c3d33cc37208c38d6502fe2bd653253f4bbb590b5375158f90",
+    "docs/media/robot-demo.mp4": "da38a7eab9617bc4c47d9c1edd2616cbf39c94e42ea8f24d0ee95169e3143d5e",
+    "docs/media/robot-demo.png": "6cf417bf6bdea2d37fb90368eb3fc20ebc869bc96892c20d6b6170a52656943e"
+  },
+  "historical_solidcraft_limit": "The original full STEP import left rotor and five servo housings open and failed strict overall validation. Historical media provenance remains unchanged; later independent SolidCraft static poses are not a new native motion study.",
+  "limitations": [
+    "Synthetic provisional limits; biological_tolerance is null. No fluid, pellet, grip force, drive/load, resonance or shared-bench vibration qualification.",
+    "No global time-optimality claim; adaptive conservative numerical intervals are not a formal floating-point certificate.",
+    "Native adaptive discrete BRep checking is not a continuous swept-volume certificate, live collision control or safety qualification.",
+    "Opt-in open-lid indexing has no standard Simulator, MockProtocol, ROS, SiLA, batch-runner or combined-workflow binding. Existing index/start contracts remain unchanged.",
+    "Replay uses synthetic program-state observations, future latch confirmations and injected logical heartbeats; no measured sensor, command duration or watchdog evidence.",
+    "The arm program has no station/sensor-dependent abort or recovery branch. Gripper/station control is not included in the ROS arm export.",
+    "ROS data export and dry-run only; live spline configuration, robot-model compatibility, ROS runtime and hardware execution remain unverified.",
+    "No transporter, native loading path, physical spin, hardware quality feedback or new native SolidCraft motion study.",
+    "Motion time, old batch-test time and accelerated video time are distinct. Only the default three-sample prefix was executed and checked.",
+    "Skipped SiLA network/.NET and runtime tests are not counted as passed. Source changes during the suite require separate fresh checks.",
+    "The legacy bare-arm base_sweep_return demonstration remains joint_linear and is not a C2-qualified exploration trajectory."
+  ],
+  "publication_base_commit": "295bca62ea65bdb5ffb60670d717058f259f3fc6",
+  "publication_recorded_at_utc": "2026-11-11T02:59:06.700253+00:00"
+}

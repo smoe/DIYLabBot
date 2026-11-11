@@ -4,14 +4,17 @@ const path = require('node:path');
 const zlib = require('node:zlib');
 const {pathToFileURL} = require('node:url');
 const assert = require('node:assert/strict');
+const crypto = require('node:crypto');
+const {spawn} = require('node:child_process');
 
 function options(argv, env = process.env) {
-  const result = {input: 'docs/media/robot-demo.html', outputBase: 'docs/media/robot-demo',
+  const result = {input: 'docs/media/robot-demo-continuous-cfr.html', outputBase: 'docs/media/robot-demo-continuous-cfr',
     playwright: env.SOLIDCRAFTBOT_PLAYWRIGHT || 'playwright', chrome: env.SOLIDCRAFTBOT_CHROME,
-    recordSeconds: env.SOLIDCRAFTBOT_VIDEO_DURATION_S || 20,
+    ffmpeg: env.SOLIDCRAFTBOT_FFMPEG || 'ffmpeg', fps: env.SOLIDCRAFTBOT_VIDEO_FPS || 20,
+    recordSeconds: env.SOLIDCRAFTBOT_VIDEO_DURATION_S || 45,
     screenshotTime: env.SOLIDCRAFTBOT_SCREENSHOT_TIME_S};
   const names = {'--input': 'input', '--output-base': 'outputBase', '--playwright': 'playwright',
-    '--chrome': 'chrome', '--record-seconds': 'recordSeconds', '--screenshot-time': 'screenshotTime'};
+    '--chrome': 'chrome', '--ffmpeg':'ffmpeg', '--fps':'fps', '--record-seconds': 'recordSeconds', '--screenshot-time': 'screenshotTime'};
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--help') {result.help = true; continue;}
@@ -26,13 +29,68 @@ function options(argv, env = process.env) {
   if (positional[0]) result.playwright = positional[0];
   if (positional[1]) result.chrome = positional[1];
   result.recordSeconds = Number(result.recordSeconds);
-  if (!Number.isFinite(result.recordSeconds) || result.recordSeconds <= 0) throw new Error('Positive recording duration required');
+  result.fps = Number(result.fps);
+  scheduleFrames(1, result.recordSeconds, result.fps);
   if (result.screenshotTime !== undefined) {
     result.screenshotTime = Number(result.screenshotTime);
     if (!Number.isFinite(result.screenshotTime) || result.screenshotTime < 0) throw new Error('Nonnegative screenshot time required');
   }
   if (/\.(mp4|webm|png|html)$/i.test(result.outputBase)) throw new Error('--output-base must omit the file extension');
   return result;
+}
+
+function scheduleFrames(duration, seconds=45, fps=20) {
+  if (!Number.isFinite(duration) || duration <= 0) throw new Error('Positive finite source duration required');
+  if (!Number.isInteger(fps) || fps < 1 || fps > 120) throw new Error('Integer fps in 1..120 required');
+  const count=seconds*fps;
+  if (!Number.isFinite(seconds) || seconds <= 0 || seconds > 3600 || !Number.isInteger(count) || count < 2 || count > 36000)
+    throw new Error('Recording requires an integer frame count in 2..36000 and at most 3600 seconds');
+  return Array.from({length:count},(_,index)=>({index,pts_s:index/fps,source_time_s:index/(count-1)*duration}));
+}
+
+const digest=data=>crypto.createHash('sha256').update(data).digest('hex');
+
+async function encodePngFrames({ffmpeg='ffmpeg',output,fps,schedule,frame,beforePublish=async()=>{}}) {
+  assert.equal(typeof output,'string');
+  assert.deepEqual(schedule,scheduleFrames(schedule.at(-1)?.source_time_s,schedule.length/fps,fps),'Canonical CFR schedule required');
+  fs.mkdirSync(path.dirname(output),{recursive:true});
+  const directory=fs.mkdtempSync(path.join(path.dirname(output),'.readme-video-'));
+  const temporary=path.join(directory,'video.mp4');
+  const args=['-hide_banner','-loglevel','error','-nostdin','-y','-f','image2pipe','-vcodec','png',
+    '-framerate',String(fps),'-i','pipe:0','-an','-c:v','libx264','-preset','medium','-crf','20',
+    '-vf','pad=ceil(iw/2)*2:ceil(ih/2)*2','-pix_fmt','yuv420p','-r',String(fps),'-fps_mode','cfr',
+    '-frames:v',String(schedule.length),'-video_track_timescale',String(fps*1000),'-movflags','+faststart',temporary];
+  let child,completion,closed=false,stderr=Buffer.alloc(0);
+  try {
+    child=spawn(ffmpeg,args,{stdio:['pipe','ignore','pipe'],shell:false});
+    completion=new Promise(resolve=>{
+      child.once('error',error=>{closed=true;resolve({error});});
+      child.once('close',(code,signal)=>{closed=true;resolve({code,signal});});
+    });
+    // Keep only bounded diagnostic output; never accumulate frame images.
+    child.stderr.on('data',data=>{stderr=Buffer.concat([stderr,data]).subarray(-16384);});
+    child.stdin.on('error',()=>{}); // Individual writes and completion report failure.
+    for (const point of schedule) {
+      const png=await frame(point);
+      assert(Buffer.isBuffer(png)&&png.length<=16*1024*1024&&png.subarray(0,8).equals(Buffer.from('89504e470d0a1a0a','hex')),'Bounded PNG frame required');
+      // Await each write callback: pipe backpressure bounds queued frame data.
+      await Promise.race([new Promise((resolve,reject)=>child.stdin.write(png,error=>error?reject(error):resolve())),
+        completion.then(result=>{throw new Error('ffmpeg stopped before all frames: '+(result.error?.message??result.code));})]);
+    }
+    child.stdin.end();
+    const result=await completion;
+    if(result.error||result.code!==0)throw new Error('ffmpeg encoding failed: '+(result.error?.message??result.signal??result.code)+' '+stderr.toString('utf8'));
+    const header=Buffer.alloc(8),fd=fs.openSync(temporary,'r');
+    try {assert.equal(fs.readSync(fd,header,0,8,0),8,'Empty encoder output');} finally {fs.closeSync(fd);}
+    assert.equal(header.toString('ascii',4,8),'ftyp','Encoder did not produce MP4');
+    await beforePublish();
+    fs.renameSync(temporary,output);
+    return {codec:'libx264',pixel_format:'yuv420p',fps_mode:'cfr',fps,frames:schedule.length,
+      duration_s:schedule.length/fps,first_pts_s:schedule[0].pts_s,last_pts_s:schedule.at(-1).pts_s};
+  } finally {
+    if(child&&!closed){child.kill('SIGKILL');await completion;}
+    fs.rmSync(directory,{recursive:true,force:true});
+  }
 }
 
 function timing(html) {
@@ -84,7 +142,7 @@ function assertStateOwnership(state,source) {
   }
 }
 
-// Normalize recording time: rendering speed varies with host CPU.
+// Legacy metadata helper for historical callers; unused by the CFR exporter.
 function shortMp4(data, seconds = 20) {
   assert.equal(data.toString('ascii', 4, 8), 'ftyp', 'Recorder did not produce an MP4 container');
   const clocks = [];
@@ -113,11 +171,12 @@ function shortMp4(data, seconds = 20) {
 async function main(argv = process.argv.slice(2)) {
   const config = options(argv);
   if (config.help) {
-    console.log('Usage: node scripts/export_readme_video.cjs [playwright-module] [chrome-executable] [--input HTML] [--output-base PATH] [--playwright MODULE] [--chrome EXECUTABLE] [--record-seconds 20] [--screenshot-time SECONDS]');
+    console.log('Usage: node scripts/export_readme_video.cjs [playwright-module] [chrome-executable] [--input HTML] [--output-base PATH] [--playwright MODULE] [--chrome EXECUTABLE] [--ffmpeg EXECUTABLE] [--fps 20] [--record-seconds 45] [--screenshot-time SECONDS]');
     return;
   }
   const input = path.resolve(config.input), output = path.resolve(config.outputBase);
-  const source = timing(fs.readFileSync(input, 'utf8'));
+  const inputBytes=fs.readFileSync(input),source = timing(inputBytes.toString('utf8'));
+  const schedule=scheduleFrames(source.duration,config.recordSeconds,config.fps);
   const screenshotTime = config.screenshotTime ?? source.screenshot;
   assert(screenshotTime <= source.duration, 'Screenshot time exceeds the source duration');
   const {chromium} = require(config.playwright);
@@ -129,62 +188,61 @@ async function main(argv = process.argv.slice(2)) {
     page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
     await page.goto(pathToFileURL(input).href);
     await page.waitForSelector('[data-current-time]');
-    const result = await page.evaluate(async ({source, seconds}) => {
-      const root = document.querySelector('#cf01-bench-rack'), canvas = root.querySelector('canvas');
-      const slider = root.querySelector('[data-time-slider]'), duration = Number(slider.max);
-      if (duration !== source.duration) throw new Error('Browser/source duration mismatch');
-      function show(time) {slider.value = time; slider.dispatchEvent(new Event('input', {bubbles: true}));}
-      const ownership = source.checks.map(([time, owner, sampleId]) => {
-        show(time);
+    const ownership=await page.evaluate(source=>{
+      const root=document.querySelector('#cf01-bench-rack'),slider=root.querySelector('[data-time-slider]');
+      if(Number(slider.max)!==source.duration)throw new Error('Browser/source duration mismatch');
+      slider.step='any'; // Preserve exact frame and event times, independent of UI stepping.
+      return source.checks.map(([time,owner,sampleId])=>{
+        slider.value=time;slider.dispatchEvent(new Event('input',{bubbles:true}));
         const actual=sampleId?JSON.parse(root.dataset.sampleOwners)[sampleId]:root.dataset.tubeOwner;
-        if (Math.abs(Number(root.dataset.currentTime) - time) > 0.001 || actual !== owner) {
-          throw new Error('Unexpected tube ownership at source time ' + time);
-        }
-        return {time_s: time, owner,...(sampleId?{sample_id:sampleId}:{})};
+        if(Math.abs(Number(root.dataset.currentTime)-time)>.001||actual!==owner)throw new Error('Unexpected tube ownership at source time '+time);
+        return {time_s:time,owner,...(sampleId?{sample_id:sampleId}:{})};
       });
-      const mime = ['video/mp4;codecs=avc1.42001E', 'video/mp4'].find(type => MediaRecorder.isTypeSupported(type));
-      if (!mime) throw new Error('MP4 MediaRecorder support required; refusing a WebM replacement');
-      show(0);
-      const fps = 20, frames = Math.max(1, Math.round(seconds * fps));
-      const recorder = new MediaRecorder(canvas.captureStream(fps), {mimeType: mime, videoBitsPerSecond: 1000000});
-      if (!recorder.mimeType.startsWith('video/mp4')) throw new Error('Recorder did not select MP4');
-      const chunks = [], states = [];
-      const done = new Promise((resolve, reject) => {
-        recorder.ondataavailable = event => chunks.push(event.data);
-        recorder.onstop = resolve;
-        recorder.onerror = () => reject(new Error('MP4 recording failed'));
-      });
-      recorder.start();
-      for (let i = 0; i <= frames; i++) {
-        show(i * duration / frames);
-        if (i % Math.max(1, Math.round(frames / 4)) === 0 || i === frames) states.push({...root.dataset,sourceTimeS:i*duration/frames});
-        await new Promise(resolve => setTimeout(resolve, 1000 / fps));
-      }
-      recorder.stop();
-      await done;
-      const bytes = new Uint8Array(await new Blob(chunks).arrayBuffer());
-      let binary = '';
-      for (const byte of bytes) binary += String.fromCharCode(byte);
-      return {mime: recorder.mimeType, data: btoa(binary), states, ownership, frames: frames + 1};
-    }, {source, seconds: config.recordSeconds});
-    for (const state of result.states) {
-      assertStateOwnership(state,source);
-    }
-    const video = shortMp4(Buffer.from(result.data, 'base64'), config.recordSeconds);
-    await page.locator('[data-time-slider]').evaluate((slider, time) => {
-      slider.value = time; slider.dispatchEvent(new Event('input', {bubbles: true}));
-    }, screenshotTime);
-    const screenshot = await page.locator('#cf01-bench-rack').screenshot();
-    assert.deepEqual(errors, []);
-    fs.mkdirSync(path.dirname(output), {recursive: true});
-    fs.writeFileSync(output + '.mp4', video);
-    fs.writeFileSync(output + '.png', screenshot);
-    console.log(JSON.stringify({input, video: output + '.mp4', screenshot: output + '.png',
-      source_scene_sha256: source.sceneSha256, source_duration_s: source.duration,
-      video_target_duration_s: config.recordSeconds, screenshot_time_s: screenshotTime,
-      mime: result.mime, frames: result.frames, ownership_checks: result.ownership, states: result.states, errors}));
+    },source);
+    const frames=[],states=[];
+    let screenshot,manifestPath,manifestSha256;
+    const encoding=await encodePngFrames({ffmpeg:config.ffmpeg,output:output+'.mp4',fps:config.fps,schedule,
+      frame:async point=>{
+        const captured=await page.evaluate(time=>{
+          const root=document.querySelector('#cf01-bench-rack'),slider=root.querySelector('[data-time-slider]');
+          slider.value=time;slider.dispatchEvent(new Event('input',{bubbles:true}));
+          // The source input handler draws synchronously; no wall-clock wait.
+          return {png:root.querySelector('canvas').toDataURL('image/png'),state:{...root.dataset,sourceTimeS:time}};
+        },point.source_time_s);
+        assert.deepEqual(errors,[]);
+        assert(Math.abs(Number(captured.state.currentTime)-point.source_time_s)<=.001,'Rendered source clock mismatch');
+        assertStateOwnership(captured.state,source);
+        assert(captured.png.startsWith('data:image/png;base64,'),'Canvas PNG required');
+        const png=Buffer.from(captured.png.slice('data:image/png;base64,'.length),'base64');
+        frames.push({...point,png_sha256:digest(png),
+          ...(source.multiSample?{owners:JSON.parse(captured.state.sampleOwners)}:{tube_owner:captured.state.tubeOwner})});
+        if(point.index%Math.max(1,Math.round((schedule.length-1)/4))===0||point.index===schedule.length-1)states.push(captured.state);
+        return png;
+      },
+      beforePublish:async()=>{
+        await page.locator('[data-time-slider]').evaluate((slider,time)=>{
+          slider.value=time;slider.dispatchEvent(new Event('input',{bubbles:true}));
+        },screenshotTime);
+        screenshot=await page.locator('#cf01-bench-rack').screenshot();
+        assert.deepEqual(errors,[]);
+        const manifest={format:'solidcraftbot.readme-video-frames/1',input,input_sha256:digest(inputBytes),
+          source_scene_sha256:source.sceneSha256,source_duration_s:source.duration,
+          video_duration_s:config.recordSeconds,fps:config.fps,frames};
+        const directory=path.resolve('tmp/readme-video');fs.mkdirSync(directory,{recursive:true});
+        manifestPath=path.join(directory,path.basename(output)+'.frames.json');
+        const bytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n');
+        fs.writeFileSync(manifestPath,bytes);manifestSha256=digest(bytes);
+      }});
+    const posterTemporary=output+'.png.tmp';
+    try {fs.writeFileSync(posterTemporary,screenshot);fs.renameSync(posterTemporary,output+'.png');}
+    finally {fs.rmSync(posterTemporary,{force:true});}
+    console.log(JSON.stringify({input,video:output+'.mp4',screenshot:output+'.png',
+      source_scene_sha256:source.sceneSha256,source_duration_s:source.duration,
+      video_target_duration_s:config.recordSeconds,screenshot_time_s:screenshotTime,
+      mime:'video/mp4',frames:frames.length,encoding,frame_manifest:manifestPath,frame_manifest_sha256:manifestSha256,
+      ownership_checks:ownership,states,errors}));
   } finally {await browser.close();}
 }
 
-module.exports = {options, timing, shortMp4, assertStateOwnership};
+module.exports = {options,timing,shortMp4,assertStateOwnership,scheduleFrames,encodePngFrames};
 if (require.main === module) main().catch(error => {console.error(error); process.exitCode = 1;});

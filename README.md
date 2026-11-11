@@ -23,10 +23,10 @@ synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
 ## Roboter in Bewegung
 
-[![Drei aufeinanderfolgende CF01-Entnahmen bei offenem Deckel](docs/media/robot-demo-smooth-batch.png)](docs/media/robot-demo-smooth-batch.mp4)
+[![Drei aufeinanderfolgende CF01-Entnahmen bei offenem Deckel](docs/media/robot-demo-continuous-cfr.png)](docs/media/robot-demo-continuous-cfr.mp4)
 
-[Kurzes Video ansehen](docs/media/robot-demo-smooth-batch.mp4) ·
-[Interaktive Demo herunterladen](docs/media/robot-demo-smooth-batch.html) ·
+[Kurzes Video ansehen](docs/media/robot-demo-continuous-cfr.mp4) ·
+[Interaktive Demo herunterladen](docs/media/robot-demo-continuous-cfr.html) ·
 [Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
 [Modellstand und Herkunft](docs/media/README.md)
 
@@ -44,13 +44,23 @@ Heberrückzug. Eine ausdrücklich aktivierte Simulatorerweiterung erlaubt dafür
 die langsame Rotorindexierung bei offenem, gehaltenem Deckel; der bestehende
 Stationsvertrag bleibt unverändert.
 
+Auch leere Fahrten und Raumsondierung sollen fließen: Ein Wegpunkt ist kein
+Haltepunkt. Warten ist nur mit einer benannten Bedingung vorgesehen, etwa auf
+den Heber, das Greifen oder die bestätigte Ablage. Eine zusätzliche Pause zur
+Vorführung des angehobenen Gefäßes entfällt. Das Video wird aus gleichmäßig
+verteilten Modellzeiten mit festen 20 Bildern pro Sekunde erzeugt.
+
 Geschwindigkeit, Beschleunigung und Ruck bleiben durch dieselben vorläufigen
 Grenzen beschränkt; Position, Geschwindigkeit und Beschleunigung sind stetig.
-Das Programm enthält 1.565 Armknoten und dauert 80,759 s: rund 29,7 % weniger
-Modellzeit als die vorherige lokale Fassung mit Deckelzyklen je Probe.
+Das Programm enthält 3.876 Armknoten und dauert 99,674 s: rund 13,2 % weniger
+Modellzeit als die ältere Fassung mit Deckelzyklen je Probe.
 Vom ersten Griff bis zur bestätigten Rackabstützung sind es 11,611 s,
-rund 1,0 % weniger als zuvor. Ein beschleunigter Videoclip ändert die
-Programmzeit nicht. Biologische Belastbarkeit, Flüssigkeitsbewegung und reale
+gegenüber 11,731 s in der älteren Fassung mit Zwischenhalten. Ein beschleunigter Videoclip ändert die
+Programmzeit nicht. Die erste durchgehende Fassung dauerte insgesamt 80,759 s;
+die jetzt ebenfalls verrundeten leeren Fahrten benötigen bei denselben
+Gelenkgrenzen mehr Modellzeit. Die beladene Fahrt bleibt unverändert; globale
+Zeitoptimalität ist nicht nachgewiesen.
+Biologische Belastbarkeit, Flüssigkeitsbewegung und reale
 Antriebsgrenzen sind noch nicht bestimmt;
 die vorläufigen Grenzwerte sind keine Freigabe für biologische Proben.
 

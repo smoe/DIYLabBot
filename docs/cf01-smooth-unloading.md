@@ -1,7 +1,7 @@
 # Geglättete synthetische CF01-Entnahme
 
-Die [interaktive Ansicht](media/robot-demo-smooth-batch.html) und das
-[Video](media/robot-demo-smooth-batch.mp4) zeigen drei aufeinanderfolgende
+Die [interaktive Ansicht](media/robot-demo-continuous-cfr.html) und das
+[Video](media/robot-demo-continuous-cfr.mp4) zeigen drei aufeinanderfolgende
 Entnahmen aus einem vollständig belegten Rotor nach dem synthetischen
 Schleuderlauf. Sample01–03 gelangen in dieser Reihenfolge an ihre ursprünglichen
 Plätze `Rack/Slot01`–`Rack/Slot03`; neun Gefäße bleiben im Rotor. Das ist ein
@@ -37,14 +37,29 @@ nominale Grenze von 10 °/s; sie wird nicht für einen kürzeren Clip erhöht.
 
 Die Präsentation hebt das jeweilige Gefäß unverändert um 16 mm entlang seiner
 geneigten Achse an. Das entspricht 13,106 mm vertikalem Hub, nicht 16 mm in Z.
-Eine mindestens 0,6 s lange Präsentationspause macht diesen Hub sichtbar.
+Sobald Hub und vorherige Armrückfahrt beendet sind, beginnt die Anfahrt;
+eine zusätzliche reine Präsentationspause entfällt.
+Die Detailkamera zeigt das angehobene Gefäß während der Anfahrt.
 Greifen, Freiraumfreigabe und Rackabstützung besitzen eigene synthetische
 Bestätigungen. Gefäß und Kappe folgen genau einem Besitzer: Rotor, Greifer
 oder ursprünglicher Rackplatz. Bereits abgelegte Gefäße bleiben dort stehen.
 
-Das neue Programm dauert **80,759 s** und enthält **1.565 Armknoten**.
+Auch die leere Anfahrt und Rückfahrt enthalten keine Zwischenruhepunkte mehr.
+Die Richtungswechsel bei `pregrasp` und `rack_approach` erhalten eine räumliche
+C2-Bézierverrundung. Die letzten 25 mm der Greifanfahrt bleiben axial; die
+ersten 96 mm der Rückfahrt bleiben vertikal und ohne Werkzeugneigung. Danach
+wechselt die Neigung durchgehend bis zum Fahrtende. Die anschließende Greif- beziehungsweise vorausgehende
+Freigabebewegung bleibt eine eigene Operation. Die tatsächlichen PVA-Kurven
+werden mit denselben vorläufigen Gelenkgrenzen geprüft; das Kein-Halt-Kriterium
+isoliert auch in diesen sechs leeren Bahnen die beiden ruhigen Endbereiche.
+
+Das neue Programm dauert **99,674 s** und enthält **3.876 Armknoten**.
 Gegenüber der vorherigen lokalen Fassung mit Zwischenhalten und Deckelzyklen
-je Probe sind das 29,7 % weniger als deren 114,823 s. Der faire Vergleich
+je Probe sind das 13,2 % weniger als deren 114,823 s. Die erste durchgehende
+Fassung dauerte 80,759 s. Die zusätzlichen Verrundungen der leeren Fahrten
+benötigen bei denselben Gelenkgrenzen mehr Zeit, obwohl die drei Vorführpausen
+entfallen. Die gewählte Kurvenform wird gleichmäßig gegen die tatsächlichen
+Grenzen skaliert; eine globale Zeitoptimierung ist nicht implementiert. Der faire Vergleich
 vom ersten Griff bis zur bestätigten Rackabstützung beträgt dagegen
 11,611 s statt 11,731 s, also rund 1,0 % weniger. Die anschließende
 Stützbestätigung dauert unverändert 0,25 s; sie gehört nicht zur bewegten Bahn.
@@ -110,7 +125,8 @@ Richtungen, erhalten aber keine ruhenden Grenzen zum Transit.
 FK-Kurve; der Arm hält dafür nicht an. Die Kriterien betreffen axiale
 Entnahme und das Erreichen der quellgebundenen Freigabegrenze. Sie sind
 synthetische Bestätigungen, keine gemessenen Sensorwerte.
-Die leere Rückfahrt führt von der Rackannäherung direkt zum Rückzugspunkt.
+Die leere Rückfahrt beginnt an der Rackablage, hebt zunächst vertikal ab und
+führt über die verrundete Ecke der Rackannäherung zum Rückzugspunkt.
 Stations- und Greiferachsen verwenden begrenzte S-Kurven. Eine allgemeine
 automatische Wegsuche oder Glättung beliebiger Kollisionskorridore ist nicht
 implementiert.
@@ -160,6 +176,9 @@ Das Kein-Halt-Kriterium betrachtet die tatsächliche Gefäßgeschwindigkeit und
 die Norm der Gelenkgeschwindigkeiten: Unterhalb der Profil-Schwellen sind nur
 ein zusammenhängender Anfangs- und ein Endbereich der beladenen Fahrt erlaubt.
 Ein eingefügter Ruhepunkt oder ein inneres ruhendes Intervall wird abgewiesen.
+Die numerische Wurzelisolation wird vorwärts und rückwärts im jeweiligen
+Quintikintervall ausgewertet, damit Auslöschung nahe dem Ende keinen sehr
+kurzen ruhigen Endbereich verschwinden lässt. Die Schwellen bleiben gleich.
 Axial-/Vertikalanteile und Ereignisprädikate werden aus der FK nachgerechnet;
 Stationsbewegungen benötigen die vorgesehenen Ruhe- und Freiraumbedingungen.
 Das Ergebnis wird getrennt vom nativen Geometriebericht gespeichert.
@@ -206,20 +225,22 @@ Marge genügen als Trennungsnachweis; darunter verfeinert die native BRep-Distan
 Das ist keine kontinuierliche Kollisionsfreiheit oder Sensor-/Schutzfunktion.
 
 Der aktuelle native Bericht im Format
-`solidcraftbot.cf01-unload-native-motion-validation/2` besteht mit 10.026
-angeforderten Frames und 9.979 unterschiedlichen Zuständen, ohne
+`solidcraftbot.cf01-unload-native-motion-validation/2` besteht mit 12.082
+angeforderten Frames und 12.044 unterschiedlichen Zuständen, ohne
 Kollisions- oder Abstandsfehler. Die Dynamikprüfung bestätigt das Kein-Halt-
-Kriterium für alle drei tatsächlich getragenen Kurven. Die Browserprüfung
+Kriterium für alle drei tatsächlich getragenen Kurven; sechs zusätzliche
+Leerfahrten bestehen die eigene Istkurvenprüfung. Die Browserprüfung
 besteht 112 Python-/JS-Vergleiche einschließlich Gelenkgeschwindigkeit,
 Entnahme-/Freigabezeitpunkten und je drei inneren Zeiten pro beladener Fahrt;
 alle drei Hübe sowie Deutsch/Englisch und drei Fensterbreiten sind geprüft.
 
-Der Gesamtprüflauf ist nicht vollständig grün: Die separate
-`AnalyticalNativeEvidenceTests`-Prüfung eines vorhandenen Mehrarm-CAD-Berichts
-weist einen veralteten Cache nach. `render_model_gallery.py --check` meldet
-fehlende Bilder für `model/lab-glassware.shared.json` und die parallel
-hinzugekommene `model/lab-equipment.shared.json`. Diese unabhängigen Arbeiten
-werden nicht durch den bestandenen CF01-Bewegungsbericht freigegeben.
+Die veralteten Instrumenten- und Mehrarm-Aufstellungsnachweise wurden durch
+die neuen nativen Revisionen `synthetic-lab-scene-a3853d4f9bf1-r6` und
+`two-arm-analytics-1f0ba0354e58-r3` ersetzt. Ihre 19 gezielten Tests bestehen.
+Die Galerie enthält auch die zuvor fehlenden Laborglas- und Gerätebilder.
+Diese separaten statischen CAD-Prüfungen sind kein Bewegungsnachweis für
+weitere Roboterabläufe; der vollständige Teststand steht in der neuen
+[Medienprovenienz](media/robot-demo-continuous-cfr.provenance.json).
 
 Der neue Build erzeugt zwei abgeleitete native FreeCAD-Prüfstellungen:
 `CF01_Unload_PresentedSample2.FCStd` und `CF01_Unload_Final.FCStd`. Eine neue
@@ -254,10 +275,13 @@ native Bericht bleibt dabei bytegenau erhalten.
 
 Die Browseransicht `renders/<revision>/cf01-unload-demo.html` wertet dieselben
 PVA-Polynome aus; zusätzliche Vorschau-Samples dienen nur der Bildauswahl.
-Die kuratierte [Medienprovenienz](media/robot-demo-smooth-batch.provenance.json)
+Die kuratierte [Medienprovenienz](media/robot-demo-continuous-cfr.provenance.json)
 bindet die README-Medien an die tatsächlich ausgeführten Prüfungen. Ein
 beschleunigter Videoclip ändert die Modellzeit oder Grenzwerte nicht.
-Das aktuelle Video verdichtet die 80,759 s Modellzeit auf 45 s.
+Das aktuelle Video verdichtet die 99,674 s Modellzeit auf 45 s. Der Export
+wertet 900 gleichmäßig verteilte Modellzeiten aus und codiert mit festen
+20 Bildern/s. Die Renderdauer beeinflusst die Bildabstände nicht; jedes Bild
+erhält Quellzeit und PNG-Prüfsumme im lokalen Frame-Manifest.
 
 Der separate ROS-Export übernimmt ausschließlich den Armkanal. In den folgenden
 Befehlen `<revision>` durch den tatsächlichen Buildordner ersetzen:
@@ -277,8 +301,8 @@ Der Export prüft die Nanosekundenquantisierung und die daraus entstehenden
 Polynome: Innere PVA-Werte werden an den gerundeten Zeiten neu ausgewertet;
 Ruheendpunkte bleiben erhalten. Das Kein-Halt-Kriterium wird auch auf den
 ROS-quantisierten Punkten geprüft.
-Der Quellkanal und der geprüfte ROS-Export enthalten jeweils 1.565 Armknoten;
-der vorhandene Client führt den Daten-Dry-run über 80,759156872 s erfolgreich
+Der Quellkanal und der geprüfte ROS-Export enthalten jeweils 3.876 Armknoten;
+der vorhandene Client führt den Daten-Dry-run über 99,673878165 s erfolgreich
 aus. Die Zahl der Exportpunkte ist mit dem Armkanal identisch.
 `compiled_program_sha256` bindet sortiert und kompakt serialisierte JSON-Daten
 (`json.dumps(..., sort_keys=True, separators=(',', ':'), allow_nan=False)`);
@@ -300,11 +324,16 @@ Hardware-Sicherheit werden nicht zugesichert.
 
 ## Übergreifende Prüfgrenzen dieses Builds
 
-Die 145 gezielten Bewegungs-, Mathematik-, Opt-in- und ROS-Tests bestehen.
-Der Gesamtlauf umfasst 729 Tests, ist aber wegen veralteter lokaler Mehrarm-/
-Instrumenten-Aufstellungsberichte und fehlender Glasware-/Ausrüstungsbilder
-nicht vollständig grün. Die ursprünglichen Loopback-Bindefehler der Sandbox
-wurden durch eine separate erfolgreiche Wiederholung der 33 betroffenen
-Netzwerktests geklärt. Die Provenienz hält ursprünglichen Gesamtlauf, Wiederholung
-und verbleibende Befunde getrennt fest; übersprungene Netzwerk- und
-Laufzeitprüfungen werden nicht als bestanden gezählt.
+Die neue Medienprovenienz bindet die ausgeführten Bewegungs-, Mathematik-,
+Opt-in-, ROS- und Gesamtsuite-Prüfungen an ihre tatsächlichen Quellen und
+Artefakte. Loopback-Tests laufen außerhalb der Sandbox; ausdrücklich
+übersprungene SiLA-Netzwerk-, .NET- und Laufzeitprüfungen zählen nicht als
+bestanden. Im isolierten Veröffentlichungsstand sind alle 788 entdeckten
+Tests abgedeckt: 766 bestanden, 22 ausdrücklich übersprungen, keine
+Fehler. Hauptlauf und Galerie-/Bibliotheksprüfungen liefen getrennt; 14 zunächst
+wegen fehlender lokaler ROS-Builddateien übersprungene Prüfungen wurden nach
+Übernahme dieser Artefakte erfolgreich nachgeholt. Das ist keine ROS-Laufzeit-
+oder Hardwareprüfung. Die nativen L01-Nachweise stehen separat im
+[L01-Bericht](lab-transfer-l01.md#validation-boundary).
+Historische Provenienzen behalten ihren damaligen Teststand,
+einschließlich der inzwischen separat behobenen CAD-/Galeriebefunde.
