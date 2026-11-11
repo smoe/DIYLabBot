@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "63dc752b79f7eea3b6139f1d7e5b3f60aaf97ada84ccd3e8811bdd45abee956c",
+  "catalog_sha256": "077b3e065aa7fe25b440b4c88446d8e80da94ae301ecee27cd492e364123ad2a",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "e18f1ecd2b8173d964c5e6a810ccafad45d3c19e0c231961af75bb78b534d7d1",
+  "render_generator_sha256": "56bbb1e747637d91606a983e47798411dcd9fb35b0047b9d830fcafb65ca623c",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -4140,12 +4140,42 @@
         "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
         "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
       }
+    },
+    {
+      "id": "extraction-kit-station",
+      "image": "images/extraction-kit-station.svg",
+      "source_files_sha256": {
+        "model/extraction-kit-station.shared.json": "4a39a34e70285a6d791ef43cb0e0f27b530d085e19c56dbc08d79e6fdf3dedfc"
+      },
+      "representation": "Source-derived K01 material/slot diagram; not a native CAD render or stock inventory",
+      "producer_files_sha256": {
+        "scripts/extraction_kit_station.py": "3729b454f5f4f4dd3557a3c70c40a4e2944147385f98b1c5b7ff502d74f09f28",
+        "model/extraction-kit-station.schema.json": "e1bd2de0a281ae049d1d577395697dec1b8f89d5f6e0425e5c3555e568d0f0fd"
+      },
+      "inventory_managed": false,
+      "article_fit_qualified": false,
+      "image_sha256": "2c55af5b7648c3a4de8dff8686191a075625ee67137a9ff47a7e160951f5c01d",
+      "bytes": 6623,
+      "dependency_files_sha256": {
+        "model/extraction-kit-station.shared.json": "4a39a34e70285a6d791ef43cb0e0f27b530d085e19c56dbc08d79e6fdf3dedfc",
+        "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
+      }
     }
   ],
   "visual_review": {
     "passed": true,
-    "reviewed_on": "2026-11-11",
-    "notes": "Reviewed updated L01 room/equipment views, open cabinet fronts and shelving, stools, wet bench, water bath and fume hood. Unchanged images, including the committed glassware baseline, retain their previous review. These are geometry views, not hardware qualification."
+    "previous_entries_review": {
+      "passed": true,
+      "reviewed_on": "2026-11-11",
+      "notes": "Reviewed updated L01 room/equipment views, open cabinet fronts and shelving, stools, wet bench, water bath and fume hood. Unchanged images, including the committed glassware baseline, retain their previous review. These are geometry views, not hardware qualification."
+    },
+    "new_entry": "extraction-kit-station",
+    "native_station_views": "documented separately in docs/media; no other gallery image regenerated",
+    "new_entry_review": {
+      "id": "extraction-kit-station",
+      "reviewed": true,
+      "scope": "Inspected the rendered SVG labels and layout. Previous 41 image records and images retained unchanged."
+    }
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

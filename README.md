@@ -232,6 +232,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Laborraum](docs/lab-room-l01.md), [Aufstellung](docs/lab-layout-l01.md), [Transfersequenz](docs/lab-transfer-l01.md)
 - [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
 - [RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md): getrennte Zellpellet-Aliquots, manuelle Qiagen-Spin-Säulen-Kits und prüfbare Material-/Prozesspläne; noch keine Extraktionsausführung
+- [Kitstation K01](docs/extraction-kit-station.md): zwei Kit-Ensembles im parametrischen Behälter-/Einsatzentwurf für das Regal, mit nativen Ansichten und ausdrücklich offenen Artikelmaßen und Lagerfreigaben
 - [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
 - [Wiederverwendbares Laborglas](docs/lab-glassware.md): hohle Becher, durchgängige Trichter und Flaschen mit separaten Verschlüssen für FreeCAD und SolidCraft
 - [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft

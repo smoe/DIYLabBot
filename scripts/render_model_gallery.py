@@ -236,6 +236,34 @@ def svg_document(title,content,width=1150,height=850):
 
 def diagram(entry):
     view=entry['render']['view'];text=lambda x,y,t,size=20:f'<text x="{x}" y="{y}" font-size="{size}">{html.escape(str(t))}</text>'
+    if view=='kit_station':
+        import extraction_kit_station as station
+        spec=station.load(ROOT/entry['sources'][0]);modules=station.ensemble(spec,station.parameters(spec))
+        content=text(40,55,'K01 · getrennte RNA-/DNA-Kitmodule',30)
+        content+=text(40,95,'Schematischer Platzplan · native CAD-Ansichten unter Details',19)
+        for index,module in enumerate(modules):
+            left=35+index*555;color=module['accent']
+            content+=f'<rect x="{left}" y="125" width="525" height="440" rx="14" fill="white" stroke="{color}" stroke-width="4"/>'
+            content+=text(left+18,160,module['id']+' · '+module['kit_name'],21)
+            content+=text(left+18,191,'QIAGEN '+module['catalog_number']+' · gleicher Behälter / wechselbarer Einsatz',14)
+            for item in module['materials']:
+                x=left+16+item['column']*165;y=220+item['row']*105
+                label=item['label'];title=html.escape(label+' · '+', '.join(item['roles']))
+                content+=f'<g><title>{title}</title><rect x="{x}" y="{y}" width="160" height="94" rx="6" fill="#eef2f6" stroke="{color}"/>'
+                content+=text(x+8,y+22,item['slot_id'],14)
+                words=label.split();lines=['']
+                for word in words:
+                    if len(lines[-1]+' '+word)>22:lines.append(word)
+                    else:lines[-1]=(lines[-1]+' '+word).strip()
+                for row,line in enumerate(lines[:3]):content+=text(x+8,y+43+row*15,line,12)
+                content+='</g>'
+        content+=text(40,615,'Je neun symbolische Materialhüllen; keine Mengen- oder Bestandsaussage.',20)
+        content+=text(40,652,'Originalgebinde verschlossen · Artikelmaße und Passungen unqualifiziert.',18)
+        content+=text(40,691,'Kitvorrat, angesetztes Reagenz und Probenlagerung besitzen getrennte Bedingungen.',17)
+        return svg_document(entry['title'],content,height=730),{
+            'representation':'Source-derived K01 material/slot diagram; not a native CAD render or stock inventory',
+            'producer_files_sha256':{n:sha(ROOT/n) for n in ['scripts/extraction_kit_station.py','model/extraction-kit-station.schema.json']},
+            'inventory_managed':False,'article_fit_qualified':False}
     if view=='integrated_workflow':
         from lab_workflow_sources import load
         definition=load();samples=definition['manifest']['samples'];count=len(samples)
@@ -449,6 +477,8 @@ def check(require_review=True):
             if sha(ROOT/source)!=digest:raise ValueError('Source changed: '+source)
         for source,digest in record['dependency_files_sha256'].items():
             if sha(ROOT/source)!=digest:raise ValueError('Image dependency changed: '+source)
+        for source,digest in record.get('producer_files_sha256',{}).items():
+            if sha(project(source))!=digest:raise ValueError('Image producer changed: '+source)
         if record['dependency_files_sha256']!=dependencies(entry):raise ValueError('Dependency graph changed: '+entry['id'])
         if set(record['source_files_sha256'])!=set(entry['sources']):raise ValueError('Source/image binding missing')
         covered.update(entry['sources']);total+=path.stat().st_size

@@ -783,3 +783,18 @@ Messgefäße und die reine µL-Originalentnahmebilanz reichen dafür nicht aus.
 Es gibt hier keinen zweiten Bestand, kein Ausführungsjournal und keinen
 Extraktionsadapter. CF01, NanoDrop- und Qubit-Verträge bleiben eigenständig;
 Zentrifugeneignung und analytspezifische QC sind später ausdrücklich zu binden.
+
+
+### Passive Kitstation K01
+
+`model/extraction-kit-station.shared.json` referenziert denselben Kitkatalog
+und ergänzt generische physische Artikelhüllen sowie zwei Kitmodule. Ein
+Behälter-/Deckel-/Einsatzrezept erzeugt beide Module und drei statische Fälle.
+FreeCAD und SolidCraft bauen direkt aus denselben portablen Operationen;
+STEP ist nur ein optionaler Vergleich. Die Galerie zeigt einen kleinen
+Belegungsplan, die [Stationsdokumentation](docs/extraction-kit-station.md)
+die nativen Ansichten. Prototypmaße sind synthetisch, reale Maße bleiben offen.
+Die Bereitstellung ist `planned_unobserved` und führt keinen zweiten Bestand.
+Raumtemperaturbedingungen der verschlossenen Originalkomponenten sind von
+Ansatz-/Öffnungsfristen und Probenlagerung getrennt. Die Station ist ein
+Druckentwurf, keine qualifizierte Lager-, Greif- oder Extraktionsmaschine.

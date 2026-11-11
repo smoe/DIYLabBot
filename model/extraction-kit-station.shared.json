@@ -1,0 +1,298 @@
+{
+  "format": "solidcraftbot.extraction-kit-station/1",
+  "id": "ExtractionKitStation_K01",
+  "status": "Passive staging concept; all article envelopes and fits are synthetic and unqualified",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "recipe": "common_container_removable_hood_and_interchangeable_3x3_insert_v1",
+  "catalog": {
+    "source": "model/extraction-automation.catalog.json",
+    "source_sha256": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
+  },
+  "parameters": {
+    "outer_w": {
+      "expression": 220,
+      "unit": "mm",
+      "range": [
+        220,
+        240
+      ],
+      "description": "Common container outside width"
+    },
+    "outer_d": {
+      "expression": 180,
+      "unit": "mm",
+      "range": [
+        180,
+        180
+      ],
+      "description": "Common container outside depth"
+    },
+    "base_h": {
+      "expression": 35,
+      "unit": "mm",
+      "range": [
+        35,
+        35
+      ],
+      "description": "Low container side height for visibility"
+    },
+    "bottom": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        3,
+        3
+      ],
+      "description": "Container bottom thickness"
+    },
+    "wall": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        3,
+        3
+      ],
+      "description": "Container side wall thickness"
+    },
+    "insert_t": {
+      "expression": 8,
+      "unit": "mm",
+      "range": [
+        8,
+        8
+      ],
+      "description": "Interchangeable insert thickness"
+    },
+    "insert_clearance": {
+      "expression": 0.5,
+      "unit": "mm",
+      "range": [
+        0.5,
+        0.5
+      ],
+      "description": "Unqualified insert side gap"
+    },
+    "slot_clearance": {
+      "expression": 0.7,
+      "unit": "mm",
+      "range": [
+        0.7,
+        0.7
+      ],
+      "description": "Unqualified article envelope clearance"
+    },
+    "lid_h": {
+      "expression": 110,
+      "unit": "mm",
+      "range": [
+        110,
+        110
+      ],
+      "description": "High removable hood height"
+    },
+    "lid_overlap": {
+      "expression": 8,
+      "unit": "mm",
+      "range": [
+        8,
+        8
+      ],
+      "description": "Hood overlap with the low container"
+    },
+    "lid_side_clearance": {
+      "expression": 0.7,
+      "unit": "mm",
+      "range": [
+        0.7,
+        0.7
+      ],
+      "description": "Unqualified hood side gap"
+    },
+    "lid_wall": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        3,
+        3
+      ],
+      "description": "Hood side and roof thickness"
+    },
+    "module_gap": {
+      "expression": 30,
+      "unit": "mm",
+      "range": [
+        30,
+        30
+      ],
+      "description": "Gap between RNA and DNA modules"
+    },
+    "rear_gap": {
+      "expression": 25,
+      "unit": "mm",
+      "range": [
+        25,
+        25
+      ],
+      "description": "Gap behind container for removed hood"
+    },
+    "shelf_margin": {
+      "expression": 20,
+      "unit": "mm",
+      "range": [
+        20,
+        20
+      ],
+      "description": "Illustrative reference floor margin"
+    },
+    "shelf_t": {
+      "expression": 6,
+      "unit": "mm",
+      "range": [
+        6,
+        6
+      ],
+      "description": "Illustrative reference floor thickness"
+    }
+  },
+  "native_edit_parameters": [
+    "outer_w"
+  ],
+  "grid": {
+    "rows": 3,
+    "columns": 3
+  },
+  "prototype_defaults": {
+    "reagent": "medium_bottle",
+    "column": "sealed_column_pack",
+    "vessel": "sealed_vessel_pack"
+  },
+  "prototypes": {
+    "small_bottle": {
+      "shape": "cylinder",
+      "radius_mm": 11,
+      "height_mm": 65,
+      "cap_height_mm": 8,
+      "measured_dimensions": null,
+      "status": "synthetic_assumption"
+    },
+    "medium_bottle": {
+      "shape": "cylinder",
+      "radius_mm": 15,
+      "height_mm": 85,
+      "cap_height_mm": 8,
+      "measured_dimensions": null,
+      "status": "synthetic_assumption"
+    },
+    "large_bottle": {
+      "shape": "cylinder",
+      "radius_mm": 19,
+      "height_mm": 100,
+      "cap_height_mm": 8,
+      "measured_dimensions": null,
+      "status": "synthetic_assumption"
+    },
+    "sealed_column_pack": {
+      "shape": "box",
+      "size_mm": [
+        32,
+        28,
+        65
+      ],
+      "measured_dimensions": null,
+      "status": "synthetic_assumption"
+    },
+    "sealed_vessel_pack": {
+      "shape": "box",
+      "size_mm": [
+        36,
+        30,
+        55
+      ],
+      "measured_dimensions": null,
+      "status": "synthetic_assumption"
+    }
+  },
+  "modules": [
+    {
+      "id": "RNA",
+      "kit_id": "rneasy_protect_cell_74624",
+      "insert": "RNAInsert",
+      "accent": "#258f98"
+    },
+    {
+      "id": "DNA",
+      "kit_id": "dneasy_blood_tissue_69504",
+      "insert": "DNAInsert",
+      "accent": "#a576bd"
+    }
+  ],
+  "inserts": {
+    "RNAInsert": {
+      "kit_module": "RNA",
+      "prototype_by_role": {
+        "stabilizer": "large_bottle",
+        "lysis_buffer": "large_bottle",
+        "wash_buffer_1": "large_bottle",
+        "wash_buffer_2": "large_bottle",
+        "eluent": "small_bottle"
+      }
+    },
+    "DNAInsert": {
+      "kit_module": "DNA",
+      "prototype_by_role": {
+        "protease": "small_bottle",
+        "optional_tissue_lysis_buffer": "medium_bottle",
+        "lysis_binding_buffer": "medium_bottle",
+        "wash_buffer_1": "large_bottle",
+        "wash_buffer_2": "large_bottle",
+        "eluent": "medium_bottle"
+      }
+    }
+  },
+  "display_pose": "open",
+  "poses": [
+    "stored",
+    "open"
+  ],
+  "cases": [
+    {
+      "id": "stored",
+      "overrides": {},
+      "display_pose": "stored"
+    },
+    {
+      "id": "open",
+      "overrides": {},
+      "display_pose": "open"
+    },
+    {
+      "id": "wide_open",
+      "overrides": {
+        "outer_w": 240
+      },
+      "display_pose": "open"
+    }
+  ],
+  "qualification": {
+    "manufacturer_dimensions_verified": false,
+    "fit_verified": false,
+    "fdm_verified": false,
+    "chemical_compatibility_verified": false,
+    "sop_implemented": false,
+    "inventory_implemented": false,
+    "sample_storage_implemented": false
+  },
+  "limitations": [
+    "Reference floor illustrates support only; no shelf product, room layout or installed station is selected.",
+    "Nine distinct catalog material IDs per kit are represented by closed generic envelopes; one envelope is not an asserted package count or stock quantity.",
+    "Kit names, catalog numbers and material identities are resolved from the pinned extraction catalog, not copied here.",
+    "Article dimensions, closures and all manufacturing clearances are illustrative assumptions; measured_dimensions is null.",
+    "Containers and inserts are passive staging concepts, not extraction machinery or a qualified storage condition.",
+    "Open and stored are separate static arrangements; no hinge, motion sequence, robot access or collision-free removal path is implemented.",
+    "Additional SOP-selected materials, sample storage, reagent preparation, volumes, consumption, reservations and stock control are outside this model.",
+    "FDM printability, material compatibility, cleanability, RNase-free handling, retention and physical fit remain unqualified."
+  ]
+}

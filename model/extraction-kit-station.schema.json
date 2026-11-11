@@ -1,0 +1,581 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "extraction-kit-station.schema.json",
+  "title": "K01 passive kit staging concept; synthetic article envelopes only",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "recipe",
+    "catalog",
+    "parameters",
+    "native_edit_parameters",
+    "grid",
+    "prototype_defaults",
+    "prototypes",
+    "modules",
+    "inserts",
+    "display_pose",
+    "poses",
+    "cases",
+    "qualification",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.extraction-kit-station/1"
+    },
+    "id": {
+      "const": "ExtractionKitStation_K01"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "type": "object",
+      "required": [
+        "length",
+        "angle"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "length": {
+          "const": "mm"
+        },
+        "angle": {
+          "const": "deg"
+        }
+      }
+    },
+    "recipe": {
+      "const": "common_container_removable_hood_and_interchangeable_3x3_insert_v1"
+    },
+    "catalog": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ],
+          "propertyNames": {
+            "enum": [
+              "source",
+              "source_sha256"
+            ]
+          }
+        }
+      ]
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "outer_w",
+        "outer_d",
+        "base_h",
+        "bottom",
+        "wall",
+        "insert_t",
+        "insert_clearance",
+        "slot_clearance",
+        "lid_h",
+        "lid_overlap",
+        "lid_side_clearance",
+        "lid_wall",
+        "module_gap",
+        "rear_gap",
+        "shelf_margin",
+        "shelf_t"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "outer_w": {
+          "$ref": "#/$defs/parameter"
+        },
+        "outer_d": {
+          "$ref": "#/$defs/parameter"
+        },
+        "base_h": {
+          "$ref": "#/$defs/parameter"
+        },
+        "bottom": {
+          "$ref": "#/$defs/parameter"
+        },
+        "wall": {
+          "$ref": "#/$defs/parameter"
+        },
+        "insert_t": {
+          "$ref": "#/$defs/parameter"
+        },
+        "insert_clearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "slot_clearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "lid_h": {
+          "$ref": "#/$defs/parameter"
+        },
+        "lid_overlap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "lid_side_clearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "lid_wall": {
+          "$ref": "#/$defs/parameter"
+        },
+        "module_gap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "rear_gap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "shelf_margin": {
+          "$ref": "#/$defs/parameter"
+        },
+        "shelf_t": {
+          "$ref": "#/$defs/parameter"
+        }
+      }
+    },
+    "native_edit_parameters": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "outer_w",
+          "outer_d",
+          "base_h",
+          "bottom",
+          "wall",
+          "insert_t",
+          "insert_clearance",
+          "slot_clearance",
+          "lid_h",
+          "lid_overlap",
+          "lid_side_clearance",
+          "lid_wall",
+          "module_gap",
+          "rear_gap",
+          "shelf_margin",
+          "shelf_t"
+        ]
+      }
+    },
+    "grid": {
+      "type": "object",
+      "required": [
+        "rows",
+        "columns"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "const": 3
+        },
+        "columns": {
+          "const": 3
+        }
+      }
+    },
+    "prototype_defaults": {
+      "type": "object",
+      "required": [
+        "reagent",
+        "column",
+        "vessel"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reagent": {
+          "enum": [
+            "small_bottle",
+            "medium_bottle",
+            "large_bottle",
+            "sealed_column_pack",
+            "sealed_vessel_pack"
+          ]
+        },
+        "column": {
+          "enum": [
+            "small_bottle",
+            "medium_bottle",
+            "large_bottle",
+            "sealed_column_pack",
+            "sealed_vessel_pack"
+          ]
+        },
+        "vessel": {
+          "enum": [
+            "small_bottle",
+            "medium_bottle",
+            "large_bottle",
+            "sealed_column_pack",
+            "sealed_vessel_pack"
+          ]
+        }
+      }
+    },
+    "prototypes": {
+      "type": "object",
+      "required": [
+        "small_bottle",
+        "medium_bottle",
+        "large_bottle",
+        "sealed_column_pack",
+        "sealed_vessel_pack"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "small_bottle": {
+          "$ref": "#/$defs/prototype"
+        },
+        "medium_bottle": {
+          "$ref": "#/$defs/prototype"
+        },
+        "large_bottle": {
+          "$ref": "#/$defs/prototype"
+        },
+        "sealed_column_pack": {
+          "$ref": "#/$defs/prototype"
+        },
+        "sealed_vessel_pack": {
+          "$ref": "#/$defs/prototype"
+        }
+      }
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/module"
+      },
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "inserts": {
+      "type": "object",
+      "required": [
+        "RNAInsert",
+        "DNAInsert"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "RNAInsert": {
+          "$ref": "#/$defs/insert"
+        },
+        "DNAInsert": {
+          "$ref": "#/$defs/insert"
+        }
+      }
+    },
+    "display_pose": {
+      "enum": [
+        "stored",
+        "open"
+      ]
+    },
+    "poses": {
+      "const": [
+        "stored",
+        "open"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/case"
+      },
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "qualification": {
+      "type": "object",
+      "required": [
+        "manufacturer_dimensions_verified",
+        "fit_verified",
+        "fdm_verified",
+        "chemical_compatibility_verified",
+        "sop_implemented",
+        "inventory_implemented",
+        "sample_storage_implemented"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "manufacturer_dimensions_verified": {
+          "const": false
+        },
+        "fit_verified": {
+          "const": false
+        },
+        "fdm_verified": {
+          "const": false
+        },
+        "chemical_compatibility_verified": {
+          "const": false
+        },
+        "sop_implemented": {
+          "const": false
+        },
+        "inventory_implemented": {
+          "const": false
+        },
+        "sample_storage_implemented": {
+          "const": false
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "required": [
+        "expression",
+        "unit",
+        "range",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "prototype": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": [
+            "shape",
+            "radius_mm",
+            "height_mm",
+            "cap_height_mm",
+            "measured_dimensions",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "shape": {
+              "const": "cylinder"
+            },
+            "radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "height_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "cap_height_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "measured_dimensions": {
+              "type": "null"
+            },
+            "status": {
+              "const": "synthetic_assumption"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": [
+            "shape",
+            "size_mm",
+            "measured_dimensions",
+            "status"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "shape": {
+              "const": "box"
+            },
+            "size_mm": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "measured_dimensions": {
+              "type": "null"
+            },
+            "status": {
+              "const": "synthetic_assumption"
+            }
+          }
+        }
+      ]
+    },
+    "module": {
+      "type": "object",
+      "required": [
+        "id",
+        "kit_id",
+        "insert",
+        "accent"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "RNA",
+            "DNA"
+          ]
+        },
+        "kit_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "insert": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accent": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      }
+    },
+    "insert": {
+      "type": "object",
+      "required": [
+        "kit_module",
+        "prototype_by_role"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "kit_module": {
+          "enum": [
+            "RNA",
+            "DNA"
+          ]
+        },
+        "prototype_by_role": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": [
+              "small_bottle",
+              "medium_bottle",
+              "large_bottle",
+              "sealed_column_pack",
+              "sealed_vessel_pack"
+            ]
+          }
+        }
+      }
+    },
+    "case": {
+      "type": "object",
+      "required": [
+        "id",
+        "overrides",
+        "display_pose"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "enum": [
+            "stored",
+            "open",
+            "wide_open"
+          ]
+        },
+        "overrides": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "outer_w": {
+              "type": "number"
+            },
+            "outer_d": {
+              "type": "number"
+            },
+            "base_h": {
+              "type": "number"
+            },
+            "bottom": {
+              "type": "number"
+            },
+            "wall": {
+              "type": "number"
+            },
+            "insert_t": {
+              "type": "number"
+            },
+            "insert_clearance": {
+              "type": "number"
+            },
+            "slot_clearance": {
+              "type": "number"
+            },
+            "lid_h": {
+              "type": "number"
+            },
+            "lid_overlap": {
+              "type": "number"
+            },
+            "lid_side_clearance": {
+              "type": "number"
+            },
+            "lid_wall": {
+              "type": "number"
+            },
+            "module_gap": {
+              "type": "number"
+            },
+            "rear_gap": {
+              "type": "number"
+            },
+            "shelf_margin": {
+              "type": "number"
+            },
+            "shelf_t": {
+              "type": "number"
+            }
+          }
+        },
+        "display_pose": {
+          "enum": [
+            "stored",
+            "open"
+          ]
+        }
+      }
+    }
+  }
+}

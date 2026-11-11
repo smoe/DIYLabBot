@@ -1,0 +1,183 @@
+{
+  "format": "solidcraftbot.kit-station-media/1",
+  "revision": "extraction-kit-station-4a39a34e7028",
+  "extraction_preparation_commit": "6039515fd7258403a56a8f38c993fb078414aa68",
+  "source_files_sha256": {
+    "model/extraction-kit-station.shared.json": "4a39a34e70285a6d791ef43cb0e0f27b530d085e19c56dbc08d79e6fdf3dedfc",
+    "scripts/build_extraction_kit_station.py": "d22d6474ca0ad9575dfeabbcca6a9873160494a3a625dde4742dd506f7d88047",
+    "scripts/build_extraction_kit_station_freecad.py": "a46a44a9f07fc7031dc102ba2857966358f74fe94994c6a1dcc52717edbb549f",
+    "scripts/extraction_kit_station.py": "3729b454f5f4f4dd3557a3c70c40a4e2944147385f98b1c5b7ff502d74f09f28",
+    "model/extraction-kit-station.schema.json": "e1bd2de0a281ae049d1d577395697dec1b8f89d5f6e0425e5c3555e568d0f0fd",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
+  },
+  "native_build_report": {
+    "path": "exports/generated/extraction-kit-station-4a39a34e7028/build-report.json",
+    "sha256": "005598df2d80a8fe6a8c53e9803a9ef6959bccd525940d01d314e4077bf8036f",
+    "bytes": 141417
+  },
+  "cases": [
+    {
+      "id": "stored",
+      "passed": true,
+      "closed_bodies": 36,
+      "cross_cad_checked": true,
+      "native_interface_checks": 24,
+      "maximum_step_xor_mm3": 0.0,
+      "files": {
+        "case": "exports/generated/extraction-kit-station-4a39a34e7028/stored.case.json",
+        "commands": "exports/generated/extraction-kit-station-4a39a34e7028/stored.commands.json",
+        "solidcraft": "cad/generated/extraction-kit-station-4a39a34e7028/stored.sc",
+        "solidcraft_measurements": "exports/generated/extraction-kit-station-4a39a34e7028/stored.solidcraft.json",
+        "step": "exports/generated/extraction-kit-station-4a39a34e7028/stored.step",
+        "solidcraft_interference_commands": "exports/generated/extraction-kit-station-4a39a34e7028/stored.interference.commands.json",
+        "solidcraft_interference": "exports/generated/extraction-kit-station-4a39a34e7028/stored.interference.json",
+        "freecad": "cad/generated/extraction-kit-station-4a39a34e7028/stored.FCStd",
+        "freecad_validation": "exports/generated/extraction-kit-station-4a39a34e7028/stored.freecad.json"
+      },
+      "artifact_sha256": {
+        "case": "ea9eb3dda26ff7c28862a462ee9b1f47f931db73ac08b468b8f198c8ced674a5",
+        "commands": "ebdcafae4a5b2a07d71d82451d7a56daa0e31479f01d2419f1f97709698ae115",
+        "solidcraft": "01698c91652ea2cf4c043808f8c5344600aa0da244197622cf2c0207d6cb14e6",
+        "solidcraft_measurements": "9d25b7ccedbf52ea18755645221e8a1aea6d9540c2604d5b09946c84b48e1e2e",
+        "step": "c9aa519636ab79db54fcf7d7d2e0ca1a5fc4ff9555eaa33a8be12e037dc3d4ef",
+        "solidcraft_interference_commands": "fa061d60d2230560f857b9eb6643cffb65657699f60f5115ba539668bcadb321",
+        "solidcraft_interference": "8989b2ac370d558790e2ad8e4492b0f303711bbdf2ae070db22dc19674596c52",
+        "freecad": "78022c40b64931428f70432d56f8d7e31da07f1a3cbb4ee35441379ec2319e61",
+        "freecad_validation": "055a42d9e4dae47b46ee0202d0407f8328cb16aaeb9e5ee9363bd54f4d232958"
+      }
+    },
+    {
+      "id": "open",
+      "passed": true,
+      "closed_bodies": 36,
+      "cross_cad_checked": true,
+      "native_interface_checks": 24,
+      "maximum_step_xor_mm3": 0.0,
+      "files": {
+        "case": "exports/generated/extraction-kit-station-4a39a34e7028/open.case.json",
+        "commands": "exports/generated/extraction-kit-station-4a39a34e7028/open.commands.json",
+        "solidcraft": "cad/generated/extraction-kit-station-4a39a34e7028/open.sc",
+        "solidcraft_measurements": "exports/generated/extraction-kit-station-4a39a34e7028/open.solidcraft.json",
+        "step": "exports/generated/extraction-kit-station-4a39a34e7028/open.step",
+        "solidcraft_interference_commands": "exports/generated/extraction-kit-station-4a39a34e7028/open.interference.commands.json",
+        "solidcraft_interference": "exports/generated/extraction-kit-station-4a39a34e7028/open.interference.json",
+        "freecad": "cad/generated/extraction-kit-station-4a39a34e7028/open.FCStd",
+        "freecad_validation": "exports/generated/extraction-kit-station-4a39a34e7028/open.freecad.json"
+      },
+      "artifact_sha256": {
+        "case": "c54d8be8b45d30aa2fb876dc5aacdd18114083145e1ce79963ec84c70ace8031",
+        "commands": "15aef725956490fbebecf12d108a75477e57ea479efe064c86cb894735606155",
+        "solidcraft": "d30bc9416df8009fb71d5db088d64f7500c931e553dd19eeaabc38e853dd5403",
+        "solidcraft_measurements": "6f5b08df2453220641bbe8f1b3861d5522a9b7df6140d529ba57e9c2570a3866",
+        "step": "a5433976b710117cc5b96e86adac6e5f7aa467f2c5c199eaca2481be6ae92f01",
+        "solidcraft_interference_commands": "fa061d60d2230560f857b9eb6643cffb65657699f60f5115ba539668bcadb321",
+        "solidcraft_interference": "3ef6a329b19b20cb17d94f4d1c67a59fd742b767276abacb684213f371550dc1",
+        "freecad": "f206b0d0eb66ad2ed9bd7044761edd5e192c94b4a132615b777afe32e09fc70e",
+        "freecad_validation": "b392d183f30a5b7e46dbf3bed83734ede872546a72bba39bd01bf2628d875aaf"
+      }
+    },
+    {
+      "id": "wide_open",
+      "passed": true,
+      "closed_bodies": 36,
+      "cross_cad_checked": true,
+      "native_interface_checks": 24,
+      "maximum_step_xor_mm3": 0.0,
+      "files": {
+        "case": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.case.json",
+        "commands": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.commands.json",
+        "solidcraft": "cad/generated/extraction-kit-station-4a39a34e7028/wide_open.sc",
+        "solidcraft_measurements": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.solidcraft.json",
+        "step": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.step",
+        "solidcraft_interference_commands": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.interference.commands.json",
+        "solidcraft_interference": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.interference.json",
+        "freecad": "cad/generated/extraction-kit-station-4a39a34e7028/wide_open.FCStd",
+        "freecad_validation": "exports/generated/extraction-kit-station-4a39a34e7028/wide_open.freecad.json"
+      },
+      "artifact_sha256": {
+        "case": "823e578e4aa962607a147a7ef28e586a229bf3c9464b4f0c974dcfe0bb25bb3f",
+        "commands": "205a6ecbae520edbf5f52d5e2e5c0a76d4e2cddd9a15c8bae7f5a4cb686c0a4d",
+        "solidcraft": "b71fb6dea0d6099d41bb7aafe934cd5656f7936d8c73767625adb2852385abeb",
+        "solidcraft_measurements": "e273ce704832a15ff0c61cabc3851e378f510b83229b1f4cd79065ad8f5ac04e",
+        "step": "b455d025f9f324a8cfa546e696eb7c593a259b7c5a64bea6ab048d791b0ad949",
+        "solidcraft_interference_commands": "fa061d60d2230560f857b9eb6643cffb65657699f60f5115ba539668bcadb321",
+        "solidcraft_interference": "08047f74b4ebb17aa0df1ed1d4949324073dd84836cff8d23d6827a228e72c8e",
+        "freecad": "7e00e7a49b178e1ec8681e9b5552552afdc6ca76a32321dfb69aca8bc864b4fb",
+        "freecad_validation": "0d32afd8c3097b298850ad814d835ce3a5584733fe1c2af15d8be712f62d0c4e"
+      }
+    }
+  ],
+  "images": {
+    "open": {
+      "path": "docs/media/extraction-kit-station-open.png",
+      "sha256": "a4631684449c3c1dc232a7b561f5b73270226da3bdf504eca94eba5ae1b8ed5e",
+      "bytes": 165340
+    },
+    "stored": {
+      "path": "docs/media/extraction-kit-station-stored.png",
+      "sha256": "7dd93e368dac0550b9925197ad8bd6b0884fc00201e04b4528dbe7dbc63df027",
+      "bytes": 98083
+    }
+  },
+  "visual_review": {
+    "passed": true,
+    "views": [
+      "open",
+      "stored"
+    ],
+    "scope": "Native SolidCraft model snapshots visually reviewed for complete framing, separate RNA/DNA modules, closed article envelopes and lids behind open containers. No additional fit or manufacturing qualification.",
+    "build_report_render_review_flags": "Original generation-time false flags retained unchanged in the immutable native report."
+  },
+  "gallery_diagram": {
+    "path": "docs/models/images/extraction-kit-station.svg",
+    "sha256": "2c55af5b7648c3a4de8dff8686191a075625ee67137a9ff47a7e160951f5c01d",
+    "bytes": 6623
+  },
+  "documentation_files_sha256": {
+    "docs/extraction-kit-station.md": "e81efd7987aebbdf862dc95a823ee9d52e7031ca0fefc201e360e9bdd1ee7027",
+    "README.md": "6dfccc167c0b2d9b9d9eb3158123bb35ec87a094e0d3bf37fb4ba548b154e316",
+    "ARCHITECTURE.md": "30b69c0bfd7815a7e7269ff87991467dd406953a53231f6f627eb16291782770",
+    "AGENTS.md": "9d64c7f2f59bdc98d14f1fcaa91862d3e322af85c49282ff074bcfa7037d14fb"
+  },
+  "limitations": [
+    "Reference floor illustrates support only; no shelf product, room layout or installed station is selected.",
+    "Nine distinct catalog material IDs per kit are represented by closed generic envelopes; one envelope is not an asserted package count or stock quantity.",
+    "Kit names, catalog numbers and material identities are resolved from the pinned extraction catalog, not copied here.",
+    "Article dimensions, closures and all manufacturing clearances are illustrative assumptions; measured_dimensions is null.",
+    "Containers and inserts are passive staging concepts, not extraction machinery or a qualified storage condition.",
+    "Open and stored are separate static arrangements; no hinge, motion sequence, robot access or collision-free removal path is implemented.",
+    "Additional SOP-selected materials, sample storage, reagent preparation, volumes, consumption, reservations and stock control are outside this model.",
+    "FDM printability, material compatibility, cleanability, RNase-free handling, retention and physical fit remain unqualified.",
+    "Three static source-defined cases; no robot movement or access trajectory is generated or qualified",
+    "Manufacturer vessels and contents are unmeasured illustrative envelopes, not purchase-part CAD",
+    "Closed solids and static clearances do not qualify FDM/PETG, chemical resistance, SDS suitability or real fit",
+    "No extraction, dosing, contamination control, reagent storage conditions or hardware execution tested",
+    "Saved FreeCAD presentation metadata checked; no FreeCAD GUI rendering verified",
+    "Backend-only reports do not establish a cross-CAD comparison",
+    "Synthetic generic article envelopes, not measured or manufacturer-supplied bottle/pack geometry.",
+    "Passive shelf concept: no temperature monitoring, stock ledger, expiry release, sample storage or extraction execution.",
+    "Closed original-component storage does not qualify opened or prepared reagents."
+  ],
+  "targeted_tests": {
+    "record": {
+      "path": "exports/k01-targeted-tests.json",
+      "sha256": "99f6303fca9204466345eb58cebaad326ef93d4c32303ad33130960ba451007f",
+      "bytes": 6982
+    },
+    "tests_run": 59,
+    "passed": true,
+    "skips": 0,
+    "scope": "Extraction preparation, K01 model/schema/build/gallery and existing gallery contract tests; not the whole repository suite."
+  }
+}

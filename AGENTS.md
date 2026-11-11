@@ -465,3 +465,13 @@ Durchfluss von späterem Säulenabfall unterscheiden. RNA-/DNA-Eluate besitzen
 eigene Identitäten und bleiben Produkte. Vor Ausführung den gemeinsamen
 Lebenszyklus und Ledger für Produktaufbewahrung, Materialumwandlung und
 SOP-gebundene Verbräuche erweitern; keinen parallelen Bestand einführen.
+
+
+Die passive Kitstation K01 steht separat in
+`model/extraction-kit-station.shared.json`; vor Änderungen
+[docs/extraction-kit-station.md](docs/extraction-kit-station.md) lesen.
+Kitrollen aus dem Extraktionskatalog referenzieren, keine zweiten Material-
+oder Mengenlisten pflegen. Physische Hüllen und Passungen sind synthetische
+Entwurfsannahmen. Geschlossene Kitvorräte, Arbeitsansätze und Probenlagerung
+nicht gleichsetzen. Beide CADs unabhängig aus denselben Operationen erzeugen;
+ein einzelner Backend-Aufbau belegt keinen CAD-übergreifenden Vergleich.

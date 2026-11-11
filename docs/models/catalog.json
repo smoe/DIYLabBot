@@ -698,6 +698,21 @@
       },
       "caption": "1200E-Referenzhülle mit Arbeitskammer, Frontschieber und beweglichen Unterbautüren. Abluftstutzen unverbunden; Erfassung und Schutzwirkung ungeprüft.",
       "documentation": "docs/lab-equipment.md"
+    },
+    {
+      "id": "extraction-kit-station",
+      "title": "K01 · RNA-/DNA-Kitstation",
+      "group": "bibliotheken",
+      "sources": [
+        "model/extraction-kit-station.shared.json"
+      ],
+      "image": "images/extraction-kit-station.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "kit_station"
+      },
+      "caption": "Schematischer Platzplan der zwei Kitmodule im gemeinsamen Behälter-/Einsatzentwurf. Verschlossene symbolische Originalkomponenten; ungemessene Artikelhüllen. Native Ansichten und Lagergrenzen unter Details.",
+      "documentation": "docs/extraction-kit-station.md"
     }
   ],
   "groups": [
