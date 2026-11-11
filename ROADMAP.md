@@ -1,7 +1,7 @@
 # Roadmap: Laborabläufe und CUT&RUN
 
-**Stand 11. November 2026. Alle folgenden CUT&RUN-Etappen sind geplant;
-ihre Abnahmekriterien sind noch nicht geprüft.** Diese Datei führt Reihenfolge,
+**Stand 11. November 2026. E0 ist mit einem Referenzprofilentwurf begonnen;
+alle CUT&RUN-Abnahmen stehen noch aus. E1–E7 sind geplant.** Diese Datei führt Reihenfolge,
 Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
 [CUT&RUN-Ablaufvertrag](ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
 Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
@@ -47,7 +47,7 @@ Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fort
 
 | Etappe | Zu lieferndes Ergebnis | Abnahme vor der nächsten Freigabe | Status |
 |---|---|---|---|
-| **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Offen, noch nicht geprüft |
+| **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Begonnen: [publikationsbezogener Melanom-/H3K4me3-Entwurf](docs/cutrun-reference-profile.md); konkrete SOP-Bindung offen |
 | **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | Offen, noch nicht geprüft |
 | **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | Offen, noch nicht geprüft |
 | **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | Offen, noch nicht geprüft |
@@ -93,17 +93,24 @@ E3 beweist weder diesen realen Nachweis noch einen Hardware-Watchdog.
 
 ## Entscheidungen vor E0-Freigabe
 
-Die Architektur- und Reihenfolgeentscheidung ist dokumentiert. Für die erste
-konkrete Ausführung sind noch Eigentümer-/Laborentscheidungen erforderlich:
+Der Eigentümer hat Melanomzelllinien, H3K4me3 als technischen Einstieg und
+[PMID 41594604](https://pubmed.ncbi.nlm.nih.gov/41594604/) als methodischen und
+wissenschaftlichen Bezug festgelegt. Ausstattung ist laut Eigentümer im
+gezeichneten Labor/direkten Umfeld vorhanden; Verantwortung liegt bei ihm,
+Sicherheitsbeauftragtem und Chefin. Die aktuelle Arbeit bleibt in silico.
+Der [Referenzentwurf](docs/cutrun-reference-profile.md) führt SK-Mel-29 als
+ersten Modellkandidaten und die späteren TP73-Cofaktorziele mit Evidenzbezug.
 
-- Referenzquelle **und Zweig**, tatsächlich vorhandenes Kit/Enzym, Probenart,
-  Fixierungszustand und Targetklasse; protocols.io v3 ist ein versionierter
-  Vergleichskandidat, keine automatisch ausgewählte Labor-SOP.
-- Reinigung und Fragmentanforderungen einschließlich der Zulässigkeit
-  organischer Schritte; zunächst bleiben diese manuell. Keine stillschweigende
-  Ersetzung einer Reinigungsmethode durch eine andere.
-- Zuständige Person, realer Arbeitsplatz und Geräte für Referenz/QC; gewünschte
-  Quellenarchivierung mit geklärter Nutzungs-/Weitergabeberechtigung.
+Für die endgültige Bindung bleiben offen:
+
+- Konkrete Laborlinie und der publizierte Labor-/SOP-Stand einschließlich
+  Quellenbeleg, Artikeln, Zellzustand und Mengen. Der aktuelle CST-Stand 09/2026
+  ist nicht als damaliger Originalstand belegt.
+- Gewählter Verfahrenszweig, Reinigung, QC, Pausen und zulässige Abweichungen;
+  keine stillschweigende Ersetzung durch eine andere Variante.
+- Vor realer Ausführung konkrete Geräte-/Ortsbindungen und lokale Freigaben.
+  Die bestätigte Verfügbarkeit ersetzt diese Nachweise nicht, blockiert aber
+  keine gekennzeichneten synthetischen Modellfälle.
 - Abnahmekriterien und zulässige Abweichungen je Profil. Roh-DNA-QC,
   Library-QC und externe Auswertung bleiben nach [Architektur](ARCHITECTURE.md#cutrun)
   getrennt; ein optionaler späterer Library-Auftrag benötigt eine eigene Freigabe.
