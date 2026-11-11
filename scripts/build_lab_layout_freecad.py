@@ -186,7 +186,7 @@ def check_equipment_access(s,entries,access_models):
                         if not intersects(bound,other_bound):continue
                         volume=shape.common(obstacle).Volume
                         if volume>1e-3:hits.append({'body':obj.SourceBody,'obstacle':other.SourceBody,'volume_mm3':volume})
-                probes=access_checks(doc,spec,p,sample['joint_values']) if sample['id'] in ('closed','access','all_open') else []
+                probes=access_checks(doc,spec,p,sample['joint_values']) if sample['id'] in ('closed','access','all_open','base_access') else []
                 if item['asset']=='fridge_4c' and sample['id'] in ('closed','access','all_open'):
                     corridor=next(c for c in s['corridors'] if c['id']=='People_Right')
                     corridor_bounds=[model.robot.evaluate(v,model.parameters(s)) for v in corridor['bounds']]

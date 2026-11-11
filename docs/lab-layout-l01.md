@@ -71,7 +71,8 @@ unconnected geometric interfaces.
 
 Three adjustable stools are parked below the open window worktops. All upper
 storage is open shelving. The scene's lower cupboard doors start closed; their
-native joints and two internal shelves are described in the
+native joints and shared two-door compartments, with two shelves per compartment,
+are described in the
 [furniture documentation](lab-room-l01.md). Opening a cupboard can occupy an
 aisle or vehicle space and requires that work area to be clear.
 

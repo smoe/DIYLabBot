@@ -98,12 +98,15 @@ values = equipment.pose(spec, p, "access")
 frames = equipment.interfaces(spec, p, values)
 ```
 
-`closed`, `access` und `all_open` sind vollständig definierte Gelenkstellungen.
+`closed` und `access` sowie je nach Gerät `all_open` oder `base_access`
+sind vollständig definierte Gelenkstellungen.
 `access` öffnet die Außentür und eine mittlere Innentür beziehungsweise
 Schublade. Beim Kühlschrank ist damit das gesamte Regal offen; bei der
 Waage sind beide Seitenpaneele verschoben und das Oberteil aufgeklappt.
 Beim Wasserbad ist der Deckel aufgestellt. Beim Abzug öffnet `access` den
-Frontschieber; erst `all_open` öffnet zusätzlich die Türen des Unterbaus.
+Frontschieber; `base_access` öffnet zusätzlich das erste Türpaar des Unterbaus.
+Die vorstehenden Bügelgriffe verhindern ein flaches Zusammenklappen aller
+Unterbautüren; `all_open` ist deshalb beim Abzug keine angebotene Prüfstellung.
 Individuelle Stellungen werden als vollständige Abbildung von Gelenk-ID
 auf Grad beziehungsweise Millimeter an `validate_pose` übergeben.
 Innentüren und Schubladen dürfen in diesem Vertrag erst bewegt werden,

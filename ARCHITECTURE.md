@@ -100,7 +100,7 @@ Sie enthält neun Körper. `furniture_model` instanziiert Möbel aus dem Katalog
 Die Einrichtung erhält die bisherigen Gebäude- und Möbelbezüge. Hohle
 Schrankkorpusse ersetzen die früheren Stauraumhüllen; Türen und Hockersitze
 ergänzen bewegliche Gruppen. Die sechs bisherigen festen Gruppen bleiben
-erhalten. Der Standardraum umfasst jetzt 171 Körper und zusätzliche Bezüge.
+erhalten. Der Standardraum umfasst jetzt 197 Körper und zusätzliche Bezüge.
 
 Für die Kaltlagerung reserviert die Möblierung 640 mm am hinteren Ende der
 linken Seitenbank; ihr Hängeschrank wird entsprechend gekürzt. Die rechte
@@ -117,7 +117,12 @@ Vorne links reserviert die Möblierung Platz für einen Nassplatz und den direkt
 anschließenden Abzug. Die restliche linke Bank und die oberen offenen Regale
 beginnen bei Y=2.800 mm. Der Nassplatz und die drei Hocker gehören zum
 Möbelkatalog; Wasserbad und Abzug zur referenzierten Gerätebibliothek.
-Unterschränke besitzen zwei Einlegeböden und bewegliche Fronten. Die bisherigen
+Unterschränke besitzen zwei Einlegeböden je Fach. Je zwei gegenläufig
+angeschlagene Türen schließen ein gemeinsames Fach ohne Mittelsteg ein;
+bei ungerader Türzahl endet die Bank mit einem Einzeltürfach.
+`door_grouping: "single"` an einer Instanz trennt alle Türen in eigene Fächer.
+Trennwände, Böden, Scharnierlagen und Zugangsproben entstehen gemeinsam
+aus demselben Rezept, auch im Abzugunterbau. Die bisherigen
 oberen Schrankinstanzen behalten ihre IDs, werden aber als offene Regale
 erzeugt. Geschlossener Zustand, Öffnungsraum und tatsächliche Zugangsproben
 werden getrennt ausgewiesen. Wasser, Abwasser und Abluft sind nicht angeschlossen.

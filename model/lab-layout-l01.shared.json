@@ -9,7 +9,7 @@
   "assets": {
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "report": "cad/lab-room-l01/shared-build-report.json",
       "case": "default"
     },
@@ -39,31 +39,31 @@
     },
     "analytical_balance": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "analytical_balance_default"
     },
     "fridge_4c": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "fridge_4c_default"
     },
     "freezer_minus20": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "freezer_minus20_default"
     },
     "water_bath_13l": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "water_bath_13l_default"
     },
     "fume_hood_1200": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "fume_hood_1200_default"
     }

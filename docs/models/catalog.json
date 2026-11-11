@@ -44,13 +44,13 @@
         "scope": "type",
         "type": "storage_bench",
         "instance": "IslandLeft",
-        "pose": "open",
+        "pose": "inspection",
         "pixels": [
           850,
           595
         ]
       },
-      "caption": "Native Stauraumbank mit geöffneten Türen und zwei Einlegeböden; Typbeispiel aus IslandLeft. Öffnungsraum ist kein freigegebener Verkehrsweg.",
+      "caption": "Native Stauraumbank mit Bügelgriff an jeder Tür. Ein Türpaar ist geöffnet, die übrigen Türen sind geschlossen. Zwei Einlegeböden je Fach; ein Einzeltürfach ergänzt die Länge. Typbeispiel aus IslandLeft. Öffnungsraum ist kein freigegebener Verkehrsweg.",
       "documentation": "ARCHITECTURE.md"
     },
     {
@@ -230,7 +230,7 @@
     },
     {
       "id": "synthetic-workspace",
-      "title": "Minimalumgebung · Arm, CF01 und Rack",
+      "title": "Automatisierte Zentrifuge",
       "group": "ausstattung",
       "sources": [
         "model/synthetic-cf01-workspace.shared.json",

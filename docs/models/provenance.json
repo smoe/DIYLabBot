@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "077b3e065aa7fe25b440b4c88446d8e80da94ae301ecee27cd492e364123ad2a",
+  "catalog_sha256": "9ea6d431c04941864b478cf3956ef4892a9de6cacd1a65cfba0d57ca48581348",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "56bbb1e747637d91606a983e47798411dcd9fb35b0047b9d830fcafb65ca623c",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -13,9 +13,9 @@
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "visible_bodies": [
         "ConcreteSupport",
@@ -28,8 +28,8 @@
         "W02Glazing",
         "W03Glazing"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 126923,
         "height": 700,
@@ -48,6 +48,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -65,6 +69,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -90,6 +102,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -109,6 +127,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -152,6 +176,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -215,7 +241,7 @@
         "snapshot",
         "tmp/model-gallery/l01-geometry.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/l01-geometry.png",
         "--width",
@@ -231,8 +257,8 @@
       "bytes": 126923,
       "dependency_files_sha256": {
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
     },
@@ -253,16 +279,22 @@
       "id": "furniture-storage-bench",
       "image": "images/furniture-storage-bench.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "IslandLeft",
       "furniture_type": "storage_bench",
       "visible_bodies": [
+        "IslandLeft_Bay2_Shelf1",
+        "IslandLeft_Bay2_Shelf2",
+        "IslandLeft_Bay3_Shelf1",
+        "IslandLeft_Bay3_Shelf2",
+        "IslandLeft_Bay4_Shelf1",
+        "IslandLeft_Bay4_Shelf2",
         "IslandLeft_Door1",
         "IslandLeft_Door2",
         "IslandLeft_Door3",
@@ -283,22 +315,22 @@
         "IslandLeft_Shelf2",
         "IslandLeft_Worktop"
       ],
-      "furniture_pose": "open",
+      "furniture_pose": "inspection",
       "camera": {
         "target": [
-          2683.642857142857,
-          3395.75,
+          2691.8669023549455,
+          3400.0,
           450.0
         ],
         "yaw": 1.15,
         "pitch": 0.55,
-        "distance": 5839.4128397154955,
+        "distance": 5811.824055147869,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
-        "bytes": 91713,
+        "bytes": 69664,
         "height": 595,
         "path": "docs/models/images/furniture-storage-bench.png",
         "renderer": "cpu",
@@ -324,6 +356,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -341,6 +377,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -366,6 +410,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -409,6 +459,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -470,7 +522,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door1",
-            "value": 90,
+            "value": 75,
             "quiet": true
           }
         },
@@ -478,7 +530,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door2",
-            "value": 90,
+            "value": 75,
             "quiet": true
           }
         },
@@ -486,7 +538,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door3",
-            "value": 90,
+            "value": 0,
             "quiet": true
           }
         },
@@ -494,7 +546,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door4",
-            "value": 90,
+            "value": 0,
             "quiet": true
           }
         },
@@ -502,7 +554,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door5",
-            "value": 90,
+            "value": 0,
             "quiet": true
           }
         },
@@ -510,7 +562,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door6",
-            "value": 90,
+            "value": 0,
             "quiet": true
           }
         },
@@ -518,7 +570,7 @@
           "command": "joint.drive",
           "params": {
             "joint": "IslandLeft_Door7",
-            "value": 90,
+            "value": 0,
             "quiet": true
           }
         },
@@ -532,7 +584,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-storage-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-storage-bench.png",
         "--width",
@@ -540,15 +592,15 @@
         "--height",
         "595",
         "--camera",
-        "{\"target\": [2683.642857142857, 3395.75, 450.0], \"yaw\": 1.15, \"pitch\": 0.55, \"distance\": 5839.4128397154955, \"fov\": 0.6}",
+        "{\"target\": [2691.8669023549455, 3400.0, 450.0], \"yaw\": 1.15, \"pitch\": 0.55, \"distance\": 5811.824055147869, \"fov\": 0.6}",
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "39f716caaf21fcf68a8ae550c910f83c7f92576ae3d862f25453d157990076a2",
-      "bytes": 91713,
+      "image_sha256": "3b3b3a9ff4e9e9d7bd646f6c5d1cf6f4f03dd316e0af89a70beab27078826b6a",
+      "bytes": 69664,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -557,12 +609,12 @@
       "id": "furniture-open-shaped-bench",
       "image": "images/furniture-open-shaped-bench.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "WindowBenchLeft",
       "furniture_type": "open_shaped_bench",
@@ -571,8 +623,8 @@
         "WindowBenchLeft_Leg2",
         "WindowBenchLeft_Worktop"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 36771,
         "height": 700,
@@ -600,6 +652,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -617,6 +673,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -642,6 +706,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -661,6 +731,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -701,6 +777,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -764,7 +842,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-open-shaped-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-open-shaped-bench.png",
         "--width",
@@ -779,8 +857,8 @@
       "image_sha256": "aa140160929b600e914f6d92125b16f044cdb3aa813f55e209b000e5cf95f27a",
       "bytes": 36771,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -789,20 +867,20 @@
       "id": "furniture-shelf-board",
       "image": "images/furniture-shelf-board.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "IslandShelf_Board",
       "furniture_type": "shelf_board",
       "visible_bodies": [
         "IslandShelf_Board"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 36435,
         "height": 700,
@@ -830,6 +908,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -847,6 +929,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -872,6 +962,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -891,6 +987,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -933,6 +1035,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -996,7 +1100,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-shelf-board.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-shelf-board.png",
         "--width",
@@ -1011,8 +1115,8 @@
       "image_sha256": "3b0ad432f77b178a37da99cf787d6f168441966ad247ef51393a538d133d56d6",
       "bytes": 36435,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -1021,20 +1125,20 @@
       "id": "furniture-upright",
       "image": "images/furniture-upright.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "IslandShelf_Post1",
       "furniture_type": "upright",
       "visible_bodies": [
         "IslandShelf_Post1"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 18906,
         "height": 700,
@@ -1062,6 +1166,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -1079,6 +1187,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -1104,6 +1220,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -1123,6 +1245,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -1165,6 +1293,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -1228,7 +1358,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-upright.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-upright.png",
         "--width",
@@ -1243,8 +1373,8 @@
       "image_sha256": "e537df8fddc053eeea9a747bf7fe9e7db6929d8518289f24de64e9774c39e180",
       "bytes": 18906,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -1253,12 +1383,12 @@
       "id": "furniture-cupboard",
       "image": "images/furniture-cupboard.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "IslandCupboard1",
       "furniture_type": "cupboard",
@@ -1266,8 +1396,8 @@
         "IslandCupboard1",
         "IslandCupboard1_Shelf"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 50688,
         "height": 595,
@@ -1295,6 +1425,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -1312,6 +1446,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -1337,6 +1479,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -1356,6 +1504,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -1397,6 +1551,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -1460,7 +1616,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-cupboard.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-cupboard.png",
         "--width",
@@ -1475,8 +1631,8 @@
       "image_sha256": "f70da4802ebb062db1a9e3b4c3695911521c90d968f8c442df315fb013435e3c",
       "bytes": 50688,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -1485,20 +1641,20 @@
       "id": "furniture-side-gap-cover",
       "image": "images/furniture-side-gap-cover.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "HeatingCoverLeft",
       "furniture_type": "side_gap_cover",
       "visible_bodies": [
         "HeatingCoverLeft"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 34796,
         "height": 700,
@@ -1526,6 +1682,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -1543,6 +1703,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -1568,6 +1736,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -1587,6 +1761,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -1629,6 +1809,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -1692,7 +1874,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-side-gap-cover.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-side-gap-cover.png",
         "--width",
@@ -1707,8 +1889,8 @@
       "image_sha256": "c0a69c33a0411796c19f4d46ae3959bd8c65a73ac5f60517e7b95f5cbe38b044",
       "bytes": 34796,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -1717,20 +1899,20 @@
       "id": "furniture-support-gap-cover",
       "image": "images/furniture-support-gap-cover.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "SupportGapCover",
       "furniture_type": "support_gap_cover",
       "visible_bodies": [
         "SupportGapCover"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 54851,
         "height": 700,
@@ -1758,6 +1940,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -1775,6 +1961,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -1800,6 +1994,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -1819,6 +2019,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -1861,6 +2067,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -1924,7 +2132,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-support-gap-cover.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-support-gap-cover.png",
         "--width",
@@ -1939,8 +2147,8 @@
       "image_sha256": "ab9a1725e07ef8cfae2b0cbae6ffddc40077baa975413ee5fb5c666cbf950f90",
       "bytes": 54851,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -2016,17 +2224,17 @@
       "image": "images/l01-furnished.png",
       "source_files_sha256": {
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252"
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
-        "bytes": 173661,
+        "bytes": 174667,
         "height": 595,
         "path": "docs/models/images/l01-furnished.png",
         "renderer": "cpu",
@@ -2038,7 +2246,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/l01-furnished.png",
         "--width",
@@ -2050,24 +2258,24 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "27f6c10c1751f6c6f6cb6e46ccc17b4307d01ed257f7ac81728b144aab6da535",
-      "bytes": 173661,
+      "image_sha256": "03bda7bdd7c7022ae54322120bf656d6826d1ebb8ed77122dd14f8698692f937",
+      "bytes": 174667,
       "dependency_files_sha256": {
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
       "id": "l01-overview",
       "image": "images/l01-overview.png",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "71cdcfc07c74006d1282d37a43b03ea1134e49577b8cd335fecf84ad917e248b",
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-layout-l01/shared-build-report.json",
-      "build_report_sha256": "99c2f03c382732931cde040c8ecf9d34ea09d5f9e71d594ff41b0bfd53e10a1f",
+      "build_report_sha256": "91f084cf53d3f3639ea72db5fec6fb07a68a03dd93f7bf412608eda577c25f33",
       "build_passed": true,
       "representation": "Native L01 assembly overview with source-referenced equipment; static and sampled device-access checks, no operational robot program",
       "camera": {
@@ -2081,10 +2289,10 @@
         "distance": 18000,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-layout-l01-71cdcfc07c74/LabLayout_L01.sc",
-      "native_model_sha256": "e2a4b76d53ab8c767b2e88e984d2cd5eccfe834120d8cde0b78e3d089c703f30",
+      "native_model": "cad/generated/lab-layout-l01-f57c842095bd/LabLayout_L01.sc",
+      "native_model_sha256": "c9dfea933ae3c90992694b4ad2c4e58f9599e427fd84ef91a088177eafe8e365",
       "renderer_result": {
-        "bytes": 251039,
+        "bytes": 251004,
         "height": 595,
         "path": "docs/models/images/l01-overview.png",
         "renderer": "cpu",
@@ -2096,7 +2304,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-layout-l01-71cdcfc07c74/LabLayout_L01.sc",
+        "cad/generated/lab-layout-l01-f57c842095bd/LabLayout_L01.sc",
         "--out",
         "docs/models/images/l01-overview.png",
         "--width",
@@ -2108,13 +2316,13 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "0c99eeb93523546a2f51e105598c7d2a0f216e9af0f0a1ba5a5196c1005028b0",
-      "bytes": 251039,
+      "image_sha256": "1d298cc742353a73deaac2e570f884b9134717c0d4d507ad738c2c3876901fae",
+      "bytes": 251004,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "71cdcfc07c74006d1282d37a43b03ea1134e49577b8cd335fecf84ad917e248b",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
         "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
@@ -2142,24 +2350,24 @@
         "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
         "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       }
     },
     {
       "id": "l01-equipment",
       "image": "images/l01-equipment.svg",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "71cdcfc07c74006d1282d37a43b03ea1134e49577b8cd335fecf84ad917e248b"
+        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9"
       },
       "representation": "Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render",
       "instances": 14,
       "image_sha256": "b63e142d5e9f8f1ec7d7961651a65955fd62475b01f41821fc4e85a3a9eab94d",
       "bytes": 12193,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "71cdcfc07c74006d1282d37a43b03ea1134e49577b8cd335fecf84ad917e248b",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
         "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
@@ -2187,7 +2395,7 @@
         "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
         "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       }
     },
     {
@@ -3108,34 +3316,34 @@
       "id": "analytical-balance",
       "image": "images/analytical-balance.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "analytical_balance_default",
       "backends": "both",
       "cross_cad_checked": true,
       "representation": "Native source-referenced library case; no operational placement or hardware qualification",
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/analytical_balance_default.sc",
-      "native_model_sha256": "22e97f54ea254e66df928f5c3f9e9443f0ffade2a307164c38ad91eca9d6171e",
-      "reused_render": "renders/lab-equipment-802e16a92cf1/analytical_balance_default.png",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/analytical_balance_default.sc",
+      "native_model_sha256": "173401b82e5ecfbd4343f79d0374e904acfa5a6181fa712f6ad2dfbbf6946b2b",
+      "reused_render": "renders/lab-equipment-e4797cf7c34c/analytical_balance_default.png",
       "reused_render_sha256": "57c01e5d79d2f0bef589fa1309ecdde5aa290a801ba49f02ed5abb4835d6fba5",
       "image_sha256": "57c01e5d79d2f0bef589fa1309ecdde5aa290a801ba49f02ed5abb4835d6fba5",
       "bytes": 121441,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
       "id": "lab-fridge",
       "image": "images/lab-fridge.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "fridge_4c_default",
       "backends": "both",
@@ -3152,8 +3360,8 @@
         "distance": 3941.216041749472,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/fridge_4c_default.sc",
-      "native_model_sha256": "cd94b708cc1403c1569a1bd93cfb94a1fe60799c80225a91bce58c24692ad168",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/fridge_4c_default.sc",
+      "native_model_sha256": "be54c7b6f87e346bb385409231c97b8ff49e7bd2a80ddf84809d5658ec244454",
       "renderer_result": {
         "bytes": 39064,
         "height": 700,
@@ -3167,7 +3375,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-equipment-802e16a92cf1/fridge_4c_default.sc",
+        "cad/generated/lab-equipment-e4797cf7c34c/fridge_4c_default.sc",
         "--out",
         "docs/models/images/lab-fridge.png",
         "--width",
@@ -3182,18 +3390,18 @@
       "image_sha256": "cc959413cc9ccbc04932d49fece876b6bed0d83963280b1d346fdfb9bd92c066",
       "bytes": 39064,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
       "id": "lab-freezer",
       "image": "images/lab-freezer.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "freezer_minus20_default",
       "backends": "both",
@@ -3210,8 +3418,8 @@
         "distance": 3969.83115853326,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/freezer_minus20_default.sc",
-      "native_model_sha256": "9b6447cd57437a21ba328647bcbdf7d364a9b5c1e08cec546245ede1da2b1bd4",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/freezer_minus20_default.sc",
+      "native_model_sha256": "5c2159ca8e7b5d8e7e2631066c6da547a6f15ec5e5801dda7ebe20f53368348a",
       "renderer_result": {
         "bytes": 44981,
         "height": 700,
@@ -3225,7 +3433,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-equipment-802e16a92cf1/freezer_minus20_default.sc",
+        "cad/generated/lab-equipment-e4797cf7c34c/freezer_minus20_default.sc",
         "--out",
         "docs/models/images/lab-freezer.png",
         "--width",
@@ -3240,18 +3448,18 @@
       "image_sha256": "48f6420796d4bdda67d8c3908923fae0599c65e76fafa8ece16f3ac510af541a",
       "bytes": 44981,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
       "id": "cellar-ult",
       "image": "images/cellar-ult.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "cellar_ult_f440n_default",
       "backends": "both",
@@ -3268,8 +3476,8 @@
         "distance": 4824.5055647435665,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/cellar_ult_f440n_default.sc",
-      "native_model_sha256": "7f39904cefaac6f3ad60279be70d4a577148eaf5f49ebf8476f19890fe8fecd1",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/cellar_ult_f440n_default.sc",
+      "native_model_sha256": "02eb8acf47ee8327284d37a15fe1219cdd9fc7d7575eca6cc26b0ec7efbd4b43",
       "renderer_result": {
         "bytes": 37376,
         "height": 700,
@@ -3283,7 +3491,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-equipment-802e16a92cf1/cellar_ult_f440n_default.sc",
+        "cad/generated/lab-equipment-e4797cf7c34c/cellar_ult_f440n_default.sc",
         "--out",
         "docs/models/images/cellar-ult.png",
         "--width",
@@ -3298,8 +3506,8 @@
       "image_sha256": "f2f42592ca035b65c6e34eaae0653c9752abee7b3f6a5d578629a7ce651f73e3",
       "bytes": 37376,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
@@ -3565,12 +3773,12 @@
       "id": "furniture-lab-stool",
       "image": "images/furniture-lab-stool.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "Stool1",
       "furniture_type": "lab_stool",
@@ -3590,8 +3798,8 @@
         "Stool1_Seat",
         "Stool1_SeatStem"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
         "bytes": 39782,
         "height": 595,
@@ -3619,6 +3827,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -3636,6 +3848,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -3661,6 +3881,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -3680,6 +3906,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -3723,6 +3955,8 @@
               "WetStation_Plinth",
               "WetStation_Shelf1",
               "WetStation_Shelf2",
+              "WetStation_Bay2_Shelf1",
+              "WetStation_Bay2_Shelf2",
               "WetStation_Door1",
               "WetStation_Handle1",
               "WetStation_Door2",
@@ -3772,7 +4006,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-lab-stool.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-lab-stool.png",
         "--width",
@@ -3787,8 +4021,8 @@
       "image_sha256": "ffc62a97f44dbbc7cc797e4c5bf7dd178ac699f9f1ae04b9272567d62ba9d67e",
       "bytes": 39782,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -3797,16 +4031,18 @@
       "id": "furniture-wet-bench",
       "image": "images/furniture-wet-bench.png",
       "source_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "584664fc10025fdc959ced0c07a4102228e9d45ad4e7df0d46c3fb2b15b9930d",
+      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
       "build_passed": true,
-      "build_source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
       "source_equivalence": null,
       "example_instance": "WetStation",
       "furniture_type": "wet_bench",
       "visible_bodies": [
+        "WetStation_Bay2_Shelf1",
+        "WetStation_Bay2_Shelf2",
         "WetStation_Door1",
         "WetStation_Door2",
         "WetStation_Door3",
@@ -3824,10 +4060,10 @@
         "WetStation_Tap",
         "WetStation_Worktop"
       ],
-      "native_model": "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
-      "native_model_sha256": "b1969795256b877c5777c6a3086ac3769a441685face44d19cfc5f03a7073cf2",
+      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
       "renderer_result": {
-        "bytes": 73395,
+        "bytes": 74004,
         "height": 595,
         "path": "docs/models/images/furniture-wet-bench.png",
         "renderer": "cpu",
@@ -3853,6 +4089,10 @@
               "LeftBench_Plinth",
               "LeftBench_Shelf1",
               "LeftBench_Shelf2",
+              "LeftBench_Bay2_Shelf1",
+              "LeftBench_Bay2_Shelf2",
+              "LeftBench_Bay3_Shelf1",
+              "LeftBench_Bay3_Shelf2",
               "LeftBench_Door1",
               "LeftBench_Handle1",
               "LeftBench_Door2",
@@ -3870,6 +4110,14 @@
               "RightBench_Plinth",
               "RightBench_Shelf1",
               "RightBench_Shelf2",
+              "RightBench_Bay2_Shelf1",
+              "RightBench_Bay2_Shelf2",
+              "RightBench_Bay3_Shelf1",
+              "RightBench_Bay3_Shelf2",
+              "RightBench_Bay4_Shelf1",
+              "RightBench_Bay4_Shelf2",
+              "RightBench_Bay5_Shelf1",
+              "RightBench_Bay5_Shelf2",
               "RightBench_Door1",
               "RightBench_Handle1",
               "RightBench_Door2",
@@ -3895,6 +4143,12 @@
               "IslandLeft_Plinth",
               "IslandLeft_Shelf1",
               "IslandLeft_Shelf2",
+              "IslandLeft_Bay2_Shelf1",
+              "IslandLeft_Bay2_Shelf2",
+              "IslandLeft_Bay3_Shelf1",
+              "IslandLeft_Bay3_Shelf2",
+              "IslandLeft_Bay4_Shelf1",
+              "IslandLeft_Bay4_Shelf2",
               "IslandLeft_Door1",
               "IslandLeft_Handle1",
               "IslandLeft_Door2",
@@ -3914,6 +4168,12 @@
               "IslandRight_Plinth",
               "IslandRight_Shelf1",
               "IslandRight_Shelf2",
+              "IslandRight_Bay2_Shelf1",
+              "IslandRight_Bay2_Shelf2",
+              "IslandRight_Bay3_Shelf1",
+              "IslandRight_Bay3_Shelf2",
+              "IslandRight_Bay4_Shelf1",
+              "IslandRight_Bay4_Shelf2",
               "IslandRight_Door1",
               "IslandRight_Handle1",
               "IslandRight_Door2",
@@ -4004,7 +4264,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-wet-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-ee8d1b4e1dec/default.sc",
+        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
         "--out",
         "docs/models/images/furniture-wet-bench.png",
         "--width",
@@ -4016,11 +4276,11 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "f906a58821c9405e0c7b3308fc0b18b3fdf03480b1e4b7e78142628232e71d3f",
-      "bytes": 73395,
+      "image_sha256": "40ed1854953a0a529a2605d8a78611106b737f564e97f6a9537560ef82395d04",
+      "bytes": 74004,
       "dependency_files_sha256": {
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836",
-        "model/lab-room-l01.shared.json": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
       }
@@ -4029,10 +4289,10 @@
       "id": "lab-water-bath",
       "image": "images/lab-water-bath.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "water_bath_13l_default",
       "backends": "both",
@@ -4049,8 +4309,8 @@
         "distance": 1487.523505408896,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/water_bath_13l_default.sc",
-      "native_model_sha256": "e36d060d30571ac3ed6f7010202ddb8d6268d8b82032c733b09805c19cf9674e",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/water_bath_13l_default.sc",
+      "native_model_sha256": "6a087a957eb390c7235ff05179dbdff0a63e288ee02dcad0e7c012b2c443f932",
       "renderer_result": {
         "bytes": 57808,
         "height": 595,
@@ -4064,7 +4324,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-equipment-802e16a92cf1/water_bath_13l_default.sc",
+        "cad/generated/lab-equipment-e4797cf7c34c/water_bath_13l_default.sc",
         "--out",
         "docs/models/images/lab-water-bath.png",
         "--width",
@@ -4079,18 +4339,18 @@
       "image_sha256": "d866e6771a23b81f941e839615d911d749359049eef6f005da2fa87c90bd99b3",
       "bytes": 57808,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
       "id": "lab-fume-hood",
       "image": "images/lab-fume-hood.png",
       "source_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-equipment/shared-build-report.json",
-      "build_report_sha256": "28352464ade4fb6dfdac54f9269bb338b76e1e9d1a55ec552ed0c978021a46f8",
+      "build_report_sha256": "518284d975f940b5f406117e3a1d296572b7d6b3cff73cb5fb67300da7a1bb5a",
       "build_passed": true,
       "case": "fume_hood_1200_default",
       "backends": "both",
@@ -4107,10 +4367,10 @@
         "distance": 5292.764214263247,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-equipment-802e16a92cf1/fume_hood_1200_default.sc",
-      "native_model_sha256": "81661244bb3fe6777957762389e18d2db51e0394e8efca9fd6669090cde8a37c",
+      "native_model": "cad/generated/lab-equipment-e4797cf7c34c/fume_hood_1200_default.sc",
+      "native_model_sha256": "9454b77b0742ef2c49e7bb7715534be7b4ac26e50f859c2d299344b99b4c1331",
       "renderer_result": {
-        "bytes": 26233,
+        "bytes": 26360,
         "height": 595,
         "path": "docs/models/images/lab-fume-hood.png",
         "renderer": "cpu",
@@ -4122,7 +4382,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-equipment-802e16a92cf1/fume_hood_1200_default.sc",
+        "cad/generated/lab-equipment-e4797cf7c34c/fume_hood_1200_default.sc",
         "--out",
         "docs/models/images/lab-fume-hood.png",
         "--width",
@@ -4134,11 +4394,11 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "6e8334dcb4ff2d5c0e3d2ad658b850eda951a263b3fc8a98659fea921d45641c",
-      "bytes": 26233,
+      "image_sha256": "b8bddb4d07698ab8b1db50ecbf040cb19634101498b85b3d6b2e4706297da804",
+      "bytes": 26360,
       "dependency_files_sha256": {
-        "model/lab-equipment.shared.json": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
-        "model/furniture/laboratory.catalog.json": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
     },
     {
@@ -4164,18 +4424,9 @@
   ],
   "visual_review": {
     "passed": true,
-    "previous_entries_review": {
-      "passed": true,
-      "reviewed_on": "2026-11-11",
-      "notes": "Reviewed updated L01 room/equipment views, open cabinet fronts and shelving, stools, wet bench, water bath and fume hood. Unchanged images, including the committed glassware baseline, retain their previous review. These are geometry views, not hardware qualification."
-    },
-    "new_entry": "extraction-kit-station",
-    "native_station_views": "documented separately in docs/media; no other gallery image regenerated",
-    "new_entry_review": {
-      "id": "extraction-kit-station",
-      "reviewed": true,
-      "scope": "Inspected the rendered SVG labels and layout. Previous 41 image records and images retained unchanged."
-    }
+    "reviewed_on": "2026-11-11",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification.",
+    "k01_reviewed": true
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

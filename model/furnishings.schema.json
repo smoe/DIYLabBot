@@ -154,6 +154,10 @@
               "closed",
               "open"
             ]
+          },
+          "door_grouping": {
+            "enum": ["paired", "single"],
+            "description": "Optional override of the lower-cupboard type's compartment grouping."
           }
         }
       }

@@ -43,9 +43,26 @@ are documented in [ARCHITECTURE.md](../ARCHITECTURE.md).
 The front of the left wall now holds a wet bench beside Door A, followed toward
 the windows by the separate fume hood. The remaining left bench and upper
 shelving start at Y=2,800 mm. Three mobile laboratory stools are parked below
-the open window benches. Lower cupboards contain real cavities, two internal
-shelves and separately hinged fronts. Every upper module is open, including
+the open window benches. Lower cupboards contain separate compartments, each
+with two internal shelves. Two doors with opposite outer hinges enclose one
+shared compartment without a central stile; an odd final door encloses its own
+compartment. Every upper module is open, including
 both sides of the central shelving; historical cupboard IDs remain stable.
+
+The catalog sets `door_grouping: "paired"` for storage and wet benches. An
+instance can override this with `door_grouping: "single"` to give every door a
+separate compartment. Leaf count is derived from bench length and the maximum
+nominal leaf width; pairs and the optional final single therefore fill the
+whole run. Each pair has two mounted bar handles near its centre seam and needs both doors
+open for full compartment access. Native access checks probe both openings,
+including states with only one door of each pair open. The fume-hood base uses
+the same recipe. Regenerate both CAD models after changing grouping or leaf count.
+The handles stand proud of the fronts, so neighbouring open compartments do not
+fold flat against each other. The gallery's `inspection` pose opens only the
+first compartment of each bench to 75°; the remaining fronts stay closed.
+The `open` pose opens that same compartment to 90° for access checks and raises
+the stool seats. Individual door limits remain 0–90°; simultaneously folding
+all fronts together is not a demonstrated pose.
 
 The build entry remains `python scripts/build_lab_room.py`. Run
 `python scripts/validate_assembly_schemas.py` with the optional `jsonschema`
@@ -83,7 +100,7 @@ The two window worktops have open lower space and simple legs. Open shallow
 storage runs along the sidewalls, and two open modules stand above the island's
 centre line. Each upper module includes an internal shelf and has no front panel.
 
-The default model contains 171 final bodies, including the wet bench and three
+The default model contains 197 final bodies, including the wet bench and three
 stools, grouped into room shell, perimeter benches, island, island shelf, upper
 storage, building services and their movable fronts/seats. Three grey heating-cover envelopes
 fill the rear gaps and the clearances around the concrete support. Their slots,
@@ -220,14 +237,14 @@ The additional native furniture checks move every door and stool seat through
 four intermediate/end positions, compare observed centres with the common
 kinematics and check self-intersections within each furniture instance. Line
 probes observe blocked cupboard access when closed and clear access to all
-three storage levels when open. Upper shelving is accessible in both states.
+three levels of the selected open compartment. Upper shelving is accessible in both states.
 These are sampled geometric observations; opened doors can occupy a walking
 strip or the parked transporter's space. Clear that work area before opening;
 the model does not implement a person/vehicle interlock.
 
 In FreeCAD, `Controller.LeftBench_Door1` and the other door properties use
 degrees; `Controller.Stool1_SeatLift` uses millimetres. SolidCraft has the
-corresponding native joints. `lab_room_model.pose(..., "closed"/"open")` and
+corresponding native joints. `lab_room_model.pose(..., "closed"/"open"/"inspection")` and
 `storage_interfaces` expose the same states and access references. Changing
 the module count requires regeneration. After native SolidCraft dimension
 experiments regenerate the model to update joint anchors and access metadata.

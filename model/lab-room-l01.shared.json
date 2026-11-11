@@ -13,7 +13,7 @@
     },
     "furniture": {
       "source": "model/furniture/laboratory.catalog.json",
-      "source_sha256": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+      "source_sha256": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
     },
     "furnishings": {
       "source": "model/furnishings/l01.furnishings.json",

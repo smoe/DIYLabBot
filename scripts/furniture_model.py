@@ -25,6 +25,8 @@ def validate_catalog(catalog):
         recipe=definition['recipe']
         if recipe not in RECIPES or set(definition['parameters'])!=RECIPES[recipe]:
             raise ValueError('Unsupported furniture recipe or dimensions: '+name)
+        if recipe in ('storage_bench','wet_bench') and definition.get('door_grouping') not in ('paired','single'):
+            raise ValueError('Cabinet recipe needs paired or single door grouping')
         for dim in definition['parameters'].values():
             if dim['unit']!='mm' or len(dim['range'])!=2 or dim['range'][0]>dim['range'][1]:
                 raise ValueError('Furniture dimensions need explicit units and valid ranges')
@@ -53,12 +55,27 @@ def expression(value,aliases,parameters):
     return text
 
 
+def storage_interfaces(storage,p,values):
+    """Evaluate a compartment's shared access and one probe through each leaf."""
+    result={}
+    for ref in storage:
+        point=lambda key:[robot.evaluate(x,p) for x in ref[key]]
+        result[ref['id']]={'origin_mm':point('origin'),'approach_mm':point('approach'),
+            'accessible':all(values[j]>=89.9 for j in ref['joints']),'access_kind':ref['access_kind']}
+        if 'access_paths' in ref:
+            result[ref['id']]['access_paths_mm']=[{key+'_mm':[robot.evaluate(x,p) for x in path[key]]
+                for key in ('origin','approach')} for path in ref['access_paths']]
+    return result
+
+
 def instantiate(catalog,item,p,aliases=None,inputs=None):
     """Lower one catalog type in its local frame, then apply the instance pose."""
-    allowed={'id','type','component','bindings','xyz','yaw_deg','frames','role','color','inputs','side','front','state'}
+    allowed={'id','type','component','bindings','xyz','yaw_deg','frames','role','color','inputs','side','front','state','door_grouping'}
     if set(item)-allowed:raise ValueError('Unsupported furniture instance fields: '+item['id'])
     if not re.fullmatch('[A-Za-z][A-Za-z0-9_]*',item['id']):raise ValueError('Invalid furniture ID')
     definition=catalog['types'][item['type']];recipe=definition['recipe'];aliases=aliases or {}
+    if 'door_grouping' in item and (recipe not in ('storage_bench','wet_bench') or item['door_grouping'] not in ('paired','single')):
+        raise ValueError('Door grouping is paired or single and only applies to lower cupboards')
     if set(item['bindings'])!=set(definition['parameters']):raise ValueError('Furniture parameter binding mismatch: '+item['id'])
     values={name:expression(v,aliases,p) for name,v in item['bindings'].items()}
     for name,v in values.items():
@@ -131,31 +148,56 @@ def instantiate(catalog,item,p,aliases=None,inputs=None):
         box(item['id']+'_StorageCavity',item['id']+'_LowerStorage',
             [v('width')+'-'+v('panel_t')+'+1',v('length')+'-2*'+v('panel_t'),v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-2*'+v('panel_t')],
             [x,v('panel_t'),v('plinth_h')+'+'+v('panel_t')],'cut')
-        for i in (1,2):
-            z=v('plinth_h')+'+'+v('panel_t')+f'+{i}*('+v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-2*'+v('panel_t')+')/3'
-            name=body('Shelf'+str(i),'internal_shelf','#b7c5cb')
-            box(name,name,[v('width')+'-2*'+v('panel_t')+'-8',v('length')+'-2*'+v('panel_t'),v('panel_t')],
-                [v('panel_t')+'+4',v('panel_t'),z])
         count=max(1,math.ceil(robot.evaluate(v('length')+'/'+v('leaf_width'),p)))
+        pitch=v('length')+f'/{count}'
+        if robot.evaluate(pitch,p)<=max(2*robot.evaluate(v('panel_t'),p),140)+robot.evaluate(v('door_gap'),p):
+            raise ValueError('Cabinet door must fit its panels and handle')
+        group_size=2 if item.get('door_grouping',definition['door_grouping'])=='paired' else 1
+        bays=[list(range(start,min(start+group_size,count))) for start in range(0,count,group_size)]
+        # A pair shares its full cavity and two shelves. Partitions occur only
+        # between compartments, never between the two leaves of a pair.
+        for k,leaves in enumerate(bays):
+            start=f'{leaves[0]}*({pitch})';end=f'{leaves[-1]+1}*({pitch})'
+            lo=v('panel_t') if k==0 else '('+start+')+'+v('panel_t')+'/2'
+            hi=v('length')+'-'+v('panel_t') if k==len(bays)-1 else '('+end+')-'+v('panel_t')+'/2'
+            if k:
+                name=item['id']+'_Partition'+str(k)
+                box(name,item['id']+'_LowerStorage',[v('width')+'-'+v('panel_t')+'-'+v('door_gap'),v('panel_t'),v('height')+'-'+v('top_t')+'-'+v('plinth_h')],
+                    [v('panel_t')+'+'+v('door_gap') if negative else 0,'('+start+')-'+v('panel_t')+'/2',v('plinth_h')],'join')
+            for i in (1,2):
+                z=v('plinth_h')+'+'+v('panel_t')+f'+{i}*('+v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-2*'+v('panel_t')+')/3'
+                name=body(('Bay'+str(k+1)+'_' if k else '')+'Shelf'+str(i),'internal_shelf','#b7c5cb')
+                box(name,name,[v('width')+'-2*'+v('panel_t')+'-8','('+hi+')-('+lo+')',v('panel_t')],
+                    [v('panel_t')+'+4',lo,z])
+            y='(('+lo+')+('+hi+'))/2'
+            for i in range(3):
+                z=v('plinth_h')+'+'+v('panel_t')+f'+({i}+.5)*('+v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-2*'+v('panel_t')+')/3'
+                if recipe=='wet_bench' and i==2 and robot.evaluate(f'({leaves[0]}+.5)*({pitch})',p)<robot.evaluate(v('basin_length')+'+80',p):z=v('height')+'-'+v('basin_depth')+'-20'
+                def storage_point(x,sy):return point(x,sy)+[add(origin[2],z)]
+                approach_x='-100' if negative else v('width')+'+100'
+                paths=[{'origin':storage_point(v('width')+'/2',f'({leaf}+.5)*({pitch})'),
+                        'approach':storage_point(approach_x,f'({leaf}+.5)*({pitch})')} for leaf in leaves]
+                result['storage'].append({'id':item['id']+'.Bay'+str(k+1)+'.Level'+str(i),
+                    'origin':storage_point(v('width')+'/2',y),'approach':storage_point(approach_x,y),
+                    'access_paths':paths,'joints':[item['id']+'_Door'+str(leaf+1) for leaf in leaves], 'access_kind':'front_shelf'})
         for i in range(count):
             child=item['id']+'_DoorGroup'+str(i+1);y=f'{i}*{v("length")}/{count}+'+v('door_gap')+'/2'
             x=0 if negative else v('width')+'-'+v('panel_t')
-            joint('Door'+str(i+1),child,[0 if negative else v('width')+'-1',y,v('plinth_h')],(0,0,1 if negative else -1),value=90 if item.get('state')=='open' else 0)
+            high_hinge=i%2==1
+            hinge_y=f'({i+1})*({pitch})-'+v('door_gap')+'/2' if high_hinge else y
+            axis=(1 if negative else -1)*(-1 if high_hinge else 1)
+            joint('Door'+str(i+1),child,[0 if negative else v('width')+'-1',hinge_y,v('plinth_h')],(0,0,axis),value=90 if item.get('state')=='open' and i in bays[0] else 0)
             name=body('Door'+str(i+1),'hinged_cabinet_door','#eeeae1',child)
             box(name,name,[v('panel_t')+'-1',v('length')+f'/{count}-'+v('door_gap'),v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-'+v('door_gap')],
                 [x,y,v('plinth_h')+'+'+v('door_gap')+'/2'])
+            handle_y=f'({y})+30' if high_hinge else f'({y})+({pitch})-110'
+            handle_z=v('height')+'-'+v('top_t')+'-65'
             name=body('Handle'+str(i+1),'cabinet_handle','#456c7b',child)
-            hx='-10' if negative else v('width')+'-1'
-            box(name,name,[10,80,12],[hx,f'({y})+{v("length")}/{count}-110',v('height')+'-'+v('top_t')+'-65'])
-        for k in range(count):
-            y=f'({k}+.5)*{v("length")}/{count}'
-            for i in range(3):
-                z=v('plinth_h')+'+'+v('panel_t')+f'+({i}+.5)*('+v('height')+'-'+v('top_t')+'-'+v('plinth_h')+'-2*'+v('panel_t')+')/3'
-                if recipe=='wet_bench' and i==2 and robot.evaluate(y,p)<robot.evaluate(v('basin_length')+'+80',p):z=v('height')+'-'+v('basin_depth')+'-20'
-                result['storage'].append({'id':item['id']+'.Bay'+str(k+1)+'.Level'+str(i),
-                    'origin':point(v('width')+'/2',y)+[add(origin[2],z)],
-                    'approach':point('-100' if negative else v('width')+'+100',y)+[add(origin[2],z)],
-                    'joints':[item['id']+'_Door'+str(k+1)], 'access_kind':'front_shelf'})
+            # One mounted U-shaped bar per leaf, with two connected stand-offs.
+            # Neighbouring open compartments cannot fold these handles flat.
+            box(name,name,[8,100,12],[-26 if negative else v('width')+'+17','('+handle_y+')-10',handle_z])
+            for end,dy in enumerate((-10,80)):
+                box(name+'_Mount'+str(end+1),name,[22,10,12],[-21 if negative else v('width')+'-2',f'({handle_y})+({dy})',handle_z],'join')
         if recipe=='wet_bench':
             # One real basin plus a separate drained drying surface and pegs.
             if robot.evaluate(v('basin_width')+'+100',p)>robot.evaluate(v('width'),p) or robot.evaluate(v('basin_length')+'+650',p)>robot.evaluate(v('length'),p):raise ValueError('Wet bench must fit its basin and drying zone')

@@ -25,8 +25,11 @@ def access_checks(doc,spec,p,values):
                 probe=Part.makeCylinder(4,p['height']+200-point.z,point)
                 overlap=sum(s.common(probe).Volume for s in shapes.values());clear=overlap<1e-5
             else:
-                probe=Part.makeLine(App.Vector(point.x,-150,point.z),point)
-                overlap=sum(s.common(probe).Length for s in shapes.values());clear=overlap<1e-6
+                obstructions=[]
+                for path in frame.get('access_paths_mm',[{'approach_mm':[point.x,-150,point.z],'origin_mm':list(point)}]):
+                    probe=Part.makeLine(App.Vector(*path['approach_mm']),App.Vector(*path['origin_mm']))
+                    obstructions.append(sum(s.common(probe).Length for s in shapes.values()))
+                overlap=sum(obstructions);clear=all(v<1e-6 for v in obstructions)
             result.append({'id':identity,'accessible':frame['accessible'],'probe_obstruction':overlap,'passed':clear==frame['accessible']})
     elif family=='analytical_balance':
         frame = refs['pan_surface']
@@ -108,7 +111,7 @@ def main():
         collisions = native.interference(doc,cache)
         poses.append({**sample,'maximum_pose_error_mm':error,**collisions,
                       'passed':error<1e-7 and collisions['passed']})
-        if sample['id'] in {'closed','access','all_open'}:
+        if sample['id'] in {'closed','access','all_open','base_access'}:
             checks[sample['id']] = access_checks(doc,spec,p,values)
     if is_overview:
         closed = None

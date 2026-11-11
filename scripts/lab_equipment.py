@@ -270,8 +270,11 @@ def expanded(spec,p):
 
 def pose(spec,p,name=None):
     name = name or 'access'
-    if name not in {'closed','access','all_open'}:
+    if name not in {'closed','access','all_open','base_access'}:
         raise ValueError('Unknown equipment pose')
+    family=spec['profile']['family']
+    if name=='base_access' and family!='fume_hood':raise ValueError('Base access is a fume-hood pose')
+    if name=='all_open' and family=='fume_hood':raise ValueError('Mounted base handles prevent all fronts folding together; use base_access')
     source = expanded(spec,p)
     values = {j['id']:0 for j in source['joints']}
     if name!='closed':
@@ -279,7 +282,8 @@ def pose(spec,p,name=None):
         if family=='water_bath':values['Lid']=p['lid_angle']
         elif family=='fume_hood':
             values['Sash']=p['sash_travel']
-            if name=='all_open':values.update({j['id']:p['base_open'] for j in source['joints'] if j['id']!='Sash'})
+            if name=='base_access':
+                values.update({j:p['base_open'] for ref in source['base_storage'] if ref['id'].endswith('.Bay1.Level0') for j in ref['joints']})
         elif family=='analytical_balance':
             values.update(LeftSlide=p['side_travel'],RightSlide=p['side_travel'],TopCover=p['top_angle'])
         else:
@@ -310,7 +314,8 @@ def validate_pose(source,values):
 
 def samples(spec,p):
     source = expanded(spec,p)
-    result = [{'id':name,'joint_values':pose(spec,p,name)} for name in ('closed','access','all_open')]
+    names=('closed','access','base_access' if spec['profile']['family']=='fume_hood' else 'all_open')
+    result = [{'id':name,'joint_values':pose(spec,p,name)} for name in names]
     for joint in source['joints']:
         base = pose(spec,p,'closed')
         if joint['id']!='OuterDoor' and 'OuterDoor' in base:
@@ -325,7 +330,8 @@ def samples(spec,p):
 
 
 def build_samples(spec,p):
-    return [{'id':name,'joint_values':pose(spec,p,name)} for name in ('closed','all_open','access')]
+    names=('closed','base_access' if spec['profile']['family']=='fume_hood' else 'all_open','access')
+    return [{'id':name,'joint_values':pose(spec,p,name)} for name in names]
 
 
 def interfaces(spec,p,values=None):
@@ -337,12 +343,12 @@ def interfaces(spec,p,values=None):
                     'accessible':values['Lid']>=85,'access_kind':'vertical_bath',
                     'nominal_capacity_l':spec['profile']['nominal_storage_l'],'reported_temperature_c':None}}
     if spec['profile']['family']=='fume_hood':
+        import furniture_model as furniture
         result={'work_chamber':{'origin_mm':[0,200,p['worktop_z']+200],
                     'accessible':values['Sash']>200,'access_kind':'front_hood',
                     'extraction_connected':False,'measured_face_velocity_m_s':None}}
-        for v in source['base_storage']:
-            result[v['id']]={'origin_mm':[evaluate(x,p) for x in v['origin']],
-                'accessible':all(values[j]>=89.9 for j in v['joints']),'access_kind':'front_hood'}
+        for identity,ref in furniture.storage_interfaces(source['base_storage'],p,values).items():
+            result[identity]={**ref,'access_kind':'front_hood'}
         return result
     if spec['profile']['family']=='analytical_balance':
         angle = math.radians(values['TopCover'])

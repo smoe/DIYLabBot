@@ -42,6 +42,10 @@
               "lab_stool"
             ]
           },
+          "door_grouping": {
+            "enum": ["paired", "single"],
+            "description": "Paired leaves share one compartment; an odd final leaf has its own. Single separates every leaf."
+          },
           "parameters": {
             "type": "object",
             "additionalProperties": {
@@ -107,6 +111,11 @@
           }
         },
         "allOf": [
+          {
+            "if": {"properties": {"recipe": {"enum": ["storage_bench", "wet_bench"]}}},
+            "then": {"required": ["door_grouping"]},
+            "else": {"not": {"required": ["door_grouping"]}}
+          },
           {
             "if": {
               "properties": {

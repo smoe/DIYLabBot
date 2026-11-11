@@ -137,15 +137,33 @@ def check_furniture(doc,spec,p):
                     volume=shape.common(obstacle).Volume
                     if volume>1e-4:hits.append({'body':name,'obstacle':other,'volume_mm3':volume})
             checks.append({'id':joint['id']+'.'+str(fraction),'maximum_pose_error_mm':error,'self_collisions':hits,'passed':error<1e-6 and not hits})
-    for name in ('closed','open'):
-        values=model.pose(spec,p,name);set_values(values)
+    access_poses={name:model.pose(spec,p,name) for name in ('closed','open','inspection')}
+    for parity in (0,1):
+        access_poses[('odd' if parity==0 else 'even')+'_doors_open']={**zero,
+            **{j['id']:90 for i,j in enumerate(j for j in source['joints'] if '_Door' in j['id']) if i%2==parity}}
+    for name,values in access_poses.items():
+        set_values(values)
         shapes={o.SourceBody:motion.world_shape(o) for o in objects(doc)}
+        hits=[]
+        names=list(shapes)
+        for i,a in enumerate(names):
+            for b in names[i+1:]:
+                if a.split('_')[0]!=b.split('_')[0] or meta[a]['component']==meta[b]['component']:continue
+                if not shapes[a].BoundBox.intersect(shapes[b].BoundBox):continue
+                volume=shapes[a].common(shapes[b]).Volume
+                if volume>1e-4:hits.append({'body':a,'obstacle':b,'volume_mm3':volume})
+        checks.append({'id':'furniture.combined_pose.'+name,'self_collisions':hits,'passed':not hits})
+        if name=='inspection':
+            checks+=check_frames(doc,spec,p)
+            continue
         for identity,ref in model.storage_interfaces(spec,p,values).items():
             prefix=identity.split('.')[0]
-            ray=Part.makeLine(App.Vector(*ref['approach_mm']),App.Vector(*ref['origin_mm']))
-            obstruction=sum(s.common(ray).Length for n,s in shapes.items() if n==prefix or n.startswith(prefix+'_'))
-            checks.append({'id':identity+'.'+name,'obstruction_mm':obstruction,'accessible':ref['accessible'],
-                           'passed':(obstruction<1e-6)==ref['accessible']})
+            obstructions=[]
+            for path in ref.get('access_paths_mm',[ref]):
+                ray=Part.makeLine(App.Vector(*path['approach_mm']),App.Vector(*path['origin_mm']))
+                obstructions.append(sum(s.common(ray).Length for n,s in shapes.items() if n==prefix or n.startswith(prefix+'_')))
+            checks.append({'id':identity+'.'+name,'path_obstructions_mm':obstructions,'accessible':ref['accessible'],
+                           'passed':all(v<1e-6 for v in obstructions)==ref['accessible']})
         checks+=check_frames(doc,spec,p)
     set_values(initial)
     return checks

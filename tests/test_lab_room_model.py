@@ -24,7 +24,7 @@ class LabRoomTests(unittest.TestCase):
         self.assertEqual(roles.count('heating_cover_envelope'),3)
         self.assertEqual(roles.count('shared_central_shelf'),1)
         self.assertEqual(roles.count('central_shelf_upright_envelope'),3)
-        self.assertEqual(roles.count('internal_shelf'),10)
+        self.assertEqual(roles.count('internal_shelf'),36)
         self.assertEqual(roles.count('central_cupboard_upright_envelope'),3)
         self.assertEqual(roles.count('window_bench_leg_envelope'),4)
         self.assertEqual(len([f for f in source['frames'] if f['id'].startswith('L01.Door')]),2)

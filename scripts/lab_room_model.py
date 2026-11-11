@@ -129,9 +129,15 @@ def expanded(spec,p):
 
 
 def pose(spec,p,name=None):
-    if name not in (None,'closed','open'):raise ValueError('Unknown furnishing pose')
-    return {j['id']:j['value'] if name is None else (j.get('limits_deg',j.get('limits_mm'))[1] if name=='open' else 0)
-            for j in expanded(spec,p)['joints']}
+    if name not in (None,'closed','open','inspection'):raise ValueError('Unknown furnishing pose')
+    source=expanded(spec,p)
+    selected={j for ref in source['storage'] if ref['id'].endswith('.Bay1.Level0') for j in ref['joints']}
+    values={j['id']:j['value'] if name is None else 0 for j in source['joints']}
+    for j in source['joints']:
+        limit=j.get('limits_deg',j.get('limits_mm'))[1]
+        if name=='open' and (j['id'] in selected or j['type']=='slider'):values[j['id']]=limit
+        elif name=='inspection' and j['id'] in selected:values[j['id']]=min(75,limit)
+    return values
 
 
 def storage_interfaces(spec,p,values=None):
@@ -140,10 +146,7 @@ def storage_interfaces(spec,p,values=None):
     for j in source['joints']:
         q=values[j['id']];lo,hi=j.get('limits_deg',j.get('limits_mm'))
         if type(q) not in (int,float) or not math.isfinite(q) or not lo<=q<=hi:raise ValueError('Invalid furniture joint position')
-    return {v['id']:{'origin_mm':[evaluate(x,p) for x in v['origin']],
-                'approach_mm':[evaluate(x,p) for x in v['approach']],
-                'accessible':all(values[j]>=89.9 for j in v['joints']), 'access_kind':v['access_kind']}
-            for v in source['storage']}
+    return furniture.storage_interfaces(source['storage'],p,values)
 
 
 def solidcraft_commands(spec,p):

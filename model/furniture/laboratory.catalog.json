@@ -7,6 +7,7 @@
   "types": {
     "storage_bench": {
       "recipe": "storage_bench",
+      "door_grouping": "paired",
       "parameters": {
         "width": {
           "unit": "mm",
@@ -370,6 +371,7 @@
     },
     "wet_bench": {
       "recipe": "wet_bench",
+      "door_grouping": "paired",
       "parameters": {
         "width": {
           "unit": "mm",
@@ -501,6 +503,7 @@
     }
   },
   "limitations": [
-    "Parameterized concept furniture, hollow storage and sampled kinematics; actual articles, loads, fittings and utilities remain unqualified."
+    "Parameterized concept furniture, hollow storage and sampled kinematics; actual articles, loads, fittings and utilities remain unqualified.",
+    "Each lower-cabinet leaf has a mounted bar handle. Adjacent open compartments do not fold flat together; inspection views show at most one open compartment per bench."
   ]
 }

@@ -141,8 +141,8 @@ class LabLayoutNativeEvidenceTests(unittest.TestCase):
             self.assertEqual(model.digest(model.ROOT/report['files'][name]),checksum)
         native=report['layout_validation']
         self.assertEqual(native['invalid_objects'],[])
-        self.assertEqual(len(native['equipment_body_metrics']),85)
-        self.assertEqual(len(report['equipment_body_comparisons']),85)
+        self.assertEqual(len(native['equipment_body_metrics']),87)
+        self.assertEqual(len(report['equipment_body_comparisons']),87)
         self.assertTrue(all(c['passed'] for c in report['equipment_body_comparisons']))
         self.assertTrue(all(c['passed'] for c in native['equipment_placement']))
         self.assertEqual({c['instance'] for c in native['equipment_access']},{'Balance01','Freezer01','Fridge01','WaterBath01','Hood01'})
