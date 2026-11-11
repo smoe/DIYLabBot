@@ -743,6 +743,183 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 12. Ein GENtle-Beleg referenziert die gewählte DIYLabBot-Instanz, `ServerUUID`
     und Featuredefinition-Digests, ohne DIYLabBot-Geometrie zu kopieren.
 
+<a id="cutrun"></a>
+
+## CUT&RUN: geplanter Ablaufvertrag
+
+**Stand 11. November 2026: Entwicklungsentscheidung, keine implementierte
+CUT&RUN-Ausführung und keine biologische Qualifikation.** Die erste Ausbaustufe
+führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
+CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
+zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
+ersetzt es nicht. Probenvorbereitung und nicht qualifizierte Geräteschritte
+bleiben zunächst Personenaufgaben. Direktligation, automatisierte
+Library-Präparation und Sequenzierung gehören zu späteren, eigenen Freigaben.
+Die Abhängigkeiten und Abnahmen stehen in [ROADMAP.md](ROADMAP.md).
+
+### Quellenbindung und Varianten
+
+Die drei angefragten Quellen wurden für diesen Architekturstand ausgewertet.
+Ein Literaturverweis ist noch keine ausführbare, bytegebundene Arbeitsanweisung.
+
+| Kennung | Referenz und Lesestand | Verwendung |
+|---|---|---|
+| CR1 | [Janssens/Henikoff, protocols.io v3](https://www.protocols.io/view/cut-amp-run-targeted-in-situ-genome-wide-profiling-14egnr4ql5dy/v3), [PDF-Export](https://www.protocols.io/view/cut-amp-run-targeted-in-situ-genome-wide-profiling-14egnr4ql5dy/v3.pdf), [DOI 10.17504/protocols.io.zcpf2vn](https://doi.org/10.17504/protocols.io.zcpf2vn). Version 3 vom 09.05.2019; PDF mit 42 Seiten/114 Schritten konsultiert am 11.11.2026; CC-BY laut PDF. | Versionierte Referenz mit mehreren Verfahrenszweigen; keine Übernahme als bereits freigegebene Labor-SOP. |
+| CR2 | [CST CUT&RUN Kit Protocol](https://www.cellsignal.com/learn-and-support/protocols/cut-and-run-protocol), Abschnitte I–IX und Anhänge konsultiert am 11.11.2026. Keine eindeutige Protokollrevision auf der Webseite erkannt; keine offene Lizenz festgestellt. | Herstellerverfahren; vor Ausführung konkretes Kit, Variante und eingefrorenen Quellenstand binden. |
+| CR3 | [EpiCypher, Complete Step-by-Step Guide](https://www.epicypher.com/resources/blog/complete-step-by-step-guide-to-cutrun/), Blog vom 11.07.2022, konsultiert am 11.11.2026; keine offene Lizenz festgestellt. | Hintergrund und QC-Abgrenzung. Die verlinkten Kit-/DIY-Anleitungen sind damit nicht als operative SOP ausgewählt oder geprüft. |
+
+Ein Profil bindet **Quelle + Revision/Quellprüfsumme + Verfahrenszweig** sowie
+Probenart, Fixierungszustand, Ziel-/Antikörper-/Enzymbezug, Reinigung und
+Umfangsende. Drei URLs ergeben keine drei fertigen Profile. Zeiten, Temperaturen,
+Mischverfahren, Mengen und Fraktionsrollen werden aus dem ausgewählten Zweig
+übernommen und gemeinsam geprüft; fehlende Angaben bleiben offen. Widersprüche
+zwischen Fließtext und Mengenfeldern, etwa in CR1 Schritt 3/65, sperren eine
+automatische Parameterübernahme bis zum dokumentierten Abgleich.
+
+| Profilbildender Unterschied | Konsequenz aus den Quellen |
+|---|---|
+| Verdauweg | CR1 trennt Standard (27–37), High-Ca/Low-Salt (38–47) und Direktligation (48–56). Letztere überspringt die DNA-Reinigung und deren Roh-DNA-Messung. |
+| Temperatur und Mischung | CR1 verwendet beim Verdau 0 °C und bei Bindung Rotator/Nutator. CR2 verlangt für den Verdau 4 °C statt Eis und für Bindungsinkubationen keine Rotation. Diese Aussagen sind schrittspezifisch, kein allgemeines Mischverbot. |
+| Eingang und Reinigung | CR2 unterscheidet lebende/fixierte Zellen, Gewebe und einen eigenen Input-Zweig; Säule und organische Reinigung sind Alternativen. Keine unveränderte Übernahme der Qiagen-Extraktionskette. |
+| Kontrollen und Kalibrierung | Antikörperkontrollen sind Reaktionen; zugegebene Spike-ins sind Materialien. CR1-Enzymchargen können E.-coli-DNA mitbringen. CR3 beschreibt zusätzlich Nukleosomenkontrollen vor Antikörperzugabe. Zeitpunkte und Rollen bleiben profilgebunden. |
+
+### Grenze zum Versuchsplaner und vorhandenen Ablauf
+
+GENtle beziehungsweise der Versuchsplaner führt die wissenschaftliche Absicht,
+Materialsemantik, Profilwahl und biologische Bewertung. DIYLabBot bindet daran
+eine operative Projektion: konkrete Gefäße, Prozessrollen, Fraktionen,
+Fähigkeitsbedarf, Ressourcen, Ausführungsbeobachtungen und Originalartefakte.
+Ein lokales, freigegebenes Profil kann die spätere Planerbindung vorbereiten;
+es wird keine zweite unabhängige wissenschaftliche Protokollquelle aufgebaut.
+Die GENtle-/SiLA-Bindung bleibt wie oben geplant.
+
+Die heutige feste Folge CF01 → NanoDrop → Qubit ist kein CUT&RUN-Programm.
+Erforderlich sind profilgetriebene Stufen einschließlich Personenaufgaben und
+externer Geräte. NanoDrop wird nicht pauschal vorgeschaltet. Das vorhandene
+Journal, Quellenpins, Reservierungen und die gemeinsame Ablaufhülle werden
+weiterverwendet; eine separate CUT&RUN-Datenbank oder Probenbilanz ist nicht vorgesehen.
+
+### Gemeinsamer Materiallebenszyklus und Fraktionen
+
+Diese Erweiterung ist dieselbe Voraussetzung wie für die
+[RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md), kein zweiter
+Ledger. Der aktuelle Gesamtlauf verlangt Originalrückgabe und Entsorgung aller
+abgeleiteten Gefäße; seine Originalentnahmebilanz in µl reicht hier nicht aus.
+Neue Verträge müssen ausdrücklich versioniert werden; historische Läufe behalten
+ihre bisherigen Abschluss- und Wiederaufnahmeregeln.
+
+- Materialidentität, Gefäß, Rackinstanz/Platz und Verantwortung getrennt halten.
+  Zellzahl, Masse, Volumen und DNA-Konzentration sind typisierte Größen mit
+  Evidenz; unbekannte Werte bleiben unbekannt. Keine Zellzahl aus Volumen allein ableiten.
+- Bindung und Reaktionsaufteilung als Materialumwandlung mit Abstammung und
+  gegebenenfalls mehreren Kindern führen. Ein verarbeitetes Original wird nicht
+  als unverbrauchte Ausgangsprobe zurückgebucht. Ein Materialwechsel im selben
+  Gefäß erzeugt nicht automatisch ein weiteres Gefäß.
+- Pro Schritt festlegen, welche Bead-, Flüssigkeits-, Säulen- oder Pelletfraktion
+  Produkt, Zwischenprodukt, aufbewahrte Nebenfraktion oder bestätigter Abfall ist.
+  Das vorhandene Fraktionsrollenprinzip der Extraktionsvorbereitung wiederverwenden.
+  Nach Freisetzung ist bei den entsprechenden CR1-Zweigen der Überstand Produkt;
+  der vorherige High-Ca-Überstand kann als Nebenfraktion erhalten bleiben.
+  Rest-Beads zur Fehlersuche und alternative Gesamt-DNA-Gewinnung nicht still entsorgen.
+- IgG-/Positivkontrollen als eigene Reaktionen, einen gewählten Input als
+  eigenen Prozesszweig führen. Zugesetzte Spike-ins mit Charge, Menge und
+  Zeitpunkt buchen; chargenbedingter E.-coli-Übertrag ist keine erfundene Zugabe.
+- Aufbewahrte Produkte, verbrauchte Materialien, Quarantäne und bestätigte
+  Entsorgung als unterschiedliche Enddispositionen erlauben. QC-Aliquots aus
+  Produktgefäßen benötigen eigene Entnahmeabsichten und Buchungen gegen dieses
+  Produkt; das ursprüngliche Material nicht erneut belasten.
+- Zunächst nur laufexklusiv bereitgestellte Reagenzaliquots mit bestätigtem
+  Anfang und Istverbrauch im gemeinsamen Root führen. Identität und Zuteilung
+  sind im gemeinsamen Store nachzuweisen: dasselbe Aliquot darf nicht zwei Läufen
+  zugeteilt oder nach Nutzung als frischer Anfangsbestand eingeführt werden.
+  Diese Identitäts-/Reservierungsprüfung erweitert noch keinen
+  globalen Reagenzvorrat. Der [Stock-Plan](docs/stock-continuation.md) schließt
+  Reagenzien zunächst aus; für gemeinsame Vorräte ist eine weitere versionierte
+  Erweiterung erforderlich, bevor unabhängige Läufe dieselben Vorräte verwenden.
+
+### Aktivierung, tatsächlicher Stopp und Wiederanlauf
+
+Die folgenden Zustandsrollen sind ein zu implementierender Vertrag, keine
+vorhandenen API-Zustände. Der Aktivierungszeitpunkt ist der profilabhängige
+Kontakt mit dem aktivierenden Reagenz, auch wenn Calcium bereits in einem
+zugegebenen Puffer enthalten ist. Die Reaktion wartet nicht auf den Scheduler.
+
+```mermaid
+flowchart LR
+    V["Vorbereitet; Stoppweg reserviert"] --> I["Aktivierungsabsicht gespeichert"]
+    I --> A["Zugabe und Mischen bestätigt; aktiv"]
+    A --> Q["Stoppabsicht gespeichert"]
+    Q --> S["Stoppzugabe und Mischen bestätigt"]
+    S --> F["Freisetzung und Fraktionsübergabe bestätigt"]
+    I -. "Wirkung unbekannt" .-> U["Gesperrt; manueller Abgleich"]
+    A -. "Kontaktverlust" .-> U
+    Q -. "Bestätigung fehlt" .-> U
+```
+
+Vor Aktivierung müssen Stoppmaterial, qualifizierter Zugangs-/Mischweg,
+Zeitbudget und ein genehmigter manueller Stoppweg verfügbar sein. Absichten
+werden vor Wirkungen dauerhaft gespeichert. Ein Software-Halt, Armstopp,
+Leaseablauf oder Neustart ist kein chemischer Stopp. Operative Stoppbestätigung
+benötigt die belegte Zugabe und Durchmischung je Gefäß nach der ausgewählten SOP;
+sie ist keine direkte Messung der Enzyminaktivität.
+
+Pro Gefäß tatsächliche Aktivierungs-/Stoppzeiten oder belegte Zeitintervalle,
+Temperaturverlauf und Abweichungen führen. Dosiertakt und garantierbarer
+Stoppdurchsatz begrenzen die Charge; ein Rotor mit zwölf Plätzen begründet keine
+Zwölfercharge. Ein Test kann Zeitereignisse injizieren. Im realen Lauf sind
+unabhängig fortschreitende Zeit, Uhrunsicherheit über Neustarts und überwachte
+Fristen erforderlich; eine logische Uhr beweist keinen Watchdog.
+
+Bei unbekannter Aktivierungs- oder Stoppwirkung keine automatische Wiederholung
+und keine angenommene Pause der Biologie. Kontaktaufnahme und Bestandsabgleich
+bleiben aus jeder Phase möglich. Ein vorgesehener manueller Not-Stopp darf auch
+bei ausgefallenem Journal nötig werden; er ist kein Freibrief für unprotokollierte
+automatische Folgeschritte. Die tatsächliche Handlung und Zeit werden nach
+Wiederherstellung als externe Evidenz abgeglichen. Ohne tragfähige Evidenz bleibt
+der Lauf fachlich gesperrt; Materialien werden bis zur bestätigten Disposition
+aufbewahrt beziehungsweise quarantänisiert. Ein rechtzeitig bestätigter Stopp
+erlaubt nur die im Profil vorgesehene Fortsetzung, sonst eine dokumentierte
+Abweichungsbewertung. Pausenorte und Lagerfristen dürfen nur aus diesem Profil stammen.
+
+### Fähigkeiten und heutige Grenzen
+
+| Benötigte Fähigkeit | Entwicklungsgrenze und Nachweisbedarf |
+|---|---|
+| Identifizieren, zählen, bereitstellen | Zell-/Kernzählung, Permeabilisierung und gegebenenfalls Gewebevorbereitung zunächst mit Personen-/externen Befunden. Kit-/Artikelrollen von beobachteten Mengen unterscheiden. |
+| Pipettieren und Mischen | Gefäß-/Spitzenlage, kleine Dosierungen, Beadverlust, scherarme Resuspension, viskose/detergenzhaltige Medien und Verschleppung prüfen. Die 1-µl-Wasseraufgabe ist ein erster Versuch; auch das Langfristziel 1–1000 µl ist noch keine qualifizierte Fähigkeit. Rotator/Vortex benötigen ein eigenes Geräte-/Aufnahmekonzept. |
+| Magnetisch trennen | Eigene Fähigkeit für Magnetposition, geklärte Suspension, beadschonende Aspirationslage, Restvolumen und Rückgewinnung. Eine Wartezeit allein bestätigt keine erfolgreiche Trennung. Noch kein implementierter Adapter. |
+| Temperieren/inkubieren | Probentemperatur direkt oder über einen qualifizierten Geräte-/Probenzusammenhang mit Unsicherheit nachweisen; ein CAD-Kühlplatz liefert diesen Nachweis nicht. Exposition, Mischmodus und tatsächlicher Beginn/Abschluss gehören zusammen. |
+| Zentrifugieren | RCF, Temperatur, Zeit, Rotor und konkreten Gefäßartikel gemeinsam binden. CF01 hat ein ungeprüftes Ziel von 16.000 × g und offene Temperaturführung; keine vollständige CUT&RUN-Eignung ist belegt. CR2 benötigt teilweise 18.500 × g. Einzelne Teilschritte bleiben erst nach Qualifikation Kandidaten; Grenzen nicht passend hochsetzen. |
+| Reinigen/weiterverarbeiten | Profilgerechte Erhaltung kleiner DNA-Fragmente, Gefäßwechsel und gegebenenfalls organische Phasentrennung separat qualifizieren. Organische Schritte bleiben zunächst manuell mit freigegebenem Arbeitsplatz; die modellierte Abzughülle ist keine Absaugungsfreigabe. |
+| Messen und übergeben | Fluorometrie, gegebenenfalls qPCR/Fragmentanalyse und externe QC-Artefakte mit eindeutigen Reaktions-/Produktbezügen. Thermocycler, Sonifikation und Library-Handhabung nur für ausdrücklich gewählte spätere Zweige binden. |
+
+Gemeinsame Quellen für Station, Gefäßhalter, Werkzeug und Fähigkeit verwenden;
+neue Geometrie später unabhängig in beiden CADs ableiten. Ein Stationstypname
+oder zwei kooperierende Arme ersetzen keinen Dosier- oder Prozessnachweis.
+Neu entwickelte Transporte benötigen weiterhin die gemeinsame fließende
+Bahnplanung und Nachweise für das vollständig getragene Gefäß.
+
+### QC-Ebenen und Umfangsende
+
+Eingangs-QC, CUT&RUN-DNA und Sequenzierbibliothek sind verschiedene Objekte.
+CR1 sieht optionale Roh-DNA-Messungen mit Einschränkungen bei schwachen Targets
+vor. CR2 beschreibt Fluoreszenzquantifizierung und qPCR; CR3 rät von Roh-DNA-
+Fragmentanalyse/qPCR als allgemeinem Erfolgsindikator ab und beurteilt die
+fertige Library separat. Daraus folgt kein universeller QC-Zwangsschritt.
+Methodenwahl, Nachweisgrenzen, Kontrollen und Interpretation bleiben an das
+freigegebene Profil gebunden. Diese Abgrenzung stammt aus
+[CR1, Schritte 68–69 und 110–112](https://www.protocols.io/view/cut-amp-run-targeted-in-situ-genome-wide-profiling-14egnr4ql5dy/v3.pdf),
+[CR2, VII–IX](https://www.cellsignal.com/learn-and-support/protocols/cut-and-run-protocol)
+und [CR3, Schritte 6–8](https://www.epicypher.com/resources/blog/complete-step-by-step-guide-to-cutrun/).
+
+Unterschrittene Nachweisgrenzen sind kein Nullverbrauch und nicht automatisch
+ein biologischer Fehlschlag. Originaldateien, Assay-/Gerätebezug, Kalibrierung,
+Verdünnung und tatsächliche QC-Entnahmen erhalten. Konzentration allein bestätigt
+keine Target-Anreicherung. Die erste Ausbaustufe endet mit Produkt, Disposition,
+QC-Befund und bestätigter Übergabe. Eine spätere Library hat eigene Identität,
+Adapter-/Indexzuordnung, Kontrollen und QC. Wissenschaftliche Sequenzanalyse und
+Peakbewertung bleiben beim externen Auswertungs-/Versuchsplaner.
+
 ## Nächste Schritte
 
 Die Geräteausstattung soll später an benannte Möbel- oder Raumrahmen gebunden
