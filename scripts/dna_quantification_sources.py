@@ -12,7 +12,8 @@ import rack_slots
 SOURCE = ROOT / 'model/dna-quantification.synthetic.json'
 RUNTIME = ['dna_quantification.py', 'dna_quantification_sources.py',
            'dna_quantification_ledger.py', 'dna_quantification_stages.py',
-           'dna_quantification_demo.py', 'run_dna_quantification.py']
+           'dna_quantification_demo.py', 'run_dna_quantification.py', 'dna_quantification_control.py',
+           'dna_quantification_port.py', 'dna_quantification_tasks.py']
 
 
 def load(source=SOURCE):

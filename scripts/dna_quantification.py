@@ -15,6 +15,8 @@ from dna_quantification_sources import load, SOURCE
 from dna_quantification_ledger import (remaining, reserve_withdrawal,
     confirm_withdrawal, resolve_not_performed, dilution_factor, classify_input)
 from dna_quantification_stages import make_context, build_adapter
+from dna_quantification_control import NetworkControl
+from dna_quantification_port import TaskPort, interface_generated
 
 FORMAT = 'solidcraftbot.dna-quantification-state/1'
 TERMINAL = {'completed', 'cancelled'}
@@ -35,9 +37,10 @@ class ContextHandle:
             artifact=content, file_name=file_name, origin='synthetic_export')
 
 
-class Workflow:
-    def __init__(self, journal, run_id, session=None):
+class Workflow(NetworkControl, TaskPort):
+    def __init__(self, journal, run_id, session=None, command_context=None, transition_guard=None):
         self.journal, self.run_id, self.session = journal, run_id, session
+        self.command_context, self.transition_guard = command_context, transition_guard
 
     @property
     def state(self):
@@ -46,7 +49,8 @@ class Workflow:
         return state
 
     @classmethod
-    def create(cls, journal, source=None, run_id=None):
+    def create(cls, journal, source=None, run_id=None, control=None, command_context=None,
+               transition_guard=None, responsible_person_id=None):
         definition = load(SOURCE if source is None else source)
         run_id = run_id or 'SYN.DNA.' + uuid.uuid4().hex[:12]
         if not isinstance(run_id, str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', run_id):
@@ -73,13 +77,20 @@ class Workflow:
                  'dilutions': {}, 'pending_dilution': None, 'attempts': {}, 'contexts': {},
                  'current_sample_id': next(iter(samples)), 'active_attempt_id': None,
                  'active_context_id': None, 'decisions': []}
+        flow = cls(journal, run_id, session, command_context, transition_guard)
+        if control is not None:
+            state.update(control=copy.deepcopy(control), network={'boot_id': command_context['boot_id'], 'commands': {}},
+                         responsible_person_id=text(responsible_person_id, 'responsible person'))
+            flow._check_control(state)
+            state['creation_receipt'] = flow._decorate(state, sequence=1, evidence='network_receipt')
         journal.create(run_id, state, immutable_definition=True)
-        return cls(journal, run_id, session)
+        return flow
 
     @classmethod
     def open(cls, journal, run_id, resume=False):
         flow = cls(journal, run_id); before, revision = journal.get_current(run_id)
         if before.get('format') != FORMAT: raise TaskError('DNA quantification run required')
+        flow._check_control(before)
         flow._source_check(before)
         if before['status'] in TERMINAL: return flow
         if before['session'] is not None and not resume:
@@ -105,6 +116,9 @@ class Workflow:
         if (current['source_files_sha256'] != state['definition']['source_files_sha256']
                 or state['clock_mode'] != 'synthetic_events/1'):
             raise TaskError('DNA run sources/clock changed; no automatic migration')
+        for name, checksum in state.get('control', {}).get('source_files_sha256', {}).items():
+            if digest((SOURCE.parent.parent / name).read_bytes()) != checksum:
+                raise TaskError('Changed network/task source: ' + name)
 
     def _transition(self, kind, actor_id, update, payload=None, artifact=None, allow_held=False):
         text(actor_id, 'synthetic actor')
@@ -113,21 +127,28 @@ class Workflow:
             raise TaskError('Active DNA quantification run required')
         if not self.session or self.session != before['session']:
             raise TaskError('Stale DNA session; reopen and reconcile')
+        self._check_control(before)
         self._source_check(before)
         if before['cancel_requested'] and kind not in {
                 'inventory_reconciled', 'cancel_requested', 'cancel_finished',
                 'session_closed', 'time_advanced', 'dilution_stock_disposed',
-                'device.place', 'device.dispose_vessel', 'device.discard_import'}:
+                'device.place', 'device.dispose_vessel', 'device.discard_import',
+                'task.cancel_requested', 'task.uncertain'}:
             raise TaskError('Cancellation requested; only reconciliation, return and disposal are allowed')
         if before['actor_id'] is not None and before['actor_id'] != actor_id:
             raise TaskError('DNA run is held by another actor')
         if before['recovery_required'] and not allow_held:
             raise TaskError('Explicit DNA reconciliation required: ' + before['recovery_required'])
+        if before.get('task_port', {}).get('pending_goal_id') and kind not in {
+                'task.dispatched', 'task.claimed', 'task.observed', 'task.uncertain',
+                'task.cancel_requested', 'inventory_reconciled', 'cancel_requested', 'session_closed'}:
+            raise TaskError('Resolve the pending worker task before another effect')
         if before['logical_time_s'] >= before['deadline_s'] and not allow_held:
             held = copy.deepcopy(before)
             held.update(status='cancelling' if before['cancel_requested'] else 'held',
                         recovery_required=before['recovery_required'] or 'deadline_exceeded')
-            self.journal.append(self.run_id, revision, 'deadline_exceeded', {}, held)
+            self.journal.append(self.run_id, revision, 'deadline_exceeded',
+                self._decorate(held, sequence=revision + 1), held)
             raise TaskError('DNA process deadline exceeded')
         state = copy.deepcopy(before)
         try:
@@ -137,11 +158,15 @@ class Workflow:
             before.update(status='cancelling' if before['cancel_requested'] else 'held',
                           recovery_required=before['recovery_required'] or 'observation_mismatch')
             self.journal.append(self.run_id, revision, 'observation_rejected',
-                {'command': kind, 'actor_id': actor_id, 'reason': str(error), **(payload or {})}, before)
+                self._decorate(before, {**(payload or {}), 'command': kind,
+                    'reason': str(error)}, revision + 1), before)
             raise
         state['resources'] = self._resources(state)
-        self.journal.append(self.run_id, revision, kind,
-            {'actor_id': actor_id, 'evidence': 'synthetic_input', **(payload or {})}, state, artifact=artifact)
+        evidence = ('worker_claim' if kind == 'task.claimed' else
+                    (payload or {}).get('observation_evidence') if kind == 'task.observed' else None)
+        decorated = self._decorate(state, payload, revision + 1, evidence)
+        decorated['actor_id'] = actor_id
+        self.journal.append(self.run_id, revision, kind, decorated, state, artifact=artifact)
         return state
 
     @staticmethod
@@ -154,6 +179,8 @@ class Workflow:
         resources += ['instrument:' + d['profile']['instrument']['id'] for d in state['definition']['devices'].values()]
         resources += ['vessel:' + key for key, vessel in state['inventory']['vessels'].items()
                       if vessel['location']['kind'] != 'discarded']
+        resources += ['agent:' + item['goal']['executing_agent_id']
+                      for item in state.get('task_port', {}).get('goals', {}).values()]
         return sorted(set(resources))
 
     @staticmethod
@@ -163,6 +190,7 @@ class Workflow:
         for vessel in state['inventory']['vessels'].values():
             location = vessel['location']; kind = location.get('kind')
             fields = {'discarded': {'kind'}, 'operator': {'kind', 'actor_id'},
+                      'agent': {'kind', 'agent_id'},
                       'rack': {'kind', 'rack_id', 'place_id'},
                       'logical': {'kind', 'holder_id', 'place_id'}}
             if kind not in fields or set(location) != fields[kind]:
@@ -172,6 +200,10 @@ class Workflow:
                 continue
             if kind == 'operator':
                 if location.get('actor_id') != state['actor_id']: raise ObservationError('Wrong vessel holder')
+                held += 1
+            elif kind == 'agent':
+                if location['agent_id'] != state.get('executing_agent_id'):
+                    raise ObservationError('Wrong assigned agent custodian')
                 held += 1
             elif kind == 'rack':
                 if location != vessel.get('home'): raise ObservationError('Vessel must use its declared home rack place')
@@ -207,6 +239,8 @@ class Workflow:
                     'evidence': 'synthetic_input', 'reason': 'Explicit disposal observation during root inventory reconciliation'}
             if vessel['location'] == vessel.get('home'):
                 vessel['return_confirmation'] = {'evidence': 'synthetic_input', 'time_s': state['logical_time_s']}
+            else:
+                vessel['return_confirmation'] = None
             seen.add(key)
 
     def accept_rack(self, actor_id, observations, workspace_clear=True, rack_on_table_confirmed=True):
@@ -447,6 +481,8 @@ class Workflow:
 
     @staticmethod
     def _closed_inventory(state):
+        if state.get('task_port', {}).get('pending_goal_id'):
+            raise TaskError('Unresolved worker task blocks completion and release')
         if state['pending_dilution'] or state['active_context_id']: raise TaskError('Pending device/dilution context blocks completion')
         if any(b['outcome'] in {'intent', 'unknown'} for b in state['bookings'].values()): raise TaskError('Unresolved withdrawal blocks completion')
         for vessel in state['inventory']['vessels'].values():
@@ -466,11 +502,35 @@ class Workflow:
         return self._transition('run_completed', actor_id, update, {'observations': observations})
 
     def reconcile(self, actor_id, observations, workspace_clear, pending_resolution=None,
-                  calibration_still_valid=False, blank_still_valid=False):
+                  calibration_still_valid=False, blank_still_valid=False, task_resolution=None):
         def update(state):
             if workspace_clear is not True: raise ObservationError('Explicit work-area observation required')
             cancelling = state['cancel_requested']
             self._observations(state, observations)
+            pending_goal_id = state.get('task_port', {}).get('pending_goal_id')
+            if pending_goal_id:
+                if (not isinstance(task_resolution, dict) or set(task_resolution) != {'goal_id', 'outcome'}
+                        or task_resolution['goal_id'] != pending_goal_id):
+                    raise TaskError('Explicit matching task observation resolution required')
+                record = state['task_port']['goals'][pending_goal_id]
+                outcome = task_resolution['outcome']
+                if outcome == 'unknown':
+                    record['status'] = 'uncertain'
+                    state.update(status='cancelling' if cancelling else 'held', recovery_required='task_outcome_unknown')
+                    return
+                if outcome not in {'performed', 'not_performed'}:
+                    raise TaskError('Explicit task outcome required')
+                from dna_quantification_port import endpoint
+                expected = endpoint(record['goal'], 'target' if outcome == 'performed' else 'source')
+                vessel = state['inventory']['vessels'][record['goal']['vessel_id']]
+                if vessel['location'] != expected:
+                    raise ObservationError('Task resolution disagrees with observed vessel custody')
+                record.update(status='reconciled_' + outcome, root_observation={
+                    'vessel_id': vessel['id'], 'sample_id': vessel['sample_id'], 'location': expected},
+                    observation_evidence='synthetic_person_input')
+                state['task_port']['pending_goal_id'] = None
+            elif task_resolution is not None:
+                raise TaskError('No pending task to reconcile')
             if state['pending_dilution']:
                 pending = state['pending_dilution']
                 if not isinstance(pending_resolution, dict) or pending_resolution.get('intent_id') != pending['intent_id']:
@@ -545,9 +605,11 @@ class Workflow:
             if vessel['kind'] in {'original', 'dilution'}:
                 vessel['remaining_volume_ul'] = remaining(state, key)
                 vessel['available_volume_ul'] = 0.0 if vessel['location']['kind'] == 'discarded' else vessel['remaining_volume_ul']
+        network = state.get('network', {})
         return {'format': 'solidcraftbot.dna-quantification-report/1', 'run_id': self.run_id,
             'status': state['status'], 'passed': state['status'] == 'completed' and not any(s['accepted_with_flags'] for s in state['samples'].values()),
-            'mode': 'synthetic_only', 'network_executed': False, 'hardware_executed': False,
+            'mode': 'synthetic_only', 'network_executed': any(c['transport'] == 'sila2_tls_loopback'
+                for c in network.get('commands', {}).values()), 'hardware_executed': False,
             'robot_motion_executed': False, 'real_export_qualified': False, 'cross_run_volume_ledger': False,
             'logical_time_s': state['logical_time_s'], 'clock_mode': state['clock_mode'],
             'rack_on_table': state['rack_ready'], 'samples': state['samples'], 'inventory': {'vessels': vessels},
@@ -555,4 +617,9 @@ class Workflow:
             'dilutions': state['dilutions'], 'pending_dilution': state['pending_dilution'],
             'resources': state['resources'], 'recovery_required': state['recovery_required'],
             'offered_dilutions': self._options(state), 'source_files_sha256': state['definition']['source_files_sha256'],
-            'limitations': state['definition']['protocol']['limitations']}
+            'limitations': state['definition']['protocol']['limitations'],
+            **({'task_port': state['task_port'], 'worker': 'mock', 'ros_interface_generated': interface_generated(),
+                'ros_compiled': False, 'ros_executed': False, 'motion_executed': False,
+                'executing_agent_id': state.get('executing_agent_id')} if state.get('task_port') else {}),
+            **({'control': state['control'], 'network': network,
+                'responsible_person_id': state['responsible_person_id']} if state.get('control') else {})}

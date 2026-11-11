@@ -93,6 +93,10 @@ class SourceSampleView(MutableMapping):
                  'initial_volume_ul': self.vessel['initial_volume_ul']}
         if key == 'remaining_volume_ul':
             return remaining(self.root, self.context['source_vessel_id'])
+        if key == 'location' and self.vessel['location']['kind'] == 'agent':
+            # Existing device operations use the responsible person's operator
+            # view. Canonical physical custody remains the distinct agent.
+            return {'kind': 'operator', 'actor_id': self.root['actor_id']}
         if key in fixed:
             return fixed[key]
         if key in {'return_confirmation', 'mass_confirmation_valid'}:
@@ -103,6 +107,13 @@ class SourceSampleView(MutableMapping):
         if key in {'id', 'sample_id', 'vessel_id', 'rack_slot', 'original_place_id',
                    'home', 'initial_volume_ul', 'remaining_volume_ul'}:
             raise TaskError('Source identities and volume projections are read only')
+        if key == 'location' and isinstance(value, dict) and value.get('kind') == 'operator':
+            agent_id = self.root.get('executing_agent_id')
+            if agent_id:
+                if value != {'kind': 'operator', 'actor_id': self.root['actor_id']}:
+                    raise TaskError('Operator view must retain the responsible person')
+                value = {'kind': 'agent', 'agent_id': agent_id}
+                self.context['executing_agent_id'] = agent_id
         self.vessel[key] = value
         if key == 'volume_uncertain' and value:
             self.vessel['mass_confirmation_valid'] = False

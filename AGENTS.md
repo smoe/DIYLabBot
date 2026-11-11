@@ -301,6 +301,24 @@ ableiten.
   die Netzwerkanbindung des gemeinsamen CF01/NanoDrop/Qubit-Workflows sind damit
   nicht implementiert; dessen Checkpointvertrag vor Effekten bleibt bestehen.
 
+## DNA-SiLA-Dienst und vorbereitete Worker-Aufträge
+
+Vor Änderungen [docs/dna-sila2-network.md](docs/dna-sila2-network.md) lesen.
+`model/dna-quantification-sila2.shared.json` pinnt DNA-Quellen, Standard-FDLs und
+den Auftragsvertrag `model/dna-quantification-tasks.protocol.json`. Der SiLA-Root
+bleibt einziger Eigentümer von Journal, Bilanz und Reservierungen. Quittungen
+und erste Wirkung atomar im selben Root speichern; Principal, verantwortliche
+Person, ausführenden Agenten und Gewahrsam trennen. Keine Geräte-Teilschritte
+als Netzwerkbestätigung anbieten. Unklare Ausführungen nicht wiederholen.
+
+`scripts/build_dna_ros_interfaces.py` erzeugt nur ignorierte Action-Definitionen;
+der lokale Mock-Worker importiert kein ROS. Worker-Ergebnisse sind Behauptungen,
+keine Ortsbeobachtungen oder Verbrauchsbuchungen. Goal-Cancel und Lockablauf geben
+keine Root-Ressourcen frei. Weder ROS-Knoten/Action-Server noch Robotik wurden
+gebaut oder ausgeführt. RoboStack/pixi ist spätere B1-Arbeit; jetzt nichts
+installieren. Neue schematische Nachweise nur unter `exports/dna-evidence/`
+ablegen; historische Medien, Galerie und Provenienz unverändert erhalten.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

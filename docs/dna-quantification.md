@@ -7,6 +7,10 @@ Messung sowie **1 Teil Probe + 9 Teile Verdünner (Faktor 10)** und **1 + 19
 bereitgestellt und nach jeder Entnahme an ihren ursprünglichen Rackplatz
 zurückgegeben. Identität, Rackinstanz und Platz werden getrennt geprüft.
 
+Der separate [SiLA-DNA-Dienst mit lokalem Mock-Auftragsport](dna-sila2-network.md)
+ergänzt eine Netzwerkgrenze zum selben Root. Sein generiertes ROS-Interface
+ist keine ausgeführte ROS-Laufzeit und kein Roboterprogramm.
+
 Nur `SyntheticBackend` erzeugt die fiktiven Messwerte und positiven
 Beobachtungen. Gerätebefehle, Pipettieren, Mischen, Scannen, Robotertransport,
 Netzwerkimport und reale Exportformate sind hier **nicht implementiert oder
