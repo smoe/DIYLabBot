@@ -21,7 +21,8 @@
     "poses",
     "cases",
     "qualification",
-    "limitations"
+    "limitations",
+    "handling"
   ],
   "additionalProperties": false,
   "properties": {
@@ -90,7 +91,18 @@
         "module_gap",
         "rear_gap",
         "shelf_margin",
-        "shelf_t"
+        "shelf_t",
+        "handle_width",
+        "handle_bar",
+        "handle_thickness",
+        "carrier_handle_projection",
+        "carrier_handle_z",
+        "lid_handle_rise",
+        "handle_embed",
+        "handle_approach_distance",
+        "assumed_finger_width",
+        "assumed_finger_thickness",
+        "handle_clearance"
       ],
       "additionalProperties": false,
       "properties": {
@@ -141,6 +153,39 @@
         },
         "shelf_t": {
           "$ref": "#/$defs/parameter"
+        },
+        "handle_width": {
+          "$ref": "#/$defs/parameter"
+        },
+        "handle_bar": {
+          "$ref": "#/$defs/parameter"
+        },
+        "handle_thickness": {
+          "$ref": "#/$defs/parameter"
+        },
+        "carrier_handle_projection": {
+          "$ref": "#/$defs/parameter"
+        },
+        "carrier_handle_z": {
+          "$ref": "#/$defs/parameter"
+        },
+        "lid_handle_rise": {
+          "$ref": "#/$defs/parameter"
+        },
+        "handle_embed": {
+          "$ref": "#/$defs/parameter"
+        },
+        "handle_approach_distance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "assumed_finger_width": {
+          "$ref": "#/$defs/parameter"
+        },
+        "assumed_finger_thickness": {
+          "$ref": "#/$defs/parameter"
+        },
+        "handle_clearance": {
+          "$ref": "#/$defs/parameter"
         }
       }
     },
@@ -163,7 +208,18 @@
           "module_gap",
           "rear_gap",
           "shelf_margin",
-          "shelf_t"
+          "shelf_t",
+          "handle_width",
+          "handle_bar",
+          "handle_thickness",
+          "carrier_handle_projection",
+          "carrier_handle_z",
+          "lid_handle_rise",
+          "handle_embed",
+          "handle_approach_distance",
+          "assumed_finger_width",
+          "assumed_finger_thickness",
+          "handle_clearance"
         ]
       }
     },
@@ -302,7 +358,12 @@
         "chemical_compatibility_verified",
         "sop_implemented",
         "inventory_implemented",
-        "sample_storage_implemented"
+        "sample_storage_implemented",
+        "gripper_qualified",
+        "load_qualified",
+        "article_retention_verified",
+        "lid_retention_verified",
+        "robot_motion_implemented"
       ],
       "additionalProperties": false,
       "properties": {
@@ -326,6 +387,21 @@
         },
         "sample_storage_implemented": {
           "const": false
+        },
+        "gripper_qualified": {
+          "const": false
+        },
+        "load_qualified": {
+          "const": false
+        },
+        "article_retention_verified": {
+          "const": false
+        },
+        "lid_retention_verified": {
+          "const": false
+        },
+        "robot_motion_implemented": {
+          "const": false
         }
       }
     },
@@ -334,6 +410,124 @@
       "items": {
         "type": "string",
         "minLength": 1
+      }
+    },
+    "handling": {
+      "type": "object",
+      "required": [
+        "recipe",
+        "status",
+        "units",
+        "frame_convention",
+        "handles",
+        "unresolved"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "recipe": {
+          "const": "integrated_front_loop_and_roof_bridge_v1"
+        },
+        "status": {
+          "const": "synthetic_unqualified"
+        },
+        "units": {
+          "type": "object",
+          "required": [
+            "length",
+            "angle"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "length": {
+              "const": "mm"
+            },
+            "angle": {
+              "const": "deg"
+            }
+          }
+        },
+        "frame_convention": {
+          "type": "object",
+          "required": [
+            "axes",
+            "approach_axis",
+            "closing_axis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "axes": {
+              "const": "right_handed_unit_vectors"
+            },
+            "approach_axis": {
+              "const": "z"
+            },
+            "closing_axis": {
+              "const": "y"
+            }
+          }
+        },
+        "handles": {
+          "type": "object",
+          "required": [
+            "carrier",
+            "lid"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "carrier": {
+              "type": "object",
+              "required": [
+                "grasp_frame",
+                "approach_frame",
+                "scope"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "grasp_frame": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approach_frame": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "const": "whole_carrier"
+                }
+              }
+            },
+            "lid": {
+              "type": "object",
+              "required": [
+                "grasp_frame",
+                "approach_frame",
+                "scope"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "grasp_frame": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "approach_frame": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "scope": {
+                  "const": "lid_only"
+                }
+              }
+            }
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
       }
     }
   },
@@ -565,6 +759,39 @@
               "type": "number"
             },
             "shelf_t": {
+              "type": "number"
+            },
+            "handle_width": {
+              "type": "number"
+            },
+            "handle_bar": {
+              "type": "number"
+            },
+            "handle_thickness": {
+              "type": "number"
+            },
+            "carrier_handle_projection": {
+              "type": "number"
+            },
+            "carrier_handle_z": {
+              "type": "number"
+            },
+            "lid_handle_rise": {
+              "type": "number"
+            },
+            "handle_embed": {
+              "type": "number"
+            },
+            "handle_approach_distance": {
+              "type": "number"
+            },
+            "assumed_finger_width": {
+              "type": "number"
+            },
+            "assumed_finger_thickness": {
+              "type": "number"
+            },
+            "handle_clearance": {
               "type": "number"
             }
           }

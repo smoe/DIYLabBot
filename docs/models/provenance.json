@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "9ea6d431c04941864b478cf3956ef4892a9de6cacd1a65cfba0d57ca48581348",
+  "catalog_sha256": "6b16f5cc7e1578d06ddeaea01ea764ecf06f5aae00ca9aaab40667403570c032",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "56bbb1e747637d91606a983e47798411dcd9fb35b0047b9d830fcafb65ca623c",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -4405,19 +4405,19 @@
       "id": "extraction-kit-station",
       "image": "images/extraction-kit-station.svg",
       "source_files_sha256": {
-        "model/extraction-kit-station.shared.json": "4a39a34e70285a6d791ef43cb0e0f27b530d085e19c56dbc08d79e6fdf3dedfc"
+        "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3"
       },
       "representation": "Source-derived K01 material/slot diagram; not a native CAD render or stock inventory",
       "producer_files_sha256": {
-        "scripts/extraction_kit_station.py": "3729b454f5f4f4dd3557a3c70c40a4e2944147385f98b1c5b7ff502d74f09f28",
-        "model/extraction-kit-station.schema.json": "e1bd2de0a281ae049d1d577395697dec1b8f89d5f6e0425e5c3555e568d0f0fd"
+        "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+        "model/extraction-kit-station.schema.json": "b795d31f6d92443a35404a55e7d0f5b150048cba0c517d87f30027ed0a416ebc"
       },
       "inventory_managed": false,
       "article_fit_qualified": false,
       "image_sha256": "2c55af5b7648c3a4de8dff8686191a075625ee67137a9ff47a7e160951f5c01d",
       "bytes": 6623,
       "dependency_files_sha256": {
-        "model/extraction-kit-station.shared.json": "4a39a34e70285a6d791ef43cb0e0f27b530d085e19c56dbc08d79e6fdf3dedfc",
+        "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3",
         "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
       }
     }

@@ -23,7 +23,7 @@ def native_bbox_fixture(spec):
     """Primitive exterior boxes stand in for measurements, never for native QA."""
     p = model.parameters(spec); shapes = {}
     for operation in model.expanded(spec, p)['operations']:
-        if operation['action'] != 'create':
+        if operation['action'] == 'cut':
             continue  # Interior cuts leave these exterior bounds intact.
         shape = model.numeric_shape(operation['shape'], p)
         if shape['kind'] == 'box':
@@ -31,6 +31,10 @@ def native_bbox_fixture(spec):
         else:
             x, y, z = shape['origin']; r = shape['radius']
             low = [x-r, y-r, z]; high = [x+r, y+r, z+shape['height']]
+        if operation['action'] == 'join':
+            old = shapes[operation['body']]['bbox']
+            low = [min(a, b) for a, b in zip(low, old['min'])]
+            high = [max(a, b) for a, b in zip(high, old['max'])]
         shapes[operation['body']] = {'body': operation['body'], 'bbox': {'min': low, 'max': high}}
     return list(shapes.values())
 
@@ -167,6 +171,87 @@ class KitStationTests(unittest.TestCase):
                 item['bbox']['min'][0] += 1; item['bbox']['max'][0] += 1
                 with self.subTest(case=case, body=body):
                     self.assertFalse(all(c['passed'] for c in model.check_interface_geometry(spec, p, measured)))
+
+    def test_handles_are_integrated_into_existing_bodies_with_positive_fusion_overlap(self):
+        for case in model.cases(self.spec):
+            spec = model.materialize(self.spec, case['id']); p = model.parameters(spec); data = model.expanded(spec, p)
+            self.assertEqual(len(data['bodies']), 36)
+            for tag in ['RNA', 'DNA']:
+                for role, target, anchor in [('Carrier', tag+'_Container', 0), ('Lid', tag+'_Lid', model.interfaces(spec, p)['modules'][tag]['lid_inner_bbox_mm']['max'][2]+p['lid_wall'])]:
+                    outer = next(o for o in data['operations'] if o['id'] == tag+'_'+role+'HandleOuter')
+                    window = next(o for o in data['operations'] if o['id'] == tag+'_'+role+'HandleWindow')
+                    self.assertEqual((outer['body'], window['body']), (target, target))
+                    self.assertEqual((outer['action'], window['action']), ('join', 'cut'))
+                    shape = model.numeric_shape(outer['shape'], p)
+                    if role == 'Carrier':
+                        self.assertGreater(shape['origin'][1]+shape['size'][1], anchor)
+                        self.assertLess(shape['origin'][2]+shape['size'][2], p['base_h']-p['lid_overlap'])
+                    else:
+                        self.assertLess(shape['origin'][2], anchor)
+                        self.assertGreater(shape['origin'][2]+shape['size'][2], anchor)
+
+    def test_grasp_and_approach_frames_are_source_derived_right_handed_and_scope_specific(self):
+        for case in model.cases(self.spec):
+            spec = model.materialize(self.spec, case['id']); p = model.parameters(spec); contract = model.interfaces(spec, p)
+            self.assertEqual(len(contract['frames']), 8)
+            for module in contract['modules'].values():
+                for role, handle in module['handles'].items():
+                    grasp = contract['frames'][handle['grasp_frame']]; approach = contract['frames'][handle['approach_frame']]
+                    self.assertEqual(grasp['body'], handle['body'])
+                    self.assertEqual(grasp['scope'], 'whole_carrier' if role == 'carrier' else 'lid_only')
+                    self.assertEqual(grasp['status'], 'synthetic_unqualified')
+                    self.assertEqual(grasp['units'], {'length': 'mm', 'angle': 'deg'})
+                    self.assertFalse(grasp['robot_motion_implemented'])
+                    x, y, z = (grasp['axes'][axis] for axis in 'xyz')
+                    self.assertEqual([x[1]*y[2]-x[2]*y[1], x[2]*y[0]-x[0]*y[2], x[0]*y[1]-x[1]*y[0]], z)
+                    self.assertEqual([a-b for a, b in zip(grasp['origin_mm'], approach['origin_mm'])], [p['handle_approach_distance']*v for v in z])
+            # All old article and insert positions remain tied to the original kit frame.
+            for module in contract['modules'].values():
+                self.assertEqual(module['container_shell_bbox_mm']['min'][1:], [0, 0])
+                self.assertEqual(module['slots'][0]['envelope_bbox_mm']['min'][2], p['bottom'])
+
+    def test_synthetic_probe_boxes_cover_each_window_fingers_and_approach_with_explicit_gap(self):
+        for case in model.cases(self.spec):
+            spec = model.materialize(self.spec, case['id']); p = model.parameters(spec); data = model.interfaces(spec, p)
+            probes = data['native_clearance_probes']; self.assertEqual(len(probes), 16)
+            self.assertEqual(len({probe['id'] for probe in probes}), 16)
+            for probe in probes:
+                self.assertIn(probe['frame_id'], data['frames'])
+                self.assertEqual(probe['minimum_clearance_mm'], p['handle_clearance'])
+                self.assertTrue(all(size > 0 for size in probe['size_mm']))
+                self.assertEqual(probe['units'], {'length': 'mm'})
+                self.assertEqual(probe['status'], 'synthetic_unqualified')
+            for tag in ('RNA', 'DNA'):
+                for role in ('carrier', 'lid'):
+                    selected = [probe for probe in probes if probe['id'].startswith(tag+'_'+role+'_')]
+                    self.assertEqual(len(selected), 4)
+                    self.assertTrue(any(probe['id'].endswith('_window') for probe in selected))
+                    self.assertTrue(any(probe['id'].endswith('_approach') for probe in selected))
+
+    def test_handle_parameter_limits_and_coupled_occlusion_checks_reject_bad_designs(self):
+        for name, value in [('handle_width', 0), ('handle_width', 80), ('carrier_handle_projection', float('inf')), ('handle_embed', True)]:
+            with self.subTest(parameter=name, value=value), self.assertRaises(ValueError):
+                model.parameters(self.spec, {name: value})
+        for name, value in [('carrier_handle_z', 24), ('handle_width', 24), ('handle_embed', 4), ('lid_handle_rise', 8)]:
+            bad = copy.deepcopy(self.spec); bad['parameters'][name]['expression'] = value; bad['parameters'][name]['range'] = [value, value]
+            with self.subTest(coupled_parameter=name), self.assertRaises(ValueError):
+                model.parameters(bad)
+        for name in ['handle_width', 'carrier_handle_projection', 'lid_handle_rise', 'handle_approach_distance']:
+            for value in self.spec['parameters'][name]['range']:
+                p = model.parameters(self.spec, {name: value})
+                self.assertEqual(len(model.interfaces(self.spec, p)['native_clearance_probes']), 16)
+
+    def test_lid_handle_cannot_claim_whole_kit_or_qualified_payload(self):
+        for change in ['lid_scope', 'frame_alias', 'load_qualified', 'lid_retention_verified', 'article_retention_verified', 'gripper_qualified', 'robot_motion_implemented']:
+            bad = copy.deepcopy(self.spec)
+            if change == 'lid_scope':
+                bad['handling']['handles']['lid']['scope'] = 'whole_carrier'
+            elif change == 'frame_alias':
+                bad['handling']['handles']['lid']['grasp_frame'] = bad['handling']['handles']['carrier']['grasp_frame']
+            else:
+                bad['qualification'][change] = True
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                model.validate(bad)
 
     def test_shared_primitive_adapter_and_dependencies_do_not_require_lab_glassware(self):
         names = [str(path.relative_to(ROOT)) for path in model.source_dependencies(self.spec)]

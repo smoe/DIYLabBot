@@ -155,6 +155,105 @@
         6
       ],
       "description": "Illustrative reference floor thickness"
+    },
+    "handle_width": {
+      "expression": 52,
+      "unit": "mm",
+      "range": [
+        48,
+        56
+      ],
+      "description": "Shared integrated handle outside width; synthetic robot interface"
+    },
+    "handle_bar": {
+      "expression": 6,
+      "unit": "mm",
+      "range": [
+        6,
+        6
+      ],
+      "description": "Shared handle post and crossbar width"
+    },
+    "handle_thickness": {
+      "expression": 8,
+      "unit": "mm",
+      "range": [
+        8,
+        8
+      ],
+      "description": "Carrier handle height and lid bridge depth"
+    },
+    "carrier_handle_projection": {
+      "expression": 28,
+      "unit": "mm",
+      "range": [
+        26,
+        30
+      ],
+      "description": "Front handle projection outside the existing container front"
+    },
+    "carrier_handle_z": {
+      "expression": 14,
+      "unit": "mm",
+      "range": [
+        14,
+        14
+      ],
+      "description": "Front handle bottom height below the stored hood rim"
+    },
+    "lid_handle_rise": {
+      "expression": 30,
+      "unit": "mm",
+      "range": [
+        28,
+        32
+      ],
+      "description": "Integrated bridge rise above the existing lid roof"
+    },
+    "handle_embed": {
+      "expression": 1,
+      "unit": "mm",
+      "range": [
+        1,
+        1
+      ],
+      "description": "Positive fusion overlap into the existing shell or roof"
+    },
+    "handle_approach_distance": {
+      "expression": 45,
+      "unit": "mm",
+      "range": [
+        40,
+        50
+      ],
+      "description": "Synthetic open-gripper approach distance, not a robot trajectory"
+    },
+    "assumed_finger_width": {
+      "expression": 18,
+      "unit": "mm",
+      "range": [
+        18,
+        18
+      ],
+      "description": "Width of each synthetic finger-space probe, not a selected gripper"
+    },
+    "assumed_finger_thickness": {
+      "expression": 4,
+      "unit": "mm",
+      "range": [
+        4,
+        4
+      ],
+      "description": "Thickness of each synthetic finger-space probe"
+    },
+    "handle_clearance": {
+      "expression": 2,
+      "unit": "mm",
+      "range": [
+        2,
+        2
+      ],
+      "description": "Conservative probe clearance from all native bodies"
     }
   },
   "native_edit_parameters": [
@@ -283,7 +382,12 @@
     "chemical_compatibility_verified": false,
     "sop_implemented": false,
     "inventory_implemented": false,
-    "sample_storage_implemented": false
+    "sample_storage_implemented": false,
+    "gripper_qualified": false,
+    "load_qualified": false,
+    "article_retention_verified": false,
+    "lid_retention_verified": false,
+    "robot_motion_implemented": false
   },
   "limitations": [
     "Reference floor illustrates support only; no shelf product, room layout or installed station is selected.",
@@ -293,6 +397,40 @@
     "Containers and inserts are passive staging concepts, not extraction machinery or a qualified storage condition.",
     "Open and stored are separate static arrangements; no hinge, motion sequence, robot access or collision-free removal path is implemented.",
     "Additional SOP-selected materials, sample storage, reagent preparation, volumes, consumption, reservations and stock control are outside this model.",
-    "FDM printability, material compatibility, cleanability, RNase-free handling, retention and physical fit remain unqualified."
-  ]
+    "FDM printability, material compatibility, cleanability, RNase-free handling, retention and physical fit remain unqualified.",
+    "Integrated front handles are candidate whole-carrier interfaces; integrated roof bridges are for removable lids only.",
+    "Front-grasp tipping moment, loaded center of gravity, article/lid retention and payload are unqualified; static clearance is not lifting qualification."
+  ],
+  "handling": {
+    "recipe": "integrated_front_loop_and_roof_bridge_v1",
+    "status": "synthetic_unqualified",
+    "units": {
+      "length": "mm",
+      "angle": "deg"
+    },
+    "frame_convention": {
+      "axes": "right_handed_unit_vectors",
+      "approach_axis": "z",
+      "closing_axis": "y"
+    },
+    "handles": {
+      "carrier": {
+        "grasp_frame": "CarrierGrasp",
+        "approach_frame": "CarrierApproach",
+        "scope": "whole_carrier"
+      },
+      "lid": {
+        "grasp_frame": "LidGrasp",
+        "approach_frame": "LidApproach",
+        "scope": "lid_only"
+      }
+    },
+    "unresolved": [
+      "Actual robot, gripper, contact pads, retention and grasp sensing are not selected or qualified.",
+      "Full-carrier mass, center of gravity, front-grasp tipping moment, stiffness and load capacity remain unverified.",
+      "Closed article and lid retention during lifting are unverified; no latch or anti-tip mechanism is implemented.",
+      "The roof bridge is for the lid alone and must never be interpreted as a whole-kit lifting handle.",
+      "The clearance probes describe synthetic static spaces, not a real gripper, swept robot path or motion program."
+    ]
+  }
 }

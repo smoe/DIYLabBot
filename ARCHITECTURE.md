@@ -803,3 +803,9 @@ Die Bereitstellung ist `planned_unobserved` und führt keinen zweiten Bestand.
 Raumtemperaturbedingungen der verschlossenen Originalkomponenten sind von
 Ansatz-/Öffnungsfristen und Probenlagerung getrennt. Die Station ist ein
 Druckentwurf, keine qualifizierte Lager-, Greif- oder Extraktionsmaschine.
+
+Version 1 hält beide Kits direkt an K01 bereit. Behälter und abnehmbare Haube
+erhalten modellierte Griffe mit abgeleiteten Greifbezügen; Griffgeometrie und
+Greifbezug stammen aus demselben Rezept. Eine Transportbahn, ein ausgewählter
+Greifer, sichere Artikel-/Deckelretention und belastbare Traglasten folgen
+daraus nicht. Automatisierter Regalzugriff ist eine spätere Ausbaustufe.

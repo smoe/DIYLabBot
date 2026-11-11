@@ -1,10 +1,14 @@
-# K01 · passive Regalstation für Extraktionskits
+# K01 · passive Bereitstellung für Extraktionskits
 
 K01 zeigt zwei vorbereitete Kitmodule für **QIAGEN RNeasy Protect Cell Mini
 74624** und **DNeasy Blood & Tissue 69504**. Verschlossene Originalkomponenten
 sollen gemeinsam in einem entnehmbaren Behälter bereitstehen. Die Station
 ergänzt die [Extraktionsvorbereitung](extraction-automation.md); sie führt
 keine Extraktion, Reagenzvorbereitung oder Roboterbewegung aus.
+
+In Version 1 stehen beide Kitmodule direkt an K01 bereit. Ein Regal und eine
+automatische Ein-/Auslagerung sind dafür nicht erforderlich. Die dargestellte
+Lagerpose ist eine geschlossene Behälterstellung am Arbeitsplatz.
 
 ## Native Ansichten des Entwurfs
 
@@ -14,7 +18,7 @@ Türkis kennzeichnet RNA, Violett DNA. Die abgenommenen Hauben stehen hinter
 den beiden Kitträgern. Flaschen und Packungen sind synthetische Hüllen mit
 unbekannten realen Herstellermaßen.
 
-![K01 in Lagerpose mit geschlossenen Hauben](media/extraction-kit-station-stored.png)
+![K01 direkt an der Station mit geschlossenen Hauben](media/extraction-kit-station-stored.png)
 
 Die [Galerie](models/README.md) ergänzt einen beschrifteten schematischen
 Platzplan. Er bleibt innerhalb ihres 4-MB-Bildbudgets; diese größeren nativen
@@ -59,15 +63,38 @@ Darstellung nicht automatisch als vorhanden, angesetzt oder lagerfähig gebucht.
 
 | Fall | Aussage |
 |---|---|
-| `stored` | Beide Kitmodule in Lagerpose, Deckel geschlossen |
+| `stored` | Beide Kitmodule am Arbeitsplatz, Deckel geschlossen |
 | `open` | Gleiche Module zur Anschauung geöffnet; Deckel hinter den Kästen abgestellt |
 | `wide_open` | Breitere parametrische Behältervariante, ebenfalls mit offen abgesetzten Deckeln |
 
 Die Ansichten sind unabhängig aufgebaute statische Zustände. Zwischen ihnen
 ist keine Öffnungs-, Greif- oder Transportbahn beschrieben. Es gibt keine
 Proben, geöffneten Reagenzflaschen oder laufbereiten Ansätze im Modell.
-Die Regalumgebung ist ein konzeptioneller Aufstellungsbezug, keine bestätigte
-Einbauposition in L01 und kein vermessenes vorhandenes Regal.
+Der Referenzboden ist ein konzeptioneller Aufstellungsbezug, keine bestätigte
+Einbauposition in L01 und kein vermessenes vorhandenes Möbel.
+
+## Getrennte Griffe für Träger und Deckel
+
+Jeder Kitträger erhält einen integrierten Frontgriff. Der abnehmbare Deckel
+erhält einen eigenen Brückengriff auf dem Dach. Beide Instanzen verwenden
+dasselbe parametrische Rezept. Die bisherigen Container-, Einsatz-,
+Artikel- und Deckelpositionen bleiben erhalten; die Griffe erweitern deren
+Außenraum. Die zugehörigen Greif- und Anfahrbezüge folgen den ausgewerteten
+Maßen und der jeweiligen statischen Deckelstellung.
+
+Der Frontgriff ist als Aufnahme des gesamten bestückten Trägers gedacht;
+der Dachgriff ausschließlich als Aufnahme des Deckels. Ein Griff am Deckel
+ist keine Aufhängung für das ganze Kit. Die Haube ist weiterhin abnehmbar
+und besitzt keine qualifizierte Verriegelung am Träger.
+
+Die modellierten Finger- und Anfahrfreiräume sind synthetische Annahmen.
+Ein realer Greifer muss einschließlich Finger, Handgelenk, Werkzeugmasse
+und Beobachtung ausgewählt und neu geprüft werden. Insbesondere erzeugt
+der frontseitige Griff ein Moment aus dem nach hinten versetzten Schwerpunkt.
+Zulässige Beladung, Schwerpunkt, Kipp- und Rutschsicherung der Artikel,
+Deckelretention, Druckfestigkeit und Verhalten bei Energieausfall sind offen.
+Vor einem Transport braucht der Träger eine dazu ausgelegte Aufnahme und
+Rückhaltemaßnahmen. Das statische Modell erteilt keine Transportfreigabe.
 
 ## Lagerung und Arbeitsvorbereitung unterscheiden
 
@@ -141,11 +168,16 @@ Vergleich. Ein erfolgreicher Aufbau oder ein Galeriebild belegt weder reale
 Passung noch Laborbetrieb; maßgeblich sind die tatsächlich ausgeführten
 Prüfungen und Grenzen des jeweiligen Berichts.
 
-Der erste native Aufbau `extraction-kit-station-4a39a34e7028` besteht in
-FreeCAD und SolidCraft: `stored`, `open` und `wide_open` enthalten jeweils
-36 gültige geschlossene Körper. 24 native Zuordnungsprüfungen je Fall
-bestätigen die berechneten Positionen und Schnittstellen. Beide CADs melden
-keine Überschneidungen; der STEP-Differenzvergleich ergibt 0 mm³. Diese
-Prüfung betrifft die modellierten synthetischen Hüllen und statischen
-Zustände, keine reale Kitpassung oder Druckqualifikation. Die nativen Bilder
-wurden visuell geprüft; eine FreeCAD-GUI-Prüfung wurde nicht durchgeführt.
+Der Griffstand `extraction-kit-station-c3b85c56a30f` besteht in FreeCAD und
+SolidCraft: `stored`, `open` und `wide_open` enthalten jeweils 36 gültige
+geschlossene Körper und 24 native Zuordnungsprüfungen. Je Fall und CAD wurden
+16 Fingerfenster-/Finger-/Anfahrhüllen gegen sämtliche Modellkörper geprüft,
+insgesamt 96 Prüfungen. Die Hüllen enthalten zusätzlich das in der Quelle
+benannte Prüfspiel von 2 mm. Es gibt keine Blockaden oder Modellinterferenzen;
+der STEP-Differenzvergleich ergibt 0 mm³. Acht Greif-/Anfahrbezüge werden aus
+denselben Parametern abgeleitet.
+
+Diese Prüfung betrifft die modellierten synthetischen Hüllen und statischen
+Zustände, keine reale Kitpassung, Greif-, Hebe- oder Druckqualifikation. Die
+nativen Bilder wurden auf vollständigen Ausschnitt und sichtbare Träger-/
+Deckelgriffe geprüft; eine FreeCAD-GUI-Prüfung wurde nicht durchgeführt.

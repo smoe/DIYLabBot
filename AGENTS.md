@@ -475,3 +475,10 @@ oder Mengenlisten pflegen. Physische Hüllen und Passungen sind synthetische
 Entwurfsannahmen. Geschlossene Kitvorräte, Arbeitsansätze und Probenlagerung
 nicht gleichsetzen. Beide CADs unabhängig aus denselben Operationen erzeugen;
 ein einzelner Backend-Aufbau belegt keinen CAD-übergreifenden Vergleich.
+
+K01 hält in Version 1 beide Kits direkt an der Station bereit. Griffe und
+Greifbezüge aus demselben Behälter-/Deckelrezept ableiten und für alle
+statischen Fälle neu prüfen. Modellierte Griffe belegen weder reale
+Greifbarkeit noch Transportfreigabe; Last, Retention, Druckfestigkeit und
+Greifer bleiben gesondert zu qualifizieren. Einen späteren Regalzugriff
+nicht als bereits implementierte Funktion ausgeben.

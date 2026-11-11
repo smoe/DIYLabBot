@@ -711,7 +711,7 @@
         "kind": "diagram",
         "view": "kit_station"
       },
-      "caption": "Schematischer Platzplan der zwei Kitmodule im gemeinsamen Behälter-/Einsatzentwurf. Verschlossene symbolische Originalkomponenten; ungemessene Artikelhüllen. Native Ansichten und Lagergrenzen unter Details.",
+      "caption": "Schematischer Platzplan der beiden Kits direkt an K01; native Ansichten mit Träger- und Deckelgriffen unter Details. Artikelhüllen und Greifmaße bleiben unqualifiziert.",
       "documentation": "docs/extraction-kit-station.md"
     }
   ],

@@ -4,6 +4,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 import subprocess
 import time
 
@@ -131,6 +132,68 @@ def check_solidcraft_interference(results, count):
     return {**result, 'passed': passed, 'scope': 'All native bodies at this static source-defined pose'}
 
 
+def clearance_probes(spec, p):
+    """Resolve source-derived, unqualified finger/approach envelopes, with margin."""
+    probes = model.interfaces(spec, p).get('native_clearance_probes')
+    if not isinstance(probes, list) or not probes:
+        raise ValueError('Native handle/approach clearance probes required')
+    identities = set()
+    result = []
+    for probe in probes:
+        required = {'id', 'frame_id', 'kind', 'origin_mm', 'size_mm', 'minimum_clearance_mm'}
+        if not isinstance(probe, dict) or not required <= set(probe):
+            raise ValueError('Incomplete native clearance probe')
+        if (not isinstance(probe['id'], str) or not re.fullmatch('[A-Za-z][A-Za-z0-9_]*', probe['id'])
+                or probe['id'] in identities or not isinstance(probe['frame_id'], str) or not probe['frame_id']
+                or probe['kind'] != 'box'):
+            raise ValueError('Unique named box clearance probes required')
+        origin, size, margin = probe['origin_mm'], probe['size_mm'], probe['minimum_clearance_mm']
+        if (not isinstance(origin, list) or not isinstance(size, list) or len(origin) != 3 or len(size) != 3
+                or any(type(value) not in (int, float) or not math.isfinite(value)
+                       for value in origin+size+[margin]) or min(size) <= 0 or margin <= 0):
+            raise ValueError('Finite probe geometry and positive clearance required')
+        identities.add(probe['id'])
+        # A cube offset contains the Euclidean ball offset: an empty expanded
+        # box conservatively certifies this margin for the declared box only.
+        result.append({**probe, 'audit_origin_mm': [value-margin for value in origin],
+                       'audit_size_mm': [value+2*margin for value in size],
+                       'grasp_qualified': False})
+    return result
+
+
+def solidcraft_clearances(args, spec, p, native_path, out, case_id, geometry, paths):
+    checks = []
+    original = robot_spec.digest(native_path)
+    names = [body['body'] for body in geometry]
+    for probe in clearance_probes(spec, p):
+        body = 'K01_Audit_'+probe['id']
+        if body in names:
+            raise ValueError('Clearance probe collides with a native body identity')
+        script = out/(case_id+'.'+probe['id']+'.clearance.commands.json')
+        report = out/(case_id+'.'+probe['id']+'.clearance.json')
+        write(script, {'commands': [
+            {'command': 'solid.box', 'params': {'operation': 'new', 'name': body, 'body_name': body,
+                'corner': probe['audit_origin_mm'],
+                **dict(zip(('length', 'width', 'height'), probe['audit_size_mm']))}},
+            {'command': 'inspect.interference', 'params': {'bodies': names+[body]}}]})
+        subprocess.run([args.solidcraft_cli, 'run', str(script), '--in', str(native_path),
+                        '--results', '--quiet', '--json-out', str(report)],
+                       check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
+        if robot_spec.digest(native_path) != original:
+            raise ValueError('Clearance audit changed native CAD input')
+        raw = json.loads(report.read_text(encoding='utf-8'))
+        if not isinstance(raw, list) or len(raw) != 2:
+            raise ValueError('Incomplete SolidCraft probe construction/audit results')
+        inspection = check_solidcraft_interference(raw[-1:], len(names)+1)
+        checks.append({**probe, 'passed': inspection['passed'], 'interference': inspection,
+                       'native_bodies_checked': names,
+                       'method': 'Native solid.box offset-envelope versus every saved model solid; no input save'})
+        paths['clearance_'+probe['id']+'_commands'] = script
+        paths['clearance_'+probe['id']+'_result'] = report
+    return {'passed': all(check['passed'] for check in checks), 'checks': checks,
+            'scope': 'Static source-defined finger and approach envelopes; no real gripper or execution qualification'}
+
+
 def verify_artifacts(paths, pins):
     for name, digest in pins.items():
         if robot_spec.digest(paths[name]) != digest:
@@ -214,8 +277,10 @@ def build(args):
                            check=True, cwd=ROOT, stdout=subprocess.DEVNULL)
             interference = check_solidcraft_interference(json.loads(paths['solidcraft_interference'].read_text()), len(sc_geometry))
             interfaces = interface_checks(current, p, sc_geometry)
-            sc_checks = {'passed': interference['passed'] and all(c['passed'] for c in interfaces),
+            clearances = solidcraft_clearances(args, current, p, paths['solidcraft'], out, case_id, sc_geometry, paths)
+            sc_checks = {'passed': interference['passed'] and clearances['passed'] and all(c['passed'] for c in interfaces),
                          'interfaces': interfaces, 'interference': interference,
+                         'handle_approach_clearances': clearances,
                          'construction': 'Direct shared operations; no FreeCAD input'}
         if args.backend in {'freecad', 'both'}:
             paths.update(freecad=cad/(case_id+'.FCStd'), freecad_validation=out/(case_id+'.freecad.json'))
@@ -260,6 +325,7 @@ def build(args):
                                        'freecad_interference_volume_mm3': .00001},
               'limitations': list(spec.get('limitations', []))+[
                   'Three static source-defined cases; no robot movement or access trajectory is generated or qualified',
+                  'Offset-box clearance probes cover only source-defined synthetic finger/approach envelopes; no real grasp qualification',
                   'Manufacturer vessels and contents are unmeasured illustrative envelopes, not purchase-part CAD',
                   'Closed solids and static clearances do not qualify FDM/PETG, chemical resistance, SDS suitability or real fit',
                   'No extraction, dosing, contamination control, reagent storage conditions or hardware execution tested',

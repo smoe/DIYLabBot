@@ -51,7 +51,7 @@ def catalog(spec):
 
 
 def parameters(spec, overrides=None):
-    require(set(spec['parameters']) == set('outer_w outer_d base_h bottom wall insert_t insert_clearance slot_clearance lid_h lid_overlap lid_side_clearance lid_wall module_gap rear_gap shelf_margin shelf_t'.split()), 'Unsupported station parameters')
+    require(set(spec['parameters']) == set('outer_w outer_d base_h bottom wall insert_t insert_clearance slot_clearance lid_h lid_overlap lid_side_clearance lid_wall module_gap rear_gap shelf_margin shelf_t handle_width handle_bar handle_thickness carrier_handle_projection carrier_handle_z lid_handle_rise handle_embed handle_approach_distance assumed_finger_width assumed_finger_thickness handle_clearance'.split()), 'Unsupported station parameters')
     for name in overrides or {}:
         require(name in spec['parameters'], 'Unknown parameter override')
         expression = str(spec['parameters'][name]['expression'])
@@ -67,19 +67,41 @@ def parameters(spec, overrides=None):
     require(p['bottom'] < p['base_h'] and p['lid_overlap'] < p['base_h'], 'Invalid container or hood overlap')
     require(p['lid_wall'] < p['lid_h'] and p['insert_t'] + p['bottom'] < p['base_h'], 'Invalid insert or hood thickness')
     require(p['outer_w'] > 2 * (p['wall'] + p['insert_clearance']) and p['outer_d'] > 2 * (p['wall'] + p['insert_clearance']), 'No insert interface remains')
+    require(p['handle_width'] < p['outer_w']-2*p['wall'], 'Handle must join the existing wall or roof away from its edges')
+    require(p['handle_width'] > 2*p['handle_bar']+p['assumed_finger_width']+2*p['handle_clearance'], 'No declared handle window or finger space remains')
+    require(p['carrier_handle_projection'] > p['handle_bar']+2*p['handle_clearance'], 'No front handle window remains')
+    require(p['carrier_handle_z'] > p['assumed_finger_thickness']+2*p['handle_clearance'], 'Lower carrier finger space meets the reference floor')
+    require(p['carrier_handle_z']+p['handle_thickness']+p['handle_clearance'] < p['base_h']-p['lid_overlap'], 'Closed hood occludes the carrier handle')
+    require(p['lid_handle_rise'] > p['handle_bar']+2*p['handle_clearance'], 'No lid handle window remains')
+    require(p['handle_embed'] < min(p['wall'], p['lid_wall']), 'Handle fusion must stay within its existing wall or roof')
+    require(p['handle_approach_distance'] > p['handle_bar']/2+2*p['handle_clearance'], 'No positive approach space remains')
     return p
 
 
 def validate(spec):
-    exact(spec, 'format id status units recipe catalog parameters native_edit_parameters grid prototype_defaults prototypes modules inserts display_pose poses cases qualification limitations', 'station source')
+    exact(spec, 'format id status units recipe catalog parameters native_edit_parameters grid prototype_defaults prototypes modules inserts display_pose poses cases qualification handling limitations', 'station source')
     require(spec['format'] == FORMAT and spec['units'] == {'length': 'mm', 'angle': 'deg'}, 'Unsupported station source or units')
     require(spec['recipe'] == 'common_container_removable_hood_and_interchangeable_3x3_insert_v1', 'Unsupported station recipe')
     require(spec['grid'] == {'rows': 3, 'columns': 3}, 'K01 uses a 3x3 reference insert')
     require(spec['poses'] == ['stored', 'open'] and spec['display_pose'] in spec['poses'], 'Unknown static arrangement')
     require(set(spec['native_edit_parameters']) <= set(spec['parameters']), 'Unknown native edit parameter')
     qualification = spec['qualification']
-    exact(qualification, 'manufacturer_dimensions_verified fit_verified fdm_verified chemical_compatibility_verified sop_implemented inventory_implemented sample_storage_implemented', 'qualification')
+    exact(qualification, 'manufacturer_dimensions_verified fit_verified fdm_verified chemical_compatibility_verified sop_implemented inventory_implemented sample_storage_implemented gripper_qualified load_qualified article_retention_verified lid_retention_verified robot_motion_implemented', 'qualification')
     require(all(v is False for v in qualification.values()), 'K01 is an unqualified passive concept')
+    handling = spec['handling']
+    exact(handling, 'recipe status units frame_convention handles unresolved', 'handling concept')
+    require(handling['recipe'] == 'integrated_front_loop_and_roof_bridge_v1' and handling['status'] == 'synthetic_unqualified', 'Unsupported or qualified handle contract')
+    require(handling['units'] == spec['units'] and handling['frame_convention'] == {'axes': 'right_handed_unit_vectors', 'approach_axis': 'z', 'closing_axis': 'y'}, 'Explicit handle frame convention required')
+    exact(handling['handles'], 'carrier lid', 'handle roles')
+    frame_ids = []
+    for role, descriptor in handling['handles'].items():
+        exact(descriptor, 'grasp_frame approach_frame scope', 'handle descriptor')
+        require(descriptor['scope'] == ('whole_carrier' if role == 'carrier' else 'lid_only'), 'A lid handle cannot lift a whole kit')
+        for name in ('grasp_frame', 'approach_frame'):
+            require(isinstance(descriptor[name], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', descriptor[name]), 'Stable handle frame ID required')
+            frame_ids.append(descriptor[name])
+    require(len(set(frame_ids)) == 4, 'Handle frames must be distinct')
+    require(isinstance(handling['unresolved'], list) and handling['unresolved'] and all(isinstance(v, str) and v for v in handling['unresolved']), 'Handle qualification limits required')
     exact(spec['prototype_defaults'], 'reagent column vessel', 'prototype defaults')
     require(set(spec['prototypes']) == {'small_bottle', 'medium_bottle', 'large_bottle', 'sealed_column_pack', 'sealed_vessel_pack'}, 'Declare the five synthetic envelope prototypes')
     for proto in spec['prototypes'].values():
@@ -173,17 +195,56 @@ def ensemble(spec, p):
     return result
 
 
+def handle_interfaces(spec, p, module_id, cx, lid_y, lid_z):
+    """Derive static candidate frames and disjoint synthetic clearance boxes.
+
+    Tool z points toward the grasp, tool y is the closing direction. These
+    frames and spaces do not select a gripper or define an executable motion.
+    """
+    frames = {}; handles = {}; probes = []
+    w, bar, thick = p['handle_width'], p['handle_bar'], p['handle_thickness']
+    gap, fw, ft = p['handle_clearance'], p['assumed_finger_width'], p['assumed_finger_thickness']
+    distance = p['handle_approach_distance']; projection = p['carrier_handle_projection']
+    carrier_z = p['carrier_handle_z']; roof = lid_z+p['lid_h']; rise = p['lid_handle_rise']
+    lid_center_y = lid_y+(p['outer_d']+2*(p['lid_side_clearance']+p['lid_wall']))/2
+    origins = {'carrier': [cx, -projection+bar/2, carrier_z+thick/2], 'lid': [cx, lid_center_y, roof+rise-bar/2]}
+    axes = {'carrier': {'x': [1, 0, 0], 'y': [0, 0, -1], 'z': [0, 1, 0]}, 'lid': {'x': [1, 0, 0], 'y': [0, -1, 0], 'z': [0, 0, -1]}}
+    for role in ('carrier', 'lid'):
+        source = spec['handling']['handles'][role]
+        owner = module_id+('_Container' if role == 'carrier' else '_Lid')
+        grasp = module_id+'_'+source['grasp_frame']; approach = module_id+'_'+source['approach_frame']
+        for name, origin, purpose in [(grasp, origins[role], 'grasp'), (approach, [v-distance*a for v, a in zip(origins[role], axes[role]['z'])], 'approach')]:
+            frames[name] = {'id': name, 'body': owner, 'origin_mm': origin, 'axes': copy.deepcopy(axes[role]), 'units': copy.deepcopy(spec['units']),
+                            'status': 'synthetic_unqualified', 'scope': source['scope'], 'purpose': purpose, 'robot_motion_implemented': False}
+        handles[role] = {'body': owner, 'grasp_frame': grasp, 'approach_frame': approach, 'scope': source['scope'], 'status': 'synthetic_unqualified'}
+    def probe(role, suffix, origin, size, frame='grasp_frame'):
+        require(all(v > 0 for v in size), 'Positive synthetic clearance box required')
+        probes.append({'id': module_id+'_'+role+'_'+suffix, 'frame_id': handles[role][frame], 'kind': 'box', 'origin_mm': origin, 'size_mm': size,
+                       'minimum_clearance_mm': gap, 'units': {'length': 'mm'}, 'status': 'synthetic_unqualified'})
+    probe('carrier', 'window', [cx-w/2+bar+gap, -projection+bar+gap, carrier_z], [w-2*(bar+gap), projection-bar-2*gap, thick])
+    for label, z in [('finger_low', carrier_z-gap-ft), ('finger_high', carrier_z+thick+gap)]:
+        probe('carrier', label, [cx-fw/2, -projection, z], [fw, bar, ft])
+    probe('carrier', 'approach', [cx-fw/2, origins['carrier'][1]-distance, carrier_z-gap-ft], [fw, distance-bar/2-gap, thick+2*(gap+ft)], 'approach_frame')
+    probe('lid', 'window', [cx-w/2+bar+gap, lid_center_y-thick/2, roof+gap], [w-2*(bar+gap), thick, rise-bar-2*gap])
+    for label, y in [('finger_front', lid_center_y-thick/2-gap-ft), ('finger_rear', lid_center_y+thick/2+gap)]:
+        probe('lid', label, [cx-fw/2, y, roof+rise-bar], [fw, ft, bar])
+    probe('lid', 'approach', [cx-fw/2, lid_center_y-thick/2-gap-ft, roof+rise+gap], [fw, thick+2*(gap+ft), distance-bar/2-gap], 'approach_frame')
+    return {'frames': frames, 'handles': handles, 'native_clearance_probes': probes}
+
+
 def interfaces(spec, p):
     interface = {'width_mm': p['outer_w'] - 2 * (p['wall'] + p['insert_clearance']),
                  'depth_mm': p['outer_d'] - 2 * (p['wall'] + p['insert_clearance']),
                  'thickness_mm': p['insert_t'], 'seat_z_mm': p['bottom'], 'status': 'synthetic_unqualified'}
-    modules = {}
+    modules = {}; frames = {}; probes = []
     for index, module in enumerate(ensemble(spec, p)):
         cx = (-1 if index == 0 else 1) * (p['outer_w'] + p['module_gap']) / 2
         x0 = cx - p['outer_w'] / 2
         lid_x = x0 - p['lid_side_clearance'] - p['lid_wall']
         lid_y = -p['lid_side_clearance'] - p['lid_wall'] if spec['display_pose'] == 'stored' else p['outer_d'] + p['rear_gap']
         lid_z = p['base_h'] - p['lid_overlap'] if spec['display_pose'] == 'stored' else 0
+        handling = handle_interfaces(spec, p, module['id'], cx, lid_y, lid_z)
+        frames.update(handling['frames']); probes.extend(handling['native_clearance_probes'])
         slots = []
         for item in module['materials']:
             center = [x0+p['wall']+(p['outer_w']-2*p['wall'])*(2*item['column']+1)/6,
@@ -195,14 +256,15 @@ def interfaces(spec, p):
                           'nominal_slot_clearance_mm': p['slot_clearance'], 'status': 'planned_unobserved'})
         modules[module['id']] = {'kit_id': module['kit_id'], 'insert_id': module['insert'],
             'container_body': module['id']+'_Container', 'insert_body': module['id']+'_Insert', 'lid_body': module['id']+'_Lid',
-            'container_bbox_mm': {'min': [x0, 0, 0], 'max': [x0+p['outer_w'], p['outer_d'], p['base_h']]},
+            'container_shell_bbox_mm': {'min': [x0, 0, 0], 'max': [x0+p['outer_w'], p['outer_d'], p['base_h']]},
+            'container_bbox_mm': {'min': [x0, -p['carrier_handle_projection'], 0], 'max': [x0+p['outer_w'], p['outer_d'], p['base_h']]},
             'insert_bbox_mm': {'min': [x0+p['wall']+p['insert_clearance'], p['wall']+p['insert_clearance'], p['bottom']],
                                'max': [x0+p['outer_w']-p['wall']-p['insert_clearance'], p['outer_d']-p['wall']-p['insert_clearance'], p['bottom']+p['insert_t']]},
-            'lid_bbox_mm': {'min': [lid_x, lid_y, lid_z], 'max': [lid_x+p['outer_w']+2*(p['lid_side_clearance']+p['lid_wall']), lid_y+p['outer_d']+2*(p['lid_side_clearance']+p['lid_wall']), lid_z+p['lid_h']]},
+            'lid_bbox_mm': {'min': [lid_x, lid_y, lid_z], 'max': [lid_x+p['outer_w']+2*(p['lid_side_clearance']+p['lid_wall']), lid_y+p['outer_d']+2*(p['lid_side_clearance']+p['lid_wall']), lid_z+p['lid_h']+p['lid_handle_rise']]},
             'lid_inner_bbox_mm': {'min': [lid_x+p['lid_wall'], lid_y+p['lid_wall'], lid_z], 'max': [lid_x+p['outer_w']+2*p['lid_side_clearance']+p['lid_wall'], lid_y+p['outer_d']+2*p['lid_side_clearance']+p['lid_wall'], lid_z+p['lid_h']-p['lid_wall']]},
-            'slots': slots}
+            'slots': slots, 'handles': handling['handles']}
     return {'common_insert': interface, 'inserts': {m['insert']: copy.deepcopy(interface) for m in spec['modules']}, 'modules': modules,
-            'arrangement': spec['display_pose'], 'fit_qualified': False}
+            'arrangement': spec['display_pose'], 'fit_qualified': False, 'frames': frames, 'native_clearance_probes': probes}
 
 
 def expanded(spec, p):
@@ -226,6 +288,10 @@ def expanded(spec, p):
         shell = body(tag + '_Container', '#e2e6e8', 'passive_container')
         box(tag+'_ContainerOuter', shell, ['outer_w', 'outer_d', 'base_h'], [x0, 0, 0])
         box(tag+'_ContainerInside', shell, ['outer_w-2*wall', 'outer_d-2*wall', 'base_h'], [f'({x0})+wall', 'wall', 'bottom'], 'cut')
+        box(tag+'_CarrierHandleOuter', shell, ['handle_width', 'carrier_handle_projection+handle_embed', 'handle_thickness'],
+            [f'({cx})-handle_width/2', '-carrier_handle_projection', 'carrier_handle_z'], 'join')
+        box(tag+'_CarrierHandleWindow', shell, ['handle_width-2*handle_bar', 'carrier_handle_projection-handle_bar', 'handle_thickness+0.2'],
+            [f'({cx})-handle_width/2+handle_bar', '-carrier_handle_projection+handle_bar', 'carrier_handle_z-0.1'], 'cut')
         insert = body(tag + '_Insert', module['accent'], 'interchangeable_insert')
         box(tag+'_InsertPlate', insert, ['outer_w-2*(wall+insert_clearance)', 'outer_d-2*(wall+insert_clearance)', 'insert_t'],
             [f'({x0})+wall+insert_clearance', 'wall+insert_clearance', 'bottom'])
@@ -252,6 +318,11 @@ def expanded(spec, p):
             [f'({x0})-lid_side_clearance-lid_wall', ly, lz])
         box(tag+'_HoodInside', lid, ['outer_w+2*lid_side_clearance', 'outer_d+2*lid_side_clearance', 'lid_h-lid_wall+0.1'],
             [f'({x0})-lid_side_clearance', f'({ly})+lid_wall', f'({lz})-0.1'], 'cut')
+        lid_center_y = f'({ly})+(outer_d+2*(lid_side_clearance+lid_wall))/2'
+        box(tag+'_LidHandleOuter', lid, ['handle_width', 'handle_thickness', 'lid_handle_rise+handle_embed'],
+            [f'({cx})-handle_width/2', f'({lid_center_y})-handle_thickness/2', f'({lz})+lid_h-handle_embed'], 'join')
+        box(tag+'_LidHandleWindow', lid, ['handle_width-2*handle_bar', 'handle_thickness+0.2', 'lid_handle_rise-handle_bar'],
+            [f'({cx})-handle_width/2+handle_bar', f'({lid_center_y})-handle_thickness/2-0.1', f'({lz})+lid_h'], 'cut')
     for operation in result['operations']:
         shape = numeric_shape(operation['shape'], p)
         for v in shape.get('size', []) + [shape[k] for k in ('radius', 'height') if k in shape]:
