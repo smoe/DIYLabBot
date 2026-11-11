@@ -1,0 +1,160 @@
+{
+  "format": "solidcraftbot.extraction-preparation-protocol/1",
+  "mode": "preparation_only",
+  "operations": {
+    "prepare_input": {
+      "capability": "specimen_preparation",
+      "purpose": "Confirm the identified separate input aliquot, preservation state and selected sample-specific SOP.",
+      "parameters": [],
+      "retained_fraction": "input"
+    },
+    "stabilize_rna": {
+      "capability": "rna_stabilization",
+      "purpose": "Select and confirm preservation or removal of stabilization reagent according to the Cell protocol.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "input"
+    },
+    "lyse_homogenize": {
+      "capability": "lysis_homogenization",
+      "purpose": "Prepare a suitable lysate with the selected kit and sample-specific method.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "input"
+    },
+    "remove_gdna": {
+      "capability": "column_separation",
+      "purpose": "Pass the RNA lysate through the distinct gDNA Eliminator column and KEEP its RNA-containing flow-through in the identified gDNA collection vessel.",
+      "parameters": [
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "flow_through"
+    },
+    "decide_rnase": {
+      "capability": "sop_decision",
+      "purpose": "Resolve the selected SOP RNA-removal branch before AL lysis; any selected treatment belongs to that confirmed pretreatment, not to a later lysate cleanup.",
+      "parameters": [],
+      "retained_fraction": "input"
+    },
+    "condition_binding": {
+      "capability": "liquid_handling",
+      "purpose": "Establish the selected kit binding conditions without substituting extraction chemistry.",
+      "parameters": [
+        "volume_ul"
+      ],
+      "retained_fraction": "input"
+    },
+    "bind_column": {
+      "capability": "column_centrifugation",
+      "purpose": "Bind the selected analyte on its own kit-specific column and retain the sample-column association.",
+      "parameters": [
+        "volume_ul",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column"
+    },
+    "wash_column": {
+      "capability": "column_washing",
+      "purpose": "Apply the complete kit-specific wash sequence, collection-tube changes and flow-through handling.",
+      "parameters": [
+        "volume_ul",
+        "cycles",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column"
+    },
+    "dry_column": {
+      "capability": "column_centrifugation",
+      "purpose": "Perform the selected membrane-drying procedure before changing to the retained-product vessel.",
+      "parameters": [
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column"
+    },
+    "elute": {
+      "capability": "eluate_collection",
+      "purpose": "Collect the extracted product in its identified retained elution vessel.",
+      "parameters": [
+        "volume_ul",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "eluate"
+    },
+    "handover_qc": {
+      "capability": "product_handover",
+      "purpose": "Retain the product, reconcile vessels/waste and request an analyte-appropriate QC workflow.",
+      "parameters": [],
+      "retained_fraction": "product"
+    }
+  },
+  "parameter_units": {
+    "volume_ul": "uL",
+    "duration_s": "s",
+    "temperature_deg_c": "degC",
+    "rcf_x_g": "x_g",
+    "cycles": "count"
+  },
+  "workflows": {
+    "rna": {
+      "kit_id": "rneasy_protect_cell_74624",
+      "steps": [
+        "prepare_input",
+        "stabilize_rna",
+        "lyse_homogenize",
+        "remove_gdna",
+        "condition_binding",
+        "bind_column",
+        "wash_column",
+        "dry_column",
+        "elute",
+        "handover_qc"
+      ],
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "dna": {
+      "kit_id": "dneasy_blood_tissue_69504",
+      "steps": [
+        "prepare_input",
+        "decide_rnase",
+        "lyse_homogenize",
+        "condition_binding",
+        "bind_column",
+        "wash_column",
+        "dry_column",
+        "elute",
+        "handover_qc"
+      ],
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    }
+  },
+  "integration_targets": {
+    "lifecycle": "scripts/manual_workflow.py",
+    "journal": "scripts/manual_tasks.py",
+    "ledger": "scripts/lab_workflow_ledger.py",
+    "qc_profiles": [
+      "model/nanodrop-manual.protocol.json",
+      "model/qubit-4-manual.protocol.json"
+    ]
+  },
+  "limitations": [
+    "Abstract preparation phases, not a replacement manufacturer SOP or executable laboratory recipe.",
+    "No extraction runner, stock booking, resource reservation, robot path, device command or expected yield.",
+    "Existing manual measurement workflows cannot yet retain extraction products or book reagent and mass consumption.",
+    "The current NanoDrop/Qubit synthetic profiles must be checked or extended for the selected analyte and assay before QC integration."
+  ]
+}

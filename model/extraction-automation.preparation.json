@@ -1,0 +1,63 @@
+{
+  "format": "solidcraftbot.extraction-preparation/1",
+  "id": "SYN.Qiagen.CellPellets.Preparation",
+  "mode": "preparation_only",
+  "catalog": {
+    "source": "model/extraction-automation.catalog.json",
+    "source_sha256": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
+  },
+  "protocol": {
+    "source": "model/extraction-automation.protocol.json",
+    "source_sha256": "f47c41cb96406042cb788cb5aee6c0e38f79b39c498583021d41adc65a931955"
+  },
+  "sample_class": "cultured_mammalian_cell_pellet",
+  "pairing_policy": "separate_input_aliquots",
+  "synthetic": true,
+  "sample_pairs": [
+    {
+      "origin_id": "SYN.Source01",
+      "rna_input_id": "SYN.Source01.RNAAliquot",
+      "dna_input_id": "SYN.Source01.DNAAliquot",
+      "rna_product_id": "SYN.Source01.RNAExtract",
+      "dna_product_id": "SYN.Source01.DNAExtract",
+      "processes": {
+        "rna": {
+          "sop": null,
+          "preservation_state": null,
+          "input_amount": null,
+          "parameter_values": {},
+          "providers": {},
+          "items": {
+            "input_vessel": "SYN.RNA.Input01",
+            "binding_column": "SYN.RNA.Column01",
+            "collection_vessel": "SYN.RNA.Collection01",
+            "elution_vessel": "SYN.RNA.Elution01",
+            "gdna_column": "SYN.RNA.GDNAColumn01",
+            "gdna_collection_vessel": "SYN.RNA.GDNACollection01"
+          },
+          "output_location": {
+            "rack_id": "SYN.ExtractRack01",
+            "place_id": "P01"
+          }
+        },
+        "dna": {
+          "sop": null,
+          "preservation_state": null,
+          "input_amount": null,
+          "parameter_values": {},
+          "providers": {},
+          "items": {
+            "input_vessel": "SYN.DNA.Input01",
+            "binding_column": "SYN.DNA.Column01",
+            "collection_vessel": "SYN.DNA.Collection01",
+            "elution_vessel": "SYN.DNA.Elution01"
+          },
+          "output_location": {
+            "rack_id": "SYN.ExtractRack01",
+            "place_id": "P02"
+          }
+        }
+      }
+    }
+  ]
+}

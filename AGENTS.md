@@ -450,3 +450,18 @@ und visuell prüfen; `python3 scripts/render_model_gallery.py --check` prüft
 Abdeckung, Quell-/Bildprüfsummen und das Bildbudget von 4 MB. Schematische
 Darstellungen ausdrücklich benennen; keine CAD- oder Funktionsprüfung aus einem
 Bild ableiten. Native Modelle und vollständige Arbeitsrenderings bleiben lokal.
+
+
+## RNA-/DNA-Extraktionsvorbereitung
+
+Vor Änderungen [docs/extraction-automation.md](docs/extraction-automation.md)
+lesen. `model/extraction-automation.*.json` führt Kitmaterial, abstrakte
+Prozessrollen und ein synthetisches Vorbereitungsprofil für getrennte
+Säugerzellpellet-Aliquots. Der Preflight bucht, reserviert und extrahiert nichts;
+`execution_ready` bleibt falsch. Herstellerunterstützung für QIAcube belegt
+keinen DIYLabBot-Adapter und keine CF01-Eignung. Kitvarianten und Säulen nicht
+stillschweigend austauschen. Nach der gDNA-Eliminator-Säule den RNA-haltigen
+Durchfluss von späterem Säulenabfall unterscheiden. RNA-/DNA-Eluate besitzen
+eigene Identitäten und bleiben Produkte. Vor Ausführung den gemeinsamen
+Lebenszyklus und Ledger für Produktaufbewahrung, Materialumwandlung und
+SOP-gebundene Verbräuche erweitern; keinen parallelen Bestand einführen.

@@ -1,0 +1,318 @@
+{
+  "format": "solidcraftbot.extraction-catalog/1",
+  "status": "preparation_only",
+  "references": {
+    "rneasy_protect_family": {
+      "url": "https://www.qiagen.com/mz/products/discovery-and-translational-research/sample-collection-stabilization/rna/rneasy-protect-kits",
+      "revision": null,
+      "accessed_on": "2026-11-11",
+      "scope": "Manufacturer product family; Cell uses RNAprotect Cell and RNeasy Plus chemistry."
+    },
+    "rnprotect_cell_handbook": {
+      "url": "https://www.qiagen.com/en-us/resources/download/kithandbook/hb-0483-003-hb-rna-protect-cell-0321-ww-1124208",
+      "revision": "HB-0483-003, March 2021",
+      "accessed_on": "2026-11-11",
+      "scope": "Cultured/sorted cells, Cell Mini 74624 and its separate gDNA Eliminator and RNeasy columns; SOP parameters must be selected from the matching protocol."
+    },
+    "dneasy_product": {
+      "url": "https://www.qiagen.com/gb/products/discovery-and-translational-research/dna-rna-purification/dna-purification/genomic-dna/dneasy-blood-and-tissue-kit",
+      "revision": null,
+      "accessed_on": "2026-11-11",
+      "scope": "Manual DNeasy Blood and Tissue Kit 69504 and manufacturer-described spin-column automation."
+    },
+    "dneasy_handbook": {
+      "url": "https://www.qiagen.com/en-us/resources/download/kithandbookandprotocol/hb-2061-004-hb-dny-blood-tissue-0623-ww",
+      "revision": "HB-2061-004, June 2023",
+      "accessed_on": "2026-11-11",
+      "scope": "Cultured animal cells and DNeasy Mini columns; kit contents and material-specific preparation."
+    },
+    "qiacube_consumables": {
+      "url": "https://www.qiagen.com/us/resources/faq/1402",
+      "revision": null,
+      "accessed_on": "2026-11-11",
+      "scope": "Supported manual kits need rotor adapters and protocol-specific filter tips for QIAcube; not a DIYLabBot qualification."
+    }
+  },
+  "materials": {
+    "RNAprotectCell": {
+      "label": "RNAprotect Cell Reagent",
+      "kind": "reagent",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RLTPlus": {
+      "label": "Buffer RLT Plus",
+      "kind": "reagent",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RW1": {
+      "label": "Buffer RW1",
+      "kind": "reagent",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RPE": {
+      "label": "Buffer RPE",
+      "kind": "reagent",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RNaseFreeWater": {
+      "label": "RNase-free water",
+      "kind": "reagent",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RNeasyMiniColumn": {
+      "label": "RNeasy Mini spin column",
+      "kind": "column",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "GDNAEliminatorColumn": {
+      "label": "gDNA Eliminator spin column",
+      "kind": "column",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RNACollectionTube": {
+      "label": "RNase-free collection tube, SOP-selected size",
+      "kind": "vessel",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "RNAElutionTube": {
+      "label": "RNase-free elution tube, SOP-selected article",
+      "kind": "vessel",
+      "supply": "kit_or_protocol_selected",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    },
+    "ProteinaseK": {
+      "label": "Proteinase K",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "ATL": {
+      "label": "Buffer ATL, if required by the selected protocol",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "AL": {
+      "label": "Buffer AL",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "AW1": {
+      "label": "Buffer AW1",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "AW2": {
+      "label": "Buffer AW2",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "AE": {
+      "label": "Buffer AE",
+      "kind": "reagent",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "DNeasyMiniColumn": {
+      "label": "DNeasy Mini spin column",
+      "kind": "column",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "DNACollectionTube": {
+      "label": "DNeasy collection tube (2 ml)",
+      "kind": "vessel",
+      "supply": "kit",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "DNAElutionTube": {
+      "label": "DNA elution tube, SOP-selected article",
+      "kind": "vessel",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "Ethanol": {
+      "label": "Ethanol, concentration and preparation per selected SOP",
+      "kind": "reagent",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "FilterTips": {
+      "label": "Compatible disposable filter tips",
+      "kind": "tip",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "qiacube_consumables"
+      ]
+    },
+    "ColumnHolder": {
+      "label": "Rotor/bench holder for the actual column and collection-tube assembly",
+      "kind": "holder",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "qiacube_consumables"
+      ]
+    },
+    "PBS": {
+      "label": "Cell resuspension medium/PBS as specified by the cultured-cell SOP",
+      "kind": "reagent",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "RNaseA": {
+      "label": "RNase A, only if selected by the DNA SOP",
+      "kind": "reagent",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "dneasy_handbook"
+      ]
+    },
+    "RNALysisAdditive": {
+      "label": "Reducing additive for the selected RNA lysis SOP, if prescribed",
+      "kind": "reagent",
+      "supply": "additional_protocol_specific",
+      "source_refs": [
+        "rnprotect_cell_handbook"
+      ]
+    }
+  },
+  "kits": {
+    "rneasy_protect_cell_74624": {
+      "manufacturer": "QIAGEN",
+      "name": "RNeasy Protect Cell Mini Kit",
+      "catalog_number": "74624",
+      "analyte": "rna",
+      "method": "silica_spin_column",
+      "sample_classes": [
+        "cultured_mammalian_cell_pellet"
+      ],
+      "source_refs": [
+        "rneasy_protect_family",
+        "rnprotect_cell_handbook"
+      ],
+      "roles": {
+        "stabilizer": "RNAprotectCell",
+        "lysis_buffer": "RLTPlus",
+        "gdna_column": "GDNAEliminatorColumn",
+        "binding_column": "RNeasyMiniColumn",
+        "collection_tube": "RNACollectionTube",
+        "elution_tube": "RNAElutionTube",
+        "wash_buffer_1": "RW1",
+        "wash_buffer_2": "RPE",
+        "eluent": "RNaseFreeWater",
+        "gdna_collection_tube": "RNACollectionTube"
+      },
+      "additional_materials": [
+        "Ethanol",
+        "FilterTips",
+        "ColumnHolder",
+        "RNALysisAdditive"
+      ],
+      "limitations": [
+        "Starting preservation state and the stabilization/removal procedure must match the selected SOP.",
+        "gDNA Eliminator and RNA-binding columns are different consumables.",
+        "No claim to recover small RNAs or produce a paired DNA product from this kit.",
+        "Supplementary materials are a planning checklist, not an automatically consumed bill of materials; actual articles and optional treatments follow the selected SOP."
+      ]
+    },
+    "dneasy_blood_tissue_69504": {
+      "manufacturer": "QIAGEN",
+      "name": "DNeasy Blood & Tissue Kit (50)",
+      "catalog_number": "69504",
+      "analyte": "dna",
+      "method": "silica_spin_column",
+      "sample_classes": [
+        "cultured_mammalian_cell_pellet"
+      ],
+      "source_refs": [
+        "dneasy_product",
+        "dneasy_handbook"
+      ],
+      "roles": {
+        "protease": "ProteinaseK",
+        "optional_tissue_lysis_buffer": "ATL",
+        "lysis_binding_buffer": "AL",
+        "binding_column": "DNeasyMiniColumn",
+        "collection_tube": "DNACollectionTube",
+        "elution_tube": "DNAElutionTube",
+        "wash_buffer_1": "AW1",
+        "wash_buffer_2": "AW2",
+        "eluent": "AE"
+      },
+      "additional_materials": [
+        "Ethanol",
+        "FilterTips",
+        "ColumnHolder",
+        "PBS",
+        "RNaseA"
+      ],
+      "limitations": [
+        "Cultured-cell protocol must be selected; the tissue ATL step is not automatically applicable.",
+        "RNA-removal treatment is a separate SOP decision.",
+        "69504 is not the dedicated QIAcube kit 69516.",
+        "Supplementary materials are a planning checklist, not an automatically consumed bill of materials; actual articles and optional treatments follow the selected SOP."
+      ]
+    }
+  },
+  "automation_reference": {
+    "platform": "QIAcube Connect",
+    "status": "manufacturer_reference_only",
+    "source_refs": [
+      "rneasy_protect_family",
+      "dneasy_handbook",
+      "qiacube_consumables"
+    ],
+    "note": "Supports feasibility of reusing the selected manual spin-column chemistry; adapters, tips and protocol-specific consumables remain necessary. No QIAcube or DIYLabBot adapter is implemented here."
+  }
+}

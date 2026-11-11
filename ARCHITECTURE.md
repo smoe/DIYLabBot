@@ -763,3 +763,23 @@ Fähigkeiten statt Gerätetypen. Verantwortlichkeit und physischer Ort bleiben
 getrennt; Aufgaben und Bestätigungen sind Laufzeitzustand außerhalb von `model/`.
 Die bestehende CF01-Szene bleibt auf Arm, CF01 und Rack beschränkt;
 Messgeräte verwenden eine eigene logische Bindung.
+
+
+## Vorbereitung der RNA-/DNA-Extraktion
+
+[docs/extraction-automation.md](docs/extraction-automation.md) beschreibt die
+Vorbereitung für getrennte Säugerzellpellet-Aliquots mit RNeasy Protect Cell
+Mini 74624 und DNeasy Blood & Tissue 69504. Katalog, abstrakte Prozessquelle
+und synthetisches Vorbereitungsprofil stehen unter
+`model/extraction-automation.*.json`. Der wirkungsfreie Preflight leitet daraus
+Materialrollen, Fraktionsbezüge, Produktabstammung und offene Anforderungen ab.
+Das Schema verwendet die vorhandenen Quellenreferenzen. Ein Providername ist
+keine Gerätequalifikation; `execution_ready` bleibt ausdrücklich falsch.
+
+Vor einer Laufzeitintegration müssen zurückbehaltene Extrakte, umgewandelte
+Eingangsmaterialien und typisierte Verbräuche im gemeinsamen Lebenszyklus und
+Ledger unterstützt werden. Die bestehende Entsorgungsbedingung für abgeleitete
+Messgefäße und die reine µL-Originalentnahmebilanz reichen dafür nicht aus.
+Es gibt hier keinen zweiten Bestand, kein Ausführungsjournal und keinen
+Extraktionsadapter. CF01, NanoDrop- und Qubit-Verträge bleiben eigenständig;
+Zentrifugeneignung und analytspezifische QC sind später ausdrücklich zu binden.
