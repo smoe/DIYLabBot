@@ -1,0 +1,1483 @@
+{
+  "format": "solidcraftbot.cutrun-preparation/1",
+  "id": "SYN.CUTRUN.SKMel29.H3K4me3.Preparation",
+  "mode": "preparation_only",
+  "synthetic": true,
+  "catalog": {
+    "source": "model/cutrun-automation.catalog.json",
+    "source_sha256": "80786183fbcaa578b6db412c5303b6b21d72e1a6783e283e306b2105559c8b25"
+  },
+  "protocol": {
+    "source": "model/cutrun-automation.protocol.json",
+    "source_sha256": "dff2cbe2aab1745cfffd3d75810a5e2fe92b55bb2eb7afc0048b2807dce8dae0"
+  },
+  "context": {
+    "sample_class": {
+      "value": "cultured_melanoma_cells",
+      "unit": "text",
+      "basis": "owner_confirmed",
+      "source_refs": [
+        "owner_e0"
+      ],
+      "note": "Owner confirmed melanoma cell lines as the specimen class."
+    },
+    "cell_line": {
+      "value": "SK-Mel-29",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "tp73_paper"
+      ],
+      "note": "Published cell line used as the first in-silico candidate; actual local stock identity is not confirmed."
+    },
+    "preservation": {
+      "value": "fresh_unfixed",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "reference_target": {
+      "value": "H3K4me3",
+      "unit": "text",
+      "basis": "owner_confirmed",
+      "source_refs": [
+        "owner_e0"
+      ],
+      "note": "Owner accepted H3K4me3 as the first technical reference target."
+    },
+    "purpose": {
+      "value": "in_silico_reference",
+      "unit": "text",
+      "basis": "owner_confirmed",
+      "source_refs": [
+        "owner_e0"
+      ],
+      "note": "Current task is in silico; no real laboratory action is authorized by this profile."
+    }
+  },
+  "selection": {
+    "kit_id": "cst_86652",
+    "cleanup_id": "cst_14209",
+    "incubation": {
+      "value": "synthetic_4c",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Synthetic 4-degree-Celsius antibody-binding scenario; the separately explicit duration is an assumption and no qualified overnight interval is asserted."
+    },
+    "normalization": {
+      "value": "none",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Single-condition technical model without biological condition comparison; optional yeast normalization deliberately not selected."
+    }
+  },
+  "source_binding": {
+    "comparison_reference": "cst_comparison_09_2026",
+    "historical_sop_revision": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [
+        "tp73_paper"
+      ],
+      "note": "Exact operative historical SOP revision remains unknown; 09/2026 is only a current comparison."
+    },
+    "original_sop_sha256": {
+      "value": null,
+      "unit": "sha256",
+      "basis": "unknown",
+      "source_refs": [
+        "tp73_paper"
+      ],
+      "note": "Original operative SOP bytes are not locally bound; no invented source hash."
+    }
+  },
+  "providers": [
+    {
+      "id": "SYN.ManualBench",
+      "status": "proposed_synthetic_unqualified",
+      "capabilities": [
+        "specimen_preparation",
+        "bead_binding",
+        "antibody_binding",
+        "enzyme_binding",
+        "reaction_activation",
+        "reaction_stopping",
+        "fragment_release",
+        "magnetic_separation",
+        "cleanup_preparation",
+        "input_lysis",
+        "product_handover"
+      ],
+      "labware": [
+        "tube_1_5ml"
+      ],
+      "limits": {
+        "volume_ul": {
+          "min": {
+            "value": 0.5,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 2000,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "temperature_deg_c": {
+          "min": {
+            "value": 0,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 60,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    },
+    {
+      "id": "SYN.CooledCentrifuge",
+      "status": "proposed_synthetic_unqualified",
+      "capabilities": [
+        "cooled_centrifugation",
+        "column_centrifugation",
+        "column_washing",
+        "eluate_collection"
+      ],
+      "labware": [
+        "tube_1_5ml",
+        "spin_column",
+        "collection_tube"
+      ],
+      "limits": {
+        "volume_ul": {
+          "min": {
+            "value": 1,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 2000,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "temperature_deg_c": {
+          "min": {
+            "value": 0,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 40,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "rcf_x_g": {
+          "min": {
+            "value": 100,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 20000,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    },
+    {
+      "id": "SYN.Sonicator",
+      "status": "proposed_synthetic_unqualified",
+      "capabilities": [
+        "input_sonication"
+      ],
+      "labware": [
+        "tube_1_5ml"
+      ],
+      "limits": {
+        "temperature_deg_c": {
+          "min": {
+            "value": 0,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 25,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    },
+    {
+      "id": "SYN.FragmentAnalyzer",
+      "status": "proposed_synthetic_unqualified",
+      "capabilities": [
+        "fragment_size_check"
+      ],
+      "labware": [
+        "tube_1_5ml"
+      ],
+      "limits": {}
+    },
+    {
+      "id": "SYN.Analytics",
+      "status": "proposed_synthetic_unqualified",
+      "capabilities": [
+        "fluorometry",
+        "qpcr"
+      ],
+      "labware": [
+        "qubit_assay_tube",
+        "qpcr_tube"
+      ],
+      "limits": {
+        "volume_ul": {
+          "min": {
+            "value": 0.5,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 200,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "temperature_deg_c": {
+          "min": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "max": {
+            "value": 100,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    }
+  ],
+  "capability_bindings": {
+    "specimen_preparation": "SYN.ManualBench",
+    "bead_binding": "SYN.ManualBench",
+    "antibody_binding": "SYN.ManualBench",
+    "enzyme_binding": "SYN.ManualBench",
+    "reaction_activation": "SYN.ManualBench",
+    "reaction_stopping": "SYN.ManualBench",
+    "fragment_release": "SYN.ManualBench",
+    "magnetic_separation": "SYN.ManualBench",
+    "cleanup_preparation": "SYN.ManualBench",
+    "input_lysis": "SYN.ManualBench",
+    "product_handover": "SYN.ManualBench",
+    "cooled_centrifugation": "SYN.CooledCentrifuge",
+    "column_centrifugation": "SYN.CooledCentrifuge",
+    "column_washing": "SYN.CooledCentrifuge",
+    "eluate_collection": "SYN.CooledCentrifuge",
+    "input_sonication": "SYN.Sonicator",
+    "fragment_size_check": "SYN.FragmentAnalyzer",
+    "fluorometry": "SYN.Analytics",
+    "qpcr": "SYN.Analytics"
+  },
+  "branches": [
+    {
+      "id": "SYN.CUTRUN.H3K4me3",
+      "role": "reference",
+      "workflow": "cutrun",
+      "input_material_id": "SYN.CUTRUN.H3K4me3.Cells",
+      "product_material_id": "SYN.CUTRUN.H3K4me3.DNA",
+      "vessels": {
+        "input": "SYN.CUTRUN.H3K4me3.Input",
+        "reaction": "SYN.CUTRUN.H3K4me3.Reaction",
+        "column": "SYN.CUTRUN.H3K4me3.Column",
+        "collection": "SYN.CUTRUN.H3K4me3.Collection",
+        "product": "SYN.CUTRUN.H3K4me3.Product"
+      },
+      "output_location": {
+        "rack_id": "SYN.CUTRUN.ProductRack",
+        "place_id": "P01"
+      },
+      "input_amount": {
+        "value": 100000,
+        "unit": "cells",
+        "basis": "synthetic_assumption",
+        "source_refs": [
+          "cst_comparison_09_2026"
+        ],
+        "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+      },
+      "material_bindings": {
+        "purification_column": "purification_column",
+        "eluent": "eluent",
+        "con_a_beads": "con_a_beads",
+        "primary_antibody": "h3k4me3_antibody",
+        "enzyme": "enzyme",
+        "stop_buffer": "stop_buffer",
+        "extraction_buffer": "extraction_buffer",
+        "proteinase_k": "proteinase_k",
+        "rnase_a": "rnase_a"
+      },
+      "parameter_values": {
+        "prepare_cells": {},
+        "bind_cona": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 22,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_antibody": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 57600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_enzyme": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 3600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "activate_digest": {
+          "volume_ul": {
+            "value": 150,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 1800,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "stop_reaction": {
+          "volume_ul": {
+            "value": 30,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 60,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "release_fragments": {
+          "duration_s": {
+            "value": 600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 37,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "isolate_product": {
+          "duration_s": {
+            "value": 120,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "prepare_cleanup": {
+          "volume_ul": {
+            "value": 300,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 3600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 55,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_column": {
+          "volume_ul": {
+            "value": 600,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "wash_column": {
+          "volume_ul": {
+            "value": 750,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "cycles": {
+            "value": 2,
+            "unit": "count",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "elute": {
+          "volume_ul": {
+            "value": 50,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "handover_qc": {},
+        "dry_column": {
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    },
+    {
+      "id": "SYN.CUTRUN.IgG",
+      "role": "negative_control",
+      "workflow": "cutrun",
+      "input_material_id": "SYN.CUTRUN.IgG.Cells",
+      "product_material_id": "SYN.CUTRUN.IgG.DNA",
+      "vessels": {
+        "input": "SYN.CUTRUN.IgG.Input",
+        "reaction": "SYN.CUTRUN.IgG.Reaction",
+        "column": "SYN.CUTRUN.IgG.Column",
+        "collection": "SYN.CUTRUN.IgG.Collection",
+        "product": "SYN.CUTRUN.IgG.Product"
+      },
+      "output_location": {
+        "rack_id": "SYN.CUTRUN.ProductRack",
+        "place_id": "P02"
+      },
+      "input_amount": {
+        "value": 100000,
+        "unit": "cells",
+        "basis": "synthetic_assumption",
+        "source_refs": [
+          "cst_comparison_09_2026"
+        ],
+        "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+      },
+      "material_bindings": {
+        "purification_column": "purification_column",
+        "eluent": "eluent",
+        "con_a_beads": "con_a_beads",
+        "primary_antibody": "igg_antibody",
+        "enzyme": "enzyme",
+        "stop_buffer": "stop_buffer",
+        "extraction_buffer": "extraction_buffer",
+        "proteinase_k": "proteinase_k",
+        "rnase_a": "rnase_a"
+      },
+      "parameter_values": {
+        "prepare_cells": {},
+        "bind_cona": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 22,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_antibody": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 57600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_enzyme": {
+          "volume_ul": {
+            "value": 100,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 3600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "activate_digest": {
+          "volume_ul": {
+            "value": 150,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 1800,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "stop_reaction": {
+          "volume_ul": {
+            "value": 30,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 60,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "release_fragments": {
+          "duration_s": {
+            "value": 600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 37,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "isolate_product": {
+          "duration_s": {
+            "value": 120,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "prepare_cleanup": {
+          "volume_ul": {
+            "value": 300,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 3600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 55,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_column": {
+          "volume_ul": {
+            "value": 600,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "wash_column": {
+          "volume_ul": {
+            "value": 750,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "cycles": {
+            "value": 2,
+            "unit": "count",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "elute": {
+          "volume_ul": {
+            "value": 50,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "handover_qc": {},
+        "dry_column": {
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    },
+    {
+      "id": "SYN.CUTRUN.Input",
+      "role": "input",
+      "workflow": "input",
+      "input_material_id": "SYN.CUTRUN.Input.Cells",
+      "product_material_id": "SYN.CUTRUN.Input.DNA",
+      "vessels": {
+        "input": "SYN.CUTRUN.Input.Input",
+        "reaction": "SYN.CUTRUN.Input.Reaction",
+        "column": "SYN.CUTRUN.Input.Column",
+        "collection": "SYN.CUTRUN.Input.Collection",
+        "product": "SYN.CUTRUN.Input.Product"
+      },
+      "output_location": {
+        "rack_id": "SYN.CUTRUN.ProductRack",
+        "place_id": "P03"
+      },
+      "input_amount": {
+        "value": 100000,
+        "unit": "cells",
+        "basis": "synthetic_assumption",
+        "source_refs": [
+          "cst_comparison_09_2026"
+        ],
+        "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+      },
+      "material_bindings": {
+        "purification_column": "purification_column",
+        "eluent": "eluent",
+        "extraction_buffer": "extraction_buffer",
+        "proteinase_k": "proteinase_k",
+        "rnase_a": "rnase_a"
+      },
+      "parameter_values": {
+        "prepare_input": {},
+        "lyse_input": {
+          "volume_ul": {
+            "value": 300,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 3600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 55,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "sonicate_input": {
+          "cycles": {
+            "value": 5,
+            "unit": "count",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 15,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "clarify_input": {
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 600,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "temperature_deg_c": {
+            "value": 4,
+            "unit": "degC",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "check_input_size": {
+          "size_min_bp": {
+            "value": 100,
+            "unit": "bp",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "size_max_bp": {
+            "value": 600,
+            "unit": "bp",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "bind_column": {
+          "volume_ul": {
+            "value": 600,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "wash_column": {
+          "volume_ul": {
+            "value": 750,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "cycles": {
+            "value": 2,
+            "unit": "count",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "elute": {
+          "volume_ul": {
+            "value": 50,
+            "unit": "uL",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        },
+        "handover_qc": {},
+        "dry_column": {
+          "rcf_x_g": {
+            "value": 18500,
+            "unit": "x_g",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          },
+          "duration_s": {
+            "value": 30,
+            "unit": "s",
+            "basis": "synthetic_assumption",
+            "source_refs": [
+              "cst_comparison_09_2026"
+            ],
+            "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+          }
+        }
+      }
+    }
+  ],
+  "qc": {
+    "methods": [
+      "fluorometry",
+      "qpcr"
+    ],
+    "target": "H3K4me3",
+    "primer_set": {
+      "value": "CST Human RPL30 Exon 3 #7014",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "ntc": {
+      "id": "SYN.CUTRUN.QC.NTC",
+      "vessel_id": "SYN.CUTRUN.QC.NTCTube",
+      "role": "pcr_no_template_control"
+    },
+    "input_branch_id": "SYN.CUTRUN.Input",
+    "negative_branch_id": "SYN.CUTRUN.IgG",
+    "reference_branch_id": "SYN.CUTRUN.H3K4me3",
+    "assay": {
+      "value": "Qubit dsDNA HS comparison; exact local assay remains a synthetic proposal",
+      "unit": "text",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "biological_threshold": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "No biological success or enrichment threshold is inferred or invented."
+    },
+    "aliquot_volumes_ul": {
+      "fluorometry": {
+        "value": 1,
+        "unit": "uL",
+        "basis": "synthetic_assumption",
+        "source_refs": [
+          "cst_comparison_09_2026"
+        ],
+        "note": "Illustrative synthetic product withdrawal for the chosen QC role; not measured consumption or a new aliquot vessel."
+      },
+      "qpcr": {
+        "value": 2,
+        "unit": "uL",
+        "basis": "synthetic_assumption",
+        "source_refs": [
+          "cst_comparison_09_2026"
+        ],
+        "note": "Illustrative synthetic product withdrawal for the chosen QC role; not measured consumption or a new aliquot vessel."
+      }
+    }
+  },
+  "stop_plan": {
+    "material_id": "stop_buffer",
+    "provider_id": "SYN.ManualBench",
+    "access": {
+      "value": true,
+      "unit": "bool",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "mixing": {
+      "value": true,
+      "unit": "bool",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "manual_fallback": {
+      "value": true,
+      "unit": "bool",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "software_hold_is_chemical_stop": {
+      "value": false,
+      "unit": "bool",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Semantic distinction required for this model; a software hold does not stop chemistry."
+    },
+    "active_branch_ids": [
+      "SYN.CUTRUN.H3K4me3",
+      "SYN.CUTRUN.IgG"
+    ],
+    "dose_per_branch_ul": {
+      "value": 30,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "time_budget_s": {
+      "value": 180,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    },
+    "service_time_per_branch_s": {
+      "value": 60,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Explicit in-silico scenario assumption; not an observed value, qualified capability, or reconstruction of the published laboratory SOP."
+    }
+  }
+}

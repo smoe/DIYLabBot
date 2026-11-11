@@ -747,7 +747,7 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 
 ## CUT&RUN: geplanter Ablaufvertrag
 
-**Stand 11. November 2026: Entwicklungsentscheidung, keine implementierte
+**Stand 12. November 2026: wirkungsfreier E1-Preflight implementiert, keine
 CUT&RUN-Ausführung und keine biologische Qualifikation.** Die erste Ausbaustufe
 führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
 CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
@@ -756,6 +756,15 @@ ersetzt es nicht. Probenvorbereitung und nicht qualifizierte Geräteschritte
 bleiben zunächst Personenaufgaben. Direktligation, automatisierte
 Library-Präparation und Sequenzierung gehören zu späteren, eigenen Freigaben.
 Die Abhängigkeiten und Abnahmen stehen in [ROADMAP.md](ROADMAP.md).
+
+Der [E1-Preflight](docs/cutrun-preflight.md) bindet Katalog, abstraktes Protokoll
+und das synthetische SK-Mel-29/H3K4me3-Profil in
+`model/cutrun-automation.*.json`. Einstieg ist
+`python3 scripts/prepare_cutrun_automation.py`. Er prüft Kontroll-/Inputzweige,
+Parameterherkunft, Fraktionen, Stoppanforderungen, Providergrenzen und Produkt-QC,
+ohne Journal-, Bestands-, Reservierungs- oder Gerätewirkung. Vollständige
+synthetische Angaben ergeben weiterhin `execution_ready: false`; die offene
+historische SOP-Bindung und E2-/Laufzeitnachweise bleiben getrennte Sperren.
 
 ### Quellenbindung und Varianten
 

@@ -1,0 +1,1727 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-automation.schema.json",
+  "title": "Synthetic CUT&RUN E1 preparation contracts; no execution or material booking",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/catalog"
+    },
+    {
+      "$ref": "#/$defs/protocol"
+    },
+    {
+      "$ref": "#/$defs/preparation"
+    }
+  ],
+  "$defs": {
+    "pinned_reference": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ],
+          "propertyNames": {
+            "enum": [
+              "source",
+              "source_sha256"
+            ]
+          }
+        }
+      ]
+    },
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "basis",
+        "source_refs",
+        "note"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "null"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "text",
+            "bool",
+            "sha256",
+            "cells",
+            "uL",
+            "s",
+            "degC",
+            "x_g",
+            "count",
+            "bp"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "owner_confirmed",
+            "publication_reported",
+            "synthetic_assumption",
+            "unknown"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "basis": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "not": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "const": "bool"
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "const": "text"
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "const": "sha256"
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "enum": [
+                  "cells",
+                  "count",
+                  "bp"
+                ]
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "enum": [
+                  "uL",
+                  "s",
+                  "x_g"
+                ]
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "unit": {
+                "const": "degC"
+              },
+              "basis": {
+                "not": {
+                  "const": "unknown"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "manufacturer_reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "revision",
+        "accessed_on",
+        "scope"
+      ],
+      "properties": {
+        "url": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^https://"
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "accessed_on": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        }
+      }
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "kind",
+        "catalog_number",
+        "source_refs"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "kind": {
+          "enum": [
+            "beads",
+            "antibody",
+            "enzyme",
+            "reagent",
+            "column"
+          ]
+        },
+        "catalog_number": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "kit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manufacturer",
+        "name",
+        "catalog_number",
+        "source_refs"
+      ],
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "catalog_number": {
+          "type": "string",
+          "pattern": "^[0-9]+$"
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "catalog": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "status",
+        "references",
+        "materials",
+        "kits",
+        "limitations"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.cutrun-catalog/1"
+        },
+        "status": {
+          "const": "preparation_only"
+        },
+        "references": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/manufacturer_reference"
+          }
+        },
+        "materials": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/material"
+          }
+        },
+        "kits": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/kit"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability",
+        "purpose",
+        "parameters",
+        "retained_fraction",
+        "required_labware"
+      ],
+      "properties": {
+        "capability": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "parameters": {
+          "type": "array",
+          "minItems": 0,
+          "items": {
+            "enum": [
+              "volume_ul",
+              "duration_s",
+              "temperature_deg_c",
+              "rcf_x_g",
+              "cycles",
+              "size_min_bp",
+              "size_max_bp"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "retained_fraction": {
+          "enum": [
+            "cells",
+            "beads",
+            "supernatant",
+            "column",
+            "eluate",
+            "product"
+          ]
+        },
+        "required_labware": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "workflow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "steps",
+        "source_refs"
+      ],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "source_refs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "mode",
+        "parameter_units",
+        "operations",
+        "workflows",
+        "fraction_contract",
+        "qc_contract",
+        "required_material_roles",
+        "stop_contract",
+        "integration_targets",
+        "limitations",
+        "input_size_contract"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.cutrun-preparation-protocol/1"
+        },
+        "mode": {
+          "const": "preparation_only"
+        },
+        "parameter_units": {
+          "const": {
+            "volume_ul": "uL",
+            "duration_s": "s",
+            "temperature_deg_c": "degC",
+            "rcf_x_g": "x_g",
+            "cycles": "count",
+            "size_min_bp": "bp",
+            "size_max_bp": "bp"
+          }
+        },
+        "operations": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/operation"
+          }
+        },
+        "workflows": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cutrun",
+            "input"
+          ],
+          "properties": {
+            "cutrun": {
+              "$ref": "#/$defs/workflow"
+            },
+            "input": {
+              "$ref": "#/$defs/workflow"
+            }
+          }
+        },
+        "fraction_contract": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "enum": [
+              "cells",
+              "beads",
+              "supernatant",
+              "column",
+              "eluate",
+              "product"
+            ]
+          }
+        },
+        "qc_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required_methods",
+            "ntc_role",
+            "target",
+            "input_required"
+          ],
+          "properties": {
+            "required_methods": {
+              "const": [
+                "fluorometry",
+                "qpcr"
+              ]
+            },
+            "ntc_role": {
+              "const": "pcr_no_template_control"
+            },
+            "target": {
+              "const": "H3K4me3"
+            },
+            "input_required": {
+              "const": true
+            }
+          }
+        },
+        "required_material_roles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cutrun",
+            "input"
+          ],
+          "properties": {
+            "cutrun": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "uniqueItems": true
+            },
+            "input": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "uniqueItems": true
+            }
+          }
+        },
+        "stop_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capability",
+            "material_id",
+            "active_roles",
+            "software_hold_is_chemical_stop"
+          ],
+          "properties": {
+            "capability": {
+              "const": "reaction_stopping"
+            },
+            "material_id": {
+              "const": "stop_buffer"
+            },
+            "active_roles": {
+              "const": [
+                "reference",
+                "negative_control"
+              ]
+            },
+            "software_hold_is_chemical_stop": {
+              "const": false
+            }
+          }
+        },
+        "integration_targets": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lifecycle",
+            "journal",
+            "ledger"
+          ],
+          "properties": {
+            "lifecycle": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "journal": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "ledger": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "input_size_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "cleanup_id",
+            "maximum_exclusive_bp"
+          ],
+          "properties": {
+            "cleanup_id": {
+              "const": "cst_14209"
+            },
+            "maximum_exclusive_bp": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "bp"
+                    },
+                    "basis": {
+                      "enum": [
+                        "synthetic_assumption",
+                        "unknown"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "status",
+        "capabilities",
+        "labware",
+        "limits"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "status": {
+          "const": "proposed_synthetic_unqualified"
+        },
+        "capabilities": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "labware": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "uniqueItems": true
+        },
+        "limits": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [],
+          "properties": {
+            "volume_ul": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "properties": {
+                "min": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "uL"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "max": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "uL"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "temperature_deg_c": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "properties": {
+                "min": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "degC"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "max": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "degC"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            },
+            "rcf_x_g": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "min",
+                "max"
+              ],
+              "properties": {
+                "min": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "x_g"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "max": {
+                  "allOf": [
+                    {
+                      "$ref": "#/$defs/fact"
+                    },
+                    {
+                      "properties": {
+                        "unit": {
+                          "const": "x_g"
+                        },
+                        "basis": {
+                          "const": "synthetic_assumption"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "branch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "role",
+        "workflow",
+        "input_material_id",
+        "product_material_id",
+        "vessels",
+        "output_location",
+        "input_amount",
+        "material_bindings",
+        "parameter_values"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "role": {
+          "enum": [
+            "reference",
+            "negative_control",
+            "input"
+          ]
+        },
+        "workflow": {
+          "enum": [
+            "cutrun",
+            "input"
+          ]
+        },
+        "input_material_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "product_material_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "vessels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "input",
+            "reaction",
+            "column",
+            "collection",
+            "product"
+          ],
+          "properties": {
+            "input": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "reaction": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "column": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "collection": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "product": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "output_location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rack_id",
+            "place_id"
+          ],
+          "properties": {
+            "rack_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "place_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        },
+        "input_amount": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "cells"
+                }
+              }
+            }
+          ]
+        },
+        "material_bindings": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "parameter_values": {
+          "type": "object",
+          "minProperties": 0,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [],
+            "properties": {
+              "volume_ul": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "uL"
+                      }
+                    }
+                  }
+                ]
+              },
+              "duration_s": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "s"
+                      }
+                    }
+                  }
+                ]
+              },
+              "temperature_deg_c": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "degC"
+                      }
+                    }
+                  }
+                ]
+              },
+              "rcf_x_g": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "x_g"
+                      }
+                    }
+                  }
+                ]
+              },
+              "cycles": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "count"
+                      }
+                    }
+                  }
+                ]
+              },
+              "size_min_bp": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "bp"
+                      }
+                    }
+                  }
+                ]
+              },
+              "size_max_bp": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "unit": {
+                        "const": "bp"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "qc": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "methods",
+        "target",
+        "primer_set",
+        "ntc",
+        "input_branch_id",
+        "negative_branch_id",
+        "reference_branch_id",
+        "assay",
+        "biological_threshold",
+        "aliquot_volumes_ul"
+      ],
+      "properties": {
+        "methods": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "fluorometry",
+              "qpcr"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "target": {
+          "const": "H3K4me3"
+        },
+        "primer_set": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "text"
+                }
+              }
+            }
+          ]
+        },
+        "ntc": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "vessel_id",
+            "role"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "vessel_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "role": {
+              "const": "pcr_no_template_control"
+            }
+          }
+        },
+        "input_branch_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "negative_branch_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reference_branch_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "assay": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "text"
+                }
+              }
+            }
+          ]
+        },
+        "biological_threshold": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "text"
+                }
+              }
+            }
+          ]
+        },
+        "aliquot_volumes_ul": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "fluorometry",
+            "qpcr"
+          ],
+          "properties": {
+            "fluorometry": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "uL"
+                    }
+                  }
+                }
+              ]
+            },
+            "qpcr": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "uL"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "stop_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_id",
+        "provider_id",
+        "access",
+        "mixing",
+        "manual_fallback",
+        "software_hold_is_chemical_stop",
+        "active_branch_ids",
+        "dose_per_branch_ul",
+        "time_budget_s",
+        "service_time_per_branch_s"
+      ],
+      "properties": {
+        "material_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "provider_id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "access": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "bool"
+                }
+              }
+            }
+          ]
+        },
+        "mixing": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "bool"
+                }
+              }
+            }
+          ]
+        },
+        "manual_fallback": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "bool"
+                }
+              }
+            }
+          ]
+        },
+        "software_hold_is_chemical_stop": {
+          "allOf": [
+            {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "bool"
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "properties": {
+                "value": {
+                  "const": false
+                }
+              }
+            }
+          ]
+        },
+        "active_branch_ids": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "maxItems": 2,
+          "uniqueItems": true
+        },
+        "dose_per_branch_ul": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "uL"
+                }
+              }
+            }
+          ]
+        },
+        "time_budget_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        },
+        "service_time_per_branch_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "preparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "synthetic",
+        "catalog",
+        "protocol",
+        "context",
+        "selection",
+        "source_binding",
+        "providers",
+        "capability_bindings",
+        "branches",
+        "qc",
+        "stop_plan"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.cutrun-preparation/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "mode": {
+          "const": "preparation_only"
+        },
+        "synthetic": {
+          "const": true
+        },
+        "catalog": {
+          "$ref": "#/$defs/pinned_reference"
+        },
+        "protocol": {
+          "$ref": "#/$defs/pinned_reference"
+        },
+        "context": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sample_class",
+            "cell_line",
+            "preservation",
+            "reference_target",
+            "purpose"
+          ],
+          "properties": {
+            "sample_class": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            "cell_line": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            "preservation": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            "reference_target": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            "purpose": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "selection": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kit_id",
+            "cleanup_id",
+            "incubation",
+            "normalization"
+          ],
+          "properties": {
+            "kit_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "cleanup_id": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "incubation": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        "synthetic_4c",
+                        null
+                      ]
+                    }
+                  }
+                }
+              ]
+            },
+            "normalization": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                },
+                {
+                  "properties": {
+                    "value": {
+                      "enum": [
+                        "none",
+                        null
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "source_binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "comparison_reference",
+            "historical_sop_revision",
+            "original_sop_sha256"
+          ],
+          "properties": {
+            "comparison_reference": {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            "historical_sop_revision": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "text"
+                    }
+                  }
+                }
+              ]
+            },
+            "original_sop_sha256": {
+              "allOf": [
+                {
+                  "$ref": "#/$defs/fact"
+                },
+                {
+                  "properties": {
+                    "unit": {
+                      "const": "sha256"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "providers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/provider"
+          }
+        },
+        "capability_bindings": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "branches": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "$ref": "#/$defs/branch"
+          },
+          "maxItems": 3
+        },
+        "qc": {
+          "$ref": "#/$defs/qc"
+        },
+        "stop_plan": {
+          "$ref": "#/$defs/stop_plan"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,128 @@
+{
+  "format": "solidcraftbot.cutrun-catalog/1",
+  "status": "preparation_only",
+  "references": {
+    "owner_e0": {
+      "url": null,
+      "revision": "2026-11-11",
+      "accessed_on": "2026-11-12",
+      "scope": "Owner confirms melanoma cell lines, H3K4me3 reference target, local equipment access and in-silico work; individual SK-Mel-29 stock and process parameters remain unconfirmed."
+    },
+    "tp73_paper": {
+      "url": "https://doi.org/10.3390/biom16010063",
+      "revision": "Biomolecules 16(1), 63; published 2025-12-31",
+      "accessed_on": "2026-11-11",
+      "scope": "Moller et al.; read sections report SK-Mel-29, CST CUT&RUN kit family and H3K4me3 control. Complete historical SOP, supplement and exact article bindings remain unverified."
+    },
+    "cst_comparison_09_2026": {
+      "url": "https://media.cellsignal.com/pdf/86652.pdf",
+      "revision": "Datasheet Revision 9; 1884 CUT & RUN Protocol Revision 09/2026",
+      "accessed_on": "2026-11-11",
+      "scope": "Current comparison source only. Not established as the original SOP of the 2025 study; original downloaded bytes/SHA-256 remain unavailable."
+    }
+  },
+  "materials": {
+    "con_a_beads": {
+      "label": "Concanavalin A Magnetic Beads",
+      "kind": "beads",
+      "catalog_number": "82307",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "h3k4me3_antibody": {
+      "label": "Tri-Methyl-Histone H3 Lys4 C42D8 Rabbit mAb",
+      "kind": "antibody",
+      "catalog_number": "9751",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "igg_antibody": {
+      "label": "Rabbit DA1E IgG Isotype Control CUT&RUN",
+      "kind": "antibody",
+      "catalog_number": "66362",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "enzyme": {
+      "label": "pAG-MNase Enzyme",
+      "kind": "enzyme",
+      "catalog_number": "57813",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "stop_buffer": {
+      "label": "CUT&RUN 4X Stop Buffer",
+      "kind": "reagent",
+      "catalog_number": "48105",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "extraction_buffer": {
+      "label": "CUT&RUN DNA Extraction Buffer",
+      "kind": "reagent",
+      "catalog_number": "42015",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "proteinase_k": {
+      "label": "Proteinase K",
+      "kind": "reagent",
+      "catalog_number": "10012",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "rnase_a": {
+      "label": "RNase A",
+      "kind": "reagent",
+      "catalog_number": "7013",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "purification_column": {
+      "label": "DNA Purification Column and Collection Tube",
+      "kind": "column",
+      "catalog_number": "10010",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "eluent": {
+      "label": "DNA Elution Buffer",
+      "kind": "reagent",
+      "catalog_number": "10009",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    }
+  },
+  "kits": {
+    "cst_86652": {
+      "manufacturer": "Cell Signaling Technology",
+      "name": "CUT&RUN Assay Kit",
+      "catalog_number": "86652",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "cst_14209": {
+      "manufacturer": "Cell Signaling Technology",
+      "name": "DNA Purification Buffers and Spin Columns",
+      "catalog_number": "14209",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    }
+  },
+  "limitations": [
+    "Article roles are current-source comparisons, not proof of actual historical kit use or current physical stocks.",
+    "No manufacturer PDF is redistributed, pinned as original SOP, or treated as operative approval."
+  ]
+}

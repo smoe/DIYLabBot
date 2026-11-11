@@ -1,0 +1,372 @@
+{
+  "format": "solidcraftbot.cutrun-preparation-protocol/1",
+  "mode": "preparation_only",
+  "parameter_units": {
+    "volume_ul": "uL",
+    "duration_s": "s",
+    "temperature_deg_c": "degC",
+    "rcf_x_g": "x_g",
+    "cycles": "count",
+    "size_min_bp": "bp",
+    "size_max_bp": "bp"
+  },
+  "operations": {
+    "prepare_cells": {
+      "capability": "specimen_preparation",
+      "purpose": "Plan identity, cell count and selected preservation/SOP branch; do not prepare or count actual cells.",
+      "parameters": [],
+      "retained_fraction": "cells",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "bind_cona": {
+      "capability": "bead_binding",
+      "purpose": "Plan bead association and retain the identified cell/bead fraction.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "beads",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "bind_antibody": {
+      "capability": "antibody_binding",
+      "purpose": "Bind the branch-specific antibody role in the proposed plan.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "beads",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "bind_enzyme": {
+      "capability": "enzyme_binding",
+      "purpose": "Plan enzyme association without asserting enzyme activity or antibody qualification.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "beads",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "activate_digest": {
+      "capability": "reaction_activation",
+      "purpose": "Require an explicit activation and stopping plan; this is not a reaction command or runtime state.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "beads",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "stop_reaction": {
+      "capability": "reaction_stopping",
+      "purpose": "Require stop material, access, mixing and throughput; a software hold is not chemical stopping.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "beads",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "release_fragments": {
+      "capability": "fragment_release",
+      "purpose": "Plan release while identifying the retained product-containing supernatant.",
+      "parameters": [
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "isolate_product": {
+      "capability": "magnetic_separation",
+      "purpose": "Require a cleared suspension observation for later execution; no timer alone proves magnetic separation.",
+      "parameters": [
+        "duration_s"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "prepare_cleanup": {
+      "capability": "cleanup_preparation",
+      "purpose": "Plan the selected pre-cleanup treatment of the CUT&RUN product fraction.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "bind_column": {
+      "capability": "column_centrifugation",
+      "purpose": "Plan binding using the selected purification column; do not infer CF01 suitability.",
+      "parameters": [
+        "volume_ul",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column",
+      "required_labware": [
+        "spin_column",
+        "collection_tube"
+      ]
+    },
+    "wash_column": {
+      "capability": "column_washing",
+      "purpose": "Plan retention of the column-bound analyte through wash steps.",
+      "parameters": [
+        "volume_ul",
+        "cycles",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column",
+      "required_labware": [
+        "spin_column",
+        "collection_tube"
+      ]
+    },
+    "elute": {
+      "capability": "eluate_collection",
+      "purpose": "Plan retained DNA eluate in its identified product vessel.",
+      "parameters": [
+        "volume_ul",
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "eluate",
+      "required_labware": [
+        "spin_column",
+        "collection_tube",
+        "tube_1_5ml"
+      ]
+    },
+    "handover_qc": {
+      "capability": "product_handover",
+      "purpose": "Retain DNA for identified QC and handover; no disposal, yield or biological success is inferred.",
+      "parameters": [],
+      "retained_fraction": "product",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "prepare_input": {
+      "capability": "specimen_preparation",
+      "purpose": "Plan a separate input aliquot; it is not a third CUT&RUN activation branch.",
+      "parameters": [],
+      "retained_fraction": "cells",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "lyse_input": {
+      "capability": "input_lysis",
+      "purpose": "Plan the independently identified input-lysis branch.",
+      "parameters": [
+        "volume_ul",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "sonicate_input": {
+      "capability": "input_sonication",
+      "purpose": "Require a suitable sonication proposal for the column-compatible input branch.",
+      "parameters": [
+        "cycles",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "clarify_input": {
+      "capability": "cooled_centrifugation",
+      "purpose": "Plan clarification under the stated temperature and RCF requirement.",
+      "parameters": [
+        "rcf_x_g",
+        "duration_s",
+        "temperature_deg_c"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "check_input_size": {
+      "capability": "fragment_size_check",
+      "purpose": "Require input fragment-size checking; do not make raw CUT&RUN fragment QC universally mandatory.",
+      "parameters": [
+        "size_min_bp",
+        "size_max_bp"
+      ],
+      "retained_fraction": "supernatant",
+      "required_labware": [
+        "tube_1_5ml"
+      ]
+    },
+    "dry_column": {
+      "capability": "column_centrifugation",
+      "purpose": "Plan removal of residual wash fluid while retaining the selected DNA-binding column before product elution.",
+      "parameters": [
+        "rcf_x_g",
+        "duration_s"
+      ],
+      "retained_fraction": "column",
+      "required_labware": [
+        "spin_column",
+        "collection_tube"
+      ]
+    }
+  },
+  "workflows": {
+    "cutrun": {
+      "steps": [
+        "prepare_cells",
+        "bind_cona",
+        "bind_antibody",
+        "bind_enzyme",
+        "activate_digest",
+        "stop_reaction",
+        "release_fragments",
+        "isolate_product",
+        "prepare_cleanup",
+        "bind_column",
+        "wash_column",
+        "dry_column",
+        "elute",
+        "handover_qc"
+      ],
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    },
+    "input": {
+      "steps": [
+        "prepare_input",
+        "lyse_input",
+        "sonicate_input",
+        "clarify_input",
+        "check_input_size",
+        "bind_column",
+        "wash_column",
+        "dry_column",
+        "elute",
+        "handover_qc"
+      ],
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ]
+    }
+  },
+  "fraction_contract": {
+    "prepare_cells": "cells",
+    "bind_cona": "beads",
+    "bind_antibody": "beads",
+    "bind_enzyme": "beads",
+    "activate_digest": "beads",
+    "stop_reaction": "beads",
+    "release_fragments": "supernatant",
+    "isolate_product": "supernatant",
+    "prepare_cleanup": "supernatant",
+    "bind_column": "column",
+    "wash_column": "column",
+    "elute": "eluate",
+    "handover_qc": "product",
+    "prepare_input": "cells",
+    "lyse_input": "supernatant",
+    "sonicate_input": "supernatant",
+    "clarify_input": "supernatant",
+    "check_input_size": "supernatant",
+    "dry_column": "column"
+  },
+  "qc_contract": {
+    "required_methods": [
+      "fluorometry",
+      "qpcr"
+    ],
+    "ntc_role": "pcr_no_template_control",
+    "target": "H3K4me3",
+    "input_required": true
+  },
+  "required_material_roles": {
+    "cutrun": [
+      "con_a_beads",
+      "primary_antibody",
+      "enzyme",
+      "stop_buffer",
+      "purification_column",
+      "eluent",
+      "extraction_buffer",
+      "proteinase_k",
+      "rnase_a"
+    ],
+    "input": [
+      "extraction_buffer",
+      "proteinase_k",
+      "rnase_a",
+      "purification_column",
+      "eluent"
+    ]
+  },
+  "stop_contract": {
+    "capability": "reaction_stopping",
+    "material_id": "stop_buffer",
+    "active_roles": [
+      "reference",
+      "negative_control"
+    ],
+    "software_hold_is_chemical_stop": false
+  },
+  "integration_targets": {
+    "lifecycle": "scripts/manual_workflow.py",
+    "journal": "scripts/manual_tasks.py",
+    "ledger": "scripts/lab_workflow_ledger.py"
+  },
+  "limitations": [
+    "Abstract synthetic requirements, not an executable SOP or reconstruction of the 2025 publication.",
+    "No process runtime, inventory booking, reservation, journal, network, device, CAD or expected yield.",
+    "Fraction and lineage entries are proposed roles only; the shared E2 lifecycle and later runtime remain unimplemented."
+  ],
+  "input_size_contract": {
+    "cleanup_id": "cst_14209",
+    "maximum_exclusive_bp": {
+      "value": 10000,
+      "unit": "bp",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "cst_comparison_09_2026"
+      ],
+      "note": "Synthetic compatibility constraint for the selected input/column model, based on the CST comparison requirement for fragmented input below 10 kb; not an observed fragment-size result or column qualification."
+    }
+  }
+}

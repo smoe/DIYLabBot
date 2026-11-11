@@ -1,7 +1,8 @@
 # Roadmap: Laborabläufe und CUT&RUN
 
-**Stand 11. November 2026. E0 ist mit einem Referenzprofilentwurf begonnen;
-alle CUT&RUN-Abnahmen stehen noch aus. E1–E7 sind geplant.** Diese Datei führt Reihenfolge,
+**Stand 12. November 2026. E0 ist begonnen; die SOP-Bindung bleibt offen.
+E1 ist für den synthetischen Referenzfall implementiert und geprüft;
+E2–E7 sind geplant.** Diese Datei führt Reihenfolge,
 Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
 [CUT&RUN-Ablaufvertrag](ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
 Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
@@ -37,6 +38,9 @@ flowchart LR
 ```
 
 Die Etappen sind Freigabebedingungen, keine Termine oder Budgetzusagen.
+Der wirkungsfreie E1-Prototyp wurde auf Eigentümerauftrag mit ausdrücklich
+synthetischen Annahmen vorgezogen. Er schließt die offene E0-/SOP-Bindung nicht
+und gibt keinen integrierten realen Lauf frei.
 E5 kann nach E0 mit geeigneten Ersatzmedien parallel beginnen. Ein unabhängig
 dokumentierter menschlicher Laborversuch darf vorher stattfinden; er wird
 dadurch noch kein nachgewiesener integrierter DIYLabBot-Referenzlauf nach E4.
@@ -48,7 +52,7 @@ Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fort
 | Etappe | Zu lieferndes Ergebnis | Abnahme vor der nächsten Freigabe | Status |
 |---|---|---|---|
 | **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Begonnen: [publikationsbezogener Melanom-/H3K4me3-Entwurf](docs/cutrun-reference-profile.md); konkrete SOP-Bindung offen |
-| **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | Offen, noch nicht geprüft |
+| **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Implementiert und synthetisch geprüft](docs/cutrun-preflight.md); E0-/SOP-Bindung offen |
 | **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | Offen, noch nicht geprüft |
 | **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | Offen, noch nicht geprüft |
 | **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | Offen, noch nicht geprüft |

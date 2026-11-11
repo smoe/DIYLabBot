@@ -1,10 +1,12 @@
 # CUT&RUN: erster E0-Referenzprofilentwurf
 
-**Stand 11. November 2026: publikationsbezogener In-silico-Entwurf;
+**Stand 12. November 2026: publikationsbezogener In-silico-Entwurf;
 E0 ist begonnen, die konkrete SOP-Bindung bleibt offen.** Dieser Entwurf konkretisiert
 [E0 der Roadmap](../ROADMAP.md) innerhalb des
-[Architekturvertrags](../ARCHITECTURE.md#cutrun). Er ist keine Labor-SOP und
-definiert noch kein unterstütztes Laufzeitprofil, Schema oder Geräteadapter.
+[Architekturvertrags](../ARCHITECTURE.md#cutrun). Der
+[wirkungsfreie E1-Preflight](cutrun-preflight.md) ist mit maschinenlesbaren Quellen
+und Schema implementiert. Dieser Entwurf ist keine Labor-SOP; eine ausführende
+CUT&RUN-Laufzeit oder ein Geräteadapter folgt daraus nicht.
 
 ## Festgelegter Kontext und erster Modellfall
 
