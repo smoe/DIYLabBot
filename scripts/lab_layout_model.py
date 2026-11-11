@@ -3,6 +3,7 @@ from pathlib import Path
 import json
 import math
 import importlib
+import copy
 import assembly_model as assembly
 import lab_room_model as room
 import robot_spec as robot
@@ -10,6 +11,7 @@ import robot_spec as robot
 ROOT=room.ROOT
 SOURCE=ROOT/'model/lab-layout-l01.shared.json'
 digest=robot.digest
+EQUIPMENT_PROFILES=frozenset({'analytical_balance','fridge_4c','freezer_minus20'})
 
 
 def load(*, validate_builds=True):
@@ -29,7 +31,11 @@ def load(*, validate_builds=True):
         if 'variant' in item:
             if item['asset'] not in ['transporter','tube_rack']: raise ValueError('Named variants are currently supported for transporter cassettes only')
             instance_variant(source,item)
-        if 'pose' in item and item['asset']!='centrifuge': raise ValueError('Named layout poses are currently supported for CF01 only')
+        if 'pose' in item:
+            if item['asset'] in EQUIPMENT_PROFILES:
+                provider(item['asset']).pose(source,provider(item['asset']).parameters(source),item['pose'])
+            elif item['asset']!='centrifuge':
+                raise ValueError('Named layout pose unsupported: '+item['asset'])
     ids=[i['id'] for i in s['instances']]
     if len(ids)!=len(set(ids)): raise ValueError('Duplicate layout instance')
     if len([i for i in s['instances'] if i['asset']=='arm'])!=3: raise ValueError('Three arms required')
@@ -39,7 +45,16 @@ def load(*, validate_builds=True):
 def parameters(s):
     ref=s['assets']['room']
     source=room.load(assembly.validate_reference(ref))
-    return {**room.parameters(source),**s['parameters']}
+    p={**room.parameters(source),**s['parameters']}
+    # Device dimensions are derived views of their catalog profiles, not copies
+    # in the room or placement source. They may drive placement expressions.
+    for item in s['instances']:
+        if item['asset'] in EQUIPMENT_PROFILES:
+            device=instance_source(s,item,context=p)
+            dimensions={item['id']+'_'+k:v for k,v in provider(item['asset']).parameters(device).items()}
+            if set(dimensions)&set(p):raise ValueError('Equipment dimensions must come from the catalog: '+item['id'])
+            p.update(dimensions)
+    return p
 def xyz(values,p): return [robot.evaluate(v,p) for v in values]
 
 
@@ -51,12 +66,20 @@ def matrix(item,p):
 def provider(kind):
     modules={'arm':'robot_spec','room':'lab_room_model','centrifuge':'centrifuge_model',
              'transporter':'sample_transport_model','tube_rack':'sample_transport_model','tip_collector':'tip_collector_model'}
+    modules.update({kind:'lab_equipment' for kind in EQUIPMENT_PROFILES})
     if kind not in modules: raise ValueError('Unsupported layout asset: '+kind)
     return importlib.import_module(modules[kind])
 
 
-def instance_source(s,item):
+def instance_source(s,item,context=None):
     kind=item['asset']; key='transporter' if kind=='tube_rack' else kind
+    if kind in EQUIPMENT_PROFILES:
+        ref=s['assets'][key]
+        if ref.get('case')!=kind+'_default':raise ValueError('Equipment profile and reference case disagree: '+kind)
+        catalog=provider(kind).load(assembly.validate_reference(ref))
+        values=parameters(s) if context is None else context
+        overrides={k:robot.evaluate(v,values) for k,v in item.get('overrides',{}).items()}
+        return provider(kind).materialize(catalog,kind,overrides)
     # Bench racks reuse the cassette variant of the actual transporter instance.
     parent=next(i for i in s['instances'] if i['asset']=='transporter') if kind=='tube_rack' else item
     overrides={**parent.get('overrides',{}),**item.get('overrides',{})}
@@ -77,6 +100,48 @@ def cassette_datum(source,item):
     module=provider('transporter')
     expanded=module.expanded(source,module.parameters(source),instance_variant(source,item))
     return next(frame['origin_mm'] for frame in expanded['interfaces'] if frame['id']=='B2_CassetteDatum')
+
+
+def equipment_solidcraft_commands(s,item):
+    """Native catalog construction with stable instance-prefixed body names."""
+    import tube_carrier_model as portable
+    module=provider(item['asset']);spec=instance_source(s,item);p=module.parameters(spec)
+    source=copy.deepcopy(module.expanded(spec,p));prefix=item['id']+'__'
+    for field in ('bodies','operations','components','joints'):
+        for value in source[field]:
+            value['id']=prefix+value['id']
+            for key in ('body','component','parent','child'):
+                if key in value:value[key]=prefix+value[key]
+    values={prefix+k:v for k,v in module.pose(spec,p,item.get('pose','closed')).items()}
+    class Provider:
+        SOURCE=module.SOURCE
+        expanded=staticmethod(lambda spec,p:source)
+        pose=staticmethod(lambda spec,p:values)
+        samples=staticmethod(lambda spec,p:[])
+    commands=portable.solidcraft_commands(spec,p,Provider)
+    for command in commands:
+        if command['command']=='document.metadata.set':
+            command['params']={'values':{'org.solidcraftbot.layout-equipment':{
+                'source':str(module.SOURCE.relative_to(ROOT)),'source_sha256':digest(module.SOURCE),
+                'instance':item['id'],'profile':item['asset'],'pose':item.get('pose','closed'),
+                'overrides':item.get('overrides',{})}}}
+    return commands
+
+
+def centrifuge_solidcraft_commands(s,item):
+    """Reuse CF01's native recipe; keep its rotor out of the STEP importer."""
+    module=provider('centrifuge');spec=instance_source(s,item);p=module.parameters(spec)
+    source=module.expanded(spec,p);prefix=item['id']+'__'
+    names={entry['id'] for field in ('bodies','operations','components','joints') for entry in source[field]}
+    def rename(value):
+        if isinstance(value,dict):return {k:rename(v) for k,v in value.items()}
+        if isinstance(value,list):return [rename(v) for v in value]
+        return prefix+value if isinstance(value,str) and value in names else value
+    commands=rename(module.solidcraft_commands(spec,p))
+    commands.extend({'command':'joint.drive','params':{'joint':prefix+k,'value':v,'quiet':True}}
+                    for k,v in module.pose(spec,p,item.get('pose','closed')).items())
+    commands.append({'command':'joint.solve','params':{}})
+    return commands
 
 
 def inverse_position_ik(s,instance,target):

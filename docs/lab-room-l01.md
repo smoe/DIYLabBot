@@ -21,7 +21,13 @@ leave open spans for reaching through to the other side. The window benches no
 longer have cupboards or plinths underneath; two open leg envelopes support each
 worktop. Actual reach, fixings and load capacity remain unverified.
 
-![L01 room with benches and storage](../cad/generated/lab-room-l01-7f455f722169/room-iso.png)
+The left side bench and its upper storage now end 640 mm earlier to reserve
+the window-end freezer bay. The right side bench and upper storage retain
+their original length; the refrigerator occupies the entrance-side pocket
+with its back against the right wall. Furnishing reservations contain no equipment geometry; the referenced devices
+belong to the [separate L01 equipment layout](lab-layout-l01.md).
+
+![L01 room with benches and storage](models/images/l01-furnished.png)
 
 
 ## Source layers for L01
@@ -30,7 +36,8 @@ The entry point `model/lab-room-l01.shared.json` is now a pinned composition of
 `model/environments/l01.geometry.json`, `model/furniture/laboratory.catalog.json`
 and `model/furnishings/l01.furnishings.json`. The shell can be evaluated without
 furniture. The furnished room retains its body IDs, named frames and existing
-equipment positions. The four-level target and the current implementation scope
+frame identities. The appliance reservations and the explicit shift of the
+left station are recorded in their respective source layers. The four-level target and the current implementation scope
 are documented in [ARCHITECTURE.md](../ARCHITECTURE.md).
 
 The build entry remains `python scripts/build_lab_room.py`. Run
@@ -76,10 +83,8 @@ airflow and small-object retention are not modeled or tested. Walls are transluc
 drawn. Cabinet interiors, doors and opening sweeps are omitted. The three window
 divisions and exact door locations are assumptions, not observations.
 
-![Top view of provisional L01](../cad/generated/lab-room-l01-7f455f722169/room-top.png)
-
-The top render shows the full wall height, including lintels above the doors;
-it is not a conventional horizontal section through the door openings.
+The [current placement plan](models/images/l01-equipment.svg) shows the
+revised worktop outlines and device reference points.
 
 ## Adjustable provisional dimensions
 
@@ -92,6 +97,7 @@ it is not a conventional horizontal section through the door openings.
 | Two door openings | 900 × 2,150 mm each |
 | Door left-edge positions on entrance wall | 600 / 5,100 mm |
 | Perimeter bench depth / worktop height | 700 / 900 mm |
+| Left rear equipment bay / additional right entrance setback | 640 / 0 mm |
 | Window-side bench depth | 500 mm, provisional |
 | Concrete support width / depth | approximately 300 / 500 mm, owner-reported |
 | Support lateral offset from room centre | 0 mm, provisional |

@@ -182,6 +182,21 @@
       "documentation": "docs/lab-room-l01.md"
     },
     {
+      "id": "l01-overview",
+      "title": "L01 · Gesamtansicht mit Waage und Kaltlagerung",
+      "group": "ausstattung",
+      "sources": [
+        "model/lab-layout-l01.shared.json",
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/l01-overview.png",
+      "render": {
+        "kind": "lab-layout"
+      },
+      "caption": "Native Gesamtansicht: −20-°C-Gefrierschrank am linken Fensterende, Analysenwaage auf der linken Mittelbank und Kühlschrank mit dem Rücken an der rechten Seitenwand hinter Tür B. Seine Öffnung zeigt zum Gang; die rechte Bank behält ihre Länge. Das manuelle Kellerlager ist nicht aufgestellt.",
+      "documentation": "docs/lab-layout-l01.md"
+    },
+    {
       "id": "l01-equipment",
       "title": "L01 · Geräteausstattung",
       "group": "ausstattung",
@@ -503,6 +518,22 @@
       },
       "caption": "Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.",
       "documentation": "docs/synthetic-lab-workflow.md"
+    },
+    {
+      "id": "lab-glassware-base",
+      "title": "Laborglas · Grundbibliothek",
+      "group": "baugruppen",
+      "sources": [
+        "model/lab-glassware.shared.json"
+      ],
+      "image": "images/lab-glassware-base.png",
+      "render": {
+        "kind": "case",
+        "family": "lab-glassware",
+        "case": "overview"
+      },
+      "caption": "Native Übersicht der bereits eingeführten Grundbibliothek: hohle Becher, durchgängige Trichter und Flaschen mit separaten Schraub- beziehungsweise Stopfenverschlüssen. Keine Laboraufstellung.",
+      "documentation": "docs/lab-glassware.md"
     }
   ],
   "groups": [

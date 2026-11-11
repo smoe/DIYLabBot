@@ -16,7 +16,7 @@ des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
 
 | 1 · Arbeitsumgebung | 2 · Möbeltypen | 3 · Möblierung | 4 · Geräteausstattung |
 |---|---|---|---|
-| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-equipment.svg" alt="Aktueller schematischer L01-Aufstellungsplan" width="180"></a> |
+| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-overview.png" alt="L01-Gesamtansicht mit Waage und Kaltlagerung" width="180"></a> |
 
 Die Galerie verbindet die vier Ebenen mit den einzelnen Konstruktionen und der
 synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.

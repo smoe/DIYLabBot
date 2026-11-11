@@ -241,6 +241,24 @@
         150
       ],
       "measured_mm": null
+    },
+    "left_rear_equipment_bay": {
+      "expression": 640,
+      "unit": "mm",
+      "range": [
+        0,
+        1200
+      ],
+      "measured_mm": null
+    },
+    "right_front_equipment_bay": {
+      "expression": 0,
+      "unit": "mm",
+      "range": [
+        0,
+        800
+      ],
+      "measured_mm": null
     }
   },
   "anchors": {
@@ -264,7 +282,7 @@
       "component": "PerimeterBenches",
       "bindings": {
         "width": "bench_depth",
-        "length": "left_depth-window_bench_depth-heating_corner_gap-perimeter_start_y",
+        "length": "left_depth-window_bench_depth-heating_corner_gap-perimeter_start_y-left_rear_equipment_bay",
         "height": "bench_height",
         "top_t": "worktop_t",
         "plinth_h": "plinth_h"
@@ -285,14 +303,14 @@
       "component": "PerimeterBenches",
       "bindings": {
         "width": "bench_depth",
-        "length": "right_depth-window_bench_depth-heating_corner_gap-perimeter_start_y",
+        "length": "right_depth-window_bench_depth-heating_corner_gap-perimeter_start_y-right_front_equipment_bay",
         "height": "bench_height",
         "top_t": "worktop_t",
         "plinth_h": "plinth_h"
       },
       "xyz": [
         "room_width-bench_depth",
-        "perimeter_start_y",
+        "perimeter_start_y+right_front_equipment_bay",
         0
       ],
       "yaw_deg": 0,
@@ -631,7 +649,7 @@
       "component": "UpperStorage",
       "bindings": {
         "width": "upper_depth",
-        "length": "left_depth-bench_depth-perimeter_start_y-250",
+        "length": "left_depth-bench_depth-perimeter_start_y-250-left_rear_equipment_bay",
         "height": "upper_height"
       },
       "xyz": [
@@ -649,12 +667,12 @@
       "component": "UpperStorage",
       "bindings": {
         "width": "upper_depth",
-        "length": "right_depth-bench_depth-perimeter_start_y-250",
+        "length": "right_depth-bench_depth-perimeter_start_y-250-right_front_equipment_bay",
         "height": "upper_height"
       },
       "xyz": [
         "room_width-upper_depth",
-        "perimeter_start_y",
+        "perimeter_start_y+right_front_equipment_bay",
         "upper_bottom_z"
       ],
       "yaw_deg": 0,

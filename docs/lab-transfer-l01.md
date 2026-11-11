@@ -4,12 +4,17 @@ The [shared protocol](../model/lab-transfer-l01.protocol.json) defines one
 closed 2 ml tube moving from TR01 to CF01 and back to the same rack position.
 The [layout source](../model/lab-layout-l01.shared.json) now places ArmA and ArmB
 on the right-hand middle bench, together with T01 and their rack. ArmC and CF01
-remain at the window end of the left wall bench. Both work areas are visible
+are grouped on the left wall bench before the freezer bay. Both work areas are visible
 in a single room view.
 
 The third arm uses a provisional 160 mm open riser. CF01 faces 270°, so the
 tilted pocket can be approached with the real wrist limits. TR01 parks at
-X=930, Y=6250, clear of the window bench; its deck remains at 900 mm.
+X=930, Y=5450; its deck remains at 900 mm. The left station group and the
+three existing absolute waypoint references share `left_station_shift_y`.
+Those waypoint coordinates accept the same millimetre expressions as the
+layout, preserving the 800 mm geometric translation. The historical native
+transfer report predates this placement; it is not a current motion-clearance
+proof. This coordinate update does not qualify a new transport program.
 All room dimensions and station placements remain provisional.
 
 ## Playback and rebuild

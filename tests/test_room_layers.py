@@ -32,9 +32,13 @@ class RoomLayerTests(unittest.TestCase):
         else:self.assertEqual(actual,expected)
 
     def test_every_primitive_boolean_sequence_style_and_frame_matches_pre_split_variants(self):
+        # The historical split fixture predates the intentional appliance bays.
+        historical=copy.deepcopy(self.spec)
+        for name in ('left_rear_equipment_bay','right_front_equipment_bay'):
+            historical['parameters'][name]['expression']=0
         for case in self.before['cases']:
             with self.subTest(case=case['id']):
-                p=room.parameters(self.spec,case['overrides']);actual=room.expanded(self.spec,p)
+                p=room.parameters(historical,case['overrides']);actual=room.expanded(historical,p)
                 for key in ['bodies','operations','frames','components']:
                     by_id={x['id']:copy.deepcopy(x) for x in actual[key]}
                     for obj in by_id.values():
@@ -48,10 +52,29 @@ class RoomLayerTests(unittest.TestCase):
                 self.assertNestedClose(room.circulation(p),case['circulation'])
 
     def test_equipment_poses_and_transfer_targets_are_preserved(self):
-        spec=layout.load(validate_builds=False);p=layout.parameters(spec)
-        self.assertNestedClose({i['id']:layout.matrix(i,p) for i in spec['instances']},self.before['equipment_matrices'])
+        spec=layout.load(validate_builds=False)
+        spec['parameters']['left_station_shift_y']=0
+        p=layout.parameters(spec)
+        self.assertNestedClose({i['id']:layout.matrix(i,p) for i in spec['instances'] if i['id'] in self.before['equipment_matrices']},self.before['equipment_matrices'])
         targets=transfer.data(transfer.load(),spec)['targets']
         self.assertNestedClose(json.loads(json.dumps(targets)),self.before['transfer_targets'])
+
+    def test_appliance_bay_changes_only_left_bench_and_upper_storage(self):
+        changed={'LeftBench_Worktop','LeftBench_LowerStorage','LeftBench_Plinth','LeftUpperStorage'}
+        p=room.parameters(self.spec)
+        current=room.expanded(self.spec,p)
+        historical=copy.deepcopy(self.spec)
+        for name in ('left_rear_equipment_bay','right_front_equipment_bay'):
+            historical['parameters'][name]['expression']=0
+        hp=room.parameters(historical)
+        before=room.expanded(historical,hp)
+        a={o['id']:room.numeric_shape(o['shape'],p) for o in current['operations'] if o['body'] not in changed}
+        b={o['id']:room.numeric_shape(o['shape'],hp) for o in before['operations'] if o['body'] not in changed}
+        self.assertNestedClose(a,b)
+        shapes={o['id']:room.numeric_shape(o['shape'],p) for o in current['operations']}
+        left=shapes['LeftBench_Worktop'];right=shapes['RightBench_Worktop']
+        self.assertEqual(left['origin'][1]+left['size'][1],p['left_depth']-p['window_bench_depth']-p['heating_corner_gap']-p['left_rear_equipment_bay'])
+        self.assertEqual(right['origin'][1],p['perimeter_start_y']+p['right_front_equipment_bay'])
 
     def test_geometry_can_be_loaded_without_furniture_parameters_or_bodies(self):
         spec=geometry.load();p=geometry.parameters(spec);expanded=geometry.expanded(spec,p)

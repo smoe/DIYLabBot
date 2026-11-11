@@ -64,6 +64,100 @@ class LabLayoutTests(unittest.TestCase):
         self.assertEqual(model.provider('transporter').parameters(model.instance_source(self.spec,self.items['TR01']))['floor_deck_z'],
                          self.spec['parameters']['vehicle_deck_z'])
 
+    def test_three_new_devices_reference_the_catalog_and_cellar_ult_stays_outside_l01(self):
+        devices=[i for i in self.spec['instances'] if i['asset'] in model.EQUIPMENT_PROFILES]
+        self.assertEqual({i['id'] for i in devices},{'Balance01','Freezer01','Fridge01'})
+        self.assertNotIn('cellar_ult_f440n',{i['asset'] for i in self.spec['instances']})
+        for item in devices:
+            ref=self.spec['assets'][item['asset']]
+            self.assertEqual(ref['source'],'model/lab-equipment.shared.json')
+            source=model.instance_source(self.spec,item)
+            self.assertEqual(source['id'],item['asset'])
+            commands=model.equipment_solidcraft_commands(self.spec,item)
+            self.assertFalse(any('insert' in c['command'] for c in commands))
+            self.assertTrue(any(c['command']=='joint.create' for c in commands))
+            self.assertTrue(any(c['command']=='solid.box' for c in commands))
+            bodies=[c['params']['body_name'] for c in commands if 'body_name' in c['params']]
+            self.assertTrue(all(name.startswith(item['id']+'__') for name in bodies))
+        invalid=copy.deepcopy(self.spec)
+        invalid['parameters']['Freezer01_width']=500
+        with self.assertRaisesRegex(ValueError,'Equipment dimensions must come from the catalog'):
+            model.parameters(invalid)
+
+    def test_cold_storage_positions_fill_the_reserved_bay_and_the_right_door_strip(self):
+        p=model.parameters(self.spec)
+        freezer=model.xyz(self.items['Freezer01']['xyz'],p)
+        half=p['Freezer01_width']/2
+        bench_end=p['left_depth']-p['window_bench_depth']-p['heating_corner_gap']-p['left_rear_equipment_bay']
+        self.assertEqual(freezer[1]-half-bench_end,p['cold_wall_gap'])
+        self.assertEqual(freezer[1]+half,p['left_depth']-p['window_bench_depth']-p['heating_corner_gap']-p['cold_wall_gap'])
+        self.assertEqual(freezer[0]-p['Freezer01_body_depth'],p['cold_wall_gap'])
+        source=model.instance_source(self.spec,self.items['Freezer01'])
+        self.assertEqual(model.provider('freezer_minus20').parameters(source)['max_open'],90)
+        fridge=model.xyz(self.items['Fridge01']['xyz'],p)
+        self.assertEqual(fridge[0]+p['Fridge01_body_depth'],p['room_width']-p['cold_wall_gap'])
+        self.assertEqual(fridge[1]+p['Fridge01_width']/2,p['perimeter_start_y']+p['right_front_equipment_bay']-p['cold_wall_gap'])
+        self.assertEqual(self.items['Fridge01']['yaw_deg'],270)
+        self.assertEqual(p['right_front_equipment_bay'],0)
+        self.assertEqual(self.items['Balance01']['host'],'IslandLeft')
+
+    def test_station_group_and_existing_transfer_waypoints_translate_together(self):
+        import json
+        historical=copy.deepcopy(self.spec)
+        historical['parameters']['left_station_shift_y']=0
+        a,b=model.parameters(historical),model.parameters(self.spec)
+        moved={'ArmC','CF01','TR01','RackCF'}
+        for name,item in self.items.items():
+            if item['asset'] in model.EQUIPMENT_PROFILES:continue
+            before=model.xyz(item['xyz'],a);after=model.xyz(item['xyz'],b)
+            self.assertEqual([after[i]-before[i] for i in range(3)],[0,b['left_station_shift_y'] if name in moved else 0,0])
+        # Check the geometric references independently of the separate runtime
+        # protocol implementation, which has its own versioned tests.
+        source=json.loads((model.ROOT/'model/lab-transfer-l01.protocol.json').read_text())
+        for key in ('transit_tcp_mm','cf_pre_tcp_mm','cf_side_tcp_mm'):
+            before=model.xyz(source['path'][key],a);after=model.xyz(source['path'][key],b)
+            self.assertAlmostEqual(after[1]-before[1],b['left_station_shift_y'])
+            self.assertEqual(before[::2],after[::2])
+
+
+class LabLayoutNativeEvidenceTests(unittest.TestCase):
+    def test_installed_appliances_and_native_cad_instances_have_current_evidence(self):
+        import json
+        path=model.ROOT/'cad/lab-layout-l01/shared-build-report.json'
+        if not path.exists():self.skipTest('Build the current L01 layout for native evidence')
+        report=json.loads(path.read_text())
+        if report['source_sha256']!=model.digest(model.SOURCE):self.skipTest('Current L01 layout has not been built locally')
+        self.assertTrue(report['passed'])
+        for name,checksum in report['source_files_sha256'].items():
+            self.assertEqual(model.digest(model.ROOT/name),checksum,name)
+        for name,checksum in report['artifact_sha256'].items():
+            self.assertEqual(model.digest(model.ROOT/report['files'][name]),checksum)
+        native=report['layout_validation']
+        self.assertEqual(native['invalid_objects'],[])
+        self.assertEqual(len(native['equipment_body_metrics']),64)
+        self.assertEqual(len(report['equipment_body_comparisons']),64)
+        self.assertTrue(all(c['passed'] for c in report['equipment_body_comparisons']))
+        self.assertTrue(all(c['passed'] for c in native['equipment_placement']))
+        self.assertEqual({c['instance'] for c in native['equipment_access']},{'Balance01','Freezer01','Fridge01'})
+        self.assertEqual(sum(len(c['samples']) for c in native['equipment_access']),109)
+        for device in native['equipment_access']:
+            self.assertTrue(device['passed'])
+            self.assertTrue(all(c['passed'] for c in device['samples']))
+        fridge=next(c for c in native['equipment_access'] if c['instance']=='Fridge01')
+        approaches=[p for sample in fridge['samples'] for p in sample['access_probes'] if p['id'].endswith('.aisle_approach')]
+        self.assertEqual(len(approaches),15)
+        self.assertTrue(all(p['passed'] for p in approaches))
+        self.assertTrue(all(p['obstruction_mm']<1e-6 for p in approaches if p['accessible']))
+        for group in ('native_arm_models','native_equipment_models'):
+            self.assertEqual(len(report[group]),3)
+            for asset in report[group].values():self.assertEqual(model.digest(model.ROOT/asset['path']),asset['sha256'])
+        self.assertEqual(set(report['native_station_models']),{'CF01'})
+        self.assertTrue(all(c['passed'] for c in report['arm_rigid_placement_checks']))
+        for entry in report['arm_rigid_metric_derivations']:
+            self.assertIn('_housing_Part',entry['body'])
+            self.assertEqual(model.digest(model.ROOT/entry['local_metrics']),entry['local_metrics_sha256'])
+        self.assertEqual(report['direct_world_measurements_complete'],not report['arm_rigid_metric_derivations'])
+
 
 if __name__ == '__main__':
     unittest.main()

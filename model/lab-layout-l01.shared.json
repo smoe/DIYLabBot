@@ -9,7 +9,7 @@
   "assets": {
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "4213ce4683f88708f5d8d7a1f5b778176bd441e15392f408c01d780d57daafd7",
+      "source_sha256": "314220ea9d48a047fcd7eb97a588e9d6e7dbd24b4e729276e593a807f147465a",
       "report": "cad/lab-room-l01/shared-build-report.json",
       "case": "default"
     },
@@ -36,6 +36,24 @@
       "source_sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
       "report": "cad/tip-collector-t01/shared-build-report.json",
       "case": "default"
+    },
+    "analytical_balance": {
+      "source": "model/lab-equipment.shared.json",
+      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "report": "cad/lab-equipment/shared-build-report.json",
+      "case": "analytical_balance_default"
+    },
+    "fridge_4c": {
+      "source": "model/lab-equipment.shared.json",
+      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "report": "cad/lab-equipment/shared-build-report.json",
+      "case": "fridge_4c_default"
+    },
+    "freezer_minus20": {
+      "source": "model/lab-equipment.shared.json",
+      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "report": "cad/lab-equipment/shared-build-report.json",
+      "case": "freezer_minus20_default"
     }
   },
   "parameters": {
@@ -52,7 +70,9 @@
     "human_check_h": 2000,
     "riser_wall": 16,
     "pair_island_offset_x": 500,
-    "cf_arm_riser_h": 160
+    "cf_arm_riser_h": 160,
+    "left_station_shift_y": -800,
+    "cold_wall_gap": 20
   },
   "instances": [
     {
@@ -99,7 +119,7 @@
       "host": "LeftBench",
       "xyz": [
         "cf_arm_x",
-        "cf_arm_y",
+        "cf_arm_y+left_station_shift_y",
         "bench_height+cf_arm_riser_h"
       ],
       "yaw_deg": 0,
@@ -119,7 +139,7 @@
       "host": "LeftBench",
       "xyz": [
         "cf_x",
-        "cf_y",
+        "cf_y+left_station_shift_y",
         "bench_height"
       ],
       "yaw_deg": 270,
@@ -131,7 +151,7 @@
       "host": "Floor",
       "xyz": [
         "vehicle_x",
-        "vehicle_y",
+        "vehicle_y+left_station_shift_y",
         0
       ],
       "yaw_deg": 90,
@@ -171,7 +191,7 @@
       "host": "LeftBench",
       "xyz": [
         "cf_x",
-        "cf_y-475",
+        "cf_y-475+left_station_shift_y",
         "bench_height"
       ],
       "yaw_deg": 0
@@ -186,6 +206,46 @@
         "bench_height"
       ],
       "yaw_deg": 0
+    },
+    {
+      "id": "Balance01",
+      "asset": "analytical_balance",
+      "host": "IslandLeft",
+      "xyz": [
+        "room_width/2-450",
+        4050,
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "pose": "access"
+    },
+    {
+      "id": "Freezer01",
+      "asset": "freezer_minus20",
+      "host": "Floor",
+      "xyz": [
+        "Freezer01_body_depth+cold_wall_gap",
+        "left_depth-window_bench_depth-heating_corner_gap-cold_wall_gap-Freezer01_width/2",
+        0
+      ],
+      "yaw_deg": 90,
+      "pose": "access",
+      "overrides": {
+        "max_open": 90,
+        "access_angle": 90
+      }
+    },
+    {
+      "id": "Fridge01",
+      "asset": "fridge_4c",
+      "host": "Floor",
+      "xyz": [
+        "room_width-cold_wall_gap-Fridge01_body_depth",
+        "perimeter_start_y+right_front_equipment_bay-cold_wall_gap-Fridge01_width/2",
+        0
+      ],
+      "yaw_deg": 270,
+      "pose": "access"
     }
   ],
   "corridors": [
@@ -239,7 +299,7 @@
       ],
       [
         "vehicle_x",
-        "vehicle_y"
+        "vehicle_y+left_station_shift_y"
       ]
     ],
     "yaw_deg": 90,
@@ -278,7 +338,7 @@
       ],
       "xyz": [
         "cf_x",
-        "cf_y",
+        "cf_y+left_station_shift_y",
         "bench_height+330"
       ]
     },
@@ -289,7 +349,7 @@
       ],
       "xyz": [
         "vehicle_x",
-        "vehicle_y-78",
+        "vehicle_y-78+left_station_shift_y",
         "TR01_floor_deck_z+160"
       ]
     },
@@ -300,7 +360,7 @@
       ],
       "xyz": [
         "vehicle_x",
-        "vehicle_y+78",
+        "vehicle_y+78+left_station_shift_y",
         "TR01_floor_deck_z+160"
       ]
     }
@@ -312,7 +372,11 @@
     "TR01 deck regenerated at 900 mm; transport cover omitted for access, no cover-handling mechanism",
     "rack geometry is the existing TR01 24-place tube cassette reused on benches",
     "green floor strips indicate provisional geometric study corridors, not regulated or safe separation distances",
-    "CF01 rotated towards ArmC; station coordinates and ArmC riser revised for oriented sample handling"
+    "CF01 rotated towards ArmC; station coordinates and ArmC riser revised for oriented sample handling",
+    "Freezer01 fills the reserved bay at the window end of the left bench; its modeled opening is limited to 90 degrees in this installation.",
+    "The left CF01/ArmC/TR01/rack group moves together toward the entrance by left_station_shift_y; its relative geometry is retained.",
+    "Fridge01 backs onto the right sidewall behind Door B, faces the aisle and ends before the original right bench; its opening and straight shelf approaches are checked.",
+    "Balance01 uses the free left middle worktop; the manual cellar ULT is not part of L01."
   ],
   "limitations": [
     "Room dimensions, doors and storage remain provisional",
@@ -321,6 +385,7 @@
     "Position-only inverse-kinematics screens do not establish orientation, approach path, cable clearance or physical grasp",
     "No collaboration scheduler, robot-motion sweeps, human detection, protective separation, egress/accessibility compliance or payload/bench-load qualification",
     "Floor transporter path is sampled against static geometry; dynamics, steering, localization and people interaction are not validated",
-    "Rack/vehicle article fits and centrifuge performance limits retain upstream qualifications"
+    "Rack/vehicle article fits and centrifuge performance limits retain upstream qualifications",
+    "Appliance doors and drawers are sampled against the static room and equipment; building-door leaves, ventilation, installation tolerances and thermal/vibration performance remain unqualified."
   ]
 }

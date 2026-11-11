@@ -46,8 +46,17 @@ def source_document(s,item,path):
         return build(source,p,model.instance_variant(source,item),path)
     if kind=='centrifuge':
         from build_centrifuge_freecad import build
+        return build(source,p,path)[0]
     elif kind=='tip_collector':
         from build_tip_collector_freecad import build
+    elif kind in model.EQUIPMENT_PROFILES:
+        import build_tube_carrier_freecad as native
+        previous=native.model
+        try:
+            native.model=provider
+            return native.build(source,p,path)
+        finally:
+            native.model=previous
     else: raise ValueError('Unsupported native layout instance: '+kind)
     return build(source,p,path)
 
@@ -58,10 +67,17 @@ def prepare(context):
     doc=room_backend.build(room_source,room.parameters(room_source),cad/'LabLayout_L01.FCStd')
     for key,value in s['parameters'].items():
         doc.ModelParameters.addProperty('App::PropertyDistance',key,'Layout study (mm)'); setattr(doc.ModelParameters,key,value)
+    for item in s['instances']:
+        if item['asset'] in model.EQUIPMENT_PROFILES:
+            device=model.instance_source(s,item)
+            for name,definition in device['parameters'].items():
+                key=item['id']+'_'+name
+                doc.ModelParameters.addProperty('App::PropertyAngle' if definition['unit']=='deg' else 'App::PropertyDistance',key,'Derived equipment dimensions')
+                setattr(doc.ModelParameters,key,p[key]);doc.ModelParameters.setEditorMode(key,1)
     controller=doc.addObject('App::FeaturePython','LayoutController')
     for key,value in [('SourceFile',str(model.SOURCE.relative_to(model.ROOT))),('SpecSHA256',model.digest(model.SOURCE)),('Status',s['status'])]:
         controller.addProperty('App::PropertyString',key,'Layout source'); setattr(controller,key,value)
-    cached={}; snapshots=[]; scene_styles={}; scene_meta={}; all_groups={}
+    cached={}; snapshots=[]; scene_styles={}; scene_meta={}; all_groups={}; access_models={}
     room_expanded=room.expanded(room_source,room.parameters(room_source))
     for b in room_expanded['bodies']: scene_styles[b['id']]=b['appearance']; scene_meta[b['id']]={'instance':'Room','role':b['role']}
     for obj in room_backend.objects(doc): obj.addProperty('App::PropertyString','LayoutInstance','Layout'); obj.LayoutInstance='Room'
@@ -72,6 +88,9 @@ def prepare(context):
         # Native translations are adjustable; rotations use the group's placement.
         for axis,value in zip('xyz',item['xyz']): group.setExpression('Placement.Base.'+axis,native_expression(value))
         group.addProperty('App::PropertyString','LayoutAsset','Layout'); group.LayoutAsset=item['asset']
+        if item['asset'] in model.EQUIPMENT_PROFILES:
+            group.addProperty('App::PropertyString','SourceProfile','Layout');group.SourceProfile=item['asset']
+            group.addProperty('App::PropertyString','SourcePose','Layout');group.SourcePose=item.get('pose','closed')
         export_doc=App.newDocument(tag+'_Snapshot'); export_objects=[]; expected=[]
         # A compound product may lose its STEP product name on import. Export
         # each solid with a stable suffix in both target snapshots instead.
@@ -104,6 +123,10 @@ def prepare(context):
         if kind=='centrifuge':
             import centrifuge_model as cf
             for key,value in cf.pose(source,cf.parameters(source),item.get('pose','closed')).items(): setattr(upstream.Controller,key,value)
+        if kind in model.EQUIPMENT_PROFILES:
+            provider=model.provider(kind);dp=provider.parameters(source)
+            for key,value in provider.pose(source,dp,item.get('pose','closed')).items():setattr(upstream.Controller,key,value)
+            access_models[item['id']]=(upstream,source,item)
         upstream.recompute(); records=[]
         for obj in motion.features(upstream):
             old=obj.SourceBody; role=getattr(obj,'ModelRole','equipment_geometry')
@@ -137,13 +160,69 @@ def prepare(context):
     doc.recompute();doc.save()
     context.update({'snapshots':snapshots,'styles':scene_styles,'body_metadata':scene_meta,'scene_file':str(cad/'LabLayout_L01.FCStd')})
     (out/'context.json').write_text(json.dumps(context,indent=2)+'\n',encoding='utf-8')
-    validate(doc,s,context)
+    validate(doc,s,context,access_models)
     for source_doc in list(cached.values()):
         if source_doc.Name in App.listDocuments(): App.closeDocument(source_doc.Name)
     App.closeDocument(doc.Name)
 
 
-def validate(doc,s,context):
+def check_equipment_access(s,entries,access_models):
+    """Sample real device parts against the complete installed scene."""
+    import build_tube_carrier_freecad as native
+    from build_lab_equipment_freecad import access_checks
+    previous=native.model;results=[]
+    try:
+        for identity,(doc,spec,item) in access_models.items():
+            provider=model.provider(item['asset']);native.model=provider
+            p=provider.parameters(spec);source=provider.expanded(spec,p)
+            transform=placement(item,model.parameters(s));cache={};samples=[];closed_bounds=None
+            obstacles=[(o,shape,b) for o,shape,b in entries if o.LayoutInstance not in (identity,'Guides')]
+            for sample in provider.samples(spec,p):
+                native.set_pose(doc,source,sample['joint_values'])
+                internal=native.interference(doc,cache);hits=[];bounds=[]
+                for obj in native.objects(doc):
+                    shape=motion.world_shape(obj);shape.Placement=transform.multiply(shape.Placement);bound=bb(shape);bounds.append(bound)
+                    for other,obstacle,other_bound in obstacles:
+                        if not intersects(bound,other_bound):continue
+                        volume=shape.common(obstacle).Volume
+                        if volume>1e-3:hits.append({'body':obj.SourceBody,'obstacle':other.SourceBody,'volume_mm3':volume})
+                probes=access_checks(doc,spec,p,sample['joint_values']) if sample['id'] in ('closed','access','all_open') else []
+                if item['asset']=='fridge_4c' and sample['id'] in ('closed','access','all_open'):
+                    corridor=next(c for c in s['corridors'] if c['id']=='People_Right')
+                    corridor_bounds=[model.robot.evaluate(v,model.parameters(s)) for v in corridor['bounds']]
+                    aisle_x=(corridor_bounds[0]+corridor_bounds[1])/2
+                    for name,frame in provider.interfaces(spec,p,sample['joint_values']).items():
+                        point=transform.multVec(App.Vector(*frame['origin_mm']))
+                        ray=Part.makeLine(App.Vector(aisle_x,point.y,point.z),point)
+                        ray_bounds=bb(ray)
+                        obstruction=sum(shape.common(ray).Length for o,shape,b in entries if o.LayoutInstance!='Guides' and intersects(ray_bounds,b))
+                        # Replace the static fridge with this sample's actual geometry.
+                        static=sum(shape.common(ray).Length for o,shape,b in entries if o.LayoutInstance==identity and intersects(ray_bounds,b))
+                        current=0
+                        for obj in native.objects(doc):
+                            shape=motion.world_shape(obj);shape.Placement=transform.multiply(shape.Placement)
+                            current+=shape.common(ray).Length
+                        obstruction=obstruction-static+current
+                        probes.append({'id':name+'.aisle_approach','accessible':frame['accessible'],
+                                       'start_mm':[aisle_x,point.y,point.z],'end_mm':list(point),
+                                       'obstruction_mm':obstruction,'passed':(obstruction<1e-6)==frame['accessible']})
+                samples.append({'id':sample['id'],'joint_values':sample['joint_values'],
+                    'collisions':hits,'internal_collisions':internal['between_components'],'access_probes':probes,
+                    'passed':not hits and internal['passed'] and all(c['passed'] for c in probes)})
+                if sample['id']=='closed':
+                    closed_bounds={'min':[min(b['min'][i] for b in bounds) for i in range(3)],
+                                   'max':[max(b['max'][i] for b in bounds) for i in range(3)]}
+            values=provider.pose(spec,p,item.get('pose','closed'));native.set_pose(doc,source,values)
+            frames={name:{**frame,'world_origin_mm':model.robot.transform(model.matrix(item,model.parameters(s)),frame['origin_mm'])}
+                    for name,frame in provider.interfaces(spec,p,values).items()}
+            results.append({'instance':identity,'profile':spec['id'],'closed_bbox':closed_bounds,
+                            'interfaces':frames,'samples':samples,'passed':all(c['passed'] for c in samples)})
+    finally:
+        native.model=previous
+    return results
+
+
+def validate(doc,s,context,access_models=None):
     p=model.parameters(s); entries=[]; groups={}
     for o in motion.features(doc):
         shape=motion.world_shape(o); bounds=bb(shape); tag=o.LayoutInstance
@@ -182,12 +261,44 @@ def validate(doc,s,context):
     for tag,shapes in groups.items():
         v,c=volume_center(shapes); bounds=[bb(x) for x in shapes]
         metrics[tag]={'body_count':len(shapes),'volume_mm3':v,'center_of_mass_mm':c,'bbox':{'min':[min(b['min'][i] for b in bounds) for i in range(3)],'max':[max(b['max'][i] for b in bounds) for i in range(3)]}}
-    report={'geometry_valid':all(shape.isValid() and shape.Volume>0 for o,shape,b in entries),'body_count':len(entries),'instance_metrics':metrics,
+    equipment_access=check_equipment_access(s,entries,access_models or {})
+    placement_checks=[]
+    if equipment_access:
+        closed={c['instance']:c['closed_bbox'] for c in equipment_access}
+        room_bodies={o.SourceBody:b for o,shape,b in entries if o.LayoutInstance=='Room'}
+        freezer=closed['Freezer01'];fridge=closed['Fridge01'];balance=closed['Balance01']
+        left_end=room_bodies['LeftBench_Worktop']['max'][1]
+        front_gap=freezer['min'][1]-left_end
+        rear_gap=p['left_depth']-p['window_bench_depth']-p['heating_corner_gap']-freezer['max'][1]
+        placement_checks.extend([
+            {'id':'Freezer01.reserved_bay','bench_gap_mm':front_gap,'window_bench_gap_mm':rear_gap,
+             'passed':abs(front_gap-p['cold_wall_gap'])<1e-6 and abs(rear_gap-p['cold_wall_gap'])<1e-6},
+            {'id':'Freezer01.left_wall','gap_mm':freezer['min'][0],
+             'passed':abs(freezer['min'][0]-p['cold_wall_gap'])<1e-6},
+            {'id':'Freezer01.upper_storage_clear','passed':room_bodies['LeftUpperStorage']['max'][1]<freezer['min'][1]},
+            {'id':'Fridge01.back_to_right_wall','right_wall_gap_mm':p['room_width']-fridge['max'][0],
+             'bench_gap_mm':room_bodies['RightBench_Worktop']['min'][1]-fridge['max'][1],
+             'passed':abs(p['room_width']-fridge['max'][0]-p['cold_wall_gap'])<1e-6
+                       and abs(room_bodies['RightBench_Worktop']['min'][1]-fridge['max'][1]-p['cold_wall_gap'])<1e-6}])
+        top=room_bodies['IslandLeft_Worktop']
+        placement_checks.append({'id':'Balance01.worktop_support','passed':abs(balance['min'][2]-top['max'][2])<1e-6
+            and all(top['min'][i]<=balance['min'][i] and balance['max'][i]<=top['max'][i] for i in (0,1))})
+        for identity in ('Freezer01','Fridge01'):
+            placement_checks.append({'id':identity+'.floor_support','passed':abs(closed[identity]['min'][2])<1e-6})
+    invalid_objects=[o.Name for o in doc.Objects if 'Invalid' in o.State]
+    report={'geometry_valid':all(shape.isValid() and shape.Volume>0 for o,shape,b in entries) and not invalid_objects,
+        'invalid_objects':invalid_objects,'body_count':len(entries),'instance_metrics':metrics,
+        'scene_geometry':[{'body':o.SourceBody,'bbox':b} for o,shape,b in entries],
+        'equipment_body_metrics':[{'body':o.SourceBody,'valid':shape.isValid(),'solid_count':len(shape.Solids),
+                                   'volume_mm3':shape.Volume,'world_center_of_mass_mm':volume_center([shape])[1],'bbox':b}
+                                  for o,shape,b in entries if o.LayoutInstance in (access_models or {})],
         'static_interferences':overlaps,'human_corridors':corridor_checks,'vehicle_route':{'samples':count+1,'collisions':route_hits,'passed':not route_hits},
-        'centrifuge_open':{'collisions':open_hits,'passed':not open_hits},'position_only_reach':model.reach_report(s)}
-    report['passed']=report['geometry_valid'] and not overlaps and all(c['passed'] for c in corridor_checks) and not route_hits and not open_hits and all(r['passed'] for r in report['position_only_reach'])
+        'centrifuge_open':{'collisions':open_hits,'passed':not open_hits},'position_only_reach':model.reach_report(s),
+        'equipment_access':equipment_access,'equipment_placement':placement_checks}
+    report['passed']=report['geometry_valid'] and not overlaps and all(c['passed'] for c in corridor_checks) and not route_hits and not open_hits and all(r['passed'] for r in report['position_only_reach']) and all(c['passed'] for c in equipment_access+placement_checks)
     (Path(context['out'])/'layout-validation.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
-    print(json.dumps({'passed':report['passed'],'bodies':len(entries),'overlaps':overlaps[:12],'corridor_failures':[c for c in corridor_checks if not c['passed']],'route_collisions':route_hits[:8],'open_lid_collisions':open_hits[:8]}),flush=True)
+    print(json.dumps({'passed':report['passed'],'bodies':len(entries),'overlaps':overlaps[:12],'corridor_failures':[c for c in corridor_checks if not c['passed']],'route_collisions':route_hits[:8],'open_lid_collisions':open_hits[:8],
+        'failed_equipment_poses':{c['instance']:[{'id':v['id'],'hits':v['collisions'],'internal':v['internal_collisions']} for v in c['samples'] if not v['passed']] for c in equipment_access}}),flush=True)
 
 
 def main(path): prepare(json.loads(Path(path).read_text(encoding='utf-8')))

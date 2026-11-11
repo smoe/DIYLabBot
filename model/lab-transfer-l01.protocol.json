@@ -27,17 +27,17 @@
     "cf_clearance_mm": 40,
     "transit_tcp_mm": [
       800,
-      6200,
+      "6200+left_station_shift_y",
       1210
     ],
     "cf_pre_tcp_mm": [
       650,
-      6270,
+      "6270+left_station_shift_y",
       1200
     ],
     "cf_side_tcp_mm": [
       450,
-      6270,
+      "6270+left_station_shift_y",
       1200
     ],
     "cf_vertical_clearance_mm": 20

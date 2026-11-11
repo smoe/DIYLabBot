@@ -1,11 +1,17 @@
 # L01 equipment placement and access study
 
 The furnished scene places three instances of the existing six-axis arm,
-CF01, floor transporter TR01, the existing T01 used-tip collector and three
-24-place tube cassettes in the current L01 room. The leading source is
+CF01, floor transporter TR01, the existing T01 used-tip collector, three
+24-place tube cassettes, an analytical balance, a refrigerator and a −20 °C
+drawer freezer in the current L01 room. The leading source is
 [`model/lab-layout-l01.shared.json`](../model/lab-layout-l01.shared.json).
 The room geometry remains in its own shared source. Measurements are still
 pending; every room dimension retains its provisional status.
+
+![L01 with analytical balance, refrigerator and drawer freezer](models/images/l01-overview.png)
+
+The manual cellar ULT remains a separate equipment-library profile. No cellar
+room, basement placement or automated long-term-storage access is added.
 
 ## Open and rebuild
 
@@ -17,20 +23,18 @@ validation evidence and render paths. Run:
 python scripts/build_lab_layout.py
 ```
 
-For execution through SolidCraft MCP, use `--prepare-only`, execute the
-generated `scene.commands.json` using MCP, save the scene and measurements at
+`--prepare-only` builds the source snapshots and native SolidCraft insert
+models. It requires both CAD runtimes. For the final scene through SolidCraft
+MCP, execute the generated `scene.commands.json`, save the scene and measurements at
 the paths in its context, then use `--finish <context.json>`. When MCP restricts
 file access, stage the source-derived STEP snapshots in its permitted temporary
 directory and replace only those input paths. Keep the original command file
 for the reproducible CLI path.
 
-Current scene revision: `lab-layout-l01-ffcf822d8b3a`.
-[FreeCAD](../cad/generated/lab-layout-l01-ffcf822d8b3a/LabLayout_L01.FCStd),
-[SolidCraft](../cad/generated/lab-layout-l01-ffcf822d8b3a/LabLayout_L01.sc),
-[overview](../cad/generated/lab-layout-l01-ffcf822d8b3a/layout-iso.png),
-[top view](../cad/generated/lab-layout-l01-ffcf822d8b3a/layout-top.png),
-[arm pair](../cad/generated/lab-layout-l01-ffcf822d8b3a/pair-detail.png) and
-[centrifuge/vehicle](../cad/generated/lab-layout-l01-ffcf822d8b3a/cf-vehicle-detail.png).
+Resolve current native paths from the build report rather than an older
+revision directory. The [curated overview](models/images/l01-overview.png) and
+[schematic placement plan](models/images/l01-equipment.svg) have source/image
+bindings in the [gallery provenance](models/provenance.json).
 
 ## Proposed arrangement
 
@@ -42,13 +46,37 @@ are placement origins, rather than footprint corners.
 |---|---|---|---|
 | ArmA | Right-hand middle bench, entrance side of pair | 3800, 3070, 965 | 70° |
 | ArmB | Same bench, window side of pair | 3800, 3730, 965 | −110° |
-| ArmC | Left wall bench, window end | 600, 6350, 1060 | −140° |
-| CF01 | Left bench beside ArmC | 500, 6050, 900 | −90° |
-| TR01, Floor_Mixed | Parked beside left bench | 930, 6250, 0 | 90° |
+| ArmC | Left wall bench, before the freezer bay | 600, 5550, 1060 | 0° |
+| CF01 | Left bench beside ArmC | 500, 5250, 900 | 270° |
+| TR01, Floor_Mixed | Parked beside left bench | 930, 5450, 0 | 90° |
 | T01 | Between the pair, towards the wall | 3550, 3400, 900 | 0° |
 | RackPair | Between the pair, towards the aisle | 3900, 3400, 900 | 0° |
-| RackCF | Left bench, entrance side of CF01 | 500, 5575, 900 | 0° |
+| RackCF | Left bench, entrance side of CF01 | 500, 4775, 900 | 0° |
 | RackManual | Left half of the middle bench | 2850, 2700, 900 | 0° |
+| Balance01 | Free left middle worktop | 2850, 4050, 900 | 0° |
+| Freezer01 | Left wall, between side bench and window bench | 585, 6105, 0 | 90° |
+| Fridge01 | Back against the right sidewall behind Door B | 6011, 681.5, 0 | 270° |
+
+The left side bench and its upper storage are shortened by 640 mm. The
+600-mm-wide freezer stands in this bay with 20 mm at each end and its back
+20 mm from the left wall; its front faces the aisle. Its local `max_open`
+and `access_angle` overrides are 90°. Larger opening angles hit the sloping
+window worktop, so this instance uses a quarter-turn opening limit.
+
+The refrigerator now backs onto the right sidewall and opens toward the
+aisle. Its back is 20 mm from that wall, and its window-side edge ends 20 mm
+before the right bench. The right bench and upper storage retain their original
+length and starting position. The door swings toward the entrance side,
+away from the bench. Straight line probes from the aisle into all five shelf
+levels check the installed approach as well as the appliance's own opening.
+These geometric probes and nominal gaps do not qualify human reach,
+installation or ventilation clearance.
+
+The balance occupies the free left island worktop with its draft shield open.
+The existing CF01, ArmC, TR01 and RackCF group shifts 800 mm toward the
+entrance through one `left_station_shift_y` parameter. Relative placements,
+reach targets and the legacy geometric transfer-waypoint references move
+together. This does not create or qualify a new transport program.
 
 The pair faces a shared work area with bases 660 mm apart. The third arm can
 turn between the centrifuge and parked transporter. Its displayed shoulder
@@ -70,10 +98,11 @@ walking strips through a 2000 mm high volume. The strips are 1000 mm wide along
 both sides of the island and across the entrance, and 900 mm wide across the
 window end. Green floor patches show these reserved study areas. They are
 geometric planning choices, not established safety separation distances or an
-egress/accessibility assessment. Door-leaf swings and drawers are absent.
+egress/accessibility assessment. Building-door leaves remain absent. Appliance
+doors, draft-shield panels and freezer drawers are modeled and sampled.
 
 The TR01 route runs straight through Door A to the left station. It is checked
-at 35 positions spaced no more than 200 mm apart. Its 412 mm cross-route
+at positions spaced no more than 200 mm apart. Its 412 mm cross-route
 envelope fits inside the provisional 900 mm door opening. At the parked
 position its right edge is X=1136; the left walking strip begins at X=1450,
 leaving 314 mm between that edge and the strip. This is a static layout gap,
@@ -88,15 +117,18 @@ vehicle bays. These endpoints do not establish tool orientation, a real TCP,
 graspability, collision-free arm motions, cables or coordinated collaboration.
 No gripper or pipette tool is added. Full arm sweeps are not checked.
 
-This revision passed all static checks: 587 valid scene bodies, zero
-cross-instance intersections, four clear walking strips, 35 clear vehicle
-samples, a clear open-lid pose and seven reachable flange positions. All 12
-equipment/riser instances agree between CADs: maximum volume difference is
-0.00393% and maximum centre-of-volume difference is 0.00235 mm. These are
-geometric comparison errors, not mechanical accuracy claims. Model renders
-were visually inspected; FreeCAD GUI rendering was not separately checked.
+The revised native check covers 651 FreeCAD scene bodies, four walking strips,
+the sampled vehicle route, the open CF01 lid and seven position-only flange
+targets. It additionally checks 109 installed appliance poses against all other
+scene bodies, including intermediate opening positions, plus storage-access
+probes, five refrigerator approaches from the aisle, bay alignment and floor/worktop support. Each of the 64 new appliance
+bodies is compared individually between the independent CAD constructions;
+equipment/riser aggregates are compared for all 15 instances. Detailed errors,
+sample counts and pass/fail results belong to the current build report.
 
-The current offline suite passes 159 tests. The separate [sample-transfer study](lab-transfer-l01.md) restores live ArmC/CF01 kinematics and checks a reversible tube-handling sequence.
+These are discrete geometric checks, not continuous collision-free paths,
+mechanical accuracy or operating qualifications. The separate
+[legacy sample-transfer study](lab-transfer-l01.md) retains its stated limits.
 
 Known construction overlaps inside each upstream rigid assembly are retained
 and excluded from cross-instance collision checking. Valid individual shapes
@@ -106,12 +138,31 @@ containment, payload, stability or human-machine operation.
 ## Shared-source boundary
 
 Each equipment asset is pinned to its source and native FreeCAD artifact by
-SHA-256 and checked against its upstream build report. Native source models
-are posed through their existing controllers, then copied into the scene as
-static geometry snapshots. Multi-solid products are flattened into named
-single-solid records consistently for both CAD targets. SolidCraft imports
-those same records as separate component instances; FreeCAD stores them in
-named placement groups. The room remains native parametric geometry.
+SHA-256 and checked against its upstream build report. FreeCAD source models
+are posed through their controllers and copied into named placement groups.
+The room remains native parametric geometry. The three new appliances are
+constructed independently in SolidCraft from their shared equipment recipes,
+then inserted as linked, posed models. Read-only derived equipment dimensions
+in the FreeCAD scene support placement expressions; changing appliance
+dimensions requires regeneration of the snapshots.
+
+The arms likewise use their checked native SolidCraft source model, posed and
+inserted with its existing manufacturer-part decomposition. This avoids the
+known importer failure on some posed, combined servo STEP bodies. The native
+parent artifact, instance model and input-command checksums bind cache reuse;
+manufacturer geometry is not replaced by a concept envelope.
+Different native body subdivisions are compared as
+instance aggregates, not presented as identical body counts.
+
+CF01 also uses its existing native SolidCraft recipe, because the STEP snapshot
+import does not preserve a closed rotor on this runtime. TR01, racks, T01 and
+risers keep their existing STEP path. For nine servo housing pieces SolidCraft
+cannot integrate the surfaces after the final world placement. All are closed
+and measured in the local native arm model. Their volumes and centres are
+therefore carried through the single rigid placement, which is checked against
+all directly measurable arm bodies. The raw world-integration errors, local
+measurement hashes and explicit derivations remain in the report. These nine
+properties are derived, not direct world-surface measurements.
 
 Adjust layout parameters, equipment poses and room dimensions in the leading
 sources and rebuild both targets together. FreeCAD placement-group translation

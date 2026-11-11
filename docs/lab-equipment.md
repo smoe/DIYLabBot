@@ -7,6 +7,12 @@ Keller-Tiefkühllager nach dem CryoCube F440n. Türen, Windschutz und Schubladen
 besitzen native Gelenke. Die Bibliothek ergänzt Gerätetypen; die Aufstellungen
 in L01 und auf den Referenzbänken bleiben davon unabhängig.
 
+Die [L01-Aufstellung](lab-layout-l01.md) referenziert inzwischen Waage,
+Kühlschrank und −20-°C-Schrank. Die dortige Gefrierschrankinstanz verwendet
+90° als Öffnungs- und Zugangswinkel, damit die Tür am Fensterarbeitstisch
+vorbeikommt. Der Katalogstandard bleibt bei 110°. Das manuelle Kellerlager
+ist in L01 nicht aufgestellt; ein Kellerraum ist weiterhin nicht modelliert.
+
 Führende Quelle ist [lab-equipment.shared.json](../model/lab-equipment.shared.json),
 Vertrag [lab-equipment.schema.json](../model/lab-equipment.schema.json).
 [lab_equipment.py](../scripts/lab_equipment.py) leitet beide Familienrezepte,

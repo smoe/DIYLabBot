@@ -65,6 +65,20 @@ def checked_case(family,case='default'):
 
 def input_for(entry):
     render=entry['render'];kind=render['kind'];commands=[];evidence={}
+    if kind=='lab-layout':
+        import lab_layout_model as layout
+        path=ROOT/'cad/lab-layout-l01/shared-build-report.json';report=read(path)
+        if not report['passed'] or report['source_sha256']!=sha(layout.SOURCE):raise ValueError('Current checked L01 layout required')
+        for source,digest in report['source_files_sha256'].items():
+            if sha(project(source))!=digest:raise ValueError('L01 build dependency changed: '+source)
+        model=project(report['files']['solidcraft'])
+        if sha(model)!=report['artifact_sha256']['solidcraft']:raise ValueError('Changed L01 CAD artifact')
+        p=layout.parameters(layout.load(validate_builds=False))
+        camera={'target':[p['room_width']/2,(p['left_depth']+p['right_depth'])/4,800],
+                'yaw':.45,'pitch':1.05,'distance':18000,'fov':.6}
+        return model,commands,None,{'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True,
+            'representation':'Native L01 assembly overview with source-referenced equipment; static and sampled device-access checks, no operational robot program',
+            'camera':camera}
     if kind=='synthetic-lab':
         path=ROOT/'cad/synthetic-lab-scene/shared-build-report.json';report=read(path)
         if not report['passed']:raise ValueError('Checked five-device scene required')
@@ -228,8 +242,11 @@ def diagram(entry):
         content+=polygon(boundary,'#f9fafb');worktops={b['id'] for b in source['bodies'] if b['role']=='work_surface'}
         for op in operations:
             if op['body'] in worktops:content+=polygon(points(op['shape']),'#d5e0e5')
-        palette={'arm':'#2d6e94','centrifuge':'#ba873a','transporter':'#4c876b','tube_rack':'#826ba0','tip_collector':'#b86b50'}
-        labels={'arm':'Laborarm','centrifuge':'Zentrifuge','transporter':'Transporter','tube_rack':'Rack','tip_collector':'Spitzenabwurf'}
+        palette={'arm':'#2d6e94','centrifuge':'#ba873a','transporter':'#4c876b','tube_rack':'#826ba0','tip_collector':'#b86b50',
+                 'analytical_balance':'#3d7d8b','fridge_4c':'#508d9e','freezer_minus20':'#4876a1'}
+        labels={'arm':'Laborarm','centrifuge':'Zentrifuge','transporter':'Transporter','tube_rack':'Rack','tip_collector':'Spitzenabwurf',
+                'analytical_balance':'Analysenwaage','fridge_4c':'Kühlschrank +4 °C','freezer_minus20':'Gefrierschrank −20 °C'}
+        legend_step=min(53,600/len(layout_spec['instances']))
         for i,item in enumerate(layout_spec['instances'],1):
             x,y,z=layout.xyz(item['xyz'],lp);sx,sy=point(x,y);color=palette[item['asset']]
             angle=math.radians(item['yaw_deg']);dx,dy=math.cos(angle),-math.sin(angle)
@@ -238,9 +255,9 @@ def diagram(entry):
             content+=f'<polygon points="{ex},{ey} {bx-4*dy},{by+4*dx} {bx+4*dy},{by-4*dx}" fill="{color}"/>'
             content+=f'<circle cx="{sx}" cy="{sy}" r="14" fill="{color}"/>'
             content+=f'<text x="{sx}" y="{sy+5}" text-anchor="middle" font-size="14" fill="white">{i}</text>'
-            content+=f'<circle cx="815" cy="{170+i*53}" r="13" fill="{color}"/>'
-            content+=f'<text x="815" y="{175+i*53}" text-anchor="middle" font-size="14" fill="white">{i}</text>'
-            content+=text(840,175+i*53,item['id'],19)+text(840,196+i*53,labels[item['asset']]+' · Z '+str(round(z))+' mm',13)
+            content+=f'<circle cx="815" cy="{170+i*legend_step}" r="13" fill="{color}"/>'
+            content+=f'<text x="815" y="{175+i*legend_step}" text-anchor="middle" font-size="14" fill="white">{i}</text>'
+            content+=text(840,175+i*legend_step,item['id'],19)+text(840,196+i*legend_step,labels[item['asset']]+' · Z '+str(round(z))+' mm',13)
         content+=text(40,830,'Symbole sind keine Bauraum- oder Kollisionshüllen. Ausrichtungspfeile folgen der Quelle.',16)
         return svg_document(entry['title'],content,height=865),{'representation':'Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render','instances':len(layout_spec['instances'])}
     raise ValueError(view)
@@ -261,7 +278,9 @@ def render_entry(entry,cli):
             args=[cli,'snapshot']
             if commands:args.append(str(script))
             if model:args.extend(['--in',str(model)])
-            args.extend(['--out',str(target),'--width','1000','--height','700','--view','iso','--no-grid','--no-axes'])
+            args.extend(['--out',str(target),'--width','1000','--height','700'])
+            args.extend(['--camera',json.dumps(evidence['camera'])] if 'camera' in evidence else ['--view','iso'])
+            args.extend(['--no-grid','--no-axes'])
             run=subprocess.run(args,check=True,cwd=ROOT,capture_output=True,text=True)
             record.update(renderer_result=json.loads(run.stdout),commands=commands,command_line=args)
             if model and sha(model)!=record['native_model_sha256']:raise ValueError('Rendering modified CAD input')

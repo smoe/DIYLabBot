@@ -68,9 +68,9 @@ def data(s,ls):
              'cf_seat':(add(cf_bottom,cf_axis,grip_height),cf_axis),
              'cf_pickup':(add(cf_bottom,cf_axis,grip_height+cp['lift_travel']),cf_axis),
              'cf_clear':(add(cf_bottom,cf_axis,grip_height+s['path']['cf_clearance_mm']),cf_axis),
-             'transit':(s['path']['transit_tcp_mm'],[0,0,1]),
-             'cf_pre':(s['path']['cf_pre_tcp_mm'],cf_axis),
-             'cf_side':(s['path']['cf_side_tcp_mm'],cf_axis)}
+             'transit':(layout.xyz(s['path']['transit_tcp_mm'],p),[0,0,1]),
+             'cf_pre':(layout.xyz(s['path']['cf_pre_tcp_mm'],p),cf_axis),
+             'cf_side':(layout.xyz(s['path']['cf_side_tcp_mm'],p),cf_axis)}
     targets['cf_raised']=(add(targets['cf_clear'][0],[0,0,1],s['path']['cf_vertical_clearance_mm']),cf_axis)
     return dict(p=p,items=items,arm=arm,ap=ap,cs=cs,cp=cp,ce=ce,base=base,station=station,
                 vehicle_bottom=vehicle_bottom,cf_bottom=cf_bottom,cf_axis=cf_axis,grip_height=grip_height,targets=targets)
