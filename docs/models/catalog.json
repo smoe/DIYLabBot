@@ -444,7 +444,7 @@
     },
     {
       "id": "lab-glassware-base",
-      "title": "Laborgefäße · drei Familien",
+      "title": "Laborgefäße · vier Familien",
       "group": "bibliotheken",
       "sources": [
         "model/lab-glassware.shared.json"
@@ -455,7 +455,7 @@
         "family": "lab-glassware",
         "case": "overview"
       },
-      "caption": "Drei parametrische Familien: Becher, Trichter und Flaschen mit getrenntem Schraubdeckel oder Glasstopfen. Native Kontaktansicht der versionierten Bibliothek in offenen und geschlossenen Zuständen; keine Laboraufstellung.",
+      "caption": "Vier parametrische Familien: Becher, Trichter, Messzylinder und Flaschen mit getrenntem Schraubdeckel oder Glasstopfen. Mehrere Größen, gleichbleibende Verschlüsse und optionale Markerbeschriftung. Native Kontaktansicht der Bibliothek; keine Laboraufstellung.",
       "documentation": "docs/lab-glassware.md"
     },
     {

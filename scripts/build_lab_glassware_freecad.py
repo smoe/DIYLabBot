@@ -60,13 +60,19 @@ def functional_checks(doc, spec, p):
         checks.append({'id': 'nominal_volume_fits_clear_space', 'fill_height_mm': fill_z,
                        'native_volume_ml': fill.Volume/1000, 'nominal_volume_ml': nominal,
                        'passed': abs(fill.Volume/1000-nominal) < 1e-6})
-        if family == 'beaker':
+        if family in {'beaker','measuring_cylinder'}:
             probe = Part.makeCylinder(p['wall']*.1, p['spout_length']+p['wall']+5,
                                       App.Vector(p['inner_radius']-3, 0, p['height']-p['wall']*.25),
                                       App.Vector(1, 0, 0))
             blocked = glass.common(probe).Volume
             checks.append({'id': 'real_open_pour_channel', 'obstruction_mm3': blocked,
                            'passed': blocked < 1e-5})
+            if family=='measuring_cylinder':
+                foot = glass.common(Part.makeBox(2*p['base_radius']+2,2*p['base_radius']+2,p['base_height']/2,
+                                                 App.Vector(-p['base_radius']-1,-p['base_radius']-1,0)))
+                expected = 3*math.sqrt(3)*p['base_radius']**2/2*p['base_height']/2
+                checks.append({'id':'hexagonal_glass_foot','native_volume_mm3':foot.Volume,
+                               'passed':abs(foot.Volume-expected)<1e-5})
         else:
             overlap = glass.common(shapes['Closure']).Volume
             checks.append({'id': 'separate_closure_without_glass_penetration', 'overlap_mm3': overlap,
@@ -75,6 +81,11 @@ def functional_checks(doc, spec, p):
                 bb = shapes['Closure'].BoundBox
                 checks.append({'id': 'removed_closure_parked_beside_vessel', 'bottom_mm': bb.ZMin,
                                'passed': abs(bb.ZMin) < 1e-7 and bb.XMin > p['outer_radius']})
+    ink = [s for name,s in shapes.items() if name.startswith('MarkerInk')]
+    if ink:
+        inside = sum(shape.common(void).Volume for shape in ink)
+        checks.append({'id':'marker_ink_keeps_interior_clear','stroke_count':len(ink),
+                       'interior_overlap_mm3':inside,'passed':inside<1e-5})
     return checks
 
 
@@ -99,7 +110,7 @@ def main():
             pose = staticmethod(model.pose)
         native.model = Provider
     else:
-        spec = model.materialize(catalog, case['item'], case['state'], overrides=case.get('overrides'))
+        spec = model.materialize(catalog, case['item'], case['state'], overrides=case.get('overrides'),label=case.get('marker_label'))
         p = model.parameters(spec)
         source = model.expanded(spec, p)
         placements = None
@@ -112,6 +123,7 @@ def main():
     interfaces = model.interfaces(spec, p) if placements is None else None
     for key, value in [('Configuration', spec.get('state', 'derived_overview')),
                        ('InterfacesJSON', json.dumps(interfaces)),
+                       ('MarkerLabelJSON',json.dumps(spec.get('label'))),
                        ('UpdatePolicy', 'Regenerate geometry and semantic references from the shared source after edits')]:
         doc.Controller.addProperty('App::PropertyString', key, 'Glassware')
         setattr(doc.Controller, key, value)

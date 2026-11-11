@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "6b16f5cc7e1578d06ddeaea01ea764ecf06f5aae00ca9aaab40667403570c032",
+  "catalog_sha256": "fe43f6492931e87cc2f17d335514ca941f8226da19a31ab8004295976c04258b",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "56bbb1e747637d91606a983e47798411dcd9fb35b0047b9d830fcafb65ca623c",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -3293,23 +3293,23 @@
       "id": "lab-glassware-base",
       "image": "images/lab-glassware.png",
       "source_files_sha256": {
-        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
+        "model/lab-glassware.shared.json": "505cd68f342647e4beb0c41391218c86979c8a04744f99ef9e13c406cf0f1b0b"
       },
       "build_report": "cad/lab-glassware/shared-build-report.json",
-      "build_report_sha256": "343a03d585a5d95800790d3028a42819bf8e779817b44ffd415a8a971e5d14d2",
+      "build_report_sha256": "629bd4ea1e857dbe61ce8dd847bcf9bcbadf72db3670100aba1da562037e6445",
       "build_passed": true,
       "case": "overview",
       "backends": "both",
       "cross_cad_checked": true,
       "representation": "Native source-referenced library case; no operational placement or hardware qualification",
-      "native_model": "cad/generated/lab-glassware-3cb59075bdb9-r7/overview.sc",
-      "native_model_sha256": "b30f492d51faacdc6cea6aa4bb17c43b1f6d143fa9c3ce364bac412909ca74dd",
-      "reused_render": "renders/lab-glassware-3cb59075bdb9-r7/overview.png",
-      "reused_render_sha256": "e63664825a413aa35b28227ba049a5bfadb7ebb2baf4f1bea771663e97f234bf",
-      "image_sha256": "e63664825a413aa35b28227ba049a5bfadb7ebb2baf4f1bea771663e97f234bf",
-      "bytes": 272152,
+      "native_model": "cad/generated/lab-glassware-505cd68f3426/overview.sc",
+      "native_model_sha256": "31c327c33740e9fc798621188029171e71e0e466181e4400377e9d58e7612dfb",
+      "reused_render": "renders/lab-glassware-505cd68f3426/overview.png",
+      "reused_render_sha256": "78f83f45e5e36606f8c00f02cebc83b63ce5b6efd9caaab9defafcc8b2fe728d",
+      "image_sha256": "78f83f45e5e36606f8c00f02cebc83b63ce5b6efd9caaab9defafcc8b2fe728d",
+      "bytes": 242928,
       "dependency_files_sha256": {
-        "model/lab-glassware.shared.json": "3cb59075bdb9b5ac2ec22693b696ed24fb6159d079200c3f7b9857cc19758c4d"
+        "model/lab-glassware.shared.json": "505cd68f342647e4beb0c41391218c86979c8a04744f99ef9e13c406cf0f1b0b"
       }
     },
     {
@@ -4425,7 +4425,7 @@
   "visual_review": {
     "passed": true,
     "reviewed_on": "2026-11-11",
-    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification.",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review.",
     "k01_reviewed": true
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."

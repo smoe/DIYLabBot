@@ -234,7 +234,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md): getrennte Zellpellet-Aliquots, manuelle Qiagen-Spin-Säulen-Kits und prüfbare Material-/Prozesspläne; noch keine Extraktionsausführung
 - [Kitstation K01](docs/extraction-kit-station.md): zwei Kit-Ensembles direkt an der Station, mit parametrischen Behältern, Einsätzen und Griffen an Träger und Deckel; native Ansichten mit ausdrücklich offenen Artikelmaßen und Transportfreigaben
 - [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
-- [Wiederverwendbares Laborglas](docs/lab-glassware.md): hohle Becher, durchgängige Trichter und Flaschen mit separaten Verschlüssen für FreeCAD und SolidCraft
+- [Wiederverwendbares Laborglas](docs/lab-glassware.md): Becher, Trichter, Messzylinder und Flaschen in mehreren Größen, mit größenunabhängigen Verschlüssen und optionaler Markerbeschriftung für FreeCAD und SolidCraft
 - [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft
 - [NanoDrop UltraC über HTTP](docs/nanodrop-ultra-network.md): gemeinsamer Leseclient und synthetisches Netzwerkmodell; Originalgerät noch nicht qualifiziert
 - [Gemeinsamer synthetischer Ablauf CF01 → NanoDrop → Qubit 4](docs/synthetic-lab-workflow.md) mit einem Probenbestand und durchgängiger Verbrauchsbuchung
