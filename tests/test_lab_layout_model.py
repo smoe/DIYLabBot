@@ -56,6 +56,13 @@ class LabLayoutTests(unittest.TestCase):
         self.assertFalse(model.inverse_position_ik(
             self.spec, self.items['ArmA'], [0, 0, 5000])['passed'])
 
+    def test_vehicle_footprint_route_requires_complete_finite_segments(self):
+        p=model.parameters(self.spec)
+        self.assertEqual(len(model.vehicle_route_points(self.spec,p)),5)
+        for field,value in [('waypoints',[]),('waypoints',[[930,0]]),('waypoints',[[0,0],[1,2,3]]),('sample_step_mm',0),('yaw_deg',float('nan'))]:
+            changed=copy.deepcopy(self.spec);changed['vehicle_route'][field]=value
+            with self.subTest(field=field,value=value),self.assertRaises(ValueError):model.vehicle_route_points(changed,p)
+
     def test_bench_racks_use_transporter_cassettes(self):
         racks = [i for i in self.spec['instances'] if i['asset'] == 'tube_rack']
         self.assertEqual(len(racks), 3)
@@ -64,9 +71,9 @@ class LabLayoutTests(unittest.TestCase):
         self.assertEqual(model.provider('transporter').parameters(model.instance_source(self.spec,self.items['TR01']))['floor_deck_z'],
                          self.spec['parameters']['vehicle_deck_z'])
 
-    def test_three_new_devices_reference_the_catalog_and_cellar_ult_stays_outside_l01(self):
+    def test_devices_reference_the_catalog_and_cellar_ult_stays_outside_l01(self):
         devices=[i for i in self.spec['instances'] if i['asset'] in model.EQUIPMENT_PROFILES]
-        self.assertEqual({i['id'] for i in devices},{'Balance01','Freezer01','Fridge01'})
+        self.assertEqual({i['id'] for i in devices},{'Balance01','Freezer01','Fridge01','WaterBath01','Hood01'})
         self.assertNotIn('cellar_ult_f440n',{i['asset'] for i in self.spec['instances']})
         for item in devices:
             ref=self.spec['assets'][item['asset']]
@@ -134,12 +141,12 @@ class LabLayoutNativeEvidenceTests(unittest.TestCase):
             self.assertEqual(model.digest(model.ROOT/report['files'][name]),checksum)
         native=report['layout_validation']
         self.assertEqual(native['invalid_objects'],[])
-        self.assertEqual(len(native['equipment_body_metrics']),64)
-        self.assertEqual(len(report['equipment_body_comparisons']),64)
+        self.assertEqual(len(native['equipment_body_metrics']),85)
+        self.assertEqual(len(report['equipment_body_comparisons']),85)
         self.assertTrue(all(c['passed'] for c in report['equipment_body_comparisons']))
         self.assertTrue(all(c['passed'] for c in native['equipment_placement']))
-        self.assertEqual({c['instance'] for c in native['equipment_access']},{'Balance01','Freezer01','Fridge01'})
-        self.assertEqual(sum(len(c['samples']) for c in native['equipment_access']),109)
+        self.assertEqual({c['instance'] for c in native['equipment_access']},{'Balance01','Freezer01','Fridge01','WaterBath01','Hood01'})
+        self.assertEqual(sum(len(c['samples']) for c in native['equipment_access']),171)
         for device in native['equipment_access']:
             self.assertTrue(device['passed'])
             self.assertTrue(all(c['passed'] for c in device['samples']))
@@ -149,7 +156,7 @@ class LabLayoutNativeEvidenceTests(unittest.TestCase):
         self.assertTrue(all(p['passed'] for p in approaches))
         self.assertTrue(all(p['obstruction_mm']<1e-6 for p in approaches if p['accessible']))
         for group in ('native_arm_models','native_equipment_models'):
-            self.assertEqual(len(report[group]),3)
+            self.assertEqual(len(report[group]),3 if group=='native_arm_models' else 5)
             for asset in report[group].values():self.assertEqual(model.digest(model.ROOT/asset['path']),asset['sha256'])
         self.assertEqual(set(report['native_station_models']),{'CF01'})
         self.assertTrue(all(c['passed'] for c in report['arm_rigid_placement_checks']))

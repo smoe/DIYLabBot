@@ -146,6 +146,7 @@ def main():
         model.ROOT/'scripts/robot_spec.py',model.ROOT/'scripts/assembly_model.py',model.ROOT/'scripts/tool_paths.py',
         model.ROOT/'scripts/build_neutral_freecad.py',model.ROOT/'scripts/freecad/solidcraftbot_freecad.py',
         model.ROOT/'scripts/freecad/persist_station_view.py',model.ROOT/'scripts/freecad/persist_view.py']
+    dependencies += [model.ROOT/'scripts/furniture_model.py',model.ROOT/'model/furniture/laboratory.catalog.json']
     report={'format':'solidcraftbot.lab-equipment-build/1','source':relative(model.SOURCE),
             'source_sha256':model.digest(model.SOURCE),'source_files_sha256':{relative(p):model.digest(p) for p in dependencies},
             'passed':all(c['passed'] for c in results),'complete_catalog':full,'backends':args.backend,

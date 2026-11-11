@@ -14,7 +14,9 @@ SOURCE = ROOT/'model/lab-equipment.shared.json'
 digest = robot.digest
 evaluate = robot.evaluate
 RECIPES = {'cold_storage':'cabinet_with_hinged_door_and_storage_insert/1',
-           'analytical_balance':'weighing_pan_with_openable_glass_draft_shield/1'}
+           'analytical_balance':'weighing_pan_with_openable_glass_draft_shield/1',
+           'water_bath':'hollow_bath_with_hinged_cover/1',
+           'fume_hood':'open_work_chamber_with_vertical_sash/1'}
 
 
 def load(path=SOURCE):
@@ -26,8 +28,10 @@ def load(path=SOURCE):
     if set(catalog['families']) != set(RECIPES):
         raise ValueError('Only the implemented cabinet and balance families are supported')
     for family, definition in catalog['families'].items():
-        if set(definition) != {'recipe','parameters'} or definition['recipe'] != RECIPES[family]:
+        expected={'recipe','parameters'}|({'furniture'} if family=='fume_hood' else set())
+        if set(definition) != expected or definition['recipe'] != RECIPES[family]:
             raise ValueError('Unsupported equipment recipe')
+        if family=='fume_hood':assembly.validate_reference(definition['furniture'])
         for name, d in definition['parameters'].items():
             if set(d) != {'expression','unit','range','description'} or d['unit'] not in {'mm','deg'}:
                 raise ValueError('Explicit equipment dimension units and bounds required')
@@ -71,6 +75,7 @@ def materialize(catalog, identity, overrides=None):
     profile = copy.deepcopy(catalog['profiles'][identity])
     spec = {'id':identity, 'profile':profile, 'status':catalog['status'],
             'parameters':copy.deepcopy(catalog['families'][profile['family']]['parameters'])}
+    if profile['family']=='fume_hood':spec['furniture']=copy.deepcopy(catalog['families']['fume_hood']['furniture'])
     spec = assembly.parameter_variant(spec,profile['overrides'])
     spec = assembly.parameter_variant(spec,overrides)
     p = parameters(spec)
@@ -97,10 +102,16 @@ def parameters(spec, overrides=None):
         if spec['profile']['insert']['kind']=='plastic_drawers':
             if min(v['height_mm'] for v in levels)<4*p['drawer_wall'] or p['drawer_travel']<p['drawer_depth']/2+30:
                 raise ValueError('Drawers require a real hollow bin and exposed access target')
-    else:
+    elif spec['profile']['family']=='analytical_balance':
         if (p['shield_width']>=p['width']-10 or p['shield_depth']>p['depth']-40
                 or 2*p['pan_radius']>=p['shield_width']-30):
             raise ValueError('Balance pan and shield must fit the chassis')
+    elif spec['profile']['family']=='water_bath':
+        if p['inner_width']+16>=p['width'] or p['inner_depth']+16>=p['depth'] or p['inner_height']+30>=p['rim_z']:
+            raise ValueError('Water bath requires a contained open tank')
+    elif spec['profile']['family']=='fume_hood':
+        if p['inner_width']+30>=p['width'] or p['inner_depth']+30>=p['depth'] or p['worktop_z']+p['inner_height']+p['sash_travel']>=p['height']:
+            raise ValueError('Hood chamber and moving sash must fit its envelope')
     return p
 
 
@@ -152,7 +163,40 @@ def expanded(spec,p):
         source['joints'].append({'id':name,'type':kind,'parent':'Frame','child':child,
             'origin':origin,'axis':list(axis),'reference_x':list(reference_x),'limit_parameter':limit,
             'limits_deg' if kind=='revolute' else 'limits_mm':[0,p[limit]]})
-    if spec['profile']['family']=='cold_storage':
+    family=spec['profile']['family']
+    if family=='water_bath':
+        shell=box('BathHousing',['-width/2','-depth/2',0],['width','depth','rim_z'],color='#e5ebeb')
+        cut('TankOpening',shell,['-inner_width/2-5','-inner_depth/2-5','rim_z-inner_height-5'],['inner_width+10','inner_depth+10','inner_height+6'])
+        tank=box('BathTank',['-inner_width/2-4','-inner_depth/2-4','rim_z-inner_height-4'],['inner_width+8','inner_depth+8','inner_height+4'],color='#a0b6bf',role='bath_tank')
+        cut('HollowBathTank',tank,['-inner_width/2','-inner_depth/2','rim_z-inner_height'],['inner_width','inner_depth','inner_height+1'])
+        box('BathDisplay',['-width*.25','-depth/2-2',40],['width*.5',2,45],color='#264e65',role='illustrative_display')
+        joint('Lid','LidGroup','revolute',[0,'depth/2','rim_z'],(-1,0,0),'lid_angle',(0,1,0))
+        box('BathCover',['-width/2','-depth/2','rim_z+1'],['width','depth','lid_t'],component='LidGroup',color='#b0c6ce',role='bath_cover')
+        box('CoverHandle',[-55,-10,'rim_z+1+lid_t'],[110,20,'height-rim_z-1-lid_t'],component='LidGroup',color='#3d6373')
+    elif family=='fume_hood':
+        import furniture_model as furniture
+        catalog=json.loads(assembly.validate_reference(spec['furniture']).read_text())
+        furniture.validate_catalog(catalog)
+        item={'id':'HoodBase','type':'storage_bench','component':'Frame',
+            'bindings':{'width':'body_depth','length':'width','height':'worktop_z','top_t':'worktop_t','plinth_h':'plinth_h',
+                        'panel_t':'panel_t','door_gap':'door_gap','leaf_width':'leaf_width'},
+            'xyz':['-width/2','body_depth',0],'yaw_deg':-90,'front':'positive_x','state':'closed'}
+        base=furniture.instantiate(catalog,item,p)
+        source['components']+=base['components'];source['bodies']+=base['bodies']
+        for operation in base['operations']:
+            shape=operation['shape']
+            if shape['kind']=='polygon_prism':shape.update(plane='XY',offset=shape.pop('z'),depth=shape.pop('height'))
+            source['operations'].append(operation)
+        source['joints']+=[{**j,'limit_parameter':'base_open'} for j in base['joints']]
+        source['base_storage']=base['storage']
+        shell=box('HoodShell',['-width/2',0,'worktop_z'],['width','body_depth','height-100-worktop_z'],color='#e0e7e9')
+        cut('WorkChamber',shell,['-inner_width/2',-1,'worktop_z'],['inner_width','inner_depth+1','inner_height'])
+        joint('Sash','SashGroup','slider',[0,0,'worktop_z'],(0,0,1),'sash_travel')
+        box('SashGlass',['-inner_width/2+5',-12,'worktop_z+3'],['inner_width-10',5,'inner_height-6'],component='SashGroup',color='#9fc8d2',opacity=.25,role='vertical_sash')
+        box('SashHandle',[-120,-42,'worktop_z+8'],[240,30,18],component='SashGroup',color='#368b9e',role='sash_handle')
+        box('TouchPanel',['width/2-85',-8,'worktop_z+inner_height+100'],[65,8,100],color='#24516a',role='illustrative_display')
+        cylinder('ExhaustConnection',[0,'body_depth/2','height-100'],125,100,color='#89a9b6',role='unconnected_exhaust_interface')
+    elif family=='cold_storage':
         shell = box('CabinetShell',['-width/2',0,'foot_height'],['width','body_depth','height-foot_height'],color='#dce4e6')
         cut('StorageCavity',shell,['-inner_width/2',-1,'opening_bottom'],['inner_width','inner_depth+1','inner_height'])
         for i,(sx,sy) in enumerate([(-1,0),(1,0),(-1,1),(1,1)]):
@@ -190,7 +234,7 @@ def expanded(spec,p):
                     ['drawer_width-2*drawer_wall','drawer_depth-2*drawer_wall',height])
                 box('DrawerHandle%02d'%n,[-50,'drawer_gap-10',base+height*.55],
                     [100,10,12],component=group,color='#498fa5',role='drawer_handle')
-    else:
+    elif family=='analytical_balance':
         box('BalanceBase',['-width/2','-depth/2','foot_height'],['width','depth','base_height'],color='#d2dde3')
         for i,(sx,sy) in enumerate([(-1,-1),(1,-1),(-1,1),(1,1)]):
             cylinder('Foot'+str(i),[f'{sx}*(width/2-24)',f'{sy}*(depth/2-24)',0],12,'foot_height',color='#394a54')
@@ -231,7 +275,12 @@ def pose(spec,p,name=None):
     source = expanded(spec,p)
     values = {j['id']:0 for j in source['joints']}
     if name!='closed':
-        if spec['profile']['family']=='analytical_balance':
+        family=spec['profile']['family']
+        if family=='water_bath':values['Lid']=p['lid_angle']
+        elif family=='fume_hood':
+            values['Sash']=p['sash_travel']
+            if name=='all_open':values.update({j['id']:p['base_open'] for j in source['joints'] if j['id']!='Sash'})
+        elif family=='analytical_balance':
             values.update(LeftSlide=p['side_travel'],RightSlide=p['side_travel'],TopCover=p['top_angle'])
         else:
             values['OuterDoor']=p['max_open']
@@ -283,6 +332,18 @@ def interfaces(spec,p,values=None):
     source = expanded(spec,p)
     values = pose(spec,p) if values is None else values
     validate_pose(source,values)
+    if spec['profile']['family']=='water_bath':
+        return {'bath_tank':{'origin_mm':[0,0,p['rim_z']-p['inner_height']+20],
+                    'accessible':values['Lid']>=85,'access_kind':'vertical_bath',
+                    'nominal_capacity_l':spec['profile']['nominal_storage_l'],'reported_temperature_c':None}}
+    if spec['profile']['family']=='fume_hood':
+        result={'work_chamber':{'origin_mm':[0,200,p['worktop_z']+200],
+                    'accessible':values['Sash']>200,'access_kind':'front_hood',
+                    'extraction_connected':False,'measured_face_velocity_m_s':None}}
+        for v in source['base_storage']:
+            result[v['id']]={'origin_mm':[evaluate(x,p) for x in v['origin']],
+                'accessible':all(values[j]>=89.9 for j in v['joints']),'access_kind':'front_hood'}
+        return result
     if spec['profile']['family']=='analytical_balance':
         angle = math.radians(values['TopCover'])
         lid_front_y = p['hinge_y']+(1-p['shield_depth'])*math.cos(angle)+math.sin(angle)

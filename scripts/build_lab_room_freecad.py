@@ -9,6 +9,7 @@ import Sketcher
 import lab_room_model as model
 from build_neutral_freecad import native_expression
 from build_tube_carrier_freecad import measurements, step_check, objects
+import solidcraftbot_freecad as motion
 
 
 def build(spec,p,path):
@@ -21,6 +22,26 @@ def build(spec,p,path):
     for key,value in [('SourceFile',str(model.SOURCE.relative_to(model.ROOT))),('SpecSHA256',model.digest(model.SOURCE)),('Status',spec['status'])]:
         controller.addProperty('App::PropertyString',key,'Source'); setattr(controller,key,value)
     groups={c['id']:doc.addObject('App::Part',c['id']) for c in source['components']}
+    values=model.pose(spec,p)
+    for joint in source['joints']:
+        name=joint['id'];angular=joint['type']=='revolute'
+        controller.addProperty('App::PropertyAngle' if angular else 'App::PropertyDistance',name,'Furniture positions (deg/mm)')
+        setattr(controller,name,values[name])
+        hi=joint.get('limits_deg',joint.get('limits_mm'))[1]
+        if angular:
+            anchor=doc.addObject('App::Part',name+'_Anchor');groups[joint['parent']].addObject(anchor)
+            frame=motion.frame_placement({'origin':[model.evaluate(v,p) for v in joint['origin']],'x':joint['reference_x'],'z':joint['axis']})
+            anchor.Placement=frame
+            for axis,value in zip('xyz',joint['origin']):anchor.setExpression('Placement.Base.'+axis,native_expression(value))
+            turn=doc.addObject('App::Part',name+'_Motion');anchor.addObject(turn)
+            turn.setExpression('Placement.Rotation.Angle',f'max(0 deg; min({hi} deg; Controller.{name}))')
+            turn.addObject(groups[joint['child']]);groups[joint['child']].Placement=frame.inverse()
+            inverse=frame.Rotation.inverted().toMatrix()
+            for row,axis in enumerate('xyz'):
+                terms=[f'({-getattr(inverse,"A%d%d"%(row+1,col+1))})*({joint["origin"][col]})' for col in range(3) if abs(getattr(inverse,'A%d%d'%(row+1,col+1)))>1e-12]
+                groups[joint['child']].setExpression('Placement.Base.'+axis,native_expression('+'.join(terms) or 0))
+        else:
+            for axis,scale in zip('xyz',joint['axis']):groups[joint['child']].setExpression('Placement.Base.'+axis,f'{scale}*max(0 mm; min({hi} mm; Controller.{name}))')
     latest={}; meta={b['id']:b for b in source['bodies']}
     for operation in source['operations']:
         s=operation['shape']; name=operation['id']; target=operation['body']; group=groups[meta[target]['component']]
@@ -28,6 +49,11 @@ def build(spec,p,path):
             obj=doc.addObject('Part::Box',name+'_Primitive'); group.addObject(obj)
             for prop,value in zip(['Length','Width','Height'],s['size']): obj.setExpression(prop,native_expression(value))
             for axis,value in zip('xyz',s['origin']): obj.setExpression('Placement.Base.'+axis,native_expression(value))
+        elif s['kind']=='cylinder':
+            obj=doc.addObject('Part::Cylinder',name+'_Primitive');group.addObject(obj)
+            if 'axis' in s:obj.Placement=App.Placement(App.Vector(),App.Rotation(App.Vector(0,0,1),App.Vector(*s['axis'])))
+            obj.setExpression('Radius',native_expression(s['radius']));obj.setExpression('Height',native_expression(s['height']))
+            for axis,value in zip('xyz',s['origin']):obj.setExpression('Placement.Base.'+axis,native_expression(value))
         else:
             sketch=doc.addObject('Sketcher::SketchObject',name+'_Profile'); group.addObject(sketch)
             sketch.setExpression('Placement.Base.z',native_expression(s['z']))
@@ -48,7 +74,7 @@ def build(spec,p,path):
             group.addObject(boolean); boolean.Base=latest[target]; boolean.Tool=obj; boolean.Refine=True; obj=boolean
         latest[target]=obj
     for f in source['frames']:
-        obj=doc.addObject('App::FeaturePython',f['id'].replace('.','_')); groups['RoomShell'].addObject(obj)
+        obj=doc.addObject('App::FeaturePython',f['id'].replace('.','_')); groups[f.get('component','RoomShell')].addObject(obj)
         obj.addProperty('App::PropertyString','FrameID','Source'); obj.FrameID=f['id']
         obj.addProperty('App::PropertyPlacement','Placement','Frame')
         yaw=math.degrees(math.atan2(f['x_axis'][1],f['x_axis'][0]))
@@ -66,7 +92,13 @@ def check_frames(doc,spec,p):
     source=model.expanded(spec,p); frame_objs={o.FrameID:o for o in doc.Objects if 'FrameID' in o.PropertiesList}
     checks=[]; bodies={o.SourceBody:o for o in objects(doc)}
     for frame in source['frames']:
-        expected=[model.evaluate(v,p) for v in frame['origin']]; actual=list(frame_objs[frame['id']].Placement.Base)
+        expected=[model.evaluate(v,p) for v in frame['origin']]
+        if frame.get('component'):
+            from tube_cam_model import matrix
+            values={j['id']:float(getattr(doc.Controller,j['id'])) for j in source['joints']}
+            expected=model.robot_spec.transform(matrix(source,frame['component'],p,values),expected)
+        parent=doc.getObject(frame.get('component','RoomShell'))
+        actual=list(motion.global_placement(parent).multiply(frame_objs[frame['id']].Placement).Base)
         error=math.dist(actual,expected)
         if '.Worktop' in frame['id']:
             name=frame['id'].split('.')[1]+'_Worktop'; error=max(error,abs(bodies[name].Shape.BoundBox.ZMax-expected[2]))
@@ -74,6 +106,48 @@ def check_frames(doc,spec,p):
         elif frame['id'].startswith('L01.IslandCupboard'):
             error=max(error,abs(bodies[frame['id'].split('.')[1]].Shape.BoundBox.ZMin-expected[2]))
         checks.append({'id':frame['id'],'error_mm':error,'passed':error<1e-6})
+    return checks
+
+
+def check_furniture(doc,spec,p):
+    """Observe native door/seat motion and real shelf cavities, including reopen."""
+    from tube_cam_model import pose_change_point
+    source=model.expanded(spec,p);initial=model.pose(spec,p)
+    def set_values(values):
+        for key,value in values.items():setattr(doc.Controller,key,value)
+        doc.recompute()
+    set_values(model.pose(spec,p,'closed'))
+    zero=model.pose(spec,p,'closed');base={b['body']:b for b in measurements(doc)}
+    meta={b['id']:b for b in source['bodies']};checks=[]
+    for joint in source['joints']:
+        limit=joint.get('limits_deg',joint.get('limits_mm'))[1]
+        moving=[name for name,b in meta.items() if b['component']==joint['child']]
+        prefix=joint['id'].split('_')[0]+'_'
+        for fraction in (.25,.5,.75,1):
+            values={**zero,joint['id']:limit*fraction};set_values(values)
+            shapes={o.SourceBody:motion.world_shape(o) for o in objects(doc) if o.SourceBody.startswith(prefix)}
+            error=0;hits=[]
+            for name in moving:
+                shape=shapes[name]
+                centre=[sum(s.CenterOfMass[k]*s.Volume for s in shape.Solids)/shape.Volume for k in range(3)]
+                expected=pose_change_point(source,meta[name]['component'],base[name]['world_center_of_mass_mm'],p,zero,values)
+                error=max(error,math.dist(centre,expected))
+                for other,obstacle in shapes.items():
+                    if meta[other]['component']==joint['child'] or not shape.BoundBox.intersect(obstacle.BoundBox):continue
+                    volume=shape.common(obstacle).Volume
+                    if volume>1e-4:hits.append({'body':name,'obstacle':other,'volume_mm3':volume})
+            checks.append({'id':joint['id']+'.'+str(fraction),'maximum_pose_error_mm':error,'self_collisions':hits,'passed':error<1e-6 and not hits})
+    for name in ('closed','open'):
+        values=model.pose(spec,p,name);set_values(values)
+        shapes={o.SourceBody:motion.world_shape(o) for o in objects(doc)}
+        for identity,ref in model.storage_interfaces(spec,p,values).items():
+            prefix=identity.split('.')[0]
+            ray=Part.makeLine(App.Vector(*ref['approach_mm']),App.Vector(*ref['origin_mm']))
+            obstruction=sum(s.common(ray).Length for n,s in shapes.items() if n==prefix or n.startswith(prefix+'_'))
+            checks.append({'id':identity+'.'+name,'obstruction_mm':obstruction,'accessible':ref['accessible'],
+                           'passed':(obstruction<1e-6)==ref['accessible']})
+        checks+=check_frames(doc,spec,p)
+    set_values(initial)
     return checks
 
 
@@ -133,7 +207,7 @@ def check_island_shelf(doc):
 def validate(output,case_path,report_path,step_path):
     spec=model.load(); case=json.loads(Path(case_path).read_text(encoding='utf-8')); p=model.parameters(spec,case['overrides'])
     doc=build(spec,p,output); geometry=measurements(doc); exact=step_check(doc,step_path); frames=check_frames(doc,spec,p); window_checks=check_window_assembly(doc)
-    shelf_checks=check_island_shelf(doc)
+    shelf_checks=check_island_shelf(doc);furniture_checks=check_furniture(doc,spec,p)
     # A native width+facade edit must move curved geometry and named work frames.
     edits=[]
     if case['id']=='default':
@@ -149,9 +223,9 @@ def validate(output,case_path,report_path,step_path):
             doc.recompute()
     doc.save(); App.closeDocument(doc.Name); doc=App.openDocument(str(output)); doc.recompute(); reopened=measurements(doc)
     reopen_ok=len(reopened)==len(geometry) and all(b['valid'] and b['solid_count']==1 for b in reopened)
-    passed=all(b['valid'] and b['solid_count']==1 for b in geometry) and all(c['passed'] for c in exact+frames+edits+window_checks+shelf_checks) and reopen_ok
+    passed=all(b['valid'] and b['solid_count']==1 for b in geometry) and all(c['passed'] for c in exact+frames+edits+window_checks+shelf_checks+furniture_checks) and reopen_ok
     report={'passed':passed,'case':case,'source_sha256':model.digest(model.SOURCE),'geometry':geometry,'solidcraft_step_xor':exact,
-        'frame_geometry_checks':frames,'window_assembly_checks':window_checks,'island_shelf_checks':shelf_checks,'native_parameter_edits':edits,'reopened_passed':reopen_ok,'freecad_version':App.Version(),
+        'frame_geometry_checks':frames,'window_assembly_checks':window_checks,'island_shelf_checks':shelf_checks,'furniture_checks':furniture_checks,'native_parameter_edits':edits,'reopened_passed':reopen_ok,'freecad_version':App.Version(),
         'circulation':model.circulation(p),'backend':'Native expression-driven boxes, constrained polygon sketches, extrusions and cuts; STEP only for comparison'}
     Path(report_path).write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8'); App.closeDocument(doc.Name)
     print(json.dumps({'passed':passed,'case':case['id'],'bodies':len(geometry),'max_xor_mm3':max(c['xor_mm3'] for c in exact)}),flush=True)

@@ -9,6 +9,7 @@ import sys
 import hashlib
 import lab_layout_model as model
 import lab_room_model as room
+from build_instrument_concepts import freecad_environment
 
 
 def write(path,data): Path(path).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
@@ -57,7 +58,7 @@ def prepare(args):
     cad=model.ROOT/'cad/generated'/revision;out=model.ROOT/'exports/generated'/revision;cad.mkdir(parents=True);out.mkdir(parents=True)
     context={'revision':revision,'cad':str(cad),'out':str(out),'source_sha256':model.digest(model.SOURCE)}
     path=out/'context.json';write(path,context)
-    subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_lab_layout_freecad.py'),str(path)],check=True,cwd=model.ROOT)
+    subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_lab_layout_freecad.py'),str(path)],check=True,cwd=model.ROOT,env=freecad_environment(args.freecad_python))
     context=json.loads(path.read_text(encoding='utf-8'))
     validation=json.loads((out/'layout-validation.json').read_text(encoding='utf-8'))
     if model.digest(model.SOURCE)!=context['source_sha256']: raise ValueError('Layout source changed during preparation; rebuild')

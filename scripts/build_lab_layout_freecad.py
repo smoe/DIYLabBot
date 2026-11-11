@@ -244,10 +244,14 @@ def validate(doc,s,context,access_models=None):
             if volume>1e-3: blockers.append({'body':o.SourceBody,'volume_mm3':volume})
         corridor_checks.append({'id':c['id'],'width_mm':min(x1-x0,y1-y0),'blockers':blockers,'passed':not blockers})
     tr_group=doc.getObject('TR01'); inv=tr_group.Placement.inverse(); vehicle=Part.makeCompound([shape for o,shape,b in entries if o.LayoutInstance=='TR01']);vehicle.Placement=inv.multiply(vehicle.Placement)
-    route=s['vehicle_route']; starts=model.xyz(route['waypoints'][0]+[0],p); ends=model.xyz(route['waypoints'][1]+[0],p); length=math.dist(starts,ends); count=math.ceil(length/route['sample_step_mm']); route_hits=[]
+    route=s['vehicle_route'];points=model.vehicle_route_points(s,p);route_hits=[];route_samples=[]
+    for start,end in zip(points,points[1:]):
+        count=max(1,math.ceil(math.dist(start,end)/route['sample_step_mm']))
+        segment=[[a+i/count*(b-a) for a,b in zip(start,end)] for i in range(count+1)]
+        route_samples+=segment if not route_samples else segment[1:]
     obstacles=[(o,shape,b) for o,shape,b in entries if o.LayoutInstance not in ['Guides','TR01']]
-    for i in range(count+1):
-        t=i/count; item={'xyz':[a+t*(b-a) for a,b in zip(starts,ends)],'yaw_deg':route['yaw_deg']}; moved=vehicle.copy(); moved.Placement=placement(item,p).multiply(vehicle.Placement); bounds=bb(moved)
+    for i,point in enumerate(route_samples):
+        item={'xyz':point,'yaw_deg':route['yaw_deg']}; moved=vehicle.copy(); moved.Placement=placement(item,p).multiply(vehicle.Placement); bounds=bb(moved)
         for o,shape,b in obstacles:
             if intersects(bounds,b):
                 volume=moved.common(shape).Volume
@@ -292,7 +296,7 @@ def validate(doc,s,context,access_models=None):
         'equipment_body_metrics':[{'body':o.SourceBody,'valid':shape.isValid(),'solid_count':len(shape.Solids),
                                    'volume_mm3':shape.Volume,'world_center_of_mass_mm':volume_center([shape])[1],'bbox':b}
                                   for o,shape,b in entries if o.LayoutInstance in (access_models or {})],
-        'static_interferences':overlaps,'human_corridors':corridor_checks,'vehicle_route':{'samples':count+1,'collisions':route_hits,'passed':not route_hits},
+        'static_interferences':overlaps,'human_corridors':corridor_checks,'vehicle_route':{'samples':len(route_samples),'waypoints_mm':points,'collisions':route_hits,'passed':not route_hits},
         'centrifuge_open':{'collisions':open_hits,'passed':not open_hits},'position_only_reach':model.reach_report(s),
         'equipment_access':equipment_access,'equipment_placement':placement_checks}
     report['passed']=report['geometry_valid'] and not overlaps and all(c['passed'] for c in corridor_checks) and not route_hits and not open_hits and all(r['passed'] for r in report['position_only_reach']) and all(c['passed'] for c in equipment_access+placement_checks)

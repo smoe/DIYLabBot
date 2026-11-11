@@ -130,6 +130,10 @@
         },
         "reported_approx_mm": {
           "type": "number"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
         }
       }
     }

@@ -61,7 +61,7 @@ def numeric_shape(shape,p):
     for key in ['origin','size']:
         if key in s: s[key]=[evaluate(v,p) for v in s[key]]
     if 'points' in s: s['points']=[[evaluate(v,p) for v in pt] for pt in s['points']]
-    for key in ['z','height']:
+    for key in ['z','height','radius']:
         if key in s: s[key]=evaluate(s[key],p)
     return s
 

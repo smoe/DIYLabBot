@@ -8,6 +8,7 @@ import subprocess
 import sys
 import lab_room_model as model
 from build_tube_carrier import compare
+from build_instrument_concepts import freecad_environment
 
 
 def write(path,data):
@@ -43,7 +44,7 @@ def finish(context,args):
         if not Path(f['solidcraft']).exists():
             subprocess.run([args.solidcraft_cli,'run',f['commands'],'--save',f['solidcraft'],'--out',f['step'],'--json-out',f['sc_measurements'],'--quiet'],check=True,cwd=model.ROOT)
         if not Path(f['freecad']).exists():
-            subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_lab_room_freecad.py'),f['freecad'],f['case'],f['fc_report'],f['step']],check=True,cwd=model.ROOT)
+            subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_lab_room_freecad.py'),f['freecad'],f['case'],f['fc_report'],f['step']],check=True,cwd=model.ROOT,env=freecad_environment(args.freecad_python))
         fc=json.loads(Path(f['fc_report']).read_text(encoding='utf-8')); sc=json.loads(Path(f['sc_measurements']).read_text(encoding='utf-8'))
         cross=compare(sc,fc['geometry']); view=persist(f['freecad'],model.expanded(spec,p),fc['geometry'])
         for index,edit in enumerate(fc['native_parameter_edits']):
@@ -55,7 +56,7 @@ def finish(context,args):
                 'max_com_error_mm':max(c['com_error_mm'] for c in checks),'body_checks':checks})
         item={'id':case['id'],'overrides':case['overrides'],'passed':fc['passed'] and all(c['passed'] for c in cross) and view['passed'],
             'bodies':len(cross),'cross_kernel_comparisons':cross,'maximum_step_xor_mm3':max(c['xor_mm3'] for c in fc['solidcraft_step_xor']),
-            'frames':fc['frame_geometry_checks'],'window_assembly_checks':fc['window_assembly_checks'],'island_shelf_checks':fc['island_shelf_checks'],'circulation':fc['circulation'],'presentation':view,
+            'frames':fc['frame_geometry_checks'],'window_assembly_checks':fc['window_assembly_checks'],'island_shelf_checks':fc['island_shelf_checks'],'furniture_checks':fc['furniture_checks'],'circulation':fc['circulation'],'presentation':view,
             'solidcraft_execution':case.get('solidcraft_execution',{'backend':'CLI'}),
             'files':{k:str(Path(v).relative_to(model.ROOT)).replace('\\','/') for k,v in f.items()},
             'artifact_sha256':{k:model.digest(f[k]) for k in ['solidcraft','freecad','step']}}

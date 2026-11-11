@@ -57,6 +57,236 @@
         "hinge_y": {"expression": "pan_y+shield_depth/2", "unit": "mm", "range": [80, 180], "description": "Rear top-cover hinge position"},
         "hinge_z": {"expression": "pan_z+shield_height+4", "unit": "mm", "range": [250, 450], "description": "Derived top-cover hinge height"}
       }
+    },
+    "water_bath": {
+      "recipe": "hollow_bath_with_hinged_cover/1",
+      "parameters": {
+        "width": {
+          "expression": 372,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "depth": {
+          "expression": 307,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "height": {
+          "expression": 350,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "inner_width": {
+          "expression": 300,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "inner_depth": {
+          "expression": 240,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "inner_height": {
+          "expression": 200,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Referenced SBS-TWB-300 product dimension; axis interpretation documented"
+        },
+        "rim_z": {
+          "expression": 300,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "lid_t": {
+          "expression": 14,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "lid_angle": {
+          "expression": 90,
+          "unit": "deg",
+          "range": [
+            85,
+            100
+          ],
+          "description": "Assumed cover hinge opening; real hinge geometry unverified"
+        }
+      }
+    },
+    "fume_hood": {
+      "recipe": "open_work_chamber_with_vertical_sash/1",
+      "parameters": {
+        "width": {
+          "expression": 1200,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "depth": {
+          "expression": 800,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "height": {
+          "expression": 2550,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "inner_width": {
+          "expression": 990,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "inner_depth": {
+          "expression": 605,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "inner_height": {
+          "expression": 900,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "worktop_z": {
+          "expression": 915,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "worktop_t": {
+          "expression": 30,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "plinth_h": {
+          "expression": 80,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "panel_t": {
+          "expression": 18,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "door_gap": {
+          "expression": 3,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "leaf_width": {
+          "expression": 550,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Assumed simplified construction dimension"
+        },
+        "sash_travel": {
+          "expression": 500,
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Published Lorderan 1200E reference dimension; construction details simplified"
+        },
+        "body_depth": {
+          "expression": "depth-42",
+          "unit": "mm",
+          "range": [
+            1,
+            3000
+          ],
+          "description": "Body depth excluding the front sash handle; assumed decomposition of the published envelope"
+        },
+        "base_open": {
+          "expression": 90,
+          "unit": "deg",
+          "range": [
+            90,
+            90
+          ],
+          "description": "Cabinet base door opening for access study"
+        }
+      },
+      "furniture": {
+        "source": "model/furniture/laboratory.catalog.json",
+        "source_sha256": "ece83331ce4274ebdc79b0ec7a38b9e66e033082aff3adca0baaad583b31f836"
+      }
     }
   },
   "profiles": {
@@ -118,12 +348,57 @@
       "handling": "manual_only",
       "location_hint": "cellar",
       "reference": "f440n"
+    },
+    "water_bath_13l": {
+      "family": "water_bath",
+      "label": "13 l laboratory water bath",
+      "overrides": {},
+      "insert": null,
+      "reference_setpoint_c": null,
+      "reported_temperature_c": null,
+      "nominal_storage_l": 13,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_model",
+      "location_hint": "L01",
+      "reference": "steinberg_sbs_twb_300"
+    },
+    "fume_hood_1200": {
+      "family": "fume_hood",
+      "label": "1200 mm ducted fume hood",
+      "overrides": {},
+      "insert": null,
+      "reference_setpoint_c": null,
+      "reported_temperature_c": null,
+      "nominal_storage_l": null,
+      "capacity_g": null,
+      "readability_g": null,
+      "handling": "manual_model",
+      "location_hint": "L01",
+      "reference": "lorderan_1200e"
     }
   },
   "references": {
     "balances": {"requested_url": "https://www.sigmaaldrich.com/DE/de/products/labware/laboratory-equipment/laboratory-balances", "verified_url": "https://www.sigmaaldrich.com/RS/en/products/labware/laboratory-equipment/laboratory-balances", "scope": "Category and draft-shield principle only; no selected balance article, measured dimensions, capacity or readability"},
     "srfvg3501": {"requested_url": "https://lt-laborhandel.de/liebherr-srfvg-3501-labor-kuehlgeraet-261-l-umluftkuehlung-mit-safetydevice-993870251", "verified_url": "https://assets-cdn.liebherr.com/assets/api/954b8562-8914-4137-b8d4-d10cb2b6fed5/Original/", "scope": "Manufacturer datasheet: 597/654/1684 mm outside and 460/423/1460 mm inside, 261 l net, four adjustable shelves plus floor; shelf elevations and mechanism details assumed"},
-    "f440n": {"requested_url": "https://www.sigmaaldrich.com/DE/de/product/sigma/epf440400035", "verified_url": "https://www.eppendorf.com/ca-en/Products/Cold-Storage/ULT-Freezers/CryoCube-F440-Series-p-PF-996668", "manual_url": "https://www.eppendorf.com/product-media/doc/en/1025273/Freezers_Operating-manual_CryoCube-F440-series.pdf", "scope": "Family table: 955/898/1950 mm overall planning envelope, 440 l and five inner doors. Manual pp. 62-63: 876 mm cabinet width, 68 mm side projection, interior 616/600/1265 mm and compartment heights. Overall envelope is used; detailed body/handle allocation assumed. Local electrical variant and serial numbers unknown."}
+    "f440n": {"requested_url": "https://www.sigmaaldrich.com/DE/de/product/sigma/epf440400035", "verified_url": "https://www.eppendorf.com/ca-en/Products/Cold-Storage/ULT-Freezers/CryoCube-F440-Series-p-PF-996668", "manual_url": "https://www.eppendorf.com/product-media/doc/en/1025273/Freezers_Operating-manual_CryoCube-F440-series.pdf", "scope": "Family table: 955/898/1950 mm overall planning envelope, 440 l and five inner doors. Manual pp. 62-63: 876 mm cabinet width, 68 mm side projection, interior 616/600/1265 mm and compartment heights. Overall envelope is used; detailed body/handle allocation assumed. Local electrical variant and serial numbers unknown."},
+    "steinberg_sbs_twb_300": {
+      "requested_url": "https://www.expondo.de/steinberg-wasserbad-labor-5-bis-99-0c-13-l-led-10031400",
+      "verified_url": "https://www.expondo.de/steinberg-wasserbad-labor-5-bis-99-0c-13-l-led-10031400",
+      "scope": "SBS-TWB-300: published L×W×H 307×372×350 mm, tank 300×240×200 mm, nominal 13 l and 5–99 °C range. Geometric tank volume is 14.4 l; nominal fill capacity is not inferred from it. Hinge and internal build are assumed; actual temperature unknown."
+    },
+    "lorderan_1200e": {
+      "requested_url": "https://www.lorderan.com/en-eu/products/4ft-fume-hood-touch-screen",
+      "verified_url": "https://www.lorderan.com/en-eu/products/4ft-fume-hood-touch-screen",
+      "scope": "1200E: published outside 1200×800×2550 mm, inside 990×605×900 mm, worktop 915 mm, sash opening 500 mm. Generic cabinet recipe and construction details simplified. Exhaust connection is unconnected; no ventilation, airflow or safety qualification."
+    }
   },
-  "limitations": ["Models describe physical equipment types and access poses, not installed room coordinates or a second laboratory layout.", "Published reference envelopes are separated from assumed doors, handles, clearances, inserts and the generic analytical-balance/-20 C designs.", "Temperature setpoints are planning labels, not measured temperatures or refrigeration simulation. Empty mass readings, balance capacity and readability remain unknown.", "The cellar ULT is manual-only. No robotic retrieval, device driver, network integration, inventory movement or handover confirmation is implemented.", "Opening doors and extending drawers are idealized native kinematics. Discrete collision checks do not qualify hinges, seals, glass strength, loads or safe operating paths."]
+  "limitations": [
+    "Models describe physical equipment types and access poses, not installed room coordinates or a second laboratory layout.",
+    "Published reference envelopes are separated from assumed doors, handles, clearances, inserts and the generic analytical-balance/-20 C designs.",
+    "Temperature setpoints are planning labels, not measured temperatures or refrigeration simulation. Empty mass readings, balance capacity and readability remain unknown.",
+    "The cellar ULT is manual-only. No robotic retrieval, device driver, network integration, inventory movement or handover confirmation is implemented.",
+    "Opening doors and extending drawers are idealized native kinematics. Discrete collision checks do not qualify hinges, seals, glass strength, loads or safe operating paths.",
+    "Water bath and fume hood are geometry/access models. Heating, liquid handling, extraction, utilities and laboratory safety have not been simulated or qualified."
+  ]
 }

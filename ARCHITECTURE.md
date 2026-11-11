@@ -80,7 +80,7 @@ Betriebspositionen werden später von der geplanten Aufstellung getrennt.
 |---|---|
 | `model/lab-room-l01.shared.json` | Schlankes Kompositionsmanifest mit Revisionen der drei Quellen |
 | `model/environments/l01.geometry.json` | Raumparameter, Fassade, Öffnungen, Verglasung und Betonstütze |
-| `model/furniture/laboratory.catalog.json` | Sieben Möbel- und Zubehörtypen mit lokalen Maßverträgen |
+| `model/furniture/laboratory.catalog.json` | Neun Möbel- und Zubehörtypen mit lokalen Maßverträgen |
 | `model/furnishings/l01.furnishings.json` | L01-Möbelinstanzen, Parameterbindungen und konkrete Aufstellungen |
 | `model/lab-layout-l01.shared.json` | Referenzierte Geräteaufstellung einschließlich Waage, Kühlschrank und −20-°C-Schrank |
 
@@ -97,8 +97,10 @@ flowchart TD
 Die Raumschale ist über `room_geometry_model` unabhängig von Möbeln auswertbar.
 Sie enthält neun Körper. `furniture_model` instanziiert Möbel aus dem Katalog;
 `lab_room_model` kombiniert die drei Quellen für die bisherigen CAD-Adapter.
-Die vollständige Einrichtung behält 41 Körper, die bisherigen Körper- und
-Operations-IDs, sechs starre Darstellungsgruppen und zwölf benannte Rahmen.
+Die Einrichtung erhält die bisherigen Gebäude- und Möbelbezüge. Hohle
+Schrankkorpusse ersetzen die früheren Stauraumhüllen; Türen und Hockersitze
+ergänzen bewegliche Gruppen. Die sechs bisherigen festen Gruppen bleiben
+erhalten. Der Standardraum umfasst jetzt 171 Körper und zusätzliche Bezüge.
 
 Für die Kaltlagerung reserviert die Möblierung 640 mm am hinteren Ende der
 linken Seitenbank; ihr Hängeschrank wird entsprechend gekürzt. Die rechte
@@ -111,7 +113,16 @@ Möbelreservierungen. Die linke CF01-/ArmC-/TR01-/Rackgruppe wird über einen
 gemeinsamen Versatz um 800 mm zum Eingang verschoben. Das manuelle
 Kellerlager gehört nicht zu L01; ein Kellerraum wird nicht ergänzt.
 
-Die Analysenwaage und beide Laborschränke entstehen in beiden CADs direkt
+Vorne links reserviert die Möblierung Platz für einen Nassplatz und den direkt
+anschließenden Abzug. Die restliche linke Bank und die oberen offenen Regale
+beginnen bei Y=2.800 mm. Der Nassplatz und die drei Hocker gehören zum
+Möbelkatalog; Wasserbad und Abzug zur referenzierten Gerätebibliothek.
+Unterschränke besitzen zwei Einlegeböden und bewegliche Fronten. Die bisherigen
+oberen Schrankinstanzen behalten ihre IDs, werden aber als offene Regale
+erzeugt. Geschlossener Zustand, Öffnungsraum und tatsächliche Zugangsproben
+werden getrennt ausgewiesen. Wasser, Abwasser und Abluft sind nicht angeschlossen.
+
+Die Analysenwaage, beide Laborschränke, Wasserbad und Abzug entstehen in beiden CADs direkt
 aus dem Gerätefamilienrezept. SolidCraft setzt diese Modelle und die bereits
 geprüften nativen Armmodelle als platzierte Verknüpfungen ein. Die Aufstellung
 bleibt eine statische Ansicht; Gerätestellungen werden zusätzlich diskret auf
@@ -119,7 +130,7 @@ Zugang und Überschneidungen geprüft. Diese Prüfung ist kein neues
 Robotertransportprogramm.
 
 Die Typen umfassen Stauraumbank, offene angepasste Bank, Regalbrett, Stütze,
-Schrank sowie seitliche und mittige passgenaue Abdeckungen. Unterschiedliche
+offenes Regal, Nassplatz und Laborhocker sowie seitliche und mittige passgenaue Abdeckungen. Unterschiedliche
 Bänke und Schränke verwenden dieselben Rezepte. Die Abdeckungen sind Zubehör
 der Einrichtung, dessen Zuschnitt an Raumkontur und Banklage gebunden ist;
 sie beschreiben keine Heizungsanlage. Die bisherige Darstellungsgruppe

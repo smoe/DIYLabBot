@@ -43,9 +43,14 @@
         "kind": "room",
         "scope": "type",
         "type": "storage_bench",
-        "instance": "IslandLeft"
+        "instance": "IslandLeft",
+        "pose": "open",
+        "pixels": [
+          850,
+          595
+        ]
       },
-      "caption": "Typbeispiel aus der L01-Instanz IslandLeft. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "caption": "Native Stauraumbank mit geöffneten Türen und zwei Einlegeböden; Typbeispiel aus IslandLeft. Öffnungsraum ist kein freigegebener Verkehrsweg.",
       "documentation": "ARCHITECTURE.md"
     },
     {
@@ -101,7 +106,7 @@
     },
     {
       "id": "furniture-cupboard",
-      "title": "Schrank",
+      "title": "Offenes Regal",
       "group": "moebeltypen",
       "sources": [
         "model/furniture/laboratory.catalog.json"
@@ -111,9 +116,13 @@
         "kind": "room",
         "scope": "type",
         "type": "cupboard",
-        "instance": "IslandCupboard1"
+        "instance": "IslandCupboard1",
+        "pixels": [
+          850,
+          595
+        ]
       },
-      "caption": "Typbeispiel aus der L01-Instanz IslandCupboard1. Abmessungen und Einpassung stammen aus deren Bindungen.",
+      "caption": "Offenes durchgängiges Regal mit internem Boden; die historische Typkennung cupboard bleibt erhalten.",
       "documentation": "ARCHITECTURE.md"
     },
     {
@@ -176,14 +185,18 @@
       "image": "images/l01-furnished.png",
       "render": {
         "kind": "room",
-        "scope": "all"
+        "scope": "all",
+        "pixels": [
+          850,
+          595
+        ]
       },
       "caption": "Die Möbeltypen werden mehrfach aufgestellt. Die Raumkomposition bindet die Quellen zusammen.",
       "documentation": "docs/lab-room-l01.md"
     },
     {
       "id": "l01-overview",
-      "title": "L01 · Gesamtansicht mit Waage und Kaltlagerung",
+      "title": "L01 · Gesamtansicht mit Nassplatz und Abzug",
       "group": "ausstattung",
       "sources": [
         "model/lab-layout-l01.shared.json",
@@ -191,9 +204,13 @@
       ],
       "image": "images/l01-overview.png",
       "render": {
-        "kind": "lab-layout"
+        "kind": "lab-layout",
+        "pixels": [
+          850,
+          595
+        ]
       },
-      "caption": "Native Gesamtansicht: −20-°C-Gefrierschrank am linken Fensterende, Analysenwaage auf der linken Mittelbank und Kühlschrank mit dem Rücken an der rechten Seitenwand hinter Tür B. Seine Öffnung zeigt zum Gang; die rechte Bank behält ihre Länge. Das manuelle Kellerlager ist nicht aufgestellt.",
+      "caption": "Native Gesamtansicht mit Nassplatz links neben Tür A, anschließendem Abzug, Wasserbad rechts, drei Hockern an der Fensterbank und offenen oberen Regalen. Waage, Kaltlagerung und drei Roboter bleiben integriert; das manuelle Kellerlager gehört nicht zu L01.",
       "documentation": "docs/lab-layout-l01.md"
     },
     {
@@ -598,6 +615,89 @@
       },
       "caption": "Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.",
       "documentation": "docs/synthetic-lab-workflow.md"
+    },
+    {
+      "id": "furniture-lab-stool",
+      "title": "Laborhocker",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-lab-stool.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "lab_stool",
+        "instance": "Stool1",
+        "pixels": [
+          850,
+          595
+        ]
+      },
+      "caption": "Vereinfachtes Labsit-Referenzmodell: Fünfsternfuß mit Rollen, Gasfeder und 450–650 mm Sitzhöhe. Native Höhenverstellung; Rollverhalten und Ergonomie ungeprüft.",
+      "documentation": "docs/lab-room-l01.md"
+    },
+    {
+      "id": "furniture-wet-bench",
+      "title": "Nassplatz und Glastrocknung",
+      "group": "moebeltypen",
+      "sources": [
+        "model/furniture/laboratory.catalog.json"
+      ],
+      "image": "images/furniture-wet-bench.png",
+      "render": {
+        "kind": "room",
+        "scope": "type",
+        "type": "wet_bench",
+        "instance": "WetStation",
+        "pixels": [
+          850,
+          595
+        ]
+      },
+      "caption": "Hohles Becken, Armatur, Papierhandtücher, getrennte Abtropffläche und zwölf Trockenstifte. Leitungsanschlüsse sind nicht ausgeführt.",
+      "documentation": "docs/lab-room-l01.md"
+    },
+    {
+      "id": "lab-water-bath",
+      "title": "Wasserbad · offener Deckel",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/lab-water-bath.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "water_bath_13l_default",
+        "view": "iso",
+        "pixels": [
+          850,
+          595
+        ]
+      },
+      "caption": "SBS-TWB-300-Referenzhülle mit offener Wanne und beweglichem Deckel; 13 l Nennfüllmenge. Keine Heiz- oder Temperaturprüfung.",
+      "documentation": "docs/lab-equipment.md"
+    },
+    {
+      "id": "lab-fume-hood",
+      "title": "Abzug · geöffneter Frontschieber",
+      "group": "bibliotheken",
+      "sources": [
+        "model/lab-equipment.shared.json"
+      ],
+      "image": "images/lab-fume-hood.png",
+      "render": {
+        "kind": "library-case",
+        "family": "lab-equipment",
+        "case": "fume_hood_1200_default",
+        "pixels": [
+          850,
+          595
+        ]
+      },
+      "caption": "1200E-Referenzhülle mit Arbeitskammer, Frontschieber und beweglichen Unterbautüren. Abluftstutzen unverbunden; Erfassung und Schutzwirkung ungeprüft.",
+      "documentation": "docs/lab-equipment.md"
     }
   ],
   "groups": [

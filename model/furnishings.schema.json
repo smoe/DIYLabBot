@@ -141,6 +141,19 @@
               "Left",
               "Right"
             ]
+          },
+          "front": {
+            "enum": [
+              "positive_x",
+              "negative_x",
+              "both"
+            ]
+          },
+          "state": {
+            "enum": [
+              "closed",
+              "open"
+            ]
           }
         }
       }

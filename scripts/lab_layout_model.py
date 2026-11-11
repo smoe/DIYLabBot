@@ -11,7 +11,7 @@ import robot_spec as robot
 ROOT=room.ROOT
 SOURCE=ROOT/'model/lab-layout-l01.shared.json'
 digest=robot.digest
-EQUIPMENT_PROFILES=frozenset({'analytical_balance','fridge_4c','freezer_minus20'})
+EQUIPMENT_PROFILES=frozenset({'analytical_balance','fridge_4c','freezer_minus20','water_bath_13l','fume_hood_1200'})
 
 
 def load(*, validate_builds=True):
@@ -39,6 +39,7 @@ def load(*, validate_builds=True):
     ids=[i['id'] for i in s['instances']]
     if len(ids)!=len(set(ids)): raise ValueError('Duplicate layout instance')
     if len([i for i in s['instances'] if i['asset']=='arm'])!=3: raise ValueError('Three arms required')
+    vehicle_route_points(s,context)
     return s
 
 
@@ -56,6 +57,19 @@ def parameters(s):
             p.update(dimensions)
     return p
 def xyz(values,p): return [robot.evaluate(v,p) for v in values]
+
+
+def vehicle_route_points(s,p):
+    route=s['vehicle_route'];points=route['waypoints']
+    if not isinstance(points,list) or len(points)<2 or any(not isinstance(v,list) or len(v)!=2 for v in points):
+        raise ValueError('Vehicle footprint route needs at least two XY points')
+    for field in ('sample_step_mm','yaw_deg'):
+        value=route[field]
+        if type(value) not in (int,float) or not math.isfinite(value) or field=='sample_step_mm' and value<=0:
+            raise ValueError('Invalid vehicle footprint route '+field)
+    result=[xyz(v+[0],p) for v in points]
+    if any(not math.isfinite(x) for point in result for x in point):raise ValueError('Nonfinite vehicle footprint route')
+    return result
 
 
 def matrix(item,p):

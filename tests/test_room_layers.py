@@ -31,22 +31,30 @@ class RoomLayerTests(unittest.TestCase):
             self.assertAlmostEqual(actual,expected,delta=1e-8)
         else:self.assertEqual(actual,expected)
 
-    def test_every_primitive_boolean_sequence_style_and_frame_matches_pre_split_variants(self):
-        # The historical split fixture predates the intentional appliance bays.
+    def test_unmodified_geometry_styles_and_frames_match_pre_split_variants(self):
+        # The fixture predates the intentional bays and functional cabinetry.
         historical=copy.deepcopy(self.spec)
-        for name in ('left_rear_equipment_bay','right_front_equipment_bay'):
+        for name in ('left_rear_equipment_bay','right_front_equipment_bay','left_front_equipment_bay'):
             historical['parameters'][name]['expression']=0
+            historical['parameters'][name]['range'][0]=0
+        rebuilt={'LeftBench_LowerStorage','RightBench_LowerStorage','IslandLeft_LowerStorage','IslandRight_LowerStorage',
+                 'LeftUpperStorage','RightUpperStorage','IslandCupboard1','IslandCupboard2'}
         for case in self.before['cases']:
             with self.subTest(case=case['id']):
                 p=room.parameters(historical,case['overrides']);actual=room.expanded(historical,p)
                 for key in ['bodies','operations','frames','components']:
-                    by_id={x['id']:copy.deepcopy(x) for x in actual[key]}
+                    expected={x['id']:x for x in case['expanded'][key]
+                              if (x.get('body',x['id']) not in rebuilt)}
+                    all_ids={x['id'] for x in actual[key]}
+                    self.assertTrue({x['id'] for x in case['expanded'][key]}<=all_ids)
+                    by_id={x['id']:copy.deepcopy(x) for x in actual[key] if x['id'] in expected}
                     for obj in by_id.values():
                         if key=='operations':obj['shape']=room.numeric_shape(obj['shape'],p)
                         if key=='frames':obj['origin']=[room.evaluate(v,p) for v in obj['origin']]
-                    self.assertNestedClose(by_id,{x['id']:x for x in case['expanded'][key]})
+                    self.assertNestedClose(by_id,expected)
                 # CSG order is part of geometry, even when independent bodies are reordered.
                 for body in actual['bodies']:
+                    if body['id'] in rebuilt or body['id'] not in {b['id'] for b in case['expanded']['bodies']}:continue
                     self.assertEqual([o['id'] for o in actual['operations'] if o['body']==body['id']],
                                      [o['id'] for o in case['expanded']['operations'] if o['body']==body['id']])
                 self.assertNestedClose(room.circulation(p),case['circulation'])
@@ -56,20 +64,23 @@ class RoomLayerTests(unittest.TestCase):
         spec['parameters']['left_station_shift_y']=0
         p=layout.parameters(spec)
         self.assertNestedClose({i['id']:layout.matrix(i,p) for i in spec['instances'] if i['id'] in self.before['equipment_matrices']},self.before['equipment_matrices'])
-        targets=transfer.data(transfer.load(),spec)['targets']
+        # Compare historical geometric targets without compiling or repinning
+        # the separately qualified motion program to this changed environment.
+        targets=transfer.data(json.loads(transfer.SOURCE.read_text()),spec)['targets']
         self.assertNestedClose(json.loads(json.dumps(targets)),self.before['transfer_targets'])
 
     def test_appliance_bay_changes_only_left_bench_and_upper_storage(self):
-        changed={'LeftBench_Worktop','LeftBench_LowerStorage','LeftBench_Plinth','LeftUpperStorage'}
+        changed=lambda name:name.startswith('LeftBench_') or name.startswith('LeftUpperStorage')
         p=room.parameters(self.spec)
         current=room.expanded(self.spec,p)
         historical=copy.deepcopy(self.spec)
-        for name in ('left_rear_equipment_bay','right_front_equipment_bay'):
+        for name in ('left_rear_equipment_bay','right_front_equipment_bay','left_front_equipment_bay'):
             historical['parameters'][name]['expression']=0
+            historical['parameters'][name]['range'][0]=0
         hp=room.parameters(historical)
         before=room.expanded(historical,hp)
-        a={o['id']:room.numeric_shape(o['shape'],p) for o in current['operations'] if o['body'] not in changed}
-        b={o['id']:room.numeric_shape(o['shape'],hp) for o in before['operations'] if o['body'] not in changed}
+        a={o['id']:room.numeric_shape(o['shape'],p) for o in current['operations'] if not changed(o['body'])}
+        b={o['id']:room.numeric_shape(o['shape'],hp) for o in before['operations'] if not changed(o['body'])}
         self.assertNestedClose(a,b)
         shapes={o['id']:room.numeric_shape(o['shape'],p) for o in current['operations']}
         left=shapes['LeftBench_Worktop'];right=shapes['RightBench_Worktop']
@@ -93,9 +104,10 @@ class RoomLayerTests(unittest.TestCase):
 
     def test_catalog_type_can_be_reused_and_rotated_without_changing_the_room(self):
         p=room.parameters(self.spec);before=geometry.expanded(self.spec['_geometry'],p)
-        item={'id':'IndependentBench','type':'storage_bench','component':'Furniture','bindings':{'width':400,'length':800,'height':900,'top_t':40,'plinth_h':100},'xyz':[100,200,0],'yaw_deg':90,'frames':{'Worktop':'IndependentBench.Top'}}
+        item={'id':'IndependentBench','type':'storage_bench','component':'Furniture','bindings':{'width':400,'length':800,'height':900,'top_t':40,'plinth_h':100,'panel_t':18,'door_gap':3,'leaf_width':550},'xyz':[100,200,0],'yaw_deg':90,'frames':{'Worktop':'IndependentBench.Top'}}
         result=furniture.instantiate(self.spec['_catalog'],item,p)
-        self.assertEqual(len(result['bodies']),3)
+        self.assertEqual(sum(b['role']=='internal_shelf' for b in result['bodies']),2)
+        self.assertEqual(len(result['joints']),2)
         self.assertEqual(result['operations'][0]['shape']['kind'],'polygon_prism')
         frame=result['frames'][0]
         self.assertNestedClose([room.evaluate(x,p) for x in frame['origin']],[-300,400,900])

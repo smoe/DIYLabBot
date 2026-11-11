@@ -36,7 +36,10 @@
               "open_shaped_bench",
               "box_envelope",
               "side_gap_cover",
-              "support_gap_cover"
+              "support_gap_cover",
+              "wet_bench",
+              "open_shelving",
+              "lab_stool"
             ]
           },
           "parameters": {
@@ -93,6 +96,14 @@
             "type": "number",
             "minimum": 0,
             "maximum": 1
+          },
+          "reference": {
+            "type": "string",
+            "pattern": "^https://"
+          },
+          "reference_scope": {
+            "type": "string",
+            "minLength": 1
           }
         },
         "allOf": [

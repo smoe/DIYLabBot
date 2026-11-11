@@ -16,19 +16,20 @@ des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
 
 | 1 · Arbeitsumgebung | 2 · Möbeltypen | 3 · Möblierung | 4 · Geräteausstattung |
 |---|---|---|---|
-| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-overview.png" alt="L01-Gesamtansicht mit Waage und Kaltlagerung" width="180"></a> |
+| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-overview.png" alt="L01-Gesamtansicht mit Nassplatz, Abzug und Geräten" width="180"></a> |
 
 Die Galerie verbindet die vier Ebenen mit den einzelnen Konstruktionen und der
 synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
 ## Roboter in Bewegung
 
-[![Drei aufeinanderfolgende CF01-Entnahmen bei offenem Deckel](docs/media/robot-demo-continuous-cfr.png)](docs/media/robot-demo-continuous-cfr.mp4)
+https://github.com/user-attachments/assets/919b9436-0b45-4b2e-9ed1-2584da67b06f
 
 [Kurzes Video ansehen](docs/media/robot-demo-continuous-cfr.mp4) ·
 [Interaktive Demo herunterladen](docs/media/robot-demo-continuous-cfr.html) ·
 [Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
-[Modellstand und Herkunft](docs/media/README.md)
+[Modellstand und Herkunft](docs/media/README.md) ·
+[Einbettungsnachweis](docs/media/robot-demo-continuous-cfr.embed.json)
 
 Die Szene wird aus einer synthetischen, unbegrenzten Umgebung mit einer
 Referenzbank abgeleitet. Sie zeigt **drei aufeinanderfolgende Entnahmen** nach
@@ -232,7 +233,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
 - [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
 - [Wiederverwendbares Laborglas](docs/lab-glassware.md): hohle Becher, durchgängige Trichter und Flaschen mit separaten Verschlüssen für FreeCAD und SolidCraft
-- [Analysenwaage und Kaltlagerung](docs/lab-equipment.md): Windschutz, direkt zugänglicher +4-°C-Kühlschrank, −20-°C-Schubladen und manuelles Keller-Tiefkühllager mit beweglichen Türen für FreeCAD und SolidCraft
+- [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft
 - [NanoDrop UltraC über HTTP](docs/nanodrop-ultra-network.md): gemeinsamer Leseclient und synthetisches Netzwerkmodell; Originalgerät noch nicht qualifiziert
 - [Gemeinsamer synthetischer Ablauf CF01 → NanoDrop → Qubit 4](docs/synthetic-lab-workflow.md) mit einem Probenbestand und durchgängiger Verbrauchsbuchung
 

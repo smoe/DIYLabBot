@@ -14,8 +14,8 @@ interpretation. The support's exact lateral position and window setback remain
 unknown. The render colours were chosen for legibility, not obtained from a
 photograph or measured finish information.
 
-The central unit now has an open shelf at 1,500 mm and two closed cupboard
-envelopes whose underside starts at approximately 1,750 mm, following the owner's
+The central unit has an open shelf at 1,500 mm and two open shelving modules
+whose underside starts at approximately 1,750 mm, following the owner's
 height references. The intervening 250 mm band has no back panel; narrow uprights
 leave open spans for reaching through to the other side. The window benches no
 longer have cupboards or plinths underneath; two open leg envelopes support each
@@ -39,6 +39,13 @@ furniture. The furnished room retains its body IDs, named frames and existing
 frame identities. The appliance reservations and the explicit shift of the
 left station are recorded in their respective source layers. The four-level target and the current implementation scope
 are documented in [ARCHITECTURE.md](../ARCHITECTURE.md).
+
+The front of the left wall now holds a wet bench beside Door A, followed toward
+the windows by the separate fume hood. The remaining left bench and upper
+shelving start at Y=2,800 mm. Three mobile laboratory stools are parked below
+the open window benches. Lower cupboards contain real cavities, two internal
+shelves and separately hinged fronts. Every upper module is open, including
+both sides of the central shelving; historical cupboard IDs remain stable.
 
 The build entry remains `python scripts/build_lab_room.py`. Run
 `python scripts/validate_assembly_schemas.py` with the optional `jsonschema`
@@ -70,17 +77,18 @@ an adjustable curve influenced by the building's oval outline.
 Two door openings occupy the entrance wall, which has no bench. Left and right
 wall benches and two window-side bench sections surround an island of two long benches
 placed back to back. Both end passages and both side aisles are kept open in
-this provisional geometry. Four closed lower-storage blocks remain below the
-side benches and central island. The two window worktops have open lower space
-and simple legs. Two shallower upper-storage blocks are assumed along the
-sidewalls. Their actual locations and any additional shelf tiers remain open.
-A narrow shelf and two higher cupboard modules stand above the island's centre line.
+this provisional geometry in the default closed-door state. Four lower cupboards
+remain below the side benches and central island; the wet bench adds another.
+The two window worktops have open lower space and simple legs. Open shallow
+storage runs along the sidewalls, and two open modules stand above the island's
+centre line. Each upper module includes an internal shelf and has no front panel.
 
-The model contains 41 final bodies grouped into room shell, perimeter benches,
-island, island shelf, upper storage and building services. Three grey heating-cover envelopes
+The default model contains 171 final bodies, including the wet bench and three
+stools, grouped into room shell, perimeter benches, island, island shelf, upper
+storage, building services and their movable fronts/seats. Three grey heating-cover envelopes
 fill the rear gaps and the clearances around the concrete support. Their slots,
 airflow and small-object retention are not modeled or tested. Walls are translucent for inspection; no ceiling is
-drawn. Cabinet interiors, doors and opening sweeps are omitted. The three window
+drawn. Cabinet interiors and discrete opening positions are checked. The three window
 divisions and exact door locations are assumptions, not observations.
 
 The [current placement plan](models/images/l01-equipment.svg) shows the
@@ -98,6 +106,9 @@ revised worktop outlines and device reference points.
 | Door left-edge positions on entrance wall | 600 / 5,100 mm |
 | Perimeter bench depth / worktop height | 700 / 900 mm |
 | Left rear equipment bay / additional right entrance setback | 640 / 0 mm |
+| Additional left front reservation / wet bench | 1,800 mm / 650 × 1,400 mm |
+| Cabinet panels / door gap / maximum nominal leaf width | 18 / 3 / 550 mm |
+| Stool seat / height / base envelope | 400 × 420 / 450–650 / Ø640 mm |
 | Window-side bench depth | 500 mm, provisional |
 | Concrete support width / depth | approximately 300 / 500 mm, owner-reported |
 | Support lateral offset from room centre | 0 mm, provisional |
@@ -184,7 +195,7 @@ SolidCraft uses parameter-driven primitives and sketch points. The default
 SolidCraft model was generated through MCP; the same commands run through the
 CLI in the reproducible build.
 
-Five cases compare all 41 bodies for validity, volume, centre, bounding box
+Five cases compare every generated body for validity, volume, centre, bounding box
 and symmetric STEP difference. Door and bench frames are checked against their
 parameter-derived positions, including worktop heights. A wider room with more
 facade bulge is also tested by native parameter edits in both CADs. A second
@@ -205,11 +216,32 @@ files are reopened, and their colors/visibility/camera are stored. SolidCraft
 isometric and top views were visually inspected; FreeCAD GUI rendering was not
 separately tested.
 
-This revision passed five cross-CAD cases and ten L01 source tests. The broader
-offline suite ran 128 tests and reported four MB01 validation failures because
-saved mobile-base evidence refers to the older arm source. The failure details
-are in the [offline test log](../exports/generated/lab-room-l01-7f455f722169/offline-tests.txt);
-they concern the separate mobile-base artifacts.
+The additional native furniture checks move every door and stool seat through
+four intermediate/end positions, compare observed centres with the common
+kinematics and check self-intersections within each furniture instance. Line
+probes observe blocked cupboard access when closed and clear access to all
+three storage levels when open. Upper shelving is accessible in both states.
+These are sampled geometric observations; opened doors can occupy a walking
+strip or the parked transporter's space. Clear that work area before opening;
+the model does not implement a person/vehicle interlock.
+
+In FreeCAD, `Controller.LeftBench_Door1` and the other door properties use
+degrees; `Controller.Stool1_SeatLift` uses millimetres. SolidCraft has the
+corresponding native joints. `lab_room_model.pose(..., "closed"/"open")` and
+`storage_interfaces` expose the same states and access references. Changing
+the module count requires regeneration. After native SolidCraft dimension
+experiments regenerate the model to update joint anchors and access metadata.
+
+The [Labsit reference](https://www.inwerk-bueromoebel.de/alle-bueromoebel/buerostuehle/arbeitsplatz/arbeitsstuehle/662/laborhocker-bimos-labsit)
+provides the stool envelope and height range. The five-star base, casters,
+gas lift and seat contour are simplified. The wet bench has a hollow basin,
+tap, paper-towel dispenser, separate drained drip tray and twelve drying pegs
+above it. Its dimensions, fittings and utility connections are assumed. Water,
+waste, load capacity, rolling behaviour and seating ergonomics remain unverified.
+
+Current case counts, source pins and individual geometric results are in the
+build report. Earlier offline-suite totals and older motion reports are
+historical evidence, rather than proof for this changed furnished environment.
 
 ## Completing the environment
 

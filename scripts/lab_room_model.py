@@ -101,6 +101,8 @@ def source_dependencies(spec):
 
 def expanded(spec,p):
     result=environment.expanded(spec['_geometry'],p)
+    result['components']=[{'id':name,'grounded':True} for name in ['RoomShell','PerimeterBenches','Island','IslandShelf','UpperStorage','BuildingServices']]
+    result['storage']=[]
     furnishing=spec['_furnishings'];ids=[i['id'] for i in furnishing['instances']]
     if len(ids)!=len(set(ids)):raise ValueError('Duplicate furnishing instance ID')
     frames={f['id']:f for f in result['frames']}
@@ -115,9 +117,8 @@ def expanded(spec,p):
     for instance in furnishing['instances']:
         try:part=furniture.instantiate(spec['_catalog'],instance,p,aliases,inputs)
         except (ValueError,KeyError) as error:raise ValueError('L01 furniture '+instance['id']+': '+str(error)) from error
-        for key in ['bodies','operations','frames']:result[key].extend(part[key])
-    result['components']=[{'id':name,'grounded':True} for name in ['RoomShell','PerimeterBenches','Island','IslandShelf','UpperStorage','BuildingServices']]
-    for key in ['bodies','operations','frames']:
+        for key in ['bodies','operations','frames','components','joints','storage']:result[key].extend(part[key])
+    for key in ['bodies','operations','frames','components','joints']:
         names=[item['id'] for item in result[key]]
         if len(names)!=len(set(names)):raise ValueError('Duplicate composed '+key+' ID')
     if any(b['component'] not in {c['id'] for c in result['components']} for b in result['bodies']):raise ValueError('Unknown furniture component')
@@ -125,6 +126,24 @@ def expanded(spec,p):
         shape=numeric_shape(op['shape'],p)
         if any(v<=0 for v in (shape['size'] if shape['kind']=='box' else [shape['height']])):raise ValueError('Nonpositive room primitive: '+op['id'])
     return result
+
+
+def pose(spec,p,name=None):
+    if name not in (None,'closed','open'):raise ValueError('Unknown furnishing pose')
+    return {j['id']:j['value'] if name is None else (j.get('limits_deg',j.get('limits_mm'))[1] if name=='open' else 0)
+            for j in expanded(spec,p)['joints']}
+
+
+def storage_interfaces(spec,p,values=None):
+    values=pose(spec,p) if values is None else values
+    source=expanded(spec,p)
+    for j in source['joints']:
+        q=values[j['id']];lo,hi=j.get('limits_deg',j.get('limits_mm'))
+        if type(q) not in (int,float) or not math.isfinite(q) or not lo<=q<=hi:raise ValueError('Invalid furniture joint position')
+    return {v['id']:{'origin_mm':[evaluate(x,p) for x in v['origin']],
+                'approach_mm':[evaluate(x,p) for x in v['approach']],
+                'accessible':all(values[j]>=89.9 for j in v['joints']), 'access_kind':v['access_kind']}
+            for v in source['storage']}
 
 
 def solidcraft_commands(spec,p):
@@ -138,6 +157,8 @@ def solidcraft_commands(spec,p):
         if op['action']=='create': args['body_name']=op['body']
         else: args['targets']=[op['body']]
         if s['kind']=='box': add('solid.box',corner=s['origin'],**dict(zip(['length','width','height'],s['size'])),**args)
+        elif s['kind']=='cylinder':
+            add('solid.cylinder',base=s['origin'],radius=s['radius'],height=s['height'],**({'axis':s['axis']} if 'axis' in s else {}),**args)
         else:
             add('sketch.create',name=op['id']+'_Profile',plane='XY',offset=s['z'])
             # Expression points are fixed to parameters by SolidCraft, so a native
@@ -145,7 +166,15 @@ def solidcraft_commands(spec,p):
             add('sketch.line',points=[[str(v) for v in pt] for pt in s['points']],closed=True,infer=False,connect=False)
             add('sketch.finish'); add('solid.extrude',distance=s['height'],**args)
     for group in source['components']:
-        add('component.create',name=group['id'],parent='root',activate=False,grounded=True)
+        add('component.create',name=group['id'],parent='root',activate=False,grounded=group['grounded'])
         add('component.move_bodies',component=group['id'],bodies=[b['id'] for b in source['bodies'] if b['component']==group['id']])
     for b in source['bodies']: add('appearance.assign',bodies=[b['id']],**b['appearance'])
+    for j in source['joints']:
+        frame={'origin':[evaluate(v,p) for v in j['origin']],'z':j['axis'],'x':j['reference_x']}
+        limit=j.get('limits_deg',j.get('limits_mm'))
+        add('joint.create',name=j['id'],type=j['type'],a={'occurrence':j['parent'],'frame':frame},
+            b={'occurrence':j['child'],'frame':frame},flip=True,values=[0],limits=[limit],quiet=True)
+        add('joint.drive',joint=j['id'],value=j['value'],quiet=True)
+    if source['joints']:add('joint.solve')
+    add('browser.visibility',folder='joints',visible=False)
     return commands

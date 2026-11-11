@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "lab-equipment.schema.json",
-  "title": "Portable laboratory balance and cold-storage equipment",
+  "title": "Portable laboratory equipment with openable storage, shields and process access",
   "type": "object",
   "additionalProperties": false,
   "required": ["format", "id", "units", "status", "families", "profiles", "references", "limitations"],
@@ -11,10 +11,12 @@
     "status": {"type": "string", "minLength": 1},
     "units": {"const": {"length": "mm", "angle": "deg", "temperature": "degC"}},
     "families": {
-      "type": "object", "additionalProperties": false, "required": ["cold_storage", "analytical_balance"],
+      "type": "object", "additionalProperties": false, "required": ["cold_storage", "analytical_balance", "water_bath", "fume_hood"],
       "properties": {
         "cold_storage": {"$ref": "#/$defs/family"},
-        "analytical_balance": {"$ref": "#/$defs/family"}
+        "analytical_balance": {"$ref": "#/$defs/family"},
+        "water_bath": {"$ref": "#/$defs/family"},
+        "fume_hood": {"$ref": "#/$defs/family"}
       }
     },
     "profiles": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/profile"}},
@@ -35,7 +37,9 @@
     "family": {
       "type": "object", "additionalProperties": false, "required": ["recipe", "parameters"],
       "properties": {
-        "recipe": {"enum": ["cabinet_with_hinged_door_and_storage_insert/1", "weighing_pan_with_openable_glass_draft_shield/1"]},
+        "recipe": {"enum": ["cabinet_with_hinged_door_and_storage_insert/1", "weighing_pan_with_openable_glass_draft_shield/1", "hollow_bath_with_hinged_cover/1", "open_work_chamber_with_vertical_sash/1"]},
+        "furniture": {"type": "object", "additionalProperties": false, "required": ["source", "source_sha256"],
+          "properties": {"source": {"const": "model/furniture/laboratory.catalog.json"}, "source_sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}},
         "parameters": {"type": "object", "minProperties": 1, "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"}, "additionalProperties": {"$ref": "#/$defs/parameter"}}
       }
     },
@@ -52,7 +56,7 @@
       "type": "object", "additionalProperties": false,
       "required": ["family", "label", "overrides", "insert", "reference_setpoint_c", "reported_temperature_c", "nominal_storage_l", "capacity_g", "readability_g", "handling", "location_hint", "reference"],
       "properties": {
-        "family": {"enum": ["cold_storage", "analytical_balance"]},
+        "family": {"enum": ["cold_storage", "analytical_balance", "water_bath", "fume_hood"]},
         "label": {"type": "string", "minLength": 1},
         "overrides": {"type": "object", "additionalProperties": {"type": "number"}},
         "insert": {"$ref": "#/$defs/insert"},
@@ -65,9 +69,9 @@
         "location_hint": {"type": ["string", "null"]},
         "reference": {"type": ["string", "null"]}
       },
-      "allOf": [{"if": {"properties": {"family": {"const": "analytical_balance"}}},
-        "then": {"properties": {"insert": {"type": "null"}, "reference_setpoint_c": {"type": "null"}}},
-        "else": {"properties": {"insert": {"type": "object"}, "reference_setpoint_c": {"type": "number"}}}}]
+      "allOf": [{"if": {"properties": {"family": {"const": "cold_storage"}}},
+        "then": {"properties": {"insert": {"type": "object"}, "reference_setpoint_c": {"type": "number"}}},
+        "else": {"properties": {"insert": {"type": "null"}, "reference_setpoint_c": {"type": "null"}}}}]
     },
     "reference": {
       "type": "object", "additionalProperties": false, "required": ["requested_url", "verified_url", "scope"],

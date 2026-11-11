@@ -17,7 +17,18 @@ def access_checks(doc,spec,p,values):
     shapes = {o.SourceBody:native.motion.world_shape(o) for o in native.objects(doc)}
     refs = model.interfaces(spec,p,values)
     result = []
-    if spec['profile']['family']=='analytical_balance':
+    family=spec['profile']['family']
+    if family in ('water_bath','fume_hood'):
+        for identity,frame in refs.items():
+            point=App.Vector(*frame['origin_mm'])
+            if family=='water_bath':
+                probe=Part.makeCylinder(4,p['height']+200-point.z,point)
+                overlap=sum(s.common(probe).Volume for s in shapes.values());clear=overlap<1e-5
+            else:
+                probe=Part.makeLine(App.Vector(point.x,-150,point.z),point)
+                overlap=sum(s.common(probe).Length for s in shapes.values());clear=overlap<1e-6
+            result.append({'id':identity,'accessible':frame['accessible'],'probe_obstruction':overlap,'passed':clear==frame['accessible']})
+    elif family=='analytical_balance':
         frame = refs['pan_surface']
         probe = Part.makeCylinder(p['pan_radius'],p['shield_height']+120,
                                   App.Vector(0,p['pan_y'],p['pan_z']+.5))

@@ -1,0 +1,12 @@
+{
+  "format": "solidcraftbot.readme-video-embedding/1",
+  "repository": "smoe/DIYLabBot",
+  "source": "docs/media/robot-demo-continuous-cfr.mp4",
+  "source_sha256": "cd60ebd65190fdbcc73a2b1da03e3f4c1859d5609fafa7407a0e530cdb3e4c82",
+  "source_bytes": 1372889,
+  "source_commit": "ef83ca84ca8e55696f927e47e70be646fe95fc10",
+  "asset_url": "https://github.com/user-attachments/assets/919b9436-0b45-4b2e-9ed1-2584da67b06f",
+  "uploaded_on": "2026-11-11",
+  "playback_test": "Not performed by the agent; the user tests playback",
+  "upload_method": "GitHub attachment upload endpoint used by GitHub CLI v2.101.0; no issue or comment created"
+}

@@ -9,7 +9,7 @@
   "assets": {
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "314220ea9d48a047fcd7eb97a588e9d6e7dbd24b4e729276e593a807f147465a",
+      "source_sha256": "ee8d1b4e1decca057658b9b1e31898d593d073c80f5a97e0af771789ae64f252",
       "report": "cad/lab-room-l01/shared-build-report.json",
       "case": "default"
     },
@@ -39,21 +39,33 @@
     },
     "analytical_balance": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "analytical_balance_default"
     },
     "fridge_4c": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "fridge_4c_default"
     },
     "freezer_minus20": {
       "source": "model/lab-equipment.shared.json",
-      "source_sha256": "0f2c2a1f3afb454d699b99cc783e5c42a03a68a7a0b52e90cc32cbe12eab01a3",
+      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "freezer_minus20_default"
+    },
+    "water_bath_13l": {
+      "source": "model/lab-equipment.shared.json",
+      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "report": "cad/lab-equipment/shared-build-report.json",
+      "case": "water_bath_13l_default"
+    },
+    "fume_hood_1200": {
+      "source": "model/lab-equipment.shared.json",
+      "source_sha256": "802e16a92cf1910673a924106b68f45be439df6e4b6dc5d11266293e340965b3",
+      "report": "cad/lab-equipment/shared-build-report.json",
+      "case": "fume_hood_1200_default"
     }
   },
   "parameters": {
@@ -246,6 +258,30 @@
       ],
       "yaw_deg": 270,
       "pose": "access"
+    },
+    {
+      "id": "WaterBath01",
+      "asset": "water_bath_13l",
+      "xyz": [
+        "room_width-bench_depth/2",
+        4400,
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "pose": "access",
+      "host": "RightBench"
+    },
+    {
+      "id": "Hood01",
+      "asset": "fume_hood_1200",
+      "xyz": [
+        "Hood01_body_depth+cold_wall_gap",
+        "wet_start_y+wet_length+cold_wall_gap+Hood01_width/2",
+        0
+      ],
+      "yaw_deg": 90,
+      "pose": "access",
+      "host": "Floor"
     }
   ],
   "corridors": [
@@ -296,6 +332,18 @@
       [
         "vehicle_x",
         -400
+      ],
+      [
+        1200,
+        700
+      ],
+      [
+        1200,
+        3000
+      ],
+      [
+        "vehicle_x",
+        3400
       ],
       [
         "vehicle_x",
@@ -386,6 +434,7 @@
     "No collaboration scheduler, robot-motion sweeps, human detection, protective separation, egress/accessibility compliance or payload/bench-load qualification",
     "Floor transporter path is sampled against static geometry; dynamics, steering, localization and people interaction are not validated",
     "Rack/vehicle article fits and centrifuge performance limits retain upstream qualifications",
-    "Appliance doors and drawers are sampled against the static room and equipment; building-door leaves, ventilation, installation tolerances and thermal/vibration performance remain unqualified."
+    "Appliance doors and drawers are sampled against the static room and equipment; building-door leaves, ventilation, installation tolerances and thermal/vibration performance remain unqualified.",
+    "Wet services and hood extraction are geometry references with unconnected utility ports; the arrangement is not a ventilation or plumbing design."
   ]
 }

@@ -259,6 +259,106 @@
         800
       ],
       "measured_mm": null
+    },
+    "cabinet_panel_t": {
+      "expression": 18,
+      "unit": "mm",
+      "range": [
+        12,
+        25
+      ],
+      "measured_mm": null,
+      "description": "Assumed carcass, shelf and door panel thickness"
+    },
+    "cabinet_door_gap": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        2,
+        6
+      ],
+      "measured_mm": null,
+      "description": "Assumed visible door-leaf gap"
+    },
+    "cabinet_leaf_width": {
+      "expression": 550,
+      "unit": "mm",
+      "range": [
+        400,
+        700
+      ],
+      "measured_mm": null,
+      "description": "Maximum nominal door-leaf width; changing leaf count requires regeneration"
+    },
+    "left_front_equipment_bay": {
+      "expression": 1800,
+      "unit": "mm",
+      "range": [
+        1600,
+        2300
+      ],
+      "measured_mm": null,
+      "description": "Independent front reservation for wet bench and hood; installed profiles checked against this bay"
+    },
+    "wet_start_y": {
+      "expression": 100,
+      "unit": "mm",
+      "range": [
+        50,
+        250
+      ],
+      "measured_mm": null,
+      "description": "Wet bench starts immediately along the wall beside Door A"
+    },
+    "wet_length": {
+      "expression": 1400,
+      "unit": "mm",
+      "range": [
+        1250,
+        1650
+      ],
+      "measured_mm": null,
+      "description": "Sink and separate drip/drying area span along wall"
+    },
+    "wet_depth": {
+      "expression": 650,
+      "unit": "mm",
+      "range": [
+        600,
+        700
+      ],
+      "measured_mm": null,
+      "description": "Wet bench projection from left wall"
+    },
+    "stool_seat_min": {
+      "expression": 450,
+      "unit": "mm",
+      "range": [
+        450,
+        450
+      ],
+      "measured_mm": null,
+      "description": "Referenced minimum seat height"
+    },
+    "stool_seat_travel": {
+      "expression": 200,
+      "unit": "mm",
+      "range": [
+        100,
+        200
+      ],
+      "measured_mm": null,
+      "description": "Gas lift illustration, maximum seat height 650 mm"
+    },
+    "stool_base_diameter": {
+      "expression": 640,
+      "unit": "mm",
+      "range": [
+        640,
+        640
+      ],
+      "measured_mm": null,
+      "description": "Referenced maximum foot envelope"
     }
   },
   "anchors": {
@@ -282,20 +382,25 @@
       "component": "PerimeterBenches",
       "bindings": {
         "width": "bench_depth",
-        "length": "left_depth-window_bench_depth-heating_corner_gap-perimeter_start_y-left_rear_equipment_bay",
+        "length": "left_depth-window_bench_depth-heating_corner_gap-perimeter_start_y-left_rear_equipment_bay-left_front_equipment_bay",
         "height": "bench_height",
         "top_t": "worktop_t",
-        "plinth_h": "plinth_h"
+        "plinth_h": "plinth_h",
+        "panel_t": "cabinet_panel_t",
+        "door_gap": "cabinet_door_gap",
+        "leaf_width": "cabinet_leaf_width"
       },
       "xyz": [
         0,
-        "perimeter_start_y",
+        "perimeter_start_y+left_front_equipment_bay",
         0
       ],
       "yaw_deg": 0,
       "frames": {
         "Worktop": "L01.LeftBench.Worktop"
-      }
+      },
+      "front": "positive_x",
+      "state": "closed"
     },
     {
       "id": "RightBench",
@@ -306,7 +411,10 @@
         "length": "right_depth-window_bench_depth-heating_corner_gap-perimeter_start_y-right_front_equipment_bay",
         "height": "bench_height",
         "top_t": "worktop_t",
-        "plinth_h": "plinth_h"
+        "plinth_h": "plinth_h",
+        "panel_t": "cabinet_panel_t",
+        "door_gap": "cabinet_door_gap",
+        "leaf_width": "cabinet_leaf_width"
       },
       "xyz": [
         "room_width-bench_depth",
@@ -316,7 +424,9 @@
       "yaw_deg": 0,
       "frames": {
         "Worktop": "L01.RightBench.Worktop"
-      }
+      },
+      "front": "negative_x",
+      "state": "closed"
     },
     {
       "id": "IslandLeft",
@@ -327,7 +437,10 @@
         "length": "island_length",
         "height": "bench_height",
         "top_t": "worktop_t",
-        "plinth_h": "plinth_h"
+        "plinth_h": "plinth_h",
+        "panel_t": "cabinet_panel_t",
+        "door_gap": "cabinet_door_gap",
+        "leaf_width": "cabinet_leaf_width"
       },
       "xyz": [
         "room_width/2-island_half_width",
@@ -337,7 +450,9 @@
       "yaw_deg": 0,
       "frames": {
         "Worktop": "L01.IslandLeft.Worktop"
-      }
+      },
+      "front": "negative_x",
+      "state": "closed"
     },
     {
       "id": "IslandRight",
@@ -348,7 +463,10 @@
         "length": "island_length",
         "height": "bench_height",
         "top_t": "worktop_t",
-        "plinth_h": "plinth_h"
+        "plinth_h": "plinth_h",
+        "panel_t": "cabinet_panel_t",
+        "door_gap": "cabinet_door_gap",
+        "leaf_width": "cabinet_leaf_width"
       },
       "xyz": [
         "room_width/2",
@@ -358,7 +476,9 @@
       "yaw_deg": 0,
       "frames": {
         "Worktop": "L01.IslandRight.Worktop"
-      }
+      },
+      "front": "positive_x",
+      "state": "closed"
     },
     {
       "id": "WindowBenchLeft",
@@ -612,7 +732,8 @@
       "bindings": {
         "width": "island_cupboard_depth",
         "length": "(island_length-2*island_shelf_end_inset-island_cupboard_gap)/2",
-        "height": "island_cupboard_height"
+        "height": "island_cupboard_height",
+        "panel_t": "cabinet_panel_t"
       },
       "xyz": [
         "room_width/2-island_cupboard_depth/2",
@@ -622,7 +743,9 @@
       "yaw_deg": 0,
       "frames": {
         "Bottom": "L01.IslandCupboard1.Bottom"
-      }
+      },
+      "role": "open_upper_storage",
+      "front": "both"
     },
     {
       "id": "IslandCupboard2",
@@ -631,7 +754,8 @@
       "bindings": {
         "width": "island_cupboard_depth",
         "length": "(island_length-2*island_shelf_end_inset-island_cupboard_gap)/2",
-        "height": "island_cupboard_height"
+        "height": "island_cupboard_height",
+        "panel_t": "cabinet_panel_t"
       },
       "xyz": [
         "room_width/2-island_cupboard_depth/2",
@@ -641,7 +765,9 @@
       "yaw_deg": 0,
       "frames": {
         "Bottom": "L01.IslandCupboard2.Bottom"
-      }
+      },
+      "role": "open_upper_storage",
+      "front": "both"
     },
     {
       "id": "LeftUpperStorage",
@@ -649,17 +775,19 @@
       "component": "UpperStorage",
       "bindings": {
         "width": "upper_depth",
-        "length": "left_depth-bench_depth-perimeter_start_y-250-left_rear_equipment_bay",
-        "height": "upper_height"
+        "length": "left_depth-bench_depth-perimeter_start_y-250-left_rear_equipment_bay-left_front_equipment_bay",
+        "height": "upper_height",
+        "panel_t": "cabinet_panel_t"
       },
       "xyz": [
         0,
-        "perimeter_start_y",
+        "perimeter_start_y+left_front_equipment_bay",
         "upper_bottom_z"
       ],
       "yaw_deg": 0,
-      "role": "shallow_upper_storage",
-      "color": "#a8b7c2"
+      "role": "open_upper_storage",
+      "color": "#a8b7c2",
+      "front": "positive_x"
     },
     {
       "id": "RightUpperStorage",
@@ -668,7 +796,8 @@
       "bindings": {
         "width": "upper_depth",
         "length": "right_depth-bench_depth-perimeter_start_y-250-right_front_equipment_bay",
-        "height": "upper_height"
+        "height": "upper_height",
+        "panel_t": "cabinet_panel_t"
       },
       "xyz": [
         "room_width-upper_depth",
@@ -676,8 +805,106 @@
         "upper_bottom_z"
       ],
       "yaw_deg": 0,
-      "role": "shallow_upper_storage",
-      "color": "#a8b7c2"
+      "role": "open_upper_storage",
+      "color": "#a8b7c2",
+      "front": "negative_x"
+    },
+    {
+      "id": "WetStation",
+      "type": "wet_bench",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "width": "wet_depth",
+        "length": "wet_length",
+        "height": "bench_height",
+        "top_t": "worktop_t",
+        "plinth_h": "plinth_h",
+        "panel_t": "cabinet_panel_t",
+        "door_gap": "cabinet_door_gap",
+        "leaf_width": "cabinet_leaf_width",
+        "basin_width": 450,
+        "basin_length": 500,
+        "basin_depth": 220,
+        "rack_height": 600
+      },
+      "xyz": [
+        0,
+        "wet_start_y",
+        0
+      ],
+      "yaw_deg": 0,
+      "front": "positive_x",
+      "state": "closed",
+      "frames": {
+        "Worktop": "L01.WetStation.Worktop",
+        "Basin": "L01.WetStation.Basin"
+      }
+    },
+    {
+      "id": "Stool1",
+      "type": "lab_stool",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "seat_width": 400,
+        "seat_depth": 420,
+        "seat_min": "stool_seat_min",
+        "seat_travel": "stool_seat_travel",
+        "base_diameter": "stool_base_diameter"
+      },
+      "xyz": [
+        1550,
+        6650,
+        0
+      ],
+      "yaw_deg": 0,
+      "state": "closed",
+      "frames": {
+        "Seat": "L01.Stool1.Seat"
+      }
+    },
+    {
+      "id": "Stool2",
+      "type": "lab_stool",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "seat_width": 400,
+        "seat_depth": 420,
+        "seat_min": "stool_seat_min",
+        "seat_travel": "stool_seat_travel",
+        "base_diameter": "stool_base_diameter"
+      },
+      "xyz": [
+        2300,
+        6650,
+        0
+      ],
+      "yaw_deg": 0,
+      "state": "closed",
+      "frames": {
+        "Seat": "L01.Stool2.Seat"
+      }
+    },
+    {
+      "id": "Stool3",
+      "type": "lab_stool",
+      "component": "PerimeterBenches",
+      "bindings": {
+        "seat_width": 400,
+        "seat_depth": 420,
+        "seat_min": "stool_seat_min",
+        "seat_travel": "stool_seat_travel",
+        "base_diameter": "stool_base_diameter"
+      },
+      "xyz": [
+        5000,
+        6600,
+        0
+      ],
+      "yaw_deg": 0,
+      "state": "closed",
+      "frames": {
+        "Seat": "L01.Stool3.Seat"
+      }
     }
   ],
   "island_shelf": {
@@ -685,7 +912,8 @@
     "upper_cupboards": {
       "recipe": "two_closed_modules",
       "open_back_below": true,
-      "load_rating_kg": null
+      "load_rating_kg": null,
+      "construction": "Open through shelving with no fronts and one internal shelf; historical instance IDs retained"
     }
   },
   "limitations": [
@@ -694,7 +922,6 @@
     "Faceted quadratic facade is an adjustable approximation of the oval exterior",
     "Support and heating-cover dimensions/positions are illustrative; no concrete structure, heating performance, airflow, load capacity or object-retention qualification",
     "Heating covers are closed visual envelopes with no modeled grille slots or small-object retention test",
-    "Storage blocks are closed envelopes; doors, hinges, internal shelves, contents and opening sweeps are omitted",
     "Upper cupboards are modeled on sidewalls and above the central shelf; actual door access and any additional tiers are unknown",
     "No ceiling is modeled; translucent walls and all colours are inspection presentation, not measured material specifications",
     "Aisle and head-setback numbers are geometric observations, not qualified human/robot access, egress or accessibility",
@@ -702,6 +929,9 @@
     "No arms, instruments, humans or vehicles are placed; reach, traffic and collision checks against them remain open",
     "Native parameter edits do not return to the shared source; regenerate and revalidate to preserve the leading source",
     "Central shelf and uprights are abstract envelopes; load rating, fixings, rigidity, item retention, reach and head clearance are unverified",
-    "Reach-through band is checked with geometric line probes between uprights, not a human reach, hand-size or ergonomic qualification; cupboard and leg fixings/load capacity remain unverified"
+    "Reach-through band is checked with geometric line probes between uprights, not a human reach, hand-size or ergonomic qualification; cupboard and leg fixings/load capacity remain unverified",
+    "Lower cupboards have two internal shelves and hinged fronts; leaf count changes require regeneration. Open fronts occupy aisle space and require a clear workstation.",
+    "Three mobile stools are parked below the open window benches. Castor rolling, stability and seating ergonomics are not simulated.",
+    "Wet bench includes basin, tap, paper-towel dispenser, drip tray and wall drying pegs. Water, waste and ventilation installations remain unknown."
   ]
 }

@@ -105,6 +105,32 @@ def input_for(entry):
             if not visible or not visible<=set(all_names):raise ValueError('Missing gallery projection bodies')
             commands=[{'command':'browser.visibility','params':{'items':[n for n in all_names if n not in visible],'visible':False}}]
             evidence['visible_bodies']=sorted(visible)
+            if render.get('pose'):
+                values=room.pose(spec,p,render['pose'])
+                commands += [{'command':'joint.drive','params':{'joint':name,'value':value,'quiet':True}}
+                             for name,value in values.items() if name.startswith(prefix+'_')]
+                commands.append({'command':'joint.solve','params':{}})
+                evidence['furniture_pose']=render['pose']
+                # Fit the opened fronts from measured native bounds and the
+                # shared joint transform, looking at the actual access side.
+                from tube_cam_model import pose_change_point
+                source=room.expanded(spec,p);bodies={b['id']:b for b in source['bodies']};points=[]
+                initial=room.pose(spec,p)
+                for body in read(project(case['files']['sc_measurements']))['bodies']:
+                    if body['name'] not in visible:continue
+                    lo,hi=body['bbox']['min'],body['bbox']['max']
+                    for x in (lo[0],hi[0]):
+                        for y in (lo[1],hi[1]):
+                            for z in (lo[2],hi[2]):
+                                points.append(pose_change_point(source,bodies[body['name']]['component'],[x,y,z],p,initial,values))
+                lo=[min(v[k] for v in points) for k in range(3)];hi=[max(v[k] for v in points) for k in range(3)]
+                yaw=1.15 if instance.get('front')=='negative_x' else -1.15
+                pitch,fov=.55,.6;dx,dy,dz=[b-a for a,b in zip(lo,hi)]
+                width=abs(math.cos(yaw))*dx+abs(math.sin(yaw))*dy
+                depth=abs(math.sin(yaw))*dx+abs(math.cos(yaw))*dy
+                span=max(width/(1000/700),dz*math.cos(pitch)+depth*math.sin(pitch))
+                evidence['camera']={'target':[(a+b)/2 for a,b in zip(lo,hi)],'yaw':yaw,'pitch':pitch,
+                    'distance':span*1.12/(2*math.tan(fov/2))+depth/2,'fov':fov}
         return model,commands,None,evidence
     if kind=='robot':
         path=ROOT/'exports/generated/build-report.json';report=read(path)
@@ -155,9 +181,9 @@ def input_for(entry):
         bodies=read(project(case['files']['solidcraft_measurements']))['bodies']
         lo=[min(body['bbox']['min'][i] for body in bodies) for i in range(3)]
         hi=[max(body['bbox']['max'][i] for body in bodies) for i in range(3)]
-        width,depth,height=[b-a for a,b in zip(lo,hi)];pitch,fov=.13,.6
+        width,depth,height=[b-a for a,b in zip(lo,hi)];pitch,fov=(.6 if render.get('view')=='iso' else .13),.6
         distance=max(width/(1000/700),height*math.cos(pitch)+depth*math.sin(pitch))
-        evidence['camera']={'target':[(a+b)/2 for a,b in zip(lo,hi)],'yaw':0.,'pitch':pitch,
+        evidence['camera']={'target':[(a+b)/2 for a,b in zip(lo,hi)],'yaw':-.5 if render.get('view')=='iso' else 0.,'pitch':pitch,
                             'distance':distance*1.15/(2*math.tan(fov/2))+depth/2,'fov':fov}
         return model,commands,None,evidence
     if kind=='native':
@@ -277,9 +303,11 @@ def diagram(entry):
         for op in operations:
             if op['body'] in worktops:content+=polygon(points(op['shape']),'#d5e0e5')
         palette={'arm':'#2d6e94','centrifuge':'#ba873a','transporter':'#4c876b','tube_rack':'#826ba0','tip_collector':'#b86b50',
-                 'analytical_balance':'#3d7d8b','fridge_4c':'#508d9e','freezer_minus20':'#4876a1'}
+                 'analytical_balance':'#3d7d8b','fridge_4c':'#508d9e','freezer_minus20':'#4876a1',
+                 'water_bath_13l':'#3d9cab','fume_hood_1200':'#637f99'}
         labels={'arm':'Laborarm','centrifuge':'Zentrifuge','transporter':'Transporter','tube_rack':'Rack','tip_collector':'Spitzenabwurf',
-                'analytical_balance':'Analysenwaage','fridge_4c':'Kühlschrank +4 °C','freezer_minus20':'Gefrierschrank −20 °C'}
+                'analytical_balance':'Analysenwaage','fridge_4c':'Kühlschrank +4 °C','freezer_minus20':'Gefrierschrank −20 °C',
+                'water_bath_13l':'Wasserbad 13 l','fume_hood_1200':'Abzug 1200 mm'}
         legend_step=min(53,600/len(layout_spec['instances']))
         for i,item in enumerate(layout_spec['instances'],1):
             x,y,z=layout.xyz(item['xyz'],lp);sx,sy=point(x,y);color=palette[item['asset']]
@@ -309,10 +337,12 @@ def render_entry(entry,cli):
             shutil.copyfile(image,target);record.update(reused_render=rel(image),reused_render_sha256=sha(image))
         else:
             script=WORK/(entry['id']+'.commands.json');script.write_text(json.dumps({'commands':commands},indent=2)+'\n')
+            pixels=entry['render'].get('pixels',[1000,700])
+            if len(pixels)!=2 or any(type(v) is not int or not 150<=v<=2400 for v in pixels):raise ValueError('Invalid gallery pixel dimensions')
             args=[cli,'snapshot']
             if commands:args.append(str(script))
             if model:args.extend(['--in',str(model)])
-            args.extend(['--out',str(target),'--width','1000','--height','700'])
+            args.extend(['--out',str(target),'--width',str(pixels[0]),'--height',str(pixels[1])])
             args.extend(['--camera',json.dumps(evidence['camera'])] if 'camera' in evidence else ['--view','iso'])
             args.extend(['--no-grid','--no-axes'])
             run=subprocess.run(args,check=True,cwd=ROOT,capture_output=True,text=True)
@@ -349,12 +379,13 @@ def reusable(entry,record):
     path=DIRECTORY/entry['image']
     if record.get('image')!=entry['image'] or not path.exists() or sha(path)!=record['image_sha256']:return False
     if record['source_files_sha256']!={s:sha(ROOT/s) for s in entry['sources']}:return False
+    if 'pixels' in entry['render'] and list(struct.unpack('>II',path.read_bytes()[16:24]))!=entry['render']['pixels']:return False
     if entry['render']['kind']=='diagram':
         content,_=diagram(entry)
         return hashlib.sha256(content.encode()).hexdigest()==record['image_sha256']
     model,commands,image,evidence=input_for(entry)
     if model and (rel(model)!=record.get('native_model') or sha(model)!=record.get('native_model_sha256')):return False
-    if entry['render']['kind']=='library-case' and evidence.get('camera')!=record.get('camera'):return False
+    if entry['render']['kind'] in ('library-case','room','lab-layout') and evidence.get('camera')!=record.get('camera'):return False
     if image:return sha(image)==record.get('reused_render_sha256')
     return commands==record.get('commands')
 

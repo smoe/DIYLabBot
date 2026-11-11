@@ -193,7 +193,7 @@ class EquipmentNativeEvidenceTests(unittest.TestCase):
         for source,checksum in report['source_files_sha256'].items():
             self.assertEqual(model.digest(ROOT/source),checksum,source)
         cases = {c['id']:c for c in report['cases']}
-        self.assertEqual(len(cases),7)
+        self.assertEqual(len(cases),9)
         self.assertIn('storage_overview',cases)
         self.assertIn('freezer_minus20_wide',cases)
         self.assertIn('analytical_balance_raised',cases)

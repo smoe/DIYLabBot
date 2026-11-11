@@ -1,4 +1,4 @@
-# Analysenwaage und Kaltlagerung
+# Laborgeräte: Waage, Kaltlagerung, Wasserbad und Abzug
 
 Die Gerätebibliothek enthält eine generische Analysenwaage mit Windschutz,
 einen Laborkühlschrank mit direkt zugänglichen Ebenen, einen generischen
@@ -6,6 +6,11 @@ einen Laborkühlschrank mit direkt zugänglichen Ebenen, einen generischen
 Keller-Tiefkühllager nach dem CryoCube F440n. Türen, Windschutz und Schubladen
 besitzen native Gelenke. Die Bibliothek ergänzt Gerätetypen; die Aufstellungen
 in L01 und auf den Referenzbänken bleiben davon unabhängig.
+
+Hinzu kommen ein 13-l-Wasserbad mit aufklappbarem Deckel und ein 1.200-mm-Abzug
+mit senkrecht verschiebbarer Frontscheibe. Sein Unterbau verwendet das gemeinsame
+Stauraumbankrezept aus dem Möbelkatalog, einschließlich Türen und zwei Einlegeböden.
+Die Möbelreferenz ist in der Gerätequelle mit einer Prüfsumme gebunden.
 
 Die [L01-Aufstellung](lab-layout-l01.md) referenziert inzwischen Waage,
 Kühlschrank und −20-°C-Schrank. Die dortige Gefrierschrankinstanz verwendet
@@ -29,6 +34,23 @@ zum Vergleich verwendet.
 | `fridge_4c` | +4 °C als Planungswert, vier Einlegeböden plus Bodenebene | 597 × 654 × 1684 mm |
 | `freezer_minus20` | −20 °C als Planungswert, sechs hohle Kunststoffschubladen | 600 × 650 × 1700 mm, generische Maße |
 | `cellar_ult_f440n` | manuelles Kellerlager, fünf Fächer mit getrennten Innentüren | 955 × 898 × 1950 mm als Gesamthülle |
+| `water_bath_13l` | hohle Edelstahlwanne, beweglicher Deckel | 372 × 307 × 350 mm als Referenzhülle |
+| `fume_hood_1200` | Arbeitskammer, vertikaler Frontschieber und Stauraumunterbau | 1200 × 800 × 2550 mm als Referenzhülle |
+
+Das [Steinberg SBS-TWB-300](https://www.expondo.de/steinberg-wasserbad-labor-5-bis-99-0c-13-l-led-10031400)
+ist mit 13 l, 5–99 °C, außen 307 × 372 × 350 mm (L × B × H) und einer Wanne von
+300 × 240 × 200 mm beschrieben. Im Modell wird die breitere Achse als X geführt.
+Die rechnerischen 14,4 l des rechteckigen Innenraums ersetzen die nominelle
+Füllmenge nicht. Scharnier und Innenaufbau sind vereinfacht; Flüssigkeit,
+Heizung und tatsächliche Temperatur werden nicht simuliert.
+
+Der [Lorderan 1200E](https://www.lorderan.com/en-eu/products/4ft-fume-hood-touch-screen)
+liefert die Referenzmaße außen 1200 × 800 × 2550 mm, innen 990 × 605 × 900 mm,
+915 mm Arbeitshöhe und 500 mm maximale Frontöffnung. Gehäuseteilung, Unterbau
+und Schieberführung bleiben schematisch. Ein oberer Abluftstutzen kennzeichnet
+die Schnittstelle; er ist nicht angeschlossen. Luftführung, Erfassung und
+Schutzwirkung sind nicht ausgelegt oder geprüft. Das Display zeigt keinen
+erfundenen Betriebswert.
 
 Die [verlinkte Waagenkategorie](https://www.sigmaaldrich.com/DE/de/products/labware/laboratory-equipment/laboratory-balances)
 wählt keinen konkreten Artikel aus. Das Modell folgt der gewünschten Bauform
@@ -80,6 +102,8 @@ frames = equipment.interfaces(spec, p, values)
 `access` öffnet die Außentür und eine mittlere Innentür beziehungsweise
 Schublade. Beim Kühlschrank ist damit das gesamte Regal offen; bei der
 Waage sind beide Seitenpaneele verschoben und das Oberteil aufgeklappt.
+Beim Wasserbad ist der Deckel aufgestellt. Beim Abzug öffnet `access` den
+Frontschieber; erst `all_open` öffnet zusätzlich die Türen des Unterbaus.
 Individuelle Stellungen werden als vollständige Abbildung von Gelenk-ID
 auf Grad beziehungsweise Millimeter an `validate_pose` übergeben.
 Innentüren und Schubladen dürfen in diesem Vertrag erst bewegt werden,
@@ -107,7 +131,7 @@ python3 scripts/build_lab_equipment.py --backend solidcraft
 python3 -m unittest discover -s tests -p 'test_lab_equipment.py' -v
 ```
 
-Der vollständige Aufbau erzeugt vier Geräte, zwei Maßvarianten und eine
+Der vollständige Aufbau erzeugt sechs Geräte, zwei Maßvarianten und eine
 abgeleitete gemeinsame Ansicht der drei Schränke. Jeder Schrank dieser Ansicht
 entsteht aus dem Geräteprofil in seiner Zugangsstellung; das Bild ist keine
 vermessene Kelleraufstellung und keine neue Raumquelle.

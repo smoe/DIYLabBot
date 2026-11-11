@@ -15,16 +15,16 @@ class LabRoomTests(unittest.TestCase):
         self.assertLess(self.p['right_depth'],self.p['left_depth'])
         self.assertEqual(model.rear_y(self.p,0.5),(self.p['left_depth']+self.p['right_depth'])/2+self.p['facade_bulge'])
 
-    def test_two_doors_six_bench_sections_and_shallow_closed_storage(self):
+    def test_two_doors_worktops_hollow_lower_storage_and_open_upper_storage(self):
         source=model.expanded(self.spec,self.p); roles=[b['role'] for b in source['bodies']]
-        self.assertEqual(roles.count('work_surface'),6)
-        self.assertEqual(roles.count('closed_lower_storage'),4)
-        self.assertEqual(roles.count('shallow_upper_storage'),2)
+        self.assertEqual(roles.count('work_surface'),7)
+        self.assertEqual(roles.count('hollow_lower_storage'),5)
+        self.assertEqual(roles.count('open_upper_storage'),4)
         self.assertEqual(roles.count('vertical_concrete_support'),1)
         self.assertEqual(roles.count('heating_cover_envelope'),3)
         self.assertEqual(roles.count('shared_central_shelf'),1)
         self.assertEqual(roles.count('central_shelf_upright_envelope'),3)
-        self.assertEqual(roles.count('central_upper_cupboard'),2)
+        self.assertEqual(roles.count('internal_shelf'),10)
         self.assertEqual(roles.count('central_cupboard_upright_envelope'),3)
         self.assertEqual(roles.count('window_bench_leg_envelope'),4)
         self.assertEqual(len([f for f in source['frames'] if f['id'].startswith('L01.Door')]),2)

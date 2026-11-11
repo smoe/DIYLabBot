@@ -11,35 +11,56 @@
         "width": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "length": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "height": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "top_t": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "plinth_h": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
+            30000
+          ]
+        },
+        "panel_t": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "door_gap": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "leaf_width": {
+          "unit": "mm",
+          "range": [
+            1,
             30000
           ]
         }
@@ -160,31 +181,38 @@
       "color": "#727d84"
     },
     "cupboard": {
-      "recipe": "box_envelope",
+      "recipe": "open_shelving",
       "parameters": {
         "width": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "length": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
             30000
           ]
         },
         "height": {
           "unit": "mm",
           "range": [
-            0.001,
+            1,
+            30000
+          ]
+        },
+        "panel_t": {
+          "unit": "mm",
+          "range": [
+            1,
             30000
           ]
         }
       },
-      "role": "central_upper_cupboard",
+      "role": "open_upper_storage",
       "color": "#e3e0d8"
     },
     "side_gap_cover": {
@@ -339,9 +367,140 @@
       ],
       "role": "heating_cover_envelope",
       "color": "#a7adb0"
+    },
+    "wet_bench": {
+      "recipe": "wet_bench",
+      "parameters": {
+        "width": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "length": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "height": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "top_t": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "plinth_h": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "panel_t": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "door_gap": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "leaf_width": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "basin_width": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "basin_length": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "basin_depth": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "rack_height": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        }
+      }
+    },
+    "lab_stool": {
+      "recipe": "lab_stool",
+      "parameters": {
+        "seat_width": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "seat_depth": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "seat_min": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "seat_travel": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        },
+        "base_diameter": {
+          "unit": "mm",
+          "range": [
+            1,
+            30000
+          ]
+        }
+      },
+      "reference": "https://www.inwerk-bueromoebel.de/alle-bueromoebel/buerostuehle/arbeitsplatz/arbeitsstuehle/662/laborhocker-bimos-labsit",
+      "reference_scope": "Labsit planning envelope: 400 x 420 mm seat, height 450–650 mm, base diameter 640 mm. Castors, foot geometry, foam and gas lift are simplified; no manufacturer CAD or mechanical qualification."
     }
   },
   "limitations": [
-    "Concept envelopes only; no selected furniture articles, loads or fixings qualified"
+    "Parameterized concept furniture, hollow storage and sampled kinematics; actual articles, loads, fittings and utilities remain unqualified."
   ]
 }
