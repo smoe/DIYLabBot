@@ -297,6 +297,38 @@ class SonicationEvidenceTests(unittest.TestCase):
             self.assertIn(text_piece, text)
         self.assertNotIn('SiLA-Loopback ausgeführt', text)
 
+    def test_scene_cannot_hide_contradictory_size_after_canonical_json_sorting(self):
+        value = evidence.derive(self.export());scene = value['scenes'][-1]
+        records = scene['intent']['size_records']
+        contradictory = copy.deepcopy(records['Fixture.Size'])
+        contradictory['observation'].update(size_id='Fixture.ContradictorySize',
+            minimum_bp=12000, maximum_bp=15000, artifact_sha256='a' * 64)
+        contradictory['fixture_range_conformant'] = False
+        records['Fixture.ContradictorySize'] = contradictory
+        canonical = json.loads(encoded(scene))
+        self.assertEqual(list(canonical['intent']['size_records']),
+            ['Fixture.ContradictorySize', 'Fixture.Size'])
+        rendered = []
+        for candidate in (scene, canonical):
+            text = renderer.scene_text(candidate, value['claims']);rendered.append(text)
+            for piece in ('Fixture.ContradictorySize', 'Fixture.Size', '12000', '15000', '150', '450',
+                          'a' * 24, self.journal.original_sha[:24], 'passend=False',
+                          'GRÖSSENPRÜFUNG: WIDERSPRUCH; S09-Abschluss gesperrt.'):
+                self.assertIn(piece, text)
+        self.assertEqual(rendered[0], rendered[1])
+
+    def test_multiple_compatible_sizes_are_all_visible_without_false_conflict(self):
+        value = evidence.derive(self.export());scene = value['scenes'][-1]
+        records = scene['intent']['size_records']
+        repeated = copy.deepcopy(records['Fixture.Size'])
+        repeated['observation'].update(size_id='Fixture.RepeatedSize', minimum_bp=175, maximum_bp=475)
+        records['Fixture.RepeatedSize'] = repeated
+        text = renderer.scene_text(scene, value['claims'])
+        for piece in ('Fixture.RepeatedSize', 'Fixture.Size', '175', '475', '150', '450',
+                      'GRÖSSENPRÜFUNG: alle erfassten Fixture-Bereiche passend; weitere S09-Gates separat.'):
+            self.assertIn(piece, text)
+        self.assertNotIn('WIDERSPRUCH', text)
+
     def test_process_receipt_cannot_invent_a_restart_for_normal_trace(self):
         process = {'worker_exit_code': -9, 'signal': 'SIGKILL',
                    'intent_persisted_before_kill': True, 'effect_replayed': False}

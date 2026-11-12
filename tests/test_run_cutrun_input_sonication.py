@@ -56,6 +56,76 @@ class SonicationCliTests(unittest.TestCase):
         self.assertFalse((ROOT/'docs'/'sonication-cli-invalid.json').exists())
         self.assertFalse(self.store.exists())
 
+    def evidence_parent_fixture(self):
+        base = ROOT / 'exports' / 'sonication-evidence'
+        base.mkdir(exist_ok=True)
+        temporary = tempfile.TemporaryDirectory(prefix='cli-parent-check-', dir=base)
+        self.addCleanup(temporary.cleanup)
+        blocker = Path(temporary.name) / 'existing-file'
+        blocker.write_bytes(b'Preserve this evidence-path blocker\n')
+        return blocker
+
+    def test_blocked_evidence_ancestors_are_rejected_before_creating_store_or_fixtures(self):
+        blocker = self.evidence_parent_fixture()
+        before = blocker.read_bytes()
+        for suffix in (Path('new-bundle'), Path('missing/deeper/new-bundle')):
+            with self.subTest(suffix=suffix):
+                fixtures = self.directory / 'not-created'
+                code, error = self.cli('demo', '--directory', fixtures,
+                                       '--evidence-directory', blocker / suffix)
+                self.assertEqual(code, 1)
+                self.assertEqual(error['error'], 'Output parent must be a directory: ' + str(blocker))
+                self.assertFalse(self.store.exists())
+                self.assertFalse(fixtures.exists())
+                self.assertEqual(blocker.read_bytes(), before)
+
+    def test_blocked_evidence_ancestors_preserve_existing_journal_and_owners(self):
+        identity = 'Fixture.CLI.Existing'
+        code, ready = self.cli('fixture-intent', '--directory', self.directory / 'seed',
+                               '--run-id', identity)
+        self.assertEqual(code, 0, ready)
+        with Journal(self.store) as journal:
+            history = journal.history(identity)
+            owners = journal.owners()
+            state = journal.state(identity)
+            dump = tuple(journal.connection.iterdump())
+            self.assertTrue(history)
+            self.assertTrue(owners)
+        database_bytes = self.store.read_bytes()
+        blocker = self.evidence_parent_fixture()
+        before = blocker.read_bytes()
+        for suffix in (Path('new-bundle'), Path('missing/deeper/new-bundle')):
+            with self.subTest(suffix=suffix):
+                fixtures = self.directory / 'not-created'
+                code, error = self.cli('demo', '--directory', fixtures,
+                                       '--evidence-directory', blocker / suffix)
+                self.assertEqual(code, 1)
+                self.assertEqual(error['error'], 'Output parent must be a directory: ' + str(blocker))
+                self.assertEqual(self.store.read_bytes(), database_bytes)
+                self.assertFalse(fixtures.exists())
+                self.assertEqual(blocker.read_bytes(), before)
+                with Journal(self.store) as journal:
+                    self.assertEqual(journal.history(identity), history)
+                    self.assertEqual(journal.owners(), owners)
+                    self.assertEqual(journal.state(identity), state)
+                    self.assertEqual(tuple(journal.connection.iterdump()), dump)
+
+    def test_blocked_fixture_ancestors_are_rejected_before_creating_store(self):
+        blocker = self.directory / 'existing-file'
+        blocker.write_bytes(b'Preserve this fixture-path blocker\n')
+        before = blocker.read_bytes()
+        for command in ('demo', 'fixture-intent'):
+            for suffix in (Path('new-fixtures'), Path('missing/deeper/new-fixtures')):
+                with self.subTest(command=command, suffix=suffix):
+                    arguments = [command, '--directory', blocker / suffix]
+                    if command == 'fixture-intent':
+                        arguments.extend(['--run-id', 'Fixture.CLI.BlockedParent'])
+                    code, error = self.cli(*arguments)
+                    self.assertEqual(code, 1)
+                    self.assertEqual(error['error'], 'Output parent must be a directory: ' + str(blocker))
+                    self.assertFalse(self.store.exists())
+                    self.assertEqual(blocker.read_bytes(), before)
+
     def test_sigkill_after_intent_never_replays_and_cli_resume_fences_old_session(self):
         identity = 'Fixture.CLI.Restart'
         process = subprocess.Popen([*self.command,'fixture-intent','--directory',str(self.directory/'child'),

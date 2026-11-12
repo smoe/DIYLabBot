@@ -36,6 +36,8 @@ Testuhr-Snapshot. `resume` und `act` verlangen eine explizite Testuhrdatei;
 `fixture-intent --wait` ist der lokale Kindprozess-Einstieg für den
 Abbruchnachweis. Er bedient kein Gerät. Die CLI-Hilfe beschreibt die Argumente.
 Ausgaben bleiben unter `exports/`; vorhandene Ausgabedateien werden erhalten.
+Nicht als Verzeichnis nutzbare Vorfahren der Demo-Ausgabepfade werden vor dem
+Öffnen des Stores und vor jeder Szenarioausführung abgewiesen.
 
 ## Quellen und die ausdrückliche Fixture-Grenze
 
@@ -132,6 +134,10 @@ CUT&RUN- oder biochemischer Erfolgsnachweis.
 Hashkette, Definition und Originalartefakte. Quellen- und Implementierungsbytes,
 Arbeitsstand, Testlogs und Szenen werden im neuen Bundle archiviert.
 `render_sonication_evidence.py` erzeugt daraus beschriftete PNG/MP4.
+Bei mehreren Größenbefunden zeigt die Karte jeden Befund mit Kennung,
+Bereich und Originalbeleg. Ein unpassender Befund bleibt unabhängig von der
+JSON-Schlüsselreihenfolge als Widerspruch mit gesperrtem S09-Abschluss sichtbar;
+passende Größenbefunde ersetzen die übrigen S09-Gates nicht.
 Root-Prozesszeit/-Intervall, gemessene lokale Fixture-Laufzeit und geraffte
 Videozeit erscheinen getrennt. Die Laufzeitmarken werden **nach** den jeweiligen
 Ereignissen erfasst; Kindprozessereignisse kann der überlebende Treiber gemeinsam

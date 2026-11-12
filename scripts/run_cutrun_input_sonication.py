@@ -37,12 +37,17 @@ def write_new(path, value):
         stream.write('\n')
 
 
+def check_output_parents(path):
+    for parent in path.parents:
+        if parent.exists() and not parent.is_dir():
+            raise TaskError('Output parent must be a directory: ' + str(parent))
+
+
 def check_new_json(value):
     path = private_path(value)
     if path.suffix != '.json' or path.exists():
         raise TaskError('Choose a new JSON output inside exports/; existing files are preserved')
-    if any(parent.exists() and not parent.is_dir() for parent in path.parents):
-        raise TaskError('JSON output parents must be directories')
+    check_output_parents(path)
     return path
 
 
@@ -89,6 +94,7 @@ def main(argv=None):
                 if (evidence.exists() or evidence == (ROOT/'exports/sonication-evidence').resolve()
                         or not evidence.is_relative_to((ROOT/'exports/sonication-evidence').resolve())):
                     raise TaskError('Choose a new evidence bundle under exports/sonication-evidence/')
+                check_output_parents(evidence)
             if len({path.name for path in args.test_log}) != len(args.test_log) or any(not path.is_file() for path in args.test_log):
                 raise TaskError('Test logs must be existing files with unique names')
         store = resolve_store(args.store)
@@ -96,6 +102,7 @@ def main(argv=None):
         if args.command in ('demo','fixture-intent'):
             directory = private_path(args.directory)
             if directory.exists():raise TaskError('Choose a new fixture directory; existing fixtures are never reset')
+            check_output_parents(directory)
         with Journal(store) as journal:
             if args.command == 'demo':
                 scenarios = run_scenarios(journal, directory, store)

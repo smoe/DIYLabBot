@@ -97,13 +97,21 @@ def scene_text(scene, claims):
     else:
         lines += ['TEMPERATUR: noch kein beobachtetes Intervall.']
     if sizes:
-        value = sizes[-1]
-        observation = value['observation']
-        dimensions = {name: item for name, item in observation.items()
-                      if 'bp' in name and type(item) in (int, float)}
-        lines += ['GRÖSSENBEFUND (Fixture, bp): ' + _compact(dimensions),
-                  'Originalbeleg: ' + str(observation['artifact_sha256'])[:24]
-                  + '…; Fixture-Bereich passend=' + str(value['fixture_range_conformant']) + '.']
+        # Keep archived single-record cards byte-compatible. Multiple findings
+        # must remain visible regardless of canonical JSON key ordering.
+        if len(sizes) > 1:
+            lines += [('GRÖSSENPRÜFUNG: alle erfassten Fixture-Bereiche passend; weitere S09-Gates separat.'
+                       if all(value['fixture_range_conformant'] is True for value in sizes)
+                       else 'GRÖSSENPRÜFUNG: WIDERSPRUCH; S09-Abschluss gesperrt.')]
+        for value in sorted(sizes, key=lambda item: item['observation']['size_id']):
+            observation = value['observation']
+            dimensions = {name: item for name, item in observation.items()
+                          if 'bp' in name and type(item) in (int, float)}
+            label = ('GRÖSSENBEFUND (Fixture, bp): ' if len(sizes) == 1 else
+                     'GRÖSSENBEFUND ' + observation['size_id'] + ' (Fixture, bp): ')
+            lines += [label + _compact(dimensions),
+                      'Originalbeleg: ' + str(observation['artifact_sha256'])[:24]
+                      + '…; Fixture-Bereich passend=' + str(value['fixture_range_conformant']) + '.']
     else:
         lines += ['GRÖSSENBEFUND: noch keiner; Konzentration ersetzt keine Fragmentgröße.']
     lines += ['', 'PROZESSZEIT (synthetischer Root): ' + str(process['minimum']) + '..' + str(process['maximum']) + ' s',
