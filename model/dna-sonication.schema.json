@@ -1,0 +1,534 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schemas/dna-sonication.schema.json",
+  "title": "Effect-free CUT&RUN input sonication protocol and profile",
+  "$defs": {
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "enum": [
+            "unknown",
+            "synthetic_assumption"
+          ]
+        },
+        "source_refs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "basis",
+        "source_refs",
+        "note"
+      ]
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "oneOf": [
+            {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          ]
+        },
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "const": "manufacturer_reported"
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "basis",
+        "source_ref"
+      ]
+    },
+    "parameter_spec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "number",
+            "integer",
+            "text",
+            "identifier"
+          ]
+        },
+        "minimum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "maximum": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "unit",
+        "kind",
+        "minimum",
+        "maximum"
+      ]
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.dna-sonication-profile/1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]*$"
+        },
+        "mode": {
+          "const": "preparation_only"
+        },
+        "synthetic": {
+          "const": true
+        },
+        "protocol": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "source",
+            "source_sha256"
+          ]
+        },
+        "preparation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "source",
+            "source_sha256"
+          ]
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cycles": {
+              "$ref": "#/$defs/fact"
+            },
+            "pulse_on_s": {
+              "$ref": "#/$defs/fact"
+            },
+            "between_pulses_s": {
+              "$ref": "#/$defs/fact"
+            },
+            "amplitude_percent": {
+              "$ref": "#/$defs/fact"
+            },
+            "device_instance_id": {
+              "$ref": "#/$defs/fact"
+            },
+            "firmware_revision": {
+              "$ref": "#/$defs/fact"
+            },
+            "vessel_article": {
+              "$ref": "#/$defs/fact"
+            },
+            "nominal_vessel_volume_ml": {
+              "$ref": "#/$defs/fact"
+            },
+            "fill_volume_ul": {
+              "$ref": "#/$defs/fact"
+            },
+            "closed_vessel_fit_evidence_ref": {
+              "$ref": "#/$defs/fact"
+            },
+            "cooling_method": {
+              "$ref": "#/$defs/fact"
+            },
+            "amplitude_evidence_ref": {
+              "$ref": "#/$defs/fact"
+            },
+            "temperature_reference_vessel_id": {
+              "$ref": "#/$defs/fact"
+            },
+            "temperature_mapping_evidence_ref": {
+              "$ref": "#/$defs/fact"
+            },
+            "temperature_limit_deg_c": {
+              "$ref": "#/$defs/fact"
+            },
+            "empirical_protocol_evidence_ref": {
+              "$ref": "#/$defs/fact"
+            },
+            "input_size_evidence_ref": {
+              "$ref": "#/$defs/fact"
+            }
+          },
+          "required": [
+            "cycles",
+            "pulse_on_s",
+            "between_pulses_s",
+            "amplitude_percent",
+            "device_instance_id",
+            "firmware_revision",
+            "vessel_article",
+            "nominal_vessel_volume_ml",
+            "fill_volume_ul",
+            "closed_vessel_fit_evidence_ref",
+            "cooling_method",
+            "amplitude_evidence_ref",
+            "temperature_reference_vessel_id",
+            "temperature_mapping_evidence_ref",
+            "temperature_limit_deg_c",
+            "empirical_protocol_evidence_ref",
+            "input_size_evidence_ref"
+          ]
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "synthetic",
+        "protocol",
+        "preparation",
+        "parameters"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.dna-sonication-protocol/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "const": "preparation_only"
+        },
+        "references": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "url": {
+                "type": "string",
+                "pattern": "^https://"
+              },
+              "accessed_on": {
+                "type": "string",
+                "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+              },
+              "scope": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "url",
+              "accessed_on",
+              "scope"
+            ]
+          }
+        },
+        "binding": {
+          "const": {
+            "workflow": "input",
+            "operation": "sonicate_input",
+            "size_check_operation": "check_input_size",
+            "manual_stage": "S09",
+            "manual_decision": "O04"
+          }
+        },
+        "device_candidate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manufacturer": {
+              "type": "string",
+              "minLength": 1
+            },
+            "processor": {
+              "type": "string",
+              "minLength": 1
+            },
+            "accessory": {
+              "type": "string",
+              "minLength": 1
+            },
+            "selected": {
+              "const": false
+            },
+            "hardware_available": {
+              "const": false
+            },
+            "coupling": {
+              "const": "indirect_closed_vessel"
+            },
+            "manufacturer_claims": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "nominal_power": {
+                  "$ref": "#/$defs/claim"
+                },
+                "frequency": {
+                  "$ref": "#/$defs/claim"
+                },
+                "maximum_vials": {
+                  "$ref": "#/$defs/claim"
+                },
+                "nominal_vessel_volumes": {
+                  "$ref": "#/$defs/claim"
+                }
+              },
+              "required": [
+                "nominal_power",
+                "frequency",
+                "maximum_vials",
+                "nominal_vessel_volumes"
+              ]
+            }
+          },
+          "required": [
+            "id",
+            "manufacturer",
+            "processor",
+            "accessory",
+            "selected",
+            "hardware_available",
+            "coupling",
+            "manufacturer_claims"
+          ]
+        },
+        "parameter_contract": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "cycles": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "pulse_on_s": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "between_pulses_s": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "amplitude_percent": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "device_instance_id": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "firmware_revision": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "vessel_article": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "nominal_vessel_volume_ml": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "fill_volume_ul": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "closed_vessel_fit_evidence_ref": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "cooling_method": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "amplitude_evidence_ref": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "temperature_reference_vessel_id": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "temperature_mapping_evidence_ref": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "temperature_limit_deg_c": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "empirical_protocol_evidence_ref": {
+              "$ref": "#/$defs/parameter_spec"
+            },
+            "input_size_evidence_ref": {
+              "$ref": "#/$defs/parameter_spec"
+            }
+          },
+          "required": [
+            "cycles",
+            "pulse_on_s",
+            "between_pulses_s",
+            "amplitude_percent",
+            "device_instance_id",
+            "firmware_revision",
+            "vessel_article",
+            "nominal_vessel_volume_ml",
+            "fill_volume_ul",
+            "closed_vessel_fit_evidence_ref",
+            "cooling_method",
+            "amplitude_evidence_ref",
+            "temperature_reference_vessel_id",
+            "temperature_mapping_evidence_ref",
+            "temperature_limit_deg_c",
+            "empirical_protocol_evidence_ref",
+            "input_size_evidence_ref"
+          ]
+        },
+        "pulse_timing": {
+          "const": {
+            "pause_policy": "between_pulses_only",
+            "duration_basis": "logical_plan_seconds",
+            "device_duty_cycle_mapping": "unbound"
+          }
+        },
+        "fragment_size": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "comparison_target": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "minimum": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0
+                },
+                "maximum": {
+                  "type": "integer",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "bp"
+                },
+                "basis": {
+                  "const": "manufacturer_comparison"
+                },
+                "source_ref": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "minimum",
+                "maximum",
+                "unit",
+                "basis",
+                "source_ref"
+              ]
+            },
+            "column_limit": {
+              "const": "derive_from_pinned_cutrun_protocol"
+            },
+            "concentration_devices_are_size_evidence": {
+              "const": false
+            }
+          },
+          "required": [
+            "comparison_target",
+            "column_limit",
+            "concentration_devices_are_size_evidence"
+          ]
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "references",
+        "binding",
+        "device_candidate",
+        "parameter_contract",
+        "pulse_timing",
+        "fragment_size",
+        "limitations"
+      ]
+    }
+  ]
+}

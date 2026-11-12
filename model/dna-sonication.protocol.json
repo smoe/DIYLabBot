@@ -1,0 +1,223 @@
+{
+  "format": "solidcraftbot.dna-sonication-protocol/1",
+  "id": "DNA.Sonication.Input.V1",
+  "mode": "preparation_only",
+  "references": {
+    "hielscher_dna": {
+      "url": "https://www.hielscher.com/de/ultrasonic-dna-fragmentation-for-next-gen-sequencing.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "DNA fragmentation application; not a CUT&RUN recipe"
+    },
+    "hielscher_vialtweeter": {
+      "url": "https://www.hielscher.com/de/up200st-with-vialtweeter-for-simultaneous-sample-preparation.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "Candidate indirect sonication, up to ten vessels"
+    },
+    "hielscher_factsheet": {
+      "url": "https://www.hielscher.com/wp-content/uploads/FactSheet-VialTweeter-HielscherUltrasonics_eng-13022024.pdf",
+      "accessed_on": "2026-11-12",
+      "scope": "Dated filename 13-02-2024; nominal vessel sizes, power and frequency"
+    },
+    "hielscher_up200st": {
+      "url": "https://www.hielscher.com/de/up200st-powerful-ultrasonic-lab-homogenizer.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "Nominal processor specifications; not sample energy"
+    },
+    "hielscher_temperature": {
+      "url": "https://www.hielscher.com/sample-preparation-with-the-ultrasonic-vialtweeter.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "Reference-tube temperature sensing and automatic pause/resume manufacturer claims"
+    },
+    "hielscher_xml": {
+      "url": "https://www.hielscher.com/xml-excel-vba.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "Read-only /mdata.xml example; model/firmware-dependent field ordering, not a command contract"
+    },
+    "hielscher_automation": {
+      "url": "https://www.hielscher.com/uip400mtp-automation.htm",
+      "accessed_on": "2026-11-12",
+      "scope": "UIP400MTP browser/API information; not an UP200St command binding"
+    },
+    "cst_comparison": {
+      "url": "https://www.cellsignal.com/learn-and-support/protocols/cut-and-run-protocol",
+      "accessed_on": "2026-11-12",
+      "scope": "Current CST VI/Appendix B comparison; input optimization, not historical SOP or local acceptance"
+    }
+  },
+  "binding": {
+    "workflow": "input",
+    "operation": "sonicate_input",
+    "size_check_operation": "check_input_size",
+    "manual_stage": "S09",
+    "manual_decision": "O04"
+  },
+  "device_candidate": {
+    "id": "hielscher_up200st_vialtweeter",
+    "manufacturer": "Hielscher",
+    "processor": "UP200St",
+    "accessory": "VialTweeter",
+    "selected": false,
+    "hardware_available": false,
+    "coupling": "indirect_closed_vessel",
+    "manufacturer_claims": {
+      "nominal_power": {
+        "value": 200,
+        "unit": "W",
+        "basis": "manufacturer_reported",
+        "source_ref": "hielscher_up200st"
+      },
+      "frequency": {
+        "value": 26000,
+        "unit": "Hz",
+        "basis": "manufacturer_reported",
+        "source_ref": "hielscher_up200st"
+      },
+      "maximum_vials": {
+        "value": 10,
+        "unit": "count",
+        "basis": "manufacturer_reported",
+        "source_ref": "hielscher_vialtweeter"
+      },
+      "nominal_vessel_volumes": {
+        "value": [
+          0.5,
+          1,
+          1.5,
+          2
+        ],
+        "unit": "mL",
+        "basis": "manufacturer_reported",
+        "source_ref": "hielscher_factsheet"
+      }
+    }
+  },
+  "parameter_contract": {
+    "cycles": {
+      "unit": "count",
+      "kind": "integer",
+      "minimum": 1,
+      "maximum": null
+    },
+    "pulse_on_s": {
+      "unit": "s",
+      "kind": "number",
+      "minimum": 0,
+      "maximum": null
+    },
+    "between_pulses_s": {
+      "unit": "s",
+      "kind": "number",
+      "minimum": 0,
+      "maximum": null
+    },
+    "amplitude_percent": {
+      "unit": "percent",
+      "kind": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "device_instance_id": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "firmware_revision": {
+      "unit": "text",
+      "kind": "text",
+      "minimum": null,
+      "maximum": null
+    },
+    "vessel_article": {
+      "unit": "text",
+      "kind": "text",
+      "minimum": null,
+      "maximum": null
+    },
+    "nominal_vessel_volume_ml": {
+      "unit": "mL",
+      "kind": "number",
+      "minimum": 0,
+      "maximum": null
+    },
+    "fill_volume_ul": {
+      "unit": "uL",
+      "kind": "number",
+      "minimum": 0,
+      "maximum": null
+    },
+    "closed_vessel_fit_evidence_ref": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "cooling_method": {
+      "unit": "text",
+      "kind": "text",
+      "minimum": null,
+      "maximum": null
+    },
+    "amplitude_evidence_ref": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "temperature_reference_vessel_id": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "temperature_mapping_evidence_ref": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "temperature_limit_deg_c": {
+      "unit": "degC",
+      "kind": "number",
+      "minimum": null,
+      "maximum": null
+    },
+    "empirical_protocol_evidence_ref": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    },
+    "input_size_evidence_ref": {
+      "unit": "text",
+      "kind": "identifier",
+      "minimum": null,
+      "maximum": null
+    }
+  },
+  "pulse_timing": {
+    "pause_policy": "between_pulses_only",
+    "duration_basis": "logical_plan_seconds",
+    "device_duty_cycle_mapping": "unbound"
+  },
+  "fragment_size": {
+    "comparison_target": {
+      "minimum": 100,
+      "maximum": 600,
+      "unit": "bp",
+      "basis": "manufacturer_comparison",
+      "source_ref": "cst_comparison"
+    },
+    "column_limit": "derive_from_pinned_cutrun_protocol",
+    "concentration_devices_are_size_evidence": false
+  },
+  "limitations": [
+    "Only the separately identified CUT&RUN input is linked; enriched H3K4me3/IgG DNA is never routed to sonication.",
+    "Manufacturer claims are candidate metadata, not local selection, uniform delivered energy or qualification.",
+    "A temperature sensor in a reference vessel is not a measurement of every closed sample vessel.",
+    "Automatic temperature pause/resume is manufacturer-reported; measured elapsed time can exceed the nominal pulse plan.",
+    "No network, ROS, SiLA, robot, sonicator or material effect is performed.",
+    "A future effect must use the existing root journal and material ledger; no replay, release or success is implied by this preflight.",
+    "Generic Hielscher telemetry and browser/API descriptions exist; model/firmware-specific start/stop acknowledgements and adapters remain unbound."
+  ]
+}

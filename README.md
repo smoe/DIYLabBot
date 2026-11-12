@@ -290,6 +290,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Gemeinsamer synthetischer Ablauf CF01 → NanoDrop → Qubit 4](docs/synthetic-lab-workflow.md) mit einem Probenbestand und durchgängiger Verbrauchsbuchung
 - [DNA nacheinander mit NanoDrop und Qubit HS messen](docs/dna-quantification.md): synthetische Ablaufvorbereitung mit Vor- oder nachträglicher Verdünnung um Faktor 10/20 und Rückgabe ins ursprüngliche Rack auf dem Tisch
 - [DNA über SiLA 2 und vorbereitete ROS-Aufträge](docs/dna-sila2-network.md): eigener Root-Netzwerkadapter und lokaler Mock-Worker; kein ROS-Laufzeit- oder Bewegungsnachweis
+- [DNA-Sonikation für die CUT&RUN-Input-Kontrolle](docs/dna-sonication.md): Hielscher-Gerätereferenz und wirkungsfreier Prüfplan für den separaten Input-Zweig; Pulsprogramm und Geräteanbindung bleiben zu qualifizieren
 
 ## Repository beziehen
 
