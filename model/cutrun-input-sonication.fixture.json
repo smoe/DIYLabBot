@@ -1,0 +1,44 @@
+{
+  "format": "solidcraftbot.cutrun-input-sonication-fixture/1",
+  "id": "Fixture.CUTRUN.InputSonication.V1",
+  "mode": "test_fixture_only",
+  "note": "All identities, quantities, observations and prospective decisions below are fictitious software-test data. They are not a laboratory recipe, manufacturer recommendation or qualification.",
+  "actor_id": "Fixture.Operator",
+  "utc_start": "2026-11-12T12:00:00Z",
+  "initial_cells": 10000,
+  "issued_reagent_ul": 500,
+  "input_lysate_ul": 300,
+  "qc_withdrawal_ul": 5,
+  "sonication": {
+    "cycles": 3,
+    "pulse_on_s": 7,
+    "between_pulses_s": 2,
+    "amplitude_percent": 30,
+    "nominal_vessel_volume_ml": 1.5,
+    "temperature_limit_deg_c": 8
+  },
+  "phase": {
+    "duration_min_s": 25,
+    "duration_max_s": 40,
+    "temperature_min_deg_c": 3,
+    "temperature_max_deg_c": 5,
+    "observed_temperature_deg_c": 4
+  },
+  "size": {"minimum_bp": 150, "maximum_bp": 450},
+  "manual_parameters": {
+    "task_deadline_s": 100000,
+    "activation_volume_ul": 150,
+    "stop_volume_ul": 150,
+    "activation_duration_s": 1800,
+    "stop_window_s": 120,
+    "temperature_tolerance_deg_c": 1,
+    "activation_temperature_deg_c": 4,
+    "phase_tolerance_s": 60,
+    "input_cells": 10000
+  },
+  "scenarios": {
+    "normal": {"run_id": "Fixture.Sonication.Normal", "prefix": "Fixture.Normal", "clock_id": "Fixture.Clock.Normal"},
+    "restart": {"run_id": "Fixture.Sonication.Restart", "prefix": "Fixture.Restart", "clock_id": "Fixture.Clock.Restart"},
+    "cancel": {"run_id": "Fixture.Sonication.Cancel", "prefix": "Fixture.Cancel", "clock_id": "Fixture.Clock.Cancel"}
+  }
+}

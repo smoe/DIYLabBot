@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schemas/cutrun-input-sonication.schema.json",
+  "title": "Test-only optional CUT&RUN input sonication composition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "enabled",
+    "bindings",
+    "sources",
+    "scope"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-input-sonication-profile/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "mode": {
+      "const": "test_fixture_only"
+    },
+    "enabled": {
+      "type": "boolean"
+    },
+    "bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "input_reaction_id",
+        "vessel_class",
+        "sonicator_place_id"
+      ],
+      "properties": {
+        "input_reaction_id": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "vessel_class": {
+          "const": "tube_1_5ml"
+        },
+        "sonicator_place_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "scope": {
+      "const": {
+        "stage_id": "S09",
+        "phase_id": "S09.input_preparation",
+        "decision_id": "O04",
+        "role": "input"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manual_profile",
+        "sop_profile",
+        "sop_protocol",
+        "sonication_profile"
+      ],
+      "properties": {
+        "manual_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "const": "model/cutrun-manual-runtime.profile.json"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "sop_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "const": "model/cutrun-manual-sop.profile.json"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "sop_protocol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "const": "model/cutrun-manual-sop.protocol.json"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "sonication_profile": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "const": "model/dna-sonication.profile.json"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        }
+      }
+    }
+  }
+}
