@@ -293,6 +293,8 @@
         "scripts/dna_sila2_server.py",
         "scripts/dna_sila2_runtime.py",
         "scripts/run_dna_sila2.py",
+        "scripts/cf01_sila2_auth.py",
+        "scripts/cf01_sila2_client.py",
         "scripts/dna_quantification_tasks.py",
         "scripts/build_dna_ros_interfaces.py",
         "scripts/dna_quantification_execution.py",

@@ -40,8 +40,11 @@ class DNAContractTests(unittest.TestCase):
             self.assertEqual(data['source_files_sha256'][ref['source']], ref['source_sha256'])
         for filename in ['scripts/dna_sila2_runtime.py', 'scripts/dna_sila2_server.py',
                          'scripts/dna_quantification.py', 'scripts/manual_tasks.py',
-                         'scripts/dna_quantification_tasks.py', 'scripts/dna_quantification_execution.py']:
-            self.assertEqual(data['source_files_sha256'][filename], contract.digest(ROOT / filename))
+                         'scripts/dna_quantification_tasks.py', 'scripts/dna_quantification_execution.py',
+                         'scripts/cf01_sila2_auth.py', 'scripts/cf01_sila2_client.py']:
+            with self.subTest(source=filename):
+                self.assertIn(filename, data['source_files_sha256'])
+                self.assertEqual(data['source_files_sha256'][filename], contract.digest(ROOT / filename))
 
     def test_source_pin_drift_is_rejected_without_rewriting_historical_sources(self):
         data = json.loads(contract.SOURCE.read_text(encoding='utf-8'))

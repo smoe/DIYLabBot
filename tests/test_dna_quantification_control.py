@@ -2,10 +2,12 @@
 import copy
 import json
 from pathlib import Path
+import re
 import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
@@ -159,6 +161,65 @@ class DNAControlTests(unittest.TestCase):
         self.assertEqual(self.state()['status'], 'created')
         self.run_pair()
         self.assertTrue(self.runtime.report(self.run_id)['passed'])
+
+    def test_reused_network_helper_drift_blocks_resume_without_persistent_effects(self):
+        def snapshot(runtime):
+            with Journal(runtime.journal_path) as journal:
+                return {'state_and_revision': journal.get_current(self.run_id, verify=True),
+                    'events': journal.connection.execute(
+                        'SELECT sequence, document, sha256 FROM events WHERE run_id=? ORDER BY sequence',
+                        (self.run_id,)).fetchall(),
+                    'owners': journal.owners()}
+
+        original_read_bytes = Path.read_bytes
+        for helper in ['scripts/cf01_sila2_auth.py', 'scripts/cf01_sila2_client.py']:
+            with self.subTest(helper=helper):
+                runtime = DNARuntime(self.directory / Path(helper).stem)
+                try:
+                    runtime.command('CreateRun', {'request_identifier': 'create',
+                        'run_identifier': self.run_id}, principal='network.operator')
+                    runtime.command('RunUntilDecision', {'request_identifier': 'run',
+                        'run_identifier': self.run_id, 'initial_dilution': 'none', 'after_range': '',
+                        'nanodrop_concentration': 50., 'qubit_concentration': 500.,
+                        'qubit_report_original': False}, principal='network.operator')
+                    old_boot = runtime.boot_id
+                    runtime.close()
+                    runtime = DNARuntime(runtime.directory)
+                    self.assertNotEqual(runtime.boot_id, old_boot)
+                    before = snapshot(runtime)
+                    self.assertTrue(before['owners'])
+                    self.assertTrue(before['state_and_revision'][0]['resources'])
+                    helper_path = (ROOT / helper).resolve()
+                    helper_bytes = original_read_bytes(helper_path)
+                    drift_reads = []
+
+                    def read_with_helper_drift(path):
+                        if path.resolve() == helper_path:
+                            drift_reads.append(path)
+                            return helper_bytes + b'\n'
+                        return original_read_bytes(path)
+
+                    with self.subTest(check='ResumeRun rejects changed helper'):
+                        with patch.object(Path, 'read_bytes', read_with_helper_drift):
+                            with self.assertRaisesRegex(TaskError,
+                                    re.escape('Changed network/task source: ' + helper)):
+                                runtime.command('ResumeRun', {'request_identifier': 'resume-drift',
+                                    'run_identifier': self.run_id, 'resume': True},
+                                    principal='network.operator')
+                    after = snapshot(runtime)
+                    with self.subTest(check='state and revision unchanged'):
+                        self.assertTrue(after['state_and_revision'] == before['state_and_revision'],
+                                        'Rejected helper drift changed root state or revision')
+                    with self.subTest(check='raw journal unchanged'):
+                        self.assertTrue(after['events'] == before['events'],
+                                        'Rejected helper drift appended or rewrote journal events')
+                    with self.subTest(check='resource reservations unchanged'):
+                        self.assertEqual(after['owners'], before['owners'])
+                    with self.subTest(check='real source check read the selected helper'):
+                        self.assertTrue(drift_reads, 'ResumeRun did not check the selected helper bytes')
+                    self.assertEqual(original_read_bytes(helper_path), helper_bytes)
+                finally:
+                    runtime.close()
 
     def test_cancellation_intent_never_releases_reserved_lab_resources(self):
         self.create(); self.run_pair(qubit_concentration=500)
