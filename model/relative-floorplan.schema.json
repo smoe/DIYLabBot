@@ -1,0 +1,251 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "relative-floorplan.schema.json",
+  "title": "Shared relative boundaries, area topology and openings; no metric calibration or original-image references",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "calibration",
+    "vertices",
+    "walls",
+    "areas",
+    "openings",
+    "provenance"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.relative-floorplan/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "units": {
+      "const": {
+        "length": "relative"
+      }
+    },
+    "calibration": {
+      "type": "null"
+    },
+    "vertices": {
+      "type": "object",
+      "minProperties": 3,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 2,
+        "maxItems": 2
+      }
+    },
+    "walls": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/wall"
+      }
+    },
+    "areas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/area"
+      }
+    },
+    "openings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/opening"
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "method",
+        "source_kind",
+        "accuracy",
+        "notes"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "const": "manual_trace"
+        },
+        "source_kind": {
+          "enum": [
+            "photograph_of_plan",
+            "synthetic_fixture"
+          ]
+        },
+        "accuracy": {
+          "const": "approximate"
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "wall": {
+      "type": "object",
+      "required": [
+        "id",
+        "start",
+        "end",
+        "kind"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "start": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "kind": {
+          "enum": [
+            "wall",
+            "open_boundary",
+            "unknown"
+          ]
+        }
+      }
+    },
+    "area": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "kind",
+        "boundary",
+        "confidence"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "label": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "kind": {
+          "enum": [
+            "room",
+            "corridor",
+            "stairwell",
+            "void",
+            "unknown"
+          ]
+        },
+        "boundary": {
+          "type": "array",
+          "minItems": 3,
+          "items": {
+            "type": "object",
+            "required": [
+              "wall",
+              "direction"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "wall": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "direction": {
+                "type": "integer",
+                "enum": [
+                  -1,
+                  1
+                ]
+              }
+            }
+          }
+        },
+        "confidence": {
+          "enum": [
+            "clear",
+            "approximate",
+            "uncertain"
+          ]
+        }
+      }
+    },
+    "opening": {
+      "type": "object",
+      "required": [
+        "id",
+        "wall",
+        "interval",
+        "kind",
+        "confidence",
+        "connection"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "wall": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+        },
+        "interval": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "kind": {
+          "enum": [
+            "door",
+            "window",
+            "unknown"
+          ]
+        },
+        "confidence": {
+          "enum": [
+            "clear",
+            "approximate",
+            "uncertain"
+          ]
+        },
+        "connection": {
+          "enum": [
+            "observed",
+            "uncertain"
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
-  "prepared_on": "2026-11-11",
-  "catalog_sha256": "fe43f6492931e87cc2f17d335514ca941f8226da19a31ab8004295976c04258b",
+  "prepared_on": "2026-11-12",
+  "catalog_sha256": "20bb2a1fe0d569e48d4bf6a49f303ff35855dbf275c8a9f7b70072f798b46c94",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "56bbb1e747637d91606a983e47798411dcd9fb35b0047b9d830fcafb65ca623c",
+  "render_generator_sha256": "f902697a5fb9c77ae5bafd4b8c2fe1fc73b16e9d8a8fcc54a2b6e350ed83975e",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -4420,13 +4420,107 @@
         "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3",
         "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
       }
+    },
+    {
+      "id": "floor-f03",
+      "image": "images/floor-f03.svg",
+      "source_files_sha256": {
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+      },
+      "representation": "Authorized manually derived relative vector plan; original photograph excluded, no metric or access qualification",
+      "producer_files_sha256": {
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf"
+      },
+      "metric_scale_known": false,
+      "original_image_embedded": false,
+      "areas": 34,
+      "shared_boundaries": 121,
+      "opening_candidates": 34,
+      "image_sha256": "b0da3e2c53c6f289f11d30e0526c2180ba04f4467c5001e1dc365129467d16ed",
+      "bytes": 31430,
+      "dependency_files_sha256": {
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+      },
+      "visual_review": {
+        "passed": true,
+        "reviewed_on": "2026-11-12",
+        "scope": "All 34 source-derived area labels visible, corridor label clear of niches, uncertain boundaries/openings marked, no raster/background/external image embedded. Not a metric survey or access qualification."
+      }
+    },
+    {
+      "id": "building-stack",
+      "image": "images/building-stack.svg",
+      "source_files_sha256": {
+        "model/building-stack.shared.json": "aecf951be6695cce3fb1e32210d6d981f78eeadd3de7ec772ad4cf9c98a9e074"
+      },
+      "representation": "Source-derived four-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
+      "producer_files_sha256": {
+        "scripts/render_building_stack_section.py": "10853a94cec1a2ebbcaf043d58a2d781bd903034fe4aed4b52be35267dee1945",
+        "model/building-stack.schema.json": "6a58d4d65d180671c760bbd695860c067213233def1a13c0f69c857efafe020f",
+        "scripts/building_stack.py": "91f2e6e603768444ec9c9f8bfcdeddc84e65aaff7419d3f79b42c24ef9d1c530",
+        "scripts/building_circulation.py": "8b11e1f44f18336feb7c9a1d467546486252a29215d3d3232bde1975d5a4bfae",
+        "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711"
+      },
+      "metric_scale_known": false,
+      "original_image_embedded": false,
+      "transport_implemented": false,
+      "hardware_executed": false,
+      "image_sha256": "b84ce670d2577d2a126bc0cf8f467011fe49e84d66203f584c0dfb3b2e36bf8a",
+      "bytes": 10666,
+      "dependency_files_sha256": {
+        "model/building-stack.shared.json": "aecf951be6695cce3fb1e32210d6d981f78eeadd3de7ec772ad4cf9c98a9e074",
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+        "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+      }
+    },
+    {
+      "id": "ground-floor-eg",
+      "image": "images/ground-floor-eg.svg",
+      "source_files_sha256": {
+        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+      },
+      "representation": "Authorized manually derived EG vectors anchored to shared core references; uncalibrated, original photograph excluded",
+      "producer_files_sha256": {
+        "scripts/render_ground_floor.py": "0c781224fd8c76370204012724dd3a4e97c79d3d458147bf889fc72c68934edf",
+        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69"
+      },
+      "metric_scale_known": false,
+      "original_image_embedded": false,
+      "areas": 35,
+      "image_sha256": "4e5456d0d14433899fab20f35bd8d8d9f7f5bb0343fcd931029b73e0d187210e",
+      "bytes": 9020,
+      "dependency_files_sha256": {
+        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+      }
     }
   ],
   "visual_review": {
     "passed": true,
-    "reviewed_on": "2026-11-11",
-    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review.",
-    "k01_reviewed": true
+    "reviewed_on": "2026-11-12",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the source-derived F03 and EG vectors and the four-storey building views with one internal right staircase, independent lift, separate external metal staircase, and X-axis glass roof over Atrium and all four corridors; original photographs are excluded and metric, operational and safety qualification remain open.",
+    "k01_reviewed": true,
+    "floor_f03_reviewed": true,
+    "building_stack_reviewed": true,
+    "ground_floor_eg_reviewed": true
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

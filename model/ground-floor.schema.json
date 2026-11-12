@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ground-floor.schema.json",
+  "title": "Already registered relative ground-floor trace with pinned F03 vertex references",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "calibration",
+    "vertices",
+    "walls",
+    "areas",
+    "openings",
+    "provenance",
+    "reference_floorplan",
+    "registration"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.registered-relative-floorplan/1"
+    },
+    "id": {
+      "$ref": "relative-floorplan.schema.json#/properties/id"
+    },
+    "units": {
+      "$ref": "relative-floorplan.schema.json#/properties/units"
+    },
+    "calibration": {
+      "$ref": "relative-floorplan.schema.json#/properties/calibration"
+    },
+    "vertices": {
+      "type": "object",
+      "minProperties": 3,
+      "propertyNames": {
+        "$ref": "relative-floorplan.schema.json#/properties/vertices/propertyNames"
+      },
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number"
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "reference_vertex"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "reference_vertex": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "walls": {
+      "type": "array",
+      "items": {
+        "$ref": "relative-floorplan.schema.json#/$defs/wall"
+      }
+    },
+    "areas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "relative-floorplan.schema.json#/$defs/area"
+      }
+    },
+    "openings": {
+      "type": "array",
+      "items": {
+        "$ref": "relative-floorplan.schema.json#/$defs/opening"
+      }
+    },
+    "provenance": {
+      "$ref": "relative-floorplan.schema.json#/properties/provenance"
+    },
+    "reference_floorplan": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ],
+          "propertyNames": {
+            "enum": [
+              "source",
+              "source_sha256"
+            ]
+          }
+        }
+      ]
+    },
+    "registration": {
+      "type": "object",
+      "required": [
+        "orientation_deg",
+        "applied_to_literals",
+        "basis",
+        "metric_scale_known",
+        "quality"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "orientation_deg": {
+          "const": 180
+        },
+        "applied_to_literals": {
+          "const": true
+        },
+        "basis": {
+          "const": "shared_vertical_cores"
+        },
+        "metric_scale_known": {
+          "const": false
+        },
+        "quality": {
+          "const": "concept_alignment"
+        }
+      }
+    }
+  }
+}

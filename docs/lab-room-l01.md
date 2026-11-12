@@ -3,7 +3,10 @@
 Prepared on 28 October 2026 from the owner's description of a room analogous to
 the institute environment in Rostock. This is an editable spatial sketch with
 provisional dimensions. It is not a measured room or a reconstruction of the
-institute's building. The floor-plan photograph is still pending.
+institute's building. A privately supplied floor-plan photograph is now used
+for the [separate relative F03 model](floorplan-f03.md). The owner identifies
+L01 with room 3.003. The existing L01 sources remain unchanged; no metric
+registration has been established.
 
 Updated on 29 October 2026: the window-side bench is split by a vertical concrete
 support close to the windows. The owner reports approximately 300 mm width and
@@ -67,8 +70,9 @@ all fronts together is not a demonstrated pose.
 The build entry remains `python scripts/build_lab_room.py`. Run
 `python scripts/validate_assembly_schemas.py` with the optional `jsonschema`
 development dependency to validate the source contracts. Furniture placement is
-currently translation plus yaw; general device attachments and multi-room or
-corridor topology remain future work.
+currently translation plus yaw. General device attachments and metric building
+registration remain future work; F03 adds a separate relative multi-room and
+corridor adjacency description.
 
 The native five-case build was also executed with the installed macOS runtimes
 (FreeCAD 27.1 and SolidCraft 0.40.0-rc.2):

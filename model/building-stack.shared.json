@@ -1,0 +1,274 @@
+{
+  "format": "solidcraftbot.building-stack/1",
+  "id": "BuildingStackConcept",
+  "sources": {
+    "floorplan": {
+      "source": "model/floor-f03.shared.json",
+      "source_sha256": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+    },
+    "room_geometry": {
+      "source": "model/environments/l01.geometry.json",
+      "source_sha256": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608"
+    },
+    "ground_floor": {
+      "source": "model/ground-floor-eg.shared.json",
+      "source_sha256": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+    }
+  },
+  "calibration": null,
+  "parameters": {
+    "clear_height_mm": {
+      "expression": 4000,
+      "unit": "mm",
+      "range": [
+        3500,
+        4500
+      ],
+      "basis": "owner_assumption",
+      "description": "Assumed clear height, not a surveyed building height"
+    },
+    "slab_thickness_mm": {
+      "expression": 250,
+      "unit": "mm",
+      "range": [
+        200,
+        350
+      ],
+      "basis": "presentation_assumption",
+      "description": "Concept slab thickness, not structural design"
+    }
+  },
+  "presentation_reference": {
+    "width_parameter": "room_width",
+    "wall_thickness_parameter": "wall_t",
+    "door_height_parameter": "door_height",
+    "floorplan_area": "R3_003",
+    "extent_axis": "x",
+    "basis": "unmeasured_concept_proportion"
+  },
+  "levels": [
+    {
+      "id": "EG",
+      "label": "EG"
+    },
+    {
+      "id": "OG1",
+      "label": "1. OG"
+    },
+    {
+      "id": "OG2",
+      "label": "2. OG"
+    },
+    {
+      "id": "OG3",
+      "label": "3. OG"
+    }
+  ],
+  "atrium": {
+    "area": "Atrium",
+    "floor_levels": [
+      "EG"
+    ]
+  },
+  "concept_exchange": {
+    "id": "ConceptExchange",
+    "footprint_fraction": 0.25,
+    "color": "#2b9ee8",
+    "opacity": 0.22,
+    "status": "semantic_visualization_only"
+  },
+  "qualification": {
+    "metric_scale_known": false,
+    "surveyed_heights": false,
+    "structural_qualified": false,
+    "transport_implemented": false,
+    "trajectory_implemented": false,
+    "hardware_executed": false,
+    "fire_safety_qualified": false
+  },
+  "limitations": [
+    "EG uses a separately registered owner-labelled trace; OG1–OG3 reuse the canonical relative F03 template.",
+    "EG literals are manually aligned to referenced vertical cores, not photogrammetric or metric registration.",
+    "The XY ratio uses an unmeasured L01 parameter; it is a presentation proportion and does not calibrate F03.",
+    "Clear height is an owner assumption; slab thickness and source-referenced wall/door dimensions are presentation assumptions.",
+    "Actual EG floors cover the upper Atrium projection; no synthetic duplicate ground Atrium slab is added.",
+    "ConceptExchange is a semantic visual marker, not a selected lift, robot, rail, handover fixture or connecting trajectory.",
+    "Basement geometry, loads, stability, retention, access, transport performance and fire protection are not implemented or qualified; roof and stairs are illustrative only.",
+    "Opening displays and constructive wall-junction overlaps retain the relative-floorplan limitations.",
+    "One internal right-hand staircase and a separate external metal fire staircase are shown; the building lift remains independent of both.",
+    "The X-axis glass cap covers Atrium, all source corridors and the explicitly selected inner core; only its perimeter skirt is facetted, with sagitta bounded relative to glass thickness. A local opaque external-stair access deck remains an explicit exception."
+  ],
+  "circulation": {
+    "status": "owner_requested_concept_geometry",
+    "elevator": {
+      "id": "BuildingLift",
+      "area": "LiftCore",
+      "reference_opening": "DLift",
+      "sides": {
+        "outward": {
+          "wall": "W049",
+          "label": "außen / links zum Flur"
+        },
+        "inward": {
+          "wall": "W062",
+          "label": "innen / rechts zum Kernbereich"
+        }
+      },
+      "default_sides": [
+        "outward"
+      ],
+      "stop_overrides": {
+        "EG": [
+          "outward",
+          "inward"
+        ]
+      },
+      "deferred_stops": [
+        {
+          "id": "KG",
+          "label": "KG (geplant)",
+          "elevation_mm": null,
+          "status": "awaiting_plan",
+          "sides": [
+            "inward"
+          ]
+        }
+      ],
+      "cabin_level": "EG",
+      "post_wall_factor": 0.4,
+      "cabin_wall_factor": 0.5,
+      "cabin_clearance_factor": 0.25
+    },
+    "stairs": {
+      "recipe": "illustrative_two_flight_turnback_v1",
+      "risers_per_flight": 12,
+      "landing_fraction": 0.16,
+      "center_gap_fraction": 0.08,
+      "wall_margin_factor": 1.0,
+      "join_slab_fraction": 0.02,
+      "instances": [
+        {
+          "id": "EastStair",
+          "area": "R3_028",
+          "entry_opening": "D3_028"
+        }
+      ]
+    },
+    "qualification": {
+      "surveyed_geometry": false,
+      "lift_operation_implemented": false,
+      "stairs_code_qualified": false,
+      "headroom_qualified": false,
+      "egress_qualified": false,
+      "basement_geometry_implemented": false
+    },
+    "limitations": [
+      "Door-side roles are owner-confirmed; the opposite port is a stack-only concept override, not an observation added to the F03 trace.",
+      "Existing building lift and cabin are distinct from the blue Atrium future-exchange marker.",
+      "Cabin, shaft frame and two-flight stairs are static illustrative geometry, not selected equipment, normative stair design or an operating lift.",
+      "KG has an inward-only policy and unknown elevation; no basement geometry is generated.",
+      "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
+      "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
+      "Lift and the separate right staircase are requested from KG to OG3; KG to EG remains a planned connection with unknown elevations and no basement geometry.",
+      "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG."
+    ],
+    "served_extent": {
+      "from_level": "KG",
+      "to_level": "OG3"
+    },
+    "external_stair": {
+      "id": "ExternalFireStair",
+      "area": "R3_017",
+      "entry_opening": "D3_017",
+      "ground_area": "ExternalStairGround",
+      "ground_exit_neighbor": "R0_022",
+      "recipe": "illustrative_metal_two_flight_v1",
+      "tread_thickness_mm": 30,
+      "stringer_depth_mm": 160,
+      "stringer_width_mm": 40,
+      "landing_thickness_mm": 60,
+      "status": "illustrative_unqualified"
+    }
+  },
+  "roof": {
+    "id": "BuildingRoof",
+    "opaque_area_ids": [
+      "R3_001",
+      "R3_002",
+      "R3_003",
+      "R3_004",
+      "R3_005",
+      "Suite3_006AB",
+      "R3_007",
+      "R3_008A",
+      "R3_008B",
+      "R3_009",
+      "R3_010",
+      "R3_011",
+      "R3_012",
+      "R3_013",
+      "R3_014",
+      "R3_015",
+      "R3_016",
+      "C3_018",
+      "C3_019",
+      "C3_020",
+      "C3_021",
+      "N3_023",
+      "N3_024",
+      "N3_025",
+      "N3_026",
+      "N3_027",
+      "R3_028",
+      "R3_029",
+      "LiftCore",
+      "NorthCore",
+      "CoreGap"
+    ],
+    "atrium_area": "Atrium",
+    "guard_gap_opening": "D3_017",
+    "barrel": {
+      "rise_mm": 1000,
+      "riser_mm": 300,
+      "overhang_mm": 250,
+      "glass_thickness_mm": 20,
+      "color": "#91cfe5",
+      "opacity": 0.35,
+      "axis": "X",
+      "profile_segments": 64,
+      "max_sagitta_fraction_of_glass_thickness": 0.25
+    },
+    "guard": {
+      "height_mm": 1100,
+      "post_width_mm": 40,
+      "rail_width_mm": 35,
+      "max_post_spacing_mm": 2000,
+      "color": "#777f85"
+    },
+    "status": "illustrative_unqualified",
+    "glass_area_ids": [
+      "Atrium",
+      "C3_018",
+      "C3_019",
+      "C3_020",
+      "C3_021",
+      "R3_011",
+      "R3_012",
+      "LiftCore",
+      "NorthCore",
+      "CoreGap",
+      "R3_028",
+      "N3_023",
+      "N3_024",
+      "N3_025",
+      "N3_026",
+      "N3_027"
+    ],
+    "local_opaque_access": {
+      "area": "C3_021",
+      "opening": "D3_017",
+      "depth_parameter": "slab_thickness_mm",
+      "status": "illustrative_unqualified"
+    }
+  }
+}

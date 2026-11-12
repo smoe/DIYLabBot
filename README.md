@@ -21,6 +21,55 @@ des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
 Die Galerie verbindet die vier Ebenen mit den einzelnen Konstruktionen und der
 synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
 
+Die vier Ebenen beschreiben die Gliederung innerhalb eines Labors. **Das
+Gebäude bildet eine weitere Ebene darüber:** Es ordnet Labore, Flure und
+Übergabeorte räumlich ein. Im Zielmodell können dieselben Laborfähigkeiten
+auch über mehrere Labore oder Standorte verteilt sein.
+
+Transportwege und Transportressourcen bleiben austauschbar, solange fachliche
+Randbedingungen, Proben- und Gefäßidentität sowie bestätigte Übergaben erhalten
+bleiben. Ein menschlicher Bote kann Transporte asynchron ausführen. Der
+Gesamtablauf kann vollständig abgeschlossen sein, wenn alle vorgesehenen
+Arbeiten, Transporte und Buchungen quittiert sind; der Transport muss dafür
+nicht vollständig automatisiert sein.
+
+```mermaid
+flowchart LR
+    LA["Labor A · Arbeitsschritt"] -->|"Abholung quittiert"| T["Asynchroner Transportauftrag<br/>Bote oder Roboter"]
+    T -->|"Ankunft quittiert"| LB["Labor B · nächster Arbeitsschritt"]
+```
+
+Dieses Schema beschreibt das Zielmodell. Der vorhandene CF01–NanoDrop–Qubit-Lauf
+prüft Identitäten und Abschluss bislang lokal und synthetisch mit seriellen
+Stufen. Eine allgemeine laborübergreifende Botenkoordination und reale
+Transportadapter sind noch zu integrieren.
+
+### Vier Geschosse und vertikaler Austausch
+
+[![Y/Z-Prinzipprojektion des viergeschossigen Konzepts](docs/models/images/building-stack.svg)](docs/building-stack.md)
+
+Eine eigene EG-Geometrie und drei Instanzen der F03-Vorlage zeigen das Gebäude mit
+angenommenen **4 m lichter Höhe**. Im EG ist der Atriumboden geschlossen; darüber
+bleibt der Luftraum zwischen den Geschossen offen und wird oben vom Glasgewölbe
+geschlossen. Das um 90° gedrehte Glasgewölbe überdeckt auch alle vier
+umlaufenden Flure. Blau markiert die Idee eines automatisierten Austauschs
+zwischen Geschossen. [Native Gesamtansicht](docs/media/building-stack-overview.png),
+[Blick in den Luftraum](docs/media/building-stack-atrium.png) und
+[Antragsbilder mit Annahmen und Prüfgrenzen](docs/building-stack.md).
+Der [alleinstehende Aufzug, das rechte innere Treppenhaus und die äußere Metalltreppe](docs/media/building-stack-circulation.png)
+sind getrennt dargestellt. Aufzug und innere Treppe reichen vom Keller bis ins
+3. OG, die Außentreppe vom Dach bis zum Boden; Kellergeometrie folgt noch.
+Der Aufzug besitzt im EG beide Türseiten, darüber nur die äußere Flurseite.
+[EG mit Seminarraum und verlegten Toiletten](docs/ground-floor-eg.md) ·
+[Gewölbtes Glasdach und Dachumrandung](docs/media/building-stack-roof.png).
+Horizontale Maße und technische Details bleiben vorläufige Darstellungsannahmen.
+
+[![Labor 3.003 im Gebäudekontext](docs/media/building-stack-lab-3-003.png)](docs/building-stack.md)
+
+**Orange: Labor 3.003 im 3. OG**, das räumliche Gegenstück des L01-Modells.
+Die Ansicht hebt den referenzierten Raum im Gesamtgebäude hervor. Die
+maßstäbliche Einpassung der separat beschriebenen L01-Einrichtung bleibt offen.
+
 ## Roboter in Bewegung
 
 https://github.com/user-attachments/assets/919b9436-0b45-4b2e-9ed1-2584da67b06f
@@ -233,6 +282,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
 - [RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md): getrennte Zellpellet-Aliquots, manuelle Qiagen-Spin-Säulen-Kits und prüfbare Material-/Prozesspläne; noch keine Extraktionsausführung
 - [Kitstation K01](docs/extraction-kit-station.md): zwei Kit-Ensembles direkt an der Station, mit parametrischen Behältern, Einsätzen und Griffen an Träger und Deckel; native Ansichten mit ausdrücklich offenen Artikelmaßen und Transportfreigaben
+- [Relative Geschossansicht F03](docs/floorplan-f03.md): gemeinsam beschriebene Raumkonturen, Flure und Türpositionen aus einer manuellen Nachzeichnung; Originalfoto privat, Maßstab unbekannt und L01 unverändert
 - [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
 - [Wiederverwendbares Laborglas](docs/lab-glassware.md): Becher, Trichter, Messzylinder und Flaschen in mehreren Größen, mit größenunabhängigen Verschlüssen und optionaler Markerbeschriftung für FreeCAD und SolidCraft
 - [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft

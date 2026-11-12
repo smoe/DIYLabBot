@@ -1,0 +1,2589 @@
+{
+  "format": "solidcraftbot.relative-floorplan/1",
+  "id": "RelativeFloor_F03",
+  "units": {
+    "length": "relative"
+  },
+  "calibration": null,
+  "vertices": {
+    "V001": [
+      0.002,
+      0.375
+    ],
+    "V002": [
+      0.008,
+      0.326
+    ],
+    "V003": [
+      0.009,
+      0.418
+    ],
+    "V004": [
+      0.026,
+      0.261
+    ],
+    "V005": [
+      0.029,
+      0.512
+    ],
+    "V006": [
+      0.051,
+      0.592
+    ],
+    "V007": [
+      0.053,
+      0.206
+    ],
+    "V008": [
+      0.084,
+      0.155
+    ],
+    "V009": [
+      0.104,
+      0.676
+    ],
+    "V010": [
+      0.128,
+      0.111
+    ],
+    "V011": [
+      0.144,
+      0.512
+    ],
+    "V012": [
+      0.144,
+      0.418
+    ],
+    "V013": [
+      0.144,
+      0.326
+    ],
+    "V014": [
+      0.144,
+      0.274
+    ],
+    "V015": [
+      0.154,
+      0.254
+    ],
+    "V016": [
+      0.154,
+      0.091
+    ],
+    "V017": [
+      0.155,
+      0.739
+    ],
+    "V018": [
+      0.197,
+      0.512
+    ],
+    "V019": [
+      0.197,
+      0.418
+    ],
+    "V020": [
+      0.197,
+      0.326
+    ],
+    "V021": [
+      0.205,
+      0.78
+    ],
+    "V022": [
+      0.205,
+      0.676
+    ],
+    "V023": [
+      0.228,
+      0.254
+    ],
+    "V024": [
+      0.228,
+      0.051
+    ],
+    "V025": [
+      0.255,
+      0.816
+    ],
+    "V026": [
+      0.255,
+      0.676
+    ],
+    "V027": [
+      0.257,
+      0.676
+    ],
+    "V028": [
+      0.257,
+      0.663
+    ],
+    "V029": [
+      0.257,
+      0.592
+    ],
+    "V030": [
+      0.257,
+      0.512
+    ],
+    "V031": [
+      0.257,
+      0.418
+    ],
+    "V032": [
+      0.257,
+      0.326
+    ],
+    "V033": [
+      0.33,
+      0.592
+    ],
+    "V034": [
+      0.33,
+      0.498
+    ],
+    "V035": [
+      0.33,
+      0.472
+    ],
+    "V036": [
+      0.33,
+      0.403
+    ],
+    "V037": [
+      0.33,
+      0.326
+    ],
+    "V038": [
+      0.334,
+      0.856
+    ],
+    "V039": [
+      0.334,
+      0.663
+    ],
+    "V040": [
+      0.34,
+      0.021
+    ],
+    "V041": [
+      0.434,
+      0.592
+    ],
+    "V042": [
+      0.434,
+      0.498
+    ],
+    "V043": [
+      0.434,
+      0.472
+    ],
+    "V044": [
+      0.434,
+      0.403
+    ],
+    "V045": [
+      0.434,
+      0.326
+    ],
+    "V046": [
+      0.448,
+      0.896
+    ],
+    "V047": [
+      0.45,
+      0.254
+    ],
+    "V048": [
+      0.45,
+      0.006
+    ],
+    "V049": [
+      0.526,
+      0.663
+    ],
+    "V050": [
+      0.526,
+      0.638
+    ],
+    "V051": [
+      0.527,
+      0.278
+    ],
+    "V052": [
+      0.527,
+      0.254
+    ],
+    "V053": [
+      0.536,
+      0.592
+    ],
+    "V054": [
+      0.536,
+      0.498
+    ],
+    "V055": [
+      0.552,
+      0.278
+    ],
+    "V056": [
+      0.552,
+      0.254
+    ],
+    "V057": [
+      0.553,
+      0.663
+    ],
+    "V058": [
+      0.553,
+      0.638
+    ],
+    "V059": [
+      0.56,
+      0.254
+    ],
+    "V060": [
+      0.56,
+      0.004
+    ],
+    "V061": [
+      0.562,
+      0.91
+    ],
+    "V062": [
+      0.562,
+      0.663
+    ],
+    "V063": [
+      0.568,
+      0.278
+    ],
+    "V064": [
+      0.568,
+      0.254
+    ],
+    "V065": [
+      0.569,
+      0.663
+    ],
+    "V066": [
+      0.569,
+      0.638
+    ],
+    "V067": [
+      0.592,
+      0.278
+    ],
+    "V068": [
+      0.592,
+      0.254
+    ],
+    "V069": [
+      0.593,
+      0.663
+    ],
+    "V070": [
+      0.593,
+      0.638
+    ],
+    "V071": [
+      0.669,
+      0.014
+    ],
+    "V072": [
+      0.678,
+      0.902
+    ],
+    "V073": [
+      0.702,
+      0.592
+    ],
+    "V074": [
+      0.702,
+      0.498
+    ],
+    "V075": [
+      0.702,
+      0.326
+    ],
+    "V076": [
+      0.749,
+      0.592
+    ],
+    "V077": [
+      0.749,
+      0.326
+    ],
+    "V078": [
+      0.755,
+      0.278
+    ],
+    "V079": [
+      0.755,
+      0.254
+    ],
+    "V080": [
+      0.787,
+      0.039
+    ],
+    "V081": [
+      0.788,
+      0.326
+    ],
+    "V082": [
+      0.788,
+      0.278
+    ],
+    "V083": [
+      0.788,
+      0.254
+    ],
+    "V084": [
+      0.792,
+      0.663
+    ],
+    "V085": [
+      0.792,
+      0.592
+    ],
+    "V086": [
+      0.793,
+      0.872
+    ],
+    "V087": [
+      0.934,
+      0.663
+    ],
+    "V088": [
+      0.934,
+      0.592
+    ]
+  },
+  "walls": [
+    {
+      "id": "W001",
+      "start": "V001",
+      "end": "V002",
+      "kind": "wall"
+    },
+    {
+      "id": "W002",
+      "start": "V001",
+      "end": "V003",
+      "kind": "wall"
+    },
+    {
+      "id": "W003",
+      "start": "V002",
+      "end": "V004",
+      "kind": "wall"
+    },
+    {
+      "id": "W004",
+      "start": "V002",
+      "end": "V013",
+      "kind": "wall"
+    },
+    {
+      "id": "W005",
+      "start": "V003",
+      "end": "V005",
+      "kind": "wall"
+    },
+    {
+      "id": "W006",
+      "start": "V003",
+      "end": "V012",
+      "kind": "wall"
+    },
+    {
+      "id": "W007",
+      "start": "V004",
+      "end": "V007",
+      "kind": "wall"
+    },
+    {
+      "id": "W008",
+      "start": "V005",
+      "end": "V006",
+      "kind": "wall"
+    },
+    {
+      "id": "W009",
+      "start": "V005",
+      "end": "V011",
+      "kind": "wall"
+    },
+    {
+      "id": "W010",
+      "start": "V006",
+      "end": "V009",
+      "kind": "wall"
+    },
+    {
+      "id": "W011",
+      "start": "V006",
+      "end": "V029",
+      "kind": "wall"
+    },
+    {
+      "id": "W012",
+      "start": "V007",
+      "end": "V008",
+      "kind": "wall"
+    },
+    {
+      "id": "W013",
+      "start": "V008",
+      "end": "V010",
+      "kind": "wall"
+    },
+    {
+      "id": "W014",
+      "start": "V009",
+      "end": "V017",
+      "kind": "wall"
+    },
+    {
+      "id": "W015",
+      "start": "V009",
+      "end": "V022",
+      "kind": "wall"
+    },
+    {
+      "id": "W016",
+      "start": "V010",
+      "end": "V016",
+      "kind": "wall"
+    },
+    {
+      "id": "W017",
+      "start": "V011",
+      "end": "V012",
+      "kind": "wall"
+    },
+    {
+      "id": "W018",
+      "start": "V011",
+      "end": "V018",
+      "kind": "wall"
+    },
+    {
+      "id": "W019",
+      "start": "V012",
+      "end": "V019",
+      "kind": "wall"
+    },
+    {
+      "id": "W020",
+      "start": "V013",
+      "end": "V014",
+      "kind": "wall"
+    },
+    {
+      "id": "W021",
+      "start": "V013",
+      "end": "V020",
+      "kind": "wall"
+    },
+    {
+      "id": "W022",
+      "start": "V014",
+      "end": "V015",
+      "kind": "wall"
+    },
+    {
+      "id": "W023",
+      "start": "V015",
+      "end": "V016",
+      "kind": "wall"
+    },
+    {
+      "id": "W024",
+      "start": "V015",
+      "end": "V023",
+      "kind": "wall"
+    },
+    {
+      "id": "W025",
+      "start": "V016",
+      "end": "V024",
+      "kind": "wall"
+    },
+    {
+      "id": "W026",
+      "start": "V017",
+      "end": "V021",
+      "kind": "wall"
+    },
+    {
+      "id": "W027",
+      "start": "V018",
+      "end": "V019",
+      "kind": "wall"
+    },
+    {
+      "id": "W028",
+      "start": "V018",
+      "end": "V030",
+      "kind": "wall"
+    },
+    {
+      "id": "W029",
+      "start": "V019",
+      "end": "V020",
+      "kind": "wall"
+    },
+    {
+      "id": "W030",
+      "start": "V019",
+      "end": "V031",
+      "kind": "wall"
+    },
+    {
+      "id": "W031",
+      "start": "V020",
+      "end": "V032",
+      "kind": "wall"
+    },
+    {
+      "id": "W032",
+      "start": "V021",
+      "end": "V022",
+      "kind": "wall"
+    },
+    {
+      "id": "W033",
+      "start": "V021",
+      "end": "V025",
+      "kind": "wall"
+    },
+    {
+      "id": "W034",
+      "start": "V022",
+      "end": "V026",
+      "kind": "wall"
+    },
+    {
+      "id": "W035",
+      "start": "V023",
+      "end": "V024",
+      "kind": "wall"
+    },
+    {
+      "id": "W036",
+      "start": "V023",
+      "end": "V047",
+      "kind": "wall"
+    },
+    {
+      "id": "W037",
+      "start": "V024",
+      "end": "V040",
+      "kind": "wall"
+    },
+    {
+      "id": "W038",
+      "start": "V025",
+      "end": "V026",
+      "kind": "wall"
+    },
+    {
+      "id": "W039",
+      "start": "V025",
+      "end": "V038",
+      "kind": "wall"
+    },
+    {
+      "id": "W040",
+      "start": "V026",
+      "end": "V027",
+      "kind": "wall"
+    },
+    {
+      "id": "W041",
+      "start": "V027",
+      "end": "V028",
+      "kind": "wall"
+    },
+    {
+      "id": "W042",
+      "start": "V028",
+      "end": "V029",
+      "kind": "wall"
+    },
+    {
+      "id": "W043",
+      "start": "V028",
+      "end": "V039",
+      "kind": "wall"
+    },
+    {
+      "id": "W044",
+      "start": "V029",
+      "end": "V030",
+      "kind": "wall"
+    },
+    {
+      "id": "W045",
+      "start": "V029",
+      "end": "V033",
+      "kind": "open_boundary"
+    },
+    {
+      "id": "W046",
+      "start": "V030",
+      "end": "V031",
+      "kind": "wall"
+    },
+    {
+      "id": "W047",
+      "start": "V031",
+      "end": "V032",
+      "kind": "wall"
+    },
+    {
+      "id": "W048",
+      "start": "V032",
+      "end": "V037",
+      "kind": "open_boundary"
+    },
+    {
+      "id": "W049",
+      "start": "V033",
+      "end": "V034",
+      "kind": "wall"
+    },
+    {
+      "id": "W050",
+      "start": "V033",
+      "end": "V041",
+      "kind": "wall"
+    },
+    {
+      "id": "W051",
+      "start": "V034",
+      "end": "V035",
+      "kind": "unknown"
+    },
+    {
+      "id": "W052",
+      "start": "V034",
+      "end": "V042",
+      "kind": "unknown"
+    },
+    {
+      "id": "W053",
+      "start": "V035",
+      "end": "V036",
+      "kind": "wall"
+    },
+    {
+      "id": "W054",
+      "start": "V035",
+      "end": "V043",
+      "kind": "unknown"
+    },
+    {
+      "id": "W055",
+      "start": "V036",
+      "end": "V037",
+      "kind": "wall"
+    },
+    {
+      "id": "W056",
+      "start": "V036",
+      "end": "V044",
+      "kind": "wall"
+    },
+    {
+      "id": "W057",
+      "start": "V037",
+      "end": "V045",
+      "kind": "wall"
+    },
+    {
+      "id": "W058",
+      "start": "V038",
+      "end": "V039",
+      "kind": "wall"
+    },
+    {
+      "id": "W059",
+      "start": "V038",
+      "end": "V046",
+      "kind": "wall"
+    },
+    {
+      "id": "W060",
+      "start": "V039",
+      "end": "V049",
+      "kind": "wall"
+    },
+    {
+      "id": "W061",
+      "start": "V040",
+      "end": "V048",
+      "kind": "wall"
+    },
+    {
+      "id": "W062",
+      "start": "V041",
+      "end": "V042",
+      "kind": "wall"
+    },
+    {
+      "id": "W063",
+      "start": "V041",
+      "end": "V053",
+      "kind": "unknown"
+    },
+    {
+      "id": "W064",
+      "start": "V042",
+      "end": "V043",
+      "kind": "unknown"
+    },
+    {
+      "id": "W065",
+      "start": "V042",
+      "end": "V054",
+      "kind": "unknown"
+    },
+    {
+      "id": "W066",
+      "start": "V043",
+      "end": "V044",
+      "kind": "wall"
+    },
+    {
+      "id": "W067",
+      "start": "V044",
+      "end": "V045",
+      "kind": "wall"
+    },
+    {
+      "id": "W068",
+      "start": "V045",
+      "end": "V075",
+      "kind": "unknown"
+    },
+    {
+      "id": "W069",
+      "start": "V046",
+      "end": "V061",
+      "kind": "wall"
+    },
+    {
+      "id": "W070",
+      "start": "V047",
+      "end": "V048",
+      "kind": "wall"
+    },
+    {
+      "id": "W071",
+      "start": "V047",
+      "end": "V052",
+      "kind": "wall"
+    },
+    {
+      "id": "W072",
+      "start": "V048",
+      "end": "V060",
+      "kind": "wall"
+    },
+    {
+      "id": "W073",
+      "start": "V049",
+      "end": "V050",
+      "kind": "wall"
+    },
+    {
+      "id": "W074",
+      "start": "V049",
+      "end": "V057",
+      "kind": "wall"
+    },
+    {
+      "id": "W075",
+      "start": "V050",
+      "end": "V058",
+      "kind": "wall"
+    },
+    {
+      "id": "W076",
+      "start": "V051",
+      "end": "V052",
+      "kind": "wall"
+    },
+    {
+      "id": "W077",
+      "start": "V051",
+      "end": "V055",
+      "kind": "wall"
+    },
+    {
+      "id": "W078",
+      "start": "V052",
+      "end": "V056",
+      "kind": "wall"
+    },
+    {
+      "id": "W079",
+      "start": "V053",
+      "end": "V054",
+      "kind": "wall"
+    },
+    {
+      "id": "W080",
+      "start": "V053",
+      "end": "V073",
+      "kind": "wall"
+    },
+    {
+      "id": "W081",
+      "start": "V054",
+      "end": "V074",
+      "kind": "wall"
+    },
+    {
+      "id": "W082",
+      "start": "V055",
+      "end": "V056",
+      "kind": "wall"
+    },
+    {
+      "id": "W083",
+      "start": "V056",
+      "end": "V059",
+      "kind": "wall"
+    },
+    {
+      "id": "W084",
+      "start": "V057",
+      "end": "V058",
+      "kind": "wall"
+    },
+    {
+      "id": "W085",
+      "start": "V057",
+      "end": "V062",
+      "kind": "wall"
+    },
+    {
+      "id": "W086",
+      "start": "V059",
+      "end": "V060",
+      "kind": "wall"
+    },
+    {
+      "id": "W087",
+      "start": "V059",
+      "end": "V064",
+      "kind": "wall"
+    },
+    {
+      "id": "W088",
+      "start": "V060",
+      "end": "V071",
+      "kind": "wall"
+    },
+    {
+      "id": "W089",
+      "start": "V061",
+      "end": "V062",
+      "kind": "wall"
+    },
+    {
+      "id": "W090",
+      "start": "V061",
+      "end": "V072",
+      "kind": "wall"
+    },
+    {
+      "id": "W091",
+      "start": "V062",
+      "end": "V065",
+      "kind": "wall"
+    },
+    {
+      "id": "W092",
+      "start": "V063",
+      "end": "V064",
+      "kind": "wall"
+    },
+    {
+      "id": "W093",
+      "start": "V063",
+      "end": "V067",
+      "kind": "wall"
+    },
+    {
+      "id": "W094",
+      "start": "V064",
+      "end": "V068",
+      "kind": "wall"
+    },
+    {
+      "id": "W095",
+      "start": "V065",
+      "end": "V066",
+      "kind": "wall"
+    },
+    {
+      "id": "W096",
+      "start": "V065",
+      "end": "V069",
+      "kind": "wall"
+    },
+    {
+      "id": "W097",
+      "start": "V066",
+      "end": "V070",
+      "kind": "wall"
+    },
+    {
+      "id": "W098",
+      "start": "V067",
+      "end": "V068",
+      "kind": "wall"
+    },
+    {
+      "id": "W099",
+      "start": "V068",
+      "end": "V079",
+      "kind": "wall"
+    },
+    {
+      "id": "W100",
+      "start": "V069",
+      "end": "V070",
+      "kind": "wall"
+    },
+    {
+      "id": "W101",
+      "start": "V069",
+      "end": "V084",
+      "kind": "wall"
+    },
+    {
+      "id": "W102",
+      "start": "V071",
+      "end": "V080",
+      "kind": "wall"
+    },
+    {
+      "id": "W103",
+      "start": "V072",
+      "end": "V086",
+      "kind": "wall"
+    },
+    {
+      "id": "W104",
+      "start": "V073",
+      "end": "V074",
+      "kind": "wall"
+    },
+    {
+      "id": "W105",
+      "start": "V073",
+      "end": "V076",
+      "kind": "wall"
+    },
+    {
+      "id": "W106",
+      "start": "V074",
+      "end": "V075",
+      "kind": "unknown"
+    },
+    {
+      "id": "W107",
+      "start": "V075",
+      "end": "V077",
+      "kind": "open_boundary"
+    },
+    {
+      "id": "W108",
+      "start": "V076",
+      "end": "V077",
+      "kind": "wall"
+    },
+    {
+      "id": "W109",
+      "start": "V076",
+      "end": "V085",
+      "kind": "wall"
+    },
+    {
+      "id": "W110",
+      "start": "V077",
+      "end": "V081",
+      "kind": "wall"
+    },
+    {
+      "id": "W111",
+      "start": "V078",
+      "end": "V079",
+      "kind": "wall"
+    },
+    {
+      "id": "W112",
+      "start": "V078",
+      "end": "V082",
+      "kind": "wall"
+    },
+    {
+      "id": "W113",
+      "start": "V079",
+      "end": "V083",
+      "kind": "wall"
+    },
+    {
+      "id": "W114",
+      "start": "V080",
+      "end": "V083",
+      "kind": "wall"
+    },
+    {
+      "id": "W115",
+      "start": "V081",
+      "end": "V082",
+      "kind": "wall"
+    },
+    {
+      "id": "W116",
+      "start": "V082",
+      "end": "V083",
+      "kind": "wall"
+    },
+    {
+      "id": "W117",
+      "start": "V084",
+      "end": "V085",
+      "kind": "unknown"
+    },
+    {
+      "id": "W118",
+      "start": "V084",
+      "end": "V086",
+      "kind": "wall"
+    },
+    {
+      "id": "W119",
+      "start": "V084",
+      "end": "V087",
+      "kind": "unknown"
+    },
+    {
+      "id": "W120",
+      "start": "V085",
+      "end": "V088",
+      "kind": "unknown"
+    },
+    {
+      "id": "W121",
+      "start": "V087",
+      "end": "V088",
+      "kind": "unknown"
+    }
+  ],
+  "areas": [
+    {
+      "id": "R3_001",
+      "label": "3.001",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W088",
+          "direction": 1
+        },
+        {
+          "wall": "W102",
+          "direction": 1
+        },
+        {
+          "wall": "W114",
+          "direction": 1
+        },
+        {
+          "wall": "W113",
+          "direction": -1
+        },
+        {
+          "wall": "W099",
+          "direction": -1
+        },
+        {
+          "wall": "W094",
+          "direction": -1
+        },
+        {
+          "wall": "W087",
+          "direction": -1
+        },
+        {
+          "wall": "W086",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_002",
+      "label": "3.002",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W072",
+          "direction": 1
+        },
+        {
+          "wall": "W086",
+          "direction": -1
+        },
+        {
+          "wall": "W083",
+          "direction": -1
+        },
+        {
+          "wall": "W078",
+          "direction": -1
+        },
+        {
+          "wall": "W071",
+          "direction": -1
+        },
+        {
+          "wall": "W070",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_003",
+      "label": "3.003",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W037",
+          "direction": 1
+        },
+        {
+          "wall": "W061",
+          "direction": 1
+        },
+        {
+          "wall": "W070",
+          "direction": -1
+        },
+        {
+          "wall": "W036",
+          "direction": -1
+        },
+        {
+          "wall": "W035",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_004",
+      "label": "3.004",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W025",
+          "direction": 1
+        },
+        {
+          "wall": "W035",
+          "direction": -1
+        },
+        {
+          "wall": "W024",
+          "direction": -1
+        },
+        {
+          "wall": "W023",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_005",
+      "label": "3.005",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W007",
+          "direction": 1
+        },
+        {
+          "wall": "W012",
+          "direction": 1
+        },
+        {
+          "wall": "W013",
+          "direction": 1
+        },
+        {
+          "wall": "W016",
+          "direction": 1
+        },
+        {
+          "wall": "W023",
+          "direction": -1
+        },
+        {
+          "wall": "W022",
+          "direction": -1
+        },
+        {
+          "wall": "W020",
+          "direction": -1
+        },
+        {
+          "wall": "W004",
+          "direction": -1
+        },
+        {
+          "wall": "W003",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "Suite3_006AB",
+      "label": "3.006A/B ?",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W001",
+          "direction": 1
+        },
+        {
+          "wall": "W004",
+          "direction": 1
+        },
+        {
+          "wall": "W021",
+          "direction": 1
+        },
+        {
+          "wall": "W029",
+          "direction": -1
+        },
+        {
+          "wall": "W019",
+          "direction": -1
+        },
+        {
+          "wall": "W006",
+          "direction": -1
+        },
+        {
+          "wall": "W002",
+          "direction": -1
+        }
+      ]
+    },
+    {
+      "id": "R3_007",
+      "label": "3.007",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W031",
+          "direction": 1
+        },
+        {
+          "wall": "W047",
+          "direction": -1
+        },
+        {
+          "wall": "W030",
+          "direction": -1
+        },
+        {
+          "wall": "W029",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_008A",
+      "label": "3.008A",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W030",
+          "direction": 1
+        },
+        {
+          "wall": "W046",
+          "direction": -1
+        },
+        {
+          "wall": "W028",
+          "direction": -1
+        },
+        {
+          "wall": "W027",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_008B",
+      "label": "3.008B",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W019",
+          "direction": 1
+        },
+        {
+          "wall": "W027",
+          "direction": -1
+        },
+        {
+          "wall": "W018",
+          "direction": -1
+        },
+        {
+          "wall": "W017",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_009",
+      "label": "3.009",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W006",
+          "direction": 1
+        },
+        {
+          "wall": "W017",
+          "direction": -1
+        },
+        {
+          "wall": "W009",
+          "direction": -1
+        },
+        {
+          "wall": "W005",
+          "direction": -1
+        }
+      ]
+    },
+    {
+      "id": "R3_010",
+      "label": "3.010",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W009",
+          "direction": 1
+        },
+        {
+          "wall": "W018",
+          "direction": 1
+        },
+        {
+          "wall": "W028",
+          "direction": 1
+        },
+        {
+          "wall": "W044",
+          "direction": -1
+        },
+        {
+          "wall": "W011",
+          "direction": -1
+        },
+        {
+          "wall": "W008",
+          "direction": -1
+        }
+      ]
+    },
+    {
+      "id": "R3_011",
+      "label": "3.011",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W057",
+          "direction": 1
+        },
+        {
+          "wall": "W067",
+          "direction": -1
+        },
+        {
+          "wall": "W056",
+          "direction": -1
+        },
+        {
+          "wall": "W055",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_012",
+      "label": "3.012",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W056",
+          "direction": 1
+        },
+        {
+          "wall": "W066",
+          "direction": -1
+        },
+        {
+          "wall": "W054",
+          "direction": -1
+        },
+        {
+          "wall": "W053",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_013",
+      "label": "3.013",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W034",
+          "direction": 1
+        },
+        {
+          "wall": "W038",
+          "direction": -1
+        },
+        {
+          "wall": "W033",
+          "direction": -1
+        },
+        {
+          "wall": "W032",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_014",
+      "label": "3.014",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W040",
+          "direction": 1
+        },
+        {
+          "wall": "W041",
+          "direction": 1
+        },
+        {
+          "wall": "W043",
+          "direction": 1
+        },
+        {
+          "wall": "W058",
+          "direction": -1
+        },
+        {
+          "wall": "W039",
+          "direction": -1
+        },
+        {
+          "wall": "W038",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_015",
+      "label": "3.015",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W060",
+          "direction": 1
+        },
+        {
+          "wall": "W074",
+          "direction": 1
+        },
+        {
+          "wall": "W085",
+          "direction": 1
+        },
+        {
+          "wall": "W089",
+          "direction": -1
+        },
+        {
+          "wall": "W069",
+          "direction": -1
+        },
+        {
+          "wall": "W059",
+          "direction": -1
+        },
+        {
+          "wall": "W058",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_016",
+      "label": "3.016",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W091",
+          "direction": 1
+        },
+        {
+          "wall": "W096",
+          "direction": 1
+        },
+        {
+          "wall": "W101",
+          "direction": 1
+        },
+        {
+          "wall": "W118",
+          "direction": 1
+        },
+        {
+          "wall": "W103",
+          "direction": -1
+        },
+        {
+          "wall": "W090",
+          "direction": -1
+        },
+        {
+          "wall": "W089",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_017",
+      "label": "3.017",
+      "kind": "stairwell",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W011",
+          "direction": 1
+        },
+        {
+          "wall": "W042",
+          "direction": -1
+        },
+        {
+          "wall": "W041",
+          "direction": -1
+        },
+        {
+          "wall": "W040",
+          "direction": -1
+        },
+        {
+          "wall": "W034",
+          "direction": -1
+        },
+        {
+          "wall": "W015",
+          "direction": -1
+        },
+        {
+          "wall": "W010",
+          "direction": -1
+        }
+      ]
+    },
+    {
+      "id": "C3_018",
+      "label": "3.018",
+      "kind": "corridor",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W106",
+          "direction": 1
+        },
+        {
+          "wall": "W107",
+          "direction": 1
+        },
+        {
+          "wall": "W108",
+          "direction": -1
+        },
+        {
+          "wall": "W105",
+          "direction": -1
+        },
+        {
+          "wall": "W104",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "C3_019",
+      "label": "3.019",
+      "kind": "corridor",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W022",
+          "direction": 1
+        },
+        {
+          "wall": "W024",
+          "direction": 1
+        },
+        {
+          "wall": "W036",
+          "direction": 1
+        },
+        {
+          "wall": "W071",
+          "direction": 1
+        },
+        {
+          "wall": "W076",
+          "direction": -1
+        },
+        {
+          "wall": "W077",
+          "direction": 1
+        },
+        {
+          "wall": "W082",
+          "direction": 1
+        },
+        {
+          "wall": "W083",
+          "direction": 1
+        },
+        {
+          "wall": "W087",
+          "direction": 1
+        },
+        {
+          "wall": "W092",
+          "direction": -1
+        },
+        {
+          "wall": "W093",
+          "direction": 1
+        },
+        {
+          "wall": "W098",
+          "direction": 1
+        },
+        {
+          "wall": "W099",
+          "direction": 1
+        },
+        {
+          "wall": "W111",
+          "direction": -1
+        },
+        {
+          "wall": "W112",
+          "direction": 1
+        },
+        {
+          "wall": "W115",
+          "direction": -1
+        },
+        {
+          "wall": "W110",
+          "direction": -1
+        },
+        {
+          "wall": "W107",
+          "direction": -1
+        },
+        {
+          "wall": "W068",
+          "direction": -1
+        },
+        {
+          "wall": "W057",
+          "direction": -1
+        },
+        {
+          "wall": "W048",
+          "direction": -1
+        },
+        {
+          "wall": "W031",
+          "direction": -1
+        },
+        {
+          "wall": "W021",
+          "direction": -1
+        },
+        {
+          "wall": "W020",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "C3_020",
+      "label": "3.020",
+      "kind": "corridor",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W046",
+          "direction": 1
+        },
+        {
+          "wall": "W047",
+          "direction": 1
+        },
+        {
+          "wall": "W048",
+          "direction": 1
+        },
+        {
+          "wall": "W055",
+          "direction": -1
+        },
+        {
+          "wall": "W053",
+          "direction": -1
+        },
+        {
+          "wall": "W051",
+          "direction": -1
+        },
+        {
+          "wall": "W049",
+          "direction": -1
+        },
+        {
+          "wall": "W045",
+          "direction": -1
+        },
+        {
+          "wall": "W044",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "C3_021",
+      "label": "3.021",
+      "kind": "corridor",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W045",
+          "direction": 1
+        },
+        {
+          "wall": "W050",
+          "direction": 1
+        },
+        {
+          "wall": "W063",
+          "direction": 1
+        },
+        {
+          "wall": "W080",
+          "direction": 1
+        },
+        {
+          "wall": "W105",
+          "direction": 1
+        },
+        {
+          "wall": "W109",
+          "direction": 1
+        },
+        {
+          "wall": "W117",
+          "direction": -1
+        },
+        {
+          "wall": "W101",
+          "direction": -1
+        },
+        {
+          "wall": "W100",
+          "direction": 1
+        },
+        {
+          "wall": "W097",
+          "direction": -1
+        },
+        {
+          "wall": "W095",
+          "direction": -1
+        },
+        {
+          "wall": "W091",
+          "direction": -1
+        },
+        {
+          "wall": "W085",
+          "direction": -1
+        },
+        {
+          "wall": "W084",
+          "direction": 1
+        },
+        {
+          "wall": "W075",
+          "direction": -1
+        },
+        {
+          "wall": "W073",
+          "direction": -1
+        },
+        {
+          "wall": "W060",
+          "direction": -1
+        },
+        {
+          "wall": "W043",
+          "direction": -1
+        },
+        {
+          "wall": "W042",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "N3_023",
+      "label": "3.023",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W075",
+          "direction": 1
+        },
+        {
+          "wall": "W084",
+          "direction": -1
+        },
+        {
+          "wall": "W074",
+          "direction": -1
+        },
+        {
+          "wall": "W073",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "N3_024",
+      "label": "3.024",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W097",
+          "direction": 1
+        },
+        {
+          "wall": "W100",
+          "direction": -1
+        },
+        {
+          "wall": "W096",
+          "direction": -1
+        },
+        {
+          "wall": "W095",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "N3_025",
+      "label": "3.025",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W113",
+          "direction": 1
+        },
+        {
+          "wall": "W116",
+          "direction": -1
+        },
+        {
+          "wall": "W112",
+          "direction": -1
+        },
+        {
+          "wall": "W111",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "N3_026",
+      "label": "3.026",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W094",
+          "direction": 1
+        },
+        {
+          "wall": "W098",
+          "direction": -1
+        },
+        {
+          "wall": "W093",
+          "direction": -1
+        },
+        {
+          "wall": "W092",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "N3_027",
+      "label": "3.027",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W078",
+          "direction": 1
+        },
+        {
+          "wall": "W082",
+          "direction": -1
+        },
+        {
+          "wall": "W077",
+          "direction": -1
+        },
+        {
+          "wall": "W076",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_028",
+      "label": "3.028",
+      "kind": "stairwell",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W081",
+          "direction": 1
+        },
+        {
+          "wall": "W104",
+          "direction": -1
+        },
+        {
+          "wall": "W080",
+          "direction": -1
+        },
+        {
+          "wall": "W079",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "R3_029",
+      "label": "3.029",
+      "kind": "room",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W032",
+          "direction": -1
+        },
+        {
+          "wall": "W026",
+          "direction": -1
+        },
+        {
+          "wall": "W014",
+          "direction": -1
+        },
+        {
+          "wall": "W015",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "Atrium",
+      "label": "Luftraum",
+      "kind": "void",
+      "confidence": "approximate",
+      "boundary": [
+        {
+          "wall": "W066",
+          "direction": 1
+        },
+        {
+          "wall": "W067",
+          "direction": 1
+        },
+        {
+          "wall": "W068",
+          "direction": 1
+        },
+        {
+          "wall": "W106",
+          "direction": -1
+        },
+        {
+          "wall": "W081",
+          "direction": -1
+        },
+        {
+          "wall": "W065",
+          "direction": -1
+        },
+        {
+          "wall": "W064",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "LiftCore",
+      "label": "Aufzug ?",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W052",
+          "direction": 1
+        },
+        {
+          "wall": "W062",
+          "direction": -1
+        },
+        {
+          "wall": "W050",
+          "direction": -1
+        },
+        {
+          "wall": "W049",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "NorthCore",
+      "label": "Kernbereich ?",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W065",
+          "direction": 1
+        },
+        {
+          "wall": "W079",
+          "direction": -1
+        },
+        {
+          "wall": "W063",
+          "direction": -1
+        },
+        {
+          "wall": "W062",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "CoreGap",
+      "label": "?",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W054",
+          "direction": 1
+        },
+        {
+          "wall": "W064",
+          "direction": -1
+        },
+        {
+          "wall": "W052",
+          "direction": -1
+        },
+        {
+          "wall": "W051",
+          "direction": 1
+        }
+      ]
+    },
+    {
+      "id": "ExternalLink",
+      "label": "Anschluss ?",
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "boundary": [
+        {
+          "wall": "W120",
+          "direction": 1
+        },
+        {
+          "wall": "W121",
+          "direction": -1
+        },
+        {
+          "wall": "W119",
+          "direction": -1
+        },
+        {
+          "wall": "W117",
+          "direction": 1
+        }
+      ]
+    }
+  ],
+  "openings": [
+    {
+      "id": "D3_001A",
+      "wall": "W099",
+      "interval": [
+        0.0674846626,
+        0.2944785276
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_001B",
+      "wall": "W099",
+      "interval": [
+        0.7668711656,
+        0.9754601227
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_002N",
+      "wall": "W071",
+      "interval": [
+        0.4935064935,
+        0.974025974
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_003A",
+      "wall": "W036",
+      "interval": [
+        0.1576576577,
+        0.3243243243
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_003B",
+      "wall": "W036",
+      "interval": [
+        0.6576576577,
+        0.8288288288
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_004",
+      "wall": "W024",
+      "interval": [
+        0.1216216216,
+        0.5945945946
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "uncertain"
+    },
+    {
+      "id": "D3_005",
+      "wall": "W020",
+      "interval": [
+        0.25,
+        0.8653846154
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_006",
+      "wall": "W021",
+      "interval": [
+        0.1886792453,
+        0.8301886792
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_006_005",
+      "wall": "W004",
+      "interval": [
+        0.6617647059,
+        0.9411764706
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "uncertain"
+    },
+    {
+      "id": "D3_007",
+      "wall": "W047",
+      "interval": [
+        0.097826087,
+        0.4565217391
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_008A",
+      "wall": "W046",
+      "interval": [
+        0.3191489362,
+        0.6595744681
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_008AB",
+      "wall": "W027",
+      "interval": [
+        0.2872340426,
+        0.6276595745
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "uncertain"
+    },
+    {
+      "id": "D3_009",
+      "wall": "W017",
+      "interval": [
+        0.2765957447,
+        0.6382978723
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_010",
+      "wall": "W044",
+      "interval": [
+        0.4625,
+        0.8375
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_011",
+      "wall": "W055",
+      "interval": [
+        0.1818181818,
+        0.6623376623
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_012",
+      "wall": "W053",
+      "interval": [
+        0.1594202899,
+        0.6666666667
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_013_014",
+      "wall": "W038",
+      "interval": [
+        0.5642857143,
+        0.7928571429
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_014",
+      "wall": "W043",
+      "interval": [
+        0.038961039,
+        0.5064935065
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_015A",
+      "wall": "W060",
+      "interval": [
+        0.2083333333,
+        0.4010416667
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_015B",
+      "wall": "W060",
+      "interval": [
+        0.8020833333,
+        0.9947916667
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_016A",
+      "wall": "W101",
+      "interval": [
+        0.0552763819,
+        0.2412060302
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_016B",
+      "wall": "W101",
+      "interval": [
+        0.6231155779,
+        0.7989949749
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_015_016",
+      "wall": "W089",
+      "interval": [
+        0.1659919028,
+        0.3076923077
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_017",
+      "wall": "W042",
+      "interval": [
+        0.1971830986,
+        0.661971831
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_028",
+      "wall": "W104",
+      "interval": [
+        0.5957446809,
+        0.9574468085
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_021_018",
+      "wall": "W105",
+      "interval": [
+        0.1063829787,
+        0.8723404255
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_002_003",
+      "wall": "W070",
+      "interval": [
+        0.7016129032,
+        0.8387096774
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_002_001",
+      "wall": "W086",
+      "interval": [
+        0.696,
+        0.832
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_023",
+      "wall": "W075",
+      "interval": [
+        0.2222222222,
+        0.8518518519
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_024",
+      "wall": "W097",
+      "interval": [
+        0.2083333333,
+        0.8333333333
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_025",
+      "wall": "W112",
+      "interval": [
+        0.2424242424,
+        0.7575757576
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_026",
+      "wall": "W093",
+      "interval": [
+        0.25,
+        0.7916666667
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "observed"
+    },
+    {
+      "id": "D3_027",
+      "wall": "W077",
+      "interval": [
+        0.2,
+        0.8
+      ],
+      "kind": "door",
+      "confidence": "uncertain",
+      "connection": "observed"
+    },
+    {
+      "id": "DLift",
+      "wall": "W049",
+      "interval": [
+        0.3829787234,
+        0.7127659574
+      ],
+      "kind": "unknown",
+      "confidence": "uncertain",
+      "connection": "uncertain"
+    }
+  ],
+  "provenance": {
+    "method": "manual_trace",
+    "source_kind": "photograph_of_plan",
+    "accuracy": "approximate",
+    "notes": [
+      "Only manually derived line geometry and room labels are published by owner authorization; the original photograph is excluded.",
+      "X points right and Y up in the traced drawing; both axes use one uniform normalization. Straight wall alignment and facade polylines are approximations; photographic perspective is not calibrated.",
+      "All physical dimensions, wall heights/thicknesses, door heights and usable widths remain unknown; calibration is null.",
+      "The owner identifies area 3.003 with the previously modeled L01; that source, furnishing, equipment and placements remain unchanged and no metric registration is established.",
+      "The subdivision of the area labeled 3.006A/B is unresolved; no separating wall has been invented.",
+      "The north core, lift/service transitions, small technical niches and external connection are uncertain; no hidden room number or traversable route is inferred.",
+      "Five small numbered technical niches are approximate enclosed regions of unknown function; door symbols do not establish access or a standard door size.",
+      "The two southern connections of 3.002 are side-wall doors to 3.003 and 3.001, not exterior facade doors.",
+      "No escape-route, fire-protection, accessibility, navigation, structural, equipment-placement or hardware qualification is provided.",
+      "The combined 3.006A/B envelope also omits ambiguous eastern entrance/partition lines; it is not a complete wall survey."
+    ]
+  }
+}

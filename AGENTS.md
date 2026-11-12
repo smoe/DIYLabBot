@@ -482,3 +482,76 @@ statischen Fälle neu prüfen. Modellierte Griffe belegen weder reale
 Greifbarkeit noch Transportfreigabe; Last, Retention, Druckfestigkeit und
 Greifer bleiben gesondert zu qualifizieren. Einen späteren Regalzugriff
 nicht als bereits implementierte Funktion ausgeben.
+
+## Relative Mehrraumgeometrie F03
+
+Vor Änderungen [docs/floorplan-f03.md](docs/floorplan-f03.md) lesen.
+`model/floor-f03.shared.json` führt ausschließlich freigegebene manuelle
+Ableitungen mit relativen Koordinaten. Gemeinsame Wände und Öffnungen einmal
+beschreiben; Bereichsränder und Nachbarschaften daraus ableiten. Unklare
+Grenzen nicht durch erfundene Wände, Türen oder Raumnummern vervollständigen.
+Ohne Kalibrierung bleiben reale Maße `null`; ein ausdrücklich gewählter
+CAD-Darstellungsmaßstab ist keine metrische Gebäudeaufnahme. Keine automatische
+Übernahme der bisherigen L01-Maße oder Gerätepositionen vornehmen.
+
+Das private Originalfoto, Kopien, Ausschnitte sowie dessen lokale Pfade,
+Prüfsummen und Metadaten nicht in Git-Quellen, Galerie oder öffentliche
+Provenienz übernehmen. Lokale Zuordnungsdaten liegen ausschließlich im
+ignorierten Bereich unter `exports/`. Öffentliche Ansichten nur aus den
+freigegebenen Vektordaten erzeugen, ohne das Originalbild einzubetten.
+Native Öffnungsschnitte und relative Nachbarschaften belegen keine realen
+Türmaße, Durchfahrbarkeit, Fluchtwege oder Sicherheitsqualifikation.
+
+Die viergeschossige Komposition `model/building-stack.shared.json` referenziert
+F03 einmal; vor Änderungen [docs/building-stack.md](docs/building-stack.md)
+lesen. Geschoss-IDs, Höhenableitung und die gemeinsame Atriumabdeckung durch
+die vorhandenen EG-Raum-/Flurböden auswerten. 4 m lichte Höhe und die vorläufige Plattendicke
+nicht mit dem Geschossabstand gleichsetzen. Die referenzierte ungemessene
+L01-Breite ist nur eine Darstellungsproportion, keine metrische Registrierung.
+Vorlagen-Raumnummern nicht als bestätigte Nummern weiterer Geschosse ausgeben.
+Die Dachglasfläche referenziert Atrium, alle vier Flure und den eingeschlossenen
+Kern statt einer kopierten Kontur oder pauschalen Rechteckabdeckung. Gewölbeachse
+und Querprofil gemeinsam auswerten; die aktuelle X-Achse besitzt ein Y/Z-Profil.
+Die erweiterte Dachöffnung nicht auf die kleineren Geschossöffnungen übertragen;
+Flurböden erhalten.
+Der Kellerplan bleibt ausstehend; eigenes EG und Dach sind implementiert. Konzeptmarker
+für vertikalen Austausch getrennt von Gebäudegeometrie und Transportprogrammen
+führen; statische Bilder und offene Geschossplatten beweisen keine freie Bahn,
+Förderfunktion, Tragfähigkeit oder Schutzwirkung.
+
+Gebäudeaufzug, inneres Treppenhaus `R3_028` und äußere Metalltreppe `R3_017`
+besitzen getrennte Quellenrollen und CAD-Gruppen. Nur die innere Treppe und
+der Aufzug reichen vom Keller bis ins 3. OG; die Metalltreppe reicht vom Dach
+zum Boden und endet im EG neben Zugang 22. Keine Treppe an den Aufzug hängen.
+Der Flur und der seitliche Versatz bleiben aus den Quellbezügen erhalten.
+Die bestätigte Aufzugzuordnung lautet außen =
+`W049` zum Flur `C3_020`, innen = `W062` zum `NorthCore` der Obergeschossvorlage.
+Im EG gelten die entsprechenden eigenen Flurflächen; deren Darstellung ist
+weiterhin kein Nachweis einer navigierbaren oder qualifizierten Verbindung.
+EG beidseitig, Obergeschosse nur außen; KG nur innen als vorgemerkte Regel
+ohne Kellerhöhe oder Kellergeometrie führen. Türseiten nicht aus Blickrichtung
+oder Gebäudeschwerpunkten neu erraten. Öffnungen in den tatsächlichen
+Wandkörpern prüfen, nicht nur Türrahmen vor geschlossene Wände setzen.
+Treppenläufe und Podeste aus einem Rezept erzeugen; obere Platten mit
+passenden Aussparungen versehen und geometrische Anschlüsse neu nachweisen.
+Die vorhandenen F03-Quellen und deren alte Nachweise bleiben unverändert.
+Ein Aufzugmodell besitzt eine Kabine, keine Kabinenkopie je Geschoss.
+Gebäudeerschließung vom blauen Atrium-Austauschkonzept unterscheiden;
+Stufendarstellung, statische Kabine und Aussparungen belegen keinen Betrieb,
+keine Begehbarkeit, Schachtfreigabe oder Brandschutzqualifikation.
+
+Das EG verwendet `model/ground-floor-eg.shared.json` statt einer F03-Kopie;
+vor Änderungen [docs/ground-floor-eg.md](docs/ground-floor-eg.md) lesen.
+Kernvertices referenzieren F03 direkt. Literalvektoren sind bereits manuell
+im gemeinsamen Rahmen; die vermerkte 180°-Planorientierung nicht nochmals
+anwenden und keine starre photogrammetrische oder metrische Registrierung
+behaupten. Seminarraum, Foyer und WC-Anordnung gehören nur zur EG-Quelle.
+Die vorhandenen EG-Raum-/Flurböden gemeinsam auf Atriumabdeckung prüfen;
+keine zusätzliche Füllplatte über sie legen. Originalfotos bleiben privat.
+
+Dach, gewölbtes Glas und Umrandung aus derselben Komposition ableiten. Das Dach
+ist kein fünftes Geschoss. Seine Platte liegt über der obersten lichten Höhe;
+Glasränder reichen über die Atriumöffnung auf die äußere Dachfläche. Parameter
+sind Darstellungsannahmen, keine nachgewiesene Entwässerung, Tragfähigkeit oder
+Absturzsicherung. Außenmetalltreppe nie mit Kelleranschluss ausstatten; der
+Kelleranschluss von Aufzug und innerer Treppe bleibt bis zum Plan ohne Geometrie.

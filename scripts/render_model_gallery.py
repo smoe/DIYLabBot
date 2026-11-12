@@ -264,6 +264,31 @@ def diagram(entry):
             'representation':'Source-derived K01 material/slot diagram; not a native CAD render or stock inventory',
             'producer_files_sha256':{n:sha(ROOT/n) for n in ['scripts/extraction_kit_station.py','model/extraction-kit-station.schema.json']},
             'inventory_managed':False,'article_fit_qualified':False}
+    if view=='ground_floor':
+        import ground_floor_model as ground
+        import render_ground_floor as renderer
+        spec=ground.load(ROOT/entry['sources'][0])
+        return renderer.render_svg(spec),{
+            'representation':'Authorized manually derived EG vectors anchored to shared core references; uncalibrated, original photograph excluded',
+            'producer_files_sha256':{rel(path):sha(path) for path in [ROOT/'scripts/render_ground_floor.py',*ground.source_dependencies(spec)] if path.suffix=='.py' or path.name.endswith('.schema.json')},
+            'metric_scale_known':False,'original_image_embedded':False,'areas':len(spec['areas'])}
+    if view=='building_stack':
+        import building_stack as stack
+        import render_building_stack_section as section
+        spec=stack.load(ROOT/entry['sources'][0])
+        return section.render_svg(spec),{
+            'representation':'Source-derived four-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification',
+            'producer_files_sha256':{rel(path):sha(path) for path in [ROOT/'scripts/render_building_stack_section.py',*stack.source_dependencies(spec)] if path.suffix=='.py' or path.name.endswith('.schema.json')},
+            'metric_scale_known':False,'original_image_embedded':False,
+            'transport_implemented':False,'hardware_executed':False}
+    if view=='relative_floorplan':
+        import relative_floorplan as floor
+        spec=floor.load(ROOT/entry['sources'][0])
+        return floor.render_svg(spec),{
+            'representation':'Authorized manually derived relative vector plan; original photograph excluded, no metric or access qualification',
+            'producer_files_sha256':{name:sha(ROOT/name) for name in ['scripts/relative_floorplan.py','model/relative-floorplan.schema.json']},
+            'metric_scale_known':False,'original_image_embedded':False,
+            'areas':len(spec['areas']),'shared_boundaries':len(spec['walls']),'opening_candidates':len(spec['openings'])}
     if view=='integrated_workflow':
         from lab_workflow_sources import load
         definition=load();samples=definition['manifest']['samples'];count=len(samples)

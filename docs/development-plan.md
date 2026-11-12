@@ -328,13 +328,19 @@ und eine Fortsetzung in CF01 folgen später. Das weitergehende Zielmodell steht 
 
 ## Budgetansatz
 
-Für die [Raumumgebung L01](lab-room-l01.md) den angekündigten Grundriss mit Maßstab
-oder mindestens einer bekannten Länge auswerten. Zunächst Raumkontur, Türen,
-Fenster, Bänke und Stauraum in der gemeinsamen Quelle korrigieren und mit
-`python scripts/build_lab_room.py` beide CADs erneut erzeugen. Erst danach L01
-im Gebäude verorten und weitere Räume, Geräte sowie menschliche und maschinelle
-Arbeits-/Verkehrsbereiche ergänzen. Das jetzige Modell ist eine abstrakte
-Einzelraumskizze mit unbekannten Messwerten.
+Die [relative Geschossansicht F03](floorplan-f03.md) wertet den privat
+bereitgestellten Plan zunächst ohne metrischen Maßstab aus. Raumkonturen,
+geteilte Wände und Türnachbarschaften ergänzen die bisherige Einraumskizze,
+ohne die L01-Quelle oder deren Aufstellung umzubinden. Das Originalfoto bleibt
+außerhalb des Repositories.
+
+Für die [Raumumgebung L01](lab-room-l01.md) als Nächstes ein definiertes
+Referenzmaß und die unklaren Konturen bestätigen, metrische Kalibrierung ergänzen
+und eine belegte Registrierung zu F03 herstellen. Erst auf dieser Grundlage
+Raumkontur, Türen, Fenster, Bänke und Stauraum gezielt korrigieren und beide CADs
+mit `python scripts/build_lab_room.py` neu prüfen. Geräte-, Mensch-/Maschinenwege
+und Transportprogramme benötigen anschließend eigene Nachweise; relative
+Nachbarschaft allein belegt weder Platz noch Passierbarkeit.
 
 Für die [Zentrifuge CF01](centrifuge-cf01.md) zuerst die stationäre Entnahme mit
 gemessenem Gefäß und echtem Greifer untersuchen. Parallel einen qualifizierten

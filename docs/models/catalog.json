@@ -713,6 +713,51 @@
       },
       "caption": "Schematischer Platzplan der beiden Kits direkt an K01; native Ansichten mit Träger- und Deckelgriffen unter Details. Artikelhüllen und Greifmaße bleiben unqualifiziert.",
       "documentation": "docs/extraction-kit-station.md"
+    },
+    {
+      "id": "floor-f03",
+      "title": "F03 · relative Mehrraumgeometrie",
+      "group": "umgebungen",
+      "sources": [
+        "model/floor-f03.shared.json"
+      ],
+      "image": "images/floor-f03.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "relative_floorplan"
+      },
+      "caption": "Manuell abgeleitete Raumkonturen, Flure und Türpositionen. Nur Vektorgeometrie; Originalfoto privat. Maßstab, unklare Nebenbereiche und Passierbarkeit bleiben offen.",
+      "documentation": "docs/floorplan-f03.md"
+    },
+    {
+      "id": "building-stack",
+      "title": "Vier Geschosse · vertikaler Austausch",
+      "group": "umgebungen",
+      "sources": [
+        "model/building-stack.shared.json"
+      ],
+      "image": "images/building-stack.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "building_stack"
+      },
+      "caption": "Eigenes EG, drei Obergeschosse und um 90° gedrehtes Glasgewölbe über Atrium und allen vier umlaufenden Fluren. Aufzug, inneres Treppenhaus und äußere Metalltreppe sind getrennte Systeme; Höhen und Details bleiben Annahmen, keine Betriebs- oder Sicherheitsqualifikation.",
+      "documentation": "docs/building-stack.md"
+    },
+    {
+      "id": "ground-floor-eg",
+      "title": "EG · Seminarraum, Foyer und WC",
+      "group": "umgebungen",
+      "sources": [
+        "model/ground-floor-eg.shared.json"
+      ],
+      "image": "images/ground-floor-eg.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "ground_floor"
+      },
+      "caption": "Eigene manuelle EG-Vektorableitung mit gemeinsamen Kernreferenzen; äußere Metalltreppe neben22. Bildorientierung an F03 angeglichen, Maße unkalibriert. Originalfoto privat.",
+      "documentation": "docs/ground-floor-eg.md"
     }
   ],
   "groups": [

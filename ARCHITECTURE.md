@@ -67,7 +67,50 @@ Räume und Flure sollen später eine gemeinsame Umgebung bilden. Gemeinsam
 verwendete Türen und Öffnungen werden dabei einmal beschrieben; die verbundenen
 Bereiche referenzieren dieselbe Öffnungs-ID. Raumgeometrie und die Topologie der
 Verbindungen sind getrennte Informationen. Die Mehrraum- und Flurtopologie ist
-in diesem ersten Schritt noch nicht implementiert.
+in diesem ersten Schritt noch nicht implementiert. Die separate
+[relative Geschossansicht F03](docs/floorplan-f03.md) ergänzt inzwischen einen
+einmalig beschriebenen Wand-/Öffnungsgraphen und Bereichsnachbarschaften;
+metrische Gebäudeintegration, Passierbarkeit und Navigation bleiben offen.
+
+Die [viergeschossige Konzeptkomposition](docs/building-stack.md) referenziert
+F03 für drei Obergeschosse und eine eigene registrierte relative EG-Quelle.
+4.000 mm lichte Höhe sind eine Eigentümerannahme; mit vorläufig 250 mm
+Geschossplatte entstehen 4.250 mm Geschossabstand. Nur im EG wird die vorhandene
+Atriumkontur durch die tatsächlichen EG-Foyer-/Flurböden gemeinsam abgedeckt.
+Die oberen Atriumflächen bleiben zwischen den Geschossen offen; ein gewölbtes
+Glasdach bildet den oberen Abschluss. Nur Kellerplan und Aufmaß stehen aus.
+Die horizontale Darstellungsproportion verweist auf die ungemessene L01-Breite,
+ohne F03 zu kalibrieren oder Möbel und Geräte zu übertragen. Geschossinstanzen
+besitzen eigene IDs; Raumnummern der Vorlage sind keine bestätigten Nummern
+der anderen Geschosse. Das blaue Austauschvolumen ist ein Konzeptmarker für
+den Antrag, keine ausgewählte Fördertechnik, Transportbahn oder Zugangszusage.
+
+Die Gebäudeerschließung wird als eigene semantische Ergänzung dieser
+Komposition aus den Quellbezügen abgeleitet: ein inneres rechtes Treppenhaus
+`R3_028` vom Keller bis zum 3. OG und eine eigene äußere Metalltreppe `R3_017`
+vom Dach zum Boden, mit EG-Ende neben Zugang 22. Ein Flur und seitlicher Versatz
+trennen sie vom alleinstehenden Aufzug. Verbundene Läufe und Podeste besitzen
+passende Geschossöffnungen; Metalltreads und Stringer sind eigene Darstellrollen.
+Aufzugschacht,
+eine stationäre Kabine und geschossabhängige Türseiten sind getrennt vom
+blauen Atrium-Marker. Die vom Eigentümer bestätigten Seiten sind außen links
+zum Flur `C3_020` und innen rechts zum `NorthCore`. EG erhält beide Seiten,
+die Obergeschosse nur außen; KG nur innen bleibt bis zum Kellerplan ohne
+geometrischen Stopp. `NorthCore` bleibt in der Obergeschossvorlage unbekannt.
+Das EG führt stattdessen seine eigenen Flurflächen an den Türseiten; die
+Darstellung beweist auch dort keinen qualifizierten begehbaren Anschluss. Die ursprüngliche
+F03-Klassifikation und ihre Nachweise werden dadurch nicht rückwirkend geändert.
+
+`model/ground-floor-eg.shared.json` führt Seminarraum, Foyer und verlegte
+Toiletten einmalig. Ein Loader löst gemeinsame Kernvertices aus F03 auf und
+validiert den vorhandenen relativen Wand-/Flächengraphen. Die manuelle Einpassung
+der bereits orientierten Literalvektoren ist kein vermessener Maßstab und keine
+starre Fotoregistrierung. Die Dachkomposition referenziert den Hauptgebäudeumriss,
+Glaswölbung mit X-Achse und Y/Z-Querprofil sowie nach außen überstehende Ränder.
+Die Glasgrundfläche bindet Atrium, alle vier Flure und den eingeschlossenen Kern
+an ihre gemeinsamen Bereichskonturen; sie ist von der kleineren Atriumöffnung
+der Geschossböden getrennt. Nur die Dachöffnung wird erweitert. Maße und
+Schutzwirkung bleiben unqualifiziert. Das Dach ist ein Abschluss und kein zusätzliches Geschoss.
 
 Ein optionales Anforderungsprofil kann später erwartete Möbel- und Gerätearten
 benennen. Solche Anforderungen erzeugen noch keine tatsächlich aufgestellten
