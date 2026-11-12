@@ -9,12 +9,16 @@ import math
 from contextlib import contextmanager
 from functools import wraps
 
-from manual_tasks import MATERIAL_DEFINITION_V2, MATERIAL_STATE_V2, TaskError, digest, encoded
+from manual_tasks import (MATERIAL_DEFINITION_V2, MATERIAL_DEFINITION_V3, MATERIAL_STATE_V2,
+                          MATERIAL_STATE_V3, TaskError, digest, encoded)
 from manual_workflow import ObservationError, keys, text
+import material_evidence
 
 UNITS = {'uL', 'mg', 'ng', 'cells'}
 KINDS = {'sample', 'control', 'reagent', 'product', 'byproduct', 'intermediate'}
 DISPOSITIONS = {'retained', 'consumed', 'quarantined', 'discarded'}
+PROTECTIVE_FORMATS = {MATERIAL_STATE_V2: MATERIAL_DEFINITION_V2,
+                      MATERIAL_STATE_V3: MATERIAL_DEFINITION_V3}
 
 
 def require(value, message):
@@ -148,16 +152,14 @@ def _touch(state, material):
         state['inventory']['vessels'][vessel_id]['content_revision'] += 1
 
 
-def _receipt(actor_id, reason, **extra):
-    text(actor_id, 'synthetic actor identity')
-    text(reason, 'evidence reason')
-    return {'actor_id': actor_id, 'reason': reason, 'evidence': 'synthetic_input', **extra}
+def _receipt(state, actor_id, reason, **extra):
+    return material_evidence.receipt(state, actor_id, reason, **extra)
 
 
 def _protective_layout(state):
-    require(state.get('format') == MATERIAL_STATE_V2
-            and state.get('definition', {}).get('format') == MATERIAL_DEFINITION_V2,
-            'Protective stops require the version-2 material contract')
+    require(state.get('format') in PROTECTIVE_FORMATS
+            and state.get('definition', {}).get('format') == PROTECTIVE_FORMATS[state['format']],
+            'Protective stops require the matching version-2 or version-3 material contract')
     bindings = state['definition'].get('protective_stop_bindings')
     operations = state.get('protective_operations')
     require(isinstance(bindings, dict) and isinstance(operations, dict),
@@ -201,7 +203,7 @@ def _protective_layout(state):
 
 
 def _unresolved_protective(state):
-    if state.get('format') != MATERIAL_STATE_V2:
+    if state.get('format') not in PROTECTIVE_FORMATS:
         return {}
     _, operations = _protective_layout(state)
     return {vessel: identity for vessel, identity in operations.items()
@@ -299,6 +301,8 @@ def _begin_effect(state, actor_id, intent_id, kind, inputs, outputs, purpose):
     state['bookings'][intent_id] = {'id': intent_id, 'request': request, 'request_sha256': fingerprint,
         'outcome': 'intent', 'actual_inputs': [], 'actual_outputs': [], 'confirmation': None,
         'quantity_resolutions': {}, 'actor_id': actor_id, 'created_at_s': state['logical_time_s'], 'confirmed_at_s': None}
+    if state.get('format') == MATERIAL_STATE_V3:
+        state['bookings'][intent_id]['intent_receipt'] = _receipt(state, actor_id, purpose)
     state['pending_operation'] = {'intent_id': intent_id}
 
 
@@ -328,6 +332,8 @@ def _actual(items, expected, state, *, outputs=False):
 def confirm_effect(state, actor_id, intent_id, actual_inputs, actual_outputs, reason):
     text(reason, 'material effect evidence reason')
     confirmation = {'actual_inputs': copy.deepcopy(actual_inputs), 'actual_outputs': copy.deepcopy(actual_outputs), 'reason': reason}
+    if state.get('format') == MATERIAL_STATE_V3:
+        confirmation.update(_receipt(state, actor_id, reason))
     booking = state['bookings'].get(intent_id)
     require(booking is not None, 'Unknown material intent')
     if booking['outcome'] == 'performed':
@@ -363,7 +369,7 @@ def confirm_effect(state, actor_id, intent_id, actual_inputs, actual_outputs, re
         _touch(state, material)
         if identity in consumed:
             material.update(vessel_id=None, disposition='consumed',
-                            disposition_confirmation=_receipt(actor_id, reason, intent_id=intent_id))
+                            disposition_confirmation=_receipt(state, actor_id, reason, intent_id=intent_id))
         elif identity in unknown_partial:
             material['disposition'] = 'quarantined'
     for item in request['outputs']:
@@ -384,7 +390,7 @@ def mark_unknown(state, actor_id, intent_id, reason):
     booking = _pending(state, intent_id)
     require(booking['outcome'] in {'intent', 'unknown'}, 'Cannot mark a resolved effect unknown')
     booking['outcome'] = 'unknown'
-    booking['uncertainty'] = _receipt(actor_id, reason)
+    booking['uncertainty'] = _receipt(state, actor_id, reason)
     state['recovery_required'] = 'material_effect_unknown'
     state['workspace_clear'] = False
 
@@ -393,7 +399,7 @@ def mark_unknown(state, actor_id, intent_id, reason):
 def not_performed(state, actor_id, intent_id, reason):
     booking = state['bookings'].get(intent_id)
     require(booking is not None, 'Unknown material intent')
-    receipt = _receipt(actor_id, reason)
+    receipt = _receipt(state, actor_id, reason)
     if booking['outcome'] == 'not_performed':
         require(booking['nonperformance'] == receipt, 'Conflicting nonperformance receipt')
         return False
@@ -467,6 +473,8 @@ def resolve_quantity(state, actor_id, intent_id, material_id, quantity, reason):
     material = _material(state, material_id)
     require(observed['unit'] == material['initial_quantity']['unit'], 'Reconciled consumption unit mismatch')
     receipt = {'quantity': observed, 'reason': text(reason, 'quantity reconciliation reason')}
+    if state.get('format') == MATERIAL_STATE_V3:
+        receipt.update(_receipt(state, actor_id, reason))
     old = booking['quantity_resolutions'].get(material_id)
     if old:
         require(old['receipt'] == receipt, 'Conflicting quantity reconciliation')
@@ -480,7 +488,8 @@ def resolve_quantity(state, actor_id, intent_id, material_id, quantity, reason):
     if request['consume_all'] and available is not None and not math.isclose(observed['value'], available, abs_tol=1e-9, rel_tol=0):
         raise ObservationError('Reconciled consume-all amount disagrees with remaining quantity')
     values[0]['quantity'] = observed
-    booking['quantity_resolutions'][material_id] = {'receipt': receipt, 'actor_id': actor_id, 'evidence': 'synthetic_input'}
+    booking['quantity_resolutions'][material_id] = {'receipt': receipt, 'actor_id': actor_id,
+                                                   **material_evidence.provenance(state)}
 
 
 @atomic
@@ -489,7 +498,7 @@ def set_disposition(state, actor_id, material_id, disposition, reason):
     require(not _unresolved_protective(state), 'Resolve protective stops before material disposition')
     require(disposition in DISPOSITIONS, 'Unsupported material disposition')
     material = _material(state, material_id)
-    receipt = _receipt(actor_id, reason)
+    receipt = _receipt(state, actor_id, reason)
     if material['disposition_confirmation'] == receipt and material['disposition'] == disposition:
         return False
     require(material['disposition'] not in {'consumed', 'discarded'}, 'Consumed or discarded material disposition is terminal')
@@ -515,7 +524,7 @@ def record_measurement(state, actor_id, material_id, measurement_id, kind, quant
     require(kind in {'concentration', 'total_vessel_mass'}, 'Unsupported material measurement role')
     observed = validate_quantity(quantity, units={'ng/uL'} if kind == 'concentration' else {'mg', 'g'}, zero=True)
     text(measurement_id, 'measurement identity')
-    receipt = {'id': measurement_id, 'kind': kind, 'quantity': observed, **_receipt(actor_id, reason),
+    receipt = {'id': measurement_id, 'kind': kind, 'quantity': observed, **_receipt(state, actor_id, reason),
                'vessel_id': material['vessel_id'],
                'content_revision': state['inventory']['vessels'][material['vessel_id']]['content_revision']}
     if measurement_id in material['measurements']:
@@ -562,7 +571,7 @@ def audit(state):
         balance = remaining(state, identity)
         require(balance['value'] is None or balance['value'] >= -1e-9, 'Negative material balance')
     pending = [identity for identity, booking in state['bookings'].items() if booking['outcome'] in {'intent', 'unknown'}]
-    if state.get('format') == MATERIAL_STATE_V2:
+    if state.get('format') in PROTECTIVE_FORMATS:
         _, protected = _protective_layout(state)
         unresolved = set(_unresolved_protective(state).values())
         normal = state['pending_operation']

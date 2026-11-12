@@ -1,0 +1,449 @@
+{
+  "format": "solidcraftbot.cutrun-manual-runtime-profile/1",
+  "id": "CUTRUN.SKMel29.H3K4me3.Manual.Preparation",
+  "mode": "manual_observation",
+  "synthetic": false,
+  "sources": {
+    "sop": {
+      "source": "docs/cutrun-manual-sop-draft.md",
+      "source_sha256": "ed2815a8d03f8a1532fd98ead984e3271fb5e552370781156b972c8ba7bd56b1",
+      "id": "SOP-CR-SKM29-H3K4me3",
+      "revision": "0.1"
+    },
+    "manufacturer": {
+      "url": "https://media.cellsignal.com/pdf/86652.pdf",
+      "source_sha256": "4569c1793c112e94cd8b0e5ca11ac7a82c53b2ce5dd46ce30831f653c830a34f",
+      "datasheet_revision": "9",
+      "protocol_revision": "09/2026"
+    }
+  },
+  "context": {
+    "cell_line": "SK-Mel-29",
+    "target": "H3K4me3",
+    "culture_id": null,
+    "material_state": null,
+    "condition_id": null
+  },
+  "roles": {
+    "h3k4me3": {
+      "role": "reference",
+      "material_id": null,
+      "vessel_id": null
+    },
+    "igg": {
+      "role": "negative_control",
+      "material_id": null,
+      "vessel_id": null
+    },
+    "input": {
+      "role": "input",
+      "material_id": null,
+      "vessel_id": null
+    },
+    "ntc": {
+      "role": "pcr_ntc",
+      "material_id": null,
+      "vessel_id": null
+    }
+  },
+  "stage_bindings": {
+    "S01": {
+      "sop_step": "S01",
+      "source_ref": "sop",
+      "section": "5. Manuelle Arbeitsfolge und Aufzeichnungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11"
+      ],
+      "required_parameters": []
+    },
+    "S02": {
+      "sop_step": "S02",
+      "source_ref": "sop",
+      "section": "4. Material-, Gef\u00e4\u00df- und Arbeitsplatzplan",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O01",
+        "O02"
+      ],
+      "required_parameters": [
+        "input_cells"
+      ]
+    },
+    "S03": {
+      "sop_step": "S03",
+      "source_ref": "sop",
+      "section": "3.2 Quellengepr\u00fcfte Eckwerte",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O01",
+        "O02",
+        "O03",
+        "O10"
+      ],
+      "required_parameters": []
+    },
+    "S04": {
+      "sop_step": "S04",
+      "source_ref": "sop",
+      "section": "5. Manuelle Arbeitsfolge und Aufzeichnungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03"
+      ],
+      "required_parameters": []
+    },
+    "S05": {
+      "sop_step": "S05",
+      "source_ref": "sop",
+      "section": "5. Manuelle Arbeitsfolge und Aufzeichnungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03"
+      ],
+      "required_parameters": []
+    },
+    "S06": {
+      "sop_step": "S06",
+      "source_ref": "sop",
+      "section": "6. Stopp, Unterbrechung und Abweichungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03",
+        "O05"
+      ],
+      "required_parameters": [
+        "task_deadline_s",
+        "activation_volume_ul",
+        "stop_volume_ul",
+        "activation_duration_s",
+        "stop_window_s",
+        "temperature_tolerance_deg_c",
+        "activation_temperature_deg_c",
+        "phase_tolerance_s",
+        "input_cells"
+      ]
+    },
+    "S07": {
+      "sop_step": "S07",
+      "source_ref": "sop",
+      "section": "6. Stopp, Unterbrechung und Abweichungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03",
+        "O05"
+      ],
+      "required_parameters": [
+        "task_deadline_s",
+        "activation_volume_ul",
+        "stop_volume_ul",
+        "activation_duration_s",
+        "stop_window_s",
+        "temperature_tolerance_deg_c",
+        "activation_temperature_deg_c",
+        "phase_tolerance_s",
+        "input_cells"
+      ]
+    },
+    "S08": {
+      "sop_step": "S08",
+      "source_ref": "sop",
+      "section": "6. Stopp, Unterbrechung und Abweichungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03",
+        "O05"
+      ],
+      "required_parameters": [
+        "stop_volume_ul",
+        "stop_window_s",
+        "temperature_tolerance_deg_c",
+        "phase_tolerance_s",
+        "task_deadline_s"
+      ]
+    },
+    "S09": {
+      "sop_step": "S09",
+      "source_ref": "sop",
+      "section": "3.1 Lokale Auswahl in Fassung 0.1",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O04"
+      ],
+      "required_parameters": []
+    },
+    "S10": {
+      "sop_step": "S10",
+      "source_ref": "sop",
+      "section": "5. Manuelle Arbeitsfolge und Aufzeichnungen",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O03",
+        "O04"
+      ],
+      "required_parameters": []
+    },
+    "S11": {
+      "sop_step": "S11",
+      "source_ref": "sop",
+      "section": "7. Produkt-QC und Abschlusskriterien",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O08"
+      ],
+      "required_parameters": []
+    },
+    "S12": {
+      "sop_step": "S12",
+      "source_ref": "sop",
+      "section": "7. Produkt-QC und Abschlusskriterien",
+      "required_decisions": [
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O11",
+        "O07"
+      ],
+      "required_parameters": []
+    }
+  },
+  "parameters": {
+    "task_deadline_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "activation_volume_ul": {
+      "value": null,
+      "unit": "uL",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "stop_volume_ul": {
+      "value": null,
+      "unit": "uL",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "activation_duration_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "stop_window_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "temperature_tolerance_deg_c": {
+      "value": null,
+      "unit": "degC",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "activation_temperature_deg_c": {
+      "value": null,
+      "unit": "degC",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "phase_tolerance_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    },
+    "input_cells": {
+      "value": null,
+      "unit": "cells",
+      "basis": "unknown",
+      "source_ref": null,
+      "evidence_ref": null
+    }
+  },
+  "local_decisions": {
+    "O01": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O02": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O03": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O04": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O05": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O06": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O07": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O08": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O09": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O10": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    },
+    "O11": {
+      "status": "open",
+      "value": null,
+      "actor_id": null,
+      "confirmed_at": null,
+      "evidence_ref": null
+    }
+  },
+  "qc_plan": {
+    "evaluation_mode": "manual_review",
+    "scope": "raw_dna",
+    "roles": {
+      "h3k4me3": {
+        "methods": [
+          "fluorometry",
+          "qpcr"
+        ],
+        "assay_id": null,
+        "criteria": null,
+        "limits": null,
+        "evidence_ref": null
+      },
+      "igg": {
+        "methods": [
+          "fluorometry",
+          "qpcr"
+        ],
+        "assay_id": null,
+        "criteria": null,
+        "limits": null,
+        "evidence_ref": null
+      },
+      "input": {
+        "methods": [
+          "fluorometry",
+          "qpcr"
+        ],
+        "assay_id": null,
+        "criteria": null,
+        "limits": null,
+        "evidence_ref": null
+      },
+      "ntc": {
+        "methods": [
+          "qpcr"
+        ],
+        "assay_id": null,
+        "criteria": null,
+        "limits": null,
+        "evidence_ref": null
+      }
+    }
+  },
+  "handover_plan": {
+    "recipient_id": null,
+    "storage_location": null,
+    "conditions": null,
+    "evidence_ref": null
+  }
+}

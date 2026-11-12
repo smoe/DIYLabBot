@@ -75,13 +75,13 @@ class MaterialVersionTests(unittest.TestCase):
         self.assertNotIn('protective_operations', self.journal.state('SYN.Run1')[0])
 
     def test_mixed_definition_state_pairs_and_unknown_versions_cannot_be_created(self):
-        for state_version, definition_version in [(1, 2), (2, 1), (3, 3)]:
+        for state_version, definition_version in [(1, 2), (2, 1), (99, 99)]:
             state = fixture(state_version)
             state['definition']['format'] = 'solidcraftbot.material-workflow-definition/' + str(definition_version)
             with self.subTest(pair=(state_version, definition_version)), self.assertRaises(TaskError):
                 self.create('SYN.Invalid', state)
             self.assertEqual(self.journal.connection.execute('SELECT count(*) FROM runs').fetchone()[0], 0)
-        state = fixture(3)
+        state = fixture(99)
         with self.assertRaisesRegex(TaskError, 'Unsupported material workflow state version'):
             self.journal.create('SYN.Invalid', state)
 

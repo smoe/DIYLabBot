@@ -525,6 +525,18 @@ class ManualWorkflow(ManualOperations):
         if state['actor_id'] is not None and state['actor_id'] != actor_id:
             raise TaskError('Task is held by another synthetic actor')
 
+    def _before_transition(self, state):
+        """Optional versioned clock/context refresh; legacy states stay unchanged."""
+
+    def _event_evidence(self, state, command, actor_id, data):
+        return {'evidence': 'synthetic_input'}
+
+    def _after_transition(self, state, command, actor_id, data, *, rejected=False):
+        """Optional accepted/rejected observation bookkeeping, never a clock tick."""
+
+    def _deadline_event(self, state):
+        return {}, state
+
     @classmethod
     def open(cls, journal, run_id, resume=False, clock_mode=None):
         state, revision = journal.state(run_id)
@@ -576,11 +588,13 @@ class ManualWorkflow(ManualOperations):
         if self.session is None or state['session'] != self.session:
             raise TaskError('Stale task session; reload and reconcile')
         self._authorize_actor(state, command, actor_id)
+        self._before_transition(state)
         if (state[self.DEADLINE_FIELD] is not None and self._now(state) >= state[self.DEADLINE_FIELD]
                 and not state['recovery_required']):
             state['recovery_required'] = 'deadline_exceeded'
             state['workspace_clear'] = False
-            self.journal.append(self.run_id, revision, 'deadline_exceeded', {}, state)
+            deadline_payload, deadline_state = self._deadline_event(state)
+            self.journal.append(self.run_id, revision, 'deadline_exceeded', deadline_payload, deadline_state)
             revision += 1
         allowed = set(self.STEPS) | {'take', 'reconcile', 'cancel', 'finish_cancel', 'discard_import', 'check_deadline'}
         if command not in allowed:
@@ -590,7 +604,7 @@ class ManualWorkflow(ManualOperations):
         if state['status'] == 'cancelling' and command not in self.CANCELLING_COMMANDS:
             raise TaskError('Only reconciliation and return are allowed while cancelling')
         before = copy.deepcopy(state)
-        payload = {**data, 'actor_id': actor_id, 'evidence': 'synthetic_input'}
+        payload = {**data, 'actor_id': actor_id, **self._event_evidence(state, command, actor_id, data)}
         handler = getattr(self, '_' + command)
         arguments = {'artifact': artifact, **data} if command == 'import_results' else {'actor_id': actor_id, **data}
         try:
@@ -602,11 +616,16 @@ class ManualWorkflow(ManualOperations):
         except ObservationError as error:
             before['recovery_required'] = 'observation_mismatch'
             before['workspace_clear'] = False
+            self._after_transition(before, command, actor_id, data, rejected=True)
+            rejected_payload = {**payload, 'command': command, 'error': str(error)}
+            if artifact is not None:
+                rejected_payload['artifact_sha256'] = digest(artifact)
             self.journal.append(self.run_id, revision, 'observation_rejected',
-                                {**payload, 'command': command, 'error': str(error)}, before)
+                                rejected_payload, before, artifact=artifact)
             raise
         if changed is False:
             return state
+        self._after_transition(state, command, actor_id, data)
         if artifact is not None:
             payload['artifact_sha256'] = digest(artifact)
         if (command == 'advance_time' and state[self.DEADLINE_FIELD] is not None

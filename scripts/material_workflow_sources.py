@@ -20,6 +20,7 @@ RUNTIME = (
     'scripts/material_workflow.py',
     'scripts/material_workflow_sources.py',
     'scripts/material_ledger.py',
+    'scripts/material_evidence.py',
     'scripts/run_material_lifecycle.py',
     'scripts/manual_workflow.py',
     'scripts/manual_tasks.py',

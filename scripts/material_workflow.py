@@ -9,9 +9,10 @@ import copy
 import re
 import uuid
 
-from manual_tasks import MATERIAL_FORMATS, TaskError, digest, encoded
+from manual_tasks import MATERIAL_FORMATS, MATERIAL_STATE_V3, TaskError, digest, encoded
 from manual_workflow import ManualWorkflow, ObservationError
 import material_ledger as ledger
+import material_evidence
 from material_workflow_sources import load
 
 
@@ -33,10 +34,14 @@ class MaterialWorkflow(ManualWorkflow):
         return cls._create_definition(journal, definition, run_id=run_id)
 
     @classmethod
-    def _create_definition(cls, journal, definition, run_id=None, extra_state=None):
+    def _create_definition(cls, journal, definition, run_id=None, extra_state=None, initial_artifacts=None):
         if (cls.STATE_FORMAT not in MATERIAL_FORMATS or not isinstance(definition, dict)
                 or definition.get('format') != MATERIAL_FORMATS[cls.STATE_FORMAT]):
             raise TaskError('Material workflow state and definition versions must match')
+        if cls.STATE_FORMAT == MATERIAL_STATE_V3 and (not isinstance(extra_state, dict)
+                or not {'clock', 'observation_context'} <= set(extra_state)
+                or not isinstance(extra_state['clock'], dict)):
+            raise TaskError('Manual material state requires explicit clock and observation context fields')
         identity = run_id or 'SYN.MATERIAL.' + uuid.uuid4().hex[:12]
         if not isinstance(identity, str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', identity):
             raise TaskError('Run id requires 1-64 ASCII letters, digits, dots, underscores or hyphens')
@@ -53,8 +58,10 @@ class MaterialWorkflow(ManualWorkflow):
                 raise TaskError('Material state extensions cannot override common fields')
             state.update(copy.deepcopy(extra_state))
         state['resources'] = cls._resources(state)
-        journal.create(identity, state, immutable_definition=True,
-                       material_allocations=definition['material_allocations'])
+        options = {'immutable_definition': True, 'material_allocations': definition['material_allocations']}
+        if initial_artifacts is not None:
+            options['initial_artifacts'] = initial_artifacts
+        journal.create(identity, state, **options)
         return cls(journal, identity, session)
 
     @staticmethod
@@ -125,8 +132,8 @@ class MaterialWorkflow(ManualWorkflow):
         found = self._inventory(state, observations, actor_id)
         for identity, location in found.items():
             state['inventory']['vessels'][identity]['location'] = location
-        state['inventory_confirmation'] = {'actor_id': actor_id, 'evidence': 'synthetic_input',
-                                           'inventory_sha256': self._inventory_digest(state)}
+        state['inventory_confirmation'] = material_evidence.inventory_receipt(
+            state, actor_id, self._inventory_digest(state))
 
     def _accept_inventory(self, state, actor_id, observations):
         if state['status'] != 'created':

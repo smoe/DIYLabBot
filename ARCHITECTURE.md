@@ -747,8 +747,9 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 
 ## CUT&RUN: geplanter Ablaufvertrag
 
-**Stand 12. November 2026: E1-Preflight, gemeinsamer E2-Materialvertrag und
-synthetischer E3-Lauf implementiert; keine reale CUT&RUN-Ausführung oder
+**Stand 12. November 2026: E1-Preflight, gemeinsamer E2-Materialvertrag,
+synthetischer E3-Lauf und erster manueller E4-Aufzeichnungskern implementiert;
+keine reale CUT&RUN-Ausführung oder
 biologische Qualifikation.** Die erste Ausbaustufe
 führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
 CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
@@ -783,6 +784,16 @@ Temperaturabdeckung, Produkt-QC und Wiederanlauf. Eigene ausgegebene Stopp-Aliqu
 ermöglichen disjunkte Stopps bei ungeklärter Aktivierung. Reale SOP und
 biochemische Qualifikation bleiben offen; ältere aktive Quellenpins werden
 nicht still migriert.
+
+Der [manuelle E4-Aufzeichnungskern](docs/cutrun-manual-runtime.md) bindet den
+lokalen SOP-Entwurf 0.1 mit einem eigenen geschlossenen `/3`-Formatpaar.
+Er verwendet dasselbe Journal und Ledger für Originalbelege, Personenbeobachtungen,
+reale UTC-/Monotonieintervalle, Aktivierung/Schutzstopp und Wiederanlaufabgleich.
+QC-Originale werden manuell zugeordnet; technische und biologische Bewertungen
+bleiben getrennt. Offene Laborparameter bleiben `null`; Systemuhrbeobachtungen
+sind kein qualifizierter Zeitnachweis. Vollständige SOP-Stufenfolge, reale
+Temperatur-/Zeitqualifikation und E4-Abnahme fehlen weiterhin. Ein geschlossener
+Aufzeichnungskopf behauptet keinen Referenzerfolg; `execution_ready` bleibt falsch.
 
 ### Quellenbindung und Varianten
 

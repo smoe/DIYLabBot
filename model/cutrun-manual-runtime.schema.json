@@ -1,0 +1,1502 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-manual-runtime.schema.json",
+  "title": "Manual CUT&RUN capture preparation; no synthetic laboratory defaults",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "synthetic",
+    "sources",
+    "context",
+    "roles",
+    "stage_bindings",
+    "parameters",
+    "local_decisions",
+    "qc_plan",
+    "handover_plan"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-manual-runtime-profile/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "mode": {
+      "const": "manual_observation"
+    },
+    "synthetic": {
+      "const": false
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sop",
+        "manufacturer"
+      ],
+      "properties": {
+        "sop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256",
+            "id",
+            "revision"
+          ],
+          "properties": {
+            "source": {
+              "const": "docs/cutrun-manual-sop-draft.md"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "id": {
+              "const": "SOP-CR-SKM29-H3K4me3"
+            },
+            "revision": {
+              "const": "0.1"
+            }
+          }
+        },
+        "manufacturer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "source_sha256",
+            "datasheet_revision",
+            "protocol_revision"
+          ],
+          "properties": {
+            "url": {
+              "const": "https://media.cellsignal.com/pdf/86652.pdf"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "datasheet_revision": {
+              "const": "9"
+            },
+            "protocol_revision": {
+              "const": "09/2026"
+            }
+          }
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cell_line",
+        "target",
+        "culture_id",
+        "material_state",
+        "condition_id"
+      ],
+      "properties": {
+        "cell_line": {
+          "const": "SK-Mel-29"
+        },
+        "target": {
+          "const": "H3K4me3"
+        },
+        "culture_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "material_state": {
+          "enum": [
+            null,
+            "fresh_unfixed"
+          ]
+        },
+        "condition_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "h3k4me3",
+        "igg",
+        "input",
+        "ntc"
+      ],
+      "properties": {
+        "h3k4me3": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "material_id",
+            "vessel_id"
+          ],
+          "properties": {
+            "role": {
+              "const": "reference"
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "igg": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "material_id",
+            "vessel_id"
+          ],
+          "properties": {
+            "role": {
+              "const": "negative_control"
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "input": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "material_id",
+            "vessel_id"
+          ],
+          "properties": {
+            "role": {
+              "const": "input"
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        },
+        "ntc": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "role",
+            "material_id",
+            "vessel_id"
+          ],
+          "properties": {
+            "role": {
+              "const": "pcr_ntc"
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "stage_bindings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12"
+      ],
+      "properties": {
+        "S01": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S01"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "5. Manuelle Arbeitsfolge und Aufzeichnungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S02": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S02"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "4. Material-, Gef\u00e4\u00df- und Arbeitsplatzplan"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O01",
+                "O02"
+              ]
+            },
+            "required_parameters": {
+              "const": [
+                "input_cells"
+              ]
+            }
+          }
+        },
+        "S03": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S03"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "3.2 Quellengepr\u00fcfte Eckwerte"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O01",
+                "O02",
+                "O03",
+                "O10"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S04": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S04"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "5. Manuelle Arbeitsfolge und Aufzeichnungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S05": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S05"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "5. Manuelle Arbeitsfolge und Aufzeichnungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S06": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S06"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "6. Stopp, Unterbrechung und Abweichungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03",
+                "O05"
+              ]
+            },
+            "required_parameters": {
+              "const": [
+                "task_deadline_s",
+                "activation_volume_ul",
+                "stop_volume_ul",
+                "activation_duration_s",
+                "stop_window_s",
+                "temperature_tolerance_deg_c",
+                "activation_temperature_deg_c",
+                "phase_tolerance_s",
+                "input_cells"
+              ]
+            }
+          }
+        },
+        "S07": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S07"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "6. Stopp, Unterbrechung und Abweichungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03",
+                "O05"
+              ]
+            },
+            "required_parameters": {
+              "const": [
+                "task_deadline_s",
+                "activation_volume_ul",
+                "stop_volume_ul",
+                "activation_duration_s",
+                "stop_window_s",
+                "temperature_tolerance_deg_c",
+                "activation_temperature_deg_c",
+                "phase_tolerance_s",
+                "input_cells"
+              ]
+            }
+          }
+        },
+        "S08": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S08"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "6. Stopp, Unterbrechung und Abweichungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03",
+                "O05"
+              ]
+            },
+            "required_parameters": {
+              "const": [
+                "stop_volume_ul",
+                "stop_window_s",
+                "temperature_tolerance_deg_c",
+                "phase_tolerance_s",
+                "task_deadline_s"
+              ]
+            }
+          }
+        },
+        "S09": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S09"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "3.1 Lokale Auswahl in Fassung 0.1"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O04"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S10": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S10"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "5. Manuelle Arbeitsfolge und Aufzeichnungen"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O03",
+                "O04"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S11": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S11"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "7. Produkt-QC und Abschlusskriterien"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O08"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        },
+        "S12": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "sop_step",
+            "source_ref",
+            "section",
+            "required_decisions",
+            "required_parameters"
+          ],
+          "properties": {
+            "sop_step": {
+              "const": "S12"
+            },
+            "source_ref": {
+              "const": "sop"
+            },
+            "section": {
+              "const": "7. Produkt-QC und Abschlusskriterien"
+            },
+            "required_decisions": {
+              "const": [
+                "O06",
+                "O07",
+                "O08",
+                "O09",
+                "O11",
+                "O07"
+              ]
+            },
+            "required_parameters": {
+              "const": []
+            }
+          }
+        }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_deadline_s",
+        "activation_volume_ul",
+        "stop_volume_ul",
+        "activation_duration_s",
+        "stop_window_s",
+        "temperature_tolerance_deg_c",
+        "activation_temperature_deg_c",
+        "phase_tolerance_s",
+        "input_cells"
+      ],
+      "properties": {
+        "task_deadline_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        },
+        "activation_volume_ul": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "uL"
+                }
+              }
+            }
+          ]
+        },
+        "stop_volume_ul": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "uL"
+                }
+              }
+            }
+          ]
+        },
+        "activation_duration_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        },
+        "stop_window_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        },
+        "temperature_tolerance_deg_c": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "degC"
+                }
+              }
+            }
+          ]
+        },
+        "activation_temperature_deg_c": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "degC"
+                }
+              }
+            }
+          ]
+        },
+        "phase_tolerance_s": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "s"
+                }
+              }
+            }
+          ]
+        },
+        "input_cells": {
+          "allOf": [
+            {
+              "$ref": "#/$defs/fact"
+            },
+            {
+              "properties": {
+                "unit": {
+                  "const": "cells"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "local_decisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "O01",
+        "O02",
+        "O03",
+        "O04",
+        "O05",
+        "O06",
+        "O07",
+        "O08",
+        "O09",
+        "O10",
+        "O11"
+      ],
+      "properties": {
+        "O01": {
+          "$ref": "#/$defs/decision"
+        },
+        "O02": {
+          "$ref": "#/$defs/decision"
+        },
+        "O03": {
+          "$ref": "#/$defs/decision"
+        },
+        "O04": {
+          "$ref": "#/$defs/decision"
+        },
+        "O05": {
+          "$ref": "#/$defs/decision"
+        },
+        "O06": {
+          "$ref": "#/$defs/decision"
+        },
+        "O07": {
+          "$ref": "#/$defs/decision"
+        },
+        "O08": {
+          "$ref": "#/$defs/decision"
+        },
+        "O09": {
+          "$ref": "#/$defs/decision"
+        },
+        "O10": {
+          "$ref": "#/$defs/decision"
+        },
+        "O11": {
+          "$ref": "#/$defs/decision"
+        }
+      }
+    },
+    "qc_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evaluation_mode",
+        "scope",
+        "roles"
+      ],
+      "properties": {
+        "evaluation_mode": {
+          "const": "manual_review"
+        },
+        "scope": {
+          "const": "raw_dna"
+        },
+        "roles": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "h3k4me3",
+            "igg",
+            "input",
+            "ntc"
+          ],
+          "properties": {
+            "h3k4me3": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methods",
+                "assay_id",
+                "criteria",
+                "limits",
+                "evidence_ref"
+              ],
+              "properties": {
+                "methods": {
+                  "const": [
+                    "fluorometry",
+                    "qpcr"
+                  ]
+                },
+                "assay_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "limits": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "evidence_ref": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "igg": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methods",
+                "assay_id",
+                "criteria",
+                "limits",
+                "evidence_ref"
+              ],
+              "properties": {
+                "methods": {
+                  "const": [
+                    "fluorometry",
+                    "qpcr"
+                  ]
+                },
+                "assay_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "limits": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "evidence_ref": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "input": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methods",
+                "assay_id",
+                "criteria",
+                "limits",
+                "evidence_ref"
+              ],
+              "properties": {
+                "methods": {
+                  "const": [
+                    "fluorometry",
+                    "qpcr"
+                  ]
+                },
+                "assay_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "limits": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "evidence_ref": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            },
+            "ntc": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "methods",
+                "assay_id",
+                "criteria",
+                "limits",
+                "evidence_ref"
+              ],
+              "properties": {
+                "methods": {
+                  "const": [
+                    "qpcr"
+                  ]
+                },
+                "assay_id": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "criteria": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "limits": {
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                },
+                "evidence_ref": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "minLength": 1,
+                      "pattern": "\\S"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "handover_plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipient_id",
+        "storage_location",
+        "conditions",
+        "evidence_ref"
+      ],
+      "properties": {
+        "recipient_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "storage_location": {
+          "type": [
+            "object",
+            "null"
+          ]
+        },
+        "conditions": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "basis",
+        "source_ref",
+        "evidence_ref"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "cells",
+            "degC",
+            "s",
+            "uL"
+          ]
+        },
+        "basis": {
+          "enum": [
+            "unknown",
+            "manufacturer_reported",
+            "local_proposal",
+            "locally_confirmed"
+          ]
+        },
+        "source_ref": {
+          "enum": [
+            "sop",
+            "manufacturer",
+            null
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "basis": {
+                "const": "unknown"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              },
+              "source_ref": {
+                "type": "null"
+              },
+              "evidence_ref": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "basis": {
+                "const": "locally_confirmed"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence_ref": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "value",
+        "actor_id",
+        "confirmed_at",
+        "evidence_ref"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "open",
+            "confirmed"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        },
+        "actor_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "confirmed_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "open"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              },
+              "actor_id": {
+                "type": "null"
+              },
+              "confirmed_at": {
+                "type": "null"
+              },
+              "evidence_ref": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "not": {
+                  "type": "null"
+                }
+              },
+              "actor_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "confirmed_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "evidence_ref": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

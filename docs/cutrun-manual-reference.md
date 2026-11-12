@@ -12,7 +12,11 @@ Der [lokale SOP-Entwurf, Fassung 0.1](cutrun-manual-sop-draft.md), ist jetzt
 erstellt. Er bindet eine lokal gesicherte CST-Originalfassung als
 Entwurfsreferenz, kennzeichnet offene Parameter und führt Abweichungen sowie
 unbekannte Übereinstimmungen zum Paper ausdrücklich auf. Seine fachliche
-Prüfung und operative Bindung stehen aus.
+Prüfung und operative Bindung stehen aus. Ein
+[erster manueller Aufzeichnungskern](cutrun-manual-runtime.md) ergänzt jetzt den
+Softwarevertrag für Quellen, Beobachtungen, reale Zeitintervalle und manuell
+zugeordnete QC-Originale. Er führt keine vollständige biochemische SOP aus;
+die Abnahme nach O12 und der tatsächliche E4-Referenznachweis bleiben offen.
 
 ## Bereits festgelegt
 
@@ -183,14 +187,16 @@ zu liefernden Implementierungen:
    verwendeten Reagenzrollen, Fähigkeiten, Fraktionen und kontrollabhängige QC
    einmalig beschreiben. E1-/E3-Modelle bleiben synthetisch; kein stiller Wechsel
    ihres Modus und kein Überschreiben historischer Läufe.
-2. **Manuelle Beobachtungen versionieren:** gemeinsame Ablaufhülle, Journal,
-   Materialbuchungen und laufexklusive Aliquotzuteilung wiederverwenden.
-   Personenbestätigung, Messdatei und synthetische Eingabe unterscheiden;
-   Originalbelege unverändert erhalten. Es entsteht keine zweite Mengenbilanz.
-3. **Reale Zeit und Wiederanlauf ergänzen:** unabhängig fortschreitende
-   Zeitführung, Uhrkontinuität beziehungsweise belegte Unsicherheit nach
-   Unterbrechung, unveränderte Reaktionsfristen und extern beobachtete Stopps
-   erfassen. Eine Rückkehr zum Rechner darf Zeit nicht zurücksetzen.
+2. **Manuellen Aufzeichnungskern vervollständigen:** das
+   [implementierte Formatpaar /3](cutrun-manual-runtime.md) verwendet gemeinsame
+   Ablaufhülle, Journal, Materialbuchungen und laufexklusive Aliquotzuteilung.
+   Originale und Beobachtungsherkunft bleiben erhalten. Vollständige SOP-Folge,
+   alle Reagenzrollen und die operative Abnahme sind noch zu ergänzen.
+3. **Reale Zeit qualifizieren:** UTC-/Monotoniebeobachtungen, unbekannte
+   Unterbrechungen, unveränderte Fristen und externe Stoppevidenz sind im ersten
+   Kernel erfasst. Der Standard-Uhranbieter ist unqualifiziert; ein geeigneter
+   realer Zeit-/Temperaturnachweis und die Prüfung des lokalen Ausfallwegs
+   bleiben erforderlich. Eine Rückkehr zum Rechner setzt Zeit nicht zurück.
 4. **QC und vollständigen Verbrauch anbinden:** die ausgewählten realen
    Exportformate anhand vorhandener Originalbeispiele prüfen; Produkt-QC,
    Kontrollen und fachliche Bewertung passend zur SOP binden. Sämtliche
@@ -205,19 +211,23 @@ E1 verlangt weiterhin offene historische SOP-Felder; deren technische
 Weiterentwicklung gehört zur Bindung der neuen lokalen Anweisung. Der E3-QC-Testvertrag
 verlangt quantifizierbare Produktsignale in allen Zweigen. Diese Grenzen lassen
 sich nicht durch Eintragen realer Messwerte oder Umbenennen des Fixtures lösen.
-Bis der eigene manuelle Vertrag implementiert und geprüft ist, sind weder
-E3-`demo` noch dessen `act`-Befehle ein Einstieg für E4-Laborhandlungen.
+E3-`demo` und dessen `act`-Befehle bleiben synthetisch. Der eigene
+[manuelle Einstieg](cutrun-manual-runtime.md) dient zunächst der Aufzeichnung
+und dem technischen Abgleich. Sein Abschluss ist keine Freigabe oder
+Bestätigung eines vollständigen E4-Laborlaufs.
 
 ## Aktueller Übergabestand
 
 - **Erledigt:** E4-Umfang, Entscheidungs-/Nachweismatrix, Aufzeichnungsbedarf
   und notwendige Softwareerweiterungen vorbereitet; lokaler SOP-Entwurf 0.1
-  und bytegebundene aktuelle CST-Originalkopie erstellt.
+  und bytegebundene aktuelle CST-Originalkopie erstellt; erster manueller
+  Aufzeichnungskern mit eigener offener Profilvorlage implementiert.
 - **Offen beim Eigentümer/Labor:** konkrete Unterlagen und Entscheidungen aus
   der Tabelle; insbesondere Bestandskultur/erste Bedingung sowie fachliche
   Prüfung der vorgeschlagenen Varianten und Abnahmekriterien.
 - **Offen in der Entwicklung:** Einarbeitung der fachlichen Entscheidungen
-  in den Anweisungsentwurf, gebundenes manuelles Laufprofil, reales
-  Beobachtungs-/Zeit-/QC-Format und dessen Prüfungen.
+  in den Anweisungsentwurf und das manuelle Profil; vollständiger
+  SOP-/Zeit-/Temperatur-/QC-Vertrag und dessen operative Abnahme. Der erste
+  Aufzeichnungskern schließt O12 und E4 nicht ab.
 - **Nicht nachgewiesen:** tatsächliche Durchführung, biologische Eignung,
   automatische Dosierung, Hardwareausführung oder E4-Abschluss.

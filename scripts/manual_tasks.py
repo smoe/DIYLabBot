@@ -26,8 +26,11 @@ MATERIAL_STATE = 'solidcraftbot.material-workflow-state/1'
 MATERIAL_DEFINITION = 'solidcraftbot.material-workflow-definition/1'
 MATERIAL_STATE_V2 = 'solidcraftbot.material-workflow-state/2'
 MATERIAL_DEFINITION_V2 = 'solidcraftbot.material-workflow-definition/2'
+MATERIAL_STATE_V3 = 'solidcraftbot.material-workflow-state/3'
+MATERIAL_DEFINITION_V3 = 'solidcraftbot.material-workflow-definition/3'
 MATERIAL_FORMATS = {MATERIAL_STATE: MATERIAL_DEFINITION,
-                    MATERIAL_STATE_V2: MATERIAL_DEFINITION_V2}
+                    MATERIAL_STATE_V2: MATERIAL_DEFINITION_V2,
+                    MATERIAL_STATE_V3: MATERIAL_DEFINITION_V3}
 
 
 class Journal:
@@ -367,7 +370,7 @@ class Journal:
                                 (alias, value['run_id'], value['material_id'], value['vessel_id'],
                                  value['declaration_sha256'], value['introduction_sha256']))
 
-    def create(self, run_id, state, *, immutable_definition=False, material_allocations=None):
+    def create(self, run_id, state, *, immutable_definition=False, material_allocations=None, initial_artifacts=None):
         if type(immutable_definition) is not bool:
             raise TaskError('Explicit immutable-definition storage option required')
         try:
@@ -394,6 +397,16 @@ class Journal:
                 content = encoded(state['definition']).encode()
                 reference = digest(content)
                 self.connection.execute('INSERT OR IGNORE INTO artifacts VALUES (?, ?)', (reference, content))
+            if initial_artifacts is not None:
+                if not isinstance(initial_artifacts, dict):
+                    raise TaskError('Initial artifacts must map SHA-256 references to original bytes')
+                for checksum, content in initial_artifacts.items():
+                    if (not isinstance(checksum, str) or len(checksum) != 64
+                            or any(character not in '0123456789abcdef' for character in checksum)
+                            or not isinstance(content, bytes) or digest(content) != checksum):
+                        raise TaskError('Initial artifact hash does not match its original bytes')
+                    self.connection.execute('INSERT OR IGNORE INTO artifacts VALUES (?, ?)', (checksum, content))
+                    self.artifact(checksum)
             if allocations is not None:
                 resources = state.get('resources')
                 if (not isinstance(resources, list)
