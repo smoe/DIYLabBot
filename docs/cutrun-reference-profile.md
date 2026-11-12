@@ -5,8 +5,13 @@ E0 ist begonnen, die konkrete SOP-Bindung bleibt offen.** Dieser Entwurf konkret
 [E0 der Roadmap](../ROADMAP.md) innerhalb des
 [Architekturvertrags](../ARCHITECTURE.md#cutrun). Der
 [wirkungsfreie E1-Preflight](cutrun-preflight.md) ist mit maschinenlesbaren Quellen
-und Schema implementiert. Dieser Entwurf ist keine Labor-SOP; eine ausführende
-CUT&RUN-Laufzeit oder ein Geräteadapter folgt daraus nicht.
+und Schema implementiert. Der [E3-Lauf](cutrun-synthetic-workflow.md) ergänzt
+synthetische Prozessbeobachtungen. Die [begonnene E4-Vorbereitung](cutrun-manual-reference.md)
+führt die noch benötigten Entscheidungen und Nachweise für den manuellen
+Referenzlauf. Dieser Entwurf ist keine Labor-SOP und kein realer Geräteadapter.
+Der [lokale SOP-Entwurf 0.1](cutrun-manual-sop-draft.md) konkretisiert inzwischen
+eine aktuelle CST-basierte Variante mit offenen Parametern und Paper-Abgleich;
+fachliche Bestätigung und reale Durchführung stehen aus.
 
 ## Festgelegter Kontext und erster Modellfall
 
@@ -31,17 +36,32 @@ Input, gereinigte DNA mit QC und Übergabe**. SK-Mel-29 folgt der Publikation;
 eine konkrete Bestandslinie ist damit noch nicht bestätigt. Zunächst wird eine
 einzige Ausgangsbedingung modelliert. Der frühere HCT-116-Vorschlag entfällt.
 
-Die CST-Kitfamilie wird durch die Publikation gestützt. Die bisher vorgeschlagene
-Bindung an **#86652, unfixierte Zellen und Säulenreinigung** bleibt eine
-Arbeitsannahme, bis der damalige Quellenstand beziehungsweise eine ausdrücklich
-gewählte aktuelle SOP abgeglichen ist. Es wird keine Beschaffung ausgelöst.
+Mit dem aktuellen E4-Auftrag ist **SK-Mel-29/H3K4me3 als Referenzprofilziel**
+ausdrücklich benannt. Die physische Bestandskultur, deren Zustand und erste
+Versuchsbedingung bleiben vor dem manuellen Lauf konkret zu binden.
+
+Der Eigentümer hat inzwischen **das Kit aus der Publikation** gewählt und
+klargestellt, dass **keine lokale SOP vorhanden ist**. Damit ist die im
+[Methodenabschnitt 2.4](https://pmc.ncbi.nlm.nih.gov/articles/PMC12839168/)
+genannte Kitfamilie **CST CUT&RUN Assay Kit** festgelegt. Die
+[heutige Herstellerzuordnung #86652](https://www.cellsignal.com/products/cut-run-kits-reagents/cut-run-assay-kit/86652)
+belegt die aktuelle Artikelbezeichnung; Artikelnummer und Anleitungsrevision
+des damaligen Versuchs bleiben im gelesenen Paperabschnitt unbestimmt.
+Die Entwicklung erstellt einen neuen lokalen Anweisungsentwurf mit
+ausdrücklicher Quellen- und Variantenbindung. Eine vorhandene lokale SOP
+wird dafür nicht mehr angefordert.
+
+Die CST-Kitfamilie ist damit gewählt. **Unfixierte Zellen und Säulenreinigung**
+bleiben Verfahrenskandidaten. #86652 ist eine aktuelle Herstellerzuordnung,
+keine belegte historische Artikelnummer. Der operative Quellenstand wird im
+neuen lokalen Entwurf ausdrücklich festgelegt. Es wird keine Beschaffung ausgelöst.
 
 | Profilteil | Vorschlag | Noch zu bestätigen |
 |---|---|---|
 | Material | Melanomzelllinien sind bestätigt; erster In-silico-Kandidat ist die humane SK-Mel-29 aus der Publikation. Frisch/unfixiert bleibt zunächst eine Modellannahme. | Konkrete Laborlinie, Zustand und lokale SOP; keine Kerne oder fixierten Pellets still gleichsetzen. |
 | Eingangsmenge | Zunächst 100.000 gezählte Zellen je CUT&RUN-Reaktion und ein entsprechend bereitgestelltes Input-Aliquot. | Verfügbare Menge, Zähl-/Qualitätsevidenz und Bedarf für Vorbereitungstests sowie spätere Wiederholungen. |
 | Referenzziel | H3K4me3 ist bestätigt. C42D8-Kaninchen-mAb #9751 und Rabbit-DA1E-IgG #66362 bleiben vorgeschlagene Artikelbindungen. | Mit Publikations-/Laborunterlagen abgleichen; spätere Chargen sind noch keine Voraussetzung für eine synthetische Annahme. |
-| Enzym und Kit | CST-Kitfamilie laut Publikation; #86652 mit pAG-MNase #57813 bleibt der konkrete Vorschlag. | Tatsächlich verwendeter Artikel und SOP-Stand; keine ungeprüften Enzym-/Puffersubstitutionen. |
+| Enzym und Kit | CST CUT&RUN Assay Kit aus der Publikation ist gewählt; #86652 ist die aktuelle Herstellerzuordnung, pAG-MNase #57813 eine zu bindende Komponente. | Ausgegebene Artikel/Chargen und operativer Quellenstand im neuen lokalen Entwurf; historische Nummer/Revision bleiben gesondert offen. |
 | Kleiner Pilot | Eine biologische Ausgangsbedingung mit zwei CUT&RUN-Reaktionen (H3K4me3 und IgG) und einem getrennten Input-Zweig. | Material reicht aus. Dieser Pilot ersetzt keine unabhängigen Referenzwiederholungen oder Qualifikation. |
 | Reinigung | CST VII-A mit DNA Purification Buffers and Spin Columns #14209; Input nach VI mit passender Sonikation. | Kit #14209 und geeignete reale Geräte vorhanden; Fragmentanforderungen fachlich passend. |
 | QC | Fluorometrische Mengenbestimmung mit festzulegendem Assay; CST-VIII-qPCR mit zum Material passenden Kontrollprimern, Input und PCR-Leerkontrolle. | Assay, Gerät/Export, Primer und fachliche Kriterien. Qubit allein belegt keine Anreicherung; keine NanoDrop-Pflichtmessung. |
@@ -115,12 +135,13 @@ III, alle Parameter, Vorbereitungstests, zulässigen Pausen und Abweichungen
 müssen vor E0-Abschluss in der lokalen fachlich freigegebenen SOP eindeutig sein.
 Die gesamte Anleitung wird hier nicht nachgeschrieben.
 
-Eine lokale Originalkopie mit SHA-256 bleibt offen: Der direkte PDF-Download
-wurde am Lesedatum mit HTTP 403 abgewiesen; der Webleser konnte die Anleitung
-auswerten. Die gelesene Revision ist deshalb noch keine bytegebundene operative
-Quelle. Vor Freigabe einen rechtmäßig bereitgestellten Originalbeleg lokal
-archivieren und prüfen; ein späterer Download ersetzt ihn nicht still.
-Die Original-PDF wird durch diesen Entwurf nicht im Repository veröffentlicht.
+Am Lesedatum 11.11.2026 war der direkte PDF-Download mit HTTP 403 abgewiesen
+worden. **Aktualisierung 12.11.2026:** Die Originaldatei konnte für den
+[lokalen SOP-Entwurf 0.1](cutrun-manual-sop-draft.md) heruntergeladen und mit
+SHA-256 gebunden werden. Der Entwurf führt Pfad, Prüfsumme und den aktuellen
+Quellenstand; eine historische Paper-Revision wird dadurch nicht rekonstruiert.
+Die Original-PDF bleibt im privaten Laufzeitbereich und wird nicht im
+Repository veröffentlicht. Die operative fachliche Quellenbindung bleibt offen.
 
 ## Abhängigkeiten, die die Wahl verändern können
 
@@ -140,25 +161,27 @@ Die Original-PDF wird durch diesen Entwurf nicht im Repository veröffentlicht.
    Die CF01-Konzeptziele und
    modellierte Laborgeräte ersetzen das nicht. Siehe
    [CST V–VII/Anhang B](https://media.cellsignal.com/pdf/86652.pdf).
-3. **Andere vorhandene SOP:** Ist bereits ein anderes Kit oder ein bewährter
-   Eigenansatz etabliert, wird dessen vollständiger Quellenstand geprüft und
-   gegebenenfalls anstelle dieses Kandidaten gewählt. CR1 v3 bleibt ein
-   versionierter Vergleichskandidat; keine Temperatur-, Antikörper- oder
-   Reinigungselemente verschiedener Quellen zu einer Misch-SOP verbinden.
+3. **Neue lokale Anweisung:** Da keine lokale SOP vorliegt, wird für die
+   gewählte Kitfamilie ein versionierter Entwurf aus den gebundenen
+   Primärquellen erarbeitet und fachlich geprüft. CR1 v3 bleibt ein
+   Vergleichskandidat; keine Temperatur-, Antikörper- oder Reinigungselemente
+   verschiedener Quellen zu einer Misch-SOP verbinden.
 
 ## Noch offene Bindungen und E0-Abschluss
 
 Die grundsätzlichen Fragen nach Probenklasse, technischem Ziel, Gerätezugang,
-lokalem Umfeld und Verantwortung sind beantwortet. Für die In-silico-Arbeit wird
-SK-Mel-29 als erster Kandidat geführt; eine andere bestätigte Laborlinie kann
-ihn vor der endgültigen Profilbindung ersetzen.
+lokalem Umfeld und Verantwortung sind beantwortet. SK-Mel-29/H3K4me3 ist das
+gewählte Referenzprofilziel; die konkrete Bestandskultur und Ausgangsbedingung
+werden für den manuellen Lauf noch zugeordnet.
 
-Offen bleibt vor allem der **konkrete publizierte Labor-/SOP-Stand**: Artikel,
-Zellzustand, Eingangsmenge, Antikörper, Inkubations-/Reinigungszweig und QC.
-Publikation und vorhandene Laborunterlagen zuerst abgleichen; falls stattdessen
-die aktuelle CST-Variante gewählt wird, diesen Wechsel ausdrücklich benennen.
-Unbekannte Werte nicht als historische Messdaten ausgeben. Synthetische
-Parameter dürfen als solche festgelegt werden; sie schließen keine reale Abnahme.
+Offen bleibt die **operative Quellen- und Variantenbindung des neu zu
+erstellenden lokalen Entwurfs**: Zellzustand, Eingangsmenge, Antikörper,
+Inkubations-/Reinigungszweig und QC. Der historische Labor-/SOP-Stand ist
+weiterhin nicht belegt; er wird nicht vom Eigentümer als vorhandenes Dokument
+vorausgesetzt. Eine aktuelle Herstellerfassung wird ausdrücklich als solche
+benannt. Unbekannte Werte nicht als historische Messdaten ausgeben.
+Synthetische Parameter dürfen als solche festgelegt werden; sie schließen
+keine reale Abnahme.
 
 Für den Abschluss arbeiten wir Quellenbeleg, exakte Parameter-/Variantenwahl,
 Gefäß- und Reagenzidentitäten sowie Rollen aus und legen mit den Verantwortlichen
