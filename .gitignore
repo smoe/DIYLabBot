@@ -23,5 +23,6 @@ ros2_ws/log/
 /ros2_ws/src/solidcraftbot_ros/config/*.json
 /ros2_ws/src/solidcraftbot_ros/config/controllers.yaml
 /ros2_ws/src/solidcraftbot_cf01_interfaces/
+/ros2_ws/src/solidcraftbot_dna_interfaces/
 /interfaces/centrifuge-cf01/
 .DS_Store

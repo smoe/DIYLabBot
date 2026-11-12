@@ -1,0 +1,107 @@
+{
+  "format": "solidcraftbot.dna-quantification-protocol/1",
+  "id": "DNA.NanoDrop.QubitHS.Sequential",
+  "mode": "synthetic_only",
+  "sequence": [
+    "nanodrop",
+    "qubit"
+  ],
+  "dilution_presets": {
+    "none": {
+      "sample_parts": 1,
+      "diluent_parts": 0,
+      "factor": 1,
+      "label_de": "Unverdünnt"
+    },
+    "1+9": {
+      "sample_parts": 1,
+      "diluent_parts": 9,
+      "factor": 10,
+      "label_de": "1 Teil Probe + 9 Teile Verdünner (Faktor 10)"
+    },
+    "1+19": {
+      "sample_parts": 1,
+      "diluent_parts": 19,
+      "factor": 20,
+      "label_de": "1 Teil Probe + 19 Teile Verdünner (Faktor 20)"
+    }
+  },
+  "repeat_policy": {
+    "source": "fresh_original",
+    "new_pair_on_dilution": true,
+    "max_attempts_per_sample": 3,
+    "on_nanodrop_above_range": "offer_dilution_before_qubit",
+    "on_nanodrop_below_range": "continue_qubit_then_review",
+    "on_unknown_range": "review_without_auto_accept",
+    "repeat_preset": false
+  },
+  "assays": {
+    "nanodrop": {
+      "id": "NanoDrop.One.dsDNA.Microvolume",
+      "sample_volume_ul_min": 1.0,
+      "range": {
+        "basis": "selected_input_concentration",
+        "unit": "ng/uL",
+        "lower": 2.0,
+        "upper": 27500.0,
+        "lower_kind": "limit_of_detection_not_lloq"
+      },
+      "reference": {
+        "url": "https://assets.thermofisher.com/TFS-Assets/CAD/Specification-Sheets/NanoDrop-One-Specifications.pdf",
+        "document": "PS52754_E 0220",
+        "revision": "2020-02",
+        "pages": [
+          2
+        ]
+      }
+    },
+    "qubit": {
+      "id": "Qubit.dsDNA.HS",
+      "catalog_numbers": [
+        "Q32851",
+        "Q32854"
+      ],
+      "sample_volume_ul_min": 1.0,
+      "sample_volume_ul_max": 20.0,
+      "assay_total_volume_ul": 200.0,
+      "standard_volume_ul": 10.0,
+      "incubation_min_s": 120.0,
+      "range": {
+        "basis": "assay_dna_mass",
+        "unit": "ng",
+        "lower": 0.1,
+        "upper": 120.0
+      },
+      "reference": {
+        "url": "https://assets.thermofisher.com/TFS-Assets/LSG/manuals/Qubit_dsDNA_HS_Assay_UG.pdf",
+        "document": "MAN0002326",
+        "revision": "C.0",
+        "date": "2022-03-08",
+        "pages": [
+          1,
+          5,
+          8
+        ]
+      },
+      "result_basis_reference": {
+        "url": "https://documents.thermofisher.com/TFS-Assets/LSG/manuals/MAN0017209_Qubit_4_Fluorometer_UG.pdf",
+        "document": "MAN0017209",
+        "revision": "D.0",
+        "pages": [
+          24,
+          25,
+          26,
+          27
+        ]
+      }
+    }
+  },
+  "limitations": [
+    "Executable simulation and orchestration preparation; no device, pipette, scanner or robot commands",
+    "Manufacturer target bounds are reference checks, not validated laboratory performance or a qualified SOP",
+    "Qubit execution/calibration and CSV remain explicitly synthetic; the older standalone 100 uL fixture is unchanged",
+    "No cross-run stock continuation; preserve all attempts and derive consumption within this root",
+    "External dilution is prepared from the original; serial dilution is not executed",
+    "NanoDrop lower bound is detection, not qualified quantification; low NanoDrop still permits a Qubit HS reading"
+  ]
+}

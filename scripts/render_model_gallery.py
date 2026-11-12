@@ -27,7 +27,7 @@ WORK=ROOT/'tmp/model-gallery'
 # These exact, versioned formats describe transport contracts rather than new
 # geometry. Their referenced station models remain subject to image coverage.
 # Unknown formats and future revisions retain the default image requirement.
-NON_GEOMETRIC_SHARED_FORMATS=frozenset({'solidcraftbot.cf01-sila2/1'})
+NON_GEOMETRIC_SHARED_FORMATS=frozenset({'solidcraftbot.cf01-sila2/1', 'solidcraftbot.dna-sila2/1'})
 
 
 def read(path):return json.loads(Path(path).read_text(encoding='utf-8'))

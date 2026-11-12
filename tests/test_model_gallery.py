@@ -66,6 +66,13 @@ class ModelGalleryCoverageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'Model source without image: .*new-station.shared.json'):
             self.check()
 
+    def test_dna_workflow_transport_has_no_geometry_but_unknown_revision_does(self):
+        self.write_source('dna-quantification-sila2.shared.json', {'format': 'solidcraftbot.dna-sila2/1'})
+        self.assertTrue(self.check()['passed'])
+        self.write_source('dna-quantification-sila2.shared.json', {'format': 'solidcraftbot.dna-sila2/2'})
+        with self.assertRaisesRegex(ValueError, 'Model source without image'):
+            self.check()
+
     def test_transport_name_does_not_exempt_unknown_format_or_version(self):
         for format_name in ['test.network/1','solidcraftbot.cf01-sila2/2']:
             with self.subTest(format=format_name):
