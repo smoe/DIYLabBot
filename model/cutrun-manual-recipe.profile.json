@@ -1,0 +1,929 @@
+{
+  "format": "solidcraftbot.cutrun-manual-recipe-profile/1",
+  "id": "CUTRUN.SKMel29.H3K4me3.Manual.Recipe.Bindings",
+  "mode": "manual_observation",
+  "synthetic": false,
+  "incoming_preparation": {
+    "mode": null,
+    "evidence_ref": null
+  },
+  "cell_wash_branch": {
+    "value": null,
+    "evidence_ref": null
+  },
+  "roles": {
+    "stock.water": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.wash_10x": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.spermidine": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.pic": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.digitonin": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.antibody_binding_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.beads": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.bead_activation_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.h3k4me3_antibody": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.igg_antibody": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.pag_mnase": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.calcium_chloride": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.stop_4x": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.rnase": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.proteinase_k": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.input_extraction_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.column_binding_base": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.isopropanol": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.column_wash_base": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.ethanol": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.elution_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "stock.trypan_blue": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {},
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.cell_wash": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.wash_10x": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.spermidine": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.pic": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.water": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.antibody_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.antibody_binding_buffer": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.spermidine": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.pic": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.digitonin": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.digitonin_buffer": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.wash_10x": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.spermidine": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.pic": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.digitonin": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.water": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.pag_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "working.digitonin_buffer": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.pag_mnase": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.activated_beads": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.beads": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.bead_activation_buffer": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.input_extraction_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.input_extraction_buffer": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.proteinase_k": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.rnase": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.column_binding": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.column_binding_base": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.isopropanol": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.column_wash": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.column_wash_base": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.ethanol": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "h3k4me3.digestion_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "working.digitonin_buffer": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.calcium_chloride": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "h3k4me3.stop_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.stop_4x": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.digitonin": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.rnase": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.water": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "igg.digestion_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "working.digitonin_buffer": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.calcium_chloride": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "igg.stop_mix": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.stop_4x": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.digitonin": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.rnase": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.water": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    },
+    "working.permeabilization_wash": {
+      "mode": null,
+      "material_id": null,
+      "vessel_id": null,
+      "lot_ref": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "components": {
+        "stock.wash_10x": {
+          "value": null,
+          "unit": "uL"
+        },
+        "stock.water": {
+          "value": null,
+          "unit": "uL"
+        }
+      },
+      "output_quantity": {
+        "value": null,
+        "unit": "uL"
+      }
+    }
+  },
+  "steps": {
+    "S02.initial_separation": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S02.cell_wash": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S02.cell_resuspension": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.bead_activation_wash": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.bead_resuspension": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.bead_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.binding_medium_removal": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.antibody_buffer_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S04.antibody_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S05.antibody_medium_removal": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S05.digitonin_wash": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S05.enzyme_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S06.enzyme_medium_removal": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S06.preactivation_wash": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S07.activation": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S08.stop": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S08.released_fraction": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S09.input_extraction_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S09.clarified_fraction": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S10.binding_buffer_addition": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S10.column_load": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S10.column_wash": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S10.column_dry": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S10.column_elution": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.permeabilization_aliquot": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.permeabilization_buffer": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.permeabilization_digitonin": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.permeabilization_dye": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    },
+    "S03.permeabilization_read": {
+      "enabled": null,
+      "repeat_count": null,
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "evidence_ref": null
+    }
+  },
+  "consumables": {
+    "h3k4me3": {
+      "column_id": null,
+      "collection_vessel_id": null,
+      "elution_vessel_id": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "permeabilization_vessel_id": null
+    },
+    "igg": {
+      "column_id": null,
+      "collection_vessel_id": null,
+      "elution_vessel_id": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "permeabilization_vessel_id": null
+    },
+    "input": {
+      "column_id": null,
+      "collection_vessel_id": null,
+      "elution_vessel_id": null,
+      "preparation_ref": null,
+      "evidence_ref": null,
+      "permeabilization_vessel_id": null
+    }
+  },
+  "permeabilization": {
+    "mode": null,
+    "evidence_ref": null
+  }
+}

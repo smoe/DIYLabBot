@@ -19,6 +19,9 @@ def workflow_class(journal, run_id):
     if engine == 'cutrun_manual_sop/1':
         from cutrun_manual_sop_workflow import CutRunManualSopWorkflow
         return CutRunManualSopWorkflow
+    if engine == 'cutrun_manual_recipe/1':
+        from cutrun_manual_recipe_workflow import CutRunManualRecipeWorkflow
+        return CutRunManualRecipeWorkflow
     raise TaskError('Unknown manual runtime contract; no automatic format migration')
 
 
@@ -29,10 +32,12 @@ def main(argv=None):
     prepare = sub.add_parser('prepare', help='Read-only SOP binding/readiness report; does not create a store')
     prepare.add_argument('--profile', type=Path);prepare.add_argument('--original-pdf', type=Path)
     prepare.add_argument('--sop-profile', type=Path)
+    prepare.add_argument('--recipe-profile', type=Path)
     prepare.add_argument('--evidence-manifest', type=Path);prepare.add_argument('--out', type=Path)
     create = sub.add_parser('create', help='Create a manual capture with explicit actual identities')
     create.add_argument('--profile', type=Path);create.add_argument('--inventory', type=Path, required=True)
     create.add_argument('--sop-profile', type=Path)
+    create.add_argument('--recipe-profile', type=Path)
     create.add_argument('--original-pdf', type=Path);create.add_argument('--evidence-manifest', type=Path)
     create.add_argument('--run-id');create.add_argument('--out', type=Path)
     for name in ('status', 'report', 'resume', 'act'):
@@ -45,9 +50,10 @@ def main(argv=None):
         args = parser.parse_args(argv)
         target = report_path(args.out) if args.out else None
         if args.command == 'prepare':
-            from cutrun_manual_sop_sources import compile_profile
+            from cutrun_manual_recipe_sources import compile_profile
             evidence = read_json(args.evidence_manifest) if args.evidence_manifest else None
-            result = compile_profile({'base_profile': args.profile, 'sop_profile': args.sop_profile},
+            result = compile_profile({'base_profile': args.profile, 'sop_profile': args.sop_profile,
+                                      'recipe_profile': args.recipe_profile},
                                      original_pdf=args.original_pdf, evidence_files=evidence)
             result.pop('evidence_artifacts')
         else:
@@ -58,13 +64,14 @@ def main(argv=None):
                 raise TaskError('Existing manual journal required')
             with Journal(store) as journal:
                 if args.command == 'create':
-                    from cutrun_manual_sop_workflow import CutRunManualSopWorkflow
+                    from cutrun_manual_recipe_workflow import CutRunManualRecipeWorkflow
                     inventory = read_json(args.inventory)
                     if not isinstance(inventory, dict) or set(inventory) != {'materials', 'vessels', 'reactions', 'actors'}:
                         raise TaskError('Explicit materials, vessels, reactions and attributable actors required')
                     evidence = read_json(args.evidence_manifest) if args.evidence_manifest else None
-                    flow = CutRunManualSopWorkflow.create(journal,
-                        {'base_profile': args.profile, 'sop_profile': args.sop_profile}, **inventory,
+                    flow = CutRunManualRecipeWorkflow.create(journal,
+                        {'base_profile': args.profile, 'sop_profile': args.sop_profile,
+                         'recipe_profile': args.recipe_profile}, **inventory,
                         original_pdf=args.original_pdf, evidence_files=evidence, run_id=args.run_id)
                     result = {'run_id': flow.run_id, 'session': flow.session, 'state': flow.state}
                 elif args.command == 'resume':

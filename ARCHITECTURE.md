@@ -843,8 +843,14 @@ werden im Softwarevertrag geprüft; Gerätesollwerte und einzelne Messpunkte
 genügen nicht. Beobachtungs- und Erfassungszeit bleiben getrennt. Neustart
 erneuert weder Stufe noch Frist, und spätere Widersprüche können frühere
 Abschlüsse entwerten. Der Schutzstopp bleibt unabhängig vom Nominalfortschritt
-erfassbar. Vollständige einzelne Herstellerrezept-/Waschunterpunkte, reale
-Temperatur-/Zeitqualifikation und E4-Abnahme fehlen weiterhin. Ein geschlossener
+erfassbar. Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-recipe.md)
+`cutrun_manual_recipe/1` ergänzt ausgewählte Waschgruppen, Arbeitsmischungen,
+Komponentenverbräuche und Fraktions-/Säulenübergänge im selben Ledger.
+Vorbereitete Ansätze benötigen Originalbelege; im Lauf hergestellte Mischungen
+verbrauchen ihre Stocks einmalig und werden danach selbst dosiert.
+Lokale Mengen und Wiederholungsentscheidungen bleiben offen. Reale
+Rezeptur-/Konzentrationsbestätigung, Temperatur-/Zeitqualifikation und
+E4-Abnahme fehlen weiterhin. Ein geschlossener
 Aufzeichnungskopf behauptet keinen Referenzerfolg; `execution_ready` bleibt falsch.
 
 ### Quellenbindung und Varianten

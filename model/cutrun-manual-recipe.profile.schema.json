@@ -1,0 +1,3833 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-manual-recipe.profile.schema.json",
+  "title": "Prospective recipe bindings; no inferred laboratory quantities",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "synthetic",
+    "incoming_preparation",
+    "cell_wash_branch",
+    "permeabilization",
+    "roles",
+    "steps",
+    "consumables"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-manual-recipe-profile/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "mode": {
+      "const": "manual_observation"
+    },
+    "synthetic": {
+      "const": false
+    },
+    "incoming_preparation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "evidence_ref"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            null,
+            "perform",
+            "external"
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "cell_wash_branch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "evidence_ref"
+      ],
+      "properties": {
+        "value": {
+          "enum": [
+            null,
+            "standard",
+            "low_cell_omit"
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "permeabilization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "evidence_ref"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            null,
+            "perform",
+            "external"
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stock.water",
+        "stock.wash_10x",
+        "stock.spermidine",
+        "stock.pic",
+        "stock.digitonin",
+        "stock.antibody_binding_buffer",
+        "stock.beads",
+        "stock.bead_activation_buffer",
+        "stock.h3k4me3_antibody",
+        "stock.igg_antibody",
+        "stock.pag_mnase",
+        "stock.calcium_chloride",
+        "stock.stop_4x",
+        "stock.rnase",
+        "stock.proteinase_k",
+        "stock.input_extraction_buffer",
+        "stock.column_binding_base",
+        "stock.isopropanol",
+        "stock.column_wash_base",
+        "stock.ethanol",
+        "stock.elution_buffer",
+        "stock.trypan_blue",
+        "working.cell_wash",
+        "working.antibody_buffer",
+        "working.digitonin_buffer",
+        "working.pag_mix",
+        "working.activated_beads",
+        "working.input_extraction_mix",
+        "working.column_binding",
+        "working.column_wash",
+        "h3k4me3.digestion_mix",
+        "h3k4me3.stop_mix",
+        "igg.digestion_mix",
+        "igg.stop_mix",
+        "working.permeabilization_wash"
+      ],
+      "properties": {
+        "stock.water": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.wash_10x": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.spermidine": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.pic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.digitonin": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.antibody_binding_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.beads": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.bead_activation_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.h3k4me3_antibody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.igg_antibody": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.pag_mnase": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.calcium_chloride": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.stop_4x": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.rnase": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.proteinase_k": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.input_extraction_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.column_binding_base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.isopropanol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.column_wash_base": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.ethanol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.elution_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "stock.trypan_blue": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.cell_wash": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.wash_10x",
+                "stock.spermidine",
+                "stock.pic",
+                "stock.water"
+              ],
+              "properties": {
+                "stock.wash_10x": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.spermidine": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.pic": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.water": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.antibody_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.antibody_binding_buffer",
+                "stock.spermidine",
+                "stock.pic",
+                "stock.digitonin"
+              ],
+              "properties": {
+                "stock.antibody_binding_buffer": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.spermidine": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.pic": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.digitonin": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.digitonin_buffer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.wash_10x",
+                "stock.spermidine",
+                "stock.pic",
+                "stock.digitonin",
+                "stock.water"
+              ],
+              "properties": {
+                "stock.wash_10x": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.spermidine": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.pic": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.digitonin": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.water": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.pag_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "working.digitonin_buffer",
+                "stock.pag_mnase"
+              ],
+              "properties": {
+                "working.digitonin_buffer": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.pag_mnase": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.activated_beads": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.beads",
+                "stock.bead_activation_buffer"
+              ],
+              "properties": {
+                "stock.beads": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.bead_activation_buffer": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.input_extraction_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.input_extraction_buffer",
+                "stock.proteinase_k",
+                "stock.rnase"
+              ],
+              "properties": {
+                "stock.input_extraction_buffer": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.proteinase_k": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.rnase": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.column_binding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.column_binding_base",
+                "stock.isopropanol"
+              ],
+              "properties": {
+                "stock.column_binding_base": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.isopropanol": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.column_wash": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.column_wash_base",
+                "stock.ethanol"
+              ],
+              "properties": {
+                "stock.column_wash_base": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.ethanol": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "h3k4me3.digestion_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "working.digitonin_buffer",
+                "stock.calcium_chloride"
+              ],
+              "properties": {
+                "working.digitonin_buffer": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.calcium_chloride": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "h3k4me3.stop_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.stop_4x",
+                "stock.digitonin",
+                "stock.rnase",
+                "stock.water"
+              ],
+              "properties": {
+                "stock.stop_4x": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.digitonin": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.rnase": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.water": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "igg.digestion_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "working.digitonin_buffer",
+                "stock.calcium_chloride"
+              ],
+              "properties": {
+                "working.digitonin_buffer": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.calcium_chloride": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "igg.stop_mix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.stop_4x",
+                "stock.digitonin",
+                "stock.rnase",
+                "stock.water"
+              ],
+              "properties": {
+                "stock.stop_4x": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.digitonin": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.rnase": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.water": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "working.permeabilization_wash": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "material_id",
+            "vessel_id",
+            "lot_ref",
+            "preparation_ref",
+            "evidence_ref",
+            "components",
+            "output_quantity"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                null,
+                "issued",
+                "prepared"
+              ]
+            },
+            "material_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "vessel_id": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "lot_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "preparation_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "evidence_ref": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1,
+                  "pattern": "\\S"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "components": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "stock.wash_10x",
+                "stock.water"
+              ],
+              "properties": {
+                "stock.wash_10x": {
+                  "$ref": "#/$defs/quantity"
+                },
+                "stock.water": {
+                  "$ref": "#/$defs/quantity"
+                }
+              }
+            },
+            "output_quantity": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        }
+      }
+    },
+    "steps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "S02.initial_separation",
+        "S02.cell_wash",
+        "S02.cell_resuspension",
+        "S03.bead_activation_wash",
+        "S03.bead_resuspension",
+        "S03.bead_addition",
+        "S03.binding_medium_removal",
+        "S03.antibody_buffer_addition",
+        "S04.antibody_addition",
+        "S05.antibody_medium_removal",
+        "S05.digitonin_wash",
+        "S05.enzyme_addition",
+        "S06.enzyme_medium_removal",
+        "S06.preactivation_wash",
+        "S07.activation",
+        "S08.stop",
+        "S08.released_fraction",
+        "S09.input_extraction_addition",
+        "S09.clarified_fraction",
+        "S10.binding_buffer_addition",
+        "S10.column_load",
+        "S10.column_wash",
+        "S10.column_dry",
+        "S10.column_elution",
+        "S03.permeabilization_aliquot",
+        "S03.permeabilization_buffer",
+        "S03.permeabilization_digitonin",
+        "S03.permeabilization_dye",
+        "S03.permeabilization_read"
+      ],
+      "properties": {
+        "S02.initial_separation": {
+          "$ref": "#/$defs/step"
+        },
+        "S02.cell_wash": {
+          "$ref": "#/$defs/step"
+        },
+        "S02.cell_resuspension": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.bead_activation_wash": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.bead_resuspension": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.bead_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.binding_medium_removal": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.antibody_buffer_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S04.antibody_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S05.antibody_medium_removal": {
+          "$ref": "#/$defs/step"
+        },
+        "S05.digitonin_wash": {
+          "$ref": "#/$defs/step"
+        },
+        "S05.enzyme_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S06.enzyme_medium_removal": {
+          "$ref": "#/$defs/step"
+        },
+        "S06.preactivation_wash": {
+          "$ref": "#/$defs/step"
+        },
+        "S07.activation": {
+          "$ref": "#/$defs/step"
+        },
+        "S08.stop": {
+          "$ref": "#/$defs/step"
+        },
+        "S08.released_fraction": {
+          "$ref": "#/$defs/step"
+        },
+        "S09.input_extraction_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S09.clarified_fraction": {
+          "$ref": "#/$defs/step"
+        },
+        "S10.binding_buffer_addition": {
+          "$ref": "#/$defs/step"
+        },
+        "S10.column_load": {
+          "$ref": "#/$defs/step"
+        },
+        "S10.column_wash": {
+          "$ref": "#/$defs/step"
+        },
+        "S10.column_dry": {
+          "$ref": "#/$defs/step"
+        },
+        "S10.column_elution": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.permeabilization_aliquot": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.permeabilization_buffer": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.permeabilization_digitonin": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.permeabilization_dye": {
+          "$ref": "#/$defs/step"
+        },
+        "S03.permeabilization_read": {
+          "$ref": "#/$defs/step"
+        }
+      }
+    },
+    "consumables": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "properties": {
+        "h3k4me3": {
+          "$ref": "#/$defs/consumable"
+        },
+        "igg": {
+          "$ref": "#/$defs/consumable"
+        },
+        "input": {
+          "$ref": "#/$defs/consumable"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "unit": {
+          "const": "uL"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "repeat_count",
+        "quantity",
+        "evidence_ref"
+      ],
+      "properties": {
+        "enabled": {
+          "type": [
+            "boolean",
+            "null"
+          ]
+        },
+        "repeat_count": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "quantity": {
+          "$ref": "#/$defs/quantity"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "consumable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "column_id",
+        "collection_vessel_id",
+        "elution_vessel_id",
+        "permeabilization_vessel_id",
+        "preparation_ref",
+        "evidence_ref"
+      ],
+      "properties": {
+        "column_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "collection_vessel_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "elution_vessel_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "permeabilization_vessel_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preparation_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

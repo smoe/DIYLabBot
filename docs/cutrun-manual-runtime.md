@@ -17,6 +17,12 @@ dasselbe Journal und dieselbe Bilanz. Vorhandene Aufzeichnungsläufe werden
 nicht zu SOP-Läufen migriert. Die CLI legt neue Läufe mit dem SOP-Vertrag an;
 beim Lesen wird der gespeicherte Engine-Typ geprüft.
 
+Die zusätzliche [Wasch- und Reagenzerweiterung](cutrun-manual-recipe.md)
+führt inzwischen die ausgewählten Waschfolgen, Arbeitsmischungen,
+Fraktionsentnahmen und Säulenbeladungen über dasselbe Ledger. Ihr eigener
+Engine-Typ `cutrun_manual_recipe/1` behält die offenen Laborparameter und die
+bisherigen Laufverträge bei.
+
 ## Quellen und offene Bindungen
 
 Die neue Quelle
@@ -45,8 +51,8 @@ Authentifizierung oder unabhängige Prüfung der fachlichen Freigabe.
 `open_requirements` benennt fehlende Angaben mit ihren betroffenen Stufen.
 Offene Bindungen sperren neue betroffene Absichten. Tatsächliche Beobachtungen,
 Originaldateien und nachträgliche Belege werden dadurch nicht verworfen.
-Der SOP-Vertrag ergänzt die Stufen- und Phasenfolge. Die vollständigen
-Herstellerrezepte, einzelne Waschunterpunkte und alle Rezeptkomponenten werden
+Der SOP-Vertrag ergänzt die Stufen- und Phasenfolge. Im reinen Stufenvertrag
+werden Herstellerrezepte, einzelne Waschunterpunkte und Rezeptkomponenten
 weiterhin aus dem gebundenen Original bezogen und nicht durch einen Decoder
 geprüft. Eine freie Notiz beweist keinen Stufenabschluss oder erfolgreichen
 Gerätevorgang.
@@ -327,16 +333,19 @@ SOP-Ausführung, biologische Eignung oder abgeschlossene E4-Abnahme.
 Zustand und Definition bilden das geschlossene Paar
 `solidcraftbot.material-workflow-state/3` und
 `solidcraftbot.material-workflow-definition/3`, mit den getrennten Engine-Typen
-`cutrun_manual_capture/1` und `cutrun_manual_sop/1`. Generische oder synthetische Runner können diesen
+`cutrun_manual_capture/1`, `cutrun_manual_sop/1` und
+[`cutrun_manual_recipe/1`](cutrun-manual-recipe.md). Generische oder synthetische
+Runner können diesen
 Vertrag nicht übernehmen. Frühere `/1`-/`/2`-Läufe werden nicht umgedeutet oder
 still migriert. Quellen und Laufzeitdateien sind gepinnt. Bei geänderten
 Runtimebytes verlangt ein aktiver alter Lauf Inspektion statt stiller
 Wiederaufnahme mit neuem Code.
 
 Nachgewiesen wird der Softwarevertrag mit ausdrücklich gekennzeichneten
-Testbeobachtungen. Sämtliche einzelnen Herstellerrezept- und Waschunterpunkte,
-alle Reagenzkomponentenverbräuche,
-realer Temperatur-/Zeitnachweis, native QC-Decoder, Geräte-/Hardwareausführung,
+Testbeobachtungen. Die zusätzliche Rezeptfassung prüft die ausgewählten
+Waschgruppen, Komponentenansätze und Istverbräuche. Reale
+Rezeptur-/Konzentrationsbestätigung, Temperatur-/Zeitnachweis, native QC-Decoder,
+Geräte-/Hardwareausführung,
 Personenauthentifizierung und biologische Akzeptanz sind gesonderte Arbeiten.
 Der SOP-Entwurf bleibt bytegleich gebunden; O12 und die vollständige E4-Abnahme
 werden durch die Softwareprüfung nicht geschlossen.

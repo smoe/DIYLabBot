@@ -644,9 +644,9 @@ class ManualSopCliTests(unittest.TestCase):
         self.assertFalse(plan['preparation_complete']);self.assertFalse(plan['can_claim_reference_success'])
         self.assertFalse(self.store.exists())
 
-    def test_default_create_uses_the_sop_engine_and_read_only_report_keeps_unstarted_stages(self):
+    def test_default_create_uses_the_recipe_engine_and_read_only_report_keeps_unstarted_stages(self):
         created = self.create()
-        self.assertEqual(created['state']['definition']['profile']['type'], 'cutrun_manual_sop/1')
+        self.assertEqual(created['state']['definition']['profile']['type'], 'cutrun_manual_recipe/1')
         before = self.snapshot()
         result, report = self.run_cli('report', self.RUN)
         self.assertEqual(result.returncode, 0, report.get('error', result.stderr))

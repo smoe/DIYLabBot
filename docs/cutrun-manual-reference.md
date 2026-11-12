@@ -19,6 +19,9 @@ zugeordnete QC-Originale. Er erzwingt die vollständige lokale Stufenfolge
 S01–S12 einschließlich getrennter Inputführung und phasenbezogener
 Zeit-/Temperaturbelege. Er führt keine biochemischen Arbeitsgänge aus;
 die Abnahme nach O12 und der tatsächliche E4-Referenznachweis bleiben offen.
+Die [Wasch- und Reagenzerweiterung](cutrun-manual-recipe.md) ergänzt jetzt
+die ausgewählten Reagenzansätze, Waschgruppen, Fraktionswechsel und
+tatsächlichen Säulenbeladungen im gemeinsamen Ledger.
 
 ## Bereits festgelegt
 
@@ -194,8 +197,9 @@ zu liefernden Implementierungen:
    Ablaufhülle, Journal, Materialbuchungen und laufexklusive Aliquotzuteilung.
    Originale und Beobachtungsherkunft bleiben erhalten. Der eigene SOP-Vertrag
    prüft inzwischen alle lokalen Stufen und acht Zeit-/Temperaturphasen.
-   Einzelne Herstellerrezept-/Waschunterpunkte, alle Komponentenverbräuche
-   und die operative Abnahme bleiben zu ergänzen.
+   Die eigene Rezeptfassung ergänzt die ausgewählten Waschgruppen und
+   Komponentenverbräuche; lokale Rezeptur-/Konzentrationsbestätigung und
+   operative Abnahme bleiben offen.
 3. **Reale Zeit qualifizieren:** UTC-/Monotoniebeobachtungen, unbekannte
    Unterbrechungen, unveränderte Fristen und externe Stoppevidenz sind im ersten
    Vertrag erfasst. Phasenbelege prüfen Zeitdomäne, Unsicherheit, Probenbezug
@@ -234,8 +238,9 @@ Bestätigung eines vollständigen E4-Laborlaufs.
   Prüfung der vorgeschlagenen Varianten und Abnahmekriterien.
 - **Offen in der Entwicklung:** Einarbeitung der fachlichen Entscheidungen
   in den Anweisungsentwurf und das manuelle Profil; vollständige einzelne
-  Herstellerrezept-/Waschunterpunkte, Komponentenverbräuche, reale
-  Zeit-/Temperaturqualifikation und operative Abnahme. Der Softwarevertrag
+  Rezeptur-/Konzentrationsbestätigung, reale Zeit-/Temperaturqualifikation
+  und operative Abnahme. Ausgewählte Waschgruppen und Komponentenverbräuche
+  sind im eigenen Rezeptvertrag implementiert. Der Softwarevertrag
   schließt O12 und E4 nicht ab.
 - **Nicht nachgewiesen:** tatsächliche Durchführung, biologische Eignung,
   automatische Dosierung, Hardwareausführung oder E4-Abschluss.

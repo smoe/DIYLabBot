@@ -115,6 +115,12 @@ class CutRunManualWorkflow(MaterialWorkflow):
         return {}
 
     @classmethod
+    def _validate_reagent_binding(cls, inventory, source, reaction_id, item, key):
+        reagent = inventory['materials'].get(item[key])
+        if reagent is None or reagent['kind'] != 'reagent':
+            raise TaskError('Distinct issued activation and stop aliquots required per reaction')
+
+    @classmethod
     def create(cls, journal, source=None, *, materials, vessels, reactions, actors,
                run_id=None, clock=None, original_pdf=None, evidence_files=None):
         provider = process_clock.SystemClock() if clock is None else clock
@@ -144,8 +150,8 @@ class CutRunManualWorkflow(MaterialWorkflow):
                     raise TaskError('Input is not an activation branch')
             else:
                 for key in ('activation_material_id', 'stop_material_id'):
-                    reagent = inventory['materials'].get(item[key])
-                    if reagent is None or reagent['kind'] != 'reagent' or item[key] in stop_ids:
+                    cls._validate_reagent_binding(inventory, source, reaction_id, item, key)
+                    if item[key] in stop_ids:
                         raise TaskError('Distinct issued activation and stop aliquots required per reaction')
                     stop_ids.add(item[key])
                 bindings[item['vessel_id']] = item['stop_material_id']

@@ -1,0 +1,1211 @@
+{
+  "format": "solidcraftbot.cutrun-manual-recipe-protocol/1",
+  "id": "CUTRUN.SKMel29.H3K4me3.Manual.Recipe.0.1",
+  "sop": {
+    "id": "SOP-CR-SKM29-H3K4me3",
+    "revision": "0.1"
+  },
+  "manufacturer": {
+    "url": "https://media.cellsignal.com/pdf/86652.pdf",
+    "source_sha256": "4569c1793c112e94cd8b0e5ca11ac7a82c53b2ce5dd46ce30831f653c830a34f",
+    "protocol_revision": "09/2026"
+  },
+  "scope": {
+    "material_state": "fresh_unfixed",
+    "purification": "VII-A",
+    "input": "VI plus locally confirmed sonication",
+    "normalization": "without_spike_in",
+    "permeabilization": "Appendix A identity conflict O10 must be resolved"
+  },
+  "reagent_roles": {
+    "stock.water": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "12931"
+    },
+    "stock.wash_10x": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "31415"
+    },
+    "stock.spermidine": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "27287"
+    },
+    "stock.pic": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "7012"
+    },
+    "stock.digitonin": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "16359"
+    },
+    "stock.antibody_binding_buffer": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "15338"
+    },
+    "stock.beads": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "82307"
+    },
+    "stock.bead_activation_buffer": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "91275"
+    },
+    "stock.h3k4me3_antibody": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "9751"
+    },
+    "stock.igg_antibody": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "66362"
+    },
+    "stock.pag_mnase": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "57813"
+    },
+    "stock.calcium_chloride": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "55676"
+    },
+    "stock.stop_4x": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "48105"
+    },
+    "stock.rnase": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "7013"
+    },
+    "stock.proteinase_k": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "10012"
+    },
+    "stock.input_extraction_buffer": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "42015"
+    },
+    "stock.column_binding_base": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "44364"
+    },
+    "stock.isopropanol": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": null
+    },
+    "stock.column_wash_base": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "10008"
+    },
+    "stock.ethanol": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": null
+    },
+    "stock.elution_buffer": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": "10009"
+    },
+    "stock.trypan_blue": {
+      "kind": "stock",
+      "components": [],
+      "source_ref": "R2",
+      "source_section": "Components; selected sections I-VII-A",
+      "pages": [
+        1,
+        4,
+        6,
+        7,
+        8
+      ],
+      "manufacturer_article": null
+    },
+    "working.cell_wash": {
+      "kind": "working",
+      "components": [
+        "stock.wash_10x",
+        "stock.spermidine",
+        "stock.pic",
+        "stock.water"
+      ],
+      "source_ref": "R2",
+      "source_section": "II-A Before Starting",
+      "pages": [
+        4
+      ],
+      "manufacturer_article": null
+    },
+    "working.antibody_buffer": {
+      "kind": "working",
+      "components": [
+        "stock.antibody_binding_buffer",
+        "stock.spermidine",
+        "stock.pic",
+        "stock.digitonin"
+      ],
+      "source_ref": "R2",
+      "source_section": "III Before Starting",
+      "pages": [
+        6
+      ],
+      "manufacturer_article": null
+    },
+    "working.digitonin_buffer": {
+      "kind": "working",
+      "components": [
+        "stock.wash_10x",
+        "stock.spermidine",
+        "stock.pic",
+        "stock.digitonin",
+        "stock.water"
+      ],
+      "source_ref": "R2",
+      "source_section": "IV Before Starting; V",
+      "pages": [
+        6,
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "working.pag_mix": {
+      "kind": "working",
+      "components": [
+        "working.digitonin_buffer",
+        "stock.pag_mnase"
+      ],
+      "source_ref": "R2",
+      "source_section": "IV Before Starting",
+      "pages": [
+        6
+      ],
+      "manufacturer_article": null
+    },
+    "working.activated_beads": {
+      "kind": "working",
+      "components": [
+        "stock.beads",
+        "stock.bead_activation_buffer"
+      ],
+      "source_ref": "R2",
+      "source_section": "I.3-7",
+      "pages": [
+        4
+      ],
+      "manufacturer_article": null
+    },
+    "working.input_extraction_mix": {
+      "kind": "working",
+      "components": [
+        "stock.input_extraction_buffer",
+        "stock.proteinase_k",
+        "stock.rnase"
+      ],
+      "source_ref": "R2",
+      "source_section": "VI Before Starting",
+      "pages": [
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "working.column_binding": {
+      "kind": "working",
+      "components": [
+        "stock.column_binding_base",
+        "stock.isopropanol"
+      ],
+      "source_ref": "R2",
+      "source_section": "VII-A Before Starting",
+      "pages": [
+        8
+      ],
+      "manufacturer_article": null
+    },
+    "working.column_wash": {
+      "kind": "working",
+      "components": [
+        "stock.column_wash_base",
+        "stock.ethanol"
+      ],
+      "source_ref": "R2",
+      "source_section": "VII-A Before Starting",
+      "pages": [
+        8
+      ],
+      "manufacturer_article": null
+    },
+    "h3k4me3.digestion_mix": {
+      "kind": "working",
+      "components": [
+        "working.digitonin_buffer",
+        "stock.calcium_chloride"
+      ],
+      "source_ref": "R2",
+      "source_section": "V Before Starting; V.5",
+      "pages": [
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "h3k4me3.stop_mix": {
+      "kind": "working",
+      "components": [
+        "stock.stop_4x",
+        "stock.digitonin",
+        "stock.rnase",
+        "stock.water"
+      ],
+      "source_ref": "R2",
+      "source_section": "V Before Starting; V.7",
+      "pages": [
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "igg.digestion_mix": {
+      "kind": "working",
+      "components": [
+        "working.digitonin_buffer",
+        "stock.calcium_chloride"
+      ],
+      "source_ref": "R2",
+      "source_section": "V Before Starting; V.5",
+      "pages": [
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "igg.stop_mix": {
+      "kind": "working",
+      "components": [
+        "stock.stop_4x",
+        "stock.digitonin",
+        "stock.rnase",
+        "stock.water"
+      ],
+      "source_ref": "R2",
+      "source_section": "V Before Starting; V.7",
+      "pages": [
+        7
+      ],
+      "manufacturer_article": null
+    },
+    "working.permeabilization_wash": {
+      "kind": "working",
+      "components": [
+        "stock.wash_10x",
+        "stock.water"
+      ],
+      "source_ref": "R2",
+      "source_section": "Appendix A Before Starting; O10 identity conflict unresolved",
+      "pages": [
+        10
+      ],
+      "manufacturer_article": null
+    }
+  },
+  "stage_steps": {
+    "S02": [
+      {
+        "id": "S02.initial_separation",
+        "kind": "remove",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "II-A.2",
+        "pages": [
+          4
+        ],
+        "source_facts": {
+          "retained": "cell_pellet",
+          "removed": "culture_medium"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S02.cell_wash",
+        "kind": "wash",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": "working.cell_wash",
+        "target_role": null,
+        "source_section": "II-A.3-5",
+        "pages": [
+          4
+        ],
+        "source_facts": {
+          "standard_cycles": 2,
+          "alternative": "low_cell_omit requires explicit local choice and evidence"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix",
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S02.cell_resuspension",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": "working.cell_wash",
+        "target_role": null,
+        "source_section": "II-A.6-7",
+        "pages": [
+          4,
+          5
+        ],
+        "source_facts": {
+          "retained": "identified cell suspension and separate Input"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      }
+    ],
+    "S03": [
+      {
+        "id": "S03.bead_activation_wash",
+        "kind": "wash",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "stock.bead_activation_buffer",
+        "target_role": "stock.beads",
+        "source_section": "I.4-6",
+        "pages": [
+          4
+        ],
+        "source_facts": {
+          "cycles": 2
+        },
+        "execution_scope": "run",
+        "actions": [
+          "add",
+          "mix",
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S03.bead_resuspension",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "stock.bead_activation_buffer",
+        "target_role": "stock.beads",
+        "source_section": "I.7",
+        "pages": [
+          4
+        ],
+        "source_facts": {
+          "retained": "activated bead suspension"
+        },
+        "execution_scope": "run",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S03.permeabilization_aliquot",
+        "kind": "split",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "Appendix A.1-3",
+        "pages": [
+          10
+        ],
+        "source_facts": {
+          "separate_assay": true,
+          "criterion": "local interpretation with original evidence; no automatic biological qualification"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "split"
+        ]
+      },
+      {
+        "id": "S03.permeabilization_buffer",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.permeabilization_wash",
+        "target_role": "assay.permeabilization",
+        "source_section": "Appendix A.3",
+        "pages": [
+          10
+        ],
+        "source_facts": {
+          "separate_assay": true,
+          "criterion": "local interpretation with original evidence; no automatic biological qualification"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S03.permeabilization_digitonin",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "stock.digitonin",
+        "target_role": "assay.permeabilization",
+        "source_section": "Appendix A.4",
+        "pages": [
+          10
+        ],
+        "source_facts": {
+          "separate_assay": true,
+          "criterion": "local interpretation with original evidence; no automatic biological qualification"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S03.permeabilization_dye",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "stock.trypan_blue",
+        "target_role": "assay.permeabilization",
+        "source_section": "Appendix A.5",
+        "pages": [
+          10
+        ],
+        "source_facts": {
+          "separate_assay": true,
+          "criterion": "local interpretation with original evidence; no automatic biological qualification"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S03.permeabilization_read",
+        "kind": "observe",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": "assay.permeabilization",
+        "source_section": "Appendix A.6-7",
+        "pages": [
+          10
+        ],
+        "source_facts": {
+          "separate_assay": true,
+          "criterion": "local interpretation with original evidence; no automatic biological qualification"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "observe"
+        ]
+      },
+      {
+        "id": "S03.bead_addition",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.activated_beads",
+        "target_role": null,
+        "source_section": "III.2-3",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "mixed": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S03.binding_medium_removal",
+        "kind": "remove",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "III.4",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "retained": "cell_bead_fraction",
+          "removed": "binding_supernatant"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S03.antibody_buffer_addition",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.antibody_buffer",
+        "target_role": null,
+        "source_section": "III.5-6",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "mixed": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      }
+    ],
+    "S04": [
+      {
+        "id": "S04.antibody_addition",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": {
+          "h3k4me3": "stock.h3k4me3_antibody",
+          "igg": "stock.igg_antibody"
+        },
+        "target_role": null,
+        "source_section": "III.7",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "mixed": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      }
+    ],
+    "S05": [
+      {
+        "id": "S05.antibody_medium_removal",
+        "kind": "remove",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "IV.1",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "retained": "cell_bead_fraction",
+          "removed": "antibody_supernatant"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S05.digitonin_wash",
+        "kind": "wash",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.digitonin_buffer",
+        "target_role": null,
+        "source_section": "IV.2-3",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "cycles": 1
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix",
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S05.enzyme_addition",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.pag_mix",
+        "target_role": null,
+        "source_section": "IV.4",
+        "pages": [
+          6
+        ],
+        "source_facts": {
+          "mixed": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      }
+    ],
+    "S06": [
+      {
+        "id": "S06.enzyme_medium_removal",
+        "kind": "remove",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "V.1",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "retained": "cell_bead_fraction",
+          "removed": "enzyme_supernatant"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S06.preactivation_wash",
+        "kind": "wash",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": "working.digitonin_buffer",
+        "target_role": null,
+        "source_section": "V.2-4",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "cycles": 2
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix",
+          "separate",
+          "remove"
+        ]
+      }
+    ],
+    "S07": [
+      {
+        "id": "S07.activation",
+        "kind": "activation",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": {
+          "h3k4me3": "h3k4me3.digestion_mix",
+          "igg": "igg.digestion_mix"
+        },
+        "target_role": null,
+        "source_section": "V.5",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "adopt_existing_booking": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "adopt"
+        ]
+      }
+    ],
+    "S08": [
+      {
+        "id": "S08.stop",
+        "kind": "stop",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": {
+          "h3k4me3": "h3k4me3.stop_mix",
+          "igg": "igg.stop_mix"
+        },
+        "target_role": null,
+        "source_section": "V.7",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "adopt_existing_booking": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "adopt"
+        ]
+      },
+      {
+        "id": "S08.released_fraction",
+        "kind": "remove",
+        "roles": [
+          "h3k4me3",
+          "igg"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "V.9-10",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "retained": "released_supernatant",
+          "removed": "bead_cell_fraction"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      }
+    ],
+    "S09": [
+      {
+        "id": "S09.input_extraction_addition",
+        "kind": "dose",
+        "roles": [
+          "input"
+        ],
+        "reagent_role": "working.input_extraction_mix",
+        "target_role": null,
+        "source_section": "VI.1",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "mixed": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S09.clarified_fraction",
+        "kind": "remove",
+        "roles": [
+          "input"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "VI.5",
+        "pages": [
+          7
+        ],
+        "source_facts": {
+          "retained": "clarified_input_supernatant",
+          "removed": "input_debris"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "separate",
+          "remove"
+        ]
+      }
+    ],
+    "S10": [
+      {
+        "id": "S10.binding_buffer_addition",
+        "kind": "dose",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": "working.column_binding",
+        "target_role": null,
+        "source_section": "VII-A.1",
+        "pages": [
+          8
+        ],
+        "source_facts": {
+          "mixed": true,
+          "prepared_stock_required": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "mix"
+        ]
+      },
+      {
+        "id": "S10.column_load",
+        "kind": "load",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "VII-A.2-5",
+        "pages": [
+          8
+        ],
+        "source_facts": {
+          "loop": "until_actual_prepared_mixture_fully_loaded",
+          "retained": "column_bound_material",
+          "removed": "flowthrough"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "load",
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S10.column_wash",
+        "kind": "wash",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": "working.column_wash",
+        "target_role": null,
+        "source_section": "VII-A.6-8",
+        "pages": [
+          8
+        ],
+        "source_facts": {
+          "cycles": 1,
+          "prepared_stock_required": true
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "separate",
+          "remove"
+        ]
+      },
+      {
+        "id": "S10.column_dry",
+        "kind": "dry",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": null,
+        "target_role": null,
+        "source_section": "VII-A.9-10",
+        "pages": [
+          8
+        ],
+        "source_facts": {
+          "reagent_dose": false,
+          "retained": "column_bound_material",
+          "removed": "residual_wash_liquid"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "dry"
+        ]
+      },
+      {
+        "id": "S10.column_elution",
+        "kind": "elute",
+        "roles": [
+          "h3k4me3",
+          "igg",
+          "input"
+        ],
+        "reagent_role": "stock.elution_buffer",
+        "target_role": null,
+        "source_section": "VII-A.11-13",
+        "pages": [
+          8
+        ],
+        "source_facts": {
+          "retained": "purified_eluate",
+          "removed": "spent_column"
+        },
+        "execution_scope": "reaction",
+        "actions": [
+          "add",
+          "separate",
+          "remove"
+        ]
+      }
+    ]
+  }
+}

@@ -168,10 +168,14 @@ def _protective_layout(state):
     for vessel_id, material_id in bindings.items():
         text(vessel_id, 'protected reaction vessel');text(material_id, 'bound stop material')
         require(vessel_id in state['inventory']['vessels'], 'Unknown protected reaction vessel')
-        material = _material(state, material_id)
-        require(material_id in initial and initial[material_id]['kind'] == 'reagent'
-                and material['kind'] == 'reagent' and material['role'] == 'issued_reagent'
-                and not material['parents'], 'Protective stop needs a bound issued reagent aliquot')
+        if state['definition'].get('profile', {}).get('type') == 'cutrun_manual_recipe/1':
+            from cutrun_recipe_bindings import validate_protective_source
+            validate_protective_source(state, vessel_id, material_id)
+        else:
+            material = _material(state, material_id)
+            require(material_id in initial and initial[material_id]['kind'] == 'reagent'
+                    and material['kind'] == 'reagent' and material['role'] == 'issued_reagent'
+                    and not material['parents'], 'Protective stop needs a bound issued reagent aliquot')
     seen = set()
     for vessel_id, intent_id in operations.items():
         text(vessel_id, 'protected reaction vessel');text(intent_id, 'protective intent identity')
@@ -274,7 +278,14 @@ def _begin_effect(state, actor_id, intent_id, kind, inputs, outputs, purpose):
     all_ids = set(state['inventory']['materials']) | set(state['inventory']['vessels']) | set(state['bookings'])
     all_ids.add(intent_id)
     for old in state['bookings'].values():
-        all_ids.update(item['material_id'] for item in old['request']['outputs'])
+        for item in old['request']['outputs']:
+            if (state.get('format') == MATERIAL_STATE_V3
+                    and state['definition'].get('profile', {}).get('type') == 'cutrun_manual_recipe/1'
+                    and old['outcome'] == 'not_performed'):
+                from cutrun_recipe_bindings import can_retry_preparation_output
+                if can_retry_preparation_output(state, old, item, request):
+                    continue
+            all_ids.add(item['material_id'])
     output_ids, output_vessels = set(), set()
     for item in outputs:
         keys(item, 'material_id kind vessel_id role', 'planned material output')
