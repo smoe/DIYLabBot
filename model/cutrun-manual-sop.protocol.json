@@ -1,0 +1,213 @@
+{
+  "format": "solidcraftbot.cutrun-manual-sop-protocol/1",
+  "id": "CUTRUN.SKMel29.H3K4me3.Manual.SOP.0.1",
+  "sop": {
+    "id": "SOP-CR-SKM29-H3K4me3",
+    "revision": "0.1"
+  },
+  "global_stages": [
+    "S01",
+    "S11",
+    "S12"
+  ],
+  "branch_sequences": {
+    "h3k4me3": [
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S10"
+    ],
+    "igg": [
+      "S02",
+      "S03",
+      "S04",
+      "S05",
+      "S06",
+      "S07",
+      "S08",
+      "S10"
+    ],
+    "input": [
+      "S02",
+      "S09",
+      "S10"
+    ]
+  },
+  "stages": {
+    "S01": {
+      "scope": "run",
+      "roles": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "phases": [],
+      "completion_evidence": [
+        "sources_verified",
+        "actors_bound",
+        "initial_inventory"
+      ]
+    },
+    "S02": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "phases": [],
+      "completion_evidence": [
+        "input_identity_quantity",
+        "origin_and_state"
+      ]
+    },
+    "S03": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [
+        "S03.preparation"
+      ],
+      "completion_evidence": [
+        "reagent_preparation",
+        "permeabilization",
+        "fraction_identity"
+      ]
+    },
+    "S04": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [
+        "S04.antibody_incubation"
+      ],
+      "completion_evidence": [
+        "antibody_lot_dose_mixing"
+      ]
+    },
+    "S05": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [
+        "S05.enzyme_incubation"
+      ],
+      "completion_evidence": [
+        "enzyme_preparation",
+        "wash_fraction_identity"
+      ]
+    },
+    "S06": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [],
+      "completion_evidence": [
+        "stop_material_access",
+        "mixing_readiness",
+        "delegate_and_pause_plan"
+      ]
+    },
+    "S07": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [
+        "S07.digestion"
+      ],
+      "completion_evidence": [
+        "activation_dose_mixing"
+      ]
+    },
+    "S08": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg"
+      ],
+      "phases": [
+        "S08.release",
+        "S08.separation"
+      ],
+      "completion_evidence": [
+        "stop_dose_mixing",
+        "physical_separation",
+        "fraction_handover"
+      ]
+    },
+    "S09": {
+      "scope": "reaction",
+      "roles": [
+        "input"
+      ],
+      "phases": [
+        "S09.input_preparation"
+      ],
+      "completion_evidence": [
+        "input_device_process",
+        "input_quality"
+      ]
+    },
+    "S10": {
+      "scope": "reaction",
+      "roles": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "phases": [
+        "S10.purification"
+      ],
+      "completion_evidence": [
+        "reagent_consumption",
+        "purified_product",
+        "fraction_dispositions"
+      ]
+    },
+    "S11": {
+      "scope": "run",
+      "roles": [
+        "h3k4me3",
+        "igg",
+        "input",
+        "ntc"
+      ],
+      "phases": [],
+      "completion_evidence": [
+        "qc_withdrawals",
+        "original_qc",
+        "technical_review",
+        "biological_review"
+      ]
+    },
+    "S12": {
+      "scope": "run",
+      "roles": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "phases": [],
+      "completion_evidence": [
+        "recipient_acceptance",
+        "storage_location",
+        "final_inventory",
+        "material_dispositions"
+      ]
+    }
+  }
+}

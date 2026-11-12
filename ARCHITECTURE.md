@@ -834,7 +834,16 @@ Er verwendet dasselbe Journal und Ledger für Originalbelege, Personenbeobachtun
 reale UTC-/Monotonieintervalle, Aktivierung/Schutzstopp und Wiederanlaufabgleich.
 QC-Originale werden manuell zugeordnet; technische und biologische Bewertungen
 bleiben getrennt. Offene Laborparameter bleiben `null`; Systemuhrbeobachtungen
-sind kein qualifizierter Zeitnachweis. Vollständige SOP-Stufenfolge, reale
+sind kein qualifizierter Zeitnachweis. Der getrennte Engine-Vertrag
+`cutrun_manual_sop/1` erzwingt die vollständige lokale Stufenfolge S01–S12,
+den separaten Inputpfad und aktuelle Material-/QC-Belege. Acht Phasen besitzen
+explizite Dauer- und Temperaturgrenzen, die in der Vorlage weiterhin `null`
+sind. Qualifizierter Probenbezug, Unsicherheit und vollständige Intervallabdeckung
+werden im Softwarevertrag geprüft; Gerätesollwerte und einzelne Messpunkte
+genügen nicht. Beobachtungs- und Erfassungszeit bleiben getrennt. Neustart
+erneuert weder Stufe noch Frist, und spätere Widersprüche können frühere
+Abschlüsse entwerten. Der Schutzstopp bleibt unabhängig vom Nominalfortschritt
+erfassbar. Vollständige einzelne Herstellerrezept-/Waschunterpunkte, reale
 Temperatur-/Zeitqualifikation und E4-Abnahme fehlen weiterhin. Ein geschlossener
 Aufzeichnungskopf behauptet keinen Referenzerfolg; `execution_ready` bleibt falsch.
 

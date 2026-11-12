@@ -4,8 +4,8 @@
 E1 ist für den synthetischen Referenzfall implementiert und geprüft;
 E2 ist als gemeinsamer synthetischer Materialvertrag implementiert;
 E3 ist als synthetischer Prozessvertrag implementiert;
-E4 ist mit Vorbereitungspaket, lokalem SOP-Entwurf 0.1 und erstem
-manuellem Aufzeichnungskern begonnen;
+E4 ist mit Vorbereitungspaket, lokalem SOP-Entwurf 0.1 und manuellem
+Stufenvertrag mit Zeit-/Temperaturbelegen begonnen;
 E5–E7 sind geplant.** Diese Datei führt Reihenfolge,
 Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
 [CUT&RUN-Ablaufvertrag](ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
@@ -20,7 +20,7 @@ Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
 | [Extraktionsvorbereitung](docs/extraction-automation.md) | Bereits vorbereitete RNA-/DNA-Ketten und deren Bedarf am gemeinsamen Materiallebenszyklus |
 | [Materiallebenszyklus](docs/material-lifecycle.md) | Gemeinsamer E2-Vertrag, typisierte Buchungen, Produkte und dauerhaft laufexklusive Reagenzaliquots im bisherigen Journal |
 | [Manueller CUT&RUN-Referenzlauf](docs/cutrun-manual-reference.md) | E4-Vorbereitung, konkrete Eigentümerentscheidungen und noch offene operative Nachweise |
-| [Manueller Aufzeichnungskern](docs/cutrun-manual-runtime.md) | Erster /3-Vertrag für Originalbelege, reale Zeitbeobachtungen, Materialbuchungen und manuelle QC-Zuordnung; kein vollständiger SOP-Executor |
+| [Manueller Laufzeitvertrag](docs/cutrun-manual-runtime.md) | Getrennte /3-Engines für Aufzeichnung und vollständige lokale SOP-Stufenfolge, phasenbezogene Zeit-/Temperaturbelege, Materialbuchungen und manuelle QC; keine Geräteausführung |
 | [Lokaler SOP-Entwurf 0.1](docs/cutrun-manual-sop-draft.md) | Manuelle Arbeitsfolge, gebundene aktuelle CST-Quelle, offene Parameter und ausdrücklich gekennzeichnete Paper-Abweichungen |
 | [Stock-Plan](docs/stock-continuation.md) | Dauerhafte Bestandsköpfe, atomare Buchungen und Schutz vor veralteten Schreibern; Reagenzvorräte bisher ausgeschlossen |
 | [Storage-Plan](docs/automated-storage-plan.md) | K01-Bereitstellung, Regal-/Übergabekonzept und spätere Transportqualifikation; S01 bleibt ein synthetischer Fixture-Nachweis |
@@ -63,7 +63,7 @@ Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fort
 | **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Implementiert und synthetisch geprüft](docs/cutrun-preflight.md); E0-/SOP-Bindung offen |
 | **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | [Gemeinsamer synthetischer Materialvertrag implementiert und geprüft](docs/material-lifecycle.md); keine biochemische Ausführung |
 | **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | [Implementiert und synthetisch geprüft](docs/cutrun-synthetic-workflow.md); reale SOP-/Stoppqualifikation bleibt E0/E4–E6 |
-| **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | [Vorbereitung begonnen](docs/cutrun-manual-reference.md); [erster Aufzeichnungskern](docs/cutrun-manual-runtime.md) implementiert. Operative SOP-Bindung, vollständiger O12-/E4-Nachweis und realer Referenzlauf offen |
+| **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | [Vorbereitung begonnen](docs/cutrun-manual-reference.md); [manueller Stufenvertrag mit Zeit-/Temperaturbelegen](docs/cutrun-manual-runtime.md) implementiert. Operative SOP-Bindung, vollständiger O12-/E4-Nachweis und realer Referenzlauf offen |
 | **E5 · Einzelne Fähigkeiten** | Pipettieren, Magnettrennung, Resuspension/Mischung, Probentemperierung und gegebenenfalls Zentrifugation/Analytik am konkreten Gefäß und Medium qualifizieren; Personenaufgaben weiter zulassen. | Vorab festgelegte Fehler-, Verlust-, Verschleppungs-, Temperatur- und Zeitgrenzen experimentell erfüllt. Stoppweg einschließlich Ausfallverhalten erprobt. Native Geometrie- und Bewegungsnachweise ergänzen die Messungen. | Offen, noch nicht geprüft |
 | **E6 · Ein automatisierter Ablauf** | Einen seriellen Ablauf desselben Profils mit eindeutig gebundenen Fähigkeiten gegen E4 vergleichen. Automatisierte und verbleibende Personenaufgaben ausweisen; noch keine frei optimierte Mehrarm-/Mehrchargenplanung. | Vorab definierte technische und biologische Vergleichskriterien erfüllt; Fristen und Probentemperatur nachgewiesen. Vollautomation nur beanspruchen, wenn alle betreffenden Schritte qualifiziert sind. | Offen, noch nicht geprüft |
 | **E7 · Bestände und Ausbau** | Laufübergreifenden Stock um die benötigten Reagenz-/Produktrollen erweitern; anschließend Storage- und Mehrarmplanung aus den verlinkten Plänen integrieren. Library-Präparation und Direktligation bleiben eigene Erweiterungsaufträge. | Bestandskopf/Lease/Fencing und Eltern-Kind-Reservierungen verhindern Doppelbelegung und Doppelverbrauch. Danach Chargen-/Armtakt, Rückhaltung, Lagerbedingungen und Wiederanlauf über alle beteiligten Ressourcen nachgewiesen. | Offen, noch nicht geprüft |
@@ -157,8 +157,17 @@ Die Profilvorlage lässt alle lokalen Laborparameter offen. Der Standard-Uhranbi
 liefert keinen qualifizierten endlichen Zeitrahmen; neue Prozessabsichten bleiben
 an bestätigte Bindungen und geeignete Zeitbelege gebunden.
 
-Der Kernel ist kein vollständiger SOP-Executor: Reihenfolge und Vollständigkeit
-aller biochemischen Arbeitsgänge, Temperaturqualifikation, native QC-Decoder
-und der reale Referenznachweis stehen aus. Ein geschlossener Aufzeichnungskopf
+Der zusätzliche Engine-Vertrag `cutrun_manual_sop/1` erzwingt inzwischen die
+vollständige lokale Folge S01–S12 mit getrenntem Inputpfad, aktuellen
+Material-/QC-Belegen und acht phasenbezogenen Dauer-/Temperaturprüfungen.
+Alle 32 neuen numerischen Grenzen bleiben in der Vorlage `null`.
+Wiederanlauf hält Stufenabsichten und Zeitlücken fest; Widersprüche können
+frühere Abschlüsse entwerten. Der Schutzstopp bleibt auch bei Abweichungen
+erfassbar, ohne einen nominalen Stufenabschluss zu behaupten.
+
+Der Vertrag ist kein Geräte- oder Herstellerrezept-Executor: sämtliche
+einzelnen Wasch-/Rezeptunterpunkte und Komponentenverbräuche, reale
+Temperatur-/Zeitqualifikation, native QC-Decoder und der reale Referenznachweis
+stehen aus. Ein geschlossener Aufzeichnungskopf
 bleibt ohne behaupteten Referenzerfolg; execution_ready bleibt falsch.
 O12 und die vollständige E4-Abnahme sind deshalb weiter offen.

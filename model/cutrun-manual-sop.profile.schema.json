@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-manual-sop.profile.schema.json",
+  "title": "Manual SOP phase bindings; open laboratory values stay null",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "synthetic",
+    "phase_requirements",
+    "qualifications"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-manual-sop-profile/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "mode": {
+      "const": "manual_observation"
+    },
+    "synthetic": {
+      "const": false
+    },
+    "phase_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "S03.preparation",
+        "S04.antibody_incubation",
+        "S05.enzyme_incubation",
+        "S07.digestion",
+        "S08.release",
+        "S08.separation",
+        "S09.input_preparation",
+        "S10.purification"
+      ],
+      "properties": {
+        "S03.preparation": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S04.antibody_incubation": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S05.enzyme_incubation": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S07.digestion": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S08.release": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S08.separation": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S09.input_preparation": {
+          "$ref": "#/$defs/phaseRequirement"
+        },
+        "S10.purification": {
+          "$ref": "#/$defs/phaseRequirement"
+        }
+      }
+    },
+    "qualifications": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "source_id",
+          "relationship",
+          "evidence_ref"
+        ],
+        "properties": {
+          "kind": {
+            "enum": [
+              "time",
+              "temperature"
+            ]
+          },
+          "source_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "relationship": {
+            "enum": [
+              null,
+              "sample_measurement",
+              "qualified_proxy",
+              "device_setpoint"
+            ]
+          },
+          "evidence_ref": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "kind": {
+                  "const": "time"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "relationship": {
+                  "type": "null"
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "phaseRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "duration_min_s",
+        "duration_max_s",
+        "temperature_min_deg_c",
+        "temperature_max_deg_c",
+        "time_qualification_ref",
+        "temperature_qualification_ref",
+        "evidence_ref"
+      ],
+      "properties": {
+        "duration_min_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "duration_max_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "temperature_min_deg_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "temperature_max_deg_c": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "time_qualification_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "temperature_qualification_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "pattern": "\\S"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

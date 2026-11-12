@@ -13,9 +13,11 @@ erstellt. Er bindet eine lokal gesicherte CST-Originalfassung als
 Entwurfsreferenz, kennzeichnet offene Parameter und führt Abweichungen sowie
 unbekannte Übereinstimmungen zum Paper ausdrücklich auf. Seine fachliche
 Prüfung und operative Bindung stehen aus. Ein
-[erster manueller Aufzeichnungskern](cutrun-manual-runtime.md) ergänzt jetzt den
+[manueller Stufenvertrag](cutrun-manual-runtime.md) ergänzt jetzt den
 Softwarevertrag für Quellen, Beobachtungen, reale Zeitintervalle und manuell
-zugeordnete QC-Originale. Er führt keine vollständige biochemische SOP aus;
+zugeordnete QC-Originale. Er erzwingt die vollständige lokale Stufenfolge
+S01–S12 einschließlich getrennter Inputführung und phasenbezogener
+Zeit-/Temperaturbelege. Er führt keine biochemischen Arbeitsgänge aus;
 die Abnahme nach O12 und der tatsächliche E4-Referenznachweis bleiben offen.
 
 ## Bereits festgelegt
@@ -190,11 +192,15 @@ zu liefernden Implementierungen:
 2. **Manuellen Aufzeichnungskern vervollständigen:** das
    [implementierte Formatpaar /3](cutrun-manual-runtime.md) verwendet gemeinsame
    Ablaufhülle, Journal, Materialbuchungen und laufexklusive Aliquotzuteilung.
-   Originale und Beobachtungsherkunft bleiben erhalten. Vollständige SOP-Folge,
-   alle Reagenzrollen und die operative Abnahme sind noch zu ergänzen.
+   Originale und Beobachtungsherkunft bleiben erhalten. Der eigene SOP-Vertrag
+   prüft inzwischen alle lokalen Stufen und acht Zeit-/Temperaturphasen.
+   Einzelne Herstellerrezept-/Waschunterpunkte, alle Komponentenverbräuche
+   und die operative Abnahme bleiben zu ergänzen.
 3. **Reale Zeit qualifizieren:** UTC-/Monotoniebeobachtungen, unbekannte
    Unterbrechungen, unveränderte Fristen und externe Stoppevidenz sind im ersten
-   Kernel erfasst. Der Standard-Uhranbieter ist unqualifiziert; ein geeigneter
+   Vertrag erfasst. Phasenbelege prüfen Zeitdomäne, Unsicherheit, Probenbezug
+   und vollständige Temperaturabdeckung. Der Standard-Uhranbieter ist
+   unqualifiziert; ein geeigneter
    realer Zeit-/Temperaturnachweis und die Prüfung des lokalen Ausfallwegs
    bleiben erforderlich. Eine Rückkehr zum Rechner setzt Zeit nicht zurück.
 4. **QC und vollständigen Verbrauch anbinden:** die ausgewählten realen
@@ -221,13 +227,15 @@ Bestätigung eines vollständigen E4-Laborlaufs.
 - **Erledigt:** E4-Umfang, Entscheidungs-/Nachweismatrix, Aufzeichnungsbedarf
   und notwendige Softwareerweiterungen vorbereitet; lokaler SOP-Entwurf 0.1
   und bytegebundene aktuelle CST-Originalkopie erstellt; erster manueller
-  Aufzeichnungskern mit eigener offener Profilvorlage implementiert.
+  Aufzeichnungskern sowie vollständige lokale Stufenfolge mit eigener
+  offener Dauer-/Temperaturvorlage und Belegprüfung implementiert.
 - **Offen beim Eigentümer/Labor:** konkrete Unterlagen und Entscheidungen aus
   der Tabelle; insbesondere Bestandskultur/erste Bedingung sowie fachliche
   Prüfung der vorgeschlagenen Varianten und Abnahmekriterien.
 - **Offen in der Entwicklung:** Einarbeitung der fachlichen Entscheidungen
-  in den Anweisungsentwurf und das manuelle Profil; vollständiger
-  SOP-/Zeit-/Temperatur-/QC-Vertrag und dessen operative Abnahme. Der erste
-  Aufzeichnungskern schließt O12 und E4 nicht ab.
+  in den Anweisungsentwurf und das manuelle Profil; vollständige einzelne
+  Herstellerrezept-/Waschunterpunkte, Komponentenverbräuche, reale
+  Zeit-/Temperaturqualifikation und operative Abnahme. Der Softwarevertrag
+  schließt O12 und E4 nicht ab.
 - **Nicht nachgewiesen:** tatsächliche Durchführung, biologische Eignung,
   automatische Dosierung, Hardwareausführung oder E4-Abschluss.

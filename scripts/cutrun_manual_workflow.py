@@ -29,6 +29,8 @@ def utc(value):
 
 
 class CutRunManualWorkflow(MaterialWorkflow):
+    ENGINE = 'cutrun_manual_capture/1'
+    MATERIAL_STAGES = frozenset({'S02', 'S03', 'S04', 'S05', 'S09', 'S10'})
     STATE_FORMAT = 'solidcraftbot.material-workflow-state/3'
     REPORT_FORMAT = 'solidcraftbot.cutrun-manual-report/1'
     STEPS = ('accept_inventory', 'confirm_inventory', 'workspace_clear', 'claim',
@@ -61,8 +63,8 @@ class CutRunManualWorkflow(MaterialWorkflow):
         super()._validate_format(state)
         definition = state.get('definition', {})
         if (definition.get('format') != 'solidcraftbot.material-workflow-definition/3'
-                or definition.get('profile', {}).get('type') != 'cutrun_manual_capture/1'
-                or state.get('manual', {}).get('engine') != 'cutrun_manual_capture/1'):
+                or definition.get('profile', {}).get('type') != cls.ENGINE
+                or state.get('manual', {}).get('engine') != cls.ENGINE):
             raise TaskError('Matching manual /3 definition and capture engine required')
 
     @staticmethod
@@ -104,9 +106,17 @@ class CutRunManualWorkflow(MaterialWorkflow):
             raise TaskError('Manual real-observation clock contract required')
 
     @classmethod
+    def _load_definition(cls, source, **kwargs):
+        from cutrun_manual_sources import load
+        return load(source, **kwargs)
+
+    @classmethod
+    def _extra_state(cls, definition, reactions):
+        return {}
+
+    @classmethod
     def create(cls, journal, source=None, *, materials, vessels, reactions, actors,
                run_id=None, clock=None, original_pdf=None, evidence_files=None):
-        from cutrun_manual_sources import load
         provider = process_clock.SystemClock() if clock is None else clock
         sample = process_clock.validate_sample(provider.sample())
         if not isinstance(actors, list) or not actors or any(not isinstance(actor, str) or not actor.strip() for actor in actors) or len(set(actors)) != len(actors):
@@ -141,7 +151,7 @@ class CutRunManualWorkflow(MaterialWorkflow):
                 bindings[item['vessel_id']] = item['stop_material_id']
             declared[reaction_id] = {**copy.deepcopy(item), 'current_material_id': item['material_id'],
                 'status': 'inactive', 'activation': None, 'stop': None}
-        definition = load(source, materials=materials, vessels=vessels,
+        definition = cls._load_definition(source, materials=materials, vessels=vessels,
                           clock_source_kind=sample['source_kind'], original_pdf=original_pdf,
                           evidence_files=evidence_files, protective_stop_bindings=bindings)
         artifacts = definition.pop('_initial_artifacts', None)
@@ -160,9 +170,10 @@ class CutRunManualWorkflow(MaterialWorkflow):
         flow = cls._create_definition(journal, definition, run_id=identity, extra_state={
             'clock': process_clock.initial(sample), 'observation_context': None,
             'protective_operations': {}, 'manual': {
-                'engine': 'cutrun_manual_capture/1', 'reactions': declared, 'actions': {},
+                'engine': cls.ENGINE, 'reactions': declared, 'actions': {},
                 'observations': {}, 'stage_observations': [], 'qc_artifacts': {},
-                'qc_bindings': {}, 'qc_reviews': {}, 'biology_reviews': {}, 'holds': []}},
+                'qc_bindings': {}, 'qc_reviews': {}, 'biology_reviews': {}, 'holds': []},
+            **cls._extra_state(definition, declared)},
             initial_artifacts=artifacts)
         flow.clock_provider = provider
         return flow
@@ -284,7 +295,7 @@ class CutRunManualWorkflow(MaterialWorkflow):
 
     def _begin_material_action(self, state, actor_id, intent_id, reaction_id, stage_id, kind, inputs, outputs, purpose,
                                retained_material_id=None):
-        if stage_id not in {'S02', 'S03', 'S04', 'S05', 'S09', 'S10'}:
+        if stage_id not in self.MATERIAL_STAGES:
             raise TaskError('Use the dedicated activation, stop or QC operation')
         self._stage_ready(state, stage_id)
         reaction = self._reaction(state, reaction_id)

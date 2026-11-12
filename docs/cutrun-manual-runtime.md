@@ -1,13 +1,21 @@
 # Manueller CUT&RUN-Aufzeichnungskern
 
-Stand 12. November 2026: Ein erster manueller Aufzeichnungskern für
-SK-Mel-29/H3K4me3 ist implementiert. Er bindet den
+Stand 12. November 2026: Der manuelle Aufzeichnungskern für
+SK-Mel-29/H3K4me3 ist um einen eigenen SOP-Stufenvertrag erweitert. Er bindet den
 [SOP-Entwurf 0.1](cutrun-manual-sop-draft.md), bewahrt Beobachtungen und
-Originaldateien und verwendet den gemeinsamen Materiallebenszyklus. Er führt
-keine vollständige biochemische SOP aus. **`execution_ready`,
+Originaldateien und verwendet den gemeinsamen Materiallebenszyklus. Er erzwingt
+die vollständige lokale Stufenfolge S01–S12 und prüft phasenbezogene Zeit- und
+Temperaturbelege. Er führt keine Geräte oder biochemischen Arbeitsgänge aus.
+**`execution_ready`,
 `reference_success` und `passed` bleiben im Bericht falsch.** Ein geschlossenes
 Aufzeichnungsprotokoll ist kein erfolgreicher E4-Referenzlauf. Die vollständige
 E4-Abnahme und O12 aus dem SOP-Entwurf bleiben offen.
+
+Der neue Engine-Typ `cutrun_manual_sop/1` ist vom bisherigen
+`cutrun_manual_capture/1` getrennt. Beide verwenden denselben Material-/3-Vertrag,
+dasselbe Journal und dieselbe Bilanz. Vorhandene Aufzeichnungsläufe werden
+nicht zu SOP-Läufen migriert. Die CLI legt neue Läufe mit dem SOP-Vertrag an;
+beim Lesen wird der gespeicherte Engine-Typ geprüft.
 
 ## Quellen und offene Bindungen
 
@@ -37,11 +45,24 @@ Authentifizierung oder unabhängige Prüfung der fachlichen Freigabe.
 `open_requirements` benennt fehlende Angaben mit ihren betroffenen Stufen.
 Offene Bindungen sperren neue betroffene Absichten. Tatsächliche Beobachtungen,
 Originaldateien und nachträgliche Belege werden dadurch nicht verworfen.
-Der Kernel prüft noch keine vollständige Reihenfolge sämtlicher Wasch-,
-Temperierungs-, Trenn- und Reinigungsoperationen. Insbesondere beweist ein
-Stufenbeleg weder erreichte Probentemperatur noch SOP-Vollständigkeit.
+Der SOP-Vertrag ergänzt die Stufen- und Phasenfolge. Die vollständigen
+Herstellerrezepte, einzelne Waschunterpunkte und alle Rezeptkomponenten werden
+weiterhin aus dem gebundenen Original bezogen und nicht durch einen Decoder
+geprüft. Eine freie Notiz beweist keinen Stufenabschluss oder erfolgreichen
+Gerätevorgang.
 
 ## Einstieg und gemeinsame Speicherung
+
+Die gemeinsame Erweiterung liegt in
+[`cutrun-manual-sop.protocol.json`](../model/cutrun-manual-sop.protocol.json)
+mit [Protokollschema](../model/cutrun-manual-sop.protocol.schema.json) und
+[`cutrun-manual-sop.profile.json`](../model/cutrun-manual-sop.profile.json)
+mit [Profilschema](../model/cutrun-manual-sop.profile.schema.json).
+Die bisherige Profilquelle führt weiterhin Rollen, Reagenzzuteilung, QC und
+neun offene Basisparameter. Das SOP-Profil ergänzt acht Phasen mit insgesamt
+32 ebenfalls offenen numerischen Dauer-/Temperaturgrenzen sowie offenen
+Qualifikations- und Originalbezügen. Es setzt keine Herstellerbeispiele als
+bestätigte Laborwerte ein.
 
 ```sh
 python3 scripts/run_cutrun_manual.py --help
@@ -50,7 +71,7 @@ python3 scripts/run_cutrun_manual.py prepare
 
 `prepare` liest Quellen und Bereitschaft ohne Store, Reservierung oder
 Materialbuchung. Ohne weitere Eingaben bleibt die Vorlage unvollständig.
-`--profile`, `--original-pdf` und `--evidence-manifest` wählen ausdrücklich
+`--profile`, `--sop-profile`, `--original-pdf` und `--evidence-manifest` wählen ausdrücklich
 bereitgestellte lokale Dateien. Das Evidenzmanifest ist ein JSON-Objekt mit
 Belegkennung als Schlüssel und Dateipfad als Wert.
 
@@ -100,12 +121,100 @@ python3 scripts/run_cutrun_manual.py resume RUN_ID
 `create` und `resume` geben die aktuelle Sitzungskennung zurück. `act` benötigt
 `--session`, `--actor`, `--action`, `--observation` und optional `--data` mit
 einem JSON-Objekt sowie `--artifact` mit Originalbytes. Die API-Einstiege sind
-`cutrun_manual_sources.compile_profile(...)`,
-`CutRunManualWorkflow.create(...)`, `.open(..., resume=True)` und
+`cutrun_manual_sop_sources.compile_profile(...)`,
+`CutRunManualSopWorkflow.create(...)`, `.open(..., resume=True)` und
 `.act(..., observation=...)`. `compile_profile` liefert zusätzlich transiente
 Artefaktbytes für die atomare Archivierung; sie sind kein zusätzlicher
 JSON-Bestand. Der `load`-Adapter kennzeichnet diese Übergabe mit
 `_initial_artifacts`, die der gemeinsame Erzeugungspfad verarbeitet.
+
+Die SOP-API erhält als `source` entweder `None` für beide Vorlagen oder
+`{"base_profile": ..., "sop_profile": ...}` mit expliziten Dateipfaden oder
+Profilobjekten. Der bisherige `CutRunManualWorkflow` bleibt ein eigener
+Aufzeichnungskern ohne nachträglich eingeschaltete Stufenpflicht.
+
+## Vollständige lokale Stufenfolge
+
+| Bereich | Verbindlicher Pfad |
+|---|---|
+| Lauföffnung | S01 vor jeder Materialstufe |
+| H3K4me3 und IgG, jeweils getrennt | S02 → S03 → S04 → S05 → S06 → S07 → S08 → S10 |
+| Input | S02 → S09 → S10; S09 darf vor den CUT&RUN-Reaktionen stattfinden |
+| Gemeinsamer QC-Abschluss | S11 erst nach allen drei gereinigten Produkten, einschließlich NTC-Befund |
+| Übergabe | S12 nach aktueller technischer und separater biologischer Bewertung |
+
+`begin_stage(stage_id, reaction_id, stage_run_id)` speichert die Stufenabsicht
+vor neuen Wirkungen. Für S01/S11/S12 ist `reaction_id: null` erforderlich.
+Jede Stufe erhält einen dauerhaften Datensatz mit dem tatsächlichen Material
+und Gefäß bei Beginn. `complete_stage(stage_run_id, receipts, action_ids,
+reason)` verlangt genau die im Protokoll benannten Belegkategorien. Die Werte
+von `receipts` sind registrierte Originalkennungen beziehungsweise im selben
+Lauf archivierte Prüfsummen. `action_ids` verweist auf tatsächlich bestätigte
+Buchungen dieses Stufenlaufs. Eine freie `record_observation`-Notiz ersetzt
+diese Voraussetzungen nicht und verschiebt keinen Fortschritt.
+
+Neue Material-, Aktivierungs- und QC-Entnahmeabsichten benötigen die passende
+offene Stufe. S08 verlangt einen bestätigten Stopp einschließlich Mischung
+und eine gebuchte erhaltene Zwischenfraktion; S10 ein gebuchtes gereinigtes
+Produkt. Stufenabschlüsse erzeugen selbst keine Zugabe, Mischung, Fraktion
+oder Verbrauchsbuchung. S11 prüft jede gebundene Rollen-/Methodenkombination,
+zugehörige Produktentnahmen, gültige technische Befunde und eine aktuelle
+separate fachliche Bewertung. Dabei kann beispielsweise ein zensierter
+IgG-Befund erhalten bleiben; ein erfolgreicher biologischer Referenznachweis
+wird daraus nicht automatisch abgeleitet.
+
+Ein Schutzstopp bleibt unabhängig von der normalen Stufenfolge möglich,
+auch zu früh, verspätet oder bei Dokumentationsausfall. S07 kann erst nach
+belegtem tatsächlichem Stopp abschließen, damit ein bloß notiertes Phasenende
+keine weiterhin aktive Reaktion beendet. Ein bereits gespeicherter Schutzstopp
+darf als Beleg für S08 referenziert werden; er wird dabei nicht erneut gebucht
+oder nachträglich als früherer Stufenauftrag ausgegeben.
+
+## Phasenbezogene Zeit- und Temperaturbelege
+
+Vorbereitung, Antikörperbindung, Enzymbindung, Verdau, Freisetzung, Abtrennung,
+Input-Aufbereitung und Reinigung besitzen eigene Phasenkennungen. S08 enthält
+Freisetzung und Abtrennung als zwei aufeinanderfolgende Phasen, damit ihre
+unterschiedlichen Temperaturbezüge nicht zu einem einzigen Wert verschmelzen.
+
+`record_phase_time(stage_run_id, phase_id, record)` erfasst den beobachteten
+Beginn und das beobachtete Ende jeweils als früheste/späteste mögliche
+Sekunde in einer ausdrücklich benannten, vorab gebundenen Zeitdomäne.
+Die mögliche Dauer lautet `[max(0, Ende_früh − Beginn_spät),
+Ende_spät − Beginn_früh]`. Fehlende Grenzen bleiben unbekannt. UTC-Zeitstempel
+der Erfassung werden dafür nicht subtrahiert. Bei derselben Prozessuhr kann
+eine Phase nicht vor der gespeicherten Stufenabsicht oder in der Zukunft
+stattgefunden haben. Bei mehreren Phasen und aufeinanderfolgenden Stufen
+muss auch ihre tatsächliche Zeitfolge belegt sein; verschiedene Zeitdomänen
+werden ohne belegte Zuordnung nicht gleichgesetzt.
+
+`record_phase_temperature(...)` bindet Beobachtungsintervall, beobachtetes
+Minimum/Maximum, Unsicherheit, Zeitdomäne, tatsächlichen Temperaturgeber und
+vorab gebundenen Probenbezug. Ein Gerätesollwert oder kalter Ablageplatz
+qualifiziert keine Probentemperatur. Zulässig sind direkte Probenmessung und
+ausdrücklich qualifizierter Stellvertreter. Die garantierte Abdeckung reicht
+vom spätesten möglichen Messbeginn bis zum frühesten möglichen Messende;
+ihre Intervallvereinigung muss die gesamte mögliche Prozessspanne abdecken.
+Zwei einzelne Temperaturpunkte belegen keine kontinuierliche Abdeckung.
+Auch die vollständige Unsicherheitshülle muss innerhalb der lokal gebundenen
+Grenzen liegen. Ein später guter Abschnitt löscht einen widersprüchlichen
+früheren Befund nicht.
+
+Beide Belegarten enthalten stabile Identitäten für Beleg, Stufenlauf, Phase,
+Reaktion, Material und Gefäß sowie Herkunft und Originalprüfsumme.
+`attach_sop_evidence(file_name, origin)` mit Originalbytes in `act(artifact=...)`
+archiviert auch erst während des Laufs entstandene Stufen- und Gerätedateien
+atomar. Diese Dateien können anschließend per Prüfsumme referenziert werden;
+die unveränderliche Definition wird dafür nicht umgeschrieben. Prospektive
+Grenz- und Qualifikationsentscheidungen bleiben vor dem Lauf gebunden.
+
+Wiederanlauf behält offene Stufen, ursprüngliche Absichten und alle Belege.
+Er startet keine Stufe erneut und erneuert keine Frist. Eine extern belegte
+Phasendauer qualifiziert nicht still die globale Prozessuhr und schließt keine
+unbekannte Neustartlücke. Späte Widersprüche entwerten die aktuelle Konformität
+auch bereits abgeschlossener Stufen und sperren normalen Fortschritt und
+Abschluss. Belege und frühere Abschlüsse bleiben erhalten. Ein expliziter
+Abbruch mit Inventar-/Quarantäneübergabe bleibt getrennt davon möglich.
 
 ## Beobachtung, Material und Wiederaufnahme
 
@@ -217,25 +326,27 @@ SOP-Ausführung, biologische Eignung oder abgeschlossene E4-Abnahme.
 
 Zustand und Definition bilden das geschlossene Paar
 `solidcraftbot.material-workflow-state/3` und
-`solidcraftbot.material-workflow-definition/3`, mit dem Engine-Typ
-`cutrun_manual_capture/1`. Generische oder synthetische Runner können diesen
+`solidcraftbot.material-workflow-definition/3`, mit den getrennten Engine-Typen
+`cutrun_manual_capture/1` und `cutrun_manual_sop/1`. Generische oder synthetische Runner können diesen
 Vertrag nicht übernehmen. Frühere `/1`-/`/2`-Läufe werden nicht umgedeutet oder
 still migriert. Quellen und Laufzeitdateien sind gepinnt. Bei geänderten
 Runtimebytes verlangt ein aktiver alter Lauf Inspektion statt stiller
 Wiederaufnahme mit neuem Code.
 
 Nachgewiesen wird der Softwarevertrag mit ausdrücklich gekennzeichneten
-Testbeobachtungen. Vollständige SOP-Stufenfolge und sämtliche Reagenzverbräuche,
+Testbeobachtungen. Sämtliche einzelnen Herstellerrezept- und Waschunterpunkte,
+alle Reagenzkomponentenverbräuche,
 realer Temperatur-/Zeitnachweis, native QC-Decoder, Geräte-/Hardwareausführung,
 Personenauthentifizierung und biologische Akzeptanz sind gesonderte Arbeiten.
 Der SOP-Entwurf bleibt bytegleich gebunden; O12 und die vollständige E4-Abnahme
-werden durch diesen ersten Kernel nicht geschlossen.
+werden durch die Softwareprüfung nicht geschlossen.
 
 Gezielte Prüfungen starten mit:
 
 ```sh
 python3 -B -m unittest discover -s tests -p 'test_cutrun_manual_*.py' -v
 python3 -B -m unittest discover -s tests -p 'test_manual_process_clock.py' -v
+python3 -B -m unittest discover -s tests -p 'test_cutrun_sop_evidence.py' -v
 python3 -B -m unittest discover -s tests -p 'test_material_v3.py' -v
 ```
 

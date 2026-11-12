@@ -1,0 +1,81 @@
+{
+  "format": "solidcraftbot.cutrun-manual-sop-profile/1",
+  "id": "CUTRUN.SKMel29.H3K4me3.Manual.SOP.Preparation",
+  "mode": "manual_observation",
+  "synthetic": false,
+  "phase_requirements": {
+    "S03.preparation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S04.antibody_incubation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S05.enzyme_incubation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S07.digestion": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S08.release": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S08.separation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S09.input_preparation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S10.purification": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    }
+  },
+  "qualifications": {}
+}

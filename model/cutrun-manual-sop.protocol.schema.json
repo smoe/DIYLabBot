@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-manual-sop.protocol.schema.json",
+  "title": "Manual SOP stage graph structure; source owns ordering and evidence roles",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "sop",
+    "global_stages",
+    "branch_sequences",
+    "stages"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-manual-sop-protocol/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "sop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "revision"
+      ],
+      "properties": {
+        "id": {
+          "const": "SOP-CR-SKM29-H3K4me3"
+        },
+        "revision": {
+          "const": "0.1"
+        }
+      }
+    },
+    "global_stages": {
+      "const": [
+        "S01",
+        "S11",
+        "S12"
+      ]
+    },
+    "branch_sequences": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "h3k4me3",
+        "igg",
+        "input"
+      ],
+      "properties": {
+        "h3k4me3": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "S01",
+              "S02",
+              "S03",
+              "S04",
+              "S05",
+              "S06",
+              "S07",
+              "S08",
+              "S09",
+              "S10",
+              "S11",
+              "S12"
+            ]
+          }
+        },
+        "igg": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "S01",
+              "S02",
+              "S03",
+              "S04",
+              "S05",
+              "S06",
+              "S07",
+              "S08",
+              "S09",
+              "S10",
+              "S11",
+              "S12"
+            ]
+          }
+        },
+        "input": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "S01",
+              "S02",
+              "S03",
+              "S04",
+              "S05",
+              "S06",
+              "S07",
+              "S08",
+              "S09",
+              "S10",
+              "S11",
+              "S12"
+            ]
+          }
+        }
+      }
+    },
+    "stages": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12"
+      ],
+      "properties": {
+        "S01": {
+          "$ref": "#/$defs/stage"
+        },
+        "S02": {
+          "$ref": "#/$defs/stage"
+        },
+        "S03": {
+          "$ref": "#/$defs/stage"
+        },
+        "S04": {
+          "$ref": "#/$defs/stage"
+        },
+        "S05": {
+          "$ref": "#/$defs/stage"
+        },
+        "S06": {
+          "$ref": "#/$defs/stage"
+        },
+        "S07": {
+          "$ref": "#/$defs/stage"
+        },
+        "S08": {
+          "$ref": "#/$defs/stage"
+        },
+        "S09": {
+          "$ref": "#/$defs/stage"
+        },
+        "S10": {
+          "$ref": "#/$defs/stage"
+        },
+        "S11": {
+          "$ref": "#/$defs/stage"
+        },
+        "S12": {
+          "$ref": "#/$defs/stage"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scope",
+        "roles",
+        "phases",
+        "completion_evidence"
+      ],
+      "properties": {
+        "scope": {
+          "enum": [
+            "run",
+            "reaction"
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "h3k4me3",
+              "igg",
+              "input",
+              "ntc"
+            ]
+          }
+        },
+        "phases": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "S03.preparation",
+              "S04.antibody_incubation",
+              "S05.enzyme_incubation",
+              "S07.digestion",
+              "S08.release",
+              "S08.separation",
+              "S09.input_preparation",
+              "S10.purification"
+            ]
+          }
+        },
+        "completion_evidence": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      }
+    }
+  }
+}
