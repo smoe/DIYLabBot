@@ -1,0 +1,35 @@
+{
+  "format": "solidcraftbot.cutrun-input-sonication-profile/1",
+  "id": "TEST.CutRun.InputSonication.Profile",
+  "mode": "test_fixture_only",
+  "enabled": false,
+  "bindings": {
+    "input_reaction_id": null,
+    "vessel_class": "tube_1_5ml",
+    "sonicator_place_id": "V01"
+  },
+  "sources": {
+    "manual_profile": {
+      "source": "model/cutrun-manual-runtime.profile.json",
+      "source_sha256": "65cb211f2949fc3293f40996520755ce210a5f2b568168bfaa74ff372b031fa5"
+    },
+    "sop_profile": {
+      "source": "model/cutrun-manual-sop.profile.json",
+      "source_sha256": "16bb969e11798cb369291f7e4613c7705e556e57dc084ed6fe7b36b0274c2e16"
+    },
+    "sop_protocol": {
+      "source": "model/cutrun-manual-sop.protocol.json",
+      "source_sha256": "7c1b5791e8eacfff64a7f9a0b07c1b8cba2ffa394f35f6a258a9ec4d07503480"
+    },
+    "sonication_profile": {
+      "source": "model/dna-sonication.profile.json",
+      "source_sha256": "a20901899a4c4876ed1feeaa17758f61dbc1ad27255e8cd3d5ec0251552c8a85"
+    }
+  },
+  "scope": {
+    "stage_id": "S09",
+    "phase_id": "S09.input_preparation",
+    "decision_id": "O04",
+    "role": "input"
+  }
+}
