@@ -319,6 +319,18 @@ gebaut oder ausgeführt. RoboStack/pixi ist spätere B1-Arbeit; jetzt nichts
 installieren. Neue schematische Nachweise nur unter `exports/dna-evidence/`
 ablegen; historische Medien, Galerie und Provenienz unverändert erhalten.
 
+## DNA-Sonikationsvorbereitung
+
+Vor Änderungen [docs/dna-sonication.md](docs/dna-sonication.md) lesen.
+`model/dna-sonication.profile.json` bindet den Sonikationsvertrag und die
+bestehende CUT&RUN-Vorbereitung. Nur den separaten Input-Zweig zuordnen;
+H3K4me3- und IgG-Reaktionen behalten ihre MNase-Fragmentierung. Der Hielscher
+UP200St/VialTweeter ist eine Gerätereferenz, keine qualifizierte Gerätebindung.
+`python3 scripts/prepare_dna_sonication.py` plant ohne Journal, Reservierungen
+oder Geräteeffekte. Unbekannte Puls-, Kühlungs- und Gefäßparameter offen lassen;
+ein Geräteabschluss oder NanoDrop-/Qubit-Wert belegt keine Fragmentgröße.
+Keine Sonikations-Nebenbilanz, Hardware-, ROS- oder SiLA-Ausführung ableiten.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

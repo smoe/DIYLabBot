@@ -1,0 +1,135 @@
+{
+  "format": "solidcraftbot.dna-sonication-profile/1",
+  "id": "SYN.CUTRUN.Input.Sonication.Preparation",
+  "mode": "preparation_only",
+  "synthetic": true,
+  "protocol": {
+    "source": "model/dna-sonication.protocol.json",
+    "source_sha256": "4c2a111253b1bfa915ee0b1b32bc5129c68c07c49e384438d8dd42f079f040b1"
+  },
+  "preparation": {
+    "source": "model/cutrun-automation.preparation.json",
+    "source_sha256": "fa465b701475c6030418f6433e48df2e2c59f3ac3107d355cf52d3b7d373180d"
+  },
+  "parameters": {
+    "cycles": {
+      "value": null,
+      "unit": "count",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "pulse_on_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "between_pulses_s": {
+      "value": null,
+      "unit": "s",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "amplitude_percent": {
+      "value": null,
+      "unit": "percent",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "device_instance_id": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "firmware_revision": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "vessel_article": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "nominal_vessel_volume_ml": {
+      "value": null,
+      "unit": "mL",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "fill_volume_ul": {
+      "value": null,
+      "unit": "uL",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "closed_vessel_fit_evidence_ref": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "cooling_method": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "amplitude_evidence_ref": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "temperature_reference_vessel_id": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "temperature_mapping_evidence_ref": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "temperature_limit_deg_c": {
+      "value": null,
+      "unit": "degC",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "empirical_protocol_evidence_ref": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    },
+    "input_size_evidence_ref": {
+      "value": null,
+      "unit": "text",
+      "basis": "unknown",
+      "source_refs": [],
+      "note": "Local binding remains open; no inherited E1 recipe or measured evidence is assumed."
+    }
+  }
+}
