@@ -1,0 +1,287 @@
+{
+  "format": "solidcraftbot.dna-sila2/1",
+  "id": "DNA.Sequential.SiLA2",
+  "mode": "synthetic_only",
+  "dna_profile": {
+    "source": "model/dna-quantification.synthetic.json",
+    "source_sha256": "91cd11d0c2e39318feb9e08e484d61a87c741aa4d5059fd8f5286d1cceffe1a2"
+  },
+  "dna_protocol": {
+    "source": "model/dna-quantification.protocol.json",
+    "source_sha256": "0941b364b3a09dc4f70198b5adeeb85eb46cc8e8f62d6d80740db2fcacb1f103"
+  },
+  "feature": {
+    "identifier": "DnaQuantificationWorkflow",
+    "originator": "org.solidcraftbot",
+    "category": "analytics",
+    "version": "1.0",
+    "sila_version": "1.1",
+    "maturity": "Draft",
+    "locale": "en-us"
+  },
+  "commands": [
+    {
+      "name": "CreateRun",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        }
+      ]
+    },
+    {
+      "name": "RunUntilDecision",
+      "observable": true,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "initial_dilution",
+          "type": "string",
+          "description": "initial dilution"
+        },
+        {
+          "name": "after_range",
+          "type": "string",
+          "description": "Offered retry preset; empty means stop at the pending decision."
+        },
+        {
+          "name": "nanodrop_concentration",
+          "type": "float64",
+          "description": "nanodrop concentration"
+        },
+        {
+          "name": "qubit_concentration",
+          "type": "float64",
+          "description": "qubit concentration"
+        },
+        {
+          "name": "qubit_report_original",
+          "type": "bool",
+          "description": "qubit report original"
+        }
+      ]
+    },
+    {
+      "name": "ChooseDilution",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "sample_identifier",
+          "type": "string",
+          "description": "sample identifier"
+        },
+        {
+          "name": "dilution_preset",
+          "type": "string",
+          "description": "dilution preset"
+        }
+      ]
+    },
+    {
+      "name": "AcceptResult",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "sample_identifier",
+          "type": "string",
+          "description": "sample identifier"
+        },
+        {
+          "name": "allow_unquantified",
+          "type": "bool",
+          "description": "allow unquantified"
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "description": "reason"
+        }
+      ]
+    },
+    {
+      "name": "ResumeRun",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "resume",
+          "type": "bool",
+          "description": "resume"
+        }
+      ]
+    },
+    {
+      "name": "ReconcileInventory",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "observation_json",
+          "type": "string",
+          "description": "Explicit complete root observations and pending-resolution JSON; not a generated observation."
+        }
+      ]
+    },
+    {
+      "name": "CancelRun",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "description": "reason"
+        }
+      ]
+    },
+    {
+      "name": "FinishCancel",
+      "observable": false,
+      "arguments": [
+        {
+          "name": "request_identifier",
+          "type": "string",
+          "description": "Unique opaque identifier for an atomic durable network receipt; exact repeats return the stored response."
+        },
+        {
+          "name": "run_identifier",
+          "type": "string",
+          "description": "Explicit root DNA run identity; never infer a run from time or order."
+        },
+        {
+          "name": "observation_json",
+          "type": "string",
+          "description": "Explicit complete final root observations JSON; cancellation acceptance is not clearance."
+        }
+      ]
+    }
+  ],
+  "standard_features": [
+    {
+      "identifier": "SiLAService",
+      "source": "interfaces/sila2/standard/SiLAService-v1_0.sila.xml",
+      "source_sha256": "4425f329c907bdb0ed757a9efc35fcc47d9caa7f2f8f6eecaf9842c1f9d674ec",
+      "upstream_path": "feature_definitions/org/silastandard/core/SiLAService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "LockController",
+      "source": "interfaces/sila2/standard/LockController-v1_0.sila.xml",
+      "source_sha256": "3d6b6499b024d802d8d13471239d88cad36e8a940b328f2f69a35609437247cb",
+      "upstream_path": "feature_definitions/org/silastandard/core/LockController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "CancelController",
+      "source": "interfaces/sila2/standard/CancelController-v1_0.sila.xml",
+      "source_sha256": "d1ac2002e1ff38f752debe59c667ebd2a9a6a65c0a11664643f83d33ad60a7e4",
+      "upstream_path": "feature_definitions/org/silastandard/core/commands/CancelController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "SimulationController",
+      "source": "interfaces/sila2/standard/SimulationController-v1_0.sila.xml",
+      "source_sha256": "f96abd91e60cef32cdf8d515665f5f3d53b9018d9f4799ceae7d81d86c04a543",
+      "upstream_path": "feature_definitions/org/silastandard/core/SimulationController-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthenticationService",
+      "source": "interfaces/sila2/standard/AuthenticationService-v1_0.sila.xml",
+      "source_sha256": "d1c3752a23b56f0464bf1511d84e0a39f107c17290cba4568e0b6015b52dddb6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthenticationService-v1_0.sila.xml"
+    },
+    {
+      "identifier": "AuthorizationService",
+      "source": "interfaces/sila2/standard/AuthorizationService-v1_0.sila.xml",
+      "source_sha256": "cf7dd469fd034b1a32e14782853ff6cdd95af323dffc08a1887958d5cd73f3f6",
+      "upstream_path": "feature_definitions/org/silastandard/core/AuthorizationService-v1_0.sila.xml"
+    }
+  ],
+  "runtime_sources": [
+    "scripts/build_dna_quantification_sila2.py",
+    "scripts/dna_sila2_server.py",
+    "scripts/dna_sila2_runtime.py",
+    "scripts/run_dna_sila2.py",
+    "scripts/cf01_sila2_auth.py",
+    "scripts/cf01_sila2_client.py",
+    "scripts/dna_quantification_tasks.py",
+    "scripts/build_dna_ros_interfaces.py",
+    "scripts/dna_quantification_execution.py",
+    "scripts/dna_quantification_control.py",
+    "scripts/dna_quantification_port.py",
+    "scripts/dna_quantification_sources.py"
+  ],
+  "publish_interval_s": 0.1,
+  "limitations": [
+    "TLS/gRPC server for the synthetic DNA coordinator only; no physical device, pipette, robot, sensor or scanner interface",
+    "Root inventory, withdrawals and network receipts share the existing atomic Journal; no second sample ledger",
+    "Network command acceptance, worker claims and cancellation acceptance do not prove physical transfer or resource release",
+    "No ROS runtime, LAN qualification, certified SiLA conformance, laboratory performance or hardware safety claim",
+    "Archived standard feature definitions remain unchanged; LockController v1.0 is retained",
+    "Pause points are private server test injection and are not network command parameters"
+  ],
+  "task_contract": {
+    "source": "model/dna-quantification-tasks.protocol.json",
+    "source_sha256": "f6f986f85256ead5ec4442f205d980fafc26071614db16b2113f8469bfdf5237"
+  }
+}

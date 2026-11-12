@@ -1,0 +1,57 @@
+{
+  "format": "solidcraftbot.dna-quantification-profile/1",
+  "id": "SYN.DNA.Sequential.HS",
+  "mode": "synthetic_only",
+  "protocol": {
+    "source": "model/dna-quantification.protocol.json",
+    "source_sha256": "0941b364b3a09dc4f70198b5adeeb85eb46cc8e8f62d6d80740db2fcacb1f103"
+  },
+  "device_profiles": {
+    "nanodrop": {
+      "source": "model/nanodrop-manual.synthetic.json",
+      "source_sha256": "e98579a7c04096b072284fe3a3fb8b5774f196ac56acc27abd54878381fa64ad"
+    },
+    "qubit": {
+      "source": "model/qubit-4-manual.synthetic.json",
+      "source_sha256": "2ed5735251c032631247db698f3f377b416526182ffe103f49be5cb05ed7c795"
+    }
+  },
+  "rack": {
+    "id": "SYN.DNA.InputRack",
+    "definition": {
+      "source": "model/guided-tube-rack.shared.json",
+      "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
+    }
+  },
+  "dilution_rack": {
+    "id": "SYN.DNA.DilutionRack",
+    "definition": {
+      "source": "model/guided-tube-rack.shared.json",
+      "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
+    }
+  },
+  "samples": [
+    {
+      "id": "DNA01",
+      "vessel_id": "SYN.DNA.Tube01",
+      "rack_slot": 1,
+      "initial_volume_ul": 40.0
+    }
+  ],
+  "parameters": {
+    "nanodrop_sample_volume_ul": 1.5,
+    "qubit_sample_volume_ul": 2.0,
+    "dilution_sample_volume_ul": 2.0,
+    "task_deadline_s": 10000.0,
+    "synthetic_calibration_validity_s": 1000.0
+  },
+  "diluent": {
+    "id": "SYN.DNA.Diluent",
+    "qualification": "synthetic_placeholder; choose a compatible real diluent before hardware work"
+  },
+  "assumptions": {
+    "input_rack_delivered_on_table": true,
+    "return_policy": "original_rack_place",
+    "new_dilutions_from_original_only": true
+  }
+}

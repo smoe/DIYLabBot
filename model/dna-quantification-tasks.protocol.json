@@ -1,0 +1,52 @@
+{
+  "format": "solidcraftbot.dna-quantification-tasks/1",
+  "id": "DNA.Quantification.VesselTaskPort",
+  "mode": "synthetic_only",
+  "operation": "transfer_vessel",
+  "ros_package": "solidcraftbot_dna_interfaces",
+  "action_name": "TransferVessel",
+  "goal_fields": [
+    {"name": "request_id", "ros_type": "string", "rule": "id", "description": "Root request identity; a worker claim never authorizes another request."},
+    {"name": "goal_id", "ros_type": "string", "rule": "id", "description": "Unique persisted task intent within the root run."},
+    {"name": "run_id", "ros_type": "string", "rule": "id", "description": "Canonical root run identity; no independent device run is created."},
+    {"name": "attempt_id", "ros_type": "string", "rule": "id", "description": "Current DNA measurement attempt identity."},
+    {"name": "context_id", "ros_type": "string", "rule": "id", "description": "Active device context identity."},
+    {"name": "operation", "ros_type": "string", "rule": "enum", "values": ["transfer_vessel"], "description": "Bounded semantic vessel handling; no path or joint program."},
+    {"name": "mode", "ros_type": "string", "rule": "enum", "values": ["synthetic_only"], "description": "B0 accepts only explicit synthetic tasks."},
+    {"name": "sample_id", "ros_type": "string", "rule": "id", "description": "Stable original DNA sample identity."},
+    {"name": "vessel_id", "ros_type": "string", "rule": "id", "description": "Selected original or dilution vessel identity."},
+    {"name": "executing_agent_id", "ros_type": "string", "rule": "id", "description": "Assigned executor, separate from the responsible person and requesting principal."},
+    {"name": "source_manifest_sha256", "ros_type": "string", "rule": "sha256", "description": "Exact root source-manifest digest; not a worker assertion of qualification."},
+    {"name": "task_contract_sha256", "ros_type": "string", "rule": "sha256", "description": "Digest of this exact leading task contract."},
+    {"name": "content_revision", "ros_type": "uint64", "rule": "uint64", "description": "Root vessel-content revision; quantity and volume are not carried or booked here."},
+    {"name": "source_kind", "ros_type": "string", "rule": "enum", "values": ["rack", "agent"], "description": "Physical source role; an agent is never encoded as a fictitious rack."},
+    {"name": "source_rack_id", "ros_type": "string", "rule": "optional_id", "description": "Required for rack source, otherwise the empty string."},
+    {"name": "source_place_id", "ros_type": "string", "rule": "optional_id", "description": "Required local place for rack source, otherwise the empty string."},
+    {"name": "source_agent_id", "ros_type": "string", "rule": "optional_id", "description": "Required custodian for agent source, otherwise the empty string."},
+    {"name": "target_kind", "ros_type": "string", "rule": "enum", "values": ["rack", "agent"], "description": "Claimed transfer destination role, pending independent root acceptance."},
+    {"name": "target_rack_id", "ros_type": "string", "rule": "optional_id", "description": "Required for rack target, otherwise the empty string."},
+    {"name": "target_place_id", "ros_type": "string", "rule": "optional_id", "description": "Required local place for rack target, otherwise the empty string."},
+    {"name": "target_agent_id", "ros_type": "string", "rule": "optional_id", "description": "Required custodian for agent target, otherwise the empty string."}
+  ],
+  "result": {
+    "echo_goal_fields": true,
+    "claim_fields": [
+      {"name": "claim_id", "ros_type": "string", "rule": "id", "description": "Unique worker report identity; this is not an observation or a consumption booking."},
+      {"name": "worker_boot_id", "ros_type": "string", "rule": "id", "description": "Worker process epoch; root must not replay uncertain work after restart."},
+      {"name": "outcome", "ros_type": "string", "rule": "enum", "values": ["claimed_performed", "claimed_not_performed", "claimed_unknown"], "description": "Worker assertion only; root observation and scientific acceptance remain separate."},
+      {"name": "evidence", "ros_type": "string", "rule": "enum", "values": ["worker_claim"], "description": "Unpromoted worker claim, never person confirmation, scan or sensor evidence."},
+      {"name": "motion_executed", "ros_type": "bool", "rule": "false", "description": "Always false in B0; semantic dispatch performs no robot trajectory."}
+    ]
+  },
+  "feedback_fields": [
+    {"goal_ref": "goal_id"},
+    {"name": "phase", "ros_type": "string", "rule": "enum", "values": ["claim_ready"], "description": "Reserved synthetic feedback phase, without progress or motion claim."}
+  ],
+  "limitations": [
+    "B0 defines and locally decodes generated ROS action fields; no ROS installation, DDS communication or action server is executed",
+    "MockTaskWorker reports a synthetic claim only and never receives a journal, workflow, inventory or ledger handle",
+    "Only rack-to-assigned-agent and assigned-agent-to-rack transfers are modeled; no rack-to-rack path or agent handover",
+    "Worker claims do not confirm physical custody, alter volume, accept measurements, or release root reservations",
+    "Source pins and worker identities are bindings, not authentication, hardware qualification or a motion proof"
+  ]
+}
