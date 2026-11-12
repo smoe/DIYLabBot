@@ -1,5 +1,5 @@
 {
-  "format": "solidcraftbot.cutrun-preparation-protocol/1",
+  "format": "solidcraftbot.cutrun-preparation-protocol/2",
   "mode": "preparation_only",
   "parameter_units": {
     "volume_ul": "uL",
@@ -18,7 +18,8 @@
       "retained_fraction": "cells",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "bind_cona": {
       "capability": "bead_binding",
@@ -31,7 +32,8 @@
       "retained_fraction": "beads",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "bind_antibody": {
       "capability": "antibody_binding",
@@ -44,7 +46,8 @@
       "retained_fraction": "beads",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "bind_enzyme": {
       "capability": "enzyme_binding",
@@ -57,7 +60,8 @@
       "retained_fraction": "beads",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "activate_digest": {
       "capability": "reaction_activation",
@@ -70,7 +74,8 @@
       "retained_fraction": "beads",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": "activation_reagent"
     },
     "stop_reaction": {
       "capability": "reaction_stopping",
@@ -83,7 +88,8 @@
       "retained_fraction": "beads",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": "stop_buffer"
     },
     "release_fragments": {
       "capability": "fragment_release",
@@ -95,7 +101,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "isolate_product": {
       "capability": "magnetic_separation",
@@ -106,7 +113,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "prepare_cleanup": {
       "capability": "cleanup_preparation",
@@ -119,7 +127,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "bind_column": {
       "capability": "column_centrifugation",
@@ -133,7 +142,8 @@
       "required_labware": [
         "spin_column",
         "collection_tube"
-      ]
+      ],
+      "reagent_role": null
     },
     "wash_column": {
       "capability": "column_washing",
@@ -148,7 +158,8 @@
       "required_labware": [
         "spin_column",
         "collection_tube"
-      ]
+      ],
+      "reagent_role": null
     },
     "elute": {
       "capability": "eluate_collection",
@@ -163,7 +174,8 @@
         "spin_column",
         "collection_tube",
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "handover_qc": {
       "capability": "product_handover",
@@ -172,7 +184,8 @@
       "retained_fraction": "product",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "prepare_input": {
       "capability": "specimen_preparation",
@@ -181,7 +194,8 @@
       "retained_fraction": "cells",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "lyse_input": {
       "capability": "input_lysis",
@@ -194,7 +208,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "sonicate_input": {
       "capability": "input_sonication",
@@ -207,7 +222,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "clarify_input": {
       "capability": "cooled_centrifugation",
@@ -220,7 +236,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "check_input_size": {
       "capability": "fragment_size_check",
@@ -232,7 +249,8 @@
       "retained_fraction": "supernatant",
       "required_labware": [
         "tube_1_5ml"
-      ]
+      ],
+      "reagent_role": null
     },
     "dry_column": {
       "capability": "column_centrifugation",
@@ -245,7 +263,8 @@
       "required_labware": [
         "spin_column",
         "collection_tube"
-      ]
+      ],
+      "reagent_role": null
     }
   },
   "workflows": {
@@ -328,7 +347,8 @@
       "eluent",
       "extraction_buffer",
       "proteinase_k",
-      "rnase_a"
+      "rnase_a",
+      "activation_reagent"
     ],
     "input": [
       "extraction_buffer",
@@ -355,7 +375,8 @@
   "limitations": [
     "Abstract synthetic requirements, not an executable SOP or reconstruction of the 2025 publication.",
     "No process runtime, inventory booking, reservation, journal, network, device, CAD or expected yield.",
-    "Fraction and lineage entries are proposed roles only; the shared material lifecycle supports explicit synthetic observations, while biochemical execution binding remains unimplemented."
+    "Fraction and lineage entries are proposed roles only; the shared material lifecycle supports explicit synthetic observations, while biochemical execution binding remains unimplemented.",
+    "Version 2 activation starts with contact of a prepared calcium-containing buffer; the stop role denotes a prepared working mixture, never dosing raw 4X stock by implication."
   ],
   "input_size_contract": {
     "cleanup_id": "cst_14209",

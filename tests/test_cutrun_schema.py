@@ -97,6 +97,42 @@ class CutrunSchemaTests(unittest.TestCase):
                 with self.assertRaises(ValidationError):
                     self.validator.validate(profile)
 
+    def test_matching_legacy_v1_documents_retain_their_old_field_shapes(self):
+        catalog = json.loads((ROOT / 'model/cutrun-automation.catalog.json').read_text())
+        protocol = json.loads((ROOT / 'model/cutrun-automation.protocol.json').read_text())
+        profile = copy.deepcopy(self.profile)
+        catalog['format'] = 'solidcraftbot.cutrun-catalog/1'
+        catalog['materials'].pop('activation_reagent')
+        catalog['materials']['stop_buffer'].update(label='CUT&RUN 4X Stop Buffer', catalog_number='48105')
+        protocol['format'] = 'solidcraftbot.cutrun-preparation-protocol/1'
+        protocol['required_material_roles']['cutrun'].remove('activation_reagent')
+        for operation in protocol['operations'].values():
+            operation.pop('reagent_role')
+        profile['format'] = 'solidcraftbot.cutrun-preparation/1'
+        for branch in profile['branches']:
+            branch['material_bindings'].pop('activation_reagent', None)
+        for document in [catalog, protocol, profile]:
+            with self.subTest(format=document['format']):
+                self.validator.validate(document)
+
+    def test_v2_requires_prepared_activation_and_stop_mixtures_without_stock_skus(self):
+        baseline = json.loads((ROOT / 'model/cutrun-automation.catalog.json').read_text())
+        for role in ['activation_reagent', 'stop_buffer']:
+            catalog = copy.deepcopy(baseline)
+            catalog['materials'][role]['catalog_number'] = '48105'
+            with self.subTest(role=role):
+                with self.assertRaises(ValidationError):
+                    self.validator.validate(catalog)
+
+    def test_operation_reagent_roles_are_required_only_in_v2(self):
+        protocol = json.loads((ROOT / 'model/cutrun-automation.protocol.json').read_text())
+        del protocol['operations']['activate_digest']['reagent_role']
+        with self.assertRaises(ValidationError):
+            self.validator.validate(protocol)
+        protocol['format'] = 'solidcraftbot.cutrun-preparation-protocol/1'
+        with self.assertRaises(ValidationError):
+            self.validator.validate(protocol)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,7 @@
 **Stand 12. November 2026. E0 ist begonnen; die SOP-Bindung bleibt offen.
 E1 ist für den synthetischen Referenzfall implementiert und geprüft;
 E2 ist als gemeinsamer synthetischer Materialvertrag implementiert;
-E3–E7 sind geplant.** Diese Datei führt Reihenfolge,
+E3 ist als synthetischer Prozessvertrag implementiert; E4–E7 sind geplant.** Diese Datei führt Reihenfolge,
 Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
 [CUT&RUN-Ablaufvertrag](ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
 Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
@@ -56,7 +56,7 @@ Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fort
 | **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Begonnen: [publikationsbezogener Melanom-/H3K4me3-Entwurf](docs/cutrun-reference-profile.md); konkrete SOP-Bindung offen |
 | **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Implementiert und synthetisch geprüft](docs/cutrun-preflight.md); E0-/SOP-Bindung offen |
 | **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | [Gemeinsamer synthetischer Materialvertrag implementiert und geprüft](docs/material-lifecycle.md); keine biochemische Ausführung |
-| **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | Offen, noch nicht geprüft |
+| **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | [Implementiert und synthetisch geprüft](docs/cutrun-synthetic-workflow.md); reale SOP-/Stoppqualifikation bleibt E0/E4–E6 |
 | **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | Offen, noch nicht geprüft |
 | **E5 · Einzelne Fähigkeiten** | Pipettieren, Magnettrennung, Resuspension/Mischung, Probentemperierung und gegebenenfalls Zentrifugation/Analytik am konkreten Gefäß und Medium qualifizieren; Personenaufgaben weiter zulassen. | Vorab festgelegte Fehler-, Verlust-, Verschleppungs-, Temperatur- und Zeitgrenzen experimentell erfüllt. Stoppweg einschließlich Ausfallverhalten erprobt. Native Geometrie- und Bewegungsnachweise ergänzen die Messungen. | Offen, noch nicht geprüft |
 | **E6 · Ein automatisierter Ablauf** | Einen seriellen Ablauf desselben Profils mit eindeutig gebundenen Fähigkeiten gegen E4 vergleichen. Automatisierte und verbleibende Personenaufgaben ausweisen; noch keine frei optimierte Mehrarm-/Mehrchargenplanung. | Vorab definierte technische und biologische Vergleichskriterien erfüllt; Fristen und Probentemperatur nachgewiesen. Vollautomation nur beanspruchen, wenn alle betreffenden Schritte qualifiziert sind. | Offen, noch nicht geprüft |
@@ -71,7 +71,8 @@ zurücksetzen. Reservierungen und Abgleich gelten weiterhin innerhalb eines Lauf
 
 ## Erforderliche negative Nachweise für E3
 
-Diese Fälle sind geplante Prüfungen, keine bereits ausgeführten Tests:
+Diese Fälle werden durch E3-Prozess-, `/2`-Ledger- und bestehende E2-Tests
+abgedeckt. Sie qualifizieren keine reale Durchführung:
 
 - Abbruch vor Aktivierung sowie nach möglicher Zugabe ohne Quittung; Ca-haltige
   Zugabe wird nicht automatisch wiederholt. Nach Kontaktverlust wird die Probe

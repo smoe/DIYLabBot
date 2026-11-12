@@ -1,0 +1,436 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-synthetic-run.schema.json",
+  "title": "Explicit synthetic CUT&RUN execution fixture; not a laboratory SOP",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "synthetic",
+    "preparation",
+    "settings",
+    "stop_actors",
+    "issued_reagents",
+    "fraction_vessels",
+    "bookkeeping_volumes_ul"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-synthetic-run/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "\\S"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "synthetic": {
+      "const": true
+    },
+    "preparation": {
+      "$ref": "cutrun-automation.schema.json#/$defs/pinned_reference"
+    },
+    "settings": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_deadline_s",
+        "phase_tolerance_s",
+        "temperature_tolerance_deg_c",
+        "stop_window_s",
+        "activation_service_s"
+      ],
+      "properties": {
+        "task_deadline_s": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "s"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "phase_tolerance_s": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "s"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "temperature_tolerance_deg_c": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "degC"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "stop_window_s": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "s"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "activation_service_s": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "s"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "stop_actors": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "\\S"
+      },
+      "uniqueItems": true
+    },
+    "issued_reagents": {
+      "type": "object",
+      "minProperties": 2,
+      "maxProperties": 2,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "activation",
+          "stop"
+        ],
+        "properties": {
+          "activation": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "material_id",
+              "vessel_id",
+              "quantity"
+            ],
+            "properties": {
+              "material_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "vessel_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "quantity": {
+                "allOf": [
+                  {
+                    "$ref": "cutrun-automation.schema.json#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "unit": {
+                        "const": "uL"
+                      },
+                      "basis": {
+                        "const": "synthetic_assumption"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "stop": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "material_id",
+              "vessel_id",
+              "quantity"
+            ],
+            "properties": {
+              "material_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "vessel_id": {
+                "type": "string",
+                "minLength": 1,
+                "pattern": "\\S"
+              },
+              "quantity": {
+                "allOf": [
+                  {
+                    "$ref": "cutrun-automation.schema.json#/$defs/fact"
+                  },
+                  {
+                    "properties": {
+                      "value": {
+                        "type": "number",
+                        "exclusiveMinimum": 0
+                      },
+                      "unit": {
+                        "const": "uL"
+                      },
+                      "basis": {
+                        "const": "synthetic_assumption"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "fraction_vessels": {
+      "type": "object",
+      "minProperties": 3,
+      "maxProperties": 3,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "supernatant",
+          "bead_remainder",
+          "column_residue"
+        ],
+        "properties": {
+          "supernatant": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "bead_remainder": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "column_residue": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          }
+        }
+      }
+    },
+    "bookkeeping_volumes_ul": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reaction",
+        "supernatant",
+        "bead_remainder",
+        "column",
+        "eluate",
+        "residue"
+      ],
+      "properties": {
+        "reaction": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "supernatant": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "bead_remainder": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "column": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "eluate": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        },
+        "residue": {
+          "allOf": [
+            {
+              "$ref": "cutrun-automation.schema.json#/$defs/fact"
+            },
+            {
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "uL"
+                },
+                "basis": {
+                  "const": "synthetic_assumption"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

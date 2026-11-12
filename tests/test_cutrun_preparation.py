@@ -67,7 +67,7 @@ class CutrunPreparationTests(unittest.TestCase):
 
     def test_default_synthetic_plan_is_complete_but_cannot_execute(self):
         plan = self.compile()
-        self.assertEqual(plan['format'], 'solidcraftbot.cutrun-preparation-plan/1')
+        self.assertEqual(plan['format'], 'solidcraftbot.cutrun-preparation-plan/2')
         self.assertEqual(plan['mode'], 'preparation_only')
         self.assertIs(plan['synthetic'], True)
         self.assertIs(plan['planning_complete'], True)
@@ -150,6 +150,51 @@ class CutrunPreparationTests(unittest.TestCase):
             with self.subTest(field=field):
                 with self.assertRaises(model.TaskError):
                     model.compile_plan(profile)
+
+    def legacy_sources(self):
+        self.profile['format'] = 'solidcraftbot.cutrun-preparation/1'
+        self.catalog['format'] = 'solidcraftbot.cutrun-catalog/1'
+        self.protocol['format'] = 'solidcraftbot.cutrun-preparation-protocol/1'
+        self.catalog['materials'].pop('activation_reagent')
+        self.catalog['materials']['stop_buffer'].update(
+            label='CUT&RUN 4X Stop Buffer', catalog_number='48105', source_refs=['cst_comparison_09_2026'])
+        self.protocol['required_material_roles']['cutrun'].remove('activation_reagent')
+        for operation in self.protocol['operations'].values():
+            operation.pop('reagent_role')
+        for branch in self.profile['branches']:
+            branch['material_bindings'].pop('activation_reagent', None)
+
+    def test_matching_legacy_v1_sources_keep_their_original_role_contract(self):
+        self.legacy_sources()
+        plan = self.compile()
+        self.assertEqual(plan['format'], 'solidcraftbot.cutrun-preparation-plan/1')
+        self.assertTrue(plan['planning_complete'])
+        self.assertTrue(all('reagent_role' not in step for branch in plan['branches'] for step in branch['steps']))
+        stop = next(item for item in plan['branches'][0]['material_requirements'] if item['role'] == 'stop_buffer')
+        self.assertEqual(stop['catalog_number'], '48105')
+
+    def test_mixed_preparation_catalog_and_protocol_versions_are_rejected(self):
+        original = (copy.deepcopy(self.profile), copy.deepcopy(self.catalog), copy.deepcopy(self.protocol))
+        for field in ['preparation', 'catalog', 'protocol']:
+            self.profile, self.catalog, self.protocol = copy.deepcopy(original)
+            value = self.profile if field == 'preparation' else self.catalog if field == 'catalog' else self.protocol
+            value['format'] = value['format'].replace('/2', '/1')
+            with self.subTest(field=field):
+                with self.assertRaisesRegex(model.TaskError, 'Mixed CUT&RUN'):
+                    self.compile()
+
+    def test_v2_activation_and_stop_use_explicit_prepared_mixture_roles(self):
+        plan = self.compile()
+        for branch in plan['branches'][:2]:
+            steps = {step['operation']: step for step in branch['steps']}
+            self.assertEqual(steps['activate_digest']['reagent_role'], 'activation_reagent')
+            self.assertEqual(steps['stop_reaction']['reagent_role'], 'stop_buffer')
+            materials = {item['role']: item for item in branch['material_requirements']}
+            self.assertIsNone(materials['activation_reagent']['catalog_number'])
+            self.assertIsNone(materials['stop_buffer']['catalog_number'])
+        self.protocol['operations']['activate_digest']['reagent_role'] = 'enzyme'
+        with self.assertRaisesRegex(model.TaskError, 'reagent role'):
+            self.compile()
 
     def test_reaction_materials_and_output_places_cannot_alias(self):
         baseline = copy.deepcopy(self.profile)

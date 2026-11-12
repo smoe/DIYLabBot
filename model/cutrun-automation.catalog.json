@@ -1,5 +1,5 @@
 {
-  "format": "solidcraftbot.cutrun-catalog/1",
+  "format": "solidcraftbot.cutrun-catalog/2",
   "status": "preparation_only",
   "references": {
     "owner_e0": {
@@ -19,6 +19,12 @@
       "revision": "Datasheet Revision 9; 1884 CUT & RUN Protocol Revision 09/2026",
       "accessed_on": "2026-11-11",
       "scope": "Current comparison source only. Not established as the original SOP of the 2025 study; original downloaded bytes/SHA-256 remain unavailable."
+    },
+    "synthetic_execution": {
+      "url": null,
+      "revision": "synthetic prepared-reagent roles/1",
+      "accessed_on": "2026-11-12",
+      "scope": "Explicit in-silico activation/stop working mixtures and execution fixture assumptions; no stock SKU, manufacturer recipe or observed laboratory preparation is claimed."
     }
   },
   "materials": {
@@ -55,11 +61,11 @@
       ]
     },
     "stop_buffer": {
-      "label": "CUT&RUN 4X Stop Buffer",
+      "label": "Prepared stopping working mixture (synthetic role; not raw 4X stock)",
       "kind": "reagent",
-      "catalog_number": "48105",
+      "catalog_number": null,
       "source_refs": [
-        "cst_comparison_09_2026"
+        "synthetic_execution"
       ]
     },
     "extraction_buffer": {
@@ -101,6 +107,14 @@
       "source_refs": [
         "cst_comparison_09_2026"
       ]
+    },
+    "activation_reagent": {
+      "label": "Prepared calcium-containing activation working buffer (synthetic role)",
+      "kind": "reagent",
+      "catalog_number": null,
+      "source_refs": [
+        "synthetic_execution"
+      ]
     }
   },
   "kits": {
@@ -123,6 +137,7 @@
   },
   "limitations": [
     "Article roles are current-source comparisons, not proof of actual historical kit use or current physical stocks.",
-    "No manufacturer PDF is redistributed, pinned as original SOP, or treated as operative approval."
+    "No manufacturer PDF is redistributed, pinned as original SOP, or treated as operative approval.",
+    "Version 2 distinguishes prepared activation and stop working mixtures from manufacturer stock articles; their simulated transfer amounts are not a chemical recipe."
   ]
 }

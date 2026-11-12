@@ -160,6 +160,9 @@ Verträge ab. E1 bleibt wirkungsfrei.
 
 E2 startet keine Geräte, Pipetten oder Roboter, führt keine Extraktions-SOP und
 keine Aktivierungs-/Stoppchemie aus und importiert keine echten QC-Dateien.
-Die CUT&RUN-Reaktionszustandsmaschine und ihre fachlichen Zeit-/Temperaturregeln
-bleiben E3. Quellenfreigabe, reale Ausführung und biologische Bewertung bleiben
+Die [E3-Reaktionszustandsmaschine](cutrun-synthetic-workflow.md) ergänzt dafür
+ein eigenes `/2`-Formatpaar mit synthetischen Zeit-/Temperaturregeln und
+gefäßbezogenen Schutzstopps im selben Ledger. Der generische E2-Runner bleibt
+bei `/1` und kann diese Prozessregeln nicht umgehen.
+Quellenfreigabe, reale Ausführung und biologische Bewertung bleiben
 die weiteren Abnahmen der [Roadmap](../ROADMAP.md).

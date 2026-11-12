@@ -9,7 +9,7 @@ import copy
 import re
 import uuid
 
-from manual_tasks import TaskError, digest, encoded
+from manual_tasks import MATERIAL_FORMATS, TaskError, digest, encoded
 from manual_workflow import ManualWorkflow, ObservationError
 import material_ledger as ledger
 from material_workflow_sources import load
@@ -30,6 +30,13 @@ class MaterialWorkflow(ManualWorkflow):
     @classmethod
     def create(cls, journal, domain, source=None, *, materials, vessels, run_id=None, task_deadline_s=3600):
         definition = load(domain, source, materials=materials, vessels=vessels, task_deadline_s=task_deadline_s)
+        return cls._create_definition(journal, definition, run_id=run_id)
+
+    @classmethod
+    def _create_definition(cls, journal, definition, run_id=None, extra_state=None):
+        if (cls.STATE_FORMAT not in MATERIAL_FORMATS or not isinstance(definition, dict)
+                or definition.get('format') != MATERIAL_FORMATS[cls.STATE_FORMAT]):
+            raise TaskError('Material workflow state and definition versions must match')
         identity = run_id or 'SYN.MATERIAL.' + uuid.uuid4().hex[:12]
         if not isinstance(identity, str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', identity):
             raise TaskError('Run id requires 1-64 ASCII letters, digits, dots, underscores or hyphens')
@@ -41,6 +48,10 @@ class MaterialWorkflow(ManualWorkflow):
                  'recovery_required': None, 'deadline_s': None, 'logical_time_s': 0.0,
                  'inventory': inventory, 'inventory_confirmation': None, 'bookings': {},
                  'pending_operation': None, 'imports': {}, 'cancel_reason': None}
+        if extra_state is not None:
+            if not isinstance(extra_state, dict) or set(extra_state) & set(state):
+                raise TaskError('Material state extensions cannot override common fields')
+            state.update(copy.deepcopy(extra_state))
         state['resources'] = cls._resources(state)
         journal.create(identity, state, immutable_definition=True,
                        material_allocations=definition['material_allocations'])

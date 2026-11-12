@@ -1,0 +1,192 @@
+{
+  "format": "solidcraftbot.cutrun-synthetic-run/1",
+  "id": "SYN.CUTRUN.SKMel29.H3K4me3.Execution",
+  "mode": "synthetic_only",
+  "synthetic": true,
+  "preparation": {
+    "source": "model/cutrun-automation.preparation.json",
+    "source_sha256": "fa465b701475c6030418f6433e48df2e2c59f3ac3107d355cf52d3b7d373180d"
+  },
+  "settings": {
+    "task_deadline_s": {
+      "value": 250000,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Overall serial fixture budget. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "phase_tolerance_s": {
+      "value": 120,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Synthetic timing acceptance beyond a declared phase duration. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "temperature_tolerance_deg_c": {
+      "value": 2,
+      "unit": "degC",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Synthetic observation tolerance around the E1 phase temperature. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "stop_window_s": {
+      "value": 180,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Synthetic stopping window after a declared digestion duration. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "activation_service_s": {
+      "value": 5,
+      "unit": "s",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Synthetic activation handling interval; contact can occur before confirmation. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    }
+  },
+  "stop_actors": [
+    "SYN.CutRun.Operator",
+    "SYN.CutRun.StopObserver"
+  ],
+  "issued_reagents": {
+    "SYN.CUTRUN.H3K4me3": {
+      "activation": {
+        "material_id": "SYN.CUTRUN.H3K4me3.IssuedActivation",
+        "vessel_id": "SYN.CUTRUN.H3K4me3.IssuedActivationTube",
+        "quantity": {
+          "value": 500,
+          "unit": "uL",
+          "basis": "synthetic_assumption",
+          "source_refs": [
+            "synthetic_execution"
+          ],
+          "note": "Explicit separately issued prepared activation mixture for this branch. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+        }
+      },
+      "stop": {
+        "material_id": "SYN.CUTRUN.H3K4me3.IssuedStop",
+        "vessel_id": "SYN.CUTRUN.H3K4me3.IssuedStopTube",
+        "quantity": {
+          "value": 200,
+          "unit": "uL",
+          "basis": "synthetic_assumption",
+          "source_refs": [
+            "synthetic_execution"
+          ],
+          "note": "Explicit separately issued prepared stop mixture for this branch. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+        }
+      }
+    },
+    "SYN.CUTRUN.IgG": {
+      "activation": {
+        "material_id": "SYN.CUTRUN.IgG.IssuedActivation",
+        "vessel_id": "SYN.CUTRUN.IgG.IssuedActivationTube",
+        "quantity": {
+          "value": 500,
+          "unit": "uL",
+          "basis": "synthetic_assumption",
+          "source_refs": [
+            "synthetic_execution"
+          ],
+          "note": "Explicit separately issued prepared activation mixture for this branch. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+        }
+      },
+      "stop": {
+        "material_id": "SYN.CUTRUN.IgG.IssuedStop",
+        "vessel_id": "SYN.CUTRUN.IgG.IssuedStopTube",
+        "quantity": {
+          "value": 200,
+          "unit": "uL",
+          "basis": "synthetic_assumption",
+          "source_refs": [
+            "synthetic_execution"
+          ],
+          "note": "Explicit separately issued prepared stop mixture for this branch. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+        }
+      }
+    }
+  },
+  "fraction_vessels": {
+    "SYN.CUTRUN.H3K4me3": {
+      "supernatant": "SYN.CUTRUN.H3K4me3.SupernatantTube",
+      "bead_remainder": "SYN.CUTRUN.H3K4me3.BeadRemainderTube",
+      "column_residue": "SYN.CUTRUN.H3K4me3.ColumnResidueTube"
+    },
+    "SYN.CUTRUN.IgG": {
+      "supernatant": "SYN.CUTRUN.IgG.SupernatantTube",
+      "bead_remainder": "SYN.CUTRUN.IgG.BeadRemainderTube",
+      "column_residue": "SYN.CUTRUN.IgG.ColumnResidueTube"
+    },
+    "SYN.CUTRUN.Input": {
+      "supernatant": "SYN.CUTRUN.Input.SupernatantTube",
+      "bead_remainder": "SYN.CUTRUN.Input.BeadRemainderTube",
+      "column_residue": "SYN.CUTRUN.Input.ColumnResidueTube"
+    }
+  },
+  "bookkeeping_volumes_ul": {
+    "reaction": {
+      "value": 150,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented reaction material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "supernatant": {
+      "value": 100,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented supernatant material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "bead_remainder": {
+      "value": 20,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented bead_remainder material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "column": {
+      "value": 50,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented column material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "eluate": {
+      "value": 50,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented eluate material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    },
+    "residue": {
+      "value": 10,
+      "unit": "uL",
+      "basis": "synthetic_assumption",
+      "source_refs": [
+        "synthetic_execution"
+      ],
+      "note": "Invented residue material-boundary receipt, not a predicted yield. Explicit in-silico fixture value; no laboratory recipe, yield or qualification is claimed."
+    }
+  }
+}

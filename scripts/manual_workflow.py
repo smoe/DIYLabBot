@@ -516,6 +516,15 @@ class ManualWorkflow(ManualOperations):
         if stored != expected or (clock_mode is not None and clock_mode != expected):
             raise TaskError('Clock mode mismatch: ' + stored + ' versus ' + str(clock_mode or expected))
 
+    @staticmethod
+    def _prepare_reopen(state):
+        """Optional versioned process clock bookkeeping in the session event."""
+
+    @staticmethod
+    def _authorize_actor(state, command, actor_id):
+        if state['actor_id'] is not None and state['actor_id'] != actor_id:
+            raise TaskError('Task is held by another synthetic actor')
+
     @classmethod
     def open(cls, journal, run_id, resume=False, clock_mode=None):
         state, revision = journal.state(run_id)
@@ -536,6 +545,7 @@ class ManualWorkflow(ManualOperations):
         if state['resources'] or state['actor_id']:
             state['recovery_required'] = state['recovery_required'] or 'session_restarted'
             state['workspace_clear'] = False
+        cls._prepare_reopen(state)
         state['session'] = session
         payload = {'explicit_resume': resume}
         if state['resources'] or state['actor_id']:
@@ -565,8 +575,7 @@ class ManualWorkflow(ManualOperations):
             raise TaskError('Run is terminal')
         if self.session is None or state['session'] != self.session:
             raise TaskError('Stale task session; reload and reconcile')
-        if state['actor_id'] is not None and state['actor_id'] != actor_id:
-            raise TaskError('Task is held by another synthetic actor')
+        self._authorize_actor(state, command, actor_id)
         if (state[self.DEADLINE_FIELD] is not None and self._now(state) >= state[self.DEADLINE_FIELD]
                 and not state['recovery_required']):
             state['recovery_required'] = 'deadline_exceeded'

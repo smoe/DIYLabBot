@@ -15,7 +15,7 @@ from manual_workflow import keys, text
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'model/cutrun-automation.preparation.json'
 SCHEMA = ROOT / 'model/cutrun-automation.schema.json'
-FORMAT = 'solidcraftbot.cutrun-preparation-plan/1'
+FORMAT = 'solidcraftbot.cutrun-preparation-plan/2'
 PARAMETER_UNITS = {'volume_ul': 'uL', 'duration_s': 's', 'temperature_deg_c': 'degC',
                    'rcf_x_g': 'x_g', 'cycles': 'count', 'size_min_bp': 'bp', 'size_max_bp': 'bp'}
 BASES = {'owner_confirmed', 'publication_reported', 'synthetic_assumption', 'unknown'}
@@ -98,6 +98,12 @@ def verify_source_pins(pins):
                 and digest(path.read_bytes()) == checksum, 'Preparation source changed: ' + name)
 
 
+def contract_version(value, prefix):
+    require(isinstance(value, str) and value in {prefix + '/1', prefix + '/2'},
+            'Unsupported CUT&RUN contract version')
+    return value.rsplit('/', 1)[1]
+
+
 def load(source=SOURCE):
     """Return a detached, pinned snapshot without constructing any runtime object."""
     path = None if isinstance(source, dict) else Path(source)
@@ -105,13 +111,16 @@ def load(source=SOURCE):
     profile = copy.deepcopy(source) if path is None else parse_json(content)
     keys(profile, 'format id mode synthetic catalog protocol context selection source_binding providers '
          'capability_bindings branches qc stop_plan', 'CUT&RUN preparation')
-    require(profile['format'] == 'solidcraftbot.cutrun-preparation/1'
-            and profile['mode'] == 'preparation_only' and profile['synthetic'] is True,
+    version = contract_version(profile['format'], 'solidcraftbot.cutrun-preparation')
+    require(profile['mode'] == 'preparation_only' and profile['synthetic'] is True,
             'Only the synthetic preparation-only CUT&RUN contract is supported')
     text(profile['id'], 'preparation id')
     pins = {}
     catalog = read_reference(profile['catalog'], pins)
     protocol = read_reference(profile['protocol'], pins)
+    require(contract_version(catalog.get('format'), 'solidcraftbot.cutrun-catalog') == version
+            and contract_version(protocol.get('format'), 'solidcraftbot.cutrun-preparation-protocol') == version,
+            'Mixed CUT&RUN preparation/catalog/protocol versions are not supported')
     if path is not None and path.resolve().is_relative_to(ROOT.resolve()):
         pins[str(path.resolve().relative_to(ROOT.resolve()))] = digest(content)
     for name in DEPENDENCIES:
@@ -174,8 +183,8 @@ class Facts:
 
 def validate_catalog(catalog):
     keys(catalog, 'format status references materials kits limitations', 'CUT&RUN catalog')
-    require(catalog['format'] == 'solidcraftbot.cutrun-catalog/1'
-            and catalog['status'] == 'preparation_only', 'Preparation-only CUT&RUN catalog required')
+    version = contract_version(catalog['format'], 'solidcraftbot.cutrun-catalog')
+    require(catalog['status'] == 'preparation_only', 'Preparation-only CUT&RUN catalog required')
     refs = catalog['references']
     require(isinstance(refs, dict) and refs, 'Source references required')
     for identity, ref in refs.items():
@@ -199,19 +208,32 @@ def validate_catalog(catalog):
                 text(item['catalog_number'], 'catalog number')
             require(set(strings(item['source_refs'], 'catalog source references')) <= set(refs), 'Unknown catalog source')
     strings(catalog['limitations'], 'catalog limitations')
+    if version == '2':
+        for role in ('activation_reagent', 'stop_buffer'):
+            require(role in catalog['materials'] and catalog['materials'][role]['kind'] == 'reagent'
+                    and catalog['materials'][role]['catalog_number'] is None,
+                    'Prepared activation/stop reagent roles require an explicit generic mixture without a stock SKU')
+    else:
+        require('activation_reagent' not in catalog['materials'], 'Activation reagent role requires CUT&RUN catalog version 2')
 
 
 def validate_protocol(protocol, catalog):
     keys(protocol, 'format mode parameter_units operations workflows fraction_contract qc_contract '
          'required_material_roles stop_contract input_size_contract integration_targets limitations', 'CUT&RUN protocol')
-    require(protocol['format'] == 'solidcraftbot.cutrun-preparation-protocol/1'
-            and protocol['mode'] == 'preparation_only', 'Preparation-only CUT&RUN protocol required')
+    version = contract_version(protocol['format'], 'solidcraftbot.cutrun-preparation-protocol')
+    require(contract_version(catalog['format'], 'solidcraftbot.cutrun-catalog') == version,
+            'Mixed CUT&RUN catalog/protocol versions are not supported')
+    require(protocol['mode'] == 'preparation_only', 'Preparation-only CUT&RUN protocol required')
     require(protocol['parameter_units'] == PARAMETER_UNITS, 'Parameter-unit contract mismatch')
     operations = protocol['operations']
     require(isinstance(operations, dict) and set(operations) == set(FRACTIONS), 'Missing or unsupported CUT&RUN operation')
     require(protocol['fraction_contract'] == FRACTIONS, 'Retained fraction contract mismatch')
     for identity, operation in operations.items():
-        keys(operation, 'capability purpose parameters retained_fraction required_labware', 'operation ' + identity)
+        fields = 'capability purpose parameters retained_fraction required_labware'
+        keys(operation, fields + (' reagent_role' if version == '2' else ''), 'operation ' + identity)
+        if version == '2':
+            expected_reagent = {'activate_digest': 'activation_reagent', 'stop_reaction': 'stop_buffer'}.get(identity)
+            require(operation['reagent_role'] == expected_reagent, 'Wrong activation/stop reagent role for ' + identity)
         text(operation['capability'], 'capability')
         text(operation['purpose'], 'purpose')
         require(set(strings(operation['parameters'], 'operation parameters', nonempty=False)) == REQUIRED_PARAMETERS[identity],
@@ -244,6 +266,8 @@ def validate_protocol(protocol, catalog):
     expected = {'cutrun': {'con_a_beads', 'primary_antibody', 'enzyme', 'stop_buffer', 'purification_column', 'eluent',
                            'extraction_buffer', 'proteinase_k', 'rnase_a'},
                 'input': {'extraction_buffer', 'proteinase_k', 'rnase_a', 'purification_column', 'eluent'}}
+    if version == '2':
+        expected['cutrun'].add('activation_reagent')
     keys(protocol['required_material_roles'], 'cutrun input', 'material roles')
     for workflow, roles in expected.items():
         require(set(strings(protocol['required_material_roles'][workflow], 'material roles')) == roles, 'Missing material role')
@@ -258,6 +282,7 @@ def compile_plan(source=SOURCE):
     profile, catalog, protocol = (definition[key] for key in ('preparation', 'catalog', 'protocol'))
     validate_catalog(catalog)
     validate_protocol(protocol, catalog)
+    version = contract_version(profile['format'], 'solidcraftbot.cutrun-preparation')
     facts = Facts(catalog['references'])
     input_size_limit = facts.read(protocol['input_size_contract']['maximum_exclusive_bp'], 'bp',
                                  'protocol.input_size_contract.maximum_exclusive_bp', synthetic=True)
@@ -393,9 +418,12 @@ def compile_plan(source=SOURCE):
                 {'value': None, 'unit': PARAMETER_UNITS[name], 'basis': 'unknown', 'source_refs': [],
                  'note': 'No planning value supplied; no default or observation is inferred.'}
                 for name in operation['parameters']}
-            steps.append({'operation': step, 'capability': operation['capability'], 'purpose': operation['purpose'],
+            compiled_step = {'operation': step, 'capability': operation['capability'], 'purpose': operation['purpose'],
                           'retained_fraction': operation['retained_fraction'], 'parameters': parameter_facts,
-                          'provider': {'instance_id': provider, 'status': 'proposed_synthetic_unqualified'}})
+                          'provider': {'instance_id': provider, 'status': 'proposed_synthetic_unqualified'}}
+            if version == '2':
+                compiled_step['reagent_role'] = operation['reagent_role']
+            steps.append(compiled_step)
         edge = {key: branch[key] for key in ('id', 'input_material_id', 'product_material_id')}
         edge.update({'input_vessel_id': branch['vessels']['input'], 'product_vessel_id': branch['vessels']['product'],
                      'status': 'planned_unobserved', 'product_disposition': 'retain'})
@@ -465,7 +493,8 @@ def compile_plan(source=SOURCE):
     required_service = None if service is None else len(active) * service
     require(budget is None or required_service is None or required_service <= budget, 'Stop throughput exceeds time budget')
     verify_source_pins(definition['source_files_sha256'])
-    return {'format': FORMAT, 'id': profile['id'], 'mode': 'preparation_only', 'synthetic': True,
+    return {'format': 'solidcraftbot.cutrun-preparation-plan/' + version,
+            'id': profile['id'], 'mode': 'preparation_only', 'synthetic': True,
             'planning_complete': not facts.open_requirements, 'execution_ready': False,
             'open_requirements': facts.open_requirements, 'assumptions': facts.assumptions,
             'execution_blockers': ['cutrun_execution_unimplemented', 'material_lifecycle_execution_binding_unimplemented',

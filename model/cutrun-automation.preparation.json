@@ -1,15 +1,15 @@
 {
-  "format": "solidcraftbot.cutrun-preparation/1",
+  "format": "solidcraftbot.cutrun-preparation/2",
   "id": "SYN.CUTRUN.SKMel29.H3K4me3.Preparation",
   "mode": "preparation_only",
   "synthetic": true,
   "catalog": {
     "source": "model/cutrun-automation.catalog.json",
-    "source_sha256": "80786183fbcaa578b6db412c5303b6b21d72e1a6783e283e306b2105559c8b25"
+    "source_sha256": "50b45dec0e6c83b6cc95dd19332e9eeb4bb21a5bb5958a363453a19829c2dfe5"
   },
   "protocol": {
     "source": "model/cutrun-automation.protocol.json",
-    "source_sha256": "9035584b60df63cc669f3ba79e08a1c5269941c2dc60696cedf7a9c1dab7de18"
+    "source_sha256": "f7bf63f5b3f9b5465a02981d504d5163724f75fc24328fe42c1cf0e4a8880ead"
   },
   "context": {
     "sample_class": {
@@ -396,7 +396,8 @@
         "stop_buffer": "stop_buffer",
         "extraction_buffer": "extraction_buffer",
         "proteinase_k": "proteinase_k",
-        "rnase_a": "rnase_a"
+        "rnase_a": "rnase_a",
+        "activation_reagent": "activation_reagent"
       },
       "parameter_values": {
         "prepare_cells": {},
@@ -759,7 +760,8 @@
         "stop_buffer": "stop_buffer",
         "extraction_buffer": "extraction_buffer",
         "proteinase_k": "proteinase_k",
-        "rnase_a": "rnase_a"
+        "rnase_a": "rnase_a",
+        "activation_reagent": "activation_reagent"
       },
       "parameter_values": {
         "prepare_cells": {},

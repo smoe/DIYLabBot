@@ -6,9 +6,10 @@ Legacy volume ledgers are not migrated or mirrored into this contract.
 """
 import copy
 import math
+from contextlib import contextmanager
 from functools import wraps
 
-from manual_tasks import TaskError, digest, encoded
+from manual_tasks import MATERIAL_DEFINITION_V2, MATERIAL_STATE_V2, TaskError, digest, encoded
 from manual_workflow import ObservationError, keys, text
 
 UNITS = {'uL', 'mg', 'ng', 'cells'}
@@ -153,8 +154,85 @@ def _receipt(actor_id, reason, **extra):
     return {'actor_id': actor_id, 'reason': reason, 'evidence': 'synthetic_input', **extra}
 
 
+def _protective_layout(state):
+    require(state.get('format') == MATERIAL_STATE_V2
+            and state.get('definition', {}).get('format') == MATERIAL_DEFINITION_V2,
+            'Protective stops require the version-2 material contract')
+    bindings = state['definition'].get('protective_stop_bindings')
+    operations = state.get('protective_operations')
+    require(isinstance(bindings, dict) and isinstance(operations, dict),
+            'Declared protective stop bindings and operation references required')
+    initial = {item['id']: item for item in state['definition']['initial_materials']}
+    for vessel_id, material_id in bindings.items():
+        text(vessel_id, 'protected reaction vessel');text(material_id, 'bound stop material')
+        require(vessel_id in state['inventory']['vessels'], 'Unknown protected reaction vessel')
+        material = _material(state, material_id)
+        require(material_id in initial and initial[material_id]['kind'] == 'reagent'
+                and material['kind'] == 'reagent' and material['role'] == 'issued_reagent'
+                and not material['parents'], 'Protective stop needs a bound issued reagent aliquot')
+    seen = set()
+    for vessel_id, intent_id in operations.items():
+        text(vessel_id, 'protected reaction vessel');text(intent_id, 'protective intent identity')
+        require(vessel_id in bindings and intent_id not in seen, 'Unknown vessel or reused protective intent')
+        seen.add(intent_id)
+        booking = state['bookings'].get(intent_id)
+        require(isinstance(booking, dict), 'Protective reference needs its canonical booking')
+        require(booking.get('protective_vessel_id') == vessel_id, 'Protective booking vessel reference mismatch')
+        require(booking['outcome'] in {'intent', 'unknown', 'performed', 'not_performed'},
+                'Unsupported protective booking outcome')
+        request = booking['request']
+        keys(request, 'kind inputs outputs purpose', 'protective withdrawal request')
+        text(request['purpose'], 'protective purpose')
+        require(request['kind'] == 'withdrawal' and request['outputs'] == []
+                and isinstance(request['inputs'], list) and len(request['inputs']) == 1,
+                'Protective stop is one withdrawal without outputs')
+        item = request['inputs'][0]
+        keys(item, 'material_id quantity consume_all', 'protective input')
+        require(item['material_id'] == bindings[vessel_id] and item['consume_all'] is False,
+                'Protective stop must withdraw only from its bound issued aliquot')
+        observed = quantity(item['quantity'])
+        require(observed['unit'] == _material(state, item['material_id'])['initial_quantity']['unit'],
+                'Protective withdrawal unit mismatch')
+    for identity, booking in state['bookings'].items():
+        if 'protective_vessel_id' in booking:
+            require(operations.get(booking['protective_vessel_id']) == identity,
+                    'A lifetime protective booking reference cannot be removed or replaced')
+    return bindings, operations
+
+
+def _unresolved_protective(state):
+    if state.get('format') != MATERIAL_STATE_V2:
+        return {}
+    _, operations = _protective_layout(state)
+    return {vessel: identity for vessel, identity in operations.items()
+            if state['bookings'][identity]['outcome'] in {'intent', 'unknown'}}
+
+
+@contextmanager
+def _protective_pending(state, intent_id=None, *, beginning=False):
+    """Select a canonical booking only on the caller's atomic cloned proposal.
+
+    The normal pending reference is always restored; protected references stay
+    untouched. No temporary context becomes persisted state or another balance.
+    """
+    pending = copy.deepcopy(state['pending_operation'])
+    state['pending_operation'] = None if beginning else {'intent_id': intent_id}
+    try:
+        yield
+    finally:
+        state['pending_operation'] = pending
+
+
 @atomic
 def begin_effect(state, actor_id, intent_id, kind, inputs, outputs, purpose):
+    text(intent_id, 'intent identity')
+    require(not _unresolved_protective(state) or intent_id in state['bookings'],
+            'Resolve protective stops before starting normal material work')
+    return _begin_effect(state, actor_id, intent_id, kind, inputs, outputs, purpose)
+
+
+def _begin_effect(state, actor_id, intent_id, kind, inputs, outputs, purpose):
+    """Shared validation on an atomic caller's proposal; no write or commit."""
     text(intent_id, 'intent identity')
     text(purpose, 'material operation purpose')
     require(kind in {'withdrawal', 'transformation'}, 'Unsupported material operation')
@@ -325,6 +403,61 @@ def not_performed(state, actor_id, intent_id, reason):
     state['pending_operation'] = None
 
 
+def _protective_reference(state, intent_id):
+    _, operations = _protective_layout(state)
+    found = [vessel for vessel, identity in operations.items() if identity == intent_id]
+    require(len(found) == 1, 'Unknown protective stop intent')
+    return found[0]
+
+
+@atomic
+def begin_protective_stop(state, actor_id, intent_id, vessel_id, material_id, quantity, purpose='protective_stop'):
+    bindings, operations = _protective_layout(state)
+    text(intent_id, 'protective intent identity');text(vessel_id, 'protected reaction vessel')
+    require(vessel_id in bindings and material_id == bindings[vessel_id], 'Wrong protective stop aliquot binding')
+    previous = operations.get(vessel_id)
+    require(previous is None or previous == intent_id, 'A reaction vessel has only one lifetime protective stop intent')
+    require(previous is not None or intent_id not in state['bookings'], 'Protective intent identity was already used')
+    for identity, booking in state['bookings'].items():
+        if identity != intent_id and booking['outcome'] in {'intent', 'unknown'}:
+            require(material_id not in {item['material_id'] for item in booking['request']['inputs']},
+                    'Unresolved material input sets must be disjoint for a protective stop')
+    with _protective_pending(state, beginning=True):
+        changed = _begin_effect(state, actor_id, intent_id, 'withdrawal',
+            [{'material_id': material_id, 'quantity': quantity, 'consume_all': False}], [], purpose)
+    if changed is False:
+        return False
+    state['protective_operations'][vessel_id] = intent_id
+    state['bookings'][intent_id]['protective_vessel_id'] = vessel_id
+
+
+@atomic
+def confirm_protective_stop(state, actor_id, intent_id, actual_inputs, reason):
+    _protective_reference(state, intent_id)
+    with _protective_pending(state, intent_id):
+        return confirm_effect(state, actor_id, intent_id, actual_inputs, [], reason)
+
+
+@atomic
+def mark_protective_unknown(state, actor_id, intent_id, reason):
+    _protective_reference(state, intent_id)
+    with _protective_pending(state, intent_id):
+        return mark_unknown(state, actor_id, intent_id, reason)
+
+
+@atomic
+def resolve_protective_stop(state, actor_id, intent_id, outcome, actual_inputs, reason):
+    _protective_reference(state, intent_id)
+    if outcome == 'performed':
+        return confirm_protective_stop(state, actor_id, intent_id, actual_inputs, reason)
+    require(actual_inputs is None or actual_inputs == [], 'A nonperformance/unknown receipt cannot invent quantities')
+    if outcome == 'unknown':
+        return mark_protective_unknown(state, actor_id, intent_id, reason)
+    require(outcome == 'not_performed', 'Explicit protective performed, not_performed or unknown outcome required')
+    with _protective_pending(state, intent_id):
+        return not_performed(state, actor_id, intent_id, reason)
+
+
 @atomic
 def resolve_quantity(state, actor_id, intent_id, material_id, quantity, reason):
     booking = state['bookings'].get(intent_id)
@@ -353,6 +486,7 @@ def resolve_quantity(state, actor_id, intent_id, material_id, quantity, reason):
 @atomic
 def set_disposition(state, actor_id, material_id, disposition, reason):
     require(state['pending_operation'] is None, 'Resolve pending effects before material disposition')
+    require(not _unresolved_protective(state), 'Resolve protective stops before material disposition')
     require(disposition in DISPOSITIONS, 'Unsupported material disposition')
     material = _material(state, material_id)
     receipt = _receipt(actor_id, reason)
@@ -375,6 +509,7 @@ def set_disposition(state, actor_id, material_id, disposition, reason):
 @atomic
 def record_measurement(state, actor_id, material_id, measurement_id, kind, quantity, reason):
     require(state['pending_operation'] is None, 'Resolve pending effects before confirming a material measurement')
+    require(not _unresolved_protective(state), 'Resolve protective stops before confirming a material measurement')
     material = _material(state, material_id)
     require(material['vessel_id'] is not None, 'A material in a current vessel is required')
     require(kind in {'concentration', 'total_vessel_mass'}, 'Unsupported material measurement role')
@@ -427,7 +562,23 @@ def audit(state):
         balance = remaining(state, identity)
         require(balance['value'] is None or balance['value'] >= -1e-9, 'Negative material balance')
     pending = [identity for identity, booking in state['bookings'].items() if booking['outcome'] in {'intent', 'unknown'}]
-    require(len(pending) <= 1 and state['pending_operation'] == ({'intent_id': pending[0]} if pending else None), 'Pending material operation mismatch')
+    if state.get('format') == MATERIAL_STATE_V2:
+        _, protected = _protective_layout(state)
+        unresolved = set(_unresolved_protective(state).values())
+        normal = state['pending_operation']
+        if normal is not None:
+            keys(normal, 'intent_id', 'normal pending material operation')
+            require(normal['intent_id'] in pending and normal['intent_id'] not in protected.values(),
+                    'Normal pending operation conflicts with protected references')
+        expected_pending = unresolved | ({normal['intent_id']} if normal else set())
+        require(set(pending) == expected_pending, 'Pending normal/protective material operation mismatch')
+        used_inputs = set()
+        for identity in pending:
+            current_inputs = {item['material_id'] for item in state['bookings'][identity]['request']['inputs']}
+            require(not current_inputs & used_inputs, 'Unresolved material input sets must be disjoint')
+            used_inputs.update(current_inputs)
+    else:
+        require(len(pending) <= 1 and state['pending_operation'] == ({'intent_id': pending[0]} if pending else None), 'Pending material operation mismatch')
     for identity, booking in state['bookings'].items():
         require(identity == booking['id'] and digest(encoded(booking['request']).encode()) == booking['request_sha256'], 'Corrupt material booking')
         require(booking['outcome'] in {'intent', 'unknown', 'performed', 'not_performed'}, 'Unsupported booking outcome')

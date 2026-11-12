@@ -385,7 +385,10 @@
       ],
       "properties": {
         "format": {
-          "const": "solidcraftbot.cutrun-catalog/1"
+          "enum": [
+            "solidcraftbot.cutrun-catalog/1",
+            "solidcraftbot.cutrun-catalog/2"
+          ]
         },
         "status": {
           "const": "preparation_only"
@@ -421,7 +424,75 @@
           },
           "uniqueItems": true
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "solidcraftbot.cutrun-catalog/2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "materials": {
+                "required": [
+                  "activation_reagent",
+                  "stop_buffer"
+                ],
+                "properties": {
+                  "activation_reagent": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/material"
+                      },
+                      {
+                        "properties": {
+                          "kind": {
+                            "const": "reagent"
+                          },
+                          "catalog_number": {
+                            "const": null
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "stop_buffer": {
+                    "allOf": [
+                      {
+                        "$ref": "#/$defs/material"
+                      },
+                      {
+                        "properties": {
+                          "kind": {
+                            "const": "reagent"
+                          },
+                          "catalog_number": {
+                            "const": null
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "materials": {
+                "not": {
+                  "required": [
+                    "activation_reagent"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "operation": {
       "type": "object",
@@ -479,6 +550,13 @@
             "pattern": "\\S"
           },
           "uniqueItems": true
+        },
+        "reagent_role": {
+          "enum": [
+            "activation_reagent",
+            "stop_buffer",
+            null
+          ]
         }
       }
     },
@@ -531,7 +609,10 @@
       ],
       "properties": {
         "format": {
-          "const": "solidcraftbot.cutrun-preparation-protocol/1"
+          "enum": [
+            "solidcraftbot.cutrun-preparation-protocol/1",
+            "solidcraftbot.cutrun-preparation-protocol/2"
+          ]
         },
         "mode": {
           "const": "preparation_only"
@@ -737,7 +818,42 @@
             }
           }
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "solidcraftbot.cutrun-preparation-protocol/2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "operations": {
+                "additionalProperties": {
+                  "required": [
+                    "reagent_role"
+                  ]
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "operations": {
+                "additionalProperties": {
+                  "not": {
+                    "required": [
+                      "reagent_role"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "provider": {
       "type": "object",
@@ -1475,7 +1591,10 @@
       ],
       "properties": {
         "format": {
-          "const": "solidcraftbot.cutrun-preparation/1"
+          "enum": [
+            "solidcraftbot.cutrun-preparation/1",
+            "solidcraftbot.cutrun-preparation/2"
+          ]
         },
         "id": {
           "type": "string",
@@ -1721,7 +1840,59 @@
         "stop_plan": {
           "$ref": "#/$defs/stop_plan"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "format": {
+                "const": "solidcraftbot.cutrun-preparation/2"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "branches": {
+                "items": {
+                  "if": {
+                    "properties": {
+                      "workflow": {
+                        "const": "cutrun"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "material_bindings": {
+                        "required": [
+                          "activation_reagent"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "branches": {
+                "items": {
+                  "properties": {
+                    "material_bindings": {
+                      "not": {
+                        "required": [
+                          "activation_reagent"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
     }
   }
 }

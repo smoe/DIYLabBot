@@ -24,6 +24,10 @@ def digest(content):
 MATERIAL_COMPONENT = 'solidcraftbot.material-allocations/1'
 MATERIAL_STATE = 'solidcraftbot.material-workflow-state/1'
 MATERIAL_DEFINITION = 'solidcraftbot.material-workflow-definition/1'
+MATERIAL_STATE_V2 = 'solidcraftbot.material-workflow-state/2'
+MATERIAL_DEFINITION_V2 = 'solidcraftbot.material-workflow-definition/2'
+MATERIAL_FORMATS = {MATERIAL_STATE: MATERIAL_DEFINITION,
+                    MATERIAL_STATE_V2: MATERIAL_DEFINITION_V2}
 
 
 class Journal:
@@ -254,13 +258,19 @@ class Journal:
 
     @staticmethod
     def _is_material_state(state):
-        return isinstance(state, dict) and state.get('format') == MATERIAL_STATE
+        return (isinstance(state, dict) and isinstance(state.get('format'), str)
+                and state['format'] in MATERIAL_FORMATS)
+
+    @staticmethod
+    def _material_family(state):
+        return (isinstance(state, dict) and isinstance(state.get('format'), str)
+                and state['format'].startswith('solidcraftbot.material-workflow-state/'))
 
     @staticmethod
     def _allocation_records(state, supplied=None):
         if (not Journal._is_material_state(state)
                 or not isinstance(state.get('definition'), dict)
-                or state['definition'].get('format') != MATERIAL_DEFINITION):
+                or state['definition'].get('format') != MATERIAL_FORMATS[state['format']]):
             raise TaskError('Versioned material workflow state and definition required')
         records = state['definition'].get('material_allocations')
         if not isinstance(records, list) or (supplied is not None and supplied != records):
@@ -299,6 +309,8 @@ class Journal:
                     event = self._expanded(json.loads(document))
                 except (ValueError, TypeError, KeyError, AttributeError) as error:
                     raise TaskError('Cannot audit material allocation introduction: ' + run_id) from error
+                if self._material_family(event.get('state')) and not self._is_material_state(event.get('state')):
+                    raise TaskError('Unsupported material workflow state version')
                 if not self._is_material_state(event.get('state')):
                     continue
                 found_material_run = True
@@ -308,6 +320,7 @@ class Journal:
                 definition = encoded(state['definition'])
                 for item in events:
                     if (not self._is_material_state(item['state'])
+                            or item['state']['format'] != state['format']
                             or encoded(item['state'].get('definition')) != definition):
                         raise TaskError('Material allocation definition changed: ' + run_id)
                 for record in records:
@@ -359,6 +372,8 @@ class Journal:
             raise TaskError('Explicit immutable-definition storage option required')
         try:
             self.connection.execute('BEGIN IMMEDIATE')
+            if self._material_family(state) and not self._is_material_state(state):
+                raise TaskError('Unsupported material workflow state version')
             enabled = self._material_component()
             if enabled or material_allocations is not None or self._is_material_state(state):
                 self.audit_material_allocations()
@@ -420,10 +435,15 @@ class Journal:
             old, current, previous = self._current(run_id)
             if current != revision:
                 raise TaskError('Task changed; reload before confirming the operation')
+            if ((self._material_family(old) and not self._is_material_state(old))
+                    or (self._material_family(state) and not self._is_material_state(state))):
+                raise TaskError('Unsupported material workflow state version')
             if self._is_material_state(old):
                 if not enabled:
                     raise TaskError('Missing material allocation store extension')
                 self._allocation_records(state)
+                if state['format'] != old['format']:
+                    raise TaskError('Material workflow state version cannot change during a run')
                 if encoded(state['definition']) != encoded(old['definition']):
                     raise TaskError('Material allocation definition is immutable')
             elif self._is_material_state(state):

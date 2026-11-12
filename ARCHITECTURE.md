@@ -747,8 +747,9 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 
 ## CUT&RUN: geplanter Ablaufvertrag
 
-**Stand 12. November 2026: E1-Preflight und synthetischer E2-Materialvertrag
-implementiert; keine CUT&RUN-Ausführung und keine biologische Qualifikation.** Die erste Ausbaustufe
+**Stand 12. November 2026: E1-Preflight, gemeinsamer E2-Materialvertrag und
+synthetischer E3-Lauf implementiert; keine reale CUT&RUN-Ausführung oder
+biologische Qualifikation.** Die erste Ausbaustufe
 führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
 CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
 zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
@@ -775,7 +776,13 @@ Die ausdrücklich aktivierte Store-Komponente `solidcraftbot.material-allocation
 ordnet ausgegebene Reagenzaliquots dauerhaft einem Lauf zu; sie ist ein gegen
 Einführungsereignisse geprüfter Identitätsindex, keine globale Reagenzmengenbilanz.
 Journalereignis, Materialprojektion und Zuteilung sind atomar. Bestehende
-Laufformate werden nicht migriert. Biochemische Prozesse und E3 bleiben offen.
+Laufformate werden nicht migriert. Der [synthetische E3-Lauf](docs/cutrun-synthetic-workflow.md)
+verwendet ein geschlossenes `/2`-Paar mit demselben Ledger und Journal:
+Phasenfolge, mögliche Aktivierung, gefäßbezogene Schutzstopps, Zeitintervalle,
+Temperaturabdeckung, Produkt-QC und Wiederanlauf. Eigene ausgegebene Stopp-Aliquots
+ermöglichen disjunkte Stopps bei ungeklärter Aktivierung. Reale SOP und
+biochemische Qualifikation bleiben offen; ältere aktive Quellenpins werden
+nicht still migriert.
 
 ### Quellenbindung und Varianten
 
@@ -859,8 +866,9 @@ ihre bisherigen Abschluss- und Wiederaufnahmeregeln.
 
 ### Aktivierung, tatsächlicher Stopp und Wiederanlauf
 
-Die folgenden Zustandsrollen sind ein zu implementierender Vertrag, keine
-vorhandenen API-Zustände. Der Aktivierungszeitpunkt ist der profilabhängige
+Die folgenden Zustandsrollen sind in E3 ausschließlich mit synthetischen
+Beobachtungen umgesetzt; die reale Ausführung bleibt zu qualifizieren.
+Der Aktivierungszeitpunkt ist der profilabhängige
 Kontakt mit dem aktivierenden Reagenz, auch wenn Calcium bereits in einem
 zugegebenen Puffer enthalten ist. Die Reaktion wartet nicht auf den Scheduler.
 
@@ -874,6 +882,7 @@ flowchart LR
     I -. "Wirkung unbekannt" .-> U["Gesperrt; manueller Abgleich"]
     A -. "Kontaktverlust" .-> U
     Q -. "Bestätigung fehlt" .-> U
+    U --> |"Schutzstopp mit getrenntem Aliquot"| Q
 ```
 
 Vor Aktivierung müssen Stoppmaterial, qualifizierter Zugangs-/Mischweg,
