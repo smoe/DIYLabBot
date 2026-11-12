@@ -559,6 +559,37 @@ eines abgeschlossenen Laufs, fortgeschriebene Restmengen und Inhaltsrevisionen
 sowie ein atomarer Root-/Stock-Schreibpfad mit exklusiver persistenter Lease,
 Kopfvergleich und Fencing. Diese Verträge und Befehle sind noch nicht implementiert.
 
+### Asynchroner Transport zwischen Laboren: synthetisches T0/T1
+
+Der [Transportvertrag](docs/async-lab-transport.md) ergänzt das Gebäude als
+räumlichen Kontext um agentenneutrale Kindaufträge für Boten und Roboter.
+T0/T1 führt einen frischen synthetischen Owner mit dem gemeinsamen Material-
+Ledger im vorhandenen Journal. Inbox, Outbox, Requestquittungen, Job-Unterclaims
+und Ressourcenprojektion liegen gemeinsam im Rootzustand; ein Journal-CAS
+speichert sie atomar. Es entstehen keine zweite Datenbank und keine eigene
+Mengenbilanz. Die reine Domäne und beide Adapter verwenden dieselben versionierten
+Protokoll-, Manifest- und Rollenregeln.
+
+`python3 scripts/run_async_transport.py demo` führt den A/B-Testfall aus.
+Beide Agenten verwenden die ausdrücklich erfundene Ausführung `teleportation_mock`
+mit null Fahrzeit. Sie liefern einen Workerclaim und vier getrennte synthetische
+Rollenquittungen; Gewahrsam ändert sich erst nach den passenden Abhol-/Ablieferungs-
+paaren. Die Inbox erhält ungeordnete Belege und wendet sie kausal an. Dispatch
+wird vor dem Adapteraufruf gespeichert. Resume hält offene Aufträge und entwertet
+die alte Sitzung; unbekannte Ausgänge werden nicht erneut ausgeführt.
+Späte widersprüchliche Belege sperren auch Folgeaufträge desselben Racks.
+Für nachträglich gehaltene terminale Jobs fehlt in T1 noch eine Freigabe-API;
+das Rack bleibt gesperrt, historische Erfolgsereignisse bleiben erhalten.
+
+Fixture und Inventar werden erst mit atomarer Admission angenommen; bestehende
+IDs oder Mengen dürfen nicht neu eingeführt werden. Basisholds und belegte
+Empfangsplätze bleiben beim Owner, während geklärte Agentenzuteilungen frei werden.
+T1 pumpt Nachrichten lokal über CLI/Python-API; Netzwerk, Hintergrundworker,
+reale Authentifizierung, physische Übergabe, ROS-/Roboterbewegung und Schutzfunktion
+sind damit nicht nachgewiesen. T2, die Anbindung an vorhandene biologische Roots,
+bleibt offen; Ownerwechsel benötigt zusätzlich den Stockvertrag. Die bestehende
+Vorgabe fließender Bewegungen gilt für spätere reale Adapter weiter.
+
 ## Lesende NanoDrop-UltraC-Netzwerkschnittstelle
 
 Der [UltraC-Netzwerkadapter](docs/nanodrop-ultra-network.md) trennt den einmalig

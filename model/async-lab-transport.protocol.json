@@ -1,0 +1,19 @@
+{
+  "format": "solidcraftbot.async-lab-transport-protocol/1",
+  "id": "AsyncLabTransport.T0",
+  "mode": "synthetic_only",
+  "roles": ["pickup_release", "pickup_accept", "delivery_release", "delivery_accept"],
+  "phases": ["requested", "reserved", "pickup_pending", "in_custody", "delivery_pending", "completed", "cancelled", "cancelled_reconciled"],
+  "execution_mode": "teleportation_mock",
+  "transport_time_s": 0,
+  "motion_executed": false,
+  "hardware_executed": false,
+  "limitations": [
+    "One authoritative synthetic owner and store; no existing material run is imported or migrated",
+    "A complete closed rack moves without altering vessel slots, contents, quantities or content revisions",
+    "Two role attestations per handover are required; worker claims never establish custody",
+    "Zero transport time is an explicit mock assumption, not a trajectory or hardware capability",
+    "No network, authentication service, physical scan, navigation, biological or safety qualification",
+    "Reconciliation observes current arrangement and never fabricates historical handover receipts"
+  ]
+}

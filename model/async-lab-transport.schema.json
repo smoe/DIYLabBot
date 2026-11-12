@@ -1,0 +1,536 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "async-lab-transport.schema.json",
+  "$ref": "#/$defs/definition",
+  "$defs": {
+    "definition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "owner_principal",
+        "initial_materials",
+        "initial_vessels",
+        "racks",
+        "endpoints",
+        "agents",
+        "protocol"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.async-lab-transport/1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "owner_principal": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "initial_materials": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/initial_material"
+          }
+        },
+        "initial_vessels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "location"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "location": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "rack_id",
+                  "place_id"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "rack"
+                  },
+                  "rack_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                  },
+                  "place_id": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "racks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "initial_endpoint",
+              "closed"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "initial_endpoint": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "closed": {
+                "const": true
+              }
+            }
+          }
+        },
+        "endpoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "site_id",
+              "lab_id",
+              "holder_id",
+              "place_id",
+              "principal"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "site_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "lab_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "holder_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "place_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "principal": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              }
+            }
+          }
+        },
+        "agents": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "kind",
+              "principal"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "kind": {
+                "enum": [
+                  "human",
+                  "robot"
+                ]
+              },
+              "principal": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              }
+            }
+          }
+        },
+        "protocol": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "const": "model/async-lab-transport.protocol.json"
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            }
+          }
+        }
+      }
+    },
+    "initial_material": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "vessel_id",
+        "quantity",
+        "origin_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "kind": {
+          "enum": [
+            "sample",
+            "control",
+            "reagent"
+          ]
+        },
+        "vessel_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "quantity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "unit": {
+              "enum": [
+                "uL",
+                "mg",
+                "ng",
+                "cells"
+              ]
+            }
+          }
+        },
+        "origin_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "manifest_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "place_id",
+        "vessel_id",
+        "content_revision",
+        "materials"
+      ],
+      "properties": {
+        "place_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "vessel_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "content_revision": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "materials": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "material_id",
+              "origin_id"
+            ],
+            "properties": {
+              "material_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "origin_id": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "envelope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "job_id",
+        "run_id",
+        "rack_id",
+        "source_endpoint",
+        "target_endpoint",
+        "agent_id",
+        "source_principal",
+        "target_principal",
+        "agent_principal",
+        "pickup_handover_id",
+        "delivery_handover_id",
+        "assignment_epoch",
+        "manifest",
+        "manifest_sha256",
+        "contract_sha256",
+        "agent_kind",
+        "execution_mode"
+      ],
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "rack_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "source_endpoint": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "target_endpoint": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "source_principal": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "target_principal": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "agent_principal": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "pickup_handover_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "delivery_handover_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "assignment_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "manifest": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/manifest_entry"
+          }
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "contract_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "agent_kind": {
+          "enum": [
+            "human",
+            "robot"
+          ]
+        },
+        "execution_mode": {
+          "const": "teleportation_mock"
+        }
+      }
+    },
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observation_id",
+        "job_id",
+        "handover_id",
+        "rack_id",
+        "source_endpoint",
+        "target_endpoint",
+        "agent_id",
+        "assignment_epoch",
+        "manifest_sha256",
+        "role",
+        "evidence"
+      ],
+      "properties": {
+        "observation_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "job_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "handover_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "rack_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "source_endpoint": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "target_endpoint": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "agent_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "assignment_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "manifest_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "role": {
+          "enum": [
+            "pickup_release",
+            "pickup_accept",
+            "delivery_release",
+            "delivery_accept"
+          ]
+        },
+        "evidence": {
+          "enum": [
+            "synthetic_endpoint_attestation",
+            "synthetic_courier_attestation",
+            "synthetic_robot_attestation"
+          ]
+        }
+      }
+    },
+    "worker_claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_id",
+        "job_id",
+        "assignment_epoch",
+        "envelope_sha256",
+        "evidence",
+        "outcome",
+        "execution_mode",
+        "transport_time_s",
+        "motion_executed",
+        "hardware_executed"
+      ],
+      "properties": {
+        "claim_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "job_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "assignment_epoch": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "envelope_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "evidence": {
+          "const": "worker_claim"
+        },
+        "outcome": {
+          "const": "claimed_performed"
+        },
+        "execution_mode": {
+          "const": "teleportation_mock"
+        },
+        "transport_time_s": {
+          "const": 0
+        },
+        "motion_executed": {
+          "const": false
+        },
+        "hardware_executed": {
+          "const": false
+        }
+      }
+    }
+  }
+}

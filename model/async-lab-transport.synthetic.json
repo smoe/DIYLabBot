@@ -1,0 +1,144 @@
+{
+  "format": "solidcraftbot.async-lab-transport/1",
+  "id": "SYN.AsyncTransport.AB",
+  "mode": "synthetic_only",
+  "owner_principal": "SYN.Async.Owner",
+  "initial_materials": [
+    {
+      "id": "SYN.Async.Material01",
+      "kind": "sample",
+      "vessel_id": "SYN.Async.Vessel01",
+      "quantity": {
+        "value": 40,
+        "unit": "uL"
+      },
+      "origin_id": "SYN.Async.Origin01"
+    },
+    {
+      "id": "SYN.Async.Material02",
+      "kind": "sample",
+      "vessel_id": "SYN.Async.Vessel02",
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "origin_id": "SYN.Async.Origin02"
+    },
+    {
+      "id": "SYN.Async.Material03",
+      "kind": "sample",
+      "vessel_id": "SYN.Async.Vessel03",
+      "quantity": {
+        "value": 40,
+        "unit": "uL"
+      },
+      "origin_id": "SYN.Async.Origin03"
+    },
+    {
+      "id": "SYN.Async.Material04",
+      "kind": "sample",
+      "vessel_id": "SYN.Async.Vessel04",
+      "quantity": {
+        "value": null,
+        "unit": "uL"
+      },
+      "origin_id": "SYN.Async.Origin04"
+    }
+  ],
+  "initial_vessels": [
+    {
+      "id": "SYN.Async.Vessel01",
+      "location": {
+        "kind": "rack",
+        "rack_id": "SYN.Async.Rack01",
+        "place_id": "Slot01"
+      }
+    },
+    {
+      "id": "SYN.Async.Vessel02",
+      "location": {
+        "kind": "rack",
+        "rack_id": "SYN.Async.Rack01",
+        "place_id": "Slot02"
+      }
+    },
+    {
+      "id": "SYN.Async.Vessel03",
+      "location": {
+        "kind": "rack",
+        "rack_id": "SYN.Async.Rack02",
+        "place_id": "Slot01"
+      }
+    },
+    {
+      "id": "SYN.Async.Vessel04",
+      "location": {
+        "kind": "rack",
+        "rack_id": "SYN.Async.Rack02",
+        "place_id": "Slot02"
+      }
+    }
+  ],
+  "racks": [
+    {
+      "id": "SYN.Async.Rack01",
+      "initial_endpoint": "LabA.S1",
+      "closed": true
+    },
+    {
+      "id": "SYN.Async.Rack02",
+      "initial_endpoint": "LabA.S2",
+      "closed": true
+    }
+  ],
+  "endpoints": [
+    {
+      "id": "LabA.S1",
+      "site_id": "SYN.Site01",
+      "lab_id": "LabA",
+      "holder_id": "LabA.Handover",
+      "place_id": "S1",
+      "principal": "SYN.LabA.Endpoint"
+    },
+    {
+      "id": "LabA.S2",
+      "site_id": "SYN.Site01",
+      "lab_id": "LabA",
+      "holder_id": "LabA.Handover",
+      "place_id": "S2",
+      "principal": "SYN.LabA.Endpoint"
+    },
+    {
+      "id": "LabB.S1",
+      "site_id": "SYN.Site01",
+      "lab_id": "LabB",
+      "holder_id": "LabB.Handover",
+      "place_id": "S1",
+      "principal": "SYN.LabB.Endpoint"
+    },
+    {
+      "id": "LabB.S2",
+      "site_id": "SYN.Site01",
+      "lab_id": "LabB",
+      "holder_id": "LabB.Handover",
+      "place_id": "S2",
+      "principal": "SYN.LabB.Endpoint"
+    }
+  ],
+  "agents": [
+    {
+      "id": "AgentHuman",
+      "kind": "human",
+      "principal": "SYN.Human.Courier"
+    },
+    {
+      "id": "AgentRobot",
+      "kind": "robot",
+      "principal": "SYN.Robot.Courier"
+    }
+  ],
+  "protocol": {
+    "source": "model/async-lab-transport.protocol.json",
+    "source_sha256": "6186308b38f02af2ffabc16e64cb9361aa1adade8aa8213ba46e5f17ac54e7af"
+  }
+}

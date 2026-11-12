@@ -331,6 +331,41 @@ oder Geräteeffekte. Unbekannte Puls-, Kühlungs- und Gefäßparameter offen las
 ein Geräteabschluss oder NanoDrop-/Qubit-Wert belegt keine Fragmentgröße.
 Keine Sonikations-Nebenbilanz, Hardware-, ROS- oder SiLA-Ausführung ableiten.
 
+## Asynchroner Labortransport T0/T1
+
+Vor Änderungen [docs/async-lab-transport.md](docs/async-lab-transport.md) lesen.
+Protokoll, Schema und A/B-Fixture unter `model/async-lab-transport.*.json`
+führen den synthetischen Vertrag. `async_transport_domain.py` prüft dieselben
+Rollen-/Manifestregeln für Boten- und Robotermock. Keine unabhängige Bilanz oder
+zweite Zustandsmaschine pro Adapter anlegen. Der gemeinsame Material-Ledger
+führt Material/Gefäß/Inhaltsrevision; Rackplatzierung ist dessen Ownerkontext.
+
+Jobs, Inbox/Outbox, Requests, Job-Unterclaims und Ressourcen gemeinsam im
+Rootzustand des vorhandenen Journals committen. Dispatch erst nach dem
+erfolgreichen Commit; keine SQL-Transaktion oder globale Sperre über die
+Ausführung halten. Die Fixture beginnt unadmitted ohne behauptete Reservierung;
+erst Admission führt Inventar und Basisholds atomar ein. Jobabschluss darf weder
+einen belegten Platz freigeben noch andere Root-Holds entfernen.
+
+`python3 scripts/run_async_transport.py demo` verwendet `teleportation_mock`:
+null Fahrzeit, keine Bahn oder Hardware. Claim, Personenbestätigung, Scan und
+Übergabe nicht gleichsetzen; die vier Mock-Rollenbelege bleiben synthetisch.
+Ungeordnete Belege kausal anwenden. Ein neues Workerboot oder Session-Resume
+rechtfertigt keine Wiederholung eines dispatchten Effekts. Alte/widersprüchliche
+Belege und unklare Ausgänge erhalten und ausdrücklich abgleichen; keine
+Zeitablauf-Freigabe und kein Zurücksetzen des Orts annehmen.
+Späte Konflikte auch auf Folgeaufträge desselben Racks anwenden. Für gehaltene
+terminale Jobs gibt es in T1 keine Freigabe-API; das Rack bleibt gesperrt.
+Historische Erfolgsereignisse dabei nicht umschreiben.
+
+T1 bindet noch keinen bestehenden biologischen Workflow an, betreibt kein
+Netzwerk und authentifiziert keine realen Personen. Die Mocks haben nur einen
+instanzlokalen Cache; der Owner bleibt die dauerhafte Autorität. Permanente
+Aliquotzuordnungen unverändert lassen. Unabhängige Owners/Stores benötigen den
+Stockvertrag. Quellenänderungen sperren aktive Fortsetzungen; keine stillen
+Migrationen. Spätere Bewegungsadapter müssen die fließende Bewegungsvorgabe
+und eigene reale Übergabe-/Sensorbedingungen erfüllen.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |
