@@ -747,8 +747,8 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 
 ## CUT&RUN: geplanter Ablaufvertrag
 
-**Stand 12. November 2026: wirkungsfreier E1-Preflight implementiert, keine
-CUT&RUN-Ausführung und keine biologische Qualifikation.** Die erste Ausbaustufe
+**Stand 12. November 2026: E1-Preflight und synthetischer E2-Materialvertrag
+implementiert; keine CUT&RUN-Ausführung und keine biologische Qualifikation.** Die erste Ausbaustufe
 führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
 CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
 zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
@@ -764,7 +764,18 @@ und das synthetische SK-Mel-29/H3K4me3-Profil in
 Parameterherkunft, Fraktionen, Stoppanforderungen, Providergrenzen und Produkt-QC,
 ohne Journal-, Bestands-, Reservierungs- oder Gerätewirkung. Vollständige
 synthetische Angaben ergeben weiterhin `execution_ready: false`; die offene
-historische SOP-Bindung und E2-/Laufzeitnachweise bleiben getrennte Sperren.
+historische SOP-Bindung und die biochemische Laufzeitbindung bleiben getrennte Sperren.
+
+Der [gemeinsame E2-Materialvertrag](docs/material-lifecycle.md) verwendet eine
+Opt-in-Variante der vorhandenen manuellen Ablaufhülle und dasselbe Journal.
+`solidcraftbot.material-workflow-state/1` trennt Materialien und Gefäße und führt typisierte
+Buchungen, 1:n-Abstammung, Produktaufbewahrung und explizite Enddispositionen.
+Extraktion und CUT&RUN binden ihre bestehenden Vorbereitungsquellen daran.
+Die ausdrücklich aktivierte Store-Komponente `solidcraftbot.material-allocations/1`
+ordnet ausgegebene Reagenzaliquots dauerhaft einem Lauf zu; sie ist ein gegen
+Einführungsereignisse geprüfter Identitätsindex, keine globale Reagenzmengenbilanz.
+Journalereignis, Materialprojektion und Zuteilung sind atomar. Bestehende
+Laufformate werden nicht migriert. Biochemische Prozesse und E3 bleiben offen.
 
 ### Quellenbindung und Varianten
 

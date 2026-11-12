@@ -21,6 +21,11 @@ def digest(content):
     return hashlib.sha256(content).hexdigest()
 
 
+MATERIAL_COMPONENT = 'solidcraftbot.material-allocations/1'
+MATERIAL_STATE = 'solidcraftbot.material-workflow-state/1'
+MATERIAL_DEFINITION = 'solidcraftbot.material-workflow-definition/1'
+
+
 class Journal:
     """Append-only event history, including state after each committed transition.
 
@@ -210,11 +215,162 @@ class Journal:
             raise TaskError('Missing or corrupt artifact: ' + checksum)
         return bytes(row[0])
 
-    def create(self, run_id, state, *, immutable_definition=False):
+    def _material_component(self):
+        tables = {row[0] for row in self.connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name IN "
+            "('journal_components', 'material_allocations')")}
+        if not tables:
+            return False
+        if tables != {'journal_components', 'material_allocations'}:
+            raise TaskError('Incomplete material allocation store extension')
+        try:
+            components = self.connection.execute('SELECT name, format FROM journal_components').fetchall()
+            columns = {row[1] for row in self.connection.execute('PRAGMA table_info(material_allocations)')}
+        except sqlite3.Error as error:
+            raise TaskError('Invalid material allocation store extension') from error
+        if components != [('material_allocations', MATERIAL_COMPONENT)]:
+            raise TaskError('Unsupported journal component version')
+        if columns != {'alias', 'run_id', 'material_id', 'vessel_id',
+                       'declaration_sha256', 'introduction_sha256'}:
+            raise TaskError('Invalid material allocation index schema')
+        return True
+
+    def _enable_material_component(self):
+        if self._material_component():
+            return
+        # DDL belongs to the introducing event's transaction. executescript()
+        # would implicitly commit and is intentionally not used here.
+        self.connection.execute('CREATE TABLE journal_components '
+                                '(name TEXT PRIMARY KEY, format TEXT NOT NULL)')
+        self.connection.execute('INSERT INTO journal_components VALUES (?, ?)',
+                                ('material_allocations', MATERIAL_COMPONENT))
+        self.connection.execute('''CREATE TABLE material_allocations (
+            alias TEXT PRIMARY KEY,
+            run_id TEXT NOT NULL REFERENCES runs(id),
+            material_id TEXT NOT NULL,
+            vessel_id TEXT NOT NULL,
+            declaration_sha256 TEXT NOT NULL,
+            introduction_sha256 TEXT NOT NULL)''')
+
+    @staticmethod
+    def _is_material_state(state):
+        return isinstance(state, dict) and state.get('format') == MATERIAL_STATE
+
+    @staticmethod
+    def _allocation_records(state, supplied=None):
+        if (not Journal._is_material_state(state)
+                or not isinstance(state.get('definition'), dict)
+                or state['definition'].get('format') != MATERIAL_DEFINITION):
+            raise TaskError('Versioned material workflow state and definition required')
+        records = state['definition'].get('material_allocations')
+        if not isinstance(records, list) or (supplied is not None and supplied != records):
+            raise TaskError('Material allocations must equal the immutable definition')
+        materials, vessels = set(), set()
+        result = []
+        for record in records:
+            if not isinstance(record, dict) or set(record) != {'material_id', 'vessel_id', 'declaration_sha256'}:
+                raise TaskError('Invalid material allocation declaration')
+            for field, seen in (('material_id', materials), ('vessel_id', vessels)):
+                value = record[field]
+                if not isinstance(value, str) or not value.strip() or value in seen:
+                    raise TaskError('Missing or duplicate material allocation identity: ' + field)
+                seen.add(value)
+            checksum = record['declaration_sha256']
+            if (not isinstance(checksum, str) or len(checksum) != 64
+                    or any(character not in '0123456789abcdef' for character in checksum)):
+                raise TaskError('Invalid material allocation declaration checksum')
+            result.append(copy.deepcopy(record))
+        return result
+
+    def audit_material_allocations(self):
+        """Verify the permanent identity index against all material introductions.
+
+        The index has no quantities and is never released. Its rows are derived
+        from new-format introduction events, including empty opted-in runs.
+        Historical reads do not require this extension to be understood.
+        """
+        with self._reading():
+            enabled = self._material_component()
+            expected, found_material_run = {}, False
+            introductions = self.connection.execute(
+                'SELECT run_id, document FROM events WHERE sequence=1 ORDER BY run_id').fetchall()
+            for run_id, document in introductions:
+                try:
+                    event = self._expanded(json.loads(document))
+                except (ValueError, TypeError, KeyError, AttributeError) as error:
+                    raise TaskError('Cannot audit material allocation introduction: ' + run_id) from error
+                if not self._is_material_state(event.get('state')):
+                    continue
+                found_material_run = True
+                events = self.history(run_id)
+                state = events[0]['state']
+                records = self._allocation_records(state)
+                definition = encoded(state['definition'])
+                for item in events:
+                    if (not self._is_material_state(item['state'])
+                            or encoded(item['state'].get('definition')) != definition):
+                        raise TaskError('Material allocation definition changed: ' + run_id)
+                for record in records:
+                    value = {'run_id': run_id, **record, 'introduction_sha256': events[0]['sha256']}
+                    for alias in ('material:' + record['material_id'], 'vessel:' + record['vessel_id']):
+                        if alias in expected:
+                            raise TaskError('Material identity has multiple introductions: ' + alias)
+                        expected[alias] = value
+            if found_material_run and not enabled:
+                raise TaskError('Missing material allocation store extension')
+            actual = {}
+            if enabled:
+                for row in self.connection.execute(
+                        'SELECT alias, run_id, material_id, vessel_id, declaration_sha256, '
+                        'introduction_sha256 FROM material_allocations'):
+                    actual[row[0]] = dict(zip(('run_id', 'material_id', 'vessel_id',
+                                              'declaration_sha256', 'introduction_sha256'), row[1:]))
+            if actual != expected:
+                raise TaskError('Material allocation index does not match introduction events')
+            return copy.deepcopy(actual)
+
+    def _acquire_resources(self, run_id, resources, *, material_component=False):
+        for resource in sorted(resources):
+            if material_component:
+                owner = self.connection.execute(
+                    'SELECT run_id FROM material_allocations WHERE alias=?', (resource,)).fetchone()
+                if owner and owner[0] != run_id:
+                    raise TaskError('Material identity permanently allocated to ' + owner[0] + ': ' + resource)
+            owner = self.connection.execute(
+                'SELECT run_id FROM resources WHERE id=?', (resource,)).fetchone()
+            if owner and owner[0] != run_id:
+                raise TaskError('Resource reserved by ' + owner[0] + ': ' + resource)
+            self.connection.execute('INSERT OR IGNORE INTO resources VALUES (?, ?)', (resource, run_id))
+
+    def _claim_material_alias(self, alias, value):
+        owner = self.connection.execute(
+            'SELECT run_id FROM material_allocations WHERE alias=?', (alias,)).fetchone()
+        if owner is not None:
+            raise TaskError('Material identity permanently allocated to ' + owner[0] + ': ' + alias)
+        held = self.connection.execute('SELECT run_id FROM resources WHERE id=?', (alias,)).fetchone()
+        if held is not None and held[0] != value['run_id']:
+            raise TaskError('Resource reserved by ' + held[0] + ': ' + alias)
+        self.connection.execute('INSERT INTO material_allocations VALUES (?, ?, ?, ?, ?, ?)',
+                                (alias, value['run_id'], value['material_id'], value['vessel_id'],
+                                 value['declaration_sha256'], value['introduction_sha256']))
+
+    def create(self, run_id, state, *, immutable_definition=False, material_allocations=None):
         if type(immutable_definition) is not bool:
             raise TaskError('Explicit immutable-definition storage option required')
         try:
             self.connection.execute('BEGIN IMMEDIATE')
+            enabled = self._material_component()
+            if enabled or material_allocations is not None or self._is_material_state(state):
+                self.audit_material_allocations()
+            allocations = None
+            if material_allocations is not None:
+                if not isinstance(material_allocations, list):
+                    raise TaskError('Explicit material allocation list required')
+                allocations = self._allocation_records(state, material_allocations)
+                self._enable_material_component()
+                enabled = True
+            elif self._is_material_state(state):
+                raise TaskError('Material workflow creation requires explicit material allocations')
             self.connection.execute('INSERT INTO runs VALUES (?)', (run_id,))
             reference = None
             if immutable_definition:
@@ -223,7 +379,19 @@ class Journal:
                 content = encoded(state['definition']).encode()
                 reference = digest(content)
                 self.connection.execute('INSERT OR IGNORE INTO artifacts VALUES (?, ?)', (reference, content))
+            if allocations is not None:
+                resources = state.get('resources')
+                if (not isinstance(resources, list)
+                        or any(not isinstance(item, str) or not item.strip() for item in resources)
+                        or len(resources) != len(set(resources))):
+                    raise TaskError('Material workflow initial resources must be unique strings')
+                self._acquire_resources(run_id, resources, material_component=enabled)
             row = self._event(run_id, 1, None, 'created', {}, state, definition_sha256=reference)
+            if allocations is not None:
+                for record in allocations:
+                    value = {'run_id': run_id, **record, 'introduction_sha256': row[2]}
+                    for alias in ('material:' + record['material_id'], 'vessel:' + record['vessel_id']):
+                        self._claim_material_alias(alias, value)
             persisted = self._expanded(json.loads(row[1]))['state']
             stamp = self._stamp()
             self.connection.commit()
@@ -246,17 +414,22 @@ class Journal:
         """
         try:
             self.connection.execute('BEGIN IMMEDIATE')
+            enabled = self._material_component()
+            if enabled:
+                self.audit_material_allocations()
             old, current, previous = self._current(run_id)
             if current != revision:
                 raise TaskError('Task changed; reload before confirming the operation')
+            if self._is_material_state(old):
+                if not enabled:
+                    raise TaskError('Missing material allocation store extension')
+                self._allocation_records(state)
+                if encoded(state['definition']) != encoded(old['definition']):
+                    raise TaskError('Material allocation definition is immutable')
+            elif self._is_material_state(state):
+                raise TaskError('Material workflow requires an opted-in introduction event')
             old_holds, new_holds = set(old['resources']), set(state['resources'])
-            for resource in sorted(new_holds):
-                owner = self.connection.execute(
-                    'SELECT run_id FROM resources WHERE id=?', (resource,)).fetchone()
-                if owner and owner[0] != run_id:
-                    raise TaskError('Resource reserved by ' + owner[0] + ': ' + resource)
-                self.connection.execute(
-                    'INSERT OR IGNORE INTO resources VALUES (?, ?)', (resource, run_id))
+            self._acquire_resources(run_id, new_holds, material_component=enabled)
             for resource in old_holds - new_holds:
                 self.connection.execute(
                     'DELETE FROM resources WHERE id=? AND run_id=?', (resource, run_id))

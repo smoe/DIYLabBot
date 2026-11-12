@@ -142,15 +142,23 @@ Die Vorbereitung referenziert den vorhandenen Lebenszyklus, das Journal und den
 Ledger als Integrationsziele. Sie legt keine zweite Ereignis- oder Bestandsführung
 an und verändert den bestehenden CF01–NanoDrop–Qubit-Lauf nicht.
 
+Der [gemeinsame E2-Materiallebenszyklus](material-lifecycle.md) ist inzwischen
+als eigener versionierter Vertrag innerhalb derselben Ablaufhülle und desselben
+Journals implementiert. Er bindet diesen Preflight und den CUT&RUN-Preflight,
+führt explizite synthetische Umwandlungen, typisierte Verbräuche und behaltene
+Produkte. Er führt noch keine Extraktions-SOP aus und macht diese Vorbereitung
+nicht ausführungsbereit.
+
 Vor einer ausführbaren Extraktion sind folgende gezielte Erweiterungen nötig:
 
 1. Ein manueller Extraktionsvertrag mit bestätigtem Vorbehandlungsende,
    Entnahme-/Transferabsichten, wiederaufnehmbaren Checkpoints und
    Abbruchabgleich. Danach können dieselben Schritte schrittweise an
    qualifizierte Adapter gebunden werden.
-2. Der gemeinsame Bestand muss Materialumwandlungen, Massen-/Zellzahl- und
-   Reagenzverbräuche sowie **aufzubewahrende Produkte** abbilden. Die heutige
-   Hülle verlangt die Rückgabe aller Originale und Entsorgung abgeleiteter
+2. Den E2-Materialvertrag an den konkreten Extraktionsablauf binden. Er bildet
+   Materialumwandlungen, typisierte Verbräuche und **aufzubewahrende Produkte**
+   synthetisch ab. Die bisherige CF01-/NanoDrop-/Qubit-Hülle verlangt weiterhin
+   die Rückgabe aller Originale und Entsorgung abgeleiteter
    Gefäße; die heutige µL-Originalentnahmebilanz reicht hierfür nicht aus.
 3. RNA-/DNA-Eluate werden über ihre Material-, Gefäß- und Platzidentitäten
    weitergegeben. Die bestehenden NanoDrop-/Qubit-Testprofile verwenden

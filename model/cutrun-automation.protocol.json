@@ -355,7 +355,7 @@
   "limitations": [
     "Abstract synthetic requirements, not an executable SOP or reconstruction of the 2025 publication.",
     "No process runtime, inventory booking, reservation, journal, network, device, CAD or expected yield.",
-    "Fraction and lineage entries are proposed roles only; the shared E2 lifecycle and later runtime remain unimplemented."
+    "Fraction and lineage entries are proposed roles only; the shared material lifecycle supports explicit synthetic observations, while biochemical execution binding remains unimplemented."
   ],
   "input_size_contract": {
     "cleanup_id": "cst_14209",

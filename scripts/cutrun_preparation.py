@@ -468,7 +468,7 @@ def compile_plan(source=SOURCE):
     return {'format': FORMAT, 'id': profile['id'], 'mode': 'preparation_only', 'synthetic': True,
             'planning_complete': not facts.open_requirements, 'execution_ready': False,
             'open_requirements': facts.open_requirements, 'assumptions': facts.assumptions,
-            'execution_blockers': ['cutrun_execution_unimplemented', 'shared_material_lifecycle_e2_unimplemented',
+            'execution_blockers': ['cutrun_execution_unimplemented', 'material_lifecycle_execution_binding_unimplemented',
                 'historical_sop_and_original_source_unbound', 'providers_and_labware_unqualified',
                 'qc_integration_unimplemented', 'biological_acceptance_undefined'],
             'context': copy.deepcopy(context), 'selection': copy.deepcopy(selection), 'source_binding': copy.deepcopy(binding),

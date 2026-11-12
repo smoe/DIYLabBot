@@ -9,7 +9,7 @@
   },
   "protocol": {
     "source": "model/cutrun-automation.protocol.json",
-    "source_sha256": "dff2cbe2aab1745cfffd3d75810a5e2fe92b55bb2eb7afc0048b2807dce8dae0"
+    "source_sha256": "9035584b60df63cc669f3ba79e08a1c5269941c2dc60696cedf7a9c1dab7de18"
   },
   "context": {
     "sample_class": {

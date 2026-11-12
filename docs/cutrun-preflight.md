@@ -67,9 +67,11 @@ mit Exitcode **0** zulässig.
 
 Unbekannte historische SOP-Revision, Original-SOP-Prüfsumme und biologische
 Abnahmeschwelle bleiben ausdrücklich ungelöst. Sie sind keine für die
-synthetische Feldvollständigkeit erfundenen Werte. Reale SOP-Nachweise,
-E2-Lebenszyklus, Providerqualifikation, QC-Anbindung und CUT&RUN-Laufzeit bleiben
-als `execution_blockers` erhalten. Ein Quellenwechsel kann diese Sperren nicht
+synthetische Feldvollständigkeit erfundenen Werte.
+Der [E2-Materialvertrag](material-lifecycle.md) ist für explizite synthetische
+Materialvorgänge implementiert; seine Bindung an eine biochemische Ausführung,
+reale SOP-Nachweise, Providerqualifikation, QC-Anbindung und CUT&RUN-Laufzeit bleiben als
+`execution_blockers` erhalten. Ein Quellenwechsel kann diese Sperren nicht
 durch ein zusätzliches `execution_ready`-Feld umgehen.
 
 ## Geprüfte Zusammenhänge
