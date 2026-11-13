@@ -298,8 +298,9 @@ ableiten.
 - Ausschließlich Simulator, synthetische Roboterbeobachtungen und lokale
   Netzwerkprüfung: keine Hardware, native Ladebahn, Sicherheitsqualifikation,
   formale SiLA-Zertifizierung oder LAN-Qualifikation. Eine GENtle-Bindung und
-  die Netzwerkanbindung des gemeinsamen CF01/NanoDrop/Qubit-Workflows sind damit
-  nicht implementiert; dessen Checkpointvertrag vor Effekten bleibt bestehen.
+  die Geräte-Netzwerkanbindung des gemeinsamen CF01/NanoDrop/Qubit-Workflows sind
+  damit nicht implementiert; dessen Checkpointvertrag vor Effekten bleibt bestehen.
+  T3 ergänzt separat Transport-HTTPS, keine Gerätekommunikation.
 
 ## DNA-SiLA-Dienst und vorbereitete Worker-Aufträge
 
@@ -413,6 +414,38 @@ Freigabe-API oder Stock-/Ownerübernahme ist damit nicht implementiert. Der
 synthetische Laborlauf besitzt genau das vorhandene Originalrack; generische Tests mit
 disjunkten Payloads sind unabhängige Testwelten und keine Bestandskopien. Beam-
 Mocks, Netzwerknachweis, reale Robotik und Schutzfunktionen getrennt halten.
+
+### T3: Botenoberfläche und Transportnetzwerk
+
+Vor Änderungen [docs/lab-transport-network.md](docs/lab-transport-network.md)
+lesen. Die ausdrücklich neue T3-Komposition referenziert T2; bestehende
+Journale nicht migrieren. `NetworkWorkflow` und HTTPS-Service verwenden
+denselben Root und Domänenport. Keine zweite Queuezustandsmaschine, Inventar-
+oder Mengenliste im Netzwerkadapter beziehungsweise Browser führen.
+
+Konto (`subject`), fachlichen Principal und ressourcengebundenen Grant trennen.
+Owner-, Endpunkt-, Agenten- und Beobachterbefugnisse serverseitig prüfen;
+Owner dürfen nicht automatisch alle Übergaberollen quittieren. Originalbytes,
+Kontobindung, Grant, Fingerabdruck, Quittung und erste Wirkung atomar speichern.
+Rollen-/Tokenprüfung und Ownerboot/-epoche unmittelbar vor dem Commit erneut
+prüfen. Übergabebelege behalten ihre eingefrorene Jobepoche und Übergabe-ID.
+
+Start, Login, Polling und Wiederverbindung dürfen nichts bestätigen oder
+dispatchen. Neue Wirkungen benötigen ausdrückliches Owner-Resume; lesender
+Replay einer alten Quittung darf keine aktuelle oder fremde Sitzung übernehmen.
+Nach Antwortverlust zuerst den eigenen Beleg einschließlich Originalfingerabdruck
+prüfen, gegebenenfalls dieselben Bytes und Kennungen ausdrücklich wiederholen.
+Passwörter und Tokens nicht in Browserpersistenz, Journal, URL oder Logs speichern.
+Offene Entwürfe dürfen ihre Konto-/Lauf-/Dienstbindung nicht still wechseln.
+
+HTTPS mit explizitem Zertifikatsvertrauen und localhost-Begrenzung erhalten.
+Der enge Workflowabgleich gilt nur für unbegonnene manuelle Empfangsstufen;
+aktive Gerätearbeit und offene Transportkonflikte nicht pauschal freigeben.
+Kontozugang, synthetische Rollenangabe, Scan und physische Übergabe unterscheiden.
+Browserfixture, echter HTTPS-/Root-Test und vollständige CLI-Demo getrennt
+ausweisen. Transportnetzwerk belegt keine Instrumentkommunikation, reale
+Personenzuordnung, LAN-, Windows-, Hardware-, Bewegungs- oder Sicherheitsprüfung.
+Stock-/Ownerübernahme und die T2-Freigabegrenzen bleiben unimplementiert.
 
 ## Gemeinsame Quellen und Generatoren
 

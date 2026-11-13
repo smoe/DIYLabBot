@@ -1,6 +1,6 @@
-# Asynchroner Transport zwischen Laboren: T0/T1, T2 und Ausbauplan
+# Asynchroner Transport zwischen Laboren: T0 bis T3 und Ausbauplan
 
-**Status: T0/T1 und die ausdrücklich gewählte synthetische Workflowanbindung T2 sind implementiert.**
+**Status: T0/T1, die synthetische Workflowanbindung T2 und die lokale Boten-/HTTPS-Erweiterung T3 sind implementiert.**
 Boten- und Robotermock verwenden denselben fachlichen Vertrag. Beide führen
 modellhaft einen **Beam-Transport mit null Fahrzeit** aus; es werden weder reale
 Boten beauftragt noch Roboter bewegt. Identitäten, Claims und die vier getrennten
@@ -9,8 +9,10 @@ Rollenquittungen werden dabei weiterhin vollständig geprüft.
 Die T0/T1-Referenzimplementierung führt einen frischen synthetischen Owner im
 vorhandenen Journal. T2 bindet denselben Transportkern an eine neue Komposition
 des vorhandenen CF01–NanoDrop–Qubit-Workflows; bestehende aktive Journale werden
-dabei nicht umgestellt. Der nachfolgende Gesamtplan enthält zusätzlich
-spätere Netzwerk-/Robotik- und Stockschritte. Gebäude und Wege bleiben optionaler
+dabei nicht umgestellt. [T3](lab-transport-network.md) ergänzt eine ausdrücklich
+neue Laufart mit lokalen Konten und tatsächlich geprüften HTTPS-Requests;
+die Übergaben bleiben synthetisch. Der Gesamtplan enthält zusätzlich spätere
+Robotik- und Stockschritte. Gebäude und Wege bleiben optionaler
 räumlicher Kontext; vorhandene aktive Läufe und Bestände werden nicht migriert.
 
 ## Ziel und erste Ausbaustufe
@@ -302,7 +304,7 @@ prüft zusätzlich sämtliche Laborstufen, Transportjobs, Buchungen und Artefakt
 dauerhafte Gefäßzuordnung, autorisierte Ownerübernahme und atomarer Schreibpfad.
 Auftragskopien oder exportierte Berichte ersetzen dies nicht.
 
-Mehrere Netzwerkclients können später dieselbe Autorität verwenden. Getrennte
+Mehrere Netzwerkclients verwenden in T3 dieselbe Autorität. Getrennte
 Labor-Serververzeichnisse besitzen heute getrennte Stores und koordinieren weder
 Reservierungen noch Mengen. Eine DB-Kopie ist kein koordiniertes Inventar;
 gespeicherte IDs allein verhindern keinen absichtlich geklonten schreibenden
@@ -315,7 +317,7 @@ Store. Föderation und verteiltes Fencing sind eigene spätere Ausbaustufen.
 | T0 · Domänenvertrag, synthetisch implementiert | Versionierte Auftrags-/Quittungsschemata, Rollen, Invarianten, reiner Zustandsautomat | Beide Quittungspaare, ungeordnete Nachrichten, Identitäts-/Versionskonflikte ohne Gerätezugriff |
 | T1 · Dauerhafte Ausführung, synthetisch implementiert | Opt-in Owner-Komposition mit Jobmap, atomarer Inbox/Outbox, Claims, Fencing; Boten- und Robotermock | Neustart-/Konkurrenztests; gleicher fachlicher Endzustand beider Adapter |
 | T2 · Workflowanbindung, synthetisch implementiert | Derselbe Labor-Owner wartet auf Transportabschluss; unabhängige NanoDrop-Ergebnisarbeit läuft weiter | Empfangssperre, unveränderte Bilanz, zwei disjunkte Jobs im generischen eingebetteten Testkontext; der Laborfall enthält ein Originalrack |
-| T3 · Mensch und Netzwerk | Berechtigte Botenoberfläche, optionaler Netzwerkadapter über dieselben Domänenoperationen | Rollen, Reconnect und persistente Deduplikation separat geprüft |
+| T3 · Lokale Konten und Transportnetzwerk, implementiert | Botenoberfläche und HTTPS über dieselben T2-Domänenoperationen; Übergaben weiterhin synthetisch | Rollen, Reconnect, persistente Deduplikation und explizites Owner-Resume separat geprüft; keine reale Personen-/Übergabequalifikation |
 | T4 · Reale Robotik | Bewegungs-/Sensoradapter mit passender Ausführungsbefugnis | Fließende Bahn, reale Griff-/Ablagebelege und lokales Ausfallverhalten separat geprüft |
 | Gesonderter Stock-Ausbau | Übergänge zwischen unabhängigen Owners, später mögliche Föderation | Keine zweite Einführung oder Mengenrücksetzung; eine Reservierungs-/Bestandsautorität |
 
@@ -373,8 +375,8 @@ Verpflichtende Tests:
     trotzdem die vorzeitige Freigabe des nächsten Laborprozesses.
 
 Die T0/T1-Prüfungen der Referenzimplementierung stehen im folgenden Abschnitt.
-Die gesamte Liste beschreibt auch spätere T3–T4-Abnahmen; sie behauptet keine
-vorhandene Netzwerkanbindung, reale Botenoberfläche, Robotik oder Ownerübernahme.
+Die gesamte Liste beschreibt auch spätere T4-/Stock-Abnahmen. T3 belegt lokale
+Konto-/Rollenregeln und HTTPS, keine realen Übergaben, Robotik oder Ownerübernahme.
 
 ## T0/T1: ausführbare Referenzimplementierung
 
@@ -566,7 +568,8 @@ ein solcher Lauf wird nicht nachträglich als normal erfolgreich abgeschlossen.
 Der synthetische Laborfall besitzt genau ein Originalrack. Zwei disjunkte Aufträge
 werden zusätzlich im generischen eingebetteten Provider mit der vorhandenen,
 unabhängigen T0/T1-Testwelt geprüft. Dies führt keine zweite Kopie der zwölf
-Laborproben ein. Es gibt weiterhin keinen Netzwerkdienst, Hintergrunddispatcher,
+Laborproben ein. T2 allein besitzt keinen Netzwerkdienst oder Hintergrunddispatcher;
+die separate T3-Erweiterung ergänzt lokalen HTTPS-Zugriff. Es gibt weiterhin keinen
 realen Boten, Scan, ROS-/Roboterweg, Hardware-, biologische oder Sicherheitsqualifikation.
 Ein geschlossener und transporttauglicher Rackzustand ist eine synthetische
 Annahme; reale Deckel-/Gefäßretention wird weder beobachtet noch qualifiziert.
@@ -592,3 +595,23 @@ Zusätzlich bestanden 112 Regressionstests des bisherigen V1-Laborworkflows,
 Journals und der Materialallokation ohne übersprungene Tests. Insgesamt wurden
 234 unterschiedliche gezielte Testfälle erfolgreich geprüft. Dies ersetzt keine
 vollständige Repository-, CAD-, Netzwerk-, Hardware- oder Sicherheitsprüfung.
+
+## T3: Botenoberfläche und HTTPS auf dem T2-Kern
+
+Die Umsetzung und Bedienung stehen in [lab-transport-network.md](lab-transport-network.md).
+Die neue Komposition referenziert T2; Queue und biologische Bilanz bleiben im
+selben Root. Ressourcengebundene Konten geben vier getrennte Übergaberollen ab.
+Routenvorbereitung und Dispatch sind ausdrückliche Owneraktionen und erzeugen
+keine Rollenbelege. Empfangssperren und späte Konflikte gelten unverändert.
+
+Requestbytes, Kontobindung und Quittung werden mit der ersten Root-Wirkung
+atomar gespeichert. Wiederverbindung liest zunächst; ein alter Request erhält
+seinen vorhandenen Beleg oder wird nach ausdrücklicher Entscheidung unverändert
+wiederholt. Ein Serverneustart führt keine Arbeit aus. Neue Schreibwirkungen
+verlangen ein eigenes Owner-Resume mit aktueller Bootkennung und Queueepoche.
+Passwörter und Tokens bleiben außerhalb der Journal-/Browserpersistenz.
+
+Die lokalen HTTPS-/Kontotests und die Browserprüfung sind kein Nachweis für
+reale Boten, Scans, physische Übergaben, Robotik, Instrumentnetzwerk, LAN-Betrieb
+oder Sicherheit. Die bestehenden T2-Grenzen, die synthetische Beam-Annahme und
+die Vorgabe fließender Bewegungen für spätere reale Adapter bleiben erhalten.

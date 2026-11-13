@@ -1,0 +1,43 @@
+{
+  "format": "solidcraftbot.lab-transport-network-protocol/1",
+  "id": "LabTransportNetwork.T3",
+  "protocol": "https-json/1",
+  "paths": {
+    "info": "/api/info",
+    "login": "/api/login",
+    "logout": "/api/logout",
+    "session": "/api/session",
+    "snapshot": "/api/snapshot",
+    "requests": "/api/requests",
+    "receipt_prefix": "/api/requests/"
+  },
+  "operations": [
+    "resume",
+    "prepare_route",
+    "dispatch",
+    "attest",
+    "hold",
+    "cancel",
+    "reconcile"
+  ],
+  "roles": [
+    "owner",
+    "observer",
+    "endpoint",
+    "agent"
+  ],
+  "limits": {
+    "max_body_bytes": 65536,
+    "max_response_bytes": 2097152,
+    "token_lifetime_s": 900,
+    "password_iterations_min": 600000,
+    "request_timeout_s": 5
+  },
+  "limitations": [
+    "Authenticated local accounts attest to the synthetic T2 model; no physical scan, handover, robot trajectory or hardware qualification",
+    "HTTPS messages and credential checks are distinct from instrument network execution and from real laboratory safety",
+    "Only explicit owner session takeover permits new writes after server boot; login and reconnect never dispatch or confirm a handover",
+    "One authoritative root journal; no distributed stock ownership, federation or automatic inventory migration",
+    "Owner commands bind server boot and current assignment epoch; handover observations retain their frozen job and handover identities"
+  ]
+}

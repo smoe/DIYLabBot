@@ -1,0 +1,20 @@
+{
+  "format": "solidcraftbot.lab-transport-network/1",
+  "id": "SYN.CF01.NanoDrop.Qubit4.Network",
+  "mode": "synthetic_only",
+  "workflow": {
+    "source": "model/synthetic-lab-workflow.transport.json",
+    "source_sha256": "b0f5d0a641fb1f6160a785dc6050cc6cd0e864ccb5c801f88764ac2c2b595675"
+  },
+  "interface_protocol": {
+    "source": "model/lab-transport-network.protocol.json",
+    "source_sha256": "fe55119f731f2eb14bc9306872b670af4201c55ad20e69f9695dd621963025c8"
+  },
+  "limitations": [
+    "Fresh versioned T3 interface composition over the existing T2 workflow; old active journals are not migrated",
+    "Accounts, password hashes, tokens, TLS keys, identity binding and journal data remain in private runtime storage under exports",
+    "A courier or endpoint confirms one role per explicit action; owner dispatch never fabricates source or receiver observations",
+    "Loopback TLS and browser behavior are checked separately; no LAN, enterprise identity, physical sample scan, biological or safety qualification",
+    "The T2 one-job-per-route and terminal-conflict quarantine limits remain; no stock handoff or real robot motion"
+  ]
+}
