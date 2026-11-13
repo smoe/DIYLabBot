@@ -1,0 +1,78 @@
+{
+  "format": "solidcraftbot.synthetic-lab-transport-workflow/2",
+  "id": "SYN.CF01.NanoDrop.Qubit4.Async",
+  "mode": "synthetic_only",
+  "workflow": {
+    "source": "model/synthetic-lab-workflow.shared.json",
+    "source_sha256": "2475fce315f97ed211807aad2ff6ba99ef011a1f921393caabee164cbd1f181b"
+  },
+  "transport_protocol": {
+    "source": "model/async-lab-transport.protocol.json",
+    "source_sha256": "6186308b38f02af2ffabc16e64cb9361aa1adade8aa8213ba46e5f17ac54e7af"
+  },
+  "owner_principal": "SYN.Operator01",
+  "rack_initial_endpoint": "LabA.CF01",
+  "endpoints": [
+    {
+      "id": "LabA.CF01",
+      "site_id": "SYN.LabWorkflow.Site01",
+      "lab_id": "SYN.LabA",
+      "holder_id": "SYN.CF01.Handover",
+      "place_id": "RackBay",
+      "principal": "SYN.LabA.Endpoint"
+    },
+    {
+      "id": "LabB.NanoDrop",
+      "site_id": "SYN.LabWorkflow.Site01",
+      "lab_id": "SYN.LabB",
+      "holder_id": "SYN.NanoDrop.Handover",
+      "place_id": "RackBay",
+      "principal": "SYN.LabB.Endpoint"
+    },
+    {
+      "id": "LabB.Qubit",
+      "site_id": "SYN.LabWorkflow.Site01",
+      "lab_id": "SYN.LabB",
+      "holder_id": "SYN.Qubit.Handover",
+      "place_id": "RackBay",
+      "principal": "SYN.LabB.Endpoint"
+    }
+  ],
+  "agents": [
+    {
+      "id": "AgentHuman",
+      "kind": "human",
+      "principal": "SYN.Human.Courier"
+    },
+    {
+      "id": "AgentRobot",
+      "kind": "robot",
+      "principal": "SYN.Robot.Courier"
+    }
+  ],
+  "routes": [
+    {
+      "id": "CF01ToNanoDrop",
+      "source_stage": "cf01",
+      "target_stage": "nanodrop",
+      "source_endpoint": "LabA.CF01",
+      "target_endpoint": "LabB.NanoDrop",
+      "agent_id": "AgentHuman"
+    },
+    {
+      "id": "NanoDropToQubit",
+      "source_stage": "nanodrop",
+      "target_stage": "qubit",
+      "source_endpoint": "LabB.NanoDrop",
+      "target_endpoint": "LabB.Qubit",
+      "agent_id": "AgentRobot"
+    }
+  ],
+  "limitations": [
+    "Logical lab endpoints do not relocate the existing CAD scene or prove real access paths",
+    "Teleportation mocks use zero travel time and synthetic role attestations; no network, hardware, real identity scans, robot trajectory or safety qualification",
+    "The twelve originals, their rack slots and all consumption remain in the existing workflow owner; no independent stock continuation or ownership transfer",
+    "The production fixture contains one original rack; concurrent disjoint jobs are checked separately through the generic embedded provider",
+    "Terminal custody conflicts stay quarantined without a release API; this version retains rack, vessel and occupied-place holds after workflow completion"
+  ]
+}

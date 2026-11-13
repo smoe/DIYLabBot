@@ -18,6 +18,8 @@ CONTRACT_SHA256 = digest(PROTOCOL.read_bytes())
 PHASES = ('requested', 'reserved', 'pickup_pending', 'in_custody', 'delivery_pending', 'completed', 'cancelled', 'cancelled_reconciled')
 STATE_FORMAT = 'solidcraftbot.async-lab-transport-state/1'
 DEFINITION_FORMAT = 'solidcraftbot.async-lab-transport/1'
+EMBEDDED_FORMAT = 'solidcraftbot.embedded-async-lab-transport/1'
+EMBEDDED_FIELDS = ('format mode run_id session assignment_epoch rack_placements jobs inbox outbox requests resources').split()
 ROLES = ('pickup_release', 'pickup_accept', 'delivery_release', 'delivery_accept')
 TERMINAL = {'completed', 'cancelled', 'cancelled_reconciled'}
 ENVELOPE_FIELDS = ('job_id run_id assignment_epoch rack_id manifest manifest_sha256 source_endpoint '
@@ -92,7 +94,22 @@ def _items(definition, name):
 def _validate_definition(value):
     exact(value, 'format id mode owner_principal initial_materials initial_vessels racks endpoints agents protocol source_files_sha256', 'definition')
     require(value['format'] == DEFINITION_FORMAT and value['mode'] == 'synthetic_only', 'Unknown transport definition version')
-    ident(value['id']); ident(value['owner_principal'])
+    ident(value['id']); _validate_topology(value)
+    racks = _items(value, 'racks')
+    inventory = ledger.initial_inventory(value['initial_materials'], value['initial_vessels'])
+    require(all(v['location']['kind'] == 'rack' and v['location']['rack_id'] in racks
+                for v in inventory['vessels'].values()), 'Vessels must occupy declared rack slots')
+    require(set(racks) == {v['location']['rack_id'] for v in inventory['vessels'].values()}, 'Every rack needs declared contents')
+    require(len(value['initial_materials']) == len(value['initial_vessels']), 'Every fixture vessel needs one material')
+    require(isinstance(value['source_files_sha256'], dict) and value['source_files_sha256'], 'Source pins required')
+    for name, expected in value['source_files_sha256'].items():
+        require(isinstance(name, str) and not Path(name).is_absolute() and '..' not in Path(name).parts, 'Relative source pin required')
+        checksum(expected)
+
+
+def _validate_topology(value):
+    """Shared identities only; fixture inventory and owner inventory stay separate."""
+    ident(value['owner_principal'])
     exact(value['protocol'], 'source source_sha256', 'protocol reference')
     require(value['protocol']['source'] == 'model/async-lab-transport.protocol.json', 'Unexpected protocol source')
     checksum(value['protocol']['source_sha256'])
@@ -113,15 +130,6 @@ def _validate_definition(value):
     require(len(tuples) == len(set(tuples)), 'Aliased endpoint identity')
     origins = [rack['initial_endpoint'] for rack in racks.values()]
     require(set(origins) <= set(endpoints) and len(origins) == len(set(origins)), 'Occupied or unknown initial rack endpoint')
-    inventory = ledger.initial_inventory(value['initial_materials'], value['initial_vessels'])
-    require(all(v['location']['kind'] == 'rack' and v['location']['rack_id'] in racks
-                for v in inventory['vessels'].values()), 'Vessels must occupy declared rack slots')
-    require(set(racks) == {v['location']['rack_id'] for v in inventory['vessels'].values()}, 'Every rack needs declared contents')
-    require(len(value['initial_materials']) == len(value['initial_vessels']), 'Every fixture vessel needs one material')
-    require(isinstance(value['source_files_sha256'], dict) and value['source_files_sha256'], 'Source pins required')
-    for name, expected in value['source_files_sha256'].items():
-        require(isinstance(name, str) and not Path(name).is_absolute() and '..' not in Path(name).parts, 'Relative source pin required')
-        checksum(expected)
 
 
 def load_definition(source=SOURCE):
@@ -155,6 +163,8 @@ def initial_state(definition, run_id, session):
 def manifest(state, rack_id):
     ident(rack_id)
     require(state['admitted'] and rack_id in _items(state['definition'], 'racks'), 'Admitted rack required')
+    if '_manifests' in state:
+        return copy.deepcopy(state['_manifests'][rack_id])
     inventory = state['inventory']; result = []
     for vessel in inventory['vessels'].values():
         place = vessel['location']
@@ -202,9 +212,15 @@ def _job_claims(state, job):
 
 def resources(state):
     if not state['admitted']: return []
-    result = {'fixture:' + state['definition']['id'], *('rack:' + rack for rack in state['rack_placements'])}
-    result.update('vessel:' + vessel for vessel in state['inventory']['vessels'])
-    result.update('material:' + material for material in state['inventory']['materials'])
+    result = {'rack:' + rack for rack in state['rack_placements']}
+    if '_manifests' in state:
+        for items in state['_manifests'].values():
+            result.update('vessel:' + item['vessel_id'] for item in items)
+            result.update('material:' + material['material_id'] for item in items for material in item['materials'])
+    else:
+        result.add('fixture:' + state['definition']['id'])
+        result.update('vessel:' + vessel for vessel in state['inventory']['vessels'])
+        result.update('material:' + material for material in state['inventory']['materials'])
     for place in state['rack_placements'].values():
         if place['kind'] == 'endpoint': result.add(_place_key(state['definition'], place['endpoint_id']))
         else: result.add('agent:' + place['agent_id'])
@@ -324,6 +340,11 @@ def audit(state):
         return True
     expected = ledger.initial_inventory(state['definition']['initial_materials'], state['definition']['initial_vessels'])
     require(state['inventory'] == expected, 'Transport fixture inventory/content changed')
+    return _audit_transport(state)
+
+
+def _audit_transport(state, *, historical_terminal=False):
+    """One queue/custody audit for both fixture and embedded owner contexts."""
     racks = _items(state['definition'], 'racks'); endpoints = _items(state['definition'], 'endpoints'); agents = _items(state['definition'], 'agents')
     require(set(state['rack_placements']) == set(racks), 'Rack placement completeness mismatch')
     occupied = set()
@@ -340,7 +361,14 @@ def audit(state):
         require(job['rack_id'] in racks and job['agent_id'] in agents and job['source_endpoint'] in endpoints
                 and job['target_endpoint'] in endpoints and job['source_endpoint'] != job['target_endpoint'], 'Unknown or identical job endpoints')
         require(type(job['assignment_epoch']) is int and 0 < job['assignment_epoch'] <= state['assignment_epoch'], 'Invalid job epoch')
-        require(job['manifest'] == manifest(state, job['rack_id']) and job['manifest_sha256'] == hashed(job['manifest']), 'Job content/manifest drift')
+        _manifest(job['manifest'])
+        require(job['manifest_sha256'] == hashed(job['manifest']), 'Job manifest digest drift')
+        current_manifest = manifest(state, job['rack_id'])
+        if historical_terminal and job['phase'] in TERMINAL:
+            identities = lambda items: [{key: value for key, value in item.items() if key != 'content_revision'} for item in items]
+            require(identities(job['manifest']) == identities(current_manifest), 'Historical job identity/slot drift')
+        else:
+            require(job['manifest'] == current_manifest, 'Job content/manifest drift')
         require(job['phase'] in PHASES and job['control'] in {'active', 'held'}, 'Invalid job phase/control')
         require((job['control'] == 'held') == bool(job['hold_reason']) and type(job['cancel_requested']) is bool, 'Invalid hold/cancel state')
         require(isinstance(job['receipts'], dict) and set(job['receipts']) <= set(ROLES) and isinstance(job['reconciliations'], list), 'Invalid job receipts')
@@ -397,7 +425,12 @@ def audit(state):
 
 def apply(state, operation, args, principal):
     """Return one detached proposal; caller commits atomically or discards it."""
-    audit(state); ident(principal); require(isinstance(args, dict), 'Operation arguments required')
+    return _reduce(state, operation, args, principal, audit)
+
+
+def _reduce(state, operation, args, principal, audit_context):
+    """Shared transitions; callers supply only their inventory/context audit."""
+    audit_context(state); ident(principal); require(isinstance(args, dict), 'Operation arguments required')
     result = copy.deepcopy(state); definition = result['definition']; owner = definition['owner_principal']
     shapes = {'admit': '', 'request': 'job_id rack_id target_endpoint agent_id', 'reserve': 'job_id',
               'prepare': 'job_id', 'mark_dispatched': 'job_id', 'worker_claim': 'job_id claim',
@@ -539,5 +572,93 @@ def apply(state, operation, args, principal):
                     require(job['phase'] == 'pickup_pending' and result['outbox'][job_id]['status'] == 'pending', 'Pending outbox required; never redispatch uncertain work')
                     result['outbox'][job_id]['status'] = 'dispatched'
     result['resources'] = resources(result)
-    audit(result)
+    audit_context(result)
     return result
+
+
+def _embedded_header(queue):
+    exact(queue, EMBEDDED_FIELDS, 'embedded queue')
+    require(queue['format'] == EMBEDDED_FORMAT and queue['mode'] == 'synthetic_only', 'Unknown embedded queue version')
+    ident(queue['run_id']); ident(queue['session'])
+    require(type(queue['assignment_epoch']) is int and queue['assignment_epoch'] > 0, 'Invalid embedded queue epoch')
+    require(all(isinstance(queue[name], dict) for name in ['rack_placements', 'jobs', 'inbox', 'outbox', 'requests']), 'Embedded queue maps required')
+
+
+def _embedded_context(queue, topology, manifests):
+    """Build a transient identity view, never a second serialized inventory."""
+    _embedded_header(queue)
+    exact(topology, 'owner_principal racks endpoints agents protocol', 'embedded topology')
+    _validate_topology(topology)
+    racks = _items(topology, 'racks')
+    require(isinstance(manifests, dict) and set(manifests) == set(racks), 'Complete existing-rack manifests required')
+    normalized = {}
+    vessels, materials = set(), set()
+    for rack_id, items in manifests.items():
+        _manifest(items)
+        for item in items:
+            require(item['vessel_id'] not in vessels, 'Vessel appears in multiple payloads')
+            vessels.add(item['vessel_id'])
+            for material in item['materials']:
+                require(material['material_id'] not in materials, 'Material appears in multiple payloads')
+                materials.add(material['material_id'])
+        normalized[rack_id] = sorted(copy.deepcopy(items), key=lambda item: (item['place_id'], item['vessel_id']))
+        for item in normalized[rack_id]:
+            item['materials'].sort(key=lambda material: material['material_id'])
+    return {**copy.deepcopy(queue), 'definition': copy.deepcopy(topology), 'admitted': True, '_manifests': normalized}
+
+
+def _audit_embedded_context(state):
+    exact(state, [*EMBEDDED_FIELDS, 'definition', 'admitted', '_manifests'], 'embedded context')
+    queue = {key: state[key] for key in EMBEDDED_FIELDS}
+    _embedded_context(queue, state['definition'], state['_manifests'])
+    require(state['admitted'] is True, 'Embedded context never introduces an inventory')
+    return _audit_transport(state, historical_terminal=True)
+
+
+def embedded_initial(topology, manifests, run_id, session):
+    """Attach an empty queue to identities already owned by the caller.
+
+    Admission, quantities and material introductions are exclusively owner
+    concerns. The provider must supply the complete declared payload manifest
+    and check physical readiness before requesting transport.
+    """
+    exact(topology, 'owner_principal racks endpoints agents protocol', 'embedded topology')
+    _validate_topology(topology)
+    queue = {'format': EMBEDDED_FORMAT, 'mode': 'synthetic_only', 'run_id': run_id,
+             'session': session, 'assignment_epoch': 1, 'rack_placements': {
+                 rack['id']: {'kind': 'endpoint', 'endpoint_id': rack['initial_endpoint']}
+                 for rack in topology['racks']},
+             'jobs': {}, 'inbox': {}, 'outbox': {}, 'requests': {}, 'resources': []}
+    context = _embedded_context(queue, topology, manifests)
+    queue['resources'] = resources(context)
+    embedded_audit(queue, topology, manifests)
+    return queue
+
+
+def embedded_audit(queue, topology, manifests):
+    """Audit a queue against current owner identities without changing either."""
+    return _audit_embedded_context(_embedded_context(queue, topology, manifests))
+
+
+def embedded_resources(queue, topology, manifests):
+    """Required live owner holds; final owner release is the owner's decision."""
+    context = _embedded_context(queue, topology, manifests)
+    _audit_embedded_context(context)
+    return resources(context)
+
+
+def embedded_envelope(queue, job_id, topology):
+    """Read the frozen assignment, including historical content revisions."""
+    _embedded_header(queue)
+    exact(topology, 'owner_principal racks endpoints agents protocol', 'embedded topology')
+    _validate_topology(topology)
+    ident(job_id); require(job_id in queue['jobs'], 'Unknown job')
+    return envelope({**queue, 'definition': topology}, job_id)
+
+
+def embedded_apply(queue, operation, args, principal, topology, manifests):
+    """Return one queue proposal for the owner's existing atomic transaction."""
+    require(operation != 'admit', 'Embedded transport cannot admit or reset inventory')
+    context = _embedded_context(queue, topology, manifests)
+    proposal = _reduce(context, operation, args, principal, _audit_embedded_context)
+    return {key: copy.deepcopy(proposal[key]) for key in EMBEDDED_FIELDS}

@@ -25,6 +25,8 @@ TERMINAL = {'completed', 'cancelled'}
 
 
 class Workflow:
+    STATE_FORMAT = FORMAT
+
     def __init__(self, journal, run_id, session=None):
         self.journal, self.run_id, self.session = journal, run_id, session
         self._format(self.state)
@@ -47,7 +49,14 @@ class Workflow:
         if not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', run_id):
             raise TaskError('Run id requires 1-64 ASCII letters, digits, dots, underscores or hyphens')
         session = uuid.uuid4().hex
-        state = {'format': FORMAT, 'run_id': run_id, 'definition': definition,
+        state = cls.initial_state(definition, run_id, session)
+        journal.create(run_id, state, immutable_definition=True)
+        return cls(journal, run_id, session)
+
+    @classmethod
+    def initial_state(cls, definition, run_id, session):
+        """Build the shared inventory/stages once for explicitly versioned owners."""
+        state = {'format': cls.STATE_FORMAT, 'run_id': run_id, 'definition': definition,
                  'status': 'created', 'active_stage': 'cf01', 'session': session,
                  'clock_mode': 'synthetic_events/1', 'logical_time_s': 0.0,
                  'deadline_s': definition['profile']['task_deadline_s'],
@@ -57,8 +66,7 @@ class Workflow:
                  'cancel_reason': None}
         for stage_id in ['nanodrop', 'qubit']:
             state['stages'][stage_id] = initial_stage(run_id, definition['stages'][stage_id], stage_id)
-        journal.create(run_id, state, immutable_definition=True)
-        return cls(journal, run_id, session)
+        return state
 
     @classmethod
     def open(cls, journal, run_id, resume=False):
@@ -93,14 +101,24 @@ class Workflow:
             self.journal.append(self.run_id, revision, 'session_closed', {}, state)
         self.session = None
 
+    def _before_transition(self, state, kind):
+        """Versioned owner extensions may guard shared operations before effects."""
+
+    def _after_transition(self, before, state, kind):
+        """Versioned owner extensions may audit one atomic root proposal."""
+
+    def _terminal_transition_allowed(self, kind):
+        return False
+
     def _transition(self, kind, actor_id, update, payload=None, artifact=None):
         text(actor_id, 'synthetic actor id')
         before, revision = self.journal.get_current(self.run_id)
         self._format(before)
-        if before['status'] in TERMINAL:
+        if before['status'] in TERMINAL and not self._terminal_transition_allowed(kind):
             raise TaskError('Workflow is terminal')
         if self.session is None or before['session'] != self.session:
             raise TaskError('Stale workflow session; reopen and reconcile')
+        self._before_transition(before, kind)
         state = copy.deepcopy(before)
         try:
             result = update(state)
@@ -113,6 +131,7 @@ class Workflow:
             raise
         if result is False:
             return before
+        self._after_transition(before, state, kind)
         self.journal.append(self.run_id, revision, kind,
                             {'actor_id': actor_id, 'evidence': 'synthetic_input', **(payload or {})},
                             state, artifact=artifact)
@@ -489,7 +508,7 @@ class Workflow:
             self.cf01_profile(state)
             stage.update(status='working',actor_id=actor_id,deadline_s=state['deadline_s'],transport=transport)
         started = self._transition('cf01.stage_started',actor_id,start,{'transport':transport})
-        execution = Workflow(self.journal, self.run_id, started['session'])
+        execution = type(self)(self.journal, self.run_id, started['session'])
         checkpoint = self._cf_checkpoint
         def execution_checkpoint(kind, payload, view):
             return checkpoint(kind, {**payload, 'attempt_id': started['stages']['cf01']['attempt_id'],

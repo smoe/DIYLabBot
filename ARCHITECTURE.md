@@ -595,9 +595,47 @@ IDs oder Mengen dürfen nicht neu eingeführt werden. Basisholds und belegte
 Empfangsplätze bleiben beim Owner, während geklärte Agentenzuteilungen frei werden.
 T1 pumpt Nachrichten lokal über CLI/Python-API; Netzwerk, Hintergrundworker,
 reale Authentifizierung, physische Übergabe, ROS-/Roboterbewegung und Schutzfunktion
-sind damit nicht nachgewiesen. T2, die Anbindung an vorhandene biologische Roots,
-bleibt offen; Ownerwechsel benötigt zusätzlich den Stockvertrag. Die bestehende
+sind damit nicht nachgewiesen. Die zusätzliche T2-Komposition bindet denselben
+Kern an den synthetischen Laborworkflow; Ownerwechsel benötigt weiterhin den Stockvertrag. Die bestehende
 Vorgabe fließender Bewegungen gilt für spätere reale Adapter weiter.
+
+### T2: asynchroner Transport im Labor-Owner
+
+`model/synthetic-lab-workflow.transport.json` referenziert die vorhandene
+CF01–NanoDrop–Qubit-Komposition und beschreibt ausschließlich logische Endpunkte,
+Agenten und Routen. `scripts/lab_transport_sources.py` bindet beide Quellen und
+ihre Schemas; `TransportWorkflow` verwendet die bisherigen Geräteoperationen mit
+der ausdrücklich gewählten Laufart `solidcraftbot.synthetic-lab-transport-state/2`.
+Bestehende V1-Läufe und Standalone-Fixtures werden nicht umgestellt.
+
+Der Root bleibt die einzige Inventar- und Verbrauchsautorität. Seine Transportqueue
+enthält keine Mengen oder Inventarkopie; der eingebettete Domänenport erhält nur
+eine nicht gespeicherte Identitäts-/Inhaltsrevisionsansicht. `SampleID` belegt darin
+das gemeinsame Feld `material_id`, ohne neue Materialidentität oder Herkunft zu
+erzeugen. Queue, Requestquittung, Inbox/Outbox, Routenbindung und Ressourcen werden
+atomar mit derselben Journalrevision gespeichert. T1 und T2 teilen Transitionen
+und Übergabeprüfungen; historische Jobmanifeste überleben spätere Inhaltsrevisionen.
+
+Die Empfangsstufe wartet auf beide Seiten von Abholung und Ablieferung sowie die
+fachliche Freigabe ihrer Vorgängerstufe. Das vorhandene Rack fährt in der Demo
+nach CF01 per Botenmock zu NanoDrop und anschließend per Robotermock zu Qubit.
+Nach bestätigten NanoDrop-Entnahmen und Rückgaben dürfen Ergebnisimport und
+Bewertung während des zweiten Transports weiterlaufen. Weitere Gefäßbewegung und
+Entnahme am reservierten Payload bleiben gesperrt. Der Laborfall besitzt ein Rack;
+zwei disjunkte Jobs werden separat im generischen eingebetteten Provider geprüft.
+
+Resume hält offene Jobs und fencet Sitzung/Epoche gemeinsam; ein neuer Mock führt
+keine unklare Arbeit erneut aus. Gesamtabschluss und Abbruch prüfen Transportstatus
+und Originalartefakte mit. Die neue Komposition behält Rack-, Originalgefäß- und belegte
+Ortsbindungen auch nach dem biologischen Abschluss. Späte Konflikte können damit
+den aktuellen Bericht entwerten; historische Erfolgsereignisse bleiben erhalten.
+Eine Freigabe terminaler Transportkonflikte und Owner-/Stockübernahme fehlen.
+
+Einstieg: `python3 scripts/run_lab_transport_workflow.py demo`. Ausführung bleibt
+`teleportation_mock` mit null Fahrzeit und synthetischen Rollenbelegen. Keine
+reale Laborverlagerung, Netzwerkanbindung, Authentifizierung, Sensorbeobachtung,
+Hardware-, ROS-/Bewegungs- oder Sicherheitsqualifikation wird daraus abgeleitet.
+Die vorhandene fließende Bewegungsvorgabe gilt für spätere reale Adapter.
 
 ## Lesende NanoDrop-UltraC-Netzwerkschnittstelle
 

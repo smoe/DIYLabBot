@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "synthetic-lab-workflow.transport.schema.json",
+  "title": "Opt-in synthetic lab workflow with embedded asynchronous transport",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "workflow",
+    "transport_protocol",
+    "owner_principal",
+    "rack_initial_endpoint",
+    "endpoints",
+    "agents",
+    "routes",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.synthetic-lab-transport-workflow/2"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "workflow": {
+      "$ref": "synthetic-lab-workflow.schema.json#/$defs/reference"
+    },
+    "transport_protocol": {
+      "$ref": "synthetic-lab-workflow.schema.json#/$defs/reference"
+    },
+    "owner_principal": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "rack_initial_endpoint": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "endpoints": {
+      "$ref": "async-lab-transport.schema.json#/$defs/definition/properties/endpoints"
+    },
+    "agents": {
+      "$ref": "async-lab-transport.schema.json#/$defs/definition/properties/agents"
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "source_stage",
+          "target_stage",
+          "source_endpoint",
+          "target_endpoint",
+          "agent_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "source_stage": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "target_stage": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "source_endpoint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "target_endpoint": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "agent_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

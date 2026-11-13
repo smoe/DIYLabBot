@@ -23,7 +23,7 @@ def handover(flow):
                   workspace_clear=True, arm_clear=True, gripper_empty=True)
 
 
-def run_nanodrop(flow, pause_after_intent=False):
+def run_nanodrop(flow, pause_after_intent=False, before_import=None):
     """Explicit fictitious input generator, separate from validation."""
     handover(flow);stage = flow.stage('nanodrop')
     stage.act('claim', ACTOR)
@@ -39,6 +39,8 @@ def run_nanodrop(flow, pause_after_intent=False):
                   volume_ul=stage.state['definition']['profile']['parameters']['sample_volume_ul'],cleaned=True)
         stage.act('place', ACTOR, sample_id=sample_id, observed_sample_id=sample_id,
                   rack_id=stage.state['definition']['profile']['rack']['id'],place_id=sample['original_place_id'])
+    if before_import is not None:
+        before_import(flow)
     stage.import_content(nanodrop_report(stage.state), ACTOR, 'synthetic-nanodrop.csv')
     stage.act('review_results', ACTOR, decision='accepted',reason='Explicit synthetic decision; no real QC qualification')
     stage.act('release', ACTOR, workspace_clear=True)

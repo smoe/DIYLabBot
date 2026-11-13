@@ -376,6 +376,32 @@ Stockvertrag. Quellenänderungen sperren aktive Fortsetzungen; keine stillen
 Migrationen. Spätere Bewegungsadapter müssen die fließende Bewegungsvorgabe
 und eigene reale Übergabe-/Sensorbedingungen erfüllen.
 
+### T2 im gemeinsamen Laborworkflow
+
+`model/synthetic-lab-workflow.transport.json` ist eine ausdrücklich gewählte
+referenzierende Komposition; `scripts/run_lab_transport_workflow.py demo` startet
+die synthetische T2-Laufart. Bestehende V1-Läufe nicht still umstellen. Topologie
+und Routen von Inventar und Geräten trennen. Die Queue bleibt im selben Root und
+enthält keine zweite Inventar- oder Mengenliste. Den eingebetteten gemeinsamen
+Domänenport und vorhandene Geräteoperationen verwenden; Inhaltsansichten nur aus
+den führenden Proben/Gefäßen ableiten. Historische Terminalmanifeste erhalten,
+aktuelle Inhaltsrevisionen bei offenen Claims prüfen.
+
+Empfangsstufen benötigen Vorgängerfreigabe und beide vollständigen Quittungspaare.
+Transportclaims auch gegenüber Gerätebewegungen und Verbrauch desselben Owners
+durchsetzen. NanoDrop-Import und -Bewertung dürfen nach bestätigter Rackrückgabe
+während des Transports weiterlaufen; eine Gerätereconciliation darf keinen
+Transporthold beseitigen. Absicht, Quittung, Artefakt und Ressourcen atomar per
+Root-CAS speichern. Beim Wiederanlauf Sitzung und Queueepoche gemeinsam fencen;
+unklare dispatchte Arbeit nicht erneut ausführen.
+
+Die T2-Komposition hält Rack, Originalgefäße und belegte Endpunkte nach biologischem
+Abschluss weiter. Späte Konflikte bleiben berichtswirksam; eine terminale
+Freigabe-API oder Stock-/Ownerübernahme ist damit nicht implementiert. Der
+synthetische Laborlauf besitzt genau das vorhandene Originalrack; generische Tests mit
+disjunkten Payloads sind unabhängige Testwelten und keine Bestandskopien. Beam-
+Mocks, Netzwerknachweis, reale Robotik und Schutzfunktionen getrennt halten.
+
 ## Gemeinsame Quellen und Generatoren
 
 | Baugruppe | Führende Quelle | Aufbau |

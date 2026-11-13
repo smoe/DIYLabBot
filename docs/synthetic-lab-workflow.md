@@ -416,6 +416,22 @@ bindet Laufzeiten, Datenmengen und Quellenprüfsummen. Der generische
 400-Übergänge-Vergleich bindet seine eigenen Quellen separat. Historische
 README-Medien und die NanoDrop-Vergleichsfixture bleiben unverändert.
 
+## Opt-in: asynchroner Transport T2
+
+`python3 scripts/run_lab_transport_workflow.py demo` verwendet eine neue,
+referenzierende [Transportkomposition](../model/synthetic-lab-workflow.transport.json).
+Die vorhandenen zwölf Originale, Gefäße, Rackplätze, Geräteoperationen und Mengen
+bleiben im selben Owner. Nach CF01 fährt das Rack per synthetischem Botenmock zu
+NanoDrop, danach per Robotermock zu Qubit. Beide verwenden erfundenes Beamen mit
+null Fahrzeit. Empfangsarbeit wartet auf vollständige Übergabebelege; NanoDrop-
+Ergebnisimport und -Bewertung können während des zweiten Transports weiterlaufen.
+
+Die Laufart ist `solidcraftbot.synthetic-lab-transport-state/2`. V1-Läufe werden
+nicht migriert. Transport verändert keine Verbrauchsbuchung und setzt keine Menge
+zurück. Rack-/Gefäß-/Endpunktholds bleiben bei T2 nach dem biologischen Abschluss
+erhalten; dies ist keine Bestandsfreigabe oder Ownerübernahme. Quellen, Befehle,
+Wiederanlauf und Grenzen stehen im [Transportvertrag](async-lab-transport.md#t2-transport-im-gemeinsamen-synthetischen-laborworkflow).
+
 ## Prüfgrenzen
 
 Keine Netzwerkadapter, Hardware, neuen CAD-Modelle, ausgeführten Roboterbahnen,

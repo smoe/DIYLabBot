@@ -1,14 +1,15 @@
-# Asynchroner Transport zwischen Laboren: T0/T1 und Ausbauplan
+# Asynchroner Transport zwischen Laboren: T0/T1, T2 und Ausbauplan
 
-**Status: T0 und T1 sind für den synthetischen A/B-Fall implementiert.**
+**Status: T0/T1 und die ausdrücklich gewählte synthetische Workflowanbindung T2 sind implementiert.**
 Boten- und Robotermock verwenden denselben fachlichen Vertrag. Beide führen
 modellhaft einen **Beam-Transport mit null Fahrzeit** aus; es werden weder reale
 Boten beauftragt noch Roboter bewegt. Identitäten, Claims und die vier getrennten
 Rollenquittungen werden dabei weiterhin vollständig geprüft.
 
-Die Referenzimplementierung führt einen frischen synthetischen Owner im
-vorhandenen Journal. T2, die Anbindung an einen bestehenden biologischen
-Workflow-Owner, bleibt offen. Der nachfolgende Gesamtplan enthält zusätzlich
+Die T0/T1-Referenzimplementierung führt einen frischen synthetischen Owner im
+vorhandenen Journal. T2 bindet denselben Transportkern an eine neue Komposition
+des vorhandenen CF01–NanoDrop–Qubit-Workflows; bestehende aktive Journale werden
+dabei nicht umgestellt. Der nachfolgende Gesamtplan enthält zusätzlich
 spätere Netzwerk-/Robotik- und Stockschritte. Gebäude und Wege bleiben optionaler
 räumlicher Kontext; vorhandene aktive Läufe und Bestände werden nicht migriert.
 
@@ -313,7 +314,7 @@ Store. Föderation und verteiltes Fencing sind eigene spätere Ausbaustufen.
 |---|---|---|
 | T0 · Domänenvertrag, synthetisch implementiert | Versionierte Auftrags-/Quittungsschemata, Rollen, Invarianten, reiner Zustandsautomat | Beide Quittungspaare, ungeordnete Nachrichten, Identitäts-/Versionskonflikte ohne Gerätezugriff |
 | T1 · Dauerhafte Ausführung, synthetisch implementiert | Opt-in Owner-Komposition mit Jobmap, atomarer Inbox/Outbox, Claims, Fencing; Boten- und Robotermock | Neustart-/Konkurrenztests; gleicher fachlicher Endzustand beider Adapter |
-| T2 · Workflowanbindung | Vorhandener Owner wartet auf Transportabschluss; unabhängige Aufgaben laufen weiter | Zwei disjunkte Jobs offen; gleicher Payload/Zielplatz niemals doppelt zugeteilt |
+| T2 · Workflowanbindung, synthetisch implementiert | Derselbe Labor-Owner wartet auf Transportabschluss; unabhängige NanoDrop-Ergebnisarbeit läuft weiter | Empfangssperre, unveränderte Bilanz, zwei disjunkte Jobs im generischen eingebetteten Testkontext; der Laborfall enthält ein Originalrack |
 | T3 · Mensch und Netzwerk | Berechtigte Botenoberfläche, optionaler Netzwerkadapter über dieselben Domänenoperationen | Rollen, Reconnect und persistente Deduplikation separat geprüft |
 | T4 · Reale Robotik | Bewegungs-/Sensoradapter mit passender Ausführungsbefugnis | Fließende Bahn, reale Griff-/Ablagebelege und lokales Ausfallverhalten separat geprüft |
 | Gesonderter Stock-Ausbau | Übergänge zwischen unabhängigen Owners, später mögliche Föderation | Keine zweite Einführung oder Mengenrücksetzung; eine Reservierungs-/Bestandsautorität |
@@ -372,7 +373,7 @@ Verpflichtende Tests:
     trotzdem die vorzeitige Freigabe des nächsten Laborprozesses.
 
 Die T0/T1-Prüfungen der Referenzimplementierung stehen im folgenden Abschnitt.
-Die gesamte Liste beschreibt auch spätere T2–T4-Abnahmen; sie behauptet keine
+Die gesamte Liste beschreibt auch spätere T3–T4-Abnahmen; sie behauptet keine
 vorhandene Netzwerkanbindung, reale Botenoberfläche, Robotik oder Ownerübernahme.
 
 ## T0/T1: ausführbare Referenzimplementierung
@@ -448,7 +449,7 @@ werden erhalten; der aktuelle Bericht weist den Konflikt aus und meldet keinen
 Erfolg. **T1 besitzt noch keine Freigabe-API für solche terminalen Konflikte.**
 Das betroffene Rack bleibt gesperrt, statt einen geklärten Ort zu behaupten.
 
-Prüfgrenzen bleiben ausdrücklich: **kein Netzwerk, keine ROS-Ausführung, keine
+Prüfgrenzen der eigenständigen T0/T1-Demo bleiben ausdrücklich: **kein Netzwerk, keine ROS-Ausführung, keine
 Bahn, keine Hardware, keine reale Authentifizierung, kein realer Scan, keine
 biologische oder Sicherheitsqualifikation, keine bestehende Workflowanbindung
 T2 und kein laufübergreifender Stock**. Null Fahrzeit ist eine erfundene
@@ -481,3 +482,113 @@ Verbindungen, harte Prozessunterbrechung, Fehler nach SQL-Schreibschritten,
 Requestwiederholung und Abgleich. Sie prüfen auch Abbruch zwischen gespeichertem
 Dispatch und Adapteraufruf, späte Konflikte bei Folgejobs sowie die strikten
 JSON-Typgrenzen für Epochen und Ausführungsflags.
+
+## T2: Transport im gemeinsamen synthetischen Laborworkflow
+
+Die zusätzliche Komposition
+[`synthetic-lab-workflow.transport.json`](../model/synthetic-lab-workflow.transport.json)
+referenziert das bisherige Workflowprofil und das unveränderte Transportprotokoll.
+Ihr [Schema](../model/synthetic-lab-workflow.transport.schema.json) verwendet
+die vorhandenen Endpunkt-, Agenten- und Referenzformen wieder. Sie beschreibt
+nur logische Übergabeorte, Agenten und Stufenrouten, keine neue Probenliste,
+Anfangsmenge oder Gerätegeometrie. `LabA.CF01`, `LabB.NanoDrop` und `LabB.Qubit`
+sind synthetische Endpunkte, keine Vermessung oder Verlagerung der CAD-Szene.
+
+```sh
+python3 scripts/run_lab_transport_workflow.py --store exports/lab-transport/workflows.sqlite3 demo
+python3 scripts/run_lab_transport_workflow.py --store exports/lab-transport/workflows.sqlite3 report SYN.LAB.AsyncTransport --out exports/lab-transport/report.json
+```
+
+[`lab_transport_sources.py`](../scripts/lab_transport_sources.py) kompiliert die
+Referenzen; [`TransportWorkflow`](../scripts/lab_transport_workflow.py) verwendet
+die vorhandenen CF01-, NanoDrop- und Qubit-Operationen. Die neue Laufart
+`solidcraftbot.synthetic-lab-transport-state/2` ist ausdrücklich opt-in. Der
+bisherige V1-Einstieg bleibt erhalten; Quellenwechsel oder ein fremdes Format
+sind keine Erlaubnis zur Migration, Wiederaufnahme oder Bestandsübernahme.
+
+Inventar, Restmengen, Inhaltsrevisionen und Verbrauchsbuchungen gehören weiterhin
+einmalig zum Laborroot. `transport` enthält ausschließlich Queue, Requests,
+Inbox/Outbox, Aufträge, Epoche und Rackplatzierung; `transport_bindings` verbindet
+eine Route mit ihrem Auftrag. Es gibt keinen zweiten Journalroot und keinen
+verschachtelten T1-Bestand. Vor `accept_rack` bleibt `transport_admitted` falsch
+und die native Ressourcenliste des Roots leer. Die Queue nennt bereits die
+benötigten Bindungen; erst die bestätigte Rackannahme erwirbt sie atomar.
+Die ephemere Manifestansicht bildet vorhandene
+`SampleID` auf das gemeinsame Feld `material_id` ab; `origin_id: null` erfindet
+keinen Herkunftsnachweis. Mengen werden weder in die Queue übernommen noch aus
+einer Transportquittung berechnet. Nach späteren Entnahmen bleiben abgeschlossene
+Auftragsmanifeste historische Snapshots; offene Claims verlangen den aktuellen
+Inhaltsstand.
+
+Die Demo führt das vorhandene Rack mit zwölf Originalgefäßen nach CF01 per
+Botenmock zu NanoDrop und danach per Robotermock zu Qubit. Rackplätze bleiben
+`Rack` plus `Slot01`–`Slot12`. Die zweite Route kann bereits nach allen bestätigten
+NanoDrop-Entnahmen und Rückgaben beginnen: Während sie offen ist, laufen der
+bestehende Ergebnisimport und die fachliche Bewertung weiter. Qubit benötigt
+sowohl die NanoDrop-Freigabe als auch den passenden vollständig quittierten
+Transport. Auch Ablieferungsbelege vor Abholbelegen werden erst kausal wirksam.
+Claim, Ankunft und einzelne Seitenquittungen geben keine Stufe frei.
+
+```mermaid
+flowchart LR
+    C["CF01 abgeschlossen"] --> H["Botenmock · Beamen"]
+    H -->|"vier Rollenquittungen"| N["NanoDrop: messen und zurückstellen"]
+    N --> R["Robotermock · Beamen"]
+    N --> M["Ergebnisse importieren und bewerten"]
+    R -->|"vier Rollenquittungen"| G{"Beide Bedingungen erfüllt"}
+    M -->|"NanoDrop-Freigabe"| G
+    G --> Q["Qubit 4"]
+```
+
+Vor Request/Dispatch müssen alle zwölf Originale bestätigt im Rack und sämtliche
+Entnahmeabsichten geklärt sein. Payload-Unterclaims sperren Gefäßbewegung,
+Entnahme und weitere Inhaltsänderung desselben Owners. Metadatenarbeit und die
+explizite Root-Prozessuhr bleiben getrennt; Freigabe oder Reconciliation einer
+Gerätestufe beseitigt keine Transportungewissheit. Alle Transportänderungen und
+ihre Ressourcen werden mit demselben Root-CAS gespeichert; ein Adapter erhält
+erst nach gespeichertem Dispatch seinen Umschlag und keinen Datenbankzugriff.
+Quittungsbatches bleiben als ausdrücklich synthetische Journalartefakte erhalten.
+
+Wiederanlauf ersetzt Sitzung und Transportepoche gemeinsam, hält offene Aufträge
+und führt keinen unklaren Effekt erneut aus. Gesamtabschluss und Abbruch dürfen
+offene oder widersprüchliche Aufträge nicht durch Ressourcenfreigabe übergehen.
+Die T2-Komposition hält Rack, Originalgefäße und belegte Übergabeorte auch nach dem
+biologischen Abschluss im Owner. So können späte Konflikte den aktuellen Bericht
+entwerten, ohne fremde Ressourcen zurückzufordern oder historische Erfolgsereignisse
+umzuschreiben. Ein geschlossener oder verlorener Schreibkontext benötigt ein
+ausdrückliches Resume. Terminale Konflikte besitzen weiterhin keine Freigabe-API;
+Stock-/Ownerübernahme ist nicht implementiert. Eine kontrollierte Abbruchdisposition
+ist kein erfolgreich ausgeführter Transport.
+Diese Version bindet genau einen Auftrag pro Route. Nach einer kontrolliert
+abgebrochenen oder abgeglichenen Route gibt es noch keine Wiederholungs-API;
+ein solcher Lauf wird nicht nachträglich als normal erfolgreich abgeschlossen.
+
+Der synthetische Laborfall besitzt genau ein Originalrack. Zwei disjunkte Aufträge
+werden zusätzlich im generischen eingebetteten Provider mit der vorhandenen,
+unabhängigen T0/T1-Testwelt geprüft. Dies führt keine zweite Kopie der zwölf
+Laborproben ein. Es gibt weiterhin keinen Netzwerkdienst, Hintergrunddispatcher,
+realen Boten, Scan, ROS-/Roboterweg, Hardware-, biologische oder Sicherheitsqualifikation.
+Ein geschlossener und transporttauglicher Rackzustand ist eine synthetische
+Annahme; reale Deckel-/Gefäßretention wird weder beobachtet noch qualifiziert.
+Die erfundene Beam-Ausführung mit null Fahrzeit ersetzt keine reale Bewegungsprüfung;
+für spätere Bewegungsadapter gilt unverändert die Vorgabe fließender Transporte.
+
+Gezielte Prüfungen:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_lab_transport*.py' -v
+python3 -m unittest discover -s tests -p 'test_async_transport*.py' -v
+```
+
+Für T2 bestanden 122 unterschiedliche Transportprüfungen ohne übersprungene
+Tests: 85 Domänen-/T0/T1-Prüfungen, 18 Owner-Laufzeitfälle, zehn integrierte
+Abnahmefälle und neun Quellen-/Schema-/CLI-Prüfungen. Der vollständige frische
+CLI-Lauf bestätigt zwei Transporte, zwölf erhaltene Originale und 24
+Verbrauchsbuchungen. Bekannte Anfangsmengen enden bei 36,5 µl; die unbekannte
+Anfangsmenge bleibt `null`. Nach Schließen und explizitem Resume wurde zusätzlich
+eine späte widersprüchliche Quittung geprüft: Der aktuelle Erfolgsbericht wird
+entwertet, historische Ereignisse und die bestehenden Basisholds bleiben erhalten.
+Zusätzlich bestanden 112 Regressionstests des bisherigen V1-Laborworkflows,
+Journals und der Materialallokation ohne übersprungene Tests. Insgesamt wurden
+234 unterschiedliche gezielte Testfälle erfolgreich geprüft. Dies ersetzt keine
+vollständige Repository-, CAD-, Netzwerk-, Hardware- oder Sicherheitsprüfung.
