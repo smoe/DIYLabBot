@@ -36,13 +36,13 @@ class ProposalMediaTests(unittest.TestCase):
             self.assertTrue(name.startswith(('model/', 'scripts/')), name)
             self.check_digest(name, digest)
         for name, digest in self.proof['documentation_files_sha256'].items():
-            self.assertIn(name, {'docs/building-stack.md', 'docs/ground-floor-eg.md'})
+            self.assertIn(name, {'docs/building-stack.md', 'docs/ground-floor-eg.md', 'docs/basement-kg.md', 'docs/building-exterior.md'})
             self.check_digest(name, digest)
         self.assertFalse(self.proof['original_photograph_included'])
 
     def test_proposal_views_and_circulation_detail_are_bound_and_visually_reviewed(self):
         images = self.proof['images']
-        self.assertEqual({image['id'] for image in images}, {'overview', 'atrium', 'circulation', 'ground', 'roof', 'section_svg', 'section_png', 'ground_svg', 'lab_3_003'})
+        self.assertEqual({image['id'] for image in images}, {'overview', 'atrium', 'circulation', 'ground', 'basement', 'front_glass', 'roof', 'section_svg', 'section_png', 'ground_svg', 'lab_3_003'})
         self.assertEqual(len({image['path'] for image in images}), len(images))
         for image in images:
             path = self.project(image['path'])
@@ -80,14 +80,15 @@ class ProposalMediaTests(unittest.TestCase):
         self.assertTrue(summary['passed'])
         self.assertEqual(summary['backends'], 'both')
         self.assertTrue(summary['cross_cad_checked'])
-        self.assertEqual(self.proof['level_ids'], ['EG', 'OG1', 'OG2', 'OG3'])
-        self.assertEqual(self.proof['level_elevations_assumed_mm'], [0, 4250, 8500, 12750])
+        self.assertEqual(self.proof['level_ids'], ['KG', 'EG', 'OG1', 'OG2', 'OG3'])
+        self.assertEqual(self.proof['level_elevations_assumed_mm'], [-4250, 0, 4250, 8500, 12750])
         self.assertEqual(self.proof['ground_fill_levels'], ['EG'])
         self.assertEqual(self.proof['xy_calibration'], None)
         expected = dict.fromkeys([
             'metric_survey', 'transport', 'hardware', 'building_safety', 'load',
             'basement_modeled', 'roof_modeled', 'ground_floor_as_built', 'robot_navigation'], False)
         expected['roof_modeled'] = True
+        expected['basement_modeled'] = True
         self.assertEqual(self.proof['qualification'], expected)
         self.assertEqual(self.proof['ground_cover_method'], 'union_filled')
         self.assertEqual(self.proof['ground_floor']['source'], 'model/ground-floor-eg.shared.json')
@@ -105,17 +106,15 @@ class ProposalMediaTests(unittest.TestCase):
         self.assertFalse(roof['safety_qualified'])
         self.assertEqual(self.proof['ground_fill_levels'], ['EG'])
 
-    def test_building_circulation_preserves_owner_door_rule_and_unmodeled_basement(self):
+    def test_building_circulation_preserves_owner_door_rule_and_modeled_basement(self):
         circulation = self.proof['circulation']
         self.assertEqual(circulation['door_walls'], {'outward': 'W049', 'inward': 'W062'})
         self.assertEqual(circulation['doors_by_level'], {
-            'EG': ['outward', 'inward'], 'OG1': ['outward'],
+            'KG': ['inward'], 'EG': ['outward', 'inward'], 'OG1': ['outward'],
             'OG2': ['outward'], 'OG3': ['outward']})
-        self.assertEqual(circulation['deferred_stops'], [{
-            'level': 'KG', 'doors': ['inward'], 'elevation_mm': None,
-            'geometry_created': False}])
+        self.assertEqual(circulation['deferred_stops'], [])
         self.assertEqual(circulation['stair_core_count'], 1)
-        self.assertEqual(circulation['stair_connection_count'], 3)
+        self.assertEqual(circulation['stair_connection_count'], 4)
         self.assertEqual(circulation['internal_area'], 'R3_028')
         self.assertEqual(circulation['external_area'], 'R3_017')
         self.assertEqual(circulation['external_served_extent'], {'from_level': 'EG', 'to_level': 'ROOF'})

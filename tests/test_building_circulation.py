@@ -49,7 +49,7 @@ def fixture():
     source['stairs']['instances'] = [{'id': 'EastStair', 'area': 'EastWell', 'entry_opening': 'EastDoor'}]
     source['external_stair'].update(area='WestWell',entry_opening='WestDoor',ground_area='GroundSupport',ground_exit_neighbor='GroundSupport')
     p = {'display_scale': 1000., 'display_thickness': 200., 'slab_thickness_mm': 250., 'door_height_mm': 2100., 'clear_height_mm': 4000., 'floor_pitch_mm': 4250., 'display_height': 4000., 'display_floor_depth': 250.}
-    levels = [{'id': name, 'z_mm': index*p['floor_pitch_mm'], 'clear_top_mm': index*p['floor_pitch_mm']+p['clear_height_mm']} for index, name in enumerate(['EG', 'OG1', 'OG2', 'OG3'])]
+    levels = [{'id': name, 'z_mm': (index-1)*p['floor_pitch_mm'], 'clear_top_mm': (index-1)*p['floor_pitch_mm']+p['clear_height_mm']} for index, name in enumerate(['KG', 'EG', 'OG1', 'OG2', 'OG3'])]
     return source, plan, p, levels
 
 
@@ -72,20 +72,19 @@ class CirculationTests(unittest.TestCase):
     def setUp(self): self.source, self.plan, self.p, self.levels = fixture()
     def build(self): return model.compile(self.source, self.plan, self.p, self.levels)
 
-    def test_confirmed_door_policy_one_cabin_and_no_basement_geometry(self):
+    def test_confirmed_door_policy_one_cabin_and_basement_geometry(self):
         result = self.build(); view = result['interface']; lift = view['elevator']
-        self.assertEqual(lift['doors_by_level'], {'EG': ['outward', 'inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']})
+        self.assertEqual(lift['doors_by_level'], {'KG': ['inward'], 'EG': ['outward', 'inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']})
         self.assertEqual(len(lift['cabin_body_ids']), 1); self.assertEqual(lift['cabin_level'], 'EG')
-        self.assertEqual(len(view['door_probes']), 5); self.assertEqual(len(view['closed_door_probes']), 3)
-        self.assertEqual(lift['deferred_stops'][0]['elevation_mm'], None)
-        self.assertEqual(lift['deferred_stops'][0]['sides'], ['inward'])
-        self.assertFalse(any('KG' in body['id'] for body in result['bodies']))
-        self.assertFalse(any(port['level_id'] == 'KG' for port in lift['ports']))
-        self.assertFalse(view['basement_geometry_implemented'])
+        self.assertEqual(len(view['door_probes']), 6); self.assertEqual(len(view['closed_door_probes']), 4)
+        self.assertEqual(lift['deferred_stops'], [])
+        self.assertTrue(any('KG' in body['id'] for body in result['bodies']))
+        self.assertTrue(any(port['level_id'] == 'KG' for port in lift['ports']))
+        self.assertTrue(view['basement_geometry_implemented'])
 
-    def test_five_visible_door_frames_match_only_active_faces_and_stay_outside_probes(self):
+    def test_six_visible_door_frames_match_only_active_faces_and_stay_outside_probes(self):
         result = self.build(); view = result['interface']; lift = view['elevator']
-        self.assertEqual(len(lift['door_frame_body_ids']), 5)
+        self.assertEqual(len(lift['door_frame_body_ids']), 6)
         for port in lift['ports']:
             self.assertEqual(port['frame_body_id'] is not None, port['active'])
         for probe in view['door_probes']:
@@ -98,7 +97,7 @@ class CirculationTests(unittest.TestCase):
     def test_all_stair_and_doorframe_joins_have_positive_connected_overlap(self):
         result = self.build()
         targets = {b['id'] for b in result['bodies'] if b['role'] in {'concept_continuous_stair', 'concept_lift_door_frame'}}
-        self.assertEqual(sum(b['role'] == 'concept_continuous_stair' for b in result['bodies']), 3)
+        self.assertEqual(sum(b['role'] == 'concept_continuous_stair' for b in result['bodies']), 4)
         for target in targets:
             pieces = []
             for operation in result['operations']:
@@ -112,7 +111,7 @@ class CirculationTests(unittest.TestCase):
 
     def test_contacts_use_full_probe_volume_inside_both_landing_and_connector(self):
         result = self.build(); view = result['interface']
-        self.assertEqual(len(view['connection_witnesses']), 21)
+        self.assertEqual(len(view['connection_witnesses']), 24)
         by_body = {}
         for operation in result['operations']:
             if operation['shape']['kind'] == 'box' and operation['action'] in {'create', 'join'}: by_body.setdefault(operation['body'], []).append(box_bounds(operation))
@@ -129,16 +128,16 @@ class CirculationTests(unittest.TestCase):
                 else:
                     self.assertTrue(any(abs(overlap(bounds, box)-volume) < 1e-5 for box in by_body[target]), target)
 
-    def test_upper_slab_holes_preserve_entry_landing_original_ids_and_ground_floor(self):
-        result = self.build(); view = result['interface']; self.assertEqual(len(view['slab_hole_probes']), 3)
+    def test_slab_holes_preserve_entry_landings_and_lowest_floor(self):
+        result = self.build(); view = result['interface']; self.assertEqual(len(view['slab_hole_probes']), 4)
         for stair in view['stairs']:
             for level in self.levels:
                 original = level['id']+'__Area_'+stair['area']
                 self.assertIn(original, view['detail_visibility_ids']); self.assertNotIn(original, view['body_ids'])
-            self.assertEqual(len(stair['connectors']), 3)
+            self.assertEqual(len(stair['connectors']), 4)
             for connector in stair['connectors']:
                 hole = next(p for p in view['slab_hole_probes'] if p['id'] == connector['id']+'_SlabHole')
-                self.assertFalse(hole['target_body'].startswith('EG__'))
+                self.assertFalse(hole['target_body'].startswith('KG__'))
                 self.assertLess(max(p[0] for p in hole['points_mm']), connector['entry_x_mm'])
                 self.assertEqual(connector['risers'], 24)
                 self.assertEqual(connector['z1_mm']-connector['z0_mm'], self.p['floor_pitch_mm'])
@@ -155,12 +154,12 @@ class CirculationTests(unittest.TestCase):
 
     def test_height_variant_updates_connectors_and_continuous_shaft_without_new_stops(self):
         self.p.update(clear_height_mm=3500, slab_thickness_mm=300, floor_pitch_mm=3800)
-        for index, level in enumerate(self.levels): level.update(z_mm=index*3800, clear_top_mm=index*3800+3500)
+        for index, level in enumerate(self.levels): level.update(z_mm=(index-1)*3800, clear_top_mm=(index-1)*3800+3500)
         result = self.build(); view = result['interface']
         for stair in view['stairs']:
-            self.assertEqual([c['z1_mm'] for c in stair['connectors']], [3800, 7600, 11400])
-        self.assertTrue(all(w['depth_mm'] == 14900 for w in view['shaft_witnesses']))
-        self.assertIsNone(view['elevator']['deferred_stops'][0]['elevation_mm'])
+            self.assertEqual([c['z1_mm'] for c in stair['connectors']], [0, 3800, 7600, 11400])
+        self.assertTrue(all(w['depth_mm'] == 18700 for w in view['shaft_witnesses']))
+        self.assertEqual(view['elevator']['deferred_stops'], [])
 
     def test_unknown_source_space_and_opening_are_not_rewritten_or_qualified(self):
         source, plan = copy.deepcopy(self.source), copy.deepcopy(self.plan)
@@ -175,7 +174,7 @@ class CirculationTests(unittest.TestCase):
         for change in ['policy', 'kg', 'side', 'fit', 'count', 'extra', 'second_stair', 'external_same', 'extent']:
             source = copy.deepcopy(self.source)
             if change == 'policy': source['elevator']['default_sides'] = ['inward']
-            elif change == 'kg': source['elevator']['deferred_stops'][0]['elevation_mm'] = -4250
+            elif change == 'kg': source['elevator']['stop_overrides']['KG'] = ['outward']
             elif change == 'side': source['elevator']['sides']['inward']['wall'] = 'LiftBoxW2'
             elif change == 'fit': source['stairs']['wall_margin_factor'] = 100
             elif change == 'count': source['stairs']['risers_per_flight'] = True
@@ -186,7 +185,7 @@ class CirculationTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError): model.compile(source, self.plan, self.p, self.levels)
 
     def test_stack_integration_preserves_source_floor_ids_and_separates_blue_marker(self):
-        spec = json.loads(stack.SOURCE.read_text()); spec['circulation'] = copy.deepcopy(self.source); spec['presentation_reference']['floorplan_area'] = 'Reference'
+        spec = json.loads(stack.SOURCE.read_text()); spec.pop('exterior', None); spec['circulation'] = copy.deepcopy(self.source); spec['presentation_reference']['floorplan_area'] = 'Reference'
         reference = {'parameters': {name: {'expression': value, 'unit': 'mm'} for name, value in [('room_width', 2000), ('wall_t', 200), ('door_height', 2100)]}}
         ground = copy.deepcopy(self.plan)
         next(a for a in ground['areas'] if a['id'] == 'WestWell')['id'] = 'GroundSupport'
@@ -202,19 +201,18 @@ class CirculationTests(unittest.TestCase):
         self.assertTrue(any(op['body'] == 'OG1__Area_EastWell' and op['action'] == 'cut' for op in expanded['operations']))
         self.assertNotIn('OG1__Area_WestWell', ids)
         self.assertFalse(any(op['body'] == 'OG1__Area_WestWell' and op['action'] == 'cut' for op in expanded['operations']))
-        self.assertTrue(any(path.name == 'building_circulation.py' for path in stack.source_dependencies(spec)))
+        self.assertTrue(any(path.name == 'building_circulation.py' for path in stack.source_dependencies(stack.load())))
 
-    def test_one_separate_stair_has_only_a_null_z_planned_basement_link(self):
+    def test_one_separate_stair_has_a_modeled_basement_link(self):
         result = self.build(); view = result['interface']; self.assertEqual(len(view['stairs']), 1)
         stair = view['stairs'][0]
         self.assertEqual(stair['id'], 'EastStair'); self.assertEqual(stair['component_id'], 'EastStair')
         self.assertEqual(view['elevator']['component_id'], 'BuildingLift')
         self.assertEqual(stair['served_extent'], {'from_level': 'KG', 'to_level': 'OG3'})
         self.assertEqual(view['elevator']['served_extent'], stair['served_extent'])
-        planned = stair['planned_connectors'][0]
-        self.assertEqual((planned['from_level'], planned['to_level'], planned['status']), ('KG', 'EG', 'awaiting_plan'))
-        self.assertIsNone(planned['z0_mm']); self.assertIsNone(planned['z1_mm']); self.assertIsNone(planned['body_id'])
-        self.assertNotIn(planned['id'], {connector['id'] for connector in stair['connectors']})
+        self.assertEqual(stair['planned_connectors'], [])
+        self.assertEqual(stair['connectors'][0]['from_level'], 'KG')
+        self.assertEqual(stair['connectors'][0]['to_level'], 'EG')
         self.assertEqual(len(view['external_stairs']), 1)
         self.assertEqual(view['external_stairs'][0]['area'], 'WestWell')
         self.assertFalse(any(body['id'].startswith('WestStair') for body in result['bodies']))

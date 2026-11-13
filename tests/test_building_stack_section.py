@@ -64,7 +64,7 @@ class BuildingStackSectionTests(unittest.TestCase):
             actual = levels[source['id']]
             self.assertEqual(float(actual.get('data-z-mm')), source['z_mm'])
             self.assertEqual(len(elements(actual, 'atrium-floor')), int(source['atrium_floor_filled']))
-            self.assertEqual(len(elements(actual, 'atrium-opening')), int(not source['atrium_floor_filled']))
+            self.assertEqual(len(elements(actual, 'atrium-opening')), int(source['id'].startswith('OG')))
         self.assertEqual(len(elements(tree, 'atrium-floor')), 1)
         self.assertEqual(len(elements(tree, 'atrium-opening')), 3)
         self.assertEqual(len(elements(tree, 'exchange-arrow')), 2)
@@ -122,7 +122,7 @@ class BuildingStackSectionTests(unittest.TestCase):
         interface.assert_called_once_with(private, {})
         self.assertNotIn('/private', svg); self.assertNotIn('private_hash', svg)
 
-    def test_door_table_follows_source_policy_and_keeps_the_basement_unpositioned(self):
+    def test_door_table_follows_source_policy_and_marks_basement_height_assumed(self):
         spec = model.load(); view = model.interfaces(spec, model.parameters(spec))
         tree = ET.fromstring(section.render_svg(spec))
         policy = elements(tree, 'lift-door-policy')[0]
@@ -132,14 +132,14 @@ class BuildingStackSectionTests(unittest.TestCase):
         self.assertEqual(set(rows), set(expected))
         for name, sides in expected.items():
             self.assertEqual(rows[name].get('data-door-sides').split(), sides)
-        self.assertEqual(rows['KG'].get('data-z-known'), 'false')
-        self.assertNotIn('KG', {element.get('data-level') for element in tree.iter()})
-        self.assertIsNone(elevator['deferred_stops'][0]['elevation_mm'])
+        self.assertEqual(rows['KG'].get('data-elevation-basis'), 'assumed')
+        self.assertIn('KG', {element.get('data-level') for element in tree.iter()})
+        self.assertEqual(elevator['deferred_stops'], [])
         labels = ''.join(policy.itertext())
-        self.assertIn('W049', labels); self.assertIn('W062', labels)
+        self.assertIn('KG-Höhe vorläufig angenommen', labels)
         self.assertIn('1 rechter Treppenkern', labels)
         self.assertIn('R3_028', labels)
-        self.assertIn('KG → EG geplant', labels)
+        self.assertIn('Außentreppe EG → Dach', labels)
         self.assertFalse(any('data-level' in element.attrib or 'data-z-mm' in element.attrib for element in policy.iter()))
 
     def test_changed_policy_changes_only_its_table_and_retains_atrium_geometry(self):

@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
-  "prepared_on": "2026-11-12",
-  "catalog_sha256": "20bb2a1fe0d569e48d4bf6a49f303ff35855dbf275c8a9f7b70072f798b46c94",
+  "prepared_on": "2026-11-13",
+  "catalog_sha256": "08887adb121e7f5357e0e1fa4484f6665eca9c54e9b4f99b4fc79349b0ba1c14",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "f902697a5fb9c77ae5bafd4b8c2fe1fc73b16e9d8a8fcc54a2b6e350ed83975e",
+  "render_generator_sha256": "4616c1a404ff4b8d62388dc113e30fc32ef4488bca126c2def2752614f2bbd38",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -4452,14 +4452,15 @@
       "id": "building-stack",
       "image": "images/building-stack.svg",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "aecf951be6695cce3fb1e32210d6d981f78eeadd3de7ec772ad4cf9c98a9e074"
+        "model/building-stack.shared.json": "efe22ae793b6099a2d75a27b631e280247fa57967c2bb6f435623e6b009bce4a",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
       },
-      "representation": "Source-derived four-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
+      "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
       "producer_files_sha256": {
-        "scripts/render_building_stack_section.py": "10853a94cec1a2ebbcaf043d58a2d781bd903034fe4aed4b52be35267dee1945",
-        "model/building-stack.schema.json": "6a58d4d65d180671c760bbd695860c067213233def1a13c0f69c857efafe020f",
-        "scripts/building_stack.py": "91f2e6e603768444ec9c9f8bfcdeddc84e65aaff7419d3f79b42c24ef9d1c530",
-        "scripts/building_circulation.py": "8b11e1f44f18336feb7c9a1d467546486252a29215d3d3232bde1975d5a4bfae",
+        "scripts/render_building_stack_section.py": "e7cf89cb414d292d754dff5ff94f0ddd966a8e23f0df68b2c7a327d1c45f18a1",
+        "model/building-stack.schema.json": "9a97ae644d13b8e8d1bab3d0a2196b3496961f221e33d8af8aab12ddce8e8d54",
+        "scripts/building_stack.py": "50676d2bfdfc3e4643d76a0ddfa95e1b1b0e9f7aaf53ccc45dc6af1bf8733b6e",
+        "scripts/building_circulation.py": "067b5a4ba3ada15eefcc7eac9970fba09787a4c2a4d72462b6d3800771016f10",
         "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
         "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
         "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
@@ -4469,19 +4470,22 @@
         "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
         "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
         "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
-        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711"
+        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+        "scripts/building_exterior.py": "4fca95bca76173d3ef8fab3a931a04122a95c9f25567c9777bd50a486f010cd4",
+        "model/building-exterior.schema.json": "617476fc6fa6d26fe399006d29ec3ec61ed03f128ae342f8b780ba0d31598071"
       },
       "metric_scale_known": false,
       "original_image_embedded": false,
       "transport_implemented": false,
       "hardware_executed": false,
-      "image_sha256": "b84ce670d2577d2a126bc0cf8f467011fe49e84d66203f584c0dfb3b2e36bf8a",
-      "bytes": 10666,
+      "image_sha256": "11682ab95ce16f8a999a29b150855a56fe4bf95653d04f2115a85ca08ec95dd1",
+      "bytes": 10546,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "aecf951be6695cce3fb1e32210d6d981f78eeadd3de7ec772ad4cf9c98a9e074",
+        "model/building-stack.shared.json": "efe22ae793b6099a2d75a27b631e280247fa57967c2bb6f435623e6b009bce4a",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
       }
     },
     {

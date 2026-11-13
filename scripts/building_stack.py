@@ -1,4 +1,4 @@
-"""Four static concept storeys from one relative floorplan, never a survey.
+"""Five static concept storeys from one relative floorplan, never a survey.
 
 XY is presentation-scaled using an unmeasured room parameter. Z uses explicit
 owner/presentation assumptions. The exchange marker is semantic geometry only.
@@ -13,6 +13,7 @@ import re
 import assembly_model as assembly
 import building_circulation as circulation
 import building_roof as roof
+import building_exterior as exterior
 import ground_floor_model as ground
 import relative_floorplan as floor
 import robot_spec as robot
@@ -88,15 +89,15 @@ def parameters(spec, overrides=None):
 
 
 def validate(spec):
-    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k != '_source'}
+    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior'}}
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact(spec['sources'], 'floorplan room_geometry ground_floor', 'stack sources')
+    exact(spec['sources'], 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
-    require([level['id'] for level in spec['levels']] == ['EG', 'OG1', 'OG2', 'OG3'], 'Exactly four ordered concept storeys required; basement remains unimplemented')
+    require([level['id'] for level in spec['levels']] == ['KG', 'EG', 'OG1', 'OG2', 'OG3'], 'Five ordered concept storeys required')
     for level in spec['levels']:
         exact(level, 'id label', 'level instance')
         require(isinstance(level['label'], str) and level['label'], 'Level label required')
@@ -154,11 +155,27 @@ def marker_polygon(spec, polygon):
 def level_plan(spec, level_id):
     """Resolve the actual registered EG once; upper floors reuse canonical F03."""
     raw = _spec(spec)
-    if level_id == 'EG':
-        ref = raw['sources']['ground_floor']; read(ref)
+    if level_id in {'EG', 'KG'}:
+        ref = raw['sources']['ground_floor' if level_id == 'EG' else 'basement']; read(ref)
         plan = ground.load(assembly.validate_reference(ref, root=ROOT))
         require(plan['_source']['sha256'] == ref['source_sha256'], 'EG source changed while loading')
         require(ground.raw_source(plan)['reference_floorplan'] == raw['sources']['floorplan'], 'EG registration must reference the same pinned canonical F03')
+        canonical = templates(raw)[0]
+        if level_id == 'KG':
+            for core in [raw['circulation']['elevator']['area'], raw['circulation']['stairs']['instances'][0]['area']]:
+                actual = floor.outline(plan, core); expected = floor.outline(canonical, core)
+                require(abs(floor.signed_area(actual)-floor.signed_area(expected)) < 1e-10
+                        and all(floor.point_membership(point, expected) == 0 for point in actual)
+                        and all(floor.point_membership(point, actual) == 0 for point in expected),
+                        'KG core differs from the shared vertical frame: '+core)
+            walls = {wall['id']: wall for wall in plan['walls']}
+            ref_walls = {wall['id']: wall for wall in canonical['walls']}
+            for side in raw['circulation']['elevator']['sides'].values():
+                name = side['wall']
+                require(name in walls and walls[name]['kind'] == 'wall' and
+                        {tuple(plan['vertices'][walls[name][key]]) for key in ('start', 'end')} ==
+                        {tuple(canonical['vertices'][ref_walls[name][key]]) for key in ('start', 'end')},
+                        'KG lift side differs from the shared port frame')
         return plan
     require(level_id in {'OG1', 'OG2', 'OG3'}, 'Unknown building level')
     return templates(raw)[0]
@@ -191,14 +208,14 @@ def interfaces(spec, p):
     for index, level in enumerate(spec['levels']):
         chosen, base, originals = bases[level['id']]
         vertices.extend(chosen['vertices'].values())
-        prefix = level['id']+'__'; z = index*p['floor_pitch_mm']; filled = level['id'] in spec['atrium']['floor_levels']
+        prefix = level['id']+'__'; z = (index-1)*p['floor_pitch_mm']; filled = level['id'] in spec['atrium']['floor_levels']
         walls = [b['id'] for b in base['bodies'] if b['role'] == 'relative_wall_display']
         slabs = [b['id'] for b in base['bodies'] if b['role'] == 'relative_area_display']
         floor_ids = [prefix+name for name in slabs]
         levels.append({**level, 'index': index, 'z_mm': z, 'slab_bottom_mm': z-p['slab_thickness_mm'], 'slab_top_mm': z, 'clear_top_mm': z+p['clear_height_mm'],
-                       'template_source': spec['sources']['ground_floor' if level['id'] == 'EG' else 'floorplan']['source'], 'template_id': chosen['id'],
+                       'template_source': spec['sources']['basement' if level['id'] == 'KG' else 'ground_floor' if level['id'] == 'EG' else 'floorplan']['source'], 'template_id': chosen['id'],
                        'atrium_floor_filled': filled, 'wall_bodies': [prefix+name for name in walls], 'floor_bodies': floor_ids})
-        if not filled:
+        if level['id'].startswith('OG'):
             voids.append({'id': level['id']+'_AtriumVoid', 'kind': 'polygon_prism', 'points_mm': polygon, 'offset_mm': z-p['slab_thickness_mm'], 'depth_mm': p['slab_thickness_mm'], 'target_bodies': floor_ids})
         opening_by_id = {opening['id']: opening for opening in chosen['openings']}
         for probe in originals['opening_probes']:
@@ -206,7 +223,7 @@ def interfaces(spec, p):
             if opening_by_id[probe['id']]['kind'] == 'door': value['depth_mm'] = p['door_height_mm']-2*probe['display_inset_mm']
             require(value['depth_mm'] > 0, 'Presentation door cannot contain its inherited opening probe')
             probes.append(value)
-    ground_probe = {'id': 'EG_AtriumCoverage', 'target_bodies': list(levels[0]['floor_bodies']), 'expectation': 'union_filled', 'kind': 'polygon_prism', 'points_mm': polygon, 'offset_mm': -p['slab_thickness_mm'], 'depth_mm': p['slab_thickness_mm'], 'expected_volume_mm3': floor.signed_area(polygon)*p['slab_thickness_mm']}
+    ground_probe = {'id': 'EG_AtriumCoverage', 'target_bodies': list(next(level for level in levels if level['id'] == 'EG')['floor_bodies']), 'expectation': 'union_filled', 'kind': 'polygon_prism', 'points_mm': polygon, 'offset_mm': -p['slab_thickness_mm'], 'depth_mm': p['slab_thickness_mm'], 'expected_volume_mm3': floor.signed_area(polygon)*p['slab_thickness_mm']}
     concept = {'body': spec['concept_exchange']['id'], 'points_mm': marker, 'offset_mm': 0, 'depth_mm': levels[-1]['clear_top_mm'], 'status': 'semantic_visualization_only'}
     data = {'levels': levels, 'clear_height_mm': p['clear_height_mm'], 'slab_thickness_mm': p['slab_thickness_mm'], 'floor_pitch_mm': p['floor_pitch_mm'],
             'ground_floor': {'id': bases['EG'][0]['id'], 'source': spec['sources']['ground_floor']['source']},
@@ -225,6 +242,20 @@ def interfaces(spec, p):
         'exclusive_boundary_walls_omitted': True, 'shared_facade_walls_preserved': True, 'source_unchanged': True}
     data['wall_visibility_ids'].extend(extra['interface']['wall_bridge_ids'])
     data['roof'] = roof.compile(spec['roof'], plan, p, levels)['interface']
+    if 'exterior' in spec:
+        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in levels}, p, levels)
+        ext = extension['interface']; omitted = set(ext['omitted_body_ids'])
+        for level in levels: level['wall_bodies'] = [n for n in level['wall_bodies'] if n not in omitted]
+        data['wall_visibility_ids'] = [n for n in data['wall_visibility_ids'] if n not in omitted]
+        data['opening_probes'] = [v for v in data['opening_probes'] if v['target_body'] not in omitted]
+        # Each leaf is checked separately against the same aperture, avoiding
+        # irrelevant constructive leaf/jamb contacts in pairwise inspection.
+        leaf_probes = []
+        for probe in data['opening_probes']:
+            if probe['id'] in ext['door_leaves']:
+                leaf_probes.append({**copy.deepcopy(probe), 'id': 'LeafClear_'+probe['id'], 'target_body': ext['door_leaves'][probe['id']]})
+        data['opening_probes'].extend(leaf_probes)
+        data['exterior'] = ext
     return data
 
 
@@ -258,12 +289,18 @@ def expanded(spec, p):
     roof_geometry = roof.compile(spec['roof'], plan, p, data['levels'])
     for key in ('components', 'bodies', 'operations'):
         result[key].extend(extra[key]); result[key].extend(roof_geometry[key])
+    if 'exterior' in spec:
+        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in data['levels']}, p, data['levels'])
+        omitted = set(extension['interface']['omitted_body_ids'])
+        result['bodies'] = [v for v in result['bodies'] if v['id'] not in omitted]
+        result['operations'] = [v for v in result['operations'] if v['body'] not in omitted]
+        for key in ('components', 'bodies', 'operations'): result[key].extend(extension[key])
     return result
 
 
 def cases(spec): return [{'id': 'stacked'}]
 def materialize(spec, case_id):
-    require(case_id == 'stacked', 'Only the static four-storey stack is implemented'); return copy.deepcopy(spec)
+    require(case_id == 'stacked', 'Only the static five-storey stack is implemented'); return copy.deepcopy(spec)
 def pose(spec, p, name=None):
     require(name in (None, 'stacked'), 'No building or transport motion is implemented'); return {}
 def validate_pose(source, values):
@@ -289,6 +326,7 @@ def solidcraft_commands(spec, p):
 
 def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
-    paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
+    paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
+    if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if '_source' in spec: paths.insert(0, Path(spec['_source']['path']))
     return list(dict.fromkeys(paths))

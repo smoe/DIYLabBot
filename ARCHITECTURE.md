@@ -72,13 +72,15 @@ in diesem ersten Schritt noch nicht implementiert. Die separate
 einmalig beschriebenen Wand-/Öffnungsgraphen und Bereichsnachbarschaften;
 metrische Gebäudeintegration, Passierbarkeit und Navigation bleiben offen.
 
-Die [viergeschossige Konzeptkomposition](docs/building-stack.md) referenziert
-F03 für drei Obergeschosse und eine eigene registrierte relative EG-Quelle.
+Die [Konzeptkomposition mit Keller und vier oberirdischen Geschossen](docs/building-stack.md) referenziert
+F03 für drei Obergeschosse sowie eigene registrierte relative KG- und EG-Quellen.
 4.000 mm lichte Höhe sind eine Eigentümerannahme; mit vorläufig 250 mm
 Geschossplatte entstehen 4.250 mm Geschossabstand. Nur im EG wird die vorhandene
 Atriumkontur durch die tatsächlichen EG-Foyer-/Flurböden gemeinsam abgedeckt.
 Die oberen Atriumflächen bleiben zwischen den Geschossen offen; ein gewölbtes
-Glasdach bildet den oberen Abschluss. Nur Kellerplan und Aufmaß stehen aus.
+Glasdach bildet den oberen Abschluss. Der Kellerplan ist separat nachgezeichnet;
+Kellerhöhe, metrische Registrierung und Aufmaß stehen aus. KG verwendet vorläufig
+denselben Darstellungsabstand unter EG.
 Die horizontale Darstellungsproportion verweist auf die ungemessene L01-Breite,
 ohne F03 zu kalibrieren oder Möbel und Geräte zu übertragen. Geschossinstanzen
 besitzen eigene IDs; Raumnummern der Vorlage sind keine bestätigten Nummern
@@ -95,11 +97,18 @@ Aufzugschacht,
 eine stationäre Kabine und geschossabhängige Türseiten sind getrennt vom
 blauen Atrium-Marker. Die vom Eigentümer bestätigten Seiten sind außen links
 zum Flur `C3_020` und innen rechts zum `NorthCore`. EG erhält beide Seiten,
-die Obergeschosse nur außen; KG nur innen bleibt bis zum Kellerplan ohne
-geometrischen Stopp. `NorthCore` bleibt in der Obergeschossvorlage unbekannt.
+die Obergeschosse nur außen und KG nur innen. Der Kellerstopp und die
+KG–EG-Treppe besitzen statische Konzeptgeometrie mit angenommener Höhe. `NorthCore` bleibt in der Obergeschossvorlage unbekannt.
 Das EG führt stattdessen seine eigenen Flurflächen an den Türseiten; die
 Darstellung beweist auch dort keinen qualifizierten begehbaren Anschluss. Die ursprüngliche
 F03-Klassifikation und ihre Nachweise werden dadurch nicht rückwirkend geändert.
+
+Die Fotoergänzung `exterior` in der Gebäudekomposition ersetzt gezielt die
+Fassaden-Platzhalterwand und zwei Atrium-/Flurkanten durch transparente Verglasung
+beziehungsweise offene Metallgeländer. Raumtürfarbe und Erdreich-Höhenbezug
+werden aus derselben Quelle in beiden CADs abgeleitet. Größen und Foto-/Planlage
+bleiben Darstellungsannahmen, keine Gebäude- oder Sicherheitsqualifikation.
+Siehe [Fotoableitung](docs/building-exterior.md).
 
 `model/ground-floor-eg.shared.json` führt Seminarraum, Foyer und verlegte
 Toiletten einmalig. Ein Loader löst gemeinsame Kernvertices aus F03 auf und
