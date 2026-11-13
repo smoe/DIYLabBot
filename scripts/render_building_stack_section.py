@@ -213,9 +213,9 @@ def _render(view):
     result.append(dimension(1260, first['z_mm'], next((level for level in levels if level['z_mm'] > first['z_mm']), levels[1])['z_mm'], f'{number(pitch/1000)} m Geschossteilung*', 'floor-pitch'))
     if view.get('exterior'):
         grade=view['exterior']['grade_z_mm']; ground_y=y(grade)
-        result.append(rect(180, ground_y, 25, y(lower)-ground_y, fill='#8a735b', data_role='earth-section'))
-        result.append(rect(1065, ground_y, 20, y(lower)-ground_y, fill='#8a735b', data_role='earth-section'))
-        result.append(f'<path d="M180 {ground_y:.3f}H1085" stroke="#8a735b" stroke-width="3" data-role="terrain-grade"/>')
+        result.append(rect(180, ground_y-2, 25, 2, fill='#559447', data_role='lawn-surface'))
+        result.append(rect(1065, ground_y-2, 20, 2, fill='#559447', data_role='lawn-surface'))
+        result.append(f'<path d="M180 {ground_y:.3f}H1085" stroke="#559447" stroke-width="3" data-role="terrain-grade"/>')
         result.append(text(250, ground_y+24, 'Gelände ±0 m*', 'small'))
     result.append(text(210, 786, 'EG: Atriumboden geschlossen. Darüber: Öffnungen der gemeinsamen Vorlage.', 'small'))
     result.append('<rect x="75" y="805" width="1350" height="180" rx="12" fill="#edf2f5"/>')

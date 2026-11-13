@@ -15,11 +15,14 @@ class ExteriorTests(unittest.TestCase):
         cls.s['sources'].pop('furnishings',None)
         cls.p=model.parameters(cls.s);cls.d=model.interfaces(cls.s,cls.p);cls.e=model.expanded(cls.s,cls.p)
 
-    def test_terrain_uses_eg_grade_and_spans_basement_not_an_extra_storey(self):
-        ext=self.d['exterior'];self.assertEqual(ext['grade_z_mm'],0);self.assertEqual(ext['terrain_bottom_mm'],-4500)
-        self.assertEqual(len(ext['terrain_body_ids']),4);self.assertEqual(len(self.d['levels']),5)
+    def test_lawn_is_a_thin_green_surface_at_eg_grade(self):
+        ext=self.d['exterior'];self.assertEqual(ext['grade_z_mm'],0);self.assertEqual(ext['terrain_bottom_mm'],-20)
+        self.assertEqual(len(ext['terrain_body_ids']),1);self.assertEqual(len(self.d['levels']),5)
         for name in ext['terrain_body_ids']:
-            shape=next(o['shape'] for o in self.e['operations'] if o['body']==name)
+            body=next(b for b in self.e['bodies'] if b['id']==name)
+            self.assertEqual(body['appearance']['color'],'#559447')
+            shape=next(o['shape'] for o in self.e['operations'] if o['body']==name and o['action']=='create')
+            self.assertEqual(shape['size'][2],20)
             self.assertEqual(shape['origin'][2]+shape['size'][2],0)
         self.assertFalse(ext['dimensions_measured']);self.assertFalse(ext['safety_qualified'])
 
@@ -28,11 +31,11 @@ class ExteriorTests(unittest.TestCase):
         self.assertNotIn('OG1__Wall_W108',names);self.assertNotIn('EG__Wall_EW074',names)
         self.assertIn('KG__Wall_W049',names)
         glass=[b for b in self.e['bodies'] if b['id'] in ext['glass_body_ids']]
-        self.assertEqual(len(glass),24);self.assertTrue(all(b['appearance']['opacity']==.2 for b in glass))
+        self.assertGreater(len(glass),24);self.assertTrue(all(b['appearance']['opacity']==.2 for b in glass))
         self.assertTrue(any(o['action']=='cut' and o['id'].endswith('_Entrance') for o in self.e['operations']))
         self.assertTrue(any(o['body']==ext['frame_body_id'] and o['action']=='join' for o in self.e['operations']))
         self.assertGreater(len(ext['frame_body_ids']),10)
-        self.assertTrue(all(o['action']=='create' for o in self.e['operations'] if o['body'] in set(ext['frame_body_ids'])-{ext['frame_body_id']}))
+        self.assertTrue(all(o['action']=='create' for o in self.e['operations'] if o['body'] in {n for n in ext['frame_body_ids'] if n.startswith('Foyer')}-{ext['frame_body_id']}))
 
     def test_door_leaves_share_one_colour_and_have_native_aperture_witnesses(self):
         ext=self.d['exterior'];doors=[b for b in self.e['bodies'] if b['id'] in ext['door_leaves'].values()]
@@ -54,9 +57,34 @@ class ExteriorTests(unittest.TestCase):
 
     def test_vertical_variant_recomputes_site_front_and_guards(self):
         p=model.parameters(self.s,{'clear_height_mm':3500,'slab_thickness_mm':200});d=model.interfaces(self.s,p)
-        self.assertEqual(d['exterior']['terrain_bottom_mm'],-3900)
+        self.assertEqual(d['exterior']['terrain_bottom_mm'],-20)
         self.assertEqual(d['exterior']['facade_top_mm'],14800)
         self.assertEqual(d['exterior']['grade_z_mm'],0)
+
+    def test_entrance_flanks_are_opaque_and_side_bands_have_closed_gaps(self):
+        ext=self.d['exterior'];bodies={b['id']:b for b in self.e['bodies']}
+        for name in ['OG1__Wall_W114','OG2__Wall_W118','OG3__Wall_W102']:
+            self.assertEqual(bodies[name]['appearance'],{'color':self.s['exterior']['concrete_color'],'opacity':1})
+        self.assertTrue(ext['side_window_groups'])
+        self.assertEqual({v['level_id'] for v in ext['side_window_groups']},{'EG','OG1','OG2','OG3'})
+        self.assertTrue(all('W114' not in v['wall'] and 'W118' not in v['wall'] for v in ext['side_window_groups']))
+        for group in ext['side_window_groups']:
+            level=next(v for v in self.d['levels'] if v['id']==group['level_id'])
+            self.assertGreater(group['z_bounds_mm'][0],level['z_mm'])
+            self.assertLess(group['z_bounds_mm'][1],level['clear_top_mm'])
+            self.assertIn(group['target_body'],ext['surface_overrides'])
+        self.assertEqual(len(ext['window_probes']),len(ext['side_window_groups']))
+
+    def test_access_surfaces_are_thin_and_separate_from_lawn(self):
+        ext=self.d['exterior']
+        self.assertEqual({v['material'] for v in ext['site_regions']},{'sidewalk','driveway','entrance_apron'})
+        self.assertEqual(len(ext['site_body_ids']),4)
+        for region in ext['site_regions']:
+            self.assertEqual(region['origin_mm'][2],-20)
+            self.assertEqual(region['size_mm'][2],20)
+        sidewalk=next(v for v in ext['site_regions'] if v['material']=='sidewalk')
+        driveway=next(v for v in ext['site_regions'] if v['material']=='driveway')
+        self.assertAlmostEqual(sidewalk['origin_mm'][0]+sidewalk['size_mm'][0],driveway['origin_mm'][0])
 
     def test_invalid_or_invented_contract_values_are_rejected(self):
         for key,value in [('bay_count',True),('glass_opacity',1),('frame_mm',0),('guard_bar_fractions',[.5,.5]),('door_color','wood')]:

@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "8b096d4eb2f403f5a99e1654a48444a76ddae16341ae604f550377e530db3423",
+  "catalog_sha256": "6f465751873f96251f7993ad635aa2117adf11a8637b1a2064dd533aff586c2e",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "d2ad3397a33a3aa802521d48476752e9f14fe75989ed295e85574f3b03cd7edf",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -4588,14 +4588,14 @@
       "id": "building-stack",
       "image": "images/building-stack.svg",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "4b47ee12d5a40f2f1e8928d7c44745a8512fcd5ba5e150fee58789412c5fe176",
+        "model/building-stack.shared.json": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
         "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
       },
       "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
       "producer_files_sha256": {
-        "scripts/render_building_stack_section.py": "e7cf89cb414d292d754dff5ff94f0ddd966a8e23f0df68b2c7a327d1c45f18a1",
+        "scripts/render_building_stack_section.py": "6e67b7d1807167d68c6c726a2275524b4d3464bf54a7df29ed055afd13799e08",
         "model/building-stack.schema.json": "bfec2b6564de4c7447c6451ea10c7d3d23e9687f73e976cf45aae30069f31df3",
-        "scripts/building_stack.py": "c770832552936eca44d3199a0afdd836e43adac595bf016554384cda7175c9b7",
+        "scripts/building_stack.py": "936d6bc60c1dcae68c8df57c1902f0dc4e539c6123ee08ff8ec08bb9d046b06e",
         "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
         "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
         "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
@@ -4612,17 +4612,17 @@
         "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
         "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
         "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-        "scripts/building_exterior.py": "4fca95bca76173d3ef8fab3a931a04122a95c9f25567c9777bd50a486f010cd4",
-        "model/building-exterior.schema.json": "617476fc6fa6d26fe399006d29ec3ec61ed03f128ae342f8b780ba0d31598071"
+        "scripts/building_exterior.py": "b0642eb8f30a00aeac956fb8e9c19a2585fe73ffac05b9d2cdd9e6a94a639e19",
+        "model/building-exterior.schema.json": "f624aae8ebadb5b22f6b89575051749727ea4c8b823b6220453a7436b1788e36"
       },
       "metric_scale_known": false,
       "original_image_embedded": false,
       "transport_implemented": false,
       "hardware_executed": false,
-      "image_sha256": "11682ab95ce16f8a999a29b150855a56fe4bf95653d04f2115a85ca08ec95dd1",
-      "bytes": 10546,
+      "image_sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151",
+      "bytes": 10540,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "4b47ee12d5a40f2f1e8928d7c44745a8512fcd5ba5e150fee58789412c5fe176",
+        "model/building-stack.shared.json": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",

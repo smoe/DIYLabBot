@@ -2,6 +2,7 @@
 import math
 import re
 import relative_floorplan as floor
+import building_roof as roof
 
 
 def require(ok, message):
@@ -9,14 +10,18 @@ def require(ok, message):
 
 
 def validate(s):
-    require(set(s)=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color'},'Explicit exterior recipe required')
+    require(set(s)=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color'},'Explicit exterior recipe required')
     require(s['status']=='photo_informed_unmeasured_concept','Declare photo-informed, unmeasured exterior')
     require(type(s['bay_count']) is int and 2<=s['bay_count']<=12,'Bounded illustrative facade bays required')
-    for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm']:
+    for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','landscape_layer_mm','sidewalk_width_mm','road_width_mm']:
         require(type(s[k]) in (int,float) and math.isfinite(s[k]) and 0<s[k]<10000,'Positive bounded presentation mm required: '+k)
     require(type(s['glass_opacity']) in (int,float) and 0<s['glass_opacity']<1,'Transparent glass required')
-    for k in ['frame_color','glass_color','door_color','terrain_color']:require(re.fullmatch('#[0-9a-fA-F]{6}',s[k]) is not None,'RGB appearance required')
+    for k in ['frame_color','glass_color','door_color','terrain_color','concrete_color','side_cladding_color','sidewalk_color','road_color']:require(re.fullmatch('#[0-9a-fA-F]{6}',s[k]) is not None,'RGB appearance required')
     require(isinstance(s['guard_bar_fractions'],list) and s['guard_bar_fractions'] and all(type(v) in (int,float) and 0<v<1 for v in s['guard_bar_fractions']) and s['guard_bar_fractions']==sorted(set(s['guard_bar_fractions'])),'Unique ordered horizontal guard fractions required')
+    for key in ['side_window_interval','side_window_height_fractions']:
+        require(isinstance(s[key],list) and len(s[key])==2 and all(type(v) in (int,float) and 0<v<1 for v in s[key]) and s[key][0]<s[key][1], 'Ordered bounded window fractions required')
+    require(isinstance(s['side_window_walls'],list) and s['side_window_walls'] and len(set(s['side_window_walls']))==len(s['side_window_walls']), 'Explicit side-window paths required')
+    require(s['landscape_layer_mm']<=50 and s['sidewalk_width_mm']<s['terrain_margin_mm'], 'Thin graphic landscape layer and fitting sidewalk required')
     require(isinstance(s['guard_boundaries'],list) and s['guard_boundaries'] and len(set(s['guard_boundaries']))==len(s['guard_boundaries']),'Unique source guard boundaries required')
 
 
@@ -33,9 +38,9 @@ def compile(s, plans, p, levels):
     def box(n,target,origin,size,action='create'):
         require(all(v>0 for v in size),'Positive exterior box required')
         r['operations'].append({'id':n,'body':target,'action':action,'shape':{'kind':'box','origin':origin,'size':size}})
-    def prism(n,target,points,z,h):
+    def prism(n,target,points,z,h,action='create'):
         if floor.signed_area(points)<0:points=list(reversed(points))
-        r['operations'].append({'id':n,'body':target,'action':'create','shape':{'kind':'polygon_prism','plane':'XY','points':points,'offset':z,'depth':h,'fixed':True}})
+        r['operations'].append({'id':n,'body':target,'action':action,'shape':{'kind':'polygon_prism','plane':'XY','points':points,'offset':z,'depth':h,'fixed':True}})
     # Replace source placeholder walls only in this building composition.
     for level in levels:
         if level['id']=='KG':continue
@@ -97,11 +102,57 @@ def compile(s, plans, p, levels):
             for i in range(1,count+1):member('Post'+str(i),i*length/count-post/2,post,z,height,post)
             for i,fraction in enumerate(s['guard_bar_fractions']):member('Bar'+str(i),-post/2,length+post,z+height*fraction,bar,bar)
             guard_groups.append({'id':n,'level_id':level['id'],'boundary':wall_id,'body_ids':members})
-    # Illustrative earth cutaway, not surveyed landscaping or a building slab.
-    allpoints=[pt for plan in plans.values() for pt in plan['vertices'].values()];clearance=s['terrain_clearance_mm'];margin=s['terrain_margin_mm']
-    xmin=min(v[0] for v in allpoints)*scale-clearance;xmax=max(v[0] for v in allpoints)*scale+clearance;ymin=min(v[1] for v in allpoints)*scale-clearance;ymax=max(v[1] for v in allpoints)*scale+clearance
-    bottom=levels[0]['slab_bottom_mm'];depth=grade-bottom
-    for tag,origin,size in [('West',[xmin-margin,ymin-margin,bottom],[margin,ymax-ymin+2*margin,depth]),('East',[xmax,ymin-margin,bottom],[margin,ymax-ymin+2*margin,depth]),('South',[xmin,ymin-margin,bottom],[xmax-xmin,margin,depth]),('North',[xmin,ymax,bottom],[xmax-xmin,margin,depth])]:
-        n=body('Terrain_'+tag,'illustrative_earth_cutaway',s['terrain_color']);terrain_ids.append(n);box(n+'_Earth',n,origin,size)
-    r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
+    # Opaque concrete entrance flanks and storey-height cladding around the
+    # bounded side window bands. Canonical paths are reused after registration;
+    # the original room graphs and all vertical core positions remain intact.
+    canonical_edges=roof.outer_contour(canonical,[a for a in canonical['areas'] if a['kind']!='void' and a['id'] not in {'R3_017','ExternalLink'}])
+    canonical_points=[canonical['vertices'][e['start']] for e in canonical_edges]
+    require(set(s['side_window_walls'])<={e['wall'] for e in canonical_edges},'Side bands must reference the actual outer facade')
+    side_segments=[(canonical['vertices'][walls[n]['start']],canonical['vertices'][walls[n]['end']]) for n in s['side_window_walls']]
+    surfaces={};opaque_ids=[];window_groups=[];window_probes=[]
+    def strip(wa,wb,lo,hi,half):
+        length=math.dist(wa,wb);normal=[-(wb[1]-wa[1])/length,(wb[0]-wa[0])/length]
+        return [[wa[j]+fraction*(wb[j]-wa[j])+side*normal[j] for j in (0,1)] for fraction,side in [(lo,-half),(hi,-half),(hi,half),(lo,half)]]
+    for level in levels:
+        plan=plans[level['id']];wallmap={w['id']:w for w in plan['walls']}
+        edges=roof.outer_contour(plan,[a for a in plan['areas'] if a['kind']!='void' and a['id'] not in {'R3_017','ExternalStairGround','ExternalLink'}])
+        for edge in edges:
+            wall=wallmap[edge['wall']];target=level['id']+'__Wall_'+wall['id']
+            if target in omitted:continue
+            wa,wb=ends(plan,wall);va,vb=[plan['vertices'][wall[k]] for k in ('start','end')]
+            side=level['id']!='KG' and any(floor.on_segment(va,a,b) and floor.on_segment(vb,a,b) for a,b in side_segments)
+            if wall['kind']=='wall':surfaces[target]={'color':s['side_cladding_color'] if side else s['concrete_color'],'opacity':1}
+            elif level['id']!='KG' and wall['kind']=='unknown':
+                n=body('FacadeClosure_'+level['id']+'_'+wall['id'],'concept_opaque_concrete_facade',s['concrete_color']);opaque_ids.append(n)
+                prism(n+'_Panel',n,strip(wa,wb,0,1,p['display_thickness']/2),level['z_mm'],p['clear_height_mm'])
+            else:continue
+            if not side or wall['kind']!='wall' or any(o['kind']=='door' and o['wall']==wall['id'] for o in plan['openings']):continue
+            length=math.dist(wa,wb);lo,hi=s['side_window_interval'];frame=s['frame_mm'];width=(hi-lo)*length
+            if width<=4*frame:continue
+            bottom=level['z_mm']+s['side_window_height_fractions'][0]*p['clear_height_mm'];height=(s['side_window_height_fractions'][1]-s['side_window_height_fractions'][0])*p['clear_height_mm']
+            name='SideWindow_'+level['id']+'_'+wall['id']
+            prism(name+'_WallCut',target,strip(wa,wb,lo,hi,p['display_thickness']*.7),bottom,height,'cut')
+            frame_id_side=body(name+'_Frame','concept_side_window_frame',s['frame_color']);frame_ids.append(frame_id_side)
+            prism(frame_id_side+'_Outer',frame_id_side,strip(wa,wb,lo,hi,frame/2),bottom,height)
+            prism(frame_id_side+'_Inner',frame_id_side,strip(wa,wb,lo+frame/length,hi-frame/length,frame),bottom+frame,height-2*frame,'cut')
+            pane=body(name+'_Glass','concept_side_band_glass',s['glass_color'],s['glass_opacity']);glass_ids.append(pane)
+            prism(pane+'_Pane',pane,strip(wa,wb,lo+frame/length,hi-frame/length,glass/2),bottom+frame,height-2*frame)
+            inset=min(frame/4,width/10);window_probes.append({'id':name+'_Aperture','target_body':target,'kind':'polygon_prism','points_mm':strip(wa,wb,lo+inset/length,hi-inset/length,p['display_thickness']*.4),'offset_mm':bottom+inset,'depth_mm':height-2*inset,'display_inset_mm':inset,'visualization_only':True})
+            window_groups.append({'id':name,'level_id':level['id'],'wall':wall['id'],'target_body':target,'glass_body':pane,'frame_body':frame_id_side,'z_bounds_mm':[bottom,bottom+height]})
+    # A leaf-thin green graphic surface follows the registered footprint. Paved
+    # access areas are separate, equally thin surfaces, never an earth volume.
+    clearance=s['terrain_clearance_mm'];margin=s['terrain_margin_mm'];layer=s['landscape_layer_mm'];bottom=grade-layer
+    xmin=min(v[0] for v in canonical_points)*scale-clearance;xmax=max(v[0] for v in canonical_points)*scale+clearance;ymin=min(v[1] for v in canonical_points)*scale-clearance;ymax=max(v[1] for v in canonical_points)*scale+clearance
+    lawn=body('Terrain_Lawn','illustrative_lawn_surface',s['terrain_color']);terrain_ids.append(lawn)
+    box(lawn+'_Sheet',lawn,[xmin-margin,ymin-margin,bottom],[xmax-xmin+2*margin,ymax-ymin+2*margin,layer])
+    prism(lawn+'_BuildingVoid',lawn,[[x*scale,y*scale] for x,y in canonical_points],bottom-layer,layer*3,'cut')
+    walk=s['sidewalk_width_mm'];center=(elo+ehi)/2;road_width=s['road_width_mm'];site_ids=[lawn];site_regions=[]
+    for name,origin,size,color,material in [
+        ('Site_Sidewalk',[xmax,ymin,bottom],[walk,ymax-ymin,layer],s['sidewalk_color'],'sidewalk'),
+        ('Site_Driveway',[xmax+walk,center-road_width/2,bottom],[margin-walk,road_width,layer],s['road_color'],'driveway'),
+        ('Site_EntranceApron',[x+glass,center-road_width/2,bottom],[xmax-x-glass,road_width,layer],s['sidewalk_color'],'entrance_apron')]:
+        n=body(name,'illustrative_'+material+'_surface',color);site_ids.append(n);box(n+'_Sheet',n,origin,size)
+        box(n+'_LawnCut',lawn,[origin[0],origin[1],bottom-layer],[size[0],size[1],layer*3],'cut')
+        site_regions.append({'body':n,'material':material,'origin_mm':origin,'size_mm':size})
+    r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'site_body_ids':site_ids,'site_regions':site_regions,'surface_layer_mm':layer,'surface_overrides':surfaces,'opaque_facade_body_ids':opaque_ids,'side_window_groups':window_groups,'window_probes':window_probes,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
     return r

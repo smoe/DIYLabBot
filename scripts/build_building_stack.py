@@ -75,7 +75,7 @@ def z_checks(geometry, contract):
                        'assumed_clear_interval_presentation_mm': gap})
     if contract.get('exterior'):
         ext = contract['exterior']
-        for name in ext['terrain_body_ids']:
+        for name in ext.get('site_body_ids',ext['terrain_body_ids']):
             bb = bodies[name]['bbox']
             checks.append({'id': name+'_Grade', 'passed': abs(bb['max'][2]-ext['grade_z_mm']) < 1e-6 and abs(bb['min'][2]-ext['terrain_bottom_mm']) < 1e-6})
         bb = bodies[ext['frame_body_id']]['bbox']
@@ -536,7 +536,7 @@ def build(args):
             if view == 'overview':
                 commands=[]; view_geometry=geometry
             elif view == 'atrium':
-                hidden=contract['wall_visibility_ids']+contract.get('roof', {}).get('body_ids', [])+contract.get('exterior', {}).get('terrain_body_ids', [])+contract.get('exterior', {}).get('glass_body_ids', [])+contract.get('exterior', {}).get('frame_body_ids', [])
+                hidden=contract['wall_visibility_ids']+contract.get('roof', {}).get('body_ids', [])+contract.get('exterior', {}).get('site_body_ids', [])+contract.get('exterior', {}).get('opaque_facade_body_ids', [])+contract.get('exterior', {}).get('glass_body_ids', [])+contract.get('exterior', {}).get('frame_body_ids', [])
                 commands=[{'command':'browser.visibility','params':{'items':hidden,'visible':False}}]; view_geometry=[body for body in geometry if body['body'] not in set(hidden)]
             else:
                 furniture_room = next((room for room in contract.get('furnishings', {}).get('rooms', []) if room['id'] == view.removesuffix('_EasterEgg')), None)

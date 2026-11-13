@@ -269,6 +269,7 @@ def interfaces(spec, p):
             if probe['id'] in ext['door_leaves']:
                 leaf_probes.append({**copy.deepcopy(probe), 'id': 'LeafClear_'+probe['id'], 'target_body': ext['door_leaves'][probe['id']]})
         data['opening_probes'].extend(leaf_probes)
+        data['opening_probes'].extend(ext.get('window_probes', []))
         data['exterior'] = ext
     return data
 
@@ -312,6 +313,9 @@ def expanded(spec, p):
     if 'exterior' in spec:
         extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in data['levels']}, p, data['levels'])
         omitted = set(extension['interface']['omitted_body_ids'])
+        for body in result['bodies']:
+            if body['id'] in extension['interface'].get('surface_overrides', {}):
+                body['appearance'] = extension['interface']['surface_overrides'][body['id']]
         result['bodies'] = [v for v in result['bodies'] if v['id'] not in omitted]
         result['operations'] = [v for v in result['operations'] if v['body'] not in omitted]
         for key in ('components', 'bodies', 'operations'): result[key].extend(extension[key])

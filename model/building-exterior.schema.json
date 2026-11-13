@@ -25,7 +25,17 @@
     "guard_max_post_spacing_mm",
     "terrain_margin_mm",
     "terrain_clearance_mm",
-    "terrain_color"
+    "terrain_color",
+    "landscape_layer_mm",
+    "concrete_color",
+    "side_cladding_color",
+    "side_window_walls",
+    "side_window_interval",
+    "side_window_height_fractions",
+    "sidewalk_width_mm",
+    "road_width_mm",
+    "sidewalk_color",
+    "road_color"
   ],
   "properties": {
     "status": {
@@ -130,6 +140,66 @@
       "exclusiveMaximum": 10000
     },
     "terrain_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "landscape_layer_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "concrete_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "side_cladding_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "side_window_walls": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+      }
+    },
+    "side_window_interval": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "exclusiveMaximum": 1
+      }
+    },
+    "side_window_height_fractions": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "exclusiveMaximum": 1
+      }
+    },
+    "sidewalk_width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "road_width_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "sidewalk_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "road_color": {
       "type": "string",
       "pattern": "^#[0-9a-fA-F]{6}$"
     }
