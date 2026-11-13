@@ -36,7 +36,7 @@ class ProposalMediaTests(unittest.TestCase):
             self.assertTrue(name.startswith(('model/', 'scripts/')), name)
             self.check_digest(name, digest)
         for name, digest in self.proof['documentation_files_sha256'].items():
-            self.assertIn(name, {'docs/building-stack.md', 'docs/ground-floor-eg.md', 'docs/basement-kg.md', 'docs/building-exterior.md'})
+            self.assertIn(name, {'docs/building-stack.md', 'docs/ground-floor-eg.md', 'docs/basement-kg.md', 'docs/building-exterior.md', 'docs/building-alignment.md'})
             self.check_digest(name, digest)
         self.assertFalse(self.proof['original_photograph_included'])
 

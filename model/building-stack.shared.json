@@ -57,7 +57,7 @@
   "levels": [
     {
       "id": "KG",
-      "label": "Keller (Höhe angenommen)"
+      "label": "Keller (H\u00f6he angenommen)"
     },
     {
       "id": "EG",
@@ -99,7 +99,7 @@
     "fire_safety_qualified": false
   },
   "limitations": [
-    "EG uses a separately registered owner-labelled trace; OG1–OG3 reuse the canonical relative F03 template.",
+    "EG uses a separately registered owner-labelled trace; OG1\u2013OG3 reuse the canonical relative F03 template.",
     "EG literals are manually aligned to referenced vertical cores, not photogrammetric or metric registration.",
     "The XY ratio uses an unmeasured L01 parameter; it is a presentation proportion and does not calibrate F03.",
     "Clear height is an owner assumption; slab thickness and source-referenced wall/door dimensions are presentation assumptions.",
@@ -123,7 +123,7 @@
       "sides": {
         "outward": {
           "wall": "W049",
-          "label": "außen / links zum Flur"
+          "label": "au\u00dfen / links zum Flur"
         },
         "inward": {
           "wall": "W062",
@@ -178,7 +178,7 @@
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
+      "KG\u2013EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
     ],
     "served_extent": {
       "from_level": "KG",
@@ -309,5 +309,131 @@
     "terrain_margin_mm": 4500,
     "terrain_clearance_mm": 200,
     "terrain_color": "#8A735B"
+  },
+  "alignment": {
+    "method": "boundary_arclength_harmonic_displacement",
+    "reference": "roof.opaque_area_ids",
+    "fixed_areas": [
+      "LiftCore",
+      "NorthCore",
+      "R3_028"
+    ],
+    "landmarks": {
+      "KG": [
+        [
+          "K047",
+          "V060"
+        ],
+        [
+          "K065",
+          "V080"
+        ],
+        [
+          "K066",
+          "V077"
+        ],
+        [
+          "K068",
+          "V076"
+        ],
+        [
+          "K071",
+          "V086"
+        ],
+        [
+          "K051",
+          "V061"
+        ],
+        [
+          "K007",
+          "V017"
+        ],
+        [
+          "K003",
+          "V009"
+        ],
+        [
+          "K001",
+          "V028"
+        ],
+        [
+          "K002",
+          "V006"
+        ],
+        [
+          "K006",
+          "V002"
+        ],
+        [
+          "K018",
+          "V024"
+        ]
+      ],
+      "EG": [
+        [
+          "E039",
+          "V060"
+        ],
+        [
+          "E001",
+          "V080"
+        ],
+        [
+          "E003",
+          "V077"
+        ],
+        [
+          "E004",
+          "V076"
+        ],
+        [
+          "E006",
+          "V086"
+        ],
+        [
+          "E034",
+          "V061"
+        ],
+        [
+          "E110",
+          "V017"
+        ],
+        [
+          "E113",
+          "V009"
+        ],
+        [
+          "E118",
+          "V027"
+        ],
+        [
+          "E117",
+          "V029"
+        ],
+        [
+          "E120",
+          "V006"
+        ],
+        [
+          "E128",
+          "V002"
+        ],
+        [
+          "E103",
+          "V024"
+        ]
+      ]
+    },
+    "ground_apron": {
+      "path": [
+        "E003",
+        "E009",
+        "E010",
+        "E011",
+        "E004"
+      ],
+      "facade_wall": "EW074"
+    },
+    "external_ground_support_area": "ExternalStairGround"
   }
 }

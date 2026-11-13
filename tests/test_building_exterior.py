@@ -10,7 +10,10 @@ import building_exterior as exterior
 class ExteriorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.s=model.load();cls.p=model.parameters(cls.s);cls.d=model.interfaces(cls.s,cls.p);cls.e=model.expanded(cls.s,cls.p)
+        cls.s=model.load()
+        # Exercise the exterior recipe independently of optional room demolition.
+        cls.s['sources'].pop('furnishings',None)
+        cls.p=model.parameters(cls.s);cls.d=model.interfaces(cls.s,cls.p);cls.e=model.expanded(cls.s,cls.p)
 
     def test_terrain_uses_eg_grade_and_spans_basement_not_an_extra_storey(self):
         ext=self.d['exterior'];self.assertEqual(ext['grade_z_mm'],0);self.assertEqual(ext['terrain_bottom_mm'],-4500)

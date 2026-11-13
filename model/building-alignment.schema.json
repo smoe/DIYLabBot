@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "building-alignment.schema.json",
+  "title": "Shared presentation envelope with fixed lift and stair cores",
+  "type": "object",
+  "required": [
+    "method",
+    "reference",
+    "fixed_areas",
+    "external_ground_support_area",
+    "ground_apron",
+    "landmarks"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "method": {
+      "const": "boundary_arclength_harmonic_displacement"
+    },
+    "reference": {
+      "const": "roof.opaque_area_ids"
+    },
+    "fixed_areas": {
+      "const": [
+        "LiftCore",
+        "NorthCore",
+        "R3_028"
+      ]
+    },
+    "external_ground_support_area": {
+      "const": "ExternalStairGround"
+    },
+    "ground_apron": {
+      "const": {
+        "path": [
+          "E003",
+          "E009",
+          "E010",
+          "E011",
+          "E004"
+        ],
+        "facade_wall": "EW074"
+      }
+    },
+    "landmarks": {
+      "type": "object",
+      "required": [
+        "KG",
+        "EG"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "KG": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+            }
+          }
+        },
+        "EG": {
+          "type": "array",
+          "minItems": 4,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -15,6 +15,7 @@ import building_circulation as circulation
 import building_roof as roof
 import building_furnishings as furnishings
 import building_exterior as exterior
+import building_alignment as alignment
 import ground_floor_model as ground
 import relative_floorplan as floor
 import robot_spec as robot
@@ -90,7 +91,7 @@ def parameters(spec, overrides=None):
 
 
 def validate(spec):
-    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior'}}
+    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior', 'alignment'}}
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
@@ -177,6 +178,9 @@ def level_plan(spec, level_id):
                         {tuple(plan['vertices'][walls[name][key]]) for key in ('start', 'end')} ==
                         {tuple(canonical['vertices'][ref_walls[name][key]]) for key in ('start', 'end')},
                         'KG lift side differs from the shared port frame')
+        if 'alignment' in raw:
+            selected = [a for a in canonical['areas'] if a['id'] in raw['roof']['opaque_area_ids']]
+            plan = alignment.register(plan, canonical, selected, raw['alignment'], level_id)
         return plan
     require(level_id in {'OG1', 'OG2', 'OG3'}, 'Unknown building level')
     return templates(raw)[0]
@@ -193,7 +197,8 @@ def _bases(spec, p):
         incident = {}
         for area in plan['areas']:
             for ref in area['boundary']: incident.setdefault(ref['wall'], set()).add(area['id'])
-        omitted = {'Area_'+ext_area} | {'Wall_'+name for name, uses in incident.items() if uses == {ext_area}}
+        overlay_areas = {ext_area, 'ExternalLink'}
+        omitted = {'Area_'+name for name in overlay_areas} | {'Wall_'+name for name, uses in incident.items() if uses and uses <= overlay_areas}
         base['bodies'] = [body for body in base['bodies'] if body['id'] not in omitted]
         base['operations'] = [op for op in base['operations'] if op['body'] not in omitted]
         original['opening_probes'] = [probe for probe in original['opening_probes'] if probe['target_body'] not in omitted]
@@ -237,7 +242,7 @@ def interfaces(spec, p):
             'assumed_dimensions': copy.deepcopy(p), 'coordinate_meaning': {'xy': 'presentation_mm', 'z': 'assumed_mm'}, 'metric_scale_known': False,
             'structural_qualified': False, 'transport_implemented': False, 'trajectory_implemented': False, 'hardware_executed': False, 'fire_safety_qualified': False,
             'room_label_policy': 'EG uses the owner-labelled registered ground-floor source; OG labels are level-scoped F03 template references', 'limitations': list(spec['limitations'])}
-    extra = circulation.compile(spec['circulation'], plan, p, levels, ground_plan=bases['EG'][0])
+    extra = circulation.compile(spec['circulation'], plan, p, levels, ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'))
     data['circulation'] = extra['interface']
     data['external_area_overlay'] = {'area': spec['circulation']['external_stair']['area'], 'full_slabs_omitted': True,
         'exclusive_boundary_walls_omitted': True, 'shared_facade_walls_preserved': True, 'source_unchanged': True}
@@ -294,7 +299,7 @@ def expanded(spec, p):
         result['operations'].append({'id': name+'_Profile', 'body': name, 'action': 'create', 'shape': {'kind': 'polygon_prism', 'plane': 'XY', 'points': points, 'offset': offset, 'depth': depth, 'fixed': True}})
     result['components'].append({'id': 'ConceptMarker', 'grounded': True}); marker = data['concept_marker']
     prism(marker['body'], 'ConceptMarker', 'semantic_exchange_marker', marker['points_mm'], marker['offset_mm'], marker['depth_mm'], spec['concept_exchange']['color'], spec['concept_exchange']['opacity'])
-    extra = circulation.compile(spec['circulation'], plan, p, data['levels'], ground_plan=bases['EG'][0])
+    extra = circulation.compile(spec['circulation'], plan, p, data['levels'], ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'))
     roof_geometry = roof.compile(spec['roof'], plan, p, data['levels'])
     for key in ('components', 'bodies', 'operations'):
         result[key].extend(extra[key]); result[key].extend(roof_geometry[key])
@@ -343,6 +348,7 @@ def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
     paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
     if 'furnishings' in spec['sources']: paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
+    if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if '_source' in spec: paths.insert(0, Path(spec['_source']['path']))
     return list(dict.fromkeys(paths))

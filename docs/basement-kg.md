@@ -19,6 +19,11 @@ tatsächliche Treppenform sind im Foto nicht nachgewiesen.
 
 ![Keller aus dem gemeinsamen 3D-Modell](media/building-stack-basement.png)
 
+In der Gebäudekomposition passt die [gemeinsame Hüllenregistrierung](building-alignment.md)
+die äußere Darstellungsgeometrie an die Obergeschosse an. Aufzug und innere
+Treppe bleiben im gemeinsamen Bezug fest; die hier beschriebene Originalquelle
+und ihre relative Nachzeichnung bleiben unverändert.
+
 ## Höhen und Erschließung
 
 EG bleibt bei Z = 0. Der Keller liegt vorläufig einen angenommenen

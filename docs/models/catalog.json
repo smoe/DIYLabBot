@@ -759,7 +759,7 @@
         "kind": "diagram",
         "view": "building_stack"
       },
-      "caption": "Eigene Keller- und EG-Raumquellen, drei Obergeschosse und Glasgewölbe. Fotoabgeleitete Glasfront, holzfarbene Raumtüren und offene Metallgeländer. Gelände auf EG-Höhe ordnet den Keller unterirdisch ein; Maße und Höhen bleiben Annahmen.",
+      "caption": "Eigene Keller- und EG-Raumquellen, drei Obergeschosse und Glasgewölbe. Fotoabgeleitete Glasfront, holzfarbene Raumtüren und offene Metallgeländer. Gelände auf EG-Höhe ordnet den Keller unterirdisch ein; Maße und Höhen bleiben Annahmen. Deckungsgleiche Außenkonturen bei festem Treppen- und Aufzugskern.",
       "documentation": "docs/building-stack.md"
     },
     {

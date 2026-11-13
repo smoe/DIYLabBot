@@ -37,6 +37,11 @@ kleine Techniknischen, genaue Anschläge, Verglasung und Fassadendetails bleiben
 vereinfacht oder ungeklärt. Gezeichnete Nachbarschaft beweist keine Passierbarkeit.
 Die geschossabhängige Aufzugtürregel liegt separat in der Gebäudekomposition.
 
+In der Gebäudekomposition passt die [gemeinsame Hüllenregistrierung](building-alignment.md)
+die äußere Darstellungsgeometrie an die Obergeschosse an. Aufzug und innere
+Treppe bleiben im gemeinsamen Bezug fest; die hier beschriebene Originalquelle
+und ihre relative Nachzeichnung bleiben unverändert.
+
 ## Bilder und Prüfung
 
 Die native [EG-Ansicht](media/building-stack-ground.png) wird aus derselben Quelle

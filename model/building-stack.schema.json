@@ -932,6 +932,9 @@
     },
     "exterior": {
       "$ref": "building-exterior.schema.json"
+    },
+    "alignment": {
+      "$ref": "building-alignment.schema.json"
     }
   }
 }

@@ -87,7 +87,7 @@ def interior_rectangle(polygon, margin):
     raise ValueError('The source footprint cannot fit the declared straight-axis circulation recipe')
 
 
-def compile(source, plan, p, levels, ground_plan=None):
+def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None):
     validate_source(source)
     areas = {a['id']: a for a in plan['areas']}; walls = {w['id']: w for w in plan['walls']}; openings = {o['id']: o for o in plan['openings']}
     if ground_plan is not None:
@@ -245,7 +245,9 @@ def compile(source, plan, p, levels, ground_plan=None):
     if ground_plan is not None:
         ground_areas = {area['id']: area for area in ground_plan['areas']}
         require(ext['ground_area'] in ground_areas and ext['ground_exit_neighbor'] in ground_areas, 'Explicit owner-traced external ground exit and neighbor required')
-        ground_neighbor = [[x*scale, y*scale] for x, y in floor.outline(ground_plan, ground_areas[ext['ground_exit_neighbor']])]
+        support_area = ground_support_area or ext['ground_exit_neighbor']
+        require(support_area in ground_areas, 'Existing external ground support area required')
+        ground_neighbor = [[x*scale, y*scale] for x, y in floor.outline(ground_plan, ground_areas[support_area])]
         bottom_probe = rectangle(entry_x+join*.25, y0+sw*.25, entry_x+join*.75, y0+sw*.5)
         require(all(floor.point_membership(point, ground_neighbor) == 1 for point in bottom_probe), 'The source-anchored external lower support must lie inside the actual EG neighbor floor')
     ext_component = ext['id']; result['components'].append({'id': ext_component, 'grounded': True})
@@ -298,7 +300,7 @@ def compile(source, plan, p, levels, ground_plan=None):
             ('Top', entry_x+join*.25, y1-sw*.75, z1-join*.75, [name, metal_landings[index+1]])]:
             dx = join*.5; dy = sw*.25; height = join*.5; volume = dx*dy*height
             if index == 0 and label == 'Bottom' and ground_plan is not None:
-                targets.append('EG__Area_'+ext['ground_exit_neighbor'])
+                targets.append('EG__Area_'+support_area)
             item = probe(name+'_'+label+'_Connection', rectangle(xx, yy, xx+dx, yy+dy), zz, height, targets, 'filled', {target: volume for target in targets})
             item['system'] = 'external_metal'; connections.append(item)
         ext_connectors.append({'id': name, 'body_id': name, 'from_level': lower['id'], 'to_level': upper['id'], 'z0_mm': z0, 'z1_mm': z1, 'mid_z_mm': mid, 'risers': 2*n, 'run_mm': run, 'lane_width_mm': lane, 'entry_x_mm': entry_x, 'slab_hole_probe_id': None})

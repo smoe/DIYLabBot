@@ -35,7 +35,7 @@ def invented_plan():
 
 class StackTests(unittest.TestCase):
     def setUp(self):
-        self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec['sources'].pop('furnishings', None)
+        self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec.pop('alignment', None); self.spec['sources'].pop('furnishings', None)
         self.spec['presentation_reference']['floorplan_area'] = 'ReferenceRoom'
         self.plan = invented_plan()
         self.ground_plan = copy.deepcopy(self.plan)
@@ -55,12 +55,6 @@ class StackTests(unittest.TestCase):
         self.mock_templates.start(); self.mock_room.start()
         self.mock_circulation.start(); self.addCleanup(self.mock_circulation.stop)
         self.addCleanup(self.mock_templates.stop); self.addCleanup(self.mock_room.stop)
-
-    def test_experimental_alignment_contract_cannot_silently_deform_floorplans(self):
-        spec=copy.deepcopy(self.spec)
-        spec['alignment']={'method':'boundary_arclength_harmonic_displacement'}
-        with self.assertRaisesRegex(ValueError,'building stack'):
-            model.validate(spec)
 
     def test_five_scoped_instances_and_explicit_assumed_dimensions(self):
         model.validate(self.spec); p = model.parameters(self.spec); data = model.interfaces(self.spec, p)
@@ -199,15 +193,27 @@ class StackTests(unittest.TestCase):
 
 
 class RegisteredFloorSourceTests(unittest.TestCase):
-    def test_registered_ground_sources_preserve_their_validated_boundaries(self):
-        spec=json.loads(model.SOURCE.read_text())
+    def test_registered_traces_stay_unchanged_and_alignment_requires_explicit_recipe(self):
+        spec=json.loads(model.SOURCE.read_text());legacy=copy.deepcopy(spec)
+        legacy.pop('alignment',None)
         for level,key in [('EG','ground_floor'),('KG','basement')]:
             with self.subTest(level=level):
-                original=model.ground.load(model.assembly.validate_reference(spec['sources'][key],root=ROOT))
-                actual=model.level_plan(spec,level)
+                path=model.assembly.validate_reference(spec['sources'][key],root=ROOT)
+                original=model.ground.load(path);before=path.read_bytes()
+                actual=model.level_plan(legacy,level)
                 model.floor.validate(actual)
                 for field in ('vertices','walls','areas','openings'):
                     self.assertEqual(actual[field],original[field])
+                composed=model.level_plan(spec,level)
+                model.floor.validate(composed)
+                self.assertEqual(path.read_bytes(),before)
+                self.assertIsNone(composed['calibration'])
+
+    def test_incomplete_alignment_recipe_is_rejected_without_mocking_its_validator(self):
+        spec=json.loads(model.SOURCE.read_text())
+        spec['alignment']={'method':'boundary_arclength_harmonic_displacement'}
+        with self.assertRaisesRegex(ValueError,'envelope registration'):
+            model.validate(spec)
 
 
 if __name__ == '__main__': unittest.main()

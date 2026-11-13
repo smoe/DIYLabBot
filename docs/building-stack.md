@@ -1,5 +1,9 @@
 # Gebäude · Keller, EG, drei Obergeschosse und Dach
 
+Die [geschossübergreifende Hüllenregistrierung](building-alignment.md) bringt
+KG und EG vollständig auf die Außenkontur der Obergeschosse. Aufzug und inneres
+Treppenhaus bleiben dabei im gemeinsamen vertikalen Bezug fest.
+
 Der [Keller](basement-kg.md) verwendet eine eigene registrierte Raumquelle und
 wird unter dem EG mit vorläufig angenommenem Geschossabstand ergänzt.
 Der [fotoabgeleitete Ausbau](building-exterior.md) ergänzt Glasfront, warme
@@ -16,6 +20,14 @@ gedreht und verläuft entlang der gemeinsamen X-Achse.
 Die Fotos bleiben privat. Veröffentlicht werden ausschließlich die freigegebenen
 Vektorableitungen und daraus erzeugte Modellansichten. Horizontale Maße,
 Glaswölbung, Dachdetails und technische Bauteile bleiben Konzeptannahmen.
+
+## Aktueller Hüllenstand
+
+`building-stack-4b47ee12d5a4-r2`: 1.477 geschlossene Körper. 388 Geometrieproben und 14 Höhenprüfungen je Backend.
+Alle 1.477 zusätzlichen STEP-Vergleiche bestehen.
+KG und EG besitzen dieselbe Außenkontur wie OG1–OG3; Aufzug und inneres
+Treppenhaus bleiben unverändert im gemeinsamen XY-Bezug. Details und
+Prüfgrenzen stehen in [der Hüllenregistrierung](building-alignment.md).
 
 ## Ansichten für den Antrag
 
@@ -182,7 +194,7 @@ zum zusätzlichen Vergleich. Native Dateien, vollständige Berichte und
 Arbeitsrenderings bleiben lokal unter `cad/`, `exports/` und `renders/`;
 ausgewählte Dokumentationsbilder sind versioniert.
 
-Aktueller Foto-Prüfstand `building-stack-efe22ae793b6-r2`: 1.048 gültige
+Historischer Foto-Prüfstand vor der Hüllenregistrierung `building-stack-efe22ae793b6-r2`: 1.048 gültige
 geschlossene Körper, 390 Geometrieproben und 14 Höhenprüfungen je Backend.
 Alle 1.048 zusätzlichen STEP-Vergleiche ergeben 0 Volumendifferenz.
 Die [Fotoableitung](building-exterior.md) dokumentiert Glasfront, Türfarbe,
