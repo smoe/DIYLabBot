@@ -1,0 +1,36 @@
+// Record native-compatible WebGL commands for an offscreen OpenGL replay.
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const html=fs.readFileSync(process.argv[2],'utf8'),commands=[];let serial=0;
+const constants={VERTEX_SHADER:35633,FRAGMENT_SHADER:35632,COMPILE_STATUS:35713,LINK_STATUS:35714,ARRAY_BUFFER:34962,ELEMENT_ARRAY_BUFFER:34963,STATIC_DRAW:35044,DYNAMIC_DRAW:35048,SHORT:5122,UNSIGNED_INT:5125,TRIANGLES:4,LINES:1,LINE_LOOP:2,LINE_STRIP:3,DEPTH_TEST:2929,BLEND:3042,SRC_ALPHA:770,ONE_MINUS_SRC_ALPHA:771,COLOR_BUFFER_BIT:16384,DEPTH_BUFFER_BIT:256,TEXTURE_2D_ARRAY:35866,DEPTH_COMPONENT24:33190,TEXTURE_MIN_FILTER:10241,TEXTURE_MAG_FILTER:10240,NEAREST:9728,TEXTURE_WRAP_S:10242,TEXTURE_WRAP_T:10243,CLAMP_TO_EDGE:33071,FRAMEBUFFER:36160,DEPTH_ATTACHMENT:36096,NONE:0,FRAMEBUFFER_COMPLETE:36053,READ_FRAMEBUFFER:36008,DRAW_FRAMEBUFFER:36009,MAX_TEXTURE_SIZE:3379,POLYGON_OFFSET_FILL:32823,TEXTURE0:33984};
+function arg(v){if(ArrayBuffer.isView(v))return{typed:v.constructor.name,data:[...v]};if(Array.isArray(v))return v.map(arg);return v}
+const gl=new Proxy(constants,{get(target,key){if(key in target)return target[key];return(...args)=>{let result;
+ if(key.startsWith('create'))result={resource:key.slice(6).toLowerCase(),id:++serial};
+ else if(key==='getUniformLocation')result={resource:'uniform',id:++serial};
+ else if(key==='getAttribLocation')result=0;
+ else if(key==='getShaderParameter'||key==='getProgramParameter')result=true;
+ else if(key==='checkFramebufferStatus')result=constants.FRAMEBUFFER_COMPLETE;
+ else if(key==='getParameter')result=4096;
+ commands.push({name:key,args:args.map(arg),result});return result}}});
+function element(dataset={}){return{dataset,style:{},value:'',checked:false,events:{},hidden:false,replaceChildren(...children){this.children=children},setAttribute(k,v){this[k]=v},addEventListener(k,cb){this.events[k]=cb}}}
+const fields=Object.fromEntries(['demo','benches','play','confirm','occupied','speed','view','seek','clock','status','error','light','daylight','time-of-day','wall-clock','artificial','traffic','traffic-status'].map(k=>['#tr01-'+k,element()]));fields['#tr01-light'].value='november';fields['#tr01-speed'].value='30';fields['#tr01-view'].value='3d';
+const labels=['DNA','CF01','QC','TS01'].map(station=>element({station})),parks=['DNA','CF01','QC','TS01'].map(park=>element({park}));const canvas=Object.assign(element(),{clientWidth:800,clientHeight:640,getContext:k=>k==='webgl2'?gl:null}),root=Object.assign(element(),{querySelector:k=>k==='canvas'?canvas:fields[k],querySelectorAll:k=>k==='[data-station]'?labels:k==='[data-vehicle]'?['TR01','TR02','TR03'].map(vehicle=>element({vehicle})):parks,appendChild(){}});
+const encoded=html.match(/id="tr01-workcell-data">([\s\S]*?)<\/script>/)[1],document={documentElement:{},getElementById:k=>k==='tr01-workcell-playback'?root:k==='tr01-workcell-data'?{textContent:encoded}:fields['#'+k],createElement:()=>element()};
+function css(element){const s=element.style.color;let c=s==='var(--background)'?[248,248,248]:s==='var(--foreground)'?[24,24,24]:s?.includes('series-1')?[50,125,180]:s?.includes('series-2')?[135,105,165]:s?.includes('series-3')?[40,150,95]:s?.includes('series-4')?[190,115,30]:[110,120,128];return{color:'rgb('+c.join(',')+')'}}
+const sandbox={document,window:{openai:{setWidgetState:()=>Promise.resolve()},addEventListener(){}},console,atob,Blob,Response,DecompressionStream,TextDecoder,Uint8Array,Int16Array,Int32Array,Uint32Array,DataView,Float32Array,Math,JSON,Promise,devicePixelRatio:1,ResizeObserver:class{observe(){}},MutationObserver:class{observe(){}},getComputedStyle:css,requestAnimationFrame:()=>1,cancelAnimationFrame(){}};
+(async()=>{await vm.runInNewContext(html.match(/<script>([\s\S]*?)<\/script>/)[1],sandbox);assert.equal(root.dataset.ready,'true',fields['#tr01-error'].textContent);assert(root.tr01.shadowFrames>0);
+ const p=root.tr01.phases.find(p=>p.loaded&&p.station==='DNA');root.tr01.jump(p.start+p.duration*.45);commands.push({name:'capture',args:['daylight-november-3d.png']});
+ fields['#tr01-view'].value='top';fields['#tr01-view'].events.change();commands.push({name:'capture',args:['daylight-november-top.png']});
+ fields['#tr01-light'].value='summer';fields['#tr01-light'].events.change();commands.push({name:'capture',args:['daylight-summer-top.png']});assert.equal(root.tr01.daylightScenario,'summer');
+ const solarSamples=[];
+ for(const minute of [0,7,360,480,720,960,1234,1320,1440]){const motion=root.tr01.time,benches=JSON.stringify(root.tr01.benchStates);fields['#tr01-time-of-day'].value=String(minute);fields['#tr01-time-of-day'].events.input();const s=root.tr01.lightState;solarSamples.push({minute,scenario:root.tr01.daylightScenario,azimuth:s.azimuth_deg,altitude:s.altitude_deg});assert.equal(root.tr01.time,motion);assert.equal(JSON.stringify(root.tr01.benchStates),benches);if([480,960,1320].includes(minute))commands.push({name:'capture',args:['daylight-time-'+minute+'.png']})}
+ fields['#tr01-time-of-day'].value='0';fields['#tr01-time-of-day'].events.input();assert.equal(root.tr01.lightState.artificial_factor,1);assert.equal(root.tr01.lightState.sky_factor,0);
+ commands.push({name:'capture',args:['night-artificial-on.png']});fields['#tr01-artificial'].value='off';fields['#tr01-artificial'].events.change();assert.equal(root.tr01.lightState.artificial_factor,0);commands.push({name:'capture',args:['night-artificial-off.png']});
+ fields['#tr01-artificial'].value='on';fields['#tr01-artificial'].events.change();assert.equal(root.tr01.lightState.artificial_factor,1);
+ fs.writeFileSync('exports/tr01-workcell/time-solar-samples.json',JSON.stringify(solarSamples));
+ const before=root.tr01.shadowFrames;root.tr01.jump(p.start+p.duration*.65);assert(root.tr01.shadowFrames>before);
+ fields['#tr01-light'].value='november';fields['#tr01-light'].events.change();fields['#tr01-artificial'].value='auto';fields['#tr01-artificial'].events.change();fields['#tr01-traffic'].events.click();assert(root.tr01.trafficActive);assert.equal(root.tr01.trafficState.poses.length,3);
+ fields['#tr01-seek'].value='13';fields['#tr01-seek'].events.input();commands.push({name:'capture',args:['three-transporters-head-on.png']});
+ fields['#tr01-seek'].value='30';fields['#tr01-seek'].events.input();assert.equal(root.tr01.trafficTime,30);assert(fields['#tr01-benches'].textContent.includes('GESPERRT'));assert(fields['#tr01-occupied'].disabled);assert(fields['#tr01-traffic-status'].textContent.includes('TR03'));commands.push({name:'capture',args:['three-transporters-3d.png']});fields['#tr01-view'].value='top';fields['#tr01-view'].events.change();commands.push({name:'capture',args:['three-transporters-top.png']});
+ fields['#tr01-seek'].value='150';fields['#tr01-seek'].events.input();commands.push({name:'capture',args:['three-transporters-resumed.png']});
+ fs.writeFileSync('exports/tr01-workcell/daylight-gl-commands.json',JSON.stringify({width:800,height:640,fragment_sha256:require('crypto').createHash('sha256').update(html).digest('hex'),commands}));console.log(JSON.stringify({commands:commands.length,shadowFrames:root.tr01.shadowFrames,scenarioSwitch:true}))
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -185,7 +185,7 @@ class CirculationTests(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError): model.compile(source, self.plan, self.p, self.levels)
 
     def test_stack_integration_preserves_source_floor_ids_and_separates_blue_marker(self):
-        spec = json.loads(stack.SOURCE.read_text()); spec.pop('exterior', None); spec['circulation'] = copy.deepcopy(self.source); spec['presentation_reference']['floorplan_area'] = 'Reference'
+        spec = json.loads(stack.SOURCE.read_text()); spec.pop('exterior', None); spec['sources'].pop('furnishings', None); spec['circulation'] = copy.deepcopy(self.source); spec['presentation_reference']['floorplan_area'] = 'Reference'
         reference = {'parameters': {name: {'expression': value, 'unit': 'mm'} for name, value in [('room_width', 2000), ('wall_t', 200), ('door_height', 2100)]}}
         ground = copy.deepcopy(self.plan)
         next(a for a in ground['areas'] if a['id'] == 'WestWell')['id'] = 'GroundSupport'

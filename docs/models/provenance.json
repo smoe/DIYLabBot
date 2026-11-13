@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
-  "prepared_on": "2026-11-13",
-  "catalog_sha256": "08887adb121e7f5357e0e1fa4484f6665eca9c54e9b4f99b4fc79349b0ba1c14",
+  "prepared_on": "2026-11-11",
+  "catalog_sha256": "f549d778fa9aaaa3844023216f977d6dd649609a7a6de770171540329fa884f9",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "4616c1a404ff4b8d62388dc113e30fc32ef4488bca126c2def2752614f2bbd38",
+  "render_generator_sha256": "d2ad3397a33a3aa802521d48476752e9f14fe75989ed295e85574f3b03cd7edf",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -2271,11 +2271,11 @@
       "id": "l01-overview",
       "image": "images/l01-overview.png",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
         "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-layout-l01/shared-build-report.json",
-      "build_report_sha256": "91f084cf53d3f3639ea72db5fec6fb07a68a03dd93f7bf412608eda577c25f33",
+      "build_report_sha256": "f8f8eb5a01eab7455c67957da7d79130defae0b3b005cfa746eda5dc4ef27532",
       "build_passed": true,
       "representation": "Native L01 assembly overview with source-referenced equipment; static and sampled device-access checks, no operational robot program",
       "camera": {
@@ -2289,37 +2289,37 @@
         "distance": 18000,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-layout-l01-f57c842095bd/LabLayout_L01.sc",
-      "native_model_sha256": "c9dfea933ae3c90992694b4ad2c4e58f9599e427fd84ef91a088177eafe8e365",
+      "native_model": "cad/generated/lab-layout-l01-040c5407d04c/LabLayout_L01.sc",
+      "native_model_sha256": "170b02973ff97d8a73ece63782fe68b2db645108147de98d643b221f1604a5eb",
       "renderer_result": {
-        "bytes": 251004,
-        "height": 595,
+        "bytes": 215964,
+        "height": 525,
         "path": "docs/models/images/l01-overview.png",
         "renderer": "cpu",
         "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
-        "width": 850
+        "width": 750
       },
       "commands": [],
       "command_line": [
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-layout-l01-f57c842095bd/LabLayout_L01.sc",
+        "cad/generated/lab-layout-l01-040c5407d04c/LabLayout_L01.sc",
         "--out",
         "docs/models/images/l01-overview.png",
         "--width",
-        "850",
+        "750",
         "--height",
-        "595",
+        "525",
         "--camera",
         "{\"target\": [3300.0, 3400.0, 800], \"yaw\": 0.45, \"pitch\": 1.05, \"distance\": 18000, \"fov\": 0.6}",
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "1d298cc742353a73deaac2e570f884b9134717c0d4d507ad738c2c3876901fae",
-      "bytes": 251004,
+      "image_sha256": "09f3c0b38ce2812a5eb8daced77a10559faff3374c3cc92c45d5d6cd79b5cc17",
+      "bytes": 215964,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
         "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
@@ -2350,21 +2350,33 @@
         "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
         "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
-        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+      },
+      "visual_review": {
+        "passed": true,
+        "scope": "Native full scene and planning envelope, or projected exported routes inspected; complete frame and readable station labels; geometry proof remains separate"
       }
     },
     {
       "id": "l01-equipment",
       "image": "images/l01-equipment.svg",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9"
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
+        "model/tr01-l01.motion.json": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
       },
       "representation": "Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render",
-      "instances": 14,
-      "image_sha256": "b63e142d5e9f8f1ec7d7961651a65955fd62475b01f41821fc4e85a3a9eab94d",
-      "bytes": 12193,
+      "instances": 17,
+      "motion_report": "cad/tr01-l01/shared-build-report.json",
+      "motion_report_sha256": "f6fdff1435f13bff59a5cb1748caff789b83a09021ba51d916960332aef4d3cf",
+      "motion_program_sha256": "c3b8394243600e28a8b4f865593b9d6a75974c9908e480c097c02aeede0ce354",
+      "route_display": "Projected exported C2 pose curves and source parking reference points; diagram is not the clearance proof",
+      "image_sha256": "a87b0fd293874a8b6c89f853424577b61fdd5200563f07b663d80245238e9853",
+      "bytes": 22485,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "f57c842095bdaa972139d2fcc7095c6482c33749a61e10ebc9a06a40171647e9",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
         "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
@@ -2395,7 +2407,11 @@
         "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
         "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
         "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
-        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+        "model/tr01-l01.motion.json": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
       }
     },
     {
@@ -2409,13 +2425,13 @@
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
       },
       "build_report": "cad/synthetic-lab-scene/shared-build-report.json",
-      "build_report_sha256": "5b10f90ed9e615bfe8ab1e223ad9b94ab3423209c17a0373bc1ab5f6c6c2e850",
+      "build_report_sha256": "0963e9bb2bd0afb763adf165ac261d84020d2f8f77af5d58bede708d0011ce13",
       "build_passed": true,
       "phase": "Grasp",
       "representation": "Native source-referenced five-device scene on the unchanged reference bench",
-      "native_model": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r4/SyntheticLab_Grasp.sc",
-      "native_model_sha256": "c0cbeeda520f186e0cfa7f80ac01723c5617e32039b389a3982a66f100c4e930",
-      "reused_render": "renders/synthetic-lab-scene-a3853d4f9bf1-r4/overview.png",
+      "native_model": "cad/generated/synthetic-lab-scene-a3853d4f9bf1-r6/SyntheticLab_Grasp.sc",
+      "native_model_sha256": "c01b9b20ef4d12b0d0038df9e1a2426c64c3bd1b9bd87e8fe4715da8712d5303",
+      "reused_render": "renders/synthetic-lab-scene-a3853d4f9bf1-r6/overview.png",
       "reused_render_sha256": "4571b89038f6d21f081cfd56c9272e97dfecf4b3149634f8a21af6d2aba1a28c",
       "image_sha256": "4571b89038f6d21f081cfd56c9272e97dfecf4b3149634f8a21af6d2aba1a28c",
       "bytes": 386502,
@@ -4422,6 +4438,51 @@
       }
     },
     {
+      "id": "kit-storage-s01",
+      "image": "images/kit-storage-s01.svg",
+      "source_files_sha256": {
+        "model/kit-storage-s01.shared.json": "62cc073c35c01bb5c09e377f7c953451b05f54a21962938faa542b0b05d87e9e",
+        "model/furnishings/kit-storage-s01.json": "c327ad184a3bb07cdc8b61ce84dd96e1cb6f7cb472e756f99f26f806824baaf8"
+      },
+      "representation": "Source-derived alternative static S01 state plan; not a CAD render, trajectory or real inventory",
+      "producer_files_sha256": {
+        "model/kit-storage-s01.schema.json": "512fd365c1070abd98152258cb36711eb3e99644fbfd124d26469223ecc0e525",
+        "scripts/kit_storage_model.py": "ced39d72c83a4ff398154c1817f43e9b1bcaa812dc7c087173b12b14ceb7b898",
+        "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+        "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+        "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
+        "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+        "model/extraction-kit-station.schema.json": "b795d31f6d92443a35404a55e7d0f5b150048cba0c517d87f30027ed0a416ebc",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69"
+      },
+      "carrier_id": "S01.Carrier01",
+      "static_cases": [
+        "shelf",
+        "handover"
+      ],
+      "real_inventory_managed": false,
+      "transport_trajectory_implemented": false,
+      "image_sha256": "0a5b3ae4a7523afd7625baaeeca3111a23cbe395e998efc614d126f51e53d7f9",
+      "bytes": 2572,
+      "dependency_files_sha256": {
+        "model/kit-storage-s01.shared.json": "62cc073c35c01bb5c09e377f7c953451b05f54a21962938faa542b0b05d87e9e",
+        "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+        "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+        "model/furnishings/kit-storage-s01.json": "c327ad184a3bb07cdc8b61ce84dd96e1cb6f7cb472e756f99f26f806824baaf8",
+        "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3",
+        "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1"
+      },
+      "visual_review": {
+        "passed": true,
+        "reviewed_on": "2026-11-11",
+        "scope": "Two alternative source-derived states show the same carrier ID, one occupied place per state, explicit symbolic-contents and no-trajectory limits; not a native CAD view."
+      }
+    },
+    {
       "id": "floor-f03",
       "image": "images/floor-f03.svg",
       "source_files_sha256": {
@@ -4449,43 +4510,50 @@
       }
     },
     {
-      "id": "building-stack",
-      "image": "images/building-stack.svg",
+      "id": "tapestation",
+      "image": "images/tapestation.png",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "efe22ae793b6099a2d75a27b631e280247fa57967c2bb6f435623e6b009bce4a",
-        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
       },
-      "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
-      "producer_files_sha256": {
-        "scripts/render_building_stack_section.py": "e7cf89cb414d292d754dff5ff94f0ddd966a8e23f0df68b2c7a327d1c45f18a1",
-        "model/building-stack.schema.json": "9a97ae644d13b8e8d1bab3d0a2196b3496961f221e33d8af8aab12ddce8e8d54",
-        "scripts/building_stack.py": "50676d2bfdfc3e4643d76a0ddfa95e1b1b0e9f7aaf53ccc45dc6af1bf8733b6e",
-        "scripts/building_circulation.py": "067b5a4ba3ada15eefcc7eac9970fba09787a4c2a4d72462b6d3800771016f10",
-        "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
-        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
-        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
-        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
-        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
-        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
-        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
-        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
-        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
-        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
-        "scripts/building_exterior.py": "4fca95bca76173d3ef8fab3a931a04122a95c9f25567c9777bd50a486f010cd4",
-        "model/building-exterior.schema.json": "617476fc6fa6d26fe399006d29ec3ec61ed03f128ae342f8b780ba0d31598071"
+      "build_report": "cad/tapestation/shared-build-report.json",
+      "build_report_sha256": "b72c9aeb51a0a73a7555ad3d8a55c29eade748bf62c5eed56ca32c279bf55023",
+      "build_passed": true,
+      "representation": "Static 4200 planning envelope on a dedicated synthetic bench; no manufacturer geometry, robot loading or measurement",
+      "native_model": "cad/generated/tapestation-50c933005136-1794492737398941000/TS01.sc",
+      "native_model_sha256": "40bb9bc6b1ed4857a59040637e8489cef34fbf592adb77470f0728823c3be076",
+      "renderer_result": {
+        "bytes": 14142,
+        "height": 225,
+        "path": "docs/models/images/tapestation.png",
+        "renderer": "cpu",
+        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "width": 300
       },
-      "metric_scale_known": false,
-      "original_image_embedded": false,
-      "transport_implemented": false,
-      "hardware_executed": false,
-      "image_sha256": "11682ab95ce16f8a999a29b150855a56fe4bf95653d04f2115a85ca08ec95dd1",
-      "bytes": 10546,
+      "commands": [],
+      "command_line": [
+        "solidcraft-cli",
+        "snapshot",
+        "--in",
+        "cad/generated/tapestation-50c933005136-1794492737398941000/TS01.sc",
+        "--out",
+        "docs/models/images/tapestation.png",
+        "--width",
+        "300",
+        "--height",
+        "225",
+        "--view",
+        "iso",
+        "--no-grid",
+        "--no-axes"
+      ],
+      "image_sha256": "0d80e430e798fde1d7a1e38e9c16d8e2683ab6f825b24f31473438bc18a4350e",
+      "bytes": 14142,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "efe22ae793b6099a2d75a27b631e280247fa57967c2bb6f435623e6b009bce4a",
-        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
-        "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
-        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+      },
+      "visual_review": {
+        "passed": true,
+        "scope": "Native full scene and planning envelope, or projected exported routes inspected; complete frame and readable station labels; geometry proof remains separate"
       }
     },
     {
@@ -4515,16 +4583,82 @@
         "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
       }
+    },
+    {
+      "id": "building-stack",
+      "image": "images/building-stack.svg",
+      "source_files_sha256": {
+        "model/building-stack.shared.json": "fd183c46fea676eb0e75d4737311686ee7cf64764e4b2bfd0c16fd457628b78c",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+      },
+      "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
+      "producer_files_sha256": {
+        "scripts/render_building_stack_section.py": "e7cf89cb414d292d754dff5ff94f0ddd966a8e23f0df68b2c7a327d1c45f18a1",
+        "model/building-stack.schema.json": "5fcd2bd9b0e85021f83fa241e6411be88b9937a63065b536b24340a6bc959f99",
+        "scripts/building_stack.py": "a8fe1e9276371ffcacc113f3f5036e3a5daaf5a8690e0d8a8302c451a125c30c",
+        "scripts/building_circulation.py": "067b5a4ba3ada15eefcc7eac9970fba09787a4c2a4d72462b6d3800771016f10",
+        "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+        "model/building-furnishings.schema.json": "5a6025742b0b1106d50c6661e384ac89dd0fc9c5b57de2ea44451ea8ed0ad24a",
+        "model/social-furniture-catalog.schema.json": "020eb4c95dcf9b49cc951739552eb3ac6a17691bdfd94818dfaa41d2b183d6ce",
+        "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
+        "scripts/building_exterior.py": "4fca95bca76173d3ef8fab3a931a04122a95c9f25567c9777bd50a486f010cd4",
+        "model/building-exterior.schema.json": "617476fc6fa6d26fe399006d29ec3ec61ed03f128ae342f8b780ba0d31598071"
+      },
+      "metric_scale_known": false,
+      "original_image_embedded": false,
+      "transport_implemented": false,
+      "hardware_executed": false,
+      "image_sha256": "11682ab95ce16f8a999a29b150855a56fe4bf95653d04f2115a85ca08ec95dd1",
+      "bytes": 10546,
+      "dependency_files_sha256": {
+        "model/building-stack.shared.json": "fd183c46fea676eb0e75d4737311686ee7cf64764e4b2bfd0c16fd457628b78c",
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+        "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
+        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+      }
+    },
+    {
+      "id": "building-social",
+      "image": "images/building-social.svg",
+      "source_files_sha256": {
+        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
+        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+      },
+      "representation": "Source-derived local kitchen furnishing plan and assumed office desk counts; not calibrated building geometry",
+      "original_image_embedded": false,
+      "producer_files_sha256": {
+        "scripts/render_model_gallery.py": "d2ad3397a33a3aa802521d48476752e9f14fe75989ed295e85574f3b03cd7edf"
+      },
+      "image_sha256": "9fe15acbcad77e232b65159449f2719b9eb80b7fc290ba9eee85b92a98e4f348",
+      "bytes": 1953,
+      "dependency_files_sha256": {
+        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
+        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+      }
     }
   ],
   "visual_review": {
     "passed": true,
     "reviewed_on": "2026-11-12",
-    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the source-derived F03 and EG vectors and the four-storey building views with one internal right staircase, independent lift, separate external metal staircase, and X-axis glass roof over Atrium and all four corridors; original photographs are excluded and metric, operational and safety qualification remain open.",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the S01 source-derived state plan; separate static poses do not establish robot motion or real inventory. Reviewed the derived F03 vector plan with all area labels and explicit uncertainties; the private original photograph is excluded. Reviewed the source-derived four-storey section: four levels, closed ground atrium, open upper floors, height assumptions and conceptual exchange arrows are legible; no original image or transport qualification. Reviewed updated building section with owner-confirmed lift door policy; separate native views show both continuous stair cores and one cabin. No building access or safety qualification. Reviewed EG vectors, one internal stair, independent lift, separate external metal stair and crowned glass roof with explicit unqualified dimensions. Original photographs remain excluded. Reviewed the rotated X-axis glass roof over the source-contoured atrium and all four corridors, its updated Y/Z principle diagram and explicit unqualified approximation. Original photographs remain excluded.",
     "k01_reviewed": true,
+    "s01_state_plan_reviewed": true,
     "floor_f03_reviewed": true,
     "building_stack_reviewed": true,
-    "ground_floor_eg_reviewed": true
+    "building_stack_circulation_reviewed": true,
+    "building_correction_reviewed": true
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

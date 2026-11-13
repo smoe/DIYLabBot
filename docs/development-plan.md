@@ -423,3 +423,21 @@ weitere Arme sind gesonderte Ausbaustufen.
 - [Eppendorf, Pipettieren kleiner Volumina](https://www.eppendorf.com/jp-ja/lab-academy/topics-methods-technology/pipetting-dispensing/how-to-pipette-small-volumes-with-handheld-manual-pipettes/)
 
 Diese Referenzen ersetzen keine Auswahl- oder Leistungsprüfung des eigenen Aufbaus.
+
+## TR01-Stationsübergaben und TapeStation (12. November 2026)
+
+Der [synthetische Aufgabenrunner](lab-station-transport.md) verbindet
+DNA-Vorbereitung, CF01, gemeinsame NanoDrop-/Qubit-Analytik und TS01 mit TR01.
+Journal, Identitätserhaltung und Wiederaufnahme mit Abgleich bleiben vom
+geometrischen Fahrprogramm getrennt. Dessen Parkpunkte und fließende,
+nativ mit Intervallhüllen geprüfte L01-Fahrkurven sind jetzt implementiert.
+Offen bleiben kalibrierte Docks, reales Fahrwerk/Navigation, dynamische
+Hindernisse und Arm-/Personenübergaben einschließlich tatsächlicher Rückmeldung.
+
+[TapeStation TS01](tapestation.md) steht als manuelle Planungshülle mit PC auf
+der linken Mittelbank in L01. NanoDrop und Qubit sind am rechten Armpaar
+geometrisch ergänzt. Bestehende Geräte und Möbel behalten ihre Positionen.
+Vor realer Installation bleiben Modellwahl und gemessene Platzprüfung nötig.
+Für einen späteren Assistenzworkflow vorhandene manuelle Aufgaben und den
+gemeinsamen Material-Ledger um Assay-/Lane-Zuordnung und Originalexport
+verwenden; der Messablauf selbst ist weiterhin ein Entwurf.

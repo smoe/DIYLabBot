@@ -169,3 +169,11 @@ die projektweite Vorgabe fließender Bahnen erfüllen.
 Als Nächstes sind die unklaren Grenzen und Türzuordnungen zu bestätigen und
 ein oder mehrere definierte Referenzmaße aufzunehmen. Erst anschließend kann
 eine belegte metrische Registrierung von L01 und weiteren Aufstellungen folgen.
+
+## Bestätigter Fensterbezug von 3.003
+
+Der geografische Fensterbezug ist jetzt separat als **Nordwest** festgehalten;
+[Abgleich und Ableitung](l01-orientation.md) unterscheiden den Gebäudepunkt,
+die Eigentümerbestätigung und den nominalen Azimut von einer Vermessung.
+Die bestehende relative Zeichnungsgeometrie und `calibration: null` bleiben
+unverändert. Insbesondere ist Zeichnung-oben weiterhin nicht geografisch Nord.

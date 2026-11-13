@@ -1,0 +1,346 @@
+{
+  "format": "solidcraftbot.tr01-workcell/1",
+  "id": "L01.TR01.Handoffs",
+  "mode": "synthetic_only",
+  "units": {
+    "length": "mm",
+    "angle": "rad",
+    "time": "s"
+  },
+  "layout": {
+    "source": "model/lab-layout-l01.shared.json",
+    "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+  },
+  "floor_motion": {
+    "source": "model/tr01-l01.motion.json",
+    "source_sha256": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+  },
+  "arm_source": {
+    "source": "model/robot.json",
+    "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+  },
+  "tool_reference": {
+    "source": "model/centrifuge-cf01.robot-pickup.shared.json",
+    "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
+  },
+  "limits_reference": {
+    "source": "model/cf01-unload-demo.motion.json",
+    "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+  },
+  "cargo_slot_body": "B1_Tube24",
+  "actors": {
+    "ArmDNA": {
+      "source_instance": null,
+      "xyz_mm": [
+        2665,
+        2600,
+        965
+      ],
+      "yaw_deg": 20,
+      "park_tcp_mm": [
+        2800,
+        2600,
+        1150
+      ]
+    },
+    "ArmC": {
+      "source_instance": "ArmC",
+      "xyz_mm": null,
+      "yaw_deg": null,
+      "park_tcp_mm": [
+        850,
+        5600,
+        1180
+      ]
+    },
+    "ArmA": {
+      "source_instance": "ArmA",
+      "xyz_mm": [
+        3920,
+        3070,
+        965
+      ],
+      "yaw_deg": 70,
+      "park_tcp_mm": [
+        4050,
+        3150,
+        1150
+      ]
+    }
+  },
+  "additional_racks": [
+    {
+      "id": "CFHandoffRack",
+      "source_instance": "RackCF",
+      "xyz_mm": [
+        600,
+        5720,
+        900
+      ]
+    },
+    {
+      "id": "TSHandoffRack",
+      "source_instance": "RackManual",
+      "xyz_mm": [
+        2800,
+        2850,
+        900
+      ]
+    }
+  ],
+  "work_areas": {
+    "LeftIsland": {
+      "stations": [
+        "DNA",
+        "TS01"
+      ],
+      "bounds_xy_mm": [
+        2000,
+        3300,
+        2300,
+        3900
+      ]
+    },
+    "CF01": {
+      "stations": [
+        "CF01"
+      ],
+      "bounds_xy_mm": [
+        0,
+        1250,
+        4750,
+        5800
+      ]
+    },
+    "QC": {
+      "stations": [
+        "QC"
+      ],
+      "bounds_xy_mm": [
+        3300,
+        4600,
+        2700,
+        4200
+      ]
+    }
+  },
+  "stations": {
+    "DNA": {
+      "work_area": "LeftIsland",
+      "actor": "ArmDNA",
+      "dock_pose_mm_rad": [
+        2320,
+        2664,
+        -1.5707963267948966
+      ],
+      "approach_via_xy_mm": [
+        [
+          1625,
+          3000
+        ],
+        [
+          2320,
+          3000
+        ]
+      ],
+      "approach_reverse": false,
+      "rack_instance": "RackManual",
+      "rack_place_body": "Tube01",
+      "clearance_tcp_mm": [
+        [
+          2805,
+          2673,
+          1100
+        ],
+        [
+          2600,
+          2673,
+          1100
+        ],
+        [
+          2347,
+          2697,
+          1100
+        ]
+      ],
+      "tool_roll_deg": -220
+    },
+    "CF01": {
+      "work_area": "CF01",
+      "actor": "ArmC",
+      "dock_pose_mm_rad": [
+        930,
+        5450,
+        1.5707963267948966
+      ],
+      "approach_via_xy_mm": [
+        [
+          1625,
+          5000
+        ],
+        [
+          930,
+          5000
+        ]
+      ],
+      "approach_reverse": false,
+      "rack_instance": "CFHandoffRack",
+      "rack_place_body": "Tube01",
+      "clearance_tcp_mm": [
+        [
+          555,
+          5693,
+          1080
+        ],
+        [
+          850,
+          5693,
+          1080
+        ],
+        [
+          903,
+          5500,
+          1060
+        ],
+        [
+          903,
+          5417,
+          1040
+        ]
+      ],
+      "tool_roll_deg": -140,
+      "empty_bench_via_tcp_mm": [
+        [
+          800,
+          5760,
+          1120
+        ]
+      ]
+    },
+    "QC": {
+      "work_area": "QC",
+      "actor": "ArmA",
+      "dock_pose_mm_rad": [
+        4290,
+        3070,
+        1.5707963267948966
+      ],
+      "approach_via_xy_mm": [
+        [
+          4975,
+          2800
+        ],
+        [
+          4290,
+          2800
+        ]
+      ],
+      "approach_reverse": false,
+      "rack_instance": "RackPair",
+      "rack_place_body": "Tube01",
+      "clearance_tcp_mm": [
+        [
+          3855,
+          3373,
+          1080
+        ],
+        [
+          4140,
+          3300,
+          1080
+        ],
+        [
+          4263,
+          3037,
+          1040
+        ]
+      ],
+      "tool_roll_deg": -140
+    },
+    "TS01": {
+      "work_area": "LeftIsland",
+      "actor": "human",
+      "dock_pose_mm_rad": [
+        2320,
+        3250,
+        -1.5707963267948966
+      ],
+      "approach_via_xy_mm": [
+        [
+          1625,
+          3550
+        ],
+        [
+          2320,
+          3550
+        ]
+      ],
+      "approach_reverse": false,
+      "rack_instance": "TSHandoffRack",
+      "rack_place_body": "Tube01",
+      "manual_carry_via_mm": [
+        [
+          2347,
+          3283,
+          1080
+        ],
+        [
+          2420,
+          2800,
+          1080
+        ],
+        [
+          2755,
+          2823,
+          1050
+        ]
+      ]
+    }
+  },
+  "cover_handling": {
+    "mode": "explicit_manual_confirmation",
+    "before_robot": "cover_removed_and_operator_outside_arm_area",
+    "before_departure": "cover_replaced_retention_confirmed_and_operator_clear",
+    "automatic_cover_mechanism_implemented": false
+  },
+  "guards": {
+    "initial_occupancy": "unknown",
+    "occupied_and_unknown": "wait_quietly_at_aisle_centre",
+    "entry_requires": [
+      "fresh_owner_release",
+      "work_area_observed_clear",
+      "all_stationary_arms_parked",
+      "destination_ready"
+    ],
+    "no_timeout_release": true,
+    "no_audible_eviction": true,
+    "invalidate_release_on_new_occupancy": true
+  },
+  "limitations": [
+    "Synthetic workcell and unqualified gripper/holders; no real grasp, hardware, safety function or personnel detection",
+    "Work-area bounds are provisional planning reservations, not protective separation distances or a qualified human body model",
+    "Instrument processing remains outside the transfer animation; CF01 uses the explicit nearby handoff rack",
+    "ArmA and its existing support move 120 mm toward the aisle; a fourth source-referenced six-axis arm is added at DNA",
+    "Manual cover removal/replacement remains required; no automated cover handling is claimed"
+  ],
+  "cargo_grip_offset_from_top_mm": -10,
+  "arm_path": {
+    "corner_trim_mm": 20,
+    "reference_step_mm": 10
+  },
+  "gripper_overrides": {
+    "open_gap_mm": 11.2
+  },
+  "parked_instances": {
+    "ArmB": {
+      "joints_deg": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  }
+}

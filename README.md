@@ -286,6 +286,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
 - [RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md): getrennte Zellpellet-Aliquots, manuelle Qiagen-Spin-Säulen-Kits und prüfbare Material-/Prozesspläne; noch keine Extraktionsausführung
 - [Kitstation K01](docs/extraction-kit-station.md): zwei Kit-Ensembles direkt an der Station, mit parametrischen Behältern, Einsätzen und Griffen an Träger und Deckel; native Ansichten mit ausdrücklich offenen Artikelmaßen und Transportfreigaben
+- [Synthetischer Storage-Test S01](docs/synthetic-storage-s01.md): ein Regalplatz, ein referenzierter K01-Träger und eine feste Übergabeablage; statische CAD-Prüfstellungen und lokaler Mock-Rundlauf mit ausdrücklich offenen Hardware- und Transportnachweisen
 - [Relative Geschossansicht F03](docs/floorplan-f03.md): gemeinsam beschriebene Raumkonturen, Flure und Türpositionen aus einer manuellen Nachzeichnung; Originalfoto privat, Maßstab unbekannt und L01 unverändert
 - [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
 - [Wiederverwendbares Laborglas](docs/lab-glassware.md): Becher, Trichter, Messzylinder und Flaschen in mehreren Größen, mit größenunabhängigen Verschlüssen und optionaler Markerbeschriftung für FreeCAD und SolidCraft
@@ -314,3 +315,27 @@ Vorhandene Klone besitzen noch die alte Historie. Am einfachsten neu klonen;
 eigene Änderungen vorher sichern und gezielt übernehmen. Alte Branches nicht
 zurück in `main` zusammenführen, da sie die entfernten Binärdateien wieder in
 die erreichbare Historie bringen würden. Lokale Build-Ausgaben bleiben lokal.
+
+## Stationsübergreifender Transport und TapeStation
+
+Die ergänzte [TR01-Übergabeanimation](docs/tr01-workcell-animation.md) beschreibt
+Gangmittenverkehr, freizugebende Bench-Bereiche, den zusätzlichen DNA-Arm und
+die menschliche TapeStation-Übergabe als separate synthetische Komposition.
+
+Der neue [TR01-Aufgabenrunner](docs/lab-station-transport.md) protokolliert
+synthetische Lade-, Fahrt- und Entladeübergaben zwischen DNA-Aufreinigung,
+CF01, gemeinsamer NanoDrop-/Qubit-Station und der manuellen
+[TapeStation TS01](docs/tapestation.md). Die separate
+[geometrische L01-Umsetzung](docs/lab-station-transport.md#geometrische-umsetzung-in-l01)
+ergänzt Parkpunkte und fließende, nativ auf 15 mm Modellabstand geprüfte
+Fahrkurven. Reale Navigation, Geräteprozesse und Armübergabebahnen bleiben offen.
+TS01 steht als manuelle Planungshülle mit PC auf der linken L01-Mittelbank;
+die Modellwahl bleibt offen. L01 und das vollständig beladene TR01-Modell
+werden in FreeCAD und SolidCraft erzeugt.
+
+```sh
+python3 scripts/run_lab_station_transport.py --world-id SYN.TR01.Demo01 demo
+python3 scripts/build_tapestation.py
+python3 scripts/build_lab_layout.py
+python3 scripts/build_tr01_floor_motion.py
+```

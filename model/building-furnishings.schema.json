@@ -1,0 +1,140 @@
+{
+  "type": "object",
+  "required": [
+    "format",
+    "catalog",
+    "basis",
+    "kitchen_template_mapping",
+    "placement_policy",
+    "rooms"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.building-furnishings/1"
+    },
+    "catalog": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "basis": {
+      "type": "string"
+    },
+    "kitchen_template_mapping": {
+      "type": "string"
+    },
+    "placement_policy": {
+      "type": "string"
+    },
+    "rooms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "room",
+          "level",
+          "template_areas",
+          "recipe",
+          "local_extent_mm",
+          "yaw_deg",
+          "instances"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "room": {
+            "type": "string",
+            "pattern": "^[123]\\.[0-9]{3}$"
+          },
+          "level": {
+            "enum": [
+              "OG1",
+              "OG2",
+              "OG3"
+            ]
+          },
+          "template_areas": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "recipe": {
+            "enum": [
+              "kitchen",
+              "office"
+            ]
+          },
+          "local_extent_mm": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          },
+          "yaw_deg": {
+            "type": "number"
+          },
+          "instances": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "type",
+                "xyz_mm",
+                "yaw_deg"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "type": {
+                  "type": "string"
+                },
+                "xyz_mm": {
+                  "type": "array",
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "number"
+                  }
+                },
+                "yaw_deg": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "building-furnishings.schema.json"
+}

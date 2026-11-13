@@ -1,0 +1,481 @@
+{
+  "format": "solidcraftbot.storage-s01-media/1",
+  "prepared_on": "2026-11-11",
+  "revision": "kit-storage-s01-62cc073c35c0",
+  "geometry_source_files_sha256": {
+    "model/kit-storage-s01.shared.json": "62cc073c35c01bb5c09e377f7c953451b05f54a21962938faa542b0b05d87e9e",
+    "scripts/build_kit_storage.py": "27b056a399ef2329eb03163e5be0bbe5cff440a9fb6df81ed068bd8152c1c7bc",
+    "scripts/build_kit_storage_freecad.py": "923df2081fb59d2a7b926e93d4cef06ac86a87accaa14d70dcc3132c05a41039",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "model/kit-storage-s01.schema.json": "512fd365c1070abd98152258cb36711eb3e99644fbfd124d26469223ecc0e525",
+    "scripts/kit_storage_model.py": "ced39d72c83a4ff398154c1817f43e9b1bcaa812dc7c087173b12b14ceb7b898",
+    "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+    "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+    "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
+    "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/furnishings/kit-storage-s01.json": "c327ad184a3bb07cdc8b61ce84dd96e1cb6f7cb472e756f99f26f806824baaf8",
+    "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3",
+    "model/extraction-kit-station.schema.json": "b795d31f6d92443a35404a55e7d0f5b150048cba0c517d87f30027ed0a416ebc",
+    "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69"
+  },
+  "workflow_source_files_sha256": {
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/environments/synthetic-unbounded.json": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604",
+    "model/extraction-automation.catalog.json": "8c5f8692bc05b96d13d235cf7c2a23972cf9bcc8e0d856f16a0da907de8d63e1",
+    "model/extraction-kit-station.schema.json": "b795d31f6d92443a35404a55e7d0f5b150048cba0c517d87f30027ed0a416ebc",
+    "model/extraction-kit-station.shared.json": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3",
+    "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
+    "model/furnishings/kit-storage-s01.json": "c327ad184a3bb07cdc8b61ce84dd96e1cb6f7cb472e756f99f26f806824baaf8",
+    "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+    "model/furniture/reference-bench.catalog.json": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7",
+    "model/kit-storage-s01.schema.json": "512fd365c1070abd98152258cb36711eb3e99644fbfd124d26469223ecc0e525",
+    "model/kit-storage-s01.shared.json": "62cc073c35c01bb5c09e377f7c953451b05f54a21962938faa542b0b05d87e9e",
+    "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+    "scripts/kit_storage_model.py": "ced39d72c83a4ff398154c1817f43e9b1bcaa812dc7c087173b12b14ceb7b898",
+    "scripts/kit_storage_workflow.py": "28280f8ab7d4bbe37d77536ea3bb3aff85f64b14b25c3ca9c0b5c23d53a5ae11",
+    "scripts/manual_tasks.py": "751afed1a3cc85539309aa8ef4253c2cbfd2e677e6c0787e400ac5384435a9e9",
+    "scripts/manual_workflow.py": "ba369c47a6619ae9cdca21951efc1876b576b079d22cf6a9f3ac12ff45c6f569",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/run_kit_storage.py": "deea518b25e2653b95cb2479f1c4fc22b85f9c0d6d7f4fcc29382feee6c8e0c8",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69"
+  },
+  "native_build_report": {
+    "path": "exports/generated/kit-storage-s01-62cc073c35c0/build-report.json",
+    "sha256": "85193cd9d56a7ade60b98c5efae74fde328eac7e38114e26ff2507766f2ad190",
+    "bytes": 155635
+  },
+  "cases": [
+    {
+      "id": "shelf",
+      "passed": true,
+      "closed_bodies": 22,
+      "native_interface_checks": 14,
+      "cross_cad_checked": true,
+      "maximum_step_xor_mm3": 0.0,
+      "support": {
+        "freecad": {
+          "support_body": "ShelfSupport",
+          "body": "ShelfSupport",
+          "carrier_body": "Carrier01_RNA_Container",
+          "footprint_bbox_mm": {
+            "min": [
+              -110.0,
+              15.0,
+              200.0
+            ],
+            "max": [
+              110.0,
+              195.0,
+              200.0
+            ]
+          },
+          "contact_z_mm": 200.0,
+          "location_id": "S01.Shelf01",
+          "qualification": "synthetic_unqualified",
+          "passed": true,
+          "footprint_area_mm2": 39600.0,
+          "witness_origin_mm": [
+            -110.0,
+            15.0,
+            199.9
+          ],
+          "witness_size_mm": [
+            220.0,
+            180.0,
+            0.2
+          ],
+          "expected_half_volume_mm3": 3960.0,
+          "witness_depth_each_side_mm": 0.1,
+          "scope": "Geometric footprint/z alignment with native thin-slab intersections; no physical contact, load, retention or stability qualification",
+          "witness_intersections_mm3": {
+            "Carrier01_RNA_Container": 3959.9999999997754,
+            "ShelfSupport": 3959.9999999997754
+          },
+          "volume_tolerance_mm3": 0.000396
+        },
+        "solidcraft": {
+          "support_body": "ShelfSupport",
+          "body": "ShelfSupport",
+          "carrier_body": "Carrier01_RNA_Container",
+          "footprint_bbox_mm": {
+            "min": [
+              -110.0,
+              15.0,
+              200.0
+            ],
+            "max": [
+              110.0,
+              195.0,
+              200.0
+            ]
+          },
+          "contact_z_mm": 200.0,
+          "location_id": "S01.Shelf01",
+          "qualification": "synthetic_unqualified",
+          "passed": true,
+          "footprint_area_mm2": 39600.0,
+          "witness_origin_mm": [
+            -110.0,
+            15.0,
+            199.9
+          ],
+          "witness_size_mm": [
+            220.0,
+            180.0,
+            0.2
+          ],
+          "expected_half_volume_mm3": 3960.0,
+          "witness_depth_each_side_mm": 0.1,
+          "scope": "Geometric footprint/z alignment with native thin-slab intersections; no physical contact, load, retention or stability qualification",
+          "witness_intersections_mm3": {
+            "Carrier01_RNA_Container": 3959.9999999986494,
+            "ShelfSupport": 3959.9999999986503
+          },
+          "volume_tolerance_mm3": 0.000396
+        }
+      },
+      "access": {
+        "freecad": {
+          "passed": true,
+          "probes": 8,
+          "scope": "Source-derived assumed access boxes with 2mm margin versus every native body; no real gripper or trajectory qualification"
+        },
+        "solidcraft": {
+          "passed": true,
+          "probes": 8,
+          "scope": "Source-derived assumed access boxes with 2mm margin versus every native body; no real gripper or trajectory qualification"
+        }
+      },
+      "files": {
+        "case": "exports/generated/kit-storage-s01-62cc073c35c0/shelf.case.json",
+        "commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf.commands.json",
+        "solidcraft": "cad/generated/kit-storage-s01-62cc073c35c0/shelf.sc",
+        "solidcraft_measurements": "exports/generated/kit-storage-s01-62cc073c35c0/shelf.solidcraft.json",
+        "step": "exports/generated/kit-storage-s01-62cc073c35c0/shelf.step",
+        "shelf_interference_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_interference.commands.json",
+        "shelf_interference_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_interference.result.json",
+        "shelf_Carrier01_RNA_carrier_window_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_window.commands.json",
+        "shelf_Carrier01_RNA_carrier_window_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_window.result.json",
+        "shelf_Carrier01_RNA_carrier_finger_low_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_finger_low.commands.json",
+        "shelf_Carrier01_RNA_carrier_finger_low_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_finger_low.result.json",
+        "shelf_Carrier01_RNA_carrier_finger_high_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_finger_high.commands.json",
+        "shelf_Carrier01_RNA_carrier_finger_high_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_finger_high.result.json",
+        "shelf_Carrier01_RNA_carrier_approach_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_approach.commands.json",
+        "shelf_Carrier01_RNA_carrier_approach_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_carrier_approach.result.json",
+        "shelf_Carrier01_RNA_lid_window_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_window.commands.json",
+        "shelf_Carrier01_RNA_lid_window_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_window.result.json",
+        "shelf_Carrier01_RNA_lid_finger_front_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_finger_front.commands.json",
+        "shelf_Carrier01_RNA_lid_finger_front_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_finger_front.result.json",
+        "shelf_Carrier01_RNA_lid_finger_rear_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_finger_rear.commands.json",
+        "shelf_Carrier01_RNA_lid_finger_rear_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_finger_rear.result.json",
+        "shelf_Carrier01_RNA_lid_approach_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_approach.commands.json",
+        "shelf_Carrier01_RNA_lid_approach_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_Carrier01_RNA_lid_approach.result.json",
+        "shelf_support_commands": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_support.commands.json",
+        "shelf_support_results": "exports/generated/kit-storage-s01-62cc073c35c0/shelf_support.result.json",
+        "freecad": "cad/generated/kit-storage-s01-62cc073c35c0/shelf.FCStd",
+        "freecad_validation": "exports/generated/kit-storage-s01-62cc073c35c0/shelf.freecad.json"
+      },
+      "artifact_sha256": {
+        "case": "c6781051ca1d69b1d1b721c4a28974f813e06ae38057ae727898404f24f1fea0",
+        "commands": "e0f470d52195199c6bba74c8ab4b373bb9c464e808001017c7dc1dc9b486ac09",
+        "solidcraft": "4c6249b6fa4f408bd9ac0dff1c4d869930a2cf211f16371056c6e233d9579491",
+        "solidcraft_measurements": "c25f233bc7c35685a36440265f2cca8a9688f45e9538564e7f23d3b710c5da43",
+        "step": "ac79af726c1fc0313a178d5fdbd582b03435ee4d4caa74a758a02179b238577e",
+        "shelf_interference_commands": "7e53c5641025d3d52cbc40269b7b2b6b20d981c5ab3eeab0ce35f2df6f347b77",
+        "shelf_interference_results": "346627de3037476f540c480d47eb9bdffa2ad8ef970205022068c2c3dfbc7c19",
+        "shelf_Carrier01_RNA_carrier_window_commands": "4bff5b04bbea7d8ac63612fe1dc131948985e0199969143114b16fb9a4363d38",
+        "shelf_Carrier01_RNA_carrier_window_results": "1da94568134dc5beaecc8b6c311aa9b3dc309a4d164e41621ef12afc7d509c0a",
+        "shelf_Carrier01_RNA_carrier_finger_low_commands": "5ea3e8a27cffd07061a0297b60755c12b810f1783825c0d5b9ab3eee2d6522c0",
+        "shelf_Carrier01_RNA_carrier_finger_low_results": "1aee7258a0564eda3d9c0a44e3fe21e81005a9e0c7727c427e0eb185ba92d4ba",
+        "shelf_Carrier01_RNA_carrier_finger_high_commands": "dc1abf291e83dd64c7dde7ff5bbda080600f987711d95a02567ea1ef526639e3",
+        "shelf_Carrier01_RNA_carrier_finger_high_results": "a6e70db262fcd56aec392eeac4f4f520316d88dc622e369414588f19a9edb795",
+        "shelf_Carrier01_RNA_carrier_approach_commands": "fa976452631042a9d28ec26e31d886265434d92951e8c0a12c935dee994016aa",
+        "shelf_Carrier01_RNA_carrier_approach_results": "992ec2f3fb04768b827073cd66346f57c07893528a9520b2fdd418ac947a5f37",
+        "shelf_Carrier01_RNA_lid_window_commands": "11d90671077306668ebd97d87c19aded80149ba520f48276353344040f3eeb70",
+        "shelf_Carrier01_RNA_lid_window_results": "f18145dfe49880be1df4a567265e239f05080dcf8d0da6b733bcc57a617e7dd3",
+        "shelf_Carrier01_RNA_lid_finger_front_commands": "c721497e48997f1e892864c144f8499773cdb490f9ddd7f1c299ce582928406a",
+        "shelf_Carrier01_RNA_lid_finger_front_results": "7a9ffe783143e12a546cd86ff76103c8e56859d145baf2e0fbbcfd842448b5eb",
+        "shelf_Carrier01_RNA_lid_finger_rear_commands": "72557a476e1f28380f4f8ae90c03386208eaea8c8fb3c26285f16d3f7bb65ea6",
+        "shelf_Carrier01_RNA_lid_finger_rear_results": "613442e16f6c559cb19bb59e65016762da2d1d70416dd6fc24f28b999f4302b8",
+        "shelf_Carrier01_RNA_lid_approach_commands": "25daa7a6428e535fbf82e776e4a87a95cbefb8c3674028f27f08ffe944e471e6",
+        "shelf_Carrier01_RNA_lid_approach_results": "02ae029d4844a0ae16b69bdd02eca84cf36356955b7536e6ebf9f89491473341",
+        "shelf_support_commands": "13289856275ffac2332662d0d8e13980b66d67b2a843e61f0a091e40c036c395",
+        "shelf_support_results": "7279631f891dc059152686bb718ac6c142f3a1f029be2d7b52b34e6307692cfb",
+        "freecad": "c23c51dc254a0c7f06d0bd4e3660bb38ad031b77a489e3d13f847f891b72f751",
+        "freecad_validation": "956f3f8cadbe2571eebe3b09b5800eae014c7029cacce01c21f126dd567586e2"
+      }
+    },
+    {
+      "id": "handover",
+      "passed": true,
+      "closed_bodies": 22,
+      "native_interface_checks": 14,
+      "cross_cad_checked": true,
+      "maximum_step_xor_mm3": 0.0,
+      "support": {
+        "freecad": {
+          "support_body": "HandoverSupport",
+          "body": "HandoverSupport",
+          "carrier_body": "Carrier01_RNA_Container",
+          "footprint_bbox_mm": {
+            "min": [
+              -110.0,
+              385.0,
+              200.0
+            ],
+            "max": [
+              110.0,
+              565.0,
+              200.0
+            ]
+          },
+          "contact_z_mm": 200.0,
+          "location_id": "S01.Handover01",
+          "qualification": "synthetic_unqualified",
+          "passed": true,
+          "footprint_area_mm2": 39600.0,
+          "witness_origin_mm": [
+            -110.0,
+            385.0,
+            199.9
+          ],
+          "witness_size_mm": [
+            220.0,
+            180.0,
+            0.2
+          ],
+          "expected_half_volume_mm3": 3960.0,
+          "witness_depth_each_side_mm": 0.1,
+          "scope": "Geometric footprint/z alignment with native thin-slab intersections; no physical contact, load, retention or stability qualification",
+          "witness_intersections_mm3": {
+            "Carrier01_RNA_Container": 3959.9999999997754,
+            "HandoverSupport": 3959.9999999997754
+          },
+          "volume_tolerance_mm3": 0.000396
+        },
+        "solidcraft": {
+          "support_body": "HandoverSupport",
+          "body": "HandoverSupport",
+          "carrier_body": "Carrier01_RNA_Container",
+          "footprint_bbox_mm": {
+            "min": [
+              -110.0,
+              385.0,
+              200.0
+            ],
+            "max": [
+              110.0,
+              565.0,
+              200.0
+            ]
+          },
+          "contact_z_mm": 200.0,
+          "location_id": "S01.Handover01",
+          "qualification": "synthetic_unqualified",
+          "passed": true,
+          "footprint_area_mm2": 39600.0,
+          "witness_origin_mm": [
+            -110.0,
+            385.0,
+            199.9
+          ],
+          "witness_size_mm": [
+            220.0,
+            180.0,
+            0.2
+          ],
+          "expected_half_volume_mm3": 3960.0,
+          "witness_depth_each_side_mm": 0.1,
+          "scope": "Geometric footprint/z alignment with native thin-slab intersections; no physical contact, load, retention or stability qualification",
+          "witness_intersections_mm3": {
+            "Carrier01_RNA_Container": 3959.9999999986494,
+            "HandoverSupport": 3959.9999999986503
+          },
+          "volume_tolerance_mm3": 0.000396
+        }
+      },
+      "access": {
+        "freecad": {
+          "passed": true,
+          "probes": 8,
+          "scope": "Source-derived assumed access boxes with 2mm margin versus every native body; no real gripper or trajectory qualification"
+        },
+        "solidcraft": {
+          "passed": true,
+          "probes": 8,
+          "scope": "Source-derived assumed access boxes with 2mm margin versus every native body; no real gripper or trajectory qualification"
+        }
+      },
+      "files": {
+        "case": "exports/generated/kit-storage-s01-62cc073c35c0/handover.case.json",
+        "commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover.commands.json",
+        "solidcraft": "cad/generated/kit-storage-s01-62cc073c35c0/handover.sc",
+        "solidcraft_measurements": "exports/generated/kit-storage-s01-62cc073c35c0/handover.solidcraft.json",
+        "step": "exports/generated/kit-storage-s01-62cc073c35c0/handover.step",
+        "handover_interference_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_interference.commands.json",
+        "handover_interference_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_interference.result.json",
+        "handover_Carrier01_RNA_carrier_window_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_window.commands.json",
+        "handover_Carrier01_RNA_carrier_window_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_window.result.json",
+        "handover_Carrier01_RNA_carrier_finger_low_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_finger_low.commands.json",
+        "handover_Carrier01_RNA_carrier_finger_low_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_finger_low.result.json",
+        "handover_Carrier01_RNA_carrier_finger_high_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_finger_high.commands.json",
+        "handover_Carrier01_RNA_carrier_finger_high_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_finger_high.result.json",
+        "handover_Carrier01_RNA_carrier_approach_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_approach.commands.json",
+        "handover_Carrier01_RNA_carrier_approach_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_carrier_approach.result.json",
+        "handover_Carrier01_RNA_lid_window_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_window.commands.json",
+        "handover_Carrier01_RNA_lid_window_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_window.result.json",
+        "handover_Carrier01_RNA_lid_finger_front_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_finger_front.commands.json",
+        "handover_Carrier01_RNA_lid_finger_front_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_finger_front.result.json",
+        "handover_Carrier01_RNA_lid_finger_rear_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_finger_rear.commands.json",
+        "handover_Carrier01_RNA_lid_finger_rear_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_finger_rear.result.json",
+        "handover_Carrier01_RNA_lid_approach_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_approach.commands.json",
+        "handover_Carrier01_RNA_lid_approach_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_Carrier01_RNA_lid_approach.result.json",
+        "handover_support_commands": "exports/generated/kit-storage-s01-62cc073c35c0/handover_support.commands.json",
+        "handover_support_results": "exports/generated/kit-storage-s01-62cc073c35c0/handover_support.result.json",
+        "freecad": "cad/generated/kit-storage-s01-62cc073c35c0/handover.FCStd",
+        "freecad_validation": "exports/generated/kit-storage-s01-62cc073c35c0/handover.freecad.json"
+      },
+      "artifact_sha256": {
+        "case": "6e494a70981e2e9227142acf3f1f188f05fcc4300fe3a800c1c6f1fd2f03dc95",
+        "commands": "81ea3a6a98894ebbfa32e19698b4f7533cf31ddf8bcddaa0a4b367625f1b68f4",
+        "solidcraft": "6382e60361dcf1bc2523b2f61124beed3672ba1cbcc13668504efa3c4f35e37e",
+        "solidcraft_measurements": "bf646b94c373471f4a4216f76ee441bec5311c7fb1556d169582ea392877dcfa",
+        "step": "60224f742dfab4481dfd97949900acda88783abb6051e276e6ddf7b735f29013",
+        "handover_interference_commands": "7e53c5641025d3d52cbc40269b7b2b6b20d981c5ab3eeab0ce35f2df6f347b77",
+        "handover_interference_results": "e0126b24a36e0b6807c5bd4b7a801bea3d0c64a906a98912de6c6f975ef3dfd6",
+        "handover_Carrier01_RNA_carrier_window_commands": "978c83580443f4d15fbe0a48a2bb9de6b44438a89d0bc0904fc223d48c79aac7",
+        "handover_Carrier01_RNA_carrier_window_results": "ec83a9ae95605113092275dd0bd3c2f85cb422142bb4e5463bbb50d3f7c13bba",
+        "handover_Carrier01_RNA_carrier_finger_low_commands": "0f9a3479a23488488ad0e946d89f88796a357d4bb1115b1e21041be4687e7e3b",
+        "handover_Carrier01_RNA_carrier_finger_low_results": "6d8706ee4012d89ebf543ac0b3973ffd2fd26e68a9a38a742d311296e4e1ff46",
+        "handover_Carrier01_RNA_carrier_finger_high_commands": "9e202482919b579ef04007e2456cc091935be835fd34eec7e5604822273e35e1",
+        "handover_Carrier01_RNA_carrier_finger_high_results": "a8f591a80b14a7b11637cdd96567f7983a716b9363381926ba6d948eacf383a6",
+        "handover_Carrier01_RNA_carrier_approach_commands": "09f305572d241d4a7187d5fd14d2a1b78d8d478e5fc796560d731f22b18b9ec0",
+        "handover_Carrier01_RNA_carrier_approach_results": "5405865127858fd7d7b6f24bc6f36864ba8e1a6e2ca7dca5d692b580fbe17369",
+        "handover_Carrier01_RNA_lid_window_commands": "2577c19a889a61e2ce8a336a40c3856973ed5d2936abf7f70baaf37cc108c6d8",
+        "handover_Carrier01_RNA_lid_window_results": "9533916684e586fcdfedfda6d64259d15d0f5f90834780f2a567cf8435b1baca",
+        "handover_Carrier01_RNA_lid_finger_front_commands": "e6a8e3e193a64a325a1d7e59b944713a915c123bdda8c987a4d9f27f2b4564c5",
+        "handover_Carrier01_RNA_lid_finger_front_results": "2d30ce3272cc510c3ec70199cca57b8d7a3a9370810b597c9ecdde7d48814568",
+        "handover_Carrier01_RNA_lid_finger_rear_commands": "b83d750e6c5b0dd14d26d6c7d90cd24dea1b1abc450a9ce610d41ab6304824e2",
+        "handover_Carrier01_RNA_lid_finger_rear_results": "00a5217098ef1f7c50d666870fc53e4cccc9d4571d9d6104007e7be980da60f0",
+        "handover_Carrier01_RNA_lid_approach_commands": "e9d5b33f9369e90f870008c26ae39b186139988968445868998b3eb0089b95b9",
+        "handover_Carrier01_RNA_lid_approach_results": "1fbb6d803dbe9798a126dac1ede85f5232182e4e637d8d1c3e62c21df303d59b",
+        "handover_support_commands": "7684b70da782e40eaa54c4aebd891b4d2d15716ca980c7554f1d50ceb6a5b83e",
+        "handover_support_results": "2091b4a6a8c6f6e4f6de8a5929590c08e7cbddfd9136968d2c94621a8b9f1cca",
+        "freecad": "38a64502dcd9685e6cd945d66e722d46ec42e81710ac7d18bcf3c7b487a4718e",
+        "freecad_validation": "d11cb8e399e40449eb7182aeed20f268fd9b22b1abd6683289fcb8718612e23a"
+      }
+    }
+  ],
+  "images": {
+    "shelf": {
+      "path": "docs/media/storage-s01-shelf.png",
+      "sha256": "d7de0d3dc17a3855b063002e952b130b065f889c290c7cf291aece2e70358b86",
+      "bytes": 99018
+    },
+    "handover": {
+      "path": "docs/media/storage-s01-handover.png",
+      "sha256": "7f8ade975242f58151f9dcebbf4ae527f8b18f4db7de088f8817c4a32070dcbd",
+      "bytes": 92826
+    }
+  },
+  "visual_review": {
+    "passed": true,
+    "views": [
+      "shelf",
+      "handover"
+    ],
+    "scope": "Native SolidCraft source:model snapshots visually reviewed for complete framing, exactly one closed RNA carrier, the other place empty, visible carrier/lid handles and fixed handover guides. No robot, rail or transfer path displayed or qualified.",
+    "immutable_report_flags": "Original generation-time visually_reviewed=false retained unchanged in the native report."
+  },
+  "gallery_diagram": {
+    "path": "docs/models/images/kit-storage-s01.svg",
+    "sha256": "0a5b3ae4a7523afd7625baaeeca3111a23cbe395e998efc614d126f51e53d7f9",
+    "bytes": 2572
+  },
+  "gallery_representation": "Source-derived state plan, not native CAD or a robot trajectory",
+  "documentation_files_sha256": {
+    "docs/synthetic-storage-s01.md": "3185715ebe80818ed9daa55d1ccb26d7a1ef97e726de9265b625013755753622",
+    "docs/automated-storage-plan.md": "5db83e7238abb48810a7237e27aa50042e9e8680fab99d7660889ef83f2d9989",
+    "README.md": "a03f082b82206788c43f8beb60cd135dc1ccc22b74ca25ae027a02c239bfa072",
+    "ARCHITECTURE.md": "28179b164436f15806843bb54a2e8d2b8114bb9d9d49c733a7b1264af189b8d9",
+    "AGENTS.md": "494a4e7e35db8a60e84c39b42d1419ac5e9cf5541d19ec608f5cff5bd899f751"
+  },
+  "synthetic_roundtrip": {
+    "artifact": {
+      "path": "exports/validation/storage-s01-demo.json",
+      "sha256": "427016d2afae382d744160040b378e434c725d999b5e6f1f0f2469de4b52067e",
+      "bytes": 174714
+    },
+    "fixture_id": "S01-validation-20261111",
+    "passed": true,
+    "status": "completed",
+    "carrier_id": "S01.Carrier01",
+    "symbolic_contents": 9,
+    "route": [
+      "S01.Shelf01",
+      "S01.Handover01",
+      "S01.Shelf01"
+    ],
+    "confirmed_operations": 6,
+    "resources_remaining": [],
+    "scene_basis": "last_confirmed_synthetic_observation",
+    "location_uncertain": false,
+    "qualifications": {
+      "cross_run_inventory": false,
+      "quantity_ledger": false,
+      "global_stock_fencing": false,
+      "robot_motion_executed": false,
+      "hardware_executed": false,
+      "network_executed": false,
+      "grasp_qualified": false,
+      "load_qualified": false,
+      "safety_function_qualified": false
+    }
+  },
+  "targeted_tests": {
+    "artifact": {
+      "path": "exports/validation/storage-s01-targeted-tests.json",
+      "sha256": "5b891b86e3cae06bb26725d8fe1594d132a5e2a3b836e9f9a8e89dc4dcd39d64",
+      "bytes": 45760
+    },
+    "passed": true,
+    "tests_run": 135,
+    "skips": 0,
+    "scope": "S01 model/schema/native evidence/workflow/gallery; K01/extraction regressions and existing gallery/Journal contracts. Not the full repository suite."
+  },
+  "limitations": [
+    "Exactly one closed RNA carrier is selected from the unchanged pinned K01 construction; the two cases are alternative static placements, not two carriers.",
+    "Nine symbolic material envelopes preserve catalog identity and slot order; they are not real package counts, observed stock or samples.",
+    "The environment is explicitly unbounded; the shelf place and handover nest are local reference geometry, not a complete shelf installation.",
+    "All new dimensions and clearances are synthetic assumptions; actual measured dimensions remain null.",
+    "Native support/contact and static handle-space checks do not establish load capacity, tipping stability, retention or a real grasp.",
+    "The fixed nest has no actuator, sensor, latch or controller. No rail robot, connecting path, swept-volume or hardware execution is implemented.",
+    "K01 geometry is generated from its source, not from another CAD output. Source-parameter changes require regeneration of this static composition.",
+    "Two static supported states; no transfer trajectory, rail robot, live grasp or hardware execution",
+    "Contact witnesses and offset access boxes verify only synthetic geometry, not load/stability/real-gripper suitability",
+    "FreeCAD saved presentation metadata checked; no FreeCAD GUI rendering qualification",
+    "Backend-only reports do not establish cross-CAD agreement",
+    "A fixture is an explicitly synthetic independent test world, not a real article count or a second material stock database.",
+    "Logical pickup, supported placement and release are confirmed synthetic observations; no physical transfer, quantity booking, temperature or biological quality verification.",
+    "The full-footprint geometric witness is not a physical contact-force, retention, load or stability qualification.",
+    "The project-wide flowing-motion rule remains required for any future executed transport program; no trajectory is implemented by these static cases.",
+    "Cross-run stock integration, distributed device fencing, ROS execution, SiLA network, GENtle binding and hardware remain unimplemented by this case."
+  ]
+}

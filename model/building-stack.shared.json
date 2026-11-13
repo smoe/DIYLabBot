@@ -17,6 +17,10 @@
     "basement": {
       "source": "model/basement-kg.shared.json",
       "source_sha256": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+    },
+    "furnishings": {
+      "source": "model/furnishings/building-social.json",
+      "source_sha256": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa"
     }
   },
   "calibration": null,

@@ -94,7 +94,9 @@ wiederverwendbaren Teile aus `model/furniture/social.catalog.json`. Die gemeinsa
 Auswertung `scripts/building_furnishings.py` erzeugt portable Operationen für
 FreeCAD und SolidCraft. Die Küche erhält die orange-roten Zeilen, eine runde
 Spüle, Mikrowelle, Wasserkocher, Kaffeemaschine, einen schematischen Tischbackofen,
-Tassenregal und Tischgruppe mit blauen Stühlen und einem Drehstuhl. Im ergänzten
+Tassenregal und Tischgruppe mit acht blauen Stühlen, jeweils vier gleichmäßig
+an jeder Längsseite; beide Stirnseiten bleiben frei (Eigentümervorgabe vom
+13. November 2026, unabhängig von der Fotointerpretation). Im ergänzten
 Unterbaukühlschrank versteckt sich ein Pinguin mit Teetasse. Das Unterbaugerät
 ist eine Modellannahme; seine Identifikation auf den Fotos bleibt offen.
 

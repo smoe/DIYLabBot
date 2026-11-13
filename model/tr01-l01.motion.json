@@ -1,0 +1,156 @@
+{
+  "format": "solidcraftbot.tr01-l01-motion/1",
+  "id": "TR01.L01.StationRoutes",
+  "mode": "synthetic_geometry_only",
+  "units": {
+    "length": "mm",
+    "angle": "rad",
+    "time": "s"
+  },
+  "layout": {
+    "source": "model/lab-layout-l01.shared.json",
+    "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+  },
+  "transporter": {
+    "source": "model/sample-transport-tr01.shared.json",
+    "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+  },
+  "vehicle": {
+    "instance_id": "TR01",
+    "variant": "Floor_T48",
+    "overrides": {
+      "floor_deck_z": "vehicle_deck_z"
+    },
+    "include_transport_cover": true
+  },
+  "stations": {
+    "DNA": {
+      "handoff_instance": "RackManual",
+      "park_xy_mm": [
+        "left",
+        2700
+      ]
+    },
+    "CF01": {
+      "handoff_instance": "CF01",
+      "park_xy_mm": [
+        "left",
+        5250
+      ]
+    },
+    "QC": {
+      "handoff_instance": "RackPair",
+      "park_xy_mm": [
+        "right",
+        3400
+      ]
+    },
+    "TS01": {
+      "handoff_instance": "TS01",
+      "park_xy_mm": [
+        "left",
+        3250
+      ]
+    }
+  },
+  "routes": [
+    {
+      "id": "DNA_to_CF01",
+      "from": "DNA",
+      "to": "CF01",
+      "via_xy_mm": [],
+      "reverse": false
+    },
+    {
+      "id": "CF01_to_QC",
+      "from": "CF01",
+      "to": "QC",
+      "via_xy_mm": [
+        [
+          "left",
+          "rear"
+        ],
+        [
+          "right",
+          "rear"
+        ]
+      ],
+      "reverse": false
+    },
+    {
+      "id": "QC_to_TS01",
+      "from": "QC",
+      "to": "TS01",
+      "via_xy_mm": [
+        [
+          "right",
+          "front"
+        ],
+        [
+          "left",
+          "front"
+        ]
+      ],
+      "reverse": false
+    },
+    {
+      "id": "TS01_to_DNA",
+      "from": "TS01",
+      "to": "DNA",
+      "via_xy_mm": [],
+      "reverse": true
+    }
+  ],
+  "curve": {
+    "kind": "c2_quintic_pva",
+    "nominal_speed_mm_s": 200,
+    "heading_subdivisions_per_segment": 20,
+    "time_quantum_s": 0.001,
+    "corner_trim_mm": 250,
+    "spatial_step_mm": 50
+  },
+  "limits": {
+    "evidence": "synthetic_design_limits_not_hardware_or_biological_qualification",
+    "linear": {
+      "velocity": 200,
+      "acceleration": 100,
+      "jerk": 200
+    },
+    "angular": {
+      "velocity": 0.35,
+      "acceleration": 0.5,
+      "jerk": 1.4
+    },
+    "carried_points": {
+      "velocity": 250,
+      "acceleration": 150,
+      "jerk": 300
+    }
+  },
+  "collision": {
+    "minimum_clearance_mm": 15,
+    "maximum_depth": 18,
+    "minimum_interval_s": 0.0001,
+    "distance_tolerance_mm": 0.001,
+    "floor_contact_body": "Floor",
+    "required_scene_status": "fixed_arms_closed_lower_cupboards_and_source_defined_instrument_poses"
+  },
+  "limitations": [
+    "Unmeasured L01 geometry; no real navigation, steering/traction, people detection or hardware execution",
+    "Geometric rigid chassis pose reference; heading fit does not qualify a physical drive or a nonholonomic controller",
+    "Full TR01 cover, 48 illustrative tube envelopes and all other vehicle bodies are included; liquid motion and retention are not simulated",
+    "Stationary arm/gripper loading paths are not part of these floor-vehicle routes; no real reach or docking accuracy claim",
+    "The floor support surface is the only excluded physical room body; people and open lower cupboards must remain outside the reserved route"
+  ],
+  "traffic_policy": {
+    "mode": "aisle_centre_only",
+    "lane_centres_mm": {
+      "left": "(bench_depth+room_width/2-island_half_width)/2",
+      "right": "(room_width/2+island_half_width+room_width-bench_depth)/2",
+      "front": "island_start_y/2",
+      "rear": "(island_start_y+island_length+left_depth-window_bench_depth)/2"
+    },
+    "work_area_priority": "occupied_or_unknown_blocks_approach",
+    "approach": "separate opt-in dock movement after explicit workstation release; no audible eviction"
+  }
+}

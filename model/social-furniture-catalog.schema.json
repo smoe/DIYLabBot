@@ -1,0 +1,425 @@
+{
+  "type": "object",
+  "required": [
+    "format",
+    "units",
+    "status",
+    "types"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.social-furniture-catalog/1"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "status": {
+      "type": "string"
+    },
+    "types": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "body",
+                "color",
+                "action",
+                "shape"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "color": {
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$"
+                },
+                "action": {
+                  "enum": [
+                    "create",
+                    "cut",
+                    "join"
+                  ]
+                },
+                "shape": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "required": [
+                        "kind",
+                        "origin",
+                        "size"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "box"
+                        },
+                        "origin": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "size": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number"
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "kind",
+                        "origin",
+                        "radius",
+                        "height"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "cylinder"
+                        },
+                        "origin": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "radius": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "height": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "kind",
+                        "origin",
+                        "radius"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "sphere"
+                        },
+                        "origin": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "radius": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "kind",
+                        "plane",
+                        "points",
+                        "offset",
+                        "depth",
+                        "fixed"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "polygon_prism"
+                        },
+                        "plane": {
+                          "const": "XY"
+                        },
+                        "points": {
+                          "type": "array",
+                          "minItems": 3,
+                          "items": {
+                            "type": "array",
+                            "minItems": 2,
+                            "maxItems": 2,
+                            "items": {
+                              "type": "number"
+                            }
+                          }
+                        },
+                        "offset": {
+                          "type": "number"
+                        },
+                        "depth": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "fixed": {
+                          "const": true
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "kind",
+                        "origin",
+                        "radius",
+                        "height",
+                        "top_radius"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "kind": {
+                          "const": "cone"
+                        },
+                        "origin": {
+                          "type": "array",
+                          "minItems": 3,
+                          "maxItems": 3,
+                          "items": {
+                            "type": "number"
+                          }
+                        },
+                        "radius": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "height": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "top_radius": {
+                          "type": "number",
+                          "minimum": 0
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "extends",
+              "omit_parts",
+              "parts"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "extends": {
+                "type": "string"
+              },
+              "omit_parts": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "uniqueItems": true
+              },
+              "parts": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "body",
+                    "color",
+                    "action",
+                    "shape"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "body": {
+                      "type": "string"
+                    },
+                    "color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "action": {
+                      "enum": [
+                        "create",
+                        "cut",
+                        "join"
+                      ]
+                    },
+                    "shape": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "origin",
+                            "size"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "box"
+                            },
+                            "origin": {
+                              "type": "array",
+                              "minItems": 3,
+                              "maxItems": 3,
+                              "items": {
+                                "type": "number"
+                              }
+                            },
+                            "size": {
+                              "type": "array",
+                              "minItems": 3,
+                              "maxItems": 3,
+                              "items": {
+                                "type": "number"
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "origin",
+                            "radius",
+                            "height"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "cylinder"
+                            },
+                            "origin": {
+                              "type": "array",
+                              "minItems": 3,
+                              "maxItems": 3,
+                              "items": {
+                                "type": "number"
+                              }
+                            },
+                            "radius": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "height": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "origin",
+                            "radius"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "sphere"
+                            },
+                            "origin": {
+                              "type": "array",
+                              "minItems": 3,
+                              "maxItems": 3,
+                              "items": {
+                                "type": "number"
+                              }
+                            },
+                            "radius": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            }
+                          }
+                        },
+                        {
+                          "type": "object",
+                          "required": [
+                            "kind",
+                            "plane",
+                            "points",
+                            "offset",
+                            "depth",
+                            "fixed"
+                          ],
+                          "additionalProperties": false,
+                          "properties": {
+                            "kind": {
+                              "const": "polygon_prism"
+                            },
+                            "plane": {
+                              "const": "XY"
+                            },
+                            "points": {
+                              "type": "array",
+                              "minItems": 3,
+                              "items": {
+                                "type": "array",
+                                "minItems": 2,
+                                "maxItems": 2,
+                                "items": {
+                                  "type": "number"
+                                }
+                              }
+                            },
+                            "offset": {
+                              "type": "number"
+                            },
+                            "depth": {
+                              "type": "number",
+                              "exclusiveMinimum": 0
+                            },
+                            "fixed": {
+                              "const": true
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "social-furniture-catalog.schema.json"
+}

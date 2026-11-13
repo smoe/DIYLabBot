@@ -1,0 +1,125 @@
+{
+  "format": "solidcraftbot.daylight-render/1",
+  "id": "L01.Daylight",
+  "sources": {
+    "orientation": {
+      "source": "model/l01-orientation.reference.json",
+      "source_sha256": "f882297ddb2db84eb56be2d25e415f93f7dae22b3775df6bcca7701278babc2c"
+    },
+    "room": {
+      "source": "model/lab-room-l01.shared.json",
+      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
+    }
+  },
+  "site": {
+    "latitude_deg": 54.084603,
+    "longitude_deg": 12.098202,
+    "timezone": "Europe/Berlin",
+    "scope": "building_location_for_solar_position_only"
+  },
+  "solar_model": {
+    "method": "NOAA_fractional_year",
+    "reference_url": "https://gml.noaa.gov/grad/solcalc/solareqns.PDF",
+    "refraction": "not_applied"
+  },
+  "default_scenario": "november",
+  "scenarios": [
+    {
+      "id": "november",
+      "local_datetime": "2026-11-12T14:00:00",
+      "label": "12.11.2026 \u00b7 Rostock"
+    },
+    {
+      "id": "summer",
+      "local_datetime": "2026-06-21T18:00:00",
+      "label": "21.06.2026 \u00b7 Rostock"
+    }
+  ],
+  "optical_assumptions": {
+    "glazing_transmittance": 0.65,
+    "diffuse_window_radiance_relative": 2.4,
+    "direct_solar_relative": 3.0,
+    "clear_atmosphere_transmittance": 0.7,
+    "indirect_bounce_relative": 0.18,
+    "window_area_samples_per_window": 3,
+    "exposure": 6.0
+  },
+  "shadow_mapping": {
+    "resolution_px": 1024,
+    "sun_filter_radius_texels": 1.2,
+    "window_filter_radius_texels": 2.5
+  },
+  "limitations": [
+    "Unmeasured window positions, nominal 315-degree facade orientation and simplified CAD envelopes",
+    "Relative light transport with window-area quadrature and filtered shadow maps; not a calibrated lux or glare calculation",
+    "No measured weather, spectral glass data, neighbouring buildings, external shading or solved multiple-bounce global illumination",
+    "Cutaway transparency is for inspection; shelves and opaque equipment still cast opaque shadows; glazing is approximated by a constant transmission",
+    "The schematic human is not a qualified solid shadow caster; robot and transporter shadows follow their checked poses",
+    "Ceiling panel positions, areas and relative output are illustrative assumptions, without measured luminaire photometry or electrical planning"
+  ],
+  "time_control": {
+    "minimum_minute": 0,
+    "maximum_minute": 1440,
+    "sample_interval_minutes": 5,
+    "twilight_full_day_altitude_deg": 10,
+    "twilight_dark_altitude_deg": -6
+  },
+  "artificial_lighting": {
+    "default_mode": "auto",
+    "relative_radiance": 5.0,
+    "indirect_bounce_relative": 0.12,
+    "auto_full_on_altitude_deg": -3,
+    "auto_off_altitude_deg": 10,
+    "scope": "synthetic_ceiling_panels_not_a_surveyed_installation",
+    "panels": [
+      {
+        "id": "Ceiling1",
+        "position_room_fraction": [
+          0.27,
+          0.28,
+          0.93
+        ],
+        "size_mm": [
+          1200,
+          600
+        ]
+      },
+      {
+        "id": "Ceiling2",
+        "position_room_fraction": [
+          0.73,
+          0.28,
+          0.93
+        ],
+        "size_mm": [
+          1200,
+          600
+        ]
+      },
+      {
+        "id": "Ceiling3",
+        "position_room_fraction": [
+          0.27,
+          0.7,
+          0.93
+        ],
+        "size_mm": [
+          1200,
+          600
+        ]
+      },
+      {
+        "id": "Ceiling4",
+        "position_room_fraction": [
+          0.73,
+          0.7,
+          0.93
+        ],
+        "size_mm": [
+          1200,
+          600
+        ]
+      }
+    ]
+  }
+}

@@ -63,6 +63,14 @@ Die Möbeltypen werden mehrfach aufgestellt. Die Raumkomposition bindet die Quel
 
 [Quelle 1](../../model/furnishings/l01.furnishings.json) · [Quelle 2](../../model/lab-room-l01.shared.json) · [Details](../../docs/lab-room-l01.md)
 
+### Küche und Büros · mit Kühlschrankgast
+
+[![Küche und Büros · mit Kühlschrankgast](images/building-social.svg)](images/building-social.svg)
+
+Schematischer Küchenplan aus der fotoinspirierten Möblierung und angenommene Büroarbeitsplätze. Native Ansichten und Kühlschrank-Easter-Egg in der Dokumentation.
+
+[Quelle 1](../../model/furnishings/building-social.json) · [Quelle 2](../../model/furniture/social.catalog.json) · [Details](../../docs/building-furnishings.md)
+
 
 
 <a id="ausstattung"></a>
@@ -71,11 +79,11 @@ Die Möbeltypen werden mehrfach aufgestellt. Die Raumkomposition bindet die Quel
 
 Die Ausstattung referenziert Gerätequellen und ordnet ihre Instanzen an. Der aktuelle L01-Plan stammt direkt aus den heutigen Quellen; er ersetzt die inzwischen überholte ältere Gesamtansicht. Die Minimalumgebung zeigt eine native SolidCraft-Prüfstellung.
 
-### L01 · Gesamtansicht mit Nassplatz und Abzug
+### L01 · Gesamtansicht mit TapeStation und Analytik
 
-[![L01 · Gesamtansicht mit Nassplatz und Abzug](images/l01-overview.png)](images/l01-overview.png)
+[![L01 · Gesamtansicht mit TapeStation und Analytik](images/l01-overview.png)](images/l01-overview.png)
 
-Native Gesamtansicht mit Nassplatz links neben Tür A, anschließendem Abzug, Wasserbad rechts, drei Hockern an der Fensterbank und offenen oberen Regalen. Waage, Kaltlagerung und drei Roboter bleiben integriert; das manuelle Kellerlager gehört nicht zu L01.
+Native L01-Gesamtansicht mit TapeStation und PC auf der linken Mittelbank, NanoDrop und Qubit am rechten Armpaar sowie vorhandenen Geräten und Möbeln. Statische Platzprüfung; die TR01-Fahrbahnen sind separat geprüft.
 
 [Quelle 1](../../model/lab-layout-l01.shared.json) · [Quelle 2](../../model/lab-equipment.shared.json) · [Details](../../docs/lab-layout-l01.md)
 
@@ -83,9 +91,9 @@ Native Gesamtansicht mit Nassplatz links neben Tür A, anschließendem Abzug, Wa
 
 [![L01 · Geräteausstattung](images/l01-equipment.svg)](images/l01-equipment.svg)
 
-Aktueller schematischer Aufstellungsplan. Nummern markieren Gerätebezugspunkte; die Symbole sind keine Kollisionshüllen.
+Schematische Gerätebezugspunkte und vier TR01-Parkplätze. Farbige Linien projizieren die exportierten fließenden Fahrkurven. Kollisionsnachweis separat im nativen Prüfbericht; Menschen und geöffnete Unterschrankfronten sind nicht Teil der reservierten Fahrt.
 
-[Quelle](../../model/lab-layout-l01.shared.json) · [Details](../../docs/lab-layout-l01.md)
+[Quelle 1](../../model/lab-layout-l01.shared.json) · [Quelle 2](../../model/tr01-l01.motion.json) · [Details](../../docs/lab-layout-l01.md)
 
 ### Automatisierte Zentrifuge
 
@@ -102,6 +110,14 @@ Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei 
 Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.
 
 [Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../docs/development-plan.md)
+
+### TS01 · TapeStation, manuelle QC
+
+[![TS01 · TapeStation, manuelle QC](images/tapestation.png)](images/tapestation.png)
+
+4200-Planungshülle mit eigener Referenzbank und PC-Fläche; Modellwahl und Laborplatz offen. Keine automatische Beladung oder Messausführung.
+
+[Quelle](../../model/tapestation.shared.json) · [Details](../../docs/tapestation.md)
 
 
 
@@ -172,6 +188,14 @@ Lokaler Mock-Chargenlauf mit zwölf Proben. Alle Roboterübergaben sind abstrahi
 Schematischer Plan für zwölf Originale mit einem Inventar und durchgängiger Verbrauchsbuchung. Kein Geräte- oder Funktionsnachweis.
 
 [Quelle 1](../../model/synthetic-lab-workflow.shared.json) · [Quelle 2](../../model/synthetic-lab-workflow.manifest.json) · [Quelle 3](../../model/synthetic-lab-workflow.schema.json) · [Details](../../docs/synthetic-lab-workflow.md)
+
+### S01 · synthetischer Storage-Test
+
+[![S01 · synthetischer Storage-Test](images/kit-storage-s01.svg)](images/kit-storage-s01.svg)
+
+Schematischer Zustandsplan: derselbe geschlossene K01-Träger entweder am Regalplatz oder auf der festen Übergabeablage. Native statische Prüfstellungen und lokaler Journal-Mock unter Details; keine Roboterbahn oder reale Bestandsführung.
+
+[Quelle 1](../../model/kit-storage-s01.shared.json) · [Quelle 2](../../model/furnishings/kit-storage-s01.json) · [Details](../../docs/synthetic-storage-s01.md)
 
 
 

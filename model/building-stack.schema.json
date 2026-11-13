@@ -108,6 +108,24 @@
               }
             }
           ]
+        },
+        "furnishings": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
         }
       }
     },

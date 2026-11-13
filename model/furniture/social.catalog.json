@@ -1,0 +1,2512 @@
+{
+  "format": "solidcraftbot.social-furniture-catalog/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "status": "Photo-inspired concept dimensions; not measured or selected products",
+  "types": {
+    "desk": [
+      {
+        "id": "Top",
+        "body": "Top",
+        "color": "#d9b987",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            710
+          ],
+          "size": [
+            1400,
+            700,
+            35
+          ]
+        }
+      },
+      {
+        "id": "Leg40_40",
+        "body": "Leg40_40",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            40,
+            40,
+            0
+          ],
+          "size": [
+            45,
+            45,
+            710
+          ]
+        }
+      },
+      {
+        "id": "Leg40_600",
+        "body": "Leg40_600",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            40,
+            600,
+            0
+          ],
+          "size": [
+            45,
+            45,
+            710
+          ]
+        }
+      },
+      {
+        "id": "Leg1300_40",
+        "body": "Leg1300_40",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1300,
+            40,
+            0
+          ],
+          "size": [
+            45,
+            45,
+            710
+          ]
+        }
+      },
+      {
+        "id": "Leg1300_600",
+        "body": "Leg1300_600",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1300,
+            600,
+            0
+          ],
+          "size": [
+            45,
+            45,
+            710
+          ]
+        }
+      }
+    ],
+    "office_chair": [
+      {
+        "id": "Column",
+        "body": "Column",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            80
+          ],
+          "radius": 28,
+          "height": 350
+        }
+      },
+      {
+        "id": "Seat",
+        "body": "Seat",
+        "color": "#354b82",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -240,
+            -220,
+            430
+          ],
+          "size": [
+            480,
+            440,
+            65
+          ]
+        }
+      },
+      {
+        "id": "Back",
+        "body": "Back",
+        "color": "#354b82",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -240,
+            160,
+            495
+          ],
+          "size": [
+            480,
+            65,
+            480
+          ]
+        }
+      },
+      {
+        "id": "Caster0",
+        "body": "Caster0",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            260.0,
+            0.0,
+            20
+          ],
+          "radius": 32,
+          "height": 55
+        }
+      },
+      {
+        "id": "Caster1",
+        "body": "Caster1",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            80.34441853748633,
+            247.27469423673992,
+            20
+          ],
+          "radius": 32,
+          "height": 55
+        }
+      },
+      {
+        "id": "Caster2",
+        "body": "Caster2",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            -210.34441853748632,
+            152.82416559604303,
+            20
+          ],
+          "radius": 32,
+          "height": 55
+        }
+      },
+      {
+        "id": "Caster3",
+        "body": "Caster3",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            -210.34441853748635,
+            -152.82416559604297,
+            20
+          ],
+          "radius": 32,
+          "height": 55
+        }
+      },
+      {
+        "id": "Caster4",
+        "body": "Caster4",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            80.34441853748628,
+            -247.27469423673995,
+            20
+          ],
+          "radius": 32,
+          "height": 55
+        }
+      },
+      {
+        "id": "StarBase",
+        "body": "StarBase",
+        "action": "create",
+        "color": "#293a46",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              280.0,
+              0.0
+            ],
+            [
+              52.58610463437159,
+              38.20604139901075
+            ],
+            [
+              86.5247584249853,
+              266.29582456264296
+            ],
+            [
+              -20.086104634371576,
+              61.81867355918499
+            ],
+            [
+              -226.52475842498527,
+              164.5798706418925
+            ],
+            [
+              -65.0,
+              7.960204194457796e-15
+            ],
+            [
+              -226.5247584249853,
+              -164.57987064189246
+            ],
+            [
+              -20.08610463437159,
+              -61.81867355918498
+            ],
+            [
+              86.52475842498522,
+              -266.295824562643
+            ],
+            [
+              52.58610463437158,
+              -38.20604139901077
+            ]
+          ],
+          "offset": 75,
+          "depth": 30,
+          "fixed": true
+        }
+      },
+      {
+        "id": "ArmSupport-270",
+        "body": "ArmSupport-270",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -270,
+            0,
+            480
+          ],
+          "size": [
+            25,
+            40,
+            170
+          ]
+        }
+      },
+      {
+        "id": "Armrest-270",
+        "body": "Armrest-270",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -270,
+            -130,
+            640
+          ],
+          "size": [
+            35,
+            280,
+            35
+          ]
+        }
+      },
+      {
+        "id": "ArmSupport240",
+        "body": "ArmSupport240",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            240,
+            0,
+            480
+          ],
+          "size": [
+            25,
+            40,
+            170
+          ]
+        }
+      },
+      {
+        "id": "Armrest240",
+        "body": "Armrest240",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            240,
+            -130,
+            640
+          ],
+          "size": [
+            35,
+            280,
+            35
+          ]
+        }
+      }
+    ],
+    "dining_chair": [
+      {
+        "id": "Seat",
+        "body": "Seat",
+        "color": "#354b82",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -220,
+            -220,
+            440
+          ],
+          "size": [
+            440,
+            440,
+            55
+          ]
+        }
+      },
+      {
+        "id": "Back",
+        "body": "Back",
+        "color": "#354b82",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -220,
+            175,
+            495
+          ],
+          "size": [
+            440,
+            45,
+            400
+          ]
+        }
+      },
+      {
+        "id": "Leg-205_-195",
+        "body": "Leg-205_-195",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -205,
+            -195,
+            0
+          ],
+          "size": [
+            25,
+            25,
+            440
+          ]
+        }
+      },
+      {
+        "id": "Leg-205_175",
+        "body": "Leg-205_175",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -205,
+            175,
+            0
+          ],
+          "size": [
+            25,
+            25,
+            440
+          ]
+        }
+      },
+      {
+        "id": "Leg180_-195",
+        "body": "Leg180_-195",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            180,
+            -195,
+            0
+          ],
+          "size": [
+            25,
+            25,
+            440
+          ]
+        }
+      },
+      {
+        "id": "Leg180_175",
+        "body": "Leg180_175",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            180,
+            175,
+            0
+          ],
+          "size": [
+            25,
+            25,
+            440
+          ]
+        }
+      }
+    ],
+    "kitchen_run": [
+      {
+        "id": "Carcass0",
+        "body": "Carcass0",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            100
+          ],
+          "size": [
+            596,
+            590,
+            750
+          ]
+        }
+      },
+      {
+        "id": "Handle0",
+        "body": "Handle0",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            480,
+            595,
+            580
+          ],
+          "size": [
+            15,
+            30,
+            150
+          ]
+        }
+      },
+      {
+        "id": "Carcass600",
+        "body": "Carcass600",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            600,
+            0,
+            100
+          ],
+          "size": [
+            596,
+            590,
+            750
+          ]
+        }
+      },
+      {
+        "id": "Handle600",
+        "body": "Handle600",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1080,
+            595,
+            580
+          ],
+          "size": [
+            15,
+            30,
+            150
+          ]
+        }
+      },
+      {
+        "id": "Carcass1200",
+        "body": "Carcass1200",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1200,
+            0,
+            100
+          ],
+          "size": [
+            596,
+            590,
+            750
+          ]
+        }
+      },
+      {
+        "id": "Handle1200",
+        "body": "Handle1200",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1680,
+            595,
+            580
+          ],
+          "size": [
+            15,
+            30,
+            150
+          ]
+        }
+      },
+      {
+        "id": "Carcass1800",
+        "body": "Carcass1800",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1800,
+            0,
+            100
+          ],
+          "size": [
+            596,
+            590,
+            750
+          ]
+        }
+      },
+      {
+        "id": "Handle1800",
+        "body": "Handle1800",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            2280,
+            595,
+            580
+          ],
+          "size": [
+            15,
+            30,
+            150
+          ]
+        }
+      },
+      {
+        "id": "Worktop",
+        "body": "Worktop",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            850
+          ],
+          "size": [
+            2400,
+            640,
+            40
+          ]
+        }
+      }
+    ],
+    "sink": [
+      {
+        "id": "Basin",
+        "body": "Basin",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            300,
+            310,
+            -170
+          ],
+          "radius": 225,
+          "height": 200
+        }
+      },
+      {
+        "id": "Cavity",
+        "body": "Basin",
+        "color": "#aab6ba",
+        "action": "cut",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            300,
+            310,
+            -155
+          ],
+          "radius": 211,
+          "height": 210
+        }
+      },
+      {
+        "id": "Tap",
+        "body": "Tap",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            300,
+            70,
+            0
+          ],
+          "radius": 14,
+          "height": 270
+        }
+      },
+      {
+        "id": "Spout",
+        "body": "Spout",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            290,
+            70,
+            250
+          ],
+          "size": [
+            20,
+            170,
+            20
+          ]
+        }
+      }
+    ],
+    "microwave": [
+      {
+        "id": "Case",
+        "body": "Case",
+        "color": "#eee9da",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            520,
+            380,
+            310
+          ]
+        }
+      },
+      {
+        "id": "Window",
+        "body": "Window",
+        "color": "#172b32",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            35,
+            381,
+            55
+          ],
+          "size": [
+            350,
+            8,
+            205
+          ]
+        }
+      },
+      {
+        "id": "Handle",
+        "body": "Handle",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            395,
+            389,
+            65
+          ],
+          "size": [
+            20,
+            25,
+            180
+          ]
+        }
+      },
+      {
+        "id": "Dial90",
+        "body": "Dial90",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            465,
+            385,
+            90
+          ],
+          "radius": 18,
+          "height": 12
+        }
+      },
+      {
+        "id": "Dial210",
+        "body": "Dial210",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            465,
+            385,
+            210
+          ],
+          "radius": 18,
+          "height": 12
+        }
+      }
+    ],
+    "kettle": [
+      {
+        "id": "Base",
+        "body": "Base",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "radius": 110,
+          "height": 20
+        }
+      },
+      {
+        "id": "Jug",
+        "body": "Jug",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            20
+          ],
+          "radius": 95,
+          "height": 230
+        }
+      },
+      {
+        "id": "Lid",
+        "body": "Lid",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            250
+          ],
+          "radius": 100,
+          "height": 15
+        }
+      },
+      {
+        "id": "Handle",
+        "body": "Handle",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            90,
+            -55,
+            55
+          ],
+          "size": [
+            35,
+            110,
+            160
+          ]
+        }
+      },
+      {
+        "id": "Spout",
+        "body": "Spout",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -120,
+            -20,
+            190
+          ],
+          "size": [
+            40,
+            40,
+            55
+          ]
+        }
+      }
+    ],
+    "coffee_machine": [
+      {
+        "id": "Machine",
+        "body": "Machine",
+        "color": "#e6e0d4",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            220,
+            280,
+            340
+          ]
+        }
+      },
+      {
+        "id": "Head",
+        "body": "Head",
+        "color": "#293a46",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            130,
+            300
+          ],
+          "size": [
+            220,
+            150,
+            70
+          ]
+        }
+      },
+      {
+        "id": "Pot",
+        "body": "Pot",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            110,
+            220,
+            30
+          ],
+          "radius": 85,
+          "height": 125
+        }
+      }
+    ],
+    "wall_shelf": [
+      {
+        "id": "Back",
+        "body": "Back",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            1800,
+            20,
+            700
+          ]
+        }
+      },
+      {
+        "id": "Shelf0",
+        "body": "Shelf0",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            1800,
+            320,
+            20
+          ]
+        }
+      },
+      {
+        "id": "Shelf330",
+        "body": "Shelf330",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            330
+          ],
+          "size": [
+            1800,
+            320,
+            20
+          ]
+        }
+      },
+      {
+        "id": "Shelf680",
+        "body": "Shelf680",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            680
+          ],
+          "size": [
+            1800,
+            320,
+            20
+          ]
+        }
+      },
+      {
+        "id": "Side0",
+        "body": "Side0",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            20,
+            320,
+            700
+          ]
+        }
+      },
+      {
+        "id": "Side580",
+        "body": "Side580",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            580,
+            0,
+            0
+          ],
+          "size": [
+            20,
+            320,
+            700
+          ]
+        }
+      },
+      {
+        "id": "Side1200",
+        "body": "Side1200",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1200,
+            0,
+            0
+          ],
+          "size": [
+            20,
+            320,
+            700
+          ]
+        }
+      },
+      {
+        "id": "Side1780",
+        "body": "Side1780",
+        "color": "#cf4c26",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            1780,
+            0,
+            0
+          ],
+          "size": [
+            20,
+            320,
+            700
+          ]
+        }
+      }
+    ],
+    "mug": [
+      {
+        "id": "Cup",
+        "body": "Cup",
+        "color": "#faf5e8",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "radius": 40,
+          "height": 95
+        }
+      },
+      {
+        "id": "Hollow",
+        "body": "Cup",
+        "color": "#faf5e8",
+        "action": "cut",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            8
+          ],
+          "radius": 33,
+          "height": 100
+        }
+      },
+      {
+        "id": "Handle",
+        "body": "Handle",
+        "color": "#faf5e8",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            35,
+            -12,
+            25
+          ],
+          "size": [
+            22,
+            24,
+            45
+          ]
+        }
+      }
+    ],
+    "fridge": [
+      {
+        "id": "Shell",
+        "body": "Shell",
+        "color": "#e4e3da",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "size": [
+            560,
+            550,
+            820
+          ]
+        }
+      },
+      {
+        "id": "Cavity",
+        "body": "Shell",
+        "color": "#e4e3da",
+        "action": "cut",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            25,
+            25,
+            35
+          ],
+          "size": [
+            510,
+            540,
+            750
+          ]
+        }
+      },
+      {
+        "id": "Shelf240",
+        "body": "Shelf240",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            25,
+            30,
+            240
+          ],
+          "size": [
+            510,
+            500,
+            12
+          ]
+        }
+      },
+      {
+        "id": "Shelf480",
+        "body": "Shelf480",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            25,
+            30,
+            480
+          ],
+          "size": [
+            510,
+            500,
+            12
+          ]
+        }
+      },
+      {
+        "id": "Door",
+        "body": "Door",
+        "color": "#f4f0e5",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            552,
+            0
+          ],
+          "size": [
+            560,
+            35,
+            820
+          ]
+        }
+      },
+      {
+        "id": "Handle",
+        "body": "Handle",
+        "color": "#aab6ba",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            480,
+            590,
+            570
+          ],
+          "size": [
+            20,
+            25,
+            180
+          ]
+        }
+      }
+    ],
+    "penguin": [
+      {
+        "id": "Body",
+        "body": "Body",
+        "color": "#18222c",
+        "action": "create",
+        "shape": {
+          "kind": "cone",
+          "origin": [
+            0,
+            0,
+            20
+          ],
+          "radius": 58,
+          "top_radius": 45,
+          "height": 110
+        }
+      },
+      {
+        "id": "Belly",
+        "body": "Belly",
+        "color": "#f6efdc",
+        "action": "create",
+        "shape": {
+          "kind": "cone",
+          "origin": [
+            0,
+            35,
+            30
+          ],
+          "radius": 39,
+          "top_radius": 28,
+          "height": 92
+        }
+      },
+      {
+        "id": "Head",
+        "body": "Head",
+        "color": "#18222c",
+        "action": "create",
+        "shape": {
+          "kind": "cone",
+          "origin": [
+            0,
+            0,
+            120
+          ],
+          "radius": 45,
+          "top_radius": 40,
+          "height": 75
+        }
+      },
+      {
+        "id": "Eye-16",
+        "body": "Eye-16",
+        "color": "#ffffff",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              -9.0,
+              39.0
+            ],
+            [
+              -9.238519215976522,
+              40.811733315717646
+            ],
+            [
+              -9.937822173508929,
+              42.5
+            ],
+            [
+              -11.050252531694166,
+              43.94974746830583
+            ],
+            [
+              -12.5,
+              45.06217782649107
+            ],
+            [
+              -14.188266684282354,
+              45.761480784023476
+            ],
+            [
+              -16.0,
+              46.0
+            ],
+            [
+              -17.811733315717646,
+              45.761480784023476
+            ],
+            [
+              -19.5,
+              45.06217782649107
+            ],
+            [
+              -20.94974746830583,
+              43.94974746830583
+            ],
+            [
+              -22.062177826491073,
+              42.5
+            ],
+            [
+              -22.761480784023476,
+              40.811733315717646
+            ],
+            [
+              -23.0,
+              39.0
+            ],
+            [
+              -22.761480784023476,
+              37.188266684282354
+            ],
+            [
+              -22.062177826491073,
+              35.5
+            ],
+            [
+              -20.949747468305837,
+              34.05025253169417
+            ],
+            [
+              -19.500000000000004,
+              32.937822173508934
+            ],
+            [
+              -17.811733315717646,
+              32.238519215976524
+            ],
+            [
+              -16.0,
+              32.0
+            ],
+            [
+              -14.188266684282357,
+              32.238519215976524
+            ],
+            [
+              -12.5,
+              32.93782217350893
+            ],
+            [
+              -11.050252531694168,
+              34.05025253169417
+            ],
+            [
+              -9.93782217350893,
+              35.5
+            ],
+            [
+              -9.238519215976524,
+              37.18826668428235
+            ]
+          ],
+          "offset": 169.4,
+          "depth": 11.200000000000001,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Pupil-16",
+        "body": "Pupil-16",
+        "color": "#15212c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              -13.0,
+              45.0
+            ],
+            [
+              -13.102222521132795,
+              45.77645713530756
+            ],
+            [
+              -13.401923788646684,
+              46.5
+            ],
+            [
+              -13.878679656440358,
+              47.121320343559645
+            ],
+            [
+              -14.5,
+              47.598076211353316
+            ],
+            [
+              -15.223542864692437,
+              47.897777478867205
+            ],
+            [
+              -16.0,
+              48.0
+            ],
+            [
+              -16.776457135307563,
+              47.897777478867205
+            ],
+            [
+              -17.5,
+              47.598076211353316
+            ],
+            [
+              -18.121320343559642,
+              47.121320343559645
+            ],
+            [
+              -18.598076211353316,
+              46.5
+            ],
+            [
+              -18.897777478867205,
+              45.77645713530757
+            ],
+            [
+              -19.0,
+              45.0
+            ],
+            [
+              -18.897777478867205,
+              44.22354286469244
+            ],
+            [
+              -18.598076211353316,
+              43.5
+            ],
+            [
+              -18.121320343559645,
+              42.87867965644036
+            ],
+            [
+              -17.5,
+              42.401923788646684
+            ],
+            [
+              -16.776457135307563,
+              42.102222521132795
+            ],
+            [
+              -16.0,
+              42.0
+            ],
+            [
+              -15.223542864692439,
+              42.102222521132795
+            ],
+            [
+              -14.5,
+              42.401923788646684
+            ],
+            [
+              -13.878679656440358,
+              42.878679656440355
+            ],
+            [
+              -13.401923788646684,
+              43.5
+            ],
+            [
+              -13.102222521132795,
+              44.22354286469243
+            ]
+          ],
+          "offset": 172.6,
+          "depth": 4.800000000000001,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Eye16",
+        "body": "Eye16",
+        "color": "#ffffff",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              23.0,
+              39.0
+            ],
+            [
+              22.761480784023476,
+              40.811733315717646
+            ],
+            [
+              22.062177826491073,
+              42.5
+            ],
+            [
+              20.949747468305834,
+              43.94974746830583
+            ],
+            [
+              19.5,
+              45.06217782649107
+            ],
+            [
+              17.811733315717646,
+              45.761480784023476
+            ],
+            [
+              16.0,
+              46.0
+            ],
+            [
+              14.188266684282356,
+              45.761480784023476
+            ],
+            [
+              12.500000000000002,
+              45.06217782649107
+            ],
+            [
+              11.050252531694168,
+              43.94974746830583
+            ],
+            [
+              9.937822173508929,
+              42.5
+            ],
+            [
+              9.238519215976522,
+              40.811733315717646
+            ],
+            [
+              9.0,
+              39.0
+            ],
+            [
+              9.238519215976522,
+              37.188266684282354
+            ],
+            [
+              9.937822173508929,
+              35.5
+            ],
+            [
+              11.050252531694165,
+              34.05025253169417
+            ],
+            [
+              12.499999999999996,
+              32.937822173508934
+            ],
+            [
+              14.188266684282356,
+              32.238519215976524
+            ],
+            [
+              15.999999999999998,
+              32.0
+            ],
+            [
+              17.811733315717643,
+              32.238519215976524
+            ],
+            [
+              19.5,
+              32.93782217350893
+            ],
+            [
+              20.94974746830583,
+              34.05025253169417
+            ],
+            [
+              22.06217782649107,
+              35.5
+            ],
+            [
+              22.761480784023476,
+              37.18826668428235
+            ]
+          ],
+          "offset": 169.4,
+          "depth": 11.200000000000001,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Pupil16",
+        "body": "Pupil16",
+        "color": "#15212c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              19.0,
+              45.0
+            ],
+            [
+              18.897777478867205,
+              45.77645713530756
+            ],
+            [
+              18.598076211353316,
+              46.5
+            ],
+            [
+              18.121320343559642,
+              47.121320343559645
+            ],
+            [
+              17.5,
+              47.598076211353316
+            ],
+            [
+              16.776457135307563,
+              47.897777478867205
+            ],
+            [
+              16.0,
+              48.0
+            ],
+            [
+              15.223542864692439,
+              47.897777478867205
+            ],
+            [
+              14.5,
+              47.598076211353316
+            ],
+            [
+              13.878679656440358,
+              47.121320343559645
+            ],
+            [
+              13.401923788646684,
+              46.5
+            ],
+            [
+              13.102222521132795,
+              45.77645713530757
+            ],
+            [
+              13.0,
+              45.0
+            ],
+            [
+              13.102222521132795,
+              44.22354286469244
+            ],
+            [
+              13.401923788646684,
+              43.5
+            ],
+            [
+              13.878679656440356,
+              42.87867965644036
+            ],
+            [
+              14.499999999999998,
+              42.401923788646684
+            ],
+            [
+              15.223542864692439,
+              42.102222521132795
+            ],
+            [
+              16.0,
+              42.0
+            ],
+            [
+              16.77645713530756,
+              42.102222521132795
+            ],
+            [
+              17.5,
+              42.401923788646684
+            ],
+            [
+              18.121320343559642,
+              42.878679656440355
+            ],
+            [
+              18.598076211353316,
+              43.5
+            ],
+            [
+              18.897777478867205,
+              44.22354286469243
+            ]
+          ],
+          "offset": 172.6,
+          "depth": 4.800000000000001,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Beak",
+        "body": "Beak",
+        "color": "#ecad31",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -12,
+            35,
+            148
+          ],
+          "size": [
+            24,
+            35,
+            14
+          ]
+        }
+      },
+      {
+        "id": "Foot-40",
+        "body": "Foot-40",
+        "color": "#ecad31",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -40,
+            0,
+            0
+          ],
+          "size": [
+            30,
+            70,
+            12
+          ]
+        }
+      },
+      {
+        "id": "Foot10",
+        "body": "Foot10",
+        "color": "#ecad31",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            10,
+            0,
+            0
+          ],
+          "size": [
+            30,
+            70,
+            12
+          ]
+        }
+      },
+      {
+        "id": "Flipper65",
+        "body": "Flipper65",
+        "color": "#18222c",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -65,
+            -10,
+            40
+          ],
+          "size": [
+            20,
+            30,
+            80
+          ]
+        }
+      },
+      {
+        "id": "Flipper45",
+        "body": "Flipper45",
+        "color": "#18222c",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            45,
+            -10,
+            40
+          ],
+          "size": [
+            20,
+            30,
+            80
+          ]
+        }
+      }
+    ],
+    "plant": [
+      {
+        "id": "Pot",
+        "body": "Pot",
+        "color": "#b95a34",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            0
+          ],
+          "radius": 85,
+          "height": 140
+        }
+      },
+      {
+        "id": "Stem",
+        "body": "Stem",
+        "color": "#466b38",
+        "action": "create",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            140
+          ],
+          "radius": 10,
+          "height": 200
+        }
+      },
+      {
+        "id": "Leaf0",
+        "body": "Leaf0",
+        "color": "#537c3c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              110.0,
+              0.0
+            ],
+            [
+              108.29629131445341,
+              12.940952255126037
+            ],
+            [
+              103.30127018922194,
+              24.999999999999996
+            ],
+            [
+              95.35533905932738,
+              35.35533905932737
+            ],
+            [
+              85.0,
+              43.30127018922193
+            ],
+            [
+              72.94095225512604,
+              48.29629131445341
+            ],
+            [
+              60.0,
+              50.0
+            ],
+            [
+              47.059047744873965,
+              48.29629131445341
+            ],
+            [
+              35.00000000000001,
+              43.30127018922194
+            ],
+            [
+              24.64466094067263,
+              35.35533905932738
+            ],
+            [
+              16.69872981077806,
+              24.999999999999996
+            ],
+            [
+              11.703708685546587,
+              12.940952255126051
+            ],
+            [
+              10.0,
+              6.123233995736766e-15
+            ],
+            [
+              11.703708685546587,
+              -12.94095225512604
+            ],
+            [
+              16.69872981077806,
+              -24.99999999999999
+            ],
+            [
+              24.64466094067261,
+              -35.355339059327356
+            ],
+            [
+              34.99999999999998,
+              -43.30127018922192
+            ],
+            [
+              47.059047744873965,
+              -48.29629131445341
+            ],
+            [
+              59.99999999999999,
+              -50.0
+            ],
+            [
+              72.940952255126,
+              -48.29629131445342
+            ],
+            [
+              85.0,
+              -43.30127018922193
+            ],
+            [
+              95.35533905932738,
+              -35.355339059327385
+            ],
+            [
+              103.30127018922192,
+              -25.00000000000002
+            ],
+            [
+              108.29629131445341,
+              -12.940952255126078
+            ]
+          ],
+          "offset": 200.0,
+          "depth": 80.0,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Leaf1",
+        "body": "Leaf1",
+        "color": "#537c3c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              82.41813835208839,
+              50.48825908847379
+            ],
+            [
+              80.7144296665418,
+              63.429211343599825
+            ],
+            [
+              75.71940854131032,
+              75.48825908847378
+            ],
+            [
+              67.77347741141577,
+              85.84359814780116
+            ],
+            [
+              57.41813835208839,
+              93.78952927769572
+            ],
+            [
+              45.35909060721442,
+              98.78455040292721
+            ],
+            [
+              32.418138352088384,
+              100.4882590884738
+            ],
+            [
+              19.477186096962352,
+              98.78455040292721
+            ],
+            [
+              7.418138352088391,
+              93.78952927769572
+            ],
+            [
+              -2.9372007072389863,
+              85.84359814780117
+            ],
+            [
+              -10.883131837133554,
+              75.48825908847378
+            ],
+            [
+              -15.878152962365029,
+              63.42921134359984
+            ],
+            [
+              -17.581861647911616,
+              50.4882590884738
+            ],
+            [
+              -15.878152962365029,
+              37.54730683334775
+            ],
+            [
+              -10.883131837133554,
+              25.4882590884738
+            ],
+            [
+              -2.9372007072390076,
+              15.132920029146433
+            ],
+            [
+              7.418138352088363,
+              7.1869888992518725
+            ],
+            [
+              19.477186096962352,
+              2.1919677740203767
+            ],
+            [
+              32.41813835208838,
+              0.4882590884737894
+            ],
+            [
+              45.3590906072144,
+              2.1919677740203696
+            ],
+            [
+              57.41813835208839,
+              7.186988899251858
+            ],
+            [
+              67.77347741141575,
+              15.132920029146405
+            ],
+            [
+              75.7194085413103,
+              25.488259088473768
+            ],
+            [
+              80.71442966654179,
+              37.54730683334771
+            ]
+          ],
+          "offset": 218.0,
+          "depth": 80.0,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Leaf2",
+        "body": "Leaf2",
+        "color": "#537c3c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              25.031189807171454,
+              54.557845609540905
+            ],
+            [
+              23.327481121624867,
+              67.49879786466694
+            ],
+            [
+              18.332459996393393,
+              79.5578456095409
+            ],
+            [
+              10.386528866498832,
+              89.91318466886827
+            ],
+            [
+              0.03118980717146158,
+              97.85911579876284
+            ],
+            [
+              -12.027857937702509,
+              102.85413692399432
+            ],
+            [
+              -24.968810192828542,
+              104.5578456095409
+            ],
+            [
+              -37.90976244795458,
+              102.85413692399432
+            ],
+            [
+              -49.96881019282854,
+              97.85911579876284
+            ],
+            [
+              -60.32414925215592,
+              89.91318466886828
+            ],
+            [
+              -68.27008038205048,
+              79.5578456095409
+            ],
+            [
+              -73.26510150728195,
+              67.49879786466695
+            ],
+            [
+              -74.96881019282854,
+              54.55784560954091
+            ],
+            [
+              -73.26510150728195,
+              41.61689335441486
+            ],
+            [
+              -68.27008038205048,
+              29.557845609540916
+            ],
+            [
+              -60.324149252155934,
+              19.20250655021355
+            ],
+            [
+              -49.96881019282857,
+              11.256575420318988
+            ],
+            [
+              -37.90976244795458,
+              6.2615542950874925
+            ],
+            [
+              -24.968810192828556,
+              4.557845609540905
+            ],
+            [
+              -12.027857937702532,
+              6.261554295087485
+            ],
+            [
+              0.03118980717146158,
+              11.256575420318974
+            ],
+            [
+              10.386528866498825,
+              19.20250655021352
+            ],
+            [
+              18.33245999639337,
+              29.557845609540884
+            ],
+            [
+              23.32748112162486,
+              41.61689335441483
+            ]
+          ],
+          "offset": 236.0,
+          "depth": 80.0,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Leaf3",
+        "body": "Leaf3",
+        "color": "#537c3c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              -9.399549796026726,
+              8.467200483592032
+            ],
+            [
+              -11.103258481573313,
+              21.40815273871807
+            ],
+            [
+              -16.098279606804788,
+              33.46720048359203
+            ],
+            [
+              -24.04421073669935,
+              43.8225395429194
+            ],
+            [
+              -34.39954979602672,
+              51.76847067281396
+            ],
+            [
+              -46.45859754090069,
+              56.76349179804544
+            ],
+            [
+              -59.399549796026726,
+              58.46720048359203
+            ],
+            [
+              -72.34050205115275,
+              56.76349179804544
+            ],
+            [
+              -84.39954979602672,
+              51.76847067281397
+            ],
+            [
+              -94.7548888553541,
+              43.82253954291941
+            ],
+            [
+              -102.70081998524867,
+              33.46720048359203
+            ],
+            [
+              -107.69584111048013,
+              21.408152738718083
+            ],
+            [
+              -109.39954979602672,
+              8.467200483592038
+            ],
+            [
+              -107.69584111048013,
+              -4.473751771534008
+            ],
+            [
+              -102.70081998524867,
+              -16.532799516407955
+            ],
+            [
+              -94.75488885535412,
+              -26.888138575735326
+            ],
+            [
+              -84.39954979602675,
+              -34.83406970562989
+            ],
+            [
+              -72.34050205115275,
+              -39.82909083086138
+            ],
+            [
+              -59.39954979602673,
+              -41.53279951640797
+            ],
+            [
+              -46.45859754090071,
+              -39.82909083086139
+            ],
+            [
+              -34.39954979602672,
+              -34.8340697056299
+            ],
+            [
+              -24.044210736699355,
+              -26.888138575735354
+            ],
+            [
+              -16.09827960680481,
+              -16.53279951640799
+            ],
+            [
+              -11.10325848157332,
+              -4.473751771534046
+            ]
+          ],
+          "offset": 254.0,
+          "depth": 80.0,
+          "fixed": true
+        }
+      },
+      {
+        "id": "Leaf4",
+        "body": "Leaf4",
+        "color": "#537c3c",
+        "action": "create",
+        "shape": {
+          "kind": "polygon_prism",
+          "plane": "XY",
+          "points": [
+            [
+              10.781382748183283,
+              -45.4081497184757
+            ],
+            [
+              9.077674062636696,
+              -32.46719746334966
+            ],
+            [
+              4.082652937405221,
+              -20.408149718475702
+            ],
+            [
+              -3.8632781924893393,
+              -10.052810659148328
+            ],
+            [
+              -14.21861725181671,
+              -2.106879529253767
+            ],
+            [
+              -26.27766499669068,
+              2.8881415959777144
+            ],
+            [
+              -39.21861725181672,
+              4.591850281524302
+            ],
+            [
+              -52.159569506942745,
+              2.8881415959777144
+            ],
+            [
+              -64.21861725181671,
+              -2.10687952925376
+            ],
+            [
+              -74.57395631114409,
+              -10.05281065914832
+            ],
+            [
+              -82.51988744103866,
+              -20.408149718475702
+            ],
+            [
+              -87.51490856627012,
+              -32.46719746334965
+            ],
+            [
+              -89.21861725181671,
+              -45.40814971847569
+            ],
+            [
+              -87.51490856627012,
+              -58.34910197360174
+            ],
+            [
+              -82.51988744103866,
+              -70.40814971847568
+            ],
+            [
+              -74.57395631114412,
+              -80.76348877780305
+            ],
+            [
+              -64.21861725181674,
+              -88.70941990769762
+            ],
+            [
+              -52.159569506942745,
+              -93.70444103292911
+            ],
+            [
+              -39.218617251816724,
+              -95.4081497184757
+            ],
+            [
+              -26.277664996690703,
+              -93.70444103292911
+            ],
+            [
+              -14.21861725181671,
+              -88.70941990769762
+            ],
+            [
+              -3.8632781924893465,
+              -80.76348877780308
+            ],
+            [
+              4.0826529374052,
+              -70.40814971847573
+            ],
+            [
+              9.077674062636689,
+              -58.349101973601776
+            ]
+          ],
+          "offset": 272.0,
+          "depth": 80.0,
+          "fixed": true
+        }
+      }
+    ],
+    "wet_kitchen_run": {
+      "extends": "kitchen_run",
+      "omit_parts": [
+        "Carcass1800",
+        "Handle1800"
+      ],
+      "parts": [
+        {
+          "id": "SinkOpening",
+          "body": "Worktop",
+          "action": "cut",
+          "color": "#cf4c26",
+          "shape": {
+            "kind": "cylinder",
+            "origin": [
+              1600,
+              310,
+              849
+            ],
+            "radius": 225,
+            "height": 42
+          }
+        },
+        {
+          "id": "SinkCarcassOpening",
+          "body": "Carcass1200",
+          "action": "cut",
+          "color": "#cf4c26",
+          "shape": {
+            "kind": "cylinder",
+            "origin": [
+              1600,
+              310,
+              719
+            ],
+            "radius": 225,
+            "height": 172
+          }
+        }
+      ]
+    }
+  }
+}

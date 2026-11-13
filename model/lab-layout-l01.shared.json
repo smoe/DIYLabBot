@@ -66,6 +66,24 @@
       "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
       "report": "cad/lab-equipment/shared-build-report.json",
       "case": "fume_hood_1200_default"
+    },
+    "tapestation": {
+      "source": "model/tapestation.shared.json",
+      "source_sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+      "report": "cad/tapestation/shared-build-report.json",
+      "case": "default"
+    },
+    "nanodrop": {
+      "source": "model/nanodrop-concept.shared.json",
+      "source_sha256": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+      "report": "cad/nanodrop-concept/shared-build-report.json",
+      "case": "default"
+    },
+    "qubit": {
+      "source": "model/qubit-4-concept.shared.json",
+      "source_sha256": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+      "report": "cad/qubit-4-concept/shared-build-report.json",
+      "case": "default"
     }
   },
   "parameters": {
@@ -282,6 +300,41 @@
       "yaw_deg": 90,
       "pose": "access",
       "host": "Floor"
+    },
+    {
+      "id": "TS01",
+      "asset": "tapestation",
+      "host": "IslandLeft",
+      "xyz": [
+        2605,
+        3000,
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "NanoDrop01",
+      "asset": "nanodrop",
+      "host": "IslandRight",
+      "xyz": [
+        3560,
+        2850,
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "pose": "loading"
+    },
+    {
+      "id": "Qubit01",
+      "asset": "qubit",
+      "host": "IslandRight",
+      "xyz": [
+        3550,
+        3950,
+        "bench_height"
+      ],
+      "yaw_deg": 0,
+      "pose": "loading"
     }
   ],
   "corridors": [
@@ -424,7 +477,10 @@
     "Freezer01 fills the reserved bay at the window end of the left bench; its modeled opening is limited to 90 degrees in this installation.",
     "The left CF01/ArmC/TR01/rack group moves together toward the entrance by left_station_shift_y; its relative geometry is retained.",
     "Fridge01 backs onto the right sidewall behind Door B, faces the aisle and ends before the original right bench; its opening and straight shelf approaches are checked.",
-    "Balance01 uses the free left middle worktop; the manual cellar ULT is not part of L01."
+    "Balance01 uses the free left middle worktop; the manual cellar ULT is not part of L01.",
+    "DNA handoff uses RackManual on IslandLeft; it is not an implemented extraction device",
+    "NanoDrop01 and Qubit01 use the existing concept sources at the right island; TS01 uses its instrument-only mounting on the left island",
+    "TS01 and its PC use an instrument-only mounting on IslandLeft between RackManual and Balance01; the reference bench is not duplicated in L01"
   ],
   "limitations": [
     "Room dimensions, doors and storage remain provisional",

@@ -1,0 +1,329 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tr01-l01-motion.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "units",
+    "vehicle",
+    "layout",
+    "transporter",
+    "stations",
+    "routes",
+    "curve",
+    "limits",
+    "collision",
+    "limitations",
+    "traffic_policy"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.tr01-l01-motion/1"
+    },
+    "id": {
+      "const": "TR01.L01.StationRoutes"
+    },
+    "mode": {
+      "const": "synthetic_geometry_only"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "rad",
+        "time": "s"
+      }
+    },
+    "vehicle": {
+      "const": {
+        "instance_id": "TR01",
+        "variant": "Floor_T48",
+        "overrides": {
+          "floor_deck_z": "vehicle_deck_z"
+        },
+        "include_transport_cover": true
+      }
+    },
+    "layout": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ]
+        }
+      ]
+    },
+    "transporter": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        {
+          "required": [
+            "source_sha256"
+          ]
+        }
+      ]
+    },
+    "stations": {
+      "type": "object",
+      "minProperties": 4,
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "handoff_instance",
+          "park_xy_mm"
+        ],
+        "properties": {
+          "handoff_instance": {
+            "type": "string",
+            "minLength": 1
+          },
+          "park_xy_mm": {
+            "type": "array",
+            "items": {
+              "type": [
+                "number",
+                "string"
+              ]
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "from",
+          "to",
+          "via_xy_mm",
+          "reverse"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "from": {
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "type": "string",
+            "minLength": 1
+          },
+          "via_xy_mm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "reverse": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "curve": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "nominal_speed_mm_s",
+        "heading_subdivisions_per_segment",
+        "time_quantum_s",
+        "corner_trim_mm",
+        "spatial_step_mm"
+      ],
+      "properties": {
+        "kind": {
+          "const": "c2_quintic_pva"
+        },
+        "nominal_speed_mm_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "heading_subdivisions_per_segment": {
+          "type": "integer",
+          "minimum": 4,
+          "maximum": 200
+        },
+        "time_quantum_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "corner_trim_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "spatial_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence",
+        "linear",
+        "angular",
+        "carried_points"
+      ],
+      "properties": {
+        "evidence": {
+          "const": "synthetic_design_limits_not_hardware_or_biological_qualification"
+        },
+        "linear": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "velocity",
+            "acceleration",
+            "jerk"
+          ],
+          "properties": {
+            "velocity": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "acceleration": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "jerk": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "angular": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "velocity",
+            "acceleration",
+            "jerk"
+          ],
+          "properties": {
+            "velocity": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "acceleration": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "jerk": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "carried_points": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "velocity",
+            "acceleration",
+            "jerk"
+          ],
+          "properties": {
+            "velocity": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "acceleration": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "jerk": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "collision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "minimum_clearance_mm",
+        "maximum_depth",
+        "minimum_interval_s",
+        "distance_tolerance_mm",
+        "floor_contact_body",
+        "required_scene_status"
+      ],
+      "properties": {
+        "minimum_clearance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "maximum_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 30
+        },
+        "minimum_interval_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "distance_tolerance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "floor_contact_body": {
+          "const": "Floor"
+        },
+        "required_scene_status": {
+          "const": "fixed_arms_closed_lower_cupboards_and_source_defined_instrument_poses"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "traffic_policy": {
+      "const": {
+        "mode": "aisle_centre_only",
+        "lane_centres_mm": {
+          "left": "(bench_depth+room_width/2-island_half_width)/2",
+          "right": "(room_width/2+island_half_width+room_width-bench_depth)/2",
+          "front": "island_start_y/2",
+          "rear": "(island_start_y+island_length+left_depth-window_bench_depth)/2"
+        },
+        "work_area_priority": "occupied_or_unknown_blocks_approach",
+        "approach": "separate opt-in dock movement after explicit workstation release; no audible eviction"
+      }
+    }
+  }
+}

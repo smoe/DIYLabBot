@@ -188,6 +188,14 @@ Alle 1.048 zusätzlichen STEP-Vergleiche ergeben 0 Volumendifferenz.
 Die [Fotoableitung](building-exterior.md) dokumentiert Glasfront, Türfarbe,
 offene Geländer und den Gelände-Höhenbezug.
 
+
+Separater lokaler Möblierungsstand `building-stack-48617bac704a`: Beide CADs erzeugen
+1.185 geschlossene Darstellkörper einschließlich Küche und Büros. 248 gezielte
+Geometrieproben, neun Höhenprüfungen und alle 1.185 STEP-Differenzprüfungen
+bestehen. Die zusätzlichen [Möbelprüfungen und Einpassungsgrenzen](building-furnishings.md)
+sind separat beschrieben.
+
+
 Vorheriger Keller-Prüfstand vor den Fotoergänzungen `building-stack-b3571c36214a`: beide CADs erzeugen
 803 geschlossene Darstellkörper. FreeCAD bestätigt 249 gezielte Geometrieproben
 und neun Höhenprüfungen; alle 803 zusätzlichen STEP-Differenzprüfungen bestehen.
@@ -221,3 +229,11 @@ Tragfähigkeit, Absturzsicherung, Entwässerungsleistung, Brandschutz- oder
 Fluchtwegfreigabe. Netzwerk, ROS-/SiLA-Anbindung, Sensorik und Hardwareausführung
 sind für dieses Gebäudekonzept nicht implementiert. Spätere Robotertransporte
 unterliegen weiterhin der Vorgabe fließender Bewegung ohne unnötige Zwischenhalte.
+
+## Küche und Denkbereiche
+
+Die [Küche 1.008 und die Büros 1.002, 2.002, 3.002 sowie 3.009](building-furnishings.md)
+werden aus einer eigenen referenzierten Möblierung ergänzt. Die Küchenfarben
+und Anordnung folgen zwei Innenfotos; Maße, Arbeitsplatzanzahlen und die
+Einpassung in die OG-Schablone bleiben ausdrücklich angenommene Darstellwerte.
+Ein separater Blick in den Kühlschrank zeigt das kleine Easter Egg.

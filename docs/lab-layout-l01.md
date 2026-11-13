@@ -199,3 +199,22 @@ The separate transport motion profile remains pinned to the earlier environment.
 Changing this room invalidates that native motion evidence; its strict source
 check deliberately requires reconciliation and a new motion build. This layout
 change does not silently repin or qualify the robot's transport program.
+
+## TapeStation und stationsübergreifende Fahrkurven
+
+Die aktuelle Aufstellung ergänzt `NanoDrop01` bei (3560, 2850, 900), `Qubit01`
+bei (3550, 3950, 900), jeweils Ausrichtung 0°, auf `IslandRight`. `TS01` steht
+bei (2605, 3000, 900), Ausrichtung 0°, auf `IslandLeft`, mit PC längs dahinter.
+Alle bisherigen Gerätepositionen und Möbel bleiben erhalten. TS01 verwendet
+seine Gerätehülle ohne die eigenständige Referenzbank. Die drei Geräte stammen
+unmittelbar aus ihren vorhandenen Quellen und werden in beiden CADs unabhängig
+aufgebaut. Modellwahl und reale Installation der TapeStation bleiben offen.
+
+Die [neuen TR01-Parkpositionen und Fahrbahnen](lab-station-transport.md#geometrische-umsetzung-in-l01)
+sind eine eigene quellengebundene Bewegungsreferenz. Die bisherige Eingangspolyline
+oben bleibt historisch eine statische Aufstellungsprüfung. Der neue native
+Intervallnachweis umfasst das vollständige beladene Fahrzeug mit Transporthaube;
+er ist von den stationären Armübergaben und realer Navigation getrennt.
+Die statische Aufstellung, Gerätefreiräume und die Fahrkurven haben getrennte
+Prüfberichte. Die Gehstreifen sind während einer kreuzenden Fahrt keine
+unabhängig freigegebenen Personenwege.

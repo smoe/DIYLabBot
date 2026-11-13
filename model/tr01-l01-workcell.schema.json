@@ -1,0 +1,366 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Source-referenced synthetic TR01 L01 workcell",
+  "type": "object",
+  "required": [
+    "format",
+    "mode",
+    "actors",
+    "stations",
+    "work_areas",
+    "guards",
+    "cover_handling",
+    "arm_path"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.tr01-workcell/1"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "layout": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "floor_motion": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "arm_source": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tool_reference": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "limits_reference": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "additionalProperties": false
+    },
+    "actors": {
+      "type": "object",
+      "minProperties": 3,
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "source_instance",
+          "xyz_mm",
+          "yaw_deg",
+          "park_tcp_mm"
+        ],
+        "properties": {
+          "source_instance": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "xyz_mm": {
+            "anyOf": [
+              {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "yaw_deg": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "park_tcp_mm": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "stations": {
+      "type": "object",
+      "required": [
+        "DNA",
+        "CF01",
+        "QC",
+        "TS01"
+      ],
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "work_area",
+          "actor",
+          "dock_pose_mm_rad",
+          "approach_via_xy_mm",
+          "rack_instance",
+          "rack_place_body"
+        ],
+        "properties": {
+          "work_area": {
+            "type": "string"
+          },
+          "actor": {
+            "type": "string"
+          },
+          "dock_pose_mm_rad": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "approach_via_xy_mm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "approach_reverse": {
+            "const": false
+          },
+          "rack_instance": {
+            "type": "string"
+          },
+          "rack_place_body": {
+            "type": "string"
+          },
+          "clearance_tcp_mm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "empty_bench_via_tcp_mm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "manual_carry_via_mm": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            }
+          },
+          "tool_roll_deg": {
+            "type": "number"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "guards": {
+      "type": "object",
+      "required": [
+        "initial_occupancy",
+        "no_timeout_release",
+        "no_audible_eviction",
+        "invalidate_release_on_new_occupancy"
+      ],
+      "properties": {
+        "initial_occupancy": {
+          "const": "unknown"
+        },
+        "no_timeout_release": {
+          "const": true
+        },
+        "no_audible_eviction": {
+          "const": true
+        },
+        "invalidate_release_on_new_occupancy": {
+          "const": true
+        }
+      }
+    },
+    "cover_handling": {
+      "type": "object",
+      "required": [
+        "automatic_cover_mechanism_implemented"
+      ],
+      "properties": {
+        "automatic_cover_mechanism_implemented": {
+          "const": false
+        }
+      }
+    },
+    "work_areas": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "stations",
+          "bounds_xy_mm"
+        ],
+        "properties": {
+          "stations": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "DNA",
+                "CF01",
+                "QC",
+                "TS01"
+              ]
+            }
+          },
+          "bounds_xy_mm": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 4,
+            "maxItems": 4
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "arm_path": {
+      "type": "object",
+      "required": [
+        "corner_trim_mm",
+        "reference_step_mm"
+      ],
+      "properties": {
+        "corner_trim_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "reference_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "gripper_overrides": {
+      "type": "object",
+      "properties": {
+        "open_gap_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "additionalProperties": false
+    },
+    "parked_instances": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "joints_deg"
+        ],
+        "properties": {
+          "joints_deg": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 6,
+            "maxItems": 6
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

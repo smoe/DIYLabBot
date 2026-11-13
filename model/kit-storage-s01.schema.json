@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "kit-storage-s01.schema.json",
+  "title": "One source-selected K01 carrier at a shelf or supported handover nest",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "sources",
+    "parameters",
+    "carrier",
+    "locations",
+    "nest",
+    "display_case",
+    "cases",
+    "measured_dimensions",
+    "qualification",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.synthetic-kit-storage/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "environment",
+        "furniture",
+        "furnishings",
+        "kit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "environment": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "furniture": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "furnishings": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "kit": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "shelf_margin_x",
+        "shelf_margin_front",
+        "shelf_margin_back",
+        "support_t",
+        "support_top",
+        "place_gap",
+        "nest_clearance",
+        "nest_guide_t",
+        "nest_guide_h"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "shelf_margin_x": {
+          "$ref": "#/$defs/parameter"
+        },
+        "shelf_margin_front": {
+          "$ref": "#/$defs/parameter"
+        },
+        "shelf_margin_back": {
+          "$ref": "#/$defs/parameter"
+        },
+        "support_t": {
+          "$ref": "#/$defs/parameter"
+        },
+        "support_top": {
+          "$ref": "#/$defs/parameter"
+        },
+        "place_gap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "nest_clearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "nest_guide_t": {
+          "$ref": "#/$defs/parameter"
+        },
+        "nest_guide_h": {
+          "$ref": "#/$defs/parameter"
+        }
+      }
+    },
+    "carrier": {
+      "type": "object",
+      "required": [
+        "id",
+        "body_prefix",
+        "module_id",
+        "source_case",
+        "datum"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "body_prefix": {
+          "type": "string",
+          "pattern": "^[A-Za-z][A-Za-z0-9_]*_$"
+        },
+        "module_id": {
+          "const": "RNA"
+        },
+        "source_case": {
+          "const": "stored"
+        },
+        "datum": {
+          "const": "container_shell_bottom_front_center"
+        }
+      }
+    },
+    "locations": {
+      "type": "object",
+      "required": [
+        "source",
+        "handover"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "object",
+          "required": [
+            "id",
+            "support_body",
+            "top_frame",
+            "static_case"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "support_body": {
+              "type": "string",
+              "minLength": 1
+            },
+            "top_frame": {
+              "type": "string",
+              "minLength": 1
+            },
+            "static_case": {
+              "const": "shelf"
+            }
+          }
+        },
+        "handover": {
+          "type": "object",
+          "required": [
+            "id",
+            "support_body",
+            "top_frame",
+            "static_case"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "support_body": {
+              "type": "string",
+              "minLength": 1
+            },
+            "top_frame": {
+              "type": "string",
+              "minLength": 1
+            },
+            "static_case": {
+              "const": "handover"
+            }
+          }
+        }
+      }
+    },
+    "nest": {
+      "type": "object",
+      "required": [
+        "id",
+        "recipe",
+        "host_location"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipe": {
+          "const": "three_sided_fixed_low_guides_v1"
+        },
+        "host_location": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "display_case": {
+      "enum": [
+        "shelf",
+        "handover"
+      ]
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "location_role"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "enum": [
+              "shelf",
+              "handover"
+            ]
+          },
+          "location_role": {
+            "enum": [
+              "source",
+              "handover"
+            ]
+          }
+        }
+      }
+    },
+    "measured_dimensions": {
+      "type": "null"
+    },
+    "qualification": {
+      "type": "object",
+      "required": [
+        "shelf_load_qualified",
+        "nest_qualified",
+        "grasp_qualified",
+        "article_retention_verified",
+        "lid_retention_verified",
+        "stability_qualified",
+        "trajectory_implemented",
+        "hardware_executed",
+        "inventory_implemented"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "shelf_load_qualified": {
+          "const": false
+        },
+        "nest_qualified": {
+          "const": false
+        },
+        "grasp_qualified": {
+          "const": false
+        },
+        "article_retention_verified": {
+          "const": false
+        },
+        "lid_retention_verified": {
+          "const": false
+        },
+        "stability_qualified": {
+          "const": false
+        },
+        "trajectory_implemented": {
+          "const": false
+        },
+        "hardware_executed": {
+          "const": false
+        },
+        "inventory_implemented": {
+          "const": false
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "required": [
+        "expression",
+        "unit",
+        "range",
+        "description"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "expression": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

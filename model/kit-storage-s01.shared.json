@@ -1,0 +1,168 @@
+{
+  "format": "solidcraftbot.synthetic-kit-storage/1",
+  "id": "SYN.Storage01",
+  "status": "Synthetic static fixture; no transport, stock or hardware qualification",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "sources": {
+    "environment": {
+      "source": "model/environments/synthetic-unbounded.json",
+      "source_sha256": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604"
+    },
+    "furniture": {
+      "source": "model/furniture/reference-bench.catalog.json",
+      "source_sha256": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7"
+    },
+    "furnishings": {
+      "source": "model/furnishings/kit-storage-s01.json",
+      "source_sha256": "c327ad184a3bb07cdc8b61ce84dd96e1cb6f7cb472e756f99f26f806824baaf8"
+    },
+    "kit": {
+      "source": "model/extraction-kit-station.shared.json",
+      "source_sha256": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3"
+    }
+  },
+  "parameters": {
+    "shelf_margin_x": {
+      "expression": 20,
+      "unit": "mm",
+      "range": [
+        15,
+        30
+      ],
+      "description": "Side allowance around the source-derived carrier footprint"
+    },
+    "shelf_margin_front": {
+      "expression": 15,
+      "unit": "mm",
+      "range": [
+        10,
+        25
+      ],
+      "description": "Front allowance beyond the carrier base; handle may overhang"
+    },
+    "shelf_margin_back": {
+      "expression": 15,
+      "unit": "mm",
+      "range": [
+        10,
+        25
+      ],
+      "description": "Rear allowance beyond the carrier base"
+    },
+    "support_t": {
+      "expression": 12,
+      "unit": "mm",
+      "range": [
+        12,
+        12
+      ],
+      "description": "Synthetic reference support thickness"
+    },
+    "support_top": {
+      "expression": 200,
+      "unit": "mm",
+      "range": [
+        180,
+        220
+      ],
+      "description": "Common synthetic support elevation"
+    },
+    "place_gap": {
+      "expression": 160,
+      "unit": "mm",
+      "range": [
+        140,
+        200
+      ],
+      "description": "Clear separation between the two fixed support footprints"
+    },
+    "nest_clearance": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        2.5,
+        4
+      ],
+      "description": "Unqualified lateral/rear carrier clearance inside the handover nest"
+    },
+    "nest_guide_t": {
+      "expression": 4,
+      "unit": "mm",
+      "range": [
+        4,
+        4
+      ],
+      "description": "Synthetic fixed guide thickness"
+    },
+    "nest_guide_h": {
+      "expression": 12,
+      "unit": "mm",
+      "range": [
+        12,
+        12
+      ],
+      "description": "Low guide height below the source hood and carrier handle"
+    }
+  },
+  "carrier": {
+    "id": "S01.Carrier01",
+    "body_prefix": "Carrier01_",
+    "module_id": "RNA",
+    "source_case": "stored",
+    "datum": "container_shell_bottom_front_center"
+  },
+  "locations": {
+    "source": {
+      "id": "S01.Shelf01",
+      "support_body": "ShelfSupport",
+      "top_frame": "S01.Shelf01.Top",
+      "static_case": "shelf"
+    },
+    "handover": {
+      "id": "S01.Handover01",
+      "support_body": "HandoverSupport",
+      "top_frame": "S01.Handover01.Top",
+      "static_case": "handover"
+    }
+  },
+  "nest": {
+    "id": "S01.HandoverNest",
+    "recipe": "three_sided_fixed_low_guides_v1",
+    "host_location": "S01.Handover01"
+  },
+  "display_case": "shelf",
+  "cases": [
+    {
+      "id": "shelf",
+      "location_role": "source"
+    },
+    {
+      "id": "handover",
+      "location_role": "handover"
+    }
+  ],
+  "measured_dimensions": null,
+  "qualification": {
+    "shelf_load_qualified": false,
+    "nest_qualified": false,
+    "grasp_qualified": false,
+    "article_retention_verified": false,
+    "lid_retention_verified": false,
+    "stability_qualified": false,
+    "trajectory_implemented": false,
+    "hardware_executed": false,
+    "inventory_implemented": false
+  },
+  "limitations": [
+    "Exactly one closed RNA carrier is selected from the unchanged pinned K01 construction; the two cases are alternative static placements, not two carriers.",
+    "Nine symbolic material envelopes preserve catalog identity and slot order; they are not real package counts, observed stock or samples.",
+    "The environment is explicitly unbounded; the shelf place and handover nest are local reference geometry, not a complete shelf installation.",
+    "All new dimensions and clearances are synthetic assumptions; actual measured dimensions remain null.",
+    "Native support/contact and static handle-space checks do not establish load capacity, tipping stability, retention or a real grasp.",
+    "The fixed nest has no actuator, sensor, latch or controller. No rail robot, connecting path, swept-volume or hardware execution is implemented.",
+    "K01 geometry is generated from its source, not from another CAD output. Source-parameter changes require regeneration of this static composition."
+  ]
+}

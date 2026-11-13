@@ -1,0 +1,49 @@
+{
+  "format": "solidcraftbot.opposing-traffic-demo/1",
+  "mode": "synthetic_only",
+  "base_profile": {
+    "source": "model/l01-local-traffic.demo.json",
+    "source_sha256": "fa6aa501fd0857fcf5ecca250cc565ade752af71a042e940db0fc4295e4fe111"
+  },
+  "missions": [
+    {
+      "id": "TR01",
+      "from": "DNA",
+      "to": "CF01",
+      "initial_direction": 1
+    },
+    {
+      "id": "TR02",
+      "from": "CF01",
+      "to": "QC",
+      "initial_direction": -1
+    },
+    {
+      "id": "TR03",
+      "from": "QC",
+      "to": "DNA",
+      "initial_direction": 1
+    }
+  ],
+  "encounter_rule": {
+    "preferred_circulation": "left_north_rear_east_right_south_front_west",
+    "yield_direction": -1,
+    "blocked_fresh_observation_s": 0.5,
+    "action": "stop_then_reverse_along_own_path_to_rear_junction_and_continue_in_preferred_circulation",
+    "peer_information": "anonymous_local_range_returns_only",
+    "bench_policy": "occupied_and_unknown_excluded_for_entire_vehicle_envelope"
+  },
+  "person": {
+    "lane": "right",
+    "y_mm": 2200
+  },
+  "maximum_duration_s": 300,
+  "path_projection_step_mm": 40,
+  "output_step_s": 0.1,
+  "limitations": [
+    "Station goals are aisle waiting positions; occupied workspaces remain closed to docking and handoffs",
+    "A common static circulation rule resolves this demonstrated head-on encounter without exchanging positions, identities or intentions; no general multi-agent completeness guarantee",
+    "Reverse travel uses the same local omnidirectional scan and stop policy, including rear obstructions; missing observations never authorize motion",
+    "Relative room geometry, ideal sensors and obstacle speed assumptions are inherited from the base fixture; no real person-protection or drive qualification"
+  ]
+}

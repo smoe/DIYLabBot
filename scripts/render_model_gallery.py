@@ -65,6 +65,16 @@ def checked_case(family,case='default'):
 
 def input_for(entry):
     render=entry['render'];kind=render['kind'];commands=[];evidence={}
+    if kind=='tapestation':
+        path=ROOT/'cad/tapestation/shared-build-report.json';report=read(path)
+        if not report['passed']:raise ValueError('Checked TapeStation build required')
+        for source,digest in report['source_files_sha256'].items():
+            if sha(project(source))!=digest:raise ValueError('TapeStation build dependency changed: '+source)
+        model=project(report['files']['solidcraft']);image=project(report['files']['render'])
+        if sha(model)!=report['artifact_sha256']['solidcraft'] or sha(image)!=report['artifact_sha256']['render']:
+            raise ValueError('Changed TapeStation artifact')
+        return model,commands,None,{'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True,
+            'representation':'Static 4200 planning envelope on a dedicated synthetic bench; no manufacturer geometry, robot loading or measurement'}
     if kind=='lab-layout':
         import lab_layout_model as layout
         path=ROOT/'cad/lab-layout-l01/shared-build-report.json';report=read(path)
@@ -236,6 +246,35 @@ def svg_document(title,content,width=1150,height=850):
 
 def diagram(entry):
     view=entry['render']['view'];text=lambda x,y,t,size=20:f'<text x="{x}" y="{y}" font-size="{size}">{html.escape(str(t))}</text>'
+    if view=='kit_storage':
+        import kit_storage_model as storage
+        spec=storage.load(ROOT/entry['sources'][0]);data=storage.interfaces(spec,storage.parameters(spec))
+        carrier=data['carrier'];locations=data['locations']
+        content=text(40,55,'S01 · ein Kitträger, zwei alternative Aufstellungen',29)
+        content+=text(40,95,'Schematischer Zustandsplan · native CAD-Ansichten unter Details',19)
+        for index,case in enumerate(data['static_cases']):
+            left=35+index*555
+            content+=f'<rect x="{left}" y="125" width="525" height="425" rx="14" fill="white" stroke="#496576" stroke-width="3"/>'
+            content+=text(left+18,165,case,25)
+            for row,role in enumerate(('source','handover')):
+                location=locations[role];y=198+row*155;active=location['static_case']==case
+                content+=f'<rect x="{left+18}" y="{y}" width="489" height="135" rx="8" fill="#eef2f6" stroke="#8499a8"/>'
+                content+=text(left+30,y+25,location['id'],19)
+                content+=text(left+30,y+51,'Auflage Z '+str(round(location['seat_origin_mm'][2],2))+' mm',15)
+                if active:
+                    content+=f'<rect x="{left+205}" y="{y+61}" width="265" height="55" rx="5" fill="#258f98"/>'
+                    content+=f'<g fill="white">'+text(left+217,y+84,carrier['id'],17)+text(left+217,y+106,carrier['module_id']+' · geschlossen',15)+'</g>'
+                else:content+=text(left+30,y+99,'frei',22)
+        content+=text(40,595,'Dieselbe referenzierte K01-Quelle und dieselben Identitäten in beiden Fällen.',19)
+        content+=text(40,631,str(len(carrier['symbolic_contents']))+' symbolische Inhaltselemente · keine reale Packungszählung oder Mengenbilanz.',18)
+        content+=text(40,667,'Lokaler Mock: Regal → Übergabeablage → Regal; keine Roboterbahn dargestellt.',18)
+        content+=text(40,703,'Geometrie und Bestätigungen synthetisch; reale Greifbarkeit und Last offen.',18)
+        producers={rel(p):sha(p) for p in storage.source_dependencies(spec)
+                   if p.suffix=='.py' or p.name.endswith('.schema.json')}
+        return svg_document(entry['title'],content,height=740),{
+            'representation':'Source-derived alternative static S01 state plan; not a CAD render, trajectory or real inventory',
+            'producer_files_sha256':producers,'carrier_id':carrier['id'],
+            'static_cases':data['static_cases'],'real_inventory_managed':False,'transport_trajectory_implemented':False}
     if view=='kit_station':
         import extraction_kit_station as station
         spec=station.load(ROOT/entry['sources'][0]);modules=station.ensemble(spec,station.parameters(spec))
@@ -272,6 +311,23 @@ def diagram(entry):
             'representation':'Authorized manually derived EG vectors anchored to shared core references; uncalibrated, original photograph excluded',
             'producer_files_sha256':{rel(path):sha(path) for path in [ROOT/'scripts/render_ground_floor.py',*ground.source_dependencies(spec)] if path.suffix=='.py' or path.name.endswith('.schema.json')},
             'metric_scale_known':False,'original_image_embedded':False,'areas':len(spec['areas'])}
+    if view=='building_social':
+        source=read(ROOT/entry['sources'][0]); kitchen=next(room for room in source['rooms'] if room['room']=='1.008')
+        parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 740"><rect width="780" height="740" fill="#f4f6f7"/><g font-family="sans-serif" fill="#243747"><text x="30" y="35" font-size="22">Küche 1.008 · Einrichtung</text><text x="390" y="100" font-size="20">Denk- und Schreibbereiche</text>']
+        parts.append('<g transform="translate(35 60) scale(.095)"><rect width="3200" height="6500" fill="white" stroke="#a5b1b9" stroke-width="12"/>')
+        dimensions={'desk':(1400,700,'#d9b987'),'kitchen_run':(2400,640,'#cf4c26'),'wet_kitchen_run':(2400,640,'#cf4c26'),'fridge':(560,550,'#d8dfdf')}
+        for item in kitchen['instances']:
+            x,y,_=item['xyz_mm'];kind=item['type']
+            if kind in dimensions:
+                w,h,color=dimensions[kind];parts.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{color}" stroke="#344956" stroke-width="10" transform="rotate({item["yaw_deg"]} {x} {y})"/>')
+            elif kind in ('office_chair','dining_chair'):
+                parts.append(f'<circle cx="{x}" cy="{y}" r="210" fill="#354b82"/>')
+        parts.append('</g>')
+        for index,room in enumerate(source['rooms'][1:]):
+            desks=sum(item['type']=='desk' for item in room['instances'])
+            parts.append(f'<text x="390" y="{160+index*70}" font-size="18">{room["room"]}: {desks} '+('Arbeitsplatz' if desks==1 else 'Arbeitsplätze')+'</text>')
+        parts.append('<text x="390" y="500" font-size="15">Pinguin mit Teetasse im Kühlschrank</text><text x="30" y="710" font-size="15">Schematischer Plan · Maße und Arbeitsplatzanzahlen angenommen</text></g></svg>')
+        return ''.join(parts),{'representation':'Source-derived local kitchen furnishing plan and assumed office desk counts; not calibrated building geometry','original_image_embedded':False,'producer_files_sha256':{rel(Path(__file__)):sha(__file__)}}
     if view=='building_stack':
         import building_stack as stack
         import render_building_stack_section as section
@@ -355,12 +411,32 @@ def diagram(entry):
         content+=polygon(boundary,'#f9fafb');worktops={b['id'] for b in source['bodies'] if b['role']=='work_surface'}
         for op in operations:
             if op['body'] in worktops:content+=polygon(points(op['shape']),'#d5e0e5')
+        motion_evidence={}
+        if 'model/tr01-l01.motion.json' in entry['sources']:
+            import tr01_floor_motion as floor_motion
+            report_path=ROOT/'cad/tr01-l01/shared-build-report.json';report=read(report_path)
+            if not report['passed']:raise ValueError('Checked TR01 route build required')
+            floor_motion.verify(report['source_files_sha256'])
+            program_path=ROOT/report['files']['program']
+            if sha(program_path)!=report['artifact_sha256']['program']:raise ValueError('TR01 program changed')
+            program=read(program_path)
+            for route,color in zip(program['routes'],('#9159a5','#4c876b','#d18a37','#3a8da4')):
+                pts=[point(*p['pose_mm_rad'][:2]) for p in route['points']]
+                content+='<polyline points="'+' '.join('%g,%g'%p for p in pts)+f'" fill="none" stroke="{color}" stroke-width="3"/>'
+            for identity,station in program['definition']['stations'].items():
+                sx,sy=point(*station['park_xy_mm'])
+                content+=f'<rect x="{sx-13}" y="{sy-17}" width="26" height="34" rx="5" fill="#f9fafb" stroke="#35566e" stroke-width="2"/>'
+                content+=text(sx+18 if identity=='CF01' else sx-22,sy-23,identity,15)
+            motion_evidence={'motion_report':rel(report_path),'motion_report_sha256':sha(report_path),
+                             'motion_program_sha256':sha(program_path),'route_display':'Projected exported C2 pose curves and source parking reference points; diagram is not the clearance proof'}
         palette={'arm':'#2d6e94','centrifuge':'#ba873a','transporter':'#4c876b','tube_rack':'#826ba0','tip_collector':'#b86b50',
                  'analytical_balance':'#3d7d8b','fridge_4c':'#508d9e','freezer_minus20':'#4876a1',
-                 'water_bath_13l':'#3d9cab','fume_hood_1200':'#637f99'}
+                 'water_bath_13l':'#3d9cab','fume_hood_1200':'#637f99',
+                 'tapestation':'#765f96','nanodrop':'#428c94','qubit':'#599e73'}
         labels={'arm':'Laborarm','centrifuge':'Zentrifuge','transporter':'Transporter','tube_rack':'Rack','tip_collector':'Spitzenabwurf',
                 'analytical_balance':'Analysenwaage','fridge_4c':'Kühlschrank +4 °C','freezer_minus20':'Gefrierschrank −20 °C',
-                'water_bath_13l':'Wasserbad 13 l','fume_hood_1200':'Abzug 1200 mm'}
+                'water_bath_13l':'Wasserbad 13 l','fume_hood_1200':'Abzug 1200 mm',
+                'tapestation':'TapeStation (manuell)','nanodrop':'NanoDrop','qubit':'Qubit'}
         legend_step=min(53,600/len(layout_spec['instances']))
         for i,item in enumerate(layout_spec['instances'],1):
             x,y,z=layout.xyz(item['xyz'],lp);sx,sy=point(x,y);color=palette[item['asset']]
@@ -374,7 +450,7 @@ def diagram(entry):
             content+=f'<text x="815" y="{175+i*legend_step}" text-anchor="middle" font-size="14" fill="white">{i}</text>'
             content+=text(840,175+i*legend_step,item['id'],19)+text(840,196+i*legend_step,labels[item['asset']]+' · Z '+str(round(z))+' mm',13)
         content+=text(40,830,'Symbole sind keine Bauraum- oder Kollisionshüllen. Ausrichtungspfeile folgen der Quelle.',16)
-        return svg_document(entry['title'],content,height=865),{'representation':'Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render','instances':len(layout_spec['instances'])}
+        return svg_document(entry['title'],content,height=865),{'representation':'Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render','instances':len(layout_spec['instances']),**motion_evidence}
     raise ValueError(view)
 
 

@@ -1162,3 +1162,58 @@ erhalten modellierte Griffe mit abgeleiteten Greifbezügen; Griffgeometrie und
 Greifbezug stammen aus demselben Rezept. Eine Transportbahn, ein ausgewählter
 Greifer, sichere Artikel-/Deckelretention und belastbare Traglasten folgen
 daraus nicht. Automatisierter Regalzugriff ist eine spätere Ausbaustufe.
+
+### Synthetischer Storage-Testfall S01
+
+[S01](docs/synthetic-storage-s01.md) ergänzt eine separate synthetische
+Komposition mit einem Regalplatz, einer festen Übergabeablage und genau einem
+geschlossenen RNA-Träger aus der unveränderten K01-Quelle. Umgebung und
+Möbeltypen werden referenziert, deren Aufstellung liegt in einer eigenen
+Möblierungsquelle. Zwei alternative statische Fälle platzieren dieselbe
+Trägerdefinition; sie sind keine Bewegungsfolge.
+
+Der lokale Storage-Runner verwendet das vorhandene Journal für einen
+dauerhaften, ausdrücklich synthetischen Fixturezustand mit Identität,
+Ort/Gewahrsam, Belegung, Reservierungen und offenen Absichten. Seine
+symbolischen Inhaltselemente sind keine realen Kitstückzahlen. Eine erneute
+Initialisierung darf denselben Fixturezustand nicht zurücksetzen. Wiederaufnahme,
+Quellenbindung und Abgleich bleiben von einer beobachteten Durchführung
+getrennt; es gibt weder automatische Wiederholung noch angenommene Rückgabe.
+
+Dies erweitert keinen gemeinsamen Material- oder Reagenzbestand. Stock-/Root-
+Integration, Transporthardware, Schienen, reale Greifer und eine fließende
+Roboterbahn bleiben spätere Schritte des [Storage-Plans](docs/automated-storage-plan.md).
+Statische Auflage- und Freiraumprüfungen sind keine Greif-, Last-, Fertigungs-
+oder Sicherheitsqualifikation. Die direkte K01-Bereitstellung bleibt Version 1.
+
+## Stationsübergreifende TR01-Aufgaben und manuelle TapeStation
+
+`model/lab-station-transport.protocol.json` referenziert den bestehenden
+Bodenroboter, Extraktionsvorbereitung/K01, CF01, die gemeinsame Analytikstation
+und TS01. `scripts/lab_station_transport.py` führt einen separaten synthetischen
+Aufgabenlauf im vorhandenen Journal aus: Absichten, explizite Beobachtungen,
+Reservierungen und Wiederaufnahme mit Abgleich. Proben-/Gefäß-/Ursprungsplatz-IDs
+stammen aus der referenzierten DNA-Vorbereitung. Das Fixture erzeugt kein
+Extraktionsprodukt, keine Mengenbilanz und keinen laufübergreifenden Bestand.
+Die bisherigen CF01-/NanoDrop-/Qubit-Läufe werden damit nicht automatisch
+transportiert oder neu gestartet. `model/tr01-l01.motion.json` ergänzt nun
+geometrische Parkpunkte und fließende Fahrkurven. Die gemeinsame PVA-Mathematik
+prüft die tatsächlich exportierten, zeitquantisierten Kurven einschließlich
+Ruckgrenzen und innerer Geschwindigkeitsnullstellen. Native L01-Abstände und
+konservative Intervallbewegungshüllen zertifizieren die gesamte Fahrt gegen
+feste Modellkörper mit mindestens 15 mm Abstand. TR01 wird vollständig mit
+48 Gefäßhüllen und Transporthaube geprüft. Die Körper werden aus derselben
+Quelle unabhängig in beiden CADs erzeugt. Reale Navigation, Fahrwerksregelung,
+Menschen im Fahrweg und lokale Armübergabebahnen bleiben offen.
+Siehe [Stationsübergaben](docs/lab-station-transport.md).
+
+`model/tapestation.shared.json` ergänzt eine manuelle TapeStation mit 4200 als
+Planungsreferenz und weiterhin offener Modellwahl. Derselbe portable Generator
+erzeugt die statische Hülle auf einer eigenen synthetischen Referenzbank in
+beiden CADs. L01 referenziert inzwischen eine Instrument-only-Montage mit PC
+auf der linken Mittelbank bei (2605, 3000, 900) mm. Auflage und Installations-
+freihaltevolumen werden gegen die native Aufstellung geprüft. F03 bleibt
+unverändert und besitzt keine Registrierung dieser Geräte. Die
+[Assistenzidee](docs/tapestation.md) trennt Personenübernahme, Aliquotbuchung im
+gemeinsamen Ledger, Assay-/Lauf-/Lane-Identität, Originalexport, Bewertung und
+Rückgabe. Dieser Messablauf und ein Geräteadapter sind noch nicht implementiert.

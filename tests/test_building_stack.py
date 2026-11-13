@@ -56,6 +56,12 @@ class StackTests(unittest.TestCase):
         self.mock_circulation.start(); self.addCleanup(self.mock_circulation.stop)
         self.addCleanup(self.mock_templates.stop); self.addCleanup(self.mock_room.stop)
 
+    def test_experimental_alignment_contract_cannot_silently_deform_floorplans(self):
+        spec=copy.deepcopy(self.spec)
+        spec['alignment']={'method':'boundary_arclength_harmonic_displacement'}
+        with self.assertRaisesRegex(ValueError,'building stack'):
+            model.validate(spec)
+
     def test_five_scoped_instances_and_explicit_assumed_dimensions(self):
         model.validate(self.spec); p = model.parameters(self.spec); data = model.interfaces(self.spec, p)
         self.assertEqual([level['id'] for level in data['levels']], ['KG', 'EG', 'OG1', 'OG2', 'OG3'])
@@ -190,6 +196,18 @@ class StackTests(unittest.TestCase):
             elif change == 'metric': bad['calibration'] = {'scale_mm_per_unit': 10}
             else: bad['qualification']['trajectory_implemented'] = True
             with self.subTest(change=change), self.assertRaises(ValidationError): validator.validate(bad)
+
+
+class RegisteredFloorSourceTests(unittest.TestCase):
+    def test_registered_ground_sources_preserve_their_validated_boundaries(self):
+        spec=json.loads(model.SOURCE.read_text())
+        for level,key in [('EG','ground_floor'),('KG','basement')]:
+            with self.subTest(level=level):
+                original=model.ground.load(model.assembly.validate_reference(spec['sources'][key],root=ROOT))
+                actual=model.level_plan(spec,level)
+                model.floor.validate(actual)
+                for field in ('vertices','walls','areas','openings'):
+                    self.assertEqual(actual[field],original[field])
 
 
 if __name__ == '__main__': unittest.main()

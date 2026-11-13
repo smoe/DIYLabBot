@@ -67,7 +67,7 @@ def z_checks(geometry, contract):
                        'clear_top_presentation_mm': level['clear_top_mm']})
     ground = contract['ground_fill_probe']
     expected = (seen | set(ground.get('target_bodies', [ground.get('target_body')])) | set(contract['marker_body_ids'])
-                | set(contract.get('exterior', {}).get('body_ids', [])) | set(contract.get('circulation', {}).get('body_ids', [])) | set(contract.get('roof', {}).get('body_ids', [])))
+                | set(contract.get('furnishings', {}).get('body_ids', [])) | set(contract.get('exterior', {}).get('body_ids', [])) | set(contract.get('circulation', {}).get('body_ids', [])) | set(contract.get('roof', {}).get('body_ids', [])))
     if expected != set(bodies): raise ValueError('Every native body must belong to an explicit scoped role')
     for a, b in zip(levels, levels[1:]):
         gap = b['slab_bottom_mm']-a['slab_top_mm']
@@ -530,6 +530,8 @@ def build(args):
     hashes={key:common.robot_spec.digest(path)for key,path in paths.items()}; renders={}; geometry=sc or fc
     if args.backend in {'both','solidcraft'} and not args.no_render:
         views = ['overview', 'atrium']+(['circulation', 'ground', 'basement'] if contract.get('circulation') else [])+(['roof'] if contract.get('roof') else [])
+        views += [room['id'] for room in contract.get('furnishings', {}).get('rooms', [])]
+        if contract.get('furnishings'): views.append('Kitchen1008_EasterEgg')
         for view in views:
             if view == 'overview':
                 commands=[]; view_geometry=geometry
@@ -537,7 +539,12 @@ def build(args):
                 hidden=contract['wall_visibility_ids']+contract.get('roof', {}).get('body_ids', [])+contract.get('exterior', {}).get('terrain_body_ids', [])+contract.get('exterior', {}).get('glass_body_ids', [])+contract.get('exterior', {}).get('frame_body_ids', [])
                 commands=[{'command':'browser.visibility','params':{'items':hidden,'visible':False}}]; view_geometry=[body for body in geometry if body['body'] not in set(hidden)]
             else:
-                if view == 'circulation':
+                furniture_room = next((room for room in contract.get('furnishings', {}).get('rooms', []) if room['id'] == view.removesuffix('_EasterEgg')), None)
+                if furniture_room:
+                    kept = set(furniture_room['body_ids'])
+                    if view.endswith('_EasterEgg'):
+                        kept = {name for name in kept if '_Fridge_' in name or '_Penguin' in name}-set(furniture_room['fridge_door_body_ids'])
+                elif view == 'circulation':
                     kept=set(contract['circulation']['detail_visibility_ids'])
                 elif view == 'basement':
                     basement_level=next(level for level in contract['levels'] if level['id']=='KG')
@@ -554,6 +561,8 @@ def build(args):
                 commands=[{'command':'browser.visibility','params':{'items':[body['body'] for body in geometry if body['body'] not in kept],'visible':False}}]
                 view_geometry=[body for body in geometry if body['body'] in kept]
             script=out/(view+'.view.commands.json'); write(script,{'commands':commands}); image=render/(view+'.png'); cam=camera(view_geometry,atrium=view!='overview')
+            if view == 'Kitchen1008': cam.update(yaw=2.3, pitch=.55)
+            if view == 'Kitchen1008_EasterEgg': cam.update(yaw=3.0, pitch=.12)
             cmd=[args.solidcraft_cli,'snapshot',str(script),'--in',str(paths['solidcraft']),'--out',str(image),'--width','1800','--height','1400','--camera',json.dumps(cam),'--no-grid','--no-axes','--quality','fine']
             subprocess.run(cmd,check=True,cwd=ROOT,stdout=subprocess.DEVNULL)
             renders[view]={'path':relative(image),'sha256':common.robot_spec.digest(image),'pixels':[1800,1400],'camera':cam,
@@ -562,7 +571,8 @@ def build(args):
     report={'format':FORMAT,'source':source_name,'source_sha256':digest,'source_files_sha256':pins,'revision':revision,'passed':passed,
             'exterior':contract.get('exterior'),
             'backends':args.backend,'cross_cad_checked':args.backend=='both','closed_body_count':len(expanded['bodies']),
-            'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids']),'marker_body_ids':contract['marker_body_ids'],
+            'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids'])-len(contract.get('furnishings', {}).get('body_ids', [])),'marker_body_ids':contract['marker_body_ids'],
+            'furnishings':contract.get('furnishings'),
             'coordinate_meaning':NOTICE,'metric_scale_known':False,'assumed_dimensions':contract['assumed_dimensions'],
             'solidcraft_checks':sc_checks,'freecad_checks_passed':None if fc_checks is None else fc_checks['passed'],'body_comparisons':cross,
             'native_corridor_roof_checks_passed':{'solidcraft':None if sc_checks is None else sc_checks.get('native_corridor_roof_checks_passed'),

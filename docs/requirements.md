@@ -13,6 +13,8 @@
 | Gemeinsame Banknutzung | Mitarbeitende sollen den angehaltenen, gefalteten Arm leicht zur Seite stellen können; Bedienkraft, Parkzeit und Platzgewinn noch messen |
 | Ausbau | Ein Arm zu Beginn, später möglicherweise drei Arme an einer Station |
 | Analytikstation | Zwei zusätzliche, weitgehend baugleiche Sechsachsarme für Tube-Handhabung, Pipettieren, Verdünnung, NanoDrop und Qubit; zusammen mit dem CF01-Arm drei Arme im Zielaufbau |
+| Stationsübergreifender Transport | Vorhandenen Bodenroboter TR01 zwischen DNA-Aufreinigung, CF01 und gemeinsamer NanoDrop-/Qubit-Station verwenden; synthetische Aufgabenübergaben sowie geometrische L01-Parkpunkte und fließende, kollisionsgeprüfte Fahrkurven sind separat implementiert; Navigation und reale Übergaben bleiben offen |
+| TapeStation TS01 | Als zunächst manuell bedienten QC-Arbeitsplatz aufnehmen; Modellwahl offen, 4200 als Planungsreferenz. Menschliche Assistenz vor automatischer Beladung vorsehen |
 | Langfristiger Volumenbereich | 1–1000 µl mit verschiedenen Werkzeugen |
 | Gefäße | Eppendorf-Gefäße, 96-Well- und 384-Well-Platten |
 | Erster begrenzter Prototyp | Budgetziel 3.000–5.000 EUR |

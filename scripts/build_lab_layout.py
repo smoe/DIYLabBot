@@ -68,7 +68,7 @@ def prepare(args):
     for snapshot in context['snapshots']:
         if snapshot['source_asset']=='arm':
             native_arm(s,snapshot,cad,out,args)
-        elif snapshot['source_asset'] in model.EQUIPMENT_PROFILES or snapshot['source_asset']=='centrifuge':
+        elif snapshot['source_asset'] in model.EQUIPMENT_PROFILES|model.INSTRUMENTS or snapshot['source_asset']=='centrifuge':
             native_file=cad/'assets'/(snapshot['id']+'.sc');native_commands=out/(snapshot['id']+'.solidcraft.commands.json')
             compiler=model.centrifuge_solidcraft_commands if snapshot['source_asset']=='centrifuge' else model.equipment_solidcraft_commands
             write(native_commands,{'commands':compiler(s,snapshot['instance'])})
@@ -151,6 +151,7 @@ def finish(context,args):
     paths += [model.ROOT/'model/assembly-reference.schema.json',model.ROOT/'model/lab-layout.schema.json']
     paths += [model.ROOT/'scripts'/name for name in ['lab_equipment.py','build_lab_equipment_freecad.py','build_tube_carrier_freecad.py','tube_carrier_model.py','tube_cam_model.py']]
     paths += [model.ROOT/'model/lab-equipment.schema.json']
+    paths += [model.ROOT/'scripts/instrument_concept.py',model.ROOT/'scripts/tapestation_model.py']
     report={'format':'solidcraftbot.lab-layout-build/1','revision':context['revision'],'source_sha256':context['source_sha256'],
         'passed':native['passed'] and presentation['passed'] and all(c['passed'] for c in checks+device_comparisons+rigid_checks),'layout_validation':native,'instance_cross_cad':checks,
         'equipment_body_comparisons':device_comparisons,'presentation':presentation,

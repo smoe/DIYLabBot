@@ -1,0 +1,643 @@
+{
+  "format": "solidcraftbot.building-furnishings/1",
+  "catalog": {
+    "source": "model/furniture/social.catalog.json",
+    "source_sha256": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+  },
+  "basis": "Owner room assignments and two private kitchen photographs; all sizes and desk counts assumed",
+  "kitchen_template_mapping": "Assumed combined OG1 projection of canonical 008A/B; internal template partition omitted only for this furnished display",
+  "placement_policy": "Uniform presentation fit inside referenced room bounds; not physical dimensions or calibrated registration",
+  "rooms": [
+    {
+      "id": "Kitchen1008",
+      "room": "1.008",
+      "level": "OG1",
+      "template_areas": [
+        "R3_008A",
+        "R3_008B"
+      ],
+      "recipe": "kitchen",
+      "local_extent_mm": [
+        3200,
+        6500
+      ],
+      "yaw_deg": 90,
+      "instances": [
+        {
+          "id": "LeftRun",
+          "type": "wet_kitchen_run",
+          "xyz_mm": [
+            0,
+            2900,
+            0
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "RightRun",
+          "type": "kitchen_run",
+          "xyz_mm": [
+            3200,
+            500,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "Sink",
+          "type": "sink",
+          "xyz_mm": [
+            0,
+            1600,
+            890
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "Microwave",
+          "type": "microwave",
+          "xyz_mm": [
+            20,
+            2300,
+            890
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "Kettle",
+          "type": "kettle",
+          "xyz_mm": [
+            320,
+            2550,
+            890
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Coffee",
+          "type": "coffee_machine",
+          "xyz_mm": [
+            2850,
+            1900,
+            890
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "MiniOven",
+          "type": "microwave",
+          "xyz_mm": [
+            3180,
+            2350,
+            890
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "Tasses",
+          "type": "wall_shelf",
+          "xyz_mm": [
+            0,
+            2900,
+            1450
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "Fridge",
+          "type": "fridge",
+          "xyz_mm": [
+            20,
+            1060,
+            0
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "Penguin",
+          "type": "penguin",
+          "xyz_mm": [
+            270,
+            780,
+            252
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "PenguinTea",
+          "type": "mug",
+          "xyz_mm": [
+            450,
+            780,
+            252
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug0",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1300,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug1",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1410,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug2",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1520,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug3",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1630,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug4",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1740,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Mug5",
+          "type": "mug",
+          "xyz_mm": [
+            220,
+            1850,
+            1800
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "TableA",
+          "type": "desk",
+          "xyz_mm": [
+            1950,
+            3500,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "TableB",
+          "type": "desk",
+          "xyz_mm": [
+            1950,
+            4900,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "LeftChair0",
+          "type": "dining_chair",
+          "xyz_mm": [
+            850,
+            3850,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "RightChair0",
+          "type": "dining_chair",
+          "xyz_mm": [
+            2350,
+            3850,
+            0
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "LeftChair1",
+          "type": "dining_chair",
+          "xyz_mm": [
+            850,
+            4550,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "RightChair1",
+          "type": "dining_chair",
+          "xyz_mm": [
+            2350,
+            4550,
+            0
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "LeftChair2",
+          "type": "dining_chair",
+          "xyz_mm": [
+            850,
+            5250,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "RightChair2",
+          "type": "dining_chair",
+          "xyz_mm": [
+            2350,
+            5250,
+            0
+          ],
+          "yaw_deg": -90
+        },
+        {
+          "id": "Plant",
+          "type": "plant",
+          "xyz_mm": [
+            1600,
+            5950,
+            745
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "LeftChair3",
+          "type": "office_chair",
+          "xyz_mm": [
+            850,
+            5950,
+            0
+          ],
+          "yaw_deg": 90
+        },
+        {
+          "id": "RightChair3",
+          "type": "dining_chair",
+          "xyz_mm": [
+            2350,
+            5950,
+            0
+          ],
+          "yaw_deg": -90
+        }
+      ]
+    },
+    {
+      "id": "PhD1002",
+      "room": "1.002",
+      "level": "OG1",
+      "template_areas": [
+        "R3_002"
+      ],
+      "recipe": "office",
+      "local_extent_mm": [
+        3300,
+        7000
+      ],
+      "yaw_deg": 0,
+      "instances": [
+        {
+          "id": "Desk0",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair0",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            2000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk1",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            1600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair1",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            500,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Desk2",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            3900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair2",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            5000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk3",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            4600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair3",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            3500,
+            0
+          ],
+          "yaw_deg": 180
+        }
+      ]
+    },
+    {
+      "id": "PhD2002",
+      "room": "2.002",
+      "level": "OG2",
+      "template_areas": [
+        "R3_002"
+      ],
+      "recipe": "office",
+      "local_extent_mm": [
+        3300,
+        7000
+      ],
+      "yaw_deg": 0,
+      "instances": [
+        {
+          "id": "Desk0",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair0",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            2000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk1",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            1600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair1",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            500,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Desk2",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            3900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair2",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            5000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk3",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            4600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair3",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            3500,
+            0
+          ],
+          "yaw_deg": 180
+        }
+      ]
+    },
+    {
+      "id": "PhD3002",
+      "room": "3.002",
+      "level": "OG3",
+      "template_areas": [
+        "R3_002"
+      ],
+      "recipe": "office",
+      "local_extent_mm": [
+        3300,
+        7000
+      ],
+      "yaw_deg": 0,
+      "instances": [
+        {
+          "id": "Desk0",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair0",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            2000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk1",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            1600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair1",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            500,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Desk2",
+          "type": "desk",
+          "xyz_mm": [
+            200,
+            3900,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair2",
+          "type": "office_chair",
+          "xyz_mm": [
+            1000,
+            5000,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Desk3",
+          "type": "desk",
+          "xyz_mm": [
+            3100,
+            4600,
+            0
+          ],
+          "yaw_deg": 180
+        },
+        {
+          "id": "Chair3",
+          "type": "office_chair",
+          "xyz_mm": [
+            2300,
+            3500,
+            0
+          ],
+          "yaw_deg": 180
+        }
+      ]
+    },
+    {
+      "id": "Office3009",
+      "room": "3.009",
+      "level": "OG3",
+      "template_areas": [
+        "R3_009"
+      ],
+      "recipe": "office",
+      "local_extent_mm": [
+        3300,
+        2200
+      ],
+      "yaw_deg": 0,
+      "instances": [
+        {
+          "id": "Desk",
+          "type": "desk",
+          "xyz_mm": [
+            700,
+            300,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Chair",
+          "type": "office_chair",
+          "xyz_mm": [
+            1400,
+            1450,
+            0
+          ],
+          "yaw_deg": 0
+        },
+        {
+          "id": "Plant",
+          "type": "plant",
+          "xyz_mm": [
+            2800,
+            500,
+            0
+          ],
+          "yaw_deg": 0
+        }
+      ]
+    }
+  ]
+}

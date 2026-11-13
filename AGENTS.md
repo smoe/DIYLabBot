@@ -584,6 +584,23 @@ Greifbarkeit noch Transportfreigabe; Last, Retention, Druckfestigkeit und
 Greifer bleiben gesondert zu qualifizieren. Einen späteren Regalzugriff
 nicht als bereits implementierte Funktion ausgeben.
 
+## Synthetischer Storage-Testfall S01
+
+Vor Änderungen [docs/synthetic-storage-s01.md](docs/synthetic-storage-s01.md)
+lesen. Die S01-Komposition referenziert genau einen geschlossenen K01-Träger;
+Geometrie, Greifrahmen und Freiraumproben gemeinsam aus derselben Quelle und
+Transformation ableiten. Alternative statische Fälle nicht als Roboterbahn
+ausgeben. Die bestehende fließende Bewegungsvorgabe gilt für spätere
+Transportprogramme weiter.
+
+Ein Fixture ist eine ausdrücklich synthetische Testwelt im vorhandenen Journal,
+kein realer oder zweiter Materialbestand. Symbolische Inhaltsidentitäten nicht
+als Packungsstückzahl oder Mengenbestand ausgeben. Derselbe Fixturezustand darf
+bei Initialisierung nicht zurückgesetzt werden. Absichten vor Bestätigungen
+speichern; offene Vorgänge und Reservierungen bei Neustart erhalten und
+ausdrücklich abgleichen. Keine Hardware-, Stock-, Greif- oder Lastqualifikation
+aus dem Mock oder statischen CAD-Fällen ableiten.
+
 ## Relative Mehrraumgeometrie F03
 
 Vor Änderungen [docs/floorplan-f03.md](docs/floorplan-f03.md) lesen.

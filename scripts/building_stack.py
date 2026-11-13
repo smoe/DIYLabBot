@@ -13,6 +13,7 @@ import re
 import assembly_model as assembly
 import building_circulation as circulation
 import building_roof as roof
+import building_furnishings as furnishings
 import building_exterior as exterior
 import ground_floor_model as ground
 import relative_floorplan as floor
@@ -93,7 +94,7 @@ def validate(spec):
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact(spec['sources'], 'floorplan room_geometry ground_floor basement', 'stack sources')
+    exact({k: v for k, v in spec['sources'].items() if k != 'furnishings'}, 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
@@ -242,6 +243,14 @@ def interfaces(spec, p):
         'exclusive_boundary_walls_omitted': True, 'shared_facade_walls_preserved': True, 'source_unchanged': True}
     data['wall_visibility_ids'].extend(extra['interface']['wall_bridge_ids'])
     data['roof'] = roof.compile(spec['roof'], plan, p, levels)['interface']
+    if 'furnishings' in spec['sources']:
+        furnished = furnishings.compile(spec['sources']['furnishings'], plan, p, levels)
+        omitted = set(furnished['omitted_walls'])
+        for level in levels:
+            level['wall_bodies'] = [name for name in level['wall_bodies'] if name not in omitted]
+        data['wall_visibility_ids'] = [name for name in data['wall_visibility_ids'] if name not in omitted]
+        data['opening_probes'] = [probe for probe in data['opening_probes'] if probe['target_body'] not in omitted]
+        data['furnishings'] = {key: furnished[key] for key in ('rooms', 'body_ids', 'omitted_walls')}
     if 'exterior' in spec:
         extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in levels}, p, levels)
         ext = extension['interface']; omitted = set(ext['omitted_body_ids'])
@@ -289,6 +298,12 @@ def expanded(spec, p):
     roof_geometry = roof.compile(spec['roof'], plan, p, data['levels'])
     for key in ('components', 'bodies', 'operations'):
         result[key].extend(extra[key]); result[key].extend(roof_geometry[key])
+    if 'furnishings' in spec['sources']:
+        furnished = furnishings.compile(spec['sources']['furnishings'], plan, p, data['levels'])
+        omitted = set(furnished['omitted_walls'])
+        result['bodies'] = [body for body in result['bodies'] if body['id'] not in omitted]
+        result['operations'] = [op for op in result['operations'] if op['body'] not in omitted]
+        for key in ('components', 'bodies', 'operations'): result[key].extend(furnished[key])
     if 'exterior' in spec:
         extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in data['levels']}, p, data['levels'])
         omitted = set(extension['interface']['omitted_body_ids'])
@@ -327,6 +342,7 @@ def solidcraft_commands(spec, p):
 def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
     paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
+    if 'furnishings' in spec['sources']: paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if '_source' in spec: paths.insert(0, Path(spec['_source']['path']))
     return list(dict.fromkeys(paths))

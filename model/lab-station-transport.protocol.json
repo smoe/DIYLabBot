@@ -1,0 +1,114 @@
+{
+  "format": "solidcraftbot.lab-station-transport/1",
+  "id": "SYN.TR01.StationTransfers",
+  "mode": "synthetic_only",
+  "sources": {
+    "transporter": {
+      "source": "model/sample-transport-tr01.shared.json",
+      "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+    },
+    "extraction": {
+      "source": "model/extraction-automation.preparation.json",
+      "source_sha256": "0d242c7621c15d904e58f57cca125623380a491de08af3004601aefd1496e97a"
+    },
+    "extraction_station": {
+      "source": "model/extraction-kit-station.shared.json",
+      "source_sha256": "c3b85c56a30fba9e44a124e44993b73cd512fe07c12cab49781da3e9cd172ba3"
+    },
+    "centrifuge": {
+      "source": "model/centrifuge-cf01.shared.json",
+      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+    },
+    "analytics": {
+      "source": "model/synthetic-analytics-workspace.shared.json",
+      "source_sha256": "dfae9eb57b9bb1267f4a10cba9aef9f7aa57b65de9c38c7e52f7eb5c846e1982"
+    },
+    "tapestation": {
+      "source": "model/tapestation.shared.json",
+      "source_sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+    },
+    "motion": {
+      "source": "model/tr01-l01.motion.json",
+      "source_sha256": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+    }
+  },
+  "vehicle": {
+    "id": "TR01",
+    "variant": "Floor_T48",
+    "load_frame": "TR01.LoadDeck",
+    "cassette_bay": 1
+  },
+  "stations": {
+    "DNA": {
+      "label": "DNA-Aufreinigung",
+      "source_key": "extraction_station",
+      "handoff": "synthetic_operator_confirmation",
+      "registered_parking_pose": {
+        "source_key": "motion",
+        "station_id": "DNA"
+      }
+    },
+    "CF01": {
+      "label": "Zentrifuge",
+      "source_key": "centrifuge",
+      "handoff": "synthetic_operator_confirmation",
+      "registered_parking_pose": {
+        "source_key": "motion",
+        "station_id": "CF01"
+      }
+    },
+    "QC": {
+      "label": "NanoDrop und Qubit",
+      "source_key": "analytics",
+      "handoff": "synthetic_operator_confirmation",
+      "registered_parking_pose": {
+        "source_key": "motion",
+        "station_id": "QC"
+      }
+    },
+    "TS01": {
+      "label": "TapeStation \u2013 manuelle Assistenz",
+      "source_key": "tapestation",
+      "handoff": "synthetic_operator_confirmation",
+      "registered_parking_pose": {
+        "source_key": "motion",
+        "station_id": "TS01"
+      }
+    }
+  },
+  "demo_route": [
+    "DNA",
+    "CF01",
+    "QC",
+    "TS01",
+    "DNA"
+  ],
+  "cargo_reference": {
+    "source_key": "extraction",
+    "sample_pair_index": 0,
+    "product": "dna",
+    "interpretation": "Explicit synthetic transport fixture referencing the declared DNA eluate; extraction is not executed or booked"
+  },
+  "transport_operations": [
+    "load",
+    "travel",
+    "unload"
+  ],
+  "motion_policy": {
+    "implementation": "source_bound_geometric_reference",
+    "continuous_travel_required": true,
+    "measured_route": null,
+    "trajectory": {
+      "source_key": "motion",
+      "route_binding": "from_to_station_ids"
+    },
+    "velocity_acceleration_jerk_limits": "motion.limits"
+  },
+  "limitations": [
+    "Task-level synthetic transfers; geometric routes are source-bound and independently built/certified, not navigation or hardware execution",
+    "Separate synthetic fixture in the existing journal; no extraction execution, material production, quantities or stock import",
+    "Station acknowledgments do not execute CF01, NanoDrop, Qubit or TapeStation and do not constitute assay completion",
+    "Existing standalone and root lab workflows remain unchanged; no implicit cross-run inventory transfer",
+    "K01 is kit provision, not an implemented DNA purification machine; DNA identifies its associated preparation workplace"
+  ]
+}

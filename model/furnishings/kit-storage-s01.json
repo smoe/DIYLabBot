@@ -1,0 +1,59 @@
+{
+  "format": "solidcraftbot.furnishings/1",
+  "id": "SYN.Storage01.Furnishings",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {},
+  "anchors": {},
+  "expressions": {
+    "support_width": "carrier_width+2*shelf_margin_x",
+    "support_depth": "carrier_depth+shelf_margin_front+shelf_margin_back",
+    "handover_y": "support_depth+place_gap"
+  },
+  "instances": [
+    {
+      "id": "ShelfSupport",
+      "type": "reference_worktop",
+      "component": "StorageFrame",
+      "bindings": {
+        "width": "support_width",
+        "length": "support_depth",
+        "height": "support_t"
+      },
+      "xyz": [
+        "-support_width/2",
+        0,
+        "support_top-support_t"
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "S01.Shelf01.Top"
+      }
+    },
+    {
+      "id": "HandoverSupport",
+      "type": "reference_worktop",
+      "component": "StorageFrame",
+      "bindings": {
+        "width": "support_width",
+        "length": "support_depth",
+        "height": "support_t"
+      },
+      "xyz": [
+        "-support_width/2",
+        "handover_y",
+        "support_top-support_t"
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "S01.Handover01.Top"
+      }
+    }
+  ],
+  "limitations": [
+    "Two fixed illustrative support surfaces: one shelf place and one handover support, not a selected shelf product.",
+    "Dimensions are synthetic source parameters; support, anchoring and load capacity remain unqualified."
+  ]
+}

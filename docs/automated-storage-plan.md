@@ -5,6 +5,13 @@
 und Deckeln. Dieser Plan wurde auf Eigentümerwunsch ohne Claude ausgearbeitet.
 Er ist keine Auswahl oder Freigabe einer realen Lager- oder Deckenanlage.
 
+Der erste begrenzte [synthetische Testfall S01](synthetic-storage-s01.md)
+ergänzt inzwischen einen Regalplatz, einen referenzierten K01-Träger und
+eine feste Übergabeablage. Statische CAD-Fälle und ein eigener Fixture-Mock
+sind von der weiterhin geplanten gemeinsamen Bestandsintegration und realen
+Transportausführung zu unterscheiden. Die folgenden Ausbauschritte bleiben
+ein Plan; S01 ersetzt insbesondere nicht das reale Aufmaß.
+
 ## Version 1: beide Kits direkt an der Station
 
 RNA- und DNA-Kit bleiben unmittelbar an K01 bereitgestellt. Einräumen,

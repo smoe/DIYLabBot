@@ -1,0 +1,120 @@
+{
+  "format": "solidcraftbot.tapestation/1",
+  "id": "TS01",
+  "status": "Manual QC workplace; 4200 planning envelope, article selection open",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {
+    "width": {
+      "expression": 435,
+      "unit": "mm",
+      "range": [
+        435,
+        435
+      ],
+      "description": "4200 reference width, not a selected instrument"
+    },
+    "depth": {
+      "expression": 510,
+      "unit": "mm",
+      "range": [
+        510,
+        510
+      ],
+      "description": "4200 reference depth"
+    },
+    "height": {
+      "expression": 445,
+      "unit": "mm",
+      "range": [
+        445,
+        445
+      ],
+      "description": "4200 reference closed height"
+    },
+    "top_clearance": {
+      "expression": 250,
+      "unit": "mm",
+      "range": [
+        250,
+        250
+      ],
+      "description": "Additional approximate lid-opening space, no hinge reconstruction"
+    },
+    "side_clearance": {
+      "expression": 75,
+      "unit": "mm",
+      "range": [
+        75,
+        75
+      ],
+      "description": "Air circulation and connections around instrument"
+    },
+    "bench_z": {
+      "expression": 900,
+      "unit": "mm",
+      "range": [
+        900,
+        900
+      ],
+      "description": "Synthetic planning worktop height"
+    },
+    "bench_width": {
+      "expression": 1200,
+      "unit": "mm",
+      "range": [
+        1200,
+        1200
+      ],
+      "description": "Synthetic dedicated bench width"
+    },
+    "bench_depth": {
+      "expression": 800,
+      "unit": "mm",
+      "range": [
+        800,
+        800
+      ],
+      "description": "Synthetic dedicated bench depth"
+    }
+  },
+  "operation": "manual_instrument_envelope_on_reference_bench/1",
+  "handling": "manual_only",
+  "selected_model": null,
+  "planning_reference": "4200 TapeStation",
+  "references": [
+    {
+      "url": "https://www.agilent.com/en/product/automated-electrophoresis/tapestation-systems/tapestation-instruments",
+      "scope": "DNA/RNA size, quantity and integrity QC; instrument automation is not robot integration"
+    },
+    {
+      "url": "https://www.agilent.com/cs/library/sitepreparationchecklists/TapeStation%20Site%20Preparation%20Checklist.pdf",
+      "scope": "D0009034 A.05, 2025-08-05, pp. 4–5: 4200 dimensions and installation space"
+    }
+  ],
+  "capabilities": [
+    "dna_rna_electrophoresis_qc"
+  ],
+  "assay": null,
+  "robot_loading_implemented": false,
+  "result_import_implemented": false,
+  "human_assistance": {
+    "status": "design_only",
+    "steps": [
+      "claim_task_and_confirm_sample_vessel_and_origin_rack_place",
+      "select_assay_and_record_aliquot_intent_in_shared_ledger_before_preparation",
+      "prepare_and_load_according_to_selected_sop",
+      "bind_instrument_run_and_lane_to_sample_and_assay",
+      "retain_original_export_and_review_result_separately",
+      "confirm_remaining_originals_returned_and_disposition_of_assay_vessels"
+    ]
+  },
+  "limitations": [
+    "No selected article, manufacturer CAD, measured installation or instrument driver",
+    "Housing, lid seam and laptop are illustrative static envelopes; no internal geometry or moving lid",
+    "Clearance volumes are planning requirements, not certified service or human access",
+    "No aliquot booking, assay preparation, measurement or automatic result acceptance implemented"
+  ]
+}

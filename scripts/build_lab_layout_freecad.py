@@ -49,7 +49,7 @@ def source_document(s,item,path):
         return build(source,p,path)[0]
     elif kind=='tip_collector':
         from build_tip_collector_freecad import build
-    elif kind in model.EQUIPMENT_PROFILES:
+    elif kind in model.EQUIPMENT_PROFILES|model.INSTRUMENTS:
         import build_tube_carrier_freecad as native
         previous=native.model
         try:
@@ -127,6 +127,9 @@ def prepare(context):
             provider=model.provider(kind);dp=provider.parameters(source)
             for key,value in provider.pose(source,dp,item.get('pose','closed')).items():setattr(upstream.Controller,key,value)
             access_models[item['id']]=(upstream,source,item)
+        if kind in {'nanodrop','qubit'}:
+            provider=model.provider(kind)
+            for key,value in provider.pose(source,provider.parameters(source),item.get('pose')).items():setattr(upstream.Controller,key,value)
         upstream.recompute(); records=[]
         for obj in motion.features(upstream):
             old=obj.SourceBody; role=getattr(obj,'ModelRole','equipment_geometry')

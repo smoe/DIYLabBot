@@ -1,0 +1,44 @@
+{
+  "format": "solidcraftbot.orientation-reference/1",
+  "id": "L01.WindowOrientation",
+  "purpose": "orientation_reference_only",
+  "sources": {
+    "floorplan": {
+      "source": "model/floor-f03.shared.json",
+      "source_sha256": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+    },
+    "room": {
+      "source": "model/lab-room-l01.shared.json",
+      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
+    }
+  },
+  "room_area_id": "R3_003",
+  "exterior_facade_wall_ids": [
+    "W037",
+    "W061"
+  ],
+  "map_reference": {
+    "url": "https://maps.app.goo.gl/7GY7XLHJsBtBYQWr6",
+    "pin_scope": "building_only_confirmed_by_owner",
+    "comparison": "Rounded building footprint visually compared with the traced exterior; map contains no room-number assignment",
+    "independent_window_azimuth_measurement": false
+  },
+  "window_direction": {
+    "compass_sector": "NW",
+    "evidence": "owner_confirmation",
+    "confirmed_on": "2026-11-12",
+    "measured_azimuth_deg": null
+  },
+  "room_frame": {
+    "id": "L01",
+    "positive_y": "towards_windows",
+    "positive_z": "up"
+  },
+  "metric_registration": null,
+  "limitations": [
+    "Cardinal-sector reference, not a surveyed facade bearing or a calibrated photographic registration",
+    "The exterior is curved; individual window panes need not share one exact normal",
+    "F03 drawing-up and its historical north/south labels are not geographic north",
+    "No CAD, furniture, equipment, robot poses or motion curves are rotated; no solar/lighting simulation is implemented by this reference"
+  ]
+}

@@ -4,6 +4,7 @@ import json
 import math
 import importlib
 import copy
+from types import SimpleNamespace
 import assembly_model as assembly
 import lab_room_model as room
 import robot_spec as robot
@@ -12,6 +13,7 @@ ROOT=room.ROOT
 SOURCE=ROOT/'model/lab-layout-l01.shared.json'
 digest=robot.digest
 EQUIPMENT_PROFILES=frozenset({'analytical_balance','fridge_4c','freezer_minus20','water_bath_13l','fume_hood_1200'})
+INSTRUMENTS=frozenset({'tapestation','nanodrop','qubit'})
 
 
 def load(*, validate_builds=True):
@@ -20,7 +22,13 @@ def load(*, validate_builds=True):
     if s['format']!='solidcraftbot.lab-layout/1' or s['units']!={'length':'mm','angle':'deg'}: raise ValueError('Layout contract')
     for ref in s['assets'].values():
         assembly.validate_reference(ref)
-        if validate_builds: assembly.resolve_artifact(ref)
+        if validate_builds and ref['source']!='model/tapestation.shared.json': assembly.resolve_artifact(ref)
+        if validate_builds and ref['source']=='model/tapestation.shared.json':
+            report=json.loads((ROOT/ref['report']).read_text())
+            if not report['passed'] or report['source_sha256']!=digest(ROOT/ref['source']):
+                raise ValueError('Checked TapeStation source required')
+            if digest(ROOT/report['files']['freecad'])!=report['artifact_sha256']['freecad']:
+                raise ValueError('TapeStation artifact changed')
     context=parameters(s)
     for item in s['instances']:
         assembly.validate_instance(item,context)
@@ -33,6 +41,8 @@ def load(*, validate_builds=True):
             instance_variant(source,item)
         if 'pose' in item:
             if item['asset'] in EQUIPMENT_PROFILES:
+                provider(item['asset']).pose(source,provider(item['asset']).parameters(source),item['pose'])
+            elif item['asset'] in {'nanodrop','qubit'}:
                 provider(item['asset']).pose(source,provider(item['asset']).parameters(source),item['pose'])
             elif item['asset']!='centrifuge':
                 raise ValueError('Named layout pose unsupported: '+item['asset'])
@@ -81,12 +91,21 @@ def provider(kind):
     modules={'arm':'robot_spec','room':'lab_room_model','centrifuge':'centrifuge_model',
              'transporter':'sample_transport_model','tube_rack':'sample_transport_model','tip_collector':'tip_collector_model'}
     modules.update({kind:'lab_equipment' for kind in EQUIPMENT_PROFILES})
+    modules.update(tapestation='tapestation_model',nanodrop='instrument_concept',qubit='instrument_concept')
     if kind not in modules: raise ValueError('Unsupported layout asset: '+kind)
-    return importlib.import_module(modules[kind])
+    module=importlib.import_module(modules[kind])
+    if kind in {'nanodrop','qubit'}:
+        family='nanodrop-concept' if kind=='nanodrop' else 'qubit-4-concept'
+        return SimpleNamespace(**{**vars(module),'SOURCE':module.SOURCES[family]})
+    return module
 
 
 def instance_source(s,item,context=None):
     kind=item['asset']; key='transporter' if kind=='tube_rack' else kind
+    if kind in INSTRUMENTS:
+        spec=assembly.load_instance(provider(kind),s['assets'][key],item.get('overrides',{}),{})
+        if kind=='tapestation':spec['_mounting']='instrument_only'
+        return spec
     if kind in EQUIPMENT_PROFILES:
         ref=s['assets'][key]
         if ref.get('case')!=kind+'_default':raise ValueError('Equipment profile and reference case disagree: '+kind)
@@ -126,7 +145,7 @@ def equipment_solidcraft_commands(s,item):
             value['id']=prefix+value['id']
             for key in ('body','component','parent','child'):
                 if key in value:value[key]=prefix+value[key]
-    values={prefix+k:v for k,v in module.pose(spec,p,item.get('pose','closed')).items()}
+    values={prefix+k:v for k,v in module.pose(spec,p,item.get('pose')).items()}
     class Provider:
         SOURCE=module.SOURCE
         expanded=staticmethod(lambda spec,p:source)

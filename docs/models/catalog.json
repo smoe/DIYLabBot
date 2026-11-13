@@ -196,7 +196,7 @@
     },
     {
       "id": "l01-overview",
-      "title": "L01 · Gesamtansicht mit Nassplatz und Abzug",
+      "title": "L01 · Gesamtansicht mit TapeStation und Analytik",
       "group": "ausstattung",
       "sources": [
         "model/lab-layout-l01.shared.json",
@@ -206,11 +206,11 @@
       "render": {
         "kind": "lab-layout",
         "pixels": [
-          850,
-          595
+          750,
+          525
         ]
       },
-      "caption": "Native Gesamtansicht mit Nassplatz links neben Tür A, anschließendem Abzug, Wasserbad rechts, drei Hockern an der Fensterbank und offenen oberen Regalen. Waage, Kaltlagerung und drei Roboter bleiben integriert; das manuelle Kellerlager gehört nicht zu L01.",
+      "caption": "Native L01-Gesamtansicht mit TapeStation und PC auf der linken Mittelbank, NanoDrop und Qubit am rechten Armpaar sowie vorhandenen Geräten und Möbeln. Statische Platzprüfung; die TR01-Fahrbahnen sind separat geprüft.",
       "documentation": "docs/lab-layout-l01.md"
     },
     {
@@ -218,14 +218,15 @@
       "title": "L01 · Geräteausstattung",
       "group": "ausstattung",
       "sources": [
-        "model/lab-layout-l01.shared.json"
+        "model/lab-layout-l01.shared.json",
+        "model/tr01-l01.motion.json"
       ],
       "image": "images/l01-equipment.svg",
       "render": {
         "kind": "diagram",
         "view": "layout"
       },
-      "caption": "Aktueller schematischer Aufstellungsplan. Nummern markieren Gerätebezugspunkte; die Symbole sind keine Kollisionshüllen.",
+      "caption": "Schematische Gerätebezugspunkte und vier TR01-Parkplätze. Farbige Linien projizieren die exportierten fließenden Fahrkurven. Kollisionsnachweis separat im nativen Prüfbericht; Menschen und geöffnete Unterschrankfronten sind nicht Teil der reservierten Fahrt.",
       "documentation": "docs/lab-layout-l01.md"
     },
     {
@@ -715,6 +716,22 @@
       "documentation": "docs/extraction-kit-station.md"
     },
     {
+      "id": "kit-storage-s01",
+      "title": "S01 · synthetischer Storage-Test",
+      "group": "ablaeufe",
+      "sources": [
+        "model/kit-storage-s01.shared.json",
+        "model/furnishings/kit-storage-s01.json"
+      ],
+      "image": "images/kit-storage-s01.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "kit_storage"
+      },
+      "caption": "Schematischer Zustandsplan: derselbe geschlossene K01-Träger entweder am Regalplatz oder auf der festen Übergabeablage. Native statische Prüfstellungen und lokaler Journal-Mock unter Details; keine Roboterbahn oder reale Bestandsführung.",
+      "documentation": "docs/synthetic-storage-s01.md"
+    },
+    {
       "id": "floor-f03",
       "title": "F03 · relative Mehrraumgeometrie",
       "group": "umgebungen",
@@ -746,6 +763,24 @@
       "documentation": "docs/building-stack.md"
     },
     {
+      "id": "tapestation",
+      "title": "TS01 · TapeStation, manuelle QC",
+      "group": "ausstattung",
+      "sources": [
+        "model/tapestation.shared.json"
+      ],
+      "image": "images/tapestation.png",
+      "render": {
+        "kind": "tapestation",
+        "pixels": [
+          300,
+          225
+        ]
+      },
+      "caption": "4200-Planungshülle mit eigener Referenzbank und PC-Fläche; Modellwahl und Laborplatz offen. Keine automatische Beladung oder Messausführung.",
+      "documentation": "docs/tapestation.md"
+    },
+    {
       "id": "ground-floor-eg",
       "title": "EG · Seminarraum, Foyer und WC",
       "group": "umgebungen",
@@ -759,6 +794,23 @@
       },
       "caption": "Eigene manuelle EG-Vektorableitung mit gemeinsamen Kernreferenzen; äußere Metalltreppe neben22. Bildorientierung an F03 angeglichen, Maße unkalibriert. Originalfoto privat.",
       "documentation": "docs/ground-floor-eg.md"
+    },
+    {
+      "id": "building-social",
+      "title": "Küche und Büros · mit Kühlschrankgast",
+      "group": "moeblierung",
+      "sources": [
+        "model/furnishings/building-social.json",
+        "model/furniture/social.catalog.json"
+      ],
+      "image": "images/building-social.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "building_social"
+      },
+      "caption": "Schematischer Küchenplan aus der fotoinspirierten Möblierung und angenommene Büroarbeitsplätze. Native Ansichten und Kühlschrank-Easter-Egg in der Dokumentation.",
+      "documentation": "docs/building-furnishings.md",
+      "description": "Küche 1.008, Doktorandenbüros 1.002/2.002/3.002 und Büro 3.009; unkalibrierte Einpassung in die Gebäudevorlage."
     }
   ],
   "groups": [

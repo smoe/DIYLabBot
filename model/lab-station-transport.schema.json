@@ -1,0 +1,270 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-station-transport.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "vehicle",
+    "demo_route",
+    "cargo_reference",
+    "transport_operations",
+    "motion_policy",
+    "sources",
+    "stations",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.lab-station-transport/1"
+    },
+    "id": {
+      "const": "SYN.TR01.StationTransfers"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "vehicle": {
+      "const": {
+        "id": "TR01",
+        "variant": "Floor_T48",
+        "load_frame": "TR01.LoadDeck",
+        "cassette_bay": 1
+      }
+    },
+    "demo_route": {
+      "const": [
+        "DNA",
+        "CF01",
+        "QC",
+        "TS01",
+        "DNA"
+      ]
+    },
+    "cargo_reference": {
+      "const": {
+        "source_key": "extraction",
+        "sample_pair_index": 0,
+        "product": "dna",
+        "interpretation": "Explicit synthetic transport fixture referencing the declared DNA eluate; extraction is not executed or booked"
+      }
+    },
+    "transport_operations": {
+      "const": [
+        "load",
+        "travel",
+        "unload"
+      ]
+    },
+    "motion_policy": {
+      "const": {
+        "implementation": "source_bound_geometric_reference",
+        "continuous_travel_required": true,
+        "measured_route": null,
+        "trajectory": {
+          "source_key": "motion",
+          "route_binding": "from_to_station_ids"
+        },
+        "velocity_acceleration_jerk_limits": "motion.limits"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transporter",
+        "extraction",
+        "extraction_station",
+        "centrifuge",
+        "analytics",
+        "tapestation",
+        "motion"
+      ],
+      "properties": {
+        "transporter": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "extraction": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "extraction_station": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "centrifuge": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "analytics": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "tapestation": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "motion": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        }
+      }
+    },
+    "stations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "DNA",
+        "CF01",
+        "QC",
+        "TS01"
+      ],
+      "properties": {
+        "DNA": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "source_key",
+            "handoff",
+            "registered_parking_pose"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_key": {
+              "enum": [
+                "transporter",
+                "extraction",
+                "extraction_station",
+                "centrifuge",
+                "analytics",
+                "tapestation"
+              ]
+            },
+            "handoff": {
+              "const": "synthetic_operator_confirmation"
+            },
+            "registered_parking_pose": {
+              "const": {
+                "source_key": "motion",
+                "station_id": "DNA"
+              }
+            }
+          }
+        },
+        "CF01": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "source_key",
+            "handoff",
+            "registered_parking_pose"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_key": {
+              "enum": [
+                "transporter",
+                "extraction",
+                "extraction_station",
+                "centrifuge",
+                "analytics",
+                "tapestation"
+              ]
+            },
+            "handoff": {
+              "const": "synthetic_operator_confirmation"
+            },
+            "registered_parking_pose": {
+              "const": {
+                "source_key": "motion",
+                "station_id": "CF01"
+              }
+            }
+          }
+        },
+        "QC": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "source_key",
+            "handoff",
+            "registered_parking_pose"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_key": {
+              "enum": [
+                "transporter",
+                "extraction",
+                "extraction_station",
+                "centrifuge",
+                "analytics",
+                "tapestation"
+              ]
+            },
+            "handoff": {
+              "const": "synthetic_operator_confirmation"
+            },
+            "registered_parking_pose": {
+              "const": {
+                "source_key": "motion",
+                "station_id": "QC"
+              }
+            }
+          }
+        },
+        "TS01": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "label",
+            "source_key",
+            "handoff",
+            "registered_parking_pose"
+          ],
+          "properties": {
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_key": {
+              "enum": [
+                "transporter",
+                "extraction",
+                "extraction_station",
+                "centrifuge",
+                "analytics",
+                "tapestation"
+              ]
+            },
+            "handoff": {
+              "const": "synthetic_operator_confirmation"
+            },
+            "registered_parking_pose": {
+              "const": {
+                "source_key": "motion",
+                "station_id": "TS01"
+              }
+            }
+          }
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

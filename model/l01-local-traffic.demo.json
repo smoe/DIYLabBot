@@ -1,0 +1,56 @@
+{
+  "format": "solidcraftbot.local-traffic-demo/1",
+  "mode": "synthetic_only",
+  "motion_source": "model/tr01-l01.motion.json",
+  "lane": "left",
+  "vehicles": [
+    {
+      "id": "TR01",
+      "start_y_mm": 3600,
+      "goal_y_mm": 5250
+    },
+    {
+      "id": "TR02",
+      "start_y_mm": 2400,
+      "goal_y_mm": 4050
+    },
+    {
+      "id": "TR03",
+      "start_y_mm": 1200,
+      "goal_y_mm": 2850
+    }
+  ],
+  "desired_speed_mm_s": 100,
+  "sensor": {
+    "range_mm": 2200,
+    "angular_step_deg": 2,
+    "period_s": 0.1,
+    "latency_s": 0.1,
+    "stale_after_s": 0.25,
+    "range_error_mm": 15,
+    "maximum_obstacle_closing_speed_mm_s": 200,
+    "clear_observation_s": 0.5
+  },
+  "controller": {
+    "clearance_mm": 75,
+    "integration_step_s": 0.05,
+    "motion_limit_utilization": 0.98
+  },
+  "person": {
+    "radius_mm": 250,
+    "y_mm": 4750,
+    "lateral_offset_mm": 825,
+    "arrives_at_lane_s": 6,
+    "leaves_lane_s": 28,
+    "fully_clear_s": 34
+  },
+  "maximum_duration_s": 90,
+  "limitations": [
+    "No exchanged positions, remote identities, intentions or remote velocity estimates; only own state, own goal and delayed anonymous first-return range scans enter each controller",
+    "Synthetic ideal horizontal omnidirectional range scan of conservative dynamic discs and simplified opaque bench footprints; no qualified real sensor or classifier",
+    "The configured obstacle closing-speed bound and unobscured detection margin are assumptions, not guarantees for arbitrary human behaviour or sudden emergence",
+    "No passing, lateral eviction, reversing, docking, station handoff, sample booking or hardware execution; all station arms remain parked",
+    "A missing or stale scan commands bounded braking; a person deliberately walking into an already stopped vehicle cannot be prevented by this model",
+    "Opposing traffic waits; no general deadlock resolution or globally time-optimal navigation is implemented"
+  ]
+}
