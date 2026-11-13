@@ -299,24 +299,6 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [S09-Sonikation am CUT&RUN-Root](docs/cutrun-input-sonication-runtime.md): kanonische Fixture-Buchungen, getrennte Belege, Wiederaufnahme/Abbruch und schematischer Video-Nachweis; keine Geräteausführung
 - [S09-Inputsonikation über SiLA 2](docs/sonication-sila2-network.md): eigener TLS/gRPC-Rootadapter mit atomaren Quittungen und explizitem Wiederaufnahme-/Abbruchabgleich; ausschließlich synthetische Fachausführung
 
-## Repository beziehen
-
-```sh
-git clone git@github.com:smoe/DIYLabBot.git
-cd DIYLabBot
-```
-
-Die Git-Historie wurde am 6. November 2026 bereinigt: Der ursprüngliche einzelne
-Import-Commit wurde durch den Quellstand ohne erzeugte Projektmodelle ersetzt.
-Primärdateien, Hersteller-Build-Eingaben und die ausgewählten README-Medien
-bleiben erhalten. Ein normaler vollständiger Klon benötigt deshalb keinen
-Download der früheren CAD-/Exporthistorie mehr.
-
-Vorhandene Klone besitzen noch die alte Historie. Am einfachsten neu klonen;
-eigene Änderungen vorher sichern und gezielt übernehmen. Alte Branches nicht
-zurück in `main` zusammenführen, da sie die entfernten Binärdateien wieder in
-die erreichbare Historie bringen würden. Lokale Build-Ausgaben bleiben lokal.
-
 ## Stationsübergreifender Transport und TapeStation
 
 Die ergänzte [TR01-Übergabeanimation](docs/tr01-workcell-animation.md) beschreibt
