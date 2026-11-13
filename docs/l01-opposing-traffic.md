@@ -9,6 +9,10 @@ parallel gestartete Missionen aus `model/l01-opposing-traffic.demo.json` ab:
 | TR02 | CF01 | NanoDrop/Qubit | links nach Süden, bewusst entgegen dem Umlauf |
 | TR03 | NanoDrop/Qubit | DNA | rechts nach Süden |
 
+Die aktuelle Animation bettet diese Fahrt inzwischen in die
+[Be- und Entladephasen der Flotte](l01-fleet-handoffs.md) ein. Der hier
+beschriebene Verkehrsfall bleibt deren unveränderter Bewegungskern.
+
 Die Ziele sind die vorhandenen Gangwartepositionen der Stationen. Docken,
 Be-/Entladen oder eine Arbeitsplatzfreigabe gehören nicht zu diesem Verkehrstest.
 Alle stationären Arme bleiben geparkt und die Bench-Bereiche durchgehend

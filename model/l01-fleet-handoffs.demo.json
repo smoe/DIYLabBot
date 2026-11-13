@@ -1,0 +1,46 @@
+{
+  "format": "solidcraftbot.fleet-handoffs-demo/1",
+  "mode": "synthetic_display_only",
+  "sources": {
+    "traffic": {
+      "source": "model/l01-opposing-traffic.demo.json",
+      "source_sha256": "62bea1982469ff5fb0f4af1d2e84280dfbbad436e88d3c7f9686b587ec33a1c0"
+    },
+    "workcell": {
+      "source": "model/tr01-l01-workcell.protocol.json",
+      "source_sha256": "a0ddf9c579ce6aff65ca41f3b724cf45ab80114e643164f883ebda3885aeba58"
+    }
+  },
+  "loading_order": [
+    "TR01",
+    "TR02",
+    "TR03"
+  ],
+  "unloading_order": [
+    "TR01",
+    "TR02",
+    "TR03"
+  ],
+  "cargo_ids": {
+    "TR01": "FleetDemo.DNA.01",
+    "TR02": "FleetDemo.CF01.01",
+    "TR03": "FleetDemo.QC.01"
+  },
+  "gate_event_duration_s": 1.0,
+  "guards": {
+    "single_active_arm": true,
+    "other_vehicles_stationary_during_handoffs": true,
+    "exclusive_work_area_lease": true,
+    "fresh_person_clear_observation_before_approach": true,
+    "no_timeout_release": true,
+    "manual_occupation_invalidates_lease": true
+  },
+  "limitations": [
+    "Positive-case autoplay uses explicit synthetic observation events, never real sensor or operator acknowledgements",
+    "No workstation docking or arm motion starts while the corresponding person-clear observation is absent or invalid",
+    "Other vehicles remain on the checked aisle waiting positions while one handoff executes; this does not qualify arbitrary arm/vehicle concurrency",
+    "Each illustrative cargo ID has one owner and a preserved rigid attachment at handovers; this display fixture is not a workflow inventory or execution journal",
+    "Manual occupancy pauses the preview and requires a new explicit synthetic clearance; it is not a qualified physical arm-braking or transporter safety function",
+    "Transport cover removal/replacement and vessel confirmations remain explicit manual roles, depicted by synthetic events; no automatic cover actuator"
+  ]
+}
