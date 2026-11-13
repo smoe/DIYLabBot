@@ -13,6 +13,11 @@ ROS und SiLA werden nicht ausgeführt. Die vorhandenen Laufarten behalten ihre
 Formate; eine automatische Migration oder Öffnung durch die alte CLI ist
 ausgeschlossen.
 
+Der separate [SiLA-2-Rootadapter](sonication-sila2-network.md) ergänzt
+authentifiziertes TLS/gRPC über Loopback für neue gebundene Fixture-Läufe.
+Die hier beschriebene lokale CLI und ihre historischen Nachweise bleiben
+eigenständige Software-Fixtures ohne ausgeführten SiLA-Transport.
+
 ## Einstieg
 
 ```sh

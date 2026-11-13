@@ -34,7 +34,8 @@ class MaterialWorkflow(ManualWorkflow):
         return cls._create_definition(journal, definition, run_id=run_id)
 
     @classmethod
-    def _create_definition(cls, journal, definition, run_id=None, extra_state=None, initial_artifacts=None):
+    def _create_definition(cls, journal, definition, run_id=None, extra_state=None, initial_artifacts=None,
+                           creation_context=None):
         if (cls.STATE_FORMAT not in MATERIAL_FORMATS or not isinstance(definition, dict)
                 or definition.get('format') != MATERIAL_FORMATS[cls.STATE_FORMAT]):
             raise TaskError('Material workflow state and definition versions must match')
@@ -58,11 +59,18 @@ class MaterialWorkflow(ManualWorkflow):
                 raise TaskError('Material state extensions cannot override common fields')
             state.update(copy.deepcopy(extra_state))
         state['resources'] = cls._resources(state)
+        cls._prepare_create_state(state, creation_context)
         options = {'immutable_definition': True, 'material_allocations': definition['material_allocations']}
         if initial_artifacts is not None:
             options['initial_artifacts'] = initial_artifacts
         journal.create(identity, state, **options)
         return cls(journal, identity, session)
+
+    @classmethod
+    def _prepare_create_state(cls, state, creation_context):
+        """Optional metadata in the first atomic Root introduction."""
+        if creation_context is not None:
+            raise TaskError('This material engine does not support a creation context')
 
     @staticmethod
     def _resources(state):

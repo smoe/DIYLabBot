@@ -297,6 +297,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [DNA über SiLA 2 und vorbereitete ROS-Aufträge](docs/dna-sila2-network.md): eigener Root-Netzwerkadapter und lokaler Mock-Worker; kein ROS-Laufzeit- oder Bewegungsnachweis
 - [DNA-Sonikation für die CUT&RUN-Input-Kontrolle](docs/dna-sonication.md): Hielscher-Gerätereferenz und wirkungsfreier Prüfplan für den separaten Input-Zweig; Pulsprogramm und Geräteanbindung bleiben zu qualifizieren
 - [S09-Sonikation am CUT&RUN-Root](docs/cutrun-input-sonication-runtime.md): kanonische Fixture-Buchungen, getrennte Belege, Wiederaufnahme/Abbruch und schematischer Video-Nachweis; keine Geräteausführung
+- [S09-Inputsonikation über SiLA 2](docs/sonication-sila2-network.md): eigener TLS/gRPC-Rootadapter mit atomaren Quittungen und explizitem Wiederaufnahme-/Abbruchabgleich; ausschließlich synthetische Fachausführung
 
 ## Repository beziehen
 
