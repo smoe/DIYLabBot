@@ -637,6 +637,55 @@ reale Laborverlagerung, Netzwerkanbindung, Authentifizierung, Sensorbeobachtung,
 Hardware-, ROS-/Bewegungs- oder Sicherheitsqualifikation wird daraus abgeleitet.
 Die vorhandene fließende Bewegungsvorgabe gilt für spätere reale Adapter.
 
+### T3: rollenberechtigte Botenoberfläche und HTTPS
+
+Die [T3-Erweiterung](docs/lab-transport-network.md) bindet dieselben
+T2-Domänenoperationen an lokale Konten und eine Botenoberfläche.
+`model/synthetic-lab-workflow.network.json` referenziert die vorhandene
+Transportkomposition und den versionierten HTTPS/JSON-Vertrag. Die ausdrücklich
+neue Laufart `solidcraftbot.synthetic-lab-network-state/3` übernimmt keine alten
+Journale. `NetworkWorkflow` erweitert den vorhandenen Labor-Owner; Queue,
+Inventar, Mengen, Geräteclaims und Empfangssperren bleiben im selben Root.
+Es entsteht keine weitere Prozesszustandsmaschine oder Mengenautorität.
+
+Owner, Endpunkt, Agent und Beobachter besitzen ressourcengebundene Grants.
+Die Oberfläche bietet getrennte Abhol- und Ablieferungsbestätigungen und beim
+Owner getrennte Routenvorbereitung, Dispatch, Hold, Abbruch und Abgleich.
+Ein Owner darf nicht automatisch alle Übergaberollen bestätigen. Der Server
+leitet Kontokennung und Principal aus der Anmeldung ab; die Originalbytes jedes
+Requests, Konto, Grant, Fingerabdruck, Quittung und erste Root-Wirkung werden
+atomar gespeichert. Rollen- und Tokenprüfung gelten auch unmittelbar vor dem
+Commit. Neue Ownerbefehle binden Dienstboot und aktuelle Queueepoche;
+Übergabebelege behalten dagegen die eingefrorene Jobepoche und Übergabe-ID.
+
+Dienststart, Login, Statusabruf und Reconnect sind lesend. Ein eigenes Owner-
+Resume eröffnet neue Schreibwirkungen und hält ungeklärte Arbeit. Bereits
+gespeicherte passende Requests bleiben nach Neustart lesend wiederholbar,
+ohne eine Schreibsitzung zu übernehmen. Die Oberfläche speichert offene
+Requestbytes vor dem POST ohne Token oder Passwort, ruft nach Antwortverlust
+zuerst den Beleg ab und wiederholt nur auf ausdrücklichen Wunsch denselben
+Request. Fremde Konten oder veränderte Bytes dürfen keinen Erfolg vortäuschen.
+Ein Journalpräfix-Cursor erkennt bekannte Rollbacks und fremde Stores; eine
+absichtlich geklonte Datenbank oder Föderation ist damit nicht abgesichert.
+
+Der Netzwerkabgleich ist eng auf eine noch nicht begonnene manuelle
+Empfangsstufe nach Sitzungsneustart begrenzt und verlangt vollständige
+Gefäßbeobachtungen sowie ausdrückliche Freiraumbestätigungen. Begonnene
+Gerätearbeit, offene Entnahmen und aktive CF01-Ausführungen benötigen weiterhin
+die vorhandenen lokalen Abgleichwege. Dispatch führt weder einen Robotermock
+erneut aus noch erzeugt es Rollenquittungen. Die vollständige CLI-Demo erzeugt
+diese synthetischen Eingaben ausdrücklich mit getrennten HTTPS-Kontokontexten.
+
+HTTPS-Loopback, lokale Kontoautorisierung und Browserbedienung sind gesondert
+geprüft. Berichte unterscheiden Transportnetzwerk von Instrumentnetzwerk,
+Hardware und Roboterbewegung. Der Listener ist auf localhost begrenzt und
+verwendet explizites Zertifikatsvertrauen. Kontozugang belegt keine reale Person,
+keinen Scan und keine physische Übergabe. LAN-/Produktionsbetrieb,
+institutionelle Identitäten, Windows-Dienstbetrieb, reale Geräte, Bewegungs-
+und Sicherheitsqualifikation bleiben offen. T2-Grenzen für Routenwiederholung,
+gehaltene terminale Jobs und Stock-/Ownerübernahme bleiben erhalten; keine
+SiLA-FDL, CAD-Geometrie oder ROS-Ausführung wird hier ergänzt.
+
 ## Lesende NanoDrop-UltraC-Netzwerkschnittstelle
 
 Der [UltraC-Netzwerkadapter](docs/nanodrop-ultra-network.md) trennt den einmalig

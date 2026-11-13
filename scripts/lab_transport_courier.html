@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <title>DIYLabBot · Botentransport</title>
+  <link rel="stylesheet" href="/courier.css">
+  <script src="/courier.js" defer></script>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">DIYLabBot</p>
+      <h1>Botentransport</h1>
+      <p class="notice">Synthetischer Laborlauf: Die Anmeldung prüft den Kontozugang.
+        Bestätigungen betreffen das Testmodell und belegen weder einen realen Scan
+        noch eine physische Übergabe oder Sicherheitsfreigabe.</p>
+      <p id="service" class="muted">Dienst wird abgerufen …</p>
+    </header>
+
+    <p id="message" role="status" aria-live="polite"></p>
+    <p id="error" role="alert" hidden></p>
+
+    <section id="login-panel" aria-labelledby="login-title">
+      <h2 id="login-title">Anmelden</h2>
+      <noscript><p class="notice">Für die Anmeldung und ausdrücklich bestätigte Meldungen wird JavaScript benötigt.</p></noscript>
+      <form id="login-form" method="post" action="/api/login">
+        <label for="username">Konto</label>
+        <input id="username" name="username" autocomplete="username" required>
+        <label for="password">Passwort</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button id="login" type="submit" disabled>Anmelden</button>
+      </form>
+    </section>
+
+    <section id="session-panel" aria-labelledby="session-title" hidden>
+      <div class="section-heading">
+        <div><h2 id="session-title">Meine Aufträge</h2><p id="identity"></p></div>
+        <div class="actions">
+          <button id="refresh" type="button" class="secondary">Aktualisieren / wiederverbinden</button>
+          <button id="logout" type="button" class="secondary">Abmelden</button>
+        </div>
+      </div>
+      <p id="write-state" class="muted"></p>
+      <p class="muted">Abrufen und Wiederverbinden bestätigen keine Übergabe.
+        Jede Rolle benötigt eine eigene ausdrückliche Bestätigung.</p>
+      <section id="owner-panel" class="notice" hidden>
+        <h3>Schreibsitzung übernehmen</h3>
+        <p>Ein Dienstneustart führt keinen Transport erneut aus. Offene Aufträge
+          bleiben bis zum ausdrücklichen Abgleich gehalten.</p>
+        <label class="check"><input id="resume-confirm" type="checkbox">
+          Ich übernehme die Sitzung als zuständiger Owner.</label>
+        <button id="resume" type="button" disabled>Schreibsitzung ausdrücklich übernehmen</button>
+      </section>
+      <section id="workflow-reconciliation" class="notice" hidden></section>
+      <section id="route-preparation" hidden></section>
+      <div id="jobs"></div>
+    </section>
+
+    <section id="pending-panel" class="pending" aria-labelledby="pending-title" hidden>
+      <h2 id="pending-title">Gespeicherte Meldung</h2>
+      <p id="pending-identity"></p>
+      <p id="pending-status">Der Ausgang ist noch nicht bestätigt. Zuerst den gespeicherten Beleg abrufen.</p>
+      <details><summary>Unveränderte Meldung anzeigen</summary><pre id="pending-wire"></pre></details>
+      <div class="actions">
+        <button id="receipt" type="button" class="secondary">Gespeicherten Beleg abrufen</button>
+        <button id="retry" type="button">Dieselbe Meldung erneut senden</button>
+        <button id="discard" type="button" class="secondary">Nur lokalen Entwurf verwerfen</button>
+      </div>
+      <p class="muted">Lokales Verwerfen bricht keinen Serverauftrag ab und gibt keine Ressource frei.
+        Eine neue Kennung ist kein Ersatz für eine ungeklärte frühere Meldung.</p>
+    </section>
+  </main>
+</body>
+</html>

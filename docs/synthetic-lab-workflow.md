@@ -5,6 +5,12 @@ Der lokale Gesamtlauf verbindet zwölf Originalproben und Originalgefäße über
 eine Ressourcenverantwortung gelten über alle Stufen. Alle Proben, SOPs,
 Mengen, Gesamtgefäßmassen, Zeitannahmen und Ergebnisse sind fiktiv.
 
+Die ausdrücklich gewählte [T2-Komposition](async-lab-transport.md#t2-transport-im-gemeinsamen-synthetischen-laborworkflow)
+ergänzt asynchrone Racktransporte zwischen den Stufen.
+[T3](lab-transport-network.md) ergänzt darauf lokale Konten, Botenoberfläche und
+Transport-HTTPS. Diese getrennten Laufarten migrieren keine bestehenden Journale;
+der unten beschriebene Basiseinstieg bleibt ein lokaler Ablauf ohne Transportdienst.
+
 ## Einstieg
 
 ```sh

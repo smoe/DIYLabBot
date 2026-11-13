@@ -1,0 +1,548 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lab-transport-network.schema.json",
+  "$ref": "#/$defs/profile",
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "workflow",
+        "interface_protocol",
+        "limitations"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.lab-transport-network/1"
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "workflow": {
+          "$ref": "synthetic-lab-workflow.schema.json#/$defs/reference"
+        },
+        "interface_protocol": {
+          "$ref": "synthetic-lab-workflow.schema.json#/$defs/reference"
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "request": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "resume"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "boot_id",
+                "assignment_epoch"
+              ],
+              "properties": {
+                "boot_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "prepare_route"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "boot_id",
+                "assignment_epoch",
+                "route_id",
+                "job_id"
+              ],
+              "properties": {
+                "boot_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "route_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "job_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "dispatch"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "boot_id",
+                "assignment_epoch",
+                "job_id"
+              ],
+              "properties": {
+                "boot_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "job_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "attest"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "job_id",
+                "role",
+                "observation_id",
+                "assignment_epoch",
+                "handover_id",
+                "manifest_sha256",
+                "observed_rack_id",
+                "confirmed"
+              ],
+              "properties": {
+                "job_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "role": {
+                  "enum": [
+                    "pickup_release",
+                    "pickup_accept",
+                    "delivery_release",
+                    "delivery_accept"
+                  ]
+                },
+                "observation_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "handover_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "manifest_sha256": {
+                  "type": "string",
+                  "pattern": "^[a-f0-9]{64}$"
+                },
+                "observed_rack_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "confirmed": {
+                  "const": true
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "hold"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "boot_id",
+                "assignment_epoch",
+                "job_id",
+                "reason"
+              ],
+              "properties": {
+                "boot_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "job_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "cancel"
+            },
+            "args": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "boot_id",
+                "assignment_epoch",
+                "job_id",
+                "reason"
+              ],
+              "properties": {
+                "boot_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "assignment_epoch": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "job_id": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 2048
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "request_id",
+            "grant_id",
+            "operation",
+            "args"
+          ],
+          "properties": {
+            "request_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "grant_id": {
+              "type": "string",
+              "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+            },
+            "operation": {
+              "const": "reconcile"
+            },
+            "args": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "boot_id",
+                    "assignment_epoch",
+                    "scope",
+                    "job_id",
+                    "outcome",
+                    "location",
+                    "manifest",
+                    "reason"
+                  ],
+                  "properties": {
+                    "boot_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                    },
+                    "assignment_epoch": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "scope": {
+                      "const": "job"
+                    },
+                    "job_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                    },
+                    "outcome": {
+                      "enum": [
+                        "unknown",
+                        "not_performed",
+                        "performed"
+                      ]
+                    },
+                    "location": {
+                      "type": [
+                        "object",
+                        "null"
+                      ]
+                    },
+                    "manifest": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "async-lab-transport.schema.json#/$defs/manifest_entry"
+                      }
+                    },
+                    "reason": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 2048
+                    }
+                  }
+                },
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "boot_id",
+                    "assignment_epoch",
+                    "scope",
+                    "observations",
+                    "workspace_clear",
+                    "arm_clear",
+                    "gripper_empty",
+                    "manifest_confirmed"
+                  ],
+                  "properties": {
+                    "boot_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                    },
+                    "assignment_epoch": {
+                      "type": "integer",
+                      "minimum": 1
+                    },
+                    "scope": {
+                      "const": "workflow"
+                    },
+                    "observations": {
+                      "type": "array",
+                      "minItems": 12,
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "workspace_clear": {
+                      "const": true
+                    },
+                    "arm_clear": {
+                      "const": true
+                    },
+                    "gripper_empty": {
+                      "const": true
+                    },
+                    "manifest_confirmed": {
+                      "const": true
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "cursor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "server_uuid",
+        "run_id",
+        "sequence",
+        "sha256"
+      ],
+      "properties": {
+        "server_uuid": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "run_id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "login": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "username",
+        "password",
+        "server_uuid"
+      ],
+      "properties": {
+        "username": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160,
+          "pattern": "^[!-~](?:[ -~]{0,158}[!-~])?$"
+        },
+        "password": {
+          "type": "string",
+          "minLength": 12,
+          "maxLength": 1024
+        },
+        "server_uuid": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+        }
+      }
+    }
+  }
+}

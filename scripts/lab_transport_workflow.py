@@ -26,11 +26,12 @@ RECOVERY = {'reconcile', 'cancel', 'finish_cancel', 'check_deadline'}
 
 class TransportWorkflow(Workflow):
     STATE_FORMAT = FORMAT
+    DEFINITION_FORMAT = DEFINITION_FORMAT
 
-    @staticmethod
-    def _format(state):
-        if (state.get('format') != FORMAT
-                or state.get('definition', {}).get('format') != DEFINITION_FORMAT):
+    @classmethod
+    def _format(cls, state):
+        if (state.get('format') != cls.STATE_FORMAT
+                or state.get('definition', {}).get('format') != cls.DEFINITION_FORMAT):
             raise TaskError('Explicit T2 laboratory transport workflow required; no implicit migration')
         if (not isinstance(state.get('transport'), dict)
                 or not isinstance(state.get('transport_bindings'), dict)
@@ -61,8 +62,17 @@ class TransportWorkflow(Workflow):
         return copy.deepcopy(self._manifests(self.state))
 
     @classmethod
-    def create(cls, journal, source=SOURCE, run_id=None):
-        definition = load(source, runtime_sources=RUNTIME)
+    def _load_definition(cls, source, runtime_sources):
+        return load(source, runtime_sources=runtime_sources)
+
+    @classmethod
+    def _initialize_transport_extension(cls, state, initial_context):
+        if initial_context is not None:
+            raise TaskError('This workflow has no initial transport extension context')
+
+    @classmethod
+    def create(cls, journal, source=SOURCE, run_id=None, *, initial_context=None):
+        definition = cls._load_definition(source, runtime_sources=RUNTIME)
         run_id = run_id or 'SYN.LAB.Transport.' + uuid.uuid4().hex[:12]
         if not isinstance(run_id, str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,64}', run_id):
             raise TaskError('Run id requires 1-64 ASCII letters, digits, dots, underscores or hyphens')
@@ -70,6 +80,7 @@ class TransportWorkflow(Workflow):
         state = cls.initial_state(definition, run_id, session)
         state.update(transport_bindings={}, transport_admitted=False)
         state['transport'] = transport.embedded_initial(cls._topology(state), cls._manifests(state), run_id, session)
+        cls._initialize_transport_extension(state, initial_context)
         verify_sources(definition)
         journal.create(run_id, state, immutable_definition=True)
         return cls(journal, run_id, session)
@@ -268,9 +279,21 @@ class TransportWorkflow(Workflow):
                 or state['recovery_required'] or state['logical_time_s'] >= state['deadline_s']):
             raise TaskError('Root hold, cancellation or deadline blocks new transport execution')
 
-    def _transport_transition(self, operation, principal, request_id, args, artifact=None):
+    def _apply_transport_extension(self, state, operation, args, principal):
+        raise TaskError('Use prepare_transport or explicit session resume for this operation')
+
+    def _validate_transport_request(self, state, operation, args, principal, request_context):
+        """Versioned network owners may bind authorization to this root proposal."""
+
+    def _transport_transition(self, operation, principal, request_id, args, artifact=None,
+                              request_context=None):
         transport.ident(principal); transport.ident(request_id)
-        fingerprint = digest(encoded({'operation': operation, 'arguments': args}).encode())
+        identity = {'operation': operation, 'arguments': args}
+        if request_context is not None:
+            if not isinstance(request_context, dict):
+                raise TaskError('Explicit authenticated request context required')
+            identity['request_context'] = copy.deepcopy(request_context)
+        fingerprint = digest(encoded(identity).encode())
         committed = False
         def update(state):
             nonlocal committed
@@ -281,6 +304,7 @@ class TransportWorkflow(Workflow):
                         or previous['operation'] != operation or previous['arguments'] != args):
                     raise TaskError('Request identity has conflicting arguments or principal')
                 return False
+            self._validate_transport_request(state, operation, args, principal, request_context)
             if operation == 'prepare_route':
                 transport.exact(args, 'route_id job_id', 'route preparation')
                 self._execution_ready(state)
@@ -300,26 +324,33 @@ class TransportWorkflow(Workflow):
                 state['transport_bindings'][route_id] = job_id
             else:
                 if operation not in {'observe', 'worker_claim', 'hold', 'cancel', 'reconcile', 'mark_dispatched'}:
-                    raise TaskError('Use prepare_transport or explicit session resume for this operation')
-                if args.get('job_id') not in state['transport_bindings'].values():
-                    raise TaskError('A bound workflow transport job is required')
-                if operation == 'mark_dispatched':
-                    self._execution_ready(state)
-                queue = transport.embedded_apply(queue, operation, args, principal,
-                                                 self._topology(state), self._manifests(state))
+                    self._apply_transport_extension(state, operation, args, principal)
+                    queue = state['transport']
+                else:
+                    if args.get('job_id') not in state['transport_bindings'].values():
+                        raise TaskError('A bound workflow transport job is required')
+                    if operation == 'mark_dispatched':
+                        self._execution_ready(state)
+                    queue = transport.embedded_apply(queue, operation, args, principal,
+                                                     self._topology(state), self._manifests(state))
             record = {'request_id': request_id, 'operation': operation, 'arguments': copy.deepcopy(args),
                       'principal': principal, 'fingerprint': fingerprint,
                       'result': {'run_id': self.run_id, 'job_id': args.get('job_id'),
                                  'job': copy.deepcopy(queue['jobs'].get(args.get('job_id')))}}
             if artifact is not None:
                 record['artifact_sha256'] = digest(artifact)
+            if request_context is not None:
+                record['request_context'] = copy.deepcopy(request_context)
             queue['requests'][request_id] = record
             state['transport'] = queue
             committed = True
         payload = {'request_id': request_id, 'operation': operation, 'arguments': copy.deepcopy(args),
                    'principal': principal, 'fingerprint': fingerprint}
         if artifact is not None:
-            payload.update(artifact_sha256=digest(artifact), artifact_kind='synthetic_transport_batch')
+            payload.update(artifact_sha256=digest(artifact), artifact_kind=(
+                'authenticated_transport_request' if request_context is not None else 'synthetic_transport_batch'))
+        if request_context is not None:
+            payload['request_context'] = copy.deepcopy(request_context)
         result = self._transition('transport.' + operation, principal, update, payload, artifact)
         return copy.deepcopy(result['transport']['requests'][request_id]), committed, result
 
