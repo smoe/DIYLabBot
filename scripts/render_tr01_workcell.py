@@ -69,15 +69,20 @@ def main():
     data['daylight']=l01_daylight.derive()
     import l01_opposing_traffic
     data['traffic']=l01_opposing_traffic.validated_result()
+    import l01_fleet_handoffs
+    data['fleet']=l01_fleet_handoffs.validated()
     if not data['traffic']['all_arrived'] or min(data['traffic']['clearance'][key] for key in ('car_car_clearance_lower_mm','car_person_clearance_lower_mm'))<data['traffic']['settings']['controller']['clearance_mm']:raise ValueError('Incomplete or unsafe local-traffic fixture')
     encoded=base64.b64encode(gzip.compress(json.dumps(data,separators=(',',':')).encode(),9)).decode()
     daylight_view=ROOT/'scripts/l01_daylight_view.js'
-    fragment=(ROOT/'scripts/tr01_workcell_player.html').read_text().replace('__DATA__',encoded).replace('__DAYLIGHT_SHADER_AND_ENGINE__',daylight_view.read_text()).replace('__LOCAL_TRAFFIC_VIEW__',(ROOT/'scripts/l01_local_traffic_view.js').read_text())
+    fragment=(ROOT/'scripts/tr01_workcell_player.html').read_text().replace('__DATA__',encoded).replace('__DAYLIGHT_SHADER_AND_ENGINE__',daylight_view.read_text()).replace('__LOCAL_TRAFFIC_VIEW__',(ROOT/'scripts/l01_local_traffic_view.js').read_text()).replace('__FLEET_HANDOFFS_VIEW__',(ROOT/'scripts/l01_fleet_handoffs_view.js').read_text())
     if len(fragment.encode())>=1000000:raise ValueError('Inline size budget exceeded')
     args.output.write_text(fragment)
     receipt={'workcell_revision':report['revision'],'source_sha256':report['source_sha256'],'fragment_sha256':digest(args.output),
              'template_sha256':digest(ROOT/'scripts/tr01_workcell_player.html'),'renderer_sha256':digest(__file__),'bytes':len(fragment.encode())}
     receipt['local_traffic_source_files_sha256']={**data['traffic']['source_files_sha256'],'scripts/l01_local_traffic_view.js':digest(ROOT/'scripts/l01_local_traffic_view.js')}
+    receipt['fleet_handoff_source_files_sha256']={**data['fleet']['source_files_sha256'],'scripts/l01_fleet_handoffs_view.js':digest(ROOT/'scripts/l01_fleet_handoffs_view.js')}
+    receipt['fleet_handoff_program_sha256']=data['fleet']['program_sha256']
+    receipt['fleet_handoff_clearance']=data['fleet']['clearance_summary']
     receipt['local_traffic_native_pose_coverage']=data['traffic']['native_pose_coverage']
     receipt['presentation_only_revision']=False
     receipt['native_geometry_reused_without_changes']=True

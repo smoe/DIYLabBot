@@ -299,3 +299,11 @@ Verkehrsfall mit drei verschiedenen Stationszielen und Gegenverkehr.
 Ablauf, lokale Rückzugsregel, Bench-Sperren und neue native Nachweise stehen
 in [l01-opposing-traffic.md](l01-opposing-traffic.md). Der frühere Geradenfall
 bleibt als separater Regressionstest erhalten.
+
+
+## Arm-Übergaben im Drei-Transporter-Ablauf
+
+**Drei Transporter** führt jetzt zuerst drei Beladungen, dann den bestehenden
+Gegenverkehrsfall und anschließend drei Entladungen aus. Quellen, Bench-Reservierungen,
+Beobachtungen und zusätzliche Geometrienachweise stehen in
+[l01-fleet-handoffs.md](l01-fleet-handoffs.md).
