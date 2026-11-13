@@ -122,7 +122,8 @@ class CutRunManualWorkflow(MaterialWorkflow):
 
     @classmethod
     def create(cls, journal, source=None, *, materials, vessels, reactions, actors,
-               run_id=None, clock=None, original_pdf=None, evidence_files=None):
+               run_id=None, clock=None, original_pdf=None, evidence_files=None,
+               _creation_context=None):
         provider = process_clock.SystemClock() if clock is None else clock
         sample = process_clock.validate_sample(provider.sample())
         if not isinstance(actors, list) or not actors or any(not isinstance(actor, str) or not actor.strip() for actor in actors) or len(set(actors)) != len(actors):
@@ -180,7 +181,7 @@ class CutRunManualWorkflow(MaterialWorkflow):
                 'observations': {}, 'stage_observations': [], 'qc_artifacts': {},
                 'qc_bindings': {}, 'qc_reviews': {}, 'biology_reviews': {}, 'holds': []},
             **cls._extra_state(definition, declared)},
-            initial_artifacts=artifacts)
+            initial_artifacts=artifacts, creation_context=_creation_context)
         flow.clock_provider = provider
         return flow
 
@@ -190,6 +191,8 @@ class CutRunManualWorkflow(MaterialWorkflow):
         cls._validate_format(state); cls._clock_matches(journal, state, clock_mode)
         if state['status'] in {'completed', 'cancelled'}:
             return cls(journal, run_id, None, clock=clock)
+        if state.get('control', {}).get('mode') == 's09_sila2_network/1':
+            raise TaskError('Network-bound S09 run: use its SiLA server; local access is read-only')
         cls._verify_runtime(state)
         cls._verify_initial_artifacts(journal, state)
         if state['session'] is not None and not resume:
@@ -208,6 +211,7 @@ class CutRunManualWorkflow(MaterialWorkflow):
         return cls(journal, run_id, state['session'], clock=provider)
 
     def _before_transition(self, state):
+        self._check_write_control(state)
         if self._observation is None:
             raise TaskError('A stable observation envelope is required')
         sample = process_clock.validate_sample(self.clock_provider.sample())
@@ -219,6 +223,17 @@ class CutRunManualWorkflow(MaterialWorkflow):
         if state['clock']['gap_required']:
             state['recovery_required'], state['workspace_clear'] = 'unresolved_clock_gap', False
         self._evaluate_reactions(state)
+
+    def _check_write_control(self, state):
+        if state.get('control', {}).get('mode') == 's09_sila2_network/1':
+            check = getattr(self, '_check_network_control', None)
+            if check is None:
+                raise TaskError('Network-bound S09 run: use its SiLA server; local access is read-only')
+            check(state)
+
+    def close(self):
+        self._check_write_control(self.state)
+        return super().close()
 
     def _event_evidence(self, state, command, actor_id, data):
         return {**material_evidence.provenance(state), 'recorded_at': copy.deepcopy(state['clock']['last_sample'])}

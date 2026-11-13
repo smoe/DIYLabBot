@@ -341,6 +341,18 @@ und ursprüngliche Rackrückgabe ausdrücklich abgleichen. Neue Nachweise nur
 unter `exports/sonication-evidence/`; eine abgeschlossene S09 ist kein
 abgeschlossener CUT&RUN-Gesamtlauf und kein Hardware- oder Bewegungsnachweis.
 
+Der [S09-SiLA-Adapter](docs/sonication-sila2-network.md) verwendet die gepinnte
+Netzwerkquelle `model/cutrun-input-sonication-sila2.protocol.json`. Nur neue
+ausdrücklich gebundene Fixture-Läufe anlegen; keine Migration alter Journale.
+Netzwerk-Principal und Fixture-Akteur sowie Transportquittung und
+`test_fixture`-Materialevidenz getrennt halten. Quittungen, erste Wirkung und
+Resume-Fencing im selben Root-CAS speichern. Keine generische Act-/Geräte-
+Bestätigungsschnittstelle anbieten oder Abgleich aus dem Ledger erzeugen.
+LockController bleibt v1.0. `SOLIDCRAFTBOT_SILA_NETWORK_TESTS=1` aktiviert echte
+Loopback-Prozesstests; Skips sind kein Netzwerknachweis. Neue versionierte
+Netzwerknachweise nur unter `exports/sonication-evidence/`; historische
+Manifeste und Medien unverändert erhalten.
+
 ## Asynchroner Labortransport T0/T1
 
 Vor Änderungen [docs/async-lab-transport.md](docs/async-lab-transport.md) lesen.

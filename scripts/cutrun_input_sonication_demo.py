@@ -61,7 +61,9 @@ class FixtureClock:
 
 class FixtureSession:
     """Build one independent fixture; never reset or rename a real inventory."""
-    def __init__(self, journal, run_id, directory, scenario_id='normal'):
+    def __init__(self, journal, run_id, directory, scenario_id='normal', *,
+                 workflow_class=InputSonicationWorkflow, workflow_options=None,
+                 reuse_fixture_evidence=False, initialize_fixture=True):
         validate_run_id(run_id)
         self.journal, self.run_id = journal, run_id
         self.directory = Path(directory)
@@ -85,19 +87,26 @@ class FixtureSession:
         self._last_sequence = 0
         self.phase_started_s = 0.0
         evidence = self.directory / (run_id + '.fixture-decisions.json')
-        with evidence.open('xb') as stream:
-            stream.write(FIXTURE.read_bytes())
+        content = FIXTURE.read_bytes()
+        if reuse_fixture_evidence and evidence.exists():
+            if evidence.read_bytes() != content:
+                raise TaskError('Existing fixture evidence differs; never replace an original')
+        else:
+            with evidence.open('xb') as stream:
+                stream.write(content)
         self.evidence_files = {'decision_evidence': evidence}
         self.materials, self.vessels, self.reactions = self._declarations()
         self.source = self._source()
-        self.flow = InputSonicationWorkflow.create(journal, self.source,
+        self.flow = workflow_class.create(journal, self.source,
             materials=self.materials, vessels=self.vessels, reactions=self.reactions,
             actors=[self.actor], run_id=run_id, clock=self.clock,
-            original_pdf=None, evidence_files=self.evidence_files)
+            original_pdf=None, evidence_files=self.evidence_files,
+            **(workflow_options or {}))
         self.capture()
-        self.act('accept_inventory', observations=self.flow.inventory_observations())
-        self.act('workspace_clear', confirmed=True)
-        self.act('claim')
+        if initialize_fixture:
+            self.act('accept_inventory', observations=self.flow.inventory_observations())
+            self.act('workspace_clear', confirmed=True)
+            self.act('claim')
 
     def _declarations(self):
         materials, reactions = [], {}
@@ -204,36 +213,50 @@ class FixtureSession:
     def act(self, command, *, artifact=None, observation=None, **data):
         self.last_observation = observation or self.envelope(artifact=artifact)
         try:
-            return self.flow.act(command, self.actor, artifact=artifact,
-                                 observation=self.last_observation, **data)
+            result = self.flow.act(command, self.actor, artifact=artifact,
+                                   observation=self.last_observation, **data)
         finally:
             self.capture()
+        checkpoint = getattr(self, '_checkpoint', None)
+        if checkpoint is not None:checkpoint(command, data)
+        return result
 
     def receipts(self, stage):
         return {name: 'decision_evidence' for name in self.flow.state['definition']['sop_protocol']['stages'][stage]['completion_evidence']}
 
-    def prepare_input(self):
-        self.act('begin_stage', stage_id='S01', reaction_id=None, stage_run_id=self.prefix + '.Stage.S01')
-        self.act('complete_stage', stage_run_id=self.prefix + '.Stage.S01', receipts=self.receipts('S01'), action_ids=[], reason='Fixture opening only')
-        self.act('begin_stage', stage_id='S02', reaction_id=self.reaction_id, stage_run_id=self.prefix + '.Stage.S02')
+    def prepare_input(self, *, resume=False):
+        def stage_id(name):return self.prefix + '.Stage.' + name
+        def stage(name):return self.flow.state['sop']['stages'].get(stage_id(name))
+        if not resume or stage('S01') is None:
+            self.act('begin_stage', stage_id='S01', reaction_id=None, stage_run_id=stage_id('S01'))
+        if not resume or stage('S01')['status'] != 'completed':
+            self.act('complete_stage', stage_run_id=stage_id('S01'), receipts=self.receipts('S01'), action_ids=[], reason='Fixture opening only')
+        if not resume or stage('S02') is None:
+            self.act('begin_stage', stage_id='S02', reaction_id=self.reaction_id, stage_run_id=stage_id('S02'))
         original = self.prefix + '.input'
         lysate = self.prefix + '.InputLysate'
         identity = self.prefix + '.InputPreparation'
         inputs = [{'material_id': original, 'quantity': {'value': self.fixture['initial_cells'], 'unit': 'cells'}, 'consume_all': True}]
         outputs = [{'material_id': lysate, 'kind': 'intermediate', 'vessel_id': self.vessel_id,
                     'role': 'prepared_input_fixture'}]
-        self.act('begin_material_action', intent_id=identity, reaction_id=self.reaction_id, stage_id='S02',
-            kind='transformation', inputs=inputs, outputs=outputs, retained_material_id=lysate,
-            purpose='Invented fixture input preparation; no lysis or yield prediction')
-        self.act('confirm_material_action', intent_id=identity,
-            actual_inputs=[{k: item[k] for k in ('material_id','quantity')} for item in inputs],
-            actual_outputs=[{'material_id': lysate,
-                             'quantity': {'value': self.fixture['input_lysate_ul'], 'unit': 'uL'}}],
-            reason='Explicit fictitious input-volume observation')
-        self.act('complete_stage', stage_run_id=self.prefix + '.Stage.S02', receipts=self.receipts('S02'),
-            action_ids=[identity], reason='Fixture input preparation observed')
-        self.act('begin_stage', stage_id='S09', reaction_id=self.reaction_id, stage_run_id=self.stage_run_id)
-        self.phase_started_s = self.clock.record['monotonic_ns'] / 1_000_000_000
+        booking = self.flow.state['bookings'].get(identity)
+        if not resume or booking is None:
+            self.act('begin_material_action', intent_id=identity, reaction_id=self.reaction_id, stage_id='S02',
+                kind='transformation', inputs=inputs, outputs=outputs, retained_material_id=lysate,
+                purpose='Invented fixture input preparation; no lysis or yield prediction')
+            self.act('confirm_material_action', intent_id=identity,
+                actual_inputs=[{k: item[k] for k in ('material_id','quantity')} for item in inputs],
+                actual_outputs=[{'material_id': lysate,
+                                 'quantity': {'value': self.fixture['input_lysate_ul'], 'unit': 'uL'}}],
+                reason='Explicit fictitious input-volume observation')
+        elif booking['outcome'] != 'performed':
+            raise TaskError('Existing input preparation requires explicit resolution; no replay')
+        if not resume or stage('S02')['status'] != 'completed':
+            self.act('complete_stage', stage_run_id=stage_id('S02'), receipts=self.receipts('S02'),
+                action_ids=[identity], reason='Fixture input preparation observed')
+        if not resume or stage('S09') is None:
+            self.act('begin_stage', stage_id='S09', reaction_id=self.reaction_id, stage_run_id=self.stage_run_id)
+        self.phase_started_s = stage('S09')['started_at']['monotonic_ns'] / 1_000_000_000
         return self
 
     def place(self, location):
@@ -261,27 +284,31 @@ class FixtureSession:
             actual_output_quantity={'value': self.fixture['input_lysate_ul'], 'unit': 'uL'},
             observed_vessel_id=self.vessel_id, reason='Fictitious physical-effect observation, no hardware', artifact=original)
 
-    def phase_evidence(self):
+    def phase_evidence(self, *, resume=False):
         start = self.phase_started_s
         values = self.fixture['sonication']
         end = start + values['cycles'] * values['pulse_on_s'] + (values['cycles'] - 1) * values['between_pulses_s']
         original = json.dumps({'fixture_only': True, 'time_basis_id': self.time_basis,
             'from_s': start, 'to_s': end, 'temperature_deg_c': self.fixture['phase']['observed_temperature_deg_c']}).encode()
-        self.act('attach_sop_evidence', file_name='synthetic-time-temperature.json', origin='test_fixture', artifact=original)
+        if not resume or digest(original) not in self.flow.state['sop']['artifacts']:
+            self.act('attach_sop_evidence', file_name='synthetic-time-temperature.json', origin='test_fixture', artifact=original)
         identity = {'stage_run_id': self.stage_run_id, 'phase_id': 'S09.input_preparation',
             'reaction_id': self.reaction_id, 'material_id': self.prefix + '.InputLysate',
             'vessel_id': self.vessel_id, 'time_basis_id': self.time_basis,
             'source_kind': 'test_fixture', 'artifact_sha256': digest(original)}
-        self.act('record_phase_time', stage_run_id=self.stage_run_id, phase_id=identity['phase_id'],
-            record={**identity, 'evidence_id': self.prefix + '.Time', 'qualification_ref': 'Fixture.Time',
-                    'start_earliest_s': start, 'start_latest_s': start, 'end_earliest_s': end, 'end_latest_s': end})
+        phase = self.flow.state['sop']['stages'][self.stage_run_id]['phases'][identity['phase_id']]
+        if not resume or not phase['times']:
+            self.act('record_phase_time', stage_run_id=self.stage_run_id, phase_id=identity['phase_id'],
+                record={**identity, 'evidence_id': self.prefix + '.Time', 'qualification_ref': 'Fixture.Time',
+                        'start_earliest_s': start, 'start_latest_s': start, 'end_earliest_s': end, 'end_latest_s': end})
         temperature = self.fixture['phase']['observed_temperature_deg_c']
-        return self.act('record_phase_temperature', stage_run_id=self.stage_run_id, phase_id=identity['phase_id'],
-            record={**identity, 'evidence_id': self.prefix + '.Temperature',
-                    'source_id': self.prefix + '.SpecimenProbe', 'qualification_ref': 'Fixture.Temperature',
-                    'time_qualification_ref': 'Fixture.Time', 'from_earliest_s': start, 'from_latest_s': start,
-                    'to_earliest_s': end, 'to_latest_s': end, 'minimum_deg_c': temperature,
-                    'maximum_deg_c': temperature, 'uncertainty_deg_c': 0})
+        if not resume or not phase['temperatures']:
+            return self.act('record_phase_temperature', stage_run_id=self.stage_run_id, phase_id=identity['phase_id'],
+                record={**identity, 'evidence_id': self.prefix + '.Temperature',
+                        'source_id': self.prefix + '.SpecimenProbe', 'qualification_ref': 'Fixture.Temperature',
+                        'time_qualification_ref': 'Fixture.Time', 'from_earliest_s': start, 'from_latest_s': start,
+                        'to_earliest_s': end, 'to_latest_s': end, 'minimum_deg_c': temperature,
+                        'maximum_deg_c': temperature, 'uncertainty_deg_c': 0})
 
     def size_evidence(self):
         identity = self.prefix + '.SizeWithdrawal'
@@ -292,6 +319,11 @@ class FixtureSession:
         self.act('confirm_material_action', intent_id=identity,
             actual_inputs=[{'material_id': self.output_material_id, 'quantity': quantity}], actual_outputs=[],
             reason='Fixture QC withdrawal observed')
+        return self.size_result()
+
+    def size_result(self):
+        """Fixture analytical original only; never withdraw a second aliquot."""
+        identity = self.prefix + '.SizeWithdrawal'
         original = ('fixture_only,intent_id,material_id,vessel_id,minimum_bp,maximum_bp\ntrue,%s,%s,%s,%s,%s\n' %
             (self.intent_id, self.output_material_id, self.vessel_id,
              self.fixture['size']['minimum_bp'], self.fixture['size']['maximum_bp'])).encode()

@@ -1,0 +1,298 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schema/cutrun-input-sonication-sila2/1",
+  "title": "Test-only CUT&RUN input-sonication SiLA 2 contract",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "simulation_only",
+    "hardware_available",
+    "composition_profile",
+    "fixture",
+    "feature",
+    "commands",
+    "standard_features",
+    "standard_provenance",
+    "runtime_sources",
+    "publish_interval_s",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.cutrun-input-sonication-sila2/1"
+    },
+    "id": {
+      "const": "CUTRUN.InputSonication.SiLA2"
+    },
+    "mode": {
+      "const": "test_fixture_only"
+    },
+    "simulation_only": {
+      "const": true
+    },
+    "hardware_available": {
+      "const": false
+    },
+    "feature": {
+      "const": {
+        "identifier": "CutRunInputSonicationWorkflow",
+        "originator": "org.solidcraftbot",
+        "category": "analytics",
+        "version": "1.0",
+        "sila_version": "1.1",
+        "maturity": "Draft",
+        "locale": "en-us"
+      }
+    },
+    "commands": {
+      "const": [
+        {
+          "name": "CreateRun",
+          "observable": false,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            },
+            {
+              "name": "scenario_identifier",
+              "type": "string",
+              "description": "Bind one named immutable scenario from the pinned test fixture to this root at creation."
+            }
+          ]
+        },
+        {
+          "name": "RunUntilDecision",
+          "observable": true,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            }
+          ]
+        },
+        {
+          "name": "ResumeRun",
+          "observable": false,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            },
+            {
+              "name": "resume",
+              "type": "bool",
+              "description": "Explicit session takeover choice; open effects still require reconciliation."
+            }
+          ]
+        },
+        {
+          "name": "ReconcileRun",
+          "observable": false,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            },
+            {
+              "name": "observation_json",
+              "type": "string",
+              "description": "Complete explicit synthetic root observations and pending-effect resolutions as JSON; not a sensor or physical confirmation."
+            }
+          ]
+        },
+        {
+          "name": "CancelRun",
+          "observable": false,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            },
+            {
+              "name": "reason",
+              "type": "string",
+              "description": "Reason for the root cancellation intent; acceptance does not release resources."
+            }
+          ]
+        },
+        {
+          "name": "FinishCancel",
+          "observable": false,
+          "arguments": [
+            {
+              "name": "request_identifier",
+              "type": "string",
+              "description": "Unique opaque identifier for a durable atomic root receipt; exact repeats return the stored response."
+            },
+            {
+              "name": "run_identifier",
+              "type": "string",
+              "description": "Explicit root run identity; never infer a run from time or order."
+            },
+            {
+              "name": "observation_json",
+              "type": "string",
+              "description": "Complete explicit synthetic final inventory and workplace observations as JSON; cancellation acceptance is not clearance."
+            }
+          ]
+        }
+      ]
+    },
+    "standard_features": {
+      "const": [
+        {
+          "identifier": "SiLAService",
+          "source": "interfaces/sila2/standard/SiLAService-v1_0.sila.xml",
+          "source_sha256": "4425f329c907bdb0ed757a9efc35fcc47d9caa7f2f8f6eecaf9842c1f9d674ec",
+          "upstream_path": "feature_definitions/org/silastandard/core/SiLAService-v1_0.sila.xml"
+        },
+        {
+          "identifier": "LockController",
+          "source": "interfaces/sila2/standard/LockController-v1_0.sila.xml",
+          "source_sha256": "3d6b6499b024d802d8d13471239d88cad36e8a940b328f2f69a35609437247cb",
+          "upstream_path": "feature_definitions/org/silastandard/core/LockController-v1_0.sila.xml"
+        },
+        {
+          "identifier": "CancelController",
+          "source": "interfaces/sila2/standard/CancelController-v1_0.sila.xml",
+          "source_sha256": "d1ac2002e1ff38f752debe59c667ebd2a9a6a65c0a11664643f83d33ad60a7e4",
+          "upstream_path": "feature_definitions/org/silastandard/core/commands/CancelController-v1_0.sila.xml"
+        },
+        {
+          "identifier": "SimulationController",
+          "source": "interfaces/sila2/standard/SimulationController-v1_0.sila.xml",
+          "source_sha256": "f96abd91e60cef32cdf8d515665f5f3d53b9018d9f4799ceae7d81d86c04a543",
+          "upstream_path": "feature_definitions/org/silastandard/core/SimulationController-v1_0.sila.xml"
+        },
+        {
+          "identifier": "AuthenticationService",
+          "source": "interfaces/sila2/standard/AuthenticationService-v1_0.sila.xml",
+          "source_sha256": "d1c3752a23b56f0464bf1511d84e0a39f107c17290cba4568e0b6015b52dddb6",
+          "upstream_path": "feature_definitions/org/silastandard/core/AuthenticationService-v1_0.sila.xml"
+        },
+        {
+          "identifier": "AuthorizationService",
+          "source": "interfaces/sila2/standard/AuthorizationService-v1_0.sila.xml",
+          "source_sha256": "cf7dd469fd034b1a32e14782853ff6cdd95af323dffc08a1887958d5cd73f3f6",
+          "upstream_path": "feature_definitions/org/silastandard/core/AuthorizationService-v1_0.sila.xml"
+        }
+      ]
+    },
+    "standard_provenance": {
+      "const": {
+        "source": "interfaces/sila2/standard/provenance.json",
+        "source_sha256": "fda867acf483a9eed0fbd73d2b2bb8be07e369ce3ff4185b786c04ed3fba1953"
+      }
+    },
+    "runtime_sources": {
+      "const": [
+        "scripts/build_cutrun_input_sonication_sila2.py",
+        "scripts/cutrun_input_sonication_sources.py",
+        "scripts/cutrun_input_sonication_workflow.py",
+        "scripts/cutrun_input_sonication_demo.py",
+        "scripts/cutrun_input_sonication_control.py",
+        "scripts/sonication_sila2_runtime.py",
+        "scripts/sonication_sila2_server.py",
+        "scripts/run_sonication_sila2.py",
+        "scripts/sonication_sila2_evidence.py",
+        "scripts/cf01_sila2_auth.py",
+        "scripts/cf01_sila2_client.py"
+      ]
+    },
+    "composition_profile": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "properties": {
+            "source": {
+              "const": "model/cutrun-input-sonication.profile.json"
+            }
+          }
+        }
+      ]
+    },
+    "fixture": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/reference"
+        },
+        {
+          "properties": {
+            "source": {
+              "const": "model/cutrun-input-sonication.fixture.json"
+            }
+          }
+        }
+      ]
+    },
+    "publish_interval_s": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "maximum": 1
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "reference": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    }
+  }
+}
