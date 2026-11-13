@@ -57,7 +57,7 @@
   "levels": [
     {
       "id": "KG",
-      "label": "Keller (H\u00f6he angenommen)"
+      "label": "Keller (Höhe angenommen)"
     },
     {
       "id": "EG",
@@ -99,7 +99,7 @@
     "fire_safety_qualified": false
   },
   "limitations": [
-    "EG uses a separately registered owner-labelled trace; OG1\u2013OG3 reuse the canonical relative F03 template.",
+    "EG uses a separately registered owner-labelled trace; OG1–OG3 reuse the canonical relative F03 template.",
     "EG literals are manually aligned to referenced vertical cores, not photogrammetric or metric registration.",
     "The XY ratio uses an unmeasured L01 parameter; it is a presentation proportion and does not calibrate F03.",
     "Clear height is an owner assumption; slab thickness and source-referenced wall/door dimensions are presentation assumptions.",
@@ -123,7 +123,7 @@
       "sides": {
         "outward": {
           "wall": "W049",
-          "label": "au\u00dfen / links zum Flur"
+          "label": "außen / links zum Flur"
         },
         "inward": {
           "wall": "W062",
@@ -178,7 +178,7 @@
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG\u2013EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
+      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
     ],
     "served_extent": {
       "from_level": "KG",
@@ -308,7 +308,39 @@
     "guard_max_post_spacing_mm": 1600,
     "terrain_margin_mm": 4500,
     "terrain_clearance_mm": 200,
-    "terrain_color": "#8A735B"
+    "terrain_color": "#559447",
+    "landscape_layer_mm": 20,
+    "concrete_color": "#B9B5AC",
+    "side_cladding_color": "#9CA6AA",
+    "side_window_walls": [
+      "W007",
+      "W012",
+      "W013",
+      "W016",
+      "W025",
+      "W037",
+      "W061",
+      "W072",
+      "W088",
+      "W069",
+      "W059",
+      "W039",
+      "W033",
+      "W026",
+      "W014"
+    ],
+    "side_window_interval": [
+      0.08,
+      0.92
+    ],
+    "side_window_height_fractions": [
+      0.18,
+      0.8
+    ],
+    "sidewalk_width_mm": 1200,
+    "road_width_mm": 4000,
+    "sidewalk_color": "#A9ACA9",
+    "road_color": "#52575B"
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",

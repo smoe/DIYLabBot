@@ -86,9 +86,9 @@
 <text x="1110.000" y="520.000" class="policy-small" >Außentreppe EG → Dach</text></g>
 <g data-role="clear-height" data-from-mm="-4250" data-to-mm="-250"><path d="M 1122 743.531 H 1138 M 1130 743.531 V 640.022 M 1122 640.022 H 1138" class="dimension"/><text x="1150.000" y="691.776" class="dimension-label" transform="rotate(-90 1150 691.776)" text-anchor="middle">4 m lichte Höhe*</text></g>
 <g data-role="floor-pitch" data-from-mm="-4250" data-to-mm="0"><path d="M 1252 743.531 H 1268 M 1260 743.531 V 633.553 M 1252 633.553 H 1268" class="dimension"/><text x="1280.000" y="688.542" class="dimension-label" transform="rotate(-90 1280 688.542)" text-anchor="middle">4,25 m Geschossteilung*</text></g>
-<rect x="180.000" y="633.553" width="25.000" height="116.447" fill="#8a735b" data-role="earth-section"/>
-<rect x="1065.000" y="633.553" width="20.000" height="116.447" fill="#8a735b" data-role="earth-section"/>
-<path d="M180 633.553H1085" stroke="#8a735b" stroke-width="3" data-role="terrain-grade"/>
+<rect x="180.000" y="631.553" width="25.000" height="2.000" fill="#559447" data-role="lawn-surface"/>
+<rect x="1065.000" y="631.553" width="20.000" height="2.000" fill="#559447" data-role="lawn-surface"/>
+<path d="M180 633.553H1085" stroke="#559447" stroke-width="3" data-role="terrain-grade"/>
 <text x="250.000" y="657.553" class="small" >Gelände ±0 m*</text>
 <text x="210.000" y="786.000" class="small" >EG: Atriumboden geschlossen. Darüber: Öffnungen der gemeinsamen Vorlage.</text>
 <rect x="75" y="805" width="1350" height="180" rx="12" fill="#edf2f5"/>

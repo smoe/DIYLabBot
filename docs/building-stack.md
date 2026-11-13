@@ -6,8 +6,8 @@ Treppenhaus bleiben dabei im gemeinsamen vertikalen Bezug fest.
 
 Der [Keller](basement-kg.md) verwendet eine eigene registrierte Raumquelle und
 wird unter dem EG mit vorläufig angenommenem Geschossabstand ergänzt.
-Der [fotoabgeleitete Ausbau](building-exterior.md) ergänzt Glasfront, warme
-Holztürfarbe, offene Metallgeländer und den Gelände-Höhenbezug für die Gesamtansicht.
+Der [fotoabgeleitete Ausbau](building-exterior.md) ergänzt Glasfront, opake Betonflanken, unterbrochene seitliche Fensterbänder, warme
+Holztürfarbe, offene Metallgeländer und die dünne grüne Gelände-Markierung für die Gesamtansicht.
 
 Das Modell unterscheidet **ein inneres Treppenhaus**, **einen alleinstehenden
 Aufzug** und **eine außenliegende Metall-Fluchttreppe**. Das Erdgeschoss besitzt
@@ -21,13 +21,21 @@ Die Fotos bleiben privat. Veröffentlicht werden ausschließlich die freigegeben
 Vektorableitungen und daraus erzeugte Modellansichten. Horizontale Maße,
 Glaswölbung, Dachdetails und technische Bauteile bleiben Konzeptannahmen.
 
-## Aktueller Hüllenstand
+## Hüllenstand vor der Seiten- und Außenflächenkorrektur
 
 `building-stack-4b47ee12d5a4-r2`: 1.477 geschlossene Körper. 388 Geometrieproben und 14 Höhenprüfungen je Backend.
 Alle 1.477 zusätzlichen STEP-Vergleiche bestehen.
 KG und EG besitzen dieselbe Außenkontur wie OG1–OG3; Aufzug und inneres
 Treppenhaus bleiben unverändert im gemeinsamen XY-Bezug. Details und
 Prüfgrenzen stehen in [der Hüllenregistrierung](building-alignment.md).
+
+## Aktueller Fassaden- und Außenflächenstand
+
+`building-stack-2d80f268decf`: opake Betonflanken, begrenzte seitliche Fensterbänder,
+dünne grüne Rasenmarkierung sowie grauer Bürgersteig und Zufahrt. Die
+Geschosshülle und festen Kerne bleiben unverändert registriert. Beide CADs
+bestehen 451 Geometrieproben und 14 Höhenprüfungen; alle 1614 STEP-Vergleiche bestehen.
+Details stehen in [der Fotoableitung](building-exterior.md).
 
 ## Ansichten für den Antrag
 

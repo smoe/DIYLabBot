@@ -1,6 +1,6 @@
 # Glasfront, Türfarbe, offene Geländer und Gelände
 
-Die beiden privat bereitgestellten Fotos zeigen die Glasfront des Foyers von
+Die privat bereitgestellten Foyer- und Seitenfotos zeigen die Glasfront des Foyers von
 außen und innen. Der Eigentümer bestätigt den warmen gelblichen Holzton der
 Seminarraumtüren als Farbe der Raumtüren im Gebäude. Die Innenaufnahme zeigt
 schlanke Metallpfosten, einen Handlauf und sehr offene horizontale Geländerstäbe.
@@ -21,9 +21,18 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
   werden Pfosten, Handlauf und vier schlanke horizontale Stäbe gemeinsam erzeugt.
   Riegel und Geländerteile bleiben einzelne editierbare Körper; die Darstellung
   benötigt keine vollständige boolesche Verschweißung ihres Profilrasters.
-- Ein brauner, rechteckiger Erdreich-Schnittkasten endet auf EG-Höhe ±0.
-  Der Keller liegt darunter. Die Öffnung um die Gebäudehülle dient der
-  Einsehbarkeit, nicht der Darstellung einer vermessenen Baugrube.
+- Die Eingangsflanken und übrigen geschlossenen Außenwände sind undurchsichtiger
+  Beton. Seitlich werden nur die ausdrücklich referenzierten Fassadenabschnitte
+  mit Fensterbändern belegt. Geschlossene Endfelder, vertikale Zwischenstücke,
+  Brüstungen und Stürze unterbrechen die Verglasung; die Brüstungsbereiche der
+  Fensterseiten erhalten eine deckende graue Verkleidung.
+- Rasen wird grün (`#559447`) als lediglich 20 Darstellungs-mm dünne Schicht
+  auf EG-Höhe ±0 markiert. Die Gebäudegrundfläche wird ausgespart. Ein massiver
+  brauner Erdblock entfällt. Der Keller liegt weiterhin unter dieser Ebene.
+- Die Zufahrt und der Bürgersteig sind getrennte dunkel- beziehungsweise
+  hellgraue dünne Flächen. Der Eingangsvorplatz verbindet den Bürgersteig mit
+  der vorhandenen Foyer-Eingangsöffnung. Lage, Breiten und Flächengrenzen sind
+  bildinformierte Darstellungsannahmen, keine vermessene Außenanlagenplanung.
 
 Die Quellgrundrisse F03, EG und KG bleiben unverändert. Sämtliche Ersetzungen
 sind ausdrücklich auf die Gebäude-Komposition begrenzt; Wände und Öffnungen
@@ -56,15 +65,15 @@ Die Bildbeleuchtung erlaubt keine exakte Material- oder Farbmessung. Auch die
 vertikale Fassadenregistrierung und die Verbindung zum anders nachgezeichneten
 EG sind konzeptionell; eine metrische Foto-/Planregistrierung fehlt.
 
-Das Erdreich ist ein grafischer Höhenbezug auf der angenommenen EG-Höhe, kein
-Geländeaufmaß. Kellerhöhe und Geschossabstand bleiben Annahmen. Konstruktive
+Die dünne Rasenmarkierung und die Verkehrsflächen sind grafische Bezüge auf
+der angenommenen EG-Höhe, kein Geländeaufmaß. Kellerhöhe und Geschossabstand bleiben Annahmen. Konstruktive
 Kontakte zwischen Glas und Profilen sowie zwischen Türblättern und Laibungen
 werden nicht als globale Kollisionsfreiheit ausgegeben. Türanschläge und
 Offenstellungen sind keine bestätigten Betriebszustände. Tragwerk, Glasaufbau,
 Absturzsicherung, Begehbarkeit, Brandschutz und Hardware sind nicht qualifiziert.
 Die Fotos belegen die sichtbare Gestaltung, keine dieser Funktionen.
 
-## Geprüfte Veröffentlichung
+## Historischer Prüfstand vor Hüllen- und Außenanlagenkorrektur
 
 Revision `building-stack-efe22ae793b6-r2` wurde unabhängig in FreeCAD und
 SolidCraft erzeugt: 1.048 geschlossene Körper, je 390 Geometrieproben und
@@ -77,3 +86,24 @@ Eine FreeCAD-GUI-Prüfung und eine globale Kollisionsprüfung wurden nicht durch
 Die gezielte Veröffentlichungssuite umfasst 137 Tests: 134 bestanden, drei
 optionale Schema-Prüfungen wegen fehlender `jsonschema`-Bibliothek übersprungen.
 Dies ist keine vollständige Repository-Suite. Originalfotos bleiben privat.
+
+Die Seitenkorrektur verwendet begrenzte Glasfelder zwischen opaken Bauteilen.
+Die gemeinsame `exterior`-Quelle hält Fensterpfade, Höhenanteile, Materialfarben
+und die dünne Außenflächenschicht einmalig fest. Beide CAD-Adapter verwenden
+dieselben daraus abgeleiteten Profile, Wandöffnungen und Geländeoperationen.
+Die ursprünglichen Raumgrundrisse und festen Treppen-/Aufzugskerne bleiben erhalten.
+
+## Aktueller Prüfstand der Seiten- und Außenflächenkorrektur
+
+`building-stack-2d80f268decf`: 1614 geschlossene Körper, je 451 Geometrieproben und 14 Höhenprüfungen
+in FreeCAD und SolidCraft. Alle zusätzlichen exakten STEP-Vergleiche bestehen.
+Die Seitenfenster besitzen eigene native Leerraum-Prüfzeugen in den tatsächlichen
+Wandkörpern. Die Außenflächen werden auf EG-Höhe und dünne Schicht geprüft.
+Der STEP-Abgleich speichert unveränderliche Schwerpunkt-/Volumenwerte zwischen;
+Zuordnungsregel, Reihenfolge bei Gleichstand und alle exakten booleschen
+Differenzprüfungen mit derselben Toleranz bleiben unverändert. Der lokale
+Prüfbericht bindet diesen Prüfadapter zusätzlich über seine Prüfsumme.
+
+Die gezielte Veröffentlichungssuite umfasst jetzt 157 Tests: 153 bestanden,
+vier optionale JSON-Schema-Prüfungen wegen fehlender `jsonschema`-Bibliothek
+übersprungen. Quellen, Bilddateien und die Galerieprüfung sind aktuell gebunden.

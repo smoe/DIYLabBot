@@ -1,12 +1,12 @@
 {
   "format": "solidcraftbot.building-stack-media/1",
   "prepared_on": "2026-11-13",
-  "revision": "building-stack-4b47ee12d5a4-r2",
+  "revision": "building-stack-2d80f268decf",
   "source": "model/building-stack.shared.json",
-  "source_sha256": "4b47ee12d5a40f2f1e8928d7c44745a8512fcd5ba5e150fee58789412c5fe176",
+  "source_sha256": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
   "source_files_sha256": {
-    "model/building-stack.shared.json": "4b47ee12d5a40f2f1e8928d7c44745a8512fcd5ba5e150fee58789412c5fe176",
-    "scripts/build_building_stack.py": "b19da172379429a6c922d2152903cf15f83d749eaaf26668403da39e5e239e6f",
+    "model/building-stack.shared.json": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
+    "scripts/build_building_stack.py": "f443bfbe58c0199bb302a59ec2f81599595c8d79293ac9b8f518423a79a7a72b",
     "scripts/build_building_stack_freecad.py": "6ec54b240d4b236b77ad6c73e60f4e8fa2f43f1b7aa25e0b57717e62fe204653",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
     "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
@@ -20,7 +20,7 @@
     "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
     "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
     "model/building-stack.schema.json": "bfec2b6564de4c7447c6451ea10c7d3d23e9687f73e976cf45aae30069f31df3",
-    "scripts/building_stack.py": "c770832552936eca44d3199a0afdd836e43adac595bf016554384cda7175c9b7",
+    "scripts/building_stack.py": "936d6bc60c1dcae68c8df57c1902f0dc4e539c6123ee08ff8ec08bb9d046b06e",
     "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
     "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
     "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
@@ -42,9 +42,9 @@
     "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-    "scripts/building_exterior.py": "4fca95bca76173d3ef8fab3a931a04122a95c9f25567c9777bd50a486f010cd4",
-    "model/building-exterior.schema.json": "617476fc6fa6d26fe399006d29ec3ec61ed03f128ae342f8b780ba0d31598071",
-    "scripts/render_building_stack_section.py": "e7cf89cb414d292d754dff5ff94f0ddd966a8e23f0df68b2c7a327d1c45f18a1",
+    "scripts/building_exterior.py": "b0642eb8f30a00aeac956fb8e9c19a2585fe73ffac05b9d2cdd9e6a94a639e19",
+    "model/building-exterior.schema.json": "f624aae8ebadb5b22f6b89575051749727ea4c8b823b6220453a7436b1788e36",
+    "scripts/render_building_stack_section.py": "6e67b7d1807167d68c6c726a2275524b4d3464bf54a7df29ed055afd13799e08",
     "scripts/render_ground_floor.py": "0c781224fd8c76370204012724dd3a4e97c79d3d458147bf889fc72c68934edf",
     "scripts/render_building_stack_highlight.py": "0b41eaa98032cbc8000855e82b96d213668955f77666865a5c8c16d773b33b1b",
     "scripts/render_building_exterior.py": "346a881469030c934fc5b4c2743d1eccd746094f3e5e77eb9f90503ed07b713d"
@@ -81,27 +81,27 @@
     "EG"
   ],
   "native_build_report": {
-    "path": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/build-report.json",
-    "sha256": "8a895d3f487ebfcc62f7585d821084cee37273ff8b71c78fcab6fc7109040a8d",
-    "bytes": 1618112
+    "path": "exports/generated/building-stack-2d80f268decf/build-report.json",
+    "sha256": "5edea867522505848fa0a76fd7c8dcb2fea114ab605772dc4f6f6b51c7725818",
+    "bytes": 1873229
   },
   "native_summary": {
     "passed": true,
     "backends": "both",
     "cross_cad_checked": true,
-    "closed_bodies": 1477,
-    "structural_display_bodies": 1087,
+    "closed_bodies": 1614,
+    "structural_display_bodies": 1224,
     "semantic_markers": [
       "ConceptExchange"
     ],
-    "scoped_probes_per_backend": 388,
+    "scoped_probes_per_backend": 451,
     "z_checks_per_backend": 14,
     "freecad_checks_passed": true,
     "maximum_step_xor_presentation_mm3": 0.0,
     "global_interference_checked": false,
     "freecad_gui_reviewed": false,
     "probe_categories": {
-      "opening": 282,
+      "opening": 345,
       "atrium_floor_hole": 3,
       "ground_fill": 1,
       "roof_eave_support": 23,
@@ -120,49 +120,49 @@
     "corridor_roof_checks_per_backend": 4
   },
   "native_files": {
-    "case": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/overview.case.json",
-    "commands": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/overview.commands.json",
-    "solidcraft": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-    "solidcraft_measurements": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/overview.solidcraft.json",
-    "step": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/overview.step",
-    "native_probe_commands": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/native-probes.commands.json",
-    "solidcraft_probes": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/native-probes.solidcraft.json",
-    "freecad": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.FCStd",
-    "freecad_validation": "exports/worktrees/floor-hull-alignment/exports/generated/building-stack-4b47ee12d5a4-r2/overview.freecad.json"
+    "case": "exports/generated/building-stack-2d80f268decf/overview.case.json",
+    "commands": "exports/generated/building-stack-2d80f268decf/overview.commands.json",
+    "solidcraft": "cad/generated/building-stack-2d80f268decf/overview.sc",
+    "solidcraft_measurements": "exports/generated/building-stack-2d80f268decf/overview.solidcraft.json",
+    "step": "exports/generated/building-stack-2d80f268decf/overview.step",
+    "native_probe_commands": "exports/generated/building-stack-2d80f268decf/native-probes.commands.json",
+    "solidcraft_probes": "exports/generated/building-stack-2d80f268decf/native-probes.solidcraft.json",
+    "freecad": "cad/generated/building-stack-2d80f268decf/overview.FCStd",
+    "freecad_validation": "exports/generated/building-stack-2d80f268decf/overview.freecad.json"
   },
   "native_artifact_sha256": {
-    "case": "db35305fca157182b2803b2b4bf19dbbd213137c55f6f809853bafa44eb32e7a",
-    "commands": "9e49828d281a16a4d1e8e06497b3ab483586bc60a9c32900cb0cbd78dd4c83e2",
-    "solidcraft": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
-    "solidcraft_measurements": "e9e0325f958e953bd58662871bf158001baa5b01d2946219a78083acffbe166f",
-    "step": "619e234b6d45a1fbbc6c5b20a95d20b6c4e6e80a6ed451d5b4f2b373aca09b0b",
-    "native_probe_commands": "1894cddd1ab2b99d5924164c6fc872109ae8e6bda1f861ee9c0ca7c048b4aa03",
-    "solidcraft_probes": "d1acefa6d66b93554a8986a157c927774437afa7dd1814caf1d454835cc6e229",
-    "freecad": "482e95c814742f98e678d04727254db57c02393f2b802ad2d2197fdb72d99abb",
-    "freecad_validation": "f6e3c1df4fe03f37dc0fdca77e60111900845be165e122e71c7ce557de7a8466"
+    "case": "618546b648112b3f922301d8c98e74846696ddf5e52d9261b7747edba67bbd0b",
+    "commands": "0c46b0b311ccf5525d4be472ff1dcd2eaddc5f9fbdc6404d890d4880dc9e6858",
+    "solidcraft": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
+    "solidcraft_measurements": "5fa9269137cb00fa8318b90147de47f9f02c0cd1f1a8e549e1fc9dddd7de44a3",
+    "step": "35a23e27414a6a9d23f95f2f1de5be328cf51fac838131740c5f9361b6df4d43",
+    "native_probe_commands": "52b9367c592168550d0d93dc97a0fce685046c82f2087c8749c40b9ff40a1d7a",
+    "solidcraft_probes": "d9fac0a271232abb0c4f68c60ac6ab69399e83c790fae8a5bb131af533d7be4e",
+    "freecad": "0dfe1149523ad2a06b77302e7e30b6b7fe457dbf711474eed606e352edb9abf7",
+    "freecad_validation": "9eaea85e657ab995c20967769ae3d3bf94afc5316d94ac6c0bcf0a6f3d7c3ff3"
   },
   "images": [
     {
       "id": "overview",
       "path": "docs/media/building-stack-overview.png",
-      "sha256": "dc241720b1bc8202088d237b63054b8c46ad3b312679745a1fd0dab0f6a7adfd",
-      "bytes": 407829,
+      "sha256": "8f62d64aee4010d6f331bf24ef7ab71d1487b676d306acc6674ba31cc506321d",
+      "bytes": 370545,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
-          13913.513513513515,
-          13586.486486486489,
+          11817.567567567567,
+          13586.486486486485,
           6900.000000000007
         ],
         "yaw": -0.8,
         "pitch": 0.48,
-        "distance": 108137.95003792341,
+        "distance": 104053.2426586687,
         "fov": 0.6
       },
       "view_commands": [],
@@ -170,17 +170,17 @@
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/overview.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/overview.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/overview.png",
+        "renders/building-stack-2d80f268decf/overview.png",
         "--width",
         "1800",
         "--height",
         "1400",
         "--camera",
-        "{\"target\": [13913.513513513515, 13586.486486486489, 6900.000000000007], \"yaw\": -0.8, \"pitch\": 0.48, \"distance\": 108137.95003792341, \"fov\": 0.6}",
+        "{\"target\": [11817.567567567567, 13586.486486486485, 6900.000000000007], \"yaw\": -0.8, \"pitch\": 0.48, \"distance\": 104053.2426586687, \"fov\": 0.6}",
         "--no-grid",
         "--no-axes",
         "--quality",
@@ -189,8 +189,7 @@
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "atrium",
@@ -202,8 +201,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
           11817.567567567568,
@@ -900,10 +899,21 @@
               "RoofGuard_W037_0",
               "RoofGuard_W061_0",
               "RoofGuard_W072_0",
-              "Terrain_West",
-              "Terrain_East",
-              "Terrain_South",
-              "Terrain_North",
+              "Terrain_Lawn",
+              "Site_Sidewalk",
+              "Site_Driveway",
+              "Site_EntranceApron",
+              "FacadeClosure_EG_EW042",
+              "FacadeClosure_EG_EW042_Align1",
+              "FacadeClosure_EG_EW043",
+              "FacadeClosure_EG_EW043_Align1",
+              "FacadeClosure_EG_EW044",
+              "FacadeClosure_EG_EW044_Align1",
+              "FacadeClosure_EG_EW045",
+              "FacadeClosure_EG_EW045_Align1",
+              "FacadeClosure_OG1_W117",
+              "FacadeClosure_OG2_W117",
+              "FacadeClosure_OG3_W117",
               "FoyerGlass_EG_0",
               "FoyerGlass_EG_1",
               "FoyerGlass_EG_2",
@@ -928,6 +938,69 @@
               "FoyerGlass_OG3_3",
               "FoyerGlass_OG3_4",
               "FoyerGlass_OG3_5",
+              "SideWindow_EG_EW008_Glass",
+              "SideWindow_EG_EW146_Glass",
+              "SideWindow_EG_EW147_Glass",
+              "SideWindow_EG_EW149_Glass",
+              "SideWindow_EG_EW152_Glass",
+              "SideWindow_EG_EW154_Align1_Glass",
+              "SideWindow_EG_EW157_Align1_Glass",
+              "SideWindow_EG_EW158_Glass",
+              "SideWindow_EG_EW039_Align1_Glass",
+              "SideWindow_EG_EW040_Glass",
+              "SideWindow_EG_EW032_Glass",
+              "SideWindow_EG_EW033_Glass",
+              "SideWindow_EG_EW035_Glass",
+              "SideWindow_EG_EW036_Glass",
+              "SideWindow_EG_EW026_Glass",
+              "SideWindow_EG_EW028_Glass",
+              "SideWindow_EG_EW028_Align1_Glass",
+              "SideWindow_EG_EW017_Glass",
+              "SideWindow_OG1_W088_Glass",
+              "SideWindow_OG1_W069_Glass",
+              "SideWindow_OG1_W059_Glass",
+              "SideWindow_OG1_W039_Glass",
+              "SideWindow_OG1_W033_Glass",
+              "SideWindow_OG1_W026_Glass",
+              "SideWindow_OG1_W014_Glass",
+              "SideWindow_OG1_W007_Glass",
+              "SideWindow_OG1_W012_Glass",
+              "SideWindow_OG1_W013_Glass",
+              "SideWindow_OG1_W016_Glass",
+              "SideWindow_OG1_W025_Glass",
+              "SideWindow_OG1_W037_Glass",
+              "SideWindow_OG1_W061_Glass",
+              "SideWindow_OG1_W072_Glass",
+              "SideWindow_OG2_W088_Glass",
+              "SideWindow_OG2_W069_Glass",
+              "SideWindow_OG2_W059_Glass",
+              "SideWindow_OG2_W039_Glass",
+              "SideWindow_OG2_W033_Glass",
+              "SideWindow_OG2_W026_Glass",
+              "SideWindow_OG2_W014_Glass",
+              "SideWindow_OG2_W007_Glass",
+              "SideWindow_OG2_W012_Glass",
+              "SideWindow_OG2_W013_Glass",
+              "SideWindow_OG2_W016_Glass",
+              "SideWindow_OG2_W025_Glass",
+              "SideWindow_OG2_W037_Glass",
+              "SideWindow_OG2_W061_Glass",
+              "SideWindow_OG2_W072_Glass",
+              "SideWindow_OG3_W088_Glass",
+              "SideWindow_OG3_W069_Glass",
+              "SideWindow_OG3_W059_Glass",
+              "SideWindow_OG3_W039_Glass",
+              "SideWindow_OG3_W033_Glass",
+              "SideWindow_OG3_W026_Glass",
+              "SideWindow_OG3_W014_Glass",
+              "SideWindow_OG3_W007_Glass",
+              "SideWindow_OG3_W012_Glass",
+              "SideWindow_OG3_W013_Glass",
+              "SideWindow_OG3_W016_Glass",
+              "SideWindow_OG3_W025_Glass",
+              "SideWindow_OG3_W037_Glass",
+              "SideWindow_OG3_W061_Glass",
+              "SideWindow_OG3_W072_Glass",
               "FoyerFacadeFrame",
               "FoyerMullion_1",
               "FoyerMullion_2",
@@ -943,21 +1016,84 @@
               "FoyerTransom_OG2_75",
               "FoyerTransom_OG3_0",
               "FoyerTransom_OG3_25",
-              "FoyerTransom_OG3_75"
+              "FoyerTransom_OG3_75",
+              "SideWindow_EG_EW008_Frame",
+              "SideWindow_EG_EW146_Frame",
+              "SideWindow_EG_EW147_Frame",
+              "SideWindow_EG_EW149_Frame",
+              "SideWindow_EG_EW152_Frame",
+              "SideWindow_EG_EW154_Align1_Frame",
+              "SideWindow_EG_EW157_Align1_Frame",
+              "SideWindow_EG_EW158_Frame",
+              "SideWindow_EG_EW039_Align1_Frame",
+              "SideWindow_EG_EW040_Frame",
+              "SideWindow_EG_EW032_Frame",
+              "SideWindow_EG_EW033_Frame",
+              "SideWindow_EG_EW035_Frame",
+              "SideWindow_EG_EW036_Frame",
+              "SideWindow_EG_EW026_Frame",
+              "SideWindow_EG_EW028_Frame",
+              "SideWindow_EG_EW028_Align1_Frame",
+              "SideWindow_EG_EW017_Frame",
+              "SideWindow_OG1_W088_Frame",
+              "SideWindow_OG1_W069_Frame",
+              "SideWindow_OG1_W059_Frame",
+              "SideWindow_OG1_W039_Frame",
+              "SideWindow_OG1_W033_Frame",
+              "SideWindow_OG1_W026_Frame",
+              "SideWindow_OG1_W014_Frame",
+              "SideWindow_OG1_W007_Frame",
+              "SideWindow_OG1_W012_Frame",
+              "SideWindow_OG1_W013_Frame",
+              "SideWindow_OG1_W016_Frame",
+              "SideWindow_OG1_W025_Frame",
+              "SideWindow_OG1_W037_Frame",
+              "SideWindow_OG1_W061_Frame",
+              "SideWindow_OG1_W072_Frame",
+              "SideWindow_OG2_W088_Frame",
+              "SideWindow_OG2_W069_Frame",
+              "SideWindow_OG2_W059_Frame",
+              "SideWindow_OG2_W039_Frame",
+              "SideWindow_OG2_W033_Frame",
+              "SideWindow_OG2_W026_Frame",
+              "SideWindow_OG2_W014_Frame",
+              "SideWindow_OG2_W007_Frame",
+              "SideWindow_OG2_W012_Frame",
+              "SideWindow_OG2_W013_Frame",
+              "SideWindow_OG2_W016_Frame",
+              "SideWindow_OG2_W025_Frame",
+              "SideWindow_OG2_W037_Frame",
+              "SideWindow_OG2_W061_Frame",
+              "SideWindow_OG2_W072_Frame",
+              "SideWindow_OG3_W088_Frame",
+              "SideWindow_OG3_W069_Frame",
+              "SideWindow_OG3_W059_Frame",
+              "SideWindow_OG3_W039_Frame",
+              "SideWindow_OG3_W033_Frame",
+              "SideWindow_OG3_W026_Frame",
+              "SideWindow_OG3_W014_Frame",
+              "SideWindow_OG3_W007_Frame",
+              "SideWindow_OG3_W012_Frame",
+              "SideWindow_OG3_W013_Frame",
+              "SideWindow_OG3_W016_Frame",
+              "SideWindow_OG3_W025_Frame",
+              "SideWindow_OG3_W037_Frame",
+              "SideWindow_OG3_W061_Frame",
+              "SideWindow_OG3_W072_Frame"
             ],
             "visible": false
           }
         }
       ],
-      "view_script_sha256": "ab646b217a327a3d5c2e5fce03a3d8fce8b5a5774e37424548d0dc631dff2487",
+      "view_script_sha256": "25c4fb70cee3a69205a7da6032463ccd00b1bdc9a95fe25907c8abb03a6f0116",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/atrium.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/atrium.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/atrium.png",
+        "renders/building-stack-2d80f268decf/atrium.png",
         "--width",
         "1800",
         "--height",
@@ -972,8 +1108,7 @@
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "circulation",
@@ -985,8 +1120,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
           12037.0395010395,
@@ -2427,24 +2562,161 @@
               "AtriumGuard_OG3_W106_Bar1",
               "AtriumGuard_OG3_W106_Bar2",
               "AtriumGuard_OG3_W106_Bar3",
-              "Terrain_West",
-              "Terrain_East",
-              "Terrain_South",
-              "Terrain_North"
+              "SideWindow_EG_EW008_Frame",
+              "SideWindow_EG_EW008_Glass",
+              "SideWindow_EG_EW146_Frame",
+              "SideWindow_EG_EW146_Glass",
+              "SideWindow_EG_EW147_Frame",
+              "SideWindow_EG_EW147_Glass",
+              "SideWindow_EG_EW149_Frame",
+              "SideWindow_EG_EW149_Glass",
+              "SideWindow_EG_EW152_Frame",
+              "SideWindow_EG_EW152_Glass",
+              "SideWindow_EG_EW154_Align1_Frame",
+              "SideWindow_EG_EW154_Align1_Glass",
+              "SideWindow_EG_EW157_Align1_Frame",
+              "SideWindow_EG_EW157_Align1_Glass",
+              "SideWindow_EG_EW158_Frame",
+              "SideWindow_EG_EW158_Glass",
+              "FacadeClosure_EG_EW042",
+              "FacadeClosure_EG_EW042_Align1",
+              "FacadeClosure_EG_EW043",
+              "FacadeClosure_EG_EW043_Align1",
+              "FacadeClosure_EG_EW044",
+              "FacadeClosure_EG_EW044_Align1",
+              "FacadeClosure_EG_EW045",
+              "FacadeClosure_EG_EW045_Align1",
+              "SideWindow_EG_EW039_Align1_Frame",
+              "SideWindow_EG_EW039_Align1_Glass",
+              "SideWindow_EG_EW040_Frame",
+              "SideWindow_EG_EW040_Glass",
+              "SideWindow_EG_EW032_Frame",
+              "SideWindow_EG_EW032_Glass",
+              "SideWindow_EG_EW033_Frame",
+              "SideWindow_EG_EW033_Glass",
+              "SideWindow_EG_EW035_Frame",
+              "SideWindow_EG_EW035_Glass",
+              "SideWindow_EG_EW036_Frame",
+              "SideWindow_EG_EW036_Glass",
+              "SideWindow_EG_EW026_Frame",
+              "SideWindow_EG_EW026_Glass",
+              "SideWindow_EG_EW028_Frame",
+              "SideWindow_EG_EW028_Glass",
+              "SideWindow_EG_EW028_Align1_Frame",
+              "SideWindow_EG_EW028_Align1_Glass",
+              "SideWindow_EG_EW017_Frame",
+              "SideWindow_EG_EW017_Glass",
+              "SideWindow_OG1_W088_Frame",
+              "SideWindow_OG1_W088_Glass",
+              "FacadeClosure_OG1_W117",
+              "SideWindow_OG1_W069_Frame",
+              "SideWindow_OG1_W069_Glass",
+              "SideWindow_OG1_W059_Frame",
+              "SideWindow_OG1_W059_Glass",
+              "SideWindow_OG1_W039_Frame",
+              "SideWindow_OG1_W039_Glass",
+              "SideWindow_OG1_W033_Frame",
+              "SideWindow_OG1_W033_Glass",
+              "SideWindow_OG1_W026_Frame",
+              "SideWindow_OG1_W026_Glass",
+              "SideWindow_OG1_W014_Frame",
+              "SideWindow_OG1_W014_Glass",
+              "SideWindow_OG1_W007_Frame",
+              "SideWindow_OG1_W007_Glass",
+              "SideWindow_OG1_W012_Frame",
+              "SideWindow_OG1_W012_Glass",
+              "SideWindow_OG1_W013_Frame",
+              "SideWindow_OG1_W013_Glass",
+              "SideWindow_OG1_W016_Frame",
+              "SideWindow_OG1_W016_Glass",
+              "SideWindow_OG1_W025_Frame",
+              "SideWindow_OG1_W025_Glass",
+              "SideWindow_OG1_W037_Frame",
+              "SideWindow_OG1_W037_Glass",
+              "SideWindow_OG1_W061_Frame",
+              "SideWindow_OG1_W061_Glass",
+              "SideWindow_OG1_W072_Frame",
+              "SideWindow_OG1_W072_Glass",
+              "SideWindow_OG2_W088_Frame",
+              "SideWindow_OG2_W088_Glass",
+              "FacadeClosure_OG2_W117",
+              "SideWindow_OG2_W069_Frame",
+              "SideWindow_OG2_W069_Glass",
+              "SideWindow_OG2_W059_Frame",
+              "SideWindow_OG2_W059_Glass",
+              "SideWindow_OG2_W039_Frame",
+              "SideWindow_OG2_W039_Glass",
+              "SideWindow_OG2_W033_Frame",
+              "SideWindow_OG2_W033_Glass",
+              "SideWindow_OG2_W026_Frame",
+              "SideWindow_OG2_W026_Glass",
+              "SideWindow_OG2_W014_Frame",
+              "SideWindow_OG2_W014_Glass",
+              "SideWindow_OG2_W007_Frame",
+              "SideWindow_OG2_W007_Glass",
+              "SideWindow_OG2_W012_Frame",
+              "SideWindow_OG2_W012_Glass",
+              "SideWindow_OG2_W013_Frame",
+              "SideWindow_OG2_W013_Glass",
+              "SideWindow_OG2_W016_Frame",
+              "SideWindow_OG2_W016_Glass",
+              "SideWindow_OG2_W025_Frame",
+              "SideWindow_OG2_W025_Glass",
+              "SideWindow_OG2_W037_Frame",
+              "SideWindow_OG2_W037_Glass",
+              "SideWindow_OG2_W061_Frame",
+              "SideWindow_OG2_W061_Glass",
+              "SideWindow_OG2_W072_Frame",
+              "SideWindow_OG2_W072_Glass",
+              "SideWindow_OG3_W088_Frame",
+              "SideWindow_OG3_W088_Glass",
+              "FacadeClosure_OG3_W117",
+              "SideWindow_OG3_W069_Frame",
+              "SideWindow_OG3_W069_Glass",
+              "SideWindow_OG3_W059_Frame",
+              "SideWindow_OG3_W059_Glass",
+              "SideWindow_OG3_W039_Frame",
+              "SideWindow_OG3_W039_Glass",
+              "SideWindow_OG3_W033_Frame",
+              "SideWindow_OG3_W033_Glass",
+              "SideWindow_OG3_W026_Frame",
+              "SideWindow_OG3_W026_Glass",
+              "SideWindow_OG3_W014_Frame",
+              "SideWindow_OG3_W014_Glass",
+              "SideWindow_OG3_W007_Frame",
+              "SideWindow_OG3_W007_Glass",
+              "SideWindow_OG3_W012_Frame",
+              "SideWindow_OG3_W012_Glass",
+              "SideWindow_OG3_W013_Frame",
+              "SideWindow_OG3_W013_Glass",
+              "SideWindow_OG3_W016_Frame",
+              "SideWindow_OG3_W016_Glass",
+              "SideWindow_OG3_W025_Frame",
+              "SideWindow_OG3_W025_Glass",
+              "SideWindow_OG3_W037_Frame",
+              "SideWindow_OG3_W037_Glass",
+              "SideWindow_OG3_W061_Frame",
+              "SideWindow_OG3_W061_Glass",
+              "SideWindow_OG3_W072_Frame",
+              "SideWindow_OG3_W072_Glass",
+              "Terrain_Lawn",
+              "Site_Sidewalk",
+              "Site_Driveway",
+              "Site_EntranceApron"
             ],
             "visible": false
           }
         }
       ],
-      "view_script_sha256": "5d2874dc4882d4e3384021cd2b4f5b5c1d434c4d8d40353bc1ceea1903a10361",
+      "view_script_sha256": "ff200d4a2d849c36e452192a3a52739a67910a9950dde5b6bca01784e55991ca",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/circulation.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/circulation.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/circulation.png",
+        "renders/building-stack-2d80f268decf/circulation.png",
         "--width",
         "1800",
         "--height",
@@ -2459,21 +2731,20 @@
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "ground",
       "path": "docs/media/building-stack-ground.png",
-      "sha256": "9609808c6d9cdb408b8a33cfea533e8a0b23dac985d927a5bc6666c2cb682053",
-      "bytes": 404929,
+      "sha256": "ce7b0f967cc5a82afd17dee1f0c44bef190acd3a928034833650c638bfcb2ae0",
+      "bytes": 391838,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
           11817.90066498702,
@@ -3743,24 +4014,161 @@
               "AtriumGuard_OG3_W106_Bar1",
               "AtriumGuard_OG3_W106_Bar2",
               "AtriumGuard_OG3_W106_Bar3",
-              "Terrain_West",
-              "Terrain_East",
-              "Terrain_South",
-              "Terrain_North"
+              "SideWindow_EG_EW008_Frame",
+              "SideWindow_EG_EW008_Glass",
+              "SideWindow_EG_EW146_Frame",
+              "SideWindow_EG_EW146_Glass",
+              "SideWindow_EG_EW147_Frame",
+              "SideWindow_EG_EW147_Glass",
+              "SideWindow_EG_EW149_Frame",
+              "SideWindow_EG_EW149_Glass",
+              "SideWindow_EG_EW152_Frame",
+              "SideWindow_EG_EW152_Glass",
+              "SideWindow_EG_EW154_Align1_Frame",
+              "SideWindow_EG_EW154_Align1_Glass",
+              "SideWindow_EG_EW157_Align1_Frame",
+              "SideWindow_EG_EW157_Align1_Glass",
+              "SideWindow_EG_EW158_Frame",
+              "SideWindow_EG_EW158_Glass",
+              "FacadeClosure_EG_EW042",
+              "FacadeClosure_EG_EW042_Align1",
+              "FacadeClosure_EG_EW043",
+              "FacadeClosure_EG_EW043_Align1",
+              "FacadeClosure_EG_EW044",
+              "FacadeClosure_EG_EW044_Align1",
+              "FacadeClosure_EG_EW045",
+              "FacadeClosure_EG_EW045_Align1",
+              "SideWindow_EG_EW039_Align1_Frame",
+              "SideWindow_EG_EW039_Align1_Glass",
+              "SideWindow_EG_EW040_Frame",
+              "SideWindow_EG_EW040_Glass",
+              "SideWindow_EG_EW032_Frame",
+              "SideWindow_EG_EW032_Glass",
+              "SideWindow_EG_EW033_Frame",
+              "SideWindow_EG_EW033_Glass",
+              "SideWindow_EG_EW035_Frame",
+              "SideWindow_EG_EW035_Glass",
+              "SideWindow_EG_EW036_Frame",
+              "SideWindow_EG_EW036_Glass",
+              "SideWindow_EG_EW026_Frame",
+              "SideWindow_EG_EW026_Glass",
+              "SideWindow_EG_EW028_Frame",
+              "SideWindow_EG_EW028_Glass",
+              "SideWindow_EG_EW028_Align1_Frame",
+              "SideWindow_EG_EW028_Align1_Glass",
+              "SideWindow_EG_EW017_Frame",
+              "SideWindow_EG_EW017_Glass",
+              "SideWindow_OG1_W088_Frame",
+              "SideWindow_OG1_W088_Glass",
+              "FacadeClosure_OG1_W117",
+              "SideWindow_OG1_W069_Frame",
+              "SideWindow_OG1_W069_Glass",
+              "SideWindow_OG1_W059_Frame",
+              "SideWindow_OG1_W059_Glass",
+              "SideWindow_OG1_W039_Frame",
+              "SideWindow_OG1_W039_Glass",
+              "SideWindow_OG1_W033_Frame",
+              "SideWindow_OG1_W033_Glass",
+              "SideWindow_OG1_W026_Frame",
+              "SideWindow_OG1_W026_Glass",
+              "SideWindow_OG1_W014_Frame",
+              "SideWindow_OG1_W014_Glass",
+              "SideWindow_OG1_W007_Frame",
+              "SideWindow_OG1_W007_Glass",
+              "SideWindow_OG1_W012_Frame",
+              "SideWindow_OG1_W012_Glass",
+              "SideWindow_OG1_W013_Frame",
+              "SideWindow_OG1_W013_Glass",
+              "SideWindow_OG1_W016_Frame",
+              "SideWindow_OG1_W016_Glass",
+              "SideWindow_OG1_W025_Frame",
+              "SideWindow_OG1_W025_Glass",
+              "SideWindow_OG1_W037_Frame",
+              "SideWindow_OG1_W037_Glass",
+              "SideWindow_OG1_W061_Frame",
+              "SideWindow_OG1_W061_Glass",
+              "SideWindow_OG1_W072_Frame",
+              "SideWindow_OG1_W072_Glass",
+              "SideWindow_OG2_W088_Frame",
+              "SideWindow_OG2_W088_Glass",
+              "FacadeClosure_OG2_W117",
+              "SideWindow_OG2_W069_Frame",
+              "SideWindow_OG2_W069_Glass",
+              "SideWindow_OG2_W059_Frame",
+              "SideWindow_OG2_W059_Glass",
+              "SideWindow_OG2_W039_Frame",
+              "SideWindow_OG2_W039_Glass",
+              "SideWindow_OG2_W033_Frame",
+              "SideWindow_OG2_W033_Glass",
+              "SideWindow_OG2_W026_Frame",
+              "SideWindow_OG2_W026_Glass",
+              "SideWindow_OG2_W014_Frame",
+              "SideWindow_OG2_W014_Glass",
+              "SideWindow_OG2_W007_Frame",
+              "SideWindow_OG2_W007_Glass",
+              "SideWindow_OG2_W012_Frame",
+              "SideWindow_OG2_W012_Glass",
+              "SideWindow_OG2_W013_Frame",
+              "SideWindow_OG2_W013_Glass",
+              "SideWindow_OG2_W016_Frame",
+              "SideWindow_OG2_W016_Glass",
+              "SideWindow_OG2_W025_Frame",
+              "SideWindow_OG2_W025_Glass",
+              "SideWindow_OG2_W037_Frame",
+              "SideWindow_OG2_W037_Glass",
+              "SideWindow_OG2_W061_Frame",
+              "SideWindow_OG2_W061_Glass",
+              "SideWindow_OG2_W072_Frame",
+              "SideWindow_OG2_W072_Glass",
+              "SideWindow_OG3_W088_Frame",
+              "SideWindow_OG3_W088_Glass",
+              "FacadeClosure_OG3_W117",
+              "SideWindow_OG3_W069_Frame",
+              "SideWindow_OG3_W069_Glass",
+              "SideWindow_OG3_W059_Frame",
+              "SideWindow_OG3_W059_Glass",
+              "SideWindow_OG3_W039_Frame",
+              "SideWindow_OG3_W039_Glass",
+              "SideWindow_OG3_W033_Frame",
+              "SideWindow_OG3_W033_Glass",
+              "SideWindow_OG3_W026_Frame",
+              "SideWindow_OG3_W026_Glass",
+              "SideWindow_OG3_W014_Frame",
+              "SideWindow_OG3_W014_Glass",
+              "SideWindow_OG3_W007_Frame",
+              "SideWindow_OG3_W007_Glass",
+              "SideWindow_OG3_W012_Frame",
+              "SideWindow_OG3_W012_Glass",
+              "SideWindow_OG3_W013_Frame",
+              "SideWindow_OG3_W013_Glass",
+              "SideWindow_OG3_W016_Frame",
+              "SideWindow_OG3_W016_Glass",
+              "SideWindow_OG3_W025_Frame",
+              "SideWindow_OG3_W025_Glass",
+              "SideWindow_OG3_W037_Frame",
+              "SideWindow_OG3_W037_Glass",
+              "SideWindow_OG3_W061_Frame",
+              "SideWindow_OG3_W061_Glass",
+              "SideWindow_OG3_W072_Frame",
+              "SideWindow_OG3_W072_Glass",
+              "Terrain_Lawn",
+              "Site_Sidewalk",
+              "Site_Driveway",
+              "Site_EntranceApron"
             ],
             "visible": false
           }
         }
       ],
-      "view_script_sha256": "d368128c6be0b67d288361ad6ee0be63bc2f8a4b8890fbf94aac0b984e60692f",
+      "view_script_sha256": "ac7bb136bf208c2750992d90d6842bfe02899515ad7bd3f174b388b6a663d9bb",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/ground.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/ground.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/ground.png",
+        "renders/building-stack-2d80f268decf/ground.png",
         "--width",
         "1800",
         "--height",
@@ -3775,8 +4183,7 @@
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "roof",
@@ -3788,8 +4195,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
           11818.291130542884,
@@ -5222,24 +5629,161 @@
               "AtriumGuard_OG3_W106_Bar1",
               "AtriumGuard_OG3_W106_Bar2",
               "AtriumGuard_OG3_W106_Bar3",
-              "Terrain_West",
-              "Terrain_East",
-              "Terrain_South",
-              "Terrain_North"
+              "SideWindow_EG_EW008_Frame",
+              "SideWindow_EG_EW008_Glass",
+              "SideWindow_EG_EW146_Frame",
+              "SideWindow_EG_EW146_Glass",
+              "SideWindow_EG_EW147_Frame",
+              "SideWindow_EG_EW147_Glass",
+              "SideWindow_EG_EW149_Frame",
+              "SideWindow_EG_EW149_Glass",
+              "SideWindow_EG_EW152_Frame",
+              "SideWindow_EG_EW152_Glass",
+              "SideWindow_EG_EW154_Align1_Frame",
+              "SideWindow_EG_EW154_Align1_Glass",
+              "SideWindow_EG_EW157_Align1_Frame",
+              "SideWindow_EG_EW157_Align1_Glass",
+              "SideWindow_EG_EW158_Frame",
+              "SideWindow_EG_EW158_Glass",
+              "FacadeClosure_EG_EW042",
+              "FacadeClosure_EG_EW042_Align1",
+              "FacadeClosure_EG_EW043",
+              "FacadeClosure_EG_EW043_Align1",
+              "FacadeClosure_EG_EW044",
+              "FacadeClosure_EG_EW044_Align1",
+              "FacadeClosure_EG_EW045",
+              "FacadeClosure_EG_EW045_Align1",
+              "SideWindow_EG_EW039_Align1_Frame",
+              "SideWindow_EG_EW039_Align1_Glass",
+              "SideWindow_EG_EW040_Frame",
+              "SideWindow_EG_EW040_Glass",
+              "SideWindow_EG_EW032_Frame",
+              "SideWindow_EG_EW032_Glass",
+              "SideWindow_EG_EW033_Frame",
+              "SideWindow_EG_EW033_Glass",
+              "SideWindow_EG_EW035_Frame",
+              "SideWindow_EG_EW035_Glass",
+              "SideWindow_EG_EW036_Frame",
+              "SideWindow_EG_EW036_Glass",
+              "SideWindow_EG_EW026_Frame",
+              "SideWindow_EG_EW026_Glass",
+              "SideWindow_EG_EW028_Frame",
+              "SideWindow_EG_EW028_Glass",
+              "SideWindow_EG_EW028_Align1_Frame",
+              "SideWindow_EG_EW028_Align1_Glass",
+              "SideWindow_EG_EW017_Frame",
+              "SideWindow_EG_EW017_Glass",
+              "SideWindow_OG1_W088_Frame",
+              "SideWindow_OG1_W088_Glass",
+              "FacadeClosure_OG1_W117",
+              "SideWindow_OG1_W069_Frame",
+              "SideWindow_OG1_W069_Glass",
+              "SideWindow_OG1_W059_Frame",
+              "SideWindow_OG1_W059_Glass",
+              "SideWindow_OG1_W039_Frame",
+              "SideWindow_OG1_W039_Glass",
+              "SideWindow_OG1_W033_Frame",
+              "SideWindow_OG1_W033_Glass",
+              "SideWindow_OG1_W026_Frame",
+              "SideWindow_OG1_W026_Glass",
+              "SideWindow_OG1_W014_Frame",
+              "SideWindow_OG1_W014_Glass",
+              "SideWindow_OG1_W007_Frame",
+              "SideWindow_OG1_W007_Glass",
+              "SideWindow_OG1_W012_Frame",
+              "SideWindow_OG1_W012_Glass",
+              "SideWindow_OG1_W013_Frame",
+              "SideWindow_OG1_W013_Glass",
+              "SideWindow_OG1_W016_Frame",
+              "SideWindow_OG1_W016_Glass",
+              "SideWindow_OG1_W025_Frame",
+              "SideWindow_OG1_W025_Glass",
+              "SideWindow_OG1_W037_Frame",
+              "SideWindow_OG1_W037_Glass",
+              "SideWindow_OG1_W061_Frame",
+              "SideWindow_OG1_W061_Glass",
+              "SideWindow_OG1_W072_Frame",
+              "SideWindow_OG1_W072_Glass",
+              "SideWindow_OG2_W088_Frame",
+              "SideWindow_OG2_W088_Glass",
+              "FacadeClosure_OG2_W117",
+              "SideWindow_OG2_W069_Frame",
+              "SideWindow_OG2_W069_Glass",
+              "SideWindow_OG2_W059_Frame",
+              "SideWindow_OG2_W059_Glass",
+              "SideWindow_OG2_W039_Frame",
+              "SideWindow_OG2_W039_Glass",
+              "SideWindow_OG2_W033_Frame",
+              "SideWindow_OG2_W033_Glass",
+              "SideWindow_OG2_W026_Frame",
+              "SideWindow_OG2_W026_Glass",
+              "SideWindow_OG2_W014_Frame",
+              "SideWindow_OG2_W014_Glass",
+              "SideWindow_OG2_W007_Frame",
+              "SideWindow_OG2_W007_Glass",
+              "SideWindow_OG2_W012_Frame",
+              "SideWindow_OG2_W012_Glass",
+              "SideWindow_OG2_W013_Frame",
+              "SideWindow_OG2_W013_Glass",
+              "SideWindow_OG2_W016_Frame",
+              "SideWindow_OG2_W016_Glass",
+              "SideWindow_OG2_W025_Frame",
+              "SideWindow_OG2_W025_Glass",
+              "SideWindow_OG2_W037_Frame",
+              "SideWindow_OG2_W037_Glass",
+              "SideWindow_OG2_W061_Frame",
+              "SideWindow_OG2_W061_Glass",
+              "SideWindow_OG2_W072_Frame",
+              "SideWindow_OG2_W072_Glass",
+              "SideWindow_OG3_W088_Frame",
+              "SideWindow_OG3_W088_Glass",
+              "FacadeClosure_OG3_W117",
+              "SideWindow_OG3_W069_Frame",
+              "SideWindow_OG3_W069_Glass",
+              "SideWindow_OG3_W059_Frame",
+              "SideWindow_OG3_W059_Glass",
+              "SideWindow_OG3_W039_Frame",
+              "SideWindow_OG3_W039_Glass",
+              "SideWindow_OG3_W033_Frame",
+              "SideWindow_OG3_W033_Glass",
+              "SideWindow_OG3_W026_Frame",
+              "SideWindow_OG3_W026_Glass",
+              "SideWindow_OG3_W014_Frame",
+              "SideWindow_OG3_W014_Glass",
+              "SideWindow_OG3_W007_Frame",
+              "SideWindow_OG3_W007_Glass",
+              "SideWindow_OG3_W012_Frame",
+              "SideWindow_OG3_W012_Glass",
+              "SideWindow_OG3_W013_Frame",
+              "SideWindow_OG3_W013_Glass",
+              "SideWindow_OG3_W016_Frame",
+              "SideWindow_OG3_W016_Glass",
+              "SideWindow_OG3_W025_Frame",
+              "SideWindow_OG3_W025_Glass",
+              "SideWindow_OG3_W037_Frame",
+              "SideWindow_OG3_W037_Glass",
+              "SideWindow_OG3_W061_Frame",
+              "SideWindow_OG3_W061_Glass",
+              "SideWindow_OG3_W072_Frame",
+              "SideWindow_OG3_W072_Glass",
+              "Terrain_Lawn",
+              "Site_Sidewalk",
+              "Site_Driveway",
+              "Site_EntranceApron"
             ],
             "visible": false
           }
         }
       ],
-      "view_script_sha256": "3d4b04c88530617a41239045474fd917a89eb37a27459d0e2dce6f6abe17406b",
+      "view_script_sha256": "643a4bbe132522a561df0038ea4c3a898abd53add33c7f64a0d09a6491527218",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/roof.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/roof.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/roof.png",
+        "renders/building-stack-2d80f268decf/roof.png",
         "--width",
         "1800",
         "--height",
@@ -5254,14 +5798,13 @@
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "section_svg",
       "path": "docs/models/images/building-stack.svg",
-      "sha256": "11682ab95ce16f8a999a29b150855a56fe4bf95653d04f2115a85ca08ec95dd1",
-      "bytes": 10546,
+      "sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151",
+      "bytes": 10540,
       "representation": "Source-derived self-contained vectors, no original image embedded",
       "visual_review": {
         "passed": true,
@@ -5282,8 +5825,8 @@
     {
       "id": "section_png",
       "path": "docs/media/building-stack-section.png",
-      "sha256": "bf220e82ec41324fe814503c5e4aac15cafba24bd083598b35dbff03f6ec75c4",
-      "bytes": 185741,
+      "sha256": "43814dbe32d5da379a8d1c1a748d912b609ac6c2b59fbac7d9b604b99a96185b",
+      "bytes": 185731,
       "pixels": [
         1800,
         1200
@@ -5302,30 +5845,30 @@
     {
       "id": "lab_3_003",
       "path": "docs/media/building-stack-lab-3-003.png",
-      "sha256": "11a9f905f1b16ee2edad21476c356e60bd483d4e92f2271fb01a907de7ed5c87",
-      "bytes": 397709,
+      "sha256": "f86cdc72ac33ea176f6757c78e0603937666c4f603908f60f53e618b9f41f243",
+      "bytes": 373942,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model; appearance and visibility only",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "build_report": {
-        "path": "exports/worktrees/floor-hull-alignment/exports/hull-checked-native-interim.json",
-        "sha256": "11a81be49496dd9cde62cd4caf0b7cbd8d8afed7522c6800e47eee1f43f0c223",
-        "bytes": 695921
+        "path": "exports/photo-checked-native.json",
+        "sha256": "76226c567c167d2ace23ab9b57caa54f8a524eb5dd190d8a0e196fa15b332192",
+        "bytes": 765791
       },
       "render_report": {
-        "path": "exports/worktrees/floor-hull-alignment/renders/hull-highlight-final/highlight-report.json",
-        "sha256": "54b0a45b1c2a87baf2bb8c4aa17f9c09d1008da2afa6ed3438e05835056a7afe",
-        "bytes": 59033
+        "path": "renders/photo-highlight-final/highlight-report.json",
+        "sha256": "26fb6c2915f112b605538eba1caa9ed36e2f3d575025185117e0dfeda5a1d166",
+        "bytes": 63873
       },
       "producer": {
         "path": "scripts/render_building_stack_highlight.py",
         "sha256": "0b41eaa98032cbc8000855e82b96d213668955f77666865a5c8c16d773b33b1b"
       },
-      "view_script": "exports/worktrees/floor-hull-alignment/renders/hull-highlight-final/view.commands.json",
+      "view_script": "renders/photo-highlight-final/view.commands.json",
       "view_script_sha256": "eecf3181b9ddadefa86f081c7e0e8c2fafb7ffab34c5f6638516a2e2c6721a21",
       "view_commands": [
         {
@@ -5532,29 +6075,29 @@
       ],
       "camera": {
         "target": [
-          13913.513513513515,
-          13586.486486486489,
+          11817.567567567568,
+          13586.486486486487,
           6252.5
         ],
         "yaw": -0.8,
         "pitch": 0.67,
-        "distance": 117247.9316975769,
+        "distance": 112273.3195427413,
         "fov": 0.6
       },
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "renders/hull-highlight-final/view.commands.json",
+        "renders/photo-highlight-final/view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/hull-highlight-final/room-highlight.pending.png",
+        "renders/photo-highlight-final/room-highlight.pending.png",
         "--width",
         "1800",
         "--height",
         "1400",
         "--camera",
-        "{\"target\": [13913.513513513515, 13586.486486486489, 6252.5], \"yaw\": -0.8, \"pitch\": 0.67, \"distance\": 117247.9316975769, \"fov\": 0.6}",
+        "{\"target\": [11817.567567567568, 13586.486486486487, 6252.5], \"yaw\": -0.8, \"pitch\": 0.67, \"distance\": 112273.3195427413, \"fov\": 0.6}",
         "--no-grid",
         "--no-axes",
         "--quality",
@@ -7214,10 +7757,147 @@
           "AtriumGuard_OG3_W106_Bar1",
           "AtriumGuard_OG3_W106_Bar2",
           "AtriumGuard_OG3_W106_Bar3",
-          "Terrain_West",
-          "Terrain_East",
-          "Terrain_South",
-          "Terrain_North"
+          "SideWindow_EG_EW008_Frame",
+          "SideWindow_EG_EW008_Glass",
+          "SideWindow_EG_EW146_Frame",
+          "SideWindow_EG_EW146_Glass",
+          "SideWindow_EG_EW147_Frame",
+          "SideWindow_EG_EW147_Glass",
+          "SideWindow_EG_EW149_Frame",
+          "SideWindow_EG_EW149_Glass",
+          "SideWindow_EG_EW152_Frame",
+          "SideWindow_EG_EW152_Glass",
+          "SideWindow_EG_EW154_Align1_Frame",
+          "SideWindow_EG_EW154_Align1_Glass",
+          "SideWindow_EG_EW157_Align1_Frame",
+          "SideWindow_EG_EW157_Align1_Glass",
+          "SideWindow_EG_EW158_Frame",
+          "SideWindow_EG_EW158_Glass",
+          "FacadeClosure_EG_EW042",
+          "FacadeClosure_EG_EW042_Align1",
+          "FacadeClosure_EG_EW043",
+          "FacadeClosure_EG_EW043_Align1",
+          "FacadeClosure_EG_EW044",
+          "FacadeClosure_EG_EW044_Align1",
+          "FacadeClosure_EG_EW045",
+          "FacadeClosure_EG_EW045_Align1",
+          "SideWindow_EG_EW039_Align1_Frame",
+          "SideWindow_EG_EW039_Align1_Glass",
+          "SideWindow_EG_EW040_Frame",
+          "SideWindow_EG_EW040_Glass",
+          "SideWindow_EG_EW032_Frame",
+          "SideWindow_EG_EW032_Glass",
+          "SideWindow_EG_EW033_Frame",
+          "SideWindow_EG_EW033_Glass",
+          "SideWindow_EG_EW035_Frame",
+          "SideWindow_EG_EW035_Glass",
+          "SideWindow_EG_EW036_Frame",
+          "SideWindow_EG_EW036_Glass",
+          "SideWindow_EG_EW026_Frame",
+          "SideWindow_EG_EW026_Glass",
+          "SideWindow_EG_EW028_Frame",
+          "SideWindow_EG_EW028_Glass",
+          "SideWindow_EG_EW028_Align1_Frame",
+          "SideWindow_EG_EW028_Align1_Glass",
+          "SideWindow_EG_EW017_Frame",
+          "SideWindow_EG_EW017_Glass",
+          "SideWindow_OG1_W088_Frame",
+          "SideWindow_OG1_W088_Glass",
+          "FacadeClosure_OG1_W117",
+          "SideWindow_OG1_W069_Frame",
+          "SideWindow_OG1_W069_Glass",
+          "SideWindow_OG1_W059_Frame",
+          "SideWindow_OG1_W059_Glass",
+          "SideWindow_OG1_W039_Frame",
+          "SideWindow_OG1_W039_Glass",
+          "SideWindow_OG1_W033_Frame",
+          "SideWindow_OG1_W033_Glass",
+          "SideWindow_OG1_W026_Frame",
+          "SideWindow_OG1_W026_Glass",
+          "SideWindow_OG1_W014_Frame",
+          "SideWindow_OG1_W014_Glass",
+          "SideWindow_OG1_W007_Frame",
+          "SideWindow_OG1_W007_Glass",
+          "SideWindow_OG1_W012_Frame",
+          "SideWindow_OG1_W012_Glass",
+          "SideWindow_OG1_W013_Frame",
+          "SideWindow_OG1_W013_Glass",
+          "SideWindow_OG1_W016_Frame",
+          "SideWindow_OG1_W016_Glass",
+          "SideWindow_OG1_W025_Frame",
+          "SideWindow_OG1_W025_Glass",
+          "SideWindow_OG1_W037_Frame",
+          "SideWindow_OG1_W037_Glass",
+          "SideWindow_OG1_W061_Frame",
+          "SideWindow_OG1_W061_Glass",
+          "SideWindow_OG1_W072_Frame",
+          "SideWindow_OG1_W072_Glass",
+          "SideWindow_OG2_W088_Frame",
+          "SideWindow_OG2_W088_Glass",
+          "FacadeClosure_OG2_W117",
+          "SideWindow_OG2_W069_Frame",
+          "SideWindow_OG2_W069_Glass",
+          "SideWindow_OG2_W059_Frame",
+          "SideWindow_OG2_W059_Glass",
+          "SideWindow_OG2_W039_Frame",
+          "SideWindow_OG2_W039_Glass",
+          "SideWindow_OG2_W033_Frame",
+          "SideWindow_OG2_W033_Glass",
+          "SideWindow_OG2_W026_Frame",
+          "SideWindow_OG2_W026_Glass",
+          "SideWindow_OG2_W014_Frame",
+          "SideWindow_OG2_W014_Glass",
+          "SideWindow_OG2_W007_Frame",
+          "SideWindow_OG2_W007_Glass",
+          "SideWindow_OG2_W012_Frame",
+          "SideWindow_OG2_W012_Glass",
+          "SideWindow_OG2_W013_Frame",
+          "SideWindow_OG2_W013_Glass",
+          "SideWindow_OG2_W016_Frame",
+          "SideWindow_OG2_W016_Glass",
+          "SideWindow_OG2_W025_Frame",
+          "SideWindow_OG2_W025_Glass",
+          "SideWindow_OG2_W037_Frame",
+          "SideWindow_OG2_W037_Glass",
+          "SideWindow_OG2_W061_Frame",
+          "SideWindow_OG2_W061_Glass",
+          "SideWindow_OG2_W072_Frame",
+          "SideWindow_OG2_W072_Glass",
+          "SideWindow_OG3_W088_Frame",
+          "SideWindow_OG3_W088_Glass",
+          "FacadeClosure_OG3_W117",
+          "SideWindow_OG3_W069_Frame",
+          "SideWindow_OG3_W069_Glass",
+          "SideWindow_OG3_W059_Frame",
+          "SideWindow_OG3_W059_Glass",
+          "SideWindow_OG3_W039_Frame",
+          "SideWindow_OG3_W039_Glass",
+          "SideWindow_OG3_W033_Frame",
+          "SideWindow_OG3_W033_Glass",
+          "SideWindow_OG3_W026_Frame",
+          "SideWindow_OG3_W026_Glass",
+          "SideWindow_OG3_W014_Frame",
+          "SideWindow_OG3_W014_Glass",
+          "SideWindow_OG3_W007_Frame",
+          "SideWindow_OG3_W007_Glass",
+          "SideWindow_OG3_W012_Frame",
+          "SideWindow_OG3_W012_Glass",
+          "SideWindow_OG3_W013_Frame",
+          "SideWindow_OG3_W013_Glass",
+          "SideWindow_OG3_W016_Frame",
+          "SideWindow_OG3_W016_Glass",
+          "SideWindow_OG3_W025_Frame",
+          "SideWindow_OG3_W025_Glass",
+          "SideWindow_OG3_W037_Frame",
+          "SideWindow_OG3_W037_Glass",
+          "SideWindow_OG3_W061_Frame",
+          "SideWindow_OG3_W061_Glass",
+          "SideWindow_OG3_W072_Frame",
+          "SideWindow_OG3_W072_Glass",
+          "Terrain_Lawn",
+          "Site_Sidewalk",
+          "Site_Driveway",
+          "Site_EntranceApron"
         ]
       },
       "highlight_color": "#ef8b23",
@@ -7232,14 +7912,13 @@
       "limitations": [
         "Appearance and roof visibility only; building geometry and immutable CAD proof are preserved.",
         "The room is associated with L01 semantically; no measured registration or furniture placement is demonstrated."
-      ],
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      ]
     },
     {
       "id": "basement",
       "path": "docs/media/building-stack-basement.png",
-      "sha256": "cfed874acbfa31f42eaf7da0c84f26bc566c63a040b3426f4eed4e44aeb35e21",
-      "bytes": 384808,
+      "sha256": "1f711eb65c12af588b5342c56627aa9e50ab0e8de9ad932d3c0996957fa8c6d5",
+      "bytes": 345562,
       "pixels": [
         1800,
         1400
@@ -8566,24 +9245,161 @@
               "AtriumGuard_OG3_W106_Bar1",
               "AtriumGuard_OG3_W106_Bar2",
               "AtriumGuard_OG3_W106_Bar3",
-              "Terrain_West",
-              "Terrain_East",
-              "Terrain_South",
-              "Terrain_North"
+              "SideWindow_EG_EW008_Frame",
+              "SideWindow_EG_EW008_Glass",
+              "SideWindow_EG_EW146_Frame",
+              "SideWindow_EG_EW146_Glass",
+              "SideWindow_EG_EW147_Frame",
+              "SideWindow_EG_EW147_Glass",
+              "SideWindow_EG_EW149_Frame",
+              "SideWindow_EG_EW149_Glass",
+              "SideWindow_EG_EW152_Frame",
+              "SideWindow_EG_EW152_Glass",
+              "SideWindow_EG_EW154_Align1_Frame",
+              "SideWindow_EG_EW154_Align1_Glass",
+              "SideWindow_EG_EW157_Align1_Frame",
+              "SideWindow_EG_EW157_Align1_Glass",
+              "SideWindow_EG_EW158_Frame",
+              "SideWindow_EG_EW158_Glass",
+              "FacadeClosure_EG_EW042",
+              "FacadeClosure_EG_EW042_Align1",
+              "FacadeClosure_EG_EW043",
+              "FacadeClosure_EG_EW043_Align1",
+              "FacadeClosure_EG_EW044",
+              "FacadeClosure_EG_EW044_Align1",
+              "FacadeClosure_EG_EW045",
+              "FacadeClosure_EG_EW045_Align1",
+              "SideWindow_EG_EW039_Align1_Frame",
+              "SideWindow_EG_EW039_Align1_Glass",
+              "SideWindow_EG_EW040_Frame",
+              "SideWindow_EG_EW040_Glass",
+              "SideWindow_EG_EW032_Frame",
+              "SideWindow_EG_EW032_Glass",
+              "SideWindow_EG_EW033_Frame",
+              "SideWindow_EG_EW033_Glass",
+              "SideWindow_EG_EW035_Frame",
+              "SideWindow_EG_EW035_Glass",
+              "SideWindow_EG_EW036_Frame",
+              "SideWindow_EG_EW036_Glass",
+              "SideWindow_EG_EW026_Frame",
+              "SideWindow_EG_EW026_Glass",
+              "SideWindow_EG_EW028_Frame",
+              "SideWindow_EG_EW028_Glass",
+              "SideWindow_EG_EW028_Align1_Frame",
+              "SideWindow_EG_EW028_Align1_Glass",
+              "SideWindow_EG_EW017_Frame",
+              "SideWindow_EG_EW017_Glass",
+              "SideWindow_OG1_W088_Frame",
+              "SideWindow_OG1_W088_Glass",
+              "FacadeClosure_OG1_W117",
+              "SideWindow_OG1_W069_Frame",
+              "SideWindow_OG1_W069_Glass",
+              "SideWindow_OG1_W059_Frame",
+              "SideWindow_OG1_W059_Glass",
+              "SideWindow_OG1_W039_Frame",
+              "SideWindow_OG1_W039_Glass",
+              "SideWindow_OG1_W033_Frame",
+              "SideWindow_OG1_W033_Glass",
+              "SideWindow_OG1_W026_Frame",
+              "SideWindow_OG1_W026_Glass",
+              "SideWindow_OG1_W014_Frame",
+              "SideWindow_OG1_W014_Glass",
+              "SideWindow_OG1_W007_Frame",
+              "SideWindow_OG1_W007_Glass",
+              "SideWindow_OG1_W012_Frame",
+              "SideWindow_OG1_W012_Glass",
+              "SideWindow_OG1_W013_Frame",
+              "SideWindow_OG1_W013_Glass",
+              "SideWindow_OG1_W016_Frame",
+              "SideWindow_OG1_W016_Glass",
+              "SideWindow_OG1_W025_Frame",
+              "SideWindow_OG1_W025_Glass",
+              "SideWindow_OG1_W037_Frame",
+              "SideWindow_OG1_W037_Glass",
+              "SideWindow_OG1_W061_Frame",
+              "SideWindow_OG1_W061_Glass",
+              "SideWindow_OG1_W072_Frame",
+              "SideWindow_OG1_W072_Glass",
+              "SideWindow_OG2_W088_Frame",
+              "SideWindow_OG2_W088_Glass",
+              "FacadeClosure_OG2_W117",
+              "SideWindow_OG2_W069_Frame",
+              "SideWindow_OG2_W069_Glass",
+              "SideWindow_OG2_W059_Frame",
+              "SideWindow_OG2_W059_Glass",
+              "SideWindow_OG2_W039_Frame",
+              "SideWindow_OG2_W039_Glass",
+              "SideWindow_OG2_W033_Frame",
+              "SideWindow_OG2_W033_Glass",
+              "SideWindow_OG2_W026_Frame",
+              "SideWindow_OG2_W026_Glass",
+              "SideWindow_OG2_W014_Frame",
+              "SideWindow_OG2_W014_Glass",
+              "SideWindow_OG2_W007_Frame",
+              "SideWindow_OG2_W007_Glass",
+              "SideWindow_OG2_W012_Frame",
+              "SideWindow_OG2_W012_Glass",
+              "SideWindow_OG2_W013_Frame",
+              "SideWindow_OG2_W013_Glass",
+              "SideWindow_OG2_W016_Frame",
+              "SideWindow_OG2_W016_Glass",
+              "SideWindow_OG2_W025_Frame",
+              "SideWindow_OG2_W025_Glass",
+              "SideWindow_OG2_W037_Frame",
+              "SideWindow_OG2_W037_Glass",
+              "SideWindow_OG2_W061_Frame",
+              "SideWindow_OG2_W061_Glass",
+              "SideWindow_OG2_W072_Frame",
+              "SideWindow_OG2_W072_Glass",
+              "SideWindow_OG3_W088_Frame",
+              "SideWindow_OG3_W088_Glass",
+              "FacadeClosure_OG3_W117",
+              "SideWindow_OG3_W069_Frame",
+              "SideWindow_OG3_W069_Glass",
+              "SideWindow_OG3_W059_Frame",
+              "SideWindow_OG3_W059_Glass",
+              "SideWindow_OG3_W039_Frame",
+              "SideWindow_OG3_W039_Glass",
+              "SideWindow_OG3_W033_Frame",
+              "SideWindow_OG3_W033_Glass",
+              "SideWindow_OG3_W026_Frame",
+              "SideWindow_OG3_W026_Glass",
+              "SideWindow_OG3_W014_Frame",
+              "SideWindow_OG3_W014_Glass",
+              "SideWindow_OG3_W007_Frame",
+              "SideWindow_OG3_W007_Glass",
+              "SideWindow_OG3_W012_Frame",
+              "SideWindow_OG3_W012_Glass",
+              "SideWindow_OG3_W013_Frame",
+              "SideWindow_OG3_W013_Glass",
+              "SideWindow_OG3_W016_Frame",
+              "SideWindow_OG3_W016_Glass",
+              "SideWindow_OG3_W025_Frame",
+              "SideWindow_OG3_W025_Glass",
+              "SideWindow_OG3_W037_Frame",
+              "SideWindow_OG3_W037_Glass",
+              "SideWindow_OG3_W061_Frame",
+              "SideWindow_OG3_W061_Glass",
+              "SideWindow_OG3_W072_Frame",
+              "SideWindow_OG3_W072_Glass",
+              "Terrain_Lawn",
+              "Site_Sidewalk",
+              "Site_Driveway",
+              "Site_EntranceApron"
             ],
             "visible": false
           }
         }
       ],
-      "view_script_sha256": "142bca473662dbfed39b0ffff3bd5ce9bd40803fafbc50b72a9a635f21be98ae",
+      "view_script_sha256": "65603bd342d3a674da7aa915ea7541309611c57703c1ca52e02b969e57156cee",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-4b47ee12d5a4-r2/basement.view.commands.json",
+        "exports/generated/building-stack-2d80f268decf/basement.view.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/building-stack-4b47ee12d5a4-r2/basement.png",
+        "renders/building-stack-2d80f268decf/basement.png",
         "--width",
         "1800",
         "--height",
@@ -8596,26 +9412,25 @@
         "fine"
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     },
     {
       "id": "front_glass",
       "path": "docs/media/building-stack-front.png",
-      "sha256": "ec55808a8083aba1b41e753a74889768ce9950bed592da154824e97f097f887a",
-      "bytes": 358344,
+      "sha256": "48425fa9ea74dd688ac415a51d3128c6f92865ee1e8149993d48124cd9a3584c",
+      "bytes": 191154,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "exports/worktrees/floor-hull-alignment/cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
-      "native_model_sha256": "530e85f85b3adeb96f01f842bb99998f5c171e7d85396880eca08c9a2247b64b",
+      "native_model": "cad/generated/building-stack-2d80f268decf/overview.sc",
+      "native_model_sha256": "3598f9499a9b502c801c55e47a1a626f6a36c5b8c0bcecea50c3206854110a38",
       "camera": {
         "target": [
           22267.567567567567,
@@ -8834,10 +9649,10 @@
               "LiftPost_NW",
               "LiftPost_SE",
               "LiftPost_SW",
-              "Terrain_East",
-              "Terrain_North",
-              "Terrain_South",
-              "Terrain_West",
+              "Site_Driveway",
+              "Site_EntranceApron",
+              "Site_Sidewalk",
+              "Terrain_Lawn",
               "WallBridge_KG_W049",
               "WallBridge_KG_W050",
               "WallBridge_KG_W062",
@@ -8850,15 +9665,15 @@
           }
         }
       ],
-      "view_script_sha256": "2191d490eccd32d3364197fc0afaa3e910f47434beed671d63e3caf1ea15a6b5",
+      "view_script_sha256": "0348c5707720f934cb9ffc0e48e29c784cb75cdc41b2db43db9409dd3aff2338",
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "renders/hull-front-final/front.commands.json",
+        "renders/photo-front-final/front.commands.json",
         "--in",
-        "cad/generated/building-stack-4b47ee12d5a4-r2/overview.sc",
+        "cad/generated/building-stack-2d80f268decf/overview.sc",
         "--out",
-        "renders/hull-front-final/front.png",
+        "renders/photo-front-final/front.png",
         "--width",
         "1800",
         "--height",
@@ -8871,23 +9686,22 @@
         "fine"
       ],
       "render_report": {
-        "path": "exports/worktrees/floor-hull-alignment/renders/hull-front-final/front-report.json",
-        "sha256": "cac27034b9783d76f114e9e15b8a0b909a0684cc5d63f14a7a88081c8616c739",
-        "bytes": 13995
+        "path": "renders/photo-front-final/front-report.json",
+        "sha256": "d6baad3ca534683ddbe4952e42d589e1e6b88f897c1ab26fae56fb50adb22dd2",
+        "bytes": 13965
       },
       "native_model_unchanged": true,
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
-      },
-      "render_execution_root": "exports/worktrees/floor-hull-alignment"
+      }
     }
   ],
   "documentation_files_sha256": {
-    "docs/building-stack.md": "25fddd554a94e623d3cc3d8a626e475ddebf0add0326d8c64b7f499347093360",
+    "docs/building-stack.md": "2bd13fc5f9e471bf7c1187130b9b83cbc74c149f09b0bfb5966d7be459822538",
     "docs/ground-floor-eg.md": "ccef100cf0acaa9cb0f97e5eeb992ea0e37b034941e78225df2788be5d43471c",
     "docs/basement-kg.md": "d45b051ee7a61679298ab1d5b4b1700234813ebfdcd117eeb51212fac11e3d47",
-    "docs/building-exterior.md": "51609223c6e9169cfa2edf3cf1d0e885d04ba7568b1bf0b4088ea30d70c7738e",
+    "docs/building-exterior.md": "803f659312b8c6499859fad2eaafbe4a10cced8456e63476e88e0de0ffd8d616",
     "docs/building-alignment.md": "745ff1bbc02484231dd01c3a62a1167e793735d41b54ce312706b1757a30f0de"
   },
   "qualification": {
@@ -8903,7 +9717,7 @@
   },
   "tests": {
     "passed": true,
-    "tests_run": 155,
+    "tests_run": 157,
     "failures": 0,
     "errors": 0,
     "skipped": 4,
@@ -8959,11 +9773,13 @@
       "test_building_circulation.CirculationTests.test_slab_holes_preserve_entry_landings_and_lowest_floor",
       "test_building_circulation.CirculationTests.test_stack_integration_preserves_source_floor_ids_and_separates_blue_marker",
       "test_building_circulation.CirculationTests.test_unknown_source_space_and_opening_are_not_rewritten_or_qualified",
+      "test_building_exterior.ExteriorTests.test_access_surfaces_are_thin_and_separate_from_lawn",
       "test_building_exterior.ExteriorTests.test_door_leaves_share_one_colour_and_have_native_aperture_witnesses",
+      "test_building_exterior.ExteriorTests.test_entrance_flanks_are_opaque_and_side_bands_have_closed_gaps",
       "test_building_exterior.ExteriorTests.test_front_replaces_only_scoped_placeholder_walls_and_is_not_an_opaque_screen",
       "test_building_exterior.ExteriorTests.test_invalid_or_invented_contract_values_are_rejected",
+      "test_building_exterior.ExteriorTests.test_lawn_is_a_thin_green_surface_at_eg_grade",
       "test_building_exterior.ExteriorTests.test_open_guards_have_posts_hand_rail_and_four_separate_horizontal_bars",
-      "test_building_exterior.ExteriorTests.test_terrain_uses_eg_grade_and_spans_basement_not_an_extra_storey",
       "test_building_exterior.ExteriorTests.test_vertical_variant_recomputes_site_front_and_guards",
       "test_building_furnishings.FurnishingsTests.test_desk_and_chair_counts",
       "test_building_furnishings.FurnishingsTests.test_easter_egg_has_separate_occluding_door",
@@ -9089,8 +9905,8 @@
       "test_model_gallery_coverage.GalleryCoverageTests.test_transport_exclusion_follows_format_not_filename",
       "test_model_gallery_coverage.GalleryCoverageTests.test_unknown_shared_and_spatial_sources_still_require_images"
     ],
-    "scope": "Targeted building, basement, registered floorplan, ground-floor and gallery suite in the current main workspace; no full repository or hardware suite",
-    "runner": "Python unittest combined discovery of the recorded patterns",
+    "scope": "Targeted building, registered floorplan, basement, ground-floor and gallery suite in the isolated photo/site publication worktree; no full repository or hardware suite",
+    "runner": "Python unittest combined discovery of recorded patterns",
     "reproduce_commands": [
       "python3 -m unittest discover -s tests -p 'test_basement_kg.py' -v",
       "python3 -m unittest discover -s tests -p 'test_building_*.py' -v",
@@ -9581,10 +10397,147 @@
       "AtriumGuard_OG3_W106_Bar1",
       "AtriumGuard_OG3_W106_Bar2",
       "AtriumGuard_OG3_W106_Bar3",
-      "Terrain_West",
-      "Terrain_East",
-      "Terrain_South",
-      "Terrain_North"
+      "SideWindow_EG_EW008_Frame",
+      "SideWindow_EG_EW008_Glass",
+      "SideWindow_EG_EW146_Frame",
+      "SideWindow_EG_EW146_Glass",
+      "SideWindow_EG_EW147_Frame",
+      "SideWindow_EG_EW147_Glass",
+      "SideWindow_EG_EW149_Frame",
+      "SideWindow_EG_EW149_Glass",
+      "SideWindow_EG_EW152_Frame",
+      "SideWindow_EG_EW152_Glass",
+      "SideWindow_EG_EW154_Align1_Frame",
+      "SideWindow_EG_EW154_Align1_Glass",
+      "SideWindow_EG_EW157_Align1_Frame",
+      "SideWindow_EG_EW157_Align1_Glass",
+      "SideWindow_EG_EW158_Frame",
+      "SideWindow_EG_EW158_Glass",
+      "FacadeClosure_EG_EW042",
+      "FacadeClosure_EG_EW042_Align1",
+      "FacadeClosure_EG_EW043",
+      "FacadeClosure_EG_EW043_Align1",
+      "FacadeClosure_EG_EW044",
+      "FacadeClosure_EG_EW044_Align1",
+      "FacadeClosure_EG_EW045",
+      "FacadeClosure_EG_EW045_Align1",
+      "SideWindow_EG_EW039_Align1_Frame",
+      "SideWindow_EG_EW039_Align1_Glass",
+      "SideWindow_EG_EW040_Frame",
+      "SideWindow_EG_EW040_Glass",
+      "SideWindow_EG_EW032_Frame",
+      "SideWindow_EG_EW032_Glass",
+      "SideWindow_EG_EW033_Frame",
+      "SideWindow_EG_EW033_Glass",
+      "SideWindow_EG_EW035_Frame",
+      "SideWindow_EG_EW035_Glass",
+      "SideWindow_EG_EW036_Frame",
+      "SideWindow_EG_EW036_Glass",
+      "SideWindow_EG_EW026_Frame",
+      "SideWindow_EG_EW026_Glass",
+      "SideWindow_EG_EW028_Frame",
+      "SideWindow_EG_EW028_Glass",
+      "SideWindow_EG_EW028_Align1_Frame",
+      "SideWindow_EG_EW028_Align1_Glass",
+      "SideWindow_EG_EW017_Frame",
+      "SideWindow_EG_EW017_Glass",
+      "SideWindow_OG1_W088_Frame",
+      "SideWindow_OG1_W088_Glass",
+      "FacadeClosure_OG1_W117",
+      "SideWindow_OG1_W069_Frame",
+      "SideWindow_OG1_W069_Glass",
+      "SideWindow_OG1_W059_Frame",
+      "SideWindow_OG1_W059_Glass",
+      "SideWindow_OG1_W039_Frame",
+      "SideWindow_OG1_W039_Glass",
+      "SideWindow_OG1_W033_Frame",
+      "SideWindow_OG1_W033_Glass",
+      "SideWindow_OG1_W026_Frame",
+      "SideWindow_OG1_W026_Glass",
+      "SideWindow_OG1_W014_Frame",
+      "SideWindow_OG1_W014_Glass",
+      "SideWindow_OG1_W007_Frame",
+      "SideWindow_OG1_W007_Glass",
+      "SideWindow_OG1_W012_Frame",
+      "SideWindow_OG1_W012_Glass",
+      "SideWindow_OG1_W013_Frame",
+      "SideWindow_OG1_W013_Glass",
+      "SideWindow_OG1_W016_Frame",
+      "SideWindow_OG1_W016_Glass",
+      "SideWindow_OG1_W025_Frame",
+      "SideWindow_OG1_W025_Glass",
+      "SideWindow_OG1_W037_Frame",
+      "SideWindow_OG1_W037_Glass",
+      "SideWindow_OG1_W061_Frame",
+      "SideWindow_OG1_W061_Glass",
+      "SideWindow_OG1_W072_Frame",
+      "SideWindow_OG1_W072_Glass",
+      "SideWindow_OG2_W088_Frame",
+      "SideWindow_OG2_W088_Glass",
+      "FacadeClosure_OG2_W117",
+      "SideWindow_OG2_W069_Frame",
+      "SideWindow_OG2_W069_Glass",
+      "SideWindow_OG2_W059_Frame",
+      "SideWindow_OG2_W059_Glass",
+      "SideWindow_OG2_W039_Frame",
+      "SideWindow_OG2_W039_Glass",
+      "SideWindow_OG2_W033_Frame",
+      "SideWindow_OG2_W033_Glass",
+      "SideWindow_OG2_W026_Frame",
+      "SideWindow_OG2_W026_Glass",
+      "SideWindow_OG2_W014_Frame",
+      "SideWindow_OG2_W014_Glass",
+      "SideWindow_OG2_W007_Frame",
+      "SideWindow_OG2_W007_Glass",
+      "SideWindow_OG2_W012_Frame",
+      "SideWindow_OG2_W012_Glass",
+      "SideWindow_OG2_W013_Frame",
+      "SideWindow_OG2_W013_Glass",
+      "SideWindow_OG2_W016_Frame",
+      "SideWindow_OG2_W016_Glass",
+      "SideWindow_OG2_W025_Frame",
+      "SideWindow_OG2_W025_Glass",
+      "SideWindow_OG2_W037_Frame",
+      "SideWindow_OG2_W037_Glass",
+      "SideWindow_OG2_W061_Frame",
+      "SideWindow_OG2_W061_Glass",
+      "SideWindow_OG2_W072_Frame",
+      "SideWindow_OG2_W072_Glass",
+      "SideWindow_OG3_W088_Frame",
+      "SideWindow_OG3_W088_Glass",
+      "FacadeClosure_OG3_W117",
+      "SideWindow_OG3_W069_Frame",
+      "SideWindow_OG3_W069_Glass",
+      "SideWindow_OG3_W059_Frame",
+      "SideWindow_OG3_W059_Glass",
+      "SideWindow_OG3_W039_Frame",
+      "SideWindow_OG3_W039_Glass",
+      "SideWindow_OG3_W033_Frame",
+      "SideWindow_OG3_W033_Glass",
+      "SideWindow_OG3_W026_Frame",
+      "SideWindow_OG3_W026_Glass",
+      "SideWindow_OG3_W014_Frame",
+      "SideWindow_OG3_W014_Glass",
+      "SideWindow_OG3_W007_Frame",
+      "SideWindow_OG3_W007_Glass",
+      "SideWindow_OG3_W012_Frame",
+      "SideWindow_OG3_W012_Glass",
+      "SideWindow_OG3_W013_Frame",
+      "SideWindow_OG3_W013_Glass",
+      "SideWindow_OG3_W016_Frame",
+      "SideWindow_OG3_W016_Glass",
+      "SideWindow_OG3_W025_Frame",
+      "SideWindow_OG3_W025_Glass",
+      "SideWindow_OG3_W037_Frame",
+      "SideWindow_OG3_W037_Glass",
+      "SideWindow_OG3_W061_Frame",
+      "SideWindow_OG3_W061_Glass",
+      "SideWindow_OG3_W072_Frame",
+      "SideWindow_OG3_W072_Glass",
+      "Terrain_Lawn",
+      "Site_Sidewalk",
+      "Site_Driveway",
+      "Site_EntranceApron"
     ],
     "omitted_body_ids": [
       "EG__Wall_EW074",
@@ -9766,7 +10719,70 @@
       "FoyerGlass_OG3_2",
       "FoyerGlass_OG3_3",
       "FoyerGlass_OG3_4",
-      "FoyerGlass_OG3_5"
+      "FoyerGlass_OG3_5",
+      "SideWindow_EG_EW008_Glass",
+      "SideWindow_EG_EW146_Glass",
+      "SideWindow_EG_EW147_Glass",
+      "SideWindow_EG_EW149_Glass",
+      "SideWindow_EG_EW152_Glass",
+      "SideWindow_EG_EW154_Align1_Glass",
+      "SideWindow_EG_EW157_Align1_Glass",
+      "SideWindow_EG_EW158_Glass",
+      "SideWindow_EG_EW039_Align1_Glass",
+      "SideWindow_EG_EW040_Glass",
+      "SideWindow_EG_EW032_Glass",
+      "SideWindow_EG_EW033_Glass",
+      "SideWindow_EG_EW035_Glass",
+      "SideWindow_EG_EW036_Glass",
+      "SideWindow_EG_EW026_Glass",
+      "SideWindow_EG_EW028_Glass",
+      "SideWindow_EG_EW028_Align1_Glass",
+      "SideWindow_EG_EW017_Glass",
+      "SideWindow_OG1_W088_Glass",
+      "SideWindow_OG1_W069_Glass",
+      "SideWindow_OG1_W059_Glass",
+      "SideWindow_OG1_W039_Glass",
+      "SideWindow_OG1_W033_Glass",
+      "SideWindow_OG1_W026_Glass",
+      "SideWindow_OG1_W014_Glass",
+      "SideWindow_OG1_W007_Glass",
+      "SideWindow_OG1_W012_Glass",
+      "SideWindow_OG1_W013_Glass",
+      "SideWindow_OG1_W016_Glass",
+      "SideWindow_OG1_W025_Glass",
+      "SideWindow_OG1_W037_Glass",
+      "SideWindow_OG1_W061_Glass",
+      "SideWindow_OG1_W072_Glass",
+      "SideWindow_OG2_W088_Glass",
+      "SideWindow_OG2_W069_Glass",
+      "SideWindow_OG2_W059_Glass",
+      "SideWindow_OG2_W039_Glass",
+      "SideWindow_OG2_W033_Glass",
+      "SideWindow_OG2_W026_Glass",
+      "SideWindow_OG2_W014_Glass",
+      "SideWindow_OG2_W007_Glass",
+      "SideWindow_OG2_W012_Glass",
+      "SideWindow_OG2_W013_Glass",
+      "SideWindow_OG2_W016_Glass",
+      "SideWindow_OG2_W025_Glass",
+      "SideWindow_OG2_W037_Glass",
+      "SideWindow_OG2_W061_Glass",
+      "SideWindow_OG2_W072_Glass",
+      "SideWindow_OG3_W088_Glass",
+      "SideWindow_OG3_W069_Glass",
+      "SideWindow_OG3_W059_Glass",
+      "SideWindow_OG3_W039_Glass",
+      "SideWindow_OG3_W033_Glass",
+      "SideWindow_OG3_W026_Glass",
+      "SideWindow_OG3_W014_Glass",
+      "SideWindow_OG3_W007_Glass",
+      "SideWindow_OG3_W012_Glass",
+      "SideWindow_OG3_W013_Glass",
+      "SideWindow_OG3_W016_Glass",
+      "SideWindow_OG3_W025_Glass",
+      "SideWindow_OG3_W037_Glass",
+      "SideWindow_OG3_W061_Glass",
+      "SideWindow_OG3_W072_Glass"
     ],
     "frame_body_id": "FoyerFacadeFrame",
     "frame_body_ids": [
@@ -9785,7 +10801,70 @@
       "FoyerTransom_OG2_75",
       "FoyerTransom_OG3_0",
       "FoyerTransom_OG3_25",
-      "FoyerTransom_OG3_75"
+      "FoyerTransom_OG3_75",
+      "SideWindow_EG_EW008_Frame",
+      "SideWindow_EG_EW146_Frame",
+      "SideWindow_EG_EW147_Frame",
+      "SideWindow_EG_EW149_Frame",
+      "SideWindow_EG_EW152_Frame",
+      "SideWindow_EG_EW154_Align1_Frame",
+      "SideWindow_EG_EW157_Align1_Frame",
+      "SideWindow_EG_EW158_Frame",
+      "SideWindow_EG_EW039_Align1_Frame",
+      "SideWindow_EG_EW040_Frame",
+      "SideWindow_EG_EW032_Frame",
+      "SideWindow_EG_EW033_Frame",
+      "SideWindow_EG_EW035_Frame",
+      "SideWindow_EG_EW036_Frame",
+      "SideWindow_EG_EW026_Frame",
+      "SideWindow_EG_EW028_Frame",
+      "SideWindow_EG_EW028_Align1_Frame",
+      "SideWindow_EG_EW017_Frame",
+      "SideWindow_OG1_W088_Frame",
+      "SideWindow_OG1_W069_Frame",
+      "SideWindow_OG1_W059_Frame",
+      "SideWindow_OG1_W039_Frame",
+      "SideWindow_OG1_W033_Frame",
+      "SideWindow_OG1_W026_Frame",
+      "SideWindow_OG1_W014_Frame",
+      "SideWindow_OG1_W007_Frame",
+      "SideWindow_OG1_W012_Frame",
+      "SideWindow_OG1_W013_Frame",
+      "SideWindow_OG1_W016_Frame",
+      "SideWindow_OG1_W025_Frame",
+      "SideWindow_OG1_W037_Frame",
+      "SideWindow_OG1_W061_Frame",
+      "SideWindow_OG1_W072_Frame",
+      "SideWindow_OG2_W088_Frame",
+      "SideWindow_OG2_W069_Frame",
+      "SideWindow_OG2_W059_Frame",
+      "SideWindow_OG2_W039_Frame",
+      "SideWindow_OG2_W033_Frame",
+      "SideWindow_OG2_W026_Frame",
+      "SideWindow_OG2_W014_Frame",
+      "SideWindow_OG2_W007_Frame",
+      "SideWindow_OG2_W012_Frame",
+      "SideWindow_OG2_W013_Frame",
+      "SideWindow_OG2_W016_Frame",
+      "SideWindow_OG2_W025_Frame",
+      "SideWindow_OG2_W037_Frame",
+      "SideWindow_OG2_W061_Frame",
+      "SideWindow_OG2_W072_Frame",
+      "SideWindow_OG3_W088_Frame",
+      "SideWindow_OG3_W069_Frame",
+      "SideWindow_OG3_W059_Frame",
+      "SideWindow_OG3_W039_Frame",
+      "SideWindow_OG3_W033_Frame",
+      "SideWindow_OG3_W026_Frame",
+      "SideWindow_OG3_W014_Frame",
+      "SideWindow_OG3_W007_Frame",
+      "SideWindow_OG3_W012_Frame",
+      "SideWindow_OG3_W013_Frame",
+      "SideWindow_OG3_W016_Frame",
+      "SideWindow_OG3_W025_Frame",
+      "SideWindow_OG3_W037_Frame",
+      "SideWindow_OG3_W061_Frame",
+      "SideWindow_OG3_W072_Frame"
     ],
     "guard_body_ids": [
       "AtriumGuard_OG1_W068_Post0",
@@ -9960,13 +11039,3417 @@
       }
     ],
     "terrain_body_ids": [
-      "Terrain_West",
-      "Terrain_East",
-      "Terrain_South",
-      "Terrain_North"
+      "Terrain_Lawn"
+    ],
+    "site_body_ids": [
+      "Terrain_Lawn",
+      "Site_Sidewalk",
+      "Site_Driveway",
+      "Site_EntranceApron"
+    ],
+    "site_regions": [
+      {
+        "body": "Site_Sidewalk",
+        "material": "sidewalk",
+        "origin_mm": [
+          23775.675675675677,
+          -81.08108108108108,
+          -20.0
+        ],
+        "size_mm": [
+          1200,
+          27335.135135135137,
+          20
+        ]
+      },
+      {
+        "body": "Site_Driveway",
+        "material": "driveway",
+        "origin_mm": [
+          24975.675675675677,
+          9288.364386972973,
+          -20.0
+        ],
+        "size_mm": [
+          3300,
+          4000,
+          20
+        ]
+      },
+      {
+        "body": "Site_EntranceApron",
+        "material": "entrance_apron",
+        "origin_mm": [
+          22287.567567567567,
+          9288.364386972973,
+          -20.0
+        ],
+        "size_mm": [
+          1488.1081081081102,
+          4000,
+          20
+        ]
+      }
+    ],
+    "surface_layer_mm": 20,
+    "surface_overrides": {
+      "KG__Wall_KW001": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW006": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW006_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW012": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW012_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW024": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW024_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW029": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW029_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW032": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW032_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW033": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW034": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW035": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW035_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW035_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW035_Align3": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW036": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW036_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW037": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW037_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW096": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW096_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW096_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW097": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW097_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW097_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW097_Align3": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW098": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW098_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW094": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW094_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW095": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW089": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW089_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW090": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW090_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW086": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW087": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW083": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW083_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW084": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW084_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW084_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW084_Align3": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW080": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW076": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW071": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW071_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW071_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW081": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "KG__Wall_KW005": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW008": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW008_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW009": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW010": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW011": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW011_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW011_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW071": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW071_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW125": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW125_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW140": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW140_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW133": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW134": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW134_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW135": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW145": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW146": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW147": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW147_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW148": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW149": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW149_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW151": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW152": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW154": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW154_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW157": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW157_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW158": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW160": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW160_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW160_Align2": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW161": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW161_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW092": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW093": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW094": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW094_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW095": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW096": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW096_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW088": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW086": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW086_Align1": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW070": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "EG__Wall_EW039": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW039_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW040": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW032": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW033": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW034": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW035": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW035_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW036": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW026": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW027": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW028": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW028_Align1": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW029": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW017": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "EG__Wall_EW018": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W088": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W102": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W114": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W116": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W115": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W110": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W109": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W118": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W103": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W090": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W069": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W059": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W039": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W033": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W026": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W014": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W015": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W034": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W040": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W041": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W042": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W011": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W008": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W005": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W002": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W001": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W003": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG1__Wall_W007": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W012": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W013": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W016": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W025": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W037": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W061": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG1__Wall_W072": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W088": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W102": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W114": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W116": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W115": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W110": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W109": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W118": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W103": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W090": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W069": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W059": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W039": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W033": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W026": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W014": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W015": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W034": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W040": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W041": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W042": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W011": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W008": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W005": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W002": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W001": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W003": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG2__Wall_W007": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W012": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W013": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W016": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W025": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W037": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W061": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG2__Wall_W072": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W088": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W102": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W114": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W116": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W115": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W110": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W109": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W118": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W103": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W090": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W069": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W059": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W039": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W033": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W026": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W014": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W015": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W034": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W040": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W041": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W042": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W011": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W008": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W005": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W002": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W001": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W003": {
+        "color": "#B9B5AC",
+        "opacity": 1
+      },
+      "OG3__Wall_W007": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W012": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W013": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W016": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W025": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W037": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W061": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      },
+      "OG3__Wall_W072": {
+        "color": "#9CA6AA",
+        "opacity": 1
+      }
+    },
+    "opaque_facade_body_ids": [
+      "FacadeClosure_EG_EW042",
+      "FacadeClosure_EG_EW042_Align1",
+      "FacadeClosure_EG_EW043",
+      "FacadeClosure_EG_EW043_Align1",
+      "FacadeClosure_EG_EW044",
+      "FacadeClosure_EG_EW044_Align1",
+      "FacadeClosure_EG_EW045",
+      "FacadeClosure_EG_EW045_Align1",
+      "FacadeClosure_OG1_W117",
+      "FacadeClosure_OG2_W117",
+      "FacadeClosure_OG3_W117"
+    ],
+    "side_window_groups": [
+      {
+        "id": "SideWindow_EG_EW008",
+        "level_id": "EG",
+        "wall": "EW008",
+        "target_body": "EG__Wall_EW008",
+        "glass_body": "SideWindow_EG_EW008_Glass",
+        "frame_body": "SideWindow_EG_EW008_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW146",
+        "level_id": "EG",
+        "wall": "EW146",
+        "target_body": "EG__Wall_EW146",
+        "glass_body": "SideWindow_EG_EW146_Glass",
+        "frame_body": "SideWindow_EG_EW146_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW147",
+        "level_id": "EG",
+        "wall": "EW147",
+        "target_body": "EG__Wall_EW147",
+        "glass_body": "SideWindow_EG_EW147_Glass",
+        "frame_body": "SideWindow_EG_EW147_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW149",
+        "level_id": "EG",
+        "wall": "EW149",
+        "target_body": "EG__Wall_EW149",
+        "glass_body": "SideWindow_EG_EW149_Glass",
+        "frame_body": "SideWindow_EG_EW149_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW152",
+        "level_id": "EG",
+        "wall": "EW152",
+        "target_body": "EG__Wall_EW152",
+        "glass_body": "SideWindow_EG_EW152_Glass",
+        "frame_body": "SideWindow_EG_EW152_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW154_Align1",
+        "level_id": "EG",
+        "wall": "EW154_Align1",
+        "target_body": "EG__Wall_EW154_Align1",
+        "glass_body": "SideWindow_EG_EW154_Align1_Glass",
+        "frame_body": "SideWindow_EG_EW154_Align1_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW157_Align1",
+        "level_id": "EG",
+        "wall": "EW157_Align1",
+        "target_body": "EG__Wall_EW157_Align1",
+        "glass_body": "SideWindow_EG_EW157_Align1_Glass",
+        "frame_body": "SideWindow_EG_EW157_Align1_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW158",
+        "level_id": "EG",
+        "wall": "EW158",
+        "target_body": "EG__Wall_EW158",
+        "glass_body": "SideWindow_EG_EW158_Glass",
+        "frame_body": "SideWindow_EG_EW158_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW039_Align1",
+        "level_id": "EG",
+        "wall": "EW039_Align1",
+        "target_body": "EG__Wall_EW039_Align1",
+        "glass_body": "SideWindow_EG_EW039_Align1_Glass",
+        "frame_body": "SideWindow_EG_EW039_Align1_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW040",
+        "level_id": "EG",
+        "wall": "EW040",
+        "target_body": "EG__Wall_EW040",
+        "glass_body": "SideWindow_EG_EW040_Glass",
+        "frame_body": "SideWindow_EG_EW040_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW032",
+        "level_id": "EG",
+        "wall": "EW032",
+        "target_body": "EG__Wall_EW032",
+        "glass_body": "SideWindow_EG_EW032_Glass",
+        "frame_body": "SideWindow_EG_EW032_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW033",
+        "level_id": "EG",
+        "wall": "EW033",
+        "target_body": "EG__Wall_EW033",
+        "glass_body": "SideWindow_EG_EW033_Glass",
+        "frame_body": "SideWindow_EG_EW033_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW035",
+        "level_id": "EG",
+        "wall": "EW035",
+        "target_body": "EG__Wall_EW035",
+        "glass_body": "SideWindow_EG_EW035_Glass",
+        "frame_body": "SideWindow_EG_EW035_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW036",
+        "level_id": "EG",
+        "wall": "EW036",
+        "target_body": "EG__Wall_EW036",
+        "glass_body": "SideWindow_EG_EW036_Glass",
+        "frame_body": "SideWindow_EG_EW036_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW026",
+        "level_id": "EG",
+        "wall": "EW026",
+        "target_body": "EG__Wall_EW026",
+        "glass_body": "SideWindow_EG_EW026_Glass",
+        "frame_body": "SideWindow_EG_EW026_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW028",
+        "level_id": "EG",
+        "wall": "EW028",
+        "target_body": "EG__Wall_EW028",
+        "glass_body": "SideWindow_EG_EW028_Glass",
+        "frame_body": "SideWindow_EG_EW028_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW028_Align1",
+        "level_id": "EG",
+        "wall": "EW028_Align1",
+        "target_body": "EG__Wall_EW028_Align1",
+        "glass_body": "SideWindow_EG_EW028_Align1_Glass",
+        "frame_body": "SideWindow_EG_EW028_Align1_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_EG_EW017",
+        "level_id": "EG",
+        "wall": "EW017",
+        "target_body": "EG__Wall_EW017",
+        "glass_body": "SideWindow_EG_EW017_Glass",
+        "frame_body": "SideWindow_EG_EW017_Frame",
+        "z_bounds_mm": [
+          720.0,
+          3200.0000000000005
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W088",
+        "level_id": "OG1",
+        "wall": "W088",
+        "target_body": "OG1__Wall_W088",
+        "glass_body": "SideWindow_OG1_W088_Glass",
+        "frame_body": "SideWindow_OG1_W088_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W069",
+        "level_id": "OG1",
+        "wall": "W069",
+        "target_body": "OG1__Wall_W069",
+        "glass_body": "SideWindow_OG1_W069_Glass",
+        "frame_body": "SideWindow_OG1_W069_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W059",
+        "level_id": "OG1",
+        "wall": "W059",
+        "target_body": "OG1__Wall_W059",
+        "glass_body": "SideWindow_OG1_W059_Glass",
+        "frame_body": "SideWindow_OG1_W059_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W039",
+        "level_id": "OG1",
+        "wall": "W039",
+        "target_body": "OG1__Wall_W039",
+        "glass_body": "SideWindow_OG1_W039_Glass",
+        "frame_body": "SideWindow_OG1_W039_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W033",
+        "level_id": "OG1",
+        "wall": "W033",
+        "target_body": "OG1__Wall_W033",
+        "glass_body": "SideWindow_OG1_W033_Glass",
+        "frame_body": "SideWindow_OG1_W033_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W026",
+        "level_id": "OG1",
+        "wall": "W026",
+        "target_body": "OG1__Wall_W026",
+        "glass_body": "SideWindow_OG1_W026_Glass",
+        "frame_body": "SideWindow_OG1_W026_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W014",
+        "level_id": "OG1",
+        "wall": "W014",
+        "target_body": "OG1__Wall_W014",
+        "glass_body": "SideWindow_OG1_W014_Glass",
+        "frame_body": "SideWindow_OG1_W014_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W007",
+        "level_id": "OG1",
+        "wall": "W007",
+        "target_body": "OG1__Wall_W007",
+        "glass_body": "SideWindow_OG1_W007_Glass",
+        "frame_body": "SideWindow_OG1_W007_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W012",
+        "level_id": "OG1",
+        "wall": "W012",
+        "target_body": "OG1__Wall_W012",
+        "glass_body": "SideWindow_OG1_W012_Glass",
+        "frame_body": "SideWindow_OG1_W012_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W013",
+        "level_id": "OG1",
+        "wall": "W013",
+        "target_body": "OG1__Wall_W013",
+        "glass_body": "SideWindow_OG1_W013_Glass",
+        "frame_body": "SideWindow_OG1_W013_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W016",
+        "level_id": "OG1",
+        "wall": "W016",
+        "target_body": "OG1__Wall_W016",
+        "glass_body": "SideWindow_OG1_W016_Glass",
+        "frame_body": "SideWindow_OG1_W016_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W025",
+        "level_id": "OG1",
+        "wall": "W025",
+        "target_body": "OG1__Wall_W025",
+        "glass_body": "SideWindow_OG1_W025_Glass",
+        "frame_body": "SideWindow_OG1_W025_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W037",
+        "level_id": "OG1",
+        "wall": "W037",
+        "target_body": "OG1__Wall_W037",
+        "glass_body": "SideWindow_OG1_W037_Glass",
+        "frame_body": "SideWindow_OG1_W037_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W061",
+        "level_id": "OG1",
+        "wall": "W061",
+        "target_body": "OG1__Wall_W061",
+        "glass_body": "SideWindow_OG1_W061_Glass",
+        "frame_body": "SideWindow_OG1_W061_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG1_W072",
+        "level_id": "OG1",
+        "wall": "W072",
+        "target_body": "OG1__Wall_W072",
+        "glass_body": "SideWindow_OG1_W072_Glass",
+        "frame_body": "SideWindow_OG1_W072_Frame",
+        "z_bounds_mm": [
+          4970.0,
+          7450.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W088",
+        "level_id": "OG2",
+        "wall": "W088",
+        "target_body": "OG2__Wall_W088",
+        "glass_body": "SideWindow_OG2_W088_Glass",
+        "frame_body": "SideWindow_OG2_W088_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W069",
+        "level_id": "OG2",
+        "wall": "W069",
+        "target_body": "OG2__Wall_W069",
+        "glass_body": "SideWindow_OG2_W069_Glass",
+        "frame_body": "SideWindow_OG2_W069_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W059",
+        "level_id": "OG2",
+        "wall": "W059",
+        "target_body": "OG2__Wall_W059",
+        "glass_body": "SideWindow_OG2_W059_Glass",
+        "frame_body": "SideWindow_OG2_W059_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W039",
+        "level_id": "OG2",
+        "wall": "W039",
+        "target_body": "OG2__Wall_W039",
+        "glass_body": "SideWindow_OG2_W039_Glass",
+        "frame_body": "SideWindow_OG2_W039_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W033",
+        "level_id": "OG2",
+        "wall": "W033",
+        "target_body": "OG2__Wall_W033",
+        "glass_body": "SideWindow_OG2_W033_Glass",
+        "frame_body": "SideWindow_OG2_W033_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W026",
+        "level_id": "OG2",
+        "wall": "W026",
+        "target_body": "OG2__Wall_W026",
+        "glass_body": "SideWindow_OG2_W026_Glass",
+        "frame_body": "SideWindow_OG2_W026_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W014",
+        "level_id": "OG2",
+        "wall": "W014",
+        "target_body": "OG2__Wall_W014",
+        "glass_body": "SideWindow_OG2_W014_Glass",
+        "frame_body": "SideWindow_OG2_W014_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W007",
+        "level_id": "OG2",
+        "wall": "W007",
+        "target_body": "OG2__Wall_W007",
+        "glass_body": "SideWindow_OG2_W007_Glass",
+        "frame_body": "SideWindow_OG2_W007_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W012",
+        "level_id": "OG2",
+        "wall": "W012",
+        "target_body": "OG2__Wall_W012",
+        "glass_body": "SideWindow_OG2_W012_Glass",
+        "frame_body": "SideWindow_OG2_W012_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W013",
+        "level_id": "OG2",
+        "wall": "W013",
+        "target_body": "OG2__Wall_W013",
+        "glass_body": "SideWindow_OG2_W013_Glass",
+        "frame_body": "SideWindow_OG2_W013_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W016",
+        "level_id": "OG2",
+        "wall": "W016",
+        "target_body": "OG2__Wall_W016",
+        "glass_body": "SideWindow_OG2_W016_Glass",
+        "frame_body": "SideWindow_OG2_W016_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W025",
+        "level_id": "OG2",
+        "wall": "W025",
+        "target_body": "OG2__Wall_W025",
+        "glass_body": "SideWindow_OG2_W025_Glass",
+        "frame_body": "SideWindow_OG2_W025_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W037",
+        "level_id": "OG2",
+        "wall": "W037",
+        "target_body": "OG2__Wall_W037",
+        "glass_body": "SideWindow_OG2_W037_Glass",
+        "frame_body": "SideWindow_OG2_W037_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W061",
+        "level_id": "OG2",
+        "wall": "W061",
+        "target_body": "OG2__Wall_W061",
+        "glass_body": "SideWindow_OG2_W061_Glass",
+        "frame_body": "SideWindow_OG2_W061_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG2_W072",
+        "level_id": "OG2",
+        "wall": "W072",
+        "target_body": "OG2__Wall_W072",
+        "glass_body": "SideWindow_OG2_W072_Glass",
+        "frame_body": "SideWindow_OG2_W072_Frame",
+        "z_bounds_mm": [
+          9220.0,
+          11700.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W088",
+        "level_id": "OG3",
+        "wall": "W088",
+        "target_body": "OG3__Wall_W088",
+        "glass_body": "SideWindow_OG3_W088_Glass",
+        "frame_body": "SideWindow_OG3_W088_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W069",
+        "level_id": "OG3",
+        "wall": "W069",
+        "target_body": "OG3__Wall_W069",
+        "glass_body": "SideWindow_OG3_W069_Glass",
+        "frame_body": "SideWindow_OG3_W069_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W059",
+        "level_id": "OG3",
+        "wall": "W059",
+        "target_body": "OG3__Wall_W059",
+        "glass_body": "SideWindow_OG3_W059_Glass",
+        "frame_body": "SideWindow_OG3_W059_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W039",
+        "level_id": "OG3",
+        "wall": "W039",
+        "target_body": "OG3__Wall_W039",
+        "glass_body": "SideWindow_OG3_W039_Glass",
+        "frame_body": "SideWindow_OG3_W039_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W033",
+        "level_id": "OG3",
+        "wall": "W033",
+        "target_body": "OG3__Wall_W033",
+        "glass_body": "SideWindow_OG3_W033_Glass",
+        "frame_body": "SideWindow_OG3_W033_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W026",
+        "level_id": "OG3",
+        "wall": "W026",
+        "target_body": "OG3__Wall_W026",
+        "glass_body": "SideWindow_OG3_W026_Glass",
+        "frame_body": "SideWindow_OG3_W026_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W014",
+        "level_id": "OG3",
+        "wall": "W014",
+        "target_body": "OG3__Wall_W014",
+        "glass_body": "SideWindow_OG3_W014_Glass",
+        "frame_body": "SideWindow_OG3_W014_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W007",
+        "level_id": "OG3",
+        "wall": "W007",
+        "target_body": "OG3__Wall_W007",
+        "glass_body": "SideWindow_OG3_W007_Glass",
+        "frame_body": "SideWindow_OG3_W007_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W012",
+        "level_id": "OG3",
+        "wall": "W012",
+        "target_body": "OG3__Wall_W012",
+        "glass_body": "SideWindow_OG3_W012_Glass",
+        "frame_body": "SideWindow_OG3_W012_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W013",
+        "level_id": "OG3",
+        "wall": "W013",
+        "target_body": "OG3__Wall_W013",
+        "glass_body": "SideWindow_OG3_W013_Glass",
+        "frame_body": "SideWindow_OG3_W013_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W016",
+        "level_id": "OG3",
+        "wall": "W016",
+        "target_body": "OG3__Wall_W016",
+        "glass_body": "SideWindow_OG3_W016_Glass",
+        "frame_body": "SideWindow_OG3_W016_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W025",
+        "level_id": "OG3",
+        "wall": "W025",
+        "target_body": "OG3__Wall_W025",
+        "glass_body": "SideWindow_OG3_W025_Glass",
+        "frame_body": "SideWindow_OG3_W025_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W037",
+        "level_id": "OG3",
+        "wall": "W037",
+        "target_body": "OG3__Wall_W037",
+        "glass_body": "SideWindow_OG3_W037_Glass",
+        "frame_body": "SideWindow_OG3_W037_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W061",
+        "level_id": "OG3",
+        "wall": "W061",
+        "target_body": "OG3__Wall_W061",
+        "glass_body": "SideWindow_OG3_W061_Glass",
+        "frame_body": "SideWindow_OG3_W061_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      },
+      {
+        "id": "SideWindow_OG3_W072",
+        "level_id": "OG3",
+        "wall": "W072",
+        "target_body": "OG3__Wall_W072",
+        "glass_body": "SideWindow_OG3_W072_Glass",
+        "frame_body": "SideWindow_OG3_W072_Frame",
+        "z_bounds_mm": [
+          13470.0,
+          15950.0
+        ]
+      }
+    ],
+    "window_probes": [
+      {
+        "id": "SideWindow_EG_EW008_Aperture",
+        "target_body": "EG__Wall_EW008",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            16936.87567670608,
+            73.05939564563568
+          ],
+          [
+            19614.117921614798,
+            318.67795022441703
+          ],
+          [
+            19600.96216113176,
+            462.0757394894995
+          ],
+          [
+            16923.719916223043,
+            216.45718491071818
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW146_Aperture",
+        "target_body": "EG__Wall_EW146",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            16618.444491015747,
+            27115.583637155414
+          ],
+          [
+            16048.279182295553,
+            27045.563336084513
+          ],
+          [
+            16065.831529715184,
+            26902.63707852468
+          ],
+          [
+            16635.996838435378,
+            26972.65737959558
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW147_Aperture",
+        "target_body": "EG__Wall_EW147",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            15732.479591672969,
+            27006.78093021858
+          ],
+          [
+            13545.054892449141,
+            26738.14982680513
+          ],
+          [
+            13562.607239868772,
+            26595.223569245296
+          ],
+          [
+            15750.0319390926,
+            26863.85467265875
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW149_Aperture",
+        "target_body": "EG__Wall_EW149",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            12516.110881246435,
+            26432.45432696039
+          ],
+          [
+            10155.944193681173,
+            25604.325664656793
+          ],
+          [
+            10203.620824357362,
+            25468.447267229658
+          ],
+          [
+            12563.787511922625,
+            26296.575929533254
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW152_Aperture",
+        "target_body": "EG__Wall_EW152",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            9412.97048626909,
+            25267.70166877607
+          ],
+          [
+            7833.965904075412,
+            24468.205677791928
+          ],
+          [
+            7899.014324720654,
+            24339.735047017573
+          ],
+          [
+            9478.018906914333,
+            25139.231038001715
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW154_Align1_Aperture",
+        "target_body": "EG__Wall_EW154_Align1",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7417.554605440119,
+            24230.441226570278
+          ],
+          [
+            6370.505017482117,
+            23476.565523240522
+          ],
+          [
+            6454.644898003808,
+            23359.70457807151
+          ],
+          [
+            7501.69448596181,
+            24113.580281401264
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW157_Align1_Aperture",
+        "target_body": "EG__Wall_EW157_Align1",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            5912.623420038599,
+            23133.08416585676
+          ],
+          [
+            4698.771821962288,
+            22137.725855434182
+          ],
+          [
+            4790.079282664104,
+            22026.3752936027
+          ],
+          [
+            6003.930880740414,
+            23021.733604025278
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW158_Aperture",
+        "target_body": "EG__Wall_EW158",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4416.692219974842,
+            21848.246695305606
+          ],
+          [
+            3171.3845186432795,
+            20309.925417190152
+          ],
+          [
+            3283.307780025157,
+            20219.320872261964
+          ],
+          [
+            4528.615481356721,
+            21757.642150377418
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW039_Align1_Aperture",
+        "target_body": "EG__Wall_EW039_Align1",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4739.934548459527,
+            2536.232268019566
+          ],
+          [
+            6548.347755348601,
+            1558.7116156470934
+          ],
+          [
+            6616.82220829723,
+            1685.3893536020555
+          ],
+          [
+            4808.409001408156,
+            2662.9100059745283
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW040_Aperture",
+        "target_body": "EG__Wall_EW040",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            6824.222668115545,
+            1429.398325827634
+          ],
+          [
+            7229.519301299918,
+            1320.8367276532483
+          ],
+          [
+            7266.777297572186,
+            1459.9332470697157
+          ],
+          [
+            6861.480664387814,
+            1568.4948452441013
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW032_Aperture",
+        "target_body": "EG__Wall_EW032",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7360.979962735607,
+            1285.6240504829746
+          ],
+          [
+            7792.674495655392,
+            1169.991586308032
+          ],
+          [
+            7829.9324919276605,
+            1309.0881057244994
+          ],
+          [
+            7398.237959007875,
+            1424.720569899442
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW033_Aperture",
+        "target_body": "EG__Wall_EW033",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7931.677414158342,
+            1132.7586617090276
+          ],
+          [
+            8416.167746548956,
+            1002.9844655329712
+          ],
+          [
+            8453.425742821222,
+            1142.0809849494385
+          ],
+          [
+            7968.93541043061,
+            1271.855181125495
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW035_Aperture",
+        "target_body": "EG__Wall_EW035",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            9577.660314423181,
+            691.8703848523751
+          ],
+          [
+            10021.34939822988,
+            573.0250945470087
+          ],
+          [
+            10058.607394502147,
+            712.1216139634761
+          ],
+          [
+            9614.918310695448,
+            830.9669042688424
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW036_Aperture",
+        "target_body": "EG__Wall_EW036",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10209.180454467121,
+            537.875393529706
+          ],
+          [
+            10570.761452286417,
+            488.5688938270746
+          ],
+          [
+            10590.217753768015,
+            631.2484380254537
+          ],
+          [
+            10228.636755948719,
+            680.5549377280851
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW026_Aperture",
+        "target_body": "EG__Wall_EW026",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10739.133451488424,
+            465.60907575407373
+          ],
+          [
+            11588.11647576527,
+            349.83866335268556
+          ],
+          [
+            11607.572777246867,
+            492.5182075510646
+          ],
+          [
+            10758.589752970021,
+            608.2886199524528
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW028_Aperture",
+        "target_body": "EG__Wall_EW028",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            12020.007682677186,
+            290.94440786469715
+          ],
+          [
+            13227.144703313854,
+            126.33481414151517
+          ],
+          [
+            13246.601004795451,
+            269.0143583398942
+          ],
+          [
+            12039.463984158783,
+            433.6239520630762
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW028_Align1_Aperture",
+        "target_body": "EG__Wall_EW028_Align1",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13462.101561258114,
+            104.84423884658646
+          ],
+          [
+            14073.734640708608,
+            93.72363740203205
+          ],
+          [
+            14076.35238987673,
+            237.69984164875052
+          ],
+          [
+            13464.719310426237,
+            248.82044309330496
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_EG_EW017_Aperture",
+        "target_body": "EG__Wall_EW017",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            14459.052811610407,
+            86.71785247654476
+          ],
+          [
+            16162.241770263316,
+            55.75078050103737
+          ],
+          [
+            16164.859519431438,
+            199.72698474775586
+          ],
+          [
+            14461.67056077853,
+            230.69405672326326
+          ]
+        ],
+        "offset_mm": 742.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W088_Aperture",
+        "target_body": "OG1__Wall_W088",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            16936.87567670608,
+            73.05939564563568
+          ],
+          [
+            19614.117921614798,
+            318.67795022441703
+          ],
+          [
+            19600.96216113176,
+            462.0757394894995
+          ],
+          [
+            16923.719916223043,
+            216.45718491071818
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W069_Aperture",
+        "target_body": "OG1__Wall_W069",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13621.162455507596,
+            26602.41456063954
+          ],
+          [
+            16423.416918939067,
+            26946.551073692524
+          ],
+          [
+            16405.864571519436,
+            27089.477331252358
+          ],
+          [
+            13603.610108087965,
+            26745.340818199373
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W059_Aperture",
+        "target_body": "OG1__Wall_W059",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10245.93417980095,
+            25483.294058613374
+          ],
+          [
+            13050.39109952389,
+            26467.31403044598
+          ],
+          [
+            13002.7144688477,
+            26603.192427873117
+          ],
+          [
+            10198.25754912476,
+            25619.17245604051
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W039_Aperture",
+        "target_body": "OG1__Wall_W039",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7821.570719354087,
+            24300.523094933233
+          ],
+          [
+            9754.288512101966,
+            25279.11438240052
+          ],
+          [
+            9689.240091456724,
+            25407.585013174874
+          ],
+          [
+            7756.522298708845,
+            24428.993725707587
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W033_Aperture",
+        "target_body": "OG1__Wall_W033",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            6273.842976457017,
+            23229.527194557817
+          ],
+          [
+            7485.972579740349,
+            24102.260508921812
+          ],
+          [
+            7401.8326992186585,
+            24219.121454090826
+          ],
+          [
+            6189.703095935327,
+            23346.38813972683
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W026_Aperture",
+        "target_body": "OG1__Wall_W026",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4790.079282664104,
+            22026.3752936027
+          ],
+          [
+            6003.930880740414,
+            23021.733604025278
+          ],
+          [
+            5912.623420038599,
+            23133.08416585676
+          ],
+          [
+            4698.771821962288,
+            22137.725855434182
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W014_Aperture",
+        "target_body": "OG1__Wall_W014",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3283.307780025157,
+            20219.320872261964
+          ],
+          [
+            4528.615481356721,
+            21757.64215037742
+          ],
+          [
+            4416.692219974842,
+            21848.24669530561
+          ],
+          [
+            3171.3845186432795,
+            20309.925417190152
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W007_Aperture",
+        "target_body": "OG1__Wall_W007",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            782.4722680181285,
+            7576.722657684972
+          ],
+          [
+            1436.912244709625,
+            6243.604186646738
+          ],
+          [
+            1566.17638063052,
+            6307.061126098813
+          ],
+          [
+            911.7364039390234,
+            7640.179597137047
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W012_Aperture",
+        "target_body": "OG1__Wall_W012",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            1599.5666698190043,
+            5946.402381905413
+          ],
+          [
+            2350.355143582098,
+            4711.234247650001
+          ],
+          [
+            2473.406303153969,
+            4786.03005052702
+          ],
+          [
+            1722.6178293908752,
+            6021.198184782432
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W013_Aperture",
+        "target_body": "OG1__Wall_W013",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            2566.944160277212,
+            4436.637868637331
+          ],
+          [
+            3633.935165934628,
+            3369.646862979914
+          ],
+          [
+            3735.7585424254908,
+            3471.470239470777
+          ],
+          [
+            2668.767536768075,
+            4538.461245128195
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W016_Aperture",
+        "target_body": "OG1__Wall_W016",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3841.178108216919,
+            3181.645013097783
+          ],
+          [
+            4454.807326004509,
+            2709.6225378765594
+          ],
+          [
+            4542.605675566865,
+            2823.760392307622
+          ],
+          [
+            3928.976457779275,
+            3295.7828675288456
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W025_Aperture",
+        "target_body": "OG1__Wall_W025",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4739.934548459527,
+            2536.232268019566
+          ],
+          [
+            6548.347755348601,
+            1558.7116156470934
+          ],
+          [
+            6616.82220829723,
+            1685.3893536020555
+          ],
+          [
+            4808.409001408156,
+            2662.9100059745283
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W037_Aperture",
+        "target_body": "OG1__Wall_W037",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7047.861589779445,
+            1369.4950432390892
+          ],
+          [
+            9801.366900434774,
+            631.9489778849838
+          ],
+          [
+            9838.62489670704,
+            771.0454973014512
+          ],
+          [
+            7085.119586051714,
+            1508.5915626555566
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W061_Aperture",
+        "target_body": "OG1__Wall_W061",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10382.295257769927,
+            514.2688294429596
+          ],
+          [
+            13084.734927234962,
+            145.7543290613641
+          ],
+          [
+            13104.19122871656,
+            288.43387325974317
+          ],
+          [
+            10401.751559251525,
+            656.9483736413387
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG1_W072_Aperture",
+        "target_body": "OG1__Wall_W072",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13661.18740732949,
+            101.2244961907433
+          ],
+          [
+            16363.221870529418,
+            52.096596859835515
+          ],
+          [
+            16365.839619697541,
+            196.07280110655398
+          ],
+          [
+            13663.805156497612,
+            245.20070043746176
+          ]
+        ],
+        "offset_mm": 4992.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W088_Aperture",
+        "target_body": "OG2__Wall_W088",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            16936.87567670608,
+            73.05939564563568
+          ],
+          [
+            19614.117921614798,
+            318.67795022441703
+          ],
+          [
+            19600.96216113176,
+            462.0757394894995
+          ],
+          [
+            16923.719916223043,
+            216.45718491071818
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W069_Aperture",
+        "target_body": "OG2__Wall_W069",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13621.162455507596,
+            26602.41456063954
+          ],
+          [
+            16423.416918939067,
+            26946.551073692524
+          ],
+          [
+            16405.864571519436,
+            27089.477331252358
+          ],
+          [
+            13603.610108087965,
+            26745.340818199373
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W059_Aperture",
+        "target_body": "OG2__Wall_W059",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10245.93417980095,
+            25483.294058613374
+          ],
+          [
+            13050.39109952389,
+            26467.31403044598
+          ],
+          [
+            13002.7144688477,
+            26603.192427873117
+          ],
+          [
+            10198.25754912476,
+            25619.17245604051
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W039_Aperture",
+        "target_body": "OG2__Wall_W039",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7821.570719354087,
+            24300.523094933233
+          ],
+          [
+            9754.288512101966,
+            25279.11438240052
+          ],
+          [
+            9689.240091456724,
+            25407.585013174874
+          ],
+          [
+            7756.522298708845,
+            24428.993725707587
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W033_Aperture",
+        "target_body": "OG2__Wall_W033",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            6273.842976457017,
+            23229.527194557817
+          ],
+          [
+            7485.972579740349,
+            24102.260508921812
+          ],
+          [
+            7401.8326992186585,
+            24219.121454090826
+          ],
+          [
+            6189.703095935327,
+            23346.38813972683
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W026_Aperture",
+        "target_body": "OG2__Wall_W026",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4790.079282664104,
+            22026.3752936027
+          ],
+          [
+            6003.930880740414,
+            23021.733604025278
+          ],
+          [
+            5912.623420038599,
+            23133.08416585676
+          ],
+          [
+            4698.771821962288,
+            22137.725855434182
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W014_Aperture",
+        "target_body": "OG2__Wall_W014",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3283.307780025157,
+            20219.320872261964
+          ],
+          [
+            4528.615481356721,
+            21757.64215037742
+          ],
+          [
+            4416.692219974842,
+            21848.24669530561
+          ],
+          [
+            3171.3845186432795,
+            20309.925417190152
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W007_Aperture",
+        "target_body": "OG2__Wall_W007",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            782.4722680181285,
+            7576.722657684972
+          ],
+          [
+            1436.912244709625,
+            6243.604186646738
+          ],
+          [
+            1566.17638063052,
+            6307.061126098813
+          ],
+          [
+            911.7364039390234,
+            7640.179597137047
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W012_Aperture",
+        "target_body": "OG2__Wall_W012",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            1599.5666698190043,
+            5946.402381905413
+          ],
+          [
+            2350.355143582098,
+            4711.234247650001
+          ],
+          [
+            2473.406303153969,
+            4786.03005052702
+          ],
+          [
+            1722.6178293908752,
+            6021.198184782432
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W013_Aperture",
+        "target_body": "OG2__Wall_W013",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            2566.944160277212,
+            4436.637868637331
+          ],
+          [
+            3633.935165934628,
+            3369.646862979914
+          ],
+          [
+            3735.7585424254908,
+            3471.470239470777
+          ],
+          [
+            2668.767536768075,
+            4538.461245128195
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W016_Aperture",
+        "target_body": "OG2__Wall_W016",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3841.178108216919,
+            3181.645013097783
+          ],
+          [
+            4454.807326004509,
+            2709.6225378765594
+          ],
+          [
+            4542.605675566865,
+            2823.760392307622
+          ],
+          [
+            3928.976457779275,
+            3295.7828675288456
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W025_Aperture",
+        "target_body": "OG2__Wall_W025",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4739.934548459527,
+            2536.232268019566
+          ],
+          [
+            6548.347755348601,
+            1558.7116156470934
+          ],
+          [
+            6616.82220829723,
+            1685.3893536020555
+          ],
+          [
+            4808.409001408156,
+            2662.9100059745283
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W037_Aperture",
+        "target_body": "OG2__Wall_W037",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7047.861589779445,
+            1369.4950432390892
+          ],
+          [
+            9801.366900434774,
+            631.9489778849838
+          ],
+          [
+            9838.62489670704,
+            771.0454973014512
+          ],
+          [
+            7085.119586051714,
+            1508.5915626555566
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W061_Aperture",
+        "target_body": "OG2__Wall_W061",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10382.295257769927,
+            514.2688294429596
+          ],
+          [
+            13084.734927234962,
+            145.7543290613641
+          ],
+          [
+            13104.19122871656,
+            288.43387325974317
+          ],
+          [
+            10401.751559251525,
+            656.9483736413387
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG2_W072_Aperture",
+        "target_body": "OG2__Wall_W072",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13661.18740732949,
+            101.2244961907433
+          ],
+          [
+            16363.221870529418,
+            52.096596859835515
+          ],
+          [
+            16365.839619697541,
+            196.07280110655398
+          ],
+          [
+            13663.805156497612,
+            245.20070043746176
+          ]
+        ],
+        "offset_mm": 9242.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W088_Aperture",
+        "target_body": "OG3__Wall_W088",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            16936.87567670608,
+            73.05939564563568
+          ],
+          [
+            19614.117921614798,
+            318.67795022441703
+          ],
+          [
+            19600.96216113176,
+            462.0757394894995
+          ],
+          [
+            16923.719916223043,
+            216.45718491071818
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W069_Aperture",
+        "target_body": "OG3__Wall_W069",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13621.162455507596,
+            26602.41456063954
+          ],
+          [
+            16423.416918939067,
+            26946.551073692524
+          ],
+          [
+            16405.864571519436,
+            27089.477331252358
+          ],
+          [
+            13603.610108087965,
+            26745.340818199373
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W059_Aperture",
+        "target_body": "OG3__Wall_W059",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10245.93417980095,
+            25483.294058613374
+          ],
+          [
+            13050.39109952389,
+            26467.31403044598
+          ],
+          [
+            13002.7144688477,
+            26603.192427873117
+          ],
+          [
+            10198.25754912476,
+            25619.17245604051
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W039_Aperture",
+        "target_body": "OG3__Wall_W039",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7821.570719354087,
+            24300.523094933233
+          ],
+          [
+            9754.288512101966,
+            25279.11438240052
+          ],
+          [
+            9689.240091456724,
+            25407.585013174874
+          ],
+          [
+            7756.522298708845,
+            24428.993725707587
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W033_Aperture",
+        "target_body": "OG3__Wall_W033",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            6273.842976457017,
+            23229.527194557817
+          ],
+          [
+            7485.972579740349,
+            24102.260508921812
+          ],
+          [
+            7401.8326992186585,
+            24219.121454090826
+          ],
+          [
+            6189.703095935327,
+            23346.38813972683
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W026_Aperture",
+        "target_body": "OG3__Wall_W026",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4790.079282664104,
+            22026.3752936027
+          ],
+          [
+            6003.930880740414,
+            23021.733604025278
+          ],
+          [
+            5912.623420038599,
+            23133.08416585676
+          ],
+          [
+            4698.771821962288,
+            22137.725855434182
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W014_Aperture",
+        "target_body": "OG3__Wall_W014",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3283.307780025157,
+            20219.320872261964
+          ],
+          [
+            4528.615481356721,
+            21757.64215037742
+          ],
+          [
+            4416.692219974842,
+            21848.24669530561
+          ],
+          [
+            3171.3845186432795,
+            20309.925417190152
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W007_Aperture",
+        "target_body": "OG3__Wall_W007",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            782.4722680181285,
+            7576.722657684972
+          ],
+          [
+            1436.912244709625,
+            6243.604186646738
+          ],
+          [
+            1566.17638063052,
+            6307.061126098813
+          ],
+          [
+            911.7364039390234,
+            7640.179597137047
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W012_Aperture",
+        "target_body": "OG3__Wall_W012",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            1599.5666698190043,
+            5946.402381905413
+          ],
+          [
+            2350.355143582098,
+            4711.234247650001
+          ],
+          [
+            2473.406303153969,
+            4786.03005052702
+          ],
+          [
+            1722.6178293908752,
+            6021.198184782432
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W013_Aperture",
+        "target_body": "OG3__Wall_W013",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            2566.944160277212,
+            4436.637868637331
+          ],
+          [
+            3633.935165934628,
+            3369.646862979914
+          ],
+          [
+            3735.7585424254908,
+            3471.470239470777
+          ],
+          [
+            2668.767536768075,
+            4538.461245128195
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W016_Aperture",
+        "target_body": "OG3__Wall_W016",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            3841.178108216919,
+            3181.645013097783
+          ],
+          [
+            4454.807326004509,
+            2709.6225378765594
+          ],
+          [
+            4542.605675566865,
+            2823.760392307622
+          ],
+          [
+            3928.976457779275,
+            3295.7828675288456
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W025_Aperture",
+        "target_body": "OG3__Wall_W025",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            4739.934548459527,
+            2536.232268019566
+          ],
+          [
+            6548.347755348601,
+            1558.7116156470934
+          ],
+          [
+            6616.82220829723,
+            1685.3893536020555
+          ],
+          [
+            4808.409001408156,
+            2662.9100059745283
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W037_Aperture",
+        "target_body": "OG3__Wall_W037",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            7047.861589779445,
+            1369.4950432390892
+          ],
+          [
+            9801.366900434774,
+            631.9489778849838
+          ],
+          [
+            9838.62489670704,
+            771.0454973014512
+          ],
+          [
+            7085.119586051714,
+            1508.5915626555566
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W061_Aperture",
+        "target_body": "OG3__Wall_W061",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            10382.295257769927,
+            514.2688294429596
+          ],
+          [
+            13084.734927234962,
+            145.7543290613641
+          ],
+          [
+            13104.19122871656,
+            288.43387325974317
+          ],
+          [
+            10401.751559251525,
+            656.9483736413387
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      },
+      {
+        "id": "SideWindow_OG3_W072_Aperture",
+        "target_body": "OG3__Wall_W072",
+        "kind": "polygon_prism",
+        "points_mm": [
+          [
+            13661.18740732949,
+            101.2244961907433
+          ],
+          [
+            16363.221870529418,
+            52.096596859835515
+          ],
+          [
+            16365.839619697541,
+            196.07280110655398
+          ],
+          [
+            13663.805156497612,
+            245.20070043746176
+          ]
+        ],
+        "offset_mm": 13492.5,
+        "depth_mm": 2435.0000000000005,
+        "display_inset_mm": 22.5,
+        "visualization_only": true
+      }
     ],
     "grade_z_mm": 0.0,
-    "terrain_bottom_mm": -4500.0,
+    "terrain_bottom_mm": -20.0,
     "facade_plane_x_mm": 22267.567567567567,
     "facade_y_bounds_mm": [
       9691.891891891892,
@@ -9981,7 +14464,7 @@
   },
   "alignment": {
     "source": "model/building-stack.shared.json",
-    "source_sha256": "4b47ee12d5a40f2f1e8928d7c44745a8512fcd5ba5e150fee58789412c5fe176",
+    "source_sha256": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
     "scale_mm_per_relative_unit": 29729.72972972973,
     "levels": [
       {
@@ -10027,6 +14510,5 @@
     ],
     "passed": true,
     "scope": "Shared source and graph comparison; native build is separate; no real metric calibration"
-  },
-  "native_execution_root": "exports/worktrees/floor-hull-alignment"
+  }
 }
