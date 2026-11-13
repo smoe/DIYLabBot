@@ -123,14 +123,18 @@ def _render(view):
         result.append(f'<g data-level="{identity}" data-z-mm="{base:g}">')
         result.append(rect(x(xlow), y(ceiling), a-x(xlow), y(base)-y(ceiling), fill='#edf2f5', data_role='template-room'))
         result.append(rect(b, y(ceiling), x(xhigh)-b, y(base)-y(ceiling), fill='#edf2f5', data_role='template-room'))
+        if level['id'] == 'KG':
+            result.append(rect(a, y(ceiling), b-a, y(base)-y(ceiling), fill='#edf2f5', data_role='basement-room'))
         for left, right in ((x(xlow), a), (b, x(xhigh))):
             result.append(rect(left, y(floor_top), right-left, y(floor_bottom)-y(floor_top), class_='slab', data_role='slab'))
         if level['atrium_floor_filled']:
             result.append(rect(a, y(floor_top), b-a, y(floor_bottom)-y(floor_top), class_='slab', data_role='atrium-floor'))
+        elif level['id'] == 'KG':
+            result.append(rect(a, y(floor_top), b-a, y(floor_bottom)-y(floor_top), class_='slab', data_role='basement-floor'))
         else:
             result.append(f'<path d="M {a:.3f} {y(base):.3f} H {b:.3f}" stroke="#a8c7d6" stroke-dasharray="3 5" data-role="atrium-opening"/>')
-        result.append(text(75, y(base)-10, level['label'], 'level'))
-        result.append(text(75, y(base)+15, f'+{number(base/1000)} m*', 'small'))
+        result.append(text(75, y(base)-10, 'KG' if level['id'] == 'KG' else level['label'], 'level'))
+        result.append(text(75, y(base)+15, f'{"+" if base >= 0 else ""}{number(base/1000)} m*', 'small'))
         result.append('</g>')
     for left, right in ((x(xlow), x(glass_left)), (x(glass_right), x(xhigh))):
         result.append(rect(left, y(roof['slab_top_mm']), right-left, y(roof['slab_bottom_mm'])-y(roof['slab_top_mm']), class_='slab', data_role='roof-slab'))
@@ -151,42 +155,77 @@ def _render(view):
     elevator = circulation['elevator']
     if set(elevator['doors_by_level']) != {level['id'] for level in levels}:
         raise ValueError('Door policy must cover exactly the drawn storeys')
-    deferred = elevator['deferred_stops']
-    if len(deferred) != 1 or deferred[0]['id'] in elevator['doors_by_level'] or deferred[0]['status'] != 'awaiting_plan':
-        raise ValueError('One separately deferred basement stop required')
-    planned = deferred[0]
-    rows = [{'id': level['id'], 'label': level['label'], 'door_sides': elevator['doors_by_level'][level['id']]} for level in reversed(levels)]
-    basement = {'id': planned['id'], 'label': planned['label'], 'z_mm': planned['elevation_mm'], 'door_sides': planned['sides']}
-    stairs = circulation['stairs']
-    if len(stairs) != 1:
-        raise ValueError('Exactly one right stair core required')
-    stair = stairs[0]; extent = elevator['served_extent']
-    if (stair['classification'] != 'internal' or stair['served_extent'] != extent
-            or extent['from_level'] != basement['id'] or extent['to_level'] != levels[-1]['id']):
-        raise ValueError('Separate lift and stair must declare the same source-served extent')
-    links = stair['planned_connectors']
-    if (len(links) != 1 or links[0]['from_level'] != basement['id'] or links[0]['to_level'] != levels[0]['id']
-            or links[0]['status'] != 'awaiting_plan' or any(links[0][key] is not None for key in ('z0_mm', 'z1_mm', 'body_id'))):
-        raise ValueError('Basement stair link must remain planned without elevation or geometry')
-    labels = {level['id']: level['label'] for level in levels}
-    stair_note = {'count': len(stairs), 'area': stair['area'], 'planned_from': links[0]['from_level'], 'planned_to': labels[links[0]['to_level']], 'served_to': labels[extent['to_level']]}
-    extent_note = {**extent, 'display': f'{extent["from_level"]} → {labels[extent["to_level"]]}'}
-    result.append(_policy_panel(rows, elevator['sides'], basement, stair_note, extent_note, text, rect))
+    if elevator['deferred_stops']:
+        deferred = elevator['deferred_stops']
+        if len(deferred) != 1 or deferred[0]['id'] in elevator['doors_by_level'] or deferred[0]['status'] != 'awaiting_plan':
+            raise ValueError('One separately deferred basement stop required')
+        planned = deferred[0]
+        rows = [{'id': level['id'], 'label': level['label'], 'door_sides': elevator['doors_by_level'][level['id']]} for level in reversed(levels)]
+        basement = {'id': planned['id'], 'label': planned['label'], 'z_mm': planned['elevation_mm'], 'door_sides': planned['sides']}
+        stairs = circulation['stairs']
+        if len(stairs) != 1:
+            raise ValueError('Exactly one right stair core required')
+        stair = stairs[0]; extent = elevator['served_extent']
+        if (stair['classification'] != 'internal' or stair['served_extent'] != extent
+                or extent['from_level'] != basement['id'] or extent['to_level'] != levels[-1]['id']):
+            raise ValueError('Separate lift and stair must declare the same source-served extent')
+        links = stair['planned_connectors']
+        if (len(links) != 1 or links[0]['from_level'] != basement['id'] or links[0]['to_level'] != levels[0]['id']
+                or links[0]['status'] != 'awaiting_plan' or any(links[0][key] is not None for key in ('z0_mm', 'z1_mm', 'body_id'))):
+            raise ValueError('Basement stair link must remain planned without elevation or geometry')
+        labels = {level['id']: level['label'] for level in levels}
+        stair_note = {'count': len(stairs), 'area': stair['area'], 'planned_from': links[0]['from_level'], 'planned_to': labels[links[0]['to_level']], 'served_to': labels[extent['to_level']]}
+        extent_note = {**extent, 'display': f'{extent["from_level"]} → {labels[extent["to_level"]]}'}
+        result.append(_policy_panel(rows, elevator['sides'], basement, stair_note, extent_note, text, rect))
+    else:
+        deferred = elevator['deferred_stops']
+        rows = [{'id': level['id'], 'label': level['label'], 'door_sides': elevator['doors_by_level'][level['id']]} for level in reversed(levels)]
+        stairs = circulation['stairs']
+        if len(stairs) != 1:
+            raise ValueError('Exactly one right stair core required')
+        stair = stairs[0]; extent = elevator['served_extent']
+        labels = {level['id']: level['label'] for level in levels}
+        if deferred:
+            raise ValueError('The current section requires all basement stops to be modeled')
+        if levels[0]['id'] != 'KG' or stair['planned_connectors']:
+            raise ValueError('Basement floor and its stair connector must be modeled')
+        extent_note = {**extent, 'display': f'{extent["from_level"]} → {labels[extent["to_level"]]}'}
+        panel = [rect(1090, 160, 335, 405, rx=10, fill='#fff3df', stroke='#d0a05b'),
+                 text(1110, 190, 'Bestandsaufzug · Türregel', 'policy-title')]
+        names = {'outward': 'außen', 'inward': 'innen'}
+        for index, row in enumerate(rows):
+            panel.append(f'<g data-lift-stop="{html.escape(row["id"], quote=True)}" data-door-sides="{" ".join(row["door_sides"])}" data-elevation-basis="assumed">')
+            panel.append(text(1110, 230+index*32, row['label']+' · '+', '.join(names[side] for side in row['door_sides']), 'policy-small'))
+            panel.append('</g>')
+        panel.append(text(1110, 425, 'KG-Höhe vorläufig angenommen', 'policy-small'))
+        panel.append(text(1110, 450, 'Türseite, kein Öffnungszustand', 'policy-small'))
+        panel.append('<g data-role="stair-extent" data-area="'+html.escape(stair['area'], quote=True)+'">')
+        panel.append(text(1110, 490, f'1 rechter Treppenkern · {stair["area"]}', 'policy-small'))
+        panel.append('</g>')
+        panel.append(text(1110, 520, 'Außentreppe EG → Dach', 'policy-small'))
+        result.append('<g data-role="lift-door-policy">'+'\n'.join(panel)+'</g>')
     external = circulation['external_stairs']
     if (len(external) != 1 or external[0]['classification'] != 'external_metal'
-            or external[0]['served_extent'] != {'from_level': levels[0]['id'], 'to_level': 'ROOF'}):
+            or external[0]['served_extent'] != {'from_level': next((level['id'] for level in levels if level['id'] == 'EG'), levels[0]['id']), 'to_level': 'ROOF'}):
         raise ValueError('One separately sourced external metal stair from roof to EG required')
     first = levels[0]
     result.append(dimension(1130, first['z_mm'], first['clear_top_mm'], f'{number(clear/1000)} m lichte Höhe*', 'clear-height'))
-    result.append(dimension(1260, first['z_mm'], levels[1]['z_mm'], f'{number(pitch/1000)} m Geschossteilung*', 'floor-pitch'))
-    result.append(text(210, 786, 'Unten: Atriumboden geschlossen. Darüber: Öffnungen der gemeinsamen Vorlage.', 'small'))
+    result.append(dimension(1260, first['z_mm'], next((level for level in levels if level['z_mm'] > first['z_mm']), levels[1])['z_mm'], f'{number(pitch/1000)} m Geschossteilung*', 'floor-pitch'))
+    if view.get('exterior'):
+        grade=view['exterior']['grade_z_mm']; ground_y=y(grade)
+        result.append(rect(180, ground_y, 25, y(lower)-ground_y, fill='#8a735b', data_role='earth-section'))
+        result.append(rect(1065, ground_y, 20, y(lower)-ground_y, fill='#8a735b', data_role='earth-section'))
+        result.append(f'<path d="M180 {ground_y:.3f}H1085" stroke="#8a735b" stroke-width="3" data-role="terrain-grade"/>')
+        result.append(text(250, ground_y+24, 'Gelände ±0 m*', 'small'))
+    result.append(text(210, 786, 'EG: Atriumboden geschlossen. Darüber: Öffnungen der gemeinsamen Vorlage.', 'small'))
     result.append('<rect x="75" y="805" width="1350" height="180" rx="12" fill="#edf2f5"/>')
     result.append(text(95, 832, f'* Annahmen: lichte Höhe {number(clear/1000)} m · Platte {number(slab)} mm · Teilung {number(pitch/1000)} m.', 'body'))
     result.append(text(95, 858, 'Breite schematisch; XY nicht kalibriert. Raumkennungen sind Vorlagenreferenzen, keine bestätigten Räume anderer Ebenen.', 'small'))
     result.append(text(95, 884, 'Blau: Konzeptbereich und Austauschpfeile. Transporttechnik, Tragwerk, Übergaben und Sicherheit sind nicht qualifiziert.', 'small'))
-    result.append(text(95, 910, f'{len(stairs)} interner Treppenkern: {extent_note["display"]} · {len(external)} äußere Metalltreppe: Dach → {labels[levels[0]["id"]]}', 'small', data_role='separate-stair-extents'))
+    result.append(text(95, 910, f'{len(stairs)} interner Treppenkern: {extent_note["display"]} · {len(external)} äußere Metalltreppe: Dach → {labels[external[0]["served_extent"]["from_level"]]}', 'small', data_role='separate-stair-extents'))
     result.append(text(95, 936, f'Quellen: EG {view["ground_floor"]["id"]} · Obergeschosse {view["template_id"]}', 'small'))
-    result.append(text(95, 960, f'Dachgeländer {number(roof["guard"]["height_mm"])} mm und Glasgewölbe: Konzept · Keller nicht modelliert · keine Schutzwirkung', 'small'))
+    basement_note = 'Kellerhöhe angenommen' if levels[0]['id'] == 'KG' else 'Keller nicht modelliert'
+    result.append(text(95, 960, f'Dachgeländer {number(roof["guard"]["height_mm"])} mm und Glasgewölbe: Konzept · {basement_note} · keine Schutzwirkung', 'small'))
     result.append('</svg>')
     return '\n'.join(result)+'\n'
 

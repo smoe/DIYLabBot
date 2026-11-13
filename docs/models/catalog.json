@@ -731,17 +731,18 @@
     },
     {
       "id": "building-stack",
-      "title": "Vier Geschosse · vertikaler Austausch",
+      "title": "Keller und vier Geschosse · vertikaler Austausch",
       "group": "umgebungen",
       "sources": [
-        "model/building-stack.shared.json"
+        "model/building-stack.shared.json",
+        "model/basement-kg.shared.json"
       ],
       "image": "images/building-stack.svg",
       "render": {
         "kind": "diagram",
         "view": "building_stack"
       },
-      "caption": "Eigenes EG, drei Obergeschosse und um 90° gedrehtes Glasgewölbe über Atrium und allen vier umlaufenden Fluren. Aufzug, inneres Treppenhaus und äußere Metalltreppe sind getrennte Systeme; Höhen und Details bleiben Annahmen, keine Betriebs- oder Sicherheitsqualifikation.",
+      "caption": "Eigene Keller- und EG-Raumquellen, drei Obergeschosse und Glasgewölbe. Fotoabgeleitete Glasfront, holzfarbene Raumtüren und offene Metallgeländer. Gelände auf EG-Höhe ordnet den Keller unterirdisch ein; Maße und Höhen bleiben Annahmen.",
       "documentation": "docs/building-stack.md"
     },
     {

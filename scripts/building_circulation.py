@@ -1,6 +1,6 @@
 """Static, source-referenced lift and shared two-flight stair concept recipe.
 
-No basement geometry, lift controller, moving cabin, normative stair design or
+No lift controller, moving cabin, normative stair design or
 navigation is implemented. Deliberate fusion/support overlaps are auditable.
 """
 import copy
@@ -21,7 +21,7 @@ def exact(value, fields, name):
 def validate_source(source):
     exact(source, 'status served_extent elevator stairs external_stair qualification limitations', 'circulation')
     require(source['status'] == 'owner_requested_concept_geometry', 'Static owner-requested circulation concept required')
-    require(source['served_extent'] == {'from_level': 'KG', 'to_level': 'OG3'}, 'Requested served extent is KG to OG3, with basement geometry deferred')
+    require(source['served_extent'] == {'from_level': 'KG', 'to_level': 'OG3'}, 'Requested served extent is KG to OG3, with explicit basement concept geometry')
     lift = source['elevator']; exact(lift, 'id area reference_opening sides default_sides stop_overrides deferred_stops cabin_level post_wall_factor cabin_wall_factor cabin_clearance_factor', 'elevator')
     require(lift['id'] == 'BuildingLift' and lift['cabin_level'] == 'EG', 'One cabin indication at EG required')
     exact(lift['sides'], 'outward inward', 'confirmed sides')
@@ -31,8 +31,8 @@ def validate_source(source):
     for name in [lift['id'], lift['area'], lift['reference_opening'], *[s['wall'] for s in lift['sides'].values()]]:
         require(isinstance(name, str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', name), 'Stable ASCII circulation reference required')
     require(lift['sides']['outward']['wall'] != lift['sides']['inward']['wall'], 'Opposite elevator sides required')
-    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['outward', 'inward']}, 'Owner-confirmed active stop policy required')
-    require(lift['deferred_stops'] == [{'id': 'KG', 'label': 'KG (geplant)', 'elevation_mm': None, 'status': 'awaiting_plan', 'sides': ['inward']}], 'KG remains inward-only with unknown elevation and no geometry')
+    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['outward', 'inward'], 'KG': ['inward']}, 'Owner-confirmed active stop policy required')
+    require(lift['deferred_stops'] == [], 'All declared stops now have concept geometry')
     for name in ('post_wall_factor', 'cabin_wall_factor', 'cabin_clearance_factor'):
         require(type(lift[name]) in (int, float) and math.isfinite(lift[name]) and 0 < lift[name] <= 1, 'Positive illustrative lift proportion required')
     stairs = source['stairs']; exact(stairs, 'recipe risers_per_flight landing_fraction center_gap_fraction wall_margin_factor join_slab_fraction instances', 'stairs')
@@ -53,7 +53,7 @@ def validate_source(source):
     for name in ('tread_thickness_mm', 'stringer_depth_mm', 'stringer_width_mm', 'landing_thickness_mm'):
         require(type(external[name]) in (int, float) and math.isfinite(external[name]) and external[name] > 0, 'Positive finite metal presentation assumption required')
     exact(source['qualification'], 'surveyed_geometry lift_operation_implemented stairs_code_qualified headroom_qualified egress_qualified basement_geometry_implemented', 'circulation qualification')
-    require(all(v is False for v in source['qualification'].values()), 'Concept geometry is not qualified circulation')
+    require(source['qualification']['basement_geometry_implemented'] is True and all(v is False for k, v in source['qualification'].items() if k != 'basement_geometry_implemented'), 'Concept geometry is not qualified circulation')
     require(isinstance(source['limitations'], list) and source['limitations'] and all(isinstance(v, str) and v for v in source['limitations']), 'Circulation limitations required')
 
 
@@ -144,11 +144,11 @@ def compile(source, plan, p, levels, ground_plan=None):
     post = thickness*lift['post_wall_factor']; cw = thickness*lift['cabin_wall_factor']; gap = thickness*lift['cabin_clearance_factor']
     inner = [bbox[0]+thickness, bbox[1]+thickness, bbox[2]-thickness, bbox[3]-thickness]
     require(inside_rectangle(rectangle(*inner), lift_poly, thickness-.0001), 'Shaft frame must lie inside the referenced footprint')
-    shaft_ids = []; top = levels[-1]['clear_top_mm']
+    shaft_ids = []; bottom = levels[0]['z_mm']; top = levels[-1]['clear_top_mm']; shaft_height = top-bottom
     for label, x, y in [('SW', inner[0], inner[1]), ('NW', inner[0], inner[3]-post), ('SE', inner[2]-post, inner[1]), ('NE', inner[2]-post, inner[3]-post)]:
-        name = 'LiftPost_'+label; shaft_ids.append(body(name, 'concept_elevator_shaft_frame', '#c47a35')); box(name+'_Box', name, [x, y, 0], [post, post, top])
-        points = rectangle(x+post*.25, y+post*.25, x+post*.75, y+post*.75); volume = (post*.5)**2*top
-        shaft_checks.append(probe(name+'_Continuity', points, 0, top, [name], 'filled', {name: volume}))
+        name = 'LiftPost_'+label; shaft_ids.append(body(name, 'concept_elevator_shaft_frame', '#c47a35')); box(name+'_Box', name, [x, y, bottom], [post, post, shaft_height])
+        points = rectangle(x+post*.25, y+post*.25, x+post*.75, y+post*.75); volume = (post*.5)**2*shaft_height
+        shaft_checks.append(probe(name+'_Continuity', points, bottom, shaft_height, [name], 'filled', {name: volume}))
     for level in levels:
         z = level['clear_top_mm']-post
         for tag, origin, size in [('Front', [inner[0], inner[1], z], [inner[2]-inner[0], post, post]), ('Back', [inner[0], inner[3]-post, z], [inner[2]-inner[0], post, post]),
@@ -229,7 +229,7 @@ def compile(source, plan, p, levels, ground_plan=None):
                 connections.append(probe(name+'_'+label+'_Connection', rectangle(xx, yy, xx+dx, yy+witness_width), zz, witness_depth, list(expected), 'filled', expected))
             connectors.append({'id': name, 'body_id': name, 'from_level': lower['id'], 'to_level': upper['id'], 'z0_mm': z0, 'z1_mm': z1, 'mid_z_mm': mid, 'risers': 2*n, 'run_mm': run, 'lane_width_mm': lane, 'entry_x_mm': entry_x, 'slab_hole_probe_id': name+'_SlabHole'})
         stairs.append({'id': instance['id'], 'component_id': instance['id'], 'area': instance['area'], 'entry_opening': instance['entry_opening'], 'interior_rectangle_mm': rectangle(x0, y0, x1, y1), 'connectors': connectors, 'body_ids': stair_ids, 'entry_landing_preserved': True,
-                       'served_extent': copy.deepcopy(source['served_extent']), 'classification': 'internal', 'planned_connectors': [{'id': instance['id']+'_KG_EG', 'from_level': 'KG', 'to_level': 'EG', 'z0_mm': None, 'z1_mm': None, 'body_id': None, 'status': 'awaiting_plan'}]})
+                       'served_extent': copy.deepcopy(source['served_extent']), 'classification': 'internal', 'planned_connectors': []})
         detail.extend(level['id']+'__Area_'+instance['area'] for level in levels)
     # The external steel illustration reuses the same source footprint/layout
     # ratios, but has thin treads and inclined stringers rather than solid steps.
@@ -250,7 +250,7 @@ def compile(source, plan, p, levels, ground_plan=None):
         require(all(floor.point_membership(point, ground_neighbor) == 1 for point in bottom_probe), 'The source-anchored external lower support must lie inside the actual EG neighbor floor')
     ext_component = ext['id']; result['components'].append({'id': ext_component, 'grounded': True})
     roof_level = {'id': 'ROOF', 'z_mm': levels[-1]['clear_top_mm']+slab}
-    stops = [*levels, roof_level]; metal_landings = []; ext_connectors = []; ext_ids = []; access_checks = []
+    stops = [*[level for level in levels if level['id'] != 'KG'], roof_level]; metal_landings = []; ext_connectors = []; ext_ids = []; access_checks = []
     entry_ylo, entry_yhi = sorted(e0[1]+fraction*(e1[1]-e0[1]) for fraction in entry['interval'])
     access_margin = min(thickness*.1, (entry_yhi-entry_ylo)*.1)
     access_ylo, access_yhi = entry_ylo+access_margin, entry_yhi-access_margin
@@ -318,5 +318,5 @@ def compile(source, plan, p, levels, ground_plan=None):
         'served_extent': copy.deepcopy(source['served_extent']),
         'slab_hole_probes': holes, 'door_probes': door_probes, 'closed_door_probes': closed, 'connection_witnesses': connections, 'shaft_witnesses': shaft_checks, 'external_access_witnesses': access_checks,
         'ground_visibility_ids': [cabin]+[port['frame_body_id'] for port in ports if port['level_id'] == 'EG' and port['frame_body_id']]+[stair['connectors'][0]['body_id'] for stair in stairs]+[ext_connectors[0]['body_id'], metal_landings[0]],
-        'basement_geometry_implemented': False, 'headroom_qualified': False, 'egress_qualified': False, 'limitations': list(source['limitations'])}
+        'basement_geometry_implemented': True, 'headroom_qualified': False, 'egress_qualified': False, 'limitations': list(source['limitations'])}
     return result

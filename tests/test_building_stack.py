@@ -35,7 +35,8 @@ def invented_plan():
 
 class StackTests(unittest.TestCase):
     def setUp(self):
-        self.spec = json.loads(model.SOURCE.read_text()); self.spec['presentation_reference']['floorplan_area'] = 'ReferenceRoom'
+        self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec['sources'].pop('furnishings', None)
+        self.spec['presentation_reference']['floorplan_area'] = 'ReferenceRoom'
         self.plan = invented_plan()
         self.ground_plan = copy.deepcopy(self.plan)
         ground_atrium = next(a for a in self.ground_plan['areas'] if a['id'] == 'Atrium')
@@ -55,10 +56,10 @@ class StackTests(unittest.TestCase):
         self.mock_circulation.start(); self.addCleanup(self.mock_circulation.stop)
         self.addCleanup(self.mock_templates.stop); self.addCleanup(self.mock_room.stop)
 
-    def test_one_template_four_instances_and_explicit_assumed_dimensions(self):
+    def test_five_scoped_instances_and_explicit_assumed_dimensions(self):
         model.validate(self.spec); p = model.parameters(self.spec); data = model.interfaces(self.spec, p)
-        self.assertEqual([level['id'] for level in data['levels']], ['EG', 'OG1', 'OG2', 'OG3'])
-        self.assertEqual([level['z_mm'] for level in data['levels']], [0, 4250, 8500, 12750])
+        self.assertEqual([level['id'] for level in data['levels']], ['KG', 'EG', 'OG1', 'OG2', 'OG3'])
+        self.assertEqual([level['z_mm'] for level in data['levels']], [-4250, 0, 4250, 8500, 12750])
         self.assertEqual(data['floor_pitch_mm'], 4250)
         self.assertEqual(p['display_scale'], 10)
         self.assertEqual(data['coordinate_meaning'], {'xy': 'presentation_mm', 'z': 'assumed_mm'})
@@ -68,7 +69,7 @@ class StackTests(unittest.TestCase):
     def test_height_and_slab_variants_update_every_level_and_marker_without_z_copies(self):
         before = copy.deepcopy(self.spec)
         p = model.parameters(self.spec, {'clear_height_mm': 3500, 'slab_thickness_mm': 200}); data = model.interfaces(self.spec, p)
-        self.assertEqual([level['z_mm'] for level in data['levels']], [0, 3700, 7400, 11100])
+        self.assertEqual([level['z_mm'] for level in data['levels']], [-3700, 0, 3700, 7400, 11100])
         for level in data['levels']:
             self.assertEqual(level['slab_top_mm']-level['slab_bottom_mm'], 200)
             self.assertEqual(level['clear_top_mm']-level['z_mm'], 3500)
@@ -113,7 +114,7 @@ class StackTests(unittest.TestCase):
                 current = operations[level['id']+'__'+original['id']]
                 a = model.numeric_shape(current['shape'], p); b = model.numeric_shape(original['shape'], p)
                 self.assertEqual(a['points'], b['points'])
-                self.assertEqual(a['offset'], b['offset']+index*p['floor_pitch_mm'])
+                self.assertEqual(a['offset'], b['offset']+(index-1)*p['floor_pitch_mm'])
                 self.assertEqual(a['depth'], p['door_height_mm'] if original['id'] == 'Opening_Door' else b['depth'])
         names = [body['id'] for body in result['bodies']]
         self.assertEqual(len(names), len(set(names)))
@@ -122,11 +123,11 @@ class StackTests(unittest.TestCase):
 
     def test_all_opening_probes_are_scoped_translated_and_inside_new_lintel(self):
         p = model.parameters(self.spec); data = model.interfaces(self.spec, p)
-        self.assertEqual(len(data['opening_probes']), 4)
+        self.assertEqual(len(data['opening_probes']), 5)
         for index, probe in enumerate(data['opening_probes']):
             self.assertTrue(probe['id'].startswith(self.spec['levels'][index]['id']+'__'))
-            self.assertGreater(probe['offset_mm'], index*p['floor_pitch_mm'])
-            self.assertLess(probe['offset_mm']+probe['depth_mm'], index*p['floor_pitch_mm']+p['door_height_mm'])
+            self.assertGreater(probe['offset_mm'], (index-1)*p['floor_pitch_mm'])
+            self.assertLess(probe['offset_mm']+probe['depth_mm'], (index-1)*p['floor_pitch_mm']+p['door_height_mm'])
 
     def test_marker_is_strictly_inside_atrium_and_separate_from_physical_claims(self):
         p = model.parameters(self.spec); data = model.interfaces(self.spec, p)

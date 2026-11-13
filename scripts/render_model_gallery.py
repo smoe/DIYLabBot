@@ -277,7 +277,7 @@ def diagram(entry):
         import render_building_stack_section as section
         spec=stack.load(ROOT/entry['sources'][0])
         return section.render_svg(spec),{
-            'representation':'Source-derived four-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification',
+            'representation':'Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification',
             'producer_files_sha256':{rel(path):sha(path) for path in [ROOT/'scripts/render_building_stack_section.py',*stack.source_dependencies(spec)] if path.suffix=='.py' or path.name.endswith('.schema.json')},
             'metric_scale_known':False,'original_image_embedded':False,
             'transport_implemented':False,'hardware_executed':False}

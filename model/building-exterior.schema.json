@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "building-exterior.schema.json",
+  "title": "Photo-informed, unmeasured envelope, door colour, open guards and illustrative terrain",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "front_wall",
+    "ground_front_wall",
+    "entry_opening",
+    "bay_count",
+    "frame_mm",
+    "glass_mm",
+    "glass_opacity",
+    "frame_color",
+    "glass_color",
+    "door_color",
+    "door_leaf_mm",
+    "guard_boundaries",
+    "guard_height_mm",
+    "guard_post_mm",
+    "guard_bar_mm",
+    "guard_bar_fractions",
+    "guard_max_post_spacing_mm",
+    "terrain_margin_mm",
+    "terrain_clearance_mm",
+    "terrain_color"
+  ],
+  "properties": {
+    "status": {
+      "const": "photo_informed_unmeasured_concept"
+    },
+    "front_wall": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "ground_front_wall": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "entry_opening": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "bay_count": {
+      "type": "integer",
+      "minimum": 2,
+      "maximum": 12
+    },
+    "frame_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "glass_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "glass_opacity": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1
+    },
+    "frame_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "glass_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "door_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "door_leaf_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "guard_boundaries": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+      }
+    },
+    "guard_height_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "guard_post_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "guard_bar_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "guard_bar_fractions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0,
+        "exclusiveMaximum": 1
+      }
+    },
+    "guard_max_post_spacing_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "terrain_margin_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "terrain_clearance_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 10000
+    },
+    "terrain_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    }
+  }
+}

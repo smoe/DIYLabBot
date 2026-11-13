@@ -13,6 +13,10 @@
     "ground_floor": {
       "source": "model/ground-floor-eg.shared.json",
       "source_sha256": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+    },
+    "basement": {
+      "source": "model/basement-kg.shared.json",
+      "source_sha256": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
     }
   },
   "calibration": null,
@@ -47,6 +51,10 @@
     "basis": "unmeasured_concept_proportion"
   },
   "levels": [
+    {
+      "id": "KG",
+      "label": "Keller (Höhe angenommen)"
+    },
     {
       "id": "EG",
       "label": "EG"
@@ -93,10 +101,14 @@
     "Clear height is an owner assumption; slab thickness and source-referenced wall/door dimensions are presentation assumptions.",
     "Actual EG floors cover the upper Atrium projection; no synthetic duplicate ground Atrium slab is added.",
     "ConceptExchange is a semantic visual marker, not a selected lift, robot, rail, handover fixture or connecting trajectory.",
-    "Basement geometry, loads, stability, retention, access, transport performance and fire protection are not implemented or qualified; roof and stairs are illustrative only.",
     "Opening displays and constructive wall-junction overlaps retain the relative-floorplan limitations.",
     "One internal right-hand staircase and a separate external metal fire staircase are shown; the building lift remains independent of both.",
-    "The X-axis glass cap covers Atrium, all source corridors and the explicitly selected inner core; only its perimeter skirt is facetted, with sagitta bounded relative to glass thickness. A local opaque external-stair access deck remains an explicit exception."
+    "The X-axis glass cap covers Atrium, all source corridors and the explicitly selected inner core; only its perimeter skirt is facetted, with sagitta bounded relative to glass thickness. A local opaque external-stair access deck remains an explicit exception.",
+    "KG uses a separate manually registered trace; its clear height and floor pitch provisionally reuse the presentation assumptions, not a surveyed basement elevation.",
+    "KG facade details and exact stair geometry remain simplified; all XY coordinates are uncalibrated.",
+    "The foyer glass front and very open metal rails follow private owner photographs; their registration, grid and sizes remain illustrative.",
+    "Room door colour is owner-confirmed warm wood, approximated under photographic lighting. Door leaves are shown open; this is not a fire-door or egress state.",
+    "Earth at EG grade is an illustrative cutaway around the building, not a measured terrain survey."
   ],
   "circulation": {
     "status": "owner_requested_concept_geometry",
@@ -121,19 +133,12 @@
         "EG": [
           "outward",
           "inward"
+        ],
+        "KG": [
+          "inward"
         ]
       },
-      "deferred_stops": [
-        {
-          "id": "KG",
-          "label": "KG (geplant)",
-          "elevation_mm": null,
-          "status": "awaiting_plan",
-          "sides": [
-            "inward"
-          ]
-        }
-      ],
+      "deferred_stops": [],
       "cabin_level": "EG",
       "post_wall_factor": 0.4,
       "cabin_wall_factor": 0.5,
@@ -160,17 +165,16 @@
       "stairs_code_qualified": false,
       "headroom_qualified": false,
       "egress_qualified": false,
-      "basement_geometry_implemented": false
+      "basement_geometry_implemented": true
     },
     "limitations": [
       "Door-side roles are owner-confirmed; the opposite port is a stack-only concept override, not an observation added to the F03 trace.",
       "Existing building lift and cabin are distinct from the blue Atrium future-exchange marker.",
       "Cabin, shaft frame and two-flight stairs are static illustrative geometry, not selected equipment, normative stair design or an operating lift.",
-      "KG has an inward-only policy and unknown elevation; no basement geometry is generated.",
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
-      "Lift and the separate right staircase are requested from KG to OG3; KG to EG remains a planned connection with unknown elevations and no basement geometry.",
-      "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG."
+      "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
+      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
     ],
     "served_extent": {
       "from_level": "KG",
@@ -270,5 +274,36 @@
       "depth_parameter": "slab_thickness_mm",
       "status": "illustrative_unqualified"
     }
+  },
+  "exterior": {
+    "status": "photo_informed_unmeasured_concept",
+    "front_wall": "W108",
+    "ground_front_wall": "EW074",
+    "entry_opening": "D0_018",
+    "bay_count": 6,
+    "frame_mm": 90,
+    "glass_mm": 20,
+    "glass_opacity": 0.2,
+    "frame_color": "#424A50",
+    "glass_color": "#A7CDD8",
+    "door_color": "#C99448",
+    "door_leaf_mm": 40,
+    "guard_boundaries": [
+      "W068",
+      "W106"
+    ],
+    "guard_height_mm": 1100,
+    "guard_post_mm": 40,
+    "guard_bar_mm": 16,
+    "guard_bar_fractions": [
+      0.15,
+      0.35,
+      0.55,
+      0.75
+    ],
+    "guard_max_post_spacing_mm": 1600,
+    "terrain_margin_mm": 4500,
+    "terrain_clearance_mm": 200,
+    "terrain_color": "#8A735B"
   }
 }

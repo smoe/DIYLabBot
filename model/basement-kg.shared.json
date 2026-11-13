@@ -1,0 +1,2044 @@
+{
+  "format": "solidcraftbot.registered-relative-floorplan/1",
+  "id": "Basement_KG",
+  "units": {
+    "length": "relative"
+  },
+  "calibration": null,
+  "vertices": {
+    "K001": [
+      0.02,
+      0.6352786885
+    ],
+    "K002": [
+      0.03,
+      0.5269230769
+    ],
+    "K003": [
+      0.03,
+      0.6971428571
+    ],
+    "K004": [
+      0.0525,
+      0.44
+    ],
+    "K005": [
+      0.06375,
+      0.76
+    ],
+    "K006": [
+      0.075,
+      0.36
+    ],
+    "K007": [
+      0.12,
+      0.8
+    ],
+    "K008": [
+      0.1575,
+      0.2
+    ],
+    "K009": [
+      0.195,
+      0.1558139535
+    ],
+    "K010": [
+      0.195,
+      0.36
+    ],
+    "K011": [
+      0.22,
+      0.69
+    ],
+    "K012": [
+      0.22,
+      0.72
+    ],
+    "K013": [
+      0.22,
+      0.83
+    ],
+    "K014": [
+      0.2588235294,
+      0.36
+    ],
+    "K015": [
+      0.2588235294,
+      0.44
+    ],
+    "K016": [
+      0.2588235294,
+      0.592
+    ],
+    "K017": [
+      0.2588235294,
+      0.69
+    ],
+    "K018": [
+      0.2717647059,
+      0.1
+    ],
+    "K019": [
+      0.33,
+      0.0755555556
+    ],
+    "K020": [
+      0.33,
+      0.44
+    ],
+    "K021": {
+      "reference_vertex": "V034"
+    },
+    "K022": {
+      "reference_vertex": "V033"
+    },
+    "K023": [
+      0.33,
+      0.64
+    ],
+    "K024": [
+      0.33,
+      0.69
+    ],
+    "K025": [
+      0.33,
+      0.72
+    ],
+    "K026": [
+      0.33,
+      0.7772307692
+    ],
+    "K027": [
+      0.33,
+      0.7969230769
+    ],
+    "K028": [
+      0.33,
+      0.85
+    ],
+    "K029": [
+      0.4128985507,
+      0.045
+    ],
+    "K030": {
+      "reference_vertex": "V042"
+    },
+    "K031": {
+      "reference_vertex": "V041"
+    },
+    "K032": [
+      0.434,
+      0.64
+    ],
+    "K033": [
+      0.434,
+      0.69
+    ],
+    "K034": [
+      0.4449285714,
+      0.85
+    ],
+    "K035": [
+      0.4449285714,
+      0.868
+    ],
+    "K036": [
+      0.4631428571,
+      0.72
+    ],
+    "K037": [
+      0.4631428571,
+      0.7772307692
+    ],
+    "K038": [
+      0.4631428571,
+      0.7969230769
+    ],
+    "K039": [
+      0.4631428571,
+      0.8255319149
+    ],
+    "K040": [
+      0.4631428571,
+      0.85
+    ],
+    "K041": [
+      0.5050357143,
+      0.036
+    ],
+    "K042": [
+      0.5050357143,
+      0.44
+    ],
+    "K043": {
+      "reference_vertex": "V054"
+    },
+    "K044": {
+      "reference_vertex": "V053"
+    },
+    "K045": [
+      0.536,
+      0.64
+    ],
+    "K046": [
+      0.536,
+      0.69
+    ],
+    "K047": [
+      0.5594042553,
+      0.03
+    ],
+    "K048": [
+      0.5734468085,
+      0.72
+    ],
+    "K049": [
+      0.5734468085,
+      0.7969230769
+    ],
+    "K050": [
+      0.5734468085,
+      0.8255319149
+    ],
+    "K051": [
+      0.5734468085,
+      0.87
+    ],
+    "K052": [
+      0.6015319149,
+      0.592
+    ],
+    "K053": [
+      0.6015319149,
+      0.64
+    ],
+    "K054": [
+      0.6015319149,
+      0.69
+    ],
+    "K055": [
+      0.6386666667,
+      0.0405
+    ],
+    "K056": [
+      0.6386666667,
+      0.44
+    ],
+    "K057": [
+      0.6478333333,
+      0.592
+    ],
+    "K058": [
+      0.6478333333,
+      0.64
+    ],
+    "K059": [
+      0.6478333333,
+      0.69
+    ],
+    "K060": [
+      0.657,
+      0.72
+    ],
+    "K061": [
+      0.657,
+      0.7969230769
+    ],
+    "K062": [
+      0.657,
+      0.868
+    ],
+    "K063": {
+      "reference_vertex": "V074"
+    },
+    "K064": {
+      "reference_vertex": "V073"
+    },
+    "K065": [
+      0.732336,
+      0.0959259259
+    ],
+    "K066": [
+      0.732336,
+      0.44
+    ],
+    "K067": [
+      0.732336,
+      0.498
+    ],
+    "K068": [
+      0.732336,
+      0.592
+    ],
+    "K069": [
+      0.732336,
+      0.69
+    ],
+    "K070": [
+      0.732336,
+      0.72
+    ],
+    "K071": [
+      0.732336,
+      0.8486666667
+    ]
+  },
+  "walls": [
+    {
+      "id": "KW001",
+      "start": "K071",
+      "end": "K062",
+      "kind": "wall"
+    },
+    {
+      "id": "KW002",
+      "start": "K062",
+      "end": "K061",
+      "kind": "wall"
+    },
+    {
+      "id": "KW003",
+      "start": "K061",
+      "end": "K060",
+      "kind": "wall"
+    },
+    {
+      "id": "KW004",
+      "start": "K060",
+      "end": "K070",
+      "kind": "wall"
+    },
+    {
+      "id": "KW005",
+      "start": "K070",
+      "end": "K071",
+      "kind": "wall"
+    },
+    {
+      "id": "KW006",
+      "start": "K062",
+      "end": "K051",
+      "kind": "wall"
+    },
+    {
+      "id": "KW007",
+      "start": "K051",
+      "end": "K050",
+      "kind": "wall"
+    },
+    {
+      "id": "KW008",
+      "start": "K050",
+      "end": "K049",
+      "kind": "wall"
+    },
+    {
+      "id": "KW009",
+      "start": "K049",
+      "end": "K061",
+      "kind": "wall"
+    },
+    {
+      "id": "KW010",
+      "start": "K049",
+      "end": "K048",
+      "kind": "wall"
+    },
+    {
+      "id": "KW011",
+      "start": "K048",
+      "end": "K060",
+      "kind": "wall"
+    },
+    {
+      "id": "KW012",
+      "start": "K051",
+      "end": "K035",
+      "kind": "wall"
+    },
+    {
+      "id": "KW013",
+      "start": "K035",
+      "end": "K034",
+      "kind": "wall"
+    },
+    {
+      "id": "KW014",
+      "start": "K034",
+      "end": "K040",
+      "kind": "wall"
+    },
+    {
+      "id": "KW015",
+      "start": "K040",
+      "end": "K039",
+      "kind": "wall"
+    },
+    {
+      "id": "KW016",
+      "start": "K039",
+      "end": "K050",
+      "kind": "wall"
+    },
+    {
+      "id": "KW017",
+      "start": "K039",
+      "end": "K038",
+      "kind": "wall"
+    },
+    {
+      "id": "KW018",
+      "start": "K038",
+      "end": "K037",
+      "kind": "wall"
+    },
+    {
+      "id": "KW019",
+      "start": "K037",
+      "end": "K036",
+      "kind": "wall"
+    },
+    {
+      "id": "KW020",
+      "start": "K036",
+      "end": "K048",
+      "kind": "wall"
+    },
+    {
+      "id": "KW021",
+      "start": "K034",
+      "end": "K028",
+      "kind": "wall"
+    },
+    {
+      "id": "KW022",
+      "start": "K028",
+      "end": "K027",
+      "kind": "wall"
+    },
+    {
+      "id": "KW023",
+      "start": "K027",
+      "end": "K038",
+      "kind": "wall"
+    },
+    {
+      "id": "KW024",
+      "start": "K035",
+      "end": "K028",
+      "kind": "wall"
+    },
+    {
+      "id": "KW025",
+      "start": "K027",
+      "end": "K026",
+      "kind": "wall"
+    },
+    {
+      "id": "KW026",
+      "start": "K026",
+      "end": "K037",
+      "kind": "wall"
+    },
+    {
+      "id": "KW027",
+      "start": "K026",
+      "end": "K025",
+      "kind": "wall"
+    },
+    {
+      "id": "KW028",
+      "start": "K025",
+      "end": "K036",
+      "kind": "wall"
+    },
+    {
+      "id": "KW029",
+      "start": "K028",
+      "end": "K013",
+      "kind": "wall"
+    },
+    {
+      "id": "KW030",
+      "start": "K013",
+      "end": "K012",
+      "kind": "wall"
+    },
+    {
+      "id": "KW031",
+      "start": "K012",
+      "end": "K025",
+      "kind": "wall"
+    },
+    {
+      "id": "KW032",
+      "start": "K013",
+      "end": "K007",
+      "kind": "wall"
+    },
+    {
+      "id": "KW033",
+      "start": "K007",
+      "end": "K005",
+      "kind": "wall"
+    },
+    {
+      "id": "KW034",
+      "start": "K005",
+      "end": "K003",
+      "kind": "wall"
+    },
+    {
+      "id": "KW035",
+      "start": "K003",
+      "end": "K001",
+      "kind": "wall"
+    },
+    {
+      "id": "KW036",
+      "start": "K001",
+      "end": "K002",
+      "kind": "wall"
+    },
+    {
+      "id": "KW037",
+      "start": "K002",
+      "end": "K004",
+      "kind": "wall"
+    },
+    {
+      "id": "KW038",
+      "start": "K004",
+      "end": "K015",
+      "kind": "wall"
+    },
+    {
+      "id": "KW039",
+      "start": "K015",
+      "end": "K020",
+      "kind": "wall"
+    },
+    {
+      "id": "KW040",
+      "start": "K020",
+      "end": "K021",
+      "kind": "wall"
+    },
+    {
+      "id": "W049",
+      "start": "K021",
+      "end": "K022",
+      "kind": "wall"
+    },
+    {
+      "id": "KW042",
+      "start": "K022",
+      "end": "K016",
+      "kind": "wall"
+    },
+    {
+      "id": "KW043",
+      "start": "K016",
+      "end": "K017",
+      "kind": "wall"
+    },
+    {
+      "id": "KW044",
+      "start": "K017",
+      "end": "K011",
+      "kind": "wall"
+    },
+    {
+      "id": "KW045",
+      "start": "K011",
+      "end": "K012",
+      "kind": "wall"
+    },
+    {
+      "id": "KW046",
+      "start": "K024",
+      "end": "K017",
+      "kind": "wall"
+    },
+    {
+      "id": "KW047",
+      "start": "K022",
+      "end": "K023",
+      "kind": "wall"
+    },
+    {
+      "id": "KW048",
+      "start": "K023",
+      "end": "K024",
+      "kind": "wall"
+    },
+    {
+      "id": "KW049",
+      "start": "K033",
+      "end": "K024",
+      "kind": "wall"
+    },
+    {
+      "id": "KW050",
+      "start": "K023",
+      "end": "K032",
+      "kind": "wall"
+    },
+    {
+      "id": "KW051",
+      "start": "K032",
+      "end": "K033",
+      "kind": "wall"
+    },
+    {
+      "id": "KW052",
+      "start": "K022",
+      "end": "K031",
+      "kind": "wall"
+    },
+    {
+      "id": "KW053",
+      "start": "K031",
+      "end": "K032",
+      "kind": "wall"
+    },
+    {
+      "id": "KW054",
+      "start": "K021",
+      "end": "K030",
+      "kind": "wall"
+    },
+    {
+      "id": "W062",
+      "start": "K030",
+      "end": "K031",
+      "kind": "wall"
+    },
+    {
+      "id": "KW056",
+      "start": "K054",
+      "end": "K046",
+      "kind": "wall"
+    },
+    {
+      "id": "KW057",
+      "start": "K046",
+      "end": "K045",
+      "kind": "wall"
+    },
+    {
+      "id": "KW058",
+      "start": "K045",
+      "end": "K053",
+      "kind": "wall"
+    },
+    {
+      "id": "KW059",
+      "start": "K053",
+      "end": "K054",
+      "kind": "wall"
+    },
+    {
+      "id": "KW060",
+      "start": "K045",
+      "end": "K044",
+      "kind": "wall"
+    },
+    {
+      "id": "KW061",
+      "start": "K044",
+      "end": "K052",
+      "kind": "wall"
+    },
+    {
+      "id": "KW062",
+      "start": "K052",
+      "end": "K053",
+      "kind": "wall"
+    },
+    {
+      "id": "KW063",
+      "start": "K059",
+      "end": "K054",
+      "kind": "wall"
+    },
+    {
+      "id": "KW064",
+      "start": "K053",
+      "end": "K058",
+      "kind": "wall"
+    },
+    {
+      "id": "KW065",
+      "start": "K058",
+      "end": "K059",
+      "kind": "wall"
+    },
+    {
+      "id": "KW066",
+      "start": "K052",
+      "end": "K057",
+      "kind": "wall"
+    },
+    {
+      "id": "KW067",
+      "start": "K057",
+      "end": "K058",
+      "kind": "wall"
+    },
+    {
+      "id": "KW068",
+      "start": "K069",
+      "end": "K059",
+      "kind": "wall"
+    },
+    {
+      "id": "KW069",
+      "start": "K057",
+      "end": "K064",
+      "kind": "wall"
+    },
+    {
+      "id": "KW070",
+      "start": "K064",
+      "end": "K068",
+      "kind": "wall"
+    },
+    {
+      "id": "KW071",
+      "start": "K068",
+      "end": "K069",
+      "kind": "wall"
+    },
+    {
+      "id": "KW072",
+      "start": "K044",
+      "end": "K043",
+      "kind": "wall"
+    },
+    {
+      "id": "KW073",
+      "start": "K043",
+      "end": "K063",
+      "kind": "wall"
+    },
+    {
+      "id": "KW074",
+      "start": "K063",
+      "end": "K064",
+      "kind": "open_boundary"
+    },
+    {
+      "id": "KW075",
+      "start": "K063",
+      "end": "K067",
+      "kind": "wall"
+    },
+    {
+      "id": "KW076",
+      "start": "K067",
+      "end": "K068",
+      "kind": "wall"
+    },
+    {
+      "id": "KW077",
+      "start": "K020",
+      "end": "K042",
+      "kind": "wall"
+    },
+    {
+      "id": "KW078",
+      "start": "K042",
+      "end": "K056",
+      "kind": "wall"
+    },
+    {
+      "id": "KW079",
+      "start": "K056",
+      "end": "K066",
+      "kind": "wall"
+    },
+    {
+      "id": "KW080",
+      "start": "K066",
+      "end": "K067",
+      "kind": "wall"
+    },
+    {
+      "id": "KW081",
+      "start": "K069",
+      "end": "K070",
+      "kind": "wall"
+    },
+    {
+      "id": "KW082",
+      "start": "K056",
+      "end": "K055",
+      "kind": "wall"
+    },
+    {
+      "id": "KW083",
+      "start": "K055",
+      "end": "K065",
+      "kind": "wall"
+    },
+    {
+      "id": "KW084",
+      "start": "K065",
+      "end": "K066",
+      "kind": "wall"
+    },
+    {
+      "id": "KW085",
+      "start": "K042",
+      "end": "K041",
+      "kind": "wall"
+    },
+    {
+      "id": "KW086",
+      "start": "K041",
+      "end": "K047",
+      "kind": "wall"
+    },
+    {
+      "id": "KW087",
+      "start": "K047",
+      "end": "K055",
+      "kind": "wall"
+    },
+    {
+      "id": "KW088",
+      "start": "K020",
+      "end": "K019",
+      "kind": "wall"
+    },
+    {
+      "id": "KW089",
+      "start": "K019",
+      "end": "K029",
+      "kind": "wall"
+    },
+    {
+      "id": "KW090",
+      "start": "K029",
+      "end": "K041",
+      "kind": "wall"
+    },
+    {
+      "id": "KW091",
+      "start": "K015",
+      "end": "K014",
+      "kind": "wall"
+    },
+    {
+      "id": "KW092",
+      "start": "K014",
+      "end": "K010",
+      "kind": "wall"
+    },
+    {
+      "id": "KW093",
+      "start": "K010",
+      "end": "K009",
+      "kind": "wall"
+    },
+    {
+      "id": "KW094",
+      "start": "K009",
+      "end": "K018",
+      "kind": "wall"
+    },
+    {
+      "id": "KW095",
+      "start": "K018",
+      "end": "K019",
+      "kind": "wall"
+    },
+    {
+      "id": "KW096",
+      "start": "K004",
+      "end": "K006",
+      "kind": "wall"
+    },
+    {
+      "id": "KW097",
+      "start": "K006",
+      "end": "K008",
+      "kind": "wall"
+    },
+    {
+      "id": "KW098",
+      "start": "K008",
+      "end": "K009",
+      "kind": "wall"
+    }
+  ],
+  "areas": [
+    {
+      "id": "K0_001",
+      "label": "0.001 Kältetechnik",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW001",
+          "direction": 1
+        },
+        {
+          "wall": "KW002",
+          "direction": 1
+        },
+        {
+          "wall": "KW003",
+          "direction": 1
+        },
+        {
+          "wall": "KW004",
+          "direction": 1
+        },
+        {
+          "wall": "KW005",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_004",
+      "label": "0.004 IT/BMA/TK-Anlage",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW006",
+          "direction": 1
+        },
+        {
+          "wall": "KW007",
+          "direction": 1
+        },
+        {
+          "wall": "KW008",
+          "direction": 1
+        },
+        {
+          "wall": "KW009",
+          "direction": 1
+        },
+        {
+          "wall": "KW002",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_002",
+      "label": "0.002 Lager",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW009",
+          "direction": -1
+        },
+        {
+          "wall": "KW010",
+          "direction": 1
+        },
+        {
+          "wall": "KW011",
+          "direction": 1
+        },
+        {
+          "wall": "KW003",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_003B",
+      "label": "0.003B ELT",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW012",
+          "direction": 1
+        },
+        {
+          "wall": "KW013",
+          "direction": 1
+        },
+        {
+          "wall": "KW014",
+          "direction": 1
+        },
+        {
+          "wall": "KW015",
+          "direction": 1
+        },
+        {
+          "wall": "KW016",
+          "direction": 1
+        },
+        {
+          "wall": "KW007",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_003A",
+      "label": "0.003A Server / Prozesszentrum",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW016",
+          "direction": -1
+        },
+        {
+          "wall": "KW017",
+          "direction": 1
+        },
+        {
+          "wall": "KW018",
+          "direction": 1
+        },
+        {
+          "wall": "KW019",
+          "direction": 1
+        },
+        {
+          "wall": "KW020",
+          "direction": 1
+        },
+        {
+          "wall": "KW010",
+          "direction": -1
+        },
+        {
+          "wall": "KW008",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_005A",
+      "label": "0.005A ELT",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW014",
+          "direction": -1
+        },
+        {
+          "wall": "KW021",
+          "direction": 1
+        },
+        {
+          "wall": "KW022",
+          "direction": 1
+        },
+        {
+          "wall": "KW023",
+          "direction": 1
+        },
+        {
+          "wall": "KW017",
+          "direction": -1
+        },
+        {
+          "wall": "KW015",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "KServiceNorth",
+      "label": null,
+      "kind": "unknown",
+      "boundary": [
+        {
+          "wall": "KW024",
+          "direction": 1
+        },
+        {
+          "wall": "KW021",
+          "direction": -1
+        },
+        {
+          "wall": "KW013",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_005B",
+      "label": "0.005B Batterieraum",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW023",
+          "direction": -1
+        },
+        {
+          "wall": "KW025",
+          "direction": 1
+        },
+        {
+          "wall": "KW026",
+          "direction": 1
+        },
+        {
+          "wall": "KW018",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_006",
+      "label": "0.006 Lager",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW026",
+          "direction": -1
+        },
+        {
+          "wall": "KW027",
+          "direction": 1
+        },
+        {
+          "wall": "KW028",
+          "direction": 1
+        },
+        {
+          "wall": "KW019",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_007",
+      "label": "0.007 Flüssigstickstoff",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW029",
+          "direction": 1
+        },
+        {
+          "wall": "KW030",
+          "direction": 1
+        },
+        {
+          "wall": "KW031",
+          "direction": 1
+        },
+        {
+          "wall": "KW027",
+          "direction": -1
+        },
+        {
+          "wall": "KW025",
+          "direction": -1
+        },
+        {
+          "wall": "KW022",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_008",
+      "label": "0.008 RLT-Zentrale",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW032",
+          "direction": 1
+        },
+        {
+          "wall": "KW033",
+          "direction": 1
+        },
+        {
+          "wall": "KW034",
+          "direction": 1
+        },
+        {
+          "wall": "KW035",
+          "direction": 1
+        },
+        {
+          "wall": "KW036",
+          "direction": 1
+        },
+        {
+          "wall": "KW037",
+          "direction": 1
+        },
+        {
+          "wall": "KW038",
+          "direction": 1
+        },
+        {
+          "wall": "KW039",
+          "direction": 1
+        },
+        {
+          "wall": "KW040",
+          "direction": 1
+        },
+        {
+          "wall": "W049",
+          "direction": 1
+        },
+        {
+          "wall": "KW042",
+          "direction": 1
+        },
+        {
+          "wall": "KW043",
+          "direction": 1
+        },
+        {
+          "wall": "KW044",
+          "direction": 1
+        },
+        {
+          "wall": "KW045",
+          "direction": 1
+        },
+        {
+          "wall": "KW030",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_009",
+      "label": "0.009 Lager",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW046",
+          "direction": 1
+        },
+        {
+          "wall": "KW043",
+          "direction": -1
+        },
+        {
+          "wall": "KW042",
+          "direction": -1
+        },
+        {
+          "wall": "KW047",
+          "direction": 1
+        },
+        {
+          "wall": "KW048",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_011",
+      "label": "0.011 Kühlraum",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW049",
+          "direction": 1
+        },
+        {
+          "wall": "KW048",
+          "direction": -1
+        },
+        {
+          "wall": "KW050",
+          "direction": 1
+        },
+        {
+          "wall": "KW051",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_010",
+      "label": "0.010 FMR Aufzug",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW050",
+          "direction": -1
+        },
+        {
+          "wall": "KW047",
+          "direction": -1
+        },
+        {
+          "wall": "KW052",
+          "direction": 1
+        },
+        {
+          "wall": "KW053",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "LiftCore",
+      "label": "Aufzug KG",
+      "kind": "unknown",
+      "boundary": [
+        {
+          "wall": "KW052",
+          "direction": -1
+        },
+        {
+          "wall": "W049",
+          "direction": -1
+        },
+        {
+          "wall": "KW054",
+          "direction": 1
+        },
+        {
+          "wall": "W062",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_012",
+      "label": "0.012 Lager",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW056",
+          "direction": 1
+        },
+        {
+          "wall": "KW057",
+          "direction": 1
+        },
+        {
+          "wall": "KW058",
+          "direction": 1
+        },
+        {
+          "wall": "KW059",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_013",
+      "label": "0.013 Lager",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW058",
+          "direction": -1
+        },
+        {
+          "wall": "KW060",
+          "direction": 1
+        },
+        {
+          "wall": "KW061",
+          "direction": 1
+        },
+        {
+          "wall": "KW062",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_014B",
+      "label": "0.014B Garderobe",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW063",
+          "direction": 1
+        },
+        {
+          "wall": "KW059",
+          "direction": -1
+        },
+        {
+          "wall": "KW064",
+          "direction": 1
+        },
+        {
+          "wall": "KW065",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_014C",
+      "label": "0.014C Garderobe",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW064",
+          "direction": -1
+        },
+        {
+          "wall": "KW062",
+          "direction": -1
+        },
+        {
+          "wall": "KW066",
+          "direction": 1
+        },
+        {
+          "wall": "KW067",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_014A",
+      "label": "0.014A",
+      "kind": "unknown",
+      "boundary": [
+        {
+          "wall": "KW068",
+          "direction": 1
+        },
+        {
+          "wall": "KW065",
+          "direction": -1
+        },
+        {
+          "wall": "KW067",
+          "direction": -1
+        },
+        {
+          "wall": "KW069",
+          "direction": 1
+        },
+        {
+          "wall": "KW070",
+          "direction": 1
+        },
+        {
+          "wall": "KW071",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "R3_028",
+      "label": "0.018 Treppenkern · registrierter Konzeptbezug",
+      "kind": "stairwell",
+      "boundary": [
+        {
+          "wall": "KW069",
+          "direction": -1
+        },
+        {
+          "wall": "KW066",
+          "direction": -1
+        },
+        {
+          "wall": "KW061",
+          "direction": -1
+        },
+        {
+          "wall": "KW072",
+          "direction": 1
+        },
+        {
+          "wall": "KW073",
+          "direction": 1
+        },
+        {
+          "wall": "KW074",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_018",
+      "label": "0.018",
+      "kind": "unknown",
+      "boundary": [
+        {
+          "wall": "KW070",
+          "direction": -1
+        },
+        {
+          "wall": "KW074",
+          "direction": -1
+        },
+        {
+          "wall": "KW075",
+          "direction": 1
+        },
+        {
+          "wall": "KW076",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_019",
+      "label": "0.019 Flur",
+      "kind": "corridor",
+      "boundary": [
+        {
+          "wall": "KW004",
+          "direction": -1
+        },
+        {
+          "wall": "KW011",
+          "direction": -1
+        },
+        {
+          "wall": "KW020",
+          "direction": -1
+        },
+        {
+          "wall": "KW028",
+          "direction": -1
+        },
+        {
+          "wall": "KW031",
+          "direction": -1
+        },
+        {
+          "wall": "KW045",
+          "direction": -1
+        },
+        {
+          "wall": "KW044",
+          "direction": -1
+        },
+        {
+          "wall": "KW046",
+          "direction": -1
+        },
+        {
+          "wall": "KW049",
+          "direction": -1
+        },
+        {
+          "wall": "KW051",
+          "direction": -1
+        },
+        {
+          "wall": "KW053",
+          "direction": -1
+        },
+        {
+          "wall": "W062",
+          "direction": -1
+        },
+        {
+          "wall": "KW054",
+          "direction": -1
+        },
+        {
+          "wall": "KW040",
+          "direction": -1
+        },
+        {
+          "wall": "KW077",
+          "direction": 1
+        },
+        {
+          "wall": "KW078",
+          "direction": 1
+        },
+        {
+          "wall": "KW079",
+          "direction": 1
+        },
+        {
+          "wall": "KW080",
+          "direction": 1
+        },
+        {
+          "wall": "KW075",
+          "direction": -1
+        },
+        {
+          "wall": "KW073",
+          "direction": -1
+        },
+        {
+          "wall": "KW072",
+          "direction": -1
+        },
+        {
+          "wall": "KW060",
+          "direction": -1
+        },
+        {
+          "wall": "KW057",
+          "direction": -1
+        },
+        {
+          "wall": "KW056",
+          "direction": -1
+        },
+        {
+          "wall": "KW063",
+          "direction": -1
+        },
+        {
+          "wall": "KW068",
+          "direction": -1
+        },
+        {
+          "wall": "KW081",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_017",
+      "label": "0.017 Heizung",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW079",
+          "direction": -1
+        },
+        {
+          "wall": "KW082",
+          "direction": 1
+        },
+        {
+          "wall": "KW083",
+          "direction": 1
+        },
+        {
+          "wall": "KW084",
+          "direction": 1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_016",
+      "label": "0.016 Sanitärzentrale",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW078",
+          "direction": -1
+        },
+        {
+          "wall": "KW085",
+          "direction": 1
+        },
+        {
+          "wall": "KW086",
+          "direction": 1
+        },
+        {
+          "wall": "KW087",
+          "direction": 1
+        },
+        {
+          "wall": "KW082",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_015",
+      "label": "0.015 Technik / Druckluft",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW077",
+          "direction": -1
+        },
+        {
+          "wall": "KW088",
+          "direction": 1
+        },
+        {
+          "wall": "KW089",
+          "direction": 1
+        },
+        {
+          "wall": "KW090",
+          "direction": 1
+        },
+        {
+          "wall": "KW085",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "KCompressors",
+      "label": "Kompressoren · Zuordnung offen",
+      "kind": "room",
+      "boundary": [
+        {
+          "wall": "KW039",
+          "direction": -1
+        },
+        {
+          "wall": "KW091",
+          "direction": 1
+        },
+        {
+          "wall": "KW092",
+          "direction": 1
+        },
+        {
+          "wall": "KW093",
+          "direction": 1
+        },
+        {
+          "wall": "KW094",
+          "direction": 1
+        },
+        {
+          "wall": "KW095",
+          "direction": 1
+        },
+        {
+          "wall": "KW088",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    },
+    {
+      "id": "K0_020",
+      "label": "0.020",
+      "kind": "unknown",
+      "boundary": [
+        {
+          "wall": "KW038",
+          "direction": -1
+        },
+        {
+          "wall": "KW096",
+          "direction": 1
+        },
+        {
+          "wall": "KW097",
+          "direction": 1
+        },
+        {
+          "wall": "KW098",
+          "direction": 1
+        },
+        {
+          "wall": "KW093",
+          "direction": -1
+        },
+        {
+          "wall": "KW092",
+          "direction": -1
+        },
+        {
+          "wall": "KW091",
+          "direction": -1
+        }
+      ],
+      "confidence": "approximate"
+    }
+  ],
+  "openings": [
+    {
+      "id": "DK001",
+      "wall": "KW004",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK002",
+      "wall": "KW011",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK003B",
+      "wall": "KW007",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK004",
+      "wall": "KW009",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK005A",
+      "wall": "KW017",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK005B",
+      "wall": "KW018",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK006",
+      "wall": "KW028",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK007",
+      "wall": "KW031",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK008",
+      "wall": "KW044",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK009",
+      "wall": "KW046",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK010",
+      "wall": "KW053",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK011",
+      "wall": "KW051",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK012",
+      "wall": "KW056",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK013",
+      "wall": "KW061",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK014B",
+      "wall": "KW065",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK014C",
+      "wall": "KW067",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK014A",
+      "wall": "KW068",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK018",
+      "wall": "KW075",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK017",
+      "wall": "KW079",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK016",
+      "wall": "KW078",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK015",
+      "wall": "KW077",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    },
+    {
+      "id": "DK020",
+      "wall": "KW038",
+      "interval": [
+        0.2,
+        0.7
+      ],
+      "kind": "door",
+      "confidence": "approximate",
+      "connection": "observed"
+    }
+  ],
+  "provenance": {
+    "method": "manual_trace",
+    "source_kind": "photograph_of_plan",
+    "accuracy": "approximate",
+    "notes": [
+      "Private owner-provided HIS 5540 basement photograph manually traced; no photograph dependency or private path is published.",
+      "Already rotated 180 degrees into the common building frame, with nonuniform concept alignment around the vertical cores; no metric or photogrammetric calibration.",
+      "The unlabelled lift footprint and an internal subregion of 0.018 use canonical F03 core bounds for stack compatibility; exact surveyed registration and stair layout remain unknown.",
+      "Small facade projections, escape ladders, services, door swings and equipment are omitted. Kompressoren is not asserted to be room 0.020."
+    ]
+  },
+  "reference_floorplan": {
+    "source": "model/floor-f03.shared.json",
+    "source_sha256": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+  },
+  "registration": {
+    "orientation_deg": 180,
+    "applied_to_literals": true,
+    "basis": "shared_vertical_cores",
+    "metric_scale_known": false,
+    "quality": "concept_alignment"
+  }
+}

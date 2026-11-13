@@ -44,11 +44,11 @@ prüft Identitäten und Abschluss bislang lokal und synthetisch mit seriellen
 Stufen. Eine allgemeine laborübergreifende Botenkoordination und reale
 Transportadapter sind noch zu integrieren.
 
-### Vier Geschosse und vertikaler Austausch
+### Keller, vier Geschosse und vertikaler Austausch
 
-[![Y/Z-Prinzipprojektion des viergeschossigen Konzepts](docs/models/images/building-stack.svg)](docs/building-stack.md)
+[![Y/Z-Prinzipprojektion mit Keller und vier oberirdischen Geschossen](docs/models/images/building-stack.svg)](docs/building-stack.md)
 
-Eine eigene EG-Geometrie und drei Instanzen der F03-Vorlage zeigen das Gebäude mit
+Eigene Keller- und EG-Geometrien sowie drei Instanzen der F03-Vorlage zeigen das Gebäude mit
 angenommenen **4 m lichter Höhe**. Im EG ist der Atriumboden geschlossen; darüber
 bleibt der Luftraum zwischen den Geschossen offen und wird oben vom Glasgewölbe
 geschlossen. Das um 90° gedrehte Glasgewölbe überdeckt auch alle vier
@@ -58,11 +58,15 @@ zwischen Geschossen. [Native Gesamtansicht](docs/media/building-stack-overview.p
 [Antragsbilder mit Annahmen und Prüfgrenzen](docs/building-stack.md).
 Der [alleinstehende Aufzug, das rechte innere Treppenhaus und die äußere Metalltreppe](docs/media/building-stack-circulation.png)
 sind getrennt dargestellt. Aufzug und innere Treppe reichen vom Keller bis ins
-3. OG, die Außentreppe vom Dach bis zum Boden; Kellergeometrie folgt noch.
-Der Aufzug besitzt im EG beide Türseiten, darüber nur die äußere Flurseite.
+3. OG, die Außentreppe vom Dach bis zum Boden. Die [Kellerhöhe](docs/basement-kg.md)
+verwendet vorläufig denselben angenommenen Geschossabstand.
+Der Aufzug besitzt im EG beide Türseiten, darüber nur die äußere Flurseite und im KG nur die innere Seite.
 [EG mit Seminarraum und verlegten Toiletten](docs/ground-floor-eg.md) ·
 [Gewölbtes Glasdach und Dachumrandung](docs/media/building-stack-roof.png).
 Horizontale Maße und technische Details bleiben vorläufige Darstellungsannahmen.
+[Glasfront, holzfarbene Raumtüren und offene Metallgeländer](docs/building-exterior.md)
+folgen den privaten Referenzfotos. Ein schematischer Gelände-Schnittkasten auf
+EG-Höhe macht den Keller in der Gesamtansicht als unterirdisch erkennbar.
 
 [![Labor 3.003 im Gebäudekontext](docs/media/building-stack-lab-3-003.png)](docs/building-stack.md)
 

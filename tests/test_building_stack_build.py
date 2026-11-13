@@ -13,7 +13,7 @@ import build_building_stack as build
 class BuildingBuildTests(unittest.TestCase):
     def scene(self):
         levels=[];geometry=[]
-        for i in range(4):
+        for i in range(5):
             z=i*4250.;floor='Floor'+str(i);wall='Wall'+str(i)
             levels.append({'id':'L'+str(i),'z_mm':z,'slab_bottom_mm':z-250,'slab_top_mm':z,'clear_top_mm':z+4000,'floor_bodies':[floor],'wall_bodies':[wall]})
             geometry.extend([{'body':floor,'bbox':{'min':[0,0,z-250],'max':[100,100,z]}},{'body':wall,'bbox':{'min':[0,0,z],'max':[100,1,z+4000]}}])
@@ -98,13 +98,13 @@ class BuildingBuildTests(unittest.TestCase):
         probe={'id':'Synthetic','kind':'polygon_prism','points_mm':[[0,0],[2,0],[2,3],[0,3]],'offset_mm':0,'depth_mm':2,'target_bodies':['Wall']}
         circ={key:[]for key in ['door_probes','closed_door_probes','slab_hole_probes','connection_witnesses','shaft_witnesses']}
         circ['stairs']=[{'connectors':[{}, {}, {}]}]
-        for key,count in [('door_probes',5),('slab_hole_probes',3)]:
+        for key,count in [('door_probes',6),('slab_hole_probes',3)]:
             circ[key]=[{**probe,'id':key+str(i)}for i in range(count)]
-        circ['closed_door_probes']=[{**probe,'id':'closed'+str(i),'target_body':'Wall','expected_volume_mm3':12.}for i in range(3)]
+        circ['closed_door_probes']=[{**probe,'id':'closed'+str(i),'target_body':'Wall','expected_volume_mm3':12.}for i in range(4)]
         for key,count in [('connection_witnesses',9),('shaft_witnesses',4)]:
             circ[key]=[{**probe,'id':key+str(i),'target_bodies':['Connector','Floor'],'expected_volumes_mm3':{'Connector':12.,'Floor':12.}}for i in range(count)]
         checks=build.circulation_probe_specs({'circulation':circ})
-        self.assertEqual(len(checks),24)
+        self.assertEqual(len(checks),26)
         self.assertEqual(checks[-1]['expected'],{'Connector':12.,'Floor':12.})
         changed=copy.deepcopy(circ);changed['connection_witnesses'][0]['expected_volumes_mm3']['Floor']=6.
         with self.assertRaises(ValueError):build.circulation_probe_specs({'circulation':changed})
@@ -116,24 +116,24 @@ class BuildingBuildTests(unittest.TestCase):
         with self.assertRaises(ValueError):build.circulation_probe_specs({'circulation':changed})
 
     def test_elevator_open_and_closed_faces_and_stair_endpoints_are_distinct(self):
-        levels=[{'id':name,'z_mm':i*4250.,'slab_bottom_mm':i*4250.-250}for i,name in enumerate(['EG','OG1','OG2','OG3'])]
-        ports=[{'level_id':level['id'],'side':side,'active':i==0 or side=='outward','wall':side+'Wall'}for i,level in enumerate(levels)for side in ['outward','inward']]
+        levels=[{'id':name,'z_mm':i*4250.,'slab_bottom_mm':i*4250.-250}for i,name in enumerate(['KG','EG','OG1','OG2','OG3'])]
+        ports=[{'level_id':level['id'],'side':side,'active':(side=='inward' if i==0 else i==1 or side=='outward'),'wall':side+'Wall'}for i,level in enumerate(levels)for side in ['outward','inward']]
         connectors=[{'body_id':'East'+str(i),'from_level':a['id'],'to_level':b['id']}for i,(a,b)in enumerate(zip(levels,levels[1:]))]
         geometry=[{'body':c['body_id'],'component':'EastStair','bbox':{'min':[0,0,levels[i]['z_mm']-5.],'max':[1,1,levels[i+1]['z_mm']]}}for i,c in enumerate(connectors)]
         geometry += [{'body':name,'component':'BuildingLift','bbox':{'min':[0,0,0],'max':[1,1,16750]}}for name in ['Shaft','Cabin','Frame']]
-        circ={'elevator':{'doors_by_level':{'EG':['outward','inward'],'OG1':['outward'],'OG2':['outward'],'OG3':['outward']},'ports':ports,
-                         'deferred_stops':[{'id':'KG','sides':['inward'],'elevation_mm':None,'status':'awaiting_plan'}],
+        circ={'elevator':{'doors_by_level':{'KG':['inward'],'EG':['outward','inward'],'OG1':['outward'],'OG2':['outward'],'OG3':['outward']},'ports':ports,
+                         'deferred_stops':[],
                          'shaft_body_ids':['Shaft'],'cabin_body_ids':['Cabin'],'door_frame_body_ids':['Frame'],'component_id':'BuildingLift',
                          'served_extent':{'from_level':'KG','to_level':'OG3'}},
               'stairs':[{'area':'R3_028','component_id':'EastStair','connectors':connectors,'body_ids':[c['body_id']for c in connectors],
                          'served_extent':{'from_level':'KG','to_level':'OG3'},
-                         'planned_connectors':[{'from_level':'KG','to_level':'EG','z0_mm':None,'z1_mm':None,'body_id':None,'status':'awaiting_plan'}]}],
+                         'planned_connectors':[]}],
               'body_ids':[body['body']for body in geometry],
-              'detail_visibility_ids':['Shaft','Cabin'], 'closed_door_probes':[{'target_body':level['id']+'__Wall_inwardWall'}for level in levels[1:]]}
+              'detail_visibility_ids':['Shaft','Cabin'], 'closed_door_probes':[{'target_body':level['id']+'__Wall_'+side+'Wall'}for level in levels for side in ['inward','outward'] if not (side=='inward' if level['id']=='KG' else level['id']=='EG' or side=='outward')]}
         contract={'levels':levels,'circulation':circ}
-        self.assertEqual(len(build.circulation_geometry(contract,geometry)),5)
+        self.assertEqual(len(build.circulation_geometry(contract,geometry)),6)
         self.assertTrue(all(c['passed']for c in build.circulation_geometry(contract,geometry)))
-        changed=copy.deepcopy(contract);changed['circulation']['elevator']['ports'][3]['active']=True
+        changed=copy.deepcopy(contract);changed['circulation']['elevator']['ports'][0]['active']=True
         with self.assertRaises(ValueError):build.circulation_geometry(changed,geometry)
         changed=copy.deepcopy(contract);changed['circulation']['closed_door_probes'][0]['target_body']='AnotherWall'
         with self.assertRaises(ValueError):build.circulation_geometry(changed,geometry)
@@ -143,7 +143,7 @@ class BuildingBuildTests(unittest.TestCase):
         self.assertFalse(all(c['passed']for c in build.circulation_geometry(contract,changed)))
         changed=copy.deepcopy(contract);changed['circulation']['stairs'].append({**circ['stairs'][0],'area':'R3_017'})
         with self.assertRaises(ValueError):build.circulation_geometry(changed,geometry)
-        changed=copy.deepcopy(contract);changed['circulation']['stairs'][0]['planned_connectors'][0]['body_id']='BasementBody'
+        changed=copy.deepcopy(contract);changed['circulation']['stairs'][0]['planned_connectors'].append({'body_id':'BasementBody'})
         with self.assertRaises(ValueError):build.circulation_geometry(changed,geometry)
 
 
@@ -161,13 +161,13 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
             if report['backends']not in {backend,'both'}:continue
             proof=report['solidcraft_checks']if backend=='solidcraft'else json.loads((ROOT/report['files']['freecad_validation']).read_text())
             self.assertTrue(proof['passed']);self.assertEqual({c['id']for c in proof['probe_checks']},expected)
-            self.assertEqual(len(proof['z_checks']),7);self.assertTrue(all(c['passed']for c in proof['z_checks']+proof['probe_checks']))
+            self.assertEqual(len(proof['z_checks']),9+(5 if contract.get('exterior') else 0));self.assertTrue(all(c['passed']for c in proof['z_checks']+proof['probe_checks']))
             if contract.get('circulation'):
                 stairs=contract['circulation']['stairs']
                 self.assertEqual([stair['area']for stair in stairs],['R3_028'])
                 external=contract['circulation'].get('external_stairs',[])
                 if external:self.assertEqual([(stair['area'],stair['classification'])for stair in external],[('R3_017','external_metal')])
-                expected_geometry={'separate_stair_and_elevator_groups','no_basement_geometry'}|{c['body_id']+'_end_levels'for stair in stairs+external for c in stair['connectors']}
+                expected_geometry={'separate_stair_and_elevator_groups','circulation_within_modeled_extent'}|{c['body_id']+'_end_levels'for stair in stairs+external for c in stair['connectors']}
                 self.assertEqual({check['id']for check in proof['circulation_geometry_checks']},expected_geometry)
                 self.assertTrue(all(c['passed']for c in proof['circulation_geometry_checks']))
                 by_id={check['id']:check for check in proof['probe_checks']}

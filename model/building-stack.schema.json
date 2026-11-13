@@ -32,7 +32,8 @@
       "required": [
         "floorplan",
         "room_geometry",
-        "ground_floor"
+        "ground_floor",
+        "basement"
       ],
       "additionalProperties": false,
       "properties": {
@@ -73,6 +74,24 @@
           ]
         },
         "ground_floor": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "basement": {
           "allOf": [
             {
               "$ref": "assembly-reference.schema.json#/$defs/reference"
@@ -225,9 +244,26 @@
     },
     "levels": {
       "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
+      "minItems": 5,
+      "maxItems": 5,
       "prefixItems": [
+        {
+          "type": "object",
+          "required": [
+            "id",
+            "label"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "const": "KG"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
         {
           "type": "object",
           "required": [
@@ -495,21 +531,14 @@
                 "EG": [
                   "outward",
                   "inward"
+                ],
+                "KG": [
+                  "inward"
                 ]
               }
             },
             "deferred_stops": {
-              "const": [
-                {
-                  "id": "KG",
-                  "label": "KG (geplant)",
-                  "elevation_mm": null,
-                  "status": "awaiting_plan",
-                  "sides": [
-                    "inward"
-                  ]
-                }
-              ]
+              "const": []
             },
             "cabin_level": {
               "const": "EG"
@@ -629,7 +658,7 @@
               "const": false
             },
             "basement_geometry_implemented": {
-              "const": false
+              "const": true
             }
           }
         },
@@ -882,6 +911,9 @@
           }
         }
       }
+    },
+    "exterior": {
+      "$ref": "building-exterior.schema.json"
     }
   }
 }
