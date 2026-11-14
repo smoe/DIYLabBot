@@ -54,6 +54,15 @@ Entwurf mit offenen Eingaben ist beim normalen Aufruf zulässig. Auch ein
 vollständig ausgefüllter Plan besitzt immer `execution_ready: false` und den
 Blocker `extraction_execution_unimplemented`. Er ersetzt keine Extraktionslaufzeit.
 
+Die separate [synthetische DNeasy-69504-Laufzeit](dneasy-extraction.md) bindet
+inzwischen die DNA-Linie dieses Plans an geordnete Zellschritte, den gemeinsamen
+Material-Ledger und manuelle TapeStation-QC. Diese neue Laufart ändert weder
+E1-Bytes noch dessen Freigabestatus. Sie ist kein realer Extraktionsadapter;
+RNA und die vorhandenen Messläufe behalten ihre eigenständigen Verträge.
+Die weitere [Puregene-Familie](puregene-extraction.md) verwendet eine separate
+Zellquelle mit Protein-/DNA-Präzipitation, während die gemeinsame Ablaufhülle,
+der Material-Ledger und die synthetische TapeStation-QC wiederverwendet werden.
+
 Herstellerreferenzen enthalten URL, konsultierte Revision und Zugriffsdatum.
 Die Hersteller-PDFs sind damit nicht lokal bytegeprüft oder als unsere SOP
 qualifiziert. Eine ausgewählte lokale, maschinenlesbare SOP wird separat durch

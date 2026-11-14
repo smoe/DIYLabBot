@@ -1208,14 +1208,113 @@ Materialrollen, Fraktionsbezüge, Produktabstammung und offene Anforderungen ab.
 Das Schema verwendet die vorhandenen Quellenreferenzen. Ein Providername ist
 keine Gerätequalifikation; `execution_ready` bleibt ausdrücklich falsch.
 
-Vor einer Laufzeitintegration müssen zurückbehaltene Extrakte, umgewandelte
-Eingangsmaterialien und typisierte Verbräuche im gemeinsamen Lebenszyklus und
-Ledger unterstützt werden. Die bestehende Entsorgungsbedingung für abgeleitete
-Messgefäße und die reine µL-Originalentnahmebilanz reichen dafür nicht aus.
-Es gibt hier keinen zweiten Bestand, kein Ausführungsjournal und keinen
-Extraktionsadapter. CF01, NanoDrop- und Qubit-Verträge bleiben eigenständig;
-Zentrifugeneignung und analytspezifische QC sind später ausdrücklich zu binden.
+Der gemeinsame E2-Materiallebenszyklus unterstützt inzwischen zurückbehaltene
+Produkte, umgewandelte Eingangsmaterialien und typisierte Verbräuche. Die
+Vorbereitung bleibt wirkungsfrei; ihre offenen Bindungen werden nicht durch
+E2-Tests zu einer freigegebenen SOP. Die bisherigen Messläufe behalten ihre
+Abschlussregeln und µL-Originalentnahmebilanz. CF01, NanoDrop- und Qubit-Verträge
+bleiben eigenständig; Zentrifugeneignung ist ausdrücklich nachzuweisen.
 
+### Synthetische DNeasy-69504-Extraktion und TapeStation-QC
+
+Der [DNeasy-Durchstich](docs/dneasy-extraction.md) wählt ausschließlich die
+DNA-Linie des bestehenden E1-Zellpelletplans aus. Neue referenzierende Quellen
+unter `model/dneasy-extraction.*.json` beschreiben die geordneten Zellschritte
+für Blood & Tissue 69504 und einen vollständig fiktiven Testfall. Eine eigene
+RNA-Eingangskopie oder eine neue Bestandsdatenbank wird nicht eingeführt.
+E1-Quellen und aktive alte Journale bleiben unverändert.
+
+`DNeasyWorkflow` verwendet `MaterialWorkflow`, den gemeinsamen Material-Ledger
+und dasselbe Journal. Das bestehende Formatpaar `material-workflow-*/2` erhält
+den eigenen Typ und Engine-Guard `dneasy_synthetic/1`; andere Engines dürfen
+diesen Lauf weder öffnen noch über generische Materialoperationen umgehen.
+Materialeffekt, bestätigte Phasenfortsetzung, Absicht und Ressourcen werden
+atomar gespeichert. Reine Prozessphasen wie Mischen, Inkubation und Spin haben
+eigene Absichten und ausdrücklich synthetische Zeit-/Temperatur-/RCF-Belege.
+
+Eingangszellen, Flüssigkeitsgemische, gebundene DNA, Durchflüsse, Waschabfälle,
+Eluat und Säulenrest besitzen getrennte Identitäten und bestätigte Dispositionen.
+Gebundene DNA-Masse bleibt unbekannt; sie wird nicht aus Zellzahl oder Volumen
+berechnet. Das Eluat bleibt als Produkt erhalten. Eine abweichende oder
+unbekannte tatsächliche Dosierung darf keinen normalen Fortgang oder
+Erfolgsabschluss auslösen; bestätigte Istverbräuche bleiben dennoch erhalten.
+Neustart und unklare Wirkungen verlangen ausdrücklichen Abgleich. Die erste
+Fassung startet mit einem vorhandenen Pellet, wählt eine Elution und bietet
+keine automatische Wiederholung nach Nichtdurchführung oder Übertragskorrektur.
+
+Die vorhandene manuelle TS01 mit 4200-Planungsreferenz wird über
+`model/tapestation-gdna.protocol.json` an Genomic DNA ScreenTape gebunden.
+Die CAD-Quelle und deren noch offene Modellwahl werden nicht umgeschrieben.
+Ladder und Probe erhalten getrennte Ansatzabsichten und Reagenzbuchungen.
+Die QC-Entnahme belastet das Eluat einmal; Import und Bewertung buchen keine
+weitere Probenentnahme. Assaybereitschaft, Misch-/Spinbelege, Beladung, Laufende,
+Ladder-Annahme, Import, Bewertung und Arbeitsplatzrückgabe bleiben getrennt.
+
+Das begrenzte Importformat ist ausdrücklich synthetisches JSON. Workflow,
+Instrumentlauf, Analyse, Messung, Lane, Sample, Eluat, Ansatzgefäß und
+Inhaltsrevision werden zugeordnet; Originalbytes bleiben als Journalartefakt
+erhalten. DIN und Fragmentgröße werden getrennt geführt. Unbekannte Flags,
+fehlende Metriken und zensierte Größen begründen keinen stillen Erfolg.
+Die abschließende Policy ist eine ausdrücklich synthetische Testvorgabe,
+keine Hersteller- oder biologische Freigabe. Beide Messansätze benötigen
+nach der Bewertung eine bestätigte Disposition; das Eluat bleibt erhalten.
+Ein Abbruch nach angelegtem TapeStation-Auftrag benötigt einen eigenen,
+identitätsgebundenen Stillstands-/Rücknahmebeleg. Die Stornoabsicht allein
+gibt Instrument und Arbeitsplatz nicht frei und sendet keinen Geräte-Stopp.
+
+Einstieg: `python3 scripts/run_dneasy_extraction.py --help`. Nur `demo` liefert
+die erfundenen positiven Beobachtungen. Es werden weder reale Extraktion noch
+Geräte, Pipetten, Heizungen, Zentrifugen, Netzwerke oder Roboter ausgeführt.
+Native TapeStation-Exporte, tatsächliche DNA-Integrität/-Ausbeute,
+Rotor-/Säulenpassung, reale SOP, Kontaminationsschutz und Sicherheit bleiben
+unqualifiziert. Laufübergreifende Restmengen-/Ownerübernahme bleibt offen.
+
+
+### Puregene-Zellextraktion und gemeinsamer Extraktionskern
+
+Die [Puregene-Ausprägung](docs/puregene-extraction.md) verwendet den eigenen
+Quellenvertrag `model/puregene-extraction.*.json` für die kleine kultivierte
+Zellvariante des Puregene Cell Kit. Sie behält DNeasy als eigene Familie.
+`scripts/extraction_workflow.py` führt die gemeinsame geordnete Absicht-/
+Bestätigungshülle und TapeStation-QC einmal; die beiden schmalen Adapter
+binden Quelle, Engine-Guard und Bericht. Gemeinsame QC-Bindung, Demo und CLI
+werden ebenfalls wiederverwendet. Die Material-/Journalimplementierung und
+deren alte Formate werden nicht umgeschrieben oder migriert.
+
+Puregene wechselt die zurückzubehaltende Fraktion: Nach Proteinpräzipitation
+geht der DNA-haltige Überstand weiter; nach DNA-Präzipitation mit Isopropanol
+und während der Ethanolwäsche bleibt das DNA-Pellet zurück. Vor tatsächlicher
+Trennung besitzt das physische Gefäß ein zusammengesetztes kanonisches Material.
+Benannte Fraktionszustände sind Prozessmetadaten ohne eigene Mengenbilanz.
+Es werden weder ein zweites Pelletgefäß noch gleichzeitig zwei unabhängig
+beschreibbare Bestände in derselben Tube erfunden.
+
+Die synthetische Pipettieradaption benennt eine reale Transfer-Spitze als
+temporären Prozessgegenstand: DNA-Überstand aufnehmen, Proteinpellet im alten
+Gefäß erhalten, dann in das separat mit Isopropanol vorbereitete Gefäß abgeben.
+Das Proteinpellet erhält keinen falschen Isopropanol-Elternbezug. Unterbrechung
+in diesem Zustand behält Material, Spitze und reservierte Ressourcen bei.
+Diese Anpassung des im Handbuch beschriebenen Gießens ist nicht mechanisch
+oder biologisch qualifiziert und erzeugt keine Roboterbahn.
+
+Lysis, Inversionen, RCF, Pelletretention, Ethanolwäsche, Trocknung und Hydratation
+benötigen explizite Belege. Die als „overnight“ beschriebene Hydratation erhält
+nur im synthetischen Testprofil eine feste erfundene Dauer; diese ist keine
+Hersteller- oder SOP-Freigabe. Bekannte Fehlverarbeitung kann ausdrücklich
+abnormal als durchgeführt abgeglichen werden: tatsächliche Buchungen und
+negative Beobachtungen bleiben erhalten, Kandidaten werden quarantänisiert,
+die Retention gilt nicht als bestätigt und nur kontrollierter Abbruch bleibt
+möglich. Unbekannte Wirkungen werden dadurch nicht als durchgeführt angenommen.
+Retentionsmetadaten folgen dem aktuellen DNA-Material. Bestätigte Nullausgänge
+dieses Stroms oder einer ausdrücklich benötigten Vorlage bleiben gebucht und
+sperren die Fortsetzung; unbekannte Mengen bleiben `null`.
+
+Einstieg: `python3 scripts/run_puregene_extraction.py --help`. Die gemeinsame
+TS01-/ScreenTape-Bindung erhält separate Ladder-/Probenansätze und einmalige
+QC-Entnahme. DIN, Größenbereich, Originalartefakte, Review und Abbruchfreigaben
+bleiben getrennt. Reale Pellet-/Spitzenhandhabung, Zentrifugation, Hydratation,
+native Exporte, Geräte-/Netzwerk-/Roboterbetrieb, biologische Leistung und
+Sicherheit bleiben unqualifiziert; TapeStation belegt keine beliebig große DNA.
 
 ### Passive Kitstation K01
 

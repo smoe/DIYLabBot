@@ -1,0 +1,714 @@
+{
+  "format": "solidcraftbot.dneasy-extraction-protocol/1",
+  "id": "DNeasy.69504.MammalianCells.Synthetic.1",
+  "mode": "synthetic_only",
+  "kit_id": "dneasy_blood_tissue_69504",
+  "sample_class": "cultured_mammalian_cell_pellet",
+  "manufacturer_reference": {
+    "url": "https://www.qiagen.com/en-US/resources/download/KitHandbook/hb-2061-004-hb-dny-blood-tissue-0623-ww",
+    "revision": "HB-2061-004, June 2023",
+    "pages": "29-32",
+    "accessed_on": "2026-11-14",
+    "scope": "Cultured mammalian-cell spin-column procedure; factual process parameters only, not a qualified local SOP."
+  },
+  "input_limit_cells": 5000000,
+  "branch_policy": {
+    "rnase": "explicit_profile_selection_before_AL",
+    "elution": "single_elution_only",
+    "carryover": "hold_and_reconcile_no_automatic_repeat"
+  },
+  "units": {
+    "duration_s": "s",
+    "temperature_min_deg_c": "degC",
+    "temperature_max_deg_c": "degC",
+    "rcf_min_x_g": "x_g"
+  },
+  "steps": [
+    {
+      "id": "confirm_buffers",
+      "kind": "observation",
+      "phase": "prepare_input",
+      "operation": "confirm_selected_prepared_buffers",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "sample_pellet_identity_confirmed",
+        "kit_69504_confirmed",
+        "buffers_AL_AW1_AW2_AE_confirmed",
+        "wash_buffers_prepared_with_ethanol",
+        "AL_precipitate_resolved",
+        "clean_collection_and_elution_vessels_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "resuspend_pbs",
+      "kind": "effect",
+      "phase": "prepare_input",
+      "operation": "resuspend_identified_cell_pellet",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "pellet_resuspended"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "cells"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "PBS",
+          "quantity": {
+            "value": 200,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "suspension",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "suspension",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "mix_resuspension",
+      "kind": "observation",
+      "phase": "prepare_input",
+      "operation": "confirm_resuspension",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "homogeneous_resuspension_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_proteinase_k",
+      "kind": "effect",
+      "phase": "lyse_homogenize",
+      "operation": "add_proteinase_k",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "ProteinaseK",
+          "quantity": {
+            "value": 20,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "pk_mix",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "pk_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "rnase_decision",
+      "kind": "observation",
+      "phase": "decide_rnase",
+      "operation": "confirm_explicit_rnase_branch",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "selected_rnase_branch_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_rnase",
+      "kind": "effect",
+      "phase": "decide_rnase",
+      "operation": "add_selected_rnase_A",
+      "when": "rnase_selected",
+      "parameters": {},
+      "required_checks": [
+        "RNase_A_100_mg_per_ml_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "RNaseA",
+          "quantity": {
+            "value": 4,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "rnase_mix",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "rnase_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "incubate_rnase",
+      "kind": "incubation",
+      "phase": "decide_rnase",
+      "operation": "incubate_selected_rnase",
+      "when": "rnase_selected",
+      "parameters": {
+        "duration_s": 120,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25
+      },
+      "required_checks": [
+        "incubation_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_al",
+      "kind": "effect",
+      "phase": "lyse_homogenize",
+      "operation": "add_buffer_AL",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "AL",
+          "quantity": {
+            "value": 200,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "lysis_mix",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "lysis_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "mix_al",
+      "kind": "observation",
+      "phase": "lyse_homogenize",
+      "operation": "mix_after_AL",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "mixed_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "incubate_lysis",
+      "kind": "incubation",
+      "phase": "lyse_homogenize",
+      "operation": "incubate_lysis",
+      "when": "always",
+      "parameters": {
+        "duration_s": 600,
+        "temperature_min_deg_c": 56,
+        "temperature_max_deg_c": 56
+      },
+      "required_checks": [
+        "incubation_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_ethanol",
+      "kind": "effect",
+      "phase": "condition_binding",
+      "operation": "add_ethanol_96_to_100_percent",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "ethanol_96_to_100_percent_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "Ethanol",
+          "quantity": {
+            "value": 200,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "binding_mix",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "binding_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "mix_binding",
+      "kind": "observation",
+      "phase": "condition_binding",
+      "operation": "mix_binding_conditions",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "mixed_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "load_column",
+      "kind": "effect",
+      "phase": "bind_column",
+      "operation": "load_identified_DNeasy_Mini_column",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "column_and_collection_identity_confirmed",
+        "complete_load_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "loaded_column",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "loaded_column",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "spin_bind",
+      "kind": "effect",
+      "phase": "bind_column",
+      "operation": "centrifuge_binding",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25,
+        "rcf_min_x_g": 6000
+      },
+      "required_checks": [
+        "spin_complete",
+        "column_retained",
+        "flowthrough_identity_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "bound_dna",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "bound_dna",
+          "unit": "ng"
+        },
+        {
+          "token": "bind_flowthrough",
+          "kind": "byproduct",
+          "vessel_role": "bind_collection",
+          "role": "bind_flowthrough",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "change_collection_aw1",
+      "kind": "observation",
+      "phase": "wash_column",
+      "operation": "place_column_in_new_AW1_collection_tube",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "new_collection_vessel_confirmed",
+        "previous_flowthrough_identity_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_aw1",
+      "kind": "effect",
+      "phase": "wash_column",
+      "operation": "add_prepared_AW1",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "AW1_prepared_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "ng"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "AW1",
+          "quantity": {
+            "value": 500,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "aw1_mix",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "aw1_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "spin_aw1",
+      "kind": "effect",
+      "phase": "wash_column",
+      "operation": "centrifuge_AW1_wash",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25,
+        "rcf_min_x_g": 6000
+      },
+      "required_checks": [
+        "spin_complete",
+        "column_retained",
+        "flowthrough_identity_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "aw1_bound_dna",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "aw1_bound_dna",
+          "unit": "ng"
+        },
+        {
+          "token": "aw1_flowthrough",
+          "kind": "byproduct",
+          "vessel_role": "aw1_collection",
+          "role": "aw1_flowthrough",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "change_collection_aw2",
+      "kind": "observation",
+      "phase": "wash_column",
+      "operation": "place_column_in_new_AW2_collection_tube",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "new_collection_vessel_confirmed",
+        "previous_flowthrough_identity_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_aw2",
+      "kind": "effect",
+      "phase": "wash_column",
+      "operation": "add_prepared_AW2",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "AW2_prepared_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "ng"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "AW2",
+          "quantity": {
+            "value": 500,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "aw2_mix",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "aw2_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "spin_aw2_dry",
+      "kind": "effect",
+      "phase": "dry_column",
+      "operation": "centrifuge_AW2_wash_and_membrane_drying",
+      "when": "always",
+      "parameters": {
+        "duration_s": 180,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25,
+        "rcf_min_x_g": 20000
+      },
+      "required_checks": [
+        "spin_complete",
+        "column_retained",
+        "no_flowthrough_carryover_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "dry_dna",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "dry_dna",
+          "unit": "ng"
+        },
+        {
+          "token": "aw2_flowthrough",
+          "kind": "byproduct",
+          "vessel_role": "aw2_collection",
+          "role": "aw2_flowthrough",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "move_to_elution_tube",
+      "kind": "observation",
+      "phase": "elute",
+      "operation": "place_column_in_clean_elution_tube",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "clean_elution_vessel_confirmed",
+        "column_no_flowthrough_contact_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "add_ae",
+      "kind": "effect",
+      "phase": "elute",
+      "operation": "add_buffer_AE_to_membrane",
+      "when": "always",
+      "parameters": {},
+      "required_checks": [
+        "AE_identity_confirmed",
+        "membrane_dosed_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "ng"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "AE",
+          "quantity": {
+            "value": 200,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "elution_mix",
+          "kind": "intermediate",
+          "vessel_role": "column",
+          "role": "elution_mix",
+          "unit": "uL"
+        }
+      ]
+    },
+    {
+      "id": "incubate_elution",
+      "kind": "incubation",
+      "phase": "elute",
+      "operation": "incubate_membrane_for_single_elution",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25
+      },
+      "required_checks": [
+        "incubation_confirmed"
+      ],
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "id": "spin_elute",
+      "kind": "effect",
+      "phase": "elute",
+      "operation": "collect_single_retained_DNA_eluate",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25,
+        "rcf_min_x_g": 6000
+      },
+      "required_checks": [
+        "spin_complete",
+        "eluate_identity_confirmed",
+        "eluate_retained"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "product",
+          "kind": "product",
+          "vessel_role": "elution",
+          "role": "dna_eluate",
+          "unit": "uL"
+        },
+        {
+          "token": "column_residue",
+          "kind": "byproduct",
+          "vessel_role": "column",
+          "role": "column_residue",
+          "unit": "ng"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Synthetic process observations only; no biochemical or hardware execution.",
+    "A preexisting identified cell pellet is the input; no unobserved harvesting step is asserted.",
+    "Bound DNA mass is unknown and is not inferred from cells or liquid volumes.",
+    "Single elution only; second elution and carryover recovery are not automatically executed.",
+    "No centrifuge, rotor, adapter, liquid handling, temperature, sterility or safety qualification."
+  ]
+}

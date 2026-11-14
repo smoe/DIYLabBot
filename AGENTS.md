@@ -613,6 +613,83 @@ Lebenszyklus und Ledger für Produktaufbewahrung, Materialumwandlung und
 SOP-gebundene Verbräuche erweitern; keinen parallelen Bestand einführen.
 
 
+### Synthetische DNeasy-Extraktion und TapeStation-QC
+
+Vor Änderungen [docs/dneasy-extraction.md](docs/dneasy-extraction.md) lesen.
+`model/dneasy-extraction.*.json` referenziert den unveränderten E1-Plan und
+wählt dessen DNA-Linie für DNeasy Blood & Tissue 69504 aus. Kein zusätzliches
+RNA-Eingangsmaterial erfinden. `DNeasyWorkflow` nutzt das gemeinsame
+Material-Formatpaar `/2` mit eigenem `dneasy_synthetic/1`-Guard; andere Engines
+und generische Materialbefehle dürfen seine Reihenfolge nicht umgehen.
+E1 bleibt wirkungsfreie Vorbereitung; alte Journale nicht migrieren.
+
+Materialeffekte und Phasenfortschritt gemeinsam committen. Reine Misch-,
+Inkubations- und Spinphasen benötigen ebenfalls gespeicherte Absichten und
+ausdrückliche synthetische Beobachtungen. RCF nicht durch RPM ersetzen.
+Istverbräuche erhalten; abweichende oder unbekannte Dosierung darf keinen
+normalen Erfolgsabschluss ergeben. Unklare Absichten und Ressourcen nach
+Neustart erhalten und ausdrücklich abgleichen. Eine Nichtdurchführung oder
+ein Übertragungsproblem erlaubt keine automatische Phasenwiederholung.
+
+Säulenfraktion, Durchfluss, Waschabfälle, Eluat und Säulenrest getrennt führen.
+DNA-Masse nicht aus Zellzahl oder Flüssigkeitsvolumen ableiten; unbekannt bleibt
+`null`. Das Eluat bleibt als Produkt erhalten. Die erste Fassung beschreibt
+ein vorhandenes Pellet und eine Elution, keine allgemeine Extraktionsmaschine.
+
+TS01 und deren 4200-Planungsreferenz wiederverwenden. Assay-/Ergebnisvertrag
+steht separat unter `model/tapestation-gdna.*.json`; die CAD-Hülle bleibt ohne
+Geräteadapter oder nativen Exportdecoder. Ladder und Probenansatz mit getrennten
+Elternbezügen und Reagenzbuchungen vorbereiten. QC-Entnahme genau einmal buchen;
+Ergebnisimport oder Review darf das Eluat nicht nochmals belasten.
+Instrumentlauf, Analyse, Messung, Lane, Material, Gefäß und Inhaltsrevision
+explizit binden. Originalbytes erhalten; veränderte oder entsorgte Ansätze
+dürfen keine aktuelle Messung vortäuschen. Laden, Messende, Import, fachliche
+Entscheidung und Entsorgung der Messansätze getrennt bestätigen.
+Nach angelegtem TapeStation-Auftrag vor Abbruchfreigabe einen eigenen
+identitätsgebundenen Stillstands-/Rücknahmebeleg verlangen; Storno ist kein
+Geräte-Stopp und gibt Instrument-/Arbeitsplatzreservierungen nicht allein frei.
+
+DIN und Fragmentgröße unterscheiden. Fehlende Metriken, unbekannte Flags oder
+zensierte Größen nicht still freigeben; synthetische Policywerte sind keine
+Hersteller- oder biologische Freigabe. Geräte-/Netzwerk-/Roboterbetrieb,
+reale SOP, Flüssigkeitshandhabung, Zentrifugeneignung und Sicherheit bleiben
+ungeprüft. Die Vorgabe fließender Bewegungen gilt für spätere Bewegungsadapter.
+
+### Puregene und gemeinsamer Extraktionskern
+
+Vor Änderungen [docs/puregene-extraction.md](docs/puregene-extraction.md) lesen.
+Puregene und DNeasy führen getrennte Protokoll-/Profilquellen und Engine-Guards;
+die geordnete Ausführung, Wiederaufnahme und TapeStation-QC liegen gemeinsam
+in `scripts/extraction_workflow.py`. Quellenbindung, Fixture-/CLI-Hülle und
+QC-Bindung wiederverwenden. Keine zweite Prozesszustandsmaschine oder
+Materialbilanz pro Kit pflegen; historische Quellen/Journale nicht migrieren.
+
+Bei Puregene nach Proteinpräzipitation den DNA-Überstand, danach das DNA-Pellet
+erhalten. Solange Pellet und Flüssigkeit in derselben Tube liegen, ein einziges
+zusammengesetztes kanonisches Material führen; Fraktionsmetadaten sind keine
+zweite Mengenprojektion. Erst bestätigte physische Transfers trennen Materialien
+in tatsächlich vorhandenen Prozessgegenständen. Eine deklarierte Transfer-Spitze
+ist keine virtuelle Pelletablage. Pipettieren statt Gießen ausdrücklich als
+unqualifizierte Automationsadaption führen; kein falscher Isopropanol-Elternbezug
+am zurückgelassenen Proteinpellet.
+
+Unbekannte Pelletmassen nicht aus Volumina oder Zellzahl ableiten. Pelletverlust,
+falsche Retention und Über-Trocknung sperren normale Fortsetzung. Für bekannte
+Fehlverarbeitung einen ausdrücklichen abnormalen Durchführungsabgleich mit
+Istwerten, Quarantäne und ausschließlich kontrolliertem Abbruch verwenden;
+keine positiven Beobachtungen erfinden und keine falsche Nichtdurchführung
+zur Freigabe verlangen. Unbekannt bleibt unbekannt. „Overnight“ nur als offene
+Herstellerangabe beziehungsweise ausdrücklich synthetische Fixturezeit führen,
+keine ausgedachte freigegebene SOP-Dauer. Die bisherigen Grenzen für reale
+Geräte, Bewegungen, Pellet-/Flüssigkeitshandhabung und biologische Leistung
+bleiben erhalten.
+
+Retention nach Materialumwandlungen auf das aktuelle DNA-Material binden.
+Bestätigte Nullausgänge des fortgeführten DNA-Stroms oder einer ausdrücklich
+erforderlichen Vorlage buchen und sperren; unbekannte Mengen nicht zu Null
+umdeuten. Solche Anforderungen gehören in den Quellenvertrag und dieselbe
+gespeicherte Prozessabsicht.
+
 Die passive Kitstation K01 steht separat in
 `model/extraction-kit-station.shared.json`; vor Änderungen
 [docs/extraction-kit-station.md](docs/extraction-kit-station.md) lesen.

@@ -1,0 +1,1012 @@
+{
+  "format": "solidcraftbot.puregene-extraction-protocol/1",
+  "id": "Puregene.158043.CulturedCells.Synthetic.1",
+  "mode": "synthetic_only",
+  "kit_id": "puregene_cell_158043",
+  "kit": {
+    "manufacturer": "QIAGEN",
+    "name": "Puregene Cell Kit",
+    "catalog_number": "158043",
+    "roles": {
+      "CellLysis": "Cell Lysis Solution",
+      "ProteinPrecipitation": "Protein Precipitation Solution",
+      "DNAHydration": "DNA Hydration Solution",
+      "RNaseA": "RNase A Solution"
+    },
+    "additional_materials": {
+      "Isopropanol": "100% isopropanol",
+      "Ethanol70": "70% ethanol",
+      "TSBuffer": "Genomic DNA Sample Buffer",
+      "TSLadder": "Genomic DNA Ladder"
+    }
+  },
+  "sample_class": "cultured_mammalian_cell_pellet",
+  "manufacturer_reference": {
+    "url": "https://www.qiagen.com/en-US/resources/download/KitHandbook/puregene-dna-handbook",
+    "revision": "HB-0326-004, January 2022",
+    "pages": "30-33",
+    "consulted_document_sha256": "2fcb8a8315c675b387bfd2e83b8a6ce814eae8a162cf74d14f9dd53df7fc3d39",
+    "accessed_on": "2026-11-14",
+    "scope": "Small cultured-cell 1.5 ml procedure; source facts only, not a qualified local SOP."
+  },
+  "input_range_cells": {
+    "minimum": 1000000,
+    "maximum": 2000000
+  },
+  "branch_policy": {
+    "rnase": "explicit_selection",
+    "scale": "microcentrifuge_1_2_million_cells_only",
+    "input": "preexisting_pellet_with_declared_20_ul_residual_liquid",
+    "transfer": "synthetic_pipetting_adaptation_of_manual_pouring",
+    "overnight": "duration_not_defined_by_manufacturer_use_explicit_synthetic_fixture",
+    "retry": "hold_and_reconcile_no_automatic_repeat"
+  },
+  "units": {
+    "duration_s": "s",
+    "duration_max_s": "s",
+    "temperature_min_deg_c": "degC",
+    "temperature_max_deg_c": "degC",
+    "rcf_min_x_g": "x_g",
+    "rcf_max_x_g": "x_g",
+    "inversion_count": "count"
+  },
+  "steps": [
+    {
+      "id": "confirm_input_and_reagents",
+      "kind": "observation",
+      "phase": "confirm_input_and_reagents",
+      "operation": "confirm_input_and_reagents",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "kit_158043_confirmed",
+        "counted_cell_pellet_confirmed",
+        "residual_liquid_20_ul_confirmed",
+        "puregene_reagents_identified",
+        "isopropanol_identity_confirmed",
+        "ethanol_70_percent_confirmed",
+        "empty_identified_transfer_tip_confirmed",
+        "receiver_and_waste_vessels_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "input",
+        "vessel_role": "input",
+        "pellet": "cells",
+        "supernatant": "residual_sample_liquid",
+        "retained": "pellet",
+        "state": "preexisting_identified_pellet"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "resuspend_cells",
+      "kind": "observation",
+      "phase": "resuspend_cells",
+      "operation": "resuspend_cells",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "cell_pellet_resuspended_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "input",
+        "vessel_role": "input",
+        "pellet": null,
+        "supernatant": "cell_suspension",
+        "retained": "all",
+        "state": "resuspended_input"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "add_cell_lysis",
+      "kind": "effect",
+      "phase": "add_cell_lysis",
+      "operation": "add_cell_lysis",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "lysis_addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "cells"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "CellLysis",
+          "quantity": {
+            "value": 300,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "lysate",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "lysate",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "lysate",
+      "retention_after": {
+        "material_token": "lysate",
+        "vessel_role": "input",
+        "pellet": null,
+        "supernatant": "cell_lysate",
+        "retained": "all",
+        "state": "unseparated_cell_lysate"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_lysis",
+      "kind": "observation",
+      "phase": "mix_lysis",
+      "operation": "mix_lysis",
+      "when": "always",
+      "parameters": {
+        "duration_s": 10
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "high_speed_mix_confirmed",
+        "homogeneous_lysate_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "rnase_decision",
+      "kind": "observation",
+      "phase": "rnase_decision",
+      "operation": "rnase_decision",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "selected_rnase_branch_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "add_rnase",
+      "kind": "effect",
+      "phase": "add_rnase",
+      "operation": "add_rnase",
+      "when": "rnase_selected",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "RNase_A_identity_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "RNaseA",
+          "quantity": {
+            "value": 1.5,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "rnase_lysate",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "rnase_lysate",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "rnase_lysate",
+      "retention_after": {
+        "material_token": "rnase_lysate",
+        "vessel_role": "input",
+        "pellet": null,
+        "supernatant": "rnase_treated_cell_lysate",
+        "retained": "all",
+        "state": "unseparated_rnase_lysate"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_rnase",
+      "kind": "observation",
+      "phase": "mix_rnase",
+      "operation": "mix_rnase",
+      "when": "rnase_selected",
+      "parameters": {
+        "inversion_count": 25
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "gentle_inversion_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "incubate_rnase",
+      "kind": "incubation",
+      "phase": "incubate_rnase",
+      "operation": "incubate_rnase",
+      "when": "rnase_selected",
+      "parameters": {
+        "duration_s": 300,
+        "temperature_min_deg_c": 37,
+        "temperature_max_deg_c": 37
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "incubation_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "cool_rnase",
+      "kind": "incubation",
+      "phase": "cool_rnase",
+      "operation": "cool_rnase",
+      "when": "rnase_selected",
+      "parameters": {
+        "duration_s": 60
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "sample_on_ice_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "add_protein_precipitant",
+      "kind": "effect",
+      "phase": "add_protein_precipitant",
+      "operation": "add_protein_precipitant",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "protein_precipitation_solution_identity_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "ProteinPrecipitation",
+          "quantity": {
+            "value": 100,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "protein_composite",
+          "kind": "intermediate",
+          "vessel_role": "input",
+          "role": "protein_composite",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "protein_composite",
+      "retention_after": {
+        "material_token": "protein_composite",
+        "vessel_role": "input",
+        "pellet": null,
+        "supernatant": "protein_precipitation_mixture",
+        "retained": "all",
+        "state": "unseparated_protein_precipitation_mixture"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_protein_precipitant",
+      "kind": "observation",
+      "phase": "mix_protein_precipitant",
+      "operation": "mix_protein_precipitant",
+      "when": "always",
+      "parameters": {
+        "duration_s": 20
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "high_speed_vortex_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "spin_protein_precipitate",
+      "kind": "incubation",
+      "phase": "spin_protein_precipitate",
+      "operation": "spin_protein_precipitate",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "rcf_min_x_g": 13000,
+        "rcf_max_x_g": 16000
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "spin_complete",
+        "compact_protein_pellet_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "protein_composite",
+        "vessel_role": "input",
+        "pellet": "protein",
+        "supernatant": "dna_containing_supernatant",
+        "retained": "supernatant",
+        "state": "coexisting_in_one_tube"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "prepare_isopropanol_receiver",
+      "kind": "effect",
+      "phase": "prepare_isopropanol_receiver",
+      "operation": "prepare_isopropanol_receiver",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "clean_receiver_identity_confirmed",
+        "isopropanol_added_before_transfer"
+      ],
+      "inputs": [
+        {
+          "source": "Isopropanol",
+          "quantity": {
+            "value": 300,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "ipa_charge",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "ipa_charge",
+          "unit": "uL"
+        }
+      ],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": [
+        "ipa_charge"
+      ]
+    },
+    {
+      "id": "aspirate_dna_supernatant",
+      "kind": "effect",
+      "phase": "aspirate_dna_supernatant",
+      "operation": "aspirate_dna_supernatant",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "source_and_transfer_tip_identity_confirmed",
+        "protein_pellet_undisturbed_confirmed",
+        "cleared_supernatant_aspirated_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "dna_supernatant",
+          "kind": "intermediate",
+          "vessel_role": "transfer_tip",
+          "role": "dna_supernatant",
+          "unit": "uL"
+        },
+        {
+          "token": "protein_pellet",
+          "kind": "byproduct",
+          "vessel_role": "input",
+          "role": "protein_pellet",
+          "unit": "ng"
+        }
+      ],
+      "current_after": "dna_supernatant",
+      "retention_after": {
+        "material_token": "dna_supernatant",
+        "vessel_role": "transfer_tip",
+        "pellet": null,
+        "supernatant": "dna_containing_supernatant",
+        "retained": "all",
+        "state": "supernatant_in_identified_transfer_tip"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "dispense_into_isopropanol",
+      "kind": "effect",
+      "phase": "dispense_into_isopropanol",
+      "operation": "dispense_into_isopropanol",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "receiver_prefilled_with_isopropanol_confirmed",
+        "tip_dispense_complete_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "token:ipa_charge",
+          "quantity": {
+            "value": 300,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "dna_ipa_composite",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "dna_ipa_composite",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "dna_ipa_composite",
+      "retention_after": {
+        "material_token": "dna_ipa_composite",
+        "vessel_role": "precipitation",
+        "pellet": null,
+        "supernatant": "dna_isopropanol_mixture",
+        "retained": "all",
+        "state": "before_dna_pellet_confirmation"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_dna_precipitation",
+      "kind": "observation",
+      "phase": "mix_dna_precipitation",
+      "operation": "mix_dna_precipitation",
+      "when": "always",
+      "parameters": {
+        "inversion_count": 50
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "gentle_inversion_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "spin_dna_precipitate",
+      "kind": "incubation",
+      "phase": "spin_dna_precipitate",
+      "operation": "spin_dna_precipitate",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "rcf_min_x_g": 13000,
+        "rcf_max_x_g": 16000
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "spin_complete",
+        "dna_pellet_present_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "dna_ipa_composite",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": "isopropanol_supernatant",
+        "retained": "pellet",
+        "state": "coexisting_in_one_tube"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "remove_isopropanol_supernatant",
+      "kind": "effect",
+      "phase": "remove_isopropanol_supernatant",
+      "operation": "remove_isopropanol_supernatant",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "dna_pellet_retained_confirmed",
+        "supernatant_removed_to_identified_waste_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "dna_pellet",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "dna_pellet",
+          "unit": "ng"
+        },
+        {
+          "token": "isopropanol_waste",
+          "kind": "byproduct",
+          "vessel_role": "ipa_waste",
+          "role": "isopropanol_waste",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "dna_pellet",
+      "retention_after": {
+        "material_token": "dna_pellet",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": null,
+        "retained": "pellet",
+        "state": "pellet_after_confirmed_liquid_removal"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "add_ethanol_wash",
+      "kind": "effect",
+      "phase": "add_ethanol_wash",
+      "operation": "add_ethanol_wash",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "ethanol_70_percent_confirmed",
+        "pellet_retained_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "ng"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "Ethanol70",
+          "quantity": {
+            "value": 300,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "ethanol_wash_composite",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "ethanol_wash_composite",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "ethanol_wash_composite",
+      "retention_after": {
+        "material_token": "ethanol_wash_composite",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": "ethanol_wash",
+        "retained": "all",
+        "state": "pellet_and_wash_in_one_tube"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_ethanol_wash",
+      "kind": "observation",
+      "phase": "mix_ethanol_wash",
+      "operation": "mix_ethanol_wash",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "pellet_washed_by_gentle_inversion_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "spin_ethanol_wash",
+      "kind": "incubation",
+      "phase": "spin_ethanol_wash",
+      "operation": "spin_ethanol_wash",
+      "when": "always",
+      "parameters": {
+        "duration_s": 60,
+        "rcf_min_x_g": 13000,
+        "rcf_max_x_g": 16000
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "spin_complete",
+        "dna_pellet_present_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "ethanol_wash_composite",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": "ethanol_wash",
+        "retained": "pellet",
+        "state": "coexisting_in_one_tube"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "remove_ethanol_wash",
+      "kind": "effect",
+      "phase": "remove_ethanol_wash",
+      "operation": "remove_ethanol_wash",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "dna_pellet_retained_confirmed",
+        "wash_removed_to_identified_waste_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "washed_dna_pellet",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "washed_dna_pellet",
+          "unit": "ng"
+        },
+        {
+          "token": "ethanol_waste",
+          "kind": "byproduct",
+          "vessel_role": "ethanol_waste",
+          "role": "ethanol_waste",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "washed_dna_pellet",
+      "retention_after": {
+        "material_token": "washed_dna_pellet",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": null,
+        "retained": "pellet",
+        "state": "pellet_after_confirmed_wash_removal"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "drain_pellet_tube",
+      "kind": "observation",
+      "phase": "drain_pellet_tube",
+      "operation": "drain_pellet_tube",
+      "when": "always",
+      "parameters": {
+        "duration_s": 5
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "loose_dna_pellet_retained_confirmed",
+        "tube_drained_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "air_dry_pellet",
+      "kind": "incubation",
+      "phase": "air_dry_pellet",
+      "operation": "air_dry_pellet",
+      "when": "always",
+      "parameters": {
+        "duration_s": 300
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "dna_pellet_retained_confirmed",
+        "pellet_not_overdried_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "add_hydration_solution",
+      "kind": "effect",
+      "phase": "add_hydration_solution",
+      "operation": "add_hydration_solution",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "hydration_solution_identity_confirmed",
+        "addition_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "ng"
+          },
+          "consume_all": true
+        },
+        {
+          "source": "DNAHydration",
+          "quantity": {
+            "value": 100,
+            "unit": "uL"
+          },
+          "consume_all": false
+        }
+      ],
+      "outputs": [
+        {
+          "token": "hydrating_dna",
+          "kind": "intermediate",
+          "vessel_role": "precipitation",
+          "role": "hydrating_dna",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "hydrating_dna",
+      "retention_after": {
+        "material_token": "hydrating_dna",
+        "vessel_role": "precipitation",
+        "pellet": "dna",
+        "supernatant": "hydration_solution",
+        "retained": "all",
+        "state": "hydrating_before_complete_dissolution"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "mix_hydration",
+      "kind": "observation",
+      "phase": "mix_hydration",
+      "operation": "mix_hydration",
+      "when": "always",
+      "parameters": {
+        "duration_s": 5
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "medium_speed_vortex_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "heated_hydration",
+      "kind": "incubation",
+      "phase": "heated_hydration",
+      "operation": "heated_hydration",
+      "when": "always",
+      "parameters": {
+        "duration_s": 3600,
+        "temperature_min_deg_c": 65,
+        "temperature_max_deg_c": 65
+      },
+      "parameter_bindings": {},
+      "required_checks": [
+        "hydration_incubation_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "overnight_hydration",
+      "kind": "incubation",
+      "phase": "overnight_hydration",
+      "operation": "overnight_hydration",
+      "when": "always",
+      "parameters": {
+        "duration_s": null,
+        "temperature_min_deg_c": 15,
+        "temperature_max_deg_c": 25
+      },
+      "parameter_bindings": {
+        "duration_s": "overnight_fixture_s"
+      },
+      "required_checks": [
+        "gentle_shaking_confirmed",
+        "cap_closed_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": null,
+      "required_positive_outputs": []
+    },
+    {
+      "id": "confirm_dissolution",
+      "kind": "observation",
+      "phase": "confirm_dissolution",
+      "operation": "confirm_dissolution",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "dna_fully_dissolved_confirmed"
+      ],
+      "inputs": [],
+      "outputs": [],
+      "current_after": null,
+      "retention_after": {
+        "material_token": "hydrating_dna",
+        "vessel_role": "precipitation",
+        "pellet": null,
+        "supernatant": "hydrated_dna_solution",
+        "retained": "all",
+        "state": "fully_dissolved_dna_solution"
+      },
+      "required_positive_outputs": []
+    },
+    {
+      "id": "transfer_to_storage",
+      "kind": "effect",
+      "phase": "transfer_to_storage",
+      "operation": "transfer_to_storage",
+      "when": "always",
+      "parameters": {},
+      "parameter_bindings": {},
+      "required_checks": [
+        "storage_vessel_identity_confirmed",
+        "dna_solution_transfer_complete_confirmed"
+      ],
+      "inputs": [
+        {
+          "source": "current",
+          "quantity": {
+            "value": null,
+            "unit": "uL"
+          },
+          "consume_all": true
+        }
+      ],
+      "outputs": [
+        {
+          "token": "product",
+          "kind": "product",
+          "vessel_role": "product",
+          "role": "retained_dna_product",
+          "unit": "uL"
+        }
+      ],
+      "current_after": "product",
+      "retention_after": {
+        "material_token": "product",
+        "vessel_role": "product",
+        "pellet": null,
+        "supernatant": "hydrated_dna_solution",
+        "retained": "all",
+        "state": "retained_hydrated_dna_product"
+      },
+      "required_positive_outputs": []
+    }
+  ],
+  "limitations": [
+    "Synthetic observations only; no biochemical, hardware, network or robot execution.",
+    "This first version starts after cell harvest with an identified pellet and explicitly confirmed residual liquid; no hidden harvesting or liquid removal is assumed.",
+    "The handbook pouring transfer is adapted to two explicitly modelled aspiration/dispense effects through a declared transient transfer tip; tip capacity and pellet-safe handling are unqualified.",
+    "A centrifuged pellet and liquid remain one composite in one tube until physical separation; retention metadata has no separate quantity ledger.",
+    "DNA and protein pellet masses remain unknown; no mass or yield is derived from cell count or liquid volume.",
+    "The manufacturer says overnight without an hour count; the profile duration is an invented synthetic timing fixture, not a validated SOP interval.",
+    "Conditional clump treatment, noncompact-protein-pellet respin, larger-scale variants and automatic retries are not implemented.",
+    "TapeStation screening does not qualify Puregene high-molecular-weight DNA size beyond the assay reference range."
+  ]
+}

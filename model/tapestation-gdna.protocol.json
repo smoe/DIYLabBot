@@ -1,0 +1,86 @@
+{
+  "format": "solidcraftbot.tapestation-gdna-protocol/1",
+  "id": "TS01.GenomicDNA.ScreenTape",
+  "mode": "synthetic_only",
+  "instrument": {
+    "id": "TS01",
+    "source": {
+      "source": "model/tapestation.shared.json",
+      "source_sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+    },
+    "planning_reference": "4200 TapeStation",
+    "selected_model": null,
+    "handling": "manual_only"
+  },
+  "assay": {
+    "id": "GenomicDNA.ScreenTape",
+    "revision": "SYN.1",
+    "screentape_part_number": "5067-5365",
+    "reagents_part_number": "5067-5366",
+    "applicable_models": [
+      "4150",
+      "4200"
+    ],
+    "sample_volume_ul": 1.0,
+    "sample_buffer_volume_ul": 10.0,
+    "ladder_volume_ul": 1.0,
+    "ladder_buffer_volume_ul": 10.0,
+    "ladder_position": "A1",
+    "fixture_sample_position": "A2",
+    "ladder_fixture_scope": "one_or_two_screentape_devices",
+    "references": {
+      "sizing_lower_bp": 200,
+      "sizing_upper_reference_bp": 60000,
+      "sizing_upper_open": true,
+      "sizing_accuracy_precision_lower_bp": 200,
+      "sizing_accuracy_precision_upper_bp": 15000,
+      "quantitative_lower_ng_ul": 10,
+      "quantitative_upper_ng_ul": 100,
+      "din_functional_lower_ng_ul": 5,
+      "din_functional_upper_ng_ul": 300,
+      "din_min": 1,
+      "din_max": 10
+    },
+    "preparation": {
+      "buffer_equilibration_s": 1800,
+      "mix_duration_s": 60,
+      "mix_rpm": 2000,
+      "spin_duration_s": 60
+    }
+  },
+  "report_format": "solidcraftbot.synthetic-tapestation-report/1",
+  "limits": {
+    "max_report_bytes": 262144,
+    "max_rows": 96,
+    "max_messages_per_row": 32,
+    "max_message_characters": 2048
+  },
+  "known_flags": [
+    "analysis_failed",
+    "ladder_failed",
+    "sizing_out_of_range",
+    "din_unavailable",
+    "concentration_out_of_range",
+    "user_flagged"
+  ],
+  "sources": [
+    {
+      "url": "https://www.agilent.com/cs/library/usermanuals/public/gDNA_QuickGuide.pdf",
+      "revision": "G2991-90041 Rev. D / SD-UF0000092 Rev. D, edition 03/2026",
+      "scope": "Standard Genomic DNA ScreenTape reference preparation and analytical specification ranges; not DIYLabBot qualification"
+    },
+    {
+      "url": "https://www.agilent.com/cs/library/datasheets/public/datasheet-genomc-dna-sample-quality-metrics-5994-5766en-agilent.pdf",
+      "revision": "5994-5766EN, February 8, 2023",
+      "scope": "DIN scale and functional concentration range; DIN differs from fragment-size estimates"
+    }
+  ],
+  "limitations": [
+    "Explicit synthetic JSON contract; not a qualified native TapeStation export decoder or device driver",
+    "TS01 remains the existing manual planning model; article selection, actual installation and hardware are unqualified",
+    "Reference ranges and fixture volumes do not qualify the procedure, DNA integrity, yield, concentration or fragment sizing",
+    "Above-range fragment sizes are censored, never represented as precise values; no electropherogram trace is manufactured",
+    "Result import and synthetic policy evaluation do not replace explicit operator review, assay completion or workspace handback",
+    "No reagent stock, biological material ledger, transport, robot path or network effect is created by the decoder"
+  ]
+}

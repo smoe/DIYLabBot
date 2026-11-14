@@ -1,0 +1,196 @@
+{
+  "format": "solidcraftbot.dneasy-extraction-synthetic/1",
+  "id": "SYN.DNeasy.69504.DNA01",
+  "mode": "synthetic_only",
+  "synthetic": true,
+  "preparation": {
+    "source": "model/extraction-automation.preparation.json",
+    "source_sha256": "0d242c7621c15d904e58f57cca125623380a491de08af3004601aefd1496e97a"
+  },
+  "protocol": {
+    "source": "model/dneasy-extraction.protocol.json",
+    "source_sha256": "74893a0f2c3a5ce573e39a89764afe70923d555eb846953450e75fa29c477abd"
+  },
+  "tapestation": {
+    "source": "model/tapestation.shared.json",
+    "source_sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+  },
+  "tapestation_protocol": {
+    "source": "model/tapestation-gdna.protocol.json",
+    "source_sha256": "5bd90f48b964134b4d384eef9064496ab9d33b9f8db6f5e343af8df122ff3e22"
+  },
+  "sample_id": "DNA01",
+  "input_material_id": "SYN.Source01.DNAAliquot",
+  "input_quantity": {
+    "value": 100000,
+    "unit": "cells"
+  },
+  "preservation_state": "synthetic_preexisting_mammalian_cell_pellet",
+  "rnase_selected": false,
+  "settings": {
+    "task_deadline_s": 7200
+  },
+  "reagent_aliquots": {
+    "PBS": {
+      "material_id": "SYN.DNA.Issued.PBS",
+      "vessel_id": "SYN.DNA.ReagentTube.PBS",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "ProteinaseK": {
+      "material_id": "SYN.DNA.Issued.ProteinaseK",
+      "vessel_id": "SYN.DNA.ReagentTube.ProteinaseK",
+      "quantity": {
+        "value": 100,
+        "unit": "uL"
+      }
+    },
+    "AL": {
+      "material_id": "SYN.DNA.Issued.AL",
+      "vessel_id": "SYN.DNA.ReagentTube.AL",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "Ethanol": {
+      "material_id": "SYN.DNA.Issued.Ethanol",
+      "vessel_id": "SYN.DNA.ReagentTube.Ethanol",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "AW1": {
+      "material_id": "SYN.DNA.Issued.AW1",
+      "vessel_id": "SYN.DNA.ReagentTube.AW1",
+      "quantity": {
+        "value": 2000,
+        "unit": "uL"
+      }
+    },
+    "AW2": {
+      "material_id": "SYN.DNA.Issued.AW2",
+      "vessel_id": "SYN.DNA.ReagentTube.AW2",
+      "quantity": {
+        "value": 2000,
+        "unit": "uL"
+      }
+    },
+    "AE": {
+      "material_id": "SYN.DNA.Issued.AE",
+      "vessel_id": "SYN.DNA.ReagentTube.AE",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "TSBuffer": {
+      "material_id": "SYN.DNA.Issued.TSBuffer",
+      "vessel_id": "SYN.DNA.ReagentTube.TSBuffer",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "TSLadder": {
+      "material_id": "SYN.DNA.Issued.TSLadder",
+      "vessel_id": "SYN.DNA.ReagentTube.TSLadder",
+      "quantity": {
+        "value": 100,
+        "unit": "uL"
+      }
+    }
+  },
+  "extra_vessels": {
+    "aw1_collection": "SYN.DNA.AW1.Collection01",
+    "aw2_collection": "SYN.DNA.AW2.Collection01",
+    "qc_sample": "SYN.DNA.TS.SampleAssayTube",
+    "qc_ladder": "SYN.DNA.TS.LadderAssayTube"
+  },
+  "fixture_output_quantities": {
+    "suspension": {
+      "value": 200,
+      "unit": "uL"
+    },
+    "pk_mix": {
+      "value": 220,
+      "unit": "uL"
+    },
+    "rnase_mix": {
+      "value": 224,
+      "unit": "uL"
+    },
+    "lysis_mix": {
+      "value": 420,
+      "unit": "uL"
+    },
+    "binding_mix": {
+      "value": 620,
+      "unit": "uL"
+    },
+    "loaded_column": {
+      "value": 620,
+      "unit": "uL"
+    },
+    "bind_flowthrough": {
+      "value": 620,
+      "unit": "uL"
+    },
+    "aw1_mix": {
+      "value": 500,
+      "unit": "uL"
+    },
+    "aw1_flowthrough": {
+      "value": 500,
+      "unit": "uL"
+    },
+    "aw2_mix": {
+      "value": 500,
+      "unit": "uL"
+    },
+    "aw2_flowthrough": {
+      "value": 500,
+      "unit": "uL"
+    },
+    "elution_mix": {
+      "value": 200,
+      "unit": "uL"
+    },
+    "product": {
+      "value": 200,
+      "unit": "uL"
+    },
+    "ts_sample": {
+      "value": 11,
+      "unit": "uL"
+    },
+    "ts_ladder": {
+      "value": 11,
+      "unit": "uL"
+    },
+    "bound_dna": {
+      "value": null,
+      "unit": "ng"
+    },
+    "aw1_bound_dna": {
+      "value": null,
+      "unit": "ng"
+    },
+    "dry_dna": {
+      "value": null,
+      "unit": "ng"
+    },
+    "column_residue": {
+      "value": null,
+      "unit": "ng"
+    }
+  },
+  "qc_policy": {
+    "minimum_din": 6,
+    "minimum_fragment_size_bp": 10000
+  },
+  "fixture_scope": "All input amounts, issued aliquots, output volumes and QC thresholds are explicitly invented test observations, not a recipe validation or expected yield."
+}

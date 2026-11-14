@@ -1,0 +1,933 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "puregene-extraction.schema.json",
+  "title": "Synthetic Puregene cultured-cell extraction sources, not a qualified laboratory SOP",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/profile"
+    },
+    {
+      "$ref": "#/$defs/protocol"
+    }
+  ],
+  "$defs": {
+    "quantity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "uL",
+            "ng",
+            "cells"
+          ]
+        }
+      }
+    },
+    "issued": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_id",
+        "vessel_id",
+        "quantity"
+      ],
+      "properties": {
+        "material_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "vessel_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "quantity": {
+          "$ref": "#/$defs/quantity"
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "quantity",
+        "consume_all"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "quantity": {
+          "$ref": "#/$defs/quantity"
+        },
+        "consume_all": {
+          "type": "boolean"
+        }
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "token",
+        "kind",
+        "vessel_role",
+        "role",
+        "unit"
+      ],
+      "properties": {
+        "token": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "kind": {
+          "enum": [
+            "intermediate",
+            "byproduct",
+            "product"
+          ]
+        },
+        "vessel_role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "unit": {
+          "enum": [
+            "uL",
+            "ng",
+            "cells"
+          ]
+        }
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_token",
+        "vessel_role",
+        "pellet",
+        "supernatant",
+        "retained",
+        "state"
+      ],
+      "properties": {
+        "material_token": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "vessel_role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "pellet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supernatant": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retained": {
+          "enum": [
+            "all",
+            "pellet",
+            "supernatant"
+          ]
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "kind",
+        "phase",
+        "operation",
+        "when",
+        "parameters",
+        "parameter_bindings",
+        "required_checks",
+        "inputs",
+        "outputs",
+        "current_after",
+        "retention_after",
+        "required_positive_outputs"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "kind": {
+          "enum": [
+            "observation",
+            "effect",
+            "incubation"
+          ]
+        },
+        "phase": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "operation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "when": {
+          "enum": [
+            "always",
+            "rnase_selected"
+          ]
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "duration_s": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "duration_max_s": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "temperature_min_deg_c": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "temperature_max_deg_c": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "rcf_min_x_g": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "rcf_max_x_g": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            },
+            "inversion_count": {
+              "type": [
+                "number",
+                "null"
+              ],
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "parameter_bindings": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "duration_s": {
+              "const": "overnight_fixture_s"
+            }
+          }
+        },
+        "required_checks": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        },
+        "inputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/input"
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/output"
+          }
+        },
+        "current_after": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "retention_after": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/retention"
+            }
+          ]
+        },
+        "required_positive_outputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 160
+          }
+        }
+      }
+    },
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "synthetic",
+        "protocol",
+        "tapestation",
+        "tapestation_protocol",
+        "sample_id",
+        "origin_id",
+        "input_material_id",
+        "input_vessel_id",
+        "input_quantity",
+        "residual_liquid_ul",
+        "preservation_state",
+        "product_material_id",
+        "product_vessel_id",
+        "rnase_selected",
+        "settings",
+        "reagent_aliquots",
+        "extra_vessels",
+        "fixture_output_quantities",
+        "qc_policy",
+        "fixture_scope"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.puregene-extraction-synthetic/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "synthetic": {
+          "const": true
+        },
+        "protocol": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "tapestation": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "tapestation_protocol": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "sample_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "origin_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "input_material_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "input_vessel_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "input_quantity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "integer",
+              "minimum": 1000000,
+              "maximum": 2000000
+            },
+            "unit": {
+              "const": "cells"
+            }
+          }
+        },
+        "residual_liquid_ul": {
+          "const": 20
+        },
+        "preservation_state": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "product_material_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "product_vessel_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "rnase_selected": {
+          "type": "boolean"
+        },
+        "settings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "task_deadline_s",
+            "overnight_fixture_s"
+          ],
+          "properties": {
+            "task_deadline_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "overnight_fixture_s": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "reagent_aliquots": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "CellLysis",
+            "ProteinPrecipitation",
+            "DNAHydration",
+            "Isopropanol",
+            "Ethanol70",
+            "TSBuffer",
+            "TSLadder"
+          ],
+          "properties": {
+            "CellLysis": {
+              "$ref": "#/$defs/issued"
+            },
+            "ProteinPrecipitation": {
+              "$ref": "#/$defs/issued"
+            },
+            "DNAHydration": {
+              "$ref": "#/$defs/issued"
+            },
+            "Isopropanol": {
+              "$ref": "#/$defs/issued"
+            },
+            "Ethanol70": {
+              "$ref": "#/$defs/issued"
+            },
+            "TSBuffer": {
+              "$ref": "#/$defs/issued"
+            },
+            "TSLadder": {
+              "$ref": "#/$defs/issued"
+            },
+            "RNaseA": {
+              "$ref": "#/$defs/issued"
+            }
+          }
+        },
+        "extra_vessels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "precipitation",
+            "transfer_tip",
+            "ipa_waste",
+            "ethanol_waste",
+            "qc_sample",
+            "qc_ladder"
+          ],
+          "properties": {
+            "precipitation": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "transfer_tip": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "ipa_waste": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "ethanol_waste": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "qc_sample": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "qc_ladder": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        },
+        "fixture_output_quantities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "lysate",
+            "rnase_lysate",
+            "protein_composite",
+            "ipa_charge",
+            "dna_supernatant",
+            "protein_pellet",
+            "dna_ipa_composite",
+            "dna_pellet",
+            "isopropanol_waste",
+            "ethanol_wash_composite",
+            "washed_dna_pellet",
+            "ethanol_waste",
+            "hydrating_dna",
+            "product",
+            "ts_sample",
+            "ts_ladder"
+          ],
+          "properties": {
+            "lysate": {
+              "$ref": "#/$defs/quantity"
+            },
+            "rnase_lysate": {
+              "$ref": "#/$defs/quantity"
+            },
+            "protein_composite": {
+              "$ref": "#/$defs/quantity"
+            },
+            "ipa_charge": {
+              "$ref": "#/$defs/quantity"
+            },
+            "dna_supernatant": {
+              "$ref": "#/$defs/quantity"
+            },
+            "protein_pellet": {
+              "$ref": "#/$defs/quantity"
+            },
+            "dna_ipa_composite": {
+              "$ref": "#/$defs/quantity"
+            },
+            "dna_pellet": {
+              "$ref": "#/$defs/quantity"
+            },
+            "isopropanol_waste": {
+              "$ref": "#/$defs/quantity"
+            },
+            "ethanol_wash_composite": {
+              "$ref": "#/$defs/quantity"
+            },
+            "washed_dna_pellet": {
+              "$ref": "#/$defs/quantity"
+            },
+            "ethanol_waste": {
+              "$ref": "#/$defs/quantity"
+            },
+            "hydrating_dna": {
+              "$ref": "#/$defs/quantity"
+            },
+            "product": {
+              "$ref": "#/$defs/quantity"
+            },
+            "ts_sample": {
+              "$ref": "#/$defs/quantity"
+            },
+            "ts_ladder": {
+              "$ref": "#/$defs/quantity"
+            }
+          }
+        },
+        "qc_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum_din",
+            "minimum_fragment_size_bp"
+          ],
+          "properties": {
+            "minimum_din": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10
+            },
+            "minimum_fragment_size_bp": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        },
+        "fixture_scope": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "rnase_selected": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "reagent_aliquots": {
+                "required": [
+                  "RNaseA"
+                ]
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "reagent_aliquots": {
+                "not": {
+                  "required": [
+                    "RNaseA"
+                  ]
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "kit_id",
+        "kit",
+        "sample_class",
+        "manufacturer_reference",
+        "input_range_cells",
+        "branch_policy",
+        "units",
+        "steps",
+        "limitations"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.puregene-extraction-protocol/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "kit_id": {
+          "const": "puregene_cell_158043"
+        },
+        "kit": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "manufacturer",
+            "name",
+            "catalog_number",
+            "roles",
+            "additional_materials"
+          ],
+          "properties": {
+            "manufacturer": {
+              "const": "QIAGEN"
+            },
+            "name": {
+              "const": "Puregene Cell Kit"
+            },
+            "catalog_number": {
+              "const": "158043"
+            },
+            "roles": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "CellLysis",
+                "ProteinPrecipitation",
+                "DNAHydration",
+                "RNaseA"
+              ],
+              "properties": {
+                "CellLysis": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "ProteinPrecipitation": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "DNAHydration": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "RNaseA": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              }
+            },
+            "additional_materials": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "Isopropanol",
+                "Ethanol70",
+                "TSBuffer",
+                "TSLadder"
+              ],
+              "properties": {
+                "Isopropanol": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "Ethanol70": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "TSBuffer": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                },
+                "TSLadder": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              }
+            }
+          }
+        },
+        "sample_class": {
+          "const": "cultured_mammalian_cell_pellet"
+        },
+        "manufacturer_reference": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "url",
+            "revision",
+            "pages",
+            "consulted_document_sha256",
+            "accessed_on",
+            "scope"
+          ],
+          "properties": {
+            "url": {
+              "type": "string",
+              "pattern": "^https://www\\.qiagen\\.com/"
+            },
+            "revision": {
+              "const": "HB-0326-004, January 2022"
+            },
+            "pages": {
+              "const": "30-33"
+            },
+            "consulted_document_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "accessed_on": {
+              "type": "string",
+              "format": "date"
+            },
+            "scope": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "input_range_cells": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "minimum",
+            "maximum"
+          ],
+          "properties": {
+            "minimum": {
+              "const": 1000000
+            },
+            "maximum": {
+              "const": 2000000
+            }
+          }
+        },
+        "branch_policy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rnase",
+            "scale",
+            "input",
+            "transfer",
+            "overnight",
+            "retry"
+          ],
+          "properties": {
+            "rnase": {
+              "const": "explicit_selection"
+            },
+            "scale": {
+              "const": "microcentrifuge_1_2_million_cells_only"
+            },
+            "input": {
+              "const": "preexisting_pellet_with_declared_20_ul_residual_liquid"
+            },
+            "transfer": {
+              "const": "synthetic_pipetting_adaptation_of_manual_pouring"
+            },
+            "overnight": {
+              "const": "duration_not_defined_by_manufacturer_use_explicit_synthetic_fixture"
+            },
+            "retry": {
+              "const": "hold_and_reconcile_no_automatic_repeat"
+            }
+          }
+        },
+        "units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "duration_s",
+            "duration_max_s",
+            "temperature_min_deg_c",
+            "temperature_max_deg_c",
+            "rcf_min_x_g",
+            "rcf_max_x_g",
+            "inversion_count"
+          ],
+          "properties": {
+            "duration_s": {
+              "const": "s"
+            },
+            "duration_max_s": {
+              "const": "s"
+            },
+            "temperature_min_deg_c": {
+              "const": "degC"
+            },
+            "temperature_max_deg_c": {
+              "const": "degC"
+            },
+            "rcf_min_x_g": {
+              "const": "x_g"
+            },
+            "rcf_max_x_g": {
+              "const": "x_g"
+            },
+            "inversion_count": {
+              "const": "count"
+            }
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 26,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

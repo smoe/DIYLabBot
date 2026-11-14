@@ -1,0 +1,172 @@
+{
+  "format": "solidcraftbot.puregene-extraction-synthetic/1",
+  "id": "SYN.Puregene.Cell.Small.DNA01",
+  "mode": "synthetic_only",
+  "synthetic": true,
+  "protocol": {
+    "source": "model/puregene-extraction.protocol.json",
+    "source_sha256": "6e157cc36973a8d362793e7e02fad89dc07614f261fad1334bde9b912fa43966"
+  },
+  "tapestation": {
+    "source": "model/tapestation.shared.json",
+    "source_sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+  },
+  "tapestation_protocol": {
+    "source": "model/tapestation-gdna.protocol.json",
+    "source_sha256": "5bd90f48b964134b4d384eef9064496ab9d33b9f8db6f5e343af8df122ff3e22"
+  },
+  "sample_id": "PG.DNA01",
+  "origin_id": "SYN.Puregene.Source01",
+  "input_material_id": "SYN.Puregene.Cells01",
+  "input_vessel_id": "SYN.Puregene.InputTube01",
+  "input_quantity": {
+    "value": 1000000,
+    "unit": "cells"
+  },
+  "residual_liquid_ul": 20,
+  "preservation_state": "synthetic_preexisting_cultured_mammalian_cell_pellet",
+  "product_material_id": "SYN.Puregene.DNAProduct01",
+  "product_vessel_id": "SYN.Puregene.StorageTube01",
+  "rnase_selected": false,
+  "settings": {
+    "task_deadline_s": 86400,
+    "overnight_fixture_s": 43200
+  },
+  "reagent_aliquots": {
+    "CellLysis": {
+      "material_id": "SYN.Puregene.Issued.CellLysis",
+      "vessel_id": "SYN.Puregene.ReagentTube.CellLysis",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "ProteinPrecipitation": {
+      "material_id": "SYN.Puregene.Issued.ProteinPrecipitation",
+      "vessel_id": "SYN.Puregene.ReagentTube.ProteinPrecipitation",
+      "quantity": {
+        "value": 500,
+        "unit": "uL"
+      }
+    },
+    "DNAHydration": {
+      "material_id": "SYN.Puregene.Issued.DNAHydration",
+      "vessel_id": "SYN.Puregene.ReagentTube.DNAHydration",
+      "quantity": {
+        "value": 500,
+        "unit": "uL"
+      }
+    },
+    "Isopropanol": {
+      "material_id": "SYN.Puregene.Issued.Isopropanol",
+      "vessel_id": "SYN.Puregene.ReagentTube.Isopropanol",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "Ethanol70": {
+      "material_id": "SYN.Puregene.Issued.Ethanol70",
+      "vessel_id": "SYN.Puregene.ReagentTube.Ethanol70",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      }
+    },
+    "TSBuffer": {
+      "material_id": "SYN.Puregene.Issued.TSBuffer",
+      "vessel_id": "SYN.Puregene.ReagentTube.TSBuffer",
+      "quantity": {
+        "value": 100,
+        "unit": "uL"
+      }
+    },
+    "TSLadder": {
+      "material_id": "SYN.Puregene.Issued.TSLadder",
+      "vessel_id": "SYN.Puregene.ReagentTube.TSLadder",
+      "quantity": {
+        "value": 10,
+        "unit": "uL"
+      }
+    }
+  },
+  "extra_vessels": {
+    "precipitation": "SYN.Puregene.PrecipitationTube01",
+    "transfer_tip": "SYN.Puregene.TransferTip01",
+    "ipa_waste": "SYN.Puregene.IPAWasteTube01",
+    "ethanol_waste": "SYN.Puregene.EthanolWasteTube01",
+    "qc_sample": "SYN.Puregene.TS.SampleAssayTube01",
+    "qc_ladder": "SYN.Puregene.TS.LadderAssayTube01"
+  },
+  "fixture_output_quantities": {
+    "lysate": {
+      "value": 320,
+      "unit": "uL"
+    },
+    "rnase_lysate": {
+      "value": 321.5,
+      "unit": "uL"
+    },
+    "protein_composite": {
+      "value": 420,
+      "unit": "uL"
+    },
+    "ipa_charge": {
+      "value": 300,
+      "unit": "uL"
+    },
+    "dna_supernatant": {
+      "value": 400,
+      "unit": "uL"
+    },
+    "protein_pellet": {
+      "value": null,
+      "unit": "ng"
+    },
+    "dna_ipa_composite": {
+      "value": 700,
+      "unit": "uL"
+    },
+    "dna_pellet": {
+      "value": null,
+      "unit": "ng"
+    },
+    "isopropanol_waste": {
+      "value": 700,
+      "unit": "uL"
+    },
+    "ethanol_wash_composite": {
+      "value": 300,
+      "unit": "uL"
+    },
+    "washed_dna_pellet": {
+      "value": null,
+      "unit": "ng"
+    },
+    "ethanol_waste": {
+      "value": 300,
+      "unit": "uL"
+    },
+    "hydrating_dna": {
+      "value": 100,
+      "unit": "uL"
+    },
+    "product": {
+      "value": 100,
+      "unit": "uL"
+    },
+    "ts_sample": {
+      "value": 11,
+      "unit": "uL"
+    },
+    "ts_ladder": {
+      "value": 11,
+      "unit": "uL"
+    }
+  },
+  "qc_policy": {
+    "minimum_din": 6,
+    "minimum_fragment_size_bp": 10000
+  },
+  "fixture_scope": "Input counts, issued aliquots, observed output quantities, overnight duration and QC thresholds are invented synthetic fixtures, not biological yields, calibrated handling or validated local SOP values."
+}

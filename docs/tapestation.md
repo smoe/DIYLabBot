@@ -50,13 +50,19 @@ Geprüft werden gültige geschlossene Einzelkörper, statische Überschneidungen
 FreeCAD-Wiederöffnung sowie Körpervolumen, Schwerpunkte und Begrenzungen im
 CAD-Vergleich. Die acht Körper umfassen Bank, Füße, Gerätehülle und PC-Hülle.
 Das ist kein Funktions-, Öffnungs-, Greif- oder Sicherheitsnachweis.
-ROS, Geräteadapter und Ergebnisimport sind nicht implementiert.
+ROS, Geräteadapter und ein geprüfter nativer Ergebnisimport sind nicht implementiert.
+Die separate [synthetische DNeasy-Laufzeit](dneasy-extraction.md) ergänzt einen
+manuellen Genomic-DNA-ScreenTape-Ablauf mit Ladder-/Probenbuchungen und einem
+ausdrücklich synthetischen JSON-Decoder. Sie verwendet diese TS01-Quelle und
+deren 4200-Planungsreferenz ohne neue CAD-Geometrie. Reale Messungen und
+Agilent-Exportformate werden dadurch nicht qualifiziert.
 
 ## Idee für menschliche Assistenz
 
 Der [TR01-Aufgabenrunner](lab-station-transport.md) enthält TS01 als manuellen
 Übergabeort. Seine synthetische Entladebestätigung ist implementiert; der
-folgende Messablauf ist **ein Entwurf**, kein ausführbarer Geräteworkflow:
+folgende allgemeine Messablauf ist **ein Entwurf**, kein ausführbarer Geräteworkflow.
+Seine eng begrenzte synthetische DNeasy-Ausprägung ist separat implementiert:
 
 1. Person übernimmt eine eindeutig benannte Aufgabe und gleicht Originalprobe,
    Gefäß und ursprünglichen Rackplatz ab. TR01 bleibt während der Übergabe stehen.
