@@ -129,6 +129,8 @@ def main():
                                   'sha256': robot.digest(out/'trajectory.json'),
                                   'semantic_sha256': trajectory_signature(data)},
               'passed': all(s['passed'] for s in snapshots+approach_checks) and context['instrument_reachability']['passed'] and instrument_motion['passed'],
+              'native_core_report': {'path': str((out/'solidcraft-scene-validation.json').relative_to(model.ROOT)),
+                                     'sha256': robot.digest(out/'solidcraft-scene-validation.json')},
               'workspace_source': str(workspace.SOURCE.relative_to(model.ROOT)),
               'workspace_sha256': robot.digest(workspace.SOURCE), 'source_files_sha256': hashes,
               'core_source_equivalence': native_core.get('source_equivalence'),

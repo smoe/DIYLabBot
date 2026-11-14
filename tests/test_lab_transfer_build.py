@@ -13,6 +13,31 @@ sys.path.insert(0,str(ROOT/'scripts'))
 import build_lab_transfer as build
 
 
+class LayoutArtifactTests(unittest.TestCase):
+    def test_single_model_tapestation_report_is_bound_and_tampering_is_rejected(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            source = root/'model/tapestation.shared.json'
+            source.parent.mkdir()
+            source.write_text('{}')
+            artifact = root/'tapestation.FCStd'
+            artifact.write_bytes(b'checked native instrument')
+            report = {'passed': True, 'source_sha256': build.robot.digest(source),
+                      'files': {'freecad': artifact.name},
+                      'artifact_sha256': {'freecad': build.robot.digest(artifact)}}
+            (root/'report.json').write_text(json.dumps(report))
+            scene = {'assets': {'tapestation': {'source': 'model/tapestation.shared.json',
+                     'report': 'report.json', 'case': 'default'}}}
+            assembly = build.layout.assembly
+            validate, project = assembly.validate_reference, assembly.project_path
+            with patch.object(assembly, 'validate_reference', side_effect=lambda ref: validate(ref, root)), \
+                    patch.object(assembly, 'project_path', side_effect=lambda path, base=root: project(path, base)):
+                self.assertEqual(list(build.layout_artifacts(scene)), [artifact])
+                artifact.write_bytes(b'changed native instrument')
+                with self.assertRaisesRegex(ValueError, 'TapeStation artifact changed'):
+                    list(build.layout_artifacts(scene))
+
+
 class NativeBindingTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)

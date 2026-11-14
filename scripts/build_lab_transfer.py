@@ -93,6 +93,23 @@ def verify_native_inputs(ctx,report):
         raise ValueError('Native report bytes changed after the audit')
 
 
+def layout_artifacts(ls):
+    """Bind upstream files, including the installed single-model TapeStation report."""
+    for ref in ls['assets'].values():
+        if ref['source'] != 'model/tapestation.shared.json':
+            yield layout.assembly.resolve_artifact(ref)
+            continue
+        source = layout.assembly.validate_reference(ref)
+        report = json.loads(layout.assembly.project_path(ref['report']).read_text())
+        if (ref.get('case', 'default') != 'default' or report.get('passed') is not True
+                or report.get('source_sha256') != robot.digest(source)):
+            raise ValueError('Checked default TapeStation source required')
+        artifact = layout.assembly.project_path(report['files']['freecad'])
+        if robot.digest(artifact) != report['artifact_sha256']['freecad']:
+            raise ValueError('TapeStation artifact changed')
+        yield artifact
+
+
 def prepare(args):
     ls=layout.load();s=model.load();digest=hashlib.sha256(layout.SOURCE.read_bytes()+model.SOURCE.read_bytes()).hexdigest();stem='lab-transfer-l01-'+digest[:12];rev=stem;n=1
     while (ROOT/'cad/generated'/rev).exists():n+=1;rev=stem+'-r'+str(n)
@@ -117,7 +134,7 @@ def prepare(args):
     ctx['build_sources_sha256']={**model.dependencies(s,ls),**{str(p.relative_to(ROOT)):robot.digest(p) for p in code}}
     context=json.loads(parent.read_text());inputs=[parent,parent.parent/'layout-validation.json',Path(context['scene_file'])]
     inputs.extend(Path(v['step']) for v in context['snapshots'] if v.get('step'))
-    inputs.extend(layout.assembly.resolve_artifact(ref) for ref in ls['assets'].values())
+    inputs.extend(layout_artifacts(ls))
     inputs.extend(layout.assembly.project_path(ref['report']) for ref in ls['assets'].values())
     ctx['geometry_inputs_sha256']={str(p.resolve().relative_to(ROOT)):robot.digest(p) for p in inputs}
     ctx['geometry_contract']=geometry_contract(s,ls)

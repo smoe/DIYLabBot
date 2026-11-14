@@ -324,7 +324,7 @@
     }
   ],
   "motion": {
-    "layout_sha256": "6720f431f0b70dcd62620fa0d621e1edfb9105c82d39c5ea60cae4a19c77a394",
+    "layout_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
     "limits_reference": {
       "source": "model/cf01-unload-demo.motion.json",
       "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",

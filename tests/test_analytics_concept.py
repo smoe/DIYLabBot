@@ -1,5 +1,7 @@
 """Source reuse, tool frames and native evidence for the analytical concept."""
 import copy
+import json
+import tempfile
 from pathlib import Path
 import sys
 import unittest
@@ -8,7 +10,37 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'scripts'))
 import analytics_concept as model
+from build_analytics_concept import current_core_report
 import robot_spec as robot
+
+
+class CurrentCoreReportTests(unittest.TestCase):
+    def test_resolves_checked_revision_and_rejects_changed_native_report(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            core = root/'exports/generated/new-revision/solidcraft-scene-validation.json'
+            core.parent.mkdir(parents=True)
+            core.write_text('{"passed": true}\n')
+            index = root/'cad/synthetic-lab-scene/shared-build-report.json'
+            index.parent.mkdir(parents=True)
+            report = {'passed': True, 'native_core_report': {
+                'path': str(core.relative_to(root)), 'sha256': robot.digest(core)}}
+            index.write_text(json.dumps(report))
+            self.assertEqual(current_core_report(root), core.resolve())
+            core.write_text('{"passed": false}\n')
+            with self.assertRaisesRegex(ValueError, 'native CF01 report changed'):
+                current_core_report(root)
+
+    def test_unbound_or_failed_scene_cannot_select_a_native_core(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            index = root/'cad/synthetic-lab-scene/shared-build-report.json'
+            index.parent.mkdir(parents=True)
+            for report in ({'passed': True}, {'passed': False, 'native_core_report': {
+                    'path': 'exports/old.json', 'sha256': '0'*64}}):
+                index.write_text(json.dumps(report))
+                with self.assertRaisesRegex(ValueError, 'Rebuild the checked synthetic lab scene'):
+                    current_core_report(root)
 
 
 class AnalyticalConceptTests(unittest.TestCase):

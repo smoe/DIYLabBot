@@ -15,8 +15,9 @@ Those waypoint coordinates accept the same millimetre expressions as the
 layout, preserving the 800 mm geometric translation. The historical native
 transfer report predates the revised room placement; it is not a current
 motion-clearance proof. The current `/2` transport compiler uses that revised
-layout explicitly. Its changed curve requires a fresh native motion report;
-an older waypoint audit does not establish flowing-motion compliance.
+layout explicitly. The fresh current-layout motion evidence is recorded in the
+[CAD/layout pin revalidation receipt](cad-layout-pin-revalidation.md); an older
+waypoint audit does not establish flowing-motion compliance.
 All room dimensions and station placements remain provisional.
 
 ## Playback and rebuild
@@ -28,7 +29,7 @@ finishes, the implementation alone is not a native collision/clearance proof.
 The static room layout has its [own report](../cad/lab-layout-l01/shared-build-report.json).
 
 ```powershell
-python scripts/build_lab_layout.py --prepare-only
+python scripts/build_lab_layout.py
 python scripts/build_lab_transfer.py
 ```
 
@@ -199,7 +200,7 @@ library/interface/STEP inputs are bound before construction and checked at
 build start, audit completion, finalization and geometry reuse. Replay also
 checks the construction helpers used by its current kinematics and layout.
 
-The current local revision `lab-transfer-l01-a03566b376d0-r2` passed 4594 native
+The earlier local revision `lab-transfer-l01-a03566b376d0-r2` passed 4594 native
 frames (4508 distinct states), with no overlap failures and a conservative
 minimum furniture-distance bound of 124.1799 mm. Its actual SolidCraft export
 passed 257 frames / 4369 rigid-pose comparisons: maximum position error
@@ -211,8 +212,13 @@ earlier `a03566b376d0` program; the new source binding and preview samples
 were checked afresh. The prior report and slow local-fit prototype remain
 historical local archives, not current evidence.
 
-Fresh targeted checks ran 77 tests with one explicit optional CF01
-actual-program skip and no failures. The current L01 curve's dynamics,
+The [current-layout revalidation](cad-layout-pin-revalidation.md) supersedes
+that previous-layout evidence with a complete new native audit and actual
+SolidCraft pose export, while preserving the physical curve and limits.
+
+The earlier revision ran 77 targeted tests with one optional CF01 actual-program
+skip. The current-layout revalidation covers 84 distinct targeted tests without
+native-evidence skips. The current L01 curve's dynamics,
 ownership and pusher overlap were also recomputed during build completion.
 The generated FreeCAD macro evaluates this curve directly; interactive GUI
 playback, hardware execution and protective feedback were not tested.

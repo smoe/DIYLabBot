@@ -120,6 +120,9 @@ class SyntheticLabBuildEvidenceTests(unittest.TestCase):
         report = json.loads(path.read_text())
         self.assertTrue(report['passed'])
         self.assertEqual(report['workspace_sha256'], robot.digest(workspace.SOURCE))
+        core = report['native_core_report']
+        self.assertEqual(robot.digest(ROOT/core['path']), core['sha256'])
+        self.assertTrue(json.loads((ROOT/core['path']).read_text())['passed'])
         for path, checksum in report['source_files_sha256'].items():
             self.assertEqual(robot.digest(ROOT/path), checksum, path)
         for snapshot in report['snapshots']:

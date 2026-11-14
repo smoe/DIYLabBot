@@ -20,9 +20,21 @@ import tool_paths
 from tube_carrier_model import numeric_shape
 
 
+def current_core_report(root=model.ROOT):
+    """Resolve the native CF01 input from the checked composition report."""
+    report = model.read(root/'cad/synthetic-lab-scene/shared-build-report.json')
+    reference = report.get('native_core_report')
+    if not report.get('passed') or not isinstance(reference, dict) or set(reference) != {'path', 'sha256'}:
+        raise ValueError('Rebuild the checked synthetic lab scene with a native-core report binding')
+    path = assembly.project_path(reference['path'], root)
+    if not path.is_file() or robot.digest(path) != reference['sha256']:
+        raise ValueError('Checked native CF01 report changed')
+    return path
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--core-report', type=Path, default=model.ROOT/'exports/generated/synthetic-lab-scene-b52c199ef5ef/solidcraft-scene-validation.json')
+    parser.add_argument('--core-report', type=Path, help='Explicit checked native CF01 report; default resolves the current synthetic-scene build report')
     tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
     args = parser.parse_args()
     tool_paths.resolve_tool_arguments(parser, args)
@@ -42,6 +54,8 @@ def main():
         model.ROOT/'scripts/build_analytics_concept_freecad.py', model.ROOT/'model/two-arm-analytics.schema.json',
         model.ROOT/'model/analytics-tools.schema.json']
     hashes = {str(p.relative_to(model.ROOT)): robot.digest(p) for p in source_paths}
+    args.core_report = args.core_report or current_core_report()
+    hashes[str(args.core_report.resolve().relative_to(model.ROOT))] = robot.digest(args.core_report)
     core = model.read(args.core_report)
     if not core['passed'] or core['freecad_required']:
         raise ValueError('Checked independent native SolidCraft CF01 context required')
