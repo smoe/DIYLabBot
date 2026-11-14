@@ -97,9 +97,20 @@ class ExteriorTests(unittest.TestCase):
         for region in ext['site_regions']:
             self.assertEqual(region['origin_mm'][2],-20)
             self.assertEqual(region['size_mm'][2],20)
-        sidewalk=next(v for v in ext['site_regions'] if v['material']=='sidewalk')
+        sidewalk=next(v for v in ext['site_regions'] if v['material']=='entrance_apron')
         driveway=next(v for v in ext['site_regions'] if v['material']=='driveway')
         self.assertAlmostEqual(sidewalk['origin_mm'][0]+sidewalk['size_mm'][0],driveway['origin_mm'][0])
+
+    def test_paving_reaches_glass_and_left_side_entrance_with_road_beyond(self):
+        ext=self.d['exterior'];regions={r['material']:r for r in ext['site_regions']}
+        front=regions['entrance_apron'];road=regions['driveway'];side=regions['sidewalk']
+        self.assertAlmostEqual(front['origin_mm'][0],ext['facade_plane_x_mm'])
+        self.assertEqual(front['origin_mm'][1],road['origin_mm'][1])
+        self.assertEqual(front['size_mm'][1],road['size_mm'][1])
+        self.assertEqual(road['size_mm'][0],self.s['exterior']['road_width_mm'])
+        self.assertEqual(side['entry_opening'],'D0_004_North')
+        self.assertTrue(side['points_mm'])
+        self.assertEqual(side['facade_walls'],['W037','W061','W072','W088','W102'])
 
     def test_invalid_or_invented_contract_values_are_rejected(self):
         for key,value in [('bay_count',True),('glass_opacity',1),('frame_mm',0),('guard_bar_fractions',[.5,.5]),('door_color','wood')]:

@@ -354,7 +354,15 @@
       "W109",
       "W117",
       "W118"
-    ]
+    ],
+    "left_sidewalk_walls": [
+      "W037",
+      "W061",
+      "W072",
+      "W088",
+      "W102"
+    ],
+    "left_sidewalk_entry_opening": "D0_004_North"
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",

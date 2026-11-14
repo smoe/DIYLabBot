@@ -2,7 +2,7 @@
   "format": "solidcraftbot.building-furnishings-media/1",
   "prepared_on": "2026-11-13",
   "source_files_sha256": {
-    "model/building-stack.shared.json": "15df4fb707000b2c82a7ae28d3a8d714866311c666ed1795b3c31835307cea09",
+    "model/building-stack.shared.json": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
     "scripts/build_building_stack.py": "f443bfbe58c0199bb302a59ec2f81599595c8d79293ac9b8f518423a79a7a72b",
     "scripts/build_building_stack_freecad.py": "6ec54b240d4b236b77ad6c73e60f4e8fa2f43f1b7aa25e0b57717e62fe204653",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
@@ -39,8 +39,8 @@
     "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-    "scripts/building_exterior.py": "5d0f9882359183d3b89a47de1a8777eacb4bbae1bb0294b5e12ac4f9c28476df",
-    "model/building-exterior.schema.json": "10dc7f8da07398b6b26863e46e5783f5ed958409b554917051776c3899870ff4",
+    "scripts/building_exterior.py": "0d1234f2a733b506ff4ecc814cffc73e7ed0a87062b2007675e7c32f0b1219e6",
+    "model/building-exterior.schema.json": "887905d48197c52a291dc679278ddb4358b3a1f6080c14e3031f8be7c1e4af77",
     "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
     "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb",
     "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
@@ -5990,5 +5990,11 @@
     "path": "exports/generated/building-stack-15df4fb70700/appearance-proof.json",
     "sha256": "84bdced1f23e37563789e79c2a9a1b9af9f8598e59b97d43a85ab98850185483",
     "bytes": 8642
+  },
+  "site_update_reuse": "All four modified site bodies hidden in the furniture views; visible source/native geometry unchanged",
+  "site_update_proof": {
+    "path": "exports/generated/building-stack-7ed88c9c9157-r2/site-update-proof.json",
+    "sha256": "efafce350f72c39c77dafbecbc9eb5a48a73765657d4f2427d4477268a6b844c",
+    "bytes": 11515
   }
 }

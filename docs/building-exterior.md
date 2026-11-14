@@ -31,10 +31,11 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
 - Rasen wird grün (`#559447`) als lediglich 20 Darstellungs-mm dünne Schicht
   auf EG-Höhe ±0 markiert. Die Gebäudegrundfläche wird ausgespart. Ein massiver
   brauner Erdblock entfällt. Der Keller liegt weiterhin unter dieser Ebene.
-- Die Zufahrt und der Bürgersteig sind getrennte dunkel- beziehungsweise
-  hellgraue dünne Flächen. Der Eingangsvorplatz verbindet den Bürgersteig mit
-  der vorhandenen Foyer-Eingangsöffnung. Lage, Breiten und Flächengrenzen sind
-  bildinformierte Darstellungsannahmen, keine vermessene Außenanlagenplanung.
+- Direkt vor der Glasfront liegt ein durchgehender Bereich aus grauen
+  Gehwegplatten, davor die Straße über die gesamte Eingangsseite. Links folgen
+  die Platten der Fassadenkontur bis ungefähr zum vorhandenen Seiteneingang
+  `D0_004_North`. Die übrigen Außenflächen bleiben Rasen. Alle Flächen sind
+  dünne Darstellungsflächen; Breiten und Grenzen sind nicht vermessen.
 
 Die Quellgrundrisse F03, EG und KG bleiben unverändert. Sämtliche Ersetzungen
 sind ausdrücklich auf die Gebäude-Komposition begrenzt; Wände und Öffnungen
