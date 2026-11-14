@@ -1,0 +1,107 @@
+"""One portable room-door definition, two glazing types and independent materials."""
+import json
+import math
+import re
+from pathlib import Path
+import assembly_model as assembly
+import relative_floorplan as floor
+
+ROOT=Path(__file__).resolve().parents[1]
+
+
+def require(ok,message):
+    if not ok:raise ValueError(message)
+
+
+def read(ref):
+    path=assembly.validate_reference(ref,root=ROOT)
+    return json.loads(path.read_text())
+
+
+def load(ref):
+    policy=read(ref);catalog=read(policy['catalog']);validate(policy,catalog)
+    return policy,catalog
+
+
+def dependencies(ref):
+    policy,catalog=load(ref)
+    return [ROOT/ref['source'],ROOT/policy['catalog']['source'],Path(__file__),
+        ROOT/'model/building-doors.schema.json',ROOT/'model/room-door-catalog.schema.json']
+
+
+def validate(policy,catalog):
+    require(set(policy)=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
+    require(set(catalog)=={'format','units','status','types','window','materials'},'Explicit door-catalog fields required')
+    require(policy['format']=='solidcraftbot.building-doors/1','Unsupported building-door policy')
+    require(catalog['format']=='solidcraftbot.room-door-catalog/1' and catalog['units']=={'length':'mm','angle':'deg'},'Typed room-door catalog required')
+    require(catalog['types']=={'plain':{'round_window':False},'round_window':{'round_window':True}},'Exactly two supported door types required')
+    require(set(catalog['materials'])=={'wood','steel'},'Explicit wood and steel profiles required')
+    require(policy['default_type'] in catalog['types'] and policy['default_material'] in catalog['materials'],'Unknown default door type or material')
+    require(all(v in catalog['materials'] for v in policy['level_materials'].values()),'Unknown floor door material')
+    require(len(set(policy['round_window_levels']))==len(policy['round_window_levels']) and set(policy['round_window_levels'])<={'EG','OG1','OG2','OG3'},'Explicit above-ground window selection required')
+    rule=policy['large_outer_room_rule'];ratio=rule['minimum_area_ratio']
+    require(type(ratio) in (int,float) and math.isfinite(ratio) and 0<ratio<=1,'Positive relative room-area threshold required')
+    for key in ('include_areas','exclude_areas'):
+        require(set(policy[key])<={'KG','EG','OG1','OG2','OG3'},'Unknown door-selection floor')
+        require(all(isinstance(ids,list) and len(ids)==len(set(ids)) for ids in policy[key].values()),'Unique room selections required')
+    for level,ids in policy['include_areas'].items():require(not set(ids)&set(policy['exclude_areas'].get(level,[])),'Contradictory explicit room door selections')
+    w=catalog['window']
+    require(set(w)=={'diameter_mm','center_height_mm','glass_thickness_mm','radial_glass_clearance_mm','rim_width_mm','rim_thickness_mm','edge_margin_mm','glass_color','glass_opacity','rim_color'},'Explicit window dimensions and finish required')
+    require(all(re.fullmatch('#[0-9a-fA-F]{6}',w[k]) for k in ('glass_color','rim_color')),'RGB door-detail colours required')
+    for name,value in w.items():
+        if name.endswith('_mm'):require(type(value) in (int,float) and math.isfinite(value) and value>0,'Positive finite window dimension: '+name)
+    require(w['radial_glass_clearance_mm']<w['diameter_mm']/2,'Glass clearance removes the pane')
+    require(type(w['glass_opacity']) in (int,float) and 0<w['glass_opacity']<1,'Transparent viewing pane required')
+    require(catalog['materials']['wood']=={'thickness_source':'exterior.door_leaf_mm','color_source':'exterior.door_color','mass_kg':None},'Wood reuses the existing shared finish and thickness')
+    require(set(policy['level_materials'])<={'KG','EG','OG1','OG2','OG3'},'Unknown material floor')
+    steel=catalog['materials']['steel'];require(set(steel)=={'thickness_mm','color','mass_kg'} and re.fullmatch('#[0-9a-fA-F]{6}',steel['color']),'Explicit steel profile required')
+    require(type(steel['thickness_mm']) in (int,float) and math.isfinite(steel['thickness_mm']) and steel['thickness_mm']>0 and steel['mass_kg'] is None,'Steel thickness is illustrative; mass remains unknown')
+
+
+def select(policy,plan,canonical,level,door):
+    areas=[a for a in plan['areas'] if any(edge['wall']==door['wall'] for edge in a['boundary'])]
+    ids={a['id'] for a in areas};material=policy['level_materials'].get(level,policy['default_material'])
+    excluded=bool(ids&set(policy['exclude_areas'].get(level,[]))) or any(term.casefold() in a['label'].casefold() for term in policy['exclude_label_terms'] for a in areas)
+    chosen=policy['default_type'];reason='default_plain_unclassified_or_small_side_room'
+    if excluded:chosen='plain';reason='explicit_room_or_label_exclusion'
+    elif level in policy['round_window_levels']:
+        if ids&set(policy['include_areas'].get(level,[])):chosen='round_window';reason='owner_confirmed_room'
+        else:
+            rule=policy['large_outer_room_rule'];reference=floor.outline(canonical,rule['reference_area']);band=floor.outline(canonical,rule['band_reference_area'])
+            threshold=abs(floor.signed_area(reference))*rule['minimum_area_ratio'];low=min(p[1] for p in band);high=max(p[1] for p in band)
+            for area in areas:
+                if area['kind']!='room':continue
+                pts=floor.outline(plan,area)
+                if abs(floor.signed_area(pts))>=threshold and (max(p[1] for p in pts)<=low+1e-9 or min(p[1] for p in pts)>=high-1e-9):
+                    chosen='round_window';reason='owner_large_outer_room_rule';break
+    return {'type':chosen,'material':material,'level_id':level,'area_ids':sorted(ids),'reason':reason,'mass_kg':None}
+
+
+def geometry(catalog,selection,name,hinge,u,normal,width,height,z,legacy,component='BuildingExterior'):
+    require(selection['type'] in catalog['types'] and selection['material'] in catalog['materials'],'Unsupported door variant')
+    material=selection['material'];profile=catalog['materials'][material]
+    thickness=legacy['door_leaf_mm'] if material=='wood' else profile['thickness_mm'];color=legacy['door_color'] if material=='wood' else profile['color']
+    require(width>0 and height>0 and thickness>0,'Positive door dimensions required')
+    result={'bodies':[],'operations':[]}
+    def body(id,role,color,opacity=1):result['bodies'].append({'id':id,'component':component,'role':role,'appearance':{'color':color,'opacity':opacity}})
+    def op(id,target,shape,action='create'):result['operations'].append({'id':id,'body':target,'action':action,'shape':shape})
+    def cylinder(id,target,along,radius,depth,action='create'):
+        op(id,target,{'kind':'cylinder','origin':[center[0]+along*u[0],center[1]+along*u[1],z+w['center_height_mm']],
+            'radius':radius,'height':depth,'axis':[u[0],u[1],0]},action)
+    body(name,'concept_open_'+material+'_room_door',color)
+    points=[[hinge[j]+along*u[j]+across*normal[j] for j in (0,1)] for along,across in [(-thickness,0),(0,0),(0,width),(-thickness,width)]]
+    if floor.signed_area(points)<0:points.reverse()
+    op(name+'_Leaf',name,{'kind':'polygon_prism','plane':'XY','points':points,'offset':z,'depth':height,'fixed':True})
+    selection.update(leaf_body_id=name,leaf_thickness_mm=thickness,width_mm=width,height_mm=height,detail_body_ids=[],dimensions_measured=False)
+    if selection['type']=='plain':return result
+    w=catalog['window'];radius=w['diameter_mm']/2;rim_radius=radius+w['rim_width_mm']
+    require(2*(rim_radius+w['edge_margin_mm'])<width and rim_radius+w['edge_margin_mm']<w['center_height_mm']<height-rim_radius-w['edge_margin_mm'],'Viewing window does not fit its door leaf: '+name)
+    require(w['glass_thickness_mm']<thickness,'Pane must fit within the leaf thickness')
+    center=[hinge[j]+width*normal[j]/2 for j in (0,1)]
+    cylinder(name+'_ViewingOpening',name,-thickness-1,radius,thickness+2,'cut')
+    pane=name+'_ViewingGlass';body(pane,'concept_round_door_glass',w['glass_color'],w['glass_opacity'])
+    cylinder(pane+'_Pane',pane,-(thickness+w['glass_thickness_mm'])/2,radius-w['radial_glass_clearance_mm'],w['glass_thickness_mm']);selection['detail_body_ids'].append(pane)
+    for suffix,along in [('Front',0),('Back',-thickness-w['rim_thickness_mm'])]:
+        rim=name+'_ViewingRim'+suffix;body(rim,'concept_round_door_rim',w['rim_color']);cylinder(rim+'_Outer',rim,along,rim_radius,w['rim_thickness_mm']);cylinder(rim+'_Inner',rim,along-.1,radius,w['rim_thickness_mm']+.2,'cut');selection['detail_body_ids'].append(rim)
+    selection['window']={'center_mm':center+[z+w['center_height_mm']],'diameter_mm':w['diameter_mm'],'axis':[u[0],u[1],0],'pane_body_id':pane}
+    return result

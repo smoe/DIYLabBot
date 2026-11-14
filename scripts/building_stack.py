@@ -257,7 +257,7 @@ def interfaces(spec, p):
         data['opening_probes'] = [probe for probe in data['opening_probes'] if probe['target_body'] not in omitted]
         data['furnishings'] = {key: furnished[key] for key in ('rooms', 'body_ids', 'omitted_walls')}
     if 'exterior' in spec:
-        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in levels}, p, levels)
+        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in levels}, p, levels, omitted_wall_ids=data.get('furnishings',{}).get('omitted_walls',()))
         ext = extension['interface']; omitted = set(ext['omitted_body_ids'])
         for level in levels: level['wall_bodies'] = [n for n in level['wall_bodies'] if n not in omitted]
         data['wall_visibility_ids'] = [n for n in data['wall_visibility_ids'] if n not in omitted]
@@ -311,7 +311,7 @@ def expanded(spec, p):
         result['operations'] = [op for op in result['operations'] if op['body'] not in omitted]
         for key in ('components', 'bodies', 'operations'): result[key].extend(furnished[key])
     if 'exterior' in spec:
-        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in data['levels']}, p, data['levels'])
+        extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in data['levels']}, p, data['levels'], omitted_wall_ids=data.get('furnishings',{}).get('omitted_walls',()))
         omitted = set(extension['interface']['omitted_body_ids'])
         for body in result['bodies']:
             if body['id'] in extension['interface'].get('surface_overrides', {}):
@@ -354,5 +354,6 @@ def source_dependencies(spec):
     if 'furnishings' in spec['sources']: paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
+    if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))
     if '_source' in spec: paths.insert(0, Path(spec['_source']['path']))
     return list(dict.fromkeys(paths))

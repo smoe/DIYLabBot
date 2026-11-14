@@ -29,13 +29,28 @@ KG und EG besitzen dieselbe Außenkontur wie OG1–OG3; Aufzug und inneres
 Treppenhaus bleiben unverändert im gemeinsamen XY-Bezug. Details und
 Prüfgrenzen stehen in [der Hüllenregistrierung](building-alignment.md).
 
-## Aktueller Fassaden- und Außenflächenstand
+## Fassaden- und Außenflächenstand vor der Türintegration
 
 `building-stack-2d80f268decf`: opake Betonflanken, begrenzte seitliche Fensterbänder,
 dünne grüne Rasenmarkierung sowie grauer Bürgersteig und Zufahrt. Die
 Geschosshülle und festen Kerne bleiben unverändert registriert. Beide CADs
 bestehen 451 Geometrieproben und 14 Höhenprüfungen; alle 1614 STEP-Vergleiche bestehen.
 Details stehen in [der Fotoableitung](building-exterior.md).
+
+## Aktueller Gesamtstand mit Raumtüren
+
+`building-stack-a08626f68c13` integriert Küche 1.008, die drei
+Doktorandenbüros, Büro 3.009 und die [gemeinsamen Türmodelle](building-doors.md).
+66 Raumtüren besitzen runde Guckfenster, 53 oberirdische Raumtüren bleiben
+fensterlos und 22 Keller-Raumtüren verwenden das fensterlose Stahlprofil.
+Die Küchenstühle bleiben gleichmäßig mit je vier Sitzen an beiden Längsseiten.
+
+FreeCAD und SolidCraft enthalten 1.811 geschlossene Körper. Je 451
+Geometrieproben und 14 Höhenprüfungen sowie alle 1.811 exakten STEP-Vergleiche
+bestehen; die maximale STEP-Volumendifferenz beträgt 0.
+Die zusätzliche native Türprüfung bestätigt alle 141 Raumtürblätter und die
+freien Ausschnitte mit separat eingesetzten Scheiben. Maße und Materialaufbau
+bleiben Darstellungsannahmen; reale Türbewegungen sind nicht geprüft.
 
 ## Ansichten für den Antrag
 

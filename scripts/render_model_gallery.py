@@ -311,6 +311,19 @@ def diagram(entry):
             'representation':'Authorized manually derived EG vectors anchored to shared core references; uncalibrated, original photograph excluded',
             'producer_files_sha256':{rel(path):sha(path) for path in [ROOT/'scripts/render_ground_floor.py',*ground.source_dependencies(spec)] if path.suffix=='.py' or path.name.endswith('.schema.json')},
             'metric_scale_known':False,'original_image_embedded':False,'areas':len(spec['areas'])}
+    if view=='room_doors':
+        import building_doors as doors
+        policy=read(ROOT/entry['sources'][0]);catalog=doors.read(policy['catalog'])
+        stack=read(ROOT/'model/building-stack.shared.json');wood=stack['exterior']['door_color'];steel=catalog['materials']['steel']['color'];w=catalog['window']
+        text=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 600"><rect width="720" height="600" fill="#f4f6f7"/><g font-family="sans-serif" text-anchor="middle" fill="#243747"><text x="360" y="34" font-size="22">Zwei Türtypen · Holz und Stahl</text>']
+        for x,label,colour,window in [(40,'Ohne Fenster',wood,False),(280,'Rundes Guckfenster',wood,True),(520,'Keller · Stahl',steel,False)]:
+            text.append(f'<rect x="{x}" y="80" width="160" height="382" fill="{colour}" stroke="#344956" stroke-width="2"/>')
+            if window:
+                radius=w['diameter_mm']/2*160/900;cy=462-w['center_height_mm']*382/2150
+                text.append(f'<circle cx="{x+80}" cy="{cy:g}" r="{radius+w["rim_width_mm"]*160/900:g}" fill="{w["rim_color"]}"/><circle cx="{x+80}" cy="{cy:g}" r="{radius:g}" fill="{w["glass_color"]}"/>')
+            text.append(f'<text x="{x+80}" y="495" font-size="17">{label}</text>')
+        text.append('<text x="360" y="555" font-size="15">Schematisch · Maße, Masse und Schutzklassen nicht qualifiziert</text></g></svg>')
+        return ''.join(text),{'representation':'Shared two-type door catalog, with a separate basement steel material profile; illustrative proportions','producer_files_sha256':{rel(Path(__file__)):sha(__file__)},'original_image_embedded':False}
     if view=='building_social':
         source=read(ROOT/entry['sources'][0]); kitchen=next(room for room in source['rooms'] if room['room']=='1.008')
         parts=['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 740"><rect width="780" height="740" fill="#f4f6f7"/><g font-family="sans-serif" fill="#243747"><text x="30" y="35" font-size="22">Küche 1.008 · Einrichtung</text><text x="390" y="100" font-size="20">Denk- und Schreibbereiche</text>']

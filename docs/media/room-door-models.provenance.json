@@ -1,0 +1,77 @@
+{
+  "format": "solidcraftbot.room-door-models-media/1",
+  "prepared_on": "2026-11-13",
+  "source_files_sha256": {
+    "model/building-stack.shared.json": "a08626f68c13a6dc1240f4ec8deba869f3d78ebfb16f59cf6dfa173798c7d4b1",
+    "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
+    "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb",
+    "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
+    "model/building-doors.schema.json": "716505f2c996d4d51c7aba30decdcc00326973c70a475599378285f5f1e30f76",
+    "model/room-door-catalog.schema.json": "18155af264ac356e33040a745dea569fa60a1832fd52ae4b9a7027a472b7e2e5",
+    "scripts/building_exterior.py": "c11ad13f56df7a3e135b091e8a20e424cf08aba986af0c30e486bb7755c5a614",
+    "model/building-exterior.schema.json": "41ddaf88b275ff7c2f83ed31872e79313d9bb6099f203b64ee3869ce03b736dc",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0"
+  },
+  "image": {
+    "path": "docs/media/room-door-models.png",
+    "sha256": "f2e5ae9043e9a49b70c20ea8bb5c5b83c452d6c517717fdd97855460aa52ee5e",
+    "bytes": 92407
+  },
+  "documentation": {
+    "path": "docs/building-doors.md",
+    "sha256": "743f07ca70d7ee299a49ba565f708292a6a3efc1e430b3c03f50e53fec905eb5",
+    "bytes": 5292
+  },
+  "native_build_report": {
+    "path": "exports/generated/room-doors-3d9675a976d8-r4/build-report.json",
+    "sha256": "7d9cdedeb25facd511df39e77dcb9820fb0614cf1da6ae6e721ec93f270c241c",
+    "bytes": 5570
+  },
+  "native_files": {
+    "solidcraft": {
+      "path": "cad/generated/room-doors-3d9675a976d8-r4/doors.sc",
+      "sha256": "988e6c05ff6c2c17f0fb21d2a88ea4e59ed870acf5d51da8cf0d4c5822dc5119",
+      "bytes": 22437
+    },
+    "freecad": {
+      "path": "cad/generated/room-doors-3d9675a976d8-r4/doors.FCStd",
+      "sha256": "d8ade31620d32ea257b978b21db7488eedf9119f07556e1d8d36333248e520a2",
+      "bytes": 26281
+    }
+  },
+  "body_count": 6,
+  "maximum_step_xor_mm3": 0.0,
+  "window_checks": [
+    {
+      "id": "PlainWood_ViewingBore",
+      "passed": true,
+      "intersection_mm3": 2463008.6404143977,
+      "expected_mm3": 2463008.6404143977
+    },
+    {
+      "id": "RoundWood_ViewingBore",
+      "passed": true,
+      "intersection_mm3": 0.0,
+      "expected_mm3": 0
+    },
+    {
+      "id": "TransparentPaneInBore",
+      "passed": true
+    },
+    {
+      "id": "PlainSteel_ViewingBore",
+      "passed": true,
+      "intersection_mm3": 3694512.9606215972,
+      "expected_mm3": 3694512.960621597
+    }
+  ],
+  "visual_review": {
+    "passed": true,
+    "method": "Native comparison inspected: plain steel at left, round-window wood at centre, plain wood at right; diagram reviewed separately"
+  },
+  "original_photograph_included": false,
+  "claude_reviewed": false,
+  "scope": "Three demonstration instances of two glazing types and an independent steel material profile; whole-building validation is separate"
+}

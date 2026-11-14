@@ -13,8 +13,9 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
 - Eine mehrgeschossige transparente Glasfront mit dunklen Pfosten und Riegeln
   ersetzt die Fassaden-Platzhalterwand `W108` in der Gebäudekomposition.
   Die EG-Eingangsöffnung bleibt über `EW074` / `D0_018` referenziert.
-- Der vorläufige Holzfarbton `#C99448` gilt für die dargestellten Raumtürblätter
-  aller fünf Ebenen. Sie stehen illustrativ offen. Die sichtbare Glasfront ist
+- Der vorläufige Holzfarbton `#C99448` gilt für die oberirdischen Raumtürblätter.
+  Die [Türtypenquelle](building-doors.md) ergänzt die runden Guckfenster und
+  das schwere Stahlprofil für den Keller. Sie stehen illustrativ offen. Die sichtbare Glasfront ist
   davon getrennt; der vorhandene Aufzug wird nicht in eine Holztür umgedeutet.
 - An den Atrium-/Flurkanten `W068` und `W106` ersetzen offene Metallgeländer
   die bisher ungeklärten Begrenzungen in den drei Obergeschossen. Pro Kante
@@ -93,7 +94,7 @@ und die dünne Außenflächenschicht einmalig fest. Beide CAD-Adapter verwenden
 dieselben daraus abgeleiteten Profile, Wandöffnungen und Geländeoperationen.
 Die ursprünglichen Raumgrundrisse und festen Treppen-/Aufzugskerne bleiben erhalten.
 
-## Aktueller Prüfstand der Seiten- und Außenflächenkorrektur
+## Prüfstand der Seiten- und Außenflächenkorrektur vor den Raumtüren
 
 `building-stack-2d80f268decf`: 1614 geschlossene Körper, je 451 Geometrieproben und 14 Höhenprüfungen
 in FreeCAD und SolidCraft. Alle zusätzlichen exakten STEP-Vergleiche bestehen.
@@ -107,3 +108,10 @@ Prüfbericht bindet diesen Prüfadapter zusätzlich über seine Prüfsumme.
 Die gezielte Veröffentlichungssuite umfasst jetzt 157 Tests: 153 bestanden,
 vier optionale JSON-Schema-Prüfungen wegen fehlender `jsonschema`-Bibliothek
 übersprungen. Quellen, Bilddateien und die Galerieprüfung sind aktuell gebunden.
+
+## Integrierter Raumtürenstand
+
+`building-stack-a08626f68c13` ergänzt dieselbe Fassade um die
+[Raumtürvarianten](building-doors.md), Küche und Büros. Beide CADs bestehen
+mit 1.811 geschlossenen Körpern, je 451 Geometrieproben und 14 Höhenprüfungen.
+Alle exakten STEP-Vergleiche ergeben 0 Volumendifferenz.

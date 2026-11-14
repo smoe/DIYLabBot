@@ -811,6 +811,23 @@
       "caption": "Schematischer Küchenplan aus der fotoinspirierten Möblierung und angenommene Büroarbeitsplätze. Native Ansichten und Kühlschrank-Easter-Egg in der Dokumentation.",
       "documentation": "docs/building-furnishings.md",
       "description": "Küche 1.008, Doktorandenbüros 1.002/2.002/3.002 und Büro 3.009; unkalibrierte Einpassung in die Gebäudevorlage."
+    },
+    {
+      "id": "room-doors",
+      "title": "Raumtüren · rundes Guckfenster und Stahl",
+      "group": "umgebungen",
+      "sources": [
+        "model/building-doors.shared.json",
+        "model/doors/room-doors.catalog.json"
+      ],
+      "image": "images/room-doors.svg",
+      "render": {
+        "kind": "diagram",
+        "view": "room_doors"
+      },
+      "caption": "Zwei gemeinsame Geometrietypen: mit rundem Guckfenster oder ohne Fenster. Keller mit schwerem Stahlprofil; Maße und Masse bleiben unqualifiziert.",
+      "documentation": "docs/building-doors.md",
+      "description": "Große Räume an beiden äußeren Zeichnungsseiten und Doktorandenbüros mit Guckfenstern; Küchen und Büroausnahmen ohne. Stahl-Materialvariante für KG."
     }
   ],
   "groups": [

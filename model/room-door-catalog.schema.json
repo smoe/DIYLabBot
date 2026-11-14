@@ -1,0 +1,144 @@
+{
+  "type": "object",
+  "required": [
+    "format",
+    "units",
+    "status",
+    "types",
+    "window",
+    "materials"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.room-door-catalog/1"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "status": {
+      "type": "string"
+    },
+    "types": {
+      "const": {
+        "plain": {
+          "round_window": false
+        },
+        "round_window": {
+          "round_window": true
+        }
+      }
+    },
+    "window": {
+      "type": "object",
+      "required": [
+        "diameter_mm",
+        "center_height_mm",
+        "glass_thickness_mm",
+        "radial_glass_clearance_mm",
+        "rim_width_mm",
+        "rim_thickness_mm",
+        "edge_margin_mm",
+        "glass_color",
+        "glass_opacity",
+        "rim_color"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "diameter_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "center_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "glass_thickness_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "radial_glass_clearance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "rim_width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "rim_thickness_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "edge_margin_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 3000
+        },
+        "glass_color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "glass_opacity": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 1
+        },
+        "rim_color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        }
+      }
+    },
+    "materials": {
+      "type": "object",
+      "required": [
+        "wood",
+        "steel"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "wood": {
+          "const": {
+            "thickness_source": "exterior.door_leaf_mm",
+            "color_source": "exterior.door_color",
+            "mass_kg": null
+          }
+        },
+        "steel": {
+          "type": "object",
+          "required": [
+            "thickness_mm",
+            "color",
+            "mass_kg"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "thickness_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3000
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "mass_kg": {
+              "type": "null"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "room-door-catalog.schema.json"
+}

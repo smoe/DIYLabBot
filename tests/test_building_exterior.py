@@ -37,10 +37,14 @@ class ExteriorTests(unittest.TestCase):
         self.assertGreater(len(ext['frame_body_ids']),10)
         self.assertTrue(all(o['action']=='create' for o in self.e['operations'] if o['body'] in {n for n in ext['frame_body_ids'] if n.startswith('Foyer')}-{ext['frame_body_id']}))
 
-    def test_door_leaves_share_one_colour_and_have_native_aperture_witnesses(self):
+    def test_door_materials_and_native_aperture_witnesses(self):
         ext=self.d['exterior'];doors=[b for b in self.e['bodies'] if b['id'] in ext['door_leaves'].values()]
         self.assertGreater(len(doors),100)
-        self.assertEqual({b['appearance']['color'] for b in doors},{self.s['exterior']['door_color']})
+        for body in doors:
+            if body['id'].startswith('KG__'):
+                self.assertEqual(body['role'],'concept_open_steel_room_door')
+            else:
+                self.assertEqual(body['appearance']['color'],self.s['exterior']['door_color'])
         witnesses={p['target_body'] for p in self.d['opening_probes'] if p['id'].startswith('LeafClear_')}
         self.assertEqual(witnesses,set(ext['door_leaves'].values()))
         self.assertFalse(set(ext['omitted_body_ids']) & {p['target_body'] for p in self.d['opening_probes']})

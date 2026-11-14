@@ -1,0 +1,25 @@
+{
+  "format": "solidcraftbot.room-door-catalog/1",
+  "units": {"length": "mm", "angle": "deg"},
+  "status": "Illustrative dimensions, not measured doors or qualified protection classes",
+  "types": {
+    "plain": {"round_window": false},
+    "round_window": {"round_window": true}
+  },
+  "window": {
+    "diameter_mm": 350,
+    "center_height_mm": 1500,
+    "glass_thickness_mm": 8,
+    "radial_glass_clearance_mm": 2,
+    "rim_width_mm": 20,
+    "rim_thickness_mm": 4,
+    "edge_margin_mm": 80,
+    "glass_color": "#A7CDD8",
+    "glass_opacity": 0.3,
+    "rim_color": "#69737C"
+  },
+  "materials": {
+    "wood": {"thickness_source": "exterior.door_leaf_mm", "color_source": "exterior.door_color", "mass_kg": null},
+    "steel": {"thickness_mm": 60, "color": "#69737C", "mass_kg": null}
+  }
+}

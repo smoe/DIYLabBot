@@ -86,7 +86,7 @@ Die Sitzmitten liegen mit gleichem Abstand und gleichen Randabständen einander
 gegenüber; alle Stühle zeigen zum Tisch. Der bisherige Drehstuhl steht nun
 seitlich. Ein weiterer Stuhl ergänzt die gerade Gesamtzahl von acht Sitzen.
 
-Die aktualisierte Küchenprojektion `kitchen-seating-883a5a7d56dd` enthält
+Die damalige Küchenprojektion `kitchen-seating-883a5a7d56dd` enthält
 148 gültige geschlossene Körper in FreeCAD und SolidCraft. Der STEP-Vergleich
 ergibt 0 Volumendifferenz; verschiedene Einrichtungsgegenstände überschneiden
 sich nicht. Verwendet wird der zuletzt geprüfte Darstellungsrahmen der
@@ -95,3 +95,13 @@ qualifiziert: Ein Vollaufbau traf auf kreuzende Grenzen `EW091/EW163`.
 Die unveränderten Büro- und Kühlschrankbilder behalten ihren bisherigen
 nativen Modellnachweis; die betroffenen Geometrie- und Darstellungsbefehle
 sind gegenüber der neuen gemeinsamen Quelle exakt gleich.
+
+## Aktueller integrierter Gebäudestand mit Raumtüren
+
+`building-stack-a08626f68c13` enthält die unveränderten Möblierungsquellen
+zusammen mit der korrigierten Gebäuderegistrierung und den neuen Raumtüren.
+Der oben beschriebene `EW091/EW163`-Fehler gehört zum historischen Zwischenstand.
+Der vollständige Aufbau besteht jetzt in beiden CADs mit 1.811 geschlossenen
+Körpern, 451 Geometrieproben und 14 Höhenprüfungen je Backend sowie
+0 Volumendifferenz in allen STEP-Vergleichen. Küche, Büros und Kühlschrank-Easter-Egg
+werden aus diesem Gesamtmodell abgebildet. Die Stuhlverteilung bleibt vier zu vier.

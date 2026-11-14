@@ -2,6 +2,7 @@
 import math
 import re
 import relative_floorplan as floor
+import building_doors as doors
 import building_roof as roof
 
 
@@ -10,7 +11,7 @@ def require(ok, message):
 
 
 def validate(s):
-    require(set(s)=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color'},'Explicit exterior recipe required')
+    require(set(s)-{'doors'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color'},'Explicit exterior recipe required')
     require(s['status']=='photo_informed_unmeasured_concept','Declare photo-informed, unmeasured exterior')
     require(type(s['bay_count']) is int and 2<=s['bay_count']<=12,'Bounded illustrative facade bays required')
     for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','landscape_layer_mm','sidewalk_width_mm','road_width_mm']:
@@ -25,14 +26,19 @@ def validate(s):
     require(isinstance(s['guard_boundaries'],list) and s['guard_boundaries'] and len(set(s['guard_boundaries']))==len(s['guard_boundaries']),'Unique source guard boundaries required')
 
 
-def compile(s, plans, p, levels):
+def compile(s, plans, p, levels, omitted_wall_ids=()):
     validate(s); canonical=plans['OG3']; ground=plans['EG']; scale=p['display_scale']
     walls={w['id']:w for w in canonical['walls']};gwalls={w['id']:w for w in ground['walls']}
     require(s['front_wall'] in walls and s['ground_front_wall'] in gwalls,'Pinned graph facade anchors required')
     def ends(plan,w):return [[v*scale for v in plan['vertices'][w[k]]] for k in ('start','end')]
     a,b=ends(canonical,walls[s['front_wall']]);require(abs(a[0]-b[0])<1e-8,'Straight X-normal front required')
     x=a[0];y0,y1=sorted([a[1],b[1]]);grade=next(v['z_mm'] for v in levels if v['id']=='EG');top=levels[-1]['clear_top_mm']+p['slab_thickness_mm']
-    r={'components':[{'id':'BuildingExterior','grounded':True}],'bodies':[],'operations':[]};omitted=[];door_map={};glass_ids=[];guard_ids=[];guard_groups=[];terrain_ids=[];frame_ids=[]
+    door_policy,door_catalog=doors.load(s['doors']) if 'doors' in s else (None,None)
+    if door_policy is not None:
+        for field in ('include_areas','exclude_areas'):
+            for level,ids in door_policy[field].items():
+                require(level in plans and set(ids)<={area['id'] for area in plans[level]['areas']},'Unknown explicitly selected door room')
+    r={'components':[{'id':'BuildingExterior','grounded':True}],'bodies':[],'operations':[]};omitted=list(omitted_wall_ids);door_map={};door_bindings={};glass_ids=[];guard_ids=[];guard_groups=[];terrain_ids=[];frame_ids=[]
     def body(n,role,color,opacity=1):
         r['bodies'].append({'id':n,'component':'BuildingExterior','role':role,'appearance':{'color':color,'opacity':opacity}});return n
     def box(n,target,origin,size,action='create'):
@@ -85,7 +91,15 @@ def compile(s, plans, p, levels):
             direction=next(v['direction'] for v in owner['boundary'] if v['wall']==door['wall']);normal=[v*direction for v in normal]
             hinge=[wa[j]+door['interval'][0]*(wb[j]-wa[j]) for j in (0,1)];width=(door['interval'][1]-door['interval'][0])*length;t=s['door_leaf_mm']
             pts=[[hinge[j]+along*u[j]+depth*normal[j] for j in (0,1)] for along,depth in [(-t,0),(0,0),(0,width),(-t,width)]]
-            n=body(level['id']+'__DoorLeaf_'+door['id'],'concept_open_wood_room_door',s['door_color']);prism(n+'_Leaf',n,pts,level['z_mm'],p['door_height_mm']);door_map[level['id']+'__'+door['id']]=n
+            n=level['id']+'__DoorLeaf_'+door['id']
+            if door_policy is None:
+                body(n,'concept_open_wood_room_door',s['door_color']);prism(n+'_Leaf',n,pts,level['z_mm'],p['door_height_mm'])
+            else:
+                selection=doors.select(door_policy,plan,canonical,level['id'],door)
+                pieces=doors.geometry(door_catalog,selection,n,hinge,u,normal,width,p['door_height_mm'],level['z_mm'],s)
+                for key in ('bodies','operations'):r[key].extend(pieces[key])
+                door_bindings[level['id']+'__'+door['id']]=selection
+            door_map[level['id']+'__'+door['id']]=n
     # Very open metal balustrades along the source's corridor/atrium edges.
     for level in levels:
         if not level['id'].startswith('OG'):continue
@@ -154,5 +168,5 @@ def compile(s, plans, p, levels):
         n=body(name,'illustrative_'+material+'_surface',color);site_ids.append(n);box(n+'_Sheet',n,origin,size)
         box(n+'_LawnCut',lawn,[origin[0],origin[1],bottom-layer],[size[0],size[1],layer*3],'cut')
         site_regions.append({'body':n,'material':material,'origin_mm':origin,'size_mm':size})
-    r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'site_body_ids':site_ids,'site_regions':site_regions,'surface_layer_mm':layer,'surface_overrides':surfaces,'opaque_facade_body_ids':opaque_ids,'side_window_groups':window_groups,'window_probes':window_probes,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
+    r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'door_bindings':door_bindings,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'site_body_ids':site_ids,'site_regions':site_regions,'surface_layer_mm':layer,'surface_overrides':surfaces,'opaque_facade_body_ids':opaque_ids,'side_window_groups':window_groups,'window_probes':window_probes,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
     return r
