@@ -399,7 +399,11 @@ nun auf 1,50 m; drei obere Stützen tragen zwei Schrank-Bauräume ab 1,75 m. Der
 zwischen den Stützen prüfen seine Offenheit. Fensterseitige Unterschrank- und
 Sockelkörper entfallen und werden durch offene Bein-Bauräume ersetzt.
 
-[H03](tube-cam-h03.md) konkretisiert den motorlosen Stationsantrieb: Zwei
+Die [aktuelle Standardrichtung](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter)
+verwendet direkten Körpergriff aus passiven Haltern und Rackübergaben zwischen
+stationären Armen und Transportrobotern. H02-Direktentnahme ist noch zu prüfen.
+Der erhaltene historische Vergleichsentwurf [H03](tube-cam-h03.md) konkretisiert
+den früher vorgesehenen motorlosen Stationsantrieb: Zwei
 Kurvenscheiben auf einer gemeinsamen horizontalen Welle heben das Gefäß und
 schließen über einen Keilkragen den Empfänger. Ein federbelasteter Bolzen
 hält den Kragen beim Folgerrückzug. Sein Zug-/Vierteldrehverschluss erlaubt
@@ -429,7 +433,7 @@ zwei native CAD-Adapter und Geometrie-/Positionsprüfungen folgen dem Ansatz des
 Arms. H01 ist nicht in die bestehende Deckelstation C01 eingebaut; deren
 Beladungsgrenze sowie die offene Auslegung von Kontakt, Kräften und Kühlung bleiben.
 
-Für den neuen Wunsch nach freier Flüssigkeitssicht folgt [H02](tube-frame-h02.md):
+Der erhaltene Entwurf für freie Flüssigkeitssicht ist [H02](tube-frame-h02.md):
 schmale Führungs-/Sitzringe und zwei hintere Pfosten statt eines umschließenden
 Körpers, durchgängige Bodenöffnungen und ein äußerer Bodenheber. Zwei geteilte
 Empfangssitze schließen erst am angehobenen Gefäß; danach zieht der Heber zurück.

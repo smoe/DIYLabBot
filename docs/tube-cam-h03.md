@@ -1,5 +1,8 @@
 # Robot-operated cam and latch — H03
 
+**Historical comparison concept, retired from the default architecture on 14 November 2026.**
+The current direction is [direct gripping and cooperating robots](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter): station arms pick tubes from passive, accessible holders; transport robots carry racks between stations. H03 is not required for new stations. Its sources, CAD evidence and animation are retained unchanged for comparison. The sequence below documents the earlier motorless design.
+
 H03 implements the owner's choice of 28 October 2026: robot-operated turning,
 with **no additional station motors**. The open H02 tube frame, body seats,
 bottom access and receiving halves are retained. A horizontal shaft now carries

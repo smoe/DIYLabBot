@@ -15,6 +15,23 @@ und gemeinsame Protokollstellungen ohne FreeCAD-Dateien als Eingabe. Erhaltene
 Hersteller-Gehäuseteile können unter einer gemeinsamen semantischen Geräte-ID
 mehrere starre CAD-Körper bilden; ihre Zuordnung wird im Build-Bericht geführt.
 
+## Gefäßhandhabung und kooperierende Roboter
+
+Die [Eigentümerentscheidung vom 14. November 2026](docs/requirements.md#direkter-gefäßgriff-und-kooperierende-roboter)
+setzt direkten Körpergriff aus passiven, zugänglichen Haltern als Standardrichtung.
+Stationäre Arme bedienen Gefäße und Geräte; mobile Roboter transportieren Racks.
+Abgestützte Rackübergaben über passive Docks bilden die bevorzugte Kopplung.
+Gefäßidentität, bestätigte Unterstützung und Ressourcen bleiben im bestehenden
+Owner-/Inventarvertrag; eine zusätzliche Roboterbilanz ist nicht vorgesehen.
+
+H03 bleibt ein historischer Vergleichsentwurf. Seine Dreh-/Verriegelungsmechanik
+ist keine Voraussetzung neuer Stationen. Die bestehenden H02-/H03-Quellen und
+Nachweise bleiben unveränderte Vergleichsstände; sie implementieren keinen
+H02-Direktgriff. Gerätespezifische Heber wie bei CF01 bleiben bei fehlendem
+Greifzugang möglich. Fingerfreigang, Nachbargefäße, Rückhaltung und Auszug
+müssen am konkreten Halter nachgewiesen werden. Die statische Dreiarmaufstellung
+und synthetischen Transportverträge belegen keine koordinierte Hardwarebewegung.
+
 ## Projektweite Bewegungsvorgabe
 
 Fließende Bewegung ist eine allgemeine Anforderung, auch bei leeren Fahrten

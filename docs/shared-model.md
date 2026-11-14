@@ -382,6 +382,10 @@ implementiert. Details und aktuelle Dateien: [TR01](sample-transport-tr01.md).
 
 ## Robotergesteuerte Drehmechanik H03
 
+Historischer Vergleichsentwurf; die aktuelle [Standardrichtung](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter)
+ist direkter Körpergriff aus passiven Haltern. Die vorhandenen Quellen und
+Nachweise bleiben unverändert; H03 ist keine Abhängigkeit neuer Stationen.
+
 Die [H03-Erweiterung](tube-cam-h03.md) verwendet eine per SHA-256 gebundene
 H02-Basis und ergänzt gemeinsame Kurvengesetze, Rollen-Hüllkonturen, Keilflächen,
 Bolzen, Federtasche und Bajonettschlitze. Gemeinsame Adapter unterstützen dafür
@@ -401,6 +405,10 @@ angewandt werden. 483 native FreeCAD-Stellungen werden mit Quelle und
 Rotationsmatrizen verglichen; Abspielzeit und Kontaktphysik bleiben unqualifiziert.
 
 ## Offener Gefäßrahmen H02
+
+Erhaltene Rahmen-/Heberbasis. Direkter Robotergriff aus H02 ist noch nicht
+implementiert oder geprüft; der folgende Vertrag beschreibt weiterhin den
+bisherigen Heber und geteilten Empfänger.
 
 [tube-frame-h02.shared.json](../model/tube-frame-h02.shared.json) beschreibt
 optische Fenster, untere Außenwandsitze, Bodenzugang und einen geteilten Empfänger.

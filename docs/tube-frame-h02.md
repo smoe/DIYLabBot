@@ -1,7 +1,8 @@
 # Open tube frame, bottom lifter and receiving cradle — H02
 
-The current actuation revision is [H03: robot-operated cams and latch](tube-cam-h03.md),
-with no extra station motors. H02 remains the preserved open-frame baseline.
+H02 is the preserved open-frame, bottom-lifter and split-receiver baseline.
+The later [H03 cam mechanism](tube-cam-h03.md) is now a historical comparison concept.
+The current direction is [direct gripping and cooperating robots](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter). Direct robot pickup from this specific H02 frame has not been demonstrated; its guides, posts and neighboring tubes still require gripper-clearance and extraction checks. The geometry and evidence below retain the earlier lifter/receiver sequence.
 
 Revised on 28 October 2026 following the owner's request to expose the liquid,
 provide bottom ejection access, and hold the tube after it leaves its frame.

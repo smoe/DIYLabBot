@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "bb83781013468da261004f2ba7328fd864ad37a8b9bc557e2b0bf065c4a8e017",
+  "catalog_sha256": "871e62eebadff0a3d172a919880027f47810e2140bb938eccc4bcdb803ffc11b",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "69fbea316e47d08cf64bc5a31c9f67120bd357c1241ce009d8d29278c789bcc4",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
