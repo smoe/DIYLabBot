@@ -381,7 +381,7 @@
     },
     {
       "id": "cam",
-      "title": "Kurvenantrieb H03",
+      "title": "Kurvenantrieb H03 · historischer Vergleich",
       "group": "baugruppen",
       "sources": [
         "model/tube-cam-h03.shared.json"
@@ -392,7 +392,7 @@
         "family": "tube-cam-h03",
         "view": "mechanism"
       },
-      "caption": "Kurven, Rollenfolger und Verriegelungsmechanik aus der gemeinsamen Quelle.",
+      "caption": "Historischer motorloser Vergleichsentwurf mit Kurven, Rollenfolgern und Verriegelung. Aktuelle Richtung: direkter Gefäßgriff aus passiven Haltern und kooperierende Roboter.",
       "documentation": "docs/tube-cam-h03.md"
     },
     {
@@ -573,7 +573,7 @@
     },
     {
       "id": "cam-cycle",
-      "title": "H03 · Übergabe und Rückstellung",
+      "title": "H03 · historischer Übergabe- und Rückstellzyklus",
       "group": "ablaeufe",
       "sources": [
         "model/tube-cam-h03-cycle.shared.json"
@@ -582,7 +582,7 @@
       "render": {
         "kind": "cycle"
       },
-      "caption": "Ansicht aus der geprüften geometrischen Ablaufdarstellung. Ein erfolgreicher Modellzyklus ist kein Hardwareversuch.",
+      "caption": "Erhaltene geometrische Ablaufdarstellung des historischen H03-Konzepts; kein Standardablauf neuer Stationen und kein Hardwareversuch.",
       "documentation": "docs/tube-cam-h03.md"
     },
     {

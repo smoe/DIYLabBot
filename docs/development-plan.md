@@ -67,8 +67,19 @@ die Gesamtbudgetgrenze bleibt bestehen.
 
 ## Mechanischer Nachweis
 
-Für die motorlose Gefäßstation [H03](tube-cam-h03.md) zuerst Kurvenscheiben,
-Rollenfolger und Riegel als langsamen Prüfstand herstellen. Federn auswählen,
+Die aktuelle Standardrichtung ist [direkter Gefäßgriff mit kooperierenden Robotern](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter).
+Zuerst den vorhandenen Körpergreifer und die passiven Rackaufnahmen wiederverwenden,
+dann Gefäßartikel und Fingerfreigang am offenen Halter prüfen. Anfahrt, Griff,
+Auszug und Ablage mit Nachbargefäßen aus derselben gemeinsamen Geometrie ableiten
+und in beiden CADs prüfen. Erst danach eine durchgehende Bahn mit bestätigtem
+Griff und bestätigter Ablage entwickeln. Stationäre Arme und Racktransport über
+passive Docks koordinieren; die vorhandene statische Dreiarmaufstellung und
+Transport-Mocks sind kein Nachweis kooperativer Hardware. Ein H02-Direktgriff
+ist noch zu implementieren und zu prüfen.
+
+H03 ist aus dem aktiven Standardpfad zurückgestellt. Nur bei erneutem Bedarf
+an genau diesem motorlosen Vergleichskonzept wären Kurvenscheiben,
+Rollenfolger und Riegel als langsamer Prüfstand herzustellen. Federn auswählen,
 Folgerkontakt, Schließ-/Entriegelungskraft und notwendiges Roboterdrehmoment
 messen. Den Halt bei zurückgezogenem Folger sowie den unterstützten Rücklauf
 mit realen Gefäßen prüfen. Erst nach bestätigter Übernahme darf der Roboter die
@@ -172,11 +183,13 @@ gesampelte Frontübergaben prüfen. Anschließend reale Gefäße ausmessen und e
 Pass-/Stabilitätsmuster drucken; erst danach Clipfreigabe, Greifer, Dockverriegelung
 und den Anschluss an C01 samt vollständigem Roboterweg konstruieren.
 
-Für den optischen Prüfstand nun den [offenen H02-Rahmen](tube-frame-h02.md) mit
+Als erhaltene Vergleichsbasis für den optischen Prüfstand den [offenen H02-Rahmen](tube-frame-h02.md) mit
 `python scripts/build_tube_frame.py` in beiden CADs erzeugen. Reale Gefäße zuerst
 manuell in offenen Mustern testen: Kippstabilität, Sicht auf Flüssigkeit und
-Wandtropfen sowie Beleuchtung. Danach geformten Bodenheber und geteilten Empfänger
-mit gemessenen Kontaktkräften und bestätigter Übernahme untersuchen. Heber erst
+Wandtropfen sowie Beleuchtung. Für die aktuelle Richtung zuerst den direkten
+Körpergriff und Auszug prüfen. Bodenheber und geteilten Empfänger nur bei
+nachgewiesenem Bedarf mit gemessenen Kontaktkräften und bestätigter Übernahme
+untersuchen. Heber erst
 nach Empfangsbestätigung zurückziehen; Empfänger erst nach freiem Heber bewegen.
 Der Verlust großer Kühlkontaktflächen erfordert ein neues thermisches Konzept,
 falls die Option Pipettieren auf Eis weiterverfolgt wird.

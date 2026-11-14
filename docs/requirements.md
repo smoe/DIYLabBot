@@ -208,7 +208,42 @@ liegt auf 1,50 m, die oberen Mittelschränke beginnen bei ungefähr 1,75 m. Dazw
 soll man zur anderen Bankseite durchgreifen können. Fensterseitige Unterschränke
 werden entfernt; Unterstauraum bleibt nur unter den Seiten- und Mittelbänken.
 
-Bestätigte Antriebsentscheidung vom 28. Oktober 2026: Gefäßübergabe durch eine
+## Direkter Gefäßgriff und kooperierende Roboter
+
+Eigentümerentscheidung vom 14. November 2026: Direkter Griff am äußeren
+Gefäßkörper aus passiven, zugänglichen Haltern ist die Standardrichtung.
+Stationäre Arme bedienen Gefäße und Geräte; mobile Transportroboter bringen
+Racks zwischen Stationen. Zusammenarbeit erfolgt bevorzugt über abgestützte
+Racks in passiven Docks. Eine synchrone Gefäßübergabe zwischen zwei Armen ist
+keine Voraussetzung dieser Architektur.
+
+H03 wird als historischer Vergleichsentwurf erhalten und ist kein Standardbaustein
+und keine Voraussetzung für neue Stationen. Auch H02 bleibt ein vorhandener
+optischer Rahmen-/Heberentwurf: Seine direkte Entnahme mit dem vorgesehenen
+Greifer ist noch nicht nachgewiesen. Vorhandene Quellen, gebundene CAD-Nachweise
+und Animationen bleiben für den Vergleich unverändert erhalten.
+
+Für neue Halter zuerst am konkreten Gefäß und Greifer prüfen: zugänglicher
+Körperbereich unterhalb des Kragens, Platz für Finger und Nachbargefäße,
+Auszug ohne Verhaken, Halterstabilität und geeignete Rückhaltung. Mund,
+Dichtlippe und Gefäßinneres bleiben kontaktfrei. Der übernehmende Arm benötigt
+bestätigten Griff vor dem Abheben; bei Ablage muss die Unterstützung vor der
+Greiferöffnung bestätigt sein. Gefäß-/Rackidentität und Übergaben im bestehenden
+Owner-/Inventarvertrag führen, keine zweite Bilanz für einzelne Roboter einführen.
+
+Ein gerätespezifischer Heber bleibt möglich, wenn der Griff sonst nicht zugänglich
+ist, etwa im vorhandenen CF01-Konzept. Daraus folgt keine allgemeine H03-Pflicht.
+Die CF01-Greifer-/Rackdarstellung ist vorhandene Konzeptgeometrie, kein Nachweis
+für direkte H02-Entnahme. Reale Griffkräfte, Gefäßpassung, Docking, Lageerfassung
+und Mehrroboterkoordination bleiben zu prüfen; die vorhandene Dreiarmaufstellung
+ist statisch. Dies ist eine Architekturentscheidung, kein neuer Bewegungs-,
+Hardware- oder Laufzeitadapter. Neue Bewegungen müssen die fließende
+Bewegungsvorgabe erfüllen.
+
+### Historischer H02-/H03-Vergleich
+
+Historische Antriebsentscheidung vom 28. Oktober 2026 (durch die obige
+Standardrichtung abgelöst): Gefäßübergabe durch eine
 vom Roboter betätigte Drehmechanik ohne zusätzliche Stationsmotoren.
 [H03](tube-cam-h03.md) beschreibt Kurven, Rollenfolger, Schließkeil und
 federbelasteten Riegel in der gemeinsamen Quelle und beiden nativen CADs.
@@ -222,7 +257,7 @@ Vierteldreh-Entriegelung einschließlich anschließendem Absenken und Wiederaufr
 Die gemeinsame Ablaufquelle verwendet dieselben Kurvengesetze wie die CADs;
 Abspielzeiten sind Anschauungswerte und keine qualifizierten Betriebszeiten.
 
-Zusätzlicher Eigentümerwunsch vom 28. Oktober 2026: Flüssigkeit beim Pipettieren
+Historischer Entwurfswunsch vom 28. Oktober 2026: Flüssigkeit beim Pipettieren
 optisch zugänglich halten, daher einen offenen Rahmen untersuchen. Ein
 Bodendurchbruch soll ein Anheben am äußeren Gefäßboden erlauben, ohne
 Gefäßöffnung oder Dichtlippe zu greifen. Ein Empfänger muss das angehobene Gefäß
