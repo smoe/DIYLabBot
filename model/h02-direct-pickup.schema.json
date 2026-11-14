@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "h02-direct-pickup.schema.json",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "units",
+    "sources",
+    "holder_parts",
+    "variants",
+    "neighbor_offsets",
+    "pitch_mm",
+    "grasp_z_mm",
+    "travel_mm",
+    "duration_s",
+    "tool_clearance_mm",
+    "volume_tolerance_mm3",
+    "status",
+    "limitations",
+    "motion_limits"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "format": {
+      "const": "solidcraftbot.h02-direct-pickup/1"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "time": "s"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "holder",
+        "gripper"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "holder": {
+          "$ref": "assembly-reference.schema.json"
+        },
+        "gripper": {
+          "$ref": "assembly-reference.schema.json"
+        }
+      }
+    },
+    "holder_parts": {
+      "const": [
+        "DockBase",
+        "CarrierShell",
+        "LowerSeat",
+        "ReferenceTube",
+        "MouthKeepout"
+      ]
+    },
+    "variants": {
+      "const": [
+        "V15",
+        "V20"
+      ]
+    },
+    "neighbor_offsets": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+          "type": "integer",
+          "minimum": -1,
+          "maximum": 1
+        }
+      }
+    },
+    "pitch_mm": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      }
+    },
+    "motion_limits": {
+      "type": "object",
+      "required": [
+        "velocity_mm_s",
+        "acceleration_mm_s2",
+        "jerk_mm_s3"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "velocity_mm_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "acceleration_mm_s2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "jerk_mm_s3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "grasp_z_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "travel_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "duration_s": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "tool_clearance_mm": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "volume_tolerance_mm3": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    }
+  }
+}

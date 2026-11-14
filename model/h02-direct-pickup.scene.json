@@ -1,0 +1,86 @@
+{
+  "format": "solidcraftbot.h02-direct-pickup/1",
+  "id": "H02DirectPickup",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "sources": {
+    "holder": {
+      "source": "model/tube-frame-h02.shared.json",
+      "source_sha256": "34a52d3bd79f847e918c645a4034bb07dc8ecb8f2ad21465101e4196c24d9cba"
+    },
+    "gripper": {
+      "source": "model/centrifuge-cf01.robot-pickup.shared.json",
+      "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
+    }
+  },
+  "holder_parts": [
+    "DockBase",
+    "CarrierShell",
+    "LowerSeat",
+    "ReferenceTube",
+    "MouthKeepout"
+  ],
+  "variants": [
+    "V15",
+    "V20"
+  ],
+  "neighbor_offsets": [
+    [
+      -1,
+      -1
+    ],
+    [
+      0,
+      -1
+    ],
+    [
+      1,
+      -1
+    ],
+    [
+      -1,
+      0
+    ],
+    [
+      1,
+      0
+    ],
+    [
+      -1,
+      1
+    ],
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      1
+    ]
+  ],
+  "pitch_mm": [
+    48,
+    44
+  ],
+  "grasp_z_mm": 33,
+  "travel_mm": 60,
+  "duration_s": 6,
+  "tool_clearance_mm": 0.5,
+  "volume_tolerance_mm3": 1e-05,
+  "status": "Synthetic tool-space direct pickup from passive H02 parts; no arm IK, hardware or force qualification",
+  "limitations": [
+    "Pitch, grip height and motion duration are illustrative, not measured",
+    "H02 mouth keepout is a conservative reserved cap/mouth envelope, not a modeled closed lid",
+    "Existing holder and CF01 gripper dimensions are reused without changes",
+    "Only vertical local approach, closure and extraction; no lateral transfer or whole-arm reach/self-collision",
+    "Passive fixture omits H02 lifter, drive and split receiver; historical source unchanged"
+  ],
+  "motion_limits": {
+    "velocity_mm_s": 30,
+    "acceleration_mm_s2": 20,
+    "jerk_mm_s3": 100
+  }
+}

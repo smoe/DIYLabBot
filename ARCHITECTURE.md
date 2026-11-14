@@ -26,8 +26,12 @@ Owner-/Inventarvertrag; eine zusätzliche Roboterbilanz ist nicht vorgesehen.
 
 H03 bleibt ein historischer Vergleichsentwurf. Seine Dreh-/Verriegelungsmechanik
 ist keine Voraussetzung neuer Stationen. Die bestehenden H02-/H03-Quellen und
-Nachweise bleiben unveränderte Vergleichsstände; sie implementieren keinen
-H02-Direktgriff. Gerätespezifische Heber wie bei CF01 bleiben bei fehlendem
+Nachweise bleiben unveränderte Vergleichsstände. Die referenzierende Komposition
+`model/h02-direct-pickup.scene.json` implementiert den separaten lokalen
+[H02-Direktgriff](docs/tube-frame-h02.md#direct-pickup-variant) mit gemeinsamem
+Greifer, vollständigen kontinuierlichen Werkzeug-/Gefäß-Hüllvolumen und
+unabhängigen CAD-Prüfungen. Sie enthält keine vollständige Arm- oder
+Mehrroboterbewegung. Gerätespezifische Heber wie bei CF01 bleiben bei fehlendem
 Greifzugang möglich. Fingerfreigang, Nachbargefäße, Rückhaltung und Auszug
 müssen am konkreten Halter nachgewiesen werden. Die statische Dreiarmaufstellung
 und synthetischen Transportverträge belegen keine koordinierte Hardwarebewegung.

@@ -1,0 +1,451 @@
+{
+  "format": "solidcraftbot.h02-direct-pickup-media/1",
+  "prepared_on": "2026-11-14",
+  "revision": "h02-direct-pickup-54888857ac82-r4",
+  "source_files_sha256": {
+    "model/h02-direct-pickup.scene.json": "54888857ac82ab7a8aaabc3306dd6fa364933a37854a0d09cee14925370ac73a",
+    "model/h02-direct-pickup.schema.json": "b6b184717ca6bf8cd6027d80eed7d889f54a52754f32ec1a9e777e7de9f05977",
+    "model/tube-frame-h02.shared.json": "34a52d3bd79f847e918c645a4034bb07dc8ecb8f2ad21465101e4196c24d9cba",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "scripts/h02_direct_pickup.py": "9e3270543008a1bd2c27b54164379064eabbf984dc7e3aaeceb5b9352821669f",
+    "scripts/tube_frame_model.py": "8484c39fdeb5a84963fe0ddaefe49ef357fa8c700adbf1208dadec66d96f12b7",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+    "scripts/build_h02_direct_pickup.py": "9ad4cc3b168bf4f52cfb7d8d82c496c6c1681e038cd3b77c4d797d39b2e835a6",
+    "scripts/build_h02_direct_pickup_freecad.py": "959221153b58c4cdd1191dc1ef0cd23a95beeba15d02ee086eb8c75abe20d6a2",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/build_tube_carrier.py": "20f8bc8a22f361e6280fe9f15c2a393d6d2dc52bde9382994334671b0c9a9b8a",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3"
+  },
+  "native_build_report": {
+    "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/build-report.json",
+    "sha256": "d519e697b7246d06599111dc89c0310fc57649af0bb7656fa5a8707f0360662a",
+    "bytes": 51559
+  },
+  "documentation": {
+    "path": "docs/tube-frame-h02.md",
+    "sha256": "9318663a293fb80876762e1bde1b97d992b8bd04d7e9bb3c5352be652cd1e7cf",
+    "bytes": 13462
+  },
+  "images": [
+    {
+      "path": "docs/media/h02-direct-pickup.png",
+      "sha256": "0379b2bfb108c0dd29fe64e9c66cfe2a70e4308e23fe5ef6f48e503041a767d1",
+      "bytes": 333497,
+      "pixels": [
+        1500,
+        1200
+      ],
+      "native_view": {
+        "state": "grasp",
+        "image": "renders/h02-direct-pickup-54888857ac82-r4/V20-grasp.png",
+        "sha256": "0379b2bfb108c0dd29fe64e9c66cfe2a70e4308e23fe5ef6f48e503041a767d1",
+        "camera": {
+          "target": [
+            0,
+            0,
+            65
+          ],
+          "yaw": -0.7,
+          "pitch": 0.65,
+          "distance": 420,
+          "fov": 0.6
+        },
+        "view_script": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/grasp.view.json",
+        "view_script_sha256": "5883f8f4d7e7d4d63c20a3035a6dee46439b99a93193120925b5766b7982e859",
+        "command_line": [
+          "solidcraft-cli",
+          "snapshot",
+          "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/grasp.view.json",
+          "--in",
+          "cad/generated/h02-direct-pickup-54888857ac82-r4/V20.sc",
+          "--out",
+          "renders/h02-direct-pickup-54888857ac82-r4/V20-grasp.png",
+          "--width",
+          "1500",
+          "--height",
+          "1200",
+          "--camera",
+          "{\"target\": [0, 0, 65], \"yaw\": -0.7, \"pitch\": 0.65, \"distance\": 420, \"fov\": 0.6}",
+          "--no-grid",
+          "--no-axes",
+          "--quality",
+          "fine"
+        ],
+        "visually_reviewed": false
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Native 3x3 occupied fixture and both grasp/extracted poses inspected; images copied without editing"
+      }
+    },
+    {
+      "path": "docs/media/h02-direct-extracted.png",
+      "sha256": "1507717b2661eaa0b7dba0178e3e2797356d7e6ce27ff06be39258d63e5556f9",
+      "bytes": 371288,
+      "pixels": [
+        1500,
+        1200
+      ],
+      "native_view": {
+        "state": "extracted",
+        "image": "renders/h02-direct-pickup-54888857ac82-r4/V20-extracted.png",
+        "sha256": "1507717b2661eaa0b7dba0178e3e2797356d7e6ce27ff06be39258d63e5556f9",
+        "camera": {
+          "target": [
+            0,
+            0,
+            65
+          ],
+          "yaw": -0.7,
+          "pitch": 0.65,
+          "distance": 420,
+          "fov": 0.6
+        },
+        "view_script": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/extracted.view.json",
+        "view_script_sha256": "c5ca1fdef55030f56e0ebe793e937edb774ba26d275b0b99182d8767ae3b56e7",
+        "command_line": [
+          "solidcraft-cli",
+          "snapshot",
+          "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/extracted.view.json",
+          "--in",
+          "cad/generated/h02-direct-pickup-54888857ac82-r4/V20.sc",
+          "--out",
+          "renders/h02-direct-pickup-54888857ac82-r4/V20-extracted.png",
+          "--width",
+          "1500",
+          "--height",
+          "1200",
+          "--camera",
+          "{\"target\": [0, 0, 65], \"yaw\": -0.7, \"pitch\": 0.65, \"distance\": 420, \"fov\": 0.6}",
+          "--no-grid",
+          "--no-axes",
+          "--quality",
+          "fine"
+        ],
+        "visually_reviewed": false
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Native 3x3 occupied fixture and both grasp/extracted poses inspected; images copied without editing"
+      }
+    }
+  ],
+  "cases": [
+    {
+      "variant": "V15",
+      "closed_bodies_including_proof": 71,
+      "visible_bodies": 42,
+      "continuous_pairs_per_backend": 806,
+      "native_poses_per_backend": 13,
+      "maximum_step_xor_mm3": 0.0,
+      "native_files": {
+        "solidcraft": {
+          "path": "cad/generated/h02-direct-pickup-54888857ac82-r4/V15.sc",
+          "sha256": "f32d3787e7ebf6b843dc89b7cec6f9f0a80a4c62d3dfd732d7dbdf28d0d02710"
+        },
+        "solidcraft_audit": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/solidcraft-audit.json",
+          "sha256": "3c7e041f6b16a1d2c49444cf944f6445f860bd5aec18a48dd6ec86b998165acd"
+        },
+        "solidcraft_measurements": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/solidcraft.json",
+          "sha256": "0336c6964988e92a151b86021e4484d6ca842930fcbb309f135bbf698ac1e4ce"
+        },
+        "commands": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/build.commands.json",
+          "sha256": "3b73eaeb00fe7d2bc915d878d26cb14d6ced00954b5d7d8b1e68f58a685a79fb"
+        },
+        "solidcraft_audit_commands": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/audit.commands.json",
+          "sha256": "0e09d4e60d1d6cbecb53f8affba9301b80ddf111e3b0cb83e05d147bb1a1791a"
+        },
+        "solidcraft_audit_raw": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/audit.raw.json",
+          "sha256": "13c8be3babd4c1675840dc238d32fae5a2792f64adc19d32f84da7262e3f2903"
+        },
+        "freecad": {
+          "path": "cad/generated/h02-direct-pickup-54888857ac82-r4/V15.FCStd",
+          "sha256": "f1ba1b4fcbf90f1f742f70707dca2ce9d37ef873ad84ee29e2386aa75b856fe4"
+        },
+        "freecad_audit": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/freecad.json",
+          "sha256": "e97d7df16351a8c08cd7a234922dbfc63441b857bd090c4a0d613c48b8addd58"
+        },
+        "case": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/case.json",
+          "sha256": "6e1b73cf511939e21d50f0de70af0f069bdec6657aac8335bc7d0ab1c2eb8fe5"
+        },
+        "step": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V15/model.step",
+          "sha256": "56563822c8422795c9e6ad84b2c24cb88c17d39e2384a35c16c330c03a0a62b4"
+        }
+      },
+      "freecad_minimum_distances_mm": {
+        "tool_to_selected_holder": 0.9999999999999893,
+        "tool_to_mouth_keepout": 0.9000000000000004,
+        "tube_envelope_to_upper_guide": 0.19999999999999923,
+        "tool_to_neighbors": 15.132745950421556
+      },
+      "solidcraft_tool_neighbor_distance_lower_bound_mm": 15.033296278372909,
+      "freecad_negative_controls": {
+        "middle_volume_mm3": 7.999999999999998,
+        "start_volume_mm3": 0.0,
+        "end_volume_mm3": 0.0,
+        "lowered_finger_overlap_mm3": 23.24096458148099,
+        "passed": true
+      },
+      "solidcraft_negative_controls": {
+        "passed": true,
+        "volumes_mm3": [
+          8.0,
+          0,
+          23.240964581486615,
+          0
+        ]
+      },
+      "motion_profile": {
+        "phases": [
+          {
+            "phase": "approach",
+            "duration_s": 6,
+            "distance_mm": 60,
+            "maximum_derivatives": {
+              "velocity_mm_s": 18.750000000000004,
+              "acceleration_mm_s2": 9.62250448649377,
+              "jerk_mm_s3": 16.66666666666667
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          },
+          {
+            "phase": "closure",
+            "duration_s": 6,
+            "distance_mm": 5.6,
+            "maximum_derivatives": {
+              "velocity_mm_s": 1.7500000000000002,
+              "acceleration_mm_s2": 0.8981004187394186,
+              "jerk_mm_s3": 1.5555555555555558
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          },
+          {
+            "phase": "extraction",
+            "duration_s": 6,
+            "distance_mm": 60,
+            "maximum_derivatives": {
+              "velocity_mm_s": 18.750000000000004,
+              "acceleration_mm_s2": 9.62250448649377,
+              "jerk_mm_s3": 16.66666666666667
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          }
+        ],
+        "normalized_progress_coefficients": [
+          0.0,
+          0.0,
+          0.0,
+          10.0,
+          -15.0,
+          6.0
+        ],
+        "scope": "C2 local tool-space episodes with finite jerk; no arm IK/FK, hardware timing or global transport route",
+        "holds": {
+          "open": "Jaw-closing operation while tube remains supported",
+          "grasp": "Grasp confirmation required before loaded extraction",
+          "extracted": "End of local geometric test; not a required intermediate halt in a future transport route"
+        }
+      }
+    },
+    {
+      "variant": "V20",
+      "closed_bodies_including_proof": 71,
+      "visible_bodies": 42,
+      "continuous_pairs_per_backend": 806,
+      "native_poses_per_backend": 13,
+      "maximum_step_xor_mm3": 0.0,
+      "native_files": {
+        "solidcraft": {
+          "path": "cad/generated/h02-direct-pickup-54888857ac82-r4/V20.sc",
+          "sha256": "4bd969c5ce80147e7cb6f51e637553e8c9867dff9aa13bb722a3d6ad43738fda"
+        },
+        "solidcraft_audit": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/solidcraft-audit.json",
+          "sha256": "820c1e5f7bc5e5a7ddb1a3ef6b44b96c0a71c0ef6e38f6528d4941f2c020270b"
+        },
+        "solidcraft_measurements": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/solidcraft.json",
+          "sha256": "f3d0e27e3d75e9f08e03a9b91e5aaa9b41e03e2b832393c660141038d788e6b3"
+        },
+        "commands": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/build.commands.json",
+          "sha256": "32f51de10f405196f6337f96f7f0b2aa12d92403dec6f8738e5a671b5bed0f36"
+        },
+        "solidcraft_audit_commands": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/audit.commands.json",
+          "sha256": "0e09d4e60d1d6cbecb53f8affba9301b80ddf111e3b0cb83e05d147bb1a1791a"
+        },
+        "solidcraft_audit_raw": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/audit.raw.json",
+          "sha256": "b72c40648caf3f309bfedc7ff1a399091b6312ea3bed2749e5a7a10a8a14f2c4"
+        },
+        "freecad": {
+          "path": "cad/generated/h02-direct-pickup-54888857ac82-r4/V20.FCStd",
+          "sha256": "bb2585ca8d868070acfa9fc47bc502f63e1ff3fe68603f4ea1df5b01297837c1"
+        },
+        "freecad_audit": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/freecad.json",
+          "sha256": "6bbdf3653a68cf81310649ac9fc5972e2eaa574e33deb2caa2e8bb94fe5a1a2c"
+        },
+        "case": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/case.json",
+          "sha256": "50e80d71ac08445c705766172f76d90debe6046b4f31b415e4d5b73a2743f8d4"
+        },
+        "step": {
+          "path": "exports/generated/h02-direct-pickup-54888857ac82-r4/V20/model.step",
+          "sha256": "93eb5380d93e474e3bbd844679dea6d7c8e8b4b3417e0a3275af2232d822822d"
+        }
+      },
+      "freecad_minimum_distances_mm": {
+        "tool_to_selected_holder": 0.9999999999999893,
+        "tool_to_mouth_keepout": 0.9000000000000004,
+        "tube_envelope_to_upper_guide": 0.19999999999999915,
+        "tool_to_neighbors": 15.132745950421556
+      },
+      "solidcraft_tool_neighbor_distance_lower_bound_mm": 15.033296278372909,
+      "freecad_negative_controls": {
+        "middle_volume_mm3": 7.999999999999998,
+        "start_volume_mm3": 0.0,
+        "end_volume_mm3": 0.0,
+        "lowered_finger_overlap_mm3": 23.24096458148099,
+        "passed": true
+      },
+      "solidcraft_negative_controls": {
+        "passed": true,
+        "volumes_mm3": [
+          8.0,
+          0,
+          23.240964581486615,
+          0
+        ]
+      },
+      "motion_profile": {
+        "phases": [
+          {
+            "phase": "approach",
+            "duration_s": 6,
+            "distance_mm": 60,
+            "maximum_derivatives": {
+              "velocity_mm_s": 18.750000000000004,
+              "acceleration_mm_s2": 9.62250448649377,
+              "jerk_mm_s3": 16.66666666666667
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          },
+          {
+            "phase": "closure",
+            "duration_s": 6,
+            "distance_mm": 5.6,
+            "maximum_derivatives": {
+              "velocity_mm_s": 1.7500000000000002,
+              "acceleration_mm_s2": 0.8981004187394186,
+              "jerk_mm_s3": 1.5555555555555558
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          },
+          {
+            "phase": "extraction",
+            "duration_s": 6,
+            "distance_mm": 60,
+            "maximum_derivatives": {
+              "velocity_mm_s": 18.750000000000004,
+              "acceleration_mm_s2": 9.62250448649377,
+              "jerk_mm_s3": 16.66666666666667
+            },
+            "limits": {
+              "velocity_mm_s": 30,
+              "acceleration_mm_s2": 20,
+              "jerk_mm_s3": 100
+            },
+            "passed": true,
+            "interior_stops": 0,
+            "monotonicity": "dq/du = 30*u^2*(1-u)^2 > 0 for 0<u<1"
+          }
+        ],
+        "normalized_progress_coefficients": [
+          0.0,
+          0.0,
+          0.0,
+          10.0,
+          -15.0,
+          6.0
+        ],
+        "scope": "C2 local tool-space episodes with finite jerk; no arm IK/FK, hardware timing or global transport route",
+        "holds": {
+          "open": "Jaw-closing operation while tube remains supported",
+          "grasp": "Grasp confirmation required before loaded extraction",
+          "extracted": "End of local geometric test; not a required intermediate halt in a future transport route"
+        }
+      }
+    }
+  ],
+  "tests": {
+    "command": "python3 -m unittest discover -s tests -p 'test_h02_direct_pickup.py' -v",
+    "run": 9,
+    "passed": 9
+  },
+  "limitations": [
+    "Pitch, grip height and motion duration are illustrative, not measured",
+    "H02 mouth keepout is a conservative reserved cap/mouth envelope, not a modeled closed lid",
+    "Existing holder and CF01 gripper dimensions are reused without changes",
+    "Only vertical local approach, closure and extraction; no lateral transfer or whole-arm reach/self-collision",
+    "Passive fixture omits H02 lifter, drive and split receiver; historical source unchanged",
+    "No whole-arm reach, self-collision or hardware test; FreeCAD GUI rendering not inspected"
+  ],
+  "claude_reviewed": false
+}

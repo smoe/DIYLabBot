@@ -219,8 +219,9 @@ keine Voraussetzung dieser Architektur.
 
 H03 wird als historischer Vergleichsentwurf erhalten und ist kein Standardbaustein
 und keine Voraussetzung für neue Stationen. Auch H02 bleibt ein vorhandener
-optischer Rahmen-/Heberentwurf: Seine direkte Entnahme mit dem vorgesehenen
-Greifer ist noch nicht nachgewiesen. Vorhandene Quellen, gebundene CAD-Nachweise
+optischer Rahmen-/Heberentwurf. Die separate [Direktgriff-Variante](tube-frame-h02.md#direct-pickup-variant)
+prüft nun den lokalen Werkzeugweg für beide Gefäßformen geometrisch in beiden
+CADs; reale Griffqualifikation und vollständige Armbewegung sind weiterhin offen. Vorhandene Quellen, gebundene CAD-Nachweise
 und Animationen bleiben für den Vergleich unverändert erhalten.
 
 Für neue Halter zuerst am konkreten Gefäß und Greifer prüfen: zugänglicher

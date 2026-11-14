@@ -74,8 +74,12 @@ Auszug und Ablage mit Nachbargefäßen aus derselben gemeinsamen Geometrie ablei
 und in beiden CADs prüfen. Erst danach eine durchgehende Bahn mit bestätigtem
 Griff und bestätigter Ablage entwickeln. Stationäre Arme und Racktransport über
 passive Docks koordinieren; die vorhandene statische Dreiarmaufstellung und
-Transport-Mocks sind kein Nachweis kooperativer Hardware. Ein H02-Direktgriff
-ist noch zu implementieren und zu prüfen.
+Transport-Mocks sind kein Nachweis kooperativer Hardware. Der lokale
+[H02-Direktgriff](tube-frame-h02.md#direct-pickup-variant) ist nun für beide
+Gefäßformen mit acht Nachbarn und kontinuierlichen Hüllvolumen in beiden CADs
+geprüft. Als Nächstes reale Gefäße, geschlossene Deckel und Greifkräfte
+qualifizieren sowie den vollständigen Armweg samt Selbstkollision und
+Lageunsicherheit aus der referenzierten Roboterquelle ableiten.
 
 H03 ist aus dem aktiven Standardpfad zurückgestellt. Nur bei erneutem Bedarf
 an genau diesem motorlosen Vergleichskonzept wären Kurvenscheiben,

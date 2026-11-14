@@ -401,7 +401,11 @@ Sockelkörper entfallen und werden durch offene Bein-Bauräume ersetzt.
 
 Die [aktuelle Standardrichtung](requirements.md#direkter-gefäßgriff-und-kooperierende-roboter)
 verwendet direkten Körpergriff aus passiven Haltern und Rackübergaben zwischen
-stationären Armen und Transportrobotern. H02-Direktentnahme ist noch zu prüfen.
+stationären Armen und Transportrobotern. Die separate
+[H02-Direktentnahme](tube-frame-h02.md#direct-pickup-variant) ist lokal mit dem
+bestehenden Greifer, acht belegten Nachbarn und kontinuierlicher Auszugshülle
+in beiden CADs geprüft. Reale Passung, Griffkräfte und der vollständige Armweg
+bleiben offen.
 Der erhaltene historische Vergleichsentwurf [H03](tube-cam-h03.md) konkretisiert
 den früher vorgesehenen motorlosen Stationsantrieb: Zwei
 Kurvenscheiben auf einer gemeinsamen horizontalen Welle heben das Gefäß und

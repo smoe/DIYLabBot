@@ -406,9 +406,14 @@ Rotationsmatrizen verglichen; Abspielzeit und Kontaktphysik bleiben unqualifizie
 
 ## Offener Gefäßrahmen H02
 
-Erhaltene Rahmen-/Heberbasis. Direkter Robotergriff aus H02 ist noch nicht
-implementiert oder geprüft; der folgende Vertrag beschreibt weiterhin den
-bisherigen Heber und geteilten Empfänger.
+Erhaltene Rahmen-/Heberbasis. Der folgende Vertrag beschreibt weiterhin den
+bisherigen Heber und geteilten Empfänger. Die separate, quellengebundene
+[Direktgriff-Komposition](tube-frame-h02.md#direct-pickup-variant) unter
+`model/h02-direct-pickup.scene.json` verwendet passive H02-Teile und den bestehenden
+Greifer. Gemeinsame Geometrie und kontinuierliche Werkzeug-/Gefäß-Hüllvolumen
+werden unabhängig in beiden CADs geprüft. C2-Testprofile aus dem gemeinsamen
+Polynomkern liefern die Koordinaten für native Stellungsprüfungen; es gibt
+keine neue Armkinematik oder Hardwareausführung.
 
 [tube-frame-h02.shared.json](../model/tube-frame-h02.shared.json) beschreibt
 optische Fenster, untere Außenwandsitze, Bodenzugang und einen geteilten Empfänger.
