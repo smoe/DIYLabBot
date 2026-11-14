@@ -385,7 +385,8 @@
       "W088",
       "W102"
     ],
-    "left_sidewalk_entry_opening": "D0_013_Exterior"
+    "left_sidewalk_entry_opening": "D0_013_Exterior",
+    "left_hardstanding_end_fraction": 0.5
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",

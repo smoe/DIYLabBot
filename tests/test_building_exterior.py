@@ -92,8 +92,8 @@ class ExteriorTests(unittest.TestCase):
 
     def test_access_surfaces_are_thin_and_separate_from_lawn(self):
         ext=self.d['exterior']
-        self.assertEqual({v['material'] for v in ext['site_regions']},{'sidewalk','driveway','entrance_apron'})
-        self.assertEqual(len(ext['site_body_ids']),4)
+        self.assertEqual({v['material'] for v in ext['site_regions']},{'sidewalk','driveway','entrance_apron','left_hardstanding'})
+        self.assertEqual(len(ext['site_body_ids']),5)
         for region in ext['site_regions']:
             self.assertEqual(region['origin_mm'][2],-20)
             self.assertEqual(region['size_mm'][2],20)
@@ -114,8 +114,15 @@ class ExteriorTests(unittest.TestCase):
         self.assertIn('W037',side['facade_walls'])
         self.assertEqual(side['facade_walls'][-1],'W102')
 
+    def test_left_context_is_hardstanding_without_a_lawn_buffer(self):
+        regions={r['material']:r for r in self.d['exterior']['site_regions']};court=regions['left_hardstanding']
+        self.assertLess(court['origin_mm'][1],min(r['origin_mm'][1] for k,r in regions.items() if k!='left_hardstanding'))
+        self.assertFalse(court['boundary_measured'])
+        self.assertEqual(next(b for b in self.e['bodies'] if b['id']==court['body'])['appearance']['color'],self.s['exterior']['road_color'])
+        self.assertTrue(any(o['body']=='Terrain_Lawn' and o['id']=='Site_LeftHardstanding_LawnCut' for o in self.e['operations']))
+
     def test_invalid_or_invented_contract_values_are_rejected(self):
-        for key,value in [('bay_count',True),('glass_opacity',1),('frame_mm',0),('guard_bar_fractions',[.5,.5]),('door_color','wood')]:
+        for key,value in [('bay_count',True),('glass_opacity',1),('frame_mm',0),('guard_bar_fractions',[.5,.5]),('door_color','wood'),('left_hardstanding_end_fraction',True)]:
             s=copy.deepcopy(self.s['exterior']);s[key]=value
             with self.subTest(key=key),self.assertRaises(ValueError):exterior.validate(s)
         s=copy.deepcopy(self.s);s['exterior']['front_wall']='Invented'

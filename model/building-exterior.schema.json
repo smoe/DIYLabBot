@@ -39,7 +39,8 @@
     "entrance_flank_color",
     "entrance_flank_walls",
     "left_sidewalk_walls",
-    "left_sidewalk_entry_opening"
+    "left_sidewalk_entry_opening",
+    "left_hardstanding_end_fraction"
   ],
   "properties": {
     "status": {
@@ -250,6 +251,12 @@
     "left_sidewalk_entry_opening": {
       "type": "string",
       "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "left_hardstanding_end_fraction": {
+      "type": "number",
+      "exclusiveMinimum": 0,
+      "exclusiveMaximum": 1,
+      "description": "Approximate display boundary of the map-informed left hardstanding, as a fraction of the registered facade Y extent; not a surveyed curb"
     }
   }
 }

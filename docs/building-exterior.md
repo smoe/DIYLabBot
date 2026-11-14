@@ -43,6 +43,25 @@ werden nicht in eine zweite Planquelle kopiert. Die Raumtüren erhalten eigene
 Prüfzeugen gegen die bestehenden Öffnungen. Die Geländehöhe und die Fassadenhöhe
 werden in den nativen Fassungen gegen die Geschossbezüge geprüft.
 
+## Außenflächen aus der Luftbildansicht
+
+Die [Google-Maps-Luftbildansicht von Schillingallee 69](https://www.google.com/maps/search/?api=1&query=Schillingallee%2069%2C%2018057%20Rostock)
+wurde am 14.11.2026 visuell geprüft. Das Gebäude ist über den Abgleich der
+Institutsadresse und der charakteristischen gekrümmten Bauform zugeordnet.
+Links liegt eine breite befestigte Hof-/Zufahrtsfläche; die bisherige grüne
+Pufferfläche hinter dem schmalen Gehweg war eine unbelegte Modellannahme.
+Der helle Fußgängerstreifen bleibt davon getrennt. Die tatsächlich begrünten
+Bereiche auf der anderen Seite bleiben grün.
+
+Die gemeinsame Quelle führt die linke befestigte Fläche ausdrücklich. Ihre
+Abgrenzung innerhalb des kleinen Darstellungsausschnitts wird über
+`left_hardstanding_end_fraction` angenähert. Das ist eine qualitative manuelle
+Kartenauswertung, keine automatische Flächenextraktion oder georeferenzierte
+Vermessung. Einzelne Plattenmaße, verdeckte Kanten und das Aufnahmedatum des
+Luftbildes sind nicht bekannt. Google-Bildmaterial wird nicht ins Repository
+übernommen. Die [Institutsadresse](https://www.iegt-rostock.de/kontakt/) bestätigt
+Schillingallee 69 als Standort.
+
 ## Ansichten und Aufbau
 
 ![Gebäude mit Glasfront und Gelände](media/building-stack-overview.png)

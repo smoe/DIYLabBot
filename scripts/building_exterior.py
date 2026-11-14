@@ -11,7 +11,7 @@ def require(ok, message):
 
 
 def validate(s):
-    require(set(s)-{'doors'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening'},'Explicit exterior recipe required')
+    require(set(s)-{'doors'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening','left_hardstanding_end_fraction'},'Explicit exterior recipe required')
     require(s['status']=='photo_informed_unmeasured_concept','Declare photo-informed, unmeasured exterior')
     require(type(s['bay_count']) is int and 2<=s['bay_count']<=12,'Bounded illustrative facade bays required')
     for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','landscape_layer_mm','sidewalk_width_mm','road_width_mm']:
@@ -22,6 +22,7 @@ def validate(s):
     for key in ['side_window_interval','side_window_height_fractions']:
         require(isinstance(s[key],list) and len(s[key])==2 and all(type(v) in (int,float) and 0<v<1 for v in s[key]) and s[key][0]<s[key][1], 'Ordered bounded window fractions required')
     require(isinstance(s['side_window_walls'],list) and s['side_window_walls'] and len(set(s['side_window_walls']))==len(s['side_window_walls']), 'Explicit side-window paths required')
+    require(type(s['left_hardstanding_end_fraction']) in (int,float) and 0<s['left_hardstanding_end_fraction']<1, 'Bounded illustrative left hardstanding extent required')
     require(s['landscape_layer_mm']<=50 and s['sidewalk_width_mm']<s['terrain_margin_mm'], 'Thin graphic landscape layer and fitting sidewalk required')
     require(isinstance(s['guard_boundaries'],list) and s['guard_boundaries'] and len(set(s['guard_boundaries']))==len(s['guard_boundaries']),'Unique source guard boundaries required')
 
@@ -200,5 +201,17 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     prism(n+'_LawnCut',lawn,side_polygon,bottom-layer,layer*3,'cut')
     lo=[min(q[i] for q in side_polygon) for i in (0,1)];hi=[max(q[i] for q in side_polygon) for i in (0,1)]
     site_regions.append({'body':n,'material':'sidewalk','origin_mm':lo+[bottom],'size_mm':[hi[i]-lo[i] for i in (0,1)]+[layer],'points_mm':side_polygon,'entry_opening':side_entry['id'],'facade_walls':path_ids})
+    # The aerial view shows a broad left court/access surface, not a lawn buffer.
+    # Its crop boundary is an explicit unmeasured display assumption.
+    court_origin=[xmin-margin,ymin-margin,bottom]
+    court_size=[xmax-xmin+2*margin,margin+s['left_hardstanding_end_fraction']*(ymax-ymin),layer]
+    n=body('Site_LeftHardstanding','illustrative_left_hardstanding_surface',s['road_color']);site_ids.append(n)
+    box(n+'_Sheet',n,court_origin,court_size)
+    prism(n+'_BuildingVoid',n,[[x*scale,y*scale] for x,y in canonical_points],bottom-layer,layer*3,'cut')
+    for name,origin,size in [('Front',front_origin,front_size),('Road',[xmax+walk,ymin,bottom],[road_width,ymax-ymin,layer])]:
+        box(n+'_'+name+'Cut',n,[origin[0],origin[1],bottom-layer],[size[0],size[1],layer*3],'cut')
+    prism(n+'_WalkCut',n,side_polygon,bottom-layer,layer*3,'cut')
+    box(n+'_LawnCut',lawn,[court_origin[0],court_origin[1],bottom-layer],[court_size[0],court_size[1],layer*3],'cut')
+    site_regions.append({'body':n,'material':'left_hardstanding','origin_mm':court_origin,'size_mm':court_size,'boundary_measured':False})
     r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'door_bindings':door_bindings,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'site_body_ids':site_ids,'site_regions':site_regions,'surface_layer_mm':layer,'surface_overrides':surfaces,'opaque_facade_body_ids':opaque_ids,'side_window_groups':window_groups,'window_probes':window_probes,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
     return r
