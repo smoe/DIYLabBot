@@ -1,0 +1,60 @@
+{
+  "format": "solidcraftbot.h02-arm-pickup/1",
+  "id": "H02ArmPickup",
+  "sources": {
+    "pickup": {
+      "source": "model/h02-direct-pickup.scene.json",
+      "source_sha256": "54888857ac82ab7a8aaabc3306dd6fa364933a37854a0d09cee14925370ac73a"
+    },
+    "robot": {
+      "source": "model/robot.json",
+      "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+    },
+    "motion_limits": {
+      "source": "model/cf01-unload-demo.motion.json",
+      "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+    }
+  },
+  "arm_fixture": {
+    "position_mm": [
+      0,
+      -280,
+      0
+    ],
+    "yaw_deg": 0
+  },
+  "branch": "planar_positive_elbow",
+  "support_plane": {
+    "origin_mm": [
+      -350,
+      -400,
+      -20
+    ],
+    "size_mm": [
+      700,
+      650,
+      20
+    ],
+    "meaning": "Finite support-plane collision witness for this synthetic fixture, not surveyed furniture"
+  },
+  "clearance_mm": {
+    "self": 0.5,
+    "arm_tool": 0.5,
+    "environment": 1.0
+  },
+  "continuous_audit": {
+    "max_depth": 14,
+    "numeric_guard_mm": 1e-05
+  },
+  "status": "Synthetic full-arm approach, grasp and extraction; unmodified default arm and H02 gripper; no hardware qualification",
+  "limitations": [
+    "Adjacent arm-link assembly interfaces and L6/tool mounting contacts use the existing allowed-collision exclusions",
+    "Support plane and base placement are synthetic fixture assumptions",
+    "No hardware, torque/force qualification, calibrated environment or multi-robot execution"
+  ],
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  }
+}

@@ -1,0 +1,328 @@
+{
+  "format": "solidcraftbot.h02-arm-pickup-media/1",
+  "prepared_on": "2026-11-14",
+  "revision": "h02-arm-pickup-78e67bb5e5e5-r2",
+  "source_files_sha256": {
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+    "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+    "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+    "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/cf01-unload-demo.motion.json": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",
+    "model/h02-arm-pickup.scene.json": "78e67bb5e5e5b4d38a94cf35f7cbe6a61aef4409ade0c52a3d4d55e563e238b6",
+    "model/h02-arm-pickup.schema.json": "fa3b663f7e54a54acdffa619b4811c60e3c264f24a2fb0bcba7289c1154ea2dd",
+    "model/h02-direct-pickup.scene.json": "54888857ac82ab7a8aaabc3306dd6fa364933a37854a0d09cee14925370ac73a",
+    "model/h02-direct-pickup.schema.json": "b6b184717ca6bf8cd6027d80eed7d889f54a52754f32ec1a9e777e7de9f05977",
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "model/tube-frame-h02.shared.json": "34a52d3bd79f847e918c645a4034bb07dc8ecb8f2ad21465101e4196c24d9cba",
+    "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
+    "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
+    "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/build_h02_arm_freecad.py": "592cbce5ec12a63526e01ed648c144d47e5f7844ea06d008eb2905e8d75cc374",
+    "scripts/build_h02_arm_pickup.py": "b29dcc3b813505f6be277b14d147b1a524d4038c69ea64ccc8333c0d9da0d63b",
+    "scripts/build_h02_direct_pickup.py": "9ad4cc3b168bf4f52cfb7d8d82c496c6c1681e038cd3b77c4d797d39b2e835a6",
+    "scripts/build_h02_direct_pickup_freecad.py": "959221153b58c4cdd1191dc1ef0cd23a95beeba15d02ee086eb8c75abe20d6a2",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/build_tube_carrier.py": "20f8bc8a22f361e6280fe9f15c2a393d6d2dc52bde9382994334671b0c9a9b8a",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/h02_arm_pickup.py": "eb4b919ce461280af40b0c7df697d21dc2d8842d9813a948f9c3d2e3e9e35870",
+    "scripts/h02_arm_solidcraft.py": "fc32cdc219fbbdac47ae74392a5b8ce74fce89cfefd915a4c430cdcbd47c84cf",
+    "scripts/h02_direct_pickup.py": "9e3270543008a1bd2c27b54164379064eabbf984dc7e3aaeceb5b9352821669f",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+    "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+    "scripts/solidcraft_audit_session.py": "562d86f4c434d59aaf7c012182616cebfd2057752c57d446b45b16a2fbbd3420",
+    "scripts/solidcraft_vendor.py": "8126506c70eecca56f222f8a158b9de23557b9abb5dfb6bc7938e4153ec8f27e",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "scripts/tube_frame_model.py": "8484c39fdeb5a84963fe0ddaefe49ef357fa8c700adbf1208dadec66d96f12b7",
+    "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
+  },
+  "native_build_report": {
+    "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/build-report.json",
+    "sha256": "de5d72fcde6cc96d7199c6f589b8ed84c38025ef5fb7064b2924e0495a331a41",
+    "bytes": 329297
+  },
+  "documentation": {
+    "path": "docs/tube-frame-h02.md",
+    "sha256": "6051b1adc8054148f475666f43781a87cab66f77f73ae43aea21792ff4706c66",
+    "bytes": 17697
+  },
+  "images": [
+    {
+      "path": "docs/media/h02-arm-pickup.png",
+      "sha256": "02a2773b0a6f096da2716376756d56bddec1f793ede7e34082ce3ed78162adfa",
+      "bytes": 331745,
+      "native_view": {
+        "path": "renders/h02-arm-pickup-78e67bb5e5e5-r2/V20-grasp.png",
+        "sha256": "02a2773b0a6f096da2716376756d56bddec1f793ede7e34082ce3ed78162adfa",
+        "bytes": 331745
+      },
+      "pixels": [
+        1500,
+        1200
+      ],
+      "visually_reviewed": true
+    },
+    {
+      "path": "docs/media/h02-arm-extracted.png",
+      "sha256": "13aac764ef2801827fde160ba7ee020a80e706e2f2c77fcd40c5ad8c5acb28e4",
+      "bytes": 343055,
+      "native_view": {
+        "path": "renders/h02-arm-pickup-78e67bb5e5e5-r2/V20-extracted.png",
+        "sha256": "13aac764ef2801827fde160ba7ee020a80e706e2f2c77fcd40c5ad8c5acb28e4",
+        "bytes": 343055
+      },
+      "pixels": [
+        1500,
+        1200
+      ],
+      "visually_reviewed": true
+    }
+  ],
+  "native_models": [
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/approach.FCStd",
+      "sha256": "3d565d4bc066910b0c5a99f10c9ad8ccad50e9304aa36cce19910493917ecfc6",
+      "bytes": 3289467,
+      "variant": "V15",
+      "backend": "freecad",
+      "state": "approach"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/grasp.FCStd",
+      "sha256": "086b356e13e1310d796474149e5eb6ff6e3c469c037d502a1a97c9b567980c81",
+      "bytes": 3289439,
+      "variant": "V15",
+      "backend": "freecad",
+      "state": "grasp"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/extracted.FCStd",
+      "sha256": "6f565612997d254bec8bc38e79a216ba7e707dace9bc4f1ab5602b12f0d34c01",
+      "bytes": 3289452,
+      "variant": "V15",
+      "backend": "freecad",
+      "state": "extracted"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/approach.sc",
+      "sha256": "cbfb4503aa95ed6f866b9d0e16fb5aaf61493956ed5c02147af567d0cff5f38d",
+      "bytes": 13574592,
+      "variant": "V15",
+      "backend": "solidcraft",
+      "state": "approach"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/grasp.sc",
+      "sha256": "19995b047e093060b6a039638d357a3a69df5642c935869c37d7db4a1366dcaf",
+      "bytes": 13574555,
+      "variant": "V15",
+      "backend": "solidcraft",
+      "state": "grasp"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/extracted.sc",
+      "sha256": "f8a26ae4ece91a5a3c8fe5255bf7feb31c14576317baf49bddb1a3b098540ebb",
+      "bytes": 13574581,
+      "variant": "V15",
+      "backend": "solidcraft",
+      "state": "extracted"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/approach.FCStd",
+      "sha256": "e4b91787ccb7f261289cb5be98bd6024519915409fc0498f50a5d0050de2d587",
+      "bytes": 3297793,
+      "variant": "V20",
+      "backend": "freecad",
+      "state": "approach"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/grasp.FCStd",
+      "sha256": "352ed6c9f30f0a7e60f5c1daabfa8c8075e070c3ca211e9f77de146567e2934b",
+      "bytes": 3297767,
+      "variant": "V20",
+      "backend": "freecad",
+      "state": "grasp"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/extracted.FCStd",
+      "sha256": "5dd7381d0bf0e53753eeeafebb2568f45267523e37441527b6750f0b8fd32a12",
+      "bytes": 3297779,
+      "variant": "V20",
+      "backend": "freecad",
+      "state": "extracted"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/approach.sc",
+      "sha256": "0ea5de1d3e3a5f8d325e694460acdd6e6f988e8c63608e8df79ce44e81200954",
+      "bytes": 13609999,
+      "variant": "V20",
+      "backend": "solidcraft",
+      "state": "approach"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/grasp.sc",
+      "sha256": "992c9bb80f714466390c099df9be9bf8e7229661604113837b2fff2259ab587f",
+      "bytes": 13609977,
+      "variant": "V20",
+      "backend": "solidcraft",
+      "state": "grasp"
+    },
+    {
+      "path": "cad/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/extracted.sc",
+      "sha256": "48e8140d4f70ee40673a401209e0d6f9fe54c682e779fed309f8740e6070063d",
+      "bytes": 13610001,
+      "variant": "V20",
+      "backend": "solidcraft",
+      "state": "extracted"
+    }
+  ],
+  "audits": [
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/continuous-freecad.json",
+      "sha256": "4c07b488013684914f04355839425b59a803ff3ab0fa90b44ecc90bacd512e40",
+      "bytes": 217501,
+      "variant": "V15",
+      "backend": "freecad",
+      "pair_count": 7004,
+      "native_pose_count": 83,
+      "maximum_depth": 5,
+      "accepted_intervals": 43,
+      "minimum_clearance_lower_bound_mm": {
+        "self": 23.617659331810813,
+        "arm_tool": 1.2250783767194449,
+        "environment": 9.3030347095683
+      }
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/continuous-solidcraft.json",
+      "sha256": "2d45c581275a2d30e90ec9133c39376904321918fd7cf3ad0d762c99b07d820e",
+      "bytes": 217521,
+      "variant": "V15",
+      "backend": "solidcraft",
+      "pair_count": 7004,
+      "native_pose_count": 83,
+      "maximum_depth": 5,
+      "accepted_intervals": 43,
+      "minimum_clearance_lower_bound_mm": {
+        "self": 23.617659331811467,
+        "arm_tool": 1.2250783767200293,
+        "environment": 9.303034709567537
+      }
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/local-freecad.json",
+      "sha256": "3f64a1b9f395fb7182dd19fd46d437dc3ca207a4feb1534bc203d0fe36a292ba",
+      "bytes": 313266,
+      "passed": true,
+      "continuous_pair_count": 806
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V15/local-solidcraft.json",
+      "sha256": "e2b9bcf7ab8af28d7172fa6053c73f1cce8ef75fe7100604e9b3f6c05242fc8e",
+      "bytes": 248634,
+      "passed": true,
+      "continuous_pair_count": 806
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/continuous-freecad.json",
+      "sha256": "4c07b488013684914f04355839425b59a803ff3ab0fa90b44ecc90bacd512e40",
+      "bytes": 217501,
+      "variant": "V20",
+      "backend": "freecad",
+      "pair_count": 7004,
+      "native_pose_count": 83,
+      "maximum_depth": 5,
+      "accepted_intervals": 43,
+      "minimum_clearance_lower_bound_mm": {
+        "self": 23.617659331810813,
+        "arm_tool": 1.2250783767194449,
+        "environment": 9.3030347095683
+      }
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/continuous-solidcraft.json",
+      "sha256": "2d45c581275a2d30e90ec9133c39376904321918fd7cf3ad0d762c99b07d820e",
+      "bytes": 217521,
+      "variant": "V20",
+      "backend": "solidcraft",
+      "pair_count": 7004,
+      "native_pose_count": 83,
+      "maximum_depth": 5,
+      "accepted_intervals": 43,
+      "minimum_clearance_lower_bound_mm": {
+        "self": 23.617659331811467,
+        "arm_tool": 1.2250783767200293,
+        "environment": 9.303034709567537
+      }
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/local-freecad.json",
+      "sha256": "093c680d2812571b90ddfa49a37e89f11f55baa222310ab4fd38e5cb6d8ee737",
+      "bytes": 313874,
+      "passed": true,
+      "continuous_pair_count": 806
+    },
+    {
+      "path": "exports/generated/h02-arm-pickup-78e67bb5e5e5-r2/V20/local-solidcraft.json",
+      "sha256": "14d39af0f86502091e50a030331fc0999fd483095cabefb6aac54bc1a4dcc4a9",
+      "bytes": 248714,
+      "passed": true,
+      "continuous_pair_count": 806
+    }
+  ],
+  "cross_cad_comparisons": 1152,
+  "limitations": [
+    "Adjacent arm-link assembly interfaces and L6/tool mounting contacts use the existing allowed-collision exclusions",
+    "Support plane and base placement are synthetic fixture assumptions",
+    "No hardware, torque/force qualification, calibrated environment or multi-robot execution"
+  ],
+  "collision_scope": "Continuous under the recorded allowed-collision matrix; no hardware or formal floating-point certificate",
+  "freecad_gui_rendering_checked": false,
+  "negative_control": "Both native CADs reject a tool blocker in mid-extraction with clear endpoints",
+  "cad_session": {
+    "name": "solidcraft",
+    "title": "SolidCraft",
+    "version": "0.40.0-rc.2"
+  },
+  "test_sources": [
+    {
+      "path": "tests/test_h02_arm_pickup.py",
+      "sha256": "c251a7532788482e5f408c624b02c693be014a4d29c84be15da29f3d84b7c181",
+      "bytes": 7148
+    },
+    {
+      "path": "tests/test_h02_direct_pickup.py",
+      "sha256": "34a0878dda5b82e58ccf8270bb3dcc7eeb1e859d55b57564d0e6943e552fe58c",
+      "bytes": 6229
+    }
+  ],
+  "test_suite": {
+    "command": "python3 -m unittest discover -s tests -p 'test_h02*pickup.py'",
+    "passed_tests": 18
+  }
+}

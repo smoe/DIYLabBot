@@ -31,7 +31,11 @@ Nachweise bleiben unveränderte Vergleichsstände. Die referenzierende Kompositi
 [H02-Direktgriff](docs/tube-frame-h02.md#direct-pickup-variant) mit gemeinsamem
 Greifer, vollständigen kontinuierlichen Werkzeug-/Gefäß-Hüllvolumen und
 unabhängigen CAD-Prüfungen. Sie enthält keine vollständige Arm- oder
-Mehrroboterbewegung. Gerätespezifische Heber wie bei CF01 bleiben bei fehlendem
+Mehrroboterbewegung. `model/h02-arm-pickup.scene.json` ergänzt den
+kontinuierlichen lokalen Armweg aus dem unveränderten Roboter mit unabhängigen
+nativen Reichweiten-, Selbstkollisions- und Freigangprüfungen;
+[Prüfumfang und ausgeschlossene Montagekontakte](docs/tube-frame-h02.md#full-arm-direct-pickup).
+Gerätespezifische Heber wie bei CF01 bleiben bei fehlendem
 Greifzugang möglich. Fingerfreigang, Nachbargefäße, Rückhaltung und Auszug
 müssen am konkreten Halter nachgewiesen werden. Die statische Dreiarmaufstellung
 und synthetischen Transportverträge belegen keine koordinierte Hardwarebewegung.

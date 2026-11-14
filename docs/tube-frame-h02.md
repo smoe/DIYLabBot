@@ -33,8 +33,9 @@ frame. The grip reference is 33 mm above the dock origin. Pads occupy Z=31–40 
 between the upper guide ending at Z=30 mm and collar starting at Z=42 mm.
 The jaws close from 22 mm gap to the illustrative 10.8 mm tube body diameter.
 After the required grasp confirmation, tool and tube rise together by 60 mm.
-This is a local tool-space test; no whole-arm IK, reach or self-collision claim
-is made, and the test endpoint is not a required stop in a future transport route.
+This component test covers local tool space. The full-arm extension below adds
+reachability and self-collision checks; the extraction endpoint is not a required
+stop in a future transport route.
 
 ![Existing gripper at the central H02 tube with eight occupied neighbors](media/h02-direct-pickup.png)
 
@@ -105,6 +106,76 @@ the checked build and native artifact hashes. Both cases contain 71 closed
 bodies including tube keepouts, continuous witnesses and negative controls;
 42 physical/reference bodies are visible. All 71 STEP differences in each
 case are zero. The regression suite has nine passing tests.
+
+## Full-arm direct pickup
+
+[The full-arm composition](../model/h02-arm-pickup.scene.json) references the
+unchanged default robot, local pickup and existing motion limits. The arm has
+its original 200 mm upper and 175 mm forearm dimensions. Its base is placed at
+(0, −280, 0) mm relative to H02. The finite support-plane witness is a synthetic
+fixture assumption, not surveyed furniture.
+
+An analytic positive-elbow IK branch keeps the TCP vertical throughout the
+60 mm approach and extraction. The shared quintic episodes each last six
+seconds, with C2 position/velocity/acceleration continuity and bounded jerk.
+Only grasp and closing require stops; there are no interior approach or
+extraction stops. Joint limits and velocity, acceleration and jerk bounds are
+checked using interval derivatives of the IK, alongside shared FK. This is a
+local pickup program, not a complete transfer or hardware controller.
+
+Both native CADs independently construct the robot from the shared arm source
+and manufacturer library. Each native evaluated link is checked against shared
+FK using four frame probes; a TCP probe and gripper mount check also verify the
+attachment. Continuous clearance uses native midpoint distances minus
+conservative all-point rigid-body motion bounds over each interval. Adaptive
+subdivision continues until every interval clears its required margin; an
+unresolved interval fails. Distant pairs use native bounding-box separation.
+This is a conservative numerical audit, not a formal floating-point proof.
+
+![Default arm grasping the central H02 tube](media/h02-arm-pickup.png)
+
+![Default arm after the continuous 60 mm extraction](media/h02-arm-extracted.png)
+
+The additional required margins are 0.5 mm for nonadjacent arm self-collision,
+0.5 mm for arm/tool separation and 1 mm against the fixture, neighboring tubes
+and support witness. The existing 806 local swept-envelope checks per variant
+and CAD retain the smaller guide and finger clearances above. Same-link bodies,
+adjacent-link assembly interfaces, the L6/tool mounting interface and base/support
+contact are explicitly excluded and listed by pair in each report. These
+assembly contacts are not claimed collision-free. A hidden blocker at the
+middle of the tool's extraction checks that a collision is rejected even when
+both endpoint poses are clear.
+
+```sh
+python3 scripts/build_h02_arm_pickup.py --backend both
+python3 scripts/build_h02_arm_pickup.py --backend freecad --no-render
+python3 scripts/build_h02_arm_pickup.py --backend solidcraft --no-render
+python3 -m unittest discover -s tests -p 'test_h02*pickup.py'
+```
+
+`cad/h02-arm-pickup/shared-build-report.json` resolves the native approach,
+grasp and extracted models, source and artifact hashes, interval results and
+cross-CAD body comparisons. Each CAD can build independently; manufacturer
+round-trip caches are reusable only after checking source and artifact pins.
+The combined build compares semantic body volume, center of mass and bounds;
+SolidCraft's split manufacturer housing pieces are aggregated for comparison.
+OCC optimal geometric bounds are used for this comparison, since its default
+spline bounds can be larger than the actual housing. The collision audit keeps
+the conservative default bounds; comparison tolerances remain unchanged.
+
+For each variant and CAD, the arm audit covers 7,004 additional pairs using
+83 evaluated native poses and 43 accepted continuous intervals (maximum depth
+5). The conservative interval clearance bounds are at least 23.617 mm for
+nonadjacent arm links, 1.225 mm for arm/tool separation and 9.303 mm against the
+surroundings. Both native blocker controls are rejected with clear endpoints.
+All 1,152 semantic body/pose comparisons pass, and the combined focused suite
+has 18 passing tests. These are nominal geometric results under the recorded
+exclusions, not measured tolerances or a hardware qualification.
+The [full-arm image evidence](media/h02-arm-pickup.provenance.json) binds the
+published views to the checked sources, audits and native models.
+
+Actual tube/lid geometry, grip forces, calibrated placement, torque limits,
+uncertainty, multi-robot coordination and hardware safety remain unqualified.
 
 ## Bottom access and capture
 

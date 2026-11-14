@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "h02-arm-pickup.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "sources",
+    "arm_fixture",
+    "branch",
+    "support_plane",
+    "clearance_mm",
+    "continuous_audit",
+    "status",
+    "limitations",
+    "units"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.h02-arm-pickup/1"
+    },
+    "id": {
+      "const": "H02ArmPickup"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "time": "s"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pickup",
+        "robot",
+        "motion_limits"
+      ],
+      "properties": {
+        "pickup": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "robot": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        },
+        "motion_limits": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "arm_fixture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "position_mm",
+        "yaw_deg"
+      ],
+      "properties": {
+        "position_mm": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "yaw_deg": {
+          "const": 0
+        }
+      }
+    },
+    "branch": {
+      "const": "planar_positive_elbow"
+    },
+    "support_plane": {
+      "type": "object",
+      "required": [
+        "origin_mm",
+        "size_mm",
+        "meaning"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "origin_mm": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number"
+          }
+        },
+        "size_mm": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "meaning": {
+          "type": "string"
+        }
+      }
+    },
+    "clearance_mm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "self",
+        "arm_tool",
+        "environment"
+      ],
+      "properties": {
+        "self": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "arm_tool": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "environment": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "continuous_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_depth",
+        "numeric_guard_mm"
+      ],
+      "properties": {
+        "max_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "numeric_guard_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "status": {
+      "type": "string"
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

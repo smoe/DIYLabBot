@@ -78,8 +78,10 @@ Transport-Mocks sind kein Nachweis kooperativer Hardware. Der lokale
 [H02-Direktgriff](tube-frame-h02.md#direct-pickup-variant) ist nun für beide
 Gefäßformen mit acht Nachbarn und kontinuierlichen Hüllvolumen in beiden CADs
 geprüft. Als Nächstes reale Gefäße, geschlossene Deckel und Greifkräfte
-qualifizieren sowie den vollständigen Armweg samt Selbstkollision und
-Lageunsicherheit aus der referenzierten Roboterquelle ableiten.
+qualifizieren und Lageunsicherheit berücksichtigen. Die
+[Arm-Erweiterung](tube-frame-h02.md#full-arm-direct-pickup) leitet den lokalen
+Armweg bereits aus der Roboterquelle ab und prüft Reichweite, Selbstkollision
+und kontinuierlichen Freigang in beiden CADs.
 
 H03 ist aus dem aktiven Standardpfad zurückgestellt. Nur bei erneutem Bedarf
 an genau diesem motorlosen Vergleichskonzept wären Kurvenscheiben,
