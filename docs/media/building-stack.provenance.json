@@ -1,11 +1,11 @@
 {
   "format": "solidcraftbot.building-stack-media/1",
-  "prepared_on": "2026-11-13",
-  "revision": "building-stack-a08626f68c13",
+  "prepared_on": "2026-11-14",
+  "revision": "building-stack-15df4fb70700",
   "source": "model/building-stack.shared.json",
-  "source_sha256": "a08626f68c13a6dc1240f4ec8deba869f3d78ebfb16f59cf6dfa173798c7d4b1",
+  "source_sha256": "15df4fb707000b2c82a7ae28d3a8d714866311c666ed1795b3c31835307cea09",
   "source_files_sha256": {
-    "model/building-stack.shared.json": "a08626f68c13a6dc1240f4ec8deba869f3d78ebfb16f59cf6dfa173798c7d4b1",
+    "model/building-stack.shared.json": "15df4fb707000b2c82a7ae28d3a8d714866311c666ed1795b3c31835307cea09",
     "scripts/build_building_stack.py": "f443bfbe58c0199bb302a59ec2f81599595c8d79293ac9b8f518423a79a7a72b",
     "scripts/build_building_stack_freecad.py": "6ec54b240d4b236b77ad6c73e60f4e8fa2f43f1b7aa25e0b57717e62fe204653",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
@@ -42,8 +42,8 @@
     "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-    "scripts/building_exterior.py": "c11ad13f56df7a3e135b091e8a20e424cf08aba986af0c30e486bb7755c5a614",
-    "model/building-exterior.schema.json": "41ddaf88b275ff7c2f83ed31872e79313d9bb6099f203b64ee3869ce03b736dc",
+    "scripts/building_exterior.py": "5d0f9882359183d3b89a47de1a8777eacb4bbae1bb0294b5e12ac4f9c28476df",
+    "model/building-exterior.schema.json": "10dc7f8da07398b6b26863e46e5783f5ed958409b554917051776c3899870ff4",
     "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
     "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb",
     "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
@@ -86,9 +86,9 @@
     "EG"
   ],
   "native_build_report": {
-    "path": "exports/generated/building-stack-a08626f68c13/build-report.json",
-    "sha256": "341866720046f58b71d5866bcc82ea2b40f2a730b743e20f23afe00433cea120",
-    "bytes": 2150068
+    "path": "exports/generated/building-stack-15df4fb70700/build-report.json",
+    "sha256": "2f66bfd9148e5f798c50e8159bbd08bafd52eec2636d95d6343a3919a43c231b",
+    "bytes": 2160585
   },
   "native_summary": {
     "passed": true,
@@ -125,40 +125,44 @@
     "corridor_roof_checks_per_backend": 4
   },
   "native_files": {
-    "case": "exports/generated/building-stack-a08626f68c13/overview.case.json",
-    "commands": "exports/generated/building-stack-a08626f68c13/overview.commands.json",
-    "solidcraft": "cad/generated/building-stack-a08626f68c13/overview.sc",
-    "solidcraft_measurements": "exports/generated/building-stack-a08626f68c13/overview.solidcraft.json",
-    "step": "exports/generated/building-stack-a08626f68c13/overview.step",
-    "native_probe_commands": "exports/generated/building-stack-a08626f68c13/native-probes.commands.json",
-    "solidcraft_probes": "exports/generated/building-stack-a08626f68c13/native-probes.solidcraft.json",
-    "freecad": "cad/generated/building-stack-a08626f68c13/overview.FCStd",
-    "freecad_validation": "exports/generated/building-stack-a08626f68c13/overview.freecad.json"
+    "case": "exports/generated/building-stack-15df4fb70700/overview.case.json",
+    "commands": "exports/generated/building-stack-15df4fb70700/overview.commands.json",
+    "solidcraft": "cad/generated/building-stack-15df4fb70700/overview.sc",
+    "solidcraft_measurements": "exports/generated/building-stack-15df4fb70700/overview.solidcraft.json",
+    "step": "exports/generated/building-stack-15df4fb70700/overview.step",
+    "native_probe_commands": "exports/generated/building-stack-15df4fb70700/native-probes.commands.json",
+    "solidcraft_probes": "exports/generated/building-stack-15df4fb70700/native-probes.solidcraft.json",
+    "freecad": "cad/generated/building-stack-15df4fb70700/overview.FCStd",
+    "freecad_validation": "exports/generated/building-stack-15df4fb70700/overview.freecad.json",
+    "appearance_proof": "exports/generated/building-stack-15df4fb70700/appearance-proof.json",
+    "appearance_commands": "exports/generated/building-stack-15df4fb70700/appearance.commands.json"
   },
   "native_artifact_sha256": {
-    "case": "f5ca054a7a516970a08eb349a9bf23b6ea727ea4099ac96d3b9fbc5324e3858d",
+    "case": "5d5d776fe874d0727562ab16db58906227a73ca7b705e47ffe4d54f76b0021b3",
     "commands": "a5d055b15852a3b9ceff033c9a1b56eee9a0ada5e7c51172f12a5e65bafa9c0b",
-    "solidcraft": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+    "solidcraft": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
     "solidcraft_measurements": "8f77ccc24648d95dc8f8a83f1e8caf418e236a12c941b452ad56936ea31bdfa0",
     "step": "af7c3ee86ce005ddf69100a199e3d3af46b7e65938c8f5cde7752ca28f34bd1e",
     "native_probe_commands": "52b9367c592168550d0d93dc97a0fce685046c82f2087c8749c40b9ff40a1d7a",
     "solidcraft_probes": "ef0335224b4d7932b58e0b5bdb14c47e125f4589b3eabdbfa154ec0d929cb912",
-    "freecad": "cdcbf23ec9b527f63ff3b9e39ec429c00a77b5cc1418e86ff1f4851b77ca7cb3",
-    "freecad_validation": "82ece2d75ff06631643708151e983e7fe59b0812801cc9014d6b351fbf0af069"
+    "freecad": "2561c9df9c9faac41e1f645a512813385c189962e55ad51b748017bdc60eafa4",
+    "freecad_validation": "82ece2d75ff06631643708151e983e7fe59b0812801cc9014d6b351fbf0af069",
+    "appearance_proof": "84bdced1f23e37563789e79c2a9a1b9af9f8598e59b97d43a85ab98850185483",
+    "appearance_commands": "0c597f4d88dc6b3c3c0824bb8f6eb81a34b99ff336486d45fb9e47e64e7b9c19"
   },
   "images": [
     {
       "id": "overview",
       "path": "docs/media/building-stack-overview.png",
-      "sha256": "c153873b23998754cc50af9d571d70354ad6e036705d21e03cf22871e066a58b",
-      "bytes": 457097,
+      "sha256": "81b63879bc8d3c619ede88b230c65f666ce89d988409c1956c9a7b99bc10a047",
+      "bytes": 364395,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           11817.567567567567,
@@ -173,13 +177,13 @@
       "view_commands": [],
       "view_script_sha256": "d1933215812bb0a62c50ba518f5a0fd2a2ceee6c0da4a4dea8ee51640a6b38a4",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/overview.view.commands.json",
+        "exports/generated/building-stack-15df4fb70700/overview.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-15df4fb70700/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/overview.png",
+        "renders/building-stack-15df4fb70700/overview.png",
         "--width",
         "1800",
         "--height",
@@ -193,8 +197,9 @@
       ],
       "visual_review": {
         "passed": true,
-        "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+        "method": "Inspected native snapshot: muted red entrance concrete, clear foyer glazing, unchanged doors and surrounding materials"
+      },
+      "view_script": "exports/generated/building-stack-15df4fb70700/overview.view.commands.json"
     },
     {
       "id": "atrium",
@@ -206,8 +211,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           11817.567567567568,
@@ -1092,13 +1097,13 @@
       ],
       "view_script_sha256": "25c4fb70cee3a69205a7da6032463ccd00b1bdc9a95fe25907c8abb03a6f0116",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/atrium.view.commands.json",
+        "exports/generated/building-stack-a08626f68c13/atrium.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-a08626f68c13/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/atrium.png",
+        "renders/building-stack-a08626f68c13/atrium.png",
         "--width",
         "1800",
         "--height",
@@ -1113,7 +1118,9 @@
       "visual_review": {
         "passed": true,
         "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+      },
+      "view_script": "exports/generated/building-stack-a08626f68c13/atrium.view.commands.json",
+      "appearance_reuse": "Changed facade bodies are hidden; image bytes retained"
     },
     {
       "id": "circulation",
@@ -1125,8 +1132,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           12037.0395010395,
@@ -2912,13 +2919,13 @@
       ],
       "view_script_sha256": "e522547350da3f60bb4c99fe825035e2b7fc0030a80f7d3e274208f29abbd02f",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/circulation.view.commands.json",
+        "exports/generated/building-stack-a08626f68c13/circulation.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-a08626f68c13/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/circulation.png",
+        "renders/building-stack-a08626f68c13/circulation.png",
         "--width",
         "1800",
         "--height",
@@ -2933,20 +2940,22 @@
       "visual_review": {
         "passed": true,
         "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+      },
+      "view_script": "exports/generated/building-stack-a08626f68c13/circulation.view.commands.json",
+      "appearance_reuse": "Changed facade bodies are hidden; image bytes retained"
     },
     {
       "id": "ground",
       "path": "docs/media/building-stack-ground.png",
-      "sha256": "dc9856603e7c71958204333feac857309181efbfdfda20ea41b1561cccd2850e",
-      "bytes": 569149,
+      "sha256": "53a0e42932a4372291c3605bfe7d359b113ce7dadd8e2af478ad201537007a41",
+      "bytes": 389815,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           11817.90066498702,
@@ -4561,13 +4570,13 @@
       ],
       "view_script_sha256": "2883421317ef8371376c85f75705343bf8dec060e72358aece9ad707a74305e0",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/ground.view.commands.json",
+        "exports/generated/building-stack-15df4fb70700/ground.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-15df4fb70700/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/ground.png",
+        "renders/building-stack-15df4fb70700/ground.png",
         "--width",
         "1800",
         "--height",
@@ -4581,8 +4590,9 @@
       ],
       "visual_review": {
         "passed": true,
-        "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+        "method": "Inspected native snapshot: muted red entrance concrete, clear foyer glazing, unchanged doors and surrounding materials"
+      },
+      "view_script": "exports/generated/building-stack-15df4fb70700/ground.view.commands.json"
     },
     {
       "id": "roof",
@@ -4594,8 +4604,8 @@
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           11818.291130542884,
@@ -6373,13 +6383,13 @@
       ],
       "view_script_sha256": "bcb65902598763d97e28804aa46bbd9f38d228df54ca24b0fd21dd6467a352a1",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/roof.view.commands.json",
+        "exports/generated/building-stack-a08626f68c13/roof.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-a08626f68c13/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/roof.png",
+        "renders/building-stack-a08626f68c13/roof.png",
         "--width",
         "1800",
         "--height",
@@ -6394,7 +6404,9 @@
       "visual_review": {
         "passed": true,
         "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+      },
+      "view_script": "exports/generated/building-stack-a08626f68c13/roof.view.commands.json",
+      "appearance_reuse": "Changed facade bodies are hidden; image bytes retained"
     },
     {
       "id": "section_svg",
@@ -6441,29 +6453,29 @@
     {
       "id": "lab_3_003",
       "path": "docs/media/building-stack-lab-3-003.png",
-      "sha256": "1fcde07e2f130f9cc926251e346b50cdc442d9ac04e0e2e21cb2390a6d12260f",
-      "bytes": 416499,
+      "sha256": "d1521b6c2502b02b0ab498f54ad1797336f5224c31f526f3d33dfce671e9c80a",
+      "bytes": 369848,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model; appearance and visibility only",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "build_report": {
-        "path": "cad/building-stack/shared-build-report.json",
-        "sha256": "341866720046f58b71d5866bcc82ea2b40f2a730b743e20f23afe00433cea120"
+        "path": "exports/generated/building-stack-15df4fb70700/appearance-build-report.json",
+        "sha256": "62fdd408404a59b891095ed2d987d080c13e0859dfa157c3024001a70b58664c"
       },
       "render_report": {
-        "path": "exports/generated/building-stack-a08626f68c13/highlight/highlight-report.json",
-        "sha256": "46b35cb3774b879bacc6ebc3ce8401dca8b0730800d7e064705afc587a4cd12f",
-        "bytes": 73518
+        "path": "exports/generated/building-stack-15df4fb70700/highlight/highlight-report.json",
+        "sha256": "587043fcbe71d343066664ca8f81ce370b43e7efcd254edd0186ee86135f8fdc",
+        "bytes": 73669
       },
       "producer": {
         "path": "scripts/render_building_stack_highlight.py",
         "sha256": "0b41eaa98032cbc8000855e82b96d213668955f77666865a5c8c16d773b33b1b"
       },
-      "view_script": "exports/generated/building-stack-a08626f68c13/highlight/view.commands.json",
+      "view_script": "exports/generated/building-stack-15df4fb70700/highlight/view.commands.json",
       "view_script_sha256": "eecf3181b9ddadefa86f081c7e0e8c2fafb7ffab34c5f6638516a2e2c6721a21",
       "view_commands": [
         {
@@ -6680,13 +6692,13 @@
         "fov": 0.6
       },
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/highlight/view.commands.json",
+        "exports/generated/building-stack-15df4fb70700/highlight/view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-15df4fb70700/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/highlight/room-highlight.pending.png",
+        "exports/generated/building-stack-15df4fb70700/highlight/room-highlight.pending.png",
         "--width",
         "1800",
         "--height",
@@ -8699,7 +8711,7 @@
       "l01_furnishings_instantiated": false,
       "visual_review": {
         "passed": true,
-        "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
+        "method": "Inspected native snapshot: muted red entrance concrete, clear foyer glazing, unchanged doors and surrounding materials"
       },
       "limitations": [
         "Appearance and roof visibility only; building geometry and immutable CAD proof are preserved.",
@@ -10382,13 +10394,13 @@
       ],
       "view_script_sha256": "531df1370877ab1e3bd7b5eb4efc294dffd323224c0839088d4f789c12c374f2",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/basement.view.commands.json",
+        "exports/generated/building-stack-a08626f68c13/basement.view.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-a08626f68c13/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/renders/building-stack-a08626f68c13/basement.png",
+        "renders/building-stack-a08626f68c13/basement.png",
         "--width",
         "1800",
         "--height",
@@ -10401,25 +10413,27 @@
         "fine"
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "visual_review": {
         "passed": true,
         "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
-      }
+      },
+      "view_script": "exports/generated/building-stack-a08626f68c13/basement.view.commands.json",
+      "appearance_reuse": "Changed facade bodies are hidden; image bytes retained"
     },
     {
       "id": "front_glass",
       "path": "docs/media/building-stack-front.png",
-      "sha256": "c03e889beccdd2dbdf3c1ed743dff626ce91c41ddc9e84e026a1bb07e52e8cc1",
-      "bytes": 470061,
+      "sha256": "1fe4b515547a13dbf334cd4a3bcd6e605217e628e4456e6e94ac35fb11bb208f",
+      "bytes": 188022,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-a08626f68c13/overview.sc",
-      "native_model_sha256": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "native_model": "cad/generated/building-stack-15df4fb70700/overview.sc",
+      "native_model_sha256": "9272c0a7e53def816a609ac0fb23e7ccf9ae2cf46c8fbfe9299f883f8284aa57",
       "camera": {
         "target": [
           22267.567567567567,
@@ -10656,13 +10670,13 @@
       ],
       "view_script_sha256": "0348c5707720f934cb9ffc0e48e29c784cb75cdc41b2db43db9409dd3aff2338",
       "command_line": [
-        "/Applications/SolidCraft.app/Contents/MacOS/solidcraft-cli",
+        "solidcraft-cli",
         "snapshot",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/front/front.commands.json",
+        "exports/generated/building-stack-15df4fb70700/front/front.commands.json",
         "--in",
-        "/Users/u005069/GitHub/DIYLabBot/cad/generated/building-stack-a08626f68c13/overview.sc",
+        "cad/generated/building-stack-15df4fb70700/overview.sc",
         "--out",
-        "/Users/u005069/GitHub/DIYLabBot/exports/generated/building-stack-a08626f68c13/front/front.png",
+        "exports/generated/building-stack-15df4fb70700/front/front.png",
         "--width",
         "1800",
         "--height",
@@ -10675,23 +10689,23 @@
         "fine"
       ],
       "render_report": {
-        "path": "exports/generated/building-stack-a08626f68c13/front/front-report.json",
-        "sha256": "81e02e30c24cd31b1a02e29187d31cff80e60893add6622854d56df422dc61da",
-        "bytes": 14501
+        "path": "exports/generated/building-stack-15df4fb70700/front/front-report.json",
+        "sha256": "d536e1e007dbe8975d5ffc8956b7673a5d4cb1fc6496bd2273526876eee431fc",
+        "bytes": 14941
       },
       "native_model_unchanged": true,
       "visual_review": {
         "passed": true,
-        "method": "Native current-revision image inspected: source-bound visibility, geometry and door variants checked; no image editing"
+        "method": "Inspected native snapshot: muted red entrance concrete, clear foyer glazing, unchanged doors and surrounding materials"
       },
-      "view_script": "exports/generated/building-stack-a08626f68c13/front/front.commands.json"
+      "view_script": "exports/generated/building-stack-15df4fb70700/front/front.commands.json"
     }
   ],
   "documentation_files_sha256": {
     "docs/building-stack.md": "1176776073e458e9316fb94fc29744c9b06022fd6f1823057468f1a95a6be85c",
     "docs/ground-floor-eg.md": "ccef100cf0acaa9cb0f97e5eeb992ea0e37b034941e78225df2788be5d43471c",
     "docs/basement-kg.md": "d45b051ee7a61679298ab1d5b4b1700234813ebfdcd117eeb51212fac11e3d47",
-    "docs/building-exterior.md": "000e60afb32a86146cf04cbc74de892723e90e295aac147caae2702ed8928197",
+    "docs/building-exterior.md": "d68c884c7d5006e334963f36ab89ecb3c3b61a17563373b1312d5baa9a1f17ab",
     "docs/building-alignment.md": "745ff1bbc02484231dd01c3a62a1167e793735d41b54ce312706b1757a30f0de"
   },
   "qualification": {
@@ -16108,39 +16122,39 @@
         "opacity": 1
       },
       "EG__Wall_EW011": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW011_Align1": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW011_Align2": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW071": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW071_Align1": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW125": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW125_Align1": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW140": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW140_Align1": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "EG__Wall_EW133": {
@@ -16352,27 +16366,27 @@
         "opacity": 1
       },
       "OG1__Wall_W114": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W116": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W115": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W110": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W109": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W118": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG1__Wall_W103": {
@@ -16492,27 +16506,27 @@
         "opacity": 1
       },
       "OG2__Wall_W114": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W116": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W115": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W110": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W109": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W118": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG2__Wall_W103": {
@@ -16632,27 +16646,27 @@
         "opacity": 1
       },
       "OG3__Wall_W114": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W116": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W115": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W110": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W109": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W118": {
-        "color": "#B9B5AC",
+        "color": "#B65E52",
         "opacity": 1
       },
       "OG3__Wall_W103": {
@@ -19301,12 +19315,12 @@
     "historical_source_sha256": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25"
   },
   "previous_native_build": {
-    "revision": "building-stack-2d80f268decf",
-    "source_sha256": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25",
+    "revision": "building-stack-a08626f68c13",
+    "source_sha256": "a08626f68c13a6dc1240f4ec8deba869f3d78ebfb16f59cf6dfa173798c7d4b1",
     "native_build_report": {
-      "path": "exports/generated/building-stack-2d80f268decf/build-report.json",
-      "sha256": "5edea867522505848fa0a76fd7c8dcb2fea114ab605772dc4f6f6b51c7725818",
-      "bytes": 1873229
+      "path": "exports/generated/building-stack-a08626f68c13/build-report.json",
+      "sha256": "341866720046f58b71d5866bcc82ea2b40f2a730b743e20f23afe00433cea120",
+      "bytes": 2150068
     }
   },
   "furnishings": {
@@ -20214,5 +20228,235 @@
     "path": "exports/generated/building-stack-a08626f68c13/room-doors-native-qa.json",
     "sha256": "bf20b0d531a4205b36f62993b7aa23b4f99ec9d4f5ffa4419eb7315dbe537f6d",
     "bytes": 29118
+  },
+  "appearance_update": {
+    "passed": true,
+    "method": "Source-derived appearance update of checked native models; geometry qualification inherited, not rerun",
+    "previous_revision": "building-stack-a08626f68c13",
+    "previous_source_files_sha256": {
+      "model/building-stack.shared.json": "a08626f68c13a6dc1240f4ec8deba869f3d78ebfb16f59cf6dfa173798c7d4b1",
+      "scripts/build_building_stack.py": "f443bfbe58c0199bb302a59ec2f81599595c8d79293ac9b8f518423a79a7a72b",
+      "scripts/build_building_stack_freecad.py": "6ec54b240d4b236b77ad6c73e60f4e8fa2f43f1b7aa25e0b57717e62fe204653",
+      "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+      "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+      "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+      "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+      "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+      "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+      "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+      "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+      "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+      "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+      "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+      "model/building-stack.schema.json": "bfec2b6564de4c7447c6451ea10c7d3d23e9687f73e976cf45aae30069f31df3",
+      "scripts/building_stack.py": "06b839c9bcd31227b1ab23134ffbb147170be66ee8a0d249868d0f16497e6b56",
+      "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+      "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+      "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+      "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+      "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+      "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+      "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+      "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+      "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+      "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+      "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+      "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+      "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+      "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+      "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
+      "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08",
+      "model/building-furnishings.schema.json": "5a6025742b0b1106d50c6661e384ac89dd0fc9c5b57de2ea44451ea8ed0ad24a",
+      "model/social-furniture-catalog.schema.json": "020eb4c95dcf9b49cc951739552eb3ac6a17691bdfd94818dfaa41d2b183d6ce",
+      "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
+      "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+      "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+      "scripts/building_exterior.py": "c11ad13f56df7a3e135b091e8a20e424cf08aba986af0c30e486bb7755c5a614",
+      "model/building-exterior.schema.json": "41ddaf88b275ff7c2f83ed31872e79313d9bb6099f203b64ee3869ce03b736dc",
+      "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
+      "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb",
+      "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
+      "model/building-doors.schema.json": "716505f2c996d4d51c7aba30decdcc00326973c70a475599378285f5f1e30f76",
+      "model/room-door-catalog.schema.json": "18155af264ac356e33040a745dea569fa60a1832fd52ae4b9a7027a472b7e2e5"
+    },
+    "previous_artifact_sha256": {
+      "case": "f5ca054a7a516970a08eb349a9bf23b6ea727ea4099ac96d3b9fbc5324e3858d",
+      "commands": "a5d055b15852a3b9ceff033c9a1b56eee9a0ada5e7c51172f12a5e65bafa9c0b",
+      "solidcraft": "b8b8d223209f0614dfd07815f05594fb6100cefdac78995e941010c0feaf4436",
+      "solidcraft_measurements": "8f77ccc24648d95dc8f8a83f1e8caf418e236a12c941b452ad56936ea31bdfa0",
+      "step": "af7c3ee86ce005ddf69100a199e3d3af46b7e65938c8f5cde7752ca28f34bd1e",
+      "native_probe_commands": "52b9367c592168550d0d93dc97a0fce685046c82f2087c8749c40b9ff40a1d7a",
+      "solidcraft_probes": "ef0335224b4d7932b58e0b5bdb14c47e125f4589b3eabdbfa154ec0d929cb912",
+      "freecad": "cdcbf23ec9b527f63ff3b9e39ec429c00a77b5cc1418e86ff1f4851b77ca7cb3",
+      "freecad_validation": "82ece2d75ff06631643708151e983e7fe59b0812801cc9014d6b351fbf0af069"
+    },
+    "geometry_sha256": "b20feb21438e50f06270370a40dc5366b74156e4ced524ce6866a33e631c3438",
+    "compiled_geometry_identical": true,
+    "changed_body_appearances": {
+      "EG__Wall_EW011": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW011_Align1": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW011_Align2": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW071": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW071_Align1": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW125": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW125_Align1": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW140": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "EG__Wall_EW140_Align1": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W109": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W110": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W114": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W115": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W116": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG1__Wall_W118": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W109": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W110": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W114": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W115": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W116": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG2__Wall_W118": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W109": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W110": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W114": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W115": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W116": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "OG3__Wall_W118": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "FacadeClosure_OG1_W117": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "FacadeClosure_OG2_W117": {
+        "color": "#B65E52",
+        "opacity": 1
+      },
+      "FacadeClosure_OG3_W117": {
+        "color": "#B65E52",
+        "opacity": 1
+      }
+    },
+    "solidcraft_body_cache_bytes_unchanged": true,
+    "solidcraft_freecad_measurements_passed": true,
+    "freecad_presentation": {
+      "passed": true,
+      "visible_final_bodies": 1811,
+      "geometry_bytes_unchanged": true,
+      "gui_render_checked": false,
+      "method": "Saved native presentation metadata; no GUI process"
+    }
+  },
+  "appearance_tests": {
+    "passed": true,
+    "unique_tests": 169,
+    "passed_tests": 164,
+    "skipped": 5,
+    "skips": [
+      {
+        "test": "test_building_furnishings.FurnishingsTests.test_sources_match_declared_schemas",
+        "reason": "jsonschema is unavailable"
+      },
+      {
+        "test": "test_building_stack.StackTests.test_schema_is_local_strict_and_keeps_calibration_unknown",
+        "reason": "Optional jsonschema development dependency required"
+      },
+      {
+        "test": "test_relative_floorplan.RelativePlanTests.test_schema_accepts_invented_data_and_rejects_metric_or_private_fields",
+        "reason": "Optional jsonschema development dependency required"
+      },
+      {
+        "test": "test_relative_floorplan_build.RelativeNativeEvidenceTests.test_existing_native_preview_is_source_bound_and_explicitly_nonmetric",
+        "reason": "Build the explicit synthetic display preview to inspect native evidence"
+      },
+      {
+        "test": "test_ground_floor_model.GroundFloorTests.test_schema_accepts_literals_or_references_but_no_metric_or_original_image_fields",
+        "reason": "Optional jsonschema dependency required"
+      }
+    ],
+    "corrected_check": {
+      "test": "test_model_gallery.ExistingModelGalleryTests.test_repository_gallery_checks_without_rendering_or_artifact_changes",
+      "cause": "Gallery bindings refreshed for the appearance-only source change",
+      "rerun_passed": true
+    },
+    "scope": "Building, basement, relative floorplans, ground floor, gallery and native/public evidence; no full repository suite or hardware test",
+    "geometry_qualification": "Reused native checks after compiled geometry equality and byte-identical native geometry; no new geometry qualification run"
   }
 }

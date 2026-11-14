@@ -23,7 +23,8 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
   Riegel und Geländerteile bleiben einzelne editierbare Körper; die Darstellung
   benötigt keine vollständige boolesche Verschweißung ihres Profilrasters.
 - Die Eingangsflanken und übrigen geschlossenen Außenwände sind undurchsichtiger
-  Beton. Seitlich werden nur die ausdrücklich referenzierten Fassadenabschnitte
+  Beton. Die Eingangsflanken erhalten oberhalb des Geländes den fotoangenäherten
+  roten Anstrich `#B65E52`; die übrigen Betonflächen bleiben grau. Seitlich werden nur die ausdrücklich referenzierten Fassadenabschnitte
   mit Fensterbändern belegt. Geschlossene Endfelder, vertikale Zwischenstücke,
   Brüstungen und Stürze unterbrechen die Verglasung; die Brüstungsbereiche der
   Fensterseiten erhalten eine deckende graue Verkleidung.

@@ -344,7 +344,17 @@
     "sidewalk_width_mm": 1200,
     "road_width_mm": 4000,
     "sidewalk_color": "#A9ACA9",
-    "road_color": "#52575B"
+    "road_color": "#52575B",
+    "entrance_flank_color": "#B65E52",
+    "entrance_flank_walls": [
+      "W114",
+      "W116",
+      "W115",
+      "W110",
+      "W109",
+      "W117",
+      "W118"
+    ]
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",

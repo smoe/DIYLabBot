@@ -67,7 +67,7 @@ class ExteriorTests(unittest.TestCase):
 
     def test_entrance_flanks_are_opaque_and_side_bands_have_closed_gaps(self):
         ext=self.d['exterior'];bodies={b['id']:b for b in self.e['bodies']}
-        for name in ['OG1__Wall_W114','OG2__Wall_W118','OG3__Wall_W102']:
+        for name in ['OG3__Wall_W102']:
             self.assertEqual(bodies[name]['appearance'],{'color':self.s['exterior']['concrete_color'],'opacity':1})
         self.assertTrue(ext['side_window_groups'])
         self.assertEqual({v['level_id'] for v in ext['side_window_groups']},{'EG','OG1','OG2','OG3'})
@@ -78,6 +78,17 @@ class ExteriorTests(unittest.TestCase):
             self.assertLess(group['z_bounds_mm'][1],level['clear_top_mm'])
             self.assertIn(group['target_body'],ext['surface_overrides'])
         self.assertEqual(len(ext['window_probes']),len(ext['side_window_groups']))
+
+    def test_only_entrance_flanks_above_grade_are_painted_red(self):
+        bodies={b['id']:b for b in self.e['bodies']}
+        for level in ['OG1','OG2','OG3']:
+            for wall in ['W114','W118']:
+                self.assertEqual(bodies[level+'__Wall_'+wall]['appearance'],{'color':self.s['exterior']['entrance_flank_color'],'opacity':1})
+        self.assertEqual(self.s['exterior']['entrance_flank_color'],'#B65E52')
+        self.assertTrue(any(v['color']==self.s['exterior']['entrance_flank_color'] for k,v in self.d['exterior']['surface_overrides'].items() if k.startswith('EG__')))
+        self.assertFalse(any(v['color']==self.s['exterior']['entrance_flank_color'] for k,v in self.d['exterior']['surface_overrides'].items() if k.startswith('KG__')))
+        for group in self.d['exterior']['side_window_groups']:
+            self.assertEqual(bodies[group['target_body']]['appearance']['color'],self.s['exterior']['side_cladding_color'])
 
     def test_access_surfaces_are_thin_and_separate_from_lawn(self):
         ext=self.d['exterior']

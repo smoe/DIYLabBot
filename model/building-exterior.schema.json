@@ -35,7 +35,9 @@
     "sidewalk_width_mm",
     "road_width_mm",
     "sidewalk_color",
-    "road_color"
+    "road_color",
+    "entrance_flank_color",
+    "entrance_flank_walls"
   ],
   "properties": {
     "status": {
@@ -220,6 +222,19 @@
     "road_color": {
       "type": "string",
       "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "entrance_flank_color": {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "entrance_flank_walls": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+      }
     }
   }
 }
