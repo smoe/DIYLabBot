@@ -4588,7 +4588,7 @@
       "id": "building-stack",
       "image": "images/building-stack.svg",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
+        "model/building-stack.shared.json": "332d920ef8de5af8cb50b7d94954d3c375483085b69c81b394787e41caf2982b",
         "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
       },
       "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
@@ -4612,7 +4612,7 @@
         "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
         "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
         "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-        "scripts/building_exterior.py": "0d1234f2a733b506ff4ecc814cffc73e7ed0a87062b2007675e7c32f0b1219e6",
+        "scripts/building_exterior.py": "60255e2335556c91374ab5f783e45bfdf1a84bb5de21fb64d73a59bcbab940e5",
         "model/building-exterior.schema.json": "887905d48197c52a291dc679278ddb4358b3a1f6080c14e3031f8be7c1e4af77",
         "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
         "model/building-doors.schema.json": "716505f2c996d4d51c7aba30decdcc00326973c70a475599378285f5f1e30f76",
@@ -4625,7 +4625,7 @@
       "image_sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151",
       "bytes": 10540,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
+        "model/building-stack.shared.json": "332d920ef8de5af8cb50b7d94954d3c375483085b69c81b394787e41caf2982b",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
@@ -4636,7 +4636,7 @@
         "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb"
       },
       "appearance_reuse": "Red entrance flank appearance does not affect this schematic; image bytes retained",
-      "site_update_reuse": "Only site sheets changed; this building section schematic retains its geometry and reviewed image bytes"
+      "site_update_reuse": "Extended site paving does not affect this section schematic; reviewed image bytes retained"
     },
     {
       "id": "building-social",

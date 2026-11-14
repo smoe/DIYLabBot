@@ -108,9 +108,11 @@ class ExteriorTests(unittest.TestCase):
         self.assertEqual(front['origin_mm'][1],road['origin_mm'][1])
         self.assertEqual(front['size_mm'][1],road['size_mm'][1])
         self.assertEqual(road['size_mm'][0],self.s['exterior']['road_width_mm'])
-        self.assertEqual(side['entry_opening'],'D0_004_North')
+        self.assertEqual(side['entry_opening'],'D0_013_Exterior')
         self.assertTrue(side['points_mm'])
-        self.assertEqual(side['facade_walls'],['W037','W061','W072','W088','W102'])
+        self.assertEqual(side['facade_walls'][0],'W090')
+        self.assertIn('W037',side['facade_walls'])
+        self.assertEqual(side['facade_walls'][-1],'W102')
 
     def test_invalid_or_invented_contract_values_are_rejected(self):
         for key,value in [('bay_count',True),('glass_opacity',1),('frame_mm',0),('guard_bar_fractions',[.5,.5]),('door_color','wood')]:

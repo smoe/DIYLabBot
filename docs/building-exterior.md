@@ -33,8 +33,8 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
   brauner Erdblock entfällt. Der Keller liegt weiterhin unter dieser Ebene.
 - Direkt vor der Glasfront liegt ein durchgehender Bereich aus grauen
   Gehwegplatten, davor die Straße über die gesamte Eingangsseite. Links folgen
-  die Platten der Fassadenkontur bis ungefähr zum vorhandenen Seiteneingang
-  `D0_004_North`. Die übrigen Außenflächen bleiben Rasen. Alle Flächen sind
+  die Platten der Fassadenkontur bis zum weiter hinten liegenden Seiteneingang
+  `D0_013_Exterior`. Die übrigen Außenflächen bleiben Rasen. Alle Flächen sind
   dünne Darstellungsflächen; Breiten und Grenzen sind nicht vermessen.
 
 Die Quellgrundrisse F03, EG und KG bleiben unverändert. Sämtliche Ersetzungen
@@ -48,6 +48,8 @@ werden in den nativen Fassungen gegen die Geschossbezüge geprüft.
 ![Gebäude mit Glasfront und Gelände](media/building-stack-overview.png)
 
 ![Foyer-Glasfront im gemeinsamen Modell](media/building-stack-front.png)
+
+![Pflasteranschluss am bestätigten weiter hinten liegenden Seiteneingang](media/building-farther-side-entrance.png)
 
 ```sh
 python3 scripts/build_building_stack.py --backend both

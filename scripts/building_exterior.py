@@ -167,7 +167,8 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     # Follow the existing left-hand facade only as far as its observed EG door.
     path_ids=s['left_sidewalk_walls']
     require(isinstance(path_ids,list) and path_ids and len(set(path_ids))==len(path_ids) and set(path_ids)<={e['wall'] for e in canonical_edges}, 'Explicit left sidewalk facade route required')
-    route=[walls[n] for n in path_ids]
+    contour_edges={edge['wall']:edge for edge in canonical_edges}
+    route=[contour_edges[n] for n in path_ids]
     require(all(a['end']==b['start'] for a,b in zip(route,route[1:])), 'Connected left sidewalk route required')
     side_entry=next((o for o in ground['openings'] if o['id']==s['left_sidewalk_entry_opening']),None)
     require(side_entry is not None and side_entry['kind']=='door', 'Observed left side entrance required')

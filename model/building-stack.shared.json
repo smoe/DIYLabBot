@@ -356,13 +356,36 @@
       "W118"
     ],
     "left_sidewalk_walls": [
+      "W090",
+      "W069",
+      "W059",
+      "W039",
+      "W033",
+      "W026",
+      "W014",
+      "W015",
+      "W034",
+      "W040",
+      "W041",
+      "W042",
+      "W011",
+      "W008",
+      "W005",
+      "W002",
+      "W001",
+      "W003",
+      "W007",
+      "W012",
+      "W013",
+      "W016",
+      "W025",
       "W037",
       "W061",
       "W072",
       "W088",
       "W102"
     ],
-    "left_sidewalk_entry_opening": "D0_004_North"
+    "left_sidewalk_entry_opening": "D0_013_Exterior"
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",

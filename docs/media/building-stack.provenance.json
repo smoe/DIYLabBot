@@ -1,11 +1,11 @@
 {
   "format": "solidcraftbot.building-stack-media/1",
   "prepared_on": "2026-11-14",
-  "revision": "building-stack-7ed88c9c9157-r2",
+  "revision": "building-stack-332d920ef8de",
   "source": "model/building-stack.shared.json",
-  "source_sha256": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
+  "source_sha256": "332d920ef8de5af8cb50b7d94954d3c375483085b69c81b394787e41caf2982b",
   "source_files_sha256": {
-    "model/building-stack.shared.json": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
+    "model/building-stack.shared.json": "332d920ef8de5af8cb50b7d94954d3c375483085b69c81b394787e41caf2982b",
     "scripts/build_building_stack.py": "f443bfbe58c0199bb302a59ec2f81599595c8d79293ac9b8f518423a79a7a72b",
     "scripts/build_building_stack_freecad.py": "6ec54b240d4b236b77ad6c73e60f4e8fa2f43f1b7aa25e0b57717e62fe204653",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
@@ -42,7 +42,7 @@
     "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-    "scripts/building_exterior.py": "0d1234f2a733b506ff4ecc814cffc73e7ed0a87062b2007675e7c32f0b1219e6",
+    "scripts/building_exterior.py": "60255e2335556c91374ab5f783e45bfdf1a84bb5de21fb64d73a59bcbab940e5",
     "model/building-exterior.schema.json": "887905d48197c52a291dc679278ddb4358b3a1f6080c14e3031f8be7c1e4af77",
     "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
     "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb",
@@ -86,9 +86,9 @@
     "EG"
   ],
   "native_build_report": {
-    "path": "exports/generated/building-stack-7ed88c9c9157-r2/build-report.json",
-    "sha256": "a4bc1f81b57a8452003961f68b3cf8653ac236c5d9cbe532515d38aa39bd612f",
-    "bytes": 2166015
+    "path": "exports/generated/building-stack-332d920ef8de/build-report.json",
+    "sha256": "37ce4bb5ee00682983603d86da43ff414b735a588e1c0d028cb482d47ec66aa6",
+    "bytes": 2170329
   },
   "native_summary": {
     "passed": true,
@@ -126,46 +126,46 @@
     "site_geometry_qualification": "Four site bodies freshly checked in both CADs; building checks inherited after exact unchanged native BRep/source equality"
   },
   "native_files": {
-    "case": "exports/generated/building-stack-7ed88c9c9157-r2/case.json",
-    "commands": "exports/generated/building-stack-7ed88c9c9157-r2/overview.commands.json",
-    "solidcraft": "cad/generated/building-stack-7ed88c9c9157-r2/overview.sc",
-    "solidcraft_measurements": "exports/generated/building-stack-7ed88c9c9157-r2/overview.solidcraft.json",
+    "case": "exports/generated/building-stack-332d920ef8de/case.json",
+    "commands": "exports/generated/building-stack-332d920ef8de/overview.commands.json",
+    "solidcraft": "cad/generated/building-stack-332d920ef8de/overview.sc",
+    "solidcraft_measurements": "exports/generated/building-stack-332d920ef8de/overview.solidcraft.json",
     "native_probe_commands": "exports/generated/building-stack-15df4fb70700/native-probes.commands.json",
     "solidcraft_probes": "exports/generated/building-stack-15df4fb70700/native-probes.solidcraft.json",
-    "freecad": "cad/generated/building-stack-7ed88c9c9157-r2/overview.FCStd",
-    "freecad_validation": "exports/generated/building-stack-7ed88c9c9157-r2/overview.freecad.json",
-    "site_step": "exports/generated/building-stack-7ed88c9c9157-r2/paving.step",
-    "site_qa": "exports/generated/building-stack-7ed88c9c9157-r2/paving-native-qa.json",
-    "site_update_proof": "exports/generated/building-stack-7ed88c9c9157-r2/site-update-proof.json",
-    "site_update_commands": "exports/generated/building-stack-7ed88c9c9157-r2/paving.commands.json"
+    "freecad": "cad/generated/building-stack-332d920ef8de/overview.FCStd",
+    "freecad_validation": "exports/generated/building-stack-332d920ef8de/overview.freecad.json",
+    "site_step": "exports/generated/building-stack-332d920ef8de/paving.step",
+    "site_qa": "exports/generated/building-stack-332d920ef8de/paving-native-qa.json",
+    "site_update_proof": "exports/generated/building-stack-332d920ef8de/site-update-proof.json",
+    "site_update_commands": "exports/generated/building-stack-332d920ef8de/paving.commands.json"
   },
   "native_artifact_sha256": {
-    "case": "ec87e84b6fd331a948fd8beb6172ae36ee957cb61b58227edc26046c6ed52a09",
-    "commands": "148066d2f09407558ebf81c95f8ffec5783511bceba308a81e36280d57ead112",
-    "solidcraft": "66d3f7e51576707690e4d72d8299980aedbb520b8c34f2bf442d3b6c052c4ac6",
-    "solidcraft_measurements": "95adc15af5a5e7ca541ba4ef2ae53f92fd73a7c714ef054eac26a6b422900a1c",
+    "case": "533cb502c3e2becfb2f865bbd2056534cc68aa755e555fa4ba4c0e14fc8e6964",
+    "commands": "084e27d362460246d3403f9673fddeb8c02d75987e23eb4891cb0d3ca8c9e141",
+    "solidcraft": "77320157e3d826a3e70f8b390e58dfd47f8570c00a79074911fc7485dd227306",
+    "solidcraft_measurements": "e318567cdeb427bb1219fd379dfc098230804c66c46e641f47efc5ba737206dc",
     "native_probe_commands": "52b9367c592168550d0d93dc97a0fce685046c82f2087c8749c40b9ff40a1d7a",
     "solidcraft_probes": "ef0335224b4d7932b58e0b5bdb14c47e125f4589b3eabdbfa154ec0d929cb912",
-    "freecad": "02ac25d0f77cafcaaecfbb5978e025f9dad3fc51f73450d59e53ae051ecd0b42",
-    "freecad_validation": "2a7b28e587347a5de87bbbbfc3c039eed78fe3a8af144f3ef8c9a7207b60193d",
-    "site_step": "26f3a1d39062f953e521a6bffb53a16c19da4834fc16aa00d0aa35b8b5f1d08c",
-    "site_qa": "2e37016bf1f64b30f7ed940afb45da62764b8fac6dd99a53880aba53a551e0f2",
-    "site_update_proof": "efafce350f72c39c77dafbecbc9eb5a48a73765657d4f2427d4477268a6b844c",
-    "site_update_commands": "37d29ccdd3204286bbe2b9fa43478a3d9b9434b9e81aca2153085a5943f843ca"
+    "freecad": "33eb6874b2d5db561ca4c926e148d33aab02bd35d4251be541aaebc49370ef0a",
+    "freecad_validation": "e3c5183b02a48c54a3a77c641a528d033d4f3fafbea1e7ae10262ad8d9dcb890",
+    "site_step": "3e9a3481f816d714b79308ea289dca0335f4a81b4351f55e835a1aa7b5aa3846",
+    "site_qa": "ea24172ed747c1312d5c7316f73ba62f8cf3d010a2506de9551bea217f4d8527",
+    "site_update_proof": "4ea0d7ad18af1801eaefff30bfc6148f03ddd26682c679eedae6e43d2e623cf4",
+    "site_update_commands": "c7b70cbe925d820b448f6712eeaf612b961108372b3cc7e44f29e62fcd947027"
   },
   "images": [
     {
       "id": "overview",
       "path": "docs/media/building-stack-overview.png",
-      "sha256": "de51aec2b13f3ca59d765a0d9a3b18f2af384326d08a2124e919be5559a10c6c",
-      "bytes": 365542,
+      "sha256": "8066db99c0e80b93a892d7c625598fae07db1591de39989130fc15fceef5bcf6",
+      "bytes": 366648,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model",
-      "native_model": "cad/generated/building-stack-7ed88c9c9157-r2/overview.sc",
-      "native_model_sha256": "66d3f7e51576707690e4d72d8299980aedbb520b8c34f2bf442d3b6c052c4ac6",
+      "native_model": "cad/generated/building-stack-332d920ef8de/overview.sc",
+      "native_model_sha256": "77320157e3d826a3e70f8b390e58dfd47f8570c00a79074911fc7485dd227306",
       "camera": {
         "target": [
           11817.567567567567,
@@ -182,11 +182,11 @@
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-7ed88c9c9157-r2/views/overview.commands.json",
+        "exports/generated/building-stack-332d920ef8de/views/overview.commands.json",
         "--in",
-        "cad/generated/building-stack-7ed88c9c9157-r2/overview.sc",
+        "cad/generated/building-stack-332d920ef8de/overview.sc",
         "--out",
-        "exports/generated/building-stack-7ed88c9c9157-r2/views/overview.png",
+        "exports/generated/building-stack-332d920ef8de/views/overview.png",
         "--width",
         "1800",
         "--height",
@@ -200,13 +200,13 @@
       ],
       "visual_review": {
         "passed": true,
-        "method": "Inspected native snapshot: continuous front paving, road beyond, left contour path ending at side entrance, remaining lawn green"
+        "method": "Inspected native snapshot: extended continuous paving reaches the confirmed farther exterior doorway; other building geometry unchanged"
       },
-      "view_script": "exports/generated/building-stack-7ed88c9c9157-r2/views/overview.commands.json",
+      "view_script": "exports/generated/building-stack-332d920ef8de/views/overview.commands.json",
       "render_report": {
-        "path": "exports/generated/building-stack-7ed88c9c9157-r2/views/overview-report.json",
-        "sha256": "582c2f824a14940241fe2d4b37e99f7abc4673527d7ded5256a097291cf36a61",
-        "bytes": 6877
+        "path": "exports/generated/building-stack-332d920ef8de/views/overview-report.json",
+        "sha256": "c0a6ceb91bb07be29dc49c0bb26bdaffe084ebb7a0c55d4e65963cad75cc6762",
+        "bytes": 6866
       }
     },
     {
@@ -6468,29 +6468,29 @@
     {
       "id": "lab_3_003",
       "path": "docs/media/building-stack-lab-3-003.png",
-      "sha256": "4793dfaf4d6c0de4cb9347824faeb6fc9f9164defe4773f866bdd5a7d9a6c82c",
-      "bytes": 371080,
+      "sha256": "d8ee4ac1afe8a6cd8a3778e3c05925894557be691c2a2b58dadb7c0c853f3f10",
+      "bytes": 372032,
       "pixels": [
         1800,
         1400
       ],
       "source": "native SolidCraft model; appearance and visibility only",
-      "native_model": "cad/generated/building-stack-7ed88c9c9157-r2/overview.sc",
-      "native_model_sha256": "66d3f7e51576707690e4d72d8299980aedbb520b8c34f2bf442d3b6c052c4ac6",
+      "native_model": "cad/generated/building-stack-332d920ef8de/overview.sc",
+      "native_model_sha256": "77320157e3d826a3e70f8b390e58dfd47f8570c00a79074911fc7485dd227306",
       "build_report": {
-        "path": "exports/generated/building-stack-7ed88c9c9157-r2/build-report.json",
-        "sha256": "a4bc1f81b57a8452003961f68b3cf8653ac236c5d9cbe532515d38aa39bd612f"
+        "path": "exports/generated/building-stack-332d920ef8de/build-report.json",
+        "sha256": "37ce4bb5ee00682983603d86da43ff414b735a588e1c0d028cb482d47ec66aa6"
       },
       "render_report": {
-        "path": "exports/generated/building-stack-7ed88c9c9157-r2/views/lab_3_003-report.json",
-        "sha256": "f30508a7640556bc78ec4a244d2e68476ef1ef411f2e59578ceb48d9b04aa7f6",
-        "bytes": 73785
+        "path": "exports/generated/building-stack-332d920ef8de/views/lab_3_003-report.json",
+        "sha256": "c9ffd5219259af564d04dd94d8a2860ac1f37b37b571416e888461f9352b3385",
+        "bytes": 73774
       },
       "producer": {
         "path": "scripts/render_building_stack_highlight.py",
         "sha256": "0b41eaa98032cbc8000855e82b96d213668955f77666865a5c8c16d773b33b1b"
       },
-      "view_script": "exports/generated/building-stack-7ed88c9c9157-r2/views/lab_3_003.commands.json",
+      "view_script": "exports/generated/building-stack-332d920ef8de/views/lab_3_003.commands.json",
       "view_script_sha256": "eecf3181b9ddadefa86f081c7e0e8c2fafb7ffab34c5f6638516a2e2c6721a21",
       "view_commands": [
         {
@@ -6709,11 +6709,11 @@
       "command_line": [
         "solidcraft-cli",
         "snapshot",
-        "exports/generated/building-stack-7ed88c9c9157-r2/views/lab_3_003.commands.json",
+        "exports/generated/building-stack-332d920ef8de/views/lab_3_003.commands.json",
         "--in",
-        "cad/generated/building-stack-7ed88c9c9157-r2/overview.sc",
+        "cad/generated/building-stack-332d920ef8de/overview.sc",
         "--out",
-        "exports/generated/building-stack-7ed88c9c9157-r2/views/lab_3_003.png",
+        "exports/generated/building-stack-332d920ef8de/views/lab_3_003.png",
         "--width",
         "1800",
         "--height",
@@ -8726,7 +8726,7 @@
       "l01_furnishings_instantiated": false,
       "visual_review": {
         "passed": true,
-        "method": "Inspected native snapshot: continuous front paving, road beyond, left contour path ending at side entrance, remaining lawn green"
+        "method": "Inspected native snapshot: extended continuous paving reaches the confirmed farther exterior doorway; other building geometry unchanged"
       },
       "limitations": [
         "Appearance and roof visibility only; building geometry and immutable CAD proof are preserved.",
@@ -10714,14 +10714,15 @@
         "passed": true,
         "method": "Inspected native snapshot: continuous front paving, road beyond, left contour path ending at side entrance, remaining lawn green"
       },
-      "view_script": "exports/generated/building-stack-7ed88c9c9157-r2/views/front_glass.commands.json"
+      "view_script": "exports/generated/building-stack-7ed88c9c9157-r2/views/front_glass.commands.json",
+      "site_update_reuse": "Changed site geometry is hidden or outside this source-derived schematic; reviewed image bytes retained"
     }
   ],
   "documentation_files_sha256": {
     "docs/building-stack.md": "1176776073e458e9316fb94fc29744c9b06022fd6f1823057468f1a95a6be85c",
     "docs/ground-floor-eg.md": "ccef100cf0acaa9cb0f97e5eeb992ea0e37b034941e78225df2788be5d43471c",
     "docs/basement-kg.md": "d45b051ee7a61679298ab1d5b4b1700234813ebfdcd117eeb51212fac11e3d47",
-    "docs/building-exterior.md": "f624e13776d1b9ea26fd3aa1bf5a7f7dfd7d6dbe7978858b5d3dca4b486508ab",
+    "docs/building-exterior.md": "2c7330a334abc3ea5ce9094d5b6ecbf046ef2a2cc990ef489f8d142cde37848a",
     "docs/building-alignment.md": "745ff1bbc02484231dd01c3a62a1167e793735d41b54ce312706b1757a30f0de"
   },
   "qualification": {
@@ -15900,19 +15901,111 @@
         "body": "Site_Sidewalk",
         "material": "sidewalk",
         "origin_mm": [
-          8267.037648147973,
+          -1152.4369377139844,
           -1082.0801511632856,
           -20.0
         ],
         "size_mm": [
-          15378.976197943532,
-          2241.539610622745,
+          24798.45078380549,
+          29341.201529161965,
           20
         ],
         "points_mm": [
           [
-            8577.520950416872,
-            1034.3030272773337
+            17714.01577730206,
+            26984.681111351027
+          ],
+          [
+            16708.10810810811,
+            27054.054054054057
+          ],
+          [
+            13318.91891891892,
+            26637.83783783784
+          ],
+          [
+            9929.72972972973,
+            25448.64864864865
+          ],
+          [
+            7581.081081081082,
+            24259.459459459456
+          ],
+          [
+            6094.594594594594,
+            23189.18918918919
+          ],
+          [
+            4608.108108108108,
+            21970.27027027027
+          ],
+          [
+            3091.8918918918916,
+            20097.2972972973
+          ],
+          [
+            6094.594594594594,
+            20097.2972972973
+          ],
+          [
+            7581.081081081082,
+            20097.2972972973
+          ],
+          [
+            7640.540540540541,
+            20097.2972972973
+          ],
+          [
+            7640.540540540541,
+            19710.810810810814
+          ],
+          [
+            7640.540540540541,
+            17600.0
+          ],
+          [
+            1516.216216216216,
+            17600.0
+          ],
+          [
+            862.1621621621622,
+            15221.621621621622
+          ],
+          [
+            267.56756756756755,
+            12427.027027027027
+          ],
+          [
+            59.45945945945946,
+            11148.648648648648
+          ],
+          [
+            237.83783783783784,
+            9691.891891891892
+          ],
+          [
+            772.9729729729729,
+            7759.45945945946
+          ],
+          [
+            1575.6756756756756,
+            6124.324324324324
+          ],
+          [
+            2497.2972972972975,
+            4608.108108108108
+          ],
+          [
+            3805.4054054054054,
+            3300.0
+          ],
+          [
+            4578.378378378378,
+            2705.4054054054054
+          ],
+          [
+            6778.378378378378,
+            1516.216216216216
           ],
           [
             10108.108108108108,
@@ -15955,12 +16048,127 @@
             -554.4286621941112
           ],
           [
-            8267.037648147973,
-            -124.83463452656042
+            6331.74881815542,
+            393.54630207858713
+          ],
+          [
+            3923.049015012286,
+            1695.5461956694712
+          ],
+          [
+            3011.982667808001,
+            2396.3664627496905
+          ],
+          [
+            1546.7849285808286,
+            3861.5642019768634
+          ],
+          [
+            522.2387770989067,
+            5547.107870543895
+          ],
+          [
+            -353.60164289550494,
+            7331.227244606586
+          ],
+          [
+            -942.430439977296,
+            9457.55345629083
+          ],
+          [
+            -1152.4369377139844,
+            11172.606521140453
+          ],
+          [
+            -912.1872736279374,
+            12648.425886240457
+          ],
+          [
+            -304.2300011451565,
+            15505.825066909525
+          ],
+          [
+            601.6681054547234,
+            18800.0
+          ],
+          [
+            6440.540540540541,
+            18800.0
+          ],
+          [
+            6440.540540540541,
+            19710.810810810814
+          ],
+          [
+            6440.540540540541,
+            18897.2972972973
+          ],
+          [
+            7581.081081081082,
+            18897.2972972973
+          ],
+          [
+            6094.594594594594,
+            18897.2972972973
+          ],
+          [
+            576.5483391940261,
+            18897.2972972973
+          ],
+          [
+            3752.489364623533,
+            22820.51856400433
+          ],
+          [
+            5362.842889399862,
+            24141.008454320923
+          ],
+          [
+            6955.698766980291,
+            25287.864686178826
+          ],
+          [
+            9458.013665857226,
+            26554.85957168614
+          ],
+          [
+            13043.958563776374,
+            27813.085851657772
+          ],
+          [
+            16675.962135409467,
+            28259.12137799868
+          ],
+          [
+            17796.57828724051,
+            28181.837505458607
           ]
         ],
-        "entry_opening": "D0_004_North",
+        "entry_opening": "D0_013_Exterior",
         "facade_walls": [
+          "W090",
+          "W069",
+          "W059",
+          "W039",
+          "W033",
+          "W026",
+          "W014",
+          "W015",
+          "W034",
+          "W040",
+          "W041",
+          "W042",
+          "W011",
+          "W008",
+          "W005",
+          "W002",
+          "W001",
+          "W003",
+          "W007",
+          "W012",
+          "W013",
+          "W016",
+          "W025",
           "W037",
           "W061",
           "W072",
@@ -19389,12 +19597,12 @@
     "historical_source_sha256": "2d80f268decf9965a44f19c6a75f171f7c680f4c216349778e016a2a129d8c25"
   },
   "previous_native_build": {
-    "revision": "building-stack-15df4fb70700",
-    "source_sha256": "15df4fb707000b2c82a7ae28d3a8d714866311c666ed1795b3c31835307cea09",
+    "revision": "building-stack-7ed88c9c9157-r2",
+    "source_sha256": "7ed88c9c91574ce8e65c9fd46ea978cc22232bca0617b5cf37ad8bfd10715215",
     "native_build_report": {
-      "path": "exports/generated/building-stack-15df4fb70700/build-report.json",
-      "sha256": "2f66bfd9148e5f798c50e8159bbd08bafd52eec2636d95d6343a3919a43c231b",
-      "bytes": 2160585
+      "path": "exports/generated/building-stack-7ed88c9c9157-r2/build-report.json",
+      "sha256": "a4bc1f81b57a8452003961f68b3cf8653ac236c5d9cbe532515d38aa39bd612f",
+      "bytes": 2166015
     }
   },
   "furnishings": {
@@ -20534,9 +20742,9 @@
     "geometry_qualification": "Reused native checks after compiled geometry equality and byte-identical native geometry; no new geometry qualification run"
   },
   "site_update": {
-    "path": "exports/generated/building-stack-7ed88c9c9157-r2/site-update-proof.json",
-    "sha256": "efafce350f72c39c77dafbecbc9eb5a48a73765657d4f2427d4477268a6b844c",
-    "bytes": 11515,
+    "path": "exports/generated/building-stack-332d920ef8de/site-update-proof.json",
+    "sha256": "4ea0d7ad18af1801eaefff30bfc6148f03ddd26682c679eedae6e43d2e623cf4",
+    "bytes": 11512,
     "method": "Rebuild four site bodies from shared portable operations; inherit building checks after unchanged compiled non-site geometry and exact native BRep equality in both CADs",
     "changed_body_ids": [
       "Site_Driveway",
@@ -20574,6 +20782,25 @@
         "reason": "Optional jsonschema dependency required"
       }
     ],
-    "scope": "Targeted building, basement, floorplans, gallery and native/public evidence checks; no complete repository or hardware suite"
+    "scope": "Targeted building, basement, floorplans, gallery and native/public evidence checks; includes the confirmed farther exterior-door connection in native QA"
+  },
+  "confirmed_farther_side_entrance": {
+    "opening_id": "D0_013_Exterior",
+    "native_door_connection": {
+      "door_body": "EG__DoorLeaf_D0_013_Exterior",
+      "distance_mm": 3.637978807091713e-12,
+      "passed": true
+    },
+    "image": {
+      "path": "docs/media/building-farther-side-entrance.png",
+      "sha256": "2189697db6cdcd289ae4e270ba8921fc3ab0e191873f03c2d5a0065dd5315d65",
+      "bytes": 155362
+    },
+    "render_report": {
+      "path": "exports/generated/building-stack-332d920ef8de/views/farther_side_entrance-report.json",
+      "sha256": "d895eb0869b4df60667269de4ea936af74d659b9a66a1b391082ee283c4401b6",
+      "bytes": 7063
+    },
+    "visually_reviewed": true
   }
 }
