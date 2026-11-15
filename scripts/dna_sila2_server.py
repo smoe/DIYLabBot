@@ -13,8 +13,10 @@ from sila.server import (Server, ServerConfig, Feature, UnobservableCommand, Obs
     UndefinedExecutionError, ValidationError, create_certificate)
 
 import build_dna_quantification_sila2 as contract
+import build_extraction_analytics_sila2 as extraction_contract
 from cf01_sila2_auth import Access
 from dna_sila2_runtime import DNARuntime
+from extraction_analytics_sila2_runtime import ExtractionAnalyticsRuntime
 from dna_quantification_control import ExecutionInterrupted
 from manual_tasks import TaskError
 
@@ -41,7 +43,8 @@ def metadatum(metadata, name):
 
 class DNAServer:
     def __init__(self, directory, users, certificate_directory, hostname='127.0.0.1', port=0,
-                 pause_after=None, runtime=None, lease_clock=time.monotonic):
+                 pause_after=None, runtime=None, lease_clock=time.monotonic,
+                 extraction_pause_after=None, extraction_runtime=None):
         if hostname not in {'127.0.0.1', 'localhost'}:
             raise ValueError('This DNA adapter supports synthetic loopback operation only')
         self.runtime = runtime or DNARuntime(directory, pause_after=pause_after)
@@ -56,20 +59,29 @@ class DNAServer:
         self._ticker = None
         self._stopping = False
         try:
+            # This facade shares the host identity, journal, mutex and lifetime;
+            # it does not acquire another directory lock or create a stock store.
+            self.extraction_runtime = extraction_runtime or ExtractionAnalyticsRuntime(
+                self.runtime, pause_after=extraction_pause_after)
             cert, key = self._certificate(Path(certificate_directory), hostname)
             self.certificate = cert
             self.server = Server(ServerConfig(hostname=hostname, port=port, tls=True,
                 uuid=self.runtime.server_uuid, type='SolidCraftBotDNA', name='Synthetic DNA quantification',
-                description='Synthetic NanoDrop/Qubit coordinator; no device, pipette, motion or qualified safety interface.',
+                description='Synthetic DNA quantification and extraction analytics; no device, pipette, motion or qualified safety interface.',
                 vendor_url='https://github.com/smoe/DIYLabBot', version='0.1.0', certificate_chain=cert, private_key=key))
             self.standard = {ref['identifier']: parsed((contract.ROOT / ref['source']).read_text(encoding='utf-8-sig'))
                              for ref in self.profile['standard_features'] if ref['identifier'] != 'SiLAService'}
             self.feature = parsed(contract.feature(self.profile))
+            self.extraction_feature = parsed(extraction_contract.feature(self.extraction_runtime.profile))
+            self._feature_runtimes = [(self.feature, self.runtime),
+                                      (self.extraction_feature, self.extraction_runtime)]
             self.access = Access(users, self.runtime.server_uuid,
-                {str(feature.fully_qualified_identifier) for feature in [self.feature, *self.standard.values()]})
+                {str(feature.fully_qualified_identifier) for feature in
+                 [self.feature, self.extraction_feature, *self.standard.values()]})
             for name in ['AuthenticationService', 'AuthorizationService', 'LockController', 'CancelController', 'SimulationController']:
                 self.server.register_feature(self.standard[name])
             self.server.register_feature(self.feature)
+            self.server.register_feature(self.extraction_feature)
             self._bind()
         except BaseException:
             self.runtime.close()
@@ -119,20 +131,21 @@ class DNAServer:
             if touch and self.lock_timeout:
                 self.lock_deadline = self._clock() + self.lock_timeout
 
-    def _error(self, error):
-        if getattr(error, 'identifier', None) in self.feature.errors:
+    def _error(self, error, feature=None):
+        feature = self.feature if feature is None else feature
+        if getattr(error, 'identifier', None) in feature.errors:
             raise error
         if isinstance(error, PermissionError):
             raise InvalidMetadata('DNA authorization or write lease is no longer valid') from error
         if isinstance(error, ExecutionInterrupted):
-            raise self.feature.errors['CommandCanceled']('DNA execution cancellation requested') from error
+            raise feature.errors['CommandCanceled']('DNA execution cancellation requested') from error
         code = getattr(error, 'code', None)
         if isinstance(error, OSError):
             code = 'PersistenceFailure'
-        if code in self.feature.errors:
-            raise self.feature.errors[code](str(error)) from error
+        if code in feature.errors:
+            raise feature.errors[code](str(error)) from error
         if isinstance(error, (TaskError, ValueError, RuntimeError)):
-            raise self.feature.errors['WorkflowRejected'](str(error)) from error
+            raise feature.errors['WorkflowRejected'](str(error)) from error
         raise UndefinedExecutionError('DNA operation failed; inspect the authoritative root journal') from error
 
     def _bind(self):
@@ -157,7 +170,8 @@ class DNAServer:
         authentication.commands['Login'].function = login
         authentication.commands['Logout'].function = logout
         access = authorization.metadata['AccessToken']
-        access.affects = [str(feature.fully_qualified_identifier) for feature in [self.feature, lock, cancellation, simulation]]
+        access.affects = [str(feature.fully_qualified_identifier) for feature in
+                          [self.feature, self.extraction_feature, lock, cancellation, simulation]]
 
         def authorize(token, handler):
             try:
@@ -167,7 +181,8 @@ class DNAServer:
 
         access.function = staticmethod(authorize)
         lease = lock.metadata['LockIdentifier']
-        lease.affects = [str(command.fully_qualified_identifier) for command in self.feature.commands.values()]
+        lease.affects = [str(command.fully_qualified_identifier)
+                         for feature, _ in self._feature_runtimes for command in feature.commands.values()]
         original = lease.from_buffer.__func__
 
         async def optional_lock(cls, handler, supplied=None):
@@ -220,7 +235,7 @@ class DNAServer:
                 raise cancellation.errors['InvalidCommandExecutionUUID']('Unknown execution for this principal')
             entry['cancel'].set()
             try:
-                self.runtime.cancel_execution(CommandExecutionUUID)
+                entry.get('runtime', self.runtime).cancel_execution(CommandExecutionUUID)
             except TaskError:
                 pass  # Its server-known pre-dispatch guard already carries the signal.
             return {}  # A cancellation signal is not a root clearance observation.
@@ -230,7 +245,7 @@ class DNAServer:
                 if entry['principal'] == PRINCIPAL.get():
                     entry['cancel'].set()
                     try:
-                        self.runtime.cancel_execution(execution)
+                        entry.get('runtime', self.runtime).cancel_execution(execution)
                     except TaskError:
                         pass
             return {}
@@ -250,25 +265,31 @@ class DNAServer:
         simulation.properties['SimulationMode'].function = simulation_mode
         simulation.commands['StartSimulationMode'].function = start_simulation
         simulation.commands['StartRealMode'].function = real_mode
-        for source in self.profile['commands']:
-            self.feature.commands[source['name']].function = self._operation(source)
+        def status_property(runtime):
+            async def status(metadata):
+                while True:
+                    yield {'Status': encoded(runtime.status())}
+                    await asyncio.sleep(self.interval)
+            return status
 
-        async def status(metadata):
-            while True:
-                yield {'Status': encoded(self.runtime.status())}
-                await asyncio.sleep(self.interval)
+        def report_property(runtime):
+            async def report(metadata):
+                return {'Report': encoded(runtime.report())}
+            return report
 
-        async def report(metadata):
-            return {'Report': encoded(self.runtime.report())}
+        for feature, runtime in self._feature_runtimes:
+            for source in runtime.profile['commands']:
+                feature.commands[source['name']].function = self._operation(source, feature, runtime)
+            feature.properties['Status'].function = status_property(runtime)
+            feature.properties['Report'].function = report_property(runtime)
 
-        self.feature.properties['Status'].function = status
-        self.feature.properties['Report'].function = report
-
-    def _operation(self, source):
+    def _operation(self, source, feature=None, runtime=None):
+        feature = self.feature if feature is None else feature
+        runtime = self.runtime if runtime is None else runtime
         async def invoke(metadata, command_execution=None, **parameters):
             arguments = {field['name']: parameters[contract.camel(field['name'])] for field in source['arguments']}
             token, identifier = metadatum(metadata, 'AccessToken'), metadatum(metadata, 'LockIdentifier')
-            implementation = self.feature.commands[source['name']]
+            implementation = feature.commands[source['name']]
             principal = self.access.authorize(token, implementation)
             execution = command_execution.command_execution_uuid if command_execution is not None else None
             cancelled = threading.Event()
@@ -284,8 +305,8 @@ class DNAServer:
             try:
                 guard()
                 if execution is not None:
-                    self._executions[execution] = {'principal': principal, 'cancel': cancelled}
-                worker = asyncio.create_task(asyncio.to_thread(self.runtime.command, source['name'], arguments,
+                    self._executions[execution] = {'principal': principal, 'cancel': cancelled, 'runtime': runtime}
+                worker = asyncio.create_task(asyncio.to_thread(runtime.command, source['name'], arguments,
                     principal, execution_uuid=execution, guard=guard))
                 self._workers.add(worker)
                 worker.add_done_callback(self._workers.discard)
@@ -293,12 +314,12 @@ class DNAServer:
                 if result.get('outcome') in {'interrupted', 'failed', 'accepted', 'uncertain'}:
                     code = 'ReconciliationRequired' if result['outcome'] in {'accepted', 'uncertain'} else result.get('error')
                     code = 'RecoveryRequired' if code == 'ReconciliationRequired' else code
-                    if code not in self.feature.errors:
+                    if code not in feature.errors:
                         code = 'WorkflowRejected'
-                    raise self.feature.errors[code]('DNA execution requires review; inspect its durable root receipt')
+                    raise feature.errors[code]('DNA execution requires review; inspect its durable root receipt')
                 return {'StatusJson': encoded(result)}
             except Exception as error:
-                self._error(error)
+                self._error(error, feature)
             finally:
                 # A dropped RPC never cancels the root worker. Keep it reachable
                 # by CancelController until the guarded root operation exits.
@@ -324,7 +345,7 @@ class DNAServer:
         for execution, entry in list(self._executions.items()):
             entry['cancel'].set()
             try:
-                self.runtime.cancel_execution(execution)
+                entry.get('runtime', self.runtime).cancel_execution(execution)
             except TaskError:
                 pass
         if self._workers:

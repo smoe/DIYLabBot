@@ -1379,6 +1379,39 @@ SOPs, native Exporte, Geräte-/Netzwerk-/Roboterbetrieb, biologische Leistung un
 Sicherheit bleiben unqualifiziert; weder eine Roboterbahn noch eine erweiterte
 Fragmentgrößenqualifikation wird daraus abgeleitet.
 
+### SiLA-Bindung der Extraktionsanalytik
+
+Die [additive SiLA-Feature](docs/extraction-analytics-sila2.md)
+`ExtractionAnalyticsWorkflow` v1.0 ergänzt den bestehenden DNA-Dienst.
+Sie teilt TLS-Identität, ServerUUID, Boot, Authentifizierung, Lease und
+`workflows.sqlite3` mit `DnaQuantificationWorkflow`. Jede Feature liest ihre
+eigenen Laufarten; Ressourcen und Materialbuchungen bleiben im gemeinsamen
+Journal koordiniert. Die alte Feature-FDL und archivierte Standarddefinitionen,
+insbesondere LockController v1.0, bleiben unverändert.
+
+Ein Netzwerkadapter bindet den vorhandenen Extraktions-/Mess-Root ausdrücklich
+an diesen Dienst. Quittung und erste Wirkung werden gemeinsam gespeichert;
+Request-/Principal-/Boot-/Sitzungsfencing verhindern eine stille Wiederholung.
+Lokale Werkzeuge können gebundene Läufe lesen, aber keine Wirkung oder Sitzung
+am Dienst vorbei ändern. Der SiLA-Treiber verwendet gespeicherte Phasen und
+Gerätebelege, keine neu gestartete Demo und keinen neuen Probenbestand.
+
+Die sechs fachlichen Create-/Run-/Resume-/Reconcile-/Cancel-Befehle verwenden
+bekannte Familien und begrenzte ausdrückliche Abgleichbelege. Es gibt keine
+generische Geräteaktionsschnittstelle. Unbekannte Wirkungen bleiben gehalten;
+Qubit-Ansatzentsorgung und TapeStation-Stillstands-/Rücknahmebeleg bleiben
+Teil der bestehenden Abbruchbedingungen. Eine Transportquittung bestätigt
+weder Probenort noch Verbrauch oder Freigabe.
+Bekannt fehlerhafte Produkte können beim kontrollierten Abbruch quarantänisiert
+bleiben; ein solcher Lauf wird dadurch nicht erfolgreich freigegeben.
+
+Wire-Berichte projizieren nur historische Trace-Zustände auf Metadaten und
+erhalten das aktuelle Inventar, Buchungen, Quittungen und Artefaktbezüge.
+Das Rohjournal bleibt unverändert. TLS/gRPC über Loopback ist ein eigener
+Transportnachweis und keine Geräte-, ROS-, Hardware-, LAN-, SOP-, biologische,
+Sicherheits- oder formale SiLA-Qualifikation. Alte Journale werden nicht migriert;
+sämtliche fachlichen und analytischen Grenzen der Komposition bleiben erhalten.
+
 ### Passive Kitstation K01
 
 `model/extraction-kit-station.shared.json` referenziert denselben Kitkatalog

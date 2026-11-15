@@ -347,6 +347,34 @@ gebaut oder ausgeführt. RoboStack/pixi ist spätere B1-Arbeit; jetzt nichts
 installieren. Neue schematische Nachweise nur unter `exports/dna-evidence/`
 ablegen; historische Medien, Galerie und Provenienz unverändert erhalten.
 
+### SiLA-Bindung der integrierten Extraktionsanalytik
+
+Vor Änderungen [docs/extraction-analytics-sila2.md](docs/extraction-analytics-sila2.md)
+lesen. Die additive `ExtractionAnalyticsWorkflow`-Feature verwendet denselben
+DNA-Server, dieselbe TLS-/Bootidentität, Zugriffskontrolle und Journaldatei.
+`model/extraction-analytics-sila2.protocol.json` führt ihren eigenen gepinnten
+Vertrag; alte DNA- und Standard-FDLs nicht umschreiben. Feature-Status/-Berichte
+nach Laufart trennen, ohne zusätzliche Bestandsdatenbank einzuführen.
+
+Netzwerkquittung und erste Wirkung im Material-Root atomar speichern. Principal,
+verantwortliche Person, Testbeobachtung und Transportquittung nicht gleichsetzen.
+Eine gebundene lokale CLI darf lesen, aber weder fortsetzen noch abgleichen,
+schließen oder freigeben. Boot-/Sitzungswechsel fencen; unklare Absichten nicht
+wiederholen. Den bestehenden Lauf an bestätigten Checkpoints fortführen,
+keine frische Demo oder kopierte Eluatmenge anlegen.
+
+Nur die deklarierten Create-/Run-/Resume-/Reconcile-/Cancel-Befehle anbieten;
+keine generische Act- oder Gerätebestätigungs-RPC. Abgleichbelege streng und
+begrenzt prüfen, Inventarbeobachtungen nicht aus dem Ledger erfinden. Qubit-
+Gefäßentsorgung und der identitätsgebundene TapeStation-Abbruchbeleg bleiben
+erforderlich. Logout, Sperrablauf und Ausführungs-Cancel geben keine Ressourcen
+frei. Abbruchfreigabe darf keine falsche Unquarantänierung eines bekannten
+fehlerhaften Produkts verlangen; normaler Erfolg benötigt weiterhin Retention.
+Kompakte Wire-Traces ausdrücklich als Projektion kennzeichnen; Rohjournal
+und Artefakte erhalten. Loopback-TLS-Nachweis von Gerätekommunikation, realer
+SOP, ROS, Hardware, LAN-, SiLA- und Sicherheitsqualifikation trennen. Keine
+neuen historischen Medien oder Galerieableitungen erzeugen.
+
 ## DNA-Sonikationsvorbereitung
 
 Vor Änderungen [docs/dna-sonication.md](docs/dna-sonication.md) lesen.

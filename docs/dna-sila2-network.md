@@ -12,6 +12,13 @@ synthetisch. TLS/gRPC über Loopback ist eine getrennt prüfbare Netzwerkgrenze.
 Roboterfahrt, Pipettierung, Hardwareanbindung, LAN- oder SiLA-Zertifizierung.
 Fachliche Vorgaben und F10/F20 stehen in [DNA-Quantifizierung](dna-quantification.md).
 
+Der gleiche Dienst ergänzt die additive
+[Extraktionsanalytik-Feature](extraction-analytics-sila2.md) für Puregene oder
+DNeasy mit NanoDrop, Qubit 4 und TapeStation. Sie teilt Identität, Zugriff und
+Journal, besitzt aber eigene Befehle und typisierte Material-Roots. Die hier
+beschriebene `DnaQuantificationWorkflow`-Feature bleibt der CLI-Standard;
+`--feature extraction` wählt den neuen Vertrag ausdrücklich.
+
 ## Führende Quellen und Einstieg
 
 `model/dna-quantification-sila2.shared.json` bindet DNA-Profil, DNA-Protokoll,

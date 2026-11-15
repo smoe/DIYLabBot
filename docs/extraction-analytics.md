@@ -5,6 +5,11 @@ Die neue, ausdrücklich gewählte Komposition verbindet die vorhandene
 [Puregene-Zellextraktion](puregene-extraction.md) mit NanoDrop und Qubit 4.
 Die vorhandene TapeStation-QC bleibt Teil desselben Laufs.
 
+Die separate [SiLA-Bindung](extraction-analytics-sila2.md) ergänzt nun die
+Workflowsteuerung über den vorhandenen DNA-Dienst. Die folgende lokale
+Komposition und ihre Geräte-/SOP-Grenzen bleiben eigenständig; eine SiLA-
+Transportquittung ist keine Instrumentmessung oder physische Übergabe.
+
 ```mermaid
 flowchart LR
     E["DNeasy oder Puregene"] --> P["Identifiziertes DNA-Produkt"]

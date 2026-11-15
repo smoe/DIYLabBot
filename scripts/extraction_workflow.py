@@ -50,7 +50,7 @@ class ExtractionWorkflow(MaterialWorkflow):
     CANCELLING_COMMANDS = RECOVERY_COMMANDS
 
     @classmethod
-    def create(cls, journal, source=None, run_id=None):
+    def create(cls, journal, source=None, run_id=None, *, _creation_context=None):
         require(cls.ENGINE and cls.SOURCE_MODULE and cls.RUN_PREFIX,
                 'An explicit source-bound extraction engine is required')
         definition = importlib.import_module(cls.SOURCE_MODULE).load(source)
@@ -64,7 +64,7 @@ class ExtractionWorkflow(MaterialWorkflow):
             process['retention'] = retention
         return cls._create_definition(journal, definition, run_id=identity, extra_state={
             'protective_operations': {},
-            'process': process})
+            'process': process}, creation_context=_creation_context)
 
     @classmethod
     def _validate_format(cls, state):

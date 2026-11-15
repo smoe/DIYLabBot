@@ -12,6 +12,13 @@ import build_dna_quantification_sila2 as contract
 from manual_tasks import TaskError
 
 
+def workflow_contract(feature):
+    if feature == 'extraction':
+        import build_extraction_analytics_sila2
+        return build_extraction_analytics_sila2
+    return contract
+
+
 def runtime_path(value):
     path = Path(value).resolve()
     if not path.is_relative_to((contract.ROOT / 'exports').resolve()):
@@ -36,7 +43,8 @@ async def serve(args):
     if set(users) != {'format', 'users'} or users['format'] != 'solidcraftbot.dna-sila-users/1':
         raise ValueError('DNA credential file required')
     application = DNAServer(runtime_path(args.directory), users['users'], runtime_path(args.tls_directory),
-        hostname=args.bind, port=args.port, pause_after=args.pause_after)
+        hostname=args.bind, port=args.port, pause_after=args.pause_after,
+        extraction_pause_after=args.extraction_pause_after)
     stopped = asyncio.Event()
     loop = asyncio.get_running_loop()
     for signum in [signal.SIGINT, signal.SIGTERM]:
@@ -54,6 +62,8 @@ async def serve(args):
                  'certificate': str(runtime_path(args.tls_directory) / 'server.crt'),
                  'feature': str(application.feature.fully_qualified_identifier),
                  'journal': str(application.runtime.journal_path)}
+        if getattr(application, 'extraction_feature', None) is not None:
+            ready['extraction_feature'] = str(application.extraction_feature.fully_qualified_identifier)
         if args.ready_file:
             private_json(args.ready_file, ready)
         print(json.dumps(ready), flush=True)
@@ -77,7 +87,11 @@ async def remote(args):
     lease = None
     uncertain = False
     try:
-        feature = client.DnaQuantificationWorkflow
+        selected = getattr(args, 'feature', 'dna')
+        feature = getattr(client, 'ExtractionAnalyticsWorkflow' if selected == 'extraction' else 'DnaQuantificationWorkflow', None)
+        if feature is None:
+            raise ValueError('The selected workflow feature is not available on this server')
+        selected_contract = workflow_contract(selected)
         if args.command in {'status', 'report'}:
             prop = feature.Status if args.command == 'status' else feature.Report
             value = json.loads(await prop.read(metadata=[auth], timeout=args.timeout * 1000))
@@ -90,7 +104,7 @@ async def remote(args):
             lease = await client.LockController.LockIdentifier.from_native(client, identifier)
 
             async def call(name, request_id, supplied):
-                source = next(c for c in contract.load()['commands'] if c['name'] == name)
+                source = next(c for c in selected_contract.load()['commands'] if c['name'] == name)
                 if not isinstance(supplied, dict):
                     raise ValueError('Typed command arguments must be a JSON object')
                 arguments = {'request_identifier': request_id, 'run_identifier': args.run_id, **supplied}
@@ -162,23 +176,31 @@ def main(argv=None):
     server.add_argument('--port', type=int, default=0)
     server.add_argument('--pause-after', choices=['dilution_intent', 'measurement_intent'],
         help='Private Testinjektion am Server; kein Netzwerkparameter und keine automatische Bestätigung')
+    server.add_argument('--extraction-pause-after',
+        choices=['phase_intent', 'nanodrop_intent', 'qubit_preparation_intent', 'tapestation_loaded'],
+        help='Private Extraktions-Testinjektion; kein Netzwerkparameter und keine automatische Bestätigung')
     for name in ['status', 'report', 'command', 'scenario']:
         child = commands.add_parser(name)
         child.add_argument('--ready-file', required=True, type=Path)
         child.add_argument('--login-input', required=True, type=Path)
         child.add_argument('--out', type=Path, required=name == 'scenario')
         child.add_argument('--timeout', type=float, default=10)
+        if name != 'scenario':
+            child.add_argument('--feature', choices=['dna', 'extraction'], default='dna',
+                help='Ausdrückliche Workflow-Auswahl; die bisherige DNA-Quantifizierung bleibt Vorgabe')
         if name in {'command', 'scenario'}:
             child.add_argument('--run-id', required=True)
             child.add_argument('--lease-timeout', type=int, default=30)
         if name == 'command':
-            child.add_argument('--name', choices=sorted(contract.COMMANDS), required=True)
+            child.add_argument('--name', required=True)
             child.add_argument('--request-id', required=True)
             child.add_argument('--arguments-input', type=Path, help='Exakt die weiteren typisierten Argumente des generierten Vertrags')
     args = parser.parse_args(argv)
     try:
         if getattr(args, 'timeout', 1) <= 0:
             raise ValueError('Positive network timeout required')
+        if args.command == 'command' and args.name not in workflow_contract(args.feature).COMMANDS:
+            raise ValueError('Unsupported command for the selected workflow feature')
         if args.command == 'init':
             from cf01_sila2_auth import credential
             from dna_sila2_runtime import DNARuntime

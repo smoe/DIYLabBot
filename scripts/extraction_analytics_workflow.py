@@ -43,6 +43,28 @@ class ExtractionAnalyticsWorkflow(ExtractionWorkflow):
             result.add('workspace:' + definition['profile']['workspace']['id'])
         return sorted(result)
 
+    def _check_write_control(self, state):
+        if state.get('control') is not None:
+            check = getattr(self, '_check_network_control', None)
+            require(check is not None, 'Network-bound extraction run: use its SiLA server; local access is read-only')
+            check(state)
+
+    def _before_transition(self, state):
+        self._check_write_control(state)
+        return super()._before_transition(state)
+
+    @classmethod
+    def open(cls, journal, run_id, resume=False, clock_mode=None):
+        state = journal.state(run_id)[0]
+        cls._validate_format(state)
+        require(state.get('control') is None,
+                'Network-bound extraction run: use its SiLA server; local access is read-only')
+        return super().open(journal, run_id, resume=resume, clock_mode=clock_mode)
+
+    def close(self):
+        self._check_write_control(self.state)
+        return super().close()
+
     def device(self, device):
         stage(self.state, device)
         return DeviceHandle(self, device)

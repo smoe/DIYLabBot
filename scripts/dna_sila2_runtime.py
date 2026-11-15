@@ -15,7 +15,7 @@ import uuid
 
 from manual_tasks import Journal, TaskError, encoded, digest
 from manual_workflow import ROOT, text
-from dna_quantification import Workflow
+from dna_quantification import Workflow, FORMAT
 from dna_quantification_control import ExecutionInterrupted
 from dna_quantification_port import interface_generated
 from dna_quantification_demo import SyntheticBackend, run_synthetic
@@ -106,6 +106,8 @@ class DNARuntime:
 
     def _snapshot(self, journal, run_id):
         state, _ = journal.get_current(run_id)
+        if state.get('format') != FORMAT:
+            raise TaskError('DNA quantification feature requires its own Root format')
         return {'run_id': run_id, 'root_status': state['status'],
                 'active_attempt_id': state['active_attempt_id'], 'active_context_id': state['active_context_id'],
                 'recovery_required': state['recovery_required'], 'cancel_requested': state['cancel_requested'],
@@ -118,7 +120,8 @@ class DNARuntime:
                   'ros_interface_generated': interface_generated(),
                   'ros_compiled': False, 'ros_executed': False}
         with Journal(self.journal_path) as journal:
-            ids = [row[0] for row in journal.connection.execute('SELECT id FROM runs ORDER BY id')]
+            ids = [row[0] for row in journal.connection.execute('SELECT id FROM runs ORDER BY id')
+                   if journal.get_current(row[0])[0].get('format') == FORMAT]
             result['run_ids'] = ids
             if run_identifier:
                 result.update(self._snapshot(journal, run_identifier))
@@ -129,7 +132,8 @@ class DNARuntime:
     def report(self, run_identifier=''):
         with Journal(self.journal_path) as journal:
             if not run_identifier:
-                ids = [r[0] for r in journal.connection.execute('SELECT id FROM runs ORDER BY id')]
+                ids = [r[0] for r in journal.connection.execute('SELECT id FROM runs ORDER BY id')
+                       if journal.get_current(r[0])[0].get('format') == FORMAT]
                 return {'server_uuid': self.server_uuid, 'boot_id': self.boot_id,
                         'reports': {identity: Workflow(journal, identity).report() for identity in ids}}
             return Workflow(journal, run_identifier).report()
@@ -164,6 +168,8 @@ class DNARuntime:
                 exists = journal.connection.execute('SELECT 1 FROM runs WHERE id=?', (run_id,)).fetchone()
                 before = journal.get_current(run_id)[0] if exists else None
                 if before:
+                    if before.get('format') != FORMAT:
+                        raise TaskError('Run belongs to another workflow feature')
                     if before.get('control', {}).get('server_uuid') != self.server_uuid:
                         raise TaskError('Run is not bound to this DNA server')
                     previous = before['network']['commands'].get(request_id)
