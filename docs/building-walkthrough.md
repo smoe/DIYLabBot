@@ -164,3 +164,57 @@ Tastatur-/Zeigerbedienung, die Geschossauswahl, die mobile Ansicht und die
 Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
 Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
 Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
+
+## Erste Objektbefehle: Kühlschrank 1.008
+
+Unter der Gebäudeansicht steht eine Zeile **Kühlschrank 1.008**. **Ansehen**
+setzt eine aus der Türgeometrie abgeleitete Kamera; die zweite Taste öffnet
+beziehungsweise schließt die Tür. Die Statusanzeige meldet geschlossen,
+wird geöffnet, offen oder wird geschlossen. Die Zeile ist in der separaten
+Laborszene ausgeblendet. Blickpunkt-, Geschoss- und Szenenwechsel erhalten die
+Türstellung während dieser Sitzung; ein Neuladen setzt die Referenzstellung.
+
+Tür und Griff drehen gemeinsam, der vorhandene Pinguin, seine Tasse,
+Innenböden und Kühlschrankhülle bleiben unverändert. Ein Objektbefehl gibt
+`accepted`, `already_in_state`, `rejected_busy` oder `unknown_target` zurück.
+Während einer Bewegung werden weitere Bewegungsbefehle abgewiesen. Es gibt
+keine Warteschlange oder automatische Umplanung.
+
+Die zusätzliche Quelle `model/furniture/social.articulations.json` referenziert
+den unveränderten Möbelkatalog und benennt Teile und Scharnierkante ohne
+kopierte Abmessungen. `scripts/furniture_articulation.py` leitet den Rahmen aus
+der platzierten Tür-Prismenoperation ab. Die Rundgangquelle referenziert nur
+Raum, Instanz und Artikulation sowie Beschriftungen und Darstellparameter.
+Der Exporter und die geprüften nativen Gebäudekörper werden unverändert benutzt.
+
+Die Scharnierkante bei lokal kleinstem X und größtem Y entspricht einem
+rechten Anschlag beim Blick von vorn auf die Tür; diese Seite ist weiterhin
+eine Darstellungsannahme. Dasselbe gilt für **90 Grad**, **1,2 Sekunden** und
+**2.000 mm Blickabstand** im Gebäudedarstellungsrahmen. Die zunächst gewählten
+900 mm ließen aus stehender Augenhöhe hauptsächlich den Fachboden erkennen;
+3.000 mm lägen außerhalb der Küchenflächen und werden vom Compiler abgewiesen.
+2.000 mm liegen innerhalb der Küche. Der mittlere Fachboden verdeckt weiterhin
+Teile des Pinguins, insbesondere den Kopf. Die Pixelprüfung verwendet einen
+festen Punkt auf der schwarzen unteren Körperflanke und vergleicht dort die
+helle geschlossene Tür mit dem geöffnet sichtbaren dunklen Körper. Für einen
+niedrigeren freien Blick kann die vorhandene Kamerasteuerung Q verwendet werden.
+
+Die Browserbewegung nutzt absolute Zeit und das weiche Profil
+`10u³ − 15u⁴ + 6u⁵`. Bei reduzierter Bewegung wird direkt die Endstellung
+angezeigt. Ein verborgener Tab verlängert die modellierte Bewegung nicht.
+Positionen und Normalen der vorhandenen Meshgruppen werden zusammen gedreht;
+bei der Referenzstellung ist die Modellmatrix exakt die Einheitsmatrix.
+
+Nur der Browser besitzt diese Artikulation. FreeCAD und SolidCraft enthalten
+weiter die **geschlossene Referenzstellung**, keine nativen Gebäudegelenke.
+Reale Scharniere, vollständige Sichtbarkeit aus jeder Perspektive, Kollisionen,
+Schwenkraum, Schrank-/Raumtüren und Roboterbefehle sind damit nicht qualifiziert
+oder implementiert. Für diese erste Erweiterung werden keine Daten gespeichert
+und keine Hardware-, ROS- oder SiLA-Befehle verschickt.
+
+Die vorhandenen Möbelbilder und ihre ursprüngliche Provenienz bleiben erhalten.
+`docs/building-furnishings-media-compatibility.json` bindet die eng begrenzten
+Änderungen der Browserquellen an die unveränderten Kameras und Bildbytes.
+Dieser Kompatibilitätsnachweis ist weder ein erneutes Rendern der historischen
+Bilder noch eine zusätzliche CAD- oder Bewegungsqualifikation. Die neuen
+Objektbefehle werden davon getrennt mit der tatsächlichen Browserprüfung geprüft.

@@ -13,7 +13,9 @@
     "stops",
     "qualification",
     "limitations",
-    "rendering"
+    "rendering",
+    "articulation_source",
+    "objects"
   ],
   "properties": {
     "format": {
@@ -373,6 +375,173 @@
               "type": "number",
               "minimum": 0.1,
               "maximum": 1
+            }
+          }
+        }
+      }
+    },
+    "articulation_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "room",
+          "instance",
+          "articulation",
+          "label",
+          "commands",
+          "state_labels",
+          "duration",
+          "view_distance"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*(\\.[A-Za-z][A-Za-z0-9_]*){2}$"
+          },
+          "room": {
+            "type": "string",
+            "minLength": 1
+          },
+          "instance": {
+            "type": "string",
+            "minLength": 1
+          },
+          "articulation": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "commands": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "open",
+              "close",
+              "view"
+            ],
+            "properties": {
+              "open": {
+                "type": "string",
+                "minLength": 1
+              },
+              "close": {
+                "type": "string",
+                "minLength": 1
+              },
+              "view": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "state_labels": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "closed",
+              "opening",
+              "open",
+              "closing"
+            ],
+            "properties": {
+              "closed": {
+                "type": "string",
+                "minLength": 1
+              },
+              "opening": {
+                "type": "string",
+                "minLength": 1
+              },
+              "open": {
+                "type": "string",
+                "minLength": 1
+              },
+              "closing": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "duration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit",
+              "range",
+              "basis"
+            ],
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "const": "s"
+              },
+              "range": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "basis": {
+                "const": "presentation_assumption"
+              }
+            }
+          },
+          "view_distance": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "value",
+              "unit",
+              "range",
+              "basis"
+            ],
+            "properties": {
+              "value": {
+                "type": "number"
+              },
+              "unit": {
+                "const": "mm"
+              },
+              "range": {
+                "type": "array",
+                "minItems": 2,
+                "maxItems": 2,
+                "items": {
+                  "type": "number"
+                }
+              },
+              "basis": {
+                "const": "presentation_assumption"
+              }
             }
           }
         }

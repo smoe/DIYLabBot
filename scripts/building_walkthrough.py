@@ -13,6 +13,7 @@ import assembly_model as assembly
 import building_stack as stack
 import lab_room_model as room
 import relative_floorplan as floor
+import furniture_articulation as articulation
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT/'model/building-walkthrough.shared.json'
@@ -39,9 +40,12 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations', 'walkthrough')
+    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects', 'walkthrough')
     require(spec['format'] == FORMAT and isinstance(spec['id'], str) and
             re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Walkthrough identity required')
+    exact(spec['articulation_source'], 'source source_sha256', 'articulation reference')
+    articulation.validate(articulation.read(spec['articulation_source']))
+    articulation.validate_requests(spec['objects'])
     exact(spec['sources'], 'building lab', 'scene sources')
     for ref in spec['sources'].values():
         exact(ref, 'source source_sha256', 'pinned scene source')
@@ -218,15 +222,17 @@ def compile(source=None):
         require(math.dist(eye, target) > 100, 'Camera eye and target must differ')
         stops.append({key: stop[key] for key in ('id', 'label', 'scene', 'level_id')} |
                      {'eye_mm': eye, 'target_mm': target, 'anchor': anchor})
-    paths = [path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
+    objects = articulation.compile_objects(spec['articulation_source'], spec['objects'], building, p, interface,
+        stack.expanded(building, p), {v['id']: stack.level_plan(building, v['id']) for v in levels}, spec['settings']['eye_height_mm'])
+    paths = [*articulation.dependencies(spec['articulation_source']), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
              *stack.source_dependencies(building), lab_path, room_path, ROOT/'scripts/lab_room_model.py',
              *room.source_dependencies(local_room)]
     pins = {str(item.resolve().relative_to(ROOT)): digest(item) for item in dict.fromkeys(paths)}
     require(digest(path) == hashlib.sha256(raw).hexdigest(), 'Walkthrough source changed while compiling')
-    for ref in [*spec['sources'].values(), lab['assets']['room']]:
+    for ref in [*spec['sources'].values(), spec['articulation_source'], lab['assets']['room']]:
         require(pins[ref['source']] == ref['source_sha256'], 'Scene source changed while compiling: '+ref['source'])
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
-            'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
+            'objects': objects, 'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/'+('building-stack' if name == 'building' else 'lab-layout-l01')+'/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},
             'hidden_body_ids': {'building': interface['marker_body_ids'], 'lab': []},

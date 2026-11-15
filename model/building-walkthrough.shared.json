@@ -111,12 +111,56 @@
     "The detailed L01 lab is a separate local scene. Switching to it does not claim a measured connection to the building frame.",
     "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
     "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
-    "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer."
+    "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer.",
+    "Furniture opening is a browser-only illustrative articulation; FreeCAD and SolidCraft retain the closed reference geometry.",
+    "No door-swing clearance, collision, hardware or robot-command qualification."
   ],
   "rendering": {
     "opacity_by_role": {
       "concept_storey_wall": 1,
       "circulation_wall_bridge": 1
     }
-  }
+  },
+  "articulation_source": {
+    "source": "model/furniture/social.articulations.json",
+    "source_sha256": "6b0edd12937e6496a7058cd7d2bb6e4b3c06e9c1b59be15afc837db0ce195403"
+  },
+  "objects": [
+    {
+      "id": "Kitchen1008.Fridge.Door",
+      "room": "Kitchen1008",
+      "instance": "Fridge",
+      "articulation": "Door",
+      "label": "Kühlschrank 1.008",
+      "commands": {
+        "open": "Öffnen",
+        "close": "Schließen",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Geschlossen",
+        "opening": "Wird geöffnet",
+        "open": "Offen",
+        "closing": "Wird geschlossen"
+      },
+      "duration": {
+        "value": 1.2,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 2000,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    }
+  ]
 }

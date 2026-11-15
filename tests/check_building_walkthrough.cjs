@@ -171,6 +171,96 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert.deepEqual(errors, [], 'No browser or renderer errors');
     assert((await read()).frames > initial.frames, 'Controls request new rendered frames');
 
+    const object = model.objects?.[0];
+    assert(object, 'A source-defined articulated object is required.');
+    const objectRow = page.locator(`[data-object-id="${object.id}"]`);
+    const identityMatrix = [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
+    const objectState = () => page.evaluate(id => window.__buildingWalkthrough.objects.find(v => v.id === id), object.id);
+    const rendered = async action => {
+      const before = await page.evaluate(() => window.__buildingWalkthrough.frames);
+      const result = await action();
+      await page.waitForFunction(before => window.__buildingWalkthrough.frames > before, before, {timeout: 120000});
+      return result;
+    };
+    await page.setViewportSize({width:1280,height:950});
+    await page.locator('#walkthrough-stops button[data-stop="kitchen"]').click(); await waitForStop('kitchen');
+    await rendered(() => objectRow.locator('[data-object-action="view"]').click());
+    assert(cameraDistance((await read()).camera.eye_mm,object.viewpoint.eye_mm)<.01,'Object camera is derived from placed source geometry');
+    assert.deepEqual((await objectState()).model_matrix,identityMatrix,'Reference pose is exactly identity');
+    assert.equal((await page.evaluate(() => window.__buildingWalkthrough.command('missing','open'))).status,'unknown_target');
+    assert.equal((await page.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),object.id)).status,'already_in_state');
+    const scene=model.scenes[object.scene], group=scene.groups.find(v=>v.id===object.moving_body_ids[0]);
+    const pos=Buffer.from(scene.positions_base64,'base64'), idx=Buffer.from(scene.indices_base64,'base64');let hingeError=Infinity;
+    for(let i=group.index_start;i<group.index_start+group.index_count;i++){
+      const v=idx.readUInt32LE(i*4),point=[0,1,2].map(k=>pos.readFloatLE((v*3+k)*4));
+      hingeError=Math.min(hingeError,Math.hypot(...point.map((x,k)=>x-object.joint.origin_mm[k])));
+    }
+    const hingeFloat32Error=Math.hypot(...object.joint.origin_mm.map((v,i)=>v-new Float32Array(object.joint.origin_mm)[i]));
+    assert(hingeError<=hingeFloat32Error+1e-6,'Compiled hinge coincides with the Float32-quantized native vertex');
+    const penguin=scene.groups.find(v=>v.id==='Kitchen1008_Penguin_Body');assert(penguin);
+    const penguinPoint=penguin.bounds_mm.min.map((v,i)=>(v+penguin.bounds_mm.max[i])/2);
+    // Sample the black body flank, away from the intentionally white belly.
+    penguinPoint[0]+=.36*(penguin.bounds_mm.max[0]-penguin.bounds_mm.min[0]);
+    // The fixed lower body flank is below the existing middle shelf; the head is partly occluded at standing eye height.
+    penguinPoint[2]=penguin.bounds_mm.min[2]+.16*(penguin.bounds_mm.max[2]-penguin.bounds_mm.min[2]);
+    const pixel = () => page.evaluate(point => {
+      const v=window.__buildingWalkthrough,p=v.projectPoint(point),canvas=document.querySelector('#walkthrough-canvas');
+      if(!p.visible)throw Error('Penguin body point is outside the source-derived camera.');
+      const gl=canvas.getContext('webgl2'),rgba=new Uint8Array(4);
+      gl.readPixels(Math.floor(p.x),canvas.height-1-Math.floor(p.y),1,1,gl.RGBA,gl.UNSIGNED_BYTE,rgba);
+      return {rgba:[...rgba],pixel:p};
+    },penguinPoint);
+    const closedPixel=await pixel();
+    await page.screenshot({path:path.join(output,'browser-fridge-closed.png'),fullPage:true});
+    // The same UI button and test API use the same command function.
+    await objectRow.locator('[data-object-action="toggle"]').focus();
+    await rendered(() => page.keyboard.press('Enter'));
+    assert.equal((await objectState()).state,'open');assert.equal((await objectState()).angle_deg,object.states.open);
+    assert(Object.values((await objectState()).body_angles_deg).every(v=>v===object.states.open),'Door and handle rotate together');
+    const openPixel=await pixel(),brightness=p=>p.rgba.slice(0,3).reduce((a,b)=>a+b,0)/3;
+    assert(brightness(closedPixel)>140,'Closed sample must show the light fridge door');
+    assert(brightness(openPixel)<brightness(closedPixel)-50,`Open sample must reveal the darker penguin: ${JSON.stringify({closedPixel,openPixel})}`);
+    await page.screenshot({path:path.join(output,'browser-fridge-open.png'),fullPage:true});
+    assert.equal((await page.evaluate(id=>window.__buildingWalkthrough.command(id,'open'),object.id)).status,'already_in_state');
+    await page.locator('#walkthrough-level').selectOption('EG');
+    await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
+    assert.equal((await objectState()).state,'open','Level and focus changes preserve object state');
+    await page.locator('#walkthrough-stops button[data-stop="lab"]').click();await waitForStop('lab');assert(await objectRow.isHidden());
+    await page.locator('#walkthrough-stops button[data-stop="kitchen"]').click();await waitForStop('kitchen');assert.equal((await objectState()).state,'open');
+    await rendered(() => page.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),object.id));
+    assert.equal((await objectState()).state,'closed');assert.deepEqual((await objectState()).model_matrix,identityMatrix);
+    for(const width of [320,600,1280]){
+      await page.setViewportSize({width,height:950});
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Object controls overflow at ${width}px`);
+    }
+    // A second context exercises actual animation, independently of reduced motion.
+    const animatedContext=await browser.newContext({viewport:{width:1280,height:950},reducedMotion:'no-preference'});
+    try{
+      const animated=await animatedContext.newPage();await animated.goto(pathToFileURL(target).href,{waitUntil:'load',timeout:120000});
+      await animated.waitForFunction(()=>window.__buildingWalkthrough?.ready,null,{timeout:120000});
+      assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'open'),object.id)).status,'accepted');
+      await animated.waitForFunction(id=>{const o=window.__buildingWalkthrough.objects.find(v=>v.id===id);return o.angle_deg>0&&o.angle_deg<90;},object.id,{timeout:10000,polling:'raf'});
+      const intermediate=await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id),object.id);
+      assert(intermediate.angle_deg>0&&intermediate.angle_deg<object.states.open);
+      assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),object.id)).status,'rejected_busy');
+      await animated.waitForFunction(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id).state==='open',object.id,{timeout:10000});
+      assert.equal(await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id).angle_deg,object.id),object.states.open);
+      assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),object.id)).status,'accepted');
+      await animated.waitForFunction(id=>{const o=window.__buildingWalkthrough.objects.find(v=>v.id===id);return o.state==='closing'&&o.angle_deg>0&&o.angle_deg<90;},object.id,{timeout:10000,polling:'raf'});
+      const interrupted=await animated.evaluate(id=>{
+        const viewer=window.__buildingWalkthrough,result=viewer.command(id,'open');
+        window.dispatchEvent(new Event('blur'));
+        return {result,state:viewer.objects.find(v=>v.id===id).state};
+      },object.id);
+      assert.equal(interrupted.result.status,'rejected_busy');assert.equal(interrupted.state,'closing');
+      await animated.waitForFunction(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id).state==='closed',object.id,{timeout:10000});
+      const closed=await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id),object.id);
+      assert.equal(closed.angle_deg,object.states.closed);assert.deepEqual(closed.model_matrix,identityMatrix);
+      report.articulation={id:object.id,hinge_vertex_error_mm:hingeError,hinge_float32_error_mm:hingeFloat32Error,closed_pixel:closedPixel,open_pixel:openPixel,intermediate_angle_deg:intermediate.angle_deg,reduced_motion:true,animated:true,animated_close:true,focus_loss_during_close:true,busy_rejected:true,state_preserved_across_scenes:true};
+    }finally{await animatedContext.close();}
+    assert.deepEqual(errors,[], 'Object commands produce no browser errors');
+    report.interactions.push('object view','keyboard object command','open/close','reduced and animated hinge motion','persistent in-memory scene state');
+
     // A corrupt source must produce a useful visible error rather than an empty canvas.
     const defaultStop = model.stops.find(stop => stop.id === (model.default_stop_id || model.default_stop)) || model.stops[0];
     const broken = {stops: [defaultStop], levels: model.levels, settings: model.settings,

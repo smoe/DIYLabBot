@@ -11,6 +11,24 @@ import building_stack as stack
 import building_furnishings as furniture
 import relative_floorplan as floor
 import wall_worktops
+import building_walkthrough as walkthrough
+
+
+MEDIA_COMPATIBLE_PRODUCERS = {
+    'model/building-walkthrough.schema.json',
+    'model/building-walkthrough.shared.json',
+    'scripts/building_walkthrough.py',
+    'scripts/building_walkthrough_viewer.html',
+    'tests/check_building_walkthrough.cjs',
+    'tests/test_building_furnishings.py',
+}
+MEDIA_CAMERA_FIELDS = ('default_stop', 'stops', 'levels', 'settings', 'rendering', 'hidden_body_ids')
+
+
+def media_camera_digest(program):
+    projection = {key: program[key] for key in MEDIA_CAMERA_FIELDS}
+    return hashlib.sha256(json.dumps(projection, sort_keys=True, separators=(',', ':'),
+                                     allow_nan=False).encode()).hexdigest()
 
 
 class FurnishingsTests(unittest.TestCase):
@@ -153,17 +171,59 @@ class FurnishingsTests(unittest.TestCase):
                     else:
                         self.assertIn(frozenset((instance,other_instance)),cavity_pairs,(a,b))
 
+    def assert_media_source_binding(self, proof, compatibility, actual, camera_digest):
+        # Historical images retain their original producer pins. Only the exact
+        # reviewed browser revisions below have a separate compatibility witness.
+        self.assertEqual(compatibility['format'], 'solidcraftbot.building-furnishings-media-compatibility/1')
+        approved = compatibility['producer_updates']
+        self.assertEqual(set(approved), MEDIA_COMPATIBLE_PRODUCERS)
+        self.assertEqual(set(actual), set(proof['source_files_sha256']))
+        for name, digest in proof['source_files_sha256'].items():
+            if name in approved:
+                self.assertEqual(approved[name]['historical_sha256'], digest, name)
+                self.assertNotEqual(approved[name]['historical_sha256'], approved[name]['current_sha256'], name)
+                self.assertEqual(actual[name], approved[name]['current_sha256'], name)
+            else:
+                self.assertEqual(actual[name], digest, name)
+        self.assertEqual(compatibility['camera_projection']['fields'], list(MEDIA_CAMERA_FIELDS))
+        self.assertEqual(camera_digest, compatibility['camera_projection']['sha256'])
+        for image in proof['images']:
+            if 'browser_view' in image:
+                self.assertEqual(compatibility['historical_manifest'], image['browser_view']['manifest'])
+
     def test_public_views_bind_current_sources_and_reviewed_images(self):
-        proof=json.loads((stack.ROOT/'docs/media/building-furnishings.provenance.json').read_text())
+        path=stack.ROOT/'docs/media/building-furnishings.provenance.json'
+        proof=json.loads(path.read_text())
+        compatibility=json.loads((stack.ROOT/'docs/building-furnishings-media-compatibility.json').read_text())
+        self.assertEqual(compatibility['historical_provenance'],
+                         {'path':str(path.relative_to(stack.ROOT)), 'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
         self.assertFalse(proof['original_photographs_included'])
         self.assertEqual({image['id'] for image in proof['images']},{'Kitchen1008','PhD1002','PhD3002','Kitchen1008_EasterEgg'})
-        for name,digest in proof['source_files_sha256'].items():
-            self.assertEqual(hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest(),digest,name)
+        actual={name:hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest() for name in proof['source_files_sha256']}
+        self.assert_media_source_binding(proof, compatibility, actual, media_camera_digest(walkthrough.compile()))
         for image in proof['images']:
             data=(stack.ROOT/image['path']).read_bytes()
             self.assertEqual(data[:8],b'\x89PNG\r\n\x1a\n')
             self.assertEqual(hashlib.sha256(data).hexdigest(),image['sha256'])
             self.assertTrue(image['visual_reviewed'])
+
+    def test_media_compatibility_rejects_unreviewed_source_and_camera_drift(self):
+        proof=json.loads((stack.ROOT/'docs/media/building-furnishings.provenance.json').read_text())
+        compatibility=json.loads((stack.ROOT/'docs/building-furnishings-media-compatibility.json').read_text())
+        actual={name:hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest() for name in proof['source_files_sha256']}
+        camera=compatibility['camera_projection']['sha256']
+        for name in ('scripts/building_furnishings.py', 'scripts/building_walkthrough_viewer.html'):
+            changed={**actual, name:'0'*64}
+            with self.subTest(source=name), self.assertRaises(AssertionError):
+                self.assert_media_source_binding(proof, compatibility, changed, camera)
+        with self.subTest(camera=True), self.assertRaises(AssertionError):
+            self.assert_media_source_binding(proof, compatibility, actual, '0'*64)
+        changed=copy.deepcopy(compatibility)
+        changed['producer_updates']['scripts/building_furnishings.py']={
+            'historical_sha256':proof['source_files_sha256']['scripts/building_furnishings.py'],
+            'current_sha256':'0'*64}
+        with self.subTest(undeclared_producer=True), self.assertRaises(AssertionError):
+            self.assert_media_source_binding(proof, changed, actual, camera)
 
     def test_sources_match_declared_schemas(self):
         try:
