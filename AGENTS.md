@@ -2,6 +2,22 @@
 
 Diese Hinweise gelten für das Projekt SolidCraftBot.
 
+## Git-Arbeitsbasis: aktueller master
+
+- Neue Aufgaben auf dem aktuellen `master` des jeweiligen Repositories beginnen.
+  Vorher den passenden Remote-Stand abrufen, normalerweise mit `git fetch origin`,
+  und `master` mit `origin/master` vergleichen. Den lokalen `master` bei Bedarf
+  per Fast-forward aktualisieren; vorhandene lokale Commits erhalten.
+- Neue Arbeitsbranches unter `codex/` vom so geprüften `master` anlegen.
+  Bestehende private, unveröffentlichte Arbeitsbranches mit sauberem Arbeitsbaum
+  bevorzugt durch `git rebase master` auf diese Basis bringen.
+- Bei veröffentlichten oder gemeinsam verwendeten Branches den aktuellen
+  `master` per Merge integrieren. Ein Rebase solcher Branches benötigt eine
+  ausdrückliche Freigabe zur Änderung ihrer Historie.
+- Laufende fremde Änderungen und belegte Worktrees erhalten. Einen verschmutzten
+  Arbeitsbaum nicht automatisch stashen, zurücksetzen oder umschalten; neue
+  Arbeit bei Bedarf in einem eigenen Worktree vom aktuellen `master` beginnen.
+
 ## Leitidee: abstrakt beschreiben, automatisch ableiten
 
 Die führende Konstruktion ist eine CAD-unabhängige, maschinenlesbare Beschreibung
