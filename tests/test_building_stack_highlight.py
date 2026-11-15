@@ -71,6 +71,27 @@ class BuildingHighlightTests(unittest.TestCase):
         self.assertEqual([item['bodies']for item in orange],[['TargetFloor'],['Wall']])
         self.assertTrue(any(item.get('opacity')==1. for item in orange))
 
+    def test_top_facade_paint_is_preserved_as_opaque(self):
+        selected={'roof_body_ids':[], 'top_level_wall_ids':['RedFlank','Interior'],
+                  'floor_body_id':'Floor', 'wall_body_ids':['Interior'],
+                  'facade_styles':{'RedFlank':{'color':'#B65E52','opacity':1}}}
+        commands=highlight.view_commands(selected)
+        assigned=[c['params'] for c in commands if 'RedFlank' in c['params'].get('bodies',[])]
+        self.assertEqual(assigned,[{'bodies':['RedFlank'],'color':'#B65E52','opacity':1}])
+
+    def test_actual_source_selection_preserves_red_facade_appearance(self):
+        spec=highlight.model.load();parameters=highlight.model.parameters(spec)
+        selected=highlight.selection(spec,parameters)
+        commands=highlight.view_commands(selected)
+        expected={'color':spec['exterior']['entrance_flank_color'],'opacity':1}
+        flanks={selected['level_id']+'__Wall_'+wall for wall in spec['exterior']['entrance_flank_walls']}
+        flanks &= set(selected['top_level_wall_ids'])
+        self.assertTrue(flanks)
+        for body in flanks:
+            self.assertEqual(selected['facade_styles'][body],expected)
+            assigned=[c['params'] for c in commands if body in c['params'].get('bodies',[])]
+            self.assertEqual(assigned,[{'bodies':[body],**expected}])
+
     def test_camera_retains_full_vertical_building_context(self):
         geometry=[{'bbox':{'min':[0,0,-250],'max':[10000,20000,16750]}}]
         cam=highlight.camera(geometry)

@@ -148,9 +148,21 @@ class ExteriorTests(unittest.TestCase):
         self.assertIn('W037',side['facade_walls'])
         self.assertEqual(side['facade_walls'][-1],'W102')
 
+    def test_straight_front_bands_span_the_entire_terrain_crop(self):
+        regions={r['material']:r for r in self.d['exterior']['site_regions']}
+        lawn=next(o['shape'] for o in self.e['operations'] if o['id']=='Terrain_Lawn_Sheet')
+        for name in ('entrance_apron','driveway'):
+            region=regions[name]
+            self.assertAlmostEqual(region['origin_mm'][1],lawn['origin'][1])
+            self.assertAlmostEqual(region['origin_mm'][1]+region['size_mm'][1],lawn['origin'][1]+lawn['size'][1])
+        cut=next(o['shape'] for o in self.e['operations'] if o['id']=='Site_FrontAccess_LawnCut')
+        front=regions['entrance_apron'];road=regions['driveway']
+        self.assertEqual(cut['origin'][:2],front['origin_mm'][:2])
+        self.assertEqual(cut['size'][:2],[front['size_mm'][0]+road['size_mm'][0],front['size_mm'][1]])
+
     def test_left_context_is_hardstanding_without_a_lawn_buffer(self):
         regions={r['material']:r for r in self.d['exterior']['site_regions']};court=regions['left_hardstanding']
-        self.assertLess(court['origin_mm'][1],min(r['origin_mm'][1] for k,r in regions.items() if k!='left_hardstanding'))
+        self.assertLessEqual(court['origin_mm'][1],min(r['origin_mm'][1] for k,r in regions.items() if k!='left_hardstanding'))
         self.assertFalse(court['boundary_measured'])
         self.assertEqual(next(b for b in self.e['bodies'] if b['id']==court['body'])['appearance']['color'],self.s['exterior']['road_color'])
         self.assertTrue(any(o['body']=='Terrain_Lawn' and o['id']=='Site_LeftHardstanding_LawnCut' for o in self.e['operations']))

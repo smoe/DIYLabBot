@@ -86,17 +86,27 @@ def selection(spec, p, level_id='OG3', area_id='R3_003'):
     return {'level_id': level_id, 'level_label': level['label'], 'area_id': area_id, 'area_label': area['label'],
             'template_source': level['template_source'], 'template_id': level['template_id'], 'floor_body_id': floor,
             'wall_body_ids': wall_ids, 'roof_body_ids': contract.get('roof', {}).get('body_ids', []),
-            'top_level_wall_ids': level['wall_bodies'], 'all_body_ids': [body['id'] for body in expanded['bodies']]}
+            'top_level_wall_ids': level['wall_bodies'],
+            'facade_styles': {body['id']: body['appearance'] for body in expanded['bodies']
+                              if body['id'] in level['wall_bodies'] and body['id'] in contract.get('exterior', {}).get('surface_overrides', {})},
+            'all_body_ids': [body['id'] for body in expanded['bodies']]}
 
 
 def view_commands(selected):
     commands = []
     if selected['roof_body_ids']:
         commands.append({'command': 'browser.visibility', 'params': {'items': selected['roof_body_ids'], 'visible': False}})
+    facade = selected.get('facade_styles', {})
+    interior = [name for name in selected['top_level_wall_ids'] if name not in facade]
+    if interior:
+        commands.append({'command': 'appearance.assign', 'params': {'bodies': interior, 'opacity': .10}})
+    # Preserve opaque exterior finishes: an opacity-only override may reset
+    # the native material, and fading the red flank makes it look unpainted.
+    for name, style in facade.items():
+        commands.append({'command': 'appearance.assign', 'params': {'bodies': [name], **style}})
     commands.extend([
-        {'command': 'appearance.assign', 'params': {'bodies': selected['top_level_wall_ids'], 'opacity': .10}},
         {'command': 'appearance.assign', 'params': {'bodies': [selected['floor_body_id']], 'color': COLOR, 'opacity': 1.}},
-        {'command': 'appearance.assign', 'params': {'bodies': selected['wall_body_ids'], 'color': COLOR, 'opacity': .32}},
+        {'command': 'appearance.assign', 'params': {'bodies': [name for name in selected['wall_body_ids'] if name not in facade], 'color': COLOR, 'opacity': .32}},
     ])
     return commands
 

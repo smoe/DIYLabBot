@@ -155,13 +155,18 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
         build.common.verify_pins(report['source_files_sha256']);build.common.verify_artifacts({k:ROOT/v for k,v in report['files'].items()},report['artifact_sha256'])
         spec=build.model.load();contract=build.model.interfaces(spec,build.model.parameters(spec))
         expected={p['id']for p in contract['opening_probes']+contract['atrium_prisms']+[contract['ground_fill_probe']]}
+        expected|={p['id']for p in contract['atrium_access_floor_probes']+contract['opening_closure_probes']}
         expected|={item['probe']['id']for item in build.circulation_probe_specs(contract)}
         expected|={item['probe']['id']for item in build.roof_probe_specs(contract)}
+        expected_z={level['id']for level in contract['levels']}
+        expected_z|={a['id']+'_to_'+b['id']for a,b in zip(contract['levels'],contract['levels'][1:])}
+        if contract.get('exterior'):
+            expected_z|={body+'_Grade'for body in contract['exterior']['site_body_ids']}|{'FoyerFacade_Height'}
         for backend in ('solidcraft','freecad'):
             if report['backends']not in {backend,'both'}:continue
             proof=report['solidcraft_checks']if backend=='solidcraft'else json.loads((ROOT/report['files']['freecad_validation']).read_text())
             self.assertTrue(proof['passed']);self.assertEqual({c['id']for c in proof['probe_checks']},expected)
-            self.assertEqual(len(proof['z_checks']),9+(5 if contract.get('exterior') else 0));self.assertTrue(all(c['passed']for c in proof['z_checks']+proof['probe_checks']))
+            self.assertEqual({c['id']for c in proof['z_checks']},expected_z);self.assertEqual(len(proof['z_checks']),len(expected_z));self.assertTrue(all(c['passed']for c in proof['z_checks']+proof['probe_checks']))
             if contract.get('circulation'):
                 stairs=contract['circulation']['stairs']
                 self.assertEqual([stair['area']for stair in stairs],['R3_028'])
@@ -181,10 +186,12 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
                     self.assertEqual({check['area_id']for check in proof['corridor_roof_checks']},set(contract['roof']['covered_corridor_area_ids']))
                     self.assertTrue(all(check['passed']for check in proof['corridor_roof_checks']))
                     self.assertTrue(report['native_corridor_roof_checks_passed'][backend])
-        if contract.get('circulation'):
-            self.assertIn('circulation',report['renders'])
-            self.assertIn('ground',report['renders'])
-        if contract.get('roof'):self.assertIn('roof',report['renders'])
+        # Native geometry proof may intentionally omit the optional renders.
+        if report['renders']:
+            if contract.get('circulation'):
+                self.assertIn('circulation',report['renders'])
+                self.assertIn('ground',report['renders'])
+            if contract.get('roof'):self.assertIn('roof',report['renders'])
         if report['backends']=='both':self.assertLess(report['maximum_step_xor_presentation_mm3'],.001)
 
 

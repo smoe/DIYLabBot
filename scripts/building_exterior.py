@@ -198,15 +198,20 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
         before=normals[max(0,i-1)];after=normals[min(i,len(normals)-1)];factor=walk/(1+sum(a*b for a,b in zip(before,after)))
         outer.append([q[j]+factor*(before[j]+after[j]) for j in (0,1)])
     side_polygon=chain+list(reversed(outer));site_ids=[lawn];site_regions=[]
-    # The front paving reaches the recessed glass; the road lies beyond it.
-    front_origin=[x,ymin,bottom];front_size=[xmax+walk-x,ymax-ymin,layer]
+    # Keep the entrance pavement and road as straight uninterrupted bands
+    # across the full terrain crop, including both ends beyond the building.
+    front_ymin=ymin-margin;front_length=ymax-ymin+2*margin
+    front_origin=[x,front_ymin,bottom];front_size=[xmax+walk-x,front_length,layer]
     for name,origin,size,color,material in [
         ('Site_EntranceApron',front_origin,front_size,s['sidewalk_color'],'entrance_apron'),
-        ('Site_Driveway',[xmax+walk,ymin,bottom],[road_width,ymax-ymin,layer],s['road_color'],'driveway')]:
+        ('Site_Driveway',[xmax+walk,front_ymin,bottom],[road_width,front_length,layer],s['road_color'],'driveway')]:
         n=body(name,'illustrative_'+material+'_surface',color);site_ids.append(n);box(n+'_Sheet',n,origin,size)
         prism(n+'_BuildingVoid',n,[[x*scale,y*scale] for x,y in canonical_points],bottom-layer,layer*3,'cut')
-        box(n+'_LawnCut',lawn,[origin[0],origin[1],bottom-layer],[size[0],size[1],layer*3],'cut')
         site_regions.append({'body':n,'material':material,'origin_mm':origin,'size_mm':size})
+    # Subtract adjacent full-length bands together, avoiding temporary
+    # disconnected grass fragments in CAD kernels.
+    front_access_size=[front_size[0]+road_width,front_length,layer*3]
+    box('Site_FrontAccess_LawnCut',lawn,[front_origin[0],front_origin[1],bottom-layer],front_access_size,'cut')
     n=body('Site_Sidewalk','illustrative_sidewalk_surface',s['sidewalk_color']);site_ids.append(n)
     prism(n+'_Sheet',n,side_polygon,bottom,layer)
     box(n+'_FrontOverlap',n,[front_origin[0],front_origin[1],bottom-layer],[front_size[0],front_size[1],layer*3],'cut')
@@ -220,8 +225,7 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     n=body('Site_LeftHardstanding','illustrative_left_hardstanding_surface',s['road_color']);site_ids.append(n)
     box(n+'_Sheet',n,court_origin,court_size)
     prism(n+'_BuildingVoid',n,[[x*scale,y*scale] for x,y in canonical_points],bottom-layer,layer*3,'cut')
-    for name,origin,size in [('Front',front_origin,front_size),('Road',[xmax+walk,ymin,bottom],[road_width,ymax-ymin,layer])]:
-        box(n+'_'+name+'Cut',n,[origin[0],origin[1],bottom-layer],[size[0],size[1],layer*3],'cut')
+    box(n+'_FrontAccessCut',n,[front_origin[0],front_origin[1],bottom-layer],front_access_size,'cut')
     prism(n+'_WalkCut',n,side_polygon,bottom-layer,layer*3,'cut')
     box(n+'_LawnCut',lawn,[court_origin[0],court_origin[1],bottom-layer],[court_size[0],court_size[1],layer*3],'cut')
     site_regions.append({'body':n,'material':'left_hardstanding','origin_mm':court_origin,'size_mm':court_size,'boundary_measured':False})

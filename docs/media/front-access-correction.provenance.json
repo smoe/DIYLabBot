@@ -1,0 +1,1002 @@
+{
+  "format": "solidcraftbot.front-access-media/1",
+  "prepared_on": "2026-11-16",
+  "source": "model/building-stack.shared.json",
+  "source_sha256": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+  "source_files_sha256": {
+    "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+    "scripts/build_building_stack.py": "e8d181d642d3d79f09047cc3a62aa7006b84c54bb9e90863167a93ecef4f5eba",
+    "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+    "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
+    "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
+    "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+    "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+    "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+    "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+    "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+    "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+    "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+    "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+    "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+    "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
+    "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+    "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+    "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+    "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+    "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+    "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+    "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+    "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+    "scripts/building_exterior.py": "9a359b986c902ea0722a8b6dc10e946fba18e50d353b37f65c467ad30d8805eb",
+    "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+    "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+    "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+    "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+    "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+    "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
+    "scripts/render_building_stack_highlight.py": "ccc735903b1dec3be23cfc02671d81b6ebf3287451e0d2456363ed8e2d2298ae",
+    "scripts/building_walkthrough_viewer.html": "89c5d05cd9ccdb43a3d0a6d7937d12cccb6e78b6f7836c8cdc63b43e541aa35b"
+  },
+  "native_build_report": {
+    "path": "exports/generated/building-stack-4738e0660ae1-straight-front-r2/build-report.json",
+    "sha256": "51db9cb6331cdf90ae81c44fd59f49576578c385220860a0d804d52c241fa9ad",
+    "bytes": 330574
+  },
+  "native_site_proof": {
+    "path": "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site-update-proof.json",
+    "sha256": "2e4f0b4d955014c40c192bf7335c8ab1df6c964eaeff2c273660b9812489a4ea",
+    "bytes": 13222
+  },
+  "native_scope": {
+    "new_site_bodies": 5,
+    "exact_site_step_comparisons": 5,
+    "maximum_site_step_xor_mm3": 0,
+    "site_pair_checks": 10,
+    "front_band_continuity_checks": 2,
+    "full_building_cross_cad_check_repeated": false,
+    "build_backends": "freecad",
+    "full_building_cross_cad_checked": false,
+    "unchanged_building_geometry_bodies": 1933,
+    "semantically_unchanged_non_site_operations": 2755,
+    "reopened_non_site_bodies_checked": 1933,
+    "reopened_brep_byte_identical_bodies": 1812,
+    "reopened_brep_reserialized_xor_zero_bodies": 121,
+    "reopened_brep_maximum_xor_mm3": 0,
+    "read_only_audit_inputs_stable": true,
+    "read_only_audit_native_files_modified": false
+  },
+  "rendering": "Chromium WebGL2 from final native FreeCAD faces; scoped appearance/visibility changes for the laboratory highlight",
+  "images": [
+    {
+      "id": "overview",
+      "path": "docs/media/building-stack-overview.png",
+      "sha256": "4fa04320a117961f459b241f99043f2fefa923690b778bfad62070e87af694a3",
+      "bytes": 181198,
+      "pixels": [
+        1800,
+        1400
+      ],
+      "camera": {
+        "target": [
+          11817.567567567568,
+          13586.486486486487,
+          6900.000000000002
+        ],
+        "yaw": -0.8,
+        "pitch": 0.67,
+        "distance": 117435.11012248466,
+        "fov": 0.6
+      },
+      "view_commands": [],
+      "source_files_sha256": {
+        "model/furniture/social.articulations.json": "6b0edd12937e6496a7058cd7d2bb6e4b3c06e9c1b59be15afc837db0ce195403",
+        "model/furniture-articulations.schema.json": "390bb3b051ad10782c20d9131929e1679f39b50b6d64da1fb8e188eb2b694393",
+        "scripts/furniture_articulation.py": "5245b74efb5f4818ff60bbb66f252f213dd4c943205b2f1ca7a8c41b7aa777d0",
+        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
+        "model/building-walkthrough.shared.json": "9e64326e44bd25b3930f4f19c7c8491c2bb3f18dbfa8a102272ff320a7fb7b92",
+        "model/building-walkthrough.schema.json": "81e2d6cc753be116f1ab692ec956b80a4cbf32be1f03d13c0f5fa431523d7c08",
+        "scripts/building_walkthrough.py": "4806c153f02a91447a81577d487f44d0f35e7db4ea4ba7ce8cb1bd397766ad5f",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+        "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
+        "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
+        "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+        "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+        "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+        "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+        "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+        "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+        "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+        "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+        "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+        "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+        "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+        "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+        "scripts/building_exterior.py": "9a359b986c902ea0722a8b6dc10e946fba18e50d353b37f65c467ad30d8805eb",
+        "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+        "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+        "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+        "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "scripts/lab_room_model.py": "a8aa368a14ed149caf91256564087cf2487a32496419d76684e9b08fa05cac1e",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
+        "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+        "model/room-composition.schema.json": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d",
+        "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+        "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+        "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
+        "scripts/build_building_walkthrough.py": "0b0363c803039e5486653c2a3fa7c5b7f7d5895083eb73a5683ec503c855a90b",
+        "scripts/export_building_walkthrough_freecad.py": "d95c183bf1a46d79d3de6380a87b9fc9697604298788db3cf842094525a589af",
+        "scripts/building_walkthrough_viewer.html": "89c5d05cd9ccdb43a3d0a6d7937d12cccb6e78b6f7836c8cdc63b43e541aa35b",
+        "cad/building-stack/shared-build-report.json": "51db9cb6331cdf90ae81c44fd59f49576578c385220860a0d804d52c241fa9ad",
+        "cad/lab-layout-l01/shared-build-report.json": "cfc49f9d4e4736802726a7537d6b9daff65a5cff046063e660324061a3c767d0",
+        "scripts/build_building_stack.py": "e8d181d642d3d79f09047cc3a62aa7006b84c54bb9e90863167a93ecef4f5eba",
+        "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
+        "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+        "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+        "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+        "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+        "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+        "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+        "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+        "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+        "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+        "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+        "cad/generated/building-stack-4738e0660ae1-straight-front-r2/overview.FCStd": "2334696de8dae2c9d7c4bb3d07b52f9d1cb4e945877d1f4f823d878e51a14a06",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/case.json": "261bae97f61f8ea78f116911b3272a9a1992110d3457d7f5944eb95d5cd15614",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/overview.freecad.json": "9080c61d07a240f5d9b30caf9ff43c4ef85e91483da275951fc7aa9d2f6324f9",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site-update-proof.json": "2e4f0b4d955014c40c192bf7335c8ab1df6c964eaeff2c273660b9812489a4ea",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.step": "98b78cd7c9e26375f863ca014114ac6610609e07676b012eca52e8116aa910fa",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.sc": "b2281ce232f001a9fdab0d78dab72e8e31b2f5ab4a2157241b1aee0ba68ce747",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.commands.json": "570c5b9356f430bedf10453ba2f9844a9fc5b9d75e747c499b7de0b70f48d52f",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/native_site_update.py": "2878621caed85bb42599827361cf03db6c50190d7c22a349019f25dbc623744e",
+        "scripts/lab_layout_model.py": "d41fc9b333b44ca0aac3164a3fc3c2caec98a71e3f86b6e5ceb3a25d6c2f4f82",
+        "scripts/build_lab_layout.py": "a54d0c890b5b077d2743ef414bf21614f7ed23ef89dafd3630fa5a7fd0a4d9d1",
+        "scripts/build_lab_layout_freecad.py": "6a3e1badea46829cae5d6ec621a576c51c5b900e59fadeddcf667d7c11c40c34",
+        "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+        "model/sample-transport-tr01.shared.json": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+        "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+        "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+        "scripts/sample_transport_model.py": "21cf3a2d4a3c7cf0c4544447b68acea9ce3f433a127b09579f2dff053bd7686c",
+        "scripts/tip_collector_model.py": "ad71d7eef5f437d4c7c3b2146529e3f7e035a4b18509e32776e3397e2fc09cca",
+        "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
+        "scripts/build_sample_transport_freecad.py": "b3d6e8099b0c6b7d94765f1b1f41819238fa9c54e662d070a71df039aa67586d",
+        "scripts/build_tip_collector_freecad.py": "f3d3191604ab175406a0799fbd17a92406176c2aee8e7d55a23826552f15f7a1",
+        "model/lab-layout.schema.json": "6adecc29e87690f9a01b152002920e0d0530174cc9e7df93d25af66f7b38f002",
+        "scripts/lab_equipment.py": "fe868847435e6ca67bc41636a58732a82fc9cf6309b49c360237e95cc35fe868",
+        "scripts/build_lab_equipment_freecad.py": "6288919f44a95ec41cfa90e84cfc602d58044e58305834e0431c16c7179aa10c",
+        "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
+        "model/lab-equipment.schema.json": "f76c820e1dad5f11aae62c7ed3e390e1a009cecc15506cab7fe24d084bc668c8",
+        "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
+        "scripts/tapestation_model.py": "56de677f2c5fcd8ac787769fc7850fc7f1b30e9c4fa360af9fc8d58406bd32c3",
+        "exports/worktrees/fix-cad-layout-pins/cad/generated/lab-layout-l01-040c5407d04c-r2/LabLayout_L01.FCStd": "f65397f9f2aa21f770de7a3d11cd6afb58a099d42fdaef6a338cbd76bfe464a6",
+        "exports/worktrees/fix-cad-layout-pins/cad/generated/lab-layout-l01-040c5407d04c-r2/LabLayout_L01.sc": "385f161f7f3a01c7e459b21e736076a8ff99b8152564c7edc9eaa9262bedc9cd",
+        "exports/worktrees/fix-cad-layout-pins/exports/generated/lab-layout-l01-040c5407d04c-r2/layout-validation.json": "5c78f9809ae953fe7307f9ab76edce0f6f1572749729509a16d7fe86ec3a6394",
+        "exports/worktrees/fix-cad-layout-pins/exports/generated/lab-layout-l01-040c5407d04c-r2/solidcraft-scene.json": "6b4edd453a960b6420b426f29d6b28bd9305a6c9061929b74ffb4ffb94fd54fa"
+      },
+      "native_model": "cad/generated/building-stack-4738e0660ae1-straight-front-r2/overview.FCStd",
+      "native_model_sha256": "2334696de8dae2c9d7c4bb3d07b52f9d1cb4e945877d1f4f823d878e51a14a06",
+      "render_report": {
+        "path": "exports/validation/exterior-facade-review-20261116/rendered/overview-view.json",
+        "sha256": "956b58a8e55b1afa15f1fbb6868a8e23b4bee9972cafc4b90a63ce675173abdf",
+        "bytes": 3913
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Inspected both source-derived native views: entrance flanks retain red over all storeys; road and pavement are straight, continuous and free of grass across the depicted front."
+      },
+      "source": "native FreeCAD BRep tessellation rendered in Chromium WebGL2",
+      "render_producers": {
+        "render_native_views.py": {
+          "path": "exports/validation/exterior-facade-review-20261116/render_native_views.py",
+          "sha256": "c68526d2fe10016d87e7e2efad6dbc7a99d42b1c233eef5ff87e9733226736f7",
+          "bytes": 2785
+        },
+        "render_native_views.cjs": {
+          "path": "exports/validation/exterior-facade-review-20261116/render_native_views.cjs",
+          "sha256": "c7f4f61cc7e704d467dbd0b653b08d355dd95302e77cb4fad4f5f0e6ca2bf775",
+          "bytes": 2063
+        }
+      },
+      "rendering": {
+        "engine": "Chromium WebGL2",
+        "version": "157.0.8103.79",
+        "canvas_only": true,
+        "page_errors": []
+      }
+    },
+    {
+      "id": "lab_3_003",
+      "path": "docs/media/building-stack-lab-3-003.png",
+      "sha256": "0b502b5c0e2e5dbdd3f30a0f4482a4a805ee58037ca9acedfcba480fa4740585",
+      "bytes": 206515,
+      "pixels": [
+        1800,
+        1400
+      ],
+      "camera": {
+        "target": [
+          11817.567567567568,
+          13586.486486486487,
+          6900.000000000002
+        ],
+        "yaw": -0.8,
+        "pitch": 0.67,
+        "distance": 117435.11012248466,
+        "fov": 0.6
+      },
+      "view_commands": [
+        {
+          "command": "browser.visibility",
+          "params": {
+            "items": [
+              "RoofSlab_R3_001",
+              "RoofSlab_R3_002",
+              "RoofSlab_R3_003",
+              "RoofSlab_R3_004",
+              "RoofSlab_R3_005",
+              "RoofSlab_Suite3_006AB",
+              "RoofSlab_R3_007",
+              "RoofSlab_R3_008A",
+              "RoofSlab_R3_008B",
+              "RoofSlab_R3_009",
+              "RoofSlab_R3_010",
+              "RoofSlab_R3_013",
+              "RoofSlab_R3_014",
+              "RoofSlab_R3_015",
+              "RoofSlab_R3_016",
+              "RoofSlab_R3_029",
+              "RoofSlab_C3_021",
+              "RoofBarrelGlass",
+              "RoofGlassSkirt",
+              "RoofGuard_W088_0",
+              "RoofGuard_W102_0",
+              "RoofGuard_W114_0",
+              "RoofGuard_W116_0",
+              "RoofGuard_W115_0",
+              "RoofGuard_W110_0",
+              "RoofGuard_W108_0",
+              "RoofGuard_W109_0",
+              "RoofGuard_W117_0",
+              "RoofGuard_W118_0",
+              "RoofGuard_W103_0",
+              "RoofGuard_W090_0",
+              "RoofGuard_W069_0",
+              "RoofGuard_W059_0",
+              "RoofGuard_W039_0",
+              "RoofGuard_W033_0",
+              "RoofGuard_W026_0",
+              "RoofGuard_W014_0",
+              "RoofGuard_W015_0",
+              "RoofGuard_W034_0",
+              "RoofGuard_W040_0",
+              "RoofGuard_W041_0",
+              "RoofGuard_W042_0",
+              "RoofGuard_W042_1",
+              "RoofGuard_W011_0",
+              "RoofGuard_W008_0",
+              "RoofGuard_W005_0",
+              "RoofGuard_W002_0",
+              "RoofGuard_W001_0",
+              "RoofGuard_W003_0",
+              "RoofGuard_W007_0",
+              "RoofGuard_W012_0",
+              "RoofGuard_W013_0",
+              "RoofGuard_W016_0",
+              "RoofGuard_W025_0",
+              "RoofGuard_W037_0",
+              "RoofGuard_W061_0",
+              "RoofGuard_W072_0"
+            ],
+            "visible": false
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W004",
+              "OG3__Wall_W006",
+              "OG3__Wall_W009",
+              "OG3__Wall_W017",
+              "OG3__Wall_W018",
+              "OG3__Wall_W019",
+              "OG3__Wall_W020",
+              "OG3__Wall_W021",
+              "OG3__Wall_W022",
+              "OG3__Wall_W023",
+              "OG3__Wall_W024",
+              "OG3__Wall_W027",
+              "OG3__Wall_W028",
+              "OG3__Wall_W029",
+              "OG3__Wall_W030",
+              "OG3__Wall_W031",
+              "OG3__Wall_W032",
+              "OG3__Wall_W035",
+              "OG3__Wall_W036",
+              "OG3__Wall_W038",
+              "OG3__Wall_W043",
+              "OG3__Wall_W044",
+              "OG3__Wall_W046",
+              "OG3__Wall_W047",
+              "OG3__Wall_W049",
+              "OG3__Wall_W050",
+              "OG3__Wall_W053",
+              "OG3__Wall_W055",
+              "OG3__Wall_W056",
+              "OG3__Wall_W057",
+              "OG3__Wall_W058",
+              "OG3__Wall_W060",
+              "OG3__Wall_W062",
+              "OG3__Wall_W066",
+              "OG3__Wall_W067",
+              "OG3__Wall_W070",
+              "OG3__Wall_W071",
+              "OG3__Wall_W073",
+              "OG3__Wall_W074",
+              "OG3__Wall_W075",
+              "OG3__Wall_W076",
+              "OG3__Wall_W077",
+              "OG3__Wall_W078",
+              "OG3__Wall_W079",
+              "OG3__Wall_W080",
+              "OG3__Wall_W081",
+              "OG3__Wall_W082",
+              "OG3__Wall_W083",
+              "OG3__Wall_W084",
+              "OG3__Wall_W085",
+              "OG3__Wall_W086",
+              "OG3__Wall_W087",
+              "OG3__Wall_W089",
+              "OG3__Wall_W091",
+              "OG3__Wall_W092",
+              "OG3__Wall_W093",
+              "OG3__Wall_W094",
+              "OG3__Wall_W095",
+              "OG3__Wall_W096",
+              "OG3__Wall_W097",
+              "OG3__Wall_W098",
+              "OG3__Wall_W099",
+              "OG3__Wall_W100",
+              "OG3__Wall_W101",
+              "OG3__Wall_W104",
+              "OG3__Wall_W105",
+              "OG3__Wall_W111",
+              "OG3__Wall_W112",
+              "OG3__Wall_W113"
+            ],
+            "opacity": 0.1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W001"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W002"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W003"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W005"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W007"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W008"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W011"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W012"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W013"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W014"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W015"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W016"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W025"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W026"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W033"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W034"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W037"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W039"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W040"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W041"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W042"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W059"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W061"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W069"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W072"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W088"
+            ],
+            "color": "#9CA6AA",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W090"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W102"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W103"
+            ],
+            "color": "#B9B5AC",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W109"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W110"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W114"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W115"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W116"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W118"
+            ],
+            "color": "#B65E52",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Area_R3_003"
+            ],
+            "color": "#ef8b23",
+            "opacity": 1
+          }
+        },
+        {
+          "command": "appearance.assign",
+          "params": {
+            "bodies": [
+              "OG3__Wall_W070",
+              "OG3__Wall_W036",
+              "OG3__Wall_W035"
+            ],
+            "color": "#ef8b23",
+            "opacity": 0.32
+          }
+        }
+      ],
+      "source_files_sha256": {
+        "model/furniture/social.articulations.json": "6b0edd12937e6496a7058cd7d2bb6e4b3c06e9c1b59be15afc837db0ce195403",
+        "model/furniture-articulations.schema.json": "390bb3b051ad10782c20d9131929e1679f39b50b6d64da1fb8e188eb2b694393",
+        "scripts/furniture_articulation.py": "5245b74efb5f4818ff60bbb66f252f213dd4c943205b2f1ca7a8c41b7aa777d0",
+        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
+        "model/building-walkthrough.shared.json": "9e64326e44bd25b3930f4f19c7c8491c2bb3f18dbfa8a102272ff320a7fb7b92",
+        "model/building-walkthrough.schema.json": "81e2d6cc753be116f1ab692ec956b80a4cbf32be1f03d13c0f5fa431523d7c08",
+        "scripts/building_walkthrough.py": "4806c153f02a91447a81577d487f44d0f35e7db4ea4ba7ce8cb1bd397766ad5f",
+        "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+        "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
+        "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
+        "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+        "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+        "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+        "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+        "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+        "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+        "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+        "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+        "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+        "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+        "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+        "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+        "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+        "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+        "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+        "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+        "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+        "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+        "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+        "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+        "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+        "scripts/building_exterior.py": "9a359b986c902ea0722a8b6dc10e946fba18e50d353b37f65c467ad30d8805eb",
+        "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+        "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+        "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+        "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "scripts/lab_room_model.py": "a8aa368a14ed149caf91256564087cf2487a32496419d76684e9b08fa05cac1e",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
+        "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+        "model/room-composition.schema.json": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d",
+        "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+        "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+        "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
+        "scripts/build_building_walkthrough.py": "0b0363c803039e5486653c2a3fa7c5b7f7d5895083eb73a5683ec503c855a90b",
+        "scripts/export_building_walkthrough_freecad.py": "d95c183bf1a46d79d3de6380a87b9fc9697604298788db3cf842094525a589af",
+        "scripts/building_walkthrough_viewer.html": "89c5d05cd9ccdb43a3d0a6d7937d12cccb6e78b6f7836c8cdc63b43e541aa35b",
+        "cad/building-stack/shared-build-report.json": "51db9cb6331cdf90ae81c44fd59f49576578c385220860a0d804d52c241fa9ad",
+        "cad/lab-layout-l01/shared-build-report.json": "cfc49f9d4e4736802726a7537d6b9daff65a5cff046063e660324061a3c767d0",
+        "scripts/build_building_stack.py": "e8d181d642d3d79f09047cc3a62aa7006b84c54bb9e90863167a93ecef4f5eba",
+        "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
+        "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+        "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+        "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+        "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+        "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+        "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+        "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+        "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+        "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+        "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+        "cad/generated/building-stack-4738e0660ae1-straight-front-r2/overview.FCStd": "2334696de8dae2c9d7c4bb3d07b52f9d1cb4e945877d1f4f823d878e51a14a06",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/case.json": "261bae97f61f8ea78f116911b3272a9a1992110d3457d7f5944eb95d5cd15614",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/overview.freecad.json": "9080c61d07a240f5d9b30caf9ff43c4ef85e91483da275951fc7aa9d2f6324f9",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site-update-proof.json": "2e4f0b4d955014c40c192bf7335c8ab1df6c964eaeff2c273660b9812489a4ea",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.step": "98b78cd7c9e26375f863ca014114ac6610609e07676b012eca52e8116aa910fa",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.sc": "b2281ce232f001a9fdab0d78dab72e8e31b2f5ab4a2157241b1aee0ba68ce747",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site.commands.json": "570c5b9356f430bedf10453ba2f9844a9fc5b9d75e747c499b7de0b70f48d52f",
+        "exports/generated/building-stack-4738e0660ae1-straight-front-r2/native_site_update.py": "2878621caed85bb42599827361cf03db6c50190d7c22a349019f25dbc623744e",
+        "scripts/lab_layout_model.py": "d41fc9b333b44ca0aac3164a3fc3c2caec98a71e3f86b6e5ceb3a25d6c2f4f82",
+        "scripts/build_lab_layout.py": "a54d0c890b5b077d2743ef414bf21614f7ed23ef89dafd3630fa5a7fd0a4d9d1",
+        "scripts/build_lab_layout_freecad.py": "6a3e1badea46829cae5d6ec621a576c51c5b900e59fadeddcf667d7c11c40c34",
+        "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+        "model/sample-transport-tr01.shared.json": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+        "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+        "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
+        "scripts/sample_transport_model.py": "21cf3a2d4a3c7cf0c4544447b68acea9ce3f433a127b09579f2dff053bd7686c",
+        "scripts/tip_collector_model.py": "ad71d7eef5f437d4c7c3b2146529e3f7e035a4b18509e32776e3397e2fc09cca",
+        "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
+        "scripts/build_sample_transport_freecad.py": "b3d6e8099b0c6b7d94765f1b1f41819238fa9c54e662d070a71df039aa67586d",
+        "scripts/build_tip_collector_freecad.py": "f3d3191604ab175406a0799fbd17a92406176c2aee8e7d55a23826552f15f7a1",
+        "model/lab-layout.schema.json": "6adecc29e87690f9a01b152002920e0d0530174cc9e7df93d25af66f7b38f002",
+        "scripts/lab_equipment.py": "fe868847435e6ca67bc41636a58732a82fc9cf6309b49c360237e95cc35fe868",
+        "scripts/build_lab_equipment_freecad.py": "6288919f44a95ec41cfa90e84cfc602d58044e58305834e0431c16c7179aa10c",
+        "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
+        "model/lab-equipment.schema.json": "f76c820e1dad5f11aae62c7ed3e390e1a009cecc15506cab7fe24d084bc668c8",
+        "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
+        "scripts/tapestation_model.py": "56de677f2c5fcd8ac787769fc7850fc7f1b30e9c4fa360af9fc8d58406bd32c3",
+        "exports/worktrees/fix-cad-layout-pins/cad/generated/lab-layout-l01-040c5407d04c-r2/LabLayout_L01.FCStd": "f65397f9f2aa21f770de7a3d11cd6afb58a099d42fdaef6a338cbd76bfe464a6",
+        "exports/worktrees/fix-cad-layout-pins/cad/generated/lab-layout-l01-040c5407d04c-r2/LabLayout_L01.sc": "385f161f7f3a01c7e459b21e736076a8ff99b8152564c7edc9eaa9262bedc9cd",
+        "exports/worktrees/fix-cad-layout-pins/exports/generated/lab-layout-l01-040c5407d04c-r2/layout-validation.json": "5c78f9809ae953fe7307f9ab76edce0f6f1572749729509a16d7fe86ec3a6394",
+        "exports/worktrees/fix-cad-layout-pins/exports/generated/lab-layout-l01-040c5407d04c-r2/solidcraft-scene.json": "6b4edd453a960b6420b426f29d6b28bd9305a6c9061929b74ffb4ffb94fd54fa"
+      },
+      "native_model": "cad/generated/building-stack-4738e0660ae1-straight-front-r2/overview.FCStd",
+      "native_model_sha256": "2334696de8dae2c9d7c4bb3d07b52f9d1cb4e945877d1f4f823d878e51a14a06",
+      "render_report": {
+        "path": "exports/validation/exterior-facade-review-20261116/rendered/lab_3_003-view.json",
+        "sha256": "4cdcee01ae9845734315e40ef8d835eaebfb4d24dc532bff64ebc96bf1938a40",
+        "bytes": 14678
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Inspected both source-derived native views: entrance flanks retain red over all storeys; road and pavement are straight, continuous and free of grass across the depicted front."
+      },
+      "source": "native FreeCAD BRep tessellation rendered in Chromium WebGL2; appearance and visibility only",
+      "render_producers": {
+        "render_native_views.py": {
+          "path": "exports/validation/exterior-facade-review-20261116/render_native_views.py",
+          "sha256": "c68526d2fe10016d87e7e2efad6dbc7a99d42b1c233eef5ff87e9733226736f7",
+          "bytes": 2785
+        },
+        "render_native_views.cjs": {
+          "path": "exports/validation/exterior-facade-review-20261116/render_native_views.cjs",
+          "sha256": "c7f4f61cc7e704d467dbd0b653b08d355dd95302e77cb4fad4f5f0e6ca2bf775",
+          "bytes": 2063
+        }
+      },
+      "rendering": {
+        "engine": "Chromium WebGL2",
+        "version": "157.0.8103.79",
+        "canvas_only": true,
+        "page_errors": []
+      },
+      "producer": {
+        "path": "scripts/render_building_stack_highlight.py",
+        "sha256": "ccc735903b1dec3be23cfc02671d81b6ebf3287451e0d2456363ed8e2d2298ae",
+        "role": "Source-derived highlight selection and appearance commands; actual WebGL render producers are recorded separately."
+      }
+    }
+  ],
+  "original_photographs_included": false,
+  "claude_reviewed": false,
+  "publication_performed": false,
+  "qualification": {
+    "metric_survey": false,
+    "transport": false,
+    "hardware": false,
+    "building_safety": false,
+    "load": false,
+    "basement_modeled": true,
+    "roof_modeled": true,
+    "ground_floor_as_built": false,
+    "robot_navigation": false
+  },
+  "limitations": [
+    "All 1933 non-site bodies and 2755 source operations remain geometrically/semantically unchanged. After reopening, 1812 BReps serialize identically; 121 serialize differently but each has exact native XOR volume zero. This is not a blanket post-reopen byte-identity claim.",
+    "The current full building model and both images use FreeCAD; five site STEP comparisons do not qualify a fresh full-building cross-CAD build.",
+    "XY, terrain extent, band widths and layer thickness remain unmeasured presentation assumptions.",
+    "No surveyed terrain, robot route, physical clearance, hardware, load, egress, structural, weather-sealing or safety qualification.",
+    "The laboratory highlight changes appearance and visibility only; no measured L01 registration or furniture placement is added.",
+    "Private original photographs remain excluded; the separate historical building-summary pins retain their original meaning."
+  ],
+  "historical_building_binding": {
+    "fields": [
+      "revision",
+      "source",
+      "source_sha256",
+      "source_files_sha256",
+      "native_build_report",
+      "native_summary",
+      "native_files",
+      "native_artifact_sha256"
+    ],
+    "image_ids": [
+      "atrium",
+      "circulation",
+      "ground",
+      "roof",
+      "section_svg",
+      "ground_svg",
+      "section_png",
+      "basement",
+      "front_glass"
+    ],
+    "sha256": "2fae3efb8c106ca30421a0e371605ace2eeea0c30cb504c7a6b1d6c94bc77b8f",
+    "scope": "Canonical historical top-level native/source metadata, unchanged image records and documentation bindings outside the explicitly current views and exterior document.",
+    "documentation_paths": [
+      "docs/building-stack.md",
+      "docs/ground-floor-eg.md",
+      "docs/basement-kg.md",
+      "docs/building-alignment.md"
+    ]
+  },
+  "native_site_proof_scope": "Historical producer proof before saving. Its serialized BRep equality statement does not establish equality after reopening; the separate read-only native audit checks the reopened files.",
+  "native_readonly_audit": {
+    "path": "exports/validation/exterior-facade-review-20261116/native-readonly-audit-r3.json",
+    "sha256": "9d22089f4fec6391915d37bfa23fef69a372b86b0b0f1d559d5fb2fb67d3eaba",
+    "bytes": 50005
+  },
+  "render_producers": {
+    "render_native_views.py": {
+      "path": "exports/validation/exterior-facade-review-20261116/render_native_views.py",
+      "sha256": "c68526d2fe10016d87e7e2efad6dbc7a99d42b1c233eef5ff87e9733226736f7",
+      "bytes": 2785
+    },
+    "render_native_views.cjs": {
+      "path": "exports/validation/exterior-facade-review-20261116/render_native_views.cjs",
+      "sha256": "c7f4f61cc7e704d467dbd0b653b08d355dd95302e77cb4fad4f5f0e6ca2bf775",
+      "bytes": 2063
+    }
+  },
+  "documentation_files_sha256": {
+    "docs/building-exterior.md": "0aca2855d42a24b910b8b2aa6e68394e159c1748b575d3d038ff91f4744aef72"
+  }
+}

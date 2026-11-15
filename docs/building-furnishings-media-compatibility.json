@@ -32,7 +32,7 @@
     },
     "tests/test_building_furnishings.py": {
       "historical_sha256": "89c6a2453a1125416486bdfc07f13a194ad51512b0b14017051e8ac09942799a",
-      "current_sha256": "edd1131f7db13e55bfd56aee69a9f6a224077f932cc253ed217b535a2b038f0a"
+      "current_sha256": "86c6a9826b93196b85386bcf288975ebcc3e41ca209eb43b94f9540eb329a89d"
     }
   },
   "camera_projection": {
@@ -47,10 +47,65 @@
     "sha256": "c003f5cf46fb291a99420055a0102ec5a40f91566d59307b25f2091696fc44a1",
     "method": "Exact canonical JSON equality of the verified historical walkthrough manifest and the current compiled walkthrough; sorted keys, compact separators, finite JSON numbers."
   },
-  "scope": "The native construction sources, materials, original room cameras and reviewed PNG bytes remain unchanged. The approved revisions add browser-only articulation and its checks; historical image and producer provenance remains historical.",
+  "scope": "The original room/furniture source bindings, room-camera projection and reviewed room PNG bytes are preserved. Browser producer revisions remain separately pinned. The exterior update changes five site sheets; the separate saved-model audit confirms 1933 non-site bodies geometrically unchanged and 2755 source operations semantically unchanged. Of those reopened bodies, 1812 have identical BRep bytes and 121 reserialized bodies have zero native symmetric-difference volume. This is scoped room/camera compatibility, not global geometry or pixel identity.",
   "limitations": [
-    "No historical image was rerendered or relabelled as a current browser screenshot.",
-    "Camera/geometry compatibility does not claim identical pixels from the new renderer.",
+    "No historical room image was rerendered or relabelled as a current browser screenshot.",
+    "Unchanged room cameras and furniture do not claim identical pixels from the new renderer or unchanged exterior geometry.",
+    "The original pre-save site proof remains historical; the separately pinned read-only audit qualifies the saved native geometry without asserting 1933 byte-identical reopened BReps.",
+    "The new native witness covers five site STEP comparisons; the full-building cross-CAD comparison was not repeated.",
     "This witness grants no native CAD articulation, collision, swept clearance, hardware, ROS, SiLA, walking or safety qualification."
-  ]
+  ],
+  "site_producer_updates": {
+    "scripts/building_exterior.py": {
+      "historical_sha256": "50fb3d5fbb1d24dac633e55141316ca5bad2aba376a99459035425d64372e407",
+      "current_sha256": "9a359b986c902ea0722a8b6dc10e946fba18e50d353b37f65c467ad30d8805eb"
+    }
+  },
+  "site_update": {
+    "front_access_provenance": {
+      "path": "docs/media/front-access-correction.provenance.json",
+      "sha256": "0a8b1f40834a93ba613bc026b39aa5ce8076a757b5ba50202a2401b899063096",
+      "bytes": 52563
+    },
+    "native_build_report": {
+      "path": "exports/generated/building-stack-4738e0660ae1-straight-front-r2/build-report.json",
+      "sha256": "51db9cb6331cdf90ae81c44fd59f49576578c385220860a0d804d52c241fa9ad",
+      "bytes": 330574
+    },
+    "native_site_proof": {
+      "path": "exports/generated/building-stack-4738e0660ae1-straight-front-r2/site-update-proof.json",
+      "sha256": "2e4f0b4d955014c40c192bf7335c8ab1df6c964eaeff2c273660b9812489a4ea",
+      "bytes": 13222
+    },
+    "native_scope": {
+      "new_site_bodies": 5,
+      "exact_site_step_comparisons": 5,
+      "maximum_site_step_xor_mm3": 0,
+      "site_pair_checks": 10,
+      "front_band_continuity_checks": 2,
+      "full_building_cross_cad_check_repeated": false,
+      "build_backends": "freecad",
+      "full_building_cross_cad_checked": false,
+      "unchanged_building_geometry_bodies": 1933,
+      "semantically_unchanged_non_site_operations": 2755,
+      "reopened_non_site_bodies_checked": 1933,
+      "reopened_brep_byte_identical_bodies": 1812,
+      "reopened_brep_reserialized_xor_zero_bodies": 121,
+      "reopened_brep_maximum_xor_mm3": 0,
+      "read_only_audit_inputs_stable": true,
+      "read_only_audit_native_files_modified": false
+    },
+    "changed_site_body_ids": [
+      "Site_EntranceApron",
+      "Site_Driveway",
+      "Site_Sidewalk",
+      "Site_LeftHardstanding",
+      "Terrain_Lawn"
+    ],
+    "native_readonly_audit": {
+      "path": "exports/validation/exterior-facade-review-20261116/native-readonly-audit-r3.json",
+      "sha256": "9d22089f4fec6391915d37bfa23fef69a372b86b0b0f1d559d5fb2fb67d3eaba",
+      "bytes": 50005
+    }
+  }
 }

@@ -158,3 +158,41 @@ fast schwarzen Blauton `#172530`. Von außen kommend sind beide rechts
 angeschlagen: Die Außentür öffnet nach außen, die Atriumtür zum Logistikraum.
 Die gemeinsame [Türquelle](building-doors.md#logistikraum-im-erdgeschoss)
 führt diese Ausnahmen mit der bestätigten fensterlosen Ausführung.
+
+## Gerade Eingangsflächen und durchgehende rote Flanken
+
+Die Eigentümerkorrektur vom 15. November 2026 führt Straße und Gehweg vor dem
+Eingang als gerade, zusammenhängende Bänder über den gesamten dargestellten
+Geländeausschnitt. Ihre gemeinsame Längsbegrenzung entsteht aus Gebäudehülle
+und vorhandenem Geländerand; innerhalb dieser Bänder liegt kein Rasen.
+Die grüne Markierung bleibt auf den übrigen Flächen erhalten. Breiten,
+Geländeausschnitt und die 20-mm-Darstellungsschicht bleiben ungemessene
+Darstellungsannahmen.
+
+Die roten Eingangsflanken waren bereits im nativen Modell über alle vier
+oberirdischen Geschosse korrekt gebunden. Die Labor-Markierungsansicht darf
+diese Fassaden beim Aufhellen der oberen Innenwände nicht mit ausblenden:
+`render_building_stack_highlight.py` erhält deren explizite Farbe und volle
+Deckkraft. Die neuen Gesamtbilder verwenden die geprüften nativen
+FreeCAD-Flächen im WebGL-Renderer; sie sind keine neuen vollständigen
+SolidCraft-Gebäudeaufbauten.
+
+Nur die fünf Gelände-Körper wurden für diese Korrektur neu erzeugt. Der
+lokale Bericht bindet fünf exakte FreeCAD-/SolidCraft-STEP-Vergleiche,
+zehn paarweise Überschneidungsprüfungen sowie durchgehende native Prüfbänder
+für Straße und Gehweg. Eine zusätzliche lesende Prüfung vergleicht die wieder
+geöffneten nativen Dateien: Alle 1.933 übrigen Körper und 2.755 zugehörigen
+Quelloperationen bleiben geometrisch beziehungsweise semantisch unverändert.
+Bei 1.812 Körpern bleiben auch die serialisierten BRep-Bytes gleich; die
+121 anders serialisierten Körper ergeben jeweils exakt null Volumendifferenz
+im nativen XOR-Vergleich. Der frühere Vergleich vor dem Speichern bleibt ein
+historischer Beleg und wird nicht als vollständige Bytegleichheit nach dem
+Wiederöffnen ausgegeben. Die unveränderten Gebäudeprüfungen werden übernommen;
+ein vollständiger CAD-übergreifender Gebäudeaufbau wurde nicht wiederholt.
+Die [Bildprovenienz](media/front-access-correction.provenance.json) trennt
+aktuelle Bilder, native Prüfungen und ältere historische Gesamtbilder.
+Die obersten Quellenpins und die native Zusammenfassung in
+`building-stack.provenance.json` bleiben dem dort genannten historischen Stand
+zugeordnet. Der Verweis `current_front_access_correction` bindet ausdrücklich
+nur die beiden erneuerten Ansichten und den begrenzten Gelände-Nachweis;
+er erklärt die ältere Gesamtmodellprüfung nicht zu einer neuen Prüfung.
