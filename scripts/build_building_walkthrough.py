@@ -14,6 +14,7 @@ from build_extraction_kit_station import freecad_environment
 ROOT = Path(__file__).resolve().parents[1]
 FORMAT = 'solidcraftbot.building-walkthrough-build/1'
 TEMPLATE = ROOT/'scripts/building_walkthrough_viewer.html'
+INTERACTION_SCRIPT = ROOT/'scripts/walkthrough_interaction.js'
 
 
 def merge_pins(*collections):
@@ -32,6 +33,9 @@ def embed_html(template, payload):
     data = json.dumps(payload, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
     # A model label must not terminate the script element containing its JSON.
     data = data.replace('<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+    if template.count('__WALKTHROUGH_INTERACTION__') > 1:
+        raise ValueError('Only one interaction-script placeholder is allowed')
+    template = template.replace('__WALKTHROUGH_INTERACTION__', INTERACTION_SCRIPT.read_text(encoding='utf-8'))
     return template.replace('__WALKTHROUGH_DATA__', data)
 
 
@@ -89,7 +93,7 @@ def build(args):
     program['scene_sources']['building']['build_report'] = str(reports['building'].relative_to(ROOT))
     source_pins = merge_pins(program['source_files_sha256'],
         {str(path.relative_to(ROOT)): mesh_export.digest(path)
-         for path in (Path(__file__), ROOT/'scripts/export_building_walkthrough_freecad.py', TEMPLATE)})
+         for path in (Path(__file__), ROOT/'scripts/export_building_walkthrough_freecad.py', TEMPLATE, INTERACTION_SCRIPT)})
     signature_pins = merge_pins(source_pins, {str(path.relative_to(ROOT)): mesh_export.digest(path) for path in reports.values()})
     key = hashlib.sha256(json.dumps(signature_pins, sort_keys=True).encode()).hexdigest()
     stem = 'building-walkthrough-'+key[:12]

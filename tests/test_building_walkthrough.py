@@ -114,6 +114,14 @@ class WalkthroughTests(unittest.TestCase):
         for name, sha in pins.items():
             self.assertEqual(walkthrough.digest(walkthrough.ROOT/name), sha, name)
 
+    def test_interaction_reach_is_a_bounded_source_assumption(self):
+        self.assertEqual(self.program['interaction']['reach_mm'],self.source['interaction']['reach']['value'])
+        for value in (True, float('nan'), 0, 4001):
+            changed=copy.deepcopy(self.source);changed['interaction']['reach']['value']=value
+            with self.subTest(value=value), self.assertRaises(ValueError): walkthrough.validate(changed)
+        changed=copy.deepcopy(self.source);changed['interaction']['reach']['unit']='m'
+        with self.assertRaises(ValueError): walkthrough.validate(changed)
+
     def test_source_matches_schema(self):
         try:
             from jsonschema import Draft202012Validator

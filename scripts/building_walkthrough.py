@@ -40,9 +40,11 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects', 'walkthrough')
+    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction', 'walkthrough')
     require(spec['format'] == FORMAT and isinstance(spec['id'], str) and
             re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Walkthrough identity required')
+    exact(spec['interaction'], 'reach', 'interaction policy')
+    articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))
     exact(spec['articulation_source'], 'source source_sha256', 'articulation reference')
     articulation.validate(articulation.read(spec['articulation_source']))
     articulation.validate_requests(spec['objects'])
@@ -232,6 +234,7 @@ def compile(source=None):
     for ref in [*spec['sources'].values(), spec['articulation_source'], lab['assets']['room']]:
         require(pins[ref['source']] == ref['source_sha256'], 'Scene source changed while compiling: '+ref['source'])
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
+            'interaction': {'reach_mm': articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))},
             'objects': objects, 'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/'+('building-stack' if name == 'building' else 'lab-layout-l01')+'/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},

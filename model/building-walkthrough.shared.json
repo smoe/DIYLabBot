@@ -162,5 +162,16 @@
         "basis": "presentation_assumption"
       }
     }
-  ]
+  ],
+  "interaction": {
+    "reach": {
+      "value": 2500,
+      "unit": "mm",
+      "range": [
+        300,
+        4000
+      ],
+      "basis": "presentation_assumption"
+    }
+  }
 }

@@ -13,8 +13,9 @@
     .stage{position:relative;background:#cfdad7;border-radius:14px;overflow:hidden;height:clamp(430px,72vh,850px);box-shadow:0 16px 45px #24372e12}.stage:fullscreen{height:100%;width:100%;border-radius:0}.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.stage canvas:active{cursor:grabbing}.caption{position:absolute;left:20px;top:19px;pointer-events:none;max-width:calc(100% - 100px);color:#23362f;background:#fffef8ed;padding:12px 16px;border-radius:10px;box-shadow:0 3px 12px #172c2510}.caption strong{display:block;font-size:16px;font-weight:500;letter-spacing:-.015em}.caption span{display:block;font-size:11px;color:#6b776e;line-height:1.6;margin-top:2px}.fullscreen{position:absolute;right:17px;top:18px;width:40px;height:40px;border:1px solid #dbe0d5;background:#fffef6f0;border-radius:9px;color:#3a5148;font-size:18px}.fullscreen[hidden]{display:none}.crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #ffffffb8;border-radius:50%;box-shadow:0 0 2px #0a1c2080;pointer-events:none;transform:translate(-50%,-50%)}
     .move-controls{position:absolute;bottom:18px;left:18px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px;gap:5px}.move-controls button,.height-controls button{border:1px solid #dbe0d5;background:#fffef6ed;color:#355346;border-radius:8px;min-width:42px;min-height:42px;font-size:17px;touch-action:none;user-select:none;-webkit-user-select:none}.move-controls button:active,.height-controls button:active{background:#b9d1bc}.move-controls [data-move=forward]{grid-column:2}.move-controls [data-move=left]{grid-column:1;grid-row:2}.move-controls [data-move=back]{grid-column:2;grid-row:2}.move-controls [data-move=right]{grid-column:3;grid-row:2}.height-controls{position:absolute;right:18px;bottom:18px;display:grid;gap:5px}.height-controls button{font-size:14px}.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e1e8e1;color:#40584b;font-size:14px}.loading[hidden],.error[hidden]{display:none}.error{position:absolute;inset:16px;z-index:5;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;background:#fffaf1f5;border-radius:10px;color:#70432e;line-height:1.6}
     .bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px 0 7px}.navigation{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.quiet-button,.level-select{color:#395447;border:1px solid #ced8cc;background:#fafbf6;border-radius:7px;font-size:12px;padding:8px 12px;min-height:38px}.quiet-button:hover{background:#e4ebe0}.level-select:disabled{opacity:.55}.help{font-size:11px;color:#758078;line-height:1.7}.notice{font-size:11px;line-height:1.6;color:#7b847c;margin:6px 0 0}.free-tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#536e5f;margin-left:8px}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-    .object-controls{display:grid;gap:8px;margin-top:12px}.object-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:9px 12px;background:#fffef9;border:1px solid #d2d9d0;border-radius:9px;min-width:0}.object-row[hidden]{display:none}.object-row strong{font-size:13px;font-weight:500;margin-right:auto;overflow-wrap:anywhere}.object-row button{min-height:44px}.object-status{font-size:12px;color:#536e5f;overflow-wrap:anywhere}.object-row button:disabled{opacity:.6;cursor:wait}
+    .interaction-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);max-width:calc(100% - 190px);margin:0;padding:9px 12px;border-radius:8px;background:#fffef6ed;color:#294d3f;font-size:12px;text-align:center;pointer-events:none}.interaction-hint[hidden]{display:none}.crosshair.is-interactive{border-color:#e3c276;background:#e3c27655;box-shadow:0 0 5px #172b21}
     @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
+    @media(max-width:650px){.interaction-hint{bottom:110px;max-width:calc(100% - 24px);width:max-content;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
@@ -29,10 +30,11 @@
   </header>
   <nav class="places" id="walkthrough-stops" aria-label="Room viewpoints"></nav>
   <section class="stage" id="walkthrough-stage" aria-label="Interactive building model">
-    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. Use W A S D or arrow keys to move, drag to look, and Q or E to move down or up." aria-describedby="walkthrough-help"></canvas>
+    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. Use W A S D or arrow keys to move, drag to look, Q or E to change height. Click a nearby door, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
     <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
     <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
     <div class="crosshair" aria-hidden="true"></div>
+    <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
       <button type="button" data-move="forward" aria-label="Move forward" title="Forward">↑</button>
       <button type="button" data-move="left" aria-label="Move left" title="Left">←</button>
@@ -46,7 +48,6 @@
     <div class="loading" id="walkthrough-loading" role="status">Preparing the model…</div>
     <div class="error" id="walkthrough-error" role="alert" hidden></div>
   </section>
-  <div id="walkthrough-objects" class="object-controls" aria-label="Objektbefehle"></div>
   <div class="bottom">
     <div class="navigation">
       <button class="quiet-button" id="walkthrough-previous" type="button">← Previous stop</button>
@@ -55,12 +56,13 @@
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>
-    <div class="help" id="walkthrough-help">WASD / arrows: move &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster</div>
+    <div class="help" id="walkthrough-help">WASD / arrows: move &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
   </div>
   <p class="notice" id="walkthrough-notice">Concept building geometry. The lab opens as its separate detailed room model; the two coordinate frames are not presented as surveyed registration.</p>
   <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
 </main>
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
+<script>__WALKTHROUGH_INTERACTION__</script>
 <script>
 (() => {
   'use strict';
@@ -125,26 +127,20 @@
     }
     const identity=()=>new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
     const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)');
-    const objectStates=new Map(),bodyOwners=new Map(),objectsNode=document.getElementById('walkthrough-objects');
+    const objectStates=new Map(),bodyOwners=new Map(),objectSceneIds=new Set();
+    const interactionHint=document.getElementById('walkthrough-interaction-hint'),crosshair=document.querySelector('.crosshair');
+    const reach=data.interaction?.reach_mm/1000;
+    if(!Number.isFinite(reach)||reach<=0)throw Error('Positive interaction reach required.');
+    let pointerPosition=null,centreTarget=null,lastInteraction=null;
     for(const config of data.objects||[]){
       if(objectStates.has(config.id)||!data.scenes[config.scene]||!finite3(config.joint?.origin_mm)||!finite3(config.joint?.axis)
         ||Math.abs(Math.hypot(...config.joint.axis)-1)>1e-7||!Array.isArray(config.moving_body_ids)||!config.moving_body_ids.length
         ||!Number.isFinite(config.duration_s)||config.duration_s<=0||!Number.isFinite(config.states?.[config.reference_state]))throw Error('Invalid articulated object.');
       const object={config,state:config.reference_state,targetState:config.reference_state,angle:config.states[config.reference_state],transition:null};
-      objectStates.set(config.id,object);
+      objectStates.set(config.id,object);objectSceneIds.add(config.scene);
       for(const body of config.moving_body_ids){const key=config.scene+':'+body;if(bodyOwners.has(key)||!data.scenes[config.scene].groups.some(g=>g.id===body))throw Error('Missing or multiply bound moving body.');bodyOwners.set(key,object);}
-      const row=document.createElement('div');row.className='object-row';row.dataset.objectId=config.id;
-      const label=document.createElement('strong');label.textContent=config.label;
-      const view=document.createElement('button');view.type='button';view.className='quiet-button';view.textContent=config.view_label;view.dataset.objectAction='view';view.addEventListener('click',()=>viewObject(config.id));
-      const toggle=document.createElement('button');toggle.type='button';toggle.className='quiet-button';toggle.dataset.objectAction='toggle';toggle.addEventListener('click',()=>command(config.id,object.targetState==='closed'?'open':'close'));
-      const status=document.createElement('span');status.className='object-status';status.dataset.objectStatus='';
-      row.append(label,view,toggle,status);objectsNode.append(row);object.ui={row,toggle,status};
     }
-    function updateObjectUI(object){
-      const {config,ui}=object;ui.row.hidden=config.scene!==sceneId;
-      ui.toggle.textContent=config.commands[object.targetState==='closed'?'open':'close'].label;
-      ui.toggle.disabled=Boolean(object.transition);ui.status.textContent=config.state_labels[object.state];
-    }
+    function updateObjectUI(){dirty=true;}
     function objectMatrix(object){
       const angle=(object.angle-object.config.states[object.config.reference_state])*Math.PI/180;
       if(angle===0)return identity();
@@ -188,6 +184,29 @@
       for(let r=0;r<4;r++)for(let c=0;c<4;c++)v[r]+=m[c*4+r]*p[c];
       return {x:(v[0]/v[3]+1)*canvas.width/2,y:(1-v[1]/v[3])*canvas.height/2,visible:v[3]>0&&Math.abs(v[0])<=v[3]&&Math.abs(v[1])<=v[3]&&Math.abs(v[2])<=v[3]};
     }
+    function pickAt(x,y,includeReference=false){
+      if(!objectSceneIds.has(sceneId))return null;
+      const forward=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];
+      const right=[Math.sin(yaw),-Math.cos(yaw),0],up=cross(right,forward),spread=Math.tan(fov/2),aspect=canvas.clientWidth/canvas.clientHeight;
+      const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
+      const scene=prepareScene(sceneId);
+      return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
+        targetForBody:id=>bodyOwners.get(sceneId+':'+id)?.config.id||null,
+        transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;}});
+    }
+    function interact(x,y,input){
+      advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
+      if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
+      const object=objectStates.get(hit.target_id),name=object.targetState==='closed'?'open':'close';
+      lastInteraction={...command(hit.target_id,name),input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
+    }
+    function updateInteractionHint(){
+      centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
+      crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
+      if(centreTarget){const object=objectStates.get(centreTarget.target_id),name=object.targetState==='closed'?'open':'close';interactionHint.textContent=object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
+      const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
+      canvas.style.cursor=drag?.moved?'grabbing':hover?'pointer':'grab';
+    }
     function decode(encoded,kind,count,label){
       if(typeof encoded!=='string')throw Error('Missing packed '+label+'.');
       const raw=atob(encoded),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
@@ -203,6 +222,7 @@
       const positions=decode(source.positions_base64,'float',source.vertex_count*3,'positions'),normals=decode(source.normals_base64,'float',source.vertex_count*3,'normals'),indices=decode(source.indices_base64,'uint',source.index_count,'indices');
       for(let i=0;i<positions.length;i++){if(!Number.isFinite(positions[i])||!Number.isFinite(normals[i]))throw Error('Nonfinite native mesh value.');positions[i]/=1000;}
       for(const index of indices)if(index>=source.vertex_count)throw Error('Native mesh index is outside its vertex array.');
+      const pickGroups=[];
       const omitted=new Set(hiddenIds[id]||[]),opaque=new Map(),movingOpaque=[],transparent=[],coverage=source.groups.slice().sort((a,b)=>a.index_start-b.index_start);let opacityOverrides=0;
       let expected=0;
       for(const group of coverage){if(group.index_start!==expected||!Number.isSafeInteger(group.index_count)||group.index_count<0||group.index_count%3)throw Error('Native mesh groups must partition all triangles.');expected+=group.index_count;}
@@ -213,6 +233,7 @@
         const opacity=Object.hasOwn(opacityByRole,group.role)?opacityByRole[group.role]:group.opacity;
         if(opacity!==group.opacity)opacityOverrides++;
         if(opacity===0||group.index_count===0)continue;
+        pickGroups.push(group);
         const local=indices.subarray(group.index_start,group.index_start+group.index_count),color=[...group.color,opacity];
         const owner=bodyOwners.get(id+':'+group.id);
         if(owner){const bb=group.bounds_mm;const batch={id:group.id,object:owner,color,parts:[local],count:local.length,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)};(opacity>=.99?movingOpaque:transparent).push(batch);}
@@ -229,7 +250,7 @@
       function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
       attribute(attributes.position,positions);attribute(attributes.normal,normals);
       const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
-      const result={vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(id,result);return result;
+      const result={picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(id,result);return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function render(){
@@ -242,7 +263,7 @@
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
       scene.transparent.sort((a,b)=>dot(b.centre.map((v,i)=>v-eye[i]),b.centre.map((v,i)=>v-eye[i]))-dot(a.centre.map((v,i)=>v-eye[i]),a.centre.map((v,i)=>v-eye[i])));
       for(const group of scene.transparent){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-      gl.depthMask(true);gl.disable(gl.BLEND);frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
+      gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
     }
     function move(seconds){
@@ -278,20 +299,32 @@
     fullscreen.addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await stageNode.requestFullscreen();requestRender();}catch(error){announcement.textContent='Full screen is not available in this browser.';}});
     document.addEventListener('fullscreenchange',()=>{fullscreen.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen');requestRender();});
     const keyNames={KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyQ:'down',KeyE:'up',ShiftLeft:'fast',ShiftRight:'fast'};
-    window.addEventListener('keydown',event=>{const name=keyNames[event.code];if(!name||event.ctrlKey||event.metaKey||event.altKey||(event.target instanceof Element&&event.target.closest('input,select,textarea,[contenteditable=true]')))return;event.preventDefault();keys.add(name);requestRender();});
+    window.addEventListener('keydown',event=>{if(event.code==='Space'&&!event.ctrlKey&&!event.metaKey&&!event.altKey){if(event.target instanceof Element&&event.target.closest('button,input,select,textarea,[contenteditable=true]'))return;if(document.activeElement!==canvas&&document.activeElement!==document.body)return;event.preventDefault();if(!event.repeat)interact(0,0,'space');return;}const name=keyNames[event.code];if(!name||event.ctrlKey||event.metaKey||event.altKey||(event.target instanceof Element&&event.target.closest('input,select,textarea,[contenteditable=true]')))return;event.preventDefault();keys.add(name);requestRender();});
     window.addEventListener('keyup',event=>{const name=keyNames[event.code];if(name){keys.delete(name);requestRender();}});
     const clearMovement=()=>{keys.clear();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();else requestRender();});
     for(const button of document.querySelectorAll('[data-move]')){
       const name=button.dataset.move;button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);keys.add(name);requestRender();});
       const stop=()=>{keys.delete(name);requestRender();};button.addEventListener('pointerup',stop);button.addEventListener('pointercancel',stop);button.addEventListener('lostpointercapture',stop);
     }
-    canvas.addEventListener('pointerdown',event=>{if(event.button!==0)return;canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);drag={id:event.pointerId,x:event.clientX,y:event.clientY};});
-    canvas.addEventListener('pointermove',event=>{if(!drag||drag.id!==event.pointerId)return;yaw-=(event.clientX-drag.x)*sensitivity;pitch=Math.max(-1.50,Math.min(1.50,pitch-(event.clientY-drag.y)*sensitivity));drag.x=event.clientX;drag.y=event.clientY;root.dataset.freeCamera='true';requestRender();});
-    canvas.addEventListener('pointerup',()=>{drag=null;});canvas.addEventListener('pointercancel',()=>{drag=null;});canvas.addEventListener('lostpointercapture',()=>{drag=null;});
+    const pointerCoordinates=event=>{const rect=canvas.getBoundingClientRect();return [(event.clientX-rect.left)/rect.width*2-1,1-(event.clientY-rect.top)/rect.height*2];};
+    canvas.addEventListener('pointerdown',event=>{if(event.button!==0)return;canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);drag={id:event.pointerId,x:event.clientX,y:event.clientY,startX:event.clientX,startY:event.clientY,moved:false};});
+    canvas.addEventListener('pointermove',event=>{
+      pointerPosition=pointerCoordinates(event);
+      if(drag&&drag.id===event.pointerId){
+        if(!drag.moved&&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)>6)drag.moved=true;
+        if(drag.moved){yaw-=(event.clientX-drag.x)*sensitivity;pitch=Math.max(-1.50,Math.min(1.50,pitch-(event.clientY-drag.y)*sensitivity));drag.x=event.clientX;drag.y=event.clientY;root.dataset.freeCamera='true';}
+      }
+      requestRender();
+    });
+    canvas.addEventListener('pointerup',event=>{if(!drag||drag.id!==event.pointerId)return;const click=!drag.moved;drag=null;pointerPosition=pointerCoordinates(event);if(click)interact(...pointerPosition,'click');requestRender();});
+    canvas.addEventListener('pointerleave',()=>{if(!drag){pointerPosition=null;requestRender();}});
+    canvas.addEventListener('pointercancel',()=>{drag=null;pointerPosition=null;});canvas.addEventListener('lostpointercapture',()=>{drag=null;});
     canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();keys.clear();fail(Error('The graphics context was lost. Reload the viewer to continue.'));});
     new ResizeObserver(requestRender).observe(stageNode);
     window.__buildingWalkthrough=Object.freeze({
       command,viewObject,projectPoint,
+      get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
+      get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,angle_deg:o.angle,model_matrix:Array.from(objectMatrix(o)),body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.angle]))}));},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},

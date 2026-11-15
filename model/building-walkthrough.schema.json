@@ -15,7 +15,8 @@
     "limitations",
     "rendering",
     "articulation_source",
-    "objects"
+    "objects",
+    "interaction"
   ],
   "properties": {
     "format": {
@@ -542,6 +543,44 @@
               "basis": {
                 "const": "presentation_assumption"
               }
+            }
+          }
+        }
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "required": [
+        "reach"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "reach": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number"
+              }
+            },
+            "basis": {
+              "const": "presentation_assumption"
             }
           }
         }

@@ -173,7 +173,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
 
     const object = model.objects?.[0];
     assert(object, 'A source-defined articulated object is required.');
-    const objectRow = page.locator(`[data-object-id="${object.id}"]`);
+    assert.equal(await page.locator('#walkthrough-objects,[data-object-action]').count(),0,'No object-command buttons are shown');
     const identityMatrix = [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
     const objectState = () => page.evaluate(id => window.__buildingWalkthrough.objects.find(v => v.id === id), object.id);
     const rendered = async action => {
@@ -184,7 +184,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     };
     await page.setViewportSize({width:1280,height:950});
     await page.locator('#walkthrough-stops button[data-stop="kitchen"]').click(); await waitForStop('kitchen');
-    await rendered(() => objectRow.locator('[data-object-action="view"]').click());
+    await rendered(() => page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),object.id));
     assert(cameraDistance((await read()).camera.eye_mm,object.viewpoint.eye_mm)<.01,'Object camera is derived from placed source geometry');
     assert.deepEqual((await objectState()).model_matrix,identityMatrix,'Reference pose is exactly identity');
     assert.equal((await page.evaluate(() => window.__buildingWalkthrough.command('missing','open'))).status,'unknown_target');
@@ -212,33 +212,70 @@ const {chromium} = require(process.argv[3] || 'playwright');
     },penguinPoint);
     const closedPixel=await pixel();
     await page.screenshot({path:path.join(output,'browser-fridge-closed.png'),fullPage:true});
-    // The same UI button and test API use the same command function.
-    await objectRow.locator('[data-object-action="toggle"]').focus();
-    await rendered(() => page.keyboard.press('Enter'));
+    const doorCentre=group.bounds_mm.min.map((v,i)=>(v+group.bounds_mm.max[i])/2);
+    const clickDoor = async () => {
+      const screen=await page.evaluate(({id,point})=>{
+        const v=window.__buildingWalkthrough,o=v.objects.find(o=>o.id===id),m=o.model_matrix,p=point.map(x=>x/1000);
+        const world=[0,1,2].map(r=>(m[r]*p[0]+m[4+r]*p[1]+m[8+r]*p[2]+m[12+r])*1000);
+        const pixel=v.projectPoint(world),c=document.querySelector('canvas'),rect=c.getBoundingClientRect();
+        return {x:rect.left+pixel.x/c.width*rect.width,y:rect.top+pixel.y/c.height*rect.height,visible:pixel.visible};
+      },{id:object.id,point:doorCentre});
+      assert(screen.visible,'Current door leaf must be visible before clicking');await page.mouse.click(screen.x,screen.y);
+      await page.waitForFunction(()=>{const v=window.__buildingWalkthrough;return v.lastInteraction?.input==='click'&&v.frames>v.lastInteraction.frame;},null,{timeout:120000});
+      assert.equal((await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction)).status,'accepted','Mouse click hits the visible nearby door');
+    };
+    await clickDoor();
     assert.equal((await objectState()).state,'open');assert.equal((await objectState()).angle_deg,object.states.open);
     assert(Object.values((await objectState()).body_angles_deg).every(v=>v===object.states.open),'Door and handle rotate together');
     const openPixel=await pixel(),brightness=p=>p.rgba.slice(0,3).reduce((a,b)=>a+b,0)/3;
     assert(brightness(closedPixel)>140,'Closed sample must show the light fridge door');
     assert(brightness(openPixel)<brightness(closedPixel)-50,`Open sample must reveal the darker penguin: ${JSON.stringify({closedPixel,openPixel})}`);
     await page.screenshot({path:path.join(output,'browser-fridge-open.png'),fullPage:true});
+    await clickDoor();assert.equal((await objectState()).state,'closed','Mouse can close the rotated leaf');
+    await clickDoor();
     assert.equal((await page.evaluate(id=>window.__buildingWalkthrough.command(id,'open'),object.id)).status,'already_in_state');
     await page.locator('#walkthrough-level').selectOption('EG');
     await page.evaluate(()=>window.dispatchEvent(new Event('blur')));
     assert.equal((await objectState()).state,'open','Level and focus changes preserve object state');
-    await page.locator('#walkthrough-stops button[data-stop="lab"]').click();await waitForStop('lab');assert(await objectRow.isHidden());
+    await page.locator('#walkthrough-stops button[data-stop="lab"]').click();await waitForStop('lab');assert(await page.locator('#walkthrough-interaction-hint').isHidden());
     await page.locator('#walkthrough-stops button[data-stop="kitchen"]').click();await waitForStop('kitchen');assert.equal((await objectState()).state,'open');
-    await rendered(() => page.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),object.id));
+    await rendered(() => page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),object.id));
+    await page.locator('#walkthrough-canvas').focus();
+    await page.keyboard.press('Space');
+    await page.waitForFunction(()=>{const v=window.__buildingWalkthrough;return v.frames>v.lastInteraction.frame;});
+    assert.equal((await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction)).status,'accepted','Space closes the nearby open doorway');
     assert.equal((await objectState()).state,'closed');assert.deepEqual((await objectState()).model_matrix,identityMatrix);
+    // Holding Space must not repeatedly toggle, and dragging must never activate a door.
+    await page.keyboard.down('Space');await page.keyboard.down('Space');await page.keyboard.up('Space');
+    assert.equal((await objectState()).state,'open','Repeated keydown is ignored');
+    await page.keyboard.press('Space');assert.equal((await objectState()).state,'closed');
+    const area=await page.locator('#walkthrough-canvas').boundingBox();
+    await page.mouse.move(area.x+area.width/2,area.y+area.height/2);await page.mouse.down();
+    await page.mouse.move(area.x+area.width/2+50,area.y+area.height/2+20,{steps:3});await page.mouse.up();
+    assert.equal((await objectState()).state,'closed','Camera dragging does not activate doors');
+    await page.locator('#walkthrough-stops button[data-stop="phd"]').click();await waitForStop('phd');
+    await page.locator('#walkthrough-canvas').focus();await page.keyboard.press('Space');
+    assert.equal((await objectState()).state,'closed','Space cannot operate a distant or occluded door');
+    assert.equal((await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction)).status,'no_target');
     for(const width of [320,600,1280]){
       await page.setViewportSize({width,height:950});
-      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Object controls overflow at ${width}px`);
+      await rendered(() => page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),object.id));
+      assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Viewer overflows at ${width}px`);
+      const hint=await page.locator('#walkthrough-interaction-hint').boundingBox();assert(hint,'Nearby door hint is visible');
+      for(const selector of ['.move-controls','.height-controls']){
+        const controls=await page.locator(selector).boundingBox();
+        const overlaps=hint.x<controls.x+controls.width&&hint.x+hint.width>controls.x&&hint.y<controls.y+controls.height&&hint.y+hint.height>controls.y;
+        assert(!overlaps,`Door hint overlaps movement controls at ${width}px`);
+      }
     }
     // A second context exercises actual animation, independently of reduced motion.
     const animatedContext=await browser.newContext({viewport:{width:1280,height:950},reducedMotion:'no-preference'});
     try{
       const animated=await animatedContext.newPage();await animated.goto(pathToFileURL(target).href,{waitUntil:'load',timeout:120000});
       await animated.waitForFunction(()=>window.__buildingWalkthrough?.ready,null,{timeout:120000});
-      assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'open'),object.id)).status,'accepted');
+      await animated.evaluate(id=>window.__buildingWalkthrough.viewObject(id),object.id);
+      await animated.locator('#walkthrough-canvas').focus();await animated.keyboard.press('Space');
+      assert.equal((await animated.evaluate(()=>window.__buildingWalkthrough.lastInteraction)).status,'accepted');
       await animated.waitForFunction(id=>{const o=window.__buildingWalkthrough.objects.find(v=>v.id===id);return o.angle_deg>0&&o.angle_deg<90;},object.id,{timeout:10000,polling:'raf'});
       const intermediate=await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id),object.id);
       assert(intermediate.angle_deg>0&&intermediate.angle_deg<object.states.open);
@@ -256,10 +293,10 @@ const {chromium} = require(process.argv[3] || 'playwright');
       await animated.waitForFunction(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id).state==='closed',object.id,{timeout:10000});
       const closed=await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id),object.id);
       assert.equal(closed.angle_deg,object.states.closed);assert.deepEqual(closed.model_matrix,identityMatrix);
-      report.articulation={id:object.id,hinge_vertex_error_mm:hingeError,hinge_float32_error_mm:hingeFloat32Error,closed_pixel:closedPixel,open_pixel:openPixel,intermediate_angle_deg:intermediate.angle_deg,reduced_motion:true,animated:true,animated_close:true,focus_loss_during_close:true,busy_rejected:true,state_preserved_across_scenes:true};
+      report.articulation={mouse_open_close:true,space_open_close:true,no_object_buttons:true,drag_does_not_activate:true,distant_space_rejected:true,id:object.id,hinge_vertex_error_mm:hingeError,hinge_float32_error_mm:hingeFloat32Error,closed_pixel:closedPixel,open_pixel:openPixel,intermediate_angle_deg:intermediate.angle_deg,reduced_motion:true,animated:true,animated_close:true,focus_loss_during_close:true,busy_rejected:true,state_preserved_across_scenes:true};
     }finally{await animatedContext.close();}
     assert.deepEqual(errors,[], 'Object commands produce no browser errors');
-    report.interactions.push('object view','keyboard object command','open/close','reduced and animated hinge motion','persistent in-memory scene state');
+    report.interactions.push('native door picking','mouse click open/close','Space near doorway','open/close','reduced and animated hinge motion','persistent in-memory scene state');
 
     // A corrupt source must produce a useful visible error rather than an empty canvas.
     const defaultStop = model.stops.find(stop => stop.id === (model.default_stop_id || model.default_stop)) || model.stops[0];

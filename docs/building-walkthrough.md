@@ -167,12 +167,33 @@ Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
 
 ## Erste Objektbefehle: Kühlschrank 1.008
 
-Unter der Gebäudeansicht steht eine Zeile **Kühlschrank 1.008**. **Ansehen**
-setzt eine aus der Türgeometrie abgeleitete Kamera; die zweite Taste öffnet
-beziehungsweise schließt die Tür. Die Statusanzeige meldet geschlossen,
-wird geöffnet, offen oder wird geschlossen. Die Zeile ist in der separaten
-Laborszene ausgeblendet. Blickpunkt-, Geschoss- und Szenenwechsel erhalten die
-Türstellung während dieser Sitzung; ein Neuladen setzt die Referenzstellung.
+Bewegliche Türen werden direkt im 3D-Bild bedient: **mit der Maus auf das
+Türblatt oder den Griff klicken**, um sie zu öffnen oder zu schließen.
+Alternativ vor die Tür gehen, die Öffnung mit dem Fadenkreuz ansehen und
+**Leertaste** drücken. Die Leertaste bedient auch eine bereits offene Tür
+an ihrer ursprünglichen Öffnung. Es gibt keine Objekt-Tastenzeile mehr.
+Ziehen mit der Maus dreht weiterhin nur die Kamera; Halten der Leertaste
+löst keinen wiederholten Wechsel aus. Normale Bedienelemente wie die
+Geschossauswahl behalten ihre Tastaturbedienung.
+
+Ein Hinweis am Fadenkreuz zeigt das erreichbare Objekt, seinen Zustand und
+die nächste Aktion. Die Reichweite beträgt zunächst **2.500 Darstellungs-mm**
+und ist als ungemessene Annahme in der Rundgangquelle gebunden. Auswahl und
+Verdeckung werden an den tatsächlichen nativen Dreiecksflächen geprüft,
+auch an gedrehten Türblättern. Eine nähere sichtbare Wand blockiert die
+Bedienung dahinter. Dies ist eine visuelle Interaktionsprüfung, keine
+Kollisions- oder Wegefreigabe.
+
+Die gemeinsame Auswahlroutine `scripts/walkthrough_interaction.js` unterstützt
+alle im Rundgang deklarierten beweglichen Objekte und wird ohne externe
+Bibliothek in das eigenständige HTML eingebettet. Aktuell ist nur die
+Kühlschranktür 1.008 als bewegliches Objekt definiert. Raum- und Schranktüren
+benötigen noch ihre eigenen Artikulationsbindungen; sie erhalten dieselbe
+Bedienung, sobald diese beschrieben sind. Die Kamera-Hilfe `viewObject` bleibt
+nur in der Test-API und hat keine Taste in der Oberfläche.
+
+Blickpunkt-, Geschoss- und Szenenwechsel erhalten die Türstellung während
+dieser Sitzung; ein Neuladen setzt die Referenzstellung.
 
 Tür und Griff drehen gemeinsam, der vorhandene Pinguin, seine Tasse,
 Innenböden und Kühlschrankhülle bleiben unverändert. Ein Objektbefehl gibt
