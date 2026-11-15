@@ -1,0 +1,70 @@
+{
+  "format": "solidcraftbot.independent-fleet-demo/1",
+  "mode": "synthetic_display_only",
+  "serial_source": {
+    "source": "model/l01-fleet-handoffs.demo.json",
+    "source_sha256": "3a9d16ed7f54521d186d321105f61a6b7cbdfe81cfe82f2e632d027db40391ee"
+  },
+  "controller": {
+    "integration_step_s": 0.05,
+    "output_step_s": 0.5,
+    "maximum_duration_s": 6000,
+    "initial_vehicle_clock_scale": 2.68
+  },
+  "workspace_interval_step_s": 0.1,
+  "minimum_added_clearance_mm": 15,
+  "guards": {
+    "exclusive_station_and_arm": true,
+    "anonymous_station_clearance_observation": true,
+    "local_range_scans_only_for_drivers": true,
+    "fresh_person_clear_before_docking": true,
+    "no_timeout_release": true
+  },
+  "limitations": [
+    "Positive handoff events are explicit synthetic fixtures, not sensor or operator acknowledgements",
+    "Station agents reserve conservative native swept workspace boxes; local scanners represent these boxes as opaque conservative workcell obstacles",
+    "Station admission observes anonymous physical obstacle stopping envelopes; no peer positions, identities or intentions enter vehicle controllers",
+    "Maximal greedy admission within certified swept boxes is not globally optimal scheduling or general deadlock freedom",
+    "A manual occupancy override freezes the preview and requires explicit renewed clearance; no qualified physical braking or human protection"
+  ],
+  "workplace_observations": [
+    {
+      "time_s": 0,
+      "station": "DNA",
+      "status": "person_clear",
+      "evidence": "synthetic_demo_fixture"
+    },
+    {
+      "time_s": 0,
+      "station": "CF01",
+      "status": "occupied",
+      "evidence": "synthetic_demo_fixture"
+    },
+    {
+      "time_s": 0,
+      "station": "QC",
+      "status": "person_clear",
+      "evidence": "synthetic_demo_fixture"
+    },
+    {
+      "time_s": 300,
+      "station": "CF01",
+      "status": "person_clear",
+      "evidence": "synthetic_demo_fixture"
+    }
+  ],
+  "concurrency_contract": {
+    "replaces_entry_condition": "all_stationary_arms_parked",
+    "retained_entry_conditions": [
+      "fresh_owner_release",
+      "work_area_observed_clear",
+      "destination_ready"
+    ],
+    "additional_entry_conditions": [
+      "exclusive_station_and_arm",
+      "disjoint_native_swept_workspaces",
+      "anonymous_stopping_envelopes_clear",
+      "current_coupled_interval_certificate"
+    ]
+  }
+}

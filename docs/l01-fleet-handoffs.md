@@ -1,6 +1,10 @@
 # Drei Transporter mit Be- und Entladen durch stationäre Arme
 
-Die aktuelle Auswahl **Drei Transporter** ergänzt den
+Die aktuelle Standardauswahl ist der
+[unabhängige Ablauf mit parallelen Übergaben](l01-independent-fleet.md).
+Dieser Text beschreibt die erhaltene serielle Referenz.
+
+Die serielle Referenz (**`--fleet-mode serial`**) ergänzt den
 [Gegenverkehrsablauf](l01-opposing-traffic.md) um sechs serielle Arm-Übergaben.
 Die führende Quelle `model/l01-fleet-handoffs.demo.json` referenziert den
 bestehenden Verkehrsfall und `model/tr01-l01-workcell.protocol.json`. Es werden

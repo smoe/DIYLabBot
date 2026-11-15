@@ -1,7 +1,40 @@
 """Render the source-derived handoff preview as a self-contained inline fragment."""
-import argparse,base64,gzip,json,struct,hashlib
+import argparse,base64,gzip,json,struct,hashlib,subprocess,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+PRESENTATION_SOURCES=('scripts/render_tr01_workcell.py','scripts/tr01_workcell_player.html',
+    'scripts/l01_fleet_handoffs_view.js','scripts/l01_independent_fleet_view.js',
+    'scripts/l01_local_traffic_view.js','scripts/l01_daylight_view.js')
+def file_digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+def checked_native_context(context,root=ROOT):
+    """Reuse a byte-bound build namespace without rewriting its CAD indexes."""
+    context=Path(context).resolve();root=Path(root).resolve()
+    if not context.is_relative_to(root/'exports/worktrees') or not context.is_dir():raise ValueError('Native context must be a project worktree')
+    out=context/'exports/tr01-workcell';program=json.loads((out/'independent-fleet.json').read_text());pins=dict(program['source_files_sha256'])
+    pins.update(json.loads((out/'daylight-shell.json').read_text())['source_files_sha256'])
+    receipt=out/'preview-receipt.json'
+    if receipt.exists():pins.update(json.loads(receipt.read_text()).get('daylight_source_files_sha256',{}))
+    pending=list(pins);visited=set()
+    while pending:
+        name=pending.pop()
+        if name in visited:continue
+        visited.add(name);metadata=context/name
+        if not name.startswith(('cad/','exports/')) or metadata.suffix!='.json' or not metadata.is_file():continue
+        if file_digest(metadata)!=pins[name]:raise ValueError('Native context metadata changed: '+name)
+        nested=json.loads(metadata.read_text())
+        if not isinstance(nested,dict):continue
+        for source,checksum in nested.get('source_files_sha256',{}).items():
+            if source in PRESENTATION_SOURCES:continue
+            if source in pins and pins[source]!=checksum:raise ValueError('Conflicting native source provenance: '+source)
+            if source not in pins:pins[source]=checksum;pending.append(source)
+    for name,checksum in pins.items():
+        if name not in PRESENTATION_SOURCES and name.startswith(('model/','scripts/','cad/vendor/')) and file_digest(root/name)!=checksum:raise ValueError('Native context is not source-equivalent to the current checkout: '+name)
+    for name in PRESENTATION_SOURCES:
+        if file_digest(root/name)!=file_digest(context/name):raise ValueError('Native context presentation differs from current checkout: '+name)
+    proof=json.loads((out/'independent-fleet-clearance.json').read_text())
+    if not proof['passed'] or proof['program_sha256']!=program['program_sha256'] or proof['checker_sha256']!=file_digest(root/'scripts/check_l01_independent_fleet_freecad.py'):raise ValueError('Current native context proof required')
+    return context
+
 def central_shelf_bounds():
     import lab_room_model as room
     source=room.load();parameters=room.parameters(source);expanded=room.expanded(source,parameters)
@@ -46,9 +79,13 @@ def compact_mesh(encoded,shelf_bounds=(),native_shell=None):
         payload+=struct.pack('<II',kind,len(indices))+struct.pack('<'+'I'*len(indices),*indices)
     return base64.b64encode(gzip.compress(payload,9)).decode()
 def main():
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',type=Path);args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('output',type=Path);parser.add_argument('--native-context',type=Path,help='Use a source-equivalent audited project worktree without rebinding its original native indexes');parser.add_argument('--fleet-mode',choices=['independent','serial'],default='independent');args=parser.parse_args()
+    if args.native_context and args.native_context.resolve()!=ROOT:
+        context=checked_native_context(args.native_context)
+        subprocess.run([sys.executable,str(context/'scripts/render_tr01_workcell.py'),str(args.output.resolve()),'--fleet-mode',args.fleet_mode],cwd=context,check=True)
+        return
     report=json.loads((ROOT/'cad/tr01-workcell/shared-build-report.json').read_text())
-    digest=lambda p:hashlib.sha256(Path(p).read_bytes()).hexdigest()
+    digest=file_digest
     # Presentation-only revisions consume the pinned, checked geometry.
     # Their current versions are bound separately in the preview receipt.
     presentation={'scripts/tr01_workcell_player.html','scripts/render_tr01_workcell.py'}
@@ -69,18 +106,23 @@ def main():
     data['daylight']=l01_daylight.derive()
     import l01_opposing_traffic
     data['traffic']=l01_opposing_traffic.validated_result()
-    import l01_fleet_handoffs
-    data['fleet']=l01_fleet_handoffs.validated()
+    if args.fleet_mode=='independent':
+        import l01_independent_fleet
+        data['fleet']=l01_independent_fleet.validated()
+        data['traffic']=data['fleet'].pop('traffic')
+    else:
+        import l01_fleet_handoffs
+        data['fleet']=l01_fleet_handoffs.validated()
     if not data['traffic']['all_arrived'] or min(data['traffic']['clearance'][key] for key in ('car_car_clearance_lower_mm','car_person_clearance_lower_mm'))<data['traffic']['settings']['controller']['clearance_mm']:raise ValueError('Incomplete or unsafe local-traffic fixture')
     encoded=base64.b64encode(gzip.compress(json.dumps(data,separators=(',',':')).encode(),9)).decode()
     daylight_view=ROOT/'scripts/l01_daylight_view.js'
-    fragment=(ROOT/'scripts/tr01_workcell_player.html').read_text().replace('__DATA__',encoded).replace('__DAYLIGHT_SHADER_AND_ENGINE__',daylight_view.read_text()).replace('__LOCAL_TRAFFIC_VIEW__',(ROOT/'scripts/l01_local_traffic_view.js').read_text()).replace('__FLEET_HANDOFFS_VIEW__',(ROOT/'scripts/l01_fleet_handoffs_view.js').read_text())
+    fragment=(ROOT/'scripts/tr01_workcell_player.html').read_text().replace('__DATA__',encoded).replace('__DAYLIGHT_SHADER_AND_ENGINE__',daylight_view.read_text()).replace('__LOCAL_TRAFFIC_VIEW__',(ROOT/'scripts/l01_local_traffic_view.js').read_text()).replace('__FLEET_HANDOFFS_VIEW__',(ROOT/'scripts/l01_fleet_handoffs_view.js').read_text()).replace('__INDEPENDENT_FLEET_VIEW__',(ROOT/'scripts/l01_independent_fleet_view.js').read_text())
     if len(fragment.encode())>=1000000:raise ValueError('Inline size budget exceeded')
     args.output.write_text(fragment)
     receipt={'workcell_revision':report['revision'],'source_sha256':report['source_sha256'],'fragment_sha256':digest(args.output),
              'template_sha256':digest(ROOT/'scripts/tr01_workcell_player.html'),'renderer_sha256':digest(__file__),'bytes':len(fragment.encode())}
     receipt['local_traffic_source_files_sha256']={**data['traffic']['source_files_sha256'],'scripts/l01_local_traffic_view.js':digest(ROOT/'scripts/l01_local_traffic_view.js')}
-    receipt['fleet_handoff_source_files_sha256']={**data['fleet']['source_files_sha256'],'scripts/l01_fleet_handoffs_view.js':digest(ROOT/'scripts/l01_fleet_handoffs_view.js')}
+    receipt['fleet_handoff_source_files_sha256']={**data['fleet']['source_files_sha256'],'scripts/l01_fleet_handoffs_view.js':digest(ROOT/'scripts/l01_fleet_handoffs_view.js'),'scripts/l01_independent_fleet_view.js':digest(ROOT/'scripts/l01_independent_fleet_view.js')}
     receipt['fleet_handoff_program_sha256']=data['fleet']['program_sha256']
     receipt['fleet_handoff_clearance']=data['fleet']['clearance_summary']
     receipt['local_traffic_native_pose_coverage']=data['traffic']['native_pose_coverage']
