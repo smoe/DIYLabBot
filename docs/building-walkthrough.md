@@ -1,6 +1,7 @@
 # Gebäude im Browser erkunden
 
-Der lokale Rundgang bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
+Der [öffentliche Rundgang auf GitHub Pages](https://smoe.github.io/DIYLabBot/)
+bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
 Labor **3.003**, Küche **1.008**, den Blick durch den **Freiraum / das Atrium**
 und den **Kernbereich im 3. OG**.
 Von dort lässt sich die Kamera frei bewegen. Die Flächen stammen aus den
@@ -102,14 +103,30 @@ zum Außenfenster ausgerichtet. EG und Keller erhalten keine weiteren Sitzgruppe
 
 ## GitHub-README und Bereitstellung
 
-Die interaktive HTML-Datei lässt sich aus dem README verlinken, beispielsweise
-über ein Vorschaubild. Direkt im README führt GitHub ihren Renderer nicht aus:
+Das anklickbare Vorschaubild im [README](../README.md#interaktiver-gebäuderundgang)
+öffnet den [öffentlichen Rundgang](https://smoe.github.io/DIYLabBot/).
+Direkt im README führt GitHub ihren Renderer nicht aus:
 Die [GFM-Regeln](https://github.github.com/gfm/#disallowed-raw-html-extension-)
 filtern unter anderem `script` und `iframe`. Ein öffentlicher Rundgang benötigt
 deshalb eine separat gehostete HTML-Datei. [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
-kann die statische Datei samt JavaScript bereitstellen. Der lokale
-`127.0.0.1`-Link ist nur auf dem Rechner erreichbar, auf dem der Server läuft.
-Dieser Export richtet keine Veröffentlichung ein.
+kann die statische Datei samt JavaScript bereitstellen. Der erste Aufruf lädt
+etwa 37 MB; ein Browser mit WebGL 2 ist erforderlich. Der lokale
+`127.0.0.1`-Link bleibt ausschließlich auf dem Rechner des lokalen Servers erreichbar.
+
+Die Veröffentlichung verwendet den separaten Branch `gh-pages` mit dessen
+Wurzelverzeichnis als Pages-Quelle. Dort liegen die unveränderte geprüfte
+`index.html`, `.nojekyll` und eine abgeleitete `site-manifest.json` mit
+Quellrevision, HTML-Prüfsumme und Bezug auf den Browsernachweis. Die
+Konstruktionsquellen bleiben auf `master`; der Veröffentlichungsbranch enthält
+eine erzeugte Momentaufnahme und keine zweite führende Modellquelle.
+
+Zur Aktualisierung den Rundgang wie oben neu erzeugen und mit der unten
+genannten Browserprüfung prüfen. Anschließend in einer separaten Arbeitskopie
+von `gh-pages` die HTML-Datei und das Publikationsmanifest ersetzen, committen
+und normal nach `origin/gh-pages` pushen. Der Push löst die Pages-Bereitstellung
+aus. Erst nach erfolgreichem Deployment die öffentliche Seite prüfen; ein
+lokaler Export allein veröffentlicht nichts. Andere Änderungen an `master`
+erneuern den veröffentlichten Rundgang nicht automatisch.
 
 ## Nachweise
 
