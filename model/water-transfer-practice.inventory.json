@@ -1,0 +1,34 @@
+{
+  "format": "solidcraftbot.water-transfer-inventory/1",
+  "medium": "water",
+  "actors": [],
+  "paths": {
+    "A": {
+      "source_material_id": null,
+      "source_vessel_id": null,
+      "target_vessel_id": null,
+      "source_location": null,
+      "target_location": null,
+      "initial_volume_ul": null,
+      "transfer_volume_ul": null
+    },
+    "B": {
+      "source_material_id": null,
+      "source_vessel_id": null,
+      "target_vessel_id": null,
+      "source_location": null,
+      "target_location": null,
+      "initial_volume_ul": null,
+      "transfer_volume_ul": null
+    },
+    "C": {
+      "source_material_id": null,
+      "source_vessel_id": null,
+      "target_vessel_id": null,
+      "source_location": null,
+      "target_location": null,
+      "initial_volume_ul": null,
+      "transfer_volume_ul": null
+    }
+  }
+}

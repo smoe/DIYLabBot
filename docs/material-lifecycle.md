@@ -166,3 +166,120 @@ gefäßbezogenen Schutzstopps im selben Ledger. Der generische E2-Runner bleibt
 bei `/1` und kann diese Prozessregeln nicht umgehen.
 Quellenfreigabe, reale Ausführung und biologische Bewertung bleiben
 die weiteren Abnahmen der [Roadmap](../ROADMAP.md).
+
+## Separate technische Wasserübung
+
+`python3 scripts/run_water_transfer_practice.py prepare` zeigt den eigenständigen
+Vertrag und die unausgefüllte Inventarvorlage. Er liest keine E4-Profile und
+legt keinen Store an. Die Reihenfolge stammt einmalig aus
+`model/water-transfer-practice.protocol.json`: A1, B1, C1 und danach A2 als
+zusätzlicher Transfer auf Weg A mit fehlender Bestätigung. Es gibt drei Quellen
+und drei Zielgefäße. Nur Wasser wird deklariert; keine Zell- oder Kitmengen.
+
+Die ausdrücklich erfundene Softwaredemo läuft mit:
+
+```sh
+python3 scripts/run_water_transfer_practice.py \
+  --store exports/water-practice/demo.sqlite3 demo \
+  --out exports/water-practice/demo-report.json
+```
+
+`model/water-transfer-practice.fixture.json` liefert nur für diese Demo
+200 µl je Quelle und 100 µl je Transfer. Diese Testzahlen sind keine Vorgabe
+für die physische Übung. Die Demo inventiert vier Transfers, lässt nach A2 die
+Quittung aus, startet eine neue Sitzung und gleicht die schon erfolgte Wirkung
+ab. Sie führt beim Abgleich keinen zweiten Transfer aus. Jede Demo ist eine
+neue, ausdrücklich synthetische Testwelt. Vorhandene Kennungen und Bestände
+werden nicht zurückgesetzt; bestehende Berichte werden nicht überschrieben.
+
+Für eine **manuelle technische Aufzeichnung** die Vorlage
+`model/water-transfer-practice.inventory.json` nach `exports/` kopieren und
+mit tatsächlichen Akteurs-, Material-, Gefäß- und Ortskennungen sowie den
+gewählten Wasser-Anfangsmengen und Transfermengen ausfüllen. A muss beide
+geplanten Transfers versorgen können. Unbekannte oder nicht positive Mengen
+sperren die neue Aufzeichnung. Die sechs physischen Gefäße und Plätze müssen
+verschieden sein. Die CLI verlangt keine automatische oder globale Stockübernahme.
+Bereits in einem Lauf zugeteiltes Wasser darf nicht unter einer neuen Kennung
+als frisches Aliquot erneut eingeführt werden.
+
+```sh
+python3 scripts/run_water_transfer_practice.py \
+  --store exports/water-practice/manual.sqlite3 create \
+  --inventory exports/water-practice/actual-inventory.json --run-id WATER.PRACTICE.01
+```
+
+`create` gibt Sitzung und Laufkennung aus. Jeder `act` benötigt diese Sitzung,
+eine deklarierte Akteurskennung, eine neue Beobachtungskennung und ein
+Beobachtungs-JSON mit genau den bestehenden Feldern:
+
+```json
+{
+  "observation_id": "<eindeutige Beobachtungskennung>",
+  "source_kind": "human_observation",
+  "observed_at": null,
+  "source_ref": "<tatsächlicher Beobachtungs-/Laufblattbezug>",
+  "artifact_sha256": null
+}
+```
+
+`observed_at: null` bedeutet unbekannter Handlungszeitpunkt. Bekannte Zeiten
+werden als `earliest_utc`/`latest_utc` mit Zeitzone erfasst. `--artifact` erhält
+vorhandene Originalbytes atomar mit dem Ereignis. Eine Kennung authentifiziert
+keine Person. Erfundene Daten bleiben `test_fixture`; ein Testuhranbieter darf
+keine Personenbeobachtung behaupten.
+
+```sh
+python3 scripts/run_water_transfer_practice.py \
+  --store exports/water-practice/manual.sqlite3 act WATER.PRACTICE.01 \
+  --session SESSION --actor ACTOR --action begin_transfer \
+  --observation exports/water-practice/observation.json \
+  --data '{"step_id":"A1","intent_id":"WATER.PRACTICE.01.A1"}'
+```
+
+Die normale Folge ist `accept_inventory` → `workspace_clear` → `claim`, dann
+je A1/B1/C1 `begin_transfer` und `confirm_transfer`. Inventarannahme und spätere
+Inventarbestätigung verlangen vollständige Beobachtungen aller Gefäße als
+`vessel_id`, `material_ids` und `location`. Der Bericht enthält die führenden
+Deklarationen und kanonischen Buchungen zur eindeutigen Zuordnung.
+
+Eine Transferbestätigung benennt `intent_id`, tatsächliche `actual_volume_ul`,
+beobachtete `target_total_ul` und `reason`. Die Zielmenge muss zum Transfer
+und dem zuvor aufgezeichneten Zielinhalt passen. Dies ist eine arithmetische
+Buchungsprüfung mit numerischer Rundungstoleranz, keine Pipettengenauigkeitsgrenze.
+Beim zweiten A-Transfer wird die alte Ziel-Inhaltsidentität im gemeinsamen
+Ledger durch die neue kombinierte Wasserfraktion ersetzt; das schon im Ziel
+befindliche Wasser wird nicht nochmals physisch pipettiert.
+
+Für A2 gilt der ausdrückliche Übungsweg: Absicht speichern, Wasser manuell
+einmal übertragen, die fehlende Quittung mit `mark_unknown(intent_id, reason)`
+erfassen. Quellen und betroffener Zielinhalt bleiben ungeklärt und gesperrt.
+Nach Neustart `resume LAUF_ID` verwenden; die alte Sitzung ist ungültig.
+`resolve_transfer` verlangt `performed`, `not_performed` oder `unknown`,
+Begründung, vollständiges beobachtetes Inventar und `workspace_clear`.
+Bei `performed` sind zusätzlich tatsächliche Transfer- und Zielmengen nötig.
+`unknown` hält weiter; nach ausdrücklich beobachteter Nichtdurchführung ist
+nur ein neuer, bewusst angelegter Versuch zulässig. Weder Neustart noch
+Inventarabgleich allein darf einen Transfer bestätigen oder wiederholen.
+
+Zum regulären Ende alle verbleibenden Materialien mit `set_disposition`
+ausdrücklich disponieren, `confirm_inventory` ausführen und `close_practice`
+mit bestätigtem Arbeitsplatz und Begründung aufrufen. Alle vier Schritte und
+der dokumentierte A2-Störfall müssen abgeschlossen sein. Ein Abbruch verwendet
+`cancel` und nach vollständigem Wirkungs-/Inventarabgleich `finish_cancel`.
+Offene Effekte verhindern die Ressourcenfreigabe auch beim Abbruch.
+`status` und `report` lesen ohne Sitzungsübernahme oder Bestätigung.
+
+Der neue Engine-Typ `water_transfer_practice/1` verwendet das bestehende
+Material-/3-Format, denselben Ledger, das Journal und die vorhandene manuelle
+Beobachtungs-/Sitzungshülle. Er übernimmt keine CUT&RUN-Prozessregeln. E4-Lader
+lehnen Wasserläufe ab; der Wasserlader lehnt E4-Läufe ab. Generische
+Material-, Aktivierungs- und QC-Befehle können den Übungsablauf nicht umgehen.
+Unqualifizierte Zeitlücken bleiben im Bericht erhalten; ohne zeitkritischen
+Prozess ist ihre unbekannte Dauer keine erfundene chemische Pause und kein
+zeitlicher Erfolgsnachweis. `elapsed_time_qualified` bleibt falsch.
+
+`practice_completed` bezeichnet nur die vollständig aufgezeichnete technische
+Übung beziehungsweise das ausdrücklich synthetische Fixture. Hardware,
+Pipettiergenauigkeit, Enzymwirkung, E4-Freigabe und Referenzerfolg werden nicht
+behauptet. O01/O02, die bestätigte O10-Entscheidung und alle übrigen E4-Bindungen
+werden weder gelesen noch geändert.

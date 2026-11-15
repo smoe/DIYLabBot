@@ -1,0 +1,13 @@
+{
+  "format": "solidcraftbot.water-transfer-practice/1",
+  "engine": "water_transfer_practice/1",
+  "medium": "water",
+  "paths": ["A", "B", "C"],
+  "steps": [
+    {"id": "A1", "path": "A", "missing_receipt_exercise": false},
+    {"id": "B1", "path": "B", "missing_receipt_exercise": false},
+    {"id": "C1", "path": "C", "missing_receipt_exercise": false},
+    {"id": "A2", "path": "A", "missing_receipt_exercise": true}
+  ],
+  "scope": "Technical manual water-transfer records and a separate explicit test-fixture demo; no equipment commands, chemistry or E4 approval"
+}

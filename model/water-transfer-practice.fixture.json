@@ -1,0 +1,7 @@
+{
+  "format": "solidcraftbot.water-transfer-practice-fixture/1",
+  "mode": "test_fixture",
+  "initial_volume_ul": 200,
+  "transfer_volume_ul": 100,
+  "note": "Invented software-test quantities only; not a manual practice prescription or pipette qualification"
+}

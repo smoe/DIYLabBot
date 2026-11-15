@@ -302,6 +302,7 @@ keine herunterladbaren GitHub-Artefakte mehr.
 - [Wiederverwendbares Laborglas](docs/lab-glassware.md): Becher, Trichter, Messzylinder und Flaschen in mehreren Größen, mit größenunabhängigen Verschlüssen und optionaler Markerbeschriftung für FreeCAD und SolidCraft
 - [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft
 - [NanoDrop UltraC über HTTP](docs/nanodrop-ultra-network.md): gemeinsamer Leseclient und synthetisches Netzwerkmodell; Originalgerät noch nicht qualifiziert
+- [Separate technische Wasserübung](docs/material-lifecycle.md#separate-technische-wasserübung): drei Transferwege, fehlende Quittung und ausdrücklicher Wiederanlaufabgleich; eigene manuelle Erfassung und gekennzeichnete Softwaredemo
 - [Gemeinsamer synthetischer Ablauf CF01 → NanoDrop → Qubit 4](docs/synthetic-lab-workflow.md) mit einem Probenbestand und durchgängiger Verbrauchsbuchung
 - [DNA nacheinander mit NanoDrop und Qubit HS messen](docs/dna-quantification.md): synthetische Ablaufvorbereitung mit Vor- oder nachträglicher Verdünnung um Faktor 10/20 und Rückgabe ins ursprüngliche Rack auf dem Tisch
 - [DNA über SiLA 2 und vorbereitete ROS-Aufträge](docs/dna-sila2-network.md): eigener Root-Netzwerkadapter und lokaler Mock-Worker; kein ROS-Laufzeit- oder Bewegungsnachweis
