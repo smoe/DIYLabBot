@@ -74,6 +74,16 @@ EG-Höhe macht den Keller in der Gesamtansicht als unterirdisch erkennbar.
 Die Ansicht hebt den referenzierten Raum im Gesamtgebäude hervor. Die
 maßstäbliche Einpassung der separat beschriebenen L01-Einrichtung bleibt offen.
 
+### Interaktiver Gebäuderundgang
+
+[![Gebäuderundgang starten – Blick in das Atrium](docs/media/atrium-accesses.png)](https://smoe.github.io/DIYLabBot/)
+
+[**Gebäuderundgang im Browser starten →**](https://smoe.github.io/DIYLabBot/)
+Doktorandenraum, Labor, Küche, Atrium und Kernbereich frei erkunden – ohne
+CAD-Installation. Das Vorschaubild öffnet die interaktive GitHub-Pages-Seite.
+Der erste Aufruf lädt etwa 37 MB; WebGL 2 wird benötigt.
+[Bedienung, Modellquellen und Prüfgrenzen](docs/building-walkthrough.md).
+
 ## Roboter in Bewegung
 
 https://github.com/user-attachments/assets/919b9436-0b45-4b2e-9ed1-2584da67b06f
