@@ -30,14 +30,18 @@ def center(shape):
 
 
 def main(case_path):
-    case=json.loads(Path(case_path).read_text());common.verify_pins(case['pins']);program=model.Program()
+    case=json.loads(Path(case_path).read_text());common.verify_pins(case['pins'])
+    if case.get('program_kind')=='h02-rack-transfer':
+        import h02_rack_transfer as transfer
+        program=transfer.Program()
+    else:program=model.Program()
     scene=program.local_scene;spec=local.context(scene,case['variant']);p=local.parameters(spec)
     directory=model.ROOT/case['directory'];cad=model.ROOT/case['cad_directory']
     local_case={'variant':case['variant'],'pins':case['pins'],'freecad':common.relative(cad/'holder.FCStd'),
         'step':None,'freecad_report':common.relative(directory/'local-freecad.json')}
     common.write(directory/'holder.case.json',local_case);h02_native.build(directory/'holder.case.json')
     doc=arm_native.build(program.arm,cad/'arm-source.FCStd');motion_native.set_angles(doc,[0]*6)
-    for name,value in [('H02SceneSource',common.relative(model.SOURCE)),('H02SceneSHA256',model.robot.digest(model.SOURCE))]:
+    for name,value in [('H02SceneSource',common.relative(getattr(program,'source_path',model.SOURCE))),('H02SceneSHA256',model.robot.digest(getattr(program,'source_path',model.SOURCE)))]:
         doc.Controller.addProperty('App::PropertyString',name,'H02 source');setattr(doc.Controller,name,value)
     doc.Robot.Placement.Base=App.Vector(*program.definition['arm_fixture']['position_mm']);doc.recompute()
     records=[];objects={};styles=[];hidden=set()
@@ -69,9 +73,25 @@ def main(case_path):
         else:remember(obj,kind,m['appearance']['color'],m['appearance']['opacity'])
         if obj.SourceBody.endswith('MouthKeepout'):hidden.add(obj.SourceBody)
     App.closeDocument(holder.Name)
-    for name in ['ToolZ','TubeZ','JawLeft','JawRight']:doc.Controller.addProperty('App::PropertyDistance',name,'H02 coordinates')
+    if hasattr(program,'extra_parts'):
+        from h02_transfer_adapters import freecad_extras
+        parts,extra=freecad_extras(program,case['variant'],cad/'rack-parts.FCStd',shapes_native);meta_extra={b['id']:b for b in parts}
+        for item in shapes_native.objects(extra):
+            b=meta_extra[item.SourceBody];group=groups.get(b['group'])
+            if group is None:group=doc.addObject('App::Part',b['group']);groups[b['group']]=group
+            obj=doc.addObject('Part::Feature',b['id']);group.addObject(obj);obj.Shape=motion_native.world_shape(item);obj.Placement.Base=obj.Placement.Base+App.Vector(*b['translation'])
+            for key,value in [('SourceBody',b['id']),('RigidLink',b['group']),('ModelRole',b['role'])]:obj.addProperty('App::PropertyString',key,'Source');setattr(obj,key,value)
+            remember(obj,b['kind'],b['appearance']['color'],b['appearance']['opacity'])
+            if b['hidden']:hidden.add(b['id'])
+        App.closeDocument(extra.Name)
+    program.local_certified=True
+    for name in getattr(program,'coordinate_names',['ToolZ','TubeZ','JawLeft','JawRight']):doc.Controller.addProperty('App::PropertyAngle' if name.endswith('Yaw') else 'App::PropertyDistance',name,'H02 coordinates')
     groups['Tool'].setExpression('Placement.Base.z','Controller.ToolZ');groups['Tube'].setExpression('Placement.Base.z','Controller.TubeZ')
     groups['FingerLeft'].setExpression('Placement.Base.x','-Controller.JawLeft');groups['FingerRight'].setExpression('Placement.Base.x','Controller.JawRight')
+    if 'ToolY' in doc.Controller.PropertiesList:
+        groups['Tool'].setExpression('Placement.Base.y','Controller.ToolY');groups['Tube'].setExpression('Placement.Base.y','Controller.TubeY')
+        groups['Tool'].setExpression('Placement.Rotation.Angle','Controller.ToolYaw');groups['Tool'].Placement.Rotation.Axis=App.Vector(0,0,1)
+        groups['Tube'].setExpression('Placement.Rotation.Angle','Controller.TubeYaw');groups['Tube'].Placement.Rotation.Axis=App.Vector(0,0,1)
     for probe in model.probes(program):
         obj=doc.addObject('Part::Feature',probe['id']);doc.getObject(probe['group']).addObject(obj)
         obj.Shape=Part.makeSphere(.2,App.Vector(*probe['point']))
@@ -82,8 +102,8 @@ def main(case_path):
     for key,value in [('SourceBody','SupportPlane'),('RigidLink','Ground'),('ModelRole','support_plane_witness')]:bench.addProperty('App::PropertyString',key,'Source');setattr(bench,key,value)
     remember(bench,'bench','#90999c')
     control=doc.addObject('Part::Feature','ArmMidpathBlocker');groups['Proof'].addObject(control)
-    center_z=program.z0+program.kin.length-3+program.travel/2
-    control.Shape=Part.makeBox(1,1,1,App.Vector(-.5,-.5,center_z-.5))
+    mid=program.state('extraction',.5);point=mid.get('tool_position_mm',[0,0,mid['tool_z_mm']]);point=[point[0],point[1],point[2]+program.kin.length-3]
+    control.Shape=Part.makeBox(1,1,1,App.Vector(point[0]-.5,point[1]-.5,point[2]-.5))
     for key,value in [('SourceBody','ArmMidpathBlocker'),('RigidLink','Proof'),('ModelRole','negative_control')]:control.addProperty('App::PropertyString',key,'Source');setattr(control,key,value)
     objects['ArmMidpathBlocker']=control;hidden.add('ArmMidpathBlocker');styles.append({'id':'ArmMidpathBlocker','appearance':{'color':'#ff00ff','opacity':.2}})
     # Marker inputs describe source positions, never collision geometry.
@@ -124,8 +144,15 @@ def main(case_path):
     if rejected['passed'] or control_shapes[1]['overlap_mm3']<.9 or min(control_shapes[i]['distance_mm'] for i in [0,2])<1:
         raise AssertionError('Midpath robot/tool control was not rejected with clear endpoints')
     records=actual_records;program=actual_program
+    contacts=[]
+    if hasattr(program,'extra_parts'):
+        set_state('release',0);support=motion_native.world_shape(objects['Rack_Base'])
+        for name in ['Selected_ReferenceTube','CarriedEnvelope']:
+            sample=motion_native.world_shape(objects[name]);distance=sample.distToShape(support)[0];volume=sum(s.Volume for s in sample.common(support).Solids)
+            if distance>1e-6 or volume>program.local_scene['volume_tolerance_mm3']:raise AssertionError('Rack support contact is not nonpenetrating')
+            contacts.append({'body':name,'distance_mm':distance,'overlap_mm3':volume,'passed':True})
     poses=[]
-    for label,phase,u in [('approach','approach',0),('grasp','closure',1),('extracted','extraction',1)]:
+    for label,phase,u in getattr(program,'native_poses',[('approach','approach',0),('grasp','closure',1),('extracted','extraction',1)]):
         state=set_state(phase,u);geometry=[]
         for name,obj in objects.items():
             shape=motion_native.world_shape(obj);geometry.append({'body':name,'volume_mm3':sum(s.Volume for s in shape.Solids),'center_of_mass':center(shape),'bbox':box(shape,optimal=True),
@@ -136,7 +163,7 @@ def main(case_path):
     App.closeDocument(doc.Name);common.verify_pins(case['pins'])
     report={'passed':True,'pins':case['pins'],'records':records,'poses':poses,'continuous_audit':common.relative(directory/'continuous-freecad.json'),
             'local_audit':local_case['freecad_report'],'analytic_reach_and_motion':program.audit(),
-            'negative_control':negative,
+            'negative_control':negative,'support_contacts':contacts,
             'presentation':'Native metadata saved; FreeCAD GUI rendering not inspected'}
     common.write(directory/'freecad-report.json',report)
     print('Full arm OCC passed '+case['variant'],flush=True)

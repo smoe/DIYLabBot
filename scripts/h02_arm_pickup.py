@@ -113,19 +113,20 @@ class Program:
             if t<start+duration or phase=='extraction':return phase,(t-start)/duration
             start+=duration
 
-    def angles(self,z):
+    def angles(self,z,radial=None):
         """Solve from the existing joint-frame origins, not copied arm lengths.
 
         R=U*sin(q2)+F*sin(q2+q3), W=U*cos(q2)+F*cos(q2+q3).
         q1=90°, q4=0°, q6=-90°, q5=180°-q2-q3 fixes Rx(180°).
         """
+        radial=self.radial if radial is None else radial
         z=J.lift(z);w=z-self.shoulder+self.end
         if isinstance(w.d[0],I):
             if w.d[0].lo<=0:raise ValueError('Planar branch requires positive W throughout')
         elif w.d[0]<=0:raise ValueError('Planar branch requires positive W')
-        c=(self.radial**2+w*w-self.upper**2-self.fore**2)*(1/(2*self.upper*self.fore))
+        c=(radial*radial+w*w-self.upper**2-self.fore**2)*(1/(2*self.upper*self.fore))
         elbow=jacos(c);sine=jsqrt(1-c*c)
-        shoulder=jatan(self.radial*reciprocal(w))-jatan(self.fore*sine*reciprocal(self.upper+self.fore*c))
+        shoulder=jatan(radial*reciprocal(w))-jatan(self.fore*sine*reciprocal(self.upper+self.fore*c))
         return [J(math.pi/2),shoulder,elbow,J(0),math.pi-shoulder-elbow,J(-math.pi/2)]
 
     def state(self,phase,u):
@@ -251,13 +252,14 @@ def probes(program):
             result.append({'id':'FK_'+str(i)+'_'+str(axis),'group':link,'point':point})
     result.append({'id':'FK_TCP','group':program.links[-1],
                    'point':[0,0,program.kin.flange[2]+program.kin.length]})
-    return result
+    return result+getattr(program,'extra_probes',lambda:[])()
 
 
 def probe_error(program,state,centers,records=()):
     frames=program.kin.forward(state['joints_deg']);errors=[]
     for item in probes(program):
-        expected=robot.transform(frames[item['group']],item['point'])
+        frame=frames[item['group']] if item['group'] in frames else program.probe_frame(item['group'],state)
+        expected=robot.transform(frame,item['point'])
         errors.append(math.dist(expected,centers[item['id']]))
     for record in records:
         if record['kind']!='arm':continue
@@ -270,14 +272,15 @@ def probe_error(program,state,centers,records=()):
             column_errors.append(math.sqrt(sum(((observed[k]-actual[k])-(target[k]-expected[k]))**2 for k in range(3)))/10)
         radius=[max(abs(record['local_bbox'][edge][i]-origin[i]) for edge in ['min','max']) for i in range(3)]
         errors.append(error0+sum(a*b for a,b in zip(radius,column_errors)))
-    expected=[0,0,state['tool_z_mm']+program.kin.length-3]
+    expected=list(state.get('tool_position_mm',[0,0,state['tool_z_mm']]))
+    expected[2]+=program.kin.length-3
     errors.append(math.dist(expected,centers['ToolMount']))
     return max(errors)
 
 
 def certify(program,records,provider):
     """Provider returns actual native BReps/boxes/distances at requested poses."""
-    pairs,excluded=collision_pairs(program,records);lookup={r['id']:r for r in records};accepted=[];failures=[];poses=0
+    pairs,excluded=getattr(program,'collision_pairs',lambda records:collision_pairs(program,records))(records);lookup={r['id']:r for r in records};accepted=[];failures=[];poses=0
     guard=program.definition['continuous_audit']['numeric_guard_mm'];maximum=program.definition['continuous_audit']['max_depth']
     pending=[(phase,0.,1.,0) for phase in program.curves]
     while pending:
@@ -300,6 +303,13 @@ def certify(program,records,provider):
             for pair in pairs:
                 x,y=pair['a'],pair['b'];excursion=delta[x]+delta[y]+guard+2*frame['fk_error_mm']
                 lower=max(0,bbox_distance(frame['boxes'][x],frame['boxes'][y])-guard)
+                certified=getattr(program,'pair_bound',lambda *args:None)(pair,phase,a,b,frame)
+                if certified is not None:
+                    if not math.isfinite(certified):raise ValueError('Invalid analytic collision bound')
+                    margin=certified-pair['required_mm'];minimum=min(minimum,margin)
+                    categories[pair['category']]=min(categories.get(pair['category'],math.inf),certified)
+                    if margin<0:unresolved.append({**pair,'certified_lower_bound_mm':certified})
+                    continue
                 if lower-excursion>=pair['required_mm']:distance=lower;method='native_bbox'
                 else:distance=frame['distance'](x,y);method='native_distance'
                 if not math.isfinite(distance) or distance<0:raise ValueError('Invalid native distance')

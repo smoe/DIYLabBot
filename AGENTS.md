@@ -72,6 +72,33 @@ keine automatischen Ruhepunkte. Geschwindigkeit,
 Beschleunigung und Ruck an der tatsächlich ausgewerteten Kurve begrenzen;
 Gelenke, Werkzeug und getragenes Gefäß einschließlich Orientierung prüfen.
 
+Roboterbewegungen müssen zügig wirken und für die vergleichbare Aufgabe
+schneller sein als die manuelle Durchführung durch einen typischen Biologen;
+dies ist ein Akzeptanzziel für jede Robotikdemo und spätere Ausführung.
+Zeitvorgaben aus den begründeten Geschwindigkeits-, Beschleunigungs- und
+Ruckgrenzen ableiten und diese möglichst ausnutzen. Keine künstlich langsamen
+Vorführprofile, unnötigen Ruhepunkte oder beschleunigte Wiedergabe als Ersatz
+für eine tatsächlich schnelle Bahn verwenden. Modellzeit und Wiedergabefaktor
+getrennt ausweisen; einen fehlenden menschlichen Vergleichswert als offen
+führen und das Akzeptanzziel ohne diesen Nachweis nicht als erfüllt melden.
+
+Bei angehängter beziehungsweise getragener Probe ausdrücklich keine plötzlichen
+Bewegungen: die maximale Beschleunigung begrenzen, mit begrenztem Ruck ein- und
+ausrampen und Start, Bremsung sowie Richtungswechsel fließend ausführen.
+Probenbezogene Geschwindigkeits-, Beschleunigungs-, Ruck- und Orientierungsgrenzen
+an der vollständigen getragenen Bahn zusätzlich zu den Robotergrenzen prüfen.
+
+Ohne angehängte Probe zählt eine möglichst schnelle Fahrt innerhalb der
+begründeten mechanischen, Antriebs-, Werkzeug- und Kollisionsgrenzen; Roboter,
+Ausstattung und Umgebung dürfen nicht beschädigt werden. Probenbezogene
+Schonungsgrenzen nicht pauschal auf Leerfahrten übertragen. Beladene und leere
+Bewegungen mit getrennten Profilen und Grenznachweisen führen; auch leere
+Fahrten ohne unnötige Zwischenhalte planen.
+
+Wenn begründete Grenzen das Geschwindigkeitsziel verhindern, Bahn, Aufstellung
+oder Auslegung verbessern und den Zielkonflikt offen ausweisen; Grenzen nicht
+allein für den schnellen Eindruck erhöhen.
+
 Notwendige Griff-, Ablage-, Mess-, Prozess- und Schutzhalte ausdrücklich
 begründen und von der Transportbahn trennen. Eine Wartebedingung benennt den
 benötigten Abschluss oder die erforderliche Beobachtung, zum Beispiel die

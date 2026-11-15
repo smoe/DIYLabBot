@@ -14,18 +14,28 @@ from verify_tube_cam_freecad import matrix
 def transforms(program,state):
     result=program.kin.forward(state['joints_deg']);c=state['coordinates']
     for name in ['Tool','FingerLeft','FingerRight','Tube']:
-        m=model.robot.identity();m[2][3]=c['TubeZ' if name=='Tube' else 'ToolZ']
-        if name=='FingerLeft':m[0][3]=-c['JawLeft']
-        if name=='FingerRight':m[0][3]=c['JawRight']
+        group='Tube' if name=='Tube' else 'Tool'
+        if hasattr(program,'probe_frame'):m=program.probe_frame(group,state)
+        else:
+            m=model.robot.identity();m[2][3]=c[group+'Z']
+        shift=model.robot.identity()
+        if name=='FingerLeft':shift[0][3]=-c['JawLeft']
+        if name=='FingerRight':shift[0][3]=c['JawRight']
+        m=model.robot.multiply(m,shift)
         result[name]=m
     return result
 
 
 def main(path):
-    context=json.loads(Path(path).read_text());program=model.Program();doc=App.openDocument(context['native'])
+    context=json.loads(Path(path).read_text())
+    if context.get('transfer'):
+        from h02_rack_transfer import Program
+        program=Program()
+    else:program=model.Program()
+    doc=App.openDocument(context['native'])
     grasp=program.state('closure',1);base=transforms(program,grasp)
     source,_,_=local.proof(program.spec,program.p);roles={b['id']:b for b in source['bodies']}
-    objects=[o for o in native.features(doc) if o.ModelRole not in ('viewing_cone','fk_probe','negative_control') and o.RigidLink!='Proof' and not o.SourceBody.endswith('MouthKeepout')]
+    objects=[o for o in native.features(doc) if o.ModelRole not in ('viewing_cone','fk_probe','negative_control','collision_envelope') and o.RigidLink!='Proof' and not o.SourceBody.endswith('MouthKeepout')]
     baseline={o.SourceBody:matrix(native.global_placement(o)) for o in objects};bodies=[]
     for obj in objects:
         inv=model.robot.inverse(base.get(obj.RigidLink,model.robot.identity()))
@@ -36,7 +46,7 @@ def main(path):
         if obj.RigidLink in program.links:
             lookup={};compact=[];remap=[]
             for point in vertices:
-                quantum=1 if obj.ModelRole.startswith('vendor_') else .1
+                quantum=(2 if context.get('transfer') else 1) if obj.ModelRole.startswith('vendor_') else .1
                 key=tuple(round(x/quantum) for x in point)
                 if key not in lookup:lookup[key]=len(compact);compact.append([round(x*quantum,1) for x in key])
                 remap.append(lookup[key])

@@ -1,0 +1,542 @@
+{
+  "format": "solidcraftbot.h02-rack-transfer-evidence/1",
+  "prepared_on": "2026-11-15",
+  "checked_build": {
+    "path": "cad/h02-rack-transfer/shared-build-report.json",
+    "sha256": "11f1e4270595478000c2917990f810000527e7da6c7e6111df6adfa0fe8f94c9",
+    "bytes": 777848
+  },
+  "motion_source": {
+    "path": "model/h02-rack-transfer.scene.json",
+    "sha256": "207b690e60926171311ef7a55da6855a88d2af50d39cc29ed14dd5f0062e55bd",
+    "bytes": 1919
+  },
+  "documentation": {
+    "path": "docs/h02-rack-transfer.md",
+    "sha256": "b9e469f66debcb3866b3275e049e00d6359944f54688d559e06a8cf68901908c",
+    "bytes": 4887
+  },
+  "source_sha256": {
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-model-1.step": "21a7a3c4edfe7ed95871623601f579e80c4fc3e3ca172a3fb34fd499d18a4d67",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-model-1.step": "79eb0f13ca547391d9336a062afc8bb55473dbaa10d710a18f20e2053799ed68",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-model-1.step": "5bde53ab43f8fc383a2e444879cae06a8d929a0657dd7df942eca2f1c7165ad9",
+    "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+    "cad/vendor/myactuator/geometry-check.json": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2",
+    "cad/vendor/myactuator/manifest.json": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/centrifuge-cf01.robot-pickup.shared.json": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f",
+    "model/cf01-unload-demo.motion.json": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",
+    "model/guided-tube-rack.shared.json": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e",
+    "model/h02-arm-pickup.scene.json": "f016aa44005934804b695bd0be10ce168a74020b2cf5fb1562dbcb285810163e",
+    "model/h02-arm-pickup.schema.json": "eece4726c56bb70409e29effca306757c5b3c17f55f11fc18116177c5436a67e",
+    "model/h02-direct-pickup.scene.json": "54888857ac82ab7a8aaabc3306dd6fa364933a37854a0d09cee14925370ac73a",
+    "model/h02-direct-pickup.schema.json": "b6b184717ca6bf8cd6027d80eed7d889f54a52754f32ec1a9e777e7de9f05977",
+    "model/h02-rack-transfer.scene.json": "207b690e60926171311ef7a55da6855a88d2af50d39cc29ed14dd5f0062e55bd",
+    "model/h02-rack-transfer.schema.json": "d13327cab625cef7872e7b815dbe411220539fcf09604fbff9937bb3c122c92f",
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "model/tube-frame-h02.shared.json": "34a52d3bd79f847e918c645a4034bb07dc8ecb8f2ad21465101e4196c24d9cba",
+    "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
+    "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
+    "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/build_h02_arm_freecad.py": "49873bc14c92e7eaf130559f84c33f04dc8a75b089221a958c4bc763a0072ca7",
+    "scripts/build_h02_arm_pickup.py": "3df483b743fe6269aecf7c80e9f46816ad6918adb804686cb240f747dec9d58c",
+    "scripts/build_h02_direct_pickup.py": "9ad4cc3b168bf4f52cfb7d8d82c496c6c1681e038cd3b77c4d797d39b2e835a6",
+    "scripts/build_h02_direct_pickup_freecad.py": "959221153b58c4cdd1191dc1ef0cd23a95beeba15d02ee086eb8c75abe20d6a2",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/build_tube_carrier.py": "20f8bc8a22f361e6280fe9f15c2a393d6d2dc52bde9382994334671b0c9a9b8a",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/centrifuge_robot_pickup.py": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+    "scripts/cf01_unload_path.py": "9ea588a5fc65a931a5397bcb83691854a463619ac51e4b8a1d4ea268ef64d9cb",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/h02_arm_pickup.py": "b44f467ee4934a6969428cb9321e3498273266951529e225540118306cf69d78",
+    "scripts/h02_arm_solidcraft.py": "1fcee892a6043312aa0aaa03e33e4d40e2cba5a13a32cf22fbf83758cf25ffdc",
+    "scripts/h02_direct_pickup.py": "52fe6e660ef8d56ee83261a01dbb579d41ceeea2c1eebd8f025a9d9a0e6099e2",
+    "scripts/h02_native_pose_boxes.py": "1dabebbfb4909903910c8f60401d3a17748eff2c4105b04a4caaa9d80526c759",
+    "scripts/h02_rack_transfer.py": "850c720d45a02ec953883ae77f5e67da56620602d55c691606e0eb6550b99a7e",
+    "scripts/h02_transfer_adapters.py": "d927cf2942d0d4c329ac0bc0b5922e2e06edc1c14e01e89e8b8194315cf1bb25",
+    "scripts/rack_slots.py": "2b48e8e2926ddbb6b42993cc7ddfa465bef97b050621e838383b71ac8982c89c",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+    "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
+    "scripts/solidcraft_audit_session.py": "562d86f4c434d59aaf7c012182616cebfd2057752c57d446b45b16a2fbbd3420",
+    "scripts/solidcraft_vendor.py": "8126506c70eecca56f222f8a158b9de23557b9abb5dfb6bc7938e4153ec8f27e",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "scripts/tube_frame_model.py": "8484c39fdeb5a84963fe0ddaefe49ef357fa8c700adbf1208dadec66d96f12b7",
+    "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
+  },
+  "native_validation": [
+    {
+      "variant": "V15",
+      "cross_cad_comparisons": 1368,
+      "backends": {
+        "freecad": {
+          "native_poses": 417,
+          "continuous_intervals": 211,
+          "pairs": 10155,
+          "maximum_depth": 8,
+          "negative_control_rejected": true,
+          "support_contacts": [
+            {
+              "body": "Selected_ReferenceTube",
+              "distance_mm": 0.0,
+              "overlap_mm3": 0,
+              "passed": true
+            },
+            {
+              "body": "CarriedEnvelope",
+              "distance_mm": 0.0,
+              "overlap_mm3": 0,
+              "passed": true
+            }
+          ]
+        },
+        "solidcraft": {
+          "native_poses": 421,
+          "continuous_intervals": 213,
+          "pairs": 10155,
+          "maximum_depth": 8,
+          "negative_control_rejected": true,
+          "support_contacts": [
+            {
+              "distance_mm": 5.115907697472721e-13,
+              "overlap_mm3": 0,
+              "passed": true
+            },
+            {
+              "distance_mm": 5.115907697472721e-13,
+              "overlap_mm3": 0,
+              "passed": true
+            }
+          ]
+        }
+      }
+    },
+    {
+      "variant": "V20",
+      "cross_cad_comparisons": 1368,
+      "backends": {
+        "freecad": {
+          "native_poses": 435,
+          "continuous_intervals": 220,
+          "pairs": 10155,
+          "maximum_depth": 9,
+          "negative_control_rejected": true,
+          "support_contacts": [
+            {
+              "body": "Selected_ReferenceTube",
+              "distance_mm": 0.0,
+              "overlap_mm3": 0,
+              "passed": true
+            },
+            {
+              "body": "CarriedEnvelope",
+              "distance_mm": 0.0,
+              "overlap_mm3": 0,
+              "passed": true
+            }
+          ]
+        },
+        "solidcraft": {
+          "native_poses": 441,
+          "continuous_intervals": 223,
+          "pairs": 10155,
+          "maximum_depth": 9,
+          "negative_control_rejected": true,
+          "support_contacts": [
+            {
+              "distance_mm": 5.115907697472721e-13,
+              "overlap_mm3": 0,
+              "passed": true
+            },
+            {
+              "distance_mm": 5.115907697472721e-13,
+              "overlap_mm3": 0,
+              "passed": true
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "motion_analysis": {
+    "passed": true,
+    "phases": {
+      "approach": {
+        "loaded": false,
+        "duration_s": 1.2491029725976845,
+        "uniform_scale": 0.92526146118347,
+        "bounds": {
+          "joint": [
+            0.31563580436904487,
+            1.4090724564037627,
+            19.999400011999764
+          ],
+          "translation": [
+            64.8465352952841,
+            280.3382093201698,
+            3029.8269308831163
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sample_translation": [
+            64.8465352952841,
+            280.3382093201698,
+            3029.8269308831163
+          ],
+          "protected_radius_mm": 8.0,
+          "scope": "Conservative interval PVA over the complete exact Cartesian/analytic-IK composition"
+        }
+      },
+      "closure": {
+        "loaded": false,
+        "duration_s": 1.2770329614269007,
+        "uniform_scale": 1.0,
+        "bounds": {
+          "joint": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sample_translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "protected_radius_mm": 8.0,
+          "scope": "Conservative interval PVA over the complete exact Cartesian/analytic-IK composition"
+        }
+      },
+      "extraction": {
+        "loaded": true,
+        "duration_s": 6.579292878109428,
+        "uniform_scale": 3.051127529452827,
+        "bounds": {
+          "joint": [
+            0.4999950000499989,
+            1.89597654608472,
+            10.109097286045044
+          ],
+          "translation": [
+            64.06058158630502,
+            221.99399513331187,
+            1172.2594990954067
+          ],
+          "rotation": [
+            26.974155004702958,
+            27.830019370896398,
+            60.90726763356282
+          ],
+          "sample_translation": [
+            64.06058158630502,
+            224.21137140700364,
+            1178.788754326587
+          ],
+          "protected_radius_mm": 8.0,
+          "scope": "Conservative interval PVA over the complete exact Cartesian/analytic-IK composition"
+        }
+      },
+      "release": {
+        "loaded": false,
+        "duration_s": 1.2770329614269007,
+        "uniform_scale": 1.0,
+        "bounds": {
+          "joint": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sample_translation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "protected_radius_mm": 8.0,
+          "scope": "Conservative interval PVA over the complete exact Cartesian/analytic-IK composition"
+        }
+      },
+      "withdraw": {
+        "loaded": false,
+        "duration_s": 1.4252578704127947,
+        "uniform_scale": 1.0557465706761442,
+        "bounds": {
+          "joint": [
+            0.44150117135503447,
+            1.7169933671343014,
+            19.999400011999377
+          ],
+          "translation": [
+            56.83182088062432,
+            215.32372430715884,
+            2039.539888529289
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "sample_translation": [
+            56.83182088062432,
+            215.32372430715884,
+            2039.539888529289
+          ],
+          "protected_radius_mm": 8.0,
+          "scope": "Conservative interval PVA over the complete exact Cartesian/analytic-IK composition"
+        }
+      }
+    },
+    "duration_s": 11.807719643973709,
+    "continuous_loaded_transport": true,
+    "no_stop_reason": "Positive S-curve clock speed and nonopposing C2 corner tangents; clearance and entry marks do not stop",
+    "global_time_optimality_proved": false,
+    "performance_acceptance": {
+      "human_reference_s": null,
+      "scope": "Confirmed grip to supported rack placement",
+      "status": "Manual benchmark not supplied; faster-than-human acceptance remains unverified"
+    },
+    "limits": {
+      "qualified": false,
+      "biological_tolerance": null,
+      "arm_loaded": {
+        "velocity_rad_s": 0.5,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "arm_empty": {
+        "velocity_rad_s": 1,
+        "acceleration_rad_s2": 2,
+        "jerk_rad_s3": 20
+      },
+      "sample_translation": {
+        "velocity_mm_s": 200,
+        "acceleration_mm_s2": 500,
+        "jerk_mm_s3": 5000
+      },
+      "sample_rotation": {
+        "velocity_deg_s": 30,
+        "acceleration_deg_s2": 90,
+        "jerk_deg_s3": 900
+      },
+      "station_lid": {
+        "velocity_deg_s": 10,
+        "acceleration_deg_s2": 180,
+        "jerk_deg_s3": 1800
+      },
+      "station_rotor": {
+        "velocity_rpm": 2,
+        "acceleration_deg_s2": 30,
+        "jerk_deg_s3": 300
+      },
+      "station_linear": {
+        "velocity_mm_s": 50,
+        "acceleration_mm_s2": 200,
+        "jerk_mm_s3": 2000
+      }
+    },
+    "loaded_scalar_limits": {
+      "velocity_mm_s": 1500,
+      "acceleration_mm_s2": 9806.65,
+      "jerk_mm_s3": 5000
+    }
+  },
+  "animation_report": {
+    "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/animation-report.json",
+    "sha256": "18c0ebbf170d3bcb9d9f9135e120327b9d983c2ed63ff7c5c9f53675469e1e79",
+    "bytes": 10499
+  },
+  "browser_verifier": {
+    "path": "scripts/verify_h02_arm_animation.cjs",
+    "sha256": "abc906200fdbcb9c15ae59d63dd620b128615c613a2fcb193d97ea3f5eb2055d",
+    "bytes": 4663
+  },
+  "browser_checks": {
+    "passed": true,
+    "reference_times": 391,
+    "maximum_source_matrix_error": 3.979039320256561e-13,
+    "browser_errors": [],
+    "checks": [
+      "Exact browser/Python PVA, IK, coordinates and link transforms",
+      "Playback, scrubbing, detail view and responsive layout"
+    ],
+    "visual_review": "Full-arm, gripper detail, rack release, narrow and dark views inspected"
+  },
+  "native_replay_checks": {
+    "passed": true,
+    "checks": [
+      {
+        "time_s": 0.0,
+        "maximum_transform_error": 2.2737367544323206e-13,
+        "passed": true
+      },
+      {
+        "time_s": 1.6176575912243982,
+        "maximum_transform_error": 1.1368683772161603e-13,
+        "passed": true
+      },
+      {
+        "time_s": 3.9319706414432454,
+        "maximum_transform_error": 3.232969447708456e-13,
+        "passed": true
+      },
+      {
+        "time_s": 5.821205784479038,
+        "maximum_transform_error": 2.9258094891815463e-13,
+        "passed": true
+      },
+      {
+        "time_s": 7.875749002530464,
+        "maximum_transform_error": 4.1109791092608556e-13,
+        "passed": true
+      },
+      {
+        "time_s": 10.142831174173416,
+        "maximum_transform_error": 3.2938549631367404e-13,
+        "passed": true
+      },
+      {
+        "time_s": 11.807719643973709,
+        "maximum_transform_error": 3.694822225952521e-13,
+        "passed": true
+      }
+    ],
+    "bodies": 149,
+    "scope": "Replay placement equivalence; existing continuous collision audit retained"
+  },
+  "review_images": [
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-rack-seated.png",
+      "sha256": "c59c0ac2b2fa5a76295b0c5467a258eedde143380b74696c603c23f25ac43268",
+      "bytes": 90133
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-width-736.png",
+      "sha256": "45d3785cc70ec184069531c02514c1e4a4efd2b35a48cd853a05043432d7ac9a",
+      "bytes": 75977
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-rack-withdrawn.png",
+      "sha256": "a9f518b96bdeec3b8c2b083103281e26eb807bce78ef087ae6c27f79c0d89a09",
+      "bytes": 95076
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-width-320.png",
+      "sha256": "187468801c5a8747117271b8a506770437163f05f5ec06d06c1906594c405fc9",
+      "bytes": 50447
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-1.888.png",
+      "sha256": "770b6483e2af11dbf21a41ad4163fdde69eda98b0faa67aa00b1cbb7c356521f",
+      "bytes": 70497
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-11.095.png",
+      "sha256": "a304b8521ce607b3cac9d40712c5b5487ba782d0a86e597a515a6c25ee12191a",
+      "bytes": 67154
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-9.744.png",
+      "sha256": "298beda61c3d0276e18a60ea5b4ba194d9219731bc2210415e23cba4675c00e4",
+      "bytes": 69651
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-0.625.png",
+      "sha256": "3e3ec1543f61c1370942c6fdf77a9d76b531b37b86507ade35b845ace1e783bc",
+      "bytes": 72166
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-0.000.png",
+      "sha256": "af2e7c4512a0b6142369a5d3aac1d1c410569997f10a39c94328597d7805b8f4",
+      "bytes": 73571
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-0.162.png",
+      "sha256": "41475edb22fa760b1ff4150a1c55426aa105441b52ad55c2a7b916e21aca22ff",
+      "bytes": 74364
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-5.816.png",
+      "sha256": "e82133d4cd7117e06ea7b60822180aaf0894ef047583abc46c925ad267ce623c",
+      "bytes": 71453
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-dark.png",
+      "sha256": "04cdb7c2a6b913b60529b1c7132245cb8657e00ac3ac0fa913eb6c567f5c9776",
+      "bytes": 65769
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-11.808.png",
+      "sha256": "32555a8255687525cba7e830a93dc62c0341e22850963952ea7486ba6664510f",
+      "bytes": 66110
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-rack-release.png",
+      "sha256": "53c86d48461dea955ba04aa3acba591d5d90b3662b986cd578063d2ef63b0f4d",
+      "bytes": 90419
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-1.249.png",
+      "sha256": "976e83cf1e16287edb72a6aa2b5351d4e32a94233e3188899c8a84c6d7bbdc64",
+      "bytes": 70029
+    },
+    {
+      "path": "exports/generated/h02-rack-transfer-animation-207b690e6092/review-detail.png",
+      "sha256": "4c994c18a64fccdd842080260519b27d4fc015b20e74fb2e9b21ab523f1c7e26",
+      "bytes": 84869
+    }
+  ],
+  "animation_artifacts_sha256": {
+    "exports/generated/h02-rack-transfer-animation-207b690e6092/mesh.json": "3fbd63fc0a79b0b4402a798632a3e79704622dac737f0034cbe12a3300279c20",
+    "exports/generated/h02-rack-transfer-animation-207b690e6092/h02-arm-pickup.html": "8262612cdc13f2b42b58d3118fb98949361d19d472ec3a02e2f65658009b1b5d",
+    "exports/generated/h02-rack-transfer-animation-207b690e6092/reference.json": "4091731c18f953096992b17447297828d849a569fd550161024f5cea960b327e",
+    "exports/generated/h02-rack-transfer-animation-207b690e6092/native-replay-checks.json": "57c666ff408ea964339888ad3471d32a59911a35555fb9c441ab6a4c44674447",
+    "exports/generated/h02-rack-transfer-animation-207b690e6092/browser-checks.json": "23425fbec83a537d1e629303eb56a16c1b48b51ffa625e01a6bd5916d121d4db"
+  },
+  "visual_review": "Native full-arm poses and browser full-arm, gripper detail, rack support/release, narrow and dark views inspected",
+  "limitations": [
+    "Synthetic grasp and support assertions; no hardware feedback",
+    "Existing rack design in a synthetic H02 fixture placement; original CF01 layout unchanged",
+    "Same-link, adjacent-link and flange interfaces use the recorded mounting exclusions",
+    "No hardware, grip-force, biological or mechanical qualification"
+  ]
+}

@@ -226,6 +226,16 @@ def sweep(shape,delta):
     return s
 
 
+def filled_tube_shape(spec,original,travel_mm=0.):
+    outer=original['points_rz']
+    # H02's conical/rounded outer profile increases to its collar. Filling the
+    # hollow interior is conservative; the axis sweep reaches the final collar top.
+    end=next(i for i,(r,z) in enumerate(outer) if r==spec['hp']['collar_radius'])
+    outer=outer[:end+1]+[[spec['hp']['collar_radius'],spec['hp']['collar_z']+2+travel_mm],
+                          [0,spec['hp']['collar_z']+2+travel_mm]]
+    return {'kind':'revolved_profile','center_x':0,'points_rz':outer}
+
+
 def proof(spec,p):
     """Static proof bodies and exhaustive pair scopes for all three phases."""
     source=expanded(spec,p);source['components'].append({'id':'Proof','grounded':True})
@@ -260,13 +270,7 @@ def proof(spec,p):
             pairs.append({'phase':'closure','a':'closure_'+left,'b':'closure_'+right,
                           'kind':'finger_self','required_mm':spec['scene']['tool_clearance_mm'],'intended_pad_contact':False})
     original=next(o['shape'] for o in source['operations'] if o['body']==tube[0])
-    outer=original['points_rz']
-    # H02's conical/rounded outer profile increases to its collar. Filling the
-    # hollow interior is conservative; the axis sweep reaches the final collar top.
-    end=next(i for i,(r,z) in enumerate(outer) if r==spec['hp']['collar_radius'])
-    outer=outer[:end+1]+[[spec['hp']['collar_radius'],spec['hp']['collar_z']+2+p['tube_travel']],
-                          [0,spec['hp']['collar_z']+2+p['tube_travel']]]
-    add('extraction_TubeEnvelope',{'kind':'revolved_profile','center_x':0,'points_rz':outer})
+    add('extraction_TubeEnvelope',filled_tube_shape(spec,original,p['tube_travel']))
     keep=next(o['shape'] for o in source['operations'] if o['body']==tube[1])
     add('extraction_MouthEnvelope',sweep(keep,[0,0,p['tube_travel']]))
     for a in ['extraction_TubeEnvelope','extraction_MouthEnvelope']:

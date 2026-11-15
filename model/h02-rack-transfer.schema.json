@@ -1,0 +1,211 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "units",
+    "sources",
+    "rack_instance",
+    "route",
+    "loaded_limits",
+    "empty_limits",
+    "events",
+    "performance",
+    "limitations",
+    "sample_caps"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.h02-rack-transfer/1"
+    },
+    "id": {
+      "const": "H02RackTransfer"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "time": "s"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pickup",
+        "rack"
+      ],
+      "properties": {
+        "pickup": {
+          "$ref": "assembly-reference.schema.json"
+        },
+        "rack": {
+          "$ref": "assembly-reference.schema.json"
+        }
+      }
+    },
+    "rack_instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "position_mm",
+        "yaw_deg",
+        "selected_slot",
+        "occupied_slots"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "position_mm": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "yaw_deg": {
+          "const": 0
+        },
+        "selected_slot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 12
+        },
+        "occupied_slots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 12
+          }
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clearance_z_mm",
+        "corner_trim_mm",
+        "time_weight",
+        "clock",
+        "release_yaw_deg"
+      ],
+      "properties": {
+        "clearance_z_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "corner_trim_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "time_weight": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 8
+        },
+        "clock": {
+          "const": "shared_s_curve_joint_scaled"
+        },
+        "release_yaw_deg": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 90
+        }
+      }
+    },
+    "loaded_limits": {
+      "enum": [
+        "h02_local",
+        "shared_sample_transport",
+        "explicit_sample_caps"
+      ]
+    },
+    "empty_limits": {
+      "const": "arm_empty"
+    },
+    "events": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grasp_confirmation",
+        "rack_support_confirmation"
+      ],
+      "properties": {
+        "grasp_confirmation": {
+          "const": "test_fixture"
+        },
+        "rack_support_confirmation": {
+          "const": "test_fixture"
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "human_reference_s",
+        "scope",
+        "status"
+      ],
+      "properties": {
+        "human_reference_s": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "exclusiveMinimum": 0
+        },
+        "scope": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "sample_caps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "velocity_mm_s",
+        "acceleration_mm_s2",
+        "jerk_mm_s3",
+        "provenance"
+      ],
+      "properties": {
+        "velocity_mm_s": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "acceleration_mm_s2": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "jerk_mm_s3": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "provenance": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

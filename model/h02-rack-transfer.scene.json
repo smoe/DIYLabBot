@@ -1,0 +1,72 @@
+{
+  "format": "solidcraftbot.h02-rack-transfer/1",
+  "id": "H02RackTransfer",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "time": "s"
+  },
+  "sources": {
+    "pickup": {
+      "source": "model/h02-arm-pickup.scene.json",
+      "source_sha256": "f016aa44005934804b695bd0be10ce168a74020b2cf5fb1562dbcb285810163e"
+    },
+    "rack": {
+      "source": "model/guided-tube-rack.shared.json",
+      "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
+    }
+  },
+  "rack_instance": {
+    "id": "H02.OutputRack",
+    "position_mm": [
+      36,
+      -116,
+      0
+    ],
+    "yaw_deg": 0,
+    "selected_slot": 1,
+    "occupied_slots": [
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ]
+  },
+  "route": {
+    "clearance_z_mm": 110,
+    "corner_trim_mm": 20,
+    "time_weight": 8,
+    "clock": "shared_s_curve_joint_scaled",
+    "release_yaw_deg": 45
+  },
+  "loaded_limits": "explicit_sample_caps",
+  "empty_limits": "arm_empty",
+  "events": {
+    "grasp_confirmation": "test_fixture",
+    "rack_support_confirmation": "test_fixture"
+  },
+  "performance": {
+    "human_reference_s": null,
+    "scope": "Confirmed grip to supported rack placement",
+    "status": "Manual benchmark not supplied; faster-than-human acceptance remains unverified"
+  },
+  "limitations": [
+    "Synthetic grasp and support assertions; no hardware feedback",
+    "Existing rack design in a synthetic H02 fixture placement; original CF01 layout unchanged",
+    "Same-link, adjacent-link and flange interfaces use the recorded mounting exclusions",
+    "No hardware, grip-force, biological or mechanical qualification"
+  ],
+  "sample_caps": {
+    "velocity_mm_s": 1500,
+    "acceleration_mm_s2": 9806.65,
+    "jerk_mm_s3": 5000,
+    "provenance": "User requested walking speed and 1 g; shared sample jerk bound retained; synthetic, not qualified"
+  }
+}

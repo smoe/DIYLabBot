@@ -36,6 +36,9 @@ def sources(program):
     for entry in manifest['models']:
         for file in entry['files']:
             if file['kind']=='step':paths.add(model.ROOT/file['path'])
+    if getattr(program,'program_kind',None)=='h02-rack-transfer':
+        paths.update([program.source_path,program.schema_path,model.ROOT/'scripts/h02_rack_transfer.py',model.ROOT/'scripts/h02_transfer_adapters.py',model.ROOT/'scripts/h02_native_pose_boxes.py',model.ROOT/'scripts/cf01_unload_path.py',model.ROOT/'scripts/rack_slots.py'])
+        paths.update(model.assembly.validate_reference(r) for r in program.transfer['sources'].values())
     return {common.relative(path):model.robot.digest(path) for path in sorted(paths)}
 
 
@@ -88,7 +91,10 @@ def local_audit(engine,program,variant,directory,raw):
 def negative_control(cli,engine,program,native,directory,records,expected_names):
     counter=copy.copy(program);counter.curves={'extraction':program.curves['extraction']}
     selected=[next(r for r in records if r['id']=='ToolMount'),{'id':'ArmMidpathBlocker','group':'Proof','kind':'control','role':'negative_control','names':['ArmMidpathBlocker'],'local_bbox':{'min':[0,0,0],'max':[1,1,1]}}]
-    provider=sc.Provider(cli,counter,native,directory,selected,expected_names,engine)
+    if hasattr(program,'extra_parts'):
+        selected[1]['native_zero_bbox']=next(b['bbox'] for b in program.native_zero_measurement['bodies'] if b['name']=='ArmMidpathBlocker')
+    negative_dir=directory/'negative-control';negative_dir.mkdir(exist_ok=True)
+    provider=sc.Provider(cli,counter,native,negative_dir,selected,expected_names,engine)
     rejected=model.certify(counter,selected,provider);commands=[]
     for u in [0,.5,1]:commands+=sc.drive(program,'extraction',u)+[{'command':'inspect.interference','params':{'bodies':['ToolMount','ArmMidpathBlocker']}}]
     results=engine.run(commands);hits=[v for v in results if isinstance(v,dict) and 'interferences' in v]
@@ -100,8 +106,12 @@ def negative_control(cli,engine,program,native,directory,records,expected_names)
 
 
 def build(args):
-    program=model.Program();analysis=program.audit();pins=sources(program)
-    stem='h02-arm-pickup-'+model.robot.digest(model.SOURCE)[:12];revision=stem;n=1
+    if getattr(args,'transfer',False):
+        import h02_rack_transfer as transfer
+        program=transfer.Program()
+    else:program=model.Program()
+    analysis=program.audit();pins=sources(program);source=getattr(program,'source_path',model.SOURCE);kind=getattr(program,'program_kind','h02-arm-pickup')
+    stem=kind+'-'+model.robot.digest(source)[:12];revision=stem;n=1
     while (model.ROOT/'exports/generated'/revision).exists():n+=1;revision=stem+'-r'+str(n)
     out=model.ROOT/'exports/generated'/revision;cad=model.ROOT/'cad/generated'/revision;render=model.ROOT/'renders'/revision
     for p in [out,cad,render]:p.mkdir(parents=True)
@@ -115,7 +125,7 @@ def build(args):
     for variant in program.local_scene['variants']:
         directory=out/variant;models=cad/variant
         for p in [directory,models]:p.mkdir()
-        case={'variant':variant,'pins':pins,'directory':common.relative(directory),'cad_directory':common.relative(models)};common.write(directory/'case.json',case)
+        case={'variant':variant,'program_kind':kind,'pins':pins,'directory':common.relative(directory),'cad_directory':common.relative(models)};common.write(directory/'case.json',case)
         fc=None;sc_report=None
         if args.backend in ('both','freecad'):
             subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_h02_arm_freecad.py'),str(directory/'case.json')],check=True,env=common.freecad_environment(args.freecad_python))
@@ -123,13 +133,16 @@ def build(args):
         if args.backend in ('both','solidcraft'):
             native,records,raw,aliases,engine=sc.construct(args.solidcraft_cli,program,variant,directory,models,sections)
             try:
-                local_audit(engine,program,variant,directory,raw)
+                local_audit(engine,program,variant,directory,raw);program.local_certified=True
                 provider=sc.Provider(args.solidcraft_cli,program,native,directory,records,[b['name'] for b in raw['bodies']],engine)
                 audit=model.certify(program,records,provider);common.write(directory/'continuous-solidcraft.json',audit)
                 if not audit['passed']:raise AssertionError('Continuous SolidCraft audit failed: '+str(audit['failures'])[:2000])
                 negative=negative_control(args.solidcraft_cli,engine,program,native,directory,records,[b['name'] for b in raw['bodies']])
+                if getattr(program,'native_batch_drive',False):
+                    from h02_native_pose_boxes import STUDY
+                    engine.run([{'command':'motion.delete','params':{'study':STUDY}}]);program.native_batch_drive=False
                 poses=[]
-                for name,phase,u in [('approach','approach',0),('grasp','closure',1),('extracted','extraction',1)]:
+                for name,phase,u in getattr(program,'native_poses',[('approach','approach',0),('grasp','closure',1),('extracted','extraction',1)]):
                     data=engine.run(sc.drive(program,phase,u)+[{'command':'inspect.measure','params':{}}]);measurement=sc.measurements(data)[0]
                     pose=models/(name+'.sc');engine.tool('save',{'path':str(pose)})
                     view=None
@@ -139,7 +152,17 @@ def build(args):
                         if not image.exists():raise ValueError('Native screenshot missing')
                         view={'path':common.relative(image),'sha256':model.robot.digest(image),'camera':camera,'visually_reviewed':False}
                     poses.append({'state':name,'file':common.relative(pose),'measurement':measurement,'view':view})
-                sc_report={'passed':True,'records':records,'poses':poses,'aliases':aliases,'continuous_audit':common.relative(directory/'continuous-solidcraft.json'),'negative_control':negative}
+                contacts=[]
+                if hasattr(program,'extra_parts'):
+                    controls=sc.drive(program,'release',0)
+                    for body in ['Selected_ReferenceTube','CarriedEnvelope']:
+                        controls.extend([{'command':'inspect.measure','params':{'items':[{'type':'body','name':body},{'type':'body','name':'Rack_Base'}]}},{'command':'inspect.interference','params':{'bodies':[body,'Rack_Base']}}])
+                    values=engine.run(controls);distances=[v for v in values if isinstance(v,dict) and 'distance_mm' in v];overlaps=[v for v in values if isinstance(v,dict) and 'interferences' in v]
+                    if len(distances)!=2 or len(overlaps)!=2:raise ValueError('Incomplete native support checks')
+                    for d,h in zip(distances,overlaps):
+                        if d['distance_mm']>1e-6 or h['unchecked'] or h['truncated'] or h['budget_exceeded'] or h['pairs_not_checked'] or sum(v['volume_mm3'] for v in h['interferences'])>program.local_scene['volume_tolerance_mm3']:raise ValueError('Invalid rack support contact')
+                        contacts.append({'distance_mm':d['distance_mm'],'overlap_mm3':sum(v['volume_mm3'] for v in h['interferences']),'passed':True})
+                sc_report={'passed':True,'support_contacts':contacts,'records':records,'poses':poses,'aliases':aliases,'continuous_audit':common.relative(directory/'continuous-solidcraft.json'),'negative_control':negative,'native_evaluation':'Native solved occurrence frames and construction BRep bounding enclosures, exact BRep distances for nearby pairs' if hasattr(program,'extra_parts') else 'Native BRep metrology'}
                 common.write(directory/'solidcraft-report.json',sc_report)
             finally:engine.close()
         comparison=[]
@@ -159,17 +182,17 @@ def build(args):
             'solidcraft_report':common.relative(directory/'solidcraft-report.json') if sc_report else None,'cross_cad_comparisons':comparison}
         cases.append(case_report);common.write(out/'cases-progress.json',cases);common.verify_pins(pins)
     report={'format':'solidcraftbot.h02-arm-pickup-build/1','revision':revision,'passed':True,'backends':args.backend,'source_files_sha256':pins,
-        'analytic_reach_and_motion':analysis,'vendor_preparation':vendor_report,'cases':cases,'limitations':program.definition['limitations'],
+        'analytic_reach_and_motion':analysis,'vendor_preparation':vendor_report,'cases':cases,'limitations':getattr(program,'transfer',program.definition)['limitations'],
         'collision_scope':'Continuous under the recorded allowed-collision matrix; no hardware or formal floating-point certificate'}
-    artifacts={common.relative(p):model.robot.digest(p) for p in [*cad.rglob('*.FCStd'),*cad.rglob('*.sc'),*out.rglob('*report.json'),*out.rglob('continuous-*.json'),*render.glob('*.png')] if p.is_file()}
+    artifacts={common.relative(p):model.robot.digest(p) for p in [*cad.rglob('*.FCStd'),*cad.rglob('*.sc'),*out.rglob('*.json'),*render.glob('*.png')] if p.is_file()}
     report['artifact_sha256']=artifacts;common.verify_pins(pins);common.write(out/'build-report.json',report)
-    current=model.ROOT/'cad/h02-arm-pickup';current.mkdir(exist_ok=True);common.write(current/'shared-build-report.json',report)
+    current=model.ROOT/'cad'/kind;current.mkdir(exist_ok=True);common.write(current/'shared-build-report.json',report)
     print('Both arm pickups passed: '+common.relative(out/'build-report.json'),flush=True)
     return report
 
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--backend',choices=['both','freecad','solidcraft'],default='both');parser.add_argument('--vendor-cache');parser.add_argument('--no-render',action='store_true')
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--backend',choices=['both','freecad','solidcraft'],default='both');parser.add_argument('--transfer',action='store_true');parser.add_argument('--vendor-cache');parser.add_argument('--no-render',action='store_true')
     tool_paths.add_tool_arguments(parser);args=parser.parse_args(argv)
     required={'both':('freecad_python','solidcraft_cli'),'freecad':('freecad_python',),'solidcraft':('solidcraft_cli',)}[args.backend]
     options=argparse.Namespace(**{n:getattr(args,n) for n in required});tool_paths.resolve_tool_arguments(parser,options,required=required)
