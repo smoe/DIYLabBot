@@ -690,6 +690,34 @@ erforderlichen Vorlage buchen und sperren; unbekannte Mengen nicht zu Null
 umdeuten. Solche Anforderungen gehören in den Quellenvertrag und dieselbe
 gespeicherte Prozessabsicht.
 
+### Extraktion mit NanoDrop, Qubit und TapeStation
+
+Vor Änderungen [docs/extraction-analytics.md](docs/extraction-analytics.md)
+lesen. Die neue Opt-in-Komposition `model/extraction-analytics.*.json`
+referenziert die bestehenden Chemie- und Gerätequellen. Sie führt Extraktion,
+NanoDrop, Qubit 4 und anschließend TapeStation im selben Material-Root aus.
+Keinen zweiten DNA-Lauf mit kopiertem Eluatvolumen initialisieren und keine
+Restmengen in Gerätekontexten speichern. Bestehende Standalone-Journale nicht
+als integrierte Laufart öffnen oder still migrieren.
+
+`NanoDropOperations` und `QubitOperations` durch Kontextansichten wiederverwenden;
+Mengen und Materialeffekte bleiben im kanonischen Material-Ledger. Produkt,
+biologische Probe, physisches Gefäß, Inhaltsrevision und ursprünglichen Platz
+explizit binden. Qubit-Working-Solution und beide Standardstocks als ausgegebene
+synthetische Aliquots führen; Standardansätze nicht mit DNA-Eltern versehen.
+Vorbereitete Working Solution ist keine bestätigte Herstellung. Messung,
+Import, Review und Entsorgung buchen keine zweite DNA-Entnahme.
+
+Geräteabsicht und Ledgerabsicht atomar speichern, unbekannte Wirkungen nach
+Neustart nicht wiederholen. Lokale Freigabe darf Root-Reservierungen nicht
+entfernen. TapeStation erst nach beiden Quantifizierungen binden und dessen
+bestehende Revisions-/Abbruchprüfungen beibehalten. Frühere Messungen als
+historische Beobachtungen erhalten; spätere Entnahmen bestätigen keine neue
+Konzentration. Quellenpins, Originalbytes, Kalibrierungszuordnung und
+ausdrückliche Dispositionen vollständig prüfen. Reale SOP, Flüssigkeitshandhabung,
+native Exporte, Geräte-/Netzwerk-/Roboterbetrieb und Sicherheit bleiben
+unqualifiziert; die fließende Bewegungsvorgabe bleibt bestehen.
+
 Die passive Kitstation K01 steht separat in
 `model/extraction-kit-station.shared.json`; vor Änderungen
 [docs/extraction-kit-station.md](docs/extraction-kit-station.md) lesen.

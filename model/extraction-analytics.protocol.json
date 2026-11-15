@@ -1,0 +1,28 @@
+{
+  "format": "solidcraftbot.extraction-analytics-protocol/1",
+  "id": "Extraction.NanoDrop.Qubit.TapeStation.Synthetic.1",
+  "mode": "synthetic_only",
+  "sequence": [
+    "extraction",
+    "nanodrop",
+    "qubit",
+    "tapestation"
+  ],
+  "input_policy": "retained_extraction_product_in_same_root",
+  "measurement_policy": {
+    "source": "undiluted_product_only",
+    "attempts_per_device": 1,
+    "predilution": false,
+    "release": "all_devices_reviewed_and_accounted"
+  },
+  "qubit_working_solution_policy": "explicit_preprepared_synthetic_issue_no_mixing_qualification",
+  "identity_policy": "source_sample_and_product_material_vessel_home",
+  "consumption_policy": "canonical_material_ledger_only",
+  "limitations": [
+    "Synthetic observations and logical process time only; no physical extraction or measurement.",
+    "NanoDrop One and Qubit 4 HS references remain unqualified; existing device profiles are projected, not copied into a new sample inventory.",
+    "The Qubit working solution is an explicitly issued preprepared synthetic stock; its preparation, chemistry and liquid handling are not qualified.",
+    "No predilution, automatic rerun, network, hardware, robot movement or cross-run stock handoff.",
+    "TapeStation DIN, concentration and fragment-size observations remain distinct; no HMW-sizing, local SOP, biochemical-yield or safety qualification."
+  ]
+}

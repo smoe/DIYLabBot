@@ -54,6 +54,53 @@ def perform_phase(flow, sample_id, step, *, actor_id, pause_before_confirmation=
     return True
 
 
+def run_tapestation(flow, definition, *, actor_id, pause_after=None):
+    """Supply explicit fictional TapeStation observations on an existing Root."""
+    identity = flow.run_id
+    qc = definition['execution']['qc']
+    equilibration_s = qc['parameters']['buffer_equilibration_s']
+    flow.act('advance_time', actor_id, seconds=equilibration_s)
+    flow.act('confirm_tapestation_ready', actor_id,
+             observations={**{key: True for key in qc['required_checks']}, 'buffer_equilibration_s': equilibration_s},
+             reason=REASON)
+    for role in ('ladder', 'sample'):
+        intent = flow.run_id + '.QC.' + role
+        flow.act('begin_qc_preparation', actor_id, role=role, intent_id=intent)
+        duration = qc['parameters']['mix_duration_s'] + qc['parameters']['spin_duration_s']
+        flow.act('advance_time', actor_id, seconds=duration)
+        flow.act('confirm_qc_preparation', actor_id, intent_id=intent,
+                 actual_inputs=actual_inputs(flow.state, intent),
+                 actual_outputs=copy.deepcopy(qc[role]['effect']['fixture_actual_outputs']),
+                 observations={'capped': True, 'mixed': True, 'spun_down': True,
+                               'mix_duration_s': qc['parameters']['mix_duration_s'],
+                               'mix_rpm': qc['parameters']['mix_rpm'],
+                               'spin_duration_s': qc['parameters']['spin_duration_s']}, reason=REASON)
+    flow.act('begin_tapestation', actor_id,
+             instrument_run_id=identity + '.TS.Run', analysis_id=identity + '.TS.Analysis',
+             measurement_id=identity + '.TS.Measurement', screen_tape_id=qc['screen_tape_id'],
+             lane_id=qc['sample']['lane_id'], ladder_lane_id=qc['ladder']['lane_id'])
+    flow.act('confirm_tapestation_loaded', actor_id,
+             observations={**flow.expected_tapestation_loading(), 'sample_loaded': True,
+                           'ladder_loaded': True, 'identities_confirmed': True}, reason=REASON)
+    if pause_after == 'tapestation_loaded':
+        return flow.report()
+    flow.act('confirm_tapestation_run_complete', actor_id,
+             observations={'run_complete': True, 'ladder_accepted': True,
+                           'instrument_run_id': identity + '.TS.Run',
+                           'analysis_id': identity + '.TS.Analysis'}, reason=REASON)
+    artifact = synthetic_report(flow.expected_tapestation(), din=8.0, fragment_size_bp=30000.0)
+    flow.act('import_results', actor_id, artifact=artifact,
+             file_name='synthetic-tapestation.json', origin='synthetic_export')
+    flow.act('review_tapestation', actor_id, decision='accept', artifact_sha256=digest(artifact), reason=REASON)
+    for material_id, item in flow.state['inventory']['materials'].items():
+        if item['disposition'] not in {'consumed', 'discarded'}:
+            disposition = 'retained' if item['kind'] in {'product', 'reagent'} else 'discarded'
+            flow.act('set_disposition', actor_id, material_id=material_id, disposition=disposition, reason=REASON)
+    flow.act('confirm_inventory', actor_id, observations=flow.inventory_observations())
+    flow.act('release', actor_id, workspace_clear=True)
+    return flow.report()
+
+
 def run_demo(journal, *, workflow_class, definition_loader, run_prefix, actor_id,
              run_id=None, source=None, pause_after=None):
     """Create a fresh synthetic fixture, never resume or reset an existing run."""
@@ -79,47 +126,6 @@ def run_demo(journal, *, workflow_class, definition_loader, run_prefix, actor_id
                     return flow.report()
         if pause_after == 'extracted':
             return flow.report()
-        qc = definition['execution']['qc']
-        equilibration_s = qc['parameters']['buffer_equilibration_s']
-        flow.act('advance_time', actor_id, seconds=equilibration_s)
-        flow.act('confirm_tapestation_ready', actor_id,
-                 observations={**{key: True for key in qc['required_checks']}, 'buffer_equilibration_s': equilibration_s},
-                 reason=REASON)
-        for role in ('ladder', 'sample'):
-            intent = flow.run_id + '.QC.' + role
-            flow.act('begin_qc_preparation', actor_id, role=role, intent_id=intent)
-            duration = qc['parameters']['mix_duration_s'] + qc['parameters']['spin_duration_s']
-            flow.act('advance_time', actor_id, seconds=duration)
-            flow.act('confirm_qc_preparation', actor_id, intent_id=intent,
-                     actual_inputs=actual_inputs(flow.state, intent),
-                     actual_outputs=copy.deepcopy(qc[role]['effect']['fixture_actual_outputs']),
-                     observations={'capped': True, 'mixed': True, 'spun_down': True,
-                                   'mix_duration_s': qc['parameters']['mix_duration_s'],
-                                   'mix_rpm': qc['parameters']['mix_rpm'],
-                                   'spin_duration_s': qc['parameters']['spin_duration_s']}, reason=REASON)
-        flow.act('begin_tapestation', actor_id,
-                 instrument_run_id=identity + '.TS.Run', analysis_id=identity + '.TS.Analysis',
-                 measurement_id=identity + '.TS.Measurement', screen_tape_id=qc['screen_tape_id'],
-                 lane_id=qc['sample']['lane_id'], ladder_lane_id=qc['ladder']['lane_id'])
-        flow.act('confirm_tapestation_loaded', actor_id,
-                 observations={**flow.expected_tapestation_loading(), 'sample_loaded': True,
-                               'ladder_loaded': True, 'identities_confirmed': True}, reason=REASON)
-        if pause_after == 'tapestation_loaded':
-            return flow.report()
-        flow.act('confirm_tapestation_run_complete', actor_id,
-                 observations={'run_complete': True, 'ladder_accepted': True,
-                               'instrument_run_id': identity + '.TS.Run',
-                               'analysis_id': identity + '.TS.Analysis'}, reason=REASON)
-        artifact = synthetic_report(flow.expected_tapestation(), din=8.0, fragment_size_bp=30000.0)
-        flow.act('import_results', actor_id, artifact=artifact,
-                 file_name='synthetic-tapestation.json', origin='synthetic_export')
-        flow.act('review_tapestation', actor_id, decision='accept', artifact_sha256=digest(artifact), reason=REASON)
-        for material_id, item in flow.state['inventory']['materials'].items():
-            if item['disposition'] != 'consumed':
-                disposition = 'retained' if item['kind'] in {'product', 'reagent'} else 'discarded'
-                flow.act('set_disposition', actor_id, material_id=material_id, disposition=disposition, reason=REASON)
-        flow.act('confirm_inventory', actor_id, observations=flow.inventory_observations())
-        flow.act('release', actor_id, workspace_clear=True)
-        return flow.report()
+        return run_tapestation(flow, definition, actor_id=actor_id, pause_after=pause_after)
     finally:
         flow.close()

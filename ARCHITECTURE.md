@@ -1316,6 +1316,45 @@ bleiben getrennt. Reale Pellet-/Spitzenhandhabung, Zentrifugation, Hydratation,
 native Exporte, Geräte-/Netzwerk-/Roboterbetrieb, biologische Leistung und
 Sicherheit bleiben unqualifiziert; TapeStation belegt keine beliebig große DNA.
 
+### Gemeinsame Extraktions- und Messkomposition
+
+[Extraktionsanalytik](docs/extraction-analytics.md) ergänzt die ausdrücklich
+neue Laufart `extraction_analytics_synthetic/1` über derselben Extraktionshülle
+und dem kanonischen Material-Ledger. Zwei referenzierende Familienprofile
+binden DNeasy beziehungsweise Puregene; Chemieschritte, Fraktionsrollen,
+Produktidentität und TapeStation-Vertrag werden nicht kopiert. Die bisherigen
+Standalone-Engines behalten ihre eigenen Quellen- und Laufartprüfungen.
+
+Die Reihenfolge lautet Extraktion → NanoDrop One → Qubit 4 dsDNA HS → TS01.
+Gerätekontexte verwenden die bestehenden manuellen Operationen durch flüchtige
+Ansichten auf Probe, Produktmaterial, physisches Gefäß und Ursprungsplatz.
+Sie speichern Gerätebelege und eingefrorene Inhaltsrevisionen, keine neue
+Probenbilanz. Ein zweiter Quantifizierungs-Root oder der ältere reine
+Gefäßvolumen-Ledger wird nicht eingebettet.
+
+NanoDrop-Entnahme und Qubit-Ansätze buchen tatsächliche Mengen einmal im
+gleichen Root. Für Working Solution und beide Standardstocks gibt es eigene
+ausgegebene synthetische Reagenzmaterialien. Drei laufgebundene Ansatzgefäße
+werden vor dem ersten Commit deklariert; Standardansätze und Probenansatz
+erhalten getrennte Elternbezüge. Kalibrierung, Inkubation, Rohdateiimport,
+Bewertung und Entsorgung bleiben eigene Belege ohne erneute DNA-Entnahme.
+Das Produkt bleibt erhalten und kehrt an seinen ursprünglichen Platz zurück.
+
+Geräte- und Materialabsichten, Originalartefakte und Ressourcen werden gemeinsam
+gespeichert. Wiederaufnahme verlangt Wirkungs- und vollständigen Inventarabgleich;
+lokaler Geräteabschluss gibt Root-Ressourcen nicht frei. TapeStation wird erst
+nach den beiden Quantifizierungsentnahmen an die aktuelle Produktrevision
+gebunden; dessen bestehende Live- und Abbruchbedingungen werden nicht gelockert.
+Frühere quantitative Messungen bleiben historische Beobachtungen. Quellenpins
+sperren veränderte aktive Läufe ohne automatische Migration.
+
+Der CLI-Einstieg ist `python3 scripts/run_extraction_analytics.py --help`.
+Nur der ausdrückliche Fixturetreiber erfindet positive Belege und Messwerte.
+Reale Extraktion, Working-Solution-Herstellung, Flüssigkeitshandhabung, lokale
+SOPs, native Exporte, Geräte-/Netzwerk-/Roboterbetrieb, biologische Leistung und
+Sicherheit bleiben unqualifiziert; weder eine Roboterbahn noch eine erweiterte
+Fragmentgrößenqualifikation wird daraus abgeleitet.
+
 ### Passive Kitstation K01
 
 `model/extraction-kit-station.shared.json` referenziert denselben Kitkatalog

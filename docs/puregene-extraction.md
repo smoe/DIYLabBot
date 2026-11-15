@@ -36,6 +36,11 @@ Quellenänderungen erlauben keine stille Migration alter Journale.
 
 ## Führende Quellen und gemeinsamer Ablaufkern
 
+Die neue [integrierte Extraktionsanalytik](extraction-analytics.md) ergänzt
+NanoDrop und Qubit 4 vor dieser TapeStation-QC im selben Material-Root.
+Sie ist eine ausdrücklich gewählte eigene Laufart; dieser Standalone-Lauf
+wird dadurch nicht still umgestellt.
+
 | Quelle | Verantwortung |
 |---|---|
 | `model/puregene-extraction.protocol.json` | Puregene-Identität, Zellschritte, Herstellerparameter und Fraktionsrollen |

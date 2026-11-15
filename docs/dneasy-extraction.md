@@ -55,6 +55,11 @@ Kennungen und einen ausdrücklichen Abgleich, keine neu gestartete Demo.
 
 ## Quellen, Identitäten und Materialfraktionen
 
+Die neue [integrierte Extraktionsanalytik](extraction-analytics.md) ergänzt
+NanoDrop und Qubit 4 vor dieser TapeStation-QC im selben Material-Root.
+Sie ist eine ausdrücklich gewählte eigene Laufart; dieser Standalone-Lauf
+wird dadurch nicht still umgestellt.
+
 Die [Puregene-Erweiterung](puregene-extraction.md) verwendet inzwischen
 denselben geordneten Extraktionskern sowie dieselbe QC-, Demo- und CLI-Hülle.
 `DNeasyWorkflow` bleibt ein eigener schmaler Quellen-/Berichtsadapter mit dem

@@ -1,0 +1,62 @@
+{
+  "format": "solidcraftbot.extraction-analytics-profile/1",
+  "id": "SYN.ExtractionAnalytics.Puregene.DNA01",
+  "mode": "synthetic_only",
+  "family": "puregene",
+  "extraction": {
+    "source": "model/puregene-extraction.synthetic.json",
+    "source_sha256": "3bba7e968e79cd036497b130377750513a4c558d802e0fd04d2fa7ae1fae19ec"
+  },
+  "quantification": {
+    "source": "model/dna-quantification.synthetic.json",
+    "source_sha256": "91cd11d0c2e39318feb9e08e484d61a87c741aa4d5059fd8f5286d1cceffe1a2"
+  },
+  "protocol": {
+    "source": "model/extraction-analytics.protocol.json",
+    "source_sha256": "fd10cc674ffa259fa1e2737f797df2a8d5e95871d629e6d1abe2d7b9fe7a80a3"
+  },
+  "issued_reagents": {
+    "working_solution": {
+      "material_id": "SYN.ExtractionAnalytics.Puregene.Issued.QubitWorkingSolution",
+      "vessel_id": "SYN.ExtractionAnalytics.Puregene.ReagentTube.QubitWorkingSolution",
+      "quantity": {
+        "value": 1000,
+        "unit": "uL"
+      },
+      "location": {
+        "kind": "logical",
+        "holder_id": "SYN.ExtractionAnalytics.Puregene.IssuedHolder",
+        "place_id": "WS"
+      }
+    },
+    "standards": {
+      "SYN.StandardLow": {
+        "material_id": "SYN.ExtractionAnalytics.Puregene.Issued.QubitStandard01",
+        "vessel_id": "SYN.ExtractionAnalytics.Puregene.ReagentTube.QubitStandard01",
+        "quantity": {
+          "value": 100,
+          "unit": "uL"
+        },
+        "location": {
+          "kind": "logical",
+          "holder_id": "SYN.ExtractionAnalytics.Puregene.IssuedHolder",
+          "place_id": "STD01"
+        }
+      },
+      "SYN.StandardHigh": {
+        "material_id": "SYN.ExtractionAnalytics.Puregene.Issued.QubitStandard02",
+        "vessel_id": "SYN.ExtractionAnalytics.Puregene.ReagentTube.QubitStandard02",
+        "quantity": {
+          "value": 100,
+          "unit": "uL"
+        },
+        "location": {
+          "kind": "logical",
+          "holder_id": "SYN.ExtractionAnalytics.Puregene.IssuedHolder",
+          "place_id": "STD02"
+        }
+      }
+    }
+  },
+  "fixture_scope": "Explicit invented working-solution and standard aliquots only. Existing extraction input, product, vessel and quantities remain authoritative. Device recipe parameters come from the referenced DNA quantification composition; no actual working-solution mixing or laboratory qualification is inferred."
+}

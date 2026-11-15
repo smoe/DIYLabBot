@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/solidcraftbot/extraction-analytics.schema.json",
+  "title": "Opt-in synthetic extraction / NanoDrop / Qubit / TapeStation source contract",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/profile"
+    },
+    {
+      "$ref": "#/$defs/protocol"
+    }
+  ],
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "family",
+        "extraction",
+        "quantification",
+        "protocol",
+        "issued_reagents",
+        "fixture_scope"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.extraction-analytics-profile/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "family": {
+          "enum": [
+            "dneasy",
+            "puregene"
+          ]
+        },
+        "extraction": {
+          "$ref": "#/$defs/reference"
+        },
+        "quantification": {
+          "$ref": "#/$defs/reference"
+        },
+        "protocol": {
+          "$ref": "#/$defs/reference"
+        },
+        "issued_reagents": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "working_solution",
+            "standards"
+          ],
+          "properties": {
+            "working_solution": {
+              "$ref": "#/$defs/issue"
+            },
+            "standards": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "SYN.StandardLow",
+                "SYN.StandardHigh"
+              ],
+              "properties": {
+                "SYN.StandardLow": {
+                  "$ref": "#/$defs/issue"
+                },
+                "SYN.StandardHigh": {
+                  "$ref": "#/$defs/issue"
+                }
+              }
+            }
+          }
+        },
+        "fixture_scope": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        }
+      }
+    },
+    "protocol": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "sequence",
+        "input_policy",
+        "measurement_policy",
+        "qubit_working_solution_policy",
+        "identity_policy",
+        "consumption_policy",
+        "limitations"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.extraction-analytics-protocol/1"
+        },
+        "id": {
+          "const": "Extraction.NanoDrop.Qubit.TapeStation.Synthetic.1"
+        },
+        "mode": {
+          "const": "synthetic_only"
+        },
+        "sequence": {
+          "const": [
+            "extraction",
+            "nanodrop",
+            "qubit",
+            "tapestation"
+          ]
+        },
+        "input_policy": {
+          "const": "retained_extraction_product_in_same_root"
+        },
+        "measurement_policy": {
+          "const": {
+            "source": "undiluted_product_only",
+            "attempts_per_device": 1,
+            "predilution": false,
+            "release": "all_devices_reviewed_and_accounted"
+          }
+        },
+        "qubit_working_solution_policy": {
+          "const": "explicit_preprepared_synthetic_issue_no_mixing_qualification"
+        },
+        "identity_policy": {
+          "const": "source_sample_and_product_material_vessel_home"
+        },
+        "consumption_policy": {
+          "const": "canonical_material_ledger_only"
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          }
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/[^\\\\]+\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "material_id",
+        "vessel_id",
+        "quantity",
+        "location"
+      ],
+      "properties": {
+        "material_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "vessel_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "quantity": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "unit": {
+              "const": "uL"
+            }
+          }
+        },
+        "location": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "holder_id",
+            "place_id"
+          ],
+          "properties": {
+            "kind": {
+              "const": "logical"
+            },
+            "holder_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            },
+            "place_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 160
+            }
+          }
+        }
+      }
+    }
+  }
+}
