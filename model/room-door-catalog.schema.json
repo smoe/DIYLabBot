@@ -135,6 +135,23 @@
               "type": "null"
             }
           }
+        },
+        "blue_black_steel": {
+          "type": "object",
+          "required": [
+            "base_material",
+            "color"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "base_material": {
+              "const": "steel"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          }
         }
       }
     }

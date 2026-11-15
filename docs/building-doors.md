@@ -36,6 +36,23 @@ Referenzen. An der in der Küchenprojektion ausgelassenen Trennwand entsteht
 kein freistehendes Türblatt; die entsprechende Wand und Tür anderer Geschosse
 bleiben erhalten.
 
+## Logistikraum im Erdgeschoss
+
+Die Eigentümerkorrektur vom 15. November 2026 bezeichnet `R0_013` als
+Logistikraum für Post und Abfall. Für `D0_013_Exterior` und `D0_013` gelten
+öffnungsspezifische Stahlprofile mit dunkelblauem, fast schwarzem Farbton
+(`#172530`, angenähert, kein bestätigter RAL-Wert).
+
+Die Außentür ist beim Blick von außen rechts angeschlagen und öffnet ins Freie.
+Die Atriumtür ist beim Weitergehen von außen, aus dem Logistikraum gesehen,
+ebenfalls rechts angeschlagen und öffnet in den Logistikraum. Beide
+Öffnungsrichtungen folgen damit dem beschriebenen Weg vom Atrium nach außen.
+Der Generator bestimmt Anschlag und Öffnungsseite aus den angrenzenden
+Raumpolygonen; die Richtung des gespeicherten Wandsegments ändert sie nicht.
+Die dargestellten 90 Grad sind eine illustrative Stellung. Sichtfenster sind
+für diese beiden Türen noch nicht bestätigt; vorläufig werden geschlossene
+Blätter gezeigt. Beschläge und Schutzklassen werden daraus nicht abgeleitet.
+
 ## Gemeinsame Konstruktion
 
 `model/doors/room-doors.catalog.json` führt beide Geometrietypen und die

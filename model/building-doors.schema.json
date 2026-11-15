@@ -43,10 +43,7 @@
       ]
     },
     "default_material": {
-      "enum": [
-        "wood",
-        "steel"
-      ]
+      "type": "string"
     },
     "level_materials": {
       "type": "object",
@@ -55,31 +52,36 @@
         "KG": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "blue_black_steel"
           ]
         },
         "EG": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "blue_black_steel"
           ]
         },
         "OG1": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "blue_black_steel"
           ]
         },
         "OG2": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "blue_black_steel"
           ]
         },
         "OG3": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "blue_black_steel"
           ]
         }
       }
@@ -227,6 +229,73 @@
       "minItems": 1,
       "items": {
         "type": "string"
+      }
+    },
+    "opening_overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "level_id",
+          "opening_id",
+          "type",
+          "material",
+          "basis"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "level_id": {
+            "enum": [
+              "KG",
+              "EG",
+              "OG1",
+              "OG2",
+              "OG3"
+            ]
+          },
+          "opening_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "enum": [
+              "plain",
+              "round_window"
+            ]
+          },
+          "material": {
+            "type": "string"
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "pose": {
+            "type": "object",
+            "required": [
+              "approach_from",
+              "hinge_side",
+              "opens_into"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "approach_from": {
+                "type": "string",
+                "minLength": 1
+              },
+              "hinge_side": {
+                "enum": [
+                  "left",
+                  "right"
+                ]
+              },
+              "opens_into": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        }
       }
     }
   },

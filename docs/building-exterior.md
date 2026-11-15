@@ -138,3 +138,12 @@ vier optionale JSON-Schema-Prüfungen wegen fehlender `jsonschema`-Bibliothek
 [Raumtürvarianten](building-doors.md), Küche und Büros. Beide CADs bestehen
 mit 1.811 geschlossenen Körpern, je 451 Geometrieproben und 14 Höhenprüfungen.
 Alle exakten STEP-Vergleiche ergeben 0 Volumendifferenz.
+
+## Stahltüren am Logistikraum
+
+Raum `R0_013` dient gemäß Eigentümerkorrektur vom 15. November 2026 der
+Logistik (Post / Abfall). Seine Außen- und Atriumtür erhalten den angenäherten
+fast schwarzen Blauton `#172530`. Von außen kommend sind beide rechts
+angeschlagen: Die Außentür öffnet nach außen, die Atriumtür zum Logistikraum.
+Die gemeinsame [Türquelle](building-doors.md#logistikraum-im-erdgeschoss)
+führt diese Ausnahmen einschließlich der noch offenen Verglasungsdetails.

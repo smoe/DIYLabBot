@@ -9,6 +9,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT/'scripts'))
 import building_doors as doors
 import building_stack as building
+import relative_floorplan as floor
 
 
 class DoorTests(unittest.TestCase):
@@ -25,7 +26,7 @@ class DoorTests(unittest.TestCase):
 
     def test_two_glazing_types_and_independent_material_profiles(self):
         self.assertEqual(set(self.catalog['types']),{'plain','round_window'})
-        self.assertEqual(set(self.catalog['materials']),{'wood','steel'})
+        self.assertEqual(set(self.catalog['materials']),{'wood','steel','blue_black_steel'})
         self.assertEqual(self.catalog['materials']['wood']['thickness_source'],'exterior.door_leaf_mm')
         self.assertTrue(all(v['mass_kg'] is None for v in self.bindings.values()))
 
@@ -89,6 +90,41 @@ class DoorTests(unittest.TestCase):
             with self.subTest(key=key),self.assertRaises(ValueError):doors.validate(self.policy,catalog)
         with self.assertRaises(ValueError):doors.geometry(self.catalog,{'type':'round_window','material':'wood'},'TooNarrow',[0,0],[1,0],[0,1],400,2150,0,self.spec['exterior'])
         with self.assertRaises(ValueError):doors.geometry(self.catalog,{'type':'unimplemented','material':'wood'},'Unknown',[0,0],[1,0],[0,1],900,2150,0,self.spec['exterior'])
+
+    def test_logistics_room_and_right_handed_steel_doors(self):
+        plan=building.level_plan(self.spec,'EG')
+        self.assertEqual(next(a['label'] for a in plan['areas'] if a['id']=='R0_013'),'13 Logistik (Post / Abfall)')
+        bodies={b['id']:b for b in building.expanded(self.spec,self.p)['bodies']}
+        for opening,region in [('D0_013_Exterior','exterior'),('D0_013','R0_013')]:
+            selected=self.bindings['EG__'+opening];placement=selected['placement']
+            self.assertEqual((selected['material'],selected['type']),('blue_black_steel','plain'))
+            self.assertEqual(placement['approach_from'],region)
+            self.assertEqual(placement['opens_into'],region)
+            self.assertEqual(placement['hinge_side'],'right')
+            self.assertAlmostEqual(sum(a*b for a,b in zip(placement['opening_axis'],placement['approach_normal'])),1)
+            door=next(o for o in plan['openings'] if o['id']==opening);wall=next(w for w in plan['walls'] if w['id']==door['wall'])
+            a,b=[plan['vertices'][wall[k]] for k in ('start','end')]
+            endpoints=[[(a[i]+f*(b[i]-a[i]))*self.p['display_scale'] for i in (0,1)] for f in door['interval']]
+            center=[sum(a[i]+f*(b[i]-a[i]) for f in door['interval'])/2 for i in (0,1)]
+            sample=[center[i]+placement['opening_axis'][i]*1e-4 for i in (0,1)]
+            membership=floor.point_membership(sample,floor.outline(plan,'R0_013'))
+            self.assertEqual(membership,-1 if region=='exterior' else 1)
+            right=placement['right_vector'];projection=lambda q:sum(x*y for x,y in zip(q,right))
+            self.assertAlmostEqual(projection(placement['hinge_mm']),max(map(projection,endpoints)))
+            self.assertEqual(bodies[selected['leaf_body_id']]['appearance']['color'],'#172530')
+            self.assertEqual(selected['leaf_thickness_mm'],self.catalog['materials']['steel']['thickness_mm'])
+
+    def test_handing_is_independent_of_wall_vertex_order(self):
+        plan=building.level_plan(self.spec,'EG');door=next(o for o in plan['openings'] if o['id']=='D0_013_Exterior')
+        pose={'approach_from':'exterior','hinge_side':'right','opens_into':'exterior'};expected=doors.handed_frame(plan,door,pose,self.p['display_scale'])
+        reverse=copy.deepcopy(plan);other=next(o for o in reverse['openings'] if o['id']==door['id']);wall=next(w for w in reverse['walls'] if w['id']==door['wall']);wall['start'],wall['end']=wall['end'],wall['start'];other['interval']=[1-other['interval'][1],1-other['interval'][0]]
+        for area in reverse['areas']:
+            for edge in area['boundary']:
+                if edge['wall']==door['wall']:edge['direction']*=-1
+        actual=doors.handed_frame(reverse,other,pose,self.p['display_scale'])
+        for key in ('hinge_mm','opening_axis'):
+            for a,b in zip(actual[key],expected[key]):self.assertAlmostEqual(a,b)
+        with self.assertRaises(ValueError):doors.handed_frame(plan,door,{**pose,'opens_into':'R0_001'},1)
 
     def test_stale_catalog_binding_is_rejected(self):
         ref=copy.deepcopy(self.spec['exterior']['doors']);ref['source_sha256']='0'*64

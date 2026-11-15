@@ -36,6 +36,7 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     x=a[0];y0,y1=sorted([a[1],b[1]]);grade=next(v['z_mm'] for v in levels if v['id']=='EG');top=levels[-1]['clear_top_mm']+p['slab_thickness_mm']
     door_policy,door_catalog=doors.load(s['doors']) if 'doors' in s else (None,None)
     if door_policy is not None:
+        doors.validate_overrides(door_policy, plans)
         for field in ('include_areas','exclude_areas'):
             for level,ids in door_policy[field].items():
                 require(level in plans and set(ids)<={area['id'] for area in plans[level]['areas']},'Unknown explicitly selected door room')
@@ -97,6 +98,9 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
                 body(n,'concept_open_wood_room_door',s['door_color']);prism(n+'_Leaf',n,pts,level['z_mm'],p['door_height_mm'])
             else:
                 selection=doors.select(door_policy,plan,canonical,level['id'],door)
+                if 'pose' in selection:
+                    placement=doors.handed_frame(plan,door,selection['pose'],scale);selection['placement']=placement
+                    hinge,u,normal=placement['hinge_mm'],placement['closed_axis'],placement['opening_axis']
                 pieces=doors.geometry(door_catalog,selection,n,hinge,u,normal,width,p['door_height_mm'],level['z_mm'],s)
                 for key in ('bodies','operations'):r[key].extend(pieces[key])
                 door_bindings[level['id']+'__'+door['id']]=selection
