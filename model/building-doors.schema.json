@@ -43,7 +43,12 @@
       ]
     },
     "default_material": {
-      "type": "string"
+      "enum": [
+        "wood",
+        "steel",
+        "glass",
+        "blue_black_steel"
+      ]
     },
     "level_materials": {
       "type": "object",
@@ -53,6 +58,7 @@
           "enum": [
             "wood",
             "steel",
+            "glass",
             "blue_black_steel"
           ]
         },
@@ -60,6 +66,7 @@
           "enum": [
             "wood",
             "steel",
+            "glass",
             "blue_black_steel"
           ]
         },
@@ -67,6 +74,7 @@
           "enum": [
             "wood",
             "steel",
+            "glass",
             "blue_black_steel"
           ]
         },
@@ -74,6 +82,7 @@
           "enum": [
             "wood",
             "steel",
+            "glass",
             "blue_black_steel"
           ]
         },
@@ -81,6 +90,7 @@
           "enum": [
             "wood",
             "steel",
+            "glass",
             "blue_black_steel"
           ]
         }
@@ -235,6 +245,7 @@
       "type": "array",
       "items": {
         "type": "object",
+        "additionalProperties": false,
         "required": [
           "level_id",
           "opening_id",
@@ -242,7 +253,6 @@
           "material",
           "basis"
         ],
-        "additionalProperties": false,
         "properties": {
           "level_id": {
             "enum": [
@@ -264,7 +274,12 @@
             ]
           },
           "material": {
-            "type": "string"
+            "enum": [
+              "wood",
+              "steel",
+              "glass",
+              "blue_black_steel"
+            ]
           },
           "basis": {
             "type": "string",
@@ -295,7 +310,25 @@
               }
             }
           }
-        }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "material": {
+                  "const": "glass"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "type": {
+                  "const": "plain"
+                }
+              }
+            }
+          }
+        ]
       }
     }
   },

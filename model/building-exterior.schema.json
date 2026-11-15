@@ -257,6 +257,40 @@
       "exclusiveMinimum": 0,
       "exclusiveMaximum": 1,
       "description": "Approximate display boundary of the map-informed left hardstanding, as a fraction of the registered facade Y extent; not a surveyed curb"
+    },
+    "side_window_walls_by_level": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "OG1": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          }
+        },
+        "OG2": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          }
+        },
+        "OG3": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          }
+        }
+      },
+      "description": "Additional canonical outer-facade window paths on explicitly named upper storeys; common window dimensions and recipe are reused."
     }
   }
 }

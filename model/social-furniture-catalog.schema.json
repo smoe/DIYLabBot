@@ -415,11 +415,269 @@
                 }
               }
             }
+          },
+          {
+            "type": "object",
+            "required": [
+              "recipe",
+              "basis",
+              "parameters",
+              "colors",
+              "part_ids"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "recipe": {
+                "const": "desktop"
+              },
+              "basis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "parameters": {
+                "type": "object",
+                "required": [
+                  "length",
+                  "depth",
+                  "height",
+                  "top_t",
+                  "leg_size",
+                  "start_inset",
+                  "end_inset",
+                  "max_leg_span"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "length": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "depth": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "height": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "top_t": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "leg_size": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "start_inset": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "end_inset": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "max_leg_span": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  }
+                }
+              },
+              "colors": {
+                "type": "object",
+                "required": [
+                  "top",
+                  "legs"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "top": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "legs": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  }
+                }
+              },
+              "part_ids": {
+                "type": "object",
+                "required": [
+                  "top",
+                  "start_start",
+                  "start_end",
+                  "end_start",
+                  "end_end"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "top": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "start_start": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "start_end": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "end_start": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "end_end": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "recipe",
+              "basis",
+              "parameters",
+              "colors",
+              "part_ids",
+              "max_chord_deviation_mm"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "recipe": {
+                "const": "elliptical_table"
+              },
+              "max_chord_deviation_mm": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2,
+                "description": "Upper bound in presentation mm for every elliptical arc to its emitted polygon chord"
+              },
+              "basis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "parameters": {
+                "type": "object",
+                "required": [
+                  "length",
+                  "width",
+                  "height",
+                  "top_t",
+                  "leg_size",
+                  "leg_inset_x",
+                  "leg_inset_y"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "length": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "width": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "height": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "top_t": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "leg_size": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "leg_inset_x": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  },
+                  "leg_inset_y": {
+                    "$ref": "#/$defs/desktop_dimension"
+                  }
+                }
+              },
+              "colors": {
+                "type": "object",
+                "required": [
+                  "top",
+                  "legs"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "top": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  },
+                  "legs": {
+                    "type": "string",
+                    "pattern": "^#[0-9a-fA-F]{6}$"
+                  }
+                }
+              },
+              "part_ids": {
+                "type": "object",
+                "required": [
+                  "top",
+                  "start_start",
+                  "start_end",
+                  "end_start",
+                  "end_end"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "top": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "start_start": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "start_end": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "end_start": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "end_end": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  }
+                }
+              }
+            }
           }
         ]
       }
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "social-furniture-catalog.schema.json"
+  "$id": "social-furniture-catalog.schema.json",
+  "$defs": {
+    "desktop_dimension": {
+      "type": "object",
+      "required": [
+        "default",
+        "unit",
+        "range",
+        "basis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "default": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "basis": {
+          "const": "presentation_assumption"
+        }
+      }
+    }
+  }
 }

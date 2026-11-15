@@ -1,5 +1,6 @@
 """Shared door types, owner exceptions, basement material and window geometry."""
 import copy
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -26,22 +27,25 @@ class DoorTests(unittest.TestCase):
 
     def test_two_glazing_types_and_independent_material_profiles(self):
         self.assertEqual(set(self.catalog['types']),{'plain','round_window'})
-        self.assertEqual(set(self.catalog['materials']),{'wood','steel','blue_black_steel'})
+        self.assertEqual(set(self.catalog['materials']),{'wood','steel','glass','blue_black_steel'})
         self.assertEqual(self.catalog['materials']['wood']['thickness_source'],'exterior.door_leaf_mm')
         self.assertTrue(all(v['mass_kg'] is None for v in self.bindings.values()))
 
-    def test_doctoral_writing_rooms_have_viewing_windows_on_every_storey(self):
+    def test_doctoral_writing_rooms_keep_windows_except_the_explicit_glass_connection(self):
         for level in ['OG1','OG2','OG3']:
-            self.assertTrue(all(v['type']=='round_window' for v in self.bindings_for(level,'R3_002')))
+            self.assertTrue(all(v['type']=='round_window' for v in self.bindings_for(level,'R3_002') if v['material']!='glass'))
+        glass=self.bindings['OG3__D3_002_001']
+        self.assertEqual((glass['type'],glass['material']),('plain','glass'))
+        self.assertTrue(glass['full_leaf_glazing'])
 
     def test_kitchen_and_owner_office_remain_plain(self):
-        for level,area in [('OG1','R3_008A'),('OG1','R3_008B'),('OG3','R3_009')]:
+        for level,area in [('OG1','R3_008A'),('OG3','R3_009')]:
             self.assertTrue(all(v['type']=='plain' for v in self.bindings_for(level,area)))
 
     def test_larger_upper_and_lower_band_rooms_use_round_windows(self):
         for level in ['OG1','OG2','OG3']:
             for area in ['R3_001','R3_003','R3_015','R3_016']:
-                self.assertTrue(all(v['type']=='round_window' for v in self.bindings_for(level,area)))
+                self.assertTrue(all(v['type']=='round_window' for v in self.bindings_for(level,area) if v['material']!='glass'))
         # A small side room is not silently classified as a laboratory.
         self.assertTrue(all(v['type']=='plain' for v in self.bindings_for('OG3','R3_007')))
 
@@ -58,7 +62,7 @@ class DoorTests(unittest.TestCase):
         self.assertIn('OG3__D3_008AB',self.bindings)
 
     def test_explicit_exclusions_win_at_shared_doorways(self):
-        policy=copy.deepcopy(self.policy);policy['include_areas']={'OG3':['Lab']};policy['exclude_areas']={'OG3':['Office']};policy['default_type']='round_window'
+        policy=copy.deepcopy(self.policy);policy['opening_overrides']=[];policy['include_areas']={'OG3':['Lab']};policy['exclude_areas']={'OG3':['Office']};policy['default_type']='round_window'
         plan={'areas':[{'id':id,'label':id,'boundary':[{'wall':'Shared'}]} for id in ['Lab','Office']]}
         selection=doors.select(policy,plan,None,'OG3',{'wall':'Shared'})
         self.assertEqual(selection['type'],'plain');self.assertEqual(selection['reason'],'explicit_room_or_label_exclusion')
@@ -90,6 +94,11 @@ class DoorTests(unittest.TestCase):
             with self.subTest(key=key),self.assertRaises(ValueError):doors.validate(self.policy,catalog)
         with self.assertRaises(ValueError):doors.geometry(self.catalog,{'type':'round_window','material':'wood'},'TooNarrow',[0,0],[1,0],[0,1],400,2150,0,self.spec['exterior'])
         with self.assertRaises(ValueError):doors.geometry(self.catalog,{'type':'unimplemented','material':'wood'},'Unknown',[0,0],[1,0],[0,1],900,2150,0,self.spec['exterior'])
+
+    def test_stale_catalog_binding_is_rejected(self):
+        ref=copy.deepcopy(self.spec['exterior']['doors']);ref['source_sha256']='0'*64
+        with self.assertRaises(ValueError):doors.load(ref)
+
 
     def test_logistics_room_and_right_handed_steel_doors(self):
         plan=building.level_plan(self.spec,'EG')
@@ -126,9 +135,100 @@ class DoorTests(unittest.TestCase):
             for a,b in zip(actual[key],expected[key]):self.assertAlmostEqual(a,b)
         with self.assertRaises(ValueError):doors.handed_frame(plan,door,{**pose,'opens_into':'R0_001'},1)
 
-    def test_stale_catalog_binding_is_rejected(self):
-        ref=copy.deepcopy(self.spec['exterior']['doors']);ref['source_sha256']='0'*64
-        with self.assertRaises(ValueError):doors.load(ref)
+class GlassOverrideTests(unittest.TestCase):
+    """Component checks do not depend on an already regenerated building cache."""
+    @classmethod
+    def setUpClass(cls):
+        source=ROOT/'model/building-doors.shared.json'
+        cls.policy,cls.catalog=doors.load({'source':str(source.relative_to(ROOT)),
+            'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest()})
+        cls.policy=copy.deepcopy(cls.policy);cls.policy['opening_overrides']=[o for o in cls.policy['opening_overrides'] if o['level_id']=='OG3']
+        cls.plan=floor.load(ROOT/'model/floor-f03.shared.json')
+        cls.door=next(item for item in cls.plan['openings'] if item['id']=='D3_002_001')
+        cls.legacy={'door_leaf_mm':40,'door_color':'#C99448'}
+
+    def test_glass_connection_is_explicitly_bound_only_on_og3(self):
+        doors.validate_overrides(self.policy,{'OG3':self.plan})
+        chosen=doors.select(self.policy,self.plan,self.plan,'OG3',self.door)
+        self.assertEqual((chosen['type'],chosen['material'],chosen['reason']),
+                         ('plain','glass','owner_opening_override'))
+        self.assertEqual(chosen['area_ids'],['R3_001','R3_002'])
+        self.assertIn('laboratory 3.001',chosen['override_basis'])
+        for level in ('OG1','OG2'):
+            chosen=doors.select(self.policy,self.plan,self.plan,level,self.door)
+            self.assertEqual((chosen['type'],chosen['material']),('round_window','wood'))
+
+    def test_full_glass_leaf_has_transparent_material_and_no_round_cut(self):
+        chosen=doors.select(self.policy,self.plan,self.plan,'OG3',self.door)
+        result=doors.geometry(self.catalog,chosen,'GlassDoor',[100,200],[1,0],[0,1],1010,2150,12750,self.legacy)
+        self.assertEqual(len(result['bodies']),1)
+        self.assertEqual(len(result['operations']),1)
+        body=result['bodies'][0]
+        self.assertEqual(body['role'],'concept_open_glass_room_door')
+        self.assertEqual(body['appearance'],{'color':self.catalog['materials']['glass']['color'],
+                                             'opacity':self.catalog['materials']['glass']['opacity']})
+        self.assertEqual(chosen['leaf_thickness_mm'],12)
+        self.assertTrue(chosen['full_leaf_glazing'])
+        self.assertFalse(chosen['dimensions_measured'])
+        self.assertEqual(chosen['detail_body_ids'],[])
+        self.assertTrue(all(operation['action']=='create' for operation in result['operations']))
+
+    def test_legacy_profiles_and_untargeted_levels_generate_identical_geometry(self):
+        legacy_policy=copy.deepcopy(self.policy);legacy_policy.pop('opening_overrides')
+        legacy_catalog=copy.deepcopy(self.catalog);legacy_catalog['materials'].pop('glass')
+        doors.validate(legacy_policy,legacy_catalog)
+        for level in ('KG','OG1','OG2'):
+            old=doors.select(legacy_policy,self.plan,self.plan,level,self.door)
+            new=doors.select(self.policy,self.plan,self.plan,level,self.door)
+            self.assertEqual(old,new)
+            a=doors.geometry(legacy_catalog,old,'Door',[100,200],[1,0],[0,1],1010,2150,4250,self.legacy)
+            b=doors.geometry(self.catalog,new,'Door',[100,200],[1,0],[0,1],1010,2150,4250,self.legacy)
+            self.assertEqual(a,b)
+
+    def test_other_og3_openings_keep_their_existing_selection(self):
+        legacy=copy.deepcopy(self.policy);legacy.pop('opening_overrides')
+        for door in self.plan['openings']:
+            if door['kind']!='door' or door['id']==self.door['id']:continue
+            with self.subTest(opening=door['id']):
+                self.assertEqual(doors.select(legacy,self.plan,self.plan,'OG3',door),
+                                 doors.select(self.policy,self.plan,self.plan,'OG3',door))
+
+    def test_unknown_override_ids_and_non_door_openings_fail_closed(self):
+        not_a_door=next(item['id'] for item in self.plan['openings'] if item['kind']!='door')
+        for identity in ('DoesNotExist',not_a_door):
+            policy=copy.deepcopy(self.policy);policy['opening_overrides'][0]['opening_id']=identity
+            with self.subTest(opening=identity):
+                with self.assertRaisesRegex(ValueError,'Unknown or non-door override opening'):
+                    doors.validate_overrides(policy,{'OG3':self.plan})
+                with self.assertRaisesRegex(ValueError,'Unknown or non-door override opening'):
+                    doors.select(policy,self.plan,self.plan,'OG3',self.door)
+
+    def test_invalid_override_levels_types_materials_and_duplicates_fail_closed(self):
+        for key,value in [('level_id','ROOF'),('type','unimplemented'),('material','paper'),('basis','')]:
+            policy=copy.deepcopy(self.policy);policy['opening_overrides'][0][key]=value
+            with self.subTest(field=key),self.assertRaises(ValueError):doors.validate(policy,self.catalog)
+        policy=copy.deepcopy(self.policy);policy['opening_overrides'].append(copy.deepcopy(policy['opening_overrides'][0]))
+        with self.assertRaisesRegex(ValueError,'Duplicate per-opening'):
+            doors.validate(policy,self.catalog)
+        with self.assertRaisesRegex(ValueError,'Override level has no actual plan'):
+            doors.validate_overrides(self.policy,{'OG2':self.plan})
+
+    def test_glass_profile_dimensions_and_opacity_are_not_guessed(self):
+        for key,value in [('thickness_mm',0),('thickness_mm',float('nan')),('opacity',True),('opacity',1),('mass_kg',10),('color',None)]:
+            catalog=copy.deepcopy(self.catalog);catalog['materials']['glass'][key]=value
+            with self.subTest(field=key,value=value),self.assertRaises(ValueError):doors.validate(self.policy,catalog)
+        with self.assertRaisesRegex(ValueError,'full-glass leaf uses the plain'):
+            doors.geometry(self.catalog,{'type':'round_window','material':'glass'},'BadGlass',
+                           [0,0],[1,0],[0,1],1010,2150,0,self.legacy)
+
+    def test_current_policy_and_catalog_match_their_schemas(self):
+        try:
+            from jsonschema import Draft202012Validator
+        except ImportError:
+            self.skipTest('jsonschema is unavailable')
+        for source,schema in [('model/building-doors.shared.json','model/building-doors.schema.json'),
+                              ('model/doors/room-doors.catalog.json','model/room-door-catalog.schema.json')]:
+            Draft202012Validator(json.loads((ROOT/schema).read_text())).validate(json.loads((ROOT/source).read_text()))
 
 
 if __name__=='__main__':unittest.main()

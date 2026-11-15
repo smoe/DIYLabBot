@@ -6435,14 +6435,19 @@
     {
       "id": "ground_svg",
       "path": "docs/models/images/ground-floor-eg.svg",
-      "sha256": "4e5456d0d14433899fab20f35bd8d8d9f7f5bb0343fcd931029b73e0d187210e",
-      "bytes": 9020,
+      "sha256": "de52f7ecb161d809d7b693a360c685e13647c87cf5173774a9b06f7de16e5bf7",
+      "bytes": 9029,
       "representation": "Source-derived self-contained vectors, no original image embedded",
       "visual_review": {
         "passed": true,
         "date": "2026-11-13"
       },
-      "site_update_reuse": "Changed site geometry is hidden or outside this source-derived schematic; reviewed image bytes retained"
+      "site_update_reuse": "Changed site geometry is hidden or outside this source-derived schematic; reviewed image bytes retained",
+      "logistics_label_update": {
+        "source": "model/ground-floor-eg.shared.json",
+        "source_sha256": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+        "basis": "Owner confirms R0_013 logistics (post / waste); source-derived SVG regenerated. Other image bindings remain historical."
+      }
     },
     {
       "id": "section_png",

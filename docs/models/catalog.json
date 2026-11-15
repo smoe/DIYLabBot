@@ -752,14 +752,15 @@
       "group": "umgebungen",
       "sources": [
         "model/building-stack.shared.json",
-        "model/basement-kg.shared.json"
+        "model/basement-kg.shared.json",
+        "model/building-walkthrough.shared.json"
       ],
       "image": "images/building-stack.svg",
       "render": {
         "kind": "diagram",
         "view": "building_stack"
       },
-      "caption": "Eigene Keller- und EG-Raumquellen, drei Obergeschosse und Glasgewölbe. Fotoabgeleitete Glasfront, holzfarbene Raumtüren und offene Metallgeländer. Dünne grüne Rasenmarkierung, graue Zufahrt und Bürgersteig auf EG-Höhe ordnen den Keller unterirdisch ein; opake Betonflanken und unterbrochene seitliche Fensterbänder folgen den Fotos; Maße und Höhen bleiben Annahmen. Deckungsgleiche Außenkonturen bei festem Treppen- und Aufzugskern.",
+      "caption": "Eigene Keller- und EG-Raumquellen, drei Obergeschosse und Glasgewölbe. Fotoabgeleitete Glasfront, holzfarbene Raumtüren und offene Metallgeländer. Dünne grüne Rasenmarkierung, graue Zufahrt und Bürgersteig auf EG-Höhe ordnen den Keller unterirdisch ein; opake Betonflanken und unterbrochene seitliche Fensterbänder folgen den Fotos; Maße und Höhen bleiben Annahmen. Deckungsgleiche Außenkonturen bei festem Treppen- und Aufzugskern. Ein lokaler Browser-Rundgang öffnet Doktorandenraum, Labor, Küche, Atrium und Kernbereich; Details erklären die getrennten Raumbezüge. Je eine offene Sitzgruppe im 1.–3. OG liegt im Kernbereich (NorthCore) mit Geländer; der westliche WC-Bereich bleibt erhalten.",
       "documentation": "docs/building-stack.md"
     },
     {
@@ -808,7 +809,7 @@
         "kind": "diagram",
         "view": "building_social"
       },
-      "caption": "Schematischer Küchenplan aus der fotoinspirierten Möblierung und angenommene Büroarbeitsplätze. Native Ansichten und Kühlschrank-Easter-Egg in der Dokumentation.",
+      "caption": "Schematischer Küchenplan aus der fotoinspirierten Möblierung und angenommene Büroarbeitsplätze. Die ungeteilte Küche 1.008 umfasst die drei referenzierten Teilflächen; ihre Tische sind am Außenfenster ausgerichtet. In 3.002 bilden wandbündige Tischplatten ein U mit freier linker Glastür zu 3.001. Im Kernbereich (NorthCore) steht im 1.–3. OG je ein weißer elliptischer Tisch mit vier Stühlen. Native Ansichten und Kühlschrank-Easter-Egg in der Dokumentation.",
       "documentation": "docs/building-furnishings.md",
       "description": "Küche 1.008, Doktorandenbüros 1.002/2.002/3.002 und Büro 3.009; unkalibrierte Einpassung in die Gebäudevorlage."
     },
@@ -825,9 +826,9 @@
         "kind": "diagram",
         "view": "room_doors"
       },
-      "caption": "Zwei gemeinsame Geometrietypen: mit rundem Guckfenster oder ohne Fenster. Keller mit schwerem Stahlprofil; Maße und Masse bleiben unqualifiziert.",
+      "caption": "Zwei gemeinsame Geometrietypen: mit rundem Guckfenster oder ohne Fenster. Keller mit schwerem Stahlprofil; die linke Verbindung 3.002–3.001 verwendet das fensterlose Profil als Glastür. Maße und Masse bleiben unqualifiziert.",
       "documentation": "docs/building-doors.md",
-      "description": "Große Räume an beiden äußeren Zeichnungsseiten und Doktorandenbüros mit Guckfenstern; Küchen und Büroausnahmen ohne. Stahl-Materialvariante für KG."
+      "description": "Große Räume an beiden äußeren Zeichnungsseiten und Doktorandenbüros mit Guckfenstern; Küchen und Büroausnahmen ohne. Stahl-Materialvariante für KG, Glas-Materialvariante für die linke Verbindung 3.002–3.001 auf OG3."
     }
   ],
   "groups": [

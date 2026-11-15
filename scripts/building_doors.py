@@ -7,6 +7,7 @@ import assembly_model as assembly
 import relative_floorplan as floor
 
 ROOT=Path(__file__).resolve().parents[1]
+LEVELS=frozenset({'KG','EG','OG1','OG2','OG3'})
 
 
 def require(ok,message):
@@ -35,7 +36,7 @@ def validate(policy,catalog):
     require(policy['format']=='solidcraftbot.building-doors/1','Unsupported building-door policy')
     require(catalog['format']=='solidcraftbot.room-door-catalog/1' and catalog['units']=={'length':'mm','angle':'deg'},'Typed room-door catalog required')
     require(catalog['types']=={'plain':{'round_window':False},'round_window':{'round_window':True}},'Exactly two supported door types required')
-    require({'wood','steel'}<=set(catalog['materials'])<={'wood','steel','blue_black_steel'},'Explicit supported door profiles required')
+    require({'wood','steel'}<=set(catalog['materials'])<={'wood','steel','glass','blue_black_steel'},'Supported wood, steel and optional glass profiles required')
     require(policy['default_type'] in catalog['types'] and policy['default_material'] in catalog['materials'],'Unknown default door type or material')
     require(all(v in catalog['materials'] for v in policy['level_materials'].values()),'Unknown floor door material')
     require(len(set(policy['round_window_levels']))==len(policy['round_window_levels']) and set(policy['round_window_levels'])<={'EG','OG1','OG2','OG3'},'Explicit above-ground window selection required')
@@ -56,32 +57,51 @@ def validate(policy,catalog):
     require(set(policy['level_materials'])<={'KG','EG','OG1','OG2','OG3'},'Unknown material floor')
     steel=catalog['materials']['steel'];require(set(steel)=={'thickness_mm','color','mass_kg'} and re.fullmatch('#[0-9a-fA-F]{6}',steel['color']),'Explicit steel profile required')
     require(type(steel['thickness_mm']) in (int,float) and math.isfinite(steel['thickness_mm']) and steel['thickness_mm']>0 and steel['mass_kg'] is None,'Steel thickness is illustrative; mass remains unknown')
-
+    if 'glass' in catalog['materials']:
+        glass=catalog['materials']['glass']
+        require(set(glass)=={'thickness_mm','color','opacity','mass_kg'} and isinstance(glass['color'],str) and re.fullmatch('#[0-9a-fA-F]{6}',glass['color']),'Explicit full-glass profile required')
+        require(type(glass['thickness_mm']) in (int,float) and math.isfinite(glass['thickness_mm']) and glass['thickness_mm']>0 and glass['mass_kg'] is None,'Glass thickness is illustrative; mass remains unknown')
+        require(type(glass['opacity']) in (int,float) and 0<glass['opacity']<1,'Transparent full-glass leaf required')
     if 'blue_black_steel' in catalog['materials']:
         variant=catalog['materials']['blue_black_steel']
         require(set(variant)=={'base_material','color'} and variant['base_material']=='steel' and isinstance(variant['color'],str) and re.fullmatch('#[0-9a-fA-F]{6}',variant['color']), 'Explicit steel finish variant required')
-    overrides=policy.get('opening_overrides',[]);require(isinstance(overrides,list),'Door overrides must be a list');seen=set()
+    overrides=policy.get('opening_overrides',[])
+    require(isinstance(overrides,list),'Explicit per-opening door overrides required')
+    identities=set()
     for override in overrides:
-        require(isinstance(override,dict) and set(override)-{'pose'}=={'level_id','opening_id','type','material','basis'},'Explicit opening override fields required')
-        require(override['level_id'] in {'KG','EG','OG1','OG2','OG3'} and isinstance(override['opening_id'],str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*',override['opening_id']), 'Stable opening override identity required')
-        require(override['type'] in catalog['types'] and override['material'] in catalog['materials'] and isinstance(override['basis'],str) and override['basis'].strip(),'Known door override and basis required')
-        key=(override['level_id'],override['opening_id']);require(key not in seen,'Duplicate opening override');seen.add(key)
+        require(isinstance(override,dict) and set(override)-{'pose'}=={'level_id','opening_id','type','material','basis'},'Explicit per-opening door override fields required')
+        require(isinstance(override['level_id'],str) and override['level_id'] in LEVELS,'Unknown override level')
+        require(isinstance(override['opening_id'],str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*',override['opening_id']),'Stable override opening ID required')
+        require(isinstance(override['type'],str) and override['type'] in catalog['types'],'Unknown override door type')
+        require(isinstance(override['material'],str) and override['material'] in catalog['materials'],'Unknown override door material')
+        require(override['material']!='glass' or override['type']=='plain','A full-glass leaf uses the plain geometry type')
+        require(isinstance(override['basis'],str) and override['basis'].strip(),'Per-opening override basis required')
+        identity=(override['level_id'],override['opening_id'])
+        require(identity not in identities,'Duplicate per-opening door override')
+        identities.add(identity)
         if 'pose' in override:
             pose=override['pose'];require(isinstance(pose,dict) and set(pose)=={'approach_from','hinge_side','opens_into'} and pose['hinge_side'] in {'left','right'} and all(isinstance(pose[k],str) and pose[k] for k in ('approach_from','opens_into')), 'Explicit door approach, hinge side and opening region required')
 
 
+
 def level_overrides(policy,plan,level):
-    if not any(o['level_id']==level for o in policy.get('opening_overrides',[])):return {}
-    openings={o['id']:o for o in plan['openings']};result={}
+    """Bind override IDs to the actual derived level, never to a guessed name."""
+    require(level in LEVELS,'Unknown door-selection level')
+    openings={opening['id']:opening for opening in plan.get('openings',[])}
+    result={}
     for override in policy.get('opening_overrides',[]):
         if override['level_id']!=level:continue
-        opening=openings.get(override['opening_id']);require(opening is not None and opening['kind']=='door','Override must reference an actual door: '+level+'__'+override['opening_id']);result[opening['id']]=override
+        opening=openings.get(override['opening_id'])
+        require(opening is not None and opening['kind']=='door','Unknown or non-door override opening: '+level+'__'+override['opening_id'])
+        result[override['opening_id']]=override
         if 'pose' in override:handed_frame(plan,opening,override['pose'],1)
     return result
 
 
 def validate_overrides(policy,plans):
-    require({o['level_id'] for o in policy.get('opening_overrides',[])}<=set(plans),'Override level must have an actual plan')
+    """Check all overrides, including a level with no generated door leaves."""
+    require(isinstance(plans,dict) and set(plans)<=LEVELS,'Known level plans required for door overrides')
+    require({override['level_id'] for override in policy.get('opening_overrides',[])}<=set(plans),'Override level has no actual plan')
     for level,plan in plans.items():level_overrides(policy,plan,level)
 
 
@@ -133,6 +153,7 @@ def select(policy,plan,canonical,level,door):
 def geometry(catalog,selection,name,hinge,u,normal,width,height,z,legacy,component='BuildingExterior'):
     require(selection['type'] in catalog['types'] and selection['material'] in catalog['materials'],'Unsupported door variant')
     material=selection['material'];profile=material_profile(catalog,material)
+    require(material!='glass' or selection['type']=='plain','A full-glass leaf uses the plain geometry type')
     thickness=legacy['door_leaf_mm'] if material=='wood' else profile['thickness_mm'];color=legacy['door_color'] if material=='wood' else profile['color']
     require(width>0 and height>0 and thickness>0,'Positive door dimensions required')
     result={'bodies':[],'operations':[]}
@@ -141,11 +162,12 @@ def geometry(catalog,selection,name,hinge,u,normal,width,height,z,legacy,compone
     def cylinder(id,target,along,radius,depth,action='create'):
         op(id,target,{'kind':'cylinder','origin':[center[0]+along*u[0],center[1]+along*u[1],z+w['center_height_mm']],
             'radius':radius,'height':depth,'axis':[u[0],u[1],0]},action)
-    body(name,'concept_open_'+material+'_room_door',color)
+    body(name,'concept_open_'+material+'_room_door',color,profile.get('opacity',1))
     points=[[hinge[j]+along*u[j]+across*normal[j] for j in (0,1)] for along,across in [(-thickness,0),(0,0),(0,width),(-thickness,width)]]
     if floor.signed_area(points)<0:points.reverse()
     op(name+'_Leaf',name,{'kind':'polygon_prism','plane':'XY','points':points,'offset':z,'depth':height,'fixed':True})
     selection.update(leaf_body_id=name,leaf_thickness_mm=thickness,width_mm=width,height_mm=height,detail_body_ids=[],dimensions_measured=False)
+    if material=='glass':selection['full_leaf_glazing']=True
     if selection['type']=='plain':return result
     w=catalog['window'];radius=w['diameter_mm']/2;rim_radius=radius+w['rim_width_mm']
     require(2*(rim_radius+w['edge_margin_mm'])<width and rim_radius+w['edge_margin_mm']<w['center_height_mm']<height-rim_radius-w['edge_margin_mm'],'Viewing window does not fit its door leaf: '+name)

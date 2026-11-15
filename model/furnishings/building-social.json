@@ -2,11 +2,11 @@
   "format": "solidcraftbot.building-furnishings/1",
   "catalog": {
     "source": "model/furniture/social.catalog.json",
-    "source_sha256": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+    "source_sha256": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50"
   },
   "basis": "Owner room assignments and two private kitchen photographs; all sizes and desk counts assumed",
-  "kitchen_template_mapping": "Assumed combined OG1 projection of canonical 008A/B; internal template partition omitted only for this furnished display",
-  "placement_policy": "Uniform presentation fit inside referenced room bounds; not physical dimensions or calibrated registration",
+  "kitchen_template_mapping": "Owner-confirmed unpartitioned kitchen 1.008 on OG1 uses the canonical 008A/B/009 projection. W027 and W017 are omitted only in this furnished OG1 view; no OG1 room number 1.009 is inferred, and OG2/OG3 retain the original partitions.",
+  "placement_policy": "Legacy rooms retain uniform presentation fit; explicitly wall-anchored worktops derive wall contact and spans from effective room geometry, with nominal dimensions presentation-scaled once",
   "rooms": [
     {
       "id": "Kitchen1008",
@@ -14,7 +14,8 @@
       "level": "OG1",
       "template_areas": [
         "R3_008A",
-        "R3_008B"
+        "R3_008B",
+        "R3_009"
       ],
       "recipe": "kitchen",
       "local_extent_mm": [
@@ -303,7 +304,18 @@
           ],
           "yaw_deg": -90
         }
-      ]
+      ],
+      "window_anchor": {
+        "area_id": "R3_009",
+        "wall_id": "W005",
+        "table_instances": [
+          "TableA",
+          "TableB"
+        ],
+        "table_gap_mm": 100,
+        "basis": "presentation_assumption"
+      },
+      "layout_basis": "Owner confirms unpartitioned kitchen 1.008 and tables next to the outside window. Nominal gap and furniture sizes remain presentation assumptions; the entire fitted recipe moves normally to W005 and minimally along it to stay within the union inner wall planes."
     },
     {
       "id": "PhD1002",
@@ -515,83 +527,135 @@
           "id": "Desk0",
           "type": "desk",
           "xyz_mm": [
-            200,
-            900,
+            0,
+            0,
             0
           ],
-          "yaw_deg": 0
+          "yaw_deg": 0,
+          "wall_span": {
+            "area_id": "R3_002",
+            "wall_id": "W070",
+            "segment": "full",
+            "back_gap_mm": 0,
+            "opening_margin_mm": 60,
+            "corner_owner": false
+          }
         },
         {
           "id": "Chair0",
           "type": "office_chair",
           "xyz_mm": [
-            1000,
-            2000,
+            950,
+            3000,
             0
           ],
-          "yaw_deg": 0
+          "yaw_deg": -90
         },
         {
           "id": "Desk1",
           "type": "desk",
           "xyz_mm": [
-            3100,
-            1600,
+            0,
+            0,
             0
           ],
-          "yaw_deg": 180
+          "yaw_deg": 0,
+          "wall_span": {
+            "area_id": "R3_002",
+            "wall_id": "W086",
+            "segment": "before_opening",
+            "back_gap_mm": 0,
+            "opening_margin_mm": 60,
+            "corner_owner": false,
+            "opening_id": "D3_002_001"
+          }
         },
         {
           "id": "Chair1",
           "type": "office_chair",
           "xyz_mm": [
-            2300,
-            500,
+            2400,
+            3700,
             0
           ],
-          "yaw_deg": 180
+          "yaw_deg": 90
         },
         {
           "id": "Desk2",
           "type": "desk",
           "xyz_mm": [
-            200,
-            3900,
+            0,
+            0,
             0
           ],
-          "yaw_deg": 0
+          "yaw_deg": 0,
+          "wall_span": {
+            "area_id": "R3_002",
+            "wall_id": "W086",
+            "segment": "after_opening",
+            "back_gap_mm": 0,
+            "opening_margin_mm": 60,
+            "corner_owner": false,
+            "opening_id": "D3_002_001"
+          }
         },
         {
           "id": "Chair2",
           "type": "office_chair",
           "xyz_mm": [
-            1000,
-            5000,
+            950,
+            5200,
             0
           ],
-          "yaw_deg": 0
+          "yaw_deg": -90
         },
         {
           "id": "Desk3",
           "type": "desk",
           "xyz_mm": [
-            3100,
-            4600,
+            0,
+            0,
             0
           ],
-          "yaw_deg": 180
+          "yaw_deg": 0,
+          "wall_span": {
+            "area_id": "R3_002",
+            "wall_id": "W072",
+            "segment": "full",
+            "back_gap_mm": 0,
+            "opening_margin_mm": 60,
+            "corner_owner": true
+          }
         },
         {
           "id": "Chair3",
           "type": "office_chair",
           "xyz_mm": [
-            2300,
-            3500,
+            1650,
+            450,
             0
           ],
-          "yaw_deg": 180
+          "yaw_deg": 0
+        },
+        {
+          "id": "FirstAid",
+          "type": "first_aid_cabinet",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "opening_anchor": {
+            "opening_id": "D3_002N",
+            "area_id": "R3_002",
+            "side": "interior_right",
+            "jamb_gap_mm": 150,
+            "height_mm": 1400
+          }
         }
-      ]
+      ],
+      "layout_basis": "Owner confirms a continuous U-shaped work surface flush with both long walls and the window wall, interrupted only at the left glass doorway to laboratory 3.001; the first-aid cabinet stays inside right of the corridor entrance. Four worktop modules and four chairs preserve existing IDs; dimensions, support spacing, jamb margins and chair positions remain presentation assumptions."
     },
     {
       "id": "Office3009",
@@ -638,6 +702,29 @@
           "yaw_deg": 0
         }
       ]
+    }
+  ],
+  "atrium_seating": [
+    {
+      "format": "solidcraftbot.atrium-seating/1",
+      "id": "AtriumAccessSeating",
+      "anchor": "AtriumAccess",
+      "levels": [
+        "OG1",
+        "OG2",
+        "OG3"
+      ],
+      "table_type": "oval_table",
+      "chair_type": "dining_chair",
+      "table_overrides_mm": {},
+      "chair_station_fraction": 0.3,
+      "table_edge_gap_mm": 80,
+      "clearances_mm": {
+        "entry": 600,
+        "wall": 50,
+        "guard": 80
+      },
+      "basis": "presentation_assumption"
     }
   ]
 }

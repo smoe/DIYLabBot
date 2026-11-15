@@ -21,6 +21,7 @@
   "materials": {
     "wood": {"thickness_source": "exterior.door_leaf_mm", "color_source": "exterior.door_color", "mass_kg": null},
     "steel": {"thickness_mm": 60, "color": "#69737C", "mass_kg": null},
-    "blue_black_steel": {"base_material": "steel", "color": "#172530"}
+    "blue_black_steel": {"base_material": "steel", "color": "#172530"},
+    "glass": {"thickness_mm": 12, "color": "#A7CDD8", "opacity": 0.3, "mass_kg": null}
   }
 }

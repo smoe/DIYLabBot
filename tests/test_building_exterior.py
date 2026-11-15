@@ -43,6 +43,12 @@ class ExteriorTests(unittest.TestCase):
         for body in doors:
             if body['id'].startswith('KG__'):
                 self.assertEqual(body['role'],'concept_open_steel_room_door')
+            elif body['id'] in {'EG__DoorLeaf_D0_013','EG__DoorLeaf_D0_013_Exterior'}:
+                self.assertEqual(body['appearance'],{'color':'#172530','opacity':1})
+                self.assertEqual(body['role'],'concept_open_blue_black_steel_room_door')
+            elif body['id']=='OG3__DoorLeaf_D3_002_001':
+                self.assertEqual(body['role'],'concept_open_glass_room_door')
+                self.assertEqual(body['appearance'],{'color':'#A7CDD8','opacity':.3})
             else:
                 self.assertEqual(body['appearance']['color'],self.s['exterior']['door_color'])
         witnesses={p['target_body'] for p in self.d['opening_probes'] if p['id'].startswith('LeafClear_')}
@@ -50,7 +56,9 @@ class ExteriorTests(unittest.TestCase):
         self.assertFalse(set(ext['omitted_body_ids']) & {p['target_body'] for p in self.d['opening_probes']})
 
     def test_open_guards_have_posts_hand_rail_and_four_separate_horizontal_bars(self):
-        ext=self.d['exterior'];self.assertEqual(len(ext['guard_groups']),6)
+        ext=self.d['exterior']
+        self.assertEqual({(group['level_id'],group['boundary']) for group in ext['guard_groups']},
+                         {(level,wall) for level in ['OG1','OG2','OG3'] for wall in ['W068','W106','W065']})
         for group in ext['guard_groups']:
             operations=[o for o in self.e['operations'] if o['body'] in group['body_ids']]
             self.assertTrue(all(o['action']=='create' for o in operations))
@@ -64,6 +72,32 @@ class ExteriorTests(unittest.TestCase):
         self.assertEqual(d['exterior']['terrain_bottom_mm'],-20)
         self.assertEqual(d['exterior']['facade_top_mm'],14800)
         self.assertEqual(d['exterior']['grade_z_mm'],0)
+
+    def test_kitchen_window_addition_is_bound_to_og1_only(self):
+        selected=copy.deepcopy(self.s)
+        selected['exterior']['side_window_walls_by_level']={'OG1':['W005']}
+        added=model.interfaces(selected,self.p)['exterior']
+        groups=[group for group in added['side_window_groups'] if group['wall']=='W005']
+        self.assertEqual([(group['level_id'],group['target_body']) for group in groups],
+                         [('OG1','OG1__Wall_W005')])
+        self.assertTrue(any(probe['target_body']=='OG1__Wall_W005' for probe in added['window_probes']))
+        baseline=copy.deepcopy(selected)
+        baseline['exterior'].pop('side_window_walls_by_level')
+        before=model.interfaces(baseline,self.p)['exterior']
+        self.assertEqual([group for group in added['side_window_groups'] if group['level_id']!='OG1'],
+                         [group for group in before['side_window_groups'] if group['level_id']!='OG1'])
+
+    def test_invalid_level_window_additions_are_rejected(self):
+        for additions in ({'KG':['W005']},{'OG1':[]},{'OG1':['W005','W005']},
+                          {'OG1':[self.s['exterior']['side_window_walls'][0]]},False):
+            selected=copy.deepcopy(self.s['exterior'])
+            selected['side_window_walls_by_level']=additions
+            with self.subTest(additions=additions),self.assertRaises(ValueError):
+                exterior.validate(selected)
+        selected=copy.deepcopy(self.s)
+        selected['exterior']['side_window_walls_by_level']={'OG1':['W070']}
+        with self.assertRaisesRegex(ValueError,'actual outer facade'):
+            model.interfaces(selected,self.p)
 
     def test_entrance_flanks_are_opaque_and_side_bands_have_closed_gaps(self):
         ext=self.d['exterior'];bodies={b['id']:b for b in self.e['bodies']}

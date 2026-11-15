@@ -1,0 +1,122 @@
+{
+  "format": "solidcraftbot.building-walkthrough/1",
+  "id": "BuildingWalkthrough",
+  "sources": {
+    "building": {
+      "source": "model/building-stack.shared.json",
+      "source_sha256": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a"
+    },
+    "lab": {
+      "source": "model/lab-layout-l01.shared.json",
+      "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+    }
+  },
+  "settings": {
+    "eye_height_mm": 1600,
+    "walk_speed_mm_s": 1400,
+    "vertical_speed_mm_s": 1000,
+    "fov_deg": 70,
+    "near_mm": 25,
+    "far_mm": 180000,
+    "look_sensitivity": 0.0025
+  },
+  "default_stop": "phd",
+  "stops": [
+    {
+      "id": "phd",
+      "label": "Doktorandenraum 3.002",
+      "scene": "building",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "room_entry",
+        "areas": [
+          "R3_002"
+        ],
+        "opening": "D3_002N",
+        "inset_mm": 1000,
+        "target_height_mm": 1350,
+        "look_at": "room_end"
+      }
+    },
+    {
+      "id": "lab",
+      "label": "Labor 3.003",
+      "scene": "lab",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "room_fraction",
+        "eye_xy": [
+          0.2,
+          0.18
+        ],
+        "target_xy": [
+          0.6,
+          0.65
+        ],
+        "target_height_mm": 1250
+      }
+    },
+    {
+      "id": "kitchen",
+      "label": "Küche 1.008",
+      "scene": "building",
+      "level_id": "OG1",
+      "anchor": {
+        "kind": "room_entry",
+        "areas": [
+          "R3_008A",
+          "R3_008B",
+          "R3_009"
+        ],
+        "opening": "D3_008A",
+        "inset_mm": 1500,
+        "target_height_mm": 1100,
+        "look_at": "room_end"
+      }
+    },
+    {
+      "id": "atrium",
+      "label": "Freiraum / Atrium",
+      "scene": "building",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "area_edge",
+        "area": "C3_019",
+        "wall": "W068",
+        "target_area": "Atrium",
+        "setback_mm": 900,
+        "target_height_mm": 700
+      }
+    },
+    {
+      "id": "seating",
+      "label": "Kernbereich · 3. OG",
+      "scene": "building",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "access_entry",
+        "access_id": "AtriumAccess",
+        "setback_mm": 800,
+        "target_height_mm": 900
+      }
+    }
+  ],
+  "qualification": {
+    "metric_scale_known": false,
+    "lab_to_building_registered": false,
+    "collision_checked": false
+  },
+  "limitations": [
+    "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
+    "The detailed L01 lab is a separate local scene. Switching to it does not claim a measured connection to the building frame.",
+    "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
+    "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
+    "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer."
+  ],
+  "rendering": {
+    "opacity_by_role": {
+      "concept_storey_wall": 1,
+      "circulation_wall_bridge": 1
+    }
+  }
+}

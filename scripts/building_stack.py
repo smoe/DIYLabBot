@@ -91,7 +91,7 @@ def parameters(spec, overrides=None):
 
 
 def validate(spec):
-    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior', 'alignment'}}
+    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior', 'alignment', 'plan_variants', 'atrium_access'}}
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
@@ -114,6 +114,8 @@ def validate(spec):
     require(all(value is False for value in spec['qualification'].values()), 'Concept assumptions do not qualify a real building or transport system')
     require(isinstance(spec['limitations'], list) and spec['limitations'] and all(isinstance(text, str) and text for text in spec['limitations']), 'Explicit text limitations required')
     p = parameters(spec); plan, reference = templates(spec)
+    validate_plan_variants(spec, plan)
+    validate_atrium_access(spec, plan)
     atrium_polygon(spec, plan)
     marker_polygon(spec, atrium_polygon(spec, plan))
     circulation.validate_source(spec['circulation'])
@@ -154,6 +156,129 @@ def marker_polygon(spec, polygon):
     return result
 
 
+def validate_plan_variants(spec, plan):
+    """Owner corrections to upper-storey use/openings; no copied plan geometry."""
+    variants = _spec(spec).get('plan_variants', [])
+    require(isinstance(variants, list), 'Plan variants must be a list')
+    areas = {area['id']: area for area in plan['areas']}
+    walls = {wall['id']: wall for wall in plan['walls']}
+    openings = {opening['id']: opening for opening in plan['openings']}
+    incidence = {name: {area['id'] for area in plan['areas'] if any(edge['wall'] == name for edge in area['boundary'])} for name in walls}
+    raw = _spec(spec)
+    protected = {raw['circulation']['elevator']['area'], *[item['area'] for item in raw['circulation']['stairs']['instances']]}
+    ids, bindings = set(), set()
+    for variant in variants:
+        exact(variant, 'id levels area_overrides wall_overrides disabled_openings basis', 'plan variant')
+        require(isinstance(variant['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', variant['id']) and variant['id'] not in ids, 'Unique plan variant ID required')
+        ids.add(variant['id'])
+        selected = variant['levels']
+        require(isinstance(selected, list) and selected and len(selected) == len(set(selected)) and set(selected) <= {'OG1', 'OG2', 'OG3'}, 'Plan variants support explicit upper-storey levels only')
+        require(isinstance(variant['basis'], str) and variant['basis'], 'Plan variant needs an explicit owner/assumption basis')
+        require(isinstance(variant['area_overrides'], dict) and isinstance(variant['wall_overrides'], dict), 'Reference-based plan overrides required')
+        for name, change in variant['area_overrides'].items():
+            exact(change, 'kind label', 'area use override')
+            require(name in areas and name not in protected and areas[name]['kind'] in {'room', 'unknown'}, 'Only existing non-core rooms or unknown areas may become access space')
+            require(change['kind'] == 'corridor' and isinstance(change['label'], str) and change['label'], 'Explicit corridor use and label required')
+        for name, kind in variant['wall_overrides'].items():
+            require(name in walls and kind == 'open_boundary' and len(incidence[name]) == 2 and not incidence[name] & protected, 'Only a referenced non-core internal boundary may be opened')
+        disabled = variant['disabled_openings']
+        require(isinstance(disabled, list) and len(disabled) == len(set(disabled)), 'Unique disabled opening references required')
+        for name in disabled:
+            require(name in openings and openings[name]['kind'] == 'door' and not incidence[openings[name]['wall']] & protected, 'Only an existing non-core doorway may be disabled')
+        for level in selected:
+            for kind, names in [('area', variant['area_overrides']), ('wall', variant['wall_overrides']), ('opening', disabled)]:
+                for name in names:
+                    key = (level, kind, name)
+                    require(key not in bindings, 'Conflicting plan variant bindings')
+                    bindings.add(key)
+
+
+def apply_plan_variants(spec, plan, level_id):
+    validate_plan_variants(spec, plan)
+    selected = [variant for variant in _spec(spec).get('plan_variants', []) if level_id in variant['levels']]
+    if not selected:
+        return plan
+    result = copy.deepcopy(plan)
+    for variant in selected:
+        for area in result['areas']:
+            area.update(variant['area_overrides'].get(area['id'], {}))
+        for wall in result['walls']:
+            if wall['id'] in variant['wall_overrides']:
+                wall['kind'] = variant['wall_overrides'][wall['id']]
+        result['openings'] = [opening for opening in result['openings'] if opening['id'] not in variant['disabled_openings']]
+        result['provenance']['notes'].append('Building-only owner correction: '+variant['id'])
+    floor.validate(result)
+    return result
+
+
+def validate_atrium_access(spec, plan):
+    access = _spec(spec).get('atrium_access')
+    if access is None:
+        return
+    exact(access, 'id plan_variant corridor_area atrium_area', 'atrium access anchor')
+    require(isinstance(access['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', access['id']), 'Stable atrium access ID required')
+    variant = next((item for item in _spec(spec).get('plan_variants', []) if item['id'] == access['plan_variant']), None)
+    require(variant is not None and variant['area_overrides'], 'Atrium access needs a declared plan variant')
+    areas = {area['id']: area for area in plan['areas']}
+    require(access['corridor_area'] in areas and areas[access['corridor_area']]['kind'] == 'corridor'
+            and access['atrium_area'] == _spec(spec)['atrium']['area'], 'Referenced corridor and atrium required')
+    selected = set(variant['area_overrides'])
+    incidence = {wall['id']: {area['id'] for area in plan['areas'] if any(edge['wall'] == wall['id'] for edge in area['boundary'])} for wall in plan['walls']}
+    opened = set(variant['wall_overrides'])
+    entries = {name for name in opened if access['corridor_area'] in incidence[name] and incidence[name] & selected}
+    guards = {name for name in opened if access['atrium_area'] in incidence[name] and incidence[name] & selected}
+    internal = {name for name, adjacent in incidence.items() if len(adjacent & selected) == 2}
+    require(entries and guards and internal <= opened, 'Alcove must connect its source areas, corridor entry and atrium edge')
+    require(guards <= set(_spec(spec).get('exterior', {}).get('guard_boundaries', [])), 'Every open alcove-to-atrium edge requires the common railing')
+
+
+def atrium_access_anchors(spec, plan, level_plans, p):
+    """Resolve one environmental anchor per supported storey, without furniture."""
+    access = _spec(spec).get('atrium_access')
+    if access is None:
+        return {}
+    validate_atrium_access(spec, plan)
+    variant = next(item for item in _spec(spec)['plan_variants'] if item['id'] == access['plan_variant'])
+    names = set(variant['area_overrides'])
+    incidence = {wall['id']: {area['id'] for area in plan['areas'] if any(edge['wall'] == wall['id'] for edge in area['boundary'])} for wall in plan['walls']}
+    entries = [name for name in variant['wall_overrides'] if access['corridor_area'] in incidence[name] and incidence[name] & names]
+    guards = [name for name in variant['wall_overrides'] if access['atrium_area'] in incidence[name] and incidence[name] & names]
+    return {level: {'id': access['id'], 'level_id': level, 'plan': level_plans[level],
+                    'area_refs': list(variant['area_overrides']), 'entry_boundary_ids': entries,
+                    'guard_boundary_ids': guards, 'guard_post_mm': _spec(spec)['exterior']['guard_post_mm']}
+            for level in variant['levels']}
+
+
+def compile_furnishings(spec, plan, p, levels, bases):
+    """Compose numbered rooms and anchor-bound non-room seating from one catalog."""
+    plans = {name: value[0] for name, value in bases.items()}
+    result = furnishings.compile(spec['sources']['furnishings'], plan, p, levels, level_plans=plans)
+    source = furnishings.read(spec['sources']['furnishings'])
+    groups = source.get('atrium_seating', [])
+    require(isinstance(groups, list), 'Atrium seating templates must be a list')
+    if groups:
+        import atrium_seating
+        catalog = furnishings.read(source['catalog'])
+        anchors = atrium_access_anchors(spec, plan, plans, p)
+        z = {level['id']: level['z_mm'] for level in levels}
+        result['seating_groups'] = []
+        seen = set()
+        for group in groups:
+            atrium_seating.validate(group)
+            require(group['id'] not in seen, 'Unique atrium seating template IDs required')
+            seen.add(group['id'])
+            for level in group['levels']:
+                require(level in anchors, 'Seating requires an actual access anchor on its storey')
+                extra = atrium_seating.compile(catalog, group, anchors[level], p, z[level])
+                for key in ('components', 'bodies', 'operations', 'body_ids'):
+                    result[key].extend(extra[key])
+                result['seating_groups'].append(extra['interface'])
+        for key in ('components', 'bodies', 'operations'):
+            ids = [item['id'] for item in result[key]]
+            require(len(ids) == len(set(ids)), 'Duplicate combined furnishing '+key+' identity')
+    return result
+
+
 def level_plan(spec, level_id):
     """Resolve the actual registered EG once; upper floors reuse canonical F03."""
     raw = _spec(spec)
@@ -183,7 +308,7 @@ def level_plan(spec, level_id):
             plan = alignment.register(plan, canonical, selected, raw['alignment'], level_id)
         return plan
     require(level_id in {'OG1', 'OG2', 'OG3'}, 'Unknown building level')
-    return templates(raw)[0]
+    return apply_plan_variants(raw, templates(raw)[0], level_id)
 
 
 def _bases(spec, p):
@@ -210,7 +335,8 @@ def interfaces(spec, p):
     spec = _spec(spec); plan, _ = templates(spec); bases = _bases(spec, p)
     polygon = [[x*p['display_scale'], y*p['display_scale']] for x, y in atrium_polygon(spec, plan)]
     marker = [[x*p['display_scale'], y*p['display_scale']] for x, y in marker_polygon(spec, atrium_polygon(spec, plan))]
-    levels = []; probes = []; voids = []; vertices = []
+    levels = []; probes = []; voids = []; vertices = []; closures = []; variants = []
+    original_probes = {probe['id']: probe for probe in floor.interfaces(plan, {key: p[key] for key in ('display_scale', 'display_height', 'display_thickness', 'display_floor_depth')})['opening_probes']}
     for index, level in enumerate(spec['levels']):
         chosen, base, originals = bases[level['id']]
         vertices.extend(chosen['vertices'].values())
@@ -229,6 +355,23 @@ def interfaces(spec, p):
             if opening_by_id[probe['id']]['kind'] == 'door': value['depth_mm'] = p['door_height_mm']-2*probe['display_inset_mm']
             require(value['depth_mm'] > 0, 'Presentation door cannot contain its inherited opening probe')
             probes.append(value)
+        selected = [variant for variant in spec.get('plan_variants', []) if level['id'] in variant['levels']]
+        chosen_walls = {wall['id']: wall for wall in chosen['walls']}
+        for variant in selected:
+            variants.append({'level_id': level['id'], **copy.deepcopy(variant)})
+            for name in variant['disabled_openings']:
+                probe = original_probes[name]
+                wall_id = probe['target_body'].removeprefix('Wall_')
+                # Removed doors on opened alcove boundaries need no material
+                # witness; a disabled door in a retained wall must be filled.
+                if chosen_walls[wall_id]['kind'] != 'wall':
+                    continue
+                value = {**copy.deepcopy(probe), 'id': prefix+'Closed_'+name,
+                         'source_opening_id': name, 'target_body': prefix+probe['target_body'],
+                         'offset_mm': z+probe['offset_mm'], 'depth_mm': p['door_height_mm']-2*probe['display_inset_mm'],
+                         'expectation': 'filled'}
+                value['expected_volume_mm3'] = abs(floor.signed_area(value['points_mm']))*value['depth_mm']
+                closures.append(value)
     ground_probe = {'id': 'EG_AtriumCoverage', 'target_bodies': list(next(level for level in levels if level['id'] == 'EG')['floor_bodies']), 'expectation': 'union_filled', 'kind': 'polygon_prism', 'points_mm': polygon, 'offset_mm': -p['slab_thickness_mm'], 'depth_mm': p['slab_thickness_mm'], 'expected_volume_mm3': floor.signed_area(polygon)*p['slab_thickness_mm']}
     concept = {'body': spec['concept_exchange']['id'], 'points_mm': marker, 'offset_mm': 0, 'depth_mm': levels[-1]['clear_top_mm'], 'status': 'semantic_visualization_only'}
     data = {'levels': levels, 'clear_height_mm': p['clear_height_mm'], 'slab_thickness_mm': p['slab_thickness_mm'], 'floor_pitch_mm': p['floor_pitch_mm'],
@@ -237,7 +380,8 @@ def interfaces(spec, p):
             'y_bounds_mm': [min(v[1] for v in vertices)*p['display_scale'], max(v[1] for v in vertices)*p['display_scale']],
             'atrium_x_bounds_mm': [min(v[0] for v in polygon), max(v[0] for v in polygon)], 'atrium_polygon_mm': polygon,
             'atrium_y_bounds_mm': [min(v[1] for v in polygon), max(v[1] for v in polygon)],
-            'opening_probes': probes, 'atrium_prisms': voids, 'ground_fill_probe': ground_probe, 'concept_marker': concept,
+            'opening_probes': probes, 'opening_closure_probes': closures, 'plan_variants': variants,
+            'atrium_prisms': voids, 'ground_fill_probe': ground_probe, 'concept_marker': concept,
             'marker_body_ids': [concept['body']], 'wall_visibility_ids': [name for level in levels for name in level['wall_bodies']],
             'assumed_dimensions': copy.deepcopy(p), 'coordinate_meaning': {'xy': 'presentation_mm', 'z': 'assumed_mm'}, 'metric_scale_known': False,
             'structural_qualified': False, 'transport_implemented': False, 'trajectory_implemented': False, 'hardware_executed': False, 'fire_safety_qualified': False,
@@ -249,13 +393,31 @@ def interfaces(spec, p):
     data['wall_visibility_ids'].extend(extra['interface']['wall_bridge_ids'])
     data['roof'] = roof.compile(spec['roof'], plan, p, levels)['interface']
     if 'furnishings' in spec['sources']:
-        furnished = furnishings.compile(spec['sources']['furnishings'], plan, p, levels)
+        furnished = compile_furnishings(spec, plan, p, levels, bases)
         omitted = set(furnished['omitted_walls'])
         for level in levels:
             level['wall_bodies'] = [name for name in level['wall_bodies'] if name not in omitted]
         data['wall_visibility_ids'] = [name for name in data['wall_visibility_ids'] if name not in omitted]
         data['opening_probes'] = [probe for probe in data['opening_probes'] if probe['target_body'] not in omitted]
         data['furnishings'] = {key: furnished[key] for key in ('rooms', 'body_ids', 'omitted_walls')}
+        if 'seating_groups' in furnished:
+            data['furnishings']['seating_groups'] = furnished['seating_groups']
+    anchors = atrium_access_anchors(spec, plan, {name: value[0] for name, value in bases.items()}, p)
+    data['atrium_accesses'] = [{key: value for key, value in anchor.items() if key != 'plan'} for anchor in anchors.values()]
+    data['atrium_access_floor_probes'] = []
+    for level_id, anchor in anchors.items():
+        chosen = anchor['plan']
+        selected = [area for area in chosen['areas'] if area['id'] in anchor['area_refs']]
+        edges = roof.outer_contour(chosen, selected)
+        points = [[value*p['display_scale'] for value in chosen['vertices'][edge['start']]] for edge in edges]
+        if floor.signed_area(points) < 0:
+            points.reverse()
+        datum = next(level['z_mm'] for level in levels if level['id'] == level_id)
+        probe = {'id': level_id+'_'+anchor['id']+'_FloorSupport', 'kind': 'polygon_prism',
+                 'points_mm': points, 'offset_mm': datum-p['slab_thickness_mm'], 'depth_mm': p['slab_thickness_mm'],
+                 'target_bodies': [level_id+'__Area_'+name for name in anchor['area_refs']], 'expectation': 'union_filled'}
+        probe['expected_volume_mm3'] = abs(floor.signed_area(points))*probe['depth_mm']
+        data['atrium_access_floor_probes'].append(probe)
     if 'exterior' in spec:
         extension = exterior.compile(spec['exterior'], {v['id']: bases[v['id']][0] for v in levels}, p, levels, omitted_wall_ids=data.get('furnishings',{}).get('omitted_walls',()))
         ext = extension['interface']; omitted = set(ext['omitted_body_ids'])
@@ -271,6 +433,13 @@ def interfaces(spec, p):
         data['opening_probes'].extend(leaf_probes)
         data['opening_probes'].extend(ext.get('window_probes', []))
         data['exterior'] = ext
+    if 'furnishings' in spec['sources']:
+        for room in furnishings.read(spec['sources']['furnishings'])['rooms']:
+            anchor = room.get('window_anchor')
+            if anchor is not None:
+                require(any(group['level_id'] == room['level'] and group['wall'] == anchor['wall_id']
+                            for group in data.get('exterior', {}).get('side_window_groups', [])),
+                        'A window-bound furniture layout requires a constructed exterior window on its storey')
     return data
 
 
@@ -305,7 +474,7 @@ def expanded(spec, p):
     for key in ('components', 'bodies', 'operations'):
         result[key].extend(extra[key]); result[key].extend(roof_geometry[key])
     if 'furnishings' in spec['sources']:
-        furnished = furnishings.compile(spec['sources']['furnishings'], plan, p, data['levels'])
+        furnished = compile_furnishings(spec, plan, p, data['levels'], bases)
         omitted = set(furnished['omitted_walls'])
         result['bodies'] = [body for body in result['bodies'] if body['id'] not in omitted]
         result['operations'] = [op for op in result['operations'] if op['body'] not in omitted]
@@ -351,7 +520,11 @@ def solidcraft_commands(spec, p):
 def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
     paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
-    if 'furnishings' in spec['sources']: paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
+    if 'furnishings' in spec['sources']:
+        paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
+        if furnishings.read(spec['sources']['furnishings']).get('atrium_seating'):
+            import atrium_seating
+            paths.extend(atrium_seating.dependencies())
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))

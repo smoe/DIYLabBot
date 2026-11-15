@@ -11,7 +11,7 @@ def require(ok, message):
 
 
 def validate(s):
-    require(set(s)-{'doors'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening','left_hardstanding_end_fraction'},'Explicit exterior recipe required')
+    require(set(s)-{'doors','side_window_walls_by_level'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening','left_hardstanding_end_fraction'},'Explicit exterior recipe required')
     require(s['status']=='photo_informed_unmeasured_concept','Declare photo-informed, unmeasured exterior')
     require(type(s['bay_count']) is int and 2<=s['bay_count']<=12,'Bounded illustrative facade bays required')
     for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','landscape_layer_mm','sidewalk_width_mm','road_width_mm']:
@@ -22,6 +22,11 @@ def validate(s):
     for key in ['side_window_interval','side_window_height_fractions']:
         require(isinstance(s[key],list) and len(s[key])==2 and all(type(v) in (int,float) and 0<v<1 for v in s[key]) and s[key][0]<s[key][1], 'Ordered bounded window fractions required')
     require(isinstance(s['side_window_walls'],list) and s['side_window_walls'] and len(set(s['side_window_walls']))==len(s['side_window_walls']), 'Explicit side-window paths required')
+    additions=s.get('side_window_walls_by_level',{})
+    require(isinstance(additions,dict) and set(additions)<={'OG1','OG2','OG3'},'Side-window additions require explicit upper-storey bindings')
+    for names in additions.values():
+        require(isinstance(names,list) and names and all(isinstance(name,str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*',name) for name in names)
+                and len(names)==len(set(names)) and not set(names)&set(s['side_window_walls']), 'Unique additional side-window paths required')
     require(type(s['left_hardstanding_end_fraction']) in (int,float) and 0<s['left_hardstanding_end_fraction']<1, 'Bounded illustrative left hardstanding extent required')
     require(s['landscape_layer_mm']<=50 and s['sidewalk_width_mm']<s['terrain_margin_mm'], 'Thin graphic landscape layer and fitting sidewalk required')
     require(isinstance(s['guard_boundaries'],list) and s['guard_boundaries'] and len(set(s['guard_boundaries']))==len(s['guard_boundaries']),'Unique source guard boundaries required')
@@ -126,7 +131,8 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     # the original room graphs and all vertical core positions remain intact.
     canonical_edges=roof.outer_contour(canonical,[a for a in canonical['areas'] if a['kind']!='void' and a['id'] not in {'R3_017','ExternalLink'}])
     canonical_points=[canonical['vertices'][e['start']] for e in canonical_edges]
-    require(set(s['side_window_walls'])<={e['wall'] for e in canonical_edges},'Side bands must reference the actual outer facade')
+    window_paths=set(s['side_window_walls'])|{name for names in s.get('side_window_walls_by_level',{}).values() for name in names}
+    require(window_paths<={e['wall'] for e in canonical_edges},'Side bands must reference the actual outer facade')
     require(isinstance(s['entrance_flank_walls'],list) and s['entrance_flank_walls'] and len(set(s['entrance_flank_walls']))==len(s['entrance_flank_walls']) and set(s['entrance_flank_walls'])<={e['wall'] for e in canonical_edges}, 'Explicit entrance flank boundaries required')
     flank_segments=[(canonical['vertices'][walls[n]['start']],canonical['vertices'][walls[n]['end']]) for n in s['entrance_flank_walls']]
     side_segments=[(canonical['vertices'][walls[n]['start']],canonical['vertices'][walls[n]['end']]) for n in s['side_window_walls']]
@@ -136,12 +142,14 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
         return [[wa[j]+fraction*(wb[j]-wa[j])+side*normal[j] for j in (0,1)] for fraction,side in [(lo,-half),(hi,-half),(hi,half),(lo,half)]]
     for level in levels:
         plan=plans[level['id']];wallmap={w['id']:w for w in plan['walls']}
+        level_segments=side_segments+[(canonical['vertices'][walls[n]['start']],canonical['vertices'][walls[n]['end']])
+                                     for n in s.get('side_window_walls_by_level',{}).get(level['id'],[])]
         edges=roof.outer_contour(plan,[a for a in plan['areas'] if a['kind']!='void' and a['id'] not in {'R3_017','ExternalStairGround','ExternalLink'}])
         for edge in edges:
             wall=wallmap[edge['wall']];target=level['id']+'__Wall_'+wall['id']
             if target in omitted:continue
             wa,wb=ends(plan,wall);va,vb=[plan['vertices'][wall[k]] for k in ('start','end')]
-            side=level['id']!='KG' and any(floor.on_segment(va,a,b) and floor.on_segment(vb,a,b) for a,b in side_segments)
+            side=level['id']!='KG' and any(floor.on_segment(va,a,b) and floor.on_segment(vb,a,b) for a,b in level_segments)
             painted=level['id']!='KG' and any(floor.on_segment(va,a,b) and floor.on_segment(vb,a,b) for a,b in flank_segments)
             concrete=s['entrance_flank_color'] if painted else s['concrete_color']
             if wall['kind']=='wall':surfaces[target]={'color':s['side_cladding_color'] if side else concrete,'opacity':1}

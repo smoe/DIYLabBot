@@ -2,7 +2,7 @@
   "format": "solidcraftbot.building-doors/1",
   "catalog": {
     "source": "model/doors/room-doors.catalog.json",
-    "source_sha256": "c22296f6f45b09e0c6326a9f71bbf46760a4fcd7713578c746fcba662e9560e8"
+    "source_sha256": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b"
   },
   "default_type": "plain",
   "default_material": "wood",
@@ -53,6 +53,13 @@
   ],
   "opening_overrides": [
     {
+      "level_id": "OG3",
+      "opening_id": "D3_002_001",
+      "type": "plain",
+      "material": "glass",
+      "basis": "Owner confirms the left-side connecting door from doctoral room 3.002 to laboratory 3.001 is a full-glass leaf. The detailed L01 model remains separately assigned to laboratory 3.003."
+    },
+    {
       "level_id": "EG",
       "opening_id": "D0_013_Exterior",
       "type": "plain",
@@ -62,7 +69,7 @@
         "hinge_side": "right",
         "opens_into": "exterior"
       },
-      "basis": "Owner correction 2026-11-15: logistics room for post and waste; dark blue/near-black steel, right-hinged viewed coming from outside. Opening direction owner-confirmed; plain leaf and 90-degree display pose illustrative; glazing detail and protection ratings not confirmed."
+      "basis": "Owner correction 2026-11-15: logistics room for post and waste; dark blue/near-black steel, right-hinged viewed coming from outside. Opening direction owner-confirmed; Owner confirms no viewing windows; 90-degree display pose illustrative; protection ratings not confirmed."
     },
     {
       "level_id": "EG",
@@ -74,7 +81,7 @@
         "hinge_side": "right",
         "opens_into": "R0_013"
       },
-      "basis": "Owner correction 2026-11-15: logistics room for post and waste; dark blue/near-black steel, right-hinged viewed coming from outside. Opening direction owner-confirmed; plain leaf and 90-degree display pose illustrative; glazing detail and protection ratings not confirmed."
+      "basis": "Owner correction 2026-11-15: logistics room for post and waste; dark blue/near-black steel, right-hinged viewed coming from outside. Opening direction owner-confirmed; Owner confirms no viewing windows; 90-degree display pose illustrative; protection ratings not confirmed."
     }
   ]
 }

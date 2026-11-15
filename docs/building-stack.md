@@ -37,7 +37,7 @@ Geschosshülle und festen Kerne bleiben unverändert registriert. Beide CADs
 bestehen 451 Geometrieproben und 14 Höhenprüfungen; alle 1614 STEP-Vergleiche bestehen.
 Details stehen in [der Fotoableitung](building-exterior.md).
 
-## Aktueller Gesamtstand mit Raumtüren
+## Prüfstand mit Raumtüren vor der Raum- und Atriumkorrektur
 
 `building-stack-a08626f68c13` integriert Küche 1.008, die drei
 Doktorandenbüros, Büro 3.009 und die [gemeinsamen Türmodelle](building-doors.md).
@@ -52,7 +52,45 @@ Die zusätzliche native Türprüfung bestätigt alle 141 Raumtürblätter und di
 freien Ausschnitte mit separat eingesetzten Scheiben. Maße und Materialaufbau
 bleiben Darstellungsannahmen; reale Türbewegungen sind nicht geprüft.
 
+## Raum- und Atriumkorrektur
+
+Die aktuelle Quellkorrektur stellt die Toilettenseite `R3_011` / `R3_012` /
+`CoreGap` einschließlich ihrer Grenzen und Türöffnungen wie gezeichnet wieder
+her. Die Sitzgruppen gehören in den **Kernbereich** (`NorthCore`), den
+unnummerierten Bereich gegenüber von 3.002 auf der anderen Seite des Atriums.
+Im 1.–3. OG stehen dort jeweils ein weißer elliptischer Tisch und vier Stühle.
+Der Zugang liegt an `W063` zum Flur `C3_021`, das Geländer an `W065`.
+Die linke Glastür zu 3.001 und die U-Arbeitsfläche in 3.002 bleiben Bestandteil
+der zuvor bestätigten Raumkorrektur.
+
+In der Küche 1.008 entfällt die hintere Büroabtrennung: Die OG1-Aufstellung
+fasst `R3_008A`, `R3_008B` und `R3_009` zusammen und lässt die inneren Wände
+`W027` und `W017` aus. Tische und gesamte Küchenanordnung werden gemeinsam
+am äußeren Fensterbezug `W005` ausgerichtet, damit der Bereich an der Raumtür
+für den Schrankzugang frei bleibt. Die Fensterzuordnung wird nur in OG1
+ergänzt; Büro 3.009 und die oberen Geschossgrenzen bleiben erhalten.
+
+Die früheren Stände `building-stack-6dbc248fae3b` und
+`building-stack-5406a30fc113-r2` enthalten noch die falsche Sitzgruppenlage auf
+der Toilettenseite. Ihre nativen Prüfungen und die damalige Außenflächen-
+Äquivalenz beziehen sich auf diese zurückgenommene Darstellung. Sie belegen
+die neue Kernbereichs- und Küchenaufstellung nicht. Der neue FreeCAD-Gesamtstand
+`building-stack-ecc15e1b9dd9` besteht mit 1.944 geschlossenen Körpern,
+452 Geometrieprüfungen und 15 Höhenprüfungen. Die neue unabhängige
+SolidCraft-Bereichsprüfung für Kernbereich, Toilettenabgrenzung und Küche
+bestätigt 306 geschlossene Körper und 18 native Prüfzeugen. Sie ist kein
+vollständiger SolidCraft-Gebäudeaufbau oder STEP-Gesamtvergleich. Der neue
+Browserexport besteht die tatsächliche Chrome-Prüfung aller fünf Blickpunkte
+und Bedienelemente. Die
+[Bildprovenienz des Kernbereichs](media/atrium-seating.provenance.json) bindet
+die neuen Nachweise getrennt nach ihrem tatsächlichen Umfang.
+
 ## Ansichten für den Antrag
+
+Die folgenden Gesamtbilder bleiben Momentaufnahmen ihrer in der Provenienz
+gebundenen Revisionen. Die korrigierten Arbeitsplätze und Atrium-Sitzgruppen
+zeigen die aktuellen [Möbelbilder](building-furnishings.md),
+[Sitznischenbilder](atrium-seating.md) und der [Browserrundgang](building-walkthrough.md).
 
 ![Gebäudekonzept mit eigener EG-Geometrie, Dach und Erschließung](media/building-stack-overview.png)
 
@@ -271,4 +309,25 @@ Die [Küche 1.008 und die Büros 1.002, 2.002, 3.002 sowie 3.009](building-furni
 werden aus einer eigenen referenzierten Möblierung ergänzt. Die Küchenfarben
 und Anordnung folgen zwei Innenfotos; Maße, Arbeitsplatzanzahlen und die
 Einpassung in die OG-Schablone bleiben ausdrücklich angenommene Darstellwerte.
+Die ergänzte Eigentümervorgabe ordnet den hinteren Vorlagenbereich `R3_009`
+im 1. OG der offenen Küche zu. Die innere Büroabtrennung entfällt dort; die
+Tischgruppe steht am äußeren Fenster, während die Eingangsseite für den
+Schrankzugang frei bleiben soll.
 Ein separater Blick in den Kühlschrank zeigt das kleine Easter Egg.
+
+Der [lokale Browserrundgang](building-walkthrough.md) öffnet den Doktorandenraum
+3.002, die Küche, den Atriumblick und den Kernbereich direkt. Das detaillierte
+Labor 3.003 öffnet als eigene Szene, solange seine Registrierung in den
+Gebäudebezug offen ist.
+
+Die aktuellen Gebäudevarianten lassen die zugrunde liegenden Raumzeichnungen
+unverändert: In 3.002 liegt die Glastür zu Labor 3.001 links, die frühere rechte
+Verbindung zu 3.003 bleibt geschlossen. Die Arbeitsplatten bilden ein
+wandbündiges U mit freier Türöffnung. Der [Kernbereich](atrium-seating.md)
+`NorthCore` erhält im 1.–3. OG je einen weißen elliptischen Tisch und vier
+Stühle. Seine Bodenfläche folgt der vorhandenen Kontur außerhalb des Luftraums;
+das Geländer an `W065` verwendet das gemeinsame Rezept. Die ursprünglichen
+Toilettenflächen, ihre Grenzen und Türen bleiben erhalten. EG, Keller und die
+Aufzug-/Treppenhauswände `W062` und `W079` bleiben von der Sitzgruppenvariante
+unberührt. Die oben gezeigten Gesamtbilder
+dokumentieren ihre jeweils in der Provenienz gebundenen früheren Revisionen.

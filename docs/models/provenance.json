@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "871e62eebadff0a3d172a919880027f47810e2140bb938eccc4bcdb803ffc11b",
+  "catalog_sha256": "8e3190f24bbf923a44ac31c995ecfcf2adbf01d00c96b823177435c71e6f2811",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "69fbea316e47d08cf64bc5a31c9f67120bd357c1241ce009d8d29278c789bcc4",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
@@ -4560,7 +4560,7 @@
       "id": "ground-floor-eg",
       "image": "images/ground-floor-eg.svg",
       "source_files_sha256": {
-        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553"
+        "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12"
       },
       "representation": "Authorized manually derived EG vectors anchored to shared core references; uncalibrated, original photograph excluded",
       "producer_files_sha256": {
@@ -4577,10 +4577,10 @@
       "metric_scale_known": false,
       "original_image_embedded": false,
       "areas": 35,
-      "image_sha256": "4e5456d0d14433899fab20f35bd8d8d9f7f5bb0343fcd931029b73e0d187210e",
-      "bytes": 9020,
+      "image_sha256": "de52f7ecb161d809d7b693a360c685e13647c87cf5173774a9b06f7de16e5bf7",
+      "bytes": 9029,
       "dependency_files_sha256": {
-        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+        "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
       }
     },
@@ -4588,14 +4588,15 @@
       "id": "building-stack",
       "image": "images/building-stack.svg",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "e1675c64fd5e217a316da4182ec556d5036e3b509f32906219359481828d442c",
-        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+        "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+        "model/building-walkthrough.shared.json": "b015e6ca37ba97bc16a10a2f00e84cf4db182452ba5e5ef9e8f46ec9779adc42"
       },
       "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
       "producer_files_sha256": {
         "scripts/render_building_stack_section.py": "6e67b7d1807167d68c6c726a2275524b4d3464bf54a7df29ed055afd13799e08",
-        "model/building-stack.schema.json": "bfec2b6564de4c7447c6451ea10c7d3d23e9687f73e976cf45aae30069f31df3",
-        "scripts/building_stack.py": "06b839c9bcd31227b1ab23134ffbb147170be66ee8a0d249868d0f16497e6b56",
+        "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
+        "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
         "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
         "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
         "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
@@ -4607,16 +4608,19 @@
         "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
         "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
         "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
-        "model/building-furnishings.schema.json": "5a6025742b0b1106d50c6661e384ac89dd0fc9c5b57de2ea44451ea8ed0ad24a",
-        "model/social-furniture-catalog.schema.json": "020eb4c95dcf9b49cc951739552eb3ac6a17691bdfd94818dfaa41d2b183d6ce",
-        "scripts/building_furnishings.py": "bcb774591adbd7f2b58028b352b964ecf5810d9a36de4fbe02cb8b2100c7dbda",
+        "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+        "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+        "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+        "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+        "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+        "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
         "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
         "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-        "scripts/building_exterior.py": "db73805a924f257a302d100512f7e696e0b35913579a3811325c190abeb82dff",
-        "model/building-exterior.schema.json": "49a051abdf01677d6f65d926c332261f5d665ac4b0d72cd240f1d0645cd67f56",
-        "scripts/building_doors.py": "88e92af11d7031bdc52b4f2dc3df113b762ab39e5adfa9b805ab055d09cf3f3c",
-        "model/building-doors.schema.json": "716505f2c996d4d51c7aba30decdcc00326973c70a475599378285f5f1e30f76",
-        "model/room-door-catalog.schema.json": "18155af264ac356e33040a745dea569fa60a1832fd52ae4b9a7027a472b7e2e5"
+        "scripts/building_exterior.py": "50fb3d5fbb1d24dac633e55141316ca5bad2aba376a99459035425d64372e407",
+        "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+        "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+        "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+        "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d"
       },
       "metric_scale_known": false,
       "original_image_embedded": false,
@@ -4625,25 +4629,58 @@
       "image_sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151",
       "bytes": 10540,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "e1675c64fd5e217a316da4182ec556d5036e3b509f32906219359481828d442c",
+        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/ground-floor-eg.shared.json": "8421e336b4217979aa9aa4ff3321e325d44b316999ff9985b4d134905cdf6553",
+        "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
         "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
-        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
-        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08",
-        "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
-        "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb"
-      },
-      "appearance_reuse": "Red entrance flank appearance does not affect this schematic; image bytes retained",
-      "site_update_reuse": "Aerial-informed site material changes do not affect this section schematic; reviewed image bytes retained"
+        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+        "model/building-walkthrough.shared.json": "b015e6ca37ba97bc16a10a2f00e84cf4db182452ba5e5ef9e8f46ec9779adc42",
+        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
+        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
+        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
+        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e",
+        "model/x2-mounting-interface.json": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
+        "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/cad-reference.step": "0216770bef2fe0a6c55c3aa7e2c48a1d3e3cb7b9da17b71c7ddd9b383fd91260",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f",
+        "model/x4-mounting-interface.json": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+        "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/cad-reference.step": "4d47c766736641efbf4258ef362bfe5c3d1db31010681ab5ca22e990a22f47aa",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
+        "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+        "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
+        "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+        "model/sample-transport-tr01.shared.json": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
+        "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
+        "model/history/tip-collector-t01.legacy.json": "28248f4d46429605341135134dc6dca9e13b65a7794e0c7cf9b8a0c101ddcaf1",
+        "model/tip-collector-t01-markings.json": "e2d32f9704e2547e648d0aad4e2407a6183b7e005ac14a42a541715bf3e99bb9",
+        "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
+        "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
+        "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+      }
     },
     {
       "id": "building-social",
       "image": "images/building-social.svg",
       "source_files_sha256": {
-        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
-        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50"
       },
       "representation": "Source-derived local kitchen furnishing plan and assumed office desk counts; not calibrated building geometry",
       "original_image_embedded": false,
@@ -4653,16 +4690,20 @@
       "image_sha256": "9fe15acbcad77e232b65159449f2719b9eb80b7fc290ba9eee85b92a98e4f348",
       "bytes": 1953,
       "dependency_files_sha256": {
-        "model/furnishings/building-social.json": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa",
-        "model/furniture/social.catalog.json": "9fd0bbea2a7bb7d0c95cbe26b76bc77be3f03b57e525b618afca7c508d3d5e08"
+        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50"
+      },
+      "reviewed_image_reuse": {
+        "method": "Exact byte equality after rendering this existing diagram from current source and producer files; the corrected NorthCore seating and unpartitioned, window-anchored kitchen are shown in the separately linked native views.",
+        "unchanged_image_sha256": "9fe15acbcad77e232b65159449f2719b9eb80b7fc290ba9eee85b92a98e4f348"
       }
     },
     {
       "id": "room-doors",
       "image": "images/room-doors.svg",
       "source_files_sha256": {
-        "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
-        "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb"
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b"
       },
       "representation": "Shared two-type door catalog, with a separate basement steel material profile; illustrative proportions",
       "producer_files_sha256": {
@@ -4672,8 +4713,8 @@
       "image_sha256": "a904495d984fdb7ca85e30394e72f40dd1b4e3d5435c39de0821dc6f66c401a7",
       "bytes": 946,
       "dependency_files_sha256": {
-        "model/building-doors.shared.json": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1",
-        "model/doors/room-doors.catalog.json": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb"
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b"
       }
     }
   ],

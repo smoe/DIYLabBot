@@ -127,11 +127,227 @@
                 },
                 "yaw_deg": {
                   "type": "number"
+                },
+                "opening_anchor": {
+                  "type": "object",
+                  "required": [
+                    "opening_id",
+                    "area_id",
+                    "side",
+                    "jamb_gap_mm",
+                    "height_mm"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "opening_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "area_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "side": {
+                      "const": "interior_right"
+                    },
+                    "jamb_gap_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    },
+                    "height_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0
+                    }
+                  }
+                },
+                "parameter_overrides_mm": {
+                  "type": "object",
+                  "propertyNames": {
+                    "enum": [
+                      "length",
+                      "depth",
+                      "height",
+                      "top_t",
+                      "leg_size",
+                      "start_inset",
+                      "end_inset",
+                      "max_leg_span"
+                    ]
+                  },
+                  "additionalProperties": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "wall_span": {
+                  "type": "object",
+                  "required": [
+                    "area_id",
+                    "wall_id",
+                    "segment",
+                    "back_gap_mm",
+                    "opening_margin_mm",
+                    "corner_owner"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "area_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "wall_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "segment": {
+                      "enum": [
+                        "full",
+                        "before_opening",
+                        "after_opening"
+                      ]
+                    },
+                    "opening_id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "back_gap_mm": {
+                      "const": 0
+                    },
+                    "opening_margin_mm": {
+                      "type": "number",
+                      "minimum": 0
+                    },
+                    "corner_owner": {
+                      "type": "boolean"
+                    }
+                  },
+                  "allOf": [
+                    {
+                      "if": {
+                        "properties": {
+                          "segment": {
+                            "const": "full"
+                          }
+                        }
+                      },
+                      "then": {
+                        "not": {
+                          "required": [
+                            "opening_id"
+                          ]
+                        }
+                      },
+                      "else": {
+                        "required": [
+                          "opening_id"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "required": [
+                      "wall_span"
+                    ]
+                  },
+                  "then": {
+                    "properties": {
+                      "xyz_mm": {
+                        "const": [
+                          0,
+                          0,
+                          0
+                        ]
+                      },
+                      "yaw_deg": {
+                        "const": 0
+                      },
+                      "parameter_overrides_mm": {
+                        "not": {
+                          "required": [
+                            "length"
+                          ]
+                        }
+                      }
+                    },
+                    "not": {
+                      "required": [
+                        "opening_anchor"
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "layout_basis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "window_anchor": {
+            "type": "object",
+            "required": [
+              "area_id",
+              "wall_id",
+              "table_instances",
+              "table_gap_mm",
+              "basis"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "area_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "wall_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+              },
+              "table_instances": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                }
+              },
+              "table_gap_mm": {
+                "type": "number",
+                "exclusiveMinimum": 0,
+                "description": "Nominal tabletop-to-window inner-face gap, presentation-scaled exactly once"
+              },
+              "basis": {
+                "const": "presentation_assumption"
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "required": [
+                "window_anchor"
+              ]
+            },
+            "then": {
+              "properties": {
+                "recipe": {
+                  "const": "kitchen"
                 }
               }
             }
           }
-        }
+        ]
+      }
+    },
+    "atrium_seating": {
+      "type": "array",
+      "items": {
+        "$ref": "atrium-seating.schema.json"
       }
     }
   },
