@@ -6,103 +6,95 @@
   },
   "status": "Photo-inspired concept dimensions; not measured or selected products",
   "types": {
-    "desk": [
-      {
-        "id": "Top",
-        "body": "Top",
-        "color": "#d9b987",
-        "action": "create",
-        "shape": {
-          "kind": "box",
-          "origin": [
-            0,
-            0,
-            710
+    "desk": {
+      "recipe": "desktop",
+      "basis": "Illustrative desktop dimensions and support spacing; no measured article or structural qualification",
+      "parameters": {
+        "length": {
+          "default": 1400,
+          "unit": "mm",
+          "range": [
+            200,
+            30000
           ],
-          "size": [
-            1400,
-            700,
-            35
-          ]
+          "basis": "presentation_assumption"
+        },
+        "depth": {
+          "default": 700,
+          "unit": "mm",
+          "range": [
+            200,
+            3000
+          ],
+          "basis": "presentation_assumption"
+        },
+        "height": {
+          "default": 745,
+          "unit": "mm",
+          "range": [
+            300,
+            1500
+          ],
+          "basis": "presentation_assumption"
+        },
+        "top_t": {
+          "default": 35,
+          "unit": "mm",
+          "range": [
+            5,
+            100
+          ],
+          "basis": "presentation_assumption"
+        },
+        "leg_size": {
+          "default": 45,
+          "unit": "mm",
+          "range": [
+            10,
+            150
+          ],
+          "basis": "presentation_assumption"
+        },
+        "start_inset": {
+          "default": 40,
+          "unit": "mm",
+          "range": [
+            10,
+            300
+          ],
+          "basis": "presentation_assumption"
+        },
+        "end_inset": {
+          "default": 100,
+          "unit": "mm",
+          "range": [
+            20,
+            500
+          ],
+          "basis": "presentation_assumption"
+        },
+        "max_leg_span": {
+          "default": 1400,
+          "unit": "mm",
+          "range": [
+            200,
+            3000
+          ],
+          "basis": "presentation_assumption"
         }
       },
-      {
-        "id": "Leg40_40",
-        "body": "Leg40_40",
-        "color": "#aab6ba",
-        "action": "create",
-        "shape": {
-          "kind": "box",
-          "origin": [
-            40,
-            40,
-            0
-          ],
-          "size": [
-            45,
-            45,
-            710
-          ]
-        }
+      "colors": {
+        "top": "#d9b987",
+        "legs": "#aab6ba"
       },
-      {
-        "id": "Leg40_600",
-        "body": "Leg40_600",
-        "color": "#aab6ba",
-        "action": "create",
-        "shape": {
-          "kind": "box",
-          "origin": [
-            40,
-            600,
-            0
-          ],
-          "size": [
-            45,
-            45,
-            710
-          ]
-        }
-      },
-      {
-        "id": "Leg1300_40",
-        "body": "Leg1300_40",
-        "color": "#aab6ba",
-        "action": "create",
-        "shape": {
-          "kind": "box",
-          "origin": [
-            1300,
-            40,
-            0
-          ],
-          "size": [
-            45,
-            45,
-            710
-          ]
-        }
-      },
-      {
-        "id": "Leg1300_600",
-        "body": "Leg1300_600",
-        "color": "#aab6ba",
-        "action": "create",
-        "shape": {
-          "kind": "box",
-          "origin": [
-            1300,
-            600,
-            0
-          ],
-          "size": [
-            45,
-            45,
-            710
-          ]
-        }
+      "part_ids": {
+        "top": "Top",
+        "start_start": "Leg40_40",
+        "start_end": "Leg40_600",
+        "end_start": "Leg1300_40",
+        "end_end": "Leg1300_600"
       }
-    ],
+    },
     "office_chair": [
       {
         "id": "Column",
@@ -2507,6 +2499,184 @@
           }
         }
       ]
+    },
+    "first_aid_cabinet": [
+      {
+        "id": "Cabinet",
+        "body": "Cabinet",
+        "color": "#e5ebe8",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -180,
+            -120,
+            0
+          ],
+          "size": [
+            360,
+            120,
+            420
+          ]
+        }
+      },
+      {
+        "id": "Door",
+        "body": "Door",
+        "color": "#edf3ee",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -170,
+            -128,
+            10
+          ],
+          "size": [
+            340,
+            8,
+            400
+          ]
+        }
+      },
+      {
+        "id": "GreenPanel",
+        "body": "GreenPanel",
+        "color": "#24844b",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -115,
+            -130,
+            95
+          ],
+          "size": [
+            230,
+            2,
+            230
+          ]
+        }
+      },
+      {
+        "id": "CrossVertical",
+        "body": "CrossVertical",
+        "color": "#ffffff",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -22,
+            -133,
+            130
+          ],
+          "size": [
+            44,
+            3,
+            160
+          ]
+        }
+      },
+      {
+        "id": "CrossHorizontal",
+        "body": "CrossHorizontal",
+        "color": "#ffffff",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -80,
+            -133,
+            188
+          ],
+          "size": [
+            160,
+            3,
+            44
+          ]
+        }
+      }
+    ],
+    "oval_table": {
+      "recipe": "elliptical_table",
+      "basis": "Owner-requested white elliptical tabletop; nominal dimensions and support arrangement remain presentation assumptions, with a declared bounded polygon approximation shared by both CAD targets",
+      "max_chord_deviation_mm": 0.5,
+      "parameters": {
+        "length": {
+          "default": 1500,
+          "unit": "mm",
+          "range": [
+            1000,
+            2400
+          ],
+          "basis": "presentation_assumption"
+        },
+        "width": {
+          "default": 800,
+          "unit": "mm",
+          "range": [
+            600,
+            1200
+          ],
+          "basis": "presentation_assumption"
+        },
+        "height": {
+          "default": 745,
+          "unit": "mm",
+          "range": [
+            500,
+            1000
+          ],
+          "basis": "presentation_assumption"
+        },
+        "top_t": {
+          "default": 35,
+          "unit": "mm",
+          "range": [
+            20,
+            80
+          ],
+          "basis": "presentation_assumption"
+        },
+        "leg_size": {
+          "default": 45,
+          "unit": "mm",
+          "range": [
+            30,
+            100
+          ],
+          "basis": "presentation_assumption"
+        },
+        "leg_inset_x": {
+          "default": 300,
+          "unit": "mm",
+          "range": [
+            150,
+            500
+          ],
+          "basis": "presentation_assumption"
+        },
+        "leg_inset_y": {
+          "default": 100,
+          "unit": "mm",
+          "range": [
+            50,
+            250
+          ],
+          "basis": "presentation_assumption"
+        }
+      },
+      "colors": {
+        "top": "#ffffff",
+        "legs": "#aab6ba"
+      },
+      "part_ids": {
+        "top": "Top",
+        "start_start": "LegStartNear",
+        "start_end": "LegStartFar",
+        "end_start": "LegEndNear",
+        "end_end": "LegEndFar"
+      }
     }
   }
 }

@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "atrium-seating.schema.json",
+  "title": "One source-bound atrium seating template repeated on OG1–3",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "anchor",
+    "levels",
+    "table_type",
+    "chair_type",
+    "table_overrides_mm",
+    "chair_station_fraction",
+    "table_edge_gap_mm",
+    "clearances_mm",
+    "basis"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.atrium-seating/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "anchor": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "levels": {
+      "const": [
+        "OG1",
+        "OG2",
+        "OG3"
+      ]
+    },
+    "table_type": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "chair_type": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "table_overrides_mm": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "length": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "top_t": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "leg_size": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "leg_inset_x": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        },
+        "leg_inset_y": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 50000
+        }
+      }
+    },
+    "chair_station_fraction": {
+      "type": "number",
+      "minimum": 0.1,
+      "maximum": 0.4,
+      "description": "Dimensionless position on each half of the table long axis, expressed as fraction of full length."
+    },
+    "table_edge_gap_mm": {
+      "type": "number",
+      "minimum": 20,
+      "maximum": 500
+    },
+    "clearances_mm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry",
+        "wall",
+        "guard"
+      ],
+      "properties": {
+        "entry": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "wall": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000
+        },
+        "guard": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2000
+        }
+      }
+    },
+    "basis": {
+      "const": "presentation_assumption"
+    }
+  }
+}

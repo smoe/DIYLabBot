@@ -129,11 +129,35 @@ Darstellung beweist auch dort keinen qualifizierten begehbaren Anschluss. Die ur
 F03-Klassifikation und ihre Nachweise werden dadurch nicht rückwirkend geändert.
 
 Die Fotoergänzung `exterior` in der Gebäudekomposition ersetzt gezielt die
-Fassaden-Platzhalterwand und zwei Atrium-/Flurkanten durch transparente Verglasung
+Fassaden-Platzhalterwand und referenzierte Atrium-/Flurkanten durch transparente Verglasung
 beziehungsweise offene Metallgeländer. Raumtürfarbe und Erdreich-Höhenbezug
 werden aus derselben Quelle in beiden CADs abgeleitet. Größen und Foto-/Planlage
 bleiben Darstellungsannahmen, keine Gebäude- oder Sicherheitsqualifikation.
 Siehe [Fotoableitung](docs/building-exterior.md).
+
+Geschossgebundene `plan_variants` überschreiben ausschließlich referenzierte
+Flächen-/Wandarten und deaktivieren benannte Öffnungen; die Rohpläne bleiben
+erhalten. So führt die linke Glastür von 3.002 zu 3.001, während die rechte
+Verbindung zu 3.003 geschlossen bleibt. Der bestätigte Kernbereich `NorthCore`
+gegenüber von 3.002 auf der anderen Atriumseite erhält im 1.–3. OG einen offenen
+Zugang über `W063` zum Flur `C3_021` und das gemeinsame Geländer an `W065`.
+Die Toilettenseite `R3_011` / `R3_012` / `CoreGap` samt Grenzen und Türen bleibt
+wie gezeichnet; ihre frühere Umwidmung war falsch. Eine gemeinsame
+Möblierungsvorlage setzt im Kernbereich je einen weißen elliptischen Tisch und
+vier Katalogstühle ein, ohne eine Raumnummer zu erfinden. Das Ellipsenprofil wird
+mit deklarierter Sehnenabweichung in vorhandene Polygonprismen überführt.
+Die U-Arbeitsflächen in 3.002 werden aus den tatsächlichen Wänden und der
+freizuhaltenden Türöffnung abgeleitet. Daraus folgt keine geprüfte Navigation.
+
+Die OG1-Küche 1.008 verwendet die referenzierten Vorlagenflächen `R3_008A`,
+`R3_008B` und `R3_009` als offenen Raum; nur dort entfallen die inneren
+Trennwände `W027` und `W017`. Ein gemeinsamer `window_anchor` bindet die
+Tischgruppe an `R3_009` / `W005` und verschiebt die gesamte Küchenanordnung
+zum äußeren Fenster. Der nominale Tisch-/Wandabstand wird einmal mit der
+Raumdarstellung skaliert. Die geschossgebundene Fensterzuordnung ergänzt
+`W005` nur in OG1 aus dem vorhandenen Fensterrezept. Die Eingangsseite ist
+für den Schrankzugang freizuhalten; ein vollständiger realer Türschwenkweg
+bleibt gesondert zu prüfen. Die obere Raumzuordnung 3.009 bleibt erhalten.
 
 `model/ground-floor-eg.shared.json` führt Seminarraum, Foyer und verlegte
 Toiletten einmalig. Ein Loader löst gemeinsame Kernvertices aus F03 auf und

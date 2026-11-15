@@ -36,6 +36,7 @@ def invented_plan():
 class StackTests(unittest.TestCase):
     def setUp(self):
         self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec.pop('alignment', None); self.spec['sources'].pop('furnishings', None)
+        self.spec.pop('plan_variants', None); self.spec.pop('atrium_access', None)
         self.spec['presentation_reference']['floorplan_area'] = 'ReferenceRoom'
         self.plan = invented_plan()
         self.ground_plan = copy.deepcopy(self.plan)

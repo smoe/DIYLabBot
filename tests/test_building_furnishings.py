@@ -9,6 +9,8 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_stack as stack
 import building_furnishings as furniture
+import relative_floorplan as floor
+import wall_worktops
 
 
 class FurnishingsTests(unittest.TestCase):
@@ -16,18 +18,20 @@ class FurnishingsTests(unittest.TestCase):
     def setUpClass(cls):
         cls.spec = stack.load(); cls.p = stack.parameters(cls.spec)
         cls.data = stack.interfaces(cls.spec, cls.p)
-        cls.result = furniture.compile(cls.spec['sources']['furnishings'], stack.templates(cls.spec)[0], cls.p, cls.data['levels'])
+        cls.level_plans = {level['id']: stack.level_plan(cls.spec,level['id']) for level in cls.data['levels'] if level['id'].startswith('OG')}
+        cls.result = furniture.compile(cls.spec['sources']['furnishings'], stack.templates(cls.spec)[0], cls.p, cls.data['levels'], cls.level_plans)
 
     def test_owner_room_assignments(self):
         self.assertEqual({r['room'] for r in self.result['rooms']}, {'1.008','1.002','2.002','3.002','3.009'})
         self.assertEqual({r['level'] for r in self.result['rooms'] if r['room']=='1.008'}, {'OG1'})
-        self.assertEqual(self.result['omitted_walls'], ['OG1__Wall_W027'])
+        self.assertEqual(set(self.result['omitted_walls']), {'OG1__Wall_W027', 'OG1__Wall_W017'})
 
-    def test_only_kitchen_partition_removed(self):
+    def test_only_kitchen_partitions_removed(self):
         expanded = stack.expanded(self.spec, self.p)
         ids = {b['id'] for b in expanded['bodies']}
-        self.assertNotIn('OG1__Wall_W027',ids)
-        self.assertTrue({'OG2__Wall_W027','OG3__Wall_W027'} <= ids)
+        for wall in ('W017','W027'):
+            self.assertNotIn('OG1__Wall_'+wall,ids)
+            self.assertTrue({'OG2__Wall_'+wall,'OG3__Wall_'+wall} <= ids)
         self.assertEqual(len(ids),len(expanded['bodies']))
         self.assertTrue({o['body'] for o in expanded['operations']} <= ids)
 
@@ -44,6 +48,75 @@ class FurnishingsTests(unittest.TestCase):
             self.assertEqual(sum(id.startswith(room+'_Desk') and id.endswith('_Top') for id in ids),4)
             self.assertEqual(sum(id.startswith(room+'_Chair') and id.endswith('_Seat') for id in ids),4)
         self.assertIn('Office3009_Desk_Top', ids)
+
+    def test_phd3002_desks_follow_both_long_sides_and_the_window_end(self):
+        source=furniture.read(self.spec['sources']['furnishings'])
+        room=next(room for room in source['rooms'] if room['room']=='3.002')
+        desks=[item for item in room['instances'] if item['type']=='desk']
+        sides=[item for item in desks if not item['wall_span']['corner_owner']]
+        window=[item for item in desks if item['wall_span']['corner_owner']]
+        self.assertEqual(len(sides),3)
+        self.assertEqual(len(window),1)
+        self.assertEqual({item['wall_span']['wall_id'] for item in sides},{'W070','W086'})
+        self.assertEqual(window[0]['wall_span']['wall_id'],'W072')
+        self.assertTrue(all(item['wall_span']['back_gap_mm']==0 for item in desks))
+        self.assertIn('presentation assumptions',room['layout_basis'])
+        self.assertTrue(all(item['type']!='first_aid_cabinet' for other in source['rooms']
+                            if other['room']!='3.002' for item in other['instances']))
+
+    def test_first_aid_is_inside_to_the_right_of_the_actual_corridor_door(self):
+        room=next(room for room in self.result['rooms'] if room['room']=='3.002')
+        anchor=room['opening_anchors'][0]
+        self.assertEqual((anchor['opening_id'],anchor['area_id'],anchor['side']),
+                         ('D3_002N','R3_002','interior_right'))
+        self.assertFalse(anchor['dimensions_measured'])
+        cabinet=next(op['shape'] for op in self.result['operations']
+                     if op['body']=='PhD3002_FirstAid_Cabinet')
+        center=[sum(point[i] for point in cabinet['points'])/4 for i in (0,1)]
+        delta=[center[i]-anchor['jamb_mm'][i] for i in (0,1)]
+        self.assertGreater(sum(delta[i]*anchor['right_direction'][i] for i in (0,1)),0)
+        self.assertGreater(sum(delta[i]*anchor['interior_direction'][i] for i in (0,1)),0)
+        plan=stack.templates(self.spec)[0]
+        polygon=floor.outline(plan,next(area for area in plan['areas'] if area['id']=='R3_002'))
+        for point in cabinet['points']:
+            self.assertEqual(floor.point_membership([v/self.p['display_scale'] for v in point],polygon),1)
+
+    def test_phd3002_flat_furniture_clears_source_open_door_leaves(self):
+        leaves={self.data['exterior']['door_leaves'][key]
+                for key,value in self.data['exterior']['door_bindings'].items()
+                if value['level_id']=='OG3' and 'R3_002' in value['area_ids']}
+        self.assertEqual(len(leaves),2)
+        doors=[op for op in stack.expanded(self.spec,self.p)['operations']
+               if op['action']=='create' and op['body'] in leaves]
+        flat=[op for op in self.result['operations'] if op['action']=='create'
+              and op['body'].startswith('PhD3002_') and op['shape']['kind']=='polygon_prism']
+        def bounds(op):
+            shape=op['shape']
+            self.assertEqual(shape['plane'],'XY')
+            return ([min(v[i] for v in shape['points']) for i in (0,1)]+[shape['offset']],
+                    [max(v[i] for v in shape['points']) for i in (0,1)]+[shape['offset']+shape['depth']])
+        for item in flat:
+            lo,hi=bounds(item)
+            for door in doors:
+                other_lo,other_hi=bounds(door)
+                self.assertFalse(all(min(hi[i],other_hi[i])-max(lo[i],other_lo[i])>1e-5
+                                     for i in range(3)),(item['body'],door['body']))
+
+    def test_first_aid_anchor_tracks_the_door_without_moving_desks(self):
+        plan=copy.deepcopy(self.level_plans['OG3'])
+        opening=next(value for value in plan['openings'] if value['id']=='D3_002N')
+        wall=next(value for value in plan['walls'] if value['id']==opening['wall'])
+        shift=-.1
+        opening['interval']=[value+shift for value in opening['interval']]
+        level_plans={**self.level_plans,'OG3':plan}
+        other=furniture.compile(self.spec['sources']['furnishings'],stack.templates(self.spec)[0],self.p,self.data['levels'],level_plans)
+        before={op['body']:op['shape'] for op in self.result['operations'] if op['action']=='create'}
+        after={op['body']:op['shape'] for op in other['operations'] if op['action']=='create'}
+        start,end=(plan['vertices'][wall[key]] for key in ('start','end'))
+        for a,b in zip(before['PhD3002_FirstAid_Cabinet']['points'],after['PhD3002_FirstAid_Cabinet']['points']):
+            for axis in (0,1):self.assertAlmostEqual(b[axis]-a[axis],shift*(end[axis]-start[axis])*self.p['display_scale'])
+        for identity in before:
+            if '_FirstAid_' not in identity:self.assertEqual(before[identity],after[identity])
 
     def test_separate_items_have_no_unintended_bbox_overlap(self):
         bounds={}
@@ -67,12 +140,23 @@ class FurnishingsTests(unittest.TestCase):
                 lo,hi=bounds[a];blo,bhi=bounds[b]
                 if min(min(hi[k],bhi[k])-max(lo[k],blo[k]) for k in range(3))>1e-5:
                     self.assertEqual(room,other_room,(a,b))
-                    self.assertIn(frozenset((instance,other_instance)),cavity_pairs,(a,b))
+                    if instance.startswith('Desk') and other_instance.startswith('Desk') and room=='PhD3002':
+                        sa=next(op['shape'] for op in self.result['operations'] if op['body']==a and op['action']=='create')
+                        sb=next(op['shape'] for op in self.result['operations'] if op['body']==b and op['action']=='create')
+                        points=sa['points'];polygon=sb['points']
+                        orientation=1 if floor.signed_area(polygon)>0 else -1
+                        for x,y in zip(polygon,polygon[1:]+polygon[:1]):
+                            normal=[orientation*(x[1]-y[1]),orientation*(y[0]-x[0])]
+                            points=wall_worktops.clip(points,x,normal,0)
+                            if not points:break
+                        self.assertLessEqual(abs(floor.signed_area(points)) if len(points)>=3 else 0,1e-5,(a,b))
+                    else:
+                        self.assertIn(frozenset((instance,other_instance)),cavity_pairs,(a,b))
 
     def test_public_views_bind_current_sources_and_reviewed_images(self):
         proof=json.loads((stack.ROOT/'docs/media/building-furnishings.provenance.json').read_text())
         self.assertFalse(proof['original_photographs_included'])
-        self.assertEqual({image['id'] for image in proof['images']},{'Kitchen1008','PhD1002','Kitchen1008_EasterEgg'})
+        self.assertEqual({image['id'] for image in proof['images']},{'Kitchen1008','PhD1002','PhD3002','Kitchen1008_EasterEgg'})
         for name,digest in proof['source_files_sha256'].items():
             self.assertEqual(hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest(),digest,name)
         for image in proof['images']:
@@ -84,10 +168,13 @@ class FurnishingsTests(unittest.TestCase):
     def test_sources_match_declared_schemas(self):
         try:
             from jsonschema import Draft202012Validator
+            from referencing import Registry, Resource
         except ImportError:
             self.skipTest('jsonschema is unavailable')
+        anchor_schema = json.loads((stack.ROOT/'model/atrium-seating.schema.json').read_text())
+        registry = Registry().with_resource('atrium-seating.schema.json', Resource.from_contents(anchor_schema))
         for source, schema in [('furnishings/building-social.json', 'building-furnishings.schema.json'), ('furniture/social.catalog.json', 'social-furniture-catalog.schema.json')]:
-            Draft202012Validator(json.loads((stack.ROOT/'model'/schema).read_text())).validate(json.loads((stack.ROOT/'model'/source).read_text()))
+            Draft202012Validator(json.loads((stack.ROOT/'model'/schema).read_text()), registry=registry).validate(json.loads((stack.ROOT/'model'/source).read_text()))
 
     def test_stale_pins_rejected(self):
         ref=copy.deepcopy(self.spec['sources']['furnishings']);ref['source_sha256']='0'*64
@@ -112,7 +199,7 @@ class KitchenSeatingTests(unittest.TestCase):
         source=furniture.read(ref);catalog=furniture.read(source['catalog'])
         kitchen=next(room for room in source['rooms'] if room['room']=='1.008')
         tables=[item for item in kitchen['instances'] if item['id'].startswith('Table')]
-        top=next(part['shape'] for part in catalog['types']['desk'] if part['id']=='Top')
+        top=next(part['shape'] for part in furniture.parts_for(catalog,'desk') if part['id']=='Top')
         self.assertTrue(all(item['yaw_deg']==90 for item in tables))
         xlo=min(t['xyz_mm'][0]-top['size'][1] for t in tables)
         xhi=max(t['xyz_mm'][0] for t in tables)

@@ -18,16 +18,27 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
   das schwere Stahlprofil für den Keller. Sie stehen illustrativ offen. Die sichtbare Glasfront ist
   davon getrennt; der vorhandene Aufzug wird nicht in eine Holztür umgedeutet.
 - An den Atrium-/Flurkanten `W068` und `W106` ersetzen offene Metallgeländer
-  die bisher ungeklärten Begrenzungen in den drei Obergeschossen. Pro Kante
+  die bisher ungeklärten Begrenzungen in den drei Obergeschossen. Die
+  [Kernbereichsvariante](atrium-seating.md) ergänzt die Kante `W065`
+  mit demselben Rezept. Insgesamt entstehen drei Geländergruppen je
+  Obergeschoss. Pro Kante
   werden Pfosten, Handlauf und vier schlanke horizontale Stäbe gemeinsam erzeugt.
   Riegel und Geländerteile bleiben einzelne editierbare Körper; die Darstellung
   benötigt keine vollständige boolesche Verschweißung ihres Profilrasters.
+  Die zuvor an `W066` und `W064` angenommene Sitznischenöffnung ist
+  zurückgenommen; die Toilettenseite behält ihre ursprünglichen Grenzen.
 - Die Eingangsflanken und übrigen geschlossenen Außenwände sind undurchsichtiger
   Beton. Die Eingangsflanken erhalten oberhalb des Geländes den fotoangenäherten
   roten Anstrich `#B65E52`; die übrigen Betonflächen bleiben grau. Seitlich werden nur die ausdrücklich referenzierten Fassadenabschnitte
   mit Fensterbändern belegt. Geschlossene Endfelder, vertikale Zwischenstücke,
   Brüstungen und Stürze unterbrechen die Verglasung; die Brüstungsbereiche der
   Fensterseiten erhalten eine deckende graue Verkleidung.
+- Die erweiterte Küche 1.008 erhält ihren äußeren Fensterbezug an `W005`.
+  `exterior.side_window_walls_by_level` ergänzt diese Wand ausdrücklich nur
+  für `OG1`; das vorhandene Seitenfensterrezept liefert die angenommenen
+  Abmessungen und Bauteile. Die Fensterlage führt keine Vermessung oder neue
+  Größenbestätigung ein. Die anderen Geschosse behalten ihre bisherigen
+  Fensterzuordnungen; insbesondere wird Büro 3.009 dadurch nicht umgebaut.
 - Rasen wird grün (`#559447`) als lediglich 20 Darstellungs-mm dünne Schicht
   auf EG-Höhe ±0 markiert. Die Gebäudegrundfläche wird ausgespart. Ein massiver
   brauner Erdblock entfällt. Der Keller liegt weiterhin unter dieser Ebene.

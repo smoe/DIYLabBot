@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Building walk-through · SolidCraftBot</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#203331;background:#f0f1ed;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,canvas:focus-visible{outline:3px solid #be713e;outline-offset:3px}
+    main{max-width:1500px;margin:auto;padding:24px 28px 18px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}.eyebrow{color:#6a7771;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0 0 5px}h1{font-size:clamp(22px,3vw,32px);font-weight:500;letter-spacing:-.035em;margin:0}.identity{display:flex;align-items:center;gap:12px}.identity svg{width:39px;height:39px;color:#57766b}.model-label{font-size:12px;color:#69766f;text-align:right;line-height:1.6}
+    .places{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.place{border:1px solid #d2d9d0;background:#fffef9;color:#4b5b53;border-radius:9px;padding:10px 16px;min-height:44px;font-size:13px;transition:background .15s,color .15s}.place:hover{background:#e5ebe3}.place[aria-pressed=true]{background:#2e5146;border-color:#2e5146;color:#fff}.place .ordinal{opacity:.62;margin-right:8px;font-variant-numeric:tabular-nums}
+    .stage{position:relative;background:#cfdad7;border-radius:14px;overflow:hidden;height:clamp(430px,72vh,850px);box-shadow:0 16px 45px #24372e12}.stage:fullscreen{height:100%;width:100%;border-radius:0}.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.stage canvas:active{cursor:grabbing}.caption{position:absolute;left:20px;top:19px;pointer-events:none;max-width:calc(100% - 100px);color:#23362f;background:#fffef8ed;padding:12px 16px;border-radius:10px;box-shadow:0 3px 12px #172c2510}.caption strong{display:block;font-size:16px;font-weight:500;letter-spacing:-.015em}.caption span{display:block;font-size:11px;color:#6b776e;line-height:1.6;margin-top:2px}.fullscreen{position:absolute;right:17px;top:18px;width:40px;height:40px;border:1px solid #dbe0d5;background:#fffef6f0;border-radius:9px;color:#3a5148;font-size:18px}.fullscreen[hidden]{display:none}.crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #ffffffb8;border-radius:50%;box-shadow:0 0 2px #0a1c2080;pointer-events:none;transform:translate(-50%,-50%)}
+    .move-controls{position:absolute;bottom:18px;left:18px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px;gap:5px}.move-controls button,.height-controls button{border:1px solid #dbe0d5;background:#fffef6ed;color:#355346;border-radius:8px;min-width:42px;min-height:42px;font-size:17px;touch-action:none;user-select:none;-webkit-user-select:none}.move-controls button:active,.height-controls button:active{background:#b9d1bc}.move-controls [data-move=forward]{grid-column:2}.move-controls [data-move=left]{grid-column:1;grid-row:2}.move-controls [data-move=back]{grid-column:2;grid-row:2}.move-controls [data-move=right]{grid-column:3;grid-row:2}.height-controls{position:absolute;right:18px;bottom:18px;display:grid;gap:5px}.height-controls button{font-size:14px}.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e1e8e1;color:#40584b;font-size:14px}.loading[hidden],.error[hidden]{display:none}.error{position:absolute;inset:16px;z-index:5;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;background:#fffaf1f5;border-radius:10px;color:#70432e;line-height:1.6}
+    .bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px 0 7px}.navigation{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.quiet-button,.level-select{color:#395447;border:1px solid #ced8cc;background:#fafbf6;border-radius:7px;font-size:12px;padding:8px 12px;min-height:38px}.quiet-button:hover{background:#e4ebe0}.level-select:disabled{opacity:.55}.help{font-size:11px;color:#758078;line-height:1.7}.notice{font-size:11px;line-height:1.6;color:#7b847c;margin:6px 0 0}.free-tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#536e5f;margin-left:8px}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+    @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+  </style>
+</head>
+<body>
+<main id="building-walkthrough" data-ready="false">
+  <header class="top">
+    <div class="identity">
+      <svg aria-hidden="true" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M7 34V13l13-7 13 7v21M7 13l13 7 13-7M20 20v14M4 34h32M11 17v4m5-1v4m8-4v4m5-7v4M11 25v4m5-1v4m8-4v4m5-7v4"/></svg>
+      <div><p class="eyebrow">SolidCraftBot · spaces</p><h1>Building walk-through</h1></div>
+    </div>
+    <div class="model-label">Explore the shared model<br>Free camera · eye-level views</div>
+  </header>
+  <nav class="places" id="walkthrough-stops" aria-label="Room viewpoints"></nav>
+  <section class="stage" id="walkthrough-stage" aria-label="Interactive building model">
+    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. Use W A S D or arrow keys to move, drag to look, and Q or E to move down or up." aria-describedby="walkthrough-help"></canvas>
+    <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
+    <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
+    <div class="crosshair" aria-hidden="true"></div>
+    <div class="move-controls" aria-label="Move camera">
+      <button type="button" data-move="forward" aria-label="Move forward" title="Forward">↑</button>
+      <button type="button" data-move="left" aria-label="Move left" title="Left">←</button>
+      <button type="button" data-move="back" aria-label="Move backward" title="Backward">↓</button>
+      <button type="button" data-move="right" aria-label="Move right" title="Right">→</button>
+    </div>
+    <div class="height-controls" aria-label="Camera height">
+      <button type="button" data-move="up" aria-label="Move camera up" title="Up · E">＋</button>
+      <button type="button" data-move="down" aria-label="Move camera down" title="Down · Q">−</button>
+    </div>
+    <div class="loading" id="walkthrough-loading" role="status">Preparing the model…</div>
+    <div class="error" id="walkthrough-error" role="alert" hidden></div>
+  </section>
+  <div class="bottom">
+    <div class="navigation">
+      <button class="quiet-button" id="walkthrough-previous" type="button">← Previous stop</button>
+      <button class="quiet-button" id="walkthrough-next" type="button">Next stop →</button>
+      <button class="quiet-button" id="walkthrough-return" type="button">Return to viewpoint</button>
+      <label class="visually-hidden" for="walkthrough-level">Building level</label>
+      <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
+    </div>
+    <div class="help" id="walkthrough-help">WASD / arrows: move &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster</div>
+  </div>
+  <p class="notice" id="walkthrough-notice">Concept building geometry. The lab opens as its separate detailed room model; the two coordinate frames are not presented as surveyed registration.</p>
+  <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
+</main>
+<script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
+<script>
+(() => {
+  'use strict';
+  const root=document.getElementById('building-walkthrough'),canvas=document.getElementById('walkthrough-canvas');
+  const loading=document.getElementById('walkthrough-loading'),errorPanel=document.getElementById('walkthrough-error');
+  const locationLabel=document.getElementById('walkthrough-location'),contextLabel=document.getElementById('walkthrough-context');
+  const stopsNode=document.getElementById('walkthrough-stops'),levelSelect=document.getElementById('walkthrough-level');
+  const announcement=document.getElementById('walkthrough-announcement'),stageNode=document.getElementById('walkthrough-stage');
+  let gl=null,frameRequest=null;
+  const fail=error=>{loading.hidden=true;errorPanel.hidden=false;errorPanel.textContent='The model could not be displayed. '+(error.message||String(error));root.dataset.ready='false';root.dataset.error=error.message||String(error);console.error(error);};
+  try {
+    const data=JSON.parse(document.getElementById('walkthrough-data').textContent);
+    if(!data.scenes||!Array.isArray(data.stops)||!data.stops.length)throw Error('Scene geometry and viewpoints are required.');
+    const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
+    if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
+    const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set();
+    const finite3=value=>Array.isArray(value)&&value.length===3&&value.every(Number.isFinite);
+    if(new Set(stops.map(s=>s.id)).size!==stops.length||stops.some(s=>!data.scenes[s.scene]||!finite3(s.eye_mm)||!finite3(s.target_mm)))throw Error('Every viewpoint needs a unique ID and a finite source-derived camera.');
+    const walkSpeed=(settings.walk_speed_mm_s||1400)/1000,verticalSpeed=(settings.vertical_speed_mm_s||1000)/1000;
+    const near=(settings.near_mm||25)/1000,far=(settings.far_mm||180000)/1000,fov=(settings.fov_deg||70)*Math.PI/180;
+    const sensitivity=settings.look_sensitivity||.0025,eyeHeight=(settings.eye_height_mm||1600)/1000;
+    if(!(walkSpeed>0&&verticalSpeed>0&&near>0&&far>near&&fov>0&&fov<Math.PI))throw Error('Invalid camera settings.');
+    gl=canvas.getContext('webgl2',{alpha:false,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
+    if(!gl)throw Error('This viewer needs a browser with WebGL 2 enabled.');
+    const vertexSource=`#version 300 es
+      precision highp float;
+      in vec3 position;in vec3 normal;uniform mat4 viewProjection;
+      out vec3 worldPosition;out vec3 worldNormal;
+      void main(){worldPosition=position;worldNormal=normal;gl_Position=viewProjection*vec4(position,1.);}`;
+    const fragmentSource=`#version 300 es
+      precision highp float;
+      in vec3 worldPosition;in vec3 worldNormal;uniform vec4 materialColor;uniform vec3 eye;
+      out vec4 outColor;
+      void main(){
+        vec3 n=normalize(worldNormal);if(!gl_FrontFacing)n=-n;
+        float hemi=.52+.13*(n.z*.5+.5);
+        float sunlight=.36*max(dot(n,normalize(vec3(-.45,-.35,1.))),0.);
+        float fill=.12*max(dot(n,normalize(vec3(.7,.3,.35))),0.);
+        vec3 linear=pow(max(materialColor.rgb,vec3(0.)),vec3(2.2));
+        vec3 lit=pow(linear*(hemi+sunlight+fill),vec3(1./2.2));
+        float fog=smoothstep(45.,170.,distance(worldPosition,eye));
+        outColor=vec4(mix(lit,vec3(.79,.85,.84),fog*.38),materialColor.a);
+      }`;
+    function shader(kind,source){const value=gl.createShader(kind);gl.shaderSource(value,source);gl.compileShader(value);if(!gl.getShaderParameter(value,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(value));return value;}
+    const program=gl.createProgram(),vertex=shader(gl.VERTEX_SHADER,vertexSource),fragment=shader(gl.FRAGMENT_SHADER,fragmentSource);
+    gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
+    gl.deleteShader(vertex);gl.deleteShader(fragment);gl.useProgram(program);
+    const uniforms=Object.fromEntries(['viewProjection','materialColor','eye'].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const attributes={position:gl.getAttribLocation(program,'position'),normal:gl.getAttribLocation(program,'normal')};
+    gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(.79,.85,.84,1);
+    let sceneId=null,stopId=null,selectedLevel=null,eye=[0,0,0],yaw=0,pitch=0,drag=null,dirty=true,lastTime=null,frames=0;
+    const normalize=v=>{const length=Math.hypot(...v);if(!(length>0))throw Error('Degenerate camera or mesh vector.');return v.map(x=>x/length);};
+    const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+    const dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0);
+    function multiply(a,b){const out=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++)for(let k=0;k<4;k++)out[c*4+r]+=a[k*4+r]*b[c*4+k];return out;}
+    function cameraMatrix(aspect){
+      const forward=[Math.cos(pitch)*Math.cos(yaw),Math.cos(pitch)*Math.sin(yaw),Math.sin(pitch)];
+      const z=forward.map(v=>-v),x=normalize(cross([0,0,1],z)),y=cross(z,x);
+      const view=new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1]);
+      const f=1/Math.tan(fov/2),projection=new Float32Array([f/aspect,0,0,0,0,f,0,0,0,0,(far+near)/(near-far),-1,0,0,2*far*near/(near-far),0]);
+      return multiply(projection,view);
+    }
+    function decode(encoded,kind,count,label){
+      if(typeof encoded!=='string')throw Error('Missing packed '+label+'.');
+      const raw=atob(encoded),bytes=new Uint8Array(raw.length);for(let i=0;i<raw.length;i++)bytes[i]=raw.charCodeAt(i);
+      if(bytes.length!==count*4)throw Error('Packed '+label+' length differs from the scene manifest.');
+      const result=kind==='float'?new Float32Array(count):new Uint32Array(count),view=new DataView(bytes.buffer);
+      for(let i=0;i<count;i++)result[i]=kind==='float'?view.getFloat32(i*4,true):view.getUint32(i*4,true);
+      return result;
+    }
+    function prepareScene(id){
+      if(sceneCache.has(id))return sceneCache.get(id);
+      const source=data.scenes[id];
+      if(!Number.isSafeInteger(source.vertex_count)||source.vertex_count<3||!Number.isSafeInteger(source.index_count)||source.index_count<3||!Array.isArray(source.groups))throw Error('A complete native mesh scene is required.');
+      const positions=decode(source.positions_base64,'float',source.vertex_count*3,'positions'),normals=decode(source.normals_base64,'float',source.vertex_count*3,'normals'),indices=decode(source.indices_base64,'uint',source.index_count,'indices');
+      for(let i=0;i<positions.length;i++){if(!Number.isFinite(positions[i])||!Number.isFinite(normals[i]))throw Error('Nonfinite native mesh value.');positions[i]/=1000;}
+      for(const index of indices)if(index>=source.vertex_count)throw Error('Native mesh index is outside its vertex array.');
+      const omitted=new Set(hiddenIds[id]||[]),opaque=new Map(),transparent=[],coverage=source.groups.slice().sort((a,b)=>a.index_start-b.index_start);let opacityOverrides=0;
+      let expected=0;
+      for(const group of coverage){if(group.index_start!==expected||!Number.isSafeInteger(group.index_count)||group.index_count<0||group.index_count%3)throw Error('Native mesh groups must partition all triangles.');expected+=group.index_count;}
+      if(expected!==source.index_count)throw Error('The native mesh group manifest omits triangles.');
+      for(const group of source.groups){
+        if(omitted.has(group.id))continue;
+        if(!finite3(group.color)||group.color.some(v=>v<0||v>1)||!Number.isFinite(group.opacity)||group.opacity<0||group.opacity>1)throw Error('Native material metadata is invalid.');
+        const opacity=Object.hasOwn(opacityByRole,group.role)?opacityByRole[group.role]:group.opacity;
+        if(opacity!==group.opacity)opacityOverrides++;
+        if(opacity===0||group.index_count===0)continue;
+        const local=indices.subarray(group.index_start,group.index_start+group.index_count),color=[...group.color,opacity];
+        if(opacity>=.99){const key=JSON.stringify(color);if(!opaque.has(key))opaque.set(key,{color,parts:[],count:0});const batch=opaque.get(key);batch.parts.push(local);batch.count+=local.length;}
+        else{
+          const bb=group.bounds_mm||group.bbox_mm;
+          if(!bb||!finite3(bb.min)||!finite3(bb.max))throw Error('Transparent native bodies need finite bounds.');
+          transparent.push({id:group.id,color,parts:[local],count:local.length,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)});
+        }
+      }
+      const batches=[...opaque.values(),...transparent],length=batches.reduce((sum,g)=>sum+g.count,0),combined=new Uint32Array(length);let offset=0;
+      for(const batch of batches){batch.offset=offset*4;for(const part of batch.parts){combined.set(part,offset);offset+=part.length;}delete batch.parts;}
+      const vao=gl.createVertexArray();gl.bindVertexArray(vao);
+      function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
+      attribute(attributes.position,positions);attribute(attributes.normal,normals);
+      const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
+      const result={vao,opaque:[...opaque.values()],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(id,result);return result;
+    }
+    function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
+    function render(){
+      const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
+      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
+      gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
+      const scene=prepareScene(sceneId);gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,cameraMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);
+      gl.disable(gl.BLEND);gl.depthMask(true);
+      for(const group of scene.opaque){gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
+      gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
+      scene.transparent.sort((a,b)=>dot(b.centre.map((v,i)=>v-eye[i]),b.centre.map((v,i)=>v-eye[i]))-dot(a.centre.map((v,i)=>v-eye[i]),a.centre.map((v,i)=>v-eye[i])));
+      for(const group of scene.transparent){gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
+      gl.depthMask(true);gl.disable(gl.BLEND);frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
+      const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
+    }
+    function move(seconds){
+      let f=(keys.has('forward')?1:0)-(keys.has('back')?1:0),r=(keys.has('right')?1:0)-(keys.has('left')?1:0),z=(keys.has('up')?1:0)-(keys.has('down')?1:0);
+      const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
+      const speed=walkSpeed*(keys.has('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
+      eye[0]+=dx*speed*seconds;eye[1]+=dy*speed*seconds;eye[2]+=z*verticalSpeed*seconds;
+      if(f||r||z){root.dataset.freeCamera='true';dirty=true;}
+    }
+    function tick(now){
+      frameRequest=null;
+      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);if(dirty){render();dirty=false;}if(keys.size)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
+      catch(error){keys.clear();fail(error);}
+    }
+    function setStop(id){
+      const stop=stops.find(s=>s.id===id);if(!stop)throw Error('Unknown viewpoint.');
+      keys.clear();sceneId=stop.scene;stopId=stop.id;selectedLevel=stop.level_id||null;eye=stop.eye_mm.map(v=>v/1000);
+      const direction=normalize(stop.target_mm.map((v,i)=>(v-stop.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(Math.max(-.995,Math.min(.995,direction[2])));
+      for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.stop===id));
+      locationLabel.textContent=stop.label;
+      const level=levels.find(l=>l.id===selectedLevel);contextLabel.textContent=sceneId==='lab'?'Detailed lab · separate local room model':(level?.label||selectedLevel||'Building')+' · concept geometry';
+      levelSelect.disabled=sceneId!=='building';if(selectedLevel!==null)levelSelect.value=selectedLevel;
+      root.dataset.freeCamera='false';announcement.textContent=stop.label+'. '+contextLabel.textContent;requestRender();
+    }
+    stops.forEach((stop,index)=>{const button=document.createElement('button');button.type='button';button.className='place';button.dataset.stop=stop.id;button.setAttribute('aria-pressed','false');const number=document.createElement('span');number.className='ordinal';number.textContent=String(index+1).padStart(2,'0');button.append(number,document.createTextNode(stop.label));button.addEventListener('click',()=>setStop(stop.id));stopsNode.append(button);});
+    for(const level of levels){const option=document.createElement('option');option.value=level.id;option.textContent=level.label||level.id;levelSelect.append(option);}
+    levelSelect.hidden=!levels.length;
+    levelSelect.addEventListener('change',()=>{const level=levels.find(l=>l.id===levelSelect.value);if(sceneId!=='building'||!level||!Number.isFinite(level.z_mm))return;selectedLevel=level.id;eye[2]=level.z_mm/1000+eyeHeight;locationLabel.textContent='Free camera · '+(level.label||level.id);contextLabel.textContent='Building · concept geometry';announcement.textContent=locationLabel.textContent;root.dataset.freeCamera='true';requestRender();});
+    document.getElementById('walkthrough-previous').addEventListener('click',()=>{const current=stops.findIndex(s=>s.id===stopId);setStop(stops[(current+stops.length-1)%stops.length].id);});
+    document.getElementById('walkthrough-next').addEventListener('click',()=>{const current=stops.findIndex(s=>s.id===stopId);setStop(stops[(current+1)%stops.length].id);});
+    document.getElementById('walkthrough-return').addEventListener('click',()=>setStop(stopId));
+    const fullscreen=document.getElementById('walkthrough-fullscreen');fullscreen.hidden=!stageNode.requestFullscreen;
+    fullscreen.addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await stageNode.requestFullscreen();requestRender();}catch(error){announcement.textContent='Full screen is not available in this browser.';}});
+    document.addEventListener('fullscreenchange',()=>{fullscreen.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen');requestRender();});
+    const keyNames={KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyQ:'down',KeyE:'up',ShiftLeft:'fast',ShiftRight:'fast'};
+    window.addEventListener('keydown',event=>{const name=keyNames[event.code];if(!name||event.ctrlKey||event.metaKey||event.altKey||(event.target instanceof Element&&event.target.closest('input,select,textarea,[contenteditable=true]')))return;event.preventDefault();keys.add(name);requestRender();});
+    window.addEventListener('keyup',event=>{const name=keyNames[event.code];if(name){keys.delete(name);requestRender();}});
+    const clearMovement=()=>{keys.clear();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();});
+    for(const button of document.querySelectorAll('[data-move]')){
+      const name=button.dataset.move;button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);keys.add(name);requestRender();});
+      const stop=()=>{keys.delete(name);requestRender();};button.addEventListener('pointerup',stop);button.addEventListener('pointercancel',stop);button.addEventListener('lostpointercapture',stop);
+    }
+    canvas.addEventListener('pointerdown',event=>{if(event.button!==0)return;canvas.focus({preventScroll:true});canvas.setPointerCapture(event.pointerId);drag={id:event.pointerId,x:event.clientX,y:event.clientY};});
+    canvas.addEventListener('pointermove',event=>{if(!drag||drag.id!==event.pointerId)return;yaw-=(event.clientX-drag.x)*sensitivity;pitch=Math.max(-1.50,Math.min(1.50,pitch-(event.clientY-drag.y)*sensitivity));drag.x=event.clientX;drag.y=event.clientY;root.dataset.freeCamera='true';requestRender();});
+    canvas.addEventListener('pointerup',()=>{drag=null;});canvas.addEventListener('pointercancel',()=>{drag=null;});canvas.addEventListener('lostpointercapture',()=>{drag=null;});
+    canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();keys.clear();fail(Error('The graphics context was lost. Reload the viewer to continue.'));});
+    new ResizeObserver(requestRender).observe(stageNode);
+    window.__buildingWalkthrough=Object.freeze({
+      get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
+      get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},
+      get frames(){return frames;},get renderer(){return 'webgl2';},
+      get sceneStats(){const scene=sceneCache.get(sceneId);return scene?{triangles:scene.triangles,native_groups:scene.nativeGroups,opaque_batches:scene.opaque.length,transparent_groups:scene.transparent.length,display_opacity_overrides:scene.opacityOverrides}:null;}
+    });
+    setStop(data.default_stop_id||data.default_stop||stops[0].id);prepareScene(sceneId);render();dirty=false;loading.hidden=true;root.dataset.ready='true';
+  }catch(error){fail(error);}
+})();
+</script>
+</body>
+</html>

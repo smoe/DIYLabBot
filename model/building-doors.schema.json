@@ -45,7 +45,8 @@
     "default_material": {
       "enum": [
         "wood",
-        "steel"
+        "steel",
+        "glass"
       ]
     },
     "level_materials": {
@@ -55,31 +56,36 @@
         "KG": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "glass"
           ]
         },
         "EG": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "glass"
           ]
         },
         "OG1": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "glass"
           ]
         },
         "OG2": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "glass"
           ]
         },
         "OG3": {
           "enum": [
             "wood",
-            "steel"
+            "steel",
+            "glass"
           ]
         }
       }
@@ -227,6 +233,70 @@
       "minItems": 1,
       "items": {
         "type": "string"
+      }
+    },
+    "opening_overrides": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "level_id",
+          "opening_id",
+          "type",
+          "material",
+          "basis"
+        ],
+        "properties": {
+          "level_id": {
+            "enum": [
+              "KG",
+              "EG",
+              "OG1",
+              "OG2",
+              "OG3"
+            ]
+          },
+          "opening_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "type": {
+            "enum": [
+              "plain",
+              "round_window"
+            ]
+          },
+          "material": {
+            "enum": [
+              "wood",
+              "steel",
+              "glass"
+            ]
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "material": {
+                  "const": "glass"
+                }
+              }
+            },
+            "then": {
+              "properties": {
+                "type": {
+                  "const": "plain"
+                }
+              }
+            }
+          }
+        ]
       }
     }
   },

@@ -935,6 +935,105 @@
     },
     "alignment": {
       "$ref": "building-alignment.schema.json"
+    },
+    "plan_variants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "levels",
+          "area_overrides",
+          "wall_overrides",
+          "disabled_openings",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "levels": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "enum": [
+                "OG1",
+                "OG2",
+                "OG3"
+              ]
+            }
+          },
+          "area_overrides": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kind",
+                "label"
+              ],
+              "properties": {
+                "kind": {
+                  "const": "corridor"
+                },
+                "label": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          },
+          "wall_overrides": {
+            "type": "object",
+            "additionalProperties": {
+              "const": "open_boundary"
+            }
+          },
+          "disabled_openings": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "basis": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "atrium_access": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "plan_variant",
+        "corridor_area",
+        "atrium_area"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "plan_variant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "corridor_area": {
+          "type": "string",
+          "minLength": 1
+        },
+        "atrium_area": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   }
 }

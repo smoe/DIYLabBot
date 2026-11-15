@@ -64,7 +64,7 @@ def main(argv=None):
         target=shapes[ground['target_body']];volume=witness.common(target).Volume;tol=max(1e-5,expected*1e-7)
         checks.append({'id':ground['id'],'category':'ground_fill','targets':[ground['target_body']],'passed':abs(volume-expected)<=tol and abs(target.Volume-expected)<=tol,
                       'expected_presentation_mm3':expected,'intersection_presentation_mm3':volume,'body_volume_presentation_mm3':target.Volume,'tolerance_presentation_mm3':tol})
-    for item in evidence.circulation_probe_specs(contract)+evidence.roof_probe_specs(contract):
+    for item in evidence.circulation_probe_specs(contract)+evidence.roof_probe_specs(contract)+evidence.opening_closure_probe_specs(contract)+evidence.atrium_access_probe_specs(contract):
         probe=item['probe'];witness=prism(probe);results={}
         if probe.get('expectation')=='union_filled':
             targets=probe['target_bodies'];inspection=union_inspection(witness,targets,shapes);result=evidence.union_coverage(inspection,targets,'Witness',evidence.prism_volume(probe))

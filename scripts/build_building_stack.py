@@ -45,6 +45,36 @@ def prism_volume(probe):
     return area*depth
 
 
+def opening_closure_probe_specs(contract):
+    """Positive material witnesses for owner-corrected former door openings."""
+    result = []
+    if not contract.get('opening_closure_probes'):
+        return result
+    walls = {name for level in contract['levels'] for name in level['wall_bodies']}
+    for probe in contract.get('opening_closure_probes', []):
+        volume = prism_volume(probe)
+        if (probe.get('expectation') != 'filled' or probe.get('target_body') not in walls
+                or abs(volume-probe['expected_volume_mm3']) > max(1e-5, volume*1e-9)):
+            raise ValueError('A closed room opening requires its retained wall and complete material witness')
+        result.append({'category': 'closed_room_opening', 'probe': probe,
+                       'expected': {probe['target_body']: volume}})
+    return result
+
+
+def atrium_access_probe_specs(contract):
+    floors = {name for level in contract['levels'] for name in level['floor_bodies']}
+    result = []
+    for probe in contract.get('atrium_access_floor_probes', []):
+        volume = prism_volume(probe)
+        targets = probe['target_bodies']
+        if (probe.get('expectation') != 'union_filled' or not targets or len(targets) != len(set(targets))
+                or not set(targets) <= floors or abs(volume-probe['expected_volume_mm3']) > max(1e-5, volume*1e-9)):
+            raise ValueError('Atrium access support requires its complete source floor union')
+        result.append({'category': 'atrium_access_floor', 'probe': probe,
+                       'expected': {name: volume for name in targets}})
+    return result
+
+
 def z_checks(geometry, contract):
     bodies = {body['body']: body for body in geometry}; checks = []
     levels = contract['levels']
@@ -437,7 +467,7 @@ def with_native_groups(geometry, listing):
 def sc_audit(args, spec, p, native, out, geometry, paths):
     contract, z = coverage(spec, p, geometry); commands = [{'command': 'component.list', 'params': {'compact': True, 'bodies': True}}]; records = []
     unions = [item['probe'] for item in roof_probe_specs(contract) if item['probe']['expectation'] == 'union_filled']
-    for category, probes in [('opening', contract['opening_probes']), ('atrium_floor_hole', contract['atrium_prisms']), ('ground_fill', [contract['ground_fill_probe']]), ('roof_eave_support', unions)]:
+    for category, probes in [('opening', contract['opening_probes']), ('atrium_floor_hole', contract['atrium_prisms']), ('ground_fill', [contract['ground_fill_probe']]), ('atrium_access_floor', [item['probe'] for item in atrium_access_probe_specs(contract)]), ('roof_eave_support', unions)]:
         for index, probe in enumerate(probes):
             name = 'StackProbe_'+category+'_'+str(index)
             if name in {b['body'] for b in geometry}: raise ValueError('Probe identity collision')
@@ -446,7 +476,7 @@ def sc_audit(args, spec, p, native, out, geometry, paths):
             part[-1]['params']['bodies'] = [name]+targets
             commands.extend(part); records.append((category, probe, name, len(commands)-1, targets))
     circulation_records = []
-    pair_specs = circulation_probe_specs(contract)+[item for item in roof_probe_specs(contract) if item['probe']['expectation'] != 'union_filled']
+    pair_specs = circulation_probe_specs(contract)+opening_closure_probe_specs(contract)+[item for item in roof_probe_specs(contract) if item['probe']['expectation'] != 'union_filled']
     for index, item in enumerate(pair_specs):
         probe = item['probe']; name = 'CirculationProbe_'+str(index); targets = list(item['expected'])
         commands.extend(floor.probe_commands({**probe, 'target_body': targets[0]}, name)[:-1])
@@ -570,6 +600,9 @@ def build(args):
     common.verify_pins(pins); common.verify_artifacts(paths,hashes)
     report={'format':FORMAT,'source':source_name,'source_sha256':digest,'source_files_sha256':pins,'revision':revision,'passed':passed,
             'exterior':contract.get('exterior'),
+            'plan_variants':contract.get('plan_variants',[]),'atrium_accesses':contract.get('atrium_accesses',[]),
+            'opening_closure_probes':contract.get('opening_closure_probes',[]),
+            'atrium_access_floor_probes':contract.get('atrium_access_floor_probes',[]),
             'backends':args.backend,'cross_cad_checked':args.backend=='both','closed_body_count':len(expanded['bodies']),
             'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids'])-len(contract.get('furnishings', {}).get('body_ids', [])),'marker_body_ids':contract['marker_body_ids'],
             'furnishings':contract.get('furnishings'),

@@ -20,7 +20,7 @@
     },
     "furnishings": {
       "source": "model/furnishings/building-social.json",
-      "source_sha256": "883a5a7d56dd99e0ecf4d8dba3b9bfe8a73c0272145994ee24d42274734579fa"
+      "source_sha256": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b"
     }
   },
   "calibration": null,
@@ -294,11 +294,12 @@
     "door_leaf_mm": 40,
     "doors": {
       "source": "model/building-doors.shared.json",
-      "source_sha256": "2d49811fe0cc86b8cf017ef65b75b80de01e458cae2d52f08dfc6227b150d8d1"
+      "source_sha256": "25bdaec38358017ccba77bf87ac58026085b8febdbef5ca14c733cbc282ee73d"
     },
     "guard_boundaries": [
       "W068",
-      "W106"
+      "W106",
+      "W065"
     ],
     "guard_height_mm": 1100,
     "guard_post_mm": 40,
@@ -386,7 +387,12 @@
       "W102"
     ],
     "left_sidewalk_entry_opening": "D0_013_Exterior",
-    "left_hardstanding_end_fraction": 0.5
+    "left_hardstanding_end_fraction": 0.5,
+    "side_window_walls_by_level": {
+      "OG1": [
+        "W005"
+      ]
+    }
   },
   "alignment": {
     "method": "boundary_arclength_harmonic_displacement",
@@ -513,5 +519,45 @@
       "facade_wall": "EW074"
     },
     "external_ground_support_area": "ExternalStairGround"
+  },
+  "plan_variants": [
+    {
+      "id": "AtriumAccess",
+      "levels": [
+        "OG1",
+        "OG2",
+        "OG3"
+      ],
+      "area_overrides": {
+        "NorthCore": {
+          "kind": "corridor",
+          "label": "Kernbereich"
+        }
+      },
+      "wall_overrides": {
+        "W063": "open_boundary",
+        "W065": "open_boundary"
+      },
+      "disabled_openings": [],
+      "basis": "Owner confirmation, 2026-11-15: location C in the annotated canonical plan, called Kernbereich, opposite doctoral room 3.002 across the atrium. One white elliptical table with four chairs on each of OG1–OG3. Restroom areas R3_011/R3_012/CoreGap, their boundaries and doors remain as drawn. No room number is invented; dimensions remain presentation assumptions."
+    },
+    {
+      "id": "DoctorLabConnection",
+      "levels": [
+        "OG3"
+      ],
+      "area_overrides": {},
+      "wall_overrides": {},
+      "disabled_openings": [
+        "D3_002_003"
+      ],
+      "basis": "Owner correction: the connection from doctoral room 3.002 goes to laboratory 3.001 on the left when looking from the corridor entrance toward the window; the erroneous right-side opening is closed on OG3 only."
+    }
+  ],
+  "atrium_access": {
+    "id": "AtriumAccess",
+    "plan_variant": "AtriumAccess",
+    "corridor_area": "C3_021",
+    "atrium_area": "Atrium"
   }
 }

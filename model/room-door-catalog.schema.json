@@ -135,6 +135,35 @@
               "type": "null"
             }
           }
+        },
+        "glass": {
+          "type": "object",
+          "required": [
+            "thickness_mm",
+            "color",
+            "opacity",
+            "mass_kg"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "thickness_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "maximum": 3000
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "opacity": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "exclusiveMaximum": 1
+            },
+            "mass_kg": {
+              "type": "null"
+            }
+          }
         }
       }
     }

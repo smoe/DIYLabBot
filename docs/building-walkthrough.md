@@ -1,0 +1,149 @@
+# Gebäude im Browser erkunden
+
+Der lokale Rundgang bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
+Labor **3.003**, Küche **1.008**, den Blick durch den **Freiraum / das Atrium**
+und den **Kernbereich im 3. OG**.
+Von dort lässt sich die Kamera frei bewegen. Die Flächen stammen aus den
+fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
+Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
+
+## Erzeugen und öffnen
+
+```bash
+python3 scripts/build_building_walkthrough.py --serve
+```
+
+Der Aufruf prüft die Quell- und Artefaktpins des nativen FreeCAD-Gebäudemodells
+und der L01-Aufstellung. Einen veralteten Gebäudestand baut er unabhängig mit
+dem FreeCAD-Adapter neu auf. Für L01 ist ein aktueller geprüfter Build erforderlich;
+der Rundgang erzeugt keine neuen Gerätestände. `--no-rebuild` verlangt auch für
+das Gebäude einen bereits aktuellen Cache. Das FreeCAD-Werkzeug lässt sich mit
+der üblichen `--freecad-python`-Option angeben. Der erste Gebäudeaufbau kann
+länger dauern als der anschließende Mesh-/HTML-Export.
+
+SolidCraft lässt sich aus derselben Quelle separat erzeugen und prüfen:
+
+```bash
+python3 scripts/build_building_stack.py --backend solidcraft --no-render
+```
+
+Die zusätzliche vollständige STEP-XOR-Vergleichsprüfung bei `--backend both`
+ist keine Build-Abhängigkeit des Rundgangs. Der Browserbericht benennt die
+tatsächlich verwendeten nativen Nachweise und übernimmt keine ausgelassene
+Vergleichsprüfung als bestanden.
+Mit `--building-report` lässt sich der versionierte FreeCAD-Prüfbericht
+ausdrücklich binden, auch wenn ein separater SolidCraft-Aufbau den gemeinsamen
+Berichtszeiger anschließend ersetzt.
+
+Die Ausgabe nennt die lokale URL und die dauerhafte Datei
+`exports/building-walkthrough/<Revision>/index.html`. Diese HTML-Datei enthält
+Geometrie, Bedienelemente und Renderer vollständig und lässt sich auch direkt
+in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek.
+`--serve` stellt sie ausschließlich auf `127.0.0.1:8765` bereit;
+`--port` ändert den Port. Vorhandene Revisionen werden erhalten.
+
+## Bedienung
+
+- Die fünf Ortsknöpfe öffnen die jeweiligen Blickpunkte.
+- **WASD / Pfeiltasten** bewegen die Kamera; **Ziehen** mit Maus oder Finger
+  ändert die Blickrichtung.
+- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt die Bewegung.
+- Bildschirmknöpfe bieten dieselbe Bewegung auf Touchgeräten.
+- Die Geschossauswahl ändert die Kamerahöhe im Gebäude. „Return to viewpoint“
+  setzt den aktuellen Blickpunkt zurück; Vollbild vergrößert die Ansicht.
+
+Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Die freie
+Kamera hat keine Kollisionsprüfung und kann Wände oder Decken durchqueren.
+
+## Gemeinsame Quellen und getrennte Raumbezüge
+
+[`model/building-walkthrough.shared.json`](../model/building-walkthrough.shared.json)
+referenziert die vorhandenen Quellen für Gebäude und Labor. Die Raumkameras
+werden aus Raumflächen und tatsächlichen Türöffnungen berechnet. Der
+Atriumblick bindet die vorhandene offene Geländerkante an den Flur. Der Blick
+in den Kernbereich wird aus seinem offenen Zugang am Flur `C3_021` abgeleitet. Die
+Kameraparameter haben explizite mm-, Sekunden- beziehungsweise Gradbezüge.
+Der Compiler `scripts/building_walkthrough.py` benötigt kein CAD.
+
+Der Doktorandenraum blickt von der Flurtür zum Fensterende. Der Küchenblick
+blickt ebenfalls vom Eingangsbereich zum äußeren Fenster. Die Küche 1.008
+fasst im 1. OG die Vorlagenflächen `R3_008A`, `R3_008B` und `R3_009` zusammen;
+die frühere hintere Büroabtrennung entfällt dort. Die Tische und die gemeinsam
+verschobene Küchenanordnung sind an das Fenster der Quellwand `W005`
+gebunden. Der nominale Tisch-/Wandabstand von 100 mm wird einmal mit der
+Darstellungseinpassung skaliert. Die Eingangssituation soll den Schrankzugang
+frei halten; ein realer Türschwenkweg wird durch den Blickpunkt nicht geprüft.
+Raumgröße und Möbeleinpassung bleiben ungemessene Darstellungsannahmen.
+
+Das Gebäude verwendet eine ungemessene Darstellskalierung und angenommene
+Geschosshöhen. Das detaillierte L01-Modell besitzt einen eigenen lokalen
+Raumbezug; eine vermessene Transformation in den Gebäudebezug fehlt weiterhin.
+Der Labor-Knopf wechselt deshalb ausdrücklich in eine zweite Szene. Diese
+Trennung wird in der Oberfläche angezeigt. Sie fügt keine scheinbar vermessene
+Türverbindung ein.
+
+Im Doktorandenraum 3.002 bilden die Tischplatten an beiden Längsseiten und vor
+dem Fenster eine durchgehende U-förmige Arbeitsfläche mit Wandkontakt. Die
+Glastür zu Labor **3.001** liegt beim Blick vom Flureingang zum Fenster links;
+ihre Öffnung bleibt frei. Die frühere rechte Verbindung zu 3.003 ist in dieser
+Geschossvariante geschlossen. Der Erste-Hilfe-Kasten ist rechts innen neben
+der Flurtür verankert. Diese Anordnung folgt der Nutzerbeschreibung;
+Abmessungen und Möbelhöhen sind weiterhin Darstellannahmen. Die übrigen
+Doktorandenräume behalten ihre bisherige Möblierung.
+
+Der [Kernbereich am Atrium](atrium-seating.md) liegt in der unnummerierten
+Fläche `NorthCore`, gegenüber von 3.002 auf der anderen Seite des Atriums.
+Er enthält im 1., 2. und 3. OG jeweils einen weißen elliptischen Tisch mit vier
+Stühlen. Zugang und Geländer beziehen sich auf `W063` und `W065`.
+Die Toilettenseite `R3_011` / `R3_012` / `CoreGap` bleibt wie gezeichnet;
+die frühere Platzierung dort wurde zurückgenommen. Die Küche 1.008 bleibt auf
+der Küchenseite des Gebäudes und wird innerhalb ihres erweiterten Raumbereichs
+zum Außenfenster ausgerichtet. EG und Keller erhalten keine weiteren Sitzgruppen.
+
+## GitHub-README und Bereitstellung
+
+Die interaktive HTML-Datei lässt sich aus dem README verlinken, beispielsweise
+über ein Vorschaubild. Direkt im README führt GitHub ihren Renderer nicht aus:
+Die [GFM-Regeln](https://github.github.com/gfm/#disallowed-raw-html-extension-)
+filtern unter anderem `script` und `iframe`. Ein öffentlicher Rundgang benötigt
+deshalb eine separat gehostete HTML-Datei. [GitHub Pages](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages)
+kann die statische Datei samt JavaScript bereitstellen. Der lokale
+`127.0.0.1`-Link ist nur auf dem Rechner erreichbar, auf dem der Server läuft.
+Dieser Export richtet keine Veröffentlichung ein.
+
+## Nachweise
+
+Die bestätigte Lage im Kernbereich und die erweiterte Küche am Fenster sind
+im Export `building-walkthrough-987112e02766` an den vollständig geprüften
+FreeCAD-Stand `building-stack-ecc15e1b9dd9` gebunden. Alle fünf Blickpunkte,
+Bewegungssteuerung, mobile Darstellung und Fehleranzeige bestehen die neue
+Chrome-Prüfung. Deren Mesh-Prüfung bestätigt zusätzlich die Sitzgruppe innerhalb
+von `NorthCore`, die weiße Tischplatte, erhaltene Toilettenwände/-türen,
+entfernte OG1-Küchenpartitionen und das nur in OG1 ergänzte Außenfenster.
+Die älteren Rundgänge der Stände
+`5406a30fc113` / `6dbc248fae3b` zeigen die zurückgenommene falsche Platzierung
+auf der Toilettenseite und sind kein Nachweis für diese Korrektur.
+
+Der Exporter `scripts/export_building_walkthrough_freecad.py` liest die finalen
+nativen BRep-Flächen. Der Build-Bericht bindet Quellen, native Artefakte,
+Tessellationstoleranzen, sämtliche Körper-IDs, Dreiecksanzahlen und die
+Float32-Konvertierungsabweichung. Der semantische blaue `ConceptExchange`-Marker
+bleibt im Mesh erhalten und wird nur in dieser Ansicht ausgeblendet.
+
+Die Rundgangquelle setzt die beiden semantischen Wandrollen
+`concept_storey_wall` und `circulation_wall_bridge` für Innenansichten auf
+deckend. Ihre native CAD-Darstellung ist für Außenübersichten transparent.
+Die ursprünglichen Materialwerte bleiben im Mesh erhalten; Glas und alle
+anderen Materialien behalten ihre native Transparenz.
+
+```bash
+python3 -m unittest discover -s tests -p 'test_building_walkthrough*.py' -v
+node tests/check_building_walkthrough.cjs exports/building-walkthrough/<Revision>/index.html
+```
+
+Die Browserprüfung erzeugt neben dem HTML einen separaten `browser-check.json`
+und Screenshots der Blickpunkte. Sie prüft tatsächliches WebGL-Zeichnen,
+Tastatur-/Zeigerbedienung, die Geschossauswahl, die mobile Ansicht und die
+Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
+Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
+Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.

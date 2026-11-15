@@ -2,7 +2,7 @@
   "format": "solidcraftbot.building-doors/1",
   "catalog": {
     "source": "model/doors/room-doors.catalog.json",
-    "source_sha256": "3d9675a976d88a8f107634c2f3066973b467d7133d44b39612db55ff86cc59fb"
+    "source_sha256": "ae89ee51d0250101797ec3c305759c98f31a3ed8196fa139daf381bc865b8780"
   },
   "default_type": "plain",
   "default_material": "wood",
@@ -50,5 +50,14 @@
     "Owner confirms round viewing windows for laboratories and doctoral writing rooms, excluding secretariat, owner office and kitchens",
     "Owner instructs using larger rooms at drawing-top/bottom and ignoring the few EG/OG3 exceptions",
     "Owner confirms heavy steel doors throughout KG; mass and protection ratings remain unknown"
+  ],
+  "opening_overrides": [
+    {
+      "level_id": "OG3",
+      "opening_id": "D3_002_001",
+      "type": "plain",
+      "material": "glass",
+      "basis": "Owner confirms the left-side connecting door from doctoral room 3.002 to laboratory 3.001 is a full-glass leaf. The detailed L01 model remains separately assigned to laboratory 3.003."
+    }
   ]
 }
