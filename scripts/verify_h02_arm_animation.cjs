@@ -1,0 +1,19 @@
+// Browser replay equivalence, controls and responsive WebGL checks.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),zlib=require('node:zlib');
+const runtime=require('./h02_arm_animation.js');
+(async()=>{
+ const out=path.resolve(process.argv[2]),html=fs.readFileSync(path.join(out,'h02-arm-pickup.html'),'utf8');
+ const packed=html.match(/data-packed>([^<]+)</)[1],data=JSON.parse(zlib.gunzipSync(Buffer.from(packed,'base64'))),refs=JSON.parse(fs.readFileSync(path.join(out,'reference.json')));
+ let max=0;for(const r of refs){const s=runtime.state(data,r.t);s.scalar.forEach((v,i)=>assert(Math.abs(v-r.scalar[i])<1e-6));s.q.forEach((q,i)=>{assert(Math.abs(q-r.state.joints_deg[i])<1e-8)});assert(Math.abs(s.tube-r.state.coordinates.TubeZ)<1e-8);assert(Math.abs(s.gap-r.state.coordinates.JawLeft)<1e-8);for(const [link,m] of Object.entries(r.arm))m.flat().forEach((v,i)=>{max=Math.max(max,Math.abs(v-s.matrices[link][i]));assert(Math.abs(v-s.matrices[link][i])<1e-7)})}
+ const {chromium}=require(path.join(process.argv[3],'playwright'));const browser=await chromium.launch({headless:true,executablePath:'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+ const page=await browser.newPage({viewport:{width:900,height:850}}),errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('file://'+path.join(out,'preview.html'));
+ const frame=page.frameLocator('iframe'),root=frame.locator('#h02-arm-motion');await root.waitFor();await root.locator('canvas').waitFor();await root.evaluate(el=>new Promise((resolve,reject)=>{let n=0;const timer=setInterval(()=>{if(el.dataset.ready==='true'){clearInterval(timer);resolve()}else if(++n>300){clearInterval(timer);reject(Error('Viewer did not become ready'))}},100)}));
+ const accelTime=(data.curves.approach.times[1]+data.curves.approach.times[2])/2;assert(Math.abs(Math.abs(runtime.state(data,accelTime).scalar[2])-data.scalar_limits.acceleration_mm_s2)<1e-6);
+ for(const t of [0,accelTime,data.durations.approach/2,data.durations.approach,data.durations.approach+data.durations.closure/2,data.total_duration]){const actual=await root.evaluate((el,t)=>{el.drawAt(t);return {...el.dataset}},t);assert.equal(actual.phase,runtime.state(data,t).phase);assert(Math.abs(Number(actual.tubeLift)-runtime.state(data,t).tube)<1e-8);await root.screenshot({path:path.join(out,'review-'+t.toFixed(3)+'.png')})}
+ await root.locator('[data-view]').selectOption('detail');await root.evaluate((el,t)=>el.drawAt(t),data.durations.approach+data.durations.closure/2);await root.screenshot({path:path.join(out,'review-detail.png')});
+ await root.locator('[data-time]').fill('2');await root.locator('[data-play]').click();await page.waitForTimeout(800);assert(Number(await root.getAttribute('data-time'))>2.2);await root.locator('[data-play]').click();
+ for(const width of [320,736]){await page.setViewportSize({width,height:850});const box=await root.evaluate(el=>({width:el.clientWidth,scroll:el.scrollWidth}));assert(box.scroll<=box.width+1);await root.screenshot({path:path.join(out,'review-width-'+width+'.png')})}
+ await page.emulateMedia({colorScheme:'dark'});await root.screenshot({path:path.join(out,'review-dark.png')});assert.deepEqual(errors,[]);
+ const result={passed:true,reference_times:refs.length,maximum_source_matrix_error:max,browser_errors:errors,checks:['Exact browser/Python PVA, IK, coordinates and link transforms; acceleration cap attained','Playback, scrubbing, detail view and responsive layout'],visual_review:'Pending image inspection'};
+ fs.writeFileSync(path.join(out,'browser-checks.json'),JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify(result));await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});

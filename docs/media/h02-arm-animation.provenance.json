@@ -1,0 +1,155 @@
+{
+  "format": "solidcraftbot.h02-arm-animation-evidence/1",
+  "prepared_on": "2026-11-15",
+  "revision": "h02-arm-animation-f016aa440059",
+  "animation_report": {
+    "path": "exports/generated/h02-arm-animation-f016aa440059/animation-report.json",
+    "sha256": "07c9e5379a4bb2213141ee8bcb908412c9b17b560d59081452c5f75fe790995f",
+    "bytes": 11552
+  },
+  "source_sha256": {
+    "scripts/build_h02_arm_animation.py": "adcf02bf7d33cc1d8ec3df6d8570bc89c784db3808bde72834cb77a8844afbee",
+    "scripts/export_h02_arm_animation_mesh.py": "79bba935ca55343fd2ace96e29a0f7aad11e06f431e0949da6987179219950c2",
+    "scripts/templates/h02_arm_animation.html": "f69364556b86f6b090721070e1686bacf9b38cb4fc0a9dc315c3dac8c92298b5",
+    "scripts/h02_arm_animation.js": "9760e8714118f64490c5d8974678e84b3f99a993638280d6d6e2da9d4954e048"
+  },
+  "checked_full_arm_build": {
+    "path": "cad/h02-arm-pickup/shared-build-report.json",
+    "sha256": "4ca4da03ca7d4237f6e364b5106f47032f168d3947d7f55ef4f4a13b4dd2205a"
+  },
+  "native_model": {
+    "path": "cad/generated/h02-arm-pickup-f016aa440059/V20/grasp.FCStd",
+    "sha256": "9ef71fe4898136aa2640077dc03900ba996b8eee3de10167e1d46015607f8255"
+  },
+  "artifacts_sha256": {
+    "exports/generated/h02-arm-animation-f016aa440059/mesh.json": "840a9997aeb3fd33656218dafa51da948b21d8ab58ef9329f9bd6b42828f7680",
+    "exports/generated/h02-arm-animation-f016aa440059/h02-arm-pickup.html": "68f5786f7e10326e8157ebe7bbce8d08fcd6aa823be4e8356d922d4113177752",
+    "exports/generated/h02-arm-animation-f016aa440059/reference.json": "276bdd82bf8020dd72fad739856a6795d5bd9721db129fffa4ad5163eb10c90d",
+    "exports/generated/h02-arm-animation-f016aa440059/native-replay-checks.json": "ee4d80458a7cf307a1b92f6302995aaeb4b2a27fd1ea6c4de5eedbf3a19a6a9f"
+  },
+  "browser_verifier": {
+    "path": "scripts/verify_h02_arm_animation.cjs",
+    "sha256": "b4e27a179ea307dcd4369f18138de31fa6eedafd0478fbc3c0d8a4e1917fa9be",
+    "bytes": 3841
+  },
+  "browser_checks": {
+    "passed": true,
+    "reference_times": 81,
+    "maximum_source_matrix_error": 3.410605131648481e-13,
+    "browser_errors": [],
+    "checks": [
+      "Exact browser/Python PVA, IK, coordinates and link transforms; acceleration cap attained",
+      "Playback, scrubbing, detail view and responsive layout"
+    ],
+    "visual_review": "Pending image inspection"
+  },
+  "native_replay_checks": {
+    "passed": true,
+    "checks": [
+      {
+        "time_s": 0.0,
+        "maximum_transform_error": 2.2737367544323206e-13,
+        "passed": true
+      },
+      {
+        "time_s": 1.1887535157154856,
+        "maximum_transform_error": 2.671030298086151e-13,
+        "passed": true
+      },
+      {
+        "time_s": 2.8894519761551583,
+        "maximum_transform_error": 3.6824922851153955e-13,
+        "passed": true
+      },
+      {
+        "time_s": 4.277777249983462,
+        "maximum_transform_error": 1.1368683772161603e-13,
+        "passed": true
+      },
+      {
+        "time_s": 5.7875809852717435,
+        "maximum_transform_error": 3.6824922851153955e-13,
+        "passed": true
+      },
+      {
+        "time_s": 7.453571313865708,
+        "maximum_transform_error": 1.983671060680626e-13,
+        "passed": true
+      },
+      {
+        "time_s": 8.677032961426901,
+        "maximum_transform_error": 2.2737367544323206e-13,
+        "passed": true
+      }
+    ],
+    "bodies": 133,
+    "scope": "Replay placement equivalence; existing continuous collision audit retained"
+  },
+  "review_images": [
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-0.000.png",
+      "sha256": "4d42f66924bdeaeed75162258284568ba1f30c3173efb993a3e9d49665de6b6a",
+      "bytes": 71406
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-0.850.png",
+      "sha256": "151927dc753459ada49db59339259ec529d0d11bb79df1bfbc7d547571855e83",
+      "bytes": 72062
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-1.850.png",
+      "sha256": "48605a584e41e5747ef027de78f452c6e91d2a0bea509abcc38e12dcae25b160",
+      "bytes": 69475
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-3.700.png",
+      "sha256": "7818d079ffe46cc1394547cfa711f89fdfa55e766a0a6b3a2d7f6980f45b3a3a",
+      "bytes": 68082
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-4.339.png",
+      "sha256": "2436da6b74478a500c3441c40659161d1b17400ed482ade2827f8af52f53d922",
+      "bytes": 68243
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-8.677.png",
+      "sha256": "079218201d0729b329c427f65fdd8f7cef4c55337f997eb4c95a398eafd37b33",
+      "bytes": 72139
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-dark.png",
+      "sha256": "c1ef1a8e99dea98cb9df5921fea1418eba03b8105f8badb97c7079abe8ff1213",
+      "bytes": 67884
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-detail.png",
+      "sha256": "bed469a903e51616d5fb5a9ec5cc304989504c43b48d068a7222493311c6c80d",
+      "bytes": 80204
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-width-320.png",
+      "sha256": "329b9027525eeb847a21601aef1e80fc087bfe790fee6ccf2d454d399244c28c",
+      "bytes": 54125
+    },
+    {
+      "path": "exports/generated/h02-arm-animation-f016aa440059/review-width-736.png",
+      "sha256": "959c50f58ac12f65e8962951e11552abbc14da9a0249ca1314db4c691d71af20",
+      "bytes": 75269
+    }
+  ],
+  "visual_review": "Full-arm acceleration plateau, gripper detail, narrow and dark screenshots inspected",
+  "documentation": {
+    "path": "docs/h02-arm-animation.md",
+    "sha256": "f5bfa515d4dded3944be1d4e4d847331e91ecd30476228e53defed191f7433ee",
+    "bytes": 2716
+  },
+  "duration_s": 8.677032961426901,
+  "variant": "V20",
+  "physical_bodies": 133,
+  "limitations": [
+    "Display meshes only; vendor detail clustered at 1 mm",
+    "Exact source curves and analytic IK; no joint interpolation",
+    "Required grasp modeled as synthetic closure; no physical feedback",
+    "No hardware or new collision qualification; source-bound CAD audit retained"
+  ]
+}

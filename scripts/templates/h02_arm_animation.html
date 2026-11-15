@@ -1,0 +1,19 @@
+<div id="h02-arm-motion">
+<style>
+#h02-arm-motion{display:grid;gap:calc(var(--font-size-base)*.5)}
+#h02-arm-motion canvas{display:block;width:100%;height:480px;touch-action:none}
+#h02-arm-motion input[type=range]{width:100%}
+@media(max-width:480px){#h02-arm-motion canvas{height:360px}}
+</style>
+<div class="viz-controls">
+<button class="btn btn-primary" type="button" data-play>Play</button>
+<label class="form-label">View <select class="form-select" data-view><option value="full">Full arm</option><option value="detail">Gripper and H02</option></select></label>
+<label class="form-label">Speed <select class="form-select" data-speed><option value=".5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label>
+</div>
+<canvas role="img" aria-label="Orbitable full-arm H02 approach, jaw closure and tube extraction. Drag to orbit; scroll to zoom.">Full-arm approach, grasp, and 60 mm extraction.</canvas>
+<div class="viz-row"><span data-phase aria-live="polite">Loading motion</span><span data-clock class="tabular-nums">0 s</span></div>
+<label class="form-label">Motion time<input class="form-range" type="range" min="0" max="1" step="any" value="0" data-time aria-label="Motion time in seconds"></label>
+<div class="viz-row text-small"><span class="tabular-nums" data-values></span><span>Drag to orbit · scroll to zoom · 2 mL reference</span></div>
+<script type="application/json" data-packed>__DATA__</script>
+<script>__RUNTIME__</script>
+</div>

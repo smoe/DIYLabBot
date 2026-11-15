@@ -21,7 +21,7 @@ J=sm.Jet
 def validate(s):
     if set(s)!=set(json.loads(SCHEMA.read_text())['properties']) or s['units']!={'length':'mm','angle':'deg','time':'s'}:
         raise ValueError('Explicit typed arm-pickup fields required')
-    if s['format']!='solidcraftbot.h02-arm-pickup/1' or s['branch']!='planar_positive_elbow':raise ValueError('Unsupported arm pickup')
+    if s['format']!='solidcraftbot.h02-arm-pickup/1' or s['branch']!='planar_positive_elbow' or s['timing_profile']!='limit_driven_s_curve':raise ValueError('Unsupported arm pickup')
     for ref in s['sources'].values():assembly.validate_reference(ref)
     if s['arm_fixture']['yaw_deg']!=0 or s['arm_fixture']['position_mm'][0]!=0 or s['arm_fixture']['position_mm'][1]>=0 or s['arm_fixture']['position_mm'][2]!=0:
         raise ValueError('This analytic branch requires a level base behind the origin on -Y')
@@ -97,12 +97,21 @@ class Program:
         self.end=self.kin.flange[2]+self.kin.length-origins[4][2]
         self.radial=-s['arm_fixture']['position_mm'][1];self.shoulder=origins[1][2]
         if min(self.upper,self.fore,self.end)<=0:raise ValueError('Positive source-derived link dimensions required')
-        self.z0=self.local_scene['grasp_z_mm'];self.travel=self.local_scene['travel_mm'];self.duration=self.local_scene['duration_s']
+        self.z0=self.local_scene['grasp_z_mm'];self.travel=self.local_scene['travel_mm']
         self.limits=json.loads(assembly.validate_reference(s['sources']['motion_limits']).read_text())['limits']
-        self.curves={}
+        self.curves={};self.durations={}
+        caps=self.local_scene['motion_limits']
         for phase,ends in [('approach',(self.z0+self.travel,self.z0)),('closure',(self.p['jaw_travel'],0)),('extraction',(self.z0,self.z0+self.travel))]:
-            self.curves[phase]=motion.Curve([{'time_s':t,'positions_rad':[v],'velocities_rad_s':[0.],'accelerations_rad_s2':[0.]}
-                for t,v in zip([0.,self.duration],ends)])
+            points=motion.rest_to_rest(ends[1]-ends[0],caps['velocity_mm_s'],caps['acceleration_mm_s2'],caps['jerk_mm_s3'])
+            for point in points:point[motion.FIELDS[0]][0]+=ends[0]
+            self.curves[phase]=motion.Curve(points);self.durations[phase]=points[-1]['time_s']
+        self.total_duration=sum(self.durations.values())
+
+    def at_time(self,t):
+        t=max(0.,min(self.total_duration,t));start=0.
+        for phase,duration in self.durations.items():
+            if t<start+duration or phase=='extraction':return phase,(t-start)/duration
+            start+=duration
 
     def angles(self,z):
         """Solve from the existing joint-frame origins, not copied arm lengths.
@@ -120,7 +129,7 @@ class Program:
         return [J(math.pi/2),shoulder,elbow,J(0),math.pi-shoulder-elbow,J(-math.pi/2)]
 
     def state(self,phase,u):
-        scalar=motion.evaluate(self.curves[phase],u*self.duration)
+        scalar=motion.evaluate(self.curves[phase],u*self.durations[phase])
         v=[scalar[f][0] for f in motion.FIELDS]
         z=J(self.z0) if phase=='closure' else J(*v)
         q=self.angles(z);qdeg=[math.degrees(a.d[0]) for a in q]
@@ -130,8 +139,14 @@ class Program:
                 'joint_state':{f:[a.d[n] for a in q] for n,f in enumerate(motion.FIELDS)}}
 
     def ranges(self,phase,a,b):
-        curve=self.curves[phase];h=self.duration;coeff=curve.segments[0][0]
-        jets=[sm._polynomial_interval(motion.derivative(coeff,n),a,b,h**n) for n in range(4)]
+        curve=self.curves[phase];start=a*self.durations[phase];end=b*self.durations[phase];pieces=[]
+        for i,segment in enumerate(curve.segments):
+            left=max(start,curve.times[i]);right=min(end,curve.times[i+1])
+            if right<left:continue
+            h=curve.times[i+1]-curve.times[i];u=(left-curve.times[i])/h;v=(right-curve.times[i])/h
+            pieces.append([sm._polynomial_interval(motion.derivative(segment[0],n),u,v,h**n) for n in range(4)])
+        if not pieces:raise ValueError('No curve interval')
+        jets=[I(min(p[n].lo for p in pieces),max(p[n].hi for p in pieces)) for n in range(4)]
         z=J(I(self.z0)) if phase=='closure' else J(*jets)
         return self.angles(z),jets[0]
 
@@ -158,9 +173,20 @@ class Program:
                 'maximum_joint_derivatives':dict(zip(names,maxima)),'limits':caps,'maximum_FK_residual':max(errors),
                 'reachability':'positive-elbow analytic branch, strict acos domain over every interval',
                 'continuous':True,'interior_stops':0 if phase!='closure' else None,
-                'no_stop_reason':'|dz/du| = travel*30*u^2*(1-u)^2 > 0 and dq3/dz = -W/(U*F*sin(q3)) != 0 in the interior' if phase!='closure' else 'Required grasp-closing operation'})
-        return {'passed':True,'phases':phases,'arm_overrides':{},'local_profile':local.motion_profile(self.spec,self.p),
+                'no_stop_reason':'Rest-to-rest S-curve has strictly positive interior speed; dq3/dz is nonzero' if phase!='closure' else 'Required grasp-closing operation'})
+        return {'passed':True,'phases':phases,'arm_overrides':{},'local_profile':self.scalar_audit(),
                 'numeric_scope':'Conservative binary64 interval enclosures, not a formal floating-point certificate'}
+
+    def scalar_audit(self):
+        phases=[];caps=self.local_scene['motion_limits']
+        for phase,curve in self.curves.items():
+            bounds=motion.bounds(curve)
+            maxima={key:bounds[field]['max_abs'][0] for key,field in [('velocity_mm_s',motion.FIELDS[1]),('acceleration_mm_s2',motion.FIELDS[2]),('jerk_mm_s3',motion.FIELDS[3])]}
+            if any(maxima[k]>caps[k]+1e-7 for k in caps):raise ValueError('Scalar S-curve exceeds source limits')
+            phases.append({'phase':phase,'duration_s':self.durations[phase],'knots':curve.points,
+                'maximum_derivatives':maxima,'limits':caps,'passed':True,'interior_stops':0})
+        return {'phases':phases,'duration_s':self.total_duration,'timing':'Shared symmetric jerk-limited rest-to-rest S-curve; fixed-path scalar limits, not global robot path optimality',
+            'holds':'Arm stationary during jaw closure; measured grasp feedback required for future hardware'}
 
     def delta(self,phase,a,b,record):
         """Every point in a native body remains within this radius of midpoint.

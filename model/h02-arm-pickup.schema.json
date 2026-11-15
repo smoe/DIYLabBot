@@ -14,7 +14,8 @@
     "continuous_audit",
     "status",
     "limitations",
-    "units"
+    "units",
+    "timing_profile"
   ],
   "properties": {
     "format": {
@@ -182,6 +183,9 @@
       "items": {
         "type": "string"
       }
+    },
+    "timing_profile": {
+      "const": "limit_driven_s_curve"
     }
   }
 }

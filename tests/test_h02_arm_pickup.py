@@ -25,10 +25,22 @@ class ArmPickupTests(unittest.TestCase):
             for actual,j in zip(phase['joint_ranges_deg'],self.program.arm['joints']):
                 self.assertGreaterEqual(actual[0],j['limits_deg'][0]);self.assertLessEqual(actual[1],j['limits_deg'][1])
 
+    def test_limit_driven_timing_attains_acceleration_and_jerk_caps(self):
+        report=self.program.scalar_audit();self.assertLess(report['duration_s'],9)
+        self.assertAlmostEqual(self.program.durations['approach'],3.7)
+        for phase in report['phases']:
+            self.assertAlmostEqual(phase['maximum_derivatives']['acceleration_mm_s2'],20,places=7)
+            self.assertAlmostEqual(phase['maximum_derivatives']['jerk_mm_s3'],100,places=6)
+            curve=self.program.curves[phase['phase']]
+            for t in curve.times[1:-1]:
+                left=m.motion.evaluate(curve,t,side='left');right=m.motion.evaluate(curve,t,side='right')
+                for field in m.motion.FIELDS[:3]:self.assertAlmostEqual(left[field][0],right[field][0],places=7)
+            for i in range(1,100):self.assertGreater(abs(m.motion.evaluate(curve,curve.times[-1]*i/100)[m.motion.FIELDS[1]][0]),0)
+
     def test_exact_branch_matches_shared_fk_and_tool_derivatives(self):
         for phase in ['approach','extraction']:
             for u in [0,.01,.2,.5,.8,.99,1]:
-                state=self.program.state(phase,u);expected=m.motion.evaluate(self.program.curves[phase],u*self.program.duration)
+                state=self.program.state(phase,u);expected=m.motion.evaluate(self.program.curves[phase],u*self.program.durations[phase])
                 fk=sample_motion.evaluate(self.program.kin,state['joint_state'])
                 for index,name in enumerate(sample_motion.LINEAR):
                     self.assertAlmostEqual(fk[name][0],0,places=8);self.assertAlmostEqual(fk[name][1],0,places=8)

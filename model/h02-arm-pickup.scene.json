@@ -56,5 +56,6 @@
     "length": "mm",
     "angle": "deg",
     "time": "s"
-  }
+  },
+  "timing_profile": "limit_driven_s_curve"
 }

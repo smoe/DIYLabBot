@@ -116,11 +116,17 @@ its original 200 mm upper and 175 mm forearm dimensions. Its base is placed at
 fixture assumption, not surveyed furniture.
 
 An analytic positive-elbow IK branch keeps the TCP vertical throughout the
-60 mm approach and extraction. The shared quintic episodes each last six
-seconds, with C2 position/velocity/acceleration continuity and bounded jerk.
+60 mm approach and extraction. The shared limit-driven S-curves take 3.70 s for approach, about 1.277 s
+for jaw closure and 3.70 s for extraction (about 8.677 s total). They preserve
+C2 position/velocity/acceleration continuity with bounded, discontinuous jerk.
+The original local component test above retains its six-second quintics.
 Only grasp and closing require stops; there are no interior approach or
 extraction stops. Joint limits and velocity, acceleration and jerk bounds are
-checked using interval derivatives of the IK, alongside shared FK. This is a
+checked using interval derivatives of the IK across every polynomial segment,
+alongside shared FK. The unchanged scalar limits are 30 mm/s, 20 mm/s² and
+100 mm/s³. Acceleration reaches its limit after a jerk ramp, with a short cruise
+only where the speed cap requires it. This is the shared symmetric scalar
+rest-to-rest S-curve for the fixed path, not global robot-path time optimality. This is a
 local pickup program, not a complete transfer or hardware controller.
 
 Both native CADs independently construct the robot from the shared arm source
@@ -165,11 +171,11 @@ the conservative default bounds; comparison tolerances remain unchanged.
 
 For each variant and CAD, the arm audit covers 7,004 additional pairs using
 83 evaluated native poses and 43 accepted continuous intervals (maximum depth
-5). The conservative interval clearance bounds are at least 23.617 mm for
-nonadjacent arm links, 1.225 mm for arm/tool separation and 9.303 mm against the
+5). The conservative interval clearance bounds are at least 24.038 mm for
+nonadjacent arm links, 1.812 mm for arm/tool separation and 9.063 mm against the
 surroundings. Both native blocker controls are rejected with clear endpoints.
 All 1,152 semantic body/pose comparisons pass, and the combined focused suite
-has 18 passing tests. These are nominal geometric results under the recorded
+has 19 passing tests. These are nominal geometric results under the recorded
 exclusions, not measured tolerances or a hardware qualification.
 The [full-arm image evidence](media/h02-arm-pickup.provenance.json) binds the
 published views to the checked sources, audits and native models.
