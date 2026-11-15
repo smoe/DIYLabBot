@@ -10727,7 +10727,7 @@
     "docs/building-stack.md": "1176776073e458e9316fb94fc29744c9b06022fd6f1823057468f1a95a6be85c",
     "docs/ground-floor-eg.md": "ccef100cf0acaa9cb0f97e5eeb992ea0e37b034941e78225df2788be5d43471c",
     "docs/basement-kg.md": "d45b051ee7a61679298ab1d5b4b1700234813ebfdcd117eeb51212fac11e3d47",
-    "docs/building-exterior.md": "3dfe4d93485745cad9e76d3380057e8f7064e574123a3eace0e148960b67c8c7",
+    "docs/building-exterior.md": "d59e084b98b664fdac79abbffa5dba153ac98b2e76c60d15d40e2f0793f401c3",
     "docs/building-alignment.md": "745ff1bbc02484231dd01c3a62a1167e793735d41b54ce312706b1757a30f0de"
   },
   "qualification": {
@@ -20837,5 +20837,9 @@
     "georeferenced": false,
     "boundary_precision": "Illustrative display crop; exact curbs and slab dimensions not extracted",
     "imagery_copied_to_repository": false
+  },
+  "logistics_door_update": {
+    "provenance": "docs/media/logistics-doors.provenance.json",
+    "scope": "R0_013 room label and its two steel doors. Existing full-building image/native bindings above remain historical; current door detail and full FreeCAD build are bound separately."
   }
 }

@@ -1,0 +1,238 @@
+{
+  "format": "solidcraftbot.logistics-doors-media/1",
+  "prepared_on": "2026-11-15",
+  "source": "model/building-stack.shared.json",
+  "source_sha256": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+  "source_files_sha256": {
+    "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+    "scripts/build_building_stack.py": "e8d181d642d3d79f09047cc3a62aa7006b84c54bb9e90863167a93ecef4f5eba",
+    "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
+    "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+    "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
+    "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
+    "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+    "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+    "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+    "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+    "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+    "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+    "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+    "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+    "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
+    "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
+    "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+    "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+    "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+    "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+    "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+    "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+    "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+    "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+    "scripts/building_exterior.py": "50fb3d5fbb1d24dac633e55141316ca5bad2aba376a99459035425d64372e407",
+    "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+    "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+    "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+    "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+    "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+    "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d"
+  },
+  "confirmed_owner_requirements": {
+    "room_id": "R0_013",
+    "room_use": "Logistik (Post / Abfall)",
+    "material": "steel",
+    "finish": "dark blue, near black",
+    "viewing_windows": false,
+    "exterior_door": {
+      "opening_id": "D0_013_Exterior",
+      "hinge_side_from_outside": "right",
+      "opens_into": "exterior"
+    },
+    "atrium_door": {
+      "opening_id": "D0_013",
+      "hinge_side_viewed_coming_from_outside": "right",
+      "opens_into": "R0_013"
+    }
+  },
+  "assumptions": {
+    "color_rgb": "#172530",
+    "exact_color_measured": false,
+    "thickness_mm": 60,
+    "thickness_measured": false,
+    "display_open_angle_deg": 90,
+    "actual_open_angle_measured": false
+  },
+  "original_photographs_included": false,
+  "native_build_report": {
+    "path": "exports/generated/building-stack-4738e0660ae1/build-report.json",
+    "sha256": "f214fea5c016d2c89c058982c08acf03277cb819b77b7e6c5c007bd45245f5b9",
+    "bytes": 315901
+  },
+  "native_qa": {
+    "path": "exports/logistics-scene/native-qa.json",
+    "sha256": "fbca171dfd9832d47fe0d1a06d6e1701af0b39a82355f93bd485fffe348b3bfa",
+    "bytes": 9257
+  },
+  "native_summary": {
+    "passed": true,
+    "freecad_full_build": true,
+    "closed_bodies": 1938,
+    "scoped_geometry_probes": 452,
+    "height_checks": 15,
+    "native_reopening_checked": true,
+    "solidcraft_context_closed_bodies": 27,
+    "exact_context_step_comparisons": 27,
+    "maximum_context_step_xor_mm3": 0.0,
+    "full_building_cross_cad_comparison_performed": false
+  },
+  "source_change_scope": {
+    "baseline_master": "bcbc0bb",
+    "modified_leaves": [
+      "EG__DoorLeaf_D0_013",
+      "EG__DoorLeaf_D0_013_Exterior"
+    ],
+    "removed_detail_bodies": [
+      "EG__DoorLeaf_D0_013_Exterior_ViewingGlass",
+      "EG__DoorLeaf_D0_013_Exterior_ViewingRimBack",
+      "EG__DoorLeaf_D0_013_Exterior_ViewingRimFront",
+      "EG__DoorLeaf_D0_013_ViewingGlass",
+      "EG__DoorLeaf_D0_013_ViewingRimBack",
+      "EG__DoorLeaf_D0_013_ViewingRimFront"
+    ],
+    "unchanged_body_count": 1936,
+    "all_other_expanded_geometry_identical": true
+  },
+  "native_opening_directions": [
+    {
+      "body": "EG__DoorLeaf_D0_013_Exterior",
+      "opens_into_room": false,
+      "native_room_overlap_fraction": 0.0,
+      "passed": true
+    },
+    {
+      "body": "EG__DoorLeaf_D0_013",
+      "opens_into_room": true,
+      "native_room_overlap_fraction": 1.0,
+      "passed": true
+    }
+  ],
+  "images": [
+    {
+      "id": "exterior",
+      "path": "docs/media/logistics-exterior-door.png",
+      "sha256": "a15f6c4edd64cb79a8e966d25385450d9692899c342a87f710c9a01c6bfc5eff",
+      "bytes": 142878,
+      "pixels": [
+        1600,
+        1200
+      ],
+      "camera": {
+        "target": [
+          16900,
+          27400,
+          1200
+        ],
+        "yaw": -2.7,
+        "pitch": 0.1,
+        "distance": 4500,
+        "fov": 0.7
+      },
+      "viewpoint": "From outside toward exterior opening",
+      "native_model": {
+        "path": "exports/logistics-scene/room.sc",
+        "sha256": "334a6792a9a9378d800c7f9a3392d3b00b3f632de6becc93a33dd96e0647d092",
+        "bytes": 271692
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Inspected source-derived native scene: opaque blue-black steel without glazing; exterior opens out, atrium leaf opens into logistics room, right jamb at both openings viewed coming from outside."
+      }
+    },
+    {
+      "id": "atrium",
+      "path": "docs/media/logistics-atrium-door.png",
+      "sha256": "c68d59e6a5245256eec6c561d44c6cb029b33b4ba47de91cf0ad73acbef333b6",
+      "bytes": 77919,
+      "pixels": [
+        1600,
+        1200
+      ],
+      "camera": {
+        "target": [
+          10400,
+          20500,
+          1200
+        ],
+        "yaw": -2.9,
+        "pitch": 0.1,
+        "distance": 4000,
+        "fov": 0.7
+      },
+      "viewpoint": "From logistics room toward atrium opening",
+      "native_model": {
+        "path": "exports/logistics-scene/room.sc",
+        "sha256": "334a6792a9a9378d800c7f9a3392d3b00b3f632de6becc93a33dd96e0647d092",
+        "bytes": 271692
+      },
+      "visual_review": {
+        "passed": true,
+        "method": "Inspected source-derived native scene: opaque blue-black steel without glazing; exterior opens out, atrium leaf opens into logistics room, right jamb at both openings viewed coming from outside."
+      }
+    }
+  ],
+  "qualification": "Fresh full FreeCAD build and reopening; separate 27-body SolidCraft room context with exact STEP XOR against full FreeCAD shapes. Full-building SolidCraft comparison not performed. Static door poses, no dynamic swing or protection qualification.",
+  "claude_reviewed": false,
+  "tests": {
+    "door_tests": {
+      "run": 21,
+      "passed": true,
+      "optional_schema_skips": 1
+    },
+    "exterior_tests": {
+      "run": 13,
+      "passed": true
+    },
+    "ground_floor_tests": {
+      "run": 12,
+      "passed": true,
+      "optional_schema_skips": 1
+    },
+    "walkthrough_source_tests": {
+      "run": 11,
+      "passed": true,
+      "optional_schema_skips": 1
+    }
+  },
+  "limitations": [
+    "Partial room context shows source walls, floor, the two leaves and site surfaces; glazing infill and other building bodies are outside these detail views.",
+    "Existing whole-building media remain historical snapshots; new details and the fresh full FreeCAD build are bound here.",
+    "No dynamic swing clearance, building-safety or protection-rating qualification."
+  ],
+  "local_walkthrough": {
+    "build_report": "exports/building-walkthrough/building-walkthrough-6ad06f2029fc/build-report.json",
+    "sha256": "d5032626e6a4fefb9750003b0d47a707150a084f7039fb9023736ba590a3eb7f",
+    "html": "exports/building-walkthrough/building-walkthrough-6ad06f2029fc/index.html",
+    "native_building_bodies": 1938,
+    "both_steel_leaves_present": true,
+    "window_detail_bodies_absent": true,
+    "mesh_colors_checked": true,
+    "browser_interaction_retested": false,
+    "public_deployment_performed": false
+  },
+  "pre_existing_check_limitation": "The whole-building historical-media source-pin test already fails on master (9491a38): e1675c64fd5e image evidence predates the current ecc15e1b9dd9 building. This task retains those historical bindings and adds current scoped door evidence."
+}
