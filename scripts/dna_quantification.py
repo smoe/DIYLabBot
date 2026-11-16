@@ -377,6 +377,8 @@ class Workflow(NetworkControl, TaskPort):
     def stage_act(self, context_id, command, actor_id, artifact=None, **data):
         def update(state):
             if context_id != state['active_context_id']: raise TaskError('Retired or inactive device context')
+            if command in {'take', 'place'} and state.get('executing_agent_id'):
+                raise TaskError('Assigned agent handling requires an explicit task observation')
             adapter = build_adapter(self, state, context_id); view = adapter.state
             if command in {'rack_ready', 'advance_time', 'release', 'cancel', 'finish_cancel', 'reconcile'}:
                 raise TaskError('Use the root lifecycle, clock and reconciliation commands')

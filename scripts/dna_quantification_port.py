@@ -161,7 +161,7 @@ class TaskPort:
                     or observation['vessel_id'] != goal['vessel_id']
                     or observation['location'] != endpoint(goal, 'target')):
                 raise ObservationError('Explicit task destination vessel/sample/location observation required')
-            adapter = build_adapter(self, state, goal['context_id']); view = adapter.state
+            adapter = build_adapter(self, state, goal['context_id'], task_observation=True); view = adapter.state
             if goal['target_kind'] == 'agent':
                 adapter._take(view, actor_id, goal['sample_id'], goal['sample_id'],
                               rack_id=goal['source_rack_id'], place_id=goal['source_place_id'])

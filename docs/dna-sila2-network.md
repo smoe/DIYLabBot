@@ -125,6 +125,10 @@ Identitäten. Root-Evidenz unterscheidet `network_receipt`, `synthetic_backend`,
 `synthetic_person_input` und `worker_claim`. Systemfelder werden nach dem
 fachlichen Payload gesetzt. Synthetische Szenariowerte werden einmal im Root
 gebunden; eine spätere Anfrage kann sie nicht still durch CLI-Vorgaben ersetzen.
+Die alten Geräteoperationen sehen Agentengewahrsam als Operator-Kompatibilitätsansicht;
+der kanonische Ort bleibt der Agent. Nur eine ausdrückliche Aufgabenbeobachtung
+darf diese Ansicht in Agentengewahrsam zurückschreiben. Sobald ein Agent
+zugewiesen ist, sind direkte `device.take`-/`device.place`-Aufrufe gesperrt.
 
 `ResumeRun` übernimmt die Sitzung im Serverprozess. Andere offene Quittungen
 werden auch im selben Boot `uncertain`; aktive Worker-Aufträge werden nicht erneut

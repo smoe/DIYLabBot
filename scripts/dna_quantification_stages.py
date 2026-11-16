@@ -81,8 +81,9 @@ def make_context(root, device, attempt_id, sample_id, source_vessel_id):
 
 class SourceSampleView(MutableMapping):
     """The selected input may be a dilution; it remains the same root vessel."""
-    def __init__(self, root, context):
+    def __init__(self, root, context, task_observation=False):
         self.root, self.context = root, context
+        self.task_observation = task_observation
         self.vessel = root['inventory']['vessels'][context['source_vessel_id']]
 
     def __getitem__(self, key):
@@ -110,6 +111,8 @@ class SourceSampleView(MutableMapping):
         if key == 'location' and isinstance(value, dict) and value.get('kind') == 'operator':
             agent_id = self.root.get('executing_agent_id')
             if agent_id:
+                if not self.task_observation:
+                    raise TaskError('Agent custody can only change through an explicit task observation')
                 if value != {'kind': 'operator', 'actor_id': self.root['actor_id']}:
                     raise TaskError('Operator view must retain the responsible person')
                 value = {'kind': 'agent', 'agent_id': agent_id}
@@ -131,13 +134,14 @@ class SourceSampleView(MutableMapping):
 
 
 class SamplesView(MutableMapping):
-    def __init__(self, root, context):
+    def __init__(self, root, context, task_observation=False):
         self.root, self.context = root, context
+        self.task_observation = task_observation
 
     def __getitem__(self, key):
         if key != self.context['sample_id']:
             raise KeyError(key)
-        return SourceSampleView(self.root, self.context)
+        return SourceSampleView(self.root, self.context, self.task_observation)
 
     def __iter__(self):
         return iter([self.context['sample_id']])
@@ -184,13 +188,14 @@ class DerivedVesselsView(MutableMapping):
 
 class ContextState(MutableMapping):
     """Runtime view only; samples and balances are never serialized here."""
-    def __init__(self, root, context_id):
+    def __init__(self, root, context_id, task_observation=False):
         self.root, self.context = root, root['contexts'][context_id]
+        self.task_observation = task_observation
         self.local = self.context['local']
         self.definition = self.context['definition']
 
     def __getitem__(self, key):
-        if key == 'samples': return SamplesView(self.root, self.context)
+        if key == 'samples': return SamplesView(self.root, self.context, self.task_observation)
         if key == 'derived_vessels': return DerivedVesselsView(self.root, self.context)
         if key == 'resources': return self.root['resources']
         if key == 'definition': return self.definition
@@ -223,11 +228,11 @@ class ContextAdapter:
     EVENT_CLOCK = True
     DEADLINE_FIELD = 'deadline_s'
 
-    def __init__(self, flow, root, context_id):
+    def __init__(self, flow, root, context_id, task_observation=False):
         self.flow, self.root = flow, root
         self.context = root['contexts'][context_id]
         self.journal, self.run_id = flow.journal, context_id
-        self.state = ContextState(root, context_id)
+        self.state = ContextState(root, context_id, task_observation)
 
     def _now(self, state):
         return self.root['logical_time_s']
@@ -300,10 +305,10 @@ class QubitAdapter(ContextAdapter, QubitOperations):
 ADAPTERS = {'nanodrop': NanoDropAdapter, 'qubit': QubitAdapter}
 
 
-def build_adapter(flow, root, context_id):
+def build_adapter(flow, root, context_id, task_observation=False):
     try:
         context = root['contexts'][context_id]
         adapter = ADAPTERS[context['device']]
     except KeyError as error:
         raise TaskError('Unknown DNA device context') from error
-    return adapter(flow, root, context_id)
+    return adapter(flow, root, context_id, task_observation)
