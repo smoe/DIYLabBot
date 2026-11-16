@@ -147,8 +147,10 @@ class Workflow(NetworkControl, TaskPort):
             held = copy.deepcopy(before)
             held.update(status='cancelling' if before['cancel_requested'] else 'held',
                         recovery_required=before['recovery_required'] or 'deadline_exceeded')
+            decorated = self._decorate(held, sequence=revision + 1)
+            decorated['actor_id'] = actor_id
             self.journal.append(self.run_id, revision, 'deadline_exceeded',
-                self._decorate(held, sequence=revision + 1), held)
+                decorated, held)
             raise TaskError('DNA process deadline exceeded')
         state = copy.deepcopy(before)
         try:
@@ -157,9 +159,11 @@ class Workflow(NetworkControl, TaskPort):
         except ObservationError as error:
             before.update(status='cancelling' if before['cancel_requested'] else 'held',
                           recovery_required=before['recovery_required'] or 'observation_mismatch')
+            decorated = self._decorate(before, {**(payload or {}), 'command': kind,
+                'reason': str(error)}, revision + 1)
+            decorated['actor_id'] = actor_id
             self.journal.append(self.run_id, revision, 'observation_rejected',
-                self._decorate(before, {**(payload or {}), 'command': kind,
-                    'reason': str(error)}, revision + 1), before)
+                decorated, before)
             raise
         state['resources'] = self._resources(state)
         evidence = ('worker_claim' if kind == 'task.claimed' else

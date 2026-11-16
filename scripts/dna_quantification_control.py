@@ -33,7 +33,7 @@ class NetworkControl:
         result = dict(payload or {})
         # System fields are deliberately written last. An observation document
         # or a future adapter cannot impersonate another principal/evidence kind.
-        result.update(actor_id=state.get('actor_id'), evidence='synthetic_input')
+        result.update(actor_id=state.get('actor_id'), evidence=evidence or 'synthetic_input')
         if not state.get('control'):
             return result
         selected = evidence or context.get('evidence', 'synthetic_backend')
