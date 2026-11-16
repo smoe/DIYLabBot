@@ -554,6 +554,10 @@ class Workflow(NetworkControl, TaskPort):
                 before = copy.deepcopy(adapter._pending(view))
                 kwargs = {'calibration_still_valid': calibration_still_valid} if state['contexts'][state['active_context_id']]['device'] == 'qubit' else {'blank_still_valid': blank_still_valid}
                 ready = adapter._reconcile_device(view, actor_id, pending_resolution=pending_resolution, **kwargs)
+                if (state['contexts'][state['active_context_id']]['device'] == 'qubit'
+                        and calibration_still_valid is False and view['calibration']['status'] == 'pending'
+                        and any(row['record_type'] == 'standard' for row in view['measurements'].values())):
+                    view['calibration']['status'] = 'invalidated_by_observation'
                 if before and pending_resolution and pending_resolution.get('outcome') == 'not_performed' and before['intent_id'] in state['bookings']:
                     resolve_not_performed(state, before['intent_id'])
                 if ready is False:
