@@ -233,12 +233,15 @@ class Workflow(NetworkControl, TaskPort):
             if vessel.get('sample_id') and item.get('sample_id') != vessel['sample_id']:
                 raise ObservationError('Observed DNA sample identity mismatch')
             if not isinstance(item.get('location'), dict): raise ObservationError('Explicit physical location required')
+            unchanged = vessel['location'] == item['location']
             vessel['location'] = copy.deepcopy(item['location'])
-            if vessel['location'].get('kind') == 'discarded' and vessel['kind'] != 'original':
+            if (vessel['location'].get('kind') == 'discarded' and vessel['kind'] != 'original'
+                    and (not unchanged or not vessel.get('disposition_confirmation'))):
                 vessel['disposition_confirmation'] = {'actor_id': state['actor_id'],
                     'evidence': 'synthetic_input', 'reason': 'Explicit disposal observation during root inventory reconciliation'}
             if vessel['location'] == vessel.get('home'):
-                vessel['return_confirmation'] = {'evidence': 'synthetic_input', 'time_s': state['logical_time_s']}
+                if not unchanged or not vessel.get('return_confirmation'):
+                    vessel['return_confirmation'] = {'evidence': 'synthetic_input', 'time_s': state['logical_time_s']}
             else:
                 vessel['return_confirmation'] = None
             seen.add(key)

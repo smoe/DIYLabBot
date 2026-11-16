@@ -169,6 +169,8 @@ class TaskPort:
             else:
                 adapter._place(view, actor_id, goal['sample_id'], goal['sample_id'],
                                rack_id=goal['target_rack_id'], place_id=goal['target_place_id'])
+                state['inventory']['vessels'][goal['vessel_id']]['return_confirmation'].update(
+                    goal_id=goal_id, executing_agent_id=goal['executing_agent_id'], evidence=evidence)
             item.update(status='observed', root_observation=copy.deepcopy(observation),
                         observation_evidence=evidence)
             state['task_port']['pending_goal_id'] = None
