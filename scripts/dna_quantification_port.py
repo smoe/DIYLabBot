@@ -133,8 +133,11 @@ class TaskPort:
 
     def cancel_task(self, actor_id, goal_id):
         def update(state):
-            record = state['task_port']['goals'][goal_id]
-            if record['status'] == 'observed': raise TaskError('Task observation is already committed')
+            port = state.get('task_port', {})
+            record = port.get('goals', {}).get(goal_id)
+            if (not record or port.get('pending_goal_id') != goal_id
+                    or record['status'] not in {'intended', 'dispatched', 'claimed'}):
+                raise TaskError('Only the open intended, dispatched or claimed task can be cancelled')
             record['status'] = 'cancel_requested'
             state['status'] = 'cancelling' if state['cancel_requested'] else 'held'
             state['recovery_required'] = 'task_cancel_requires_observation'
@@ -158,7 +161,7 @@ class TaskPort:
                     or observation['vessel_id'] != goal['vessel_id']
                     or observation['location'] != endpoint(goal, 'target')):
                 raise ObservationError('Explicit task destination vessel/sample/location observation required')
-            adapter = build_adapter(self, state, goal['context_id']); view = adapter.state
+            adapter = build_adapter(self, state, goal['context_id'], task_observation=True); view = adapter.state
             if goal['target_kind'] == 'agent':
                 adapter._take(view, actor_id, goal['sample_id'], goal['sample_id'],
                               rack_id=goal['source_rack_id'], place_id=goal['source_place_id'])
@@ -166,6 +169,8 @@ class TaskPort:
             else:
                 adapter._place(view, actor_id, goal['sample_id'], goal['sample_id'],
                                rack_id=goal['target_rack_id'], place_id=goal['target_place_id'])
+                state['inventory']['vessels'][goal['vessel_id']]['return_confirmation'].update(
+                    goal_id=goal_id, executing_agent_id=goal['executing_agent_id'], evidence=evidence)
             item.update(status='observed', root_observation=copy.deepcopy(observation),
                         observation_evidence=evidence)
             state['task_port']['pending_goal_id'] = None

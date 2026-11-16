@@ -124,7 +124,7 @@ class DnaQuantificationExecutionTests(unittest.TestCase):
         self.assertFalse(self.backend.run_context(self.flow, context, 'measurement_intent'))
         pending = copy.deepcopy(self.flow.stage(context).state['pending_operation'])
         self.reopen(pending_resolution={'outcome': 'performed', 'intent_id': pending['intent_id'],
-                    'observed_vessel_id': pending['vessel_id'], 'returned_to_holder': True})
+                    'observed_vessel_id': pending['vessel_id'], 'returned_to_holder': True}, calibration=True)
         run_synthetic(self.flow, backend=self.backend)
         report = self.flow.report(); local = report['contexts'][context]['local']
         self.assertTrue(report['passed'])
@@ -132,6 +132,40 @@ class DnaQuantificationExecutionTests(unittest.TestCase):
         self.assertIn(pending['measurement_id'], local['measurements'])
         self.assertEqual(len(local['preparations']), 3)
         self.assertEqual(report['logical_time_s'], 240)
+
+    def test_pending_calibration_is_invalidated_after_reconciling_a_standard_measurement(self):
+        context = self.ready_qubit()
+        self.assertFalse(self.backend.run_context(self.flow, context, 'measurement_intent'))
+        pending = copy.deepcopy(self.flow.stage(context).state['pending_operation'])
+        self.reopen(pending_resolution={'outcome': 'performed', 'intent_id': pending['intent_id'],
+                    'observed_vessel_id': pending['vessel_id'], 'returned_to_holder': True}, calibration=False)
+        before = self.flow.state; events = self.journal.history(self.flow.run_id)
+        owners = self.journal.owners()
+        local = before['contexts'][context]['local']
+        self.assertIsNone(local['pending_operation'])
+        self.assertEqual(set(local['measurements']), {pending['measurement_id']})
+        self.assertEqual(local['calibration']['status'], 'invalidated_by_observation')
+        with self.assertRaisesRegex(TaskError, 'invalidated'):
+            self.backend.run_context(self.flow, context)
+        self.assertEqual(self.flow.state, before)
+        self.assertEqual(self.journal.history(self.flow.run_id), events)
+        self.assertEqual(self.journal.owners(), owners)
+
+    def test_pending_calibration_with_recorded_standards_is_not_automatically_approved(self):
+        context = self.ready_qubit(); handle = self.prepare_standards(context, approve=False)
+        measurements = copy.deepcopy(handle.state['measurements'])
+        self.assertEqual(handle.state['calibration']['status'], 'pending')
+        self.reopen(calibration=False)
+        before = self.flow.state; events = self.journal.history(self.flow.run_id)
+        owners = self.journal.owners()
+        local = before['contexts'][context]['local']
+        self.assertEqual(local['measurements'], measurements)
+        self.assertEqual(local['calibration']['status'], 'invalidated_by_observation')
+        with self.assertRaisesRegex(TaskError, 'invalidated'):
+            self.backend.run_context(self.flow, context)
+        self.assertEqual(self.flow.state, before)
+        self.assertEqual(self.journal.history(self.flow.run_id), events)
+        self.assertEqual(self.journal.owners(), owners)
 
     def test_performed_qubit_sample_preparation_does_not_debit_original_again(self):
         context = self.ready_qubit(); handle = self.prepare_standards(context)

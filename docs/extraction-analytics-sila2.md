@@ -79,6 +79,18 @@ lesenden Bericht und die eigene gespeicherte Requestquittung prüfen;
 keinen neuen Request als automatische Wiederholung eines unklaren Effekts
 verwenden. Ein unveränderter Request desselben Principals liefert seine
 gespeicherte Quittung. Eine andere Verwendung derselben Kennung wird abgelehnt.
+Die Request-Kennungen gelten serverweit über beide Features, alle an dieselbe
+ServerUUID gebundenen DNA-/Extraktionsläufe und Bootwechsel hinweg; ihr flüchtiger
+Index wird aus dem Root-Journal unter dem gemeinsamen Host-Mutex aufgebaut und
+vor jeder neuen Wirkung abgeglichen.
+
+Eine Ausnahme nach eigener gespeicherter Quittung sperrt neue Effekte des
+aktiven Laufs. Halt und Abschluss werden bestmöglich im Root-Journal
+gespeichert; schlägt auch dies fehl, wird die lokale Schreibsitzung verworfen.
+Die Fortsetzung benötigt dann ausdrücklich `ResumeRun` und Abgleich. Andere
+noch offene Quittungen werden bei der Wiederaufnahme auch im selben Boot
+`uncertain`. SQLite-Fehler erscheinen als `PersistenceFailure`; terminale
+Rootzustände und bereits bestätigte Buchungen werden nicht zurückgerollt.
 
 ## Eigentum, Quittungen und Wiederaufnahme
 

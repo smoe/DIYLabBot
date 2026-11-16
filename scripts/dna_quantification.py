@@ -147,8 +147,10 @@ class Workflow(NetworkControl, TaskPort):
             held = copy.deepcopy(before)
             held.update(status='cancelling' if before['cancel_requested'] else 'held',
                         recovery_required=before['recovery_required'] or 'deadline_exceeded')
+            decorated = self._decorate(held, sequence=revision + 1)
+            decorated['actor_id'] = actor_id
             self.journal.append(self.run_id, revision, 'deadline_exceeded',
-                self._decorate(held, sequence=revision + 1), held)
+                decorated, held)
             raise TaskError('DNA process deadline exceeded')
         state = copy.deepcopy(before)
         try:
@@ -157,9 +159,11 @@ class Workflow(NetworkControl, TaskPort):
         except ObservationError as error:
             before.update(status='cancelling' if before['cancel_requested'] else 'held',
                           recovery_required=before['recovery_required'] or 'observation_mismatch')
+            decorated = self._decorate(before, {**(payload or {}), 'command': kind,
+                'reason': str(error)}, revision + 1)
+            decorated['actor_id'] = actor_id
             self.journal.append(self.run_id, revision, 'observation_rejected',
-                self._decorate(before, {**(payload or {}), 'command': kind,
-                    'reason': str(error)}, revision + 1), before)
+                decorated, before)
             raise
         state['resources'] = self._resources(state)
         evidence = ('worker_claim' if kind == 'task.claimed' else
@@ -233,12 +237,15 @@ class Workflow(NetworkControl, TaskPort):
             if vessel.get('sample_id') and item.get('sample_id') != vessel['sample_id']:
                 raise ObservationError('Observed DNA sample identity mismatch')
             if not isinstance(item.get('location'), dict): raise ObservationError('Explicit physical location required')
+            unchanged = vessel['location'] == item['location']
             vessel['location'] = copy.deepcopy(item['location'])
-            if vessel['location'].get('kind') == 'discarded' and vessel['kind'] != 'original':
+            if (vessel['location'].get('kind') == 'discarded' and vessel['kind'] != 'original'
+                    and (not unchanged or not vessel.get('disposition_confirmation'))):
                 vessel['disposition_confirmation'] = {'actor_id': state['actor_id'],
                     'evidence': 'synthetic_input', 'reason': 'Explicit disposal observation during root inventory reconciliation'}
             if vessel['location'] == vessel.get('home'):
-                vessel['return_confirmation'] = {'evidence': 'synthetic_input', 'time_s': state['logical_time_s']}
+                if not unchanged or not vessel.get('return_confirmation'):
+                    vessel['return_confirmation'] = {'evidence': 'synthetic_input', 'time_s': state['logical_time_s']}
             else:
                 vessel['return_confirmation'] = None
             seen.add(key)
@@ -374,6 +381,8 @@ class Workflow(NetworkControl, TaskPort):
     def stage_act(self, context_id, command, actor_id, artifact=None, **data):
         def update(state):
             if context_id != state['active_context_id']: raise TaskError('Retired or inactive device context')
+            if command in {'take', 'place'} and state.get('executing_agent_id'):
+                raise TaskError('Assigned agent handling requires an explicit task observation')
             adapter = build_adapter(self, state, context_id); view = adapter.state
             if command in {'rack_ready', 'advance_time', 'release', 'cancel', 'finish_cancel', 'reconcile'}:
                 raise TaskError('Use the root lifecycle, clock and reconciliation commands')
@@ -554,6 +563,10 @@ class Workflow(NetworkControl, TaskPort):
                 before = copy.deepcopy(adapter._pending(view))
                 kwargs = {'calibration_still_valid': calibration_still_valid} if state['contexts'][state['active_context_id']]['device'] == 'qubit' else {'blank_still_valid': blank_still_valid}
                 ready = adapter._reconcile_device(view, actor_id, pending_resolution=pending_resolution, **kwargs)
+                if (state['contexts'][state['active_context_id']]['device'] == 'qubit'
+                        and calibration_still_valid is False and view['calibration']['status'] == 'pending'
+                        and any(row['record_type'] == 'standard' for row in view['measurements'].values())):
+                    view['calibration']['status'] = 'invalidated_by_observation'
                 if before and pending_resolution and pending_resolution.get('outcome') == 'not_performed' and before['intent_id'] in state['bookings']:
                     resolve_not_performed(state, before['intent_id'])
                 if ready is False:
