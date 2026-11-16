@@ -80,6 +80,14 @@ keinen neuen Request als automatische Wiederholung eines unklaren Effekts
 verwenden. Ein unveränderter Request desselben Principals liefert seine
 gespeicherte Quittung. Eine andere Verwendung derselben Kennung wird abgelehnt.
 
+Eine Ausnahme nach eigener gespeicherter Quittung sperrt neue Effekte des
+aktiven Laufs. Halt und Abschluss werden bestmöglich im Root-Journal
+gespeichert; schlägt auch dies fehl, wird die lokale Schreibsitzung verworfen.
+Die Fortsetzung benötigt dann ausdrücklich `ResumeRun` und Abgleich. Andere
+noch offene Quittungen werden bei der Wiederaufnahme auch im selben Boot
+`uncertain`. SQLite-Fehler erscheinen als `PersistenceFailure`; terminale
+Rootzustände und bereits bestätigte Buchungen werden nicht zurückgerollt.
+
 ## Eigentum, Quittungen und Wiederaufnahme
 
 Der bestehende Material-Root führt weiterhin Probe, Produktmaterial,

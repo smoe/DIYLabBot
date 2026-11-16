@@ -91,8 +91,8 @@ class NetworkControl:
     def resume_network(self, actor_id):
         def update(state):
             previous_boot = state['network']['boot_id']
-            for record in state['network']['commands'].values():
-                if record['status'] == 'accepted' and record['boot_id'] != self.command_context['boot_id']:
+            for request_id, record in state['network']['commands'].items():
+                if record['status'] == 'accepted' and request_id != self.command_context['request_id']:
                     record.update(status='uncertain', error='ReconciliationRequired')
             state['session'] = self.session
             if state['status'] not in {'completed', 'cancelled'}:

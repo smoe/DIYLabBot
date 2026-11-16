@@ -107,14 +107,23 @@ gespeicherte Antwort ohne neues Ereignis. Eine andere Verwendung derselben
 Kennung wird abgelehnt. Weitere Transitionen tragen dieselben Korrelations-IDs;
 `command_finished` protokolliert den Abschluss. Ein RPC-Timeout ist kein Ergebnis.
 
+Jede Ausnahme nach einer eigenen gespeicherten Quittung sperrt weitere Effekte
+des noch aktiven Laufs. Der Dienst versucht Halt und Abschluss im Root-Journal
+zu speichern. Ist das Journal nicht schreibbar, verwirft er die lokale
+Schreibsitzung; erst `ResumeRun` und ausdrücklicher Abgleich erlauben die
+Fortsetzung. Eine Wiederholung des ursprünglichen Requests liefert nur dessen
+gespeicherten Stand. Bereits terminale Rootzustände und Buchungen werden dabei
+nicht zurückgerollt. SQLite-Speicherfehler werden als `PersistenceFailure`
+gemeldet.
+
 SiLA-Principal, verantwortliche Person und ausführender Agent sind verschiedene
 Identitäten. Root-Evidenz unterscheidet `network_receipt`, `synthetic_backend`,
 `synthetic_person_input` und `worker_claim`. Systemfelder werden nach dem
 fachlichen Payload gesetzt. Synthetische Szenariowerte werden einmal im Root
 gebunden; eine spätere Anfrage kann sie nicht still durch CLI-Vorgaben ersetzen.
 
-`ResumeRun` übernimmt die Sitzung im Serverprozess. Offene Quittungen aus einem
-früheren Boot werden `uncertain`; aktive Worker-Aufträge werden nicht erneut
+`ResumeRun` übernimmt die Sitzung im Serverprozess. Andere offene Quittungen
+werden auch im selben Boot `uncertain`; aktive Worker-Aufträge werden nicht erneut
 gesendet. `ReconcileInventory` benötigt vollständige ausdrückliche Beobachtungen
 und den passenden Ausgang jeder offenen Absicht. `unknown` hält Bestand und
 Reservierungen. Auf gebundenen Läufen darf die alte lokale DNA-CLI nur

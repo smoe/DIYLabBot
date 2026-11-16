@@ -9,6 +9,7 @@ import json
 import math
 import os
 from pathlib import Path
+import sqlite3
 import threading
 import time
 import uuid
@@ -55,6 +56,7 @@ class DNARuntime:
             self.actor_id = 'SYN.DNA.Operator01'
             self._mutex = threading.RLock()
             self._sessions, self._cancellations = {}, {}
+            self._fenced_runs = set()
             self._closed = threading.Event()
             with Journal(self.journal_path):
                 pass
@@ -148,6 +150,78 @@ class DNARuntime:
         return {'execution_uuid': execution_uuid, 'cancel_requested': True,
                 'root_cancelled': False, 'resources_released': False}
 
+    @staticmethod
+    def _fence_session(runtime, run_id):
+        runtime._sessions.pop(run_id, None)
+        runtime._fenced_runs.add(run_id)
+
+    def _command_failure(self, runtime, flow, context, error, *, journal=None):
+        """Best-effort receipt completion; failed storage never preserves write access."""
+        run_id, request = context['arguments']['run_identifier'], context['request_id']
+        try:
+            state = flow.state if flow is not None else journal.get_current(run_id)[0]
+        except Exception:
+            self._fence_session(runtime, run_id)
+            raise error
+        own = state.get('network', {}).get('commands', {}).get(request)
+        if own is None or own['execution_uuid'] != context['execution_uuid']:
+            raise error
+        if flow is None:
+            from extraction_analytics_sila2_control import NetworkExtractionAnalyticsWorkflow
+            try:
+                flow = NetworkExtractionAnalyticsWorkflow(journal, run_id, state['session'], command_context=context)
+            except Exception:
+                self._fence_session(runtime, run_id)
+                raise error
+        if own['status'] != 'accepted':
+            self._fence_session(runtime, run_id)
+            raise error  # An already finished receipt remains an observation.
+        interrupted = isinstance(error, (ExecutionInterrupted, PermissionError))
+        if interrupted:
+            pending = self._pending(state) if runtime is self else flow._pending(state)
+            code = ('ReconciliationRequired' if runtime is self else 'RecoveryRequired') if pending else 'CommandCanceled'
+        elif isinstance(error, (OSError, sqlite3.Error)):
+            self._fence_session(runtime, run_id)
+            code = 'PersistenceFailure'
+        else:
+            code = type(error).__name__ if runtime is self else 'WorkflowRejected'
+
+        def hold(current):
+            if current['status'] in {'completed', 'cancelled'}:
+                return
+            current['recovery_required'] = current['recovery_required'] or 'execution_interrupted'
+            if runtime is self:
+                current['status'] = 'cancelling' if current['cancel_requested'] else 'held'
+            else:
+                current['workspace_clear'] = False
+
+        hold_error = None
+        if state['status'] in {'completed', 'cancelled'}:
+            self._fence_session(runtime, run_id)
+        else:
+            try:
+                if runtime is self:
+                    flow.control_event('execution_interrupted', self.actor_id, hold, {'error': code})
+                else:
+                    flow.control_event('execution_interrupted', hold, {'error': code}, trusted=True)
+            except Exception as failure:
+                self._fence_session(runtime, run_id)
+                hold_error = failure
+        try:
+            response = {'run_id': run_id, 'request_id': request, 'command': context['command'],
+                'execution_uuid': context['execution_uuid'], 'outcome': 'interrupted' if interrupted else 'failed',
+                'root_status': flow.state['status'], 'error': code, 'message': str(error)}
+            if runtime is self:
+                flow.finish_command(self.actor_id, response, outcome=response['outcome'], error=code)
+            else:
+                flow.finish_command(response, outcome=response['outcome'], error=code)
+        except Exception:
+            self._fence_session(runtime, run_id)
+            raise
+        if hold_error is not None:
+            raise hold_error
+        return response
+
     def command(self, name, arguments, principal, execution_uuid=None, guard=None):
         args = self._normalize(name, arguments)
         text(principal, 'network principal')
@@ -190,29 +264,31 @@ class DNARuntime:
                     'transport': self.transport, 'evidence': 'synthetic_backend'}
                 if name in {'ReconcileInventory', 'FinishCancel', 'AcceptResult', 'CancelRun', 'ChooseDilution'}:
                     context['evidence'] = 'synthetic_person_input'
-                if not before:
-                    boundary()
-                    flow = Workflow.create(journal, run_id=run_id, control=self._binding(),
-                        command_context=context, transition_guard=boundary,
-                        responsible_person_id=self.actor_id)
-                    self._sessions[run_id] = flow.session
-                else:
-                    if name == 'CreateRun': raise TaskError('Run identifier already exists')
-                    flow = Workflow(journal, run_id, self._sessions.get(run_id), context, boundary)
-                    if name == 'ResumeRun':
-                        if not args['resume'] and before['session'] is not None:
-                            raise TaskError('Explicit resume required for an open previous session')
-                        flow.session = uuid.uuid4().hex
-                        self._sessions[run_id] = flow.session
-                    elif (before['network']['boot_id'] != self.boot_id
-                          or (before['status'] not in {'completed', 'cancelled'}
-                              and flow.session != before['session'])):
-                        raise TaskError('ResumeRun and explicit inventory reconciliation required')
+                flow = Workflow(journal, run_id, self._sessions.get(run_id), context, boundary)
                 try:
+                    if not before:
+                        boundary()
+                        flow = Workflow.create(journal, run_id=run_id, control=self._binding(),
+                            command_context=context, transition_guard=boundary,
+                            responsible_person_id=self.actor_id)
+                        self._sessions[run_id] = flow.session
+                        self._fenced_runs.discard(run_id)
+                    else:
+                        if name == 'CreateRun': raise TaskError('Run identifier already exists')
+                        if name == 'ResumeRun':
+                            if not args['resume'] and before['session'] is not None:
+                                raise TaskError('Explicit resume required for an open previous session')
+                            flow.session = uuid.uuid4().hex
+                        elif (run_id in self._fenced_runs or before['network']['boot_id'] != self.boot_id
+                              or (before['status'] not in {'completed', 'cancelled'}
+                                  and flow.session != before['session'])):
+                            raise TaskError('ResumeRun and explicit inventory reconciliation required')
                     if name == 'CreateRun':
                         pass
                     elif name == 'ResumeRun':
                         flow.resume_network(self.actor_id)
+                        self._sessions[run_id] = flow.session
+                        self._fenced_runs.discard(run_id)
                     elif name == 'RunUntilDecision':
                         self._run(flow, args)
                     elif name == 'ChooseDilution':
@@ -236,26 +312,8 @@ class DNARuntime:
                         'root_status': state['status'], 'error': None}
                     flow.finish_command(self.actor_id, response)
                     return response
-                except (TaskError, PermissionError, TypeError, ValueError) as error:
-                    # Only interrupted commands need a held root. A rejected
-                    # request never undoes an earlier committed withdrawal.
-                    state = flow.state
-                    own = state.get('network', {}).get('commands', {}).get(request_id)
-                    if own is None:
-                        raise
-                    interrupted = isinstance(error, (ExecutionInterrupted, PermissionError))
-                    code = ('ReconciliationRequired' if self._pending(state) else 'CommandCanceled') if interrupted else type(error).__name__
-                    if interrupted and state['status'] not in {'completed', 'cancelled'}:
-                        def hold(current):
-                            current['status'] = 'cancelling' if current['cancel_requested'] else 'held'
-                            current['recovery_required'] = current['recovery_required'] or 'execution_interrupted'
-                        flow.control_event('execution_interrupted', self.actor_id, hold,
-                                           {'error': code})
-                    response = {'run_id': run_id, 'request_id': request_id, 'command': name,
-                        'execution_uuid': execution_uuid, 'outcome': 'interrupted' if interrupted else 'failed',
-                        'root_status': flow.state['status'], 'error': code, 'message': str(error)}
-                    flow.finish_command(self.actor_id, response, outcome=response['outcome'], error=code)
-                    return response
+                except Exception as error:
+                    return self._command_failure(self, flow, context, error)
         finally:
             self._cancellations.pop(execution_uuid, None)
 

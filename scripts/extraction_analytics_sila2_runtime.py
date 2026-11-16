@@ -30,6 +30,7 @@ class ExtractionAnalyticsRuntime:
         self.server_uuid, self.boot_id = host_runtime.server_uuid, host_runtime.boot_id
         self.clock, self._mutex, self._closed = host_runtime.clock, host_runtime._mutex, host_runtime._closed
         self._sessions, self._cancellations = {}, {}
+        self._fenced_runs = set()
 
     @property
     def transport(self): return self.host.transport
@@ -156,44 +157,36 @@ class ExtractionAnalyticsRuntime:
                     if name == 'CreateRun': raise TaskError('Run identifier already exists')
                     if before['status'] in {'completed', 'cancelled'} and name != 'ResumeRun':
                         raise TaskError('Terminal Root: read its report, replay the original request or explicitly resume receipt metadata')
-                    if name != 'ResumeRun' and (before['network']['boot_id'] != self.boot_id or self._sessions.get(identity) != before['session']):
+                    if name != 'ResumeRun' and (identity in self._fenced_runs or before['network']['boot_id'] != self.boot_id or self._sessions.get(identity) != before['session']):
                         raise TaskError('Explicit ResumeRun and reconciliation required')
                 elif name != 'CreateRun': raise TaskError('Create the explicitly identified extraction run first')
                 context = {'request_id': request, 'fingerprint': fingerprint, 'command': name, 'arguments': args,
                     'principal': principal, 'server_uuid': self.server_uuid, 'boot_id': self.boot_id,
                     'execution_uuid': execution_uuid, 'clock': self.clock, 'transport': self.transport}
-                if before is None:
-                    source = contract.ROOT / self.profile['families'][args['family_identifier']]['source']
-                    flow = NetworkExtractionAnalyticsWorkflow.create(journal, source, identity, control=self._binding(),
-                        command_context=context, transition_guard=boundary, actor_id=ACTOR)
-                    self._sessions[identity] = flow.session
-                else:
-                    flow = NetworkExtractionAnalyticsWorkflow(journal, identity, self._sessions.get(identity),
-                        command_context=context, transition_guard=boundary)
+                flow = None
                 try:
+                    if before is None:
+                        source = contract.ROOT / self.profile['families'][args['family_identifier']]['source']
+                        flow = NetworkExtractionAnalyticsWorkflow.create(journal, source, identity, control=self._binding(),
+                            command_context=context, transition_guard=boundary, actor_id=ACTOR)
+                        self._sessions[identity] = flow.session
+                        self._fenced_runs.discard(identity)
+                    else:
+                        flow = NetworkExtractionAnalyticsWorkflow(journal, identity, self._sessions.get(identity),
+                            command_context=context, transition_guard=boundary)
                     if name == 'ResumeRun':
                         flow = NetworkExtractionAnalyticsWorkflow.open(journal, identity, resume=args['resume'],
                             control=self._binding(), command_context=context, transition_guard=boundary)
                         self._sessions[identity] = flow.session
+                        self._fenced_runs.discard(identity)
                     elif name == 'RunUntilDecision': ExecutionDriver(flow, self._pause).run()
                     elif name in {'ReconcileRun', 'FinishCancel'}: self._reconcile(flow, args['observation_json'], finish=name == 'FinishCancel')
                     elif name == 'CancelRun': flow.act('cancel', ACTOR, reason=args['reason'])
                     response = {'run_id': identity, 'request_id': request, 'command': name, 'execution_uuid': execution_uuid,
                         'outcome': 'completed', 'root_status': flow.state['status'], 'error': None}
                     flow.finish_command(response); return response
-                except (TaskError, PermissionError, ValueError, TypeError) as error:
-                    state = flow.state; own = state.get('network', {}).get('commands', {}).get(request)
-                    if own is None: raise
-                    interrupted = isinstance(error, (ExecutionInterrupted, PermissionError))
-                    code = ('RecoveryRequired' if flow._pending(state) else 'CommandCanceled') if interrupted else 'WorkflowRejected'
-                    if interrupted and state['status'] not in {'completed', 'cancelled'}:
-                        flow.control_event('execution_interrupted', lambda s: s.update(
-                            recovery_required=s['recovery_required'] or 'execution_interrupted', workspace_clear=False),
-                            {'error': code}, trusted=True)
-                    response = {'run_id': identity, 'request_id': request, 'command': name, 'execution_uuid': execution_uuid,
-                        'outcome': 'interrupted' if interrupted else 'failed', 'root_status': flow.state['status'],
-                        'error': code, 'message': str(error)}
-                    flow.finish_command(response, outcome=response['outcome'], error=code); return response
+                except Exception as error:
+                    return self.host._command_failure(self, flow, context, error, journal=journal)
         finally: self._cancellations.pop(execution_uuid, None)
 
     def _pause(self, point, flow):

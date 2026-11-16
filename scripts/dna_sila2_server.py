@@ -5,6 +5,7 @@ import datetime
 import json
 import os
 from pathlib import Path
+import sqlite3
 import threading
 import time
 
@@ -140,7 +141,7 @@ class DNAServer:
         if isinstance(error, ExecutionInterrupted):
             raise feature.errors['CommandCanceled']('DNA execution cancellation requested') from error
         code = getattr(error, 'code', None)
-        if isinstance(error, OSError):
+        if isinstance(error, (OSError, sqlite3.Error)):
             code = 'PersistenceFailure'
         if code in feature.errors:
             raise feature.errors[code](str(error)) from error
