@@ -852,8 +852,8 @@
         "base_diameter": "stool_base_diameter"
       },
       "xyz": [
-        1550,
-        6650,
+        "edge_left/2",
+        "left_depth-heating_corner_gap-window_bench_depth+(support_front-(left_depth-heating_corner_gap-window_bench_depth))/2+100",
         0
       ],
       "yaw_deg": 0,
@@ -874,8 +874,8 @@
         "base_diameter": "stool_base_diameter"
       },
       "xyz": [
-        2300,
-        6650,
+        "edge_left*23/31",
+        "left_depth-heating_corner_gap-window_bench_depth+(support_front-(left_depth-heating_corner_gap-window_bench_depth))*23/31+1225/31",
         0
       ],
       "yaw_deg": 0,
@@ -896,8 +896,8 @@
         "base_diameter": "stool_base_diameter"
       },
       "xyz": [
-        5000,
-        6600,
+        "edge_right+(room_width-edge_right)*15/31",
+        "support_front+((right_depth-heating_corner_gap-window_bench_depth)-support_front)*15/31+7425/31",
         0
       ],
       "yaw_deg": 0,

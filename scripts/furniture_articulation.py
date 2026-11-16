@@ -6,8 +6,10 @@ import json
 import math
 from pathlib import Path
 import re
+import string
 
 import assembly_model as assembly
+import atrium_seating
 import relative_floorplan as floor
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +31,7 @@ def read(ref):
 
 
 def validate(source):
-    exact(source, 'format catalog types', 'articulation source')
+    exact(source, 'format catalog types lab_joints', 'articulation source')
     require(source['format'] == 'solidcraftbot.furniture-articulations/1', 'Unsupported articulation source')
     exact(source['catalog'], 'source source_sha256', 'catalog reference')
     catalog = read(source['catalog'])
@@ -40,7 +42,7 @@ def validate(source):
         bodies = {p['id']: p for p in parts if p['action'] == 'create'}
         require(isinstance(joints, dict) and joints, 'Named articulations required')
         for identity, joint in joints.items():
-            exact(joint, 'id type moving_parts hinge axis front limits_deg states reference_state basis qualification', 'joint')
+            exact(joint, 'id type moving_parts hinge axis front limits_deg states reference_state basis qualification presentation', 'joint')
             require(joint['id'] == identity and joint['type'] == 'revolute', 'Named revolute joint required')
             moving = joint['moving_parts']
             require(isinstance(moving, list) and moving and all(isinstance(v, str) for v in moving)
@@ -64,6 +66,10 @@ def validate(source):
             require(joint['basis'] == 'presentation_assumption', 'Illustrative articulation basis required')
             require(isinstance(joint['qualification'], dict) and set(joint['qualification']) == QUALIFICATIONS
                     and all(v is False for v in joint['qualification'].values()), 'Articulation does not qualify measured/native/swing behaviour')
+            validate_presentation(joint['presentation'])
+    exact(source['lab_joints'], 'revolute prismatic', 'laboratory joint profiles')
+    for presentation in source['lab_joints'].values():
+        validate_presentation(presentation)
     return catalog
 
 
@@ -76,6 +82,29 @@ def parameter(value, unit, bounds):
             and bounds[0] <= declared[0] <= value['value'] <= declared[1] <= bounds[1]
             and declared[0] < declared[1], 'Finite display parameter within range required')
     return value['value']
+
+
+def validate_presentation(item):
+    """Labels and timing belong to a type, not to its placed instances."""
+    exact(item, 'label commands state_labels duration view_distance', 'type presentation')
+    require(isinstance(item['label'], str) and item['label'], 'Type label required')
+    for _, field, format_spec, conversion in string.Formatter().parse(item['label']):
+        require(field is None or (field in {'room', 'instance', 'articulation'} and not format_spec and not conversion),
+                'Only semantic room/instance/articulation label fields are supported')
+    for field, keys in [('commands', 'open close view'), ('state_labels', 'closed opening open closing')]:
+        exact(item[field], keys, field)
+        require(all(isinstance(v, str) and v for v in item[field].values()), 'Object labels required')
+    parameter(item['duration'], 's', (.1, 10))
+    parameter(item['view_distance'], 'mm', (300, 3000))
+
+
+def presentation_fields(item, *, room, instance, articulation):
+    validate_presentation(item)
+    return {'label': item['label'].format(room=room, instance=instance, articulation=articulation),
+            'commands': {key: {'label': item['commands'][key], 'target_state': 'open' if key == 'open' else 'closed'}
+                         for key in ('open', 'close')},
+            'view_label': item['commands']['view'], 'state_labels': dict(item['state_labels']),
+            'duration_s': parameter(item['duration'], 's', (.1, 10))}
 
 
 def validate_requests(objects):
@@ -96,6 +125,11 @@ def validate_requests(objects):
 
 
 def compile_objects(ref, objects, building, parameters, interface, expanded, plans, eye_height):
+    """Instantiate every declared social type articulation in every furnished room.
+
+    ``objects`` accepts the old explicit requests for compatibility, but no
+    request is needed to activate a type. New compositions use an empty list.
+    """
     validate_requests(objects)
     source = read(ref)
     catalog = validate(source)
@@ -103,14 +137,17 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
     require(source['catalog'] == furnishings['catalog'], 'Articulation and furnishings catalog pins must match')
     body_ids = {body['id'] for body in expanded['bodies']}
     operations = {op['body']: op for op in expanded['operations'] if op['action'] == 'create'}
+    requested = {item['id']: item for item in objects}
+    placed = []
+    for room in furnishings['rooms']:
+        for instance in room['instances']:
+            for identity, joint in source['types'].get(instance['type'], {}).items():
+                object_id = '.'.join((room['id'], instance['id'], identity))
+                presentation = requested.get(object_id, joint['presentation'])
+                placed.append((object_id, room, instance, identity, joint, presentation))
+    require(set(requested) <= {item[0] for item in placed}, 'Unknown object room, instance or articulation')
     result = []
-    for item in objects:
-        room = next((v for v in furnishings['rooms'] if v['id'] == item['room']), None)
-        require(room is not None, 'Unknown object room')
-        instance = next((v for v in room['instances'] if v['id'] == item['instance']), None)
-        require(instance is not None and instance['type'] == 'fridge', 'Unknown or unsupported object instance')
-        joint = source['types'].get(instance['type'], {}).get(item['articulation'])
-        require(joint is not None, 'Unknown object articulation')
+    for object_id, room, instance, identity, joint, item in placed:
         parts = {v['id']: v for v in catalog['types'][instance['type']] if v['action'] == 'create'}
         prefix = room['id']+'_'+instance['id']+'_'
         moving = [prefix+parts[name]['body'] for name in joint['moving_parts']]
@@ -135,17 +172,80 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         local = [v/parameters['display_scale'] for v in eye[:2]]
         require(any(floor.point_membership(local, floor.outline(plan, name)) == 1
                     for name in room['template_areas'] if name in areas), 'Object viewpoint outside kitchen source areas')
-        result.append({'id': item['id'], 'label': item['label'], 'scene': 'building', 'level_id': room['level'],
+        result.append({'id': object_id, 'scene': 'building', 'level_id': room['level'],
                        'joint': {'id': joint['id'], 'type': joint['type'], 'origin_mm': hinge, 'axis': joint['axis'], 'limits_deg': joint['limits_deg']},
                        'front': front, 'moving_body_ids': moving, 'states': joint['states'], 'reference_state': joint['reference_state'],
-                       'commands': {k: {'label': item['commands'][k], 'target_state': k if k == 'open' else 'closed'} for k in ('open', 'close')},
-                       'view_label': item['commands']['view'], 'state_labels': item['state_labels'],
-                       'duration_s': parameter(item['duration'], 's', (.1, 10)), 'viewpoint': {'eye_mm': eye, 'target_mm': target},
+                       **presentation_fields({key: item[key] for key in ('label', 'commands', 'state_labels', 'duration', 'view_distance')},
+                           room=room.get('room', room['id']), instance=instance['id'], articulation=identity),
+                       'viewpoint': {'eye_mm': eye, 'target_mm': target},
                        'basis': joint['basis'], 'qualification': joint['qualification']})
+    return result
+
+
+def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height):
+    """Use the recipe's joints and child bodies after laboratory placement.
+
+    Geometry, hinge frames, stroke and ownership come from the laboratory
+    compiler. This adapter supplies the type-wide browser labels and timing.
+    """
+    source = read(ref)
+    validate(source)
+    levels = {level['id']: level['z_mm'] for level in interface['levels']}
+    body_ids = {body['id'] for body in expanded['bodies']}
+    operations = expanded['operations']
+    result, identities, moving_owners = [], set(), set()
+    for lab in interface.get('laboratories', []):
+        require(lab['level_id'] in levels, 'Known laboratory object level required')
+        plan = plans[lab['level_id']]
+        polygons = [floor.outline(plan, name) for name in lab['template_areas']]
+        for joint in lab['joints']:
+            kind = 'prismatic' if joint['type'] == 'slider' else joint['type']
+            require(kind in source['lab_joints'], 'Unsupported laboratory recipe joint')
+            identity = '.'.join((lab['id'], joint['instance_id'], joint['articulation_id']))
+            require(identity not in identities, 'Duplicate laboratory object identity')
+            identities.add(identity)
+            moving = joint['moving_body_ids']
+            require(isinstance(moving, list) and moving and len(set(moving)) == len(moving)
+                    and set(moving) <= body_ids & set(lab['furniture_body_ids']), 'Missing laboratory articulated bodies')
+            require(not set(moving) & moving_owners, 'A laboratory body cannot belong to two browser joints')
+            moving_owners.update(moving)
+            origin, axis, front = (joint[name] for name in ('origin_mm', 'axis', 'front'))
+            for vector in (origin, axis, front):
+                require(isinstance(vector, (list, tuple)) and len(vector) == 3
+                        and all(type(value) in (int, float) and math.isfinite(value) for value in vector),
+                        'Finite laboratory joint frame required')
+            require(abs(math.hypot(*axis)-1) < 1e-8 and abs(math.hypot(*front)-1) < 1e-8
+                    and abs(front[2]) < 1e-8, 'Unit joint axis and horizontal viewing direction required')
+            limit_key = 'limits_deg' if kind == 'revolute' else 'limits_mm'
+            limits = joint[limit_key]
+            require(isinstance(limits, (list, tuple)) and len(limits) == 2
+                    and all(type(value) in (int, float) and math.isfinite(value) for value in limits)
+                    and limits[0] == 0 and limits[1] > limits[0], 'Ordered zero-reference laboratory joint limits required')
+            require(type(joint['value']) in (int, float) and joint['value'] == limits[0],
+                    'Laboratory browser geometry must use its closed/lowered recipe reference')
+            bounds = atrium_seating.combine_bounds(atrium_seating.body_bounds(
+                operation for operation in operations if operation['body'] in moving).values())
+            target = [(bounds['min'][i]+bounds['max'][i])/2 for i in range(3)]
+            profile = source['lab_joints'][kind]
+            distance = parameter(profile['view_distance'], 'mm', (300, 3000))
+            eye = [target[i]+front[i]*distance for i in (0, 1)]+[levels[lab['level_id']]+eye_height]
+            xy = [value/parameters['display_scale'] for value in eye[:2]]
+            require(any(floor.point_membership(xy, polygon) == 1 for polygon in polygons),
+                    'Laboratory object viewpoint outside its source room: '+identity)
+            result.append({'id': identity, 'scene': 'building', 'level_id': lab['level_id'],
+                'joint': {'id': joint['articulation_id'], 'type': kind, 'origin_mm': list(origin),
+                          'axis': list(axis), limit_key: list(limits)},
+                'front': list(front), 'moving_body_ids': list(moving),
+                'states': {'closed': limits[0], 'open': limits[1]}, 'reference_state': 'closed',
+                **presentation_fields(profile, room=lab.get('room', lab['id']),
+                    instance=joint['instance_id'], articulation=joint['articulation_id']),
+                'viewpoint': {'eye_mm': eye, 'target_mm': target}, 'basis': 'presentation_assumption',
+                'qualification': {key: False for key in sorted(QUALIFICATIONS)}})
     return result
 
 
 def dependencies(ref):
     source = read(ref)
     validate(source)
-    return [ROOT/ref['source'], SCHEMA, Path(__file__), ROOT/source['catalog']['source']]
+    return [ROOT/ref['source'], SCHEMA, Path(__file__), ROOT/source['catalog']['source'],
+            ROOT/'scripts/atrium_seating.py']

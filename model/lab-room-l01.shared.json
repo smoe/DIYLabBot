@@ -17,7 +17,7 @@
     },
     "furnishings": {
       "source": "model/furnishings/l01.furnishings.json",
-      "source_sha256": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+      "source_sha256": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
     }
   },
   "confirmed": [

@@ -1,12 +1,15 @@
 # Gebäude im Browser erkunden
 
-Der [öffentliche Rundgang auf GitHub Pages](https://smoe.github.io/DIYLabBot/)
-bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
+Der Rundgang bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
 Labor **3.003**, Küche **1.008**, den Blick durch den **Freiraum / das Atrium**
 und den **Kernbereich im 3. OG**.
 Von dort lässt sich die Kamera frei bewegen. Die Flächen stammen aus den
 fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
 Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
+Labor 3.003 liegt jetzt im selben Gebäudebezug wie Flur, Büros und Aufzug.
+Die [öffentliche GitHub-Pages-Seite](https://smoe.github.io/DIYLabBot/) bleibt
+eine getrennt veröffentlichte Momentaufnahme; diese Erweiterung wird erst
+nach ausdrücklicher Freigabe dorthin übertragen.
 
 ## Erzeugen und öffnen
 
@@ -46,6 +49,8 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 ## Bedienung
 
 - Die fünf Ortsknöpfe öffnen die jeweiligen Blickpunkte.
+- Der Ortstitel bezeichnet den zuletzt gewählten Blickpunkt; freies Gehen
+  schaltet diese Beschriftung nicht automatisch auf den betretenen Raum um.
 - **WASD / Pfeiltasten** bewegen die Kamera; **Ziehen** mit Maus oder Finger
   ändert die Blickrichtung.
 - **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt die Bewegung.
@@ -56,10 +61,14 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Die freie
 Kamera hat keine Kollisionsprüfung und kann Wände oder Decken durchqueren.
 
-## Gemeinsame Quellen und getrennte Raumbezüge
+## Gemeinsame Gebäudeszene und Laborbindung
 
 [`model/building-walkthrough.shared.json`](../model/building-walkthrough.shared.json)
-referenziert die vorhandenen Quellen für Gebäude und Labor. Die Raumkameras
+referenziert die Gebäudekomposition. Deren optionale Quelle
+[`model/furnishings/building-laboratories.json`](../model/furnishings/building-laboratories.json)
+bindet `Lab3003` an `OG3` / `R3_003`, Eingangswand `W036`, und die gepinnten
+L01-Raum- und Layoutdefinitionen. Sie enthält keine kopierten Maße oder
+Gerätepositionen. Die Raumkameras
 werden aus Raumflächen und tatsächlichen Türöffnungen berechnet. Der
 Atriumblick bindet die vorhandene offene Geländerkante an den Flur. Der Blick
 in den Kernbereich wird aus seinem offenen Zugang am Flur `C3_021` abgeleitet. Die
@@ -76,12 +85,53 @@ Darstellungseinpassung skaliert. Die Eingangssituation soll den Schrankzugang
 frei halten; ein realer Türschwenkweg wird durch den Blickpunkt nicht geprüft.
 Raumgröße und Möbeleinpassung bleiben ungemessene Darstellungsannahmen.
 
-Das Gebäude verwendet eine ungemessene Darstellskalierung und angenommene
-Geschosshöhen. Das detaillierte L01-Modell besitzt einen eigenen lokalen
-Raumbezug; eine vermessene Transformation in den Gebäudebezug fehlt weiterhin.
-Der Labor-Knopf wechselt deshalb ausdrücklich in eine zweite Szene. Diese
-Trennung wird in der Oberfläche angezeigt. Sie fügt keine scheinbar vermessene
-Türverbindung ein.
+Alle fünf Blickpunkte verwenden dieselbe Gebäudeszene. Der Laborblick wird
+wie die anderen Raumblicke an einer tatsächlichen Eingangstür berechnet.
+Vom Doktorandenraum führt die Darstellung über `D3_002N`, den gemeinsamen
+Flur und `D3_003A` oder `D3_003B` in das ausgestattete Labor; dafür ist kein
+Szenenwechsel nötig. „Labor isoliert anzeigen“ filtert dieselben Körper im
+selben Koordinatenrahmen und ergänzt die zugehörige Gebäudehülle von `R3_003`.
+Die isolierte Standalone-L01-Fassung für Ablauftests bleibt zusätzlich erhalten.
+
+`scripts/building_laboratories.py` leitet Breite, linke und rechte Tiefe sowie
+Fassadenwölbung aus den Innenflächen des Zielraums ab. Jede Wand wird um die
+halbe Darstellungswandstärke eingerückt; die Wölbung folgt dem Mittelpunkt der
+hinteren Polylinie. Mit diesen unabhängigen Parametern wertet der Compiler die
+bestehenden L01-Rezepte erneut aus. Die Transformation folgt der Eingangswand,
+der inneren linken Eingangsecke beim Blick zum Fenster und der OG3-Höhe.
+Möbel und Geräte behalten Maßstab 1. Das Gebäude liefert Boden, Wände, Türen
+und Verglasung; die entsprechenden L01-Hüllrollen werden nicht dupliziert.
+
+Die neue Gebäude-CAD-Fassung enthält die 183 gebundenen Möbel-/Strukturkörper.
+Die 17 Geräteinstanzen werden nur im Browser aus dem geprüften vollständigen
+Standalone-L01-Layout übernommen. Je Instanz gilt die starre Abbildung
+`Gebäude · gebundene Pose · Standalone-Pose⁻¹`; Normalen und Grenzen folgen
+derselben Abbildung. Die drei funktionalen Arm-Unterbauten werden aus derselben Layoutquelle mitgeführt.
+Studienkörper `People_*` und Fahrzeugrouten entfallen.
+Native Geräte im Gebäude-CAD sind weiterhin fehlende Zielunterstützung.
+
+Die Fassadenpolylinie und die quadratische L01-Näherung stimmen nicht exakt
+überein. Ihr Bericht berechnet die maximale lokale Y-Differenz einschließlich der
+Extremstellen jedes Segmentes analytisch; aktuell sind es rund 52
+Darstellungs-mm. Die Möbelprüfung verwendet ausdrücklich die halbe
+Wandstärke als Toleranz. Die aus L01 übernommene Betonstütze ist nicht im
+F03-Plan belegt und bleibt eine offene Eigentümerentscheidung. Dasselbe gilt
+für die praktische Eignung des nur rund 904 mm breiten Fensterdurchgangs.
+Aufmaß, reale Kollisionsfreiheit und `lab_to_building_registered` bleiben
+ungeprüft beziehungsweise `false`.
+
+Die drei Hocker sind über feste Bruchteile ihrer Fensterbankabschnitte an
+deren tatsächliche Vorderkante gebunden. X und Y verwenden dieselbe
+Interpolation; damit bleiben die nativen FreeCAD-Ausdrücke linear. Alle
+Standardkörper, Operationen, Rahmen und Gelenke bleiben numerisch gegenüber
+der bisherigen L01-Fassung erhalten. Der separate abgeleitete
+`l01-default-equivalence.json` weist diese Prüfung samt Toleranz aus.
+
+Das Gebäude-Interface führt benannte Laborarbeitsflächen, Rackplätze aus den
+vorhandenen Kassettenteilen und die Tischplatten der Büro-Desktoprezepte im
+Gebäudebezug. Der Türgraph liefert die Verbindung Büro–Flur–Labor getrennt von
+der Geometrie. Das sind Voraussetzungen für spätere Materialtransfers; T2/T3,
+logische Endpunkte und Transporterbahnen werden dadurch nicht angebunden.
 
 Im Doktorandenraum 3.002 bilden die Tischplatten an beiden Längsseiten und vor
 dem Fenster eine durchgehende U-förmige Arbeitsfläche mit Wandkontakt. Die
@@ -122,13 +172,53 @@ eine erzeugte Momentaufnahme und keine zweite führende Modellquelle.
 
 Zur Aktualisierung den Rundgang wie oben neu erzeugen und mit der unten
 genannten Browserprüfung prüfen. Anschließend in einer separaten Arbeitskopie
-von `gh-pages` die HTML-Datei und das Publikationsmanifest ersetzen, committen
-und normal nach `origin/gh-pages` pushen. Der Push löst die Pages-Bereitstellung
+von `gh-pages` die HTML-Datei und das Publikationsmanifest ersetzen und
+committen. Erst nach ausdrücklicher Freigabe normal nach `origin/gh-pages` pushen. Der Push löst die Pages-Bereitstellung
 aus. Erst nach erfolgreichem Deployment die öffentliche Seite prüfen; ein
 lokaler Export allein veröffentlicht nichts. Andere Änderungen an `master`
 erneuern den veröffentlichten Rundgang nicht automatisch.
 
 ## Nachweise
+
+**Prüfstand der Labor-/Aufzugerweiterung:**
+`building-stack-2b9b9a5b1e10-r2` besteht den nativen FreeCAD-Aufbau mit 2.121
+geschlossenen Körpern, 452 Geometrieprüfungen und 16 Höhenprüfungen. Der
+Standalone-Raum `lab-room-l01-8827f0e318a4` besteht fünf Varianten in beiden
+CADs sowie drei native Parameteränderungen; die STEP-Volumendifferenz ist 0.
+Die vollständige Aufstellung `lab-layout-l01-991a9ba9534d` besteht beide CADs
+mit 878 FreeCAD-Körpern und den bisherigen Aufstellungsprüfungen.
+
+Der Rundgang `building-walkthrough-d0fca19566f3` enthält 2.798 native
+Körpergruppen und 727.735 Dreiecke in einem Gebäudebezug. Alle 17 Geräte und
+drei Arm-Unterbauten sind vollständig übernommen. Die native Begrenzungsprüfung
+der Geräte bleibt innerhalb des Zielraums; der kleinste Abstand beträgt 20 mm.
+Die 72 Rackplatzrahmen stimmen mit den nativen Tube-Mittelpunkten und Basis-Z-
+Werten überein. Die numerische Standard-L01-Abweichung liegt unter `1e-9` mm.
+Die vollständige Prüfung in Chrome 157 mit dem Metal-Backend des lokalen Macs
+besteht. Sie führt über öffentliche Tasten vom Büro durch den Flur ins Labor,
+prüft den Kameraverlauf gegen native Bodenflächen und beide Türöffnungen und
+bedient eine Schranktür sowie den 200-mm-Hockerlift. Laborfilter, Kühlschrank,
+mobile Oberfläche und Fehleranzeige bestehen ebenfalls. Der Aufzug besteht
+die zeitgeführte Fahrt OG3–EG–OG3 einschließlich Zwischenbild mit absoluter
+Kameramitnahme, `rejected_busy` und der Ausstiegsregeln für EG, OG und KG.
+`browser-check.json` enthält den Rohbericht; `browser-evidence.json` bindet
+dessen unveränderte Bytes, HTML, ausgeführtes Prüfsystem und 15 geprüfte Bilder.
+
+Ein neuer vollständiger SolidCraft-Gebäudeaufbau wurde für diese Erweiterung
+ausgelassen; der unabhängige SolidCraft-Nachweis gilt hier für Standalone-L01.
+Historische Medien und die folgenden Berichte bleiben ihren eigenen Revisionen
+zugeordnet und belegen diese Erweiterung nicht.
+
+143 gezielte Offline-Prüfungen einschließlich der neuen Schemas bestehen ohne
+Überspringen. Der zusätzlich ausgeführte Gesamtlauf umfasst 2.340 Tests und
+ist nicht vollständig grün. Nach gezielten Wiederholungen mit den gesperrten
+Testabhängigkeiten, vollständigen Geräte-Cachedateien und lokalen Netzwerkrechten
+verbleiben drei bereits auf der Ausgangsbasis fehlschlagende historische
+Medienprüfungen, eine dort ebenfalls fehlerhafte synthetische Flur-Fixture und
+drei Testklassen ohne aktuellen nativen Verkehrs-/Übergabenachweis. Deren alte
+Quellpins werden nicht als neuer Nachweis umgeschrieben. Neue Transportbahnen
+und deren Nachweiskette sind separate Folgearbeit. Netzwerk-/SDK-Prüfungen,
+die im Gesamtlauf übersprungen wurden, gelten weiterhin nicht als bestanden.
 
 Die bestätigte Lage im Kernbereich und die erweiterte Küche am Fenster sind
 im Export `building-walkthrough-987112e02766` an den vollständig geprüften
@@ -158,6 +248,11 @@ python3 -m unittest discover -s tests -p 'test_building_walkthrough*.py' -v
 node tests/check_building_walkthrough.cjs exports/building-walkthrough/<Revision>/index.html
 ```
 
+Für die lokale Mac-Prüfung lässt sich mit
+`SOLIDCRAFTBOT_WALKTHROUGH_GPU=metal` die tatsächliche Grafikbeschleunigung
+verwenden. Ohne Auswahl bleibt die portable Softwaredarstellung eingestellt;
+der Bericht nennt das tatsächlich verwendete Backend.
+
 Die Browserprüfung erzeugt neben dem HTML einen separaten `browser-check.json`
 und Screenshots der Blickpunkte. Sie prüft tatsächliches WebGL-Zeichnen,
 Tastatur-/Zeigerbedienung, die Geschossauswahl, die mobile Ansicht und die
@@ -165,7 +260,7 @@ Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
 Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
 Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
 
-## Erste Objektbefehle: Kühlschrank 1.008
+## Typweite Möbelbefehle
 
 Bewegliche Türen werden direkt im 3D-Bild bedient: **mit der Maus auf das
 Türblatt oder den Griff klicken**, um sie zu öffnen oder zu schließen.
@@ -186,14 +281,17 @@ Kollisions- oder Wegefreigabe.
 
 Die gemeinsame Auswahlroutine `scripts/walkthrough_interaction.js` unterstützt
 alle im Rundgang deklarierten beweglichen Objekte und wird ohne externe
-Bibliothek in das eigenständige HTML eingebettet. Aktuell ist nur die
-Kühlschranktür 1.008 als bewegliches Objekt definiert. Raum- und Schranktüren
-benötigen noch ihre eigenen Artikulationsbindungen; sie erhalten dieselbe
-Bedienung, sobald diese beschrieben sind. Die Kamera-Hilfe `viewObject` bleibt
+Bibliothek in das eigenständige HTML eingebettet. Alle platzierten Instanzen
+eines artikulierten Sozialmöbeltyps erhalten ihre Bedienung automatisch aus
+`model/furniture/social.articulations.json`. Im Labor stammen die 31
+Schranktürgelenke und drei Hockerlifte direkt aus den gebundenen Möbelrezepten.
+Die Hockerlifte verwenden prismatische Gelenke und die typspezifischen
+Heben-/Senken-Befehle. Die Raumtüren der Gebäudehülle erhalten dadurch noch
+keine beweglichen Türblätter. Die Kamera-Hilfe `viewObject` bleibt
 nur in der Test-API und hat keine Taste in der Oberfläche.
 
-Blickpunkt-, Geschoss- und Szenenwechsel erhalten die Türstellung während
-dieser Sitzung; ein Neuladen setzt die Referenzstellung.
+Blickpunkt- und Geschosswechsel sowie der Laborfilter erhalten die
+Türstellung während dieser Sitzung; ein Neuladen setzt die Referenzstellung.
 
 Tür und Griff drehen gemeinsam, der vorhandene Pinguin, seine Tasse,
 Innenböden und Kühlschrankhülle bleiben unverändert. Ein Objektbefehl gibt
@@ -204,9 +302,11 @@ keine Warteschlange oder automatische Umplanung.
 Die zusätzliche Quelle `model/furniture/social.articulations.json` referenziert
 den unveränderten Möbelkatalog und benennt Teile und Scharnierkante ohne
 kopierte Abmessungen. `scripts/furniture_articulation.py` leitet den Rahmen aus
-der platzierten Tür-Prismenoperation ab. Die Rundgangquelle referenziert nur
-Raum, Instanz und Artikulation sowie Beschriftungen und Darstellparameter.
-Der Exporter und die geprüften nativen Gebäudekörper werden unverändert benutzt.
+der platzierten Tür-Prismenoperation ab. Beschriftungen, Zustandsnamen und Darstellparameter stehen auf Typ- oder
+Artikulationsebene, ohne Eintrag je Möbelinstanz. Die Objektkennung bleibt
+`<Raum>.<Instanz>.<Gelenk>`; `Kitchen1008.Fridge.Door` behält seine Kennung und
+Bedienung. Quellgeometrie, bewegte Körper und die Weltachsen werden gemeinsam
+geprüft, bevor das Objekt in den Renderer gelangt.
 
 Die Scharnierkante bei lokal kleinstem X und größtem Y entspricht einem
 rechten Anschlag beim Blick von vorn auf die Tür; diese Seite ist weiterhin
@@ -223,14 +323,15 @@ niedrigeren freien Blick kann die vorhandene Kamerasteuerung Q verwendet werden.
 Die Browserbewegung nutzt absolute Zeit und das weiche Profil
 `10u³ − 15u⁴ + 6u⁵`. Bei reduzierter Bewegung wird direkt die Endstellung
 angezeigt. Ein verborgener Tab verlängert die modellierte Bewegung nicht.
-Positionen und Normalen der vorhandenen Meshgruppen werden zusammen gedreht;
+Positionen und Normalen der vorhandenen Meshgruppen werden gemeinsam
+gedreht beziehungsweise bei prismatischen Gelenken verschoben;
 bei der Referenzstellung ist die Modellmatrix exakt die Einheitsmatrix.
 
 Nur der Browser besitzt diese Artikulation. FreeCAD und SolidCraft enthalten
 weiter die **geschlossene Referenzstellung**, keine nativen Gebäudegelenke.
 Reale Scharniere, vollständige Sichtbarkeit aus jeder Perspektive, Kollisionen,
-Schwenkraum, Schrank-/Raumtüren und Roboterbefehle sind damit nicht qualifiziert
-oder implementiert. Für diese erste Erweiterung werden keine Daten gespeichert
+Schwenkraum und Roboterbefehle sind damit nicht qualifiziert. Die
+Gebäude-Raumtürblätter bleiben statisch. Für diese erste Erweiterung werden keine Daten gespeichert
 und keine Hardware-, ROS- oder SiLA-Befehle verschickt.
 
 Die vorhandenen Möbelbilder und ihre ursprüngliche Provenienz bleiben erhalten.
@@ -239,3 +340,36 @@ Die vorhandenen Möbelbilder und ihre ursprüngliche Provenienz bleiben erhalten
 Dieser Kompatibilitätsnachweis ist weder ein erneutes Rendern der historischen
 Bilder noch eine zusätzliche CAD- oder Bewegungsqualifikation. Die neuen
 Objektbefehle werden davon getrennt mit der tatsächlichen Browserprüfung geprüft.
+
+
+## Aufzug benutzen
+
+Der Aufzug bleibt eine einzelne Kabine der vorhandenen Quelle `BuildingLift`.
+Am aktiven Geschossrahmen ruft ein Klick oder die Leertaste die Kabine.
+Das Overlay in Aufzugnähe bietet „Call lift“ und nach der Ankunft „Enter“.
+An Bord erscheinen die Geschossknöpfe und die zulässigen Ausstiegsseiten.
+KG erlaubt nur den inneren Ausgang, EG beide Seiten und die Obergeschosse
+nur den äußeren Ausgang. Halte, Höhen und aktive Seiten stammen aus
+`interface.circulation.elevator`, nicht aus einer zweiten Geschossliste.
+
+Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
+wird nach jeder Objektaktualisierung absolut an den Kabinenzustand gebunden;
+es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind WASD,
+Pfeiltasten, Q/E, Bildschirmbewegung, freie Geschossauswahl, Ortsknöpfe und
+Laborisolation gesperrt. Umschauen bleibt möglich. Erst ein ausdrücklich
+gewählter erlaubter Ausstieg löst die Kamerabindung. Weitere Befehle während
+einer Fahrt liefern `rejected_busy`; es gibt keine automatische Warteschlange.
+
+Die Weglänge bestimmt die Dauer. Mit dem glatten Profil
+`10u³ − 15u⁴ + 6u⁵` und der deklarierten Spitzen-Geschwindigkeitsannahme von
+1.200 Darstellungs-mm/s gilt `Dauer = 1,875 · Weg / Geschwindigkeit`.
+Bei reduzierter Bewegung wird unmittelbar die Zielstellung angezeigt. Die
+unveränderte native Kabine steht in der EG-Referenz; dort ist ihre
+Darstellungsmatrix exakt die Einheitsmatrix. In anderen Geschossen wird nur
+diese Kabine verschoben, während Schacht, Geschossrahmen und Nachbarkörper
+stehen bleiben. Die geschlossene innere Schachtwand bleibt in den
+Obergeschossen erhalten, obwohl die EG-Kabine zwei Öffnungen besitzt.
+
+Es gibt keine Aufzugtürblätter, reale Steuerung oder Schutzfunktion.
+`lift_operation_implemented` bleibt `false`; die Browserfahrt ist keine
+mechanische, zeitliche oder sicherheitstechnische Aufzugsqualifikation.

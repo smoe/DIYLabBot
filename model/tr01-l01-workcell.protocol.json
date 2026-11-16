@@ -9,11 +9,11 @@
   },
   "layout": {
     "source": "model/lab-layout-l01.shared.json",
-    "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+    "source_sha256": "991a9ba9534d341e7af3947e5ff115436582556018fb0dc6014b8dda825cfffc"
   },
   "floor_motion": {
     "source": "model/tr01-l01.motion.json",
-    "source_sha256": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+    "source_sha256": "5b91d06e01c709ea4db19eb21560057d0b52daef6c525267a8503c48bf0ec2df"
   },
   "arm_source": {
     "source": "model/robot.json",

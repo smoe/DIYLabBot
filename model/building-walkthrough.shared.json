@@ -4,11 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a"
-    },
-    "lab": {
-      "source": "model/lab-layout-l01.shared.json",
-      "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+      "source_sha256": "2b9b9a5b1e1084fad63208ba32beaa80e026338df9d78c4b0a820cb1cd781f03"
     }
   },
   "settings": {
@@ -41,19 +37,17 @@
     {
       "id": "lab",
       "label": "Labor 3.003",
-      "scene": "lab",
+      "scene": "building",
       "level_id": "OG3",
       "anchor": {
-        "kind": "room_fraction",
-        "eye_xy": [
-          0.2,
-          0.18
+        "kind": "room_entry",
+        "areas": [
+          "R3_003"
         ],
-        "target_xy": [
-          0.6,
-          0.65
-        ],
-        "target_height_mm": 1250
+        "opening": "D3_003A",
+        "inset_mm": 1100,
+        "target_height_mm": 1250,
+        "look_at": "room_end"
       }
     },
     {
@@ -108,12 +102,14 @@
   },
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
-    "The detailed L01 lab is a separate local scene. Switching to it does not claim a measured connection to the building frame.",
+    "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
     "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
     "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
     "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer.",
     "Furniture opening is a browser-only illustrative articulation; FreeCAD and SolidCraft retain the closed reference geometry.",
-    "No door-swing clearance, collision, hardware or robot-command qualification."
+    "No door-swing clearance, collision, hardware or robot-command qualification.",
+    "The single elevator cabin and boarded camera move only in the browser; no real lift control, door leaves or navigation qualification is implemented.",
+    "Native building CAD contains the bound laboratory furniture; equipment is instanced into its browser view from the checked L01 layout."
   ],
   "rendering": {
     "opacity_by_role": {
@@ -123,46 +119,9 @@
   },
   "articulation_source": {
     "source": "model/furniture/social.articulations.json",
-    "source_sha256": "6b0edd12937e6496a7058cd7d2bb6e4b3c06e9c1b59be15afc837db0ce195403"
+    "source_sha256": "ba2933056f391f4a7c4775e8e4662cf8d4b55ae87ac9a9bfcb3b14aeb1c46e4b"
   },
-  "objects": [
-    {
-      "id": "Kitchen1008.Fridge.Door",
-      "room": "Kitchen1008",
-      "instance": "Fridge",
-      "articulation": "Door",
-      "label": "Kühlschrank 1.008",
-      "commands": {
-        "open": "Öffnen",
-        "close": "Schließen",
-        "view": "Ansehen"
-      },
-      "state_labels": {
-        "closed": "Geschlossen",
-        "opening": "Wird geöffnet",
-        "open": "Offen",
-        "closing": "Wird geschlossen"
-      },
-      "duration": {
-        "value": 1.2,
-        "unit": "s",
-        "range": [
-          0.1,
-          10
-        ],
-        "basis": "presentation_assumption"
-      },
-      "view_distance": {
-        "value": 2000,
-        "unit": "mm",
-        "range": [
-          300,
-          3000
-        ],
-        "basis": "presentation_assumption"
-      }
-    }
-  ],
+  "objects": [],
   "interaction": {
     "reach": {
       "value": 2500,
@@ -170,6 +129,18 @@
       "range": [
         300,
         4000
+      ],
+      "basis": "presentation_assumption"
+    }
+  },
+  "elevator": {
+    "id": "BuildingLift",
+    "speed": {
+      "value": 1200,
+      "unit": "mm/s",
+      "range": [
+        100,
+        3000
       ],
       "basis": "presentation_assumption"
     }

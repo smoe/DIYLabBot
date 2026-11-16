@@ -4,11 +4,11 @@
   "sources": {
     "orientation": {
       "source": "model/l01-orientation.reference.json",
-      "source_sha256": "f882297ddb2db84eb56be2d25e415f93f7dae22b3775df6bcca7701278babc2c"
+      "source_sha256": "a5c3435d634881a1d2bd1542815fe57e74cef0dd3c7ce684f9baad9f15214c44"
     },
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
+      "source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
     }
   },
   "site": {

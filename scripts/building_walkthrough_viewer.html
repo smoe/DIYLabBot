@@ -16,6 +16,8 @@
     .interaction-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);max-width:calc(100% - 190px);margin:0;padding:9px 12px;border-radius:8px;background:#fffef6ed;color:#294d3f;font-size:12px;text-align:center;pointer-events:none}.interaction-hint[hidden]{display:none}.crosshair.is-interactive{border-color:#e3c276;background:#e3c27655;box-shadow:0 0 5px #172b21}
     @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
     @media(max-width:650px){.interaction-hint{bottom:110px;max-width:calc(100% - 24px);width:max-content;font-size:11px}}
+    .lift-panel{position:absolute;right:18px;top:72px;z-index:2;max-width:calc(100% - 36px);width:260px;max-height:calc(100% - 90px);overflow:auto;overscroll-behavior:contain;padding:12px;background:#fffef6f5;border:1px solid #ced8cc;border-radius:10px;color:#294d3f;font-size:12px}.lift-panel[hidden]{display:none}.lift-panel p{margin:0 0 9px;line-height:1.5}.lift-actions,.lift-floors{display:flex;gap:6px;flex-wrap:wrap}.lift-floors{margin-bottom:8px}.lift-panel button{min-height:38px}.lift-panel button:disabled,.quiet-button:disabled,.place:disabled{opacity:.55;cursor:default}.lift-status{font-size:11px;color:#64766a}.isolation-button[aria-pressed=true]{background:#d7e6d7}
+    @media(max-width:650px){.lift-panel{right:12px;top:65px;width:230px;padding:9px;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
@@ -34,6 +36,11 @@
     <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
     <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
     <div class="crosshair" aria-hidden="true"></div>
+    <section class="lift-panel" id="walkthrough-lift" aria-label="Elevator controls" hidden>
+      <p><strong id="walkthrough-lift-label">Building lift</strong><br><span class="lift-status" id="walkthrough-lift-status" role="status"></span></p>
+      <div class="lift-floors" id="walkthrough-lift-floors" aria-label="Destination floor"></div>
+      <div class="lift-actions" id="walkthrough-lift-actions"></div>
+    </section>
     <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
       <button type="button" data-move="forward" aria-label="Move forward" title="Forward">↑</button>
@@ -53,12 +60,13 @@
       <button class="quiet-button" id="walkthrough-previous" type="button">← Previous stop</button>
       <button class="quiet-button" id="walkthrough-next" type="button">Next stop →</button>
       <button class="quiet-button" id="walkthrough-return" type="button">Return to viewpoint</button>
+      <button class="quiet-button isolation-button" id="walkthrough-isolate" type="button" aria-pressed="false" hidden>Isolate lab 3.003</button>
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>
     <div class="help" id="walkthrough-help">WASD / arrows: move &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
   </div>
-  <p class="notice" id="walkthrough-notice">Concept building geometry. The lab opens as its separate detailed room model; the two coordinate frames are not presented as surveyed registration.</p>
+  <p class="notice" id="walkthrough-notice">Concept building geometry. Lab 3.003 belongs to this building scene; its room binding is a presentation assumption, not surveyed registration. The elevator is a browser presentation, not a real lift controller.</p>
   <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
 </main>
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
@@ -79,6 +87,10 @@
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
     if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
     const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set();
+    const isolation=data.isolation||null,isolationIds=new Set(isolation?.body_ids||[]),isolationButton=document.getElementById('walkthrough-isolate');
+    let isolated=false;
+    isolationButton.hidden=!isolation;isolationButton.textContent=isolation?.label||'Isolate lab 3.003';
+    const sceneKey=id=>id+':'+(isolated?'isolated':'complete');
     const finite3=value=>Array.isArray(value)&&value.length===3&&value.every(Number.isFinite);
     if(new Set(stops.map(s=>s.id)).size!==stops.length||stops.some(s=>!data.scenes[s.scene]||!finite3(s.eye_mm)||!finite3(s.target_mm)))throw Error('Every viewpoint needs a unique ID and a finite source-derived camera.');
     const walkSpeed=(settings.walk_speed_mm_s||1400)/1000,verticalSpeed=(settings.vertical_speed_mm_s||1000)/1000;
@@ -136,43 +148,85 @@
       if(objectStates.has(config.id)||!data.scenes[config.scene]||!finite3(config.joint?.origin_mm)||!finite3(config.joint?.axis)
         ||Math.abs(Math.hypot(...config.joint.axis)-1)>1e-7||!Array.isArray(config.moving_body_ids)||!config.moving_body_ids.length
         ||!Number.isFinite(config.duration_s)||config.duration_s<=0||!Number.isFinite(config.states?.[config.reference_state]))throw Error('Invalid articulated object.');
-      const object={config,state:config.reference_state,targetState:config.reference_state,angle:config.states[config.reference_state],transition:null};
+      if(!['revolute','prismatic'].includes(config.joint.type))throw Error('Unsupported articulated joint type.');
+      const object={config,state:config.reference_state,targetState:config.reference_state,value:config.states[config.reference_state],transition:null};
       objectStates.set(config.id,object);objectSceneIds.add(config.scene);
       for(const body of config.moving_body_ids){const key=config.scene+':'+body;if(bodyOwners.has(key)||!data.scenes[config.scene].groups.some(g=>g.id===body))throw Error('Missing or multiply bound moving body.');bodyOwners.set(key,object);}
     }
+    const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
+    const elevator=elevatorConfig?WalkthroughInteraction.createLiftSession(elevatorConfig,elevatorObject,name=>command(elevatorConfig.object_id,name)):null;
+    const liftPanel=document.getElementById('walkthrough-lift'),liftLabel=document.getElementById('walkthrough-lift-label'),liftStatus=document.getElementById('walkthrough-lift-status');
+    const liftFloors=document.getElementById('walkthrough-lift-floors'),liftActions=document.getElementById('walkthrough-lift-actions');
+    const portById=new Map((elevatorConfig?.ports||[]).map(port=>[port.id,port])),triggerPorts=new Map();
+    for(const port of elevatorConfig?.ports||[])if(port.active)for(const body of port.trigger_body_ids||[])triggerPorts.set(body,port);
+    let liftUIKey=null,lastLiftCommand=null;
     function updateObjectUI(){dirty=true;}
-    function objectMatrix(object){
-      const angle=(object.angle-object.config.states[object.config.reference_state])*Math.PI/180;
-      if(angle===0)return identity();
-      const [x,y,z]=object.config.joint.axis,[px,py,pz]=object.config.joint.origin_mm.map(v=>v/1000),c=Math.cos(angle),s=Math.sin(angle),t=1-c;
-      const r=[t*x*x+c,t*x*y+s*z,t*x*z-s*y,0,t*x*y-s*z,t*y*y+c,t*y*z+s*x,0,t*x*z+s*y,t*y*z-s*x,t*z*z+c,0,0,0,0,1];
-      r[12]=px-(r[0]*px+r[4]*py+r[8]*pz);r[13]=py-(r[1]*px+r[5]*py+r[9]*pz);r[14]=pz-(r[2]*px+r[6]*py+r[10]*pz);return new Float32Array(r);
+    function objectMatrix(object){return WalkthroughInteraction.jointMatrix(object.config.joint,object.value,object.config.states[object.config.reference_state]);}
+    function syncLiftCamera(){
+      const attached=elevator?.attachedEye();if(!attached)return;
+      eye=attached.map(v=>v/1000);sceneId='building';
+      if(!elevatorObject.transition){selectedLevel=elevatorObject.state;levelSelect.value=selectedLevel;}
+      contextLabel.textContent='Building lift · '+(elevatorObject.transition?'travelling':elevatorObject.config.state_labels[elevatorObject.state]);
+      locationLabel.textContent=elevatorObject.config.label;dirty=true;
+    }
+    function recordLift(result){
+      lastLiftCommand={...result,frame:frames};announcement.textContent=result.status==='accepted'?'Building lift: command accepted.':'Building lift: '+result.status;
+      liftUIKey=null;syncLiftCamera();updateLiftUI();requestRender();return result;
+    }
+    function updateLiftUI(){
+      const boarded=Boolean(elevator?.boarded),nearby=elevator&&!isolated&&sceneId==='building'?elevator.nearby(eye.map(v=>v*1000),reach*1000):null;
+      const busy=Boolean(elevatorObject?.transition),key=JSON.stringify([boarded,nearby?.id,busy,elevatorObject?.state,elevatorObject?.targetState,lastLiftCommand?.status]);
+      for(const node of [...stopsNode.querySelectorAll('button'),document.getElementById('walkthrough-previous'),document.getElementById('walkthrough-next'),document.getElementById('walkthrough-return'),isolationButton])node.disabled=boarded;
+      levelSelect.disabled=boarded||sceneId!=='building';
+      for(const node of document.querySelectorAll('[data-move]'))node.disabled=boarded;
+      liftPanel.hidden=!elevator||(!boarded&&!nearby);if(key===liftUIKey)return;liftUIKey=key;
+      liftFloors.replaceChildren();liftActions.replaceChildren();if(!elevator)return;
+      liftLabel.textContent=elevatorObject.config.label;
+      const label=elevatorObject.config.state_labels[elevatorObject.state]||elevatorObject.state;
+      liftStatus.textContent=(busy?'Travelling to '+(elevatorObject.config.state_labels[elevatorObject.targetState]||elevatorObject.targetState):label)+(lastLiftCommand?' · '+lastLiftCommand.status:'');
+      function button(parent,text,action,attrs={}){const node=document.createElement('button');node.type='button';node.className='quiet-button';node.textContent=text;for(const [k,v] of Object.entries(attrs))node.setAttribute(k,v);node.addEventListener('click',action);parent.append(node);return node;}
+      if(boarded){
+        for(const level of levels.filter(level=>elevatorConfig.ports.some(p=>p.active&&p.level_id===level.id)))button(liftFloors,level.label||level.id,()=>recordLift(elevator.select(level.id)),{'data-lift-floor':level.id,'aria-label':'Travel to '+(level.label||level.id)});
+        for(const port of elevatorConfig.ports.filter(port=>port.active&&port.level_id===elevatorObject.state))button(liftActions,'Exit · '+port.side,()=>{
+          const result=elevator.exit(port.side);if(result.status==='accepted'){eye=result.eye_mm.map(v=>v/1000);selectedLevel=result.level_id;levelSelect.value=selectedLevel;root.dataset.freeCamera='true';keys.clear();}
+          recordLift(result);
+        },{'data-lift-exit':port.side});
+      }else if(nearby){
+        button(liftActions,'Call lift',()=>recordLift(elevator.call(nearby.id)),{'data-lift-call':nearby.id});
+        const enter=button(liftActions,'Enter lift',()=>{
+          const result=elevator.board(nearby.id,eye.map(v=>v*1000),reach*1000);if(result.status==='accepted'){keys.clear();isolated=false;isolationButton.setAttribute('aria-pressed','false');}
+          recordLift(result);
+        },{'data-lift-enter':nearby.id});enter.disabled=busy||elevatorObject.state!==nearby.level_id;
+      }
     }
     function advanceObjects(now){
       let active=false;
       for(const object of objectStates.values()){
         const motion=object.transition;if(!motion)continue;
         const u=Math.max(0,Math.min(1,(now-motion.start)/motion.duration));
-        const smooth=u*u*u*(10+u*(-15+6*u));object.angle=motion.from+(motion.to-motion.from)*smooth;dirty=true;
-        if(u===1){object.angle=motion.to;object.state=object.targetState;object.transition=null;announcement.textContent=object.config.label+': '+object.config.state_labels[object.state];}
+        const smooth=u*u*u*(10+u*(-15+6*u));object.value=motion.from+(motion.to-motion.from)*smooth;dirty=true;
+        if(u===1){object.value=motion.to;object.state=object.targetState;object.transition=null;announcement.textContent=object.config.label+': '+object.config.state_labels[object.state];}
         else active=true;
         updateObjectUI(object);
       }
-      return active;
+      syncLiftCamera();return active;
     }
     function command(id,name){
       advanceObjects(performance.now());const object=objectStates.get(id),target=object?.config.commands[name]?.target_state;
-      if(!object||!target)return {status:'unknown_target',id};
+      if(!object||!target||!Number.isFinite(object.config.states[target]))return {status:'unknown_target',id};
       if(object.transition)return {status:'rejected_busy',id,state:object.state};
       if(object.state===target)return {status:'already_in_state',id,state:object.state};
-      object.targetState=target;object.state=target==='open'?'opening':'closing';
-      object.transition={from:object.angle,to:object.config.states[target],start:performance.now(),duration:object.config.duration_s*1000};
+      const isLift=id===elevatorConfig?.object_id;
+      object.targetState=target;object.state=isLift?'moving':target==='open'?'opening':'closing';
+      const duration=isLift?1.875*Math.abs(object.config.states[target]-object.value)/elevatorConfig.speed_mm_s:object.config.duration_s;
+      object.transition={from:object.value,to:object.config.states[target],start:performance.now(),duration:duration*1000};
       announcement.textContent=object.config.label+': '+object.config.state_labels[object.state];updateObjectUI(object);
       if(reducedMotion.matches)advanceObjects(object.transition.start+object.transition.duration);
       requestRender();return {status:'accepted',id,state:object.state};
     }
     function viewObject(id){
-      const object=objectStates.get(id);if(!object)return {status:'unknown_target',id};
+      if(elevator?.boarded)return {status:'rejected_aboard',id};
+      const object=objectStates.get(id);if(!object?.config.viewpoint)return {status:'unknown_target',id};
       const config=object.config;keys.clear();sceneId=config.scene;selectedLevel=config.level_id;eye=config.viewpoint.eye_mm.map(v=>v/1000);
       const direction=normalize(config.viewpoint.target_mm.map((v,i)=>(v-config.viewpoint.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(direction[2]);
       for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed','false');
@@ -191,19 +245,20 @@
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>bodyOwners.get(sceneId+':'+id)?.config.id||null,
+        targetForBody:id=>triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;}});
     }
     function interact(x,y,input){
       advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
       if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
-      const object=objectStates.get(hit.target_id),name=object.targetState==='closed'?'open':'close';
-      lastInteraction={...command(hit.target_id,name),input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
+      const port=portById.get(hit.target_id),object=objectStates.get(hit.target_id),name=object?.targetState==='closed'?'open':'close';
+      const result=port?recordLift(elevator.call(port.id)):command(hit.target_id,name);
+      lastInteraction={...result,input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
     }
     function updateInteractionHint(){
       centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
       crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
-      if(centreTarget){const object=objectStates.get(centreTarget.target_id),name=object.targetState==='closed'?'open':'close';interactionHint.textContent=object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
+      if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
       const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
       canvas.style.cursor=drag?.moved?'grabbing':hover?'pointer':'grab';
     }
@@ -216,7 +271,7 @@
       return result;
     }
     function prepareScene(id){
-      if(sceneCache.has(id))return sceneCache.get(id);
+      const key=sceneKey(id);if(sceneCache.has(key))return sceneCache.get(key);
       const source=data.scenes[id];
       if(!Number.isSafeInteger(source.vertex_count)||source.vertex_count<3||!Number.isSafeInteger(source.index_count)||source.index_count<3||!Array.isArray(source.groups))throw Error('A complete native mesh scene is required.');
       const positions=decode(source.positions_base64,'float',source.vertex_count*3,'positions'),normals=decode(source.normals_base64,'float',source.vertex_count*3,'normals'),indices=decode(source.indices_base64,'uint',source.index_count,'indices');
@@ -228,7 +283,7 @@
       for(const group of coverage){if(group.index_start!==expected||!Number.isSafeInteger(group.index_count)||group.index_count<0||group.index_count%3)throw Error('Native mesh groups must partition all triangles.');expected+=group.index_count;}
       if(expected!==source.index_count)throw Error('The native mesh group manifest omits triangles.');
       for(const group of source.groups){
-        if(omitted.has(group.id))continue;
+        if(omitted.has(group.id)||(isolated&&!isolationIds.has(group.id)))continue;
         if(!finite3(group.color)||group.color.some(v=>v<0||v>1)||!Number.isFinite(group.opacity)||group.opacity<0||group.opacity>1)throw Error('Native material metadata is invalid.');
         const opacity=Object.hasOwn(opacityByRole,group.role)?opacityByRole[group.role]:group.opacity;
         if(opacity!==group.opacity)opacityOverrides++;
@@ -250,10 +305,11 @@
       function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
       attribute(attributes.position,positions);attribute(attributes.normal,normals);
       const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
-      const result={picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(id,result);return result;
+      const result={picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function render(){
+      syncLiftCamera();
       const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
       gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
@@ -263,10 +319,11 @@
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
       scene.transparent.sort((a,b)=>dot(b.centre.map((v,i)=>v-eye[i]),b.centre.map((v,i)=>v-eye[i]))-dot(a.centre.map((v,i)=>v-eye[i]),a.centre.map((v,i)=>v-eye[i])));
       for(const group of scene.transparent){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-      gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
+      gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();updateLiftUI();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
     }
     function move(seconds){
+      if(elevator?.boarded)return;
       let f=(keys.has('forward')?1:0)-(keys.has('back')?1:0),r=(keys.has('right')?1:0)-(keys.has('left')?1:0),z=(keys.has('up')?1:0)-(keys.has('down')?1:0);
       const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
       const speed=walkSpeed*(keys.has('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
@@ -279,19 +336,22 @@
       catch(error){keys.clear();fail(error);}
     }
     function setStop(id){
+      if(elevator?.boarded)return {status:'rejected_aboard'};
+      if(id!=='lab'){isolated=false;isolationButton.setAttribute('aria-pressed','false');}
       const stop=stops.find(s=>s.id===id);if(!stop)throw Error('Unknown viewpoint.');
       keys.clear();sceneId=stop.scene;stopId=stop.id;selectedLevel=stop.level_id||null;eye=stop.eye_mm.map(v=>v/1000);
       const direction=normalize(stop.target_mm.map((v,i)=>(v-stop.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(Math.max(-.995,Math.min(.995,direction[2])));
       for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.stop===id));
       locationLabel.textContent=stop.label;
-      const level=levels.find(l=>l.id===selectedLevel);contextLabel.textContent=sceneId==='lab'?'Detailed lab · separate local room model':(level?.label||selectedLevel||'Building')+' · concept geometry';
+      const level=levels.find(l=>l.id===selectedLevel);contextLabel.textContent=(level?.label||selectedLevel||'Building')+' · concept geometry';
       levelSelect.disabled=sceneId!=='building';if(selectedLevel!==null)levelSelect.value=selectedLevel;
       root.dataset.freeCamera='false';announcement.textContent=stop.label+'. '+contextLabel.textContent;for(const object of objectStates.values())updateObjectUI(object);requestRender();
     }
     stops.forEach((stop,index)=>{const button=document.createElement('button');button.type='button';button.className='place';button.dataset.stop=stop.id;button.setAttribute('aria-pressed','false');const number=document.createElement('span');number.className='ordinal';number.textContent=String(index+1).padStart(2,'0');button.append(number,document.createTextNode(stop.label));button.addEventListener('click',()=>setStop(stop.id));stopsNode.append(button);});
+    isolationButton.addEventListener('click',()=>{if(elevator?.boarded)return recordLift({status:'rejected_aboard'});const next=!isolated;if(next)setStop('lab');isolated=next;isolationButton.setAttribute('aria-pressed',String(isolated));requestRender();});
     for(const level of levels){const option=document.createElement('option');option.value=level.id;option.textContent=level.label||level.id;levelSelect.append(option);}
     levelSelect.hidden=!levels.length;
-    levelSelect.addEventListener('change',()=>{const level=levels.find(l=>l.id===levelSelect.value);if(sceneId!=='building'||!level||!Number.isFinite(level.z_mm))return;selectedLevel=level.id;eye[2]=level.z_mm/1000+eyeHeight;locationLabel.textContent='Free camera · '+(level.label||level.id);contextLabel.textContent='Building · concept geometry';announcement.textContent=locationLabel.textContent;root.dataset.freeCamera='true';requestRender();});
+    levelSelect.addEventListener('change',()=>{if(elevator?.boarded){levelSelect.value=selectedLevel;recordLift({status:'rejected_aboard'});return;}const level=levels.find(l=>l.id===levelSelect.value);if(sceneId!=='building'||!level||!Number.isFinite(level.z_mm))return;selectedLevel=level.id;eye[2]=level.z_mm/1000+eyeHeight;locationLabel.textContent='Free camera · '+(level.label||level.id);contextLabel.textContent='Building · concept geometry';announcement.textContent=locationLabel.textContent;root.dataset.freeCamera='true';requestRender();});
     document.getElementById('walkthrough-previous').addEventListener('click',()=>{const current=stops.findIndex(s=>s.id===stopId);setStop(stops[(current+stops.length-1)%stops.length].id);});
     document.getElementById('walkthrough-next').addEventListener('click',()=>{const current=stops.findIndex(s=>s.id===stopId);setStop(stops[(current+1)%stops.length].id);});
     document.getElementById('walkthrough-return').addEventListener('click',()=>setStop(stopId));
@@ -325,11 +385,13 @@
       command,viewObject,projectPoint,
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
-      get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,angle_deg:o.angle,model_matrix:Array.from(objectMatrix(o)),body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.angle]))}));},
+      get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
+      get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
+      get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},
       get frames(){return frames;},get renderer(){return 'webgl2';},
-      get sceneStats(){const scene=sceneCache.get(sceneId);return scene?{triangles:scene.triangles,native_groups:scene.nativeGroups,opaque_batches:scene.opaque.length,transparent_groups:scene.transparent.length,display_opacity_overrides:scene.opacityOverrides}:null;}
+      get sceneStats(){const scene=sceneCache.get(sceneKey(sceneId));return scene?{triangles:scene.triangles,native_groups:scene.nativeGroups,opaque_batches:scene.opaque.length,transparent_groups:scene.transparent.length,display_opacity_overrides:scene.opacityOverrides}:null;}
     });
     setStop(data.default_stop_id||data.default_stop||stops[0].id);prepareScene(sceneId);render();dirty=false;loading.hidden=true;root.dataset.ready='true';
   }catch(error){fail(error);}

@@ -9,7 +9,7 @@
   },
   "layout": {
     "source": "model/lab-layout-l01.shared.json",
-    "source_sha256": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228"
+    "source_sha256": "991a9ba9534d341e7af3947e5ff115436582556018fb0dc6014b8dda825cfffc"
   },
   "transporter": {
     "source": "model/sample-transport-tr01.shared.json",

@@ -1,4 +1,4 @@
-"""Source-derived viewpoints for the building and the separate detailed L01 frame.
+"""Source-derived viewpoints and interactions in one furnished building frame.
 
 This module compiles cameras, not a navigation mesh or physical walking route.
 Native Boolean surfaces are exported separately from checked CAD build reports.
@@ -11,9 +11,9 @@ import re
 
 import assembly_model as assembly
 import building_stack as stack
-import lab_room_model as room
 import relative_floorplan as floor
 import furniture_articulation as articulation
+import walkthrough_elevator
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT/'model/building-walkthrough.shared.json'
@@ -40,7 +40,7 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction', 'walkthrough')
+    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator', 'walkthrough')
     require(spec['format'] == FORMAT and isinstance(spec['id'], str) and
             re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Walkthrough identity required')
     exact(spec['interaction'], 'reach', 'interaction policy')
@@ -48,7 +48,8 @@ def validate(spec):
     exact(spec['articulation_source'], 'source source_sha256', 'articulation reference')
     articulation.validate(articulation.read(spec['articulation_source']))
     articulation.validate_requests(spec['objects'])
-    exact(spec['sources'], 'building lab', 'scene sources')
+    walkthrough_elevator.validate(spec['elevator'])
+    exact(spec['sources'], 'building', 'scene sources')
     for ref in spec['sources'].values():
         exact(ref, 'source source_sha256', 'pinned scene source')
         assembly.validate_reference(ref, root=ROOT)
@@ -88,13 +89,6 @@ def validate(spec):
             exact(anchor, 'kind area wall target_area setback_mm target_height_mm', 'area edge anchor')
             require(stop['scene'] == 'building', 'Building edge required')
             number(anchor['setback_mm'], 300, 3000, 'edge setback')
-        elif kind == 'room_fraction':
-            exact(anchor, 'kind eye_xy target_xy target_height_mm', 'local room anchor')
-            require(stop['scene'] == 'lab', 'Fraction anchors belong to the separate local lab frame')
-            for key in ('eye_xy', 'target_xy'):
-                require(isinstance(anchor[key], list) and len(anchor[key]) == 2, 'Local XY fraction required')
-                for value in anchor[key]:
-                    number(value, .05, .95, 'interior room fraction')
         elif kind == 'access_entry':
             exact(anchor, 'kind access_id setback_mm target_height_mm', 'access entry anchor')
             require(stop['scene'] == 'building' and isinstance(anchor['access_id'], str) and anchor['access_id'], 'Building access reference required')
@@ -178,12 +172,10 @@ def compile(source=None):
     interface = stack.interfaces(building, p)
     levels = [{key: level[key] for key in ('id', 'label', 'z_mm')} for level in interface['levels']]
     level_z = {level['id']: level['z_mm'] for level in levels}
-    lab_path = assembly.validate_reference(spec['sources']['lab'], root=ROOT)
-    lab = json.loads(lab_path.read_text(encoding='utf-8'))
-    require(lab.get('format') == 'solidcraftbot.lab-layout/1', 'Detailed L01 layout required')
-    room_path = assembly.validate_reference(lab['assets']['room'], root=ROOT)
-    local_room = room.load(room_path)
-    rp = room.parameters(local_room)
+    laboratories = interface.get('laboratories', [])
+    require(len(laboratories) == 1, 'One source-bound laboratory is required')
+    laboratory = laboratories[0]
+    expanded = stack.expanded(building, p)
     stops = []
     for stop in spec['stops']:
         require(stop['level_id'] in level_z, 'Unknown viewpoint level')
@@ -215,29 +207,44 @@ def compile(source=None):
                             'Atrium view requires an implemented open guard boundary')
                 eye, target = building_camera(anchor, stack.level_plan(building, stop['level_id']), p['display_scale'],
                                               level_z[stop['level_id']], spec['settings']['eye_height_mm'])
-        else:
-            require(stop['level_id'] == 'OG3', 'Detailed L01 is the owner-assigned third-floor lab')
-            # Local interior axes only; there is deliberately no L01-to-building transform.
-            extent = [rp['room_width'], min(rp['left_depth'], rp['right_depth'])]
-            eye = [anchor['eye_xy'][i]*extent[i] for i in (0, 1)]+[spec['settings']['eye_height_mm']]
-            target = [anchor['target_xy'][i]*extent[i] for i in (0, 1)]+[anchor['target_height_mm']]
         require(math.dist(eye, target) > 100, 'Camera eye and target must differ')
         stops.append({key: stop[key] for key in ('id', 'label', 'scene', 'level_id')} |
                      {'eye_mm': eye, 'target_mm': target, 'anchor': anchor})
     objects = articulation.compile_objects(spec['articulation_source'], spec['objects'], building, p, interface,
-        stack.expanded(building, p), {v['id']: stack.level_plan(building, v['id']) for v in levels}, spec['settings']['eye_height_mm'])
+        expanded, {v['id']: stack.level_plan(building, v['id']) for v in levels}, spec['settings']['eye_height_mm'])
+    objects += articulation.compile_lab_objects(spec['articulation_source'], interface, expanded,
+        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
+    lift_object, elevator = walkthrough_elevator.compile(spec['elevator'], building, p, interface,
+        expanded, stack.level_plan(building, 'OG3'), spec['settings']['eye_height_mm'])
+    objects.append(lift_object)
+    plan = stack.level_plan(building, laboratory['level_id'])
+    area = next(value for value in plan['areas'] if value['id'] == laboratory['area'])
+    wall_ids = {edge['wall'] for edge in area['boundary']}
+    openings = [opening['id'] for opening in plan['openings'] if opening['wall'] in wall_ids]
+    prefix = laboratory['level_id']+'__'
+    shell = {prefix+'Area_'+area['id'], *[prefix+'Wall_'+name for name in wall_ids]}
+    shell.update(body['id'] for body in expanded['bodies']
+                 if any(body['id'].startswith(prefix+'DoorLeaf_'+name) for name in openings))
+    for window in interface['exterior'].get('side_window_groups', []):
+        if window['level_id'] == laboratory['level_id'] and window['wall'] in wall_ids:
+            shell.update([window['glass_body'], window['frame_body']])
+    isolation = {'label': 'Labor isoliert anzeigen', 'body_ids': sorted(shell |
+        set(laboratory['furniture_body_ids']))}
     paths = [*articulation.dependencies(spec['articulation_source']), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
-             *stack.source_dependencies(building), lab_path, room_path, ROOT/'scripts/lab_room_model.py',
-             *room.source_dependencies(local_room)]
+             *stack.source_dependencies(building), ROOT/'scripts/walkthrough_elevator.py',
+             ROOT/'scripts/atrium_seating.py']
     pins = {str(item.resolve().relative_to(ROOT)): digest(item) for item in dict.fromkeys(paths)}
     require(digest(path) == hashlib.sha256(raw).hexdigest(), 'Walkthrough source changed while compiling')
-    for ref in [*spec['sources'].values(), spec['articulation_source'], lab['assets']['room']]:
+    for ref in [*spec['sources'].values(), spec['articulation_source']]:
         require(pins[ref['source']] == ref['source_sha256'], 'Scene source changed while compiling: '+ref['source'])
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
             'interaction': {'reach_mm': articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))},
-            'objects': objects, 'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
-            'scene_sources': {name: {**ref, 'build_report': 'cad/'+('building-stack' if name == 'building' else 'lab-layout-l01')+'/shared-build-report.json'}
+            'objects': objects, 'elevator': elevator, 'isolation': isolation,
+            'laboratories': laboratories, 'places': interface['places'], 'topology': interface['topology'],
+            'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
+            'scene_sources': {name: {**ref, 'build_report': 'cad/building-stack/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},
-            'hidden_body_ids': {'building': interface['marker_body_ids'], 'lab': []},
+            'equipment_source': {**laboratory['layout_source'], 'build_report': 'cad/lab-layout-l01/shared-build-report.json'},
+            'hidden_body_ids': {'building': interface['marker_body_ids']},
             'source_files_sha256': pins, 'qualification': spec['qualification'],
             'limitations': spec['limitations']}

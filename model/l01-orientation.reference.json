@@ -9,7 +9,7 @@
     },
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
+      "source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
     }
   },
   "room_area_id": "R3_003",

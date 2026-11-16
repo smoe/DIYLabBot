@@ -21,6 +21,10 @@
     "furnishings": {
       "source": "model/furnishings/building-social.json",
       "source_sha256": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b"
+    },
+    "laboratories": {
+      "source": "model/furnishings/building-laboratories.json",
+      "source_sha256": "440d09083f189c02f23383d2865386a95a75ef1cb949c8fdfb3db7e03338f00d"
     }
   },
   "calibration": null,

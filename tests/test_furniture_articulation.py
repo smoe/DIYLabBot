@@ -24,7 +24,12 @@ class ArticulationTests(unittest.TestCase):
         cls.interface = stack.interfaces(cls.building, cls.p)
         cls.expanded = stack.expanded(cls.building, cls.p)
         cls.plans = {v['id']: stack.level_plan(cls.building, v['id']) for v in cls.interface['levels']}
-        cls.objects = cls.derive(cls.spec['objects'])
+        # The source no longer needs a per-instance list. Retain one explicit
+        # request fixture to exercise compatibility/error handling separately.
+        cls.requests = [{'id': 'Kitchen1008.Fridge.Door', 'room': 'Kitchen1008',
+                         'instance': 'Fridge', 'articulation': 'Door',
+                         **copy.deepcopy(cls.art['types']['fridge']['Door']['presentation'])}]
+        cls.objects = cls.derive([])
 
     @classmethod
     def derive(cls, requests):
@@ -78,7 +83,7 @@ class ArticulationTests(unittest.TestCase):
 
     def test_unknown_object_references_are_rejected(self):
         for key in ('room', 'instance', 'articulation'):
-            requests = copy.deepcopy(self.spec['objects']); requests[0][key] = 'Unknown'
+            requests = copy.deepcopy(self.requests); requests[0][key] = 'Unknown'
             requests[0]['id'] = '.'.join(requests[0][k] for k in ('room', 'instance', 'articulation'))
             with self.subTest(reference=key), self.assertRaises(ValueError): self.derive(requests)
 
@@ -104,21 +109,21 @@ class ArticulationTests(unittest.TestCase):
                 validator.validate(source)
 
     def test_object_view_cannot_leave_kitchen_even_with_valid_parameter(self):
-        requests = copy.deepcopy(self.spec['objects']); requests[0]['view_distance']['value'] = 3000
+        requests = copy.deepcopy(self.requests); requests[0]['view_distance']['value'] = 3000
         with self.assertRaisesRegex(ValueError, 'outside kitchen'): self.derive(requests)
 
     def test_typed_assumptions_and_duplicate_objects_are_rejected(self):
         for field, value in [('duration', -1), ('duration', float('nan')), ('view_distance', True), ('view_distance', 10000)]:
-            requests = copy.deepcopy(self.spec['objects']); requests[0][field]['value'] = value
+            requests = copy.deepcopy(self.requests); requests[0][field]['value'] = value
             with self.subTest(field=field,value=value), self.assertRaises(ValueError): articulation.validate_requests(requests)
-        with self.assertRaises(ValueError): articulation.validate_requests(self.spec['objects']*2)
+        with self.assertRaises(ValueError): articulation.validate_requests(self.requests*2)
 
     def test_articulation_preserves_native_dependencies_and_files(self):
         paths = stack.source_dependencies(self.building)
         self.assertNotIn(Path(articulation.__file__), paths)
         self.assertNotIn(ROOT/self.spec['articulation_source']['source'], paths)
         pins = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
-        self.derive(self.spec['objects'])
+        self.derive([])
         for path, before in pins.items():
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before, str(path))
 

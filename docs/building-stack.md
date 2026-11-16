@@ -85,6 +85,56 @@ und Bedienelemente. Die
 [Bildprovenienz des Kernbereichs](media/atrium-seating.provenance.json) bindet
 die neuen Nachweise getrennt nach ihrem tatsächlichen Umfang.
 
+## Labor 3.003 als Gebäudeinstanz
+
+Die optionale Referenz
+[`model/furnishings/building-laboratories.json`](../model/furnishings/building-laboratories.json)
+bindet die bestehende L01-Definition an `OG3` / `R3_003` und dessen Eingangswand
+`W036`. `scripts/building_laboratories.py` berechnet die vier unabhängigen
+Raumparameter aus den Innenflächen der F03-Wände. Die Gebäudetransformation
+folgt der inneren Eingangsecke, der Wandrichtung und der vorhandenen
+Geschosshöhe. Die Quelle enthält weder Maßkopien noch eigene Geräteposen.
+
+Die Möbel werden mit Maßstab 1 aus denselben Rezepten neu ausgewertet; die
+Darstellungsskalierung der Büromöbel wird nicht auf sie angewendet. Boden,
+Wände und Glas bleiben ausschließlich bei der Gebäudehülle. Die 183
+verbleibenden Möbel-/Strukturkörper gehören zur neuen nativen Gebäudefassung.
+Die aus L01 übernommene Betonstütze ist ausdrücklich nicht im F03-Plan belegt.
+Die maximale lokale Y-Differenz der quadratischen Fassadennäherung zur Polylinie wird
+je Segment einschließlich der inneren Extremstellen berechnet und im
+`laboratories`-Interface ausgewiesen. Sie ist keine Aufmaßgenauigkeit.
+Der nur rund 904 mm breite Fensterdurchgang bleibt eine offene praktische
+Eigentümerentscheidung; `placement_qualified` bleibt `false`.
+
+Das Interface enthält außerdem hergeleitete Parameter, Welttransformationen,
+Möbelrahmen und Gelenke, benannte Arbeitsflächen und Rackplätze. Der
+Öffnungsgraph verbindet 3.002 über `D3_002N` und den Flur mit `D3_003A/B` und
+3.003; diese Topologie bleibt getrennt von Geometrie und Materiallaufzeit.
+T2/T3-Endpunkte, Transporterfahrten und eine Materialübergabe sind nicht
+implementiert. Für spätere Roboterbahnen gilt weiterhin die gemeinsame
+Vorgabe fließender Bewegungen.
+
+Der Browser übernimmt zusätzlich alle 17 Gerätegruppen aus dem geprüften
+Standalone-L01-Layout mit ihren gebundenen Posen und starren Transformationen.
+Native Geräte im Gebäude-CAD fehlen in dieser Stufe ausdrücklich. Es gibt nur
+eine Gebäudeszene; der isolierte Laborblick filtert dieselben Weltkörper.
+Standalone-L01 bleibt für Ablauftests aus derselben Definition erzeugbar.
+Typweite Browserartikulationen geben den vorhandenen Schranktürgelenken und
+Hockerliften Bedienung, ohne ihre Definition je Instanz zu kopieren.
+
+**Prüfstand dieser Erweiterung:** Der neue native FreeCAD-Gebäudestand
+`building-stack-2b9b9a5b1e10-r2` besteht mit 2.121 geschlossenen Körpern,
+452 Geometrieprüfungen und 16 Höhenprüfungen. Standalone-L01 wurde unabhängig
+in beiden CADs neu aufgebaut: fünf Raumvarianten und die vollständige
+878-Körper-Aufstellung bestehen. Der Browserexport `building-walkthrough-d0fca19566f3`
+bindet diese Berichte und enthält alle 17 Geräte sowie drei funktionale
+Arm-Unterbauten. Die tatsächliche Chrome-Prüfung besteht den Büro–Flur–Labor-Weg,
+Schranktür und Hockerlift sowie Aufzugruf, Einstieg, Fahrt OG3–EG–OG3 und
+die geschossabhängigen Ausstiege. Ein neuer
+vollständiger SolidCraft-Gebäudeaufbau ist ausdrücklich ausgelassen.
+Historische Berichte und folgende Bilder bleiben ihren eigenen Revisionen
+zugeordnet und belegen diese neue Laborbindung oder Aufzugfahrt nicht.
+
 ## Ansichten für den Antrag
 
 Die folgenden Gesamtbilder bleiben Momentaufnahmen ihrer in der Provenienz
@@ -104,8 +154,10 @@ zeigen die aktuellen [Möbelbilder](building-furnishings.md),
 Das Dach ist für diese Ansicht ausgeblendet, die Wände des obersten Geschosses
 sind transparenter. Es werden ausschließlich Darstellungseigenschaften des
 geprüften nativen Modells geändert; die CAD-Datei bleibt bytegleich.
-L01 ist diesem Raum semantisch zugeordnet. Die bisherige L01-Einrichtung wird
-hier nicht maßstäblich eingesetzt; eine vermessene Registrierung bleibt offen.
+Diese historische Ansicht zeigt die frühere semantische Zuordnung ohne
+L01-Einrichtung. Die neue explizite Laborbindung ist oben beschrieben; das
+Bild und seine Provenienz bleiben erhalten. Eine vermessene Registrierung
+bleibt auch mit der neuen Bindung offen.
 
 ![Luftraum als native Sichtbarkeitsansicht](media/building-stack-atrium.png)
 
@@ -155,7 +207,7 @@ Alle nativen PNG-Ansichten oben sind ebenfalls für die Antragsunterlagen abrufb
 | System | Bestätigte Reichweite | Aktuelle Darstellung |
 |---|---|---|
 | Inneres Treppenhaus, F03-Bereich 3.028 / EG-Bereich 20 | Keller bis 3. OG | KG–3. OG mit verbundenen Konzeptläufen und Podesten; Kellerhöhe angenommen |
-| Gebäudeaufzug | Keller bis 3. OG | Eine stationäre EG-Kabine, durchgehender Schachtrahmen und vorgesehene Türseiten; Kellerstopp mit angenommener Höhenlage |
+| Gebäudeaufzug | Keller bis 3. OG | Statische EG-Kabinenreferenz im CAD, durchgehender Schachtrahmen; im Browser eine bewegte Kabine mit Ruf, Einstieg, Geschosswahl und erlaubtem Ausstieg |
 | Äußere Metall-Fluchttreppe, F03-Bereich 3.017 | Dach bis Boden | Eigenständige Metallkonstruktion mit Podesten und Anschluss am Dach; EG-Ende neben Zugang 22 |
 
 Die Außentreppe ist **kein zweites inneres Treppenhaus** und keine Baugruppe des
@@ -180,8 +232,18 @@ eine Aufzugseite, keinen Gebäudeausgang.
 
 Die einmalig referenzierte Öffnung `DLift` liefert die synthetische Lage/Breite
 für die Aufzugdarstellung. Die tatsächlichen Zielwände werden geschnitten;
-Rahmen stehen nicht vor ungebrochenen Wandkörpern. Die Anzeige beschreibt
-vorgesehene Türseiten, keinen ausgeführten Öffnungszustand oder Aufzugsbetrieb.
+Rahmen stehen nicht vor ungebrochenen Wandkörpern. Im Browser begrenzt
+dieselbe aktive Portliste die Ausstiegsseiten. Die bewegte EG-Kabine besitzt
+weiter ihre beiden Öffnungen; die inneren Schachtwände der Obergeschosse
+bleiben dennoch geschlossen. Es werden keine Türblätter ergänzt.
+
+Die Browserfahrt verschiebt genau eine Kabine und die absolut daran gebundene
+Kamera. Die übrige freie Navigation ist an Bord gesperrt. Halte und Höhen
+kommen aus dem bestehenden Aufzuginterface; die Fahrtzeit folgt einer
+ausdrücklich synthetischen Geschwindigkeitsannahme. Bedienung und Grenzen
+stehen im [Rundgang](building-walkthrough.md#aufzug-benutzen).
+`lift_operation_implemented` bleibt `false`: Die Darstellung ist kein realer
+Aufzugsbetrieb oder Nachweis einer Schutzfunktion.
 `NorthCore` bleibt in der Obergeschossvorlage in seiner übrigen Nutzung unbestimmt.
 
 ## Quellen und gemeinsame Bezugssysteme
@@ -193,7 +255,8 @@ Die führende Komposition
 - [die eigene Keller-Ableitung](../model/basement-kg.shared.json) für KG;
 - [die eigene EG-Ableitung](../model/ground-floor-eg.shared.json) für EG;
 - die bestehenden, ungemessenen L01-Parameter als horizontale Darstellungsproportion;
-- getrennte Rezepte für Aufzug, innere Treppe, äußere Metalltreppe und Dach.
+- getrennte Rezepte für Aufzug, innere Treppe, äußere Metalltreppe und Dach;
+- optional die gepinnte Laborreferenz mit L01-Raum-/Möbeldefinition und Geräteaufstellung.
 
 Die EG-Abbildung ist gegenüber F03 um 180° orientiert. Ihre Literalvektoren sind
 bereits im gemeinsamen Darstellungsrahmen abgelegt. Gemeinsame Kernpunkte werden

@@ -13,6 +13,7 @@ class ExteriorTests(unittest.TestCase):
         cls.s=model.load()
         # Exercise the exterior recipe independently of optional room demolition.
         cls.s['sources'].pop('furnishings',None)
+        cls.s['sources'].pop('laboratories',None)
         cls.p=model.parameters(cls.s);cls.d=model.interfaces(cls.s,cls.p);cls.e=model.expanded(cls.s,cls.p)
 
     def test_lawn_is_a_thin_green_surface_at_eg_grade(self):

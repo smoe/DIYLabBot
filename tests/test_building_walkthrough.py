@@ -66,7 +66,7 @@ class WalkthroughTests(unittest.TestCase):
     def test_atrium_view_uses_existing_open_guard_and_does_not_hide_architecture(self):
         atrium = next(stop for stop in self.program['stops'] if stop['id'] == 'atrium')
         self.assertIn(atrium['anchor']['wall'], self.building['exterior']['guard_boundaries'])
-        self.assertEqual(self.program['hidden_body_ids'], {'building': ['ConceptExchange'], 'lab': []})
+        self.assertEqual(self.program['hidden_body_ids'], {'building': ['ConceptExchange']})
 
     def test_interior_wall_display_policy_preserves_native_glass_materials(self):
         self.assertEqual(self.program['rendering']['opacity_by_role'],
@@ -76,14 +76,17 @@ class WalkthroughTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'architectural opacity policy'):
             walkthrough.validate(changed)
 
-    def test_lab_stays_in_separate_local_frame(self):
+    def test_lab_occupies_its_building_room_on_the_same_third_floor(self):
         lab = next(stop for stop in self.program['stops'] if stop['id'] == 'lab')
         building = next(stop for stop in self.program['stops'] if stop['id'] == 'phd')
-        self.assertEqual(lab['scene'], 'lab')
-        self.assertEqual(lab['eye_mm'][2], self.source['settings']['eye_height_mm'])
-        self.assertGreater(building['eye_mm'][2]-lab['eye_mm'][2], 10000)
+        self.assertEqual(lab['scene'], 'building')
+        self.assertEqual(lab['anchor']['areas'], ['R3_003'])
+        self.assertEqual(lab['eye_mm'][2], building['eye_mm'][2])
+        self.assertEqual(set(self.program['scene_sources']), {'building'})
         self.assertFalse(self.program['qualification']['lab_to_building_registered'])
-        self.assertNotIn('transform', self.program['scene_sources']['lab'])
+        self.assertEqual(len(self.program['laboratories'][0]['device_instances']), 17)
+        self.assertTrue(self.program['isolation']['body_ids'])
+        self.assertTrue(self.program['topology'])
 
     def test_stale_reference_and_false_qualification_are_rejected(self):
         changed = copy.deepcopy(self.source)
@@ -94,6 +97,28 @@ class WalkthroughTests(unittest.TestCase):
         changed['qualification']['collision_checked'] = True
         with self.assertRaisesRegex(ValueError, 'does not qualify'):
             walkthrough.validate(changed)
+
+    def test_isolated_room_keeps_the_real_window_glass_and_frames(self):
+        interface = stack.interfaces(self.building, self.parameters)
+        laboratory = self.program['laboratories'][0]
+        area = next(value for value in self.plan['areas'] if value['id'] == laboratory['area'])
+        walls = {edge['wall'] for edge in area['boundary']}
+        windows = [window for window in interface['exterior']['side_window_groups']
+                   if window['level_id'] == laboratory['level_id'] and window['wall'] in walls]
+        self.assertTrue(windows)
+        for window in windows:
+            self.assertTrue({window['glass_body'], window['frame_body']} <= set(self.program['isolation']['body_ids']))
+
+    def test_functional_arm_supports_are_kept_separate_from_the_seventeen_devices(self):
+        import export_building_walkthrough_freecad as export
+        bindings = export.native_equipment_bindings(self.program['laboratories'])
+        devices = [device for laboratory, device in bindings if not device.get('supporting_device_id')]
+        supports = [device for laboratory, device in bindings if device.get('supporting_device_id')]
+        self.assertEqual(len(devices), 17)
+        self.assertEqual({device['supporting_device_id'] for device in supports}, {'ArmA', 'ArmB', 'ArmC'})
+        for support in supports:
+            owner = next(device for device in devices if device['id'] == support['supporting_device_id'])
+            self.assertEqual(support['transform'], owner['transform'])
 
     def test_camera_settings_and_ambiguous_stops_are_rejected(self):
         for value in (True, float('nan'), 0, 4001):
