@@ -49,7 +49,7 @@
     },
     "cam_tip_front_z": {
       "unit": "mm",
-      "expression": "46"
+      "expression": "10"
     },
     "cam_tip_body_w": {
       "unit": "mm",
@@ -77,7 +77,7 @@
     },
     "cam_tip_far_r": {
       "unit": "mm",
-      "expression": "22"
+      "expression": "110"
     },
     "cam_scene_body_w": {
       "unit": "mm",
@@ -105,7 +105,7 @@
     },
     "cam_scene_far_r": {
       "unit": "mm",
-      "expression": "150"
+      "expression": "600"
     },
     "x6_plate_t": {
       "unit": "mm",
@@ -707,19 +707,19 @@
           "part": null,
           "frame": {
             "origin": [
-              -35,
-              -45,
-              "shoulder_z + 100"
+              80,
+              -150,
+              "shoulder_z + 220"
             ],
             "axis": [
-              0.8,
-              0,
-              -0.6
+              0.8248628195623473,
+              0.3866544466698503,
+              -0.41243140978117365
             ],
             "x": [
-              0,
-              1,
-              0
+              0.4244338762307196,
+              -0.9054589359588684,
+              0.0
             ]
           },
           "body_size_mm": [
@@ -734,26 +734,38 @@
           "mount_boxes": [
             {
               "origin": [
-                -65,
-                -45,
+                15,
+                -154,
                 96
               ],
               "size": [
-                40,
-                10,
+                20,
+                114,
                 6
               ]
             },
             {
               "origin": [
-                -65,
-                -45,
+                15,
+                -154,
                 102
               ],
               "size": [
                 10,
                 10,
-                "shoulder_z + 106 - 102"
+                "shoulder_z + 230 - 102"
+              ]
+            },
+            {
+              "origin": [
+                15,
+                -169,
+                "shoulder_z + 220"
+              ],
+              "size": [
+                60,
+                25,
+                6
               ]
             }
           ],
@@ -780,7 +792,7 @@
             "strain_relief": null,
             "max_frame_age_ms": null
           },
-          "aim_note": "Broad illustrative view outward and downward from the J1 turret; rotates with J1, not with shoulder pitch."
+          "aim_note": "Upright wide-angle view of the forward work area and lateral approaches from an outboard J1 mast. Nominal target [400, 0, shoulder_z + 60] mm. Rotates only with J1. Intended for later hazard observation; no detector, 360-degree coverage or protective function."
         }
       ]
     },
@@ -2513,18 +2525,18 @@
           "frame": {
             "origin": [
               "cam_tip_offset_x",
-              0,
+              -55,
               "flange_z + cam_tip_front_z"
             ],
             "axis": [
-              -0.4472135954999579,
-              0,
-              0.8944271909999159
+              -0.5152915730035986,
+              0.5248340095407024,
+              0.6775129941343612
             ],
             "x": [
-              0,
-              1,
-              0
+              -0.7135639703685389,
+              -0.7005900799982019,
+              0.0
             ]
           },
           "body_size_mm": [
@@ -2544,21 +2556,33 @@
                 "flange_z + 20"
               ],
               "size": [
-                "cam_tip_offset_x - 12",
+                "cam_tip_offset_x + 10",
                 12,
                 6
               ]
             },
             {
               "origin": [
-                "cam_tip_offset_x",
+                "cam_tip_offset_x + 16",
                 -6,
-                "flange_z + 26"
+                "flange_z - 24"
               ],
               "size": [
-                6,
                 12,
-                "cam_tip_front_z - 26"
+                12,
+                50
+              ]
+            },
+            {
+              "origin": [
+                "cam_tip_offset_x + 16",
+                -80,
+                "flange_z - 24"
+              ],
+              "size": [
+                12,
+                86,
+                6
               ]
             }
           ],
@@ -2590,7 +2614,7 @@
             "strain_relief": null,
             "max_frame_age_ms": null
           },
-          "aim_note": "Aims at an illustrative tip on the tool axis 128 mm beyond the bare flange; no pipette or calibrated TCP is modeled."
+          "aim_note": "Nominal oblique view between the parallel fingers at their grip centre, 55 mm beyond the flange reference, for the existing H02/CF01 gripper. Image up points toward the wrist. Re-aim for a different tool or independent camera-offset change; no calibrated TCP."
         }
       ]
     }

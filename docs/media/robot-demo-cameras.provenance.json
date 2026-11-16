@@ -1,0 +1,308 @@
+{
+  "format": "solidcraftbot.camera-demo/1",
+  "scope": "Rendering only; unchanged frozen geometry and compiled motion",
+  "base_media": {
+    "robot-demo-continuous-cfr.html": "7da5d83eb62d647927e17e9e4ea2a41cd070aa2651ddcc04392cd2580b4e3583",
+    "robot-demo-continuous-cfr.provenance.json": "161c34eded9887a2a5c13685e5dd2a60604042bd97577af1247b4ee3fca0755f"
+  },
+  "source_files_sha256": {
+    "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "scripts/build_cf01_camera_demo.py": "65a877c5b18b22aa61de26dc34c5eca16c22ac7fb172184ff6a0143fa228a3f3",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/templates/centrifuge_robot_pickup.html": "bf1f4ede7eafc083484420523997c184dded1d2afefbc3645bf2336b817a1fb1",
+    "scripts/templates/robot_demo_header.html": "b738bdba34a1688632891680041b8fb8ffaad9b2f077b2b8193b4da8a470e701",
+    "scripts/templates/quintic_motion.js": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30",
+    "scripts/templates/robot_camera_views.js": "dac97ba25bbb4672e182d70eed066bc63aca91372b1f485e637145285b8f50dd"
+  },
+  "compiled_program_canonical_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+  "geometry_canonical_sha256": "e7ec61ed63d06817fcfb58d15ca3fc1b93fe969dbf64c0a8de28ef3ee3fc3283",
+  "body_count": 223,
+  "camera_views": [
+    {
+      "id": "C_scene",
+      "purpose": "awareness",
+      "mounted_link": "L1_Turret",
+      "status": "provisional",
+      "manufacturing_released": false,
+      "part": null,
+      "optical_frame": {
+        "r": [
+          0,
+          0.6,
+          0.8,
+          1,
+          -0.0,
+          0,
+          0,
+          0.8,
+          -0.6
+        ],
+        "p": [
+          -35.0,
+          -45.0,
+          250.0
+        ]
+      },
+      "cone_range_mm": 300.0,
+      "cone_far_radius_mm": 150.0,
+      "full_cone_angle_deg": 53.13010235415599,
+      "cone_is_collision_geometry": false,
+      "occlusion_checked": false,
+      "route_links": [
+        "L0_Base",
+        "L1_Turret"
+      ],
+      "required_joint_passages": [
+        "J1_BaseYaw"
+      ],
+      "physical_wiring_verified": false,
+      "calibration_verified": false,
+      "group": "Arm.L1_Turret"
+    },
+    {
+      "id": "C_tip",
+      "purpose": "tip",
+      "mounted_link": "L6_BareFlange",
+      "status": "provisional",
+      "manufacturing_released": false,
+      "part": null,
+      "optical_frame": {
+        "r": [
+          0,
+          -0.8944271909999159,
+          -0.4472135954999579,
+          1,
+          0.0,
+          0,
+          0,
+          -0.4472135954999579,
+          0.8944271909999159
+        ],
+        "p": [
+          54.0,
+          0.0,
+          816.0
+        ]
+      },
+      "cone_range_mm": 145.0,
+      "cone_far_radius_mm": 22.0,
+      "full_cone_angle_deg": 17.25470628813048,
+      "cone_is_collision_geometry": false,
+      "occlusion_checked": false,
+      "route_links": [
+        "L0_Base",
+        "L1_Turret",
+        "L2_UpperArm",
+        "L3_Elbow",
+        "L4_ForearmRoll",
+        "L5_WristPitch",
+        "L6_BareFlange"
+      ],
+      "required_joint_passages": [
+        "J1_BaseYaw",
+        "J2_Shoulder",
+        "J3_Elbow",
+        "J4_ForearmRoll",
+        "J5_WristPitch",
+        "J6_FlangeRoll"
+      ],
+      "physical_wiring_verified": false,
+      "calibration_verified": false,
+      "group": "Arm.L6_BareFlange"
+    }
+  ],
+  "html_sha256": "efa3b90ad52a639d3bea2771ee2546a626a14e0d227c0c01a15b57341a22c12b",
+  "html_bytes": 1944177,
+  "projection": "Illustrative 16:9 pinhole sensor inscribed in source circular cone, letterboxed on resize; optical +Z forward, +X right, +Y down; 0.5–5000 mm render clipping, no measured sensor range",
+  "occlusion": "Depth-tested opaque mesh surfaces, including robot, gripper and equipment; display cones excluded",
+  "limitations": [
+    "No calibrated intrinsics, distortion, focus, lighting or real camera data",
+    "No changed geometry or motion; historical native evidence retained, no new CAD motion qualification"
+  ],
+  "media": {
+    "html": {
+      "path": "docs/media/robot-demo-cameras.html",
+      "sha256": "efa3b90ad52a639d3bea2771ee2546a626a14e0d227c0c01a15b57341a22c12b",
+      "bytes": 1944177
+    },
+    "video": {
+      "path": "docs/media/robot-demo-cameras.mp4",
+      "sha256": "0b3d1da966394257574470aabdb273c617cffb9213325badc66f2ef4b500ab47",
+      "bytes": 3434229
+    },
+    "poster": {
+      "path": "docs/media/robot-demo-cameras.png",
+      "sha256": "933ce3369578faaaf46dedcd0ca35489765d28804804bf581dd4989423ccc8f5",
+      "bytes": 155712
+    }
+  },
+  "capture": {
+    "source_scene_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+    "source_duration_s": 99.67387816519029,
+    "video_target_duration_s": 99.7,
+    "screenshot_time_s": 20.65,
+    "mime": "video/mp4",
+    "frames": 1994,
+    "encoding": {
+      "codec": "libx264",
+      "pixel_format": "yuv420p",
+      "fps_mode": "cfr",
+      "fps": 20,
+      "frames": 1994,
+      "duration_s": 99.7,
+      "first_pts_s": 0,
+      "last_pts_s": 99.65
+    },
+    "frame_manifest_sha256": "0a4cad20c9ee13a9f50d9924442d8827e0e12d7099767e65753ec9af528e8161",
+    "camera_ids": [
+      "C_scene",
+      "C_tip"
+    ],
+    "angle": "metal",
+    "playback_factor": 1.0002396203230335,
+    "ownership_checks": [
+      {
+        "time_s": 20.63918689198967,
+        "owner": "rotor",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 20.64918689198967,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2504445124263,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2604445124263,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 49.48878734264693,
+        "owner": "rotor",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 49.49878734264693,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.065727167540636,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.075727167540634,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 78.29352784443284,
+        "owner": "rotor",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 78.30352784443285,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9513341579452,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9613341579452,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      }
+    ],
+    "errors": [],
+    "frame_manifest": "tmp/readme-video/robot-demo-cameras.frames.json",
+    "ffprobe": {
+      "codec_name": "h264",
+      "width": 920,
+      "height": 720,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "20/1",
+      "duration": "99.700000",
+      "nb_read_frames": "1994"
+    }
+  },
+  "browser_validation": {
+    "passed": true,
+    "html_sha256": "efa3b90ad52a639d3bea2771ee2546a626a14e0d227c0c01a15b57341a22c12b",
+    "test_sha256": "30f92f02f7675e394b36aa90ee1b5bcb3ba16ddc49de05fb1198b5e040e3e29a",
+    "angle": "metal",
+    "independent_fk_times": [
+      0,
+      5,
+      20.64818689198967,
+      20.64918689198967,
+      20.650186891989673,
+      25,
+      31.9,
+      32.2594445124263,
+      32.2604445124263,
+      32.261444512426294,
+      49.49778734264693,
+      49.49878734264693,
+      49.499787342646925,
+      50,
+      61.07472716754064,
+      61.075727167540634,
+      61.07672716754063,
+      78.30252784443284,
+      78.30352784443285,
+      78.30452784443285,
+      85,
+      89.9603341579452,
+      89.9613341579452,
+      89.96233415794521,
+      99.67387816519029
+    ],
+    "camera_count": 2,
+    "near_surface_occlusion_pixel": [
+      221,
+      0,
+      0,
+      255
+    ],
+    "captures": [
+      "tmp/camera-demo/checked-390-de.png",
+      "tmp/camera-demo/checked-390-en.png",
+      "tmp/camera-demo/checked-960-de.png",
+      "tmp/camera-demo/checked-960-en.png"
+    ],
+    "errors": []
+  },
+  "validation_sources_sha256": {
+    "scripts/export_readme_video.cjs": "eafb086c5049d0681e53fc06ba0854b90e755ea05557863cd562cc04dd3d47d8",
+    "tests/check_cf01_camera_views.cjs": "30f92f02f7675e394b36aa90ee1b5bcb3ba16ddc49de05fb1198b5e040e3e29a",
+    "tests/test_cf01_camera_demo.py": "3422b2c3b131a68873f4cf9b711ca1ab214142f5b24cf69e5b82d67f3d211adc",
+    "tests/check_readme_video_export.cjs": "8fb37446ea0d386f657add1538d7c0a5c3a467db5fffe32f6cb0a2b8552f1b20"
+  }
+}

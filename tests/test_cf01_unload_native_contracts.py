@@ -15,6 +15,18 @@ import synthetic_lab_scene as layout
 
 
 class NativeUnloadContractTests(unittest.TestCase):
+    def test_camera_bodies_do_not_inherit_joint_or_gripper_contact_exceptions(self):
+        camera = {'id': 'Arm.C_tip_body_ENVELOPE', 'kind': 'arm', 'group': 'Arm.L6',
+                  'role': 'camera_envelope', 'sample_id': None}
+        adjacent = {**camera, 'id': 'Arm.L5', 'group': 'Arm.L5', 'role': 'structure'}
+        gripper = {**camera, 'id': 'LeftFingerStem', 'kind': 'gripper', 'group': 'Tool', 'role': 'tool'}
+        mount = {**camera, 'id': 'Arm.C_tip_mount_1', 'role': 'camera_mount'}
+        for a, b in [(camera, adjacent), (adjacent, camera), (mount, adjacent)]:
+            self.assertEqual(qa.pair_category(a, b, {}), 'camera_other_arm_link')
+        for a, b in [(camera, gripper), (gripper, camera), (mount, gripper)]:
+            self.assertEqual(qa.pair_category(a, b, {}), 'camera_gripper')
+        self.assertIsNone(qa.pair_category(camera, mount, {'Arm.L6': 6}))
+
     def test_world_hinge_envelopes_contain_every_corner_including_interior_extrema(self):
         entry=next(e for e in layout.instrument_instances() if e['instance']['asset']=='nanodrop')
         minimum=[-7.,-100.,-30.];maximum=[30.,37.,120.]

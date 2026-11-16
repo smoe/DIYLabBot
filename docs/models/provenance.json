@@ -1,9 +1,9 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
   "prepared_on": "2026-11-11",
-  "catalog_sha256": "8e3190f24bbf923a44ac31c995ecfcf2adbf01d00c96b823177435c71e6f2811",
+  "catalog_sha256": "337a306d8257027b55b41a7c5a8b28a6c3c3a2c9e93a4fb037fa48b9be1625ed",
   "render_generator": "scripts/render_model_gallery.py",
-  "render_generator_sha256": "69fbea316e47d08cf64bc5a31c9f67120bd357c1241ce009d8d29278c789bcc4",
+  "render_generator_sha256": "1a0002e505f65a8b169cab1ffe008cc07f9976e63ad630b20d7beff47d0113ca",
   "solidcraft_version": "solidcraft-cli 0.40.0-rc.2",
   "images": [
     {
@@ -2545,27 +2545,42 @@
       "id": "robot",
       "image": "images/robot.png",
       "source_files_sha256": {
-        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+        "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
       },
-      "build_report": "exports/generated/build-report.json",
-      "build_report_sha256": "3b8f969c1a0c7daeb4eb08bbcd770116279c783ff392075404a9c6036c1300a3",
+      "build_report": "exports/generated/978fa3557abc/build-report.json",
+      "build_report_sha256": "eb10d2628a494421f187f89be567c3bcc8bd7e12a64040ce25bdb9e6e7720699",
       "build_passed": true,
-      "native_model": "cad/generated/c7dd198799c0/Laborarm_6R_A01_Neutral.solidcraft",
-      "native_model_sha256": "0ca92565b72219bd5cb203ef7c50f90009970f0a6cbdfa8112adfef87672f045",
+      "hidden_visual_bodies": [
+        "C_scene_view_CONE",
+        "C_tip_view_CONE"
+      ],
+      "native_model": "cad/generated/978fa3557abc/Laborarm_6R_A01_Neutral.solidcraft",
+      "native_model_sha256": "4542011729932e5efcbe1bf3473796b398ee40477e95e63b355a4c745d4008e3",
       "renderer_result": {
-        "bytes": 127036,
+        "bytes": 95947,
         "height": 700,
         "path": "docs/models/images/robot.png",
-        "renderer": "cpu",
-        "warning": "drawn by the CPU rasterizer (no GPU adapter qualified, or SOLIDCRAFT_GPU=cpu): surface analysis colours, highlights and legends are not drawn; `solidcraft-cli gpu` lists the adapters",
+        "renderer": "gpu",
         "width": 1000
       },
-      "commands": [],
+      "commands": [
+        {
+          "command": "browser.visibility",
+          "params": {
+            "items": [
+              "C_scene_view_CONE",
+              "C_tip_view_CONE"
+            ],
+            "visible": false
+          }
+        }
+      ],
       "command_line": [
         "solidcraft-cli",
         "snapshot",
+        "tmp/model-gallery/robot.commands.json",
         "--in",
-        "cad/generated/c7dd198799c0/Laborarm_6R_A01_Neutral.solidcraft",
+        "cad/generated/978fa3557abc/Laborarm_6R_A01_Neutral.solidcraft",
         "--out",
         "docs/models/images/robot.png",
         "--width",
@@ -2577,10 +2592,10 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "6e92001b988103fca75bdfe15ade271071139a8d1d89f19bc5c9b3b2293d9455",
-      "bytes": 127036,
+      "image_sha256": "4fb9c38bbda5484f36e39bbff24e5c1c66c40fe5bee37d2aa357f414afe41d35",
+      "bytes": 95947,
       "dependency_files_sha256": {
-        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
         "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
@@ -2601,11 +2616,6 @@
         "model/x6-mounting-interface.json": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
         "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67"
-      },
-      "line_ending_equivalence": {
-        "baseline_commit": "c22e971414f37a7b8977e6237a275f855bea8562",
-        "migration_report": "docs/line-ending-migration.json",
-        "method": "LF normalization and updated dependency hashes only; original build evidence and image bytes retained"
       }
     },
     {
@@ -4721,13 +4731,14 @@
   "visual_review": {
     "passed": true,
     "reviewed_on": "2026-11-12",
-    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the S01 source-derived state plan; separate static poses do not establish robot motion or real inventory. Reviewed the derived F03 vector plan with all area labels and explicit uncertainties; the private original photograph is excluded. Reviewed the source-derived four-storey section: four levels, closed ground atrium, open upper floors, height assumptions and conceptual exchange arrows are legible; no original image or transport qualification. Reviewed updated building section with owner-confirmed lift door policy; separate native views show both continuous stair cores and one cabin. No building access or safety qualification. Reviewed EG vectors, one internal stair, independent lift, separate external metal stair and crowned glass roof with explicit unqualified dimensions. Original photographs remain excluded. Reviewed the rotated X-axis glass roof over the source-contoured atrium and all four corridors, its updated Y/Z principle diagram and explicit unqualified approximation. Original photographs remain excluded.",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the S01 source-derived state plan; separate static poses do not establish robot motion or real inventory. Reviewed the derived F03 vector plan with all area labels and explicit uncertainties; the private original photograph is excluded. Reviewed the source-derived four-storey section: four levels, closed ground atrium, open upper floors, height assumptions and conceptual exchange arrows are legible; no original image or transport qualification. Reviewed updated building section with owner-confirmed lift door policy; separate native views show both continuous stair cores and one cabin. No building access or safety qualification. Reviewed EG vectors, one internal stair, independent lift, separate external metal stair and crowned glass roof with explicit unqualified dimensions. Original photographs remain excluded. Reviewed the rotated X-axis glass roof over the source-contoured atrium and all four corridors, its updated Y/Z principle diagram and explicit unqualified approximation. Original photographs remain excluded. Reviewed the 16 November camera-aligned robot preview from its checked SolidCraft model. Wide view cones are hidden for legible arm framing; camera bodies and mounts remain visible. Other scene previews retain their pinned historical robot revision.",
     "k01_reviewed": true,
     "s01_state_plan_reviewed": true,
     "floor_f03_reviewed": true,
     "building_stack_reviewed": true,
     "building_stack_circulation_reviewed": true,
-    "building_correction_reviewed": true
+    "building_correction_reviewed": true,
+    "robot_cameras_reviewed_on": "2026-11-16"
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

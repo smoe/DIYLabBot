@@ -1,0 +1,31 @@
+{
+  "format": "solidcraftbot.readme-video-embedding/1",
+  "repository": "smoe/DIYLabBot",
+  "source": "docs/media/robot-demo-cameras.mp4",
+  "source_sha256": "0b3d1da966394257574470aabdb273c617cffb9213325badc66f2ef4b500ab47",
+  "source_bytes": 3434229,
+  "working_tree_base_commit": "3fffd171611af326fe28a9cfc2c1090a76b7668f",
+  "source_commit": null,
+  "asset_url": "https://github.com/user-attachments/assets/cc05001c-7461-477b-bf05-e6a654fd625b",
+  "uploaded_at_utc": "2026-11-16T00:42:07.243677+00:00",
+  "upload_method": "GitHub CLI v2.101.0 attachment endpoint; no issue or comment created",
+  "playback_test": "Local MP4 decoded, 1994 CFR frames at 20 fps verified, six encoded frames visually inspected; live README player not tested before commit",
+  "authenticated_range_check": {
+    "status": 206,
+    "content_type": "video/mp4",
+    "content_length": 1
+  },
+  "anonymous_head_check": {
+    "status": 404,
+    "content_type": "text/plain; charset=utf-8"
+  },
+  "anonymous_browser_check": {
+    "status": 404,
+    "video_elements": 0
+  },
+  "anonymous_previous_video_check": {
+    "status": 404,
+    "content_type": "text/plain; charset=utf-8"
+  },
+  "publication_limit": "Upload and authenticated retrieval succeeded; anonymous access returned 404 for both new and previous video. Live README player not verified before commit."
+}

@@ -64,7 +64,17 @@ class CameraContracts(unittest.TestCase):
         distance = origin[0] / -tip["frame"]["axis"][0]
         target = [a + distance * z for a, z in zip(origin, tip["frame"]["axis"])]
         self.assertAlmostEqual(target[0], 0)
-        self.assertAlmostEqual(target[2] - model.evaluate(spec["flange_reference"]["point"][2], p), 128)
+        self.assertAlmostEqual(target[1], 0)
+        self.assertAlmostEqual(target[2] - model.evaluate(spec["flange_reference"]["point"][2], p), 55)
+
+    def test_overview_is_upright_and_wide_angle(self):
+        camera = next(c for _, c in cameras.cameras(self.spec) if c['id'] == 'C_scene')
+        p = model.parameters(self.spec)
+        frame = model.frame({'frame': camera['frame']}, p)
+        self.assertLess(frame[2][1], -.8)  # Optical +Y down: world up stays image up.
+        angle = 2 * math.degrees(math.atan(p['cam_scene_far_r'] / p['cam_scene_range'] / math.sqrt(1 + (9/16)**2)))
+        self.assertGreater(angle, 115)
+        self.assertLess(angle, 125)
 
     @unittest.skipUnless((ROOT / 'ros2_ws/src/solidcraftbot_ros/urdf/robot.urdf').is_file(), "Requires local CAD/ROS build: python scripts/build_models.py --ros2")
     def test_urdf_optical_frames_follow_their_links_in_multiple_poses(self):

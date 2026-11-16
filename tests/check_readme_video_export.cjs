@@ -26,6 +26,10 @@ async function checkCfr(){
   assert.equal(defaults.input,'docs/media/robot-demo-continuous-cfr.html');
   assert.equal(defaults.outputBase,'docs/media/robot-demo-continuous-cfr');
   assert.equal(defaults.recordSeconds,45);assert.equal(defaults.fps,20);
+  assert.equal(defaults.angle,'default');
+  assert.equal(options(['--angle','metal'],{}).angle,'metal');
+  assert.equal(options([],{SOLIDCRAFTBOT_ANGLE:'swiftshader'}).angle,'swiftshader');
+  assert.throws(()=>options(['--angle','unknown'],{}));
   const configured=options(['legacy-playwright','legacy-chrome','--input','old.html','--output-base','new',
     '--ffmpeg','/a path/ffmpeg','--fps=24','--record-seconds','3'],{});
   assert.equal(configured.playwright,'legacy-playwright');assert.equal(configured.chrome,'legacy-chrome');
