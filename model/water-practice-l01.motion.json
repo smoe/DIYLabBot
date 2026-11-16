@@ -12,7 +12,7 @@
     },
     "model/tr01-l01-workcell.protocol.json": {
       "source": "model/tr01-l01-workcell.protocol.json",
-      "source_sha256": "a0ddf9c579ce6aff65ca41f3b724cf45ab80114e643164f883ebda3885aeba58"
+      "source_sha256": "37061bdf8fa04562cd9ff716c424f42f7d1b7ca53095babe005d682024a51c59"
     },
     "model/cf01-unload-demo.motion.json": {
       "source": "model/cf01-unload-demo.motion.json",
@@ -75,7 +75,7 @@
   "pipette_case": "pipette",
   "insertion_below_rim_mm": 33,
   "transit_above_rim_mm": 25,
-  "path_samples": 33,
+  "path_samples": 129,
   "fluid_display_full_height_mm": 32,
   "holds_s": {
     "aspirate": 1,
@@ -93,6 +93,23 @@
     "Water levels show fixture amount fractions, not measured vessel calibration",
     "Separate animation clock; journal replay does not actuate devices; E4 decisions unchanged"
   ],
-  "bound_subdivisions": 16,
-  "empty_tcp_limits_rationale": "Unqualified empty-tool display caps; no biological water limits applied. Joint limits remain those of the existing empty-arm profile. Human speed comparison and real actuator capability remain open."
+  "bound_subdivisions": 8,
+  "empty_tcp_limits_rationale": "Unqualified empty-tool display caps; no biological water limits applied. Joint limits remain those of the existing empty-arm profile. Human speed comparison and real actuator capability remain open.",
+  "bound_method": "upright_chain_with_actual_polynomial_residuals",
+  "approach_samples": 65,
+  "retreat_samples": 129,
+  "progress_law": "quintic_rest_to_rest",
+  "retiming": {
+    "method": "smooth_density_coordinate_descent",
+    "centres": 9,
+    "width": 0.16,
+    "steps": [
+      1,
+      0.5,
+      0.25,
+      0.125,
+      0.0625
+    ],
+    "passes": 2
+  }
 }

@@ -9,6 +9,7 @@ import analytics_concept as tools
 import centrifuge_robot_pickup as pickup
 import robot_spec as robot
 import sample_motion
+import water_practice_upright_bounds as upright
 import cf01_unload_validation as validation
 from cf01_unload_path import CornerPath
 from solidcraftbot_ros import motion
@@ -34,6 +35,12 @@ def load():
     for ref in s['sources'].values():
         if digest(ROOT/ref['source']) != ref['source_sha256']:
             raise ValueError('Changed water motion input: '+ref['source'])
+    if s['bound_method']!='upright_chain_with_actual_polynomial_residuals' or s['progress_law']!='quintic_rest_to_rest':
+        raise ValueError('Supported water-path bound and progress methods required')
+    settings=s['retiming']
+    if (settings['method']!='smooth_density_coordinate_descent' or settings['centres']<3 or settings['passes']<1
+            or not 0<settings['width']<=1 or any(not math.isfinite(v) or v<=0 for v in settings['steps'])):
+        raise ValueError('Finite positive smooth retiming settings required')
     return s
 
 
@@ -75,7 +82,38 @@ def upright_ik(kin, point, roll, seed):
     return min(candidates,key=lambda q:sum((a-b)**2 for a,b in zip(q,seed)))
 
 
-def fit(qs, kin, limits, loaded, empty_limits, subdivisions):
+def density_retime(points,caps,settings):
+    """Optimize a smooth time density; final interval certification is separate."""
+    positions=[p[F[0]] for p in points];n=len(positions)-1
+    centres=[i/(settings['centres']-1) for i in range(settings['centres'])]
+    basis=[[math.exp(-(((i+.5)/n-c)/settings['width'])**2) for c in centres] for i in range(n)]
+    evaluations=0
+    def candidate(weights):
+        nonlocal evaluations
+        evaluations+=1
+        intervals=[math.exp(sum(w*b for w,b in zip(weights,row))) for row in basis]
+        scale=n/sum(intervals);times=[0.]
+        for interval in intervals:times.append(times[-1]+interval*scale)
+        result=motion.from_positions(times,positions);bound=motion.bounds(result)
+        factor=max((max(bound[field]['max_abs'])/caps[key])**(1/order)
+            for order,(field,key) in enumerate(zip(F[1:],('velocity_rad_s','acceleration_rad_s2','jerk_rad_s3')),1))
+        return factor*n,result
+    weights=[0.]*len(centres);best,result=candidate(weights);initial=best
+    for step in settings['steps']:
+        for _ in range(settings['passes']):
+            for i in range(len(weights)):
+                options=[]
+                for sign in (-1,1):
+                    trial=weights[:];trial[i]=max(-4.,min(4.,trial[i]+sign*step))
+                    cost,curve=candidate(trial);options.append((cost,trial,curve))
+                cost,trial,curve=min(options,key=lambda v:v[0])
+                if cost<best*(1-1e-8):best,weights,result=cost,trial,curve
+    return result,{'method':'smooth_density_coordinate_descent','evaluations':evaluations,
+                   'initial_joint_limited_duration_s':initial,'joint_limited_duration_s':best,
+                   'density_weights':weights,'global_time_optimality_proved':False}
+
+
+def fit(qs, kin, limits, loaded, empty_limits, subdivisions, retiming):
     points = motion.from_positions(list(range(len(qs))),[[math.radians(v) for v in q] for q in qs])
     joint = motion.bounds(points)
     for lo,hi,declared in zip(joint[F[0]]['min'],joint[F[0]]['max'],kin.limits):
@@ -84,28 +122,61 @@ def fit(qs, kin, limits, loaded, empty_limits, subdivisions):
     # Include a conservative cube around the water carried inside the tip,
     # and the entire pipettor, all expressed relative to its TCP.
     references = [[x,y,z] for x in (-40,40) for y in (-24,24) for z in (-kin.length,0)]
-    fk = sample_motion.bounds(kin,points,points_mm=references,subdivisions=subdivisions)
     caps = limits['arm_loaded' if loaded else 'arm_empty']
-    factor = max((max(joint[field]['max_abs'])/caps[key])**(1/order)
-                 for order,(field,key) in enumerate(zip(F[1:],('velocity_rad_s','acceleration_rad_s2','jerk_rad_s3')),1))
     linear = limits['sample_translation'] if loaded else empty_limits
-    for order,field in enumerate(('velocity_mm_s','acceleration_mm_s2','jerk_mm_s3'),1):
-        factor = max(factor,(fk[field]/linear[field])**(1/order))
-    for order,field in enumerate(sample_motion.ANGULAR,1):
-        cap = math.radians(limits['sample_rotation'][('velocity_deg_s','acceleration_deg_s2','jerk_deg_s3')[order-1]])
-        factor = max(factor,(fk[field]/cap)**(1/order))
-    factor = math.ceil(factor*100*(1+1e-6))/100
-    points = motion.scale(points,factor)
-    curve = motion.Curve(points)
+    def factor_for(points):
+        joint=motion.bounds(points)
+        fk=upright.bounds(kin,points,points_mm=references,subdivisions=subdivisions)
+        factor=max((max(joint[field]['max_abs'])/caps[key])**(1/order)
+            for order,(field,key) in enumerate(zip(F[1:],('velocity_rad_s','acceleration_rad_s2','jerk_rad_s3')),1))
+        for order,field in enumerate(('velocity_mm_s','acceleration_mm_s2','jerk_mm_s3'),1):factor=max(factor,(fk[field]/linear[field])**(1/order))
+        for order,field in enumerate(sample_motion.ANGULAR,1):
+            cap=math.radians(limits['sample_rotation'][('velocity_deg_s','acceleration_deg_s2','jerk_deg_s3')[order-1]])
+            factor=max(factor,(fk[field]/cap)**(1/order))
+        return math.ceil(factor*10000*(1+1e-6))/10000
+    candidates=[]
+    factor=factor_for(points);candidates.append((points,factor,'uniform'))
+    optimization=None
+    if points[-1]['time_s']*factor>2:
+        weighted,optimization=density_retime(points,caps,retiming)
+        bounds=motion.bounds(weighted)
+        if all(math.degrees(lo)>=lim[0]-1e-6 and math.degrees(hi)<=lim[1]+1e-6
+               for lo,hi,lim in zip(bounds[F[0]]['min'],bounds[F[0]]['max'],kin.limits)):
+            candidates.append((weighted,factor_for(weighted),'smooth_density_joint_extrema'))
+    points,factor,method=min(candidates,key=lambda c:c[0][-1]['time_s']*c[1])
+    points=motion.scale(points,factor)
+    curve=motion.Curve(points)
     no_stop = validation.no_stop(curve,0,curve.times[-1],sample_motion.KinematicJets(kin),[[0,0,0]],
                                  {'stop_joint_speed_rad_s':1e-6,'stop_speed_mm_s':.01})
     if not no_stop['passed']:
         raise ValueError('Unnecessary internal stop')
     return {'duration_s':curve.times[-1],'points':points,'loaded':loaded,
             'joint_bounds':motion.bounds(curve),
-            'fk_bounds':sample_motion.bounds(kin,curve,points_mm=references,subdivisions=subdivisions),
-            'no_stop':no_stop,'timing':{'uniform_factor':factor,'global_time_optimality_proved':False},
+            'fk_bounds':upright.bounds(kin,curve,points_mm=references,subdivisions=subdivisions),
+            'no_stop':no_stop,'timing':{'uniform_factor':factor,'scale_factor_resolution':.0001,'progress_law':'quintic_rest_to_rest','retiming':method,'optimization':optimization,'global_time_optimality_proved':False},
             'material_point_box_tcp_mm':{'min':[-40,-24,-kin.length],'max':[40,24,0]}}
+
+
+def progress(u):
+    return 10*u**3-15*u**4+6*u**5
+
+
+def rounded_points(route,count):
+    pieces=[];cursor=route[0]
+    for i,corner in enumerate(route[1:-1],1):
+        trim=min(10,math.dist(route[i-1],corner)/4,math.dist(corner,route[i+1])/4)
+        blend=CornerPath(route[i-1],corner,route[i+1],0,0,trim)
+        pieces.append(([cursor,blend.controls[0]],math.dist(cursor,blend.controls[0])))
+        pieces.append((blend.controls,7*trim/3));cursor=blend.controls[-1]
+    pieces.append(([cursor,route[-1]],math.dist(cursor,route[-1])))
+    total=sum(weight for _,weight in pieces);points=[]
+    for i in range(count):
+        distance=total*progress(i/(count-1))
+        for controls,weight in pieces:
+            if distance<=weight+1e-8:break
+            distance-=weight
+        points.append(CornerPath._bezier(controls,max(0,min(1,distance/weight))))
+    return points
 
 
 def compile_program(actor_data, report):
@@ -134,21 +205,7 @@ def compile_program(actor_data, report):
         high = max(source[2],target[2])+s['insertion_below_rim_mm']+s['transit_above_rim_mm']
         # Withdraw vertically until the full immersed tip clears the rim,
         # then blend the two elevated corners without a transport stop.
-        route=[source,[source[0],source[1],high],[target[0],target[1],high],target]
-        pieces=[];cursor=source
-        for i,corner in enumerate(route[1:-1],1):
-            trim=min(10,math.dist(route[i-1],corner)/4,math.dist(corner,route[i+1])/4)
-            blend=CornerPath(route[i-1],corner,route[i+1],0,0,trim)
-            pieces.append(([cursor,blend.controls[0]],math.dist(cursor,blend.controls[0])))
-            pieces.append((blend.controls,7*trim/3));cursor=blend.controls[-1]
-        pieces.append(([cursor,target],math.dist(cursor,target)))
-        total=sum(weight for _,weight in pieces);points=[]
-        for i in range(s['path_samples']):
-            distance=total*i/(s['path_samples']-1)
-            for controls,weight in pieces:
-                if distance<=weight+1e-8:break
-                distance-=weight
-            points.append(CornerPath._bezier(controls,max(0,min(1,distance/weight))))
+        points=rounded_points([source,[source[0],source[1],high],[target[0],target[1],high],target],s['path_samples'])
         qs=[];seed=actor_data[actor]['park']
         for point in points:
             seed=upright_ik(kin,point,roll,seed);qs.append(seed)
@@ -156,18 +213,17 @@ def compile_program(actor_data, report):
         # automatic tool change or movement from the legacy gripper park.
         park_point=[source[0],source[1],high]
         park=upright_ik(kin,park_point,roll,qs[0])
-        approach_q=[upright_ik(kin,[source[0],source[1],high+(source[2]-high)*i/8],roll,park) for i in range(9)]
+        approach_q=[upright_ik(kin,[source[0],source[1],high+(source[2]-high)*progress(i/(s['approach_samples']-1))],roll,park) for i in range(s['approach_samples'])]
         # Retreat lifts vertically first before returning over the source.
-        retreat_points=[[target[0],target[1],target[2]+(high-target[2])*i/8] for i in range(9)]
-        retreat_points += [[target[0]+(source[0]-target[0])*i/8,target[1]+(source[1]-target[1])*i/8,high] for i in range(1,9)]
+        retreat_points=rounded_points([target,[target[0],target[1],high],park_point],s['retreat_samples'])
         retreat_q=[upright_ik(kin,p,roll,qs[-1]) for p in retreat_points]
-        curves={'approach':fit(approach_q,kin,limits,False,s['empty_tcp_limits'],s['bound_subdivisions']),
-                'loaded':fit(qs,kin,limits,True,s['empty_tcp_limits'],s['bound_subdivisions']),
-                'retreat':fit(retreat_q,kin,limits,False,s['empty_tcp_limits'],s['bound_subdivisions'])}
+        curves={'approach':fit(approach_q,kin,limits,False,s['empty_tcp_limits'],s['bound_subdivisions'],s['retiming']),
+                'loaded':fit(qs,kin,limits,True,s['empty_tcp_limits'],s['bound_subdivisions'],s['retiming']),
+                'retreat':fit(retreat_q,kin,limits,False,s['empty_tcp_limits'],s['bound_subdivisions'],s['retiming'])}
         program['paths'][name]={**path,'park':park,'tcp_source':source,'tcp_target':target,'curves':curves}
     program['source_files_sha256']={str(SOURCE.relative_to(ROOT)):digest(SOURCE),
         **{r['source']:r['source_sha256'] for r in s['sources'].values()},
-        **{str(Path(m.__file__).relative_to(ROOT)):digest(m.__file__) for m in (robot,pickup,sample_motion,validation,tools)},
+        **{str(Path(m.__file__).relative_to(ROOT)):digest(m.__file__) for m in (robot,pickup,sample_motion,validation,tools,upright)},
         'scripts/cf01_unload_path.py':digest(ROOT/'scripts/cf01_unload_path.py'),
         str(Path(__file__).relative_to(ROOT)):digest(__file__),
         'ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py':digest(motion.__file__)}

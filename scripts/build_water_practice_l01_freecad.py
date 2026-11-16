@@ -15,6 +15,7 @@ from pathlib import Path
 import FreeCAD as App
 import Part
 import water_practice_l01 as m
+import water_practice_context as context_equivalence
 import build_neutral_freecad as arm_native
 import build_tr01_workcell_freecad as native
 import check_tr01_floor_motion as boxes
@@ -69,9 +70,10 @@ def context_inputs(context):
                     if child not in visited:pending[child]=digest;pins[child]=digest
     # Only robot cameras changed since the original L01 derivation. The new
     # water scene replaces ALL four native arm instances from current source.
+    changed={}
     for name,sha in pins.items():
         if name.startswith(('model/','scripts/','cad/vendor/')) and name not in ('model/robot.json','scripts/render_tr01_workcell.py','scripts/tr01_workcell_player.html'):
-            if m.digest(m.ROOT/name)!=sha:raise ValueError('Non-arm L01 source changed: '+name)
+            if m.digest(m.ROOT/name)!=sha:changed[name]={'original_sha256':sha,'current_sha256':m.digest(m.ROOT/name)}
     for key,filename in report['files'].items():
         if key in report['artifact_sha256'] and m.digest(context/filename)!=report['artifact_sha256'][key]:
             raise ValueError('Changed native artifact: '+key)
@@ -83,13 +85,14 @@ def context_inputs(context):
     if {k:v for k,v in old['parameters'].items() if not k.startswith('cam_')}!={k:v for k,v in new['parameters'].items() if not k.startswith('cam_')}:
         raise ValueError('L01 arm dimensions changed')
     preview=m.read(context/report['files']['preview_data'])
-    return report,preview,pins
+    equivalence=context_equivalence.verify(context,m.ROOT,changed) if changed else None
+    return report,preview,pins,equivalence
 
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--native-context',type=Path,required=True);p.add_argument('--report',type=Path,required=True)
     args=p.parse_args();context=args.native_context.resolve();out=m.OUT;out.mkdir(parents=True,exist_ok=True)
-    report,preview,pins=context_inputs(context)
+    report,preview,pins,equivalence=context_inputs(context)
     definition=m.load()
     program={'definition':definition,'kit':m.read(m.ROOT/'model/analytics-tools.shared.json'),'paths':definition['paths'],'actors':preview['actors']}
     source=m.robot.load();inputs=geometry_inputs(source);arm_meta=out/'arm-build.json'
@@ -217,7 +220,7 @@ def main():
     program['native_context']={'revision':report['revision'],'original_arm_sha256':pins['model/robot.json'],
         'replacement_arm_sha256':m.digest(m.robot.SPEC),'all_arm_instances_replaced':True,
         'native_scene_sha256':m.digest(context/report['files']['freecad']),
-        'original_context_files_sha256':pins,'current_arm_artifact_sha256':m.digest(arm_path)}
+        'original_context_files_sha256':pins,'default_geometry_equivalence':equivalence,'current_arm_artifact_sha256':m.digest(arm_path)}
     proof={'passed':all(c['passed'] for c in checks),'checks':checks,'fixture_installation_overlaps':installation,
         'scope':'Discrete native current arms and concept pipettor versus unchanged L01 solids, six open fixtures and all other parked current arms. No continuous clearance or self-collision certificate.',
         'excluded_contacts':['L0_Base against own mounting support only'],
@@ -226,6 +229,9 @@ def main():
     program['source_files_sha256'].update({name:sha for name,sha in pins.items()
         if name.startswith(('model/','scripts/','cad/vendor/')) and name not in ('model/robot.json','scripts/tr01_workcell_player.html','scripts/render_tr01_workcell.py')})
     program['source_files_sha256'].update(inputs)
+    if equivalence:
+        program['source_files_sha256'].update({name:values['current_sha256'] for name,values in equivalence['changed_sources'].items()})
+    program['source_files_sha256']['scripts/water_practice_context.py']=m.digest(context_equivalence.__file__)
     program['source_files_sha256']['scripts/build_water_practice_l01_freecad.py']=m.digest(__file__)
     program['program_sha256']=__import__('hashlib').sha256(json.dumps(program,sort_keys=True,separators=(',',':')).encode()).hexdigest()
     write(out/'program.json',program);write(out/'native-proof.json',proof)

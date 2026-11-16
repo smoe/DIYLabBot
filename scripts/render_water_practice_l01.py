@@ -4,14 +4,33 @@ import base64
 import gzip
 import hashlib
 import json
+import math
 import re
 import struct
 from pathlib import Path
 import water_practice_l01 as m
 
 
+def encode_curve(curve):
+    """Lossless float-bit prediction for the two coupled wrist axes."""
+    rows=[[p['time_s'],*p[m.F[0]],*p[m.F[1]],*p[m.F[2]]] for p in curve['points']]
+    columns=list(map(list,zip(*rows)));offset=rows[0][6]-rows[0][1];residual=bytearray()
+    bits=lambda x:struct.unpack('<Q',struct.pack('<d',x))[0]
+    for row in rows:
+        for base in (1,7,13):
+            predictions=((math.pi if base==1 else 0.)-row[base+1]-row[base+2],row[base]+(offset if base==1 else 0.))
+            for column,prediction in zip((base+4,base+5),predictions):
+                value=bits(row[column])^bits(prediction)
+                while value>=128:residual.append((value&127)|128);value>>=7
+                residual.append(value)
+    for column in (5,6,11,12,17,18):columns[column]=None
+    return {'duration':curve['duration_s'],'columns':columns,'q6_offset':offset,
+            'coupled_xor':base64.b64encode(residual).decode(),
+            'f64_sha256':hashlib.sha256(b''.join(struct.pack('<d',v) for row in rows for v in row)).hexdigest()}
+
+
 def display_mesh(encoded):
-    """2 mm vertex clustering for arm display only; retain tips and vessels.
+    """4 mm vertex clustering for arm display only; retain tips and vessels.
 
     Native collision solids and motion coefficients are never simplified.
     """
@@ -24,7 +43,7 @@ def display_mesh(encoded):
         simplify=kind==481 or 400<=kind<460 and kind%20<7
         values=[]
         for i in ids:
-            point=tuple(round(v/8)*8 for v in source[i]) if simplify else source[i]
+            point=tuple(round(v/16)*16 for v in source[i]) if simplify else source[i]
             if point not in seen:seen[point]=len(vertices);vertices.append(point)
             values.append(seen[point])
         faces=[values[i:i+3] for i in range(0,len(values),3) if len(set(values[i:i+3]))==3]
@@ -77,7 +96,8 @@ def main():
     data['mesh']=compact_mesh(merge_mesh(data['mesh'],display_mesh(program['mesh'])))
     water={k:v for k,v in program.items() if k not in ('mesh','source_files_sha256','native_context','proof')}
     for path in water['paths'].values():
-        path['curves']={k:{'duration':c['duration_s'],'points':[[p['time_s'],p[m.F[0]],p[m.F[1]],p[m.F[2]]] for p in c['points']]} for k,c in path['curves'].items()}
+        path['curves']={k:encode_curve(c) for k,c in path['curves'].items()}
+    water['limits']=m.read(m.ROOT/'model/cf01-unload-demo.motion.json')['limits']
     water['fixture']=m.read(m.ROOT/'model/water-transfer-practice.fixture.json')
     water['display_bindings']=fixture_report['trace'][0]['state']['definition']['water_inventory']['paths']
     water['binding_scope']='display_projection_not_runtime_location'
@@ -89,6 +109,16 @@ def main():
     # diagnostics and duplicate poses from display frames to fit inline limits.
     for frame in data['traffic']['frames']:
         frame['vehicles']=[{k:v[k] for k in ('id','station','mode','velocity_mm_s')} for v in frame['vehicles']]
+    if data['fleet'].get('tracks'):
+        # Independent playback derives velocities from the unchanged PVA.
+        # Drop its unused diagnostic copy and constant status-frame interiors;
+        # preserve every status transition and both ends of person segments.
+        frames=data['traffic']['frames']
+        for frame in frames:
+            for vehicle in frame['vehicles']:vehicle['velocity_mm_s']=0
+        def same(a,b):return a['vehicles']==b['vehicles'] and a['person_mm']==b['person_mm']
+        data['traffic']['frames']=[f for i,f in enumerate(frames)
+            if i==0 or i==len(frames)-1 or not same(frames[i-1],f) or not same(f,frames[i+1])]
     encoded=json.dumps(base64.b64encode(gzip.compress(json.dumps(data,separators=(',',':')).encode(),9)).decode())
     fragment=fragment[:match.start(2)]+encoded+fragment[match.end(2):]
     # A single explicit extension point; reject incompatible base templates.
@@ -111,7 +141,8 @@ def main():
         'base_fragment_sha256':receipt['fragment_sha256'],'water_program_sha256':checksum,'bytes':len(fragment.encode()),
         'source_files_sha256':{**program['source_files_sha256'],str(view.relative_to(m.ROOT)):m.digest(view),'scripts/render_tr01_workcell.py':m.digest(m.ROOT/'scripts/render_tr01_workcell.py'),
                               str(Path(__file__).relative_to(m.ROOT)):m.digest(__file__)},
-        'display_arm_vertex_grid_mm':2,'native_solids_simplified':False,
+        'water_curve_encoding':'lossless_coupled_float_xor_1','display_arm_vertex_grid_mm':4,'native_solids_simplified':False,
+        'traffic_pva_unchanged':True,'unused_traffic_velocity_diagnostics_omitted':bool(data['fleet'].get('tracks')),
         'native_proof':program['proof'],'tool_arm_proof_sha256':m.digest(m.OUT/'tool-arm-proof.json'),'tool_arm_proof':tool_proof,'fixture_report_sha256':program['fixture_report_sha256'],'e4_decisions_changed':False}
     (m.OUT/'preview-receipt.json').write_text(json.dumps(write,indent=2)+'\n');print(args.output,len(fragment.encode()))
 

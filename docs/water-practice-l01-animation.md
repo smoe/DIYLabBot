@@ -19,6 +19,21 @@ Grenzen sind synthetische Darstellungsannahmen. Mechanische Eignung, Dosierung,
 globale Zeitoptimalität und der Geschwindigkeitsvergleich mit einem Menschen
 sind nicht qualifiziert. Wiedergabefaktor und Modellzeit bleiben getrennt.
 
+Die zügige Fassung verwendet ein quintisches Fortschrittsprofil und optimiert
+eine glatte Zeitdichte entlang der Bahn anhand der tatsächlichen
+Gelenkpolynom-Extrema. Gerade Abschnitte und enge Kurven erhalten damit
+unterschiedliche Zeitanteile. Anschließend werden die vollständigen neu
+angepassten C2-PVA-Kurven mit unveränderten Grenzwerten zertifiziert; eine
+pauschale Erhöhung der Wiedergaberate ersetzt diese Prüfung nicht. Aufnahme-
+und Abgabehalte werden dabei nicht verkürzt.
+
+`water_practice_upright_bounds.py` wertet dieselben FK-/Intervall-Jets in einer
+algebraisch zusammengefassten Form aus. Sie gilt nur für die ausdrücklich
+geprüfte Achsstruktur bei identisch ruhender J4. Pitch- und Yaw-Reste der
+tatsächlichen exportierten Quintikpolynome bleiben als Intervalle erhalten.
+Unabhängige Vergleiche mit der allgemeinen Sechsachs-FK prüfen Position und
+Ableitungen bis zum Ruck einschließlich nicht verschwindender Orientierungsreste.
+
 Der native Einstieg lautet im Checkout mit den benötigten CAD-Abhängigkeiten:
 
 ```sh
@@ -41,6 +56,14 @@ Armableitungen** ersetzt. Gelenkrahmen, nicht kamerabezogene Abmessungen und
 die übrigen Geometriequellen müssen weiterhin übereinstimmen. Es werden keine
 alten CAD-Prüfsummen auf neue Quellen umgeschrieben.
 
+Bei den benannten Kompositions-/Formeländerungen des aktuellen `master` prüft
+`water_practice_context.py` zusätzlich sämtliche numerischen Raumoperationen
+und alle L01-Instanztransformationen gegen den ursprünglichen Kontext. Die
+numerische Vergleichsauflösung beträgt 0,000001 mm. Nur die geometrisch gleiche
+Standardaufstellung darf so weiterverwendet werden; geänderte Geometrie oder
+andere Parametervarianten benötigen einen neuen Kontext. Originalpins und
+Äquivalenzbeleg werden getrennt im neuen Bericht erhalten.
+
 `exports/water-practice/l01/native-proof.json` dokumentiert die neue diskrete
 BRep-Prüfung der Arme und Pipetten gegen Laboreinrichtung, offene Gefäße und die
 anderen geparkten Arme. Positive Überschneidungen werden nicht als erlaubtes
@@ -61,7 +84,7 @@ node tests/check_water_practice_l01_player.cjs OUTPUT.html
 Der Renderer verlangt den zur unveränderten Basisanimation passenden Receipt
 und einen bestandenen aktuellen Wasser-Geometriebericht. Die bisherigen
 Transportmodi bleiben enthalten. Nur für die Browseransicht werden Armvertices
-auf einem 2-mm-Raster zusammengefasst; Pipettenspitzen und Gefäße bleiben davon
+auf einem 4-mm-Raster zusammengefasst; Pipettenspitzen und Gefäße bleiben davon
 ausgenommen. Die nativen Prüfkörper und Bewegungskurven bleiben unverändert. Im Wassermodus fahren keine Transporter in
 die reservierten Bench-Bereiche. Eine neue Personenbelegung stoppt die
 Darstellung; Abwahl allein löst den Halt nicht, eine erneute ausdrückliche
