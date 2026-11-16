@@ -106,6 +106,10 @@ Gleiche Kennung mit gleichen Argumenten und gleichem Principal liefert die
 gespeicherte Antwort ohne neues Ereignis. Eine andere Verwendung derselben
 Kennung wird abgelehnt. Weitere Transitionen tragen dieselben Korrelations-IDs;
 `command_finished` protokolliert den Abschluss. Ein RPC-Timeout ist kein Ergebnis.
+Die Request-Kennungen gelten serverweit über beide Features, alle an dieselbe
+ServerUUID gebundenen DNA-/Extraktionsläufe und Bootwechsel hinweg; ihr flüchtiger
+Index wird aus dem Root-Journal unter dem gemeinsamen Host-Mutex aufgebaut und
+vor jeder neuen Wirkung abgeglichen.
 
 Jede Ausnahme nach einer eigenen gespeicherten Quittung sperrt weitere Effekte
 des noch aktiven Laufs. Der Dienst versucht Halt und Abschluss im Root-Journal

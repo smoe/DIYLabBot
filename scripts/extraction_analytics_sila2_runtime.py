@@ -160,6 +160,7 @@ class ExtractionAnalyticsRuntime:
                     if name != 'ResumeRun' and (identity in self._fenced_runs or before['network']['boot_id'] != self.boot_id or self._sessions.get(identity) != before['session']):
                         raise TaskError('Explicit ResumeRun and reconciliation required')
                 elif name != 'CreateRun': raise TaskError('Create the explicitly identified extraction run first')
+                self.host._check_request_scope(journal, request, identity, MODE, fingerprint, principal)
                 context = {'request_id': request, 'fingerprint': fingerprint, 'command': name, 'arguments': args,
                     'principal': principal, 'server_uuid': self.server_uuid, 'boot_id': self.boot_id,
                     'execution_uuid': execution_uuid, 'clock': self.clock, 'transport': self.transport}

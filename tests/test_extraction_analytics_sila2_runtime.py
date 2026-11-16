@@ -93,24 +93,25 @@ class ExtractionAnalyticsSiLARuntimeTests(unittest.TestCase):
         for family,amount in [('dneasy',195.5),('puregene',95.5)]:
             with self.subTest(family=family):
                 self.run='SYN.Analytics.'+family
+                run_request='run.'+family
                 self.create(family)
                 if family=='dneasy':
                     # Inject precisely the crash window after terminal domain
                     # release and before its network completion receipt.
                     with patch.object(NetworkExtractionAnalyticsWorkflow,'finish_command',side_effect=OSError('Injected completion write loss')):
-                        with self.assertRaises(OSError):self.command('RunUntilDecision',request='run')
+                        with self.assertRaises(OSError):self.command('RunUntilDecision',request=run_request)
                     before=self.state()
                     self.assertEqual(before['status'],'completed')
-                    self.assertEqual(before['network']['commands']['run']['status'],'accepted')
+                    self.assertEqual(before['network']['commands'][run_request]['status'],'accepted')
                     self.command('ResumeRun',resume=True)
                     after=self.state()
-                    self.assertEqual(after['network']['commands']['run']['status'],'uncertain')
+                    self.assertEqual(after['network']['commands'][run_request]['status'],'uncertain')
                     for key in ('inventory','bookings','resources','status'):
                         self.assertEqual(after[key],before[key])
                     self.assertIsNone(after['session'])
                     replay_outcome='uncertain'
                 else:
-                    self.command('RunUntilDecision',request='run');replay_outcome='completed'
+                    self.command('RunUntilDecision',request=run_request);replay_outcome='completed'
                 report=self.runtime.report(self.run)
                 self.assertTrue(report['passed']);self.assertEqual(report['resources'],[])
                 product=next(key for key,m in report['inventory']['materials'].items() if m['kind']=='product')
@@ -121,7 +122,7 @@ class ExtractionAnalyticsSiLARuntimeTests(unittest.TestCase):
                 self.assertTrue(all(set(event)=={'sequence','kind','sha256','previous_sha256','time_unix_s'} for event in report['trace']))
                 self.assertEqual(report['wire_projection']['trace'],'metadata_only')
                 before=self.state()['bookings']
-                self.assertEqual(self.command('RunUntilDecision',request='run')['outcome'],replay_outcome)
+                self.assertEqual(self.command('RunUntilDecision',request=run_request)['outcome'],replay_outcome)
                 self.assertEqual(self.state()['bookings'],before)
 
     def test_resume_and_unknown_phase_keep_holds_until_explicit_resolution(self):

@@ -79,6 +79,10 @@ lesenden Bericht und die eigene gespeicherte Requestquittung prüfen;
 keinen neuen Request als automatische Wiederholung eines unklaren Effekts
 verwenden. Ein unveränderter Request desselben Principals liefert seine
 gespeicherte Quittung. Eine andere Verwendung derselben Kennung wird abgelehnt.
+Die Request-Kennungen gelten serverweit über beide Features, alle an dieselbe
+ServerUUID gebundenen DNA-/Extraktionsläufe und Bootwechsel hinweg; ihr flüchtiger
+Index wird aus dem Root-Journal unter dem gemeinsamen Host-Mutex aufgebaut und
+vor jeder neuen Wirkung abgeglichen.
 
 Eine Ausnahme nach eigener gespeicherter Quittung sperrt neue Effekte des
 aktiven Laufs. Halt und Abschluss werden bestmöglich im Root-Journal

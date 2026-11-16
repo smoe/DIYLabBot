@@ -58,8 +58,8 @@ class DNARuntime:
             self._sessions, self._cancellations = {}, {}
             self._fenced_runs = set()
             self._closed = threading.Event()
-            with Journal(self.journal_path):
-                pass
+            with self._mutex, Journal(self.journal_path) as journal:
+                self._rebuild_request_index(journal)
         except BaseException:
             self._lock_file.close()
             raise
@@ -67,6 +67,28 @@ class DNARuntime:
     def close(self):
         self._closed.set()
         self._lock_file.close()
+
+    def _rebuild_request_index(self, journal):
+        # This cache has no independent persistence. Rebuild under the shared
+        # host mutex, including both feature families and previous boots.
+        index = {}
+        for (run_id,) in journal.connection.execute('SELECT id FROM runs ORDER BY id'):
+            state = journal.get_current(run_id)[0]
+            binding = state.get('control') or {}
+            if binding.get('server_uuid') != self.server_uuid:
+                continue
+            for request, record in state.get('network', {}).get('commands', {}).items():
+                index.setdefault(request, []).append((run_id, binding.get('mode'),
+                    record['fingerprint'], record['principal']))
+        self._request_index = index
+
+    def _check_request_scope(self, journal, request, run_id, mode, fingerprint, principal):
+        # Re-read canonical receipts before each new mutation. A failed read
+        # rejects the command before any effect; stale cache entries are unused.
+        self._rebuild_request_index(journal)
+        expected = (run_id, mode, fingerprint, principal)
+        if any(entry != expected for entry in self._request_index.get(request, [])):
+            raise TaskError('Request identifier already used by another run, feature, arguments or principal')
 
     def _normalize(self, name, arguments):
         definition = next((c for c in self.profile['commands'] if c['name'] == name), None)
@@ -257,6 +279,8 @@ class DNARuntime:
                             'error': previous.get('error'), 'root_status': before['status']})
                 elif name != 'CreateRun':
                     raise TaskError('Create the explicitly identified run first')
+                self._check_request_scope(journal, request_id, run_id,
+                    self._binding()['mode'], fingerprint, principal)
                 context = {'request_id': request_id, 'fingerprint': fingerprint,
                     'command': name, 'arguments': args, 'principal': principal,
                     'server_uuid': self.server_uuid, 'boot_id': self.boot_id,
