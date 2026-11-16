@@ -133,8 +133,11 @@ class TaskPort:
 
     def cancel_task(self, actor_id, goal_id):
         def update(state):
-            record = state['task_port']['goals'][goal_id]
-            if record['status'] == 'observed': raise TaskError('Task observation is already committed')
+            port = state.get('task_port', {})
+            record = port.get('goals', {}).get(goal_id)
+            if (not record or port.get('pending_goal_id') != goal_id
+                    or record['status'] not in {'intended', 'dispatched', 'claimed'}):
+                raise TaskError('Only the open intended, dispatched or claimed task can be cancelled')
             record['status'] = 'cancel_requested'
             state['status'] = 'cancelling' if state['cancel_requested'] else 'held'
             state['recovery_required'] = 'task_cancel_requires_observation'
