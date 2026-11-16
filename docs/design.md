@@ -269,8 +269,8 @@ außerhalb dieses Armaufbaus.
 
 | Rolle | Vorläufiger Montagebereich | Bildaufgabe |
 |---|---|---|
-| C_tip, untere Armkamera | Vorläufig L6, auf der rotierenden Werkzeugseite von J6, seitlich am freien Flansch | Spitze, Gefäßöffnung und sichtbare Flüssigkeit bei der Feinanfahrt |
-| C_scene, obere Armkamera | Vorläufig L1, erhöhter Halter neben dem Schulterturm; dreht nur mit J1 | Breiter Blick auf Racks, Gefäße und die nächste Arbeitszone |
+| C_tip, untere Armkamera | Vorläufig L6, auf der rotierenden Werkzeugseite von J6, seitlich am freien Flansch | Finger und Gefäß am aktuellen Parallelgreifer; spätere Pipette benötigt eine eigene Ausrichtung |
+| C_scene, obere Armkamera | Vorläufig L1, erhöhter, seitlich auskragender Halter; dreht nur mit J1 | Breiter Blick auf Arbeitszone und seitliche Annäherungen für spätere Gefahrenerkennung |
 | C_station_*, stationäre Kameras | Feste Labor-/Stationshalter, zum Beispiel von oben und schräg auf einzelne Arbeitsplätze | Stabiler Stationsbezug und ergänzende Sicht bei Verdeckung |
 
 Der [visuelle Entwurf V01](../exports/vision/v01/camera-layout-v01.png) zeigt
@@ -288,9 +288,11 @@ Die [native Modellansicht V02](../exports/vision/v02/model-iso.png) zeigt die
 tatsächlich erzeugte Geometrie des Quellstands `fa7821d1ce02`, mit
 [Renderzuordnung](../exports/vision/v02/model-render.json). Anders als die
 historische Illustration V01 enthält der CAD-Aufbau weiterhin keine Pipette,
-Gefäße oder stationären Kameras. Die Achse der Nahkamera ist auf einen rein
-gedachten Spitzenpunkt 128 mm vor der Flanschstirnfläche ausgerichtet; nach
-Werkzeugauswahl ist diese Annahme zu ersetzen und die Sicht erneut zu prüfen.
+Gefäße oder stationären Kameras. Im historischen V02-Stand war die Achse auf einen rein
+gedachten Spitzenpunkt 128 mm vor der Flanschstirnfläche ausgerichtet. Die
+Greiferanordnung vom 16. November ersetzt diese Annahme, siehe unten.
+
+Historische Konzeptmaße von V02:
 
 | Bauraum / Sichtkegel | C_tip | C_scene |
 |---|---:|---:|
@@ -368,6 +370,40 @@ und elf Protokollstichproben einschließlich Kamera-/Halterbauräumen ohne erkan
 wurden zusätzlich bei Änderungen der Oberarmlänge, des Kameraabstands und
 der Kegellänge geprüft. 70 Offline-Tests bestanden. Vollständiger Bewegungsraum,
 optische Sichtbarkeit, FreeCAD-GUI und laufendes ROS/RViz sind nicht damit geprüft.
+
+### Ausrichtung auf den Greifer und die Arbeitszone, 16. November 2026
+
+`model/robot.json` richtet C_tip auf den Griffpunkt des bestehenden Parallelgreifers
+aus: 55 mm vor der Flanschreferenz. Die Optik liegt bei `[54, -55, flange_z + 10]` mm,
+seitlich und zum Handgelenk zurückgesetzt. Der seitliche Blick führt am
+Greifergehäuse vorbei zu beiden Fingern und dem Gefäß. Die Rückversetzung hält
+das Gehäuse beim Absenken aus dem Bereich benachbarter Rotorgefäße heraus.
+Bildoben weist zum Handgelenk. Ein anderes Werkzeug oder unabhängig geänderte
+Kameraabstände benötigen eine neue Ausrichtung; dies ist keine TCP-Kalibrierung.
+
+C_scene liegt bei `[80, -150, shoulder_z + 220]` mm auf einem seitlichen Mast
+an L1. Sie blickt aufrecht nach vorn und abwärts zum nominalen Punkt
+`[400, 0, shoulder_z + 60]` mm. Ihr breites Bild soll neben Zentrifuge, Rack und
+Arbeitsfläche auch Annäherungen an diese Arbeitszone erfassen. Damit wird der
+gewünschte Beobachtungsbereich modelliert; eine Gefahrenerkennung oder
+Schutzreaktion ist nicht implementiert. Der mit J1 gedrehte Blick besitzt
+weiterhin Verdeckungen und tote Winkel und deckt nicht die gesamte Umgebung ab.
+
+| Illustrative Optik | C_tip | C_scene |
+|---|---:|---:|
+| Kegellänge / ferner Radius | 145 / 110 mm | 300 / 600 mm |
+| Kreisförmiger Öffnungswinkel | 74,37° | 126,87° |
+| Horizontaler Bildwinkel bei eingeschriebenem 16:9-Bild | ca. 67° | ca. 120° |
+
+Der [Mediennachweis](media/robot-demo-cameras-aligned.provenance.json) bindet die
+neuen Kamerakörper an die unveränderte historische CF01-Bewegung. Die native
+Bewegungsprüfung schließt auch Kameras gegen benachbarte Armglieder und den
+Greifer ein. Die Browserprüfung vergleicht optische Rahmen mit der Python-FK
+und prüft die sichtbaren Pixel beider Finger und des Gefäßes bei Griff,
+Transport und Rackankunft. Das sind diskrete Geometrie- und Sichtprüfungen,
+keine reale Kamera-, Halter- oder Sicherheitsqualifikation. Frühere auf einen
+Robotquellstand gepinnte Aufstellungen benötigen vor einer Umstellung eigene
+Neubauten und Prüfungen; ihre alten Pins werden nicht automatisch ersetzt.
 
 ## Noch offene Konstruktion
 

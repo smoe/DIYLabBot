@@ -1,0 +1,555 @@
+{
+  "format": "solidcraftbot.camera-demo/2",
+  "scope": "Current camera geometry; unchanged historical non-camera geometry and compiled motion, newly checked native motion",
+  "base_media": {
+    "robot-demo-continuous-cfr.html": "7da5d83eb62d647927e17e9e4ea2a41cd070aa2651ddcc04392cd2580b4e3583",
+    "robot-demo-continuous-cfr.provenance.json": "161c34eded9887a2a5c13685e5dd2a60604042bd97577af1247b4ee3fca0755f"
+  },
+  "source_files_sha256": {
+    "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
+    "scripts/build_cf01_camera_demo.py": "2f5d61640fb73a2207d3ef5f73b3972db1b90205b2958befe24c298b3faa1254",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "scripts/templates/centrifuge_robot_pickup.html": "bf1f4ede7eafc083484420523997c184dded1d2afefbc3645bf2336b817a1fb1",
+    "scripts/templates/robot_demo_header.html": "b738bdba34a1688632891680041b8fb8ffaad9b2f077b2b8193b4da8a470e701",
+    "scripts/templates/quintic_motion.js": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30",
+    "scripts/templates/robot_camera_views.js": "faaef02de9a1c2d405e74a7375b6042c71f6b9406a9dece010c41009c19d95a5"
+  },
+  "compiled_program_canonical_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+  "geometry_canonical_sha256": "5fb5c0f76feadf5bc2899458afef5d0e4d5ae20b07ff79ded86efbd50c37ce71",
+  "body_count": 225,
+  "camera_views": [
+    {
+      "id": "C_scene",
+      "purpose": "awareness",
+      "mounted_link": "L1_Turret",
+      "status": "provisional",
+      "manufacturing_released": false,
+      "part": null,
+      "optical_frame": {
+        "r": [
+          0.4244338762307196,
+          -0.37343970545647753,
+          0.8248628195623473,
+          -0.9054589359588684,
+          -0.17504986193272384,
+          0.3866544466698503,
+          0.0,
+          -0.9109886564748837,
+          -0.41243140978117365
+        ],
+        "p": [
+          80.0,
+          -150.0,
+          370.0
+        ]
+      },
+      "cone_range_mm": 300.0,
+      "cone_far_radius_mm": 600.0,
+      "full_cone_angle_deg": 126.86989764584403,
+      "cone_is_collision_geometry": false,
+      "occlusion_checked": false,
+      "route_links": [
+        "L0_Base",
+        "L1_Turret"
+      ],
+      "required_joint_passages": [
+        "J1_BaseYaw"
+      ],
+      "physical_wiring_verified": false,
+      "calibration_verified": false,
+      "group": "Arm.L1_Turret"
+    },
+    {
+      "id": "C_tip",
+      "purpose": "tip",
+      "mounted_link": "L6_BareFlange",
+      "status": "provisional",
+      "manufacturing_released": false,
+      "part": null,
+      "optical_frame": {
+        "r": [
+          -0.7135639703685389,
+          0.4746588827604134,
+          -0.5152915730035986,
+          -0.7005900799982019,
+          -0.48344886207079135,
+          0.5248340095407024,
+          0.0,
+          0.7355108039852937,
+          0.6775129941343612
+        ],
+        "p": [
+          54.0,
+          -55.0,
+          780.0
+        ]
+      },
+      "cone_range_mm": 145.0,
+      "cone_far_radius_mm": 110.0,
+      "full_cone_angle_deg": 74.36941290646625,
+      "cone_is_collision_geometry": false,
+      "occlusion_checked": false,
+      "route_links": [
+        "L0_Base",
+        "L1_Turret",
+        "L2_UpperArm",
+        "L3_Elbow",
+        "L4_ForearmRoll",
+        "L5_WristPitch",
+        "L6_BareFlange"
+      ],
+      "required_joint_passages": [
+        "J1_BaseYaw",
+        "J2_Shoulder",
+        "J3_Elbow",
+        "J4_ForearmRoll",
+        "J5_WristPitch",
+        "J6_FlangeRoll"
+      ],
+      "physical_wiring_verified": false,
+      "calibration_verified": false,
+      "group": "Arm.L6_BareFlange"
+    }
+  ],
+  "html_sha256": "467a782113dfa261d82dbf2d546eecc8b7df3179b109a95b44c561e9a1a7d172",
+  "html_bytes": 1965765,
+  "camera_scene": {
+    "path": "exports/generated/cf01-camera-scene-report.json",
+    "sha256": "00cddae4583ff5cf81df6bbfad43c2803b9dff2e4d7bbc043f0190007b004b8d",
+    "report": {
+      "format": "solidcraftbot.cf01-camera-scene/1",
+      "passed": true,
+      "preview_only": false,
+      "camera_source_delta": {
+        "previous_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "current_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
+        "non_camera_source_equal": true,
+        "scope": "Only camera operations and exclusively camera parameters may differ; replace all camera bodies before motion validation"
+      },
+      "source_robot_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
+      "historical_provenance_sha256": "161c34eded9887a2a5c13685e5dd2a60604042bd97577af1247b4ee3fca0755f",
+      "mesh": {
+        "path": "exports/generated/cf01-cameras-978fa3557abc/scene-mesh.json",
+        "sha256": "2535ff0b0d31a62c136e1e0c6c72218fdf54535df5e7a4ffc717a9ce2f94c677"
+      },
+      "program_canonical_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+      "camera_body_ids": [
+        "Arm.C_scene_body_ENVELOPE",
+        "Arm.C_scene_lens_ENVELOPE",
+        "Arm.C_scene_mount_0_PROVISIONAL",
+        "Arm.C_scene_mount_1_PROVISIONAL",
+        "Arm.C_scene_mount_2_PROVISIONAL",
+        "Arm.C_tip_body_ENVELOPE",
+        "Arm.C_tip_lens_ENVELOPE",
+        "Arm.C_tip_mount_0_PROVISIONAL",
+        "Arm.C_tip_mount_1_PROVISIONAL",
+        "Arm.C_tip_mount_2_PROVISIONAL"
+      ],
+      "scope": "Current camera bodies in the frozen historical CF01 scene; unchanged arm mechanics and compiled motion",
+      "body_coverage": {
+        "total": 274,
+        "cameras": 10,
+        "sample_bodies": [
+          "ClosedCap01",
+          "ClosedCap02",
+          "ClosedCap03",
+          "ClosedCap04",
+          "ClosedCap05",
+          "ClosedCap06",
+          "ClosedCap07",
+          "ClosedCap08",
+          "ClosedCap09",
+          "ClosedCap10",
+          "ClosedCap11",
+          "ClosedCap12",
+          "Tube01",
+          "Tube02",
+          "Tube03",
+          "Tube04",
+          "Tube05",
+          "Tube06",
+          "Tube07",
+          "Tube08",
+          "Tube09",
+          "Tube10",
+          "Tube11",
+          "Tube12"
+        ],
+        "instrument_envelopes": [
+          "SYN.NanoDrop01.FingerGrip.FullHingeEnvelope",
+          "SYN.NanoDrop01.Lever.FullHingeEnvelope",
+          "SYN.NanoDrop01.UpperOpticalFace.FullHingeEnvelope",
+          "SYN.NanoDrop01.UpperProbe.FullHingeEnvelope"
+        ]
+      },
+      "native_motion": {
+        "path": "exports/generated/cf01-cameras-978fa3557abc/native-motion-validation.json",
+        "sha256": "25567cc8e34bed93518214db2d0362786bb80bfbde83de7aa85d2734e56f2871",
+        "passed": true,
+        "frames": 12082,
+        "collisions": 0,
+        "distance_failures": 0
+      },
+      "posed_models": [
+        {
+          "path": "exports/generated/cf01-cameras-978fa3557abc/CF01_Cameras_Grasp.FCStd",
+          "sha256": "254bf442c5fc30a583590dbc5bc6ae424e8c7a67f0a0d158f69e4ae8f8263635",
+          "time_s": 20.64918689198967,
+          "phase": "arm_loaded_transfer",
+          "owners": {
+            "Sample01": "gripper",
+            "Sample02": "rotor",
+            "Sample03": "rotor",
+            "Sample04": "rotor",
+            "Sample05": "rotor",
+            "Sample06": "rotor",
+            "Sample07": "rotor",
+            "Sample08": "rotor",
+            "Sample09": "rotor",
+            "Sample10": "rotor",
+            "Sample11": "rotor",
+            "Sample12": "rotor"
+          },
+          "active_sample_id": "Sample01",
+          "program_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+          "presentation": {
+            "passed": true,
+            "visible_final_bodies": 270,
+            "geometry_bytes_unchanged": true,
+            "gui_render_checked": false,
+            "method": "Saved native presentation metadata; no GUI process"
+          }
+        },
+        {
+          "path": "exports/generated/cf01-cameras-978fa3557abc/CF01_Cameras_Final.FCStd",
+          "sha256": "aead37aecac5a33146d168db5b268fee8444f9f945af84b44caaac83d67cfc5c",
+          "time_s": 99.67387816519029,
+          "phase": "preview_complete",
+          "owners": {
+            "Sample01": "rack",
+            "Sample02": "rack",
+            "Sample03": "rack",
+            "Sample04": "rotor",
+            "Sample05": "rotor",
+            "Sample06": "rotor",
+            "Sample07": "rotor",
+            "Sample08": "rotor",
+            "Sample09": "rotor",
+            "Sample10": "rotor",
+            "Sample11": "rotor",
+            "Sample12": "rotor"
+          },
+          "active_sample_id": "Sample03",
+          "program_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+          "presentation": {
+            "passed": true,
+            "visible_final_bodies": 270,
+            "geometry_bytes_unchanged": true,
+            "gui_render_checked": false,
+            "method": "Saved native presentation metadata; no GUI process"
+          }
+        }
+      ],
+      "generator_sha256": {
+        "scripts/build_cf01_camera_scene.py": "94e56b3f26ecb028ceb475e4d2fcd709ab337effd12b3c73e83ead2ee4e7ce8f",
+        "scripts/camera_revision.py": "64dd14dec3455a614d97a92127d075f6b489665e65ba2911e7a41da34ada7d70",
+        "scripts/check_cf01_unload_motion.py": "b01387e628764ce4ef724a40b95accb45d25b264b6493f829610c233d18da4ce"
+      }
+    }
+  },
+  "projection": "Illustrative 16:9 pinhole sensor inscribed in source circular cone, letterboxed on resize; optical +Z forward, +X right, +Y down; 0.5–5000 mm render clipping, no measured sensor range",
+  "occlusion": "Depth-tested opaque mesh surfaces, including robot, gripper and equipment; display cones excluded",
+  "limitations": [
+    "No calibrated intrinsics, distortion, focus, lighting or real camera data",
+    "Discrete native collision/clearance checks; no continuous collision guarantee or safety qualification",
+    "Wide-angle workspace observation is an intended use; no hazard detector or protective stop is implemented"
+  ],
+  "media": {
+    "html": {
+      "path": "docs/media/robot-demo-cameras-aligned.html",
+      "sha256": "467a782113dfa261d82dbf2d546eecc8b7df3179b109a95b44c561e9a1a7d172",
+      "bytes": 1965765
+    },
+    "video": {
+      "path": "docs/media/robot-demo-cameras-aligned.mp4",
+      "sha256": "525da4ba7cc9655c18ad5e70ebf52e5f4c392d71a3c1544eb46f60e6bfb6f3c2",
+      "bytes": 4122885
+    },
+    "poster": {
+      "path": "docs/media/robot-demo-cameras-aligned.png",
+      "sha256": "b8b8b8b327fcd286e7de37178e7234e42a1a0c58352aa1bf3a5d3a037e989ef3",
+      "bytes": 193606
+    }
+  },
+  "capture": {
+    "source_scene_sha256": "eb7510a525c3d6a8b45e70197abe597a0f87744988c81b0b7687c20f866a9216",
+    "source_duration_s": 99.67387816519029,
+    "video_target_duration_s": 99.7,
+    "screenshot_time_s": 20.65,
+    "mime": "video/mp4",
+    "frames": 1994,
+    "encoding": {
+      "codec": "libx264",
+      "pixel_format": "yuv420p",
+      "fps_mode": "cfr",
+      "fps": 20,
+      "frames": 1994,
+      "duration_s": 99.7,
+      "first_pts_s": 0,
+      "last_pts_s": 99.65
+    },
+    "frame_manifest_sha256": "88ce0106b243434e27ce9b69ef74a725848b3c060e57532a5ea3b4317a939d18",
+    "camera_ids": [
+      "C_scene",
+      "C_tip"
+    ],
+    "angle": "metal",
+    "playback_factor": 1.0002396203230335,
+    "ownership_checks": [
+      {
+        "time_s": 20.63918689198967,
+        "owner": "rotor",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 20.64918689198967,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2504445124263,
+        "owner": "gripper",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 32.2604445124263,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample01"
+      },
+      {
+        "time_s": 49.48878734264693,
+        "owner": "rotor",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 49.49878734264693,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.065727167540636,
+        "owner": "gripper",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 61.075727167540634,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample02"
+      },
+      {
+        "time_s": 78.29352784443284,
+        "owner": "rotor",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 78.30352784443285,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9513341579452,
+        "owner": "gripper",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 89.9613341579452,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      },
+      {
+        "time_s": 99.67387816519029,
+        "owner": "rack",
+        "sample_id": "Sample03"
+      }
+    ],
+    "errors": [],
+    "frame_manifest": "tmp/readme-video/robot-demo-cameras-aligned.frames.json",
+    "ffprobe": {
+      "codec_name": "h264",
+      "width": 920,
+      "height": 720,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "20/1",
+      "duration": "99.700000",
+      "nb_read_frames": "1994"
+    }
+  },
+  "browser_validation": {
+    "passed": true,
+    "html_sha256": "467a782113dfa261d82dbf2d546eecc8b7df3179b109a95b44c561e9a1a7d172",
+    "test_sha256": "d58f4ad49ea71c122f7becf21b22fef418701d3d7a72c6db80837b264d2130bb",
+    "angle": "metal",
+    "independent_fk_times": [
+      0,
+      5,
+      20.64818689198967,
+      20.64918689198967,
+      20.650186891989673,
+      25,
+      31.9,
+      32.2594445124263,
+      32.2604445124263,
+      32.261444512426294,
+      49.49778734264693,
+      49.49878734264693,
+      49.499787342646925,
+      50,
+      61.07472716754064,
+      61.075727167540634,
+      61.07672716754063,
+      78.30252784443284,
+      78.30352784443285,
+      78.30452784443285,
+      85,
+      89.9603341579452,
+      89.9613341579452,
+      89.96233415794521,
+      99.67387816519029
+    ],
+    "camera_count": 2,
+    "gripper_visibility": [
+      {
+        "sample_id": "Sample01",
+        "stage": "grasp",
+        "time_s": 20.659186891989673,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 654,
+        "overview_station_pixels": 16366,
+        "overview_bench_pixels": 2760,
+        "overview_rack_pixels": 0
+      },
+      {
+        "sample_id": "Sample01",
+        "stage": "transfer",
+        "time_s": 26.454815702207984,
+        "left_finger_pixels": 95,
+        "right_finger_pixels": 226,
+        "tube_pixels": 857,
+        "overview_station_pixels": 15889,
+        "overview_bench_pixels": 4281,
+        "overview_rack_pixels": 736
+      },
+      {
+        "sample_id": "Sample01",
+        "stage": "rack_arrival",
+        "time_s": 32.2504445124263,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 723,
+        "overview_station_pixels": 3408,
+        "overview_bench_pixels": 5762,
+        "overview_rack_pixels": 355
+      },
+      {
+        "sample_id": "Sample02",
+        "stage": "grasp",
+        "time_s": 49.508787342646926,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 653,
+        "overview_station_pixels": 16366,
+        "overview_bench_pixels": 2760,
+        "overview_rack_pixels": 0
+      },
+      {
+        "sample_id": "Sample02",
+        "stage": "transfer",
+        "time_s": 55.28725725509378,
+        "left_finger_pixels": 95,
+        "right_finger_pixels": 226,
+        "tube_pixels": 858,
+        "overview_station_pixels": 16166,
+        "overview_bench_pixels": 4141,
+        "overview_rack_pixels": 743
+      },
+      {
+        "sample_id": "Sample02",
+        "stage": "rack_arrival",
+        "time_s": 61.065727167540636,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 722,
+        "overview_station_pixels": 3797,
+        "overview_bench_pixels": 5769,
+        "overview_rack_pixels": 365
+      },
+      {
+        "sample_id": "Sample03",
+        "stage": "grasp",
+        "time_s": 78.31352784443285,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 652,
+        "overview_station_pixels": 16366,
+        "overview_bench_pixels": 2760,
+        "overview_rack_pixels": 0
+      },
+      {
+        "sample_id": "Sample03",
+        "stage": "transfer",
+        "time_s": 84.13243100118902,
+        "left_finger_pixels": 93,
+        "right_finger_pixels": 226,
+        "tube_pixels": 858,
+        "overview_station_pixels": 16426,
+        "overview_bench_pixels": 4029,
+        "overview_rack_pixels": 747
+      },
+      {
+        "sample_id": "Sample03",
+        "stage": "rack_arrival",
+        "time_s": 89.9513341579452,
+        "left_finger_pixels": 107,
+        "right_finger_pixels": 237,
+        "tube_pixels": 721,
+        "overview_station_pixels": 4213,
+        "overview_bench_pixels": 5766,
+        "overview_rack_pixels": 371
+      }
+    ],
+    "visibility_scope": "Sampled pixels with opaque occlusion; overview may exclude the rack during CF01 pickup. No all-around hazard coverage.",
+    "near_surface_occlusion_pixel": [
+      221,
+      0,
+      0,
+      255
+    ],
+    "captures": [
+      "tmp/camera-demo/checked-390-de.png",
+      "tmp/camera-demo/checked-390-en.png",
+      "tmp/camera-demo/checked-960-de.png",
+      "tmp/camera-demo/checked-960-en.png"
+    ],
+    "errors": []
+  },
+  "validation_sources_sha256": {
+    "scripts/export_readme_video.cjs": "eafb086c5049d0681e53fc06ba0854b90e755ea05557863cd562cc04dd3d47d8",
+    "tests/check_cf01_camera_views.cjs": "d58f4ad49ea71c122f7becf21b22fef418701d3d7a72c6db80837b264d2130bb",
+    "tests/test_cf01_camera_demo.py": "e98096544d47bb3df12514c8fe947a5c58a09670de89f21f2ff3f51334a83580",
+    "tests/check_readme_video_export.cjs": "8fb37446ea0d386f657add1538d7c0a5c3a467db5fffe32f6cb0a2b8552f1b20"
+  }
+}

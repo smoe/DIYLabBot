@@ -154,6 +154,10 @@ def adaptive_frames(program,evaluate,records):
 def pair_category(a,b,arm_indices):
     """Station internal interfaces are excluded; all twelve samples are not."""
     ak,bk=a['kind'],b['kind'];sa,sb=a.get('sample_id'),b.get('sample_id')
+    camera_roles={'camera_envelope','camera_mount'}
+    if a.get('role') in camera_roles or b.get('role') in camera_roles:
+        if ak==bk=='arm' and a['group']!=b['group']:return 'camera_other_arm_link'
+        if {ak,bk}=={'arm','gripper'}:return 'camera_gripper'
     if sa and sb:return None if sa==sb else 'different_samples'
     if sa or sb:return 'sample_environment'
     if ak==bk=='arm':return 'nonadjacent_arm' if abs(arm_indices[a['group']]-arm_indices[b['group']])>1 else None

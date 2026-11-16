@@ -147,7 +147,10 @@ def input_for(entry):
         if not report['passed'] or report['spec_sha256']!=sha(ROOT/'model/robot.json'):raise ValueError('Rebuild current robot first')
         model=project(report['artifacts']['solidcraft'])
         if sha(model)!=report['artifact_sha256']['solidcraft']:raise ValueError('Changed robot CAD')
-        return model,commands,None,{'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True}
+        cones=[op['body'] for link in robot.expanded(robot.load())['links'] for op in link['recipe'] if op.get('role')=='viewing_cone']
+        # Wide observation cones otherwise dominate auto-framing and hide the arm.
+        commands=[{'command':'browser.visibility','params':{'items':cones,'visible':False}}] if cones else []
+        return model,commands,None,{'build_report':rel(path),'build_report_sha256':sha(path),'build_passed':True,'hidden_visual_bodies':cones}
     if kind=='state':
         path=ROOT/'cad'/render['family']/'shared-build-report.json';report=read(path)
         if not report['passed'] or report['source_sha256']!=sha(ROOT/entry['sources'][0]):raise ValueError('Rebuild mobile base first')

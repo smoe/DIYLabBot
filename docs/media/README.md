@@ -1,6 +1,130 @@
 # README-Demo
 
-## Aktuelle Fassung: drei durchgehende Entnahmen bei offenem Deckel
+## Aktuelle Fassung: ausgerichtete Greifer- und Übersichtskamera
+
+[Video](robot-demo-cameras-aligned.mp4) und
+[interaktive Demo](robot-demo-cameras-aligned.html) zeigen den vollständigen Arm
+mit beiden synchronen Kamerabildern. Die Nahkamera ist seitlich zurückgesetzt
+und blickt auf den tatsächlichen Griffpunkt, 55 mm vor der Flanschreferenz.
+Beide Finger und das gegriffene Gefäß sind sichtbar. Die hintere Kamera sitzt
+auf einem auskragenden Mast, blickt aufrecht auf die Arbeitszone und besitzt
+etwa 120° horizontalen Bildwinkel. Sie soll später auch Annäherungen und
+Gefahrensituationen beobachten können. Bei der CF01-Entnahme liegt das Rack
+außerhalb ihres Bildes; bei der Rackankunft ist es sichtbar. Verdeckungen und tote Winkel bleiben;
+Gefahrendetektion oder eine Schutzreaktion sind nicht implementiert.
+
+Körper, Halter, optische Rahmen und Sichtkegel stammen gemeinsam aus
+`model/robot.json`. Der 16:9-Bildausschnitt bleibt beim Verkleinern des Fensters
+gleich. Physische Oberflächen verdecken einander auch dann, wenn die
+Gesamtansicht sie transparent zeichnet. Die Optik ist eine illustrative
+Lochkamera ohne kalibrierte Intrinsik, Verzeichnung oder reale Bilddaten.
+
+Die Bewegung und sämtliche übrigen Körper der historischen CF01-Szene bleiben
+bytegebunden erhalten. `camera_revision.py` erlaubt ausschließlich Änderungen
+an Kameraoperationen und nur dort verwendeten Parametern. Der native Build
+ersetzt sämtliche Kamerakörper einschließlich Halter und prüft die komplette
+Bewegung mit allen zwölf Gefäßen, Nachbargeräten und beweglichen Gruppen neu.
+Auch benachbarte Armglieder und der Greifer werden gegen die Kameras geprüft.
+Der bisherige 5-mm-Abstand zu Geräten wird beibehalten. Das sind adaptive,
+diskrete BRep-Prüfungen, kein kontinuierlicher Kollisions- oder Sicherheitsbeweis.
+
+Die Browserprüfung vergleicht 25 Kameraposen und Gefäßeigentümer mit der Python-FK.
+Sie prüft den Griffpunkt auf der optischen Achse und zählt tatsächlich sichtbare
+Pixel beider Finger und des Gefäßes in neun Griff-/Transport-/Ablageposen.
+Die Übersicht muss dabei die Arbeitsfläche und am jeweiligen Endpunkt
+Zentrifuge beziehungsweise Rack zeigen; fehlende Sicht auf das andere Gerät
+wird als Einschränkung protokolliert.
+Die Videoausgabe verwendet für beide Ansichten exakt dieselbe Modellzeit wie
+für die Gesamtansicht. 99,674 s Modellzeit werden mit 20 Bildern/s in 99,700 s
+wiedergegeben; der Faktor liegt gerundet bei 1×. Ein menschlicher Zeitvergleich
+bleibt offen. Die [Provenienz](robot-demo-cameras-aligned.provenance.json) bindet
+Geometrie, native Prüfung, Browserprüfung, Videoframes und fertige Medien.
+Der [Einbettungsnachweis](robot-demo-cameras-aligned.embed.json) bestätigt Upload
+und authentifizierten Abruf. Der anonyme Abruf lieferte weiterhin 404; der
+öffentliche README-Player bleibt ungeprüft. Die lokalen MP4-/HTML-Dateien sind
+oben zusätzlich verlinkt.
+
+Reproduktion benötigt die in der historischen Provenienz gepinnten lokalen
+CAD-/Build-Artefakte; ein frischer Checkout enthält diese nicht. Der Build
+verwendet aktuelle Kameras mit der historischen Umgebung und ist kein Neubau
+aller inzwischen geänderten Geräte- und Möbelquellen.
+
+Die direkte Roboteransicht der Modellgalerie ist erneuert; ihre breiten,
+nicht physischen Sichtkegel sind für eine lesbare Übersicht ausgeblendet.
+Andere Aufstellungen behalten ihre ausdrücklichen Pins auf den vorherigen
+Robotquellstand. Der globale Galerie-Check meldet deshalb weiterhin
+`Image dependency changed: model/robot.json`. Die Migration dieser Szenen
+einschließlich neuer Geometrie-/Bewegungsprüfungen ist ein separater Folgeschritt;
+der vollständige Galerie-Check wird hier nicht als bestanden ausgewiesen.
+
+```sh
+mkdir -p tmp/camera-alignment
+python3 - <<'PYTHON'
+import subprocess, sys
+sys.path.insert(0, 'scripts')
+from tool_paths import default_freecad_python
+from build_instrument_concepts import freecad_environment
+python = default_freecad_python()
+subprocess.run([python, 'scripts/build_cf01_camera_scene.py'],
+               env=freecad_environment(python), check=True)
+PYTHON
+python3 scripts/build_cf01_camera_demo.py
+node scripts/export_readme_video.cjs --input docs/media/robot-demo-cameras-aligned.html \
+  --output-base docs/media/robot-demo-cameras-aligned --record-seconds 99.7 --fps 20 \
+  --screenshot-time 20.65 > tmp/camera-alignment/capture.json
+node tests/check_cf01_camera_views.cjs
+python3 scripts/build_cf01_camera_demo.py \
+  --capture-report tmp/camera-alignment/capture.json \
+  --browser-report tmp/camera-demo/browser-validation.json
+```
+
+`SOLIDCRAFTBOT_FREECAD_PYTHON` überschreibt den erkannten FreeCAD-Interpreter.
+Playwright und Chrome über `SOLIDCRAFTBOT_PLAYWRIGHT` und
+`SOLIDCRAFTBOT_CHROME` angeben. Unter macOS verwendet `--angle metal` für den
+Export beziehungsweise `SOLIDCRAFTBOT_ANGLE=metal` für die Browserprüfung die
+Hardwarebeschleunigung. Ohne Playwright wird der Browserteil ausdrücklich
+übersprungen. `python3 scripts/build_models.py --ros2` erzeugt zusätzlich den
+Standardarm in beiden CADs und seine ROS-Daten aus derselben Quelle.
+
+## Historischer Kamera-Prototyp: ursprüngliche Blickrichtungen
+
+[Video](robot-demo-cameras.mp4) und [interaktive Demo](robot-demo-cameras.html)
+zeigen dieselben drei CF01-Entnahmen wie die Bewegungsquelle unten. Der gesamte
+Arm bleibt in der voreingestellten Gesamtansicht sichtbar. `C_scene` am
+drehbaren Sockel und `C_tip` am Werkzeugflansch sind farblich markiert; ihre
+Perspektiven werden gleichzeitig eingeblendet. Auf schmalen Bildschirmen stehen
+die beiden Kamerafenster untereinander.
+
+Die optischen Rahmen stammen aus `model/robot.json`, ausgewertet mit den
+280-/250-mm-Armlängen dieser Szene. Beide Bilder verwenden die aktuelle
+Gelenkstellung, Station und Gefäßzuordnung derselben Zeitachse. Eine illustrative
+16:9-Lochkamera wird in den jeweiligen Sichtkegel eingeschrieben. Das Bildfeld
+bleibt beim Verkleinern des Fensters gleich. Die Kegellänge beschreibt keine
+gemessene Sensorreichweite; die Darstellung begrenzt Tiefen auf 0,5–5.000 mm.
+
+Die Kamerabilder berücksichtigen Verdeckungen mit einem Tiefenpuffer. Auch die
+in der Gesamtansicht transparent gezeigten Gerätehüllen sind dort undurchsichtig.
+Das macht vorhandene Einschränkungen sichtbar: Die Sockelkamera blickt teilweise
+auf den eigenen Arm, und die enge Greiferkamera ist noch nicht auf den Greifpunkt
+dieses Werkzeugs abgestimmt. Kamerahalter und Optik bleiben vorläufig. Reale
+Bilddaten, Kalibrierung, Linsenverzeichnung, Schärfe, Beleuchtung und Objekterkennung
+sind nicht simuliert oder qualifiziert.
+
+Das Video läuft mit 20 Bildern/s über 99,700 s; die Modellzeit von 99,674 s
+wird bis auf die Bildrasterung in Echtzeit wiedergegeben. Der Wiedergabefaktor
+ist eingeblendet. Ein Vergleich mit menschlicher Durchführung ist weiterhin
+offen. Geometrie und kompiliertes Bewegungsprogramm sind gegenüber
+`robot-demo-continuous-cfr.html` unverändert. Dessen native Prüfnachweise und
+Grenzen bleiben maßgeblich; diese Erweiterung ist eine Darstellungsprüfung.
+Die [neue Provenienz](robot-demo-cameras.provenance.json) bindet die Quellen,
+Kamerarahmen, Medien und ausgeführten Prüfungen. Historische Medien bleiben erhalten.
+Der [Einbettungsnachweis](robot-demo-cameras.embed.json) enthält die GitHub-URL:
+Upload und authentifizierter Abruf sind bestätigt. Der anonyme Abruf lieferte
+bei der Prüfung für neues und bisheriges Video 404; die Wiedergabe im
+veröffentlichten README ist damit noch nicht bestätigt. Der MP4-Dateilink bleibt
+zusätzlich erhalten.
+
+## Bewegungsquelle: drei durchgehende Entnahmen bei offenem Deckel
 
 `robot-demo-continuous-cfr.html`, `robot-demo-continuous-cfr.mp4` und
 `robot-demo-continuous-cfr.png` zeigen Sample01–03 nach einem vollständigen

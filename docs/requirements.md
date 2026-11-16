@@ -334,6 +334,15 @@ und Halterbauräume sind geometrisch mitgeprüft; Sichtkegel sind ausdrücklich
 keine physischen Kollisionskörper. Optische Sichtbarkeit und reale Eignung
 der Halter sind damit nicht nachgewiesen.
 
+Ergänzung vom 16. November 2026: In der Greifer-/Zentrifugendemo muss die
+Nahkamera tatsächlich beide Finger und das gegriffene Gefäß beobachten.
+Die hintere Kamera soll aufrecht und weitwinklig über die Arbeitszone blicken,
+insbesondere als Grundlage für eine spätere Erkennung von Gefahrensituationen.
+Eine bloße Vergrößerung des Sichtfelds ist noch kein Gefahrendetektor. Die
+aktuelle Ausrichtung und simulierten Sichtprüfungen stehen im
+[Kameraentwurf](design.md#ausrichtung-auf-den-greifer-und-die-arbeitszone-16-november-2026);
+reale Beobachtungen, Latenzen, Detektion und Schutzreaktionen bleiben offen.
+
 ## Spitzenabwurf: Eigentümerwunsch vom 28. Oktober 2026
 
 Eine Sammelbox mit unterschiedlichen Abstreifnuten soll gebrauchte Spitzen von

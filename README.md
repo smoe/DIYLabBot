@@ -1,335 +1,161 @@
 # SolidCraftBot
 
-Ein sechsachsiger Laborroboter für ein universitäres Labor, entwickelt aus einer
-CAD-unabhängigen, maschinenlesbaren Konstruktionsbeschreibung. FreeCAD, SolidCraft
-und ROS 2/RViz sind daraus abgeleitete Darstellungen.
+**Robotik, die Zeit für Forschung schafft.**
 
-**Stand: CAD-Konzept A01, keine Fertigungsfreigabe.** Der erste Prototyp soll mit
-3D-Druckern und der Universitätswerkstatt entstehen; Budgetziel: 3.000–5.000 EUR.
-Tragfähigkeit, Steifigkeit, Präzision, Dosierleistung und Sicherheit sind noch
-nicht nachgewiesen. Die austauschbare Pipettenaufnahme ist zunächst außerhalb
-des CAD-Umfangs; die Armquelle endet an einem allgemeinen Flansch.
+Damit Robotik im Forschungslabor Akzeptanz findet, muss ihr Zweck deutlich
+werden: Es geht hier nicht um Hochdurchsatz. Roboter sollen diejenigen Arbeiten
+übernehmen, die Menschen nicht selbst erledigen müssen. So können Forschende
+in derselben Zeit nachdenken, Ergebnisse aufschreiben, Verfahren verbessern
+und mit Kolleginnen und Kollegen diskutieren.
 
-## Modelle entdecken
+Dieses Projekt bietet Modelle für unterschiedliche Roboter. Sie sehen
+verschieden aus, weil sie verschiedene Dinge können. Ihr Zusammenspiel bildet
+biologische Workflows im Modell ab. Dabei soll ihre Arbeitsweise so menschlich
+wie möglich sein: weitgehend dieselben Werkzeuge, dieselben Gefäße und dieselbe
+Arbeitsumgebung, die wir auch selbst verwenden.
 
-[**Zur Modellgalerie →**](docs/models/README.md) · Baugruppen, Varianten und Abläufe mit Bildern und Quellenlinks.
+Die Roboter sollen dabei **„Self-Aware“** sein: ihren eigenen Zustand und ihre
+Fähigkeiten kennen, die Ergebnisse ihrer Handlungen überprüfen und Fehler
+erkennen können. Wenn eine Probe fehlt, ein Griff misslingt oder eine Übergabe
+unklar bleibt, sollen sie das bemerken und Unterstützung anfordern können.
+Diese Rückmeldung gehört zum Entwicklungsziel ebenso wie die Bewegung selbst.
 
-| 1 · Arbeitsumgebung | 2 · Möbeltypen | 3 · Möblierung | 4 · Geräteausstattung |
-|---|---|---|---|
-| <a href="docs/models/README.md#umgebungen"><img src="docs/models/images/l01-geometry.png" alt="L01-Raumgeometrie" width="180"></a> | <a href="docs/models/README.md#moebeltypen"><img src="docs/models/images/furniture-storage-bench.png" alt="Wiederverwendbarer Banktyp" width="180"></a> | <a href="docs/models/README.md#moeblierung"><img src="docs/models/images/l01-furnished.png" alt="L01 mit Möblierung" width="180"></a> | <a href="docs/models/README.md#ausstattung"><img src="docs/models/images/l01-overview.png" alt="L01-Gesamtansicht mit Nassplatz, Abzug und Geräten" width="180"></a> |
+Wir wollen unsere Roboter **selbst bauen, verändern und reparieren können**.
+Eine Ausstattung mit vielen Robotern für unterschiedliche Aufgaben wäre für uns
+sonst kaum finanzierbar. Eigenbau gibt uns die Möglichkeit, die Technik an unsere
+Forschung anzupassen und dabei weniger oder wenigstens andere Kompromisse
+einzugehen. Vorhandene Werkzeuge, 3D-Drucker und die Universitätswerkstatt sind
+dafür wichtige Voraussetzungen.
 
-Die Galerie verbindet die vier Ebenen mit den einzelnen Konstruktionen und der
-synthetischen Testumgebung. CAD-Ansichten und schematische Pläne sind benannt.
+Unser Ziel ist, biologische Workflows zunächst vollständig am Rechner
+modellieren und erproben zu können. Deshalb beschreiben wir neben den Robotern
+auch die Geräte, Materialien, Abläufe und die gemeinsame Arbeitsumgebung.
 
-Die vier Ebenen beschreiben die Gliederung innerhalb eines Labors. **Das
-Gebäude bildet eine weitere Ebene darüber:** Es ordnet Labore, Flure und
-Übergabeorte räumlich ein. Im Zielmodell können dieselben Laborfähigkeiten
-auch über mehrere Labore oder Standorte verteilt sein.
+## Unser Laborroboter
 
-Transportwege und Transportressourcen bleiben austauschbar, solange fachliche
-Randbedingungen, Proben- und Gefäßidentität sowie bestätigte Übergaben erhalten
-bleiben. Ein menschlicher Bote kann Transporte asynchron ausführen. Der
-Gesamtablauf kann vollständig abgeschlossen sein, wenn alle vorgesehenen
-Arbeiten, Transporte und Buchungen quittiert sind; der Transport muss dafür
-nicht vollständig automatisiert sein.
+Der sechsachsige Laborarm ist unser erster Roboterentwurf. Unterschiedliche
+Werkzeuge sollen ihn für die Handhabung von Gefäßen, das Pipettieren und die
+Bedienung von Laborgeräten einsetzbar machen. Die Armkonstruktion endet an einem
+allgemeinen Werkzeugflansch; die Pipettierfunktion ist noch zu entwickeln.
 
-```mermaid
-flowchart LR
-    LA["Labor A · Arbeitsschritt"] -->|"Abholung quittiert"| T["Asynchroner Transportauftrag<br/>Bote oder Roboter"]
-    T -->|"Ankunft quittiert"| LB["Labor B · nächster Arbeitsschritt"]
-```
+Zum Zusammenspiel gehören auch der [Probentransporter TR01](docs/sample-transport-tr01.md),
+der Racks zwischen Arbeitsplätzen befördern soll, und spezialisierte Stationen
+wie die [Zentrifuge CF01](docs/centrifuge-cf01.md). Diese verschiedenen
+Konstruktionen und ihre Aufgaben zeigt die [Modellgalerie](docs/models/README.md#baugruppen).
 
-Dieses Schema beschreibt das Zielmodell. Der vorhandene CF01–NanoDrop–Qubit-Lauf
-prüft Identitäten und Abschluss bislang lokal und synthetisch mit seriellen
-Stufen. Eine allgemeine laborübergreifende Botenkoordination und reale
-Transportadapter sind noch zu integrieren.
+**Stand: CAD-Konzept, keine Fertigungsfreigabe.** Für den ersten begrenzten
+Armprototyp liegt das Budgetziel bei 3.000–5.000 EUR. Tragfähigkeit, Präzision,
+Dosierleistung und Sicherheit müssen am realen Aufbau nachgewiesen werden.
 
-### Keller, vier Geschosse und vertikaler Austausch
+### Roboter in Bewegung
 
-[![Y/Z-Prinzipprojektion mit Keller und vier oberirdischen Geschossen](docs/models/images/building-stack.svg)](docs/building-stack.md)
+https://github.com/user-attachments/assets/433efc9b-b910-42ef-aa4d-9ce2ba1704d3
 
-Eigene Keller- und EG-Geometrien sowie drei Instanzen der F03-Vorlage zeigen das Gebäude mit
-angenommenen **4 m lichter Höhe**. Im EG ist der Atriumboden geschlossen; darüber
-bleibt der Luftraum zwischen den Geschossen offen und wird oben vom Glasgewölbe
-geschlossen. Das um 90° gedrehte Glasgewölbe überdeckt auch alle vier
-umlaufenden Flure. Blau markiert die Idee eines automatisierten Austauschs
-zwischen Geschossen. [Native Gesamtansicht](docs/media/building-stack-overview.png),
-[Blick in den Luftraum](docs/media/building-stack-atrium.png) und
-[Antragsbilder mit Annahmen und Prüfgrenzen](docs/building-stack.md).
-Der [alleinstehende Aufzug, das rechte innere Treppenhaus und die äußere Metalltreppe](docs/media/building-stack-circulation.png)
-sind getrennt dargestellt. Aufzug und innere Treppe reichen vom Keller bis ins
-3. OG, die Außentreppe vom Dach bis zum Boden. Die [Kellerhöhe](docs/basement-kg.md)
-verwendet vorläufig denselben angenommenen Geschossabstand.
-Der Aufzug besitzt im EG beide Türseiten, darüber nur die äußere Flurseite und im KG nur die innere Seite.
-[EG mit Seminarraum und verlegten Toiletten](docs/ground-floor-eg.md) ·
-[Gewölbtes Glasdach und Dachumrandung](docs/media/building-stack-roof.png).
-Horizontale Maße und technische Details bleiben vorläufige Darstellungsannahmen.
-[Glasfront, holzfarbene Raumtüren und offene Metallgeländer](docs/building-exterior.md)
-folgen den privaten Referenzfotos. Ein schematischer Gelände-Schnittkasten auf
-EG-Höhe macht den Keller in der Gesamtansicht als unterirdisch erkennbar.
+Die Simulation zeigt das Zusammenspiel von Arm, Zentrifuge und Rack: Drei
+Proben werden nacheinander entnommen und in ihre ursprünglichen Rackplätze
+zurückgebracht. Vom bestätigten Griff bis zur Ablage bewegt sich jedes Gefäß
+auf einer durchgehenden Bahn. Der Deckel bleibt während der drei Entnahmen offen;
+die dabei verwendete offene Rotorindexierung ist eine gesonderte Simulation.
 
-[![Labor 3.003 im Gebäudekontext](docs/media/building-stack-lab-3-003.png)](docs/building-stack.md)
+Beide Armkameras zeigen ihre simulierten Bilder synchron zum Ablauf: Die
+Greiferkamera blickt auf Finger und Gefäß. Die hintere Übersichtskamera erfasst
+mit etwa 120° horizontalem Bildwinkel die Arbeitszone und ihre Zugänge – als
+Grundlage für eine spätere Gefahrenerkennung. Verdeckungen bleiben sichtbar;
+reale Optik und Gefahrendetektion sind noch zu entwickeln. Das Video zeigt
+rund 100 Sekunden Modellzeit bei 1× Wiedergabe.
 
-**Orange: Labor 3.003 im 3. OG**, das räumliche Gegenstück des L01-Modells.
-Die Ansicht hebt den referenzierten Raum im Gesamtgebäude hervor. Die
-maßstäbliche Einpassung der separat beschriebenen L01-Einrichtung bleibt offen.
+Roboter sollen zügig arbeiten und Menschen tatsächlich Zeit verschaffen.
+Getragene Proben benötigen dabei fließende Bewegungen mit begrenzter
+Beschleunigung und begrenztem Ruck. Die gezeigte Bahn ist im Modell geprüft;
+reale Sensorik, Fehlerreaktionen und Hardwarebetrieb bleiben zu entwickeln.
+
+[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) ·
+[Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) ·
+[Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
+[Modellstand und Herkunft der Medien](docs/media/README.md)
+
+Ein weiteres Beispiel ist die [direkte Entnahme aus H02 mit Ablage im Rack](docs/h02-rack-transfer.md).
+Hier greift ein Arm derselben Konstruktion ein Gefäß aus seinem offenen Halter und setzt es
+zwischen bereits belegten Rackplätzen ab. Der vollständige Weg einschließlich
+Greiferöffnung und Rückzug ist für beide Gefäßvarianten in FreeCAD und
+SolidCraft geprüft.
+
+## Die gemeinsame Arbeitsumgebung
+
+Ein Workflow braucht mehr als erreichbare Geräte: Gefäße müssen bereitstehen,
+Werkzeuge zugänglich sein und Proben zwischen Arbeitsplätzen wechseln können.
+Das Modell unserer Arbeitsumgebung hilft, diese Zusammenhänge schon am Rechner
+zu untersuchen und die Aufgaben zwischen Menschen und Robotern aufzuteilen.
+
+Der [Laborraum L01 mit Möbeln und Geräten](docs/lab-layout-l01.md) beschreibt
+einen Arbeitsplatz im Detail. Das [Gebäudemodell](docs/building-stack.md)
+ergänzt Labore, Flure, Büros und Aufenthaltsbereiche. Auch Denk- und
+Schreibplätze und die Küche gehören zu diesem Forschungsalltag. Die
+[Modellgalerie](docs/models/README.md) führt durch Räume, Möbel, Geräte und ihre
+Aufstellungen. Gebäudeabmessungen sind teilweise Darstellungsannahmen;
+reale Transportwege müssen gesondert geprüft werden.
 
 ### Interaktiver Gebäuderundgang
 
 [![Gebäuderundgang starten – Blick in das Atrium](docs/media/atrium-accesses.png)](https://smoe.github.io/DIYLabBot/)
 
 [**Gebäuderundgang im Browser starten →**](https://smoe.github.io/DIYLabBot/)
-Doktorandenraum, Labor, Küche, Atrium und Kernbereich frei erkunden – ohne
-CAD-Installation. Das Vorschaubild öffnet die interaktive GitHub-Pages-Seite.
-Der erste Aufruf lädt etwa 37 MB; WebGL 2 wird benötigt.
+
+Doktorandenraum, Labor, Küche und Atrium lassen sich ohne CAD-Installation
+besichtigen. Der erste Aufruf lädt etwa 37 MB; WebGL 2 wird benötigt.
 [Bedienung, Modellquellen und Prüfgrenzen](docs/building-walkthrough.md).
 
-## Roboter in Bewegung
+## Biologische Workflows gemeinsam ausführen
 
-https://github.com/user-attachments/assets/919b9436-0b45-4b2e-9ed1-2584da67b06f
+Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält
+ihre Identität über Entnahmen, Messungen und Transporte hinweg; ihre Übergaben
+und verbrauchten Mengen werden dokumentiert. Menschliche Arbeitsschritte und
+Botengänge gehören ausdrücklich dazu. So lässt sich ein Ablauf schrittweise
+automatisieren.
 
-[Kurzes Video ansehen](docs/media/robot-demo-continuous-cfr.mp4) ·
-[Interaktive Demo herunterladen](docs/media/robot-demo-continuous-cfr.html) ·
-[Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
-[Modellstand und Herkunft](docs/media/README.md) ·
-[Einbettungsnachweis](docs/media/robot-demo-continuous-cfr.embed.json)
+Bereits ausführbare **synthetische Softwareabläufe** zeigen beispielsweise:
 
-Die Szene wird aus einer synthetischen, unbegrenzten Umgebung mit einer
-Referenzbank abgeleitet. Sie zeigt **drei aufeinanderfolgende Entnahmen** nach
-einem Zwölferlauf: Sample01–03 gelangen in ihre ursprünglichen Rackplätze,
-neun Gefäße bleiben im Rotor. Eine Detailansicht zeigt den vorhandenen
-16-mm-Hub entlang der Gefäßachse, bevor der Greifer zugreift.
+- [Zentrifugieren, NanoDrop und Qubit 4](docs/synthetic-lab-workflow.md) mit
+  gemeinsamem Probenbestand und nachvollziehbaren Entnahmen.
+- [DNA-Extraktion mit NanoDrop, Qubit und TapeStation](docs/extraction-analytics.md)
+  von der Ausgangsprobe bis zur Bewertung des erhaltenen DNA-Produkts.
+- [Asynchronen Labortransport](docs/async-lab-transport.md) mit bestätigten
+  Übergaben und ausdrücklichem Abgleich bei unklaren Ergebnissen.
 
-Vom bestätigten Griff bis zur Rackablage fährt das getragene Gefäß ohne
-Zwischenhalt: axiale Entnahme, gerundeter Transit und vertikale Ablage gehören
-zu einer gemeinsamen glatten Bahn. Der Deckel bleibt zwischen den drei
-Entnahmen offen und schließt erst nach der letzten Freigabe und dem
-Heberrückzug. Eine ausdrücklich aktivierte Simulatorerweiterung erlaubt dafür
-die langsame Rotorindexierung bei offenem, gehaltenem Deckel; der bestehende
-Stationsvertrag bleibt unverändert.
+Diese Abläufe verwenden Testdaten und simulierte Rückmeldungen. Sie erlauben,
+Prozesslogik und Fehlerfälle zu untersuchen; reale Gerätebedienung und biologische
+Ergebnisse benötigen eigene Nachweise. Die automatische Zuordnung einer
+biologischen Versuchsabsicht zu geeigneten Robotern und Geräten bleibt ein
+[Entwicklungsziel](ARCHITECTURE.md#sila-fähigkeiten-und-gentle-ressourcenbindung).
 
-Auch leere Fahrten und Raumsondierung sollen fließen: Ein Wegpunkt ist kein
-Haltepunkt. Warten ist nur mit einer benannten Bedingung vorgesehen, etwa auf
-den Heber, das Greifen oder die bestätigte Ablage. Eine zusätzliche Pause zur
-Vorführung des angehobenen Gefäßes entfällt. Das Video wird aus gleichmäßig
-verteilten Modellzeiten mit festen 20 Bildern pro Sekunde erzeugt.
+## Mitentwickeln
 
-Geschwindigkeit, Beschleunigung und Ruck bleiben durch dieselben vorläufigen
-Grenzen beschränkt; Position, Geschwindigkeit und Beschleunigung sind stetig.
-Das Programm enthält 3.876 Armknoten und dauert 99,674 s: rund 13,2 % weniger
-Modellzeit als die ältere Fassung mit Deckelzyklen je Probe.
-Vom ersten Griff bis zur bestätigten Rackabstützung sind es 11,611 s,
-gegenüber 11,731 s in der älteren Fassung mit Zwischenhalten. Ein beschleunigter Videoclip ändert die
-Programmzeit nicht. Die erste durchgehende Fassung dauerte insgesamt 80,759 s;
-die jetzt ebenfalls verrundeten leeren Fahrten benötigen bei denselben
-Gelenkgrenzen mehr Modellzeit. Die beladene Fahrt bleibt unverändert; globale
-Zeitoptimalität ist nicht nachgewiesen.
-Biologische Belastbarkeit, Flüssigkeitsbewegung und reale
-Antriebsgrenzen sind noch nicht bestimmt;
-die vorläufigen Grenzwerte sind keine Freigabe für biologische Proben.
+Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen.
+FreeCAD und SolidCraft erzeugen daraus unabhängig ihre Modelle; ROS 2/RViz
+nutzt daraus abgeleitete Roboterbeschreibungen und vorbereitete Armprogramme.
+Änderungen sollen so in Konstruktion, Bewegungsprüfung und Ablaufmodell
+nachvollziehbar bleiben.
 
-Die HTML-Datei lokal öffnen: Wiedergabe, Zeitschieber, automatische Hubansicht
-und Deutsch/Englisch funktionieren ohne CAD-Installation oder Netzwerk.
-Die Bewegungsansicht besitzt eine eigene Zeitachse. Sie ruft weder den
-Chargenrunner noch Geräte oder Hardware auf. Der vollständige lokale
-**Rack → CF01 → Rack-Lauf für zwölf Proben** bleibt separat ausführbar.
-Ein Transporter hat das Rack bereitgestellt; seine Fahrt und die native
-Ladebahn sind nicht dargestellt. Bisherige Medien bleiben als historische
-Fassungen mit eigener Provenienz erhalten.
+Für den Einstieg:
 
-Die offene Indexierung ist ausschließlich eine zusätzliche Simulation. Sie
-ist weder ein neuer ROS-/SiLA-Befehl noch eine Ausführung des bisherigen
-Chargenrunners oder des gemeinsamen Laborworkflows. Eine sensorabhängige
-Abbruch- und Rückführstrategie des Armprogramms ist noch nicht implementiert.
-
-```sh
-python3 scripts/run_cf01_rack_batch.py
-python3 scripts/run_cf01_rack_batch.py --transport sila2
-```
-
-Die Transportauswahl prüft lokale ROS-/SiLA-Vertragsdecoder, keine Netzwerkserver.
-Massen, Laufzeiten und Qualifikationswerte sind ausdrücklich fiktive Testdaten.
-Eine native Ladebahn und Hardwarebetrieb sind damit nicht nachgewiesen.
-
-Für echte TLS/gRPC-Kommunikation mit dem CF01-Simulator gibt es zusätzlich den
-[SiLA-2-Netzwerkeinstieg](docs/sila2-network.md). Er verwendet denselben
-Chargenrunner, einen separaten v2-Vertrag und ein dauerhaftes Übergabejournal.
-Die Anleitung führt durch Anmeldung, Serverstart und Netzwerk-Chargenlauf auf
-Deutsch und Englisch; historische Medien bleiben unverändert.
-
-```mermaid
-flowchart TB
-    Q["Gemeinsame CAD-unabhängige Quellen<br/>Modelle, Schnittstellen und Protokolle"]
-    Q --> F["FreeCAD<br/>Konstruktion und Prüfung"]
-    Q --> S["SolidCraft<br/>Konstruktion und Prüfung"]
-    Q --> R["ROS 2 / RViz<br/>Armprogramm über Trajektorienschnittstelle"]
-    Q --> W["DIYLabBot<br/>synthetischer Gesamtlauf und Inventar"]
-    Q --> C["Separater CF01-Netzwerk-Chargenrunner"]
-    C -->|"TLS/gRPC geprüft"| I["SiLA 2<br/>CF01-Simulator"]
-    W -.->|"Gesamtlauf-Anbindung geplant"| R
-    W -.->|"Netzwerkintegration geplant"| I
-    G["GENtle · Zielbild<br/>biologische Versuchsabsicht"] -.->|"Fähigkeitsbindung geplant"| W
-    R -.->|"Hardwaretreiber geplant"| H["Reale Roboter und Geräte<br/>Anbindung und Qualifikation offen"]
-    I -.->|"Gerätehardware geplant"| H
-```
-
-FreeCAD und SolidCraft erzeugen ihre Modelle unabhängig aus denselben Quellen.
-**Die gezeigte Armbewegung ist bereits für die ROS-Trajektorienschnittstelle
-programmiert.** Der
-[Exporter](scripts/export_cf01_unload_ros2.py) übernimmt dieselben
-Gelenkpositionen, Geschwindigkeiten und Beschleunigungen für die quintische
-Interpolation des vorhandenen `FollowJointTrajectory`-Clients.
-Exportiert wird der Armkanal; Greifer und CF01 benötigen eigene Steuerkanäle.
-Vor Ausführung müssen Roboterbeschreibung, 280/250-mm-Armvariante, Aufstellung
-und Werkzeugbezug übereinstimmen; der Client prüft diese Geometriebindung nicht.
-ROS-Laufzeit und Hardwareausführung sind ungeprüft; reale Kollisions-, Sensor-,
-Qualitäts- und Schutzrückmeldungen bleiben einzubinden. Beim separaten
-CF01-Chargenrunner ist dagegen TLS/gRPC zum Simulator geprüft. Gestrichelte
-Verbindungen sind geplant; der gemeinsame CF01–NanoDrop–Qubit-Ablauf arbeitet
-bislang lokal und synthetisch. Export und Datenprüfung ohne ROS-Installation:
-
-```sh
-python3 scripts/export_cf01_unload_ros2.py
-PYTHONPATH=ros2_ws/src/solidcraftbot_ros python3 -m solidcraftbot_ros.demo \
-  --config exports/generated/cf01-unload-ros2/scenarios.json \
-  --scenario cf01_unload_three_samples --dry-run
-```
-
-Biologische Versuche sollen im Zielbild in GENtle oder einem anderen
-Versuchsplaner gepflegt werden: wissenschaftliche Absicht, Proben- und
-Materialsemantik, benötigte Fähigkeiten, Randbedingungen und Freigabe.
-DIYLabBot führt die operative Umsetzung mit Gefäßidentitäten, Orten, Verbrauch
-und Reservierungen. Ein anderer Roboter erhält eine passende Modellbeschreibung
-und operative Anbindung; die biologische Absicht soll über benötigte Fähigkeiten
-wiederverwendbar bleiben. Diese automatische Fähigkeits- und Ressourcenbindung
-ist noch nicht implementiert; Einzelheiten stehen in
-[ARCHITECTURE.md](ARCHITECTURE.md#sila-fähigkeiten-und-gentle-ressourcenbindung).
-
-## Quellen und lokale Ausgaben
-
-Aktive Textquellen verwenden LF im Repository und auf allen Rechnern beim
-Auschecken; `.gitattributes` schaltet lokale CRLF-Konvertierung ausdrücklich ab.
-Herstelleroriginale, Historie, Test-Fixtures und die historischen README-Medien
-bleiben bytegenau erhalten. Die einmalige Umstellung steht im
-[Migrationsbericht](docs/line-ending-migration.json). Dessen Prüfsummen gehören
-zum damaligen Migrationsstand; spätere fachliche Änderungen erzeugen neue
-Quellstände. Alte Build-Prüfsummen und Bilder bleiben historische Nachweise.
-
-
-Versioniert werden Konstruktionsabsicht, Generatoren, Dokumentation, Tests und
-Laufzeitcode. Eigene FreeCAD-/SolidCraft-Dateien, STEP-/Mesh-Exporte,
-Build-Berichte und Arbeitsrenderings werden lokal erzeugt und ignoriert.
-Die kleine, bewusst ausgewählte README-Demo unter `docs/media/` ist die Ausnahme.
-
-| Inhalt | Maßgeblicher Ort |
-|---|---|
-| Arm, Parameter, Gelenke, Protokolle und Schnittstellen | `model/` |
-| Gemeinsame Ableitung und CAD-/ROS-Adapter | `scripts/` |
-| Unveränderte Herstellerdaten und registrierte, prüfsummengebundene Bibliothek | `cad/vendor/` |
-| ROS-Laufzeitcode, Launch-Dateien und Paketvorlagen | `ros2_ws/src/solidcraftbot_ros/` |
-| Kleine, festgehaltene Geometriereferenzen für Regressionen | `tests/fixtures/` |
-| Lokale Modelle | `cad/generated/` und Baugruppenordner unter `cad/` |
-| Lokale Prüfberichte und Exporte | `exports/` und Baugruppenordner unter `cad/` |
-| Lokale Renderings | `renders/` |
-| Generierte ROS-Beschreibungen, Konfiguration und Netze | `ros2_ws/src/solidcraftbot_ros/{urdf,config,meshes}/` |
-
-Die Herstellerbibliothek bleibt vorerst vollständig als Build-Eingabe erhalten:
-`model/robot.json` und die Adapter referenzieren ihre registrierten Teilgeometrien
-über SHA-256. Sie ist keine zweite führende Quelle für unsere Armkonstruktion.
-Native CAD-Änderungen müssen in gemeinsame Quelle oder Generator zurückgeführt
-und anschließend neu abgeleitet werden.
-
-## Erzeugen und prüfen
+- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und
+  [Entwicklungsplan](docs/development-plan.md).
+- [Architektur](ARCHITECTURE.md) und [gemeinsames Modell](docs/shared-model.md).
+- [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und
+  [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
 
 ```sh
 python3 -m unittest discover -s tests -v
-python3 scripts/tool_paths.py          # zeigt die gefundenen CAD-Laufzeiten
+python3 scripts/tool_paths.py
 python3 scripts/build_models.py --ros2
 ```
 
-Die beiden CF01-SolidCraft-Prüfstellungen lassen sich unabhängig von FreeCAD
-direkt aus den gemeinsamen Quellen erzeugen:
+Quell- und Kinematiktests laufen ohne CAD; Prüfungen noch nicht erzeugter
+CAD-/ROS-Ausgaben werden übersprungen. Für den Modellaufbau müssen FreeCAD und
+SolidCraft CLI lokal installiert sein. Optionen und Umgebungsvariablen für die
+Laufzeiten beschreibt [tool_paths.py](scripts/tool_paths.py).
 
-```sh
-python3 scripts/export_centrifuge_robot_pickup_solidcraft.py
-```
-
-Der [native CF01-Adapter](docs/centrifuge-cf01-robot-pickup.md#independent-solidcraft-build-and-importer-workaround)
-umgeht den dokumentierten STEP-Importfehler. Die historische Medien-Provenienz
-bleibt als damaliger Prüfstand erhalten.
-
-Python, FreeCAD mit importierbarem `FreeCAD`/`Part` und SolidCraft CLI müssen lokal
-vorhanden sein. Alle Generatoren finden die Laufzeiten über
-[`scripts/tool_paths.py`](scripts/tool_paths.py), in dieser Reihenfolge:
-`--freecad-python`/`--solidcraft-cli`, dann die Umgebungsvariablen
-`SOLIDCRAFTBOT_FREECAD_PYTHON`/`SOLIDCRAFTBOT_SOLIDCRAFT_CLI`, dann
-`solidcraft-cli` im `PATH`, zuletzt die üblichen Installationsorte unter macOS
-(`/Applications/FreeCAD.app`, `/Applications/SolidCraft.app`) und Windows
-(neueste `FreeCAD */bin/python.exe` unter `%LOCALAPPDATA%\Programs` bzw.
-`%ProgramFiles%`). Unter Linux ist für FreeCAD die Umgebungsvariable oder die
-Option nötig. Fehlt eine Laufzeit, bricht der Aufruf vor dem Build mit einem
-Hinweis ab. Die komplette CAD-Kette wurde nach dem Mac-Checkout noch nicht neu
-ausgeführt.
-
-Auf einem frischen Checkout laufen die Quell- und Kinematiktests ohne CAD.
-Tests gespeicherter CAD-/ROS-Ausgaben melden **skipped**, bis die betreffenden
-lokalen Builds existieren. Ein bestandener Quelltest ersetzt keine native
-Geometrieprüfung. Nach dem Build enthält `exports/generated/build-report.json`
-die aktuellen Armdateien, Prüfergebnisse und Grenzen; die Stationsgeneratoren
-schreiben ihre jeweiligen `cad/<baugruppe>/shared-build-report.json`.
-Dateipfade in älteren Fachdokumenten bezeichnen lokale Build-Ausgaben und sind
-keine herunterladbaren GitHub-Artefakte mehr.
-
-## Baugruppen und Entwicklung
-
-- [Architektur: Arbeitsumgebung, Möbeltypen, Möblierung und Geräteausstattung](ARCHITECTURE.md)
-
-- [Gemeinsames Modell und Entwicklungsschleife](docs/shared-model.md)
-- [Anforderungen](docs/requirements.md), [Entwurf](docs/design.md), [Entwicklungsplan](docs/development-plan.md)
-- [FreeCAD](docs/freecad.md), [ROS 2/RViz und Prüfgrenzen](docs/ros2.md)
-- [Servo-Integration](docs/servo-integration.md), [Herstellerdaten](cad/vendor/myactuator/README.md)
-- [Mobile Armbasis MB01](docs/mobile-base-mb01.md), [Probentransport TR01](docs/sample-transport-tr01.md)
-- [Deckelstation C01](docs/tube-station-c01.md), [Spitzenabwurf T01](docs/tip-collector-t01.md)
-- [Zentrifuge CF01](docs/centrifuge-cf01.md), [Roboterentnahme](docs/centrifuge-cf01-robot-pickup.md)
-- [Gefäßträger H01](docs/tube-carrier-h01.md), [Rahmen H02](docs/tube-frame-h02.md), [Drehantrieb H03 · historischer Vergleich](docs/tube-cam-h03.md)
-- [Laborraum](docs/lab-room-l01.md), [Aufstellung](docs/lab-layout-l01.md), [Transfersequenz](docs/lab-transfer-l01.md)
-- [Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md), [NanoDrop](docs/nanodrop-manual-workflow.md) und [Qubit 4](docs/qubit-4-manual-workflow.md) (synthetische Abläufe)
-- [RNA-/DNA-Extraktionsvorbereitung](docs/extraction-automation.md): getrennte Zellpellet-Aliquots, manuelle Qiagen-Spin-Säulen-Kits und prüfbare Material-/Prozesspläne; noch keine Extraktionsausführung
-- [Kitstation K01](docs/extraction-kit-station.md): zwei Kit-Ensembles direkt an der Station, mit parametrischen Behältern, Einsätzen und Griffen an Träger und Deckel; native Ansichten mit ausdrücklich offenen Artikelmaßen und Transportfreigaben
-- [Synthetischer Storage-Test S01](docs/synthetic-storage-s01.md): ein Regalplatz, ein referenzierter K01-Träger und eine feste Übergabeablage; statische CAD-Prüfstellungen und lokaler Mock-Rundlauf mit ausdrücklich offenen Hardware- und Transportnachweisen
-- [Relative Geschossansicht F03](docs/floorplan-f03.md): gemeinsam beschriebene Raumkonturen, Flure und Türpositionen aus einer manuellen Nachzeichnung; Originalfoto privat, Maßstab unbekannt und L01 unverändert
-- [NanoDrop- und Qubit-Anschauungsmodelle](docs/instrument-concepts.md) mit schwenkbaren Hebeln beziehungsweise Deckeln in beiden CADs
-- [Wiederverwendbares Laborglas](docs/lab-glassware.md): Becher, Trichter, Messzylinder und Flaschen in mehreren Größen, mit größenunabhängigen Verschlüssen und optionaler Markerbeschriftung für FreeCAD und SolidCraft
-- [Laborgeräte](docs/lab-equipment.md): Analysenwaage, Kaltlagerung, Wasserbad und Abzug mit beweglichen Deckeln, Türen und Frontschieber für FreeCAD und SolidCraft
-- [NanoDrop UltraC über HTTP](docs/nanodrop-ultra-network.md): gemeinsamer Leseclient und synthetisches Netzwerkmodell; Originalgerät noch nicht qualifiziert
-- [Separate technische Wasserübung](docs/material-lifecycle.md#separate-technische-wasserübung): drei Transferwege, fehlende Quittung und ausdrücklicher Wiederanlaufabgleich; eigene manuelle Erfassung und gekennzeichnete Softwaredemo
-- [Gemeinsamer synthetischer Ablauf CF01 → NanoDrop → Qubit 4](docs/synthetic-lab-workflow.md) mit einem Probenbestand und durchgängiger Verbrauchsbuchung
-- [DNA nacheinander mit NanoDrop und Qubit HS messen](docs/dna-quantification.md): synthetische Ablaufvorbereitung mit Vor- oder nachträglicher Verdünnung um Faktor 10/20 und Rückgabe ins ursprüngliche Rack auf dem Tisch
-- [DNA über SiLA 2 und vorbereitete ROS-Aufträge](docs/dna-sila2-network.md): eigener Root-Netzwerkadapter und lokaler Mock-Worker; kein ROS-Laufzeit- oder Bewegungsnachweis
-- [DNA-Sonikation für die CUT&RUN-Input-Kontrolle](docs/dna-sonication.md): Hielscher-Gerätereferenz und wirkungsfreier Prüfplan für den separaten Input-Zweig; Pulsprogramm und Geräteanbindung bleiben zu qualifizieren
-- [S09-Sonikation am CUT&RUN-Root](docs/cutrun-input-sonication-runtime.md): kanonische Fixture-Buchungen, getrennte Belege, Wiederaufnahme/Abbruch und schematischer Video-Nachweis; keine Geräteausführung
-- [S09-Inputsonikation über SiLA 2](docs/sonication-sila2-network.md): eigener TLS/gRPC-Rootadapter mit atomaren Quittungen und explizitem Wiederaufnahme-/Abbruchabgleich; ausschließlich synthetische Fachausführung
-
-## Stationsübergreifender Transport und TapeStation
-
-Die ergänzte [TR01-Übergabeanimation](docs/tr01-workcell-animation.md) beschreibt
-Gangmittenverkehr, freizugebende Bench-Bereiche, den zusätzlichen DNA-Arm und
-die menschliche TapeStation-Übergabe als separate synthetische Komposition.
-
-Der neue [TR01-Aufgabenrunner](docs/lab-station-transport.md) protokolliert
-synthetische Lade-, Fahrt- und Entladeübergaben zwischen DNA-Aufreinigung,
-CF01, gemeinsamer NanoDrop-/Qubit-Station und der manuellen
-[TapeStation TS01](docs/tapestation.md). Die separate
-[geometrische L01-Umsetzung](docs/lab-station-transport.md#geometrische-umsetzung-in-l01)
-ergänzt Parkpunkte und fließende, nativ auf 15 mm Modellabstand geprüfte
-Fahrkurven. Reale Navigation, Geräteprozesse und Armübergabebahnen bleiben offen.
-TS01 steht als manuelle Planungshülle mit PC auf der linken L01-Mittelbank;
-die Modellwahl bleibt offen. L01 und das vollständig beladene TR01-Modell
-werden in FreeCAD und SolidCraft erzeugt.
-
-```sh
-python3 scripts/run_lab_station_transport.py --world-id SYN.TR01.Demo01 demo
-python3 scripts/build_tapestation.py
-python3 scripts/build_lab_layout.py
-python3 scripts/build_tr01_floor_motion.py
-```
+Versioniert werden Modellquellen, Generatoren, Laufzeitcode, Tests und
+Dokumentation. Native CAD-Dateien und vollständige Prüfberichte entstehen lokal;
+die aktuellen Dateipfade stehen in den jeweiligen Build-Berichten. Ausgewählte
+Bilder und Demos bleiben als nachvollziehbare Modellstände im Repository.

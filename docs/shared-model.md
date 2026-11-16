@@ -185,8 +185,14 @@ erhält feste optische Kindrahmen. `config/cameras.json` und der versionierte
 `cameras-report.json` führen Entwurfsrahmen, Kegelmaße, offene Kabeldaten und
 benötigte Gelenkdurchführungen. Die Kamera auf L6 benötigt zusätzlich J6;
 dieser Anschlussweg wird getrennt von den sechs Servokreisen auditiert.
-Bildthemen, Treiber, Kalibrierung, reale Optik und Verdeckungsrechnung sind
-nicht implementiert. [Anordnung und Prüfgrenzen](design.md#konzeptoption-zwei-armkameras-und-stationäre-laboransichten).
+Bildthemen, Treiber, Kalibrierung und reale Optik sind nicht implementiert.
+Die README-Demo rendert beide optischen Perspektiven mit Tiefenprüfung der
+Szenenmeshes; das ersetzt keine reale Sichtprüfung oder Gefahrenerkennung.
+`build_cf01_camera_scene.py` ersetzt ausschließlich die Kamerakörper der
+gepinnten historischen Szene und prüft die gesamte bisherige Bewegung erneut.
+`camera_revision.py` sperrt dabei Änderungen an der übrigen Armkonstruktion;
+der Darstellungsbuild benötigt den bestandenen nativen Prüfbericht.
+[Anordnung und Prüfgrenzen](design.md#konzeptoption-zwei-armkameras-und-stationäre-laboransichten).
 
 ## Protokolle und Rückmeldung
 

@@ -280,7 +280,7 @@
       "render": {
         "kind": "robot"
       },
-      "caption": "Arm mit registrierten Servos, Montageplatten und zwei provisorischen Kameras. Sichtkegel sind illustrative Modellgeometrie.",
+      "caption": "Arm mit registrierten Servos, Montageplatten und zwei provisorischen Kameras. Die weiten Sichtkegel sind für diese Übersicht ausgeblendet.",
       "documentation": "docs/design.md"
     },
     {

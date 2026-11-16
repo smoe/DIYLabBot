@@ -1,0 +1,23 @@
+{
+  "format": "solidcraftbot.readme-video-embedding/1",
+  "repository": "smoe/DIYLabBot",
+  "source": "docs/media/robot-demo-cameras-aligned.mp4",
+  "source_sha256": "525da4ba7cc9655c18ad5e70ebf52e5f4c392d71a3c1544eb46f60e6bfb6f3c2",
+  "source_bytes": 4122885,
+  "working_tree_base_commit": "3fffd171611af326fe28a9cfc2c1090a76b7668f",
+  "source_commit": null,
+  "asset_url": "https://github.com/user-attachments/assets/433efc9b-b910-42ef-aa4d-9ce2ba1704d3",
+  "uploaded_at_utc": "2026-11-16T01:43:40.563475+00:00",
+  "upload_method": "GitHub CLI attachment endpoint; no issue or comment created",
+  "playback_test": "Local H.264 MP4 decoded; 1994 CFR frames at 20 fps; six encoded frames visually inspected; live README player not tested before commit",
+  "authenticated_range_check": {
+    "status": 206,
+    "content_type": "video/mp4",
+    "content_length": 1
+  },
+  "anonymous_head_check": {
+    "status": 404,
+    "content_type": "text/plain; charset=utf-8"
+  },
+  "publication_limit": "Upload and authenticated retrieval succeeded; anonymous access returned 404. Local MP4 and HTML are checked; live public README playback remains unverified."
+}

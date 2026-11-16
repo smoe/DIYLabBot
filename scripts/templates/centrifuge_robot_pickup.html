@@ -162,6 +162,8 @@
     localize();
     const canvas=root.querySelector('[data-scene]'),ctx=canvas.getContext('2d'),slider=root.querySelector('[data-time-slider]'),button=root.querySelector('[data-play]'),view=root.querySelector('[data-view]'),speed=root.querySelector('[data-speed]');
     if(unload){const option=document.createElement('option');option.value='auto';option.textContent='Auto · Lift / Hub';view.prepend(option);view.value='auto';speed.value='1';slider.step='any';root.querySelector('[data-unload-inventory]').hidden=false;}
+    const cameraViews=mesh.camera_views?RobotCameraViews.create(mesh):null;
+    if(cameraViews){view.value='assembly';root.dataset.cameraViews='2';const style=document.createElement('style');style.textContent='#cf01-bench-rack .cf01-scene{height:720px}@media(max-width:640px){#cf01-bench-rack .cf01-scene{height:840px}}';root.appendChild(style);}
     const duration=keys[keys.length-1].time_s;
     slider.max=duration;
     let t=0,playing=false,last=0,lastPhase='',theme={},current=null;
@@ -213,15 +215,15 @@
     function color(variable){const probe=document.createElement('span');probe.style.color='var('+variable+')';root.appendChild(probe);const result=getComputedStyle(probe).color;probe.style.color='var(--background)';const background=getComputedStyle(probe).color;probe.remove();const scratch=document.createElement('canvas');scratch.width=scratch.height=1;const sc=scratch.getContext('2d');sc.fillStyle=background;sc.fillRect(0,0,1,1);sc.fillStyle=result;sc.fillRect(0,0,1,1);return Array.from(sc.getImageData(0,0,1,1).data).slice(0,3)}
     function readTheme(){theme={text:color('--foreground'),muted:color('--muted-foreground'),background:color('--background'),rotor:color('--viz-series-1'),tube:color('--viz-series-2'),pusher:color('--viz-series-3'),motor:color('--viz-series-4')};draw()}
     function rgb(c){return 'rgb('+c.map(x=>Math.max(0,Math.min(255,Math.round(x)))).join(',')+')'}
-    function bodyColor(b){if(unload&&b.sample_id)return current.owners[b.sample_id]==='rack'?[65,174,142]:b.sample_id===current.active_sample_id?theme.tube:[134,186,194];if(b.id==='Tube01'||b.id==='ClosedCap01')return theme.tube;if(b.asset==='gripper'||b.id==='RetractablePusher'||b.id==='LiftActuatorEnvelope')return theme.pusher;if(b.id==='Rotor')return theme.rotor;if(b.asset==='arm'&&b.role==='structure')return theme.motor;if(b.id.includes('UMR'))return theme.text;return theme.muted}
+    function bodyColor(b){if(cameraViews&&b.role==='camera_envelope')return b.id.includes('lens')?[30,40,48]:b.id.includes('C_tip')?[200,91,28]:[8,110,153];if(unload&&b.sample_id)return current.owners[b.sample_id]==='rack'?[65,174,142]:b.sample_id===current.active_sample_id?theme.tube:[134,186,194];if(b.id==='Tube01'||b.id==='ClosedCap01')return theme.tube;if(b.asset==='gripper'||b.id==='RetractablePusher'||b.id==='LiftActuatorEnvelope')return theme.pusher;if(b.id==='Rotor')return theme.rotor;if(b.asset==='arm'&&b.role==='structure')return theme.motor;if(b.id.includes('UMR'))return theme.text;return theme.muted}
     function draw(){
       if(!theme.text)return;
-      const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,h=rect.height;
+      const rect=canvas.getBoundingClientRect(),dpr=window.devicePixelRatio||1,w=rect.width,totalHeight=rect.height,h=cameraViews?Math.round(totalHeight*(w<600?.4:.62)):totalHeight;
       if(w<1||h<1)return;
-      if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
-      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
+      if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(totalHeight*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(totalHeight*dpr)}
+      ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,totalHeight);
       // MP4 has no canvas alpha channel: bake in the preview background.
-      if(unload){ctx.fillStyle=rgb(theme.background);ctx.fillRect(0,0,w,h);}
+      if(unload){ctx.fillStyle=rgb(theme.background);ctx.fillRect(0,0,w,totalHeight);}
       const frame=pose(t);current=frame;
       const automaticDetail=unload&&view.value==='auto'&&['tube_presented','station_present_tube','station_present_tube_confirmed'].includes(frame.phase_key);
       const matrices=transforms(frame),rackView=view.value==='rack',detail=view.value==='tube'||rackView||automaticDetail;
@@ -252,10 +254,20 @@
       const seated=unload?frame.owners[frame.active_sample_id]==='rack':t>=mesh.scene.checks.rack_handoff_time_s,carried=unload?frame.owners[frame.active_sample_id]==='gripper':t>=mesh.scene.checks.attachment_time_s&&!seated,clear=unload?frame.workspace_clear:t>=mesh.scene.checks.robot_clear_confirmed_s;
       if(unload){
         const active=frame.active_sample_id||unload.samples[0].id,nRack=Object.values(frame.owners).filter(x=>x==='rack').length;
-        ctx.fillText(`${active} · ${tr(frame.phase_key)} · ${t.toFixed(1)} s`,12,24);
-        ctx.fillText(`${language.value==='en'?'Rack / rotor':'Rack / Rotor'}: ${nRack} / ${12-nRack-(carried?1:0)}${detail?` · ${frame.values.TubeLift.toFixed(1)} / 16 mm`:''}`,12,45);
+        if(cameraViews&&w<600){ctx.fillText(`${active} · ${t.toFixed(1)} s`,12,24);ctx.font='12px system-ui,sans-serif';ctx.fillText(tr(frame.phase_key),12,44,w-24);}
+        else ctx.fillText(`${active} · ${tr(frame.phase_key)} · ${t.toFixed(1)} s`,12,24);
+        ctx.fillText(`${language.value==='en'?'Rack / rotor':'Rack / Rotor'}: ${nRack} / ${12-nRack-(carried?1:0)}${detail?` · ${frame.values.TubeLift.toFixed(1)} / 16 mm`:''}`,12,cameraViews&&w<600?62:45);
       }else if(detail)ctx.fillText(seated?tr("Tube supported in rack slot 01"):carried?tr("Tube held by gripper"):tr("Tube 01"),12,24);
       if(rackView){ctx.textAlign='center';for(const slot of mesh.rack_slots){const q=project(apply(rackFrame,[slot.grip_mm[0],slot.grip_mm[1]-10,25]));ctx.fillText(String(slot.slot).padStart(2,'0'),q[0],q[1])}ctx.textAlign='start'}
+      if(cameraViews){
+        if(!detail)for(const camera of mesh.camera_views){const q=project(RobotCameraViews.worldFrame(camera,matrices.get(camera.group)).p);
+          ctx.strokeStyle=camera.purpose==='tip'?'#b75219':'#086e99';ctx.fillStyle=ctx.strokeStyle;ctx.lineWidth=1.5;
+          ctx.beginPath();ctx.arc(q[0],q[1],8,0,2*Math.PI);ctx.stroke();ctx.font='600 12px system-ui,sans-serif';ctx.fillText(camera.id,q[0]+12,q[1]-9);}
+        const cameraState=cameraViews.draw(ctx,matrices,w,h+8,totalHeight,bodyColor,language.value==='en',t);
+        root.dataset.cameraTime=String(cameraState.time_s);root.dataset.cameraFrames=JSON.stringify(cameraState.frames);
+        ctx.font='12px system-ui,sans-serif';ctx.fillStyle=rgb(theme.muted);ctx.textAlign='right';
+        ctx.fillText((language.value==='en'?'Playback ':'Wiedergabe ')+(root.dataset.captureSpeed||speed.value)+'×',w-12,h-8);ctx.textAlign='start';
+      }
       root.querySelector('[data-values]').textContent=tr("Lid ")+frame.values.Lid.toFixed(0)+tr("° · jaw gap ")+frame.jaw_gap_mm.toFixed(1)+' mm';
       root.querySelector('[data-time]').textContent=t.toFixed(1)+' / '+duration.toFixed(1)+' s';
       root.querySelector('[data-lift]').textContent=seated?(t>=mesh.scene.checks.release_complete_time_s?tr("Tube in rack slot 01 · gripper released"):tr("Tube supported in rack slot 01 · fingers still closed")):clear?tr("Robot and tube clear of centrifuge"):carried?tr("Tube moves with gripper"):tr("Rotor stopped · tube supported by station");

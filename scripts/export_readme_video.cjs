@@ -12,9 +12,10 @@ function options(argv, env = process.env) {
     playwright: env.SOLIDCRAFTBOT_PLAYWRIGHT || 'playwright', chrome: env.SOLIDCRAFTBOT_CHROME,
     ffmpeg: env.SOLIDCRAFTBOT_FFMPEG || 'ffmpeg', fps: env.SOLIDCRAFTBOT_VIDEO_FPS || 20,
     recordSeconds: env.SOLIDCRAFTBOT_VIDEO_DURATION_S || 45,
+    angle: env.SOLIDCRAFTBOT_ANGLE || 'default',
     screenshotTime: env.SOLIDCRAFTBOT_SCREENSHOT_TIME_S};
   const names = {'--input': 'input', '--output-base': 'outputBase', '--playwright': 'playwright',
-    '--chrome': 'chrome', '--ffmpeg':'ffmpeg', '--fps':'fps', '--record-seconds': 'recordSeconds', '--screenshot-time': 'screenshotTime'};
+    '--chrome': 'chrome', '--ffmpeg':'ffmpeg', '--fps':'fps', '--record-seconds': 'recordSeconds', '--screenshot-time': 'screenshotTime', '--angle':'angle'};
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--help') {result.help = true; continue;}
@@ -30,6 +31,7 @@ function options(argv, env = process.env) {
   if (positional[1]) result.chrome = positional[1];
   result.recordSeconds = Number(result.recordSeconds);
   result.fps = Number(result.fps);
+  assert(['default','metal','swiftshader'].includes(result.angle),'Unsupported ANGLE renderer');
   scheduleFrames(1, result.recordSeconds, result.fps);
   if (result.screenshotTime !== undefined) {
     result.screenshotTime = Number(result.screenshotTime);
@@ -110,6 +112,7 @@ function timing(html) {
     }
     const shown=program.transfers[1];
     return {duration,checks,screenshot:shown.presented_s+.1,multiSample:true,
+      cameraIds:(mesh.camera_views||[]).map(camera=>camera.id),
       sampleIds:program.samples.map(sample=>sample.id),
       transfers:program.transfers.map(({sample_id,gripped_s,support_s})=>({sample_id,gripped_s,support_s})),
       sceneSha256:mesh.trajectory.scene_sha256};
@@ -171,7 +174,7 @@ function shortMp4(data, seconds = 20) {
 async function main(argv = process.argv.slice(2)) {
   const config = options(argv);
   if (config.help) {
-    console.log('Usage: node scripts/export_readme_video.cjs [playwright-module] [chrome-executable] [--input HTML] [--output-base PATH] [--playwright MODULE] [--chrome EXECUTABLE] [--ffmpeg EXECUTABLE] [--fps 20] [--record-seconds 45] [--screenshot-time SECONDS]');
+    console.log('Usage: node scripts/export_readme_video.cjs [playwright-module] [chrome-executable] [--input HTML] [--output-base PATH] [--playwright MODULE] [--chrome EXECUTABLE] [--ffmpeg EXECUTABLE] [--fps 20] [--record-seconds 45] [--screenshot-time SECONDS] [--angle default|metal|swiftshader]');
     return;
   }
   const input = path.resolve(config.input), output = path.resolve(config.outputBase);
@@ -180,7 +183,9 @@ async function main(argv = process.argv.slice(2)) {
   const screenshotTime = config.screenshotTime ?? source.screenshot;
   assert(screenshotTime <= source.duration, 'Screenshot time exceeds the source duration');
   const {chromium} = require(config.playwright);
-  const browser = await chromium.launch({headless: true, ...(config.chrome ? {executablePath: config.chrome} : {})});
+  const hasCameras=source.cameraIds?.length>0;
+  const browser = await chromium.launch({headless: true, ...(config.chrome ? {executablePath: config.chrome} : {}),
+    ...(hasCameras?{args:config.angle==='default'?[]:['--use-gl=angle','--use-angle='+config.angle,...(config.angle==='swiftshader'?['--enable-unsafe-swiftshader']:[])]}:{})});
   try {
     const page = await browser.newPage({viewport: {width: 960, height: 820}, deviceScaleFactor: 1, reducedMotion: 'reduce'});
     const errors = [];
@@ -188,6 +193,11 @@ async function main(argv = process.argv.slice(2)) {
     page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
     await page.goto(pathToFileURL(input).href);
     await page.waitForSelector('[data-current-time]');
+    const cameraIds=await page.evaluate(factor=>{
+      const root=document.querySelector('#cf01-bench-rack');root.dataset.captureSpeed=factor.toFixed(3);
+      return Object.keys(JSON.parse(root.dataset.cameraFrames||'{}'));
+    },source.duration/schedule.at(-1).pts_s);
+    assert.deepEqual(cameraIds,source.cameraIds||[],'Rendered cameras must match the source');
     const ownership=await page.evaluate(source=>{
       const root=document.querySelector('#cf01-bench-rack'),slider=root.querySelector('[data-time-slider]');
       if(Number(slider.max)!==source.duration)throw new Error('Browser/source duration mismatch');
@@ -212,11 +222,17 @@ async function main(argv = process.argv.slice(2)) {
         assert.deepEqual(errors,[]);
         assert(Math.abs(Number(captured.state.currentTime)-point.source_time_s)<=.001,'Rendered source clock mismatch');
         assertStateOwnership(captured.state,source);
+        if(cameraIds.length){
+          assert(Math.abs(Number(captured.state.cameraTime)-point.source_time_s)<1e-9,'Camera/main clock mismatch');
+          assert.deepEqual(Object.keys(JSON.parse(captured.state.cameraFrames)),cameraIds);
+        }
         assert(captured.png.startsWith('data:image/png;base64,'),'Canvas PNG required');
         const png=Buffer.from(captured.png.slice('data:image/png;base64,'.length),'base64');
         frames.push({...point,png_sha256:digest(png),
+          ...(cameraIds.length?{camera_time_s:Number(captured.state.cameraTime),camera_frames_sha256:digest(Buffer.from(captured.state.cameraFrames))}:{}),
           ...(source.multiSample?{owners:JSON.parse(captured.state.sampleOwners)}:{tube_owner:captured.state.tubeOwner})});
         if(point.index%Math.max(1,Math.round((schedule.length-1)/4))===0||point.index===schedule.length-1)states.push(captured.state);
+        if(point.index%100===0)console.error(`Rendered ${point.index+1}/${schedule.length} frames`);
         return png;
       },
       beforePublish:async()=>{
@@ -228,6 +244,7 @@ async function main(argv = process.argv.slice(2)) {
         const manifest={format:'solidcraftbot.readme-video-frames/1',input,input_sha256:digest(inputBytes),
           source_scene_sha256:source.sceneSha256,source_duration_s:source.duration,
           video_duration_s:config.recordSeconds,fps:config.fps,frames};
+        if(cameraIds.length)manifest.camera_ids=cameraIds;
         const directory=path.resolve('tmp/readme-video');fs.mkdirSync(directory,{recursive:true});
         manifestPath=path.join(directory,path.basename(output)+'.frames.json');
         const bytes=Buffer.from(JSON.stringify(manifest,null,2)+'\n');
@@ -240,6 +257,7 @@ async function main(argv = process.argv.slice(2)) {
       source_scene_sha256:source.sceneSha256,source_duration_s:source.duration,
       video_target_duration_s:config.recordSeconds,screenshot_time_s:screenshotTime,
       mime:'video/mp4',frames:frames.length,encoding,frame_manifest:manifestPath,frame_manifest_sha256:manifestSha256,
+      ...(cameraIds.length?{camera_ids:cameraIds,angle:config.angle,playback_factor:source.duration/schedule.at(-1).pts_s}:{}),
       ownership_checks:ownership,states,errors}));
   } finally {await browser.close();}
 }
