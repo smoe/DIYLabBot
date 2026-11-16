@@ -164,6 +164,50 @@ abgeleitet. Laufrichtung, Stufenaufteilung, Metallquerschnitte und Anschlussdeta
 sind vorläufige Darstellungsannahmen. Sie sind keine nachgewiesene reale Flucht-
 oder Wartungsroute. Eine Kelleranbindung der Außentreppe wird nicht angelegt.
 
+### Gemeinsames Geländer für Atrium und inneres Treppenhaus
+
+Die inneren Treppenläufe vom Keller bis zum 3. OG erhalten an ihren freien
+Kanten dasselbe offene Metallgeländer wie das Atrium: Pfosten, Handlauf und
+vier Querstreben. `circulation.stairs.guard_profile_ref` verweist mit
+`#/exterior` auf die bereits vorhandenen Atriumparameter; im Treppenrezept
+werden weder Maße noch Farbe nochmals definiert. `scripts/building_guards.py`
+erzeugt die gemeinsamen Bauteile für beide Aufstellungen.
+
+Die Streben folgen den geneigten Läufen. Die kurzen Geländer auf Zwischen-
+und Geschosspodesten schließen das Treppenauge. Im obersten 3. OG wird der
+Abschluss über den dort ungenutzten Aufwärtslauf bis zur Seitenwand geführt.
+`circulation.stairs.instances[].top_guard_wall` referenziert dafür `W081`;
+Wandinnenfläche und bündiger Endpfosten werden aus Wandlage, Wandstärke und
+dem gemeinsamen Profil abgeleitet. Der ankommende Treppenlauf sowie die
+Zugänge und Wendebereiche bleiben frei. Untere Geschosse behalten ihre
+bisherigen Geländer. Gemeinsame Eckpfosten werden einmal erzeugt.
+Die geneigte Führung folgt den Stufenvorderkanten; die Pfostenfüße werden aus
+den vorhandenen Stufen- und Podestkörpern abgeleitet. Querschnitte bleiben
+normal zur geneigten Strebe erhalten, und Pfostenabstände werden entlang
+der tatsächlichen dreidimensionalen Verbindung begrenzt.
+Stufen, Podeste, Aufzug und äußere Metalltreppe werden dadurch nicht neu
+konstruiert. Die bestehenden Körper-IDs bleiben erhalten.
+
+Höhe, Querschnitte, Abstände und Anschlussüberdeckung sind weiterhin
+Darstellungsannahmen. Geometrische Prüfungen der neuen Bauteile und ihrer
+deklarierten Freiräume ersetzen keine Prüfung realer Absturzsicherung,
+Treppennormen, Kopffreiheit, Tragfähigkeit oder Fluchtwege.
+
+![Gemeinsames Atriumprofil am inneren Treppenhaus mit Wandabschluss im 3. OG](media/stairwell-railing.png)
+
+Die [Bildprovenienz](media/stairwell-railing.provenance.json) bindet diese
+Detailansicht an die gemeinsame Quelle und die native Teilprüfung: 161 neue
+Geländerteile sowie vier bestehende Treppenverbindungen und fünf Geschossböden
+und die Anschlusswand im 3. OG wurden unabhängig in FreeCAD und SolidCraft
+erzeugt. 171 STEP-Vergleiche,
+41 Auflagerproben und 16 abgegrenzte Laufbereichsproben bestehen die Prüfungen.
+Der Endpfosten schließt bündig an die Wand an; die Geländerteile dringen nicht
+in sie ein. Die Querstreben schneiden kein Stufen- oder Bodenmaterial. Eine vollständige
+native Gebäudeprüfung wurde damit nicht erneuert; ältere Gesamtbilder und
+deren Provenienz behalten ihren historischen Stand.
+Der reguläre Gebäudebuild übernimmt dieselben Auflager- und Freiraumproben
+für beide CAD-Ziele und weist fehlende oder unvollständige Geländerbelege ab.
+
 ## Aufzugtürseiten
 
 Der Eigentümer bestätigt im Bezug des ersten Geschossplans **außen links zum

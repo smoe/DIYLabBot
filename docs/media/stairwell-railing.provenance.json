@@ -1,0 +1,255 @@
+{
+  "format": "solidcraftbot.stairwell-railing-media/1",
+  "prepared_on": "2026-11-16",
+  "source": "model/building-stack.shared.json",
+  "source_sha256": "ce7855f6339693fc6fcc27eae62978c3c230ca9bb7af9fe8cebf45e2c08b8e68",
+  "profile_reference": "#/exterior",
+  "coordinate_meaning": {
+    "xy": "presentation_mm",
+    "z": "assumed_mm"
+  },
+  "source_files_sha256": {
+    "model/building-stack.shared.json": "ce7855f6339693fc6fcc27eae62978c3c230ca9bb7af9fe8cebf45e2c08b8e68",
+    "model/building-stack.schema.json": "896f61d4d0fef376c3a739254c1d507363e0477980c003637d667f22faa1580a",
+    "scripts/building_stack.py": "7c6629909a39c7f6bc69db46de1560dba0d53cfe7d92583a4d1a83d8da4602c6",
+    "scripts/building_circulation.py": "da0be0bc51015b5b5717d9f80567eba42972ec88873ca4bad9c2d0e1cab09dc9",
+    "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+    "scripts/building_guards.py": "297b418ad939086e9130aaa0604a4153e41adb5e79e04f3efbc53812200f3d28",
+    "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
+    "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
+    "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
+    "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+    "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
+    "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
+    "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
+    "scripts/relative_floorplan.py": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b",
+    "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+    "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
+    "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
+    "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
+    "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
+    "model/furnishings/building-social.json": "c27f86d7acfd063026df3a790dd4794e060253917d06e195dec2958016861ec0",
+    "model/furniture/social.catalog.json": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745",
+    "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
+    "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
+    "scripts/building_furnishings.py": "edc841bc2c1910f212109f3f4ff7e7ce8e03d8ee221be8c959471d5e086c88ed",
+    "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+    "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
+    "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
+    "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+    "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
+    "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
+    "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
+    "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
+    "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+    "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+    "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
+    "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
+    "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
+    "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
+    "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
+    "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
+    "scripts/build_building_stack.py": "e9bf80cbd6df4f2a871ac7dc45fe2e9455b7260acd96d20bafc0a5e1222fe22e",
+    "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
+    "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
+    "exports/validation/stairwell-railing/native-tools/native_support.py": "d067c4d4fd1910f7e5014b534303b1a6d552f4b48d899d3ebce780390e3e6770",
+    "exports/validation/stairwell-railing/native-tools/run_native.py": "1a50e36038fa827a616eed1a9fb1badad0d3438abaf3a9c740d4fb94a123e956",
+    "exports/validation/stairwell-railing/native-tools/freecad_check.py": "3c8d9d3adc8adf64f79bce216c30dcd1ea457fc7023088d93a5ab2aac98c67a4"
+  },
+  "native_validation": {
+    "path": "exports/validation/stairwell-railing/native-r4/summary.json",
+    "sha256": "d8e6c19f80c87ac333b65768e9f97ef42f0e53bd9aeeeee80ebbc8611f11c5e2",
+    "bytes": 385202
+  },
+  "native_artifact_manifest": {
+    "path": "exports/validation/stairwell-railing/native-r4/artifact-manifest.json",
+    "sha256": "a2fab36e918b8af78330d4826b4d620ee7c53fd6cd88e07d2156f8e112aeee68",
+    "bytes": 10695
+  },
+  "source_preservation": {
+    "path": "exports/validation/stairwell-railing/geometry-preservation-r4.json",
+    "sha256": "954898cf2402c36f6402f9c7aa9723e0acf2b23bcbda723435d190fb8f3c872c",
+    "bytes": 24141
+  },
+  "scope": {
+    "selected_native_solids": 171,
+    "new_guard_bodies": 161,
+    "unique_posts": 41,
+    "rail_members": 120,
+    "intervals": 4,
+    "guard_segments": 24,
+    "attachment_witnesses_per_backend": 41,
+    "walking_core_probes_per_backend": 16,
+    "maximum_step_xor_presentation_mm3": 0.0,
+    "independent_cad_subset_checked": true,
+    "full_building_rebuilt": false,
+    "unchanged_source_bodies": 2018,
+    "unchanged_source_operations": 2854,
+    "wall_contact_checked_backends": [
+      "freecad",
+      "solidcraft"
+    ],
+    "context_wall_body_ids": [
+      "OG3__Wall_W081"
+    ]
+  },
+  "images": [
+    {
+      "id": "detail_og2_og3_wall_termination",
+      "path": "docs/media/stairwell-railing.png",
+      "sha256": "afa411e9b0209783cd0a67418b9175f15dd2b660dc7f4c944d5fe5dc58372380",
+      "bytes": 293620,
+      "pixels": [
+        1800,
+        1400
+      ],
+      "representation": "Actual SolidCraft render of the source-derived stair/guard native validation subset; OG2-to-OG3 detail with the top closure at the existing W081 wall. Other intervals are hidden and floor/wall appearance is adjusted only for presentation.",
+      "native_model": {
+        "path": "exports/validation/stairwell-railing/native-r4/case.sc",
+        "sha256": "9d48d98d40336f3cb0a4f2993495ef1dc18e357a1d08f67a1f57f98ea3dd1542",
+        "bytes": 1771167
+      },
+      "camera": {
+        "target": [
+          18402.702702702703,
+          16202.702702702703,
+          11056.830399338374
+        ],
+        "yaw": 2.3415926535897933,
+        "pitch": 0.48,
+        "distance": 16709.29263259579,
+        "fov": 0.6
+      },
+      "view_commands_report": {
+        "path": "exports/validation/stairwell-railing/native-r4/stair-top-detail.view.commands.json",
+        "sha256": "9925170e76791cf30cc926c632e7cae55657deb1d0c9fa668123f342ca54410e",
+        "bytes": 6887
+      },
+      "visual_review": {
+        "passed": true,
+        "scope": "Topmost guard visibly closes the unused upward-flight side against the existing wall while the arriving flight remains open. This does not qualify real stair safety.",
+        "report": {
+          "path": "exports/validation/stairwell-railing/native-r4/visual-review.json",
+          "sha256": "58f00bc5423ceaea171eebf15a1d09268c7a963d3dfc7cf2aff1357e92bb2af7",
+          "bytes": 2896
+        }
+      }
+    }
+  ],
+  "qualification": {
+    "full_building_proof": false,
+    "hardware": false,
+    "headroom": false,
+    "egress": false,
+    "load": false,
+    "fall_protection": false
+  },
+  "limitations": [
+    "The complete building was not rebuilt or requalified in either CAD; the native checks cover the declared 171-body subset, including one existing wall for the top termination.",
+    "Canonical preservation of 2018 current-master source bodies and 2854 operations uses the current shared compiler; this is a source-level comparison, not a full native building comparison. The earlier pre-refactor source comparison remains separate historical evidence.",
+    "Declared foot witnesses, walking-core boxes and rail/support material separation do not qualify all collisions, actual headroom, egress, loads or fall protection.",
+    "Existing historical media and native reports remain historical and are not silently repinned to this new stair-guard source.",
+    "The flush terminal post is a geometric concept contact; no structural wall fastening or fall-protection qualification is asserted."
+  ],
+  "original_photographs_included": false,
+  "regular_build_checks": {
+    "attachment_probes": 41,
+    "guard_only_clearance_probes": 16,
+    "entry_point": "scripts/build_building_stack.py",
+    "binding_verified_in_native_subset": true
+  },
+  "wall_termination": {
+    "level_id": "OG3",
+    "wall": "W081",
+    "freecad": [
+      {
+        "group_id": "EastStair_OG2_OG3_Guard_UpperGap",
+        "wall": "W081",
+        "wall_body_id": "OG3__Wall_W081",
+        "interior_face_y_mm": 14895.405405405405,
+        "terminal_post_body_id": "EastStair_OG2_OG3_Guard_UpperGap_Post1",
+        "contact": "flush_concept_geometry_not_structural_attachment",
+        "passed": true,
+        "native_distance_mm": 0.0,
+        "native_intersection_mm3": 0.0,
+        "native_source_face_error_mm": 0.0,
+        "distance_tolerance_mm": 1e-06,
+        "scope": "Flush native concept contact only, not structural attachment or fastening qualification"
+      }
+    ],
+    "solidcraft": [
+      {
+        "group_id": "EastStair_OG2_OG3_Guard_UpperGap",
+        "wall": "W081",
+        "wall_body_id": "OG3__Wall_W081",
+        "interior_face_y_mm": 14895.405405405405,
+        "terminal_post_body_id": "EastStair_OG2_OG3_Guard_UpperGap_Post1",
+        "contact": "flush_concept_geometry_not_structural_attachment",
+        "passed": true,
+        "native_bbox_face_gap_mm": 0.0,
+        "bbox_tolerance_mm": 1e-06,
+        "interference": {
+          "boolean_ms": 3.102,
+          "budget_exceeded": false,
+          "budget_s": 240.0,
+          "checked": 2,
+          "count": 0,
+          "interferences": [],
+          "ms": 3.767,
+          "pairs_candidate": 1,
+          "pairs_cleared": 0,
+          "pairs_intersected": 1,
+          "pairs_not_checked": 0,
+          "skipped_pairs": 0,
+          "slowest": [
+            {
+              "a": "OG3__Wall_W081",
+              "b": "EastStair_OG2_OG3_Guard_UpperGap_Post1",
+              "boolean_ms": 3.102,
+              "ms": 3.102,
+              "tessellate_ms": 0.0
+            }
+          ],
+          "tessellate_ms": 0.0,
+          "threads": 1,
+          "truncated": false,
+          "unchecked": [],
+          "passed": true,
+          "scope": "All native bodies at this static source-defined pose"
+        },
+        "distance_query_performed": false,
+        "scope": "SolidCraft exact pair interference plus native bounding-face agreement; exact shape distance is checked separately in FreeCAD"
+      }
+    ],
+    "structural_attachment_qualified": false
+  },
+  "source_archive": {
+    "path": "exports/validation/stairwell-railing/source-history/r4/index.json",
+    "sha256": "b02cbf9182cbeb35b2f2526b70de6a5c5d08fa1ad9d781437febfbfa57e9a234",
+    "bytes": 11541
+  },
+  "previous_validation": {
+    "native_validation": {
+      "path": "exports/validation/stairwell-railing/native-r3/summary.json",
+      "sha256": "e80cbd57190a3b4dec495d97ccc3fdc3540dab23aab415ea1d37e36902e9bdc4",
+      "bytes": 385102
+    },
+    "source_preservation": {
+      "path": "exports/validation/stairwell-railing/geometry-preservation-r3.json",
+      "sha256": "107e03c2cae3c63c20f653bb5a925df04d6411271d550dafff0f8e1a04867bb4",
+      "bytes": 24482
+    },
+    "source_archive": {
+      "path": "exports/validation/stairwell-railing/source-history/r3/index.json",
+      "sha256": "4658ed2dbd6db3eaea01a0ace36f6cc9808fb9fdb0286d18bac358b2fe4f44eb",
+      "bytes": 11308
+    },
+    "note": "Historical R3 evidence is retained; the integrated source is freshly replayed and independently checked in R4."
+  },
+  "native_subset_replay": {
+    "path": "exports/validation/stairwell-railing/native-r4/replay-comparison.json",
+    "sha256": "d1eb5bded0699080c8abca503bda140abb4e327ba42d6f0018330d3c8cbeaab0",
+    "bytes": 1273
+  }
+}

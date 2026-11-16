@@ -4,6 +4,7 @@ import re
 import relative_floorplan as floor
 import building_doors as doors
 import building_roof as roof
+import building_guards as guards
 
 
 def require(ok, message):
@@ -111,20 +112,15 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
                 door_bindings[level['id']+'__'+door['id']]=selection
             door_map[level['id']+'__'+door['id']]=n
     # Very open metal balustrades along the source's corridor/atrium edges.
+    guard_profile=guards.profile_from_exterior(s)
     for level in levels:
         if not level['id'].startswith('OG'):continue
         for wall_id in s['guard_boundaries']:
-            require(wall_id in walls,'Existing guard edge required');wa,wb=ends(canonical,walls[wall_id]);dx,dy=wb[0]-wa[0],wb[1]-wa[1];length=math.hypot(dx,dy);u=[dx/length,dy/length];normal=[-u[1],u[0]];count=math.ceil(length/s['guard_max_post_spacing_mm']);post=s['guard_post_mm'];bar=s['guard_bar_mm'];z=level['z_mm'];height=s['guard_height_mm']
-            n='AtriumGuard_'+level['id']+'_'+wall_id;members=[]
-            def member(tag,along,run,zz,hh,thick):
-                pts=[[wa[j]+distance*u[j]+side*normal[j] for j in (0,1)] for distance,side in [(along,-thick/2),(along+run,-thick/2),(along+run,thick/2),(along,thick/2)]]
-                if floor.signed_area(pts)<0:pts.reverse()
-                target=body(n+'_'+tag,'concept_open_metal_balustrade_member',s['frame_color']);members.append(target);guard_ids.append(target)
-                r['operations'].append({'id':target+'_Profile','body':target,'action':'create','shape':{'kind':'polygon_prism','plane':'XY','points':pts,'offset':zz,'depth':hh,'fixed':True}})
-            member('Post0',-post/2,post,z,height,post)
-            member('Handrail',-post/2,length+post,z+height-bar,bar,post)
-            for i in range(1,count+1):member('Post'+str(i),i*length/count-post/2,post,z,height,post)
-            for i,fraction in enumerate(s['guard_bar_fractions']):member('Bar'+str(i),-post/2,length+post,z+height*fraction,bar,bar)
+            require(wall_id in walls,'Existing guard edge required');wa,wb=ends(canonical,walls[wall_id]);z=level['z_mm']
+            n='AtriumGuard_'+level['id']+'_'+wall_id
+            segment=guards.compile_segment(guard_profile,n,wa+[z],wb+[z],component='BuildingExterior')
+            for key in ('bodies','operations'):r[key].extend(segment[key])
+            members=segment['interface']['body_ids'];guard_ids.extend(members)
             guard_groups.append({'id':n,'level_id':level['id'],'boundary':wall_id,'body_ids':members})
     # Opaque concrete entrance flanks and storey-height cladding around the
     # bounded side window bands. Canonical paths are reused after registration;

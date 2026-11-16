@@ -642,9 +642,18 @@
                   "entry_opening": {
                     "type": "string",
                     "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  },
+                  "top_guard_wall": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$",
+                    "description": "Optional source boundary wall closing the unused flight side on the topmost served storey; requires guard_profile_ref."
                   }
                 }
               }
+            },
+            "guard_profile_ref": {
+              "const": "#/exterior",
+              "description": "Reuse the existing atrium guard dimensions and material; no independent stair guard profile."
             }
           }
         },

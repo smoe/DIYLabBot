@@ -135,6 +135,17 @@ werden aus derselben Quelle in beiden CADs abgeleitet. Größen und Foto-/Planla
 bleiben Darstellungsannahmen, keine Gebäude- oder Sicherheitsqualifikation.
 Siehe [Fotoableitung](docs/building-exterior.md).
 
+Das offene Atriumgeländer und die Geländer des inneren Treppenhauses verwenden
+denselben portablen Bauteilcompiler `scripts/building_guards.py`.
+`circulation.stairs.guard_profile_ref` bindet mit `#/exterior` die vorhandenen
+Atriummaße und das Material; im Treppenrezept stehen nur die daraus abgeleiteten
+freien Kanten und Auflager. Geneigte Streben folgen den Stufenvorderkanten;
+gemeinsame Eckpfosten besitzen eine einzige Körperdefinition. Stufen, Podeste
+und der getrennte Dachschutz behalten ihre eigenen Quellen. Der oberste
+Geschossabschluss bindet mit `top_guard_wall` die vorhandene Seitenwand;
+die Verlängerung bis zu deren Innenfläche wird ohne kopierte Wandmaße abgeleitet.
+Diese statische Ableitung qualifiziert weder reale Absturzsicherung noch Treppen oder Fluchtwege.
+
 Geschossgebundene `plan_variants` überschreiben ausschließlich referenzierte
 Flächen-/Wandarten und deaktivieren benannte Öffnungen; die Rohpläne bleiben
 erhalten. So führt die linke Glastür von 3.002 zu 3.001, während die rechte

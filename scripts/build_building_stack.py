@@ -228,6 +228,119 @@ def circulation_geometry(contract, geometry):
     return checks
 
 
+def _stair_guard_probe_sets(contract, circ):
+    """Require complete guard metadata before admitting native pair checks."""
+    fields = ('guard_body_ids', 'guard_groups', 'guard_posts',
+              'guard_attachment_witnesses', 'guard_clearance_probes')
+    stairs = circ['stairs']
+    reference = circ.get('guard_profile_ref')
+    if reference is None:
+        if (any(circ.get(key) for key in fields)
+                or any(stair.get('guard_profile_ref') is not None
+                       or stair.get('guard_body_ids') or stair.get('guard_groups')
+                       or any(connector.get('guard_body_ids') for connector in stair['connectors'])
+                       for stair in stairs)):
+            raise ValueError('Guard data requires its explicit shared profile reference')
+        return []
+    if reference != '#/exterior' or circ.get('guard_safety_qualified') is not False:
+        raise ValueError('An unqualified reference to the shared atrium guard profile is required')
+
+    def names(value, label, nonempty=True):
+        if (not isinstance(value, list) or (nonempty and not value)
+                or any(not isinstance(name, str) or not name for name in value)
+                or len(value) != len(set(value))):
+            raise ValueError('Distinct explicit '+label+' required')
+        return set(value)
+
+    def rows(value, key, label):
+        if not isinstance(value, list) or not value or any(not isinstance(row, dict) for row in value):
+            raise ValueError('Explicit '+label+' metadata required')
+        names([row.get(key) for row in value], label)
+        return {row[key]: row for row in value}
+
+    identifiers = names(circ.get('guard_body_ids'), 'guard body IDs')
+    if (not identifiers <= set(circ['body_ids'])
+            or not identifiers <= set(circ['detail_visibility_ids'])):
+        raise ValueError('Every guard member must belong to the declared circulation scene')
+    groups = rows(circ.get('guard_groups'), 'id', 'guard groups')
+    posts = rows(circ.get('guard_posts'), 'body_id', 'guard posts')
+    if not set(posts) <= identifiers:
+        raise ValueError('Every declared guard post must be a guard body')
+    kinds = ('FirstInner', 'FirstTop', 'MidGap', 'ReturnInner', 'ReturnTop', 'UpperGap')
+    clearance_kinds = ('FirstFlight', 'ReturnFlight', 'MidTurnback', 'EntryLanding')
+    internal = [connector for stair in stairs for connector in stair['connectors']]
+    connectors = rows(internal, 'id', 'guarded internal connectors')
+    expected_groups = {name+'_Guard_'+kind: (connector, kind)
+                       for name, connector in connectors.items() for kind in kinds}
+    if set(groups) != set(expected_groups):
+        raise ValueError('Every internal connector requires its complete named guard groups')
+    grouped_members, grouped_posts = set(), set()
+    for name, group in groups.items():
+        connector, kind = expected_groups[name]
+        members = names(group.get('body_ids'), 'guard group members')
+        post_ids = names(group.get('post_body_ids'), 'guard group posts')
+        if (group.get('kind') != kind or group.get('connector_id') != connector['id']
+                or group.get('from_level') != connector['from_level']
+                or group.get('to_level') != connector['to_level']
+                or group.get('profile_ref') != reference
+                or post_ids != members & set(posts) or len(post_ids) < 2
+                or not members <= identifiers):
+            raise ValueError('Guard group metadata must bind its connector, profile and members')
+        grouped_members.update(members); grouped_posts.update(post_ids)
+    if grouped_members != identifiers or grouped_posts != set(posts):
+        raise ValueError('Complete guard member and unique post coverage required')
+    for stair in stairs:
+        local_connectors = {connector['id'] for connector in stair['connectors']}
+        local_groups = {name: group for name, group in groups.items()
+                        if group['connector_id'] in local_connectors}
+        declared = rows(stair.get('guard_groups'), 'id', 'stair guard groups')
+        local_members = set().union(*(set(group['body_ids']) for group in local_groups.values()))
+        if (stair.get('guard_profile_ref') != reference
+                or stair.get('guard_safety_qualified') is not False
+                or declared != local_groups
+                or names(stair.get('guard_body_ids'), 'stair guard members') != local_members):
+            raise ValueError('Stair and global guard metadata must describe the same members')
+        for connector in stair['connectors']:
+            members = set().union(*(set(group['body_ids']) for group in local_groups.values()
+                                    if group['connector_id'] == connector['id']))
+            if names(connector.get('guard_body_ids'), 'connector guard members') != members:
+                raise ValueError('Connector guard members must match its named groups')
+
+    attachments = rows(circ.get('guard_attachment_witnesses'), 'id', 'guard attachment witnesses')
+    expected_attachments = {name+'_Attachment' for name in posts}
+    if set(attachments) != expected_attachments:
+        raise ValueError('Exactly one named native attachment witness per guard post required')
+    allowed_supports = {connector['body_id'] for connector in internal}
+    floors = {name for level in contract.get('levels', []) for name in level['floor_bodies']}
+    allowed_supports.update(level['id']+'__Area_'+stair['area']
+                            for level in contract.get('levels', []) for stair in stairs
+                            if level['id']+'__Area_'+stair['area'] in floors)
+    for name, post in posts.items():
+        identifier = name+'_Attachment'; witness = attachments[identifier]
+        support = post.get('support_body_id')
+        if (post.get('attachment_probe_id') != identifier or support not in allowed_supports
+                or support in identifiers or post.get('support_body_ids') != [support]
+                or names(witness.get('target_bodies'), 'guard attachment targets') != {name, support}
+                or witness.get('expectation') != 'filled'):
+            raise ValueError('Guard attachment must bind its post and existing stair or floor support')
+        expected = witness.get('expected_volumes_mm3')
+        if (not isinstance(expected, dict) or set(expected) != {name, support}
+                or any(type(value) not in (int, float) or not math.isfinite(value)
+                       or value <= 0 for value in expected.values())):
+            raise ValueError('Positive explicit material coverage required for both guard attachment targets')
+
+    clearances = rows(circ.get('guard_clearance_probes'), 'id', 'guard clearance probes')
+    expected_clearances = {name+'_GuardClear_'+kind for name in connectors for kind in clearance_kinds}
+    if set(clearances) != expected_clearances:
+        raise ValueError('Every internal connector requires all four named guard-only clearance probes')
+    for probe in clearances.values():
+        if (probe.get('scope') != 'new_guard_members_only' or probe.get('expectation') != 'empty'
+                or names(probe.get('target_bodies'), 'guard clearance targets') != identifiers):
+            raise ValueError('Guard clearance must check every new guard member and only those members')
+    return [('stair_guard_attachment', circ['guard_attachment_witnesses']),
+            ('stair_guard_clearance', circ['guard_clearance_probes'])]
+
+
 def circulation_probe_specs(contract):
     circ = contract.get('circulation')
     if not circ: return []
@@ -244,16 +357,19 @@ def circulation_probe_specs(contract):
         if {connector['slab_hole_probe_id'] for connector in connectors if connector['slab_hole_probe_id'] is not None} != {probe['id'] for probe in circ['slab_hole_probes']}:
             raise ValueError('Native slab-hole proofs must match the explicitly declared connector aperture IDs')
     result = []
-    for category, probes in [('circulation_door', circ['door_probes']), ('closed_inward_door', circ['closed_door_probes']),
-                             ('stair_slab_hole', circ['slab_hole_probes']), ('stair_connection', circ['connection_witnesses']),
-                             ('shaft_continuity', circ['shaft_witnesses']), ('external_access', circ.get('external_access_witnesses', []))]:
+    probe_sets = [('circulation_door', circ['door_probes']), ('closed_inward_door', circ['closed_door_probes']),
+                  ('stair_slab_hole', circ['slab_hole_probes']), ('stair_connection', circ['connection_witnesses']),
+                  ('shaft_continuity', circ['shaft_witnesses']), ('external_access', circ.get('external_access_witnesses', []))]
+    probe_sets.extend(_stair_guard_probe_sets(contract, circ))
+    empty_categories = {'circulation_door', 'stair_slab_hole', 'stair_guard_clearance'}
+    for category, probes in probe_sets:
         for probe in probes:
             volume = prism_volume(probe)
             targets = probe.get('target_bodies', [probe.get('target_body')])
             if (not targets or any(not isinstance(name, str) or not name for name in targets)
                     or len(targets) != len(set(targets))):
                 raise ValueError('Distinct explicit native witness targets required')
-            if category in {'circulation_door', 'stair_slab_hole'}:
+            if category in empty_categories:
                 expected = {target: 0. for target in targets}
             elif category == 'closed_inward_door':
                 expected = {probe['target_body']: probe['expected_volume_mm3']}
@@ -261,7 +377,7 @@ def circulation_probe_specs(contract):
                 expected = probe['expected_volumes_mm3']
             if not expected or set(expected) != set(targets):
                 raise ValueError('Every circulation witness requires explicit target coverage')
-            if category not in {'circulation_door', 'stair_slab_hole'}:
+            if category not in empty_categories:
                 if any(type(value) not in (int, float) or not math.isfinite(value) or abs(value-volume) > max(1e-5, volume*1e-9) for value in expected.values()):
                     raise ValueError('Positive material witnesses must be fully covered by every declared target')
             result.append({'category': category, 'probe': probe, 'expected': expected})

@@ -15,6 +15,7 @@ import building_circulation as circulation
 import building_roof as roof
 import building_furnishings as furnishings
 import building_exterior as exterior
+import building_guards as guards
 import building_alignment as alignment
 import ground_floor_model as ground
 import relative_floorplan as floor
@@ -48,6 +49,16 @@ def read(ref):
     path = assembly.validate_reference(ref, root=ROOT); raw = path.read_bytes()
     require(hashlib.sha256(raw).hexdigest() == ref['source_sha256'], 'Source changed while reading')
     return json.loads(raw)
+
+
+def stair_guard_profile(spec):
+    source = _spec(spec)
+    reference = source['circulation']['stairs'].get('guard_profile_ref')
+    if reference is None:
+        return None
+    require(reference == '#/exterior' and 'exterior' in source,
+            'Stair guards require the referenced exterior atrium profile')
+    return guards.profile_from_exterior(source['exterior'])
 
 
 def templates(spec):
@@ -386,7 +397,7 @@ def interfaces(spec, p):
             'assumed_dimensions': copy.deepcopy(p), 'coordinate_meaning': {'xy': 'presentation_mm', 'z': 'assumed_mm'}, 'metric_scale_known': False,
             'structural_qualified': False, 'transport_implemented': False, 'trajectory_implemented': False, 'hardware_executed': False, 'fire_safety_qualified': False,
             'room_label_policy': 'EG uses the owner-labelled registered ground-floor source; OG labels are level-scoped F03 template references', 'limitations': list(spec['limitations'])}
-    extra = circulation.compile(spec['circulation'], plan, p, levels, ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'))
+    extra = circulation.compile(spec['circulation'], plan, p, levels, ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'), guard_profile=stair_guard_profile(spec))
     data['circulation'] = extra['interface']
     data['external_area_overlay'] = {'area': spec['circulation']['external_stair']['area'], 'full_slabs_omitted': True,
         'exclusive_boundary_walls_omitted': True, 'shared_facade_walls_preserved': True, 'source_unchanged': True}
@@ -469,7 +480,7 @@ def expanded(spec, p):
         result['operations'].append({'id': name+'_Profile', 'body': name, 'action': 'create', 'shape': {'kind': 'polygon_prism', 'plane': 'XY', 'points': points, 'offset': offset, 'depth': depth, 'fixed': True}})
     result['components'].append({'id': 'ConceptMarker', 'grounded': True}); marker = data['concept_marker']
     prism(marker['body'], 'ConceptMarker', 'semantic_exchange_marker', marker['points_mm'], marker['offset_mm'], marker['depth_mm'], spec['concept_exchange']['color'], spec['concept_exchange']['opacity'])
-    extra = circulation.compile(spec['circulation'], plan, p, data['levels'], ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'))
+    extra = circulation.compile(spec['circulation'], plan, p, data['levels'], ground_plan=bases['EG'][0], ground_support_area=spec.get('alignment', {}).get('external_ground_support_area'), guard_profile=stair_guard_profile(spec))
     roof_geometry = roof.compile(spec['roof'], plan, p, data['levels'])
     for key in ('components', 'bodies', 'operations'):
         result[key].extend(extra[key]); result[key].extend(roof_geometry[key])
@@ -519,7 +530,7 @@ def solidcraft_commands(spec, p):
 
 def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
-    paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
+    paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', ROOT/'scripts/building_guards.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
     if 'furnishings' in spec['sources']:
         paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
         if furnishings.read(spec['sources']['furnishings']).get('atrium_seating'):

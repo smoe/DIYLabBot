@@ -44,6 +44,7 @@ def fixture():
         plan['openings'].append({'id': identifier, 'wall': wall, 'interval': [.25, .5], 'kind': kind, 'confidence': 'uncertain' if kind == 'unknown' else 'approximate', 'connection': 'uncertain'})
     floor.validate(plan)
     source = json.loads(stack.SOURCE.read_text())['circulation']
+    source['stairs'].pop('guard_profile_ref', None)  # Independent fixture has no exterior profile.
     source['elevator'].update(area='LiftBox', reference_opening='LiftAnchor')
     source['elevator']['sides']['outward']['wall'] = 'LiftBoxW3'; source['elevator']['sides']['inward']['wall'] = 'LiftBoxW1'
     source['stairs']['instances'] = [{'id': 'EastStair', 'area': 'EastWell', 'entry_opening': 'EastDoor'}]

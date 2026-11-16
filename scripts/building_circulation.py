@@ -8,6 +8,7 @@ import math
 import re
 
 import relative_floorplan as floor
+import building_guards as guards
 
 
 def require(condition, message):
@@ -35,15 +36,20 @@ def validate_source(source):
     require(lift['deferred_stops'] == [], 'All declared stops now have concept geometry')
     for name in ('post_wall_factor', 'cabin_wall_factor', 'cabin_clearance_factor'):
         require(type(lift[name]) in (int, float) and math.isfinite(lift[name]) and 0 < lift[name] <= 1, 'Positive illustrative lift proportion required')
-    stairs = source['stairs']; exact(stairs, 'recipe risers_per_flight landing_fraction center_gap_fraction wall_margin_factor join_slab_fraction instances', 'stairs')
+    stairs = source['stairs']; require(isinstance(stairs, dict), 'Invalid stairs fields')
+    exact(stairs, 'recipe risers_per_flight landing_fraction center_gap_fraction wall_margin_factor join_slab_fraction instances'+(' guard_profile_ref' if 'guard_profile_ref' in stairs else ''), 'stairs')
+    if 'guard_profile_ref' in stairs:
+        require(stairs['guard_profile_ref'] == '#/exterior', 'The stair guard must reference the existing exterior atrium profile')
     require(stairs['recipe'] == 'illustrative_two_flight_turnback_v1' and type(stairs['risers_per_flight']) is int and 2 <= stairs['risers_per_flight'] <= 40, 'Bounded shared stepped-stair recipe required')
     for key in ('landing_fraction', 'center_gap_fraction', 'join_slab_fraction'):
         require(type(stairs[key]) in (int, float) and math.isfinite(stairs[key]) and 0 < stairs[key] < .4, 'Positive bounded stair ratio required')
     require(type(stairs['wall_margin_factor']) in (int, float) and math.isfinite(stairs['wall_margin_factor']) and stairs['wall_margin_factor'] >= .5, 'Preserve at least half the presentation wall thickness')
     require(len(stairs['instances']) == 1, 'Exactly one separate right-hand continuous staircase is requested')
     for item in stairs['instances']:
-        exact(item, 'id area entry_opening', 'stair instance')
+        exact(item, 'id area entry_opening'+(' top_guard_wall' if 'top_guard_wall' in item else ''), 'stair instance')
         require(all(isinstance(name, str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', name) for name in item.values()), 'Stable ASCII stair references required')
+        require('top_guard_wall' not in item or 'guard_profile_ref' in stairs,
+                'A top guard wall requires the referenced guard profile')
     external = source['external_stair']
     exact(external, 'id area entry_opening ground_area ground_exit_neighbor recipe tread_thickness_mm stringer_depth_mm stringer_width_mm landing_thickness_mm status', 'external metal stair')
     for name in ('id', 'area', 'entry_opening', 'ground_area', 'ground_exit_neighbor'):
@@ -87,8 +93,14 @@ def interior_rectangle(polygon, margin):
     raise ValueError('The source footprint cannot fit the declared straight-axis circulation recipe')
 
 
-def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None):
+def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None, *, guard_profile=None):
     validate_source(source)
+    guard_ref = source['stairs'].get('guard_profile_ref')
+    if guard_ref is not None:
+        require(guard_profile is not None, 'Referenced stair guard profile must be supplied explicitly')
+        guards.validate_profile(guard_profile)
+    else:
+        require(guard_profile is None, 'A stair guard profile requires an explicit source reference')
     areas = {a['id']: a for a in plan['areas']}; walls = {w['id']: w for w in plan['walls']}; openings = {o['id']: o for o in plan['openings']}
     if ground_plan is not None:
         ground_areas = {area['id']: area for area in ground_plan['areas']}
@@ -105,6 +117,7 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None)
     scale = p['display_scale']; thickness = p['display_thickness']; slab = p['slab_thickness_mm']; door_h = p['door_height_mm']
     result = {'components': [{'id': source['elevator']['id'], 'grounded': True}], 'bodies': [], 'operations': []}
     detail = []; bridges = []; holes = []; door_probes = []; closed = []; connections = []; shaft_checks = []
+    guard_ids = []; guard_groups = []; guard_posts = []; guard_attachments = []; guard_clearances = []; ground_guard_ids = []
     def body(name, role, color, opacity=1, component=None):
         result['bodies'].append({'id': name, 'component': component or source['elevator']['id'], 'role': role, 'appearance': {'color': color, 'opacity': opacity}})
         return name
@@ -204,7 +217,28 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None)
         landing = (x1-x0)*recipe['landing_fraction']; run0 = x0+landing; entry_x = x1-landing; run = entry_x-run0
         total_width = y1-y0; lane = total_width*(1-recipe['center_gap_fraction'])/2
         require(run > 4*join and lane > 4*join and landing > 2*join, 'Stair footprint cannot contain flights and landings')
-        connectors = []; stair_ids = []
+        connectors = []; stair_ids = []; stair_guard_ids = []; stair_guard_groups = []; post_registry = {}
+        if guard_profile is not None:
+            post = guard_profile['post_mm']
+            require(post < lane/2 and post < landing and post < total_width-2*lane and post < run/4,
+                    'The referenced guard profile cannot fit the stair lanes, landing and centre gap')
+            first_y = y0+lane-post/2; return_y = y1-lane+post/2
+        top_wall = None
+        if 'top_guard_wall' in instance:
+            wall_id = instance['top_guard_wall']
+            require(wall_id in {ref['wall'] for ref in area['boundary']}
+                    and walls[wall_id]['kind'] == 'wall',
+                    'The top guard must terminate at an existing stairwell boundary wall')
+            a, b = wall_points(wall_id)
+            require(abs(a[1]-b[1]) < 1e-7 and abs(a[1]-min(q[1] for q in poly)) < 1e-7,
+                    'The top guard wall must bound the unused Ymin flight side')
+            face_y = a[1]+thickness/2
+            terminal_y = face_y+post/2
+            require(terminal_y < first_y and min(a[0], b[0])+post/2 < entry_x+run/n
+                    < max(a[0], b[0])-post/2,
+                    'The source top guard wall must contain the complete terminal post')
+            top_wall = {'wall': wall_id, 'interior_face_y_mm': face_y,
+                        'terminal_center_y_mm': terminal_y}
         for lower, upper in zip(levels, levels[1:]):
             name = instance['id']+'_'+lower['id']+'_'+upper['id']; stair_ids.append(body(name, 'concept_continuous_stair', '#8599ac', component=instance['id'])); detail.append(name)
             z0, z1 = lower['z_mm'], upper['z_mm']; mid = (z0+z1)/2; rise = (z1-z0)/2/n; tread = run/n
@@ -228,8 +262,132 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None)
                 expected = {target: volume*fraction for target, fraction in expected_parts}
                 connections.append(probe(name+'_'+label+'_Connection', rectangle(xx, yy, xx+dx, yy+witness_width), zz, witness_depth, list(expected), 'filled', expected))
             connectors.append({'id': name, 'body_id': name, 'from_level': lower['id'], 'to_level': upper['id'], 'z0_mm': z0, 'z1_mm': z1, 'mid_z_mm': mid, 'risers': 2*n, 'run_mm': run, 'lane_width_mm': lane, 'entry_x_mm': entry_x, 'slab_hole_probe_id': name+'_SlabHole'})
+            if guard_profile is not None:
+                require(tread+post < landing,
+                        'The source nosing-line guard extensions cannot fit the stair landings')
+                rear_x = run0-tread; front_x = entry_x+tread
+                top_termination = top_wall if upper['id'] == levels[-1]['id'] else None
+                # Slopes follow the tread nosing line. Horizontal extensions
+                # join the landing guards without passing bars through treads.
+                # Post support comes from the already generated step boxes,
+                # never from a second independently maintained stair formula.
+                segments = [
+                    ('FirstInner', [front_x, first_y, z0], [run0+tread, first_y, mid]),
+                    ('FirstTop', [run0+tread, first_y, mid], [rear_x, first_y, mid]),
+                    ('MidGap', [rear_x, first_y, mid], [rear_x, return_y, mid]),
+                    ('ReturnInner', [rear_x, return_y, mid], [entry_x-tread, return_y, z1]),
+                    ('ReturnTop', [entry_x-tread, return_y, z1], [front_x, return_y, z1]),
+                    ('UpperGap', [front_x, return_y, z1],
+                     [front_x, top_termination['terminal_center_y_mm'] if top_termination else first_y, z1]),
+                ]
+                step_boxes = [op['shape'] for op in result['operations']
+                              if op['body'] == name and op['action'] in {'create', 'join'}
+                              and op['shape']['kind'] == 'box']
+                entry_floors = {
+                    'FirstInner': (lower['id']+'__Area_'+instance['area'], z0),
+                    'ReturnTop': (floor_body, z1), 'UpperGap': (floor_body, z1),
+                }
+
+                def contains_xy(shape, point):
+                    return all(shape['origin'][i]-1e-7 <= point[i] <=
+                               shape['origin'][i]+shape['size'][i]+1e-7 for i in (0, 1))
+
+                def contains_xyz(shape, point):
+                    return all(shape['origin'][i]-1e-7 <= point[i] <=
+                               shape['origin'][i]+shape['size'][i]+1e-7 for i in (0, 1, 2))
+
+                connector_guards = []
+                for kind, start, end in segments:
+                    group_id = name+'_Guard_'+kind
+                    support_boxes = {name: step_boxes}
+                    if kind in entry_floors:
+                        floor_id, floor_z = entry_floors[kind]
+                        # The final closure reaches beyond the recipe inset,
+                        # but stays on the existing source floor at the wall.
+                        floor_y = top_termination['interior_face_y_mm'] if kind == 'UpperGap' and top_termination else y0
+                        require(inside_rectangle(rectangle(entry_x, floor_y, x1, y1), poly, 0),
+                                'The top guard landing support must lie within the existing source floor')
+                        support_boxes[floor_id] = [{'origin': [entry_x, floor_y, floor_z-slab],
+                            'size': [x1-entry_x, y1-floor_y, slab]}]
+
+                    def support_top(point):
+                        tops = []
+                        for xx in (point[0]-post/2, point[0]+post/2):
+                            for yy in (point[1]-post/2, point[1]+post/2):
+                                present = [shape['origin'][2]+shape['size'][2]
+                                    for boxes in support_boxes.values() for shape in boxes
+                                    if contains_xy(shape, (xx, yy))]
+                                require(present, 'The guard post footprint has no source stair or landing support')
+                                tops.append(max(present))
+                        return min(tops)
+
+                    pieces = guards.compile_segment(guard_profile, group_id, start, end,
+                        component=instance['id'], post_registry=post_registry, post_embed_mm=join,
+                        post_support_z=support_top)
+                    result['bodies'].extend(pieces['bodies']); result['operations'].extend(pieces['operations'])
+                    interface = pieces['interface']
+                    group = {'id': group_id, 'kind': kind, 'connector_id': name,
+                             'from_level': lower['id'], 'to_level': upper['id'],
+                             'profile_ref': guard_ref, 'start_mm': list(start), 'end_mm': list(end),
+                             'height_basis': 'source_nosing_line_with_horizontal_landing_extensions',
+                             'body_ids': list(interface['body_ids']),
+                             'post_body_ids': [item['body_id'] for item in interface['posts']]}
+                    if kind == 'UpperGap' and top_termination:
+                        group['wall_termination'] = {
+                            'wall': top_termination['wall'],
+                            'wall_body_id': upper['id']+'__Wall_'+top_termination['wall'],
+                            'interior_face_y_mm': top_termination['interior_face_y_mm'],
+                            'terminal_post_body_id': interface['posts'][-1]['body_id'],
+                            'contact': 'flush_concept_geometry_not_structural_attachment'}
+                    stair_guard_groups.append(group); guard_groups.append(group)
+                    for identifier in interface['body_ids']:
+                        if identifier not in connector_guards: connector_guards.append(identifier)
+                        if identifier not in stair_guard_ids: stair_guard_ids.append(identifier)
+                        if identifier not in guard_ids: guard_ids.append(identifier)
+                    for item in interface['posts']:
+                        if not item['new']: continue
+                        base = item['base_mm']; pitch_z = item['pitchline_mm'][2]
+                        width = min(post/4, join); depth = join/2; volume = width*width*depth
+                        patch = rectangle(base[0]-width/2, base[1]-width/2,
+                                          base[0]+width/2, base[1]+width/2)
+                        patch_z = (base[2]+join/4, base[2]+join*.75)
+                        sample_points = [[xx, yy, zz] for xx, yy in patch for zz in patch_z]
+                        supporting = [body_id for body_id, boxes in support_boxes.items()
+                            if all(any(contains_xyz(shape, point) for shape in boxes) for point in sample_points)]
+                        require(supporting, 'The embedded guard foot has no complete source support witness')
+                        support = supporting[0]
+                        identifier = item['body_id']+'_Attachment'
+                        witness = probe(identifier, patch, base[2]+join/4, depth,
+                            [item['body_id'], support], 'filled', {item['body_id']: volume, support: volume})
+                        guard_attachments.append(witness)
+                        guard_posts.append({'body_id': item['body_id'], 'base_mm': list(base),
+                            'top_mm': list(item['top_mm']), 'reference_pitch_z_mm': pitch_z,
+                            'support_z_mm': item['support_z_mm'], 'support_body_id': support,
+                            'support_body_ids': [support], 'attachment_probe_id': identifier})
+                connectors[-1]['guard_body_ids'] = connector_guards
+                connectors[-1]['guard_nosing_extension_mm'] = tread
+                first_clear = lane-post; landing_clear = landing-tread-post
+                guard_height = guard_profile['height_mm']
+                for kind, points, z, height in [
+                    ('FirstFlight', rectangle(run0+post, y0+first_clear*.2,
+                        entry_x-post, y0+first_clear*.8), z0, mid-z0+guard_height+join),
+                    ('ReturnFlight', rectangle(run0+post, y1-first_clear*.8,
+                        entry_x-post, y1-first_clear*.2), mid, z1-mid+guard_height+join),
+                    ('MidTurnback', rectangle(x0+landing_clear*.2, y0+post,
+                        x0+landing_clear*.8, y1-post), mid, guard_height+join),
+                    ('EntryLanding', rectangle(entry_x+tread+post+landing_clear*.2, y0+post,
+                        entry_x+tread+post+landing_clear*.8, y1-post), z1, guard_height+join),
+                ]:
+                    item = probe(name+'_GuardClear_'+kind, points, z, height, [])
+                    item['scope'] = 'new_guard_members_only'
+                    guard_clearances.append(item)
+                if lower['id'] == levels[0]['id']:
+                    ground_guard_ids.extend(identifier for identifier in connector_guards if identifier not in ground_guard_ids)
         stairs.append({'id': instance['id'], 'component_id': instance['id'], 'area': instance['area'], 'entry_opening': instance['entry_opening'], 'interior_rectangle_mm': rectangle(x0, y0, x1, y1), 'connectors': connectors, 'body_ids': stair_ids, 'entry_landing_preserved': True,
-                       'served_extent': copy.deepcopy(source['served_extent']), 'classification': 'internal', 'planned_connectors': []})
+                       'served_extent': copy.deepcopy(source['served_extent']), 'classification': 'internal', 'planned_connectors': [],
+                       'guard_profile_ref': guard_ref, 'guard_body_ids': stair_guard_ids, 'guard_groups': stair_guard_groups,
+                       'guard_safety_qualified': False})
+        detail.extend(stair_guard_ids)
         detail.extend(level['id']+'__Area_'+instance['area'] for level in levels)
     # The external steel illustration reuses the same source footprint/layout
     # ratios, but has thin treads and inclined stringers rather than solid steps.
@@ -315,10 +473,15 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None)
             points = [[a[0]+nx,a[1]+ny],[b[0]+nx,b[1]+ny],[b[0]-nx,b[1]-ny],[a[0]-nx,a[1]-ny]]
             name = 'WallBridge_'+lower['id']+'_'+wall_id; bridges.append(body(name, 'circulation_wall_bridge', '#a0b5bf', .7, component=boundary_owners[wall_id]))
             result['operations'].append({'id': name+'_Profile', 'body': name, 'action': 'create', 'shape': {'kind': 'polygon_prism', 'plane': 'XY', 'points': points, 'offset': lower['clear_top_mm'], 'depth': upper['z_mm']-lower['clear_top_mm'], 'fixed': True}})
+    for item in guard_clearances:
+        item['target_bodies'] = list(guard_ids)
     result['interface'] = {'elevator': {'id': lift['id'], 'component_id': lift['id'], 'served_extent': copy.deepcopy(source['served_extent']), 'area': lift['area'], 'shaft_body_ids': shaft_ids, 'cabin_body_ids': [cabin], 'door_frame_body_ids': door_frames, 'sides': copy.deepcopy(lift['sides']), 'ports': ports, 'doors_by_level': doors_by_level, 'deferred_stops': copy.deepcopy(lift['deferred_stops']), 'cabin_level': lift['cabin_level'], 'operation_implemented': False},
         'stairs': stairs, 'external_stairs': [external], 'body_ids': [b['id'] for b in result['bodies']], 'wall_bridge_ids': bridges, 'detail_visibility_ids': detail,
         'served_extent': copy.deepcopy(source['served_extent']),
         'slab_hole_probes': holes, 'door_probes': door_probes, 'closed_door_probes': closed, 'connection_witnesses': connections, 'shaft_witnesses': shaft_checks, 'external_access_witnesses': access_checks,
-        'ground_visibility_ids': [cabin]+[port['frame_body_id'] for port in ports if port['level_id'] == 'EG' and port['frame_body_id']]+[stair['connectors'][0]['body_id'] for stair in stairs]+[ext_connectors[0]['body_id'], metal_landings[0]],
+        'guard_profile_ref': guard_ref, 'guard_body_ids': guard_ids, 'guard_groups': guard_groups,
+        'guard_posts': guard_posts, 'guard_attachment_witnesses': guard_attachments,
+        'guard_clearance_probes': guard_clearances, 'guard_safety_qualified': False,
+        'ground_visibility_ids': [cabin]+[port['frame_body_id'] for port in ports if port['level_id'] == 'EG' and port['frame_body_id']]+[stair['connectors'][0]['body_id'] for stair in stairs]+[ext_connectors[0]['body_id'], metal_landings[0]]+ground_guard_ids,
         'basement_geometry_implemented': True, 'headroom_qualified': False, 'egress_qualified': False, 'limitations': list(source['limitations'])}
     return result

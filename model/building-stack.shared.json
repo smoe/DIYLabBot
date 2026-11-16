@@ -159,9 +159,11 @@
         {
           "id": "EastStair",
           "area": "R3_028",
-          "entry_opening": "D3_028"
+          "entry_opening": "D3_028",
+          "top_guard_wall": "W081"
         }
-      ]
+      ],
+      "guard_profile_ref": "#/exterior"
     },
     "qualification": {
       "surveyed_geometry": false,
@@ -178,7 +180,8 @@
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled."
+      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled.",
+      "Internal stair guards reuse the atrium profile at #/exterior; dimensions, attachment and clearances are illustrative, not a qualified fall-protection or stair design."
     ],
     "served_extent": {
       "from_level": "KG",
