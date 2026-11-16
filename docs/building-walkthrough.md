@@ -128,6 +128,22 @@ aus. Erst nach erfolgreichem Deployment die öffentliche Seite prüfen; ein
 lokaler Export allein veröffentlicht nichts. Andere Änderungen an `master`
 erneuern den veröffentlichten Rundgang nicht automatisch.
 
+Vor und nach einer Veröffentlichung prüft der folgende Befehl HTML-Prüfsumme,
+Quellenpins, aktuelle Objektbindungen und vollständige Gebäude-Körperabdeckung:
+
+```sh
+python3 scripts/check_walkthrough_publication.py /pfad/zur/gh-pages-arbeitskopie
+python3 scripts/check_walkthrough_publication.py https://smoe.github.io/DIYLabBot/
+```
+
+Er weist auch eine intern korrekt signierte, aber veraltete Momentaufnahme
+zurück. Die GitHub-Actions-Prüfung `Walkthrough regressions` führt die
+Quell-, Arbeitsplatz-, Artikulations- und Publikationsvertragstests bei
+relevanten Änderungen aus. Die tatsächliche Browserbedienung bleibt eine
+separate Prüfung des erzeugten nativen Rundgangs mit
+`tests/check_building_walkthrough.cjs`; die Quellenprüfung allein belegt keine
+erfolgreiche Pages-Bereitstellung.
+
 ## Nachweise
 
 Die bestätigte Lage im Kernbereich und die erweiterte Küche am Fenster sind
@@ -165,7 +181,7 @@ Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
 Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
 Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
 
-## Erste Objektbefehle: Kühlschrank 1.008
+## Objektbefehle: Kühlschrank und Mikrowelle 1.008
 
 Bewegliche Türen werden direkt im 3D-Bild bedient: **mit der Maus auf das
 Türblatt oder den Griff klicken**, um sie zu öffnen oder zu schließen.
@@ -186,8 +202,8 @@ Kollisions- oder Wegefreigabe.
 
 Die gemeinsame Auswahlroutine `scripts/walkthrough_interaction.js` unterstützt
 alle im Rundgang deklarierten beweglichen Objekte und wird ohne externe
-Bibliothek in das eigenständige HTML eingebettet. Aktuell ist nur die
-Kühlschranktür 1.008 als bewegliches Objekt definiert. Raum- und Schranktüren
+Bibliothek in das eigenständige HTML eingebettet. Aktuell sind die
+Kühlschranktür und die Mikrowellentür 1.008 als bewegliche Objekte definiert. Raum- und Schranktüren
 benötigen noch ihre eigenen Artikulationsbindungen; sie erhalten dieselbe
 Bedienung, sobald diese beschrieben sind. Die Kamera-Hilfe `viewObject` bleibt
 nur in der Test-API und hat keine Taste in der Oberfläche.
@@ -202,7 +218,7 @@ Während einer Bewegung werden weitere Bewegungsbefehle abgewiesen. Es gibt
 keine Warteschlange oder automatische Umplanung.
 
 Die zusätzliche Quelle `model/furniture/social.articulations.json` referenziert
-den unveränderten Möbelkatalog und benennt Teile und Scharnierkante ohne
+den Möbelkatalog und benennt Teile und Scharnierkante ohne
 kopierte Abmessungen. `scripts/furniture_articulation.py` leitet den Rahmen aus
 der platzierten Tür-Prismenoperation ab. Die Rundgangquelle referenziert nur
 Raum, Instanz und Artikulation sowie Beschriftungen und Darstellparameter.

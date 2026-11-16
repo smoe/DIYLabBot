@@ -108,7 +108,7 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         room = next((v for v in furnishings['rooms'] if v['id'] == item['room']), None)
         require(room is not None, 'Unknown object room')
         instance = next((v for v in room['instances'] if v['id'] == item['instance']), None)
-        require(instance is not None and instance['type'] == 'fridge', 'Unknown or unsupported object instance')
+        require(instance is not None and instance['type'] in source['types'], 'Unknown or unsupported object instance')
         joint = source['types'].get(instance['type'], {}).get(item['articulation'])
         require(joint is not None, 'Unknown object articulation')
         parts = {v['id']: v for v in catalog['types'][instance['type']] if v['action'] == 'create'}

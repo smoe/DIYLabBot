@@ -20,7 +20,7 @@
     },
     "furnishings": {
       "source": "model/furnishings/building-social.json",
-      "source_sha256": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b"
+      "source_sha256": "c27f86d7acfd063026df3a790dd4794e060253917d06e195dec2958016861ec0"
     }
   },
   "calibration": null,

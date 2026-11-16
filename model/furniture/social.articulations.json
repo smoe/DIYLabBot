@@ -2,7 +2,7 @@
   "format": "solidcraftbot.furniture-articulations/1",
   "catalog": {
     "source": "model/furniture/social.catalog.json",
-    "source_sha256": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50"
+    "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"
   },
   "types": {
     "fridge": {
@@ -11,6 +11,49 @@
         "type": "revolute",
         "moving_parts": [
           "Door",
+          "Handle"
+        ],
+        "hinge": {
+          "part": "Door",
+          "edge": {
+            "x": "min",
+            "y": "max"
+          }
+        },
+        "axis": [
+          0,
+          0,
+          1
+        ],
+        "front": [
+          0,
+          1,
+          0
+        ],
+        "limits_deg": [
+          0,
+          90
+        ],
+        "states": {
+          "closed": 0,
+          "open": 90
+        },
+        "reference_state": "closed",
+        "basis": "presentation_assumption",
+        "qualification": {
+          "measured_hinge": false,
+          "native_articulation": false,
+          "swing_clearance_checked": false
+        }
+      }
+    },
+    "microwave": {
+      "Door": {
+        "id": "Door",
+        "type": "revolute",
+        "moving_parts": [
+          "Door",
+          "Window",
           "Handle"
         ],
         "hinge": {

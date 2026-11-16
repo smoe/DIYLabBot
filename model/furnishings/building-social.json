@@ -2,7 +2,7 @@
   "format": "solidcraftbot.building-furnishings/1",
   "catalog": {
     "source": "model/furniture/social.catalog.json",
-    "source_sha256": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50"
+    "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"
   },
   "basis": "Owner room assignments and two private kitchen photographs; all sizes and desk counts assumed",
   "kitchen_template_mapping": "Owner-confirmed unpartitioned kitchen 1.008 on OG1 uses the canonical 008A/B/009 projection. W027 and W017 are omitted only in this furnished OG1 view; no OG1 room number 1.009 is inferred, and OG2/OG3 retain the original partitions.",
@@ -410,6 +410,74 @@
             0
           ],
           "yaw_deg": 180
+        },
+        {
+          "id": "Computer0",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk0",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer1",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk1",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer2",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk2",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer3",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk3",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
         }
       ]
     },
@@ -506,6 +574,74 @@
             0
           ],
           "yaw_deg": 180
+        },
+        {
+          "id": "Computer0",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk0",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer1",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk1",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer2",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk2",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer3",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk3",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
         }
       ]
     },
@@ -653,6 +789,74 @@
             "jamb_gap_mm": 150,
             "height_mm": 1400
           }
+        },
+        {
+          "id": "Computer0",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk0",
+            "uv": [
+              0.62,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer1",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk1",
+            "uv": [
+              0.69,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer2",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk0",
+            "uv": [
+              0.32,
+              0.3
+            ]
+          }
+        },
+        {
+          "id": "Computer3",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk3",
+            "uv": [
+              0.5,
+              0.3
+            ]
+          }
         }
       ],
       "layout_basis": "Owner confirms a continuous U-shaped work surface flush with both long walls and the window wall, interrupted only at the left glass doorway to laboratory 3.001; the first-aid cabinet stays inside right of the corridor entrance. Four worktop modules and four chairs preserve existing IDs; dimensions, support spacing, jamb margins and chair positions remain presentation assumptions."
@@ -700,6 +904,23 @@
             0
           ],
           "yaw_deg": 0
+        },
+        {
+          "id": "Computer",
+          "type": "office_computer",
+          "xyz_mm": [
+            0,
+            0,
+            0
+          ],
+          "yaw_deg": 0,
+          "worktop_anchor": {
+            "instance": "Desk",
+            "uv": [
+              0.45,
+              0.3
+            ]
+          }
         }
       ]
     }

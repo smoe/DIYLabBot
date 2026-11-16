@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a"
+      "source_sha256": "b588759d142ef39f82ce503356adc15c35a64521ea9d428ed0cf2992e98d06ce"
     },
     "lab": {
       "source": "model/lab-layout-l01.shared.json",
@@ -123,7 +123,7 @@
   },
   "articulation_source": {
     "source": "model/furniture/social.articulations.json",
-    "source_sha256": "6b0edd12937e6496a7058cd7d2bb6e4b3c06e9c1b59be15afc837db0ce195403"
+    "source_sha256": "5342c1d3d6c2110b9b46a9bd2fa7c485182c5329e08bd93436d8846b4c808de6"
   },
   "objects": [
     {
@@ -154,6 +154,42 @@
       },
       "view_distance": {
         "value": 2000,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    },
+    {
+      "id": "Kitchen1008.Microwave.Door",
+      "room": "Kitchen1008",
+      "instance": "Microwave",
+      "articulation": "Door",
+      "label": "Mikrowelle 1.008",
+      "commands": {
+        "open": "Öffnen",
+        "close": "Schließen",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Geschlossen",
+        "opening": "Wird geöffnet",
+        "open": "Offen",
+        "closing": "Wird geschlossen"
+      },
+      "duration": {
+        "value": 0.8,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1500,
         "unit": "mm",
         "range": [
           300,

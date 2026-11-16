@@ -231,8 +231,17 @@ class FurnishingsTests(unittest.TestCase):
                          {'path':str(path.relative_to(stack.ROOT)), 'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
         self.assertFalse(proof['original_photographs_included'])
         self.assertEqual({image['id'] for image in proof['images']},{'Kitchen1008','PhD1002','PhD3002','Kitchen1008_EasterEgg'})
-        actual={name:hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest() for name in proof['source_files_sha256']}
-        self.assert_media_source_binding(proof, compatibility, actual, media_camera_digest(walkthrough.compile()), site)
+        # These preserved PNGs predate the explicitly added office devices and
+        # microwave leaf. Validate their last compatible bindings separately;
+        # never promote their old pixels to a current rendering claim.
+        status=json.loads((stack.ROOT/'docs/building-furnishings-media-status.json').read_text())
+        self.assertIs(status['historical_images_represent_current_model'], False)
+        self.assertEqual(status['historical_provenance'], compatibility['historical_provenance'])
+        self.assertEqual(set(status['last_compatible_sources_sha256']), set(proof['source_files_sha256']))
+        self.assertEqual(set(status['current_sources_sha256']), set(proof['source_files_sha256'])|{'scripts/worktop_equipment.py'})
+        for name,digest in status['current_sources_sha256'].items():
+            self.assertEqual(hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest(),digest,name)
+        self.assert_media_source_binding(proof, compatibility, status['last_compatible_sources_sha256'], media_camera_digest(walkthrough.compile()), site)
         for image in proof['images']:
             data=(stack.ROOT/image['path']).read_bytes()
             self.assertEqual(data[:8],b'\x89PNG\r\n\x1a\n')
@@ -243,7 +252,7 @@ class FurnishingsTests(unittest.TestCase):
         proof=json.loads((stack.ROOT/'docs/media/building-furnishings.provenance.json').read_text())
         compatibility=json.loads((stack.ROOT/'docs/building-furnishings-media-compatibility.json').read_text())
         site=json.loads((stack.ROOT/'docs/media/front-access-correction.provenance.json').read_text())
-        actual={name:hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest() for name in proof['source_files_sha256']}
+        actual=json.loads((stack.ROOT/'docs/building-furnishings-media-status.json').read_text())['last_compatible_sources_sha256']
         camera=compatibility['camera_projection']['sha256']
         for name in ('scripts/building_furnishings.py', 'scripts/building_walkthrough_viewer.html', 'scripts/building_exterior.py'):
             changed={**actual, name:'0'*64}

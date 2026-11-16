@@ -44,7 +44,17 @@ durchgehenden rechten Lauf, zwei durch die linke Tür getrennte Abschnitte und
 das Fensterstück. Das Fensterstück besitzt beide Ecken; die Seiten schließen
 ohne Spalt oder überlagerte Platten daran an. Vier Stühle sowie Maße, Höhen,
 Stützenabstände und der Abstand zu den Türpfosten bleiben ausdrückliche
-Darstellungsannahmen. 1.002 und 2.002 bleiben unverändert.
+Darstellungsannahmen. Die Tischanordnung in 1.002 und 2.002 bleibt unverändert.
+
+Alle 13 Büroarbeitsplätze erhalten je einen Bildschirm mit Standfuß und einen
+kleinen Mini-PC. Der gemeinsame Typ `office_computer` beschreibt die Teile
+einmalig; jede Instanz referenziert über `worktop_anchor` ihre Tischplatte und
+zwei relative Positionsanteile. Höhe, Ausrichtung und Raumskalierung werden
+aus der tatsächlich erzeugten Platte abgeleitet. Die Auswertung weist Geräte
+zurück, die über deren Rand ragen. In 3.002 liegen zwei Sets auf dem langen
+linken Lauf sowie je eines rechts und am Fenster; das kurze Stück hinter der
+Glastür bleibt frei. Gerätemaße und Ausstattung sind Darstellungsannahmen.
+Die nachfolgenden publizierten Bürobilder zeigen den früheren Stand ohne Geräte.
 
 Der Erste-Hilfe-Kasten ist als eigener portabler Möbeltyp beschrieben. Seine Platzierung
 referenziert die Flurtür `D3_002N` und deren Innenseite im Raum `R3_002`;
@@ -72,6 +82,14 @@ Das unveränderte [Büro 1.002](media/office-1-002.png) behält seine bisherige
 angenommene Vierergruppe.
 
 ## Ein kleiner Gast im Kühlschrank
+
+Im lokalen Rundgang lässt sich auch die Mikrowelle per Mausklick oder
+Leertaste öffnen und schließen. Türrahmen, Fenster und Griff bilden die
+bewegliche Gruppe; das ausgehöhlte Gehäuse und die Bedienknöpfe bleiben fest.
+Die gemeinsame Gerätevorlage liefert auch dem Tischbackofen eine getrennte
+statische Tür; interaktiv gebunden ist hier ausschließlich die Mikrowelle.
+Die Scharnierlage und der Öffnungswinkel von 90° sind Darstellungsannahmen.
+Die CAD-Referenz bleibt geschlossen; eine reale Schwenkfreiheit ist nicht geprüft.
 
 Ein Pinguin mit Teetasse sitzt im ergänzten Unterbaukühlschrank. Kühlschrankhülle,
 Innenraum, Fachböden, Tür und Griff sind getrennt modelliert. Die Detailansicht

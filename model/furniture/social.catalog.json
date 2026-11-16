@@ -741,6 +741,63 @@
         }
       },
       {
+        "id": "Cavity",
+        "body": "Case",
+        "color": "#eee9da",
+        "action": "cut",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            20,
+            20,
+            20
+          ],
+          "size": [
+            400,
+            365,
+            270
+          ]
+        }
+      },
+      {
+        "id": "Door",
+        "body": "Door",
+        "color": "#eee9da",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            0,
+            381,
+            0
+          ],
+          "size": [
+            430,
+            8,
+            310
+          ]
+        }
+      },
+      {
+        "id": "DoorOpening",
+        "body": "Door",
+        "color": "#eee9da",
+        "action": "cut",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            35,
+            380,
+            55
+          ],
+          "size": [
+            350,
+            10,
+            205
+          ]
+        }
+      },
+      {
         "id": "Window",
         "body": "Window",
         "color": "#172b32",
@@ -2677,6 +2734,122 @@
         "end_start": "LegEndNear",
         "end_end": "LegEndFar"
       }
-    }
+    },
+    "office_computer": [
+      {
+        "id": "MonitorCase",
+        "body": "MonitorCase",
+        "color": "#252D35",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -270,
+            0,
+            180
+          ],
+          "size": [
+            540,
+            22,
+            330
+          ]
+        }
+      },
+      {
+        "id": "MonitorScreen",
+        "body": "MonitorScreen",
+        "color": "#183A50",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -254,
+            22,
+            196
+          ],
+          "size": [
+            508,
+            2,
+            298
+          ]
+        }
+      },
+      {
+        "id": "MonitorStand",
+        "body": "MonitorStand",
+        "color": "#505B65",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -15,
+            10,
+            15
+          ],
+          "size": [
+            30,
+            30,
+            180
+          ]
+        }
+      },
+      {
+        "id": "MonitorFoot",
+        "body": "MonitorFoot",
+        "color": "#505B65",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -100,
+            -20,
+            0
+          ],
+          "size": [
+            200,
+            180,
+            15
+          ]
+        }
+      },
+      {
+        "id": "MiniPC",
+        "body": "MiniPC",
+        "color": "#303941",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            290,
+            40,
+            0
+          ],
+          "size": [
+            125,
+            125,
+            40
+          ]
+        }
+      },
+      {
+        "id": "MiniPCPower",
+        "body": "MiniPCPower",
+        "color": "#5AA8C7",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            389,
+            165,
+            17
+          ],
+          "size": [
+            7,
+            2,
+            4
+          ]
+        }
+      }
+    ]
   }
 }

@@ -39,6 +39,22 @@ class ArticulationTests(unittest.TestCase):
         self.assertFalse(any('Penguin' in n or 'Shelf' in n or 'Shell' in n for n in obj['moving_body_ids']))
         self.assertTrue(all(value is False for value in obj['qualification'].values()))
 
+    def test_microwave_leaf_window_and_handle_move_independently_of_case(self):
+        obj = next(v for v in self.objects if v['id'] == 'Kitchen1008.Microwave.Door')
+        self.assertEqual(set(obj['moving_body_ids']),
+            {'Kitchen1008_Microwave_'+part for part in ('Door', 'Window', 'Handle')})
+        self.assertEqual(obj['states'], {'closed': 0, 'open': 90})
+        hinge = obj['joint']['origin_mm']
+        handle = next(v['shape'] for v in self.expanded['operations']
+                      if v['id'] == 'Kitchen1008_Microwave_Handle')
+        delta = [sum(p[i] for p in handle['points'])/4-hinge[i] for i in (0, 1)]
+        opened = [-delta[1], delta[0]]
+        self.assertGreater(sum(opened[i]*obj['front'][i] for i in (0, 1)),
+                           sum(delta[i]*obj['front'][i] for i in (0, 1)))
+        self.assertTrue(any(v['action'] == 'cut' and v['body'] == 'Kitchen1008_Microwave_Case'
+                            for v in self.expanded['operations']))
+        self.assertTrue(all(value is False for value in obj['qualification'].values()))
+
     def test_hinge_is_the_ordered_top_left_footprint_vertex(self):
         obj = self.objects[0]
         operation = next(o for o in self.expanded['operations'] if o['id'] == 'Kitchen1008_Fridge_Door')

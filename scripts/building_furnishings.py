@@ -5,6 +5,7 @@ from pathlib import Path
 import assembly_model as assembly
 import relative_floorplan as floor
 import wall_worktops
+import worktop_equipment
 import building_roof as boundaries
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -18,7 +19,7 @@ def read(ref):
 
 def dependencies(ref):
     source = read(ref)
-    return [ROOT/ref['source'], ROOT/source['catalog']['source'], ROOT/'model/building-furnishings.schema.json', ROOT/'model/social-furniture-catalog.schema.json', Path(__file__), ROOT/'scripts/wall_worktops.py', ROOT/'scripts/building_roof.py']
+    return [ROOT/ref['source'], ROOT/source['catalog']['source'], ROOT/'model/building-furnishings.schema.json', ROOT/'model/social-furniture-catalog.schema.json', Path(__file__), ROOT/'scripts/wall_worktops.py', ROOT/'scripts/building_roof.py', ROOT/'scripts/worktop_equipment.py']
 
 
 def parts_for(catalog, name, overrides=None, footprint=None):
@@ -270,18 +271,22 @@ def compile(ref, plan, p, levels, level_plans=None):
         origin = [(hi[i]+lo[i]-scale*(rhi[i]+rlo[i]))/2 for i in (0,1)]
         z = level_z[room['level']]; component = room['id']+'_Furniture'
         result['components'].append({'id':component,'grounded':True})
-        room_ids = []; anchors = []
+        room_ids = []; anchors = []; equipment_anchors = []; item_frames = {}
         def point(x,y,zlocal):return [origin[0]+scale*(c*x-s*y),origin[1]+scale*(s*x+c*y),z+scale*zlocal]
         window_report = None
         if 'window_anchor' in room:
             translation, window_report = window_anchor_translation(room, catalog, room_plan, p, scale, point)
             origin[:] = [origin[i]+translation[i] for i in (0, 1)]
         fits = wall_worktops.fit_spans(room, catalog, room_plan, p, scale)
-        for item in room['instances']:
+        ordered=[v for v in room['instances'] if 'worktop_anchor' not in v]+[v for v in room['instances'] if 'worktop_anchor' in v]
+        for item in ordered:
             yaw=math.radians(item['yaw_deg']); a,b=math.cos(yaw),math.sin(yaw)
             fit = fits.get(item['id'])
             parts = parts_for(catalog, item['type'], fit['values'] if fit else item.get('parameter_overrides_mm'), fit['footprint'] if fit else None)
-            if fit:
+            if 'worktop_anchor' in item:
+                placed, equipment_report, support_polygon = worktop_equipment.anchor(item,room,catalog,item_frames,result['operations'],scale)
+                equipment_anchors.append(equipment_report)
+            elif fit:
                 def placed(x,y,zlocal):
                     return [fit['base'][i]+scale*(fit['tangent'][i]*x+fit['inward'][i]*y) for i in (0,1)]+[z+scale*zlocal]
             elif 'opening_anchor' in item:
@@ -292,7 +297,12 @@ def compile(ref, plan, p, levels, level_plans=None):
                     return [base[i]+scale*(xaxis[i]*xx+yaxis[i]*yy) for i in (0,1)]+[base[2]+scale*(item['xyz_mm'][2]+zlocal)]
             else:
                 def placed(x,y,zlocal):return point(item['xyz_mm'][0]+a*x-b*y,item['xyz_mm'][1]+b*x+a*y,item['xyz_mm'][2]+zlocal)
+            frame_origin=placed(0,0,0)
+            item_frames[item['id']]=(frame_origin,[(placed(1,0,0)[i]-frame_origin[i])/scale for i in (0,1)],[(placed(0,1,0)[i]-frame_origin[i])/scale for i in (0,1)])
             placed_parts = place_parts(parts, room['id']+'_'+item['id'], component, placed, scale, names)
+            if 'worktop_anchor' in item:
+                worktop_equipment.check(placed_parts,support_polygon,equipment_report['origin_mm'][2])
+                equipment_report['body_ids']=placed_parts['body_ids']
             room_ids.extend(placed_parts['body_ids'])
             result['bodies'].extend(placed_parts['bodies'])
             result['operations'].extend(placed_parts['operations'])
@@ -307,6 +317,7 @@ def compile(ref, plan, p, levels, level_plans=None):
             'easter_egg_body_ids':[name for name in room_ids if '_Penguin' in name],
             'fridge_door_body_ids':[name for name in room_ids if '_Fridge_' in name and name.endswith(('_Door','_Handle'))]})
         if anchors:result['rooms'][-1]['opening_anchors'] = anchors
+        if equipment_anchors:result['rooms'][-1]['worktop_equipment'] = equipment_anchors
         if window_report:result['rooms'][-1]['window_anchor'] = window_report
         if fits:
             result['rooms'][-1]['wall_spans'] = [{'instance': key, 'wall_id': fit['span']['wall_id'],

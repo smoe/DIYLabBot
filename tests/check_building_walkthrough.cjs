@@ -298,6 +298,33 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert.deepEqual(errors,[], 'Object commands produce no browser errors');
     report.interactions.push('native door picking','mouse click open/close','Space near doorway','open/close','reduced and animated hinge motion','persistent in-memory scene state');
 
+    const microwave = model.objects.find(v=>v.id==='Kitchen1008.Microwave.Door');
+    assert(microwave,'The microwave has a source-defined door');
+    const fridgeBefore = await objectState();
+    await rendered(()=>page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),microwave.id));
+    const microwaveState=()=>page.evaluate(id=>window.__buildingWalkthrough.objects.find(v=>v.id===id),microwave.id);
+    const windowGroup=scene.groups.find(v=>v.id==='Kitchen1008_Microwave_Window');
+    const windowCentre=windowGroup.bounds_mm.min.map((v,i)=>(v+windowGroup.bounds_mm.max[i])/2);
+    for(const expected of ['open','closed']) {
+      const screen=await page.evaluate(({id,point})=>{
+        const v=window.__buildingWalkthrough,o=v.objects.find(v=>v.id===id),m=o.model_matrix,p=point.map(x=>x/1000);
+        const world=[0,1,2].map(r=>(m[r]*p[0]+m[4+r]*p[1]+m[8+r]*p[2]+m[12+r])*1000);
+        const pixel=v.projectPoint(world),c=document.querySelector('canvas'),rect=c.getBoundingClientRect();
+        return {x:rect.left+pixel.x/c.width*rect.width,y:rect.top+pixel.y/c.height*rect.height};
+      },{id:microwave.id,point:windowCentre});
+      await rendered(()=>page.mouse.click(screen.x,screen.y));
+      assert.equal((await microwaveState()).state,expected,'Microwave native window responds to mouse');
+      assert(Object.values((await microwaveState()).body_angles_deg).every(a=>a===(expected==='open'?90:0)));
+      await page.screenshot({path:path.join(output,`browser-microwave-${expected}.png`),fullPage:true});
+    }
+    await page.locator('#walkthrough-canvas').focus();
+    for(const expected of ['open','closed']) {
+      await rendered(()=>page.keyboard.press('Space'));
+      assert.equal((await microwaveState()).state,expected,'Space toggles the microwave at its opening');
+    }
+    assert.deepEqual(await objectState(),fridgeBefore,'Microwave commands leave the refrigerator unchanged');
+    report.microwave={mouse_open_close:true,space_open_close:true,moving_body_ids:microwave.moving_body_ids};
+
     // A corrupt source must produce a useful visible error rather than an empty canvas.
     const defaultStop = model.stops.find(stop => stop.id === (model.default_stop_id || model.default_stop)) || model.stops[0];
     const broken = {stops: [defaultStop], levels: model.levels, settings: model.settings,
