@@ -2,98 +2,43 @@
 
 **Robotik, die Zeit für Forschung schafft.**
 
-Damit Robotik im Forschungslabor Akzeptanz findet, muss ihr Zweck deutlich
-werden: Es geht hier nicht um Hochdurchsatz. Roboter sollen diejenigen Arbeiten
-übernehmen, die Menschen nicht selbst erledigen müssen. So können Forschende
-in derselben Zeit nachdenken, Ergebnisse aufschreiben, Verfahren verbessern
-und mit Kolleginnen und Kollegen diskutieren.
+Damit Robotik im Forschungslabor Akzeptanz findet, muss ihr Zweck deutlich werden: Es geht hier nicht um Hochdurchsatz. Roboter sollen diejenigen Arbeiten übernehmen, die Menschen nicht selbst erledigen müssen. So können Forschende in derselben Zeit nachdenken, Ergebnisse aufschreiben, Verfahren verbessern und mit Kolleginnen und Kollegen diskutieren.
 
-Dieses Projekt bietet Modelle für unterschiedliche Roboter. Sie sehen
-verschieden aus, weil sie verschiedene Dinge können. Ihr Zusammenspiel bildet
-biologische Workflows im Modell ab. Dabei soll ihre Arbeitsweise so menschlich
-wie möglich sein: weitgehend dieselben Werkzeuge, dieselben Gefäße und dieselbe
-Arbeitsumgebung, die wir auch selbst verwenden.
+Dieses Projekt bietet Modelle für unterschiedliche Roboter. Sie sehen verschieden aus, weil sie verschiedene Dinge können. Ihr Zusammenspiel bildet biologische Workflows im Modell ab. Dabei soll ihre Arbeitsweise so menschlich wie möglich sein: weitgehend dieselben Werkzeuge, dieselben Gefäße und dieselbe Arbeitsumgebung, die wir auch selbst verwenden.
 
-Die Roboter sollen dabei **„Self-Aware“** sein: ihren eigenen Zustand und ihre
-Fähigkeiten kennen, die Ergebnisse ihrer Handlungen überprüfen und Fehler
-erkennen können. Wenn eine Probe fehlt, ein Griff misslingt oder eine Übergabe
-unklar bleibt, sollen sie das bemerken und Unterstützung anfordern können.
-Diese Rückmeldung gehört zum Entwicklungsziel ebenso wie die Bewegung selbst.
+Die Roboter sollen dabei **„Self-Aware“** sein: ihren eigenen Zustand und ihre Fähigkeiten kennen, die Ergebnisse ihrer Handlungen überprüfen und Fehler erkennen können. Wenn eine Probe fehlt, ein Griff misslingt oder eine Übergabe unklar bleibt, sollen sie das bemerken und Unterstützung anfordern können. Diese Rückmeldung gehört zum Entwicklungsziel ebenso wie die Bewegung selbst.
 
-Wir wollen unsere Roboter **selbst bauen, verändern und reparieren können**.
-Eine Ausstattung mit vielen Robotern für unterschiedliche Aufgaben wäre für uns
-sonst kaum finanzierbar. Eigenbau gibt uns die Möglichkeit, die Technik an unsere
-Forschung anzupassen und dabei weniger oder wenigstens andere Kompromisse
-einzugehen. Vorhandene Werkzeuge, 3D-Drucker und die Universitätswerkstatt sind
-dafür wichtige Voraussetzungen.
+Wir wollen unsere Roboter **selbst bauen, verändern und reparieren können**. Eine Ausstattung mit vielen Robotern für unterschiedliche Aufgaben wäre für uns sonst kaum finanzierbar. Eigenbau gibt uns die Möglichkeit, die Technik an unsere Forschung anzupassen und dabei weniger oder wenigstens andere Kompromisse einzugehen. Vorhandene Werkzeuge, 3D-Drucker und die Universitätswerkstatt sind dafür wichtige Voraussetzungen.
 
-Unser Ziel ist, biologische Workflows zunächst vollständig am Rechner
-modellieren und erproben zu können. Deshalb beschreiben wir neben den Robotern
-auch die Geräte, Materialien, Abläufe und die gemeinsame Arbeitsumgebung.
+Unser Ziel ist, biologische Workflows zunächst vollständig am Rechner modellieren und erproben zu können. Deshalb beschreiben wir neben den Robotern auch die Geräte, Materialien, Abläufe und die gemeinsame Arbeitsumgebung.
 
 ## Unser Laborroboter
 
-Der sechsachsige Laborarm ist unser erster Roboterentwurf. Unterschiedliche
-Werkzeuge sollen ihn für die Handhabung von Gefäßen, das Pipettieren und die
-Bedienung von Laborgeräten einsetzbar machen. Die Armkonstruktion endet an einem
-allgemeinen Werkzeugflansch; die Pipettierfunktion ist noch zu entwickeln.
+Der sechsachsige Laborarm ist unser erster Roboterentwurf. Unterschiedliche Werkzeuge sollen ihn für die Handhabung von Gefäßen, das Pipettieren und die Bedienung von Laborgeräten einsetzbar machen. Die Armkonstruktion endet an einem allgemeinen Werkzeugflansch; die Pipettierfunktion ist noch zu entwickeln.
 
-Zum Zusammenspiel gehören auch der [Probentransporter TR01](docs/sample-transport-tr01.md),
-der Racks zwischen Arbeitsplätzen befördern soll, und spezialisierte Stationen
-wie die [Zentrifuge CF01](docs/centrifuge-cf01.md). Diese verschiedenen
-Konstruktionen und ihre Aufgaben zeigt die [Modellgalerie](docs/models/README.md#baugruppen).
+Zum Zusammenspiel gehören auch der [Probentransporter TR01](docs/sample-transport-tr01.md), der Racks zwischen Arbeitsplätzen befördern soll, und spezialisierte Stationen wie die [Zentrifuge CF01](docs/centrifuge-cf01.md). Diese verschiedenen Konstruktionen und ihre Aufgaben zeigt die [Modellgalerie](docs/models/README.md#baugruppen).
 
-**Stand: CAD-Konzept, keine Fertigungsfreigabe.** Für den ersten begrenzten
-Armprototyp liegt das Budgetziel bei 3.000–5.000 EUR. Tragfähigkeit, Präzision,
-Dosierleistung und Sicherheit müssen am realen Aufbau nachgewiesen werden.
+**Stand: CAD-Konzept, keine Fertigungsfreigabe.** Für den ersten begrenzten Armprototyp liegt das Budgetziel bei 3.000–5.000 EUR. Tragfähigkeit, Präzision, Dosierleistung und Sicherheit müssen am realen Aufbau nachgewiesen werden.
 
 ### Roboter in Bewegung
 
 https://github.com/user-attachments/assets/433efc9b-b910-42ef-aa4d-9ce2ba1704d3
 
-Die Simulation zeigt das Zusammenspiel von Arm, Zentrifuge und Rack: Drei
-Proben werden nacheinander entnommen und in ihre ursprünglichen Rackplätze
-zurückgebracht. Vom bestätigten Griff bis zur Ablage bewegt sich jedes Gefäß
-auf einer durchgehenden Bahn. Der Deckel bleibt während der drei Entnahmen offen;
-die dabei verwendete offene Rotorindexierung ist eine gesonderte Simulation.
+Die Simulation zeigt das Zusammenspiel von Arm, Zentrifuge und Rack: Drei Proben werden nacheinander entnommen und in ihre ursprünglichen Rackplätze zurückgebracht. Vom bestätigten Griff bis zur Ablage bewegt sich jedes Gefäß auf einer durchgehenden Bahn. Der Deckel bleibt während der drei Entnahmen offen; die dabei verwendete offene Rotorindexierung ist eine gesonderte Simulation.
 
-Beide Armkameras zeigen ihre simulierten Bilder synchron zum Ablauf: Die
-Greiferkamera blickt auf Finger und Gefäß. Die hintere Übersichtskamera erfasst
-mit etwa 120° horizontalem Bildwinkel die Arbeitszone und ihre Zugänge – als
-Grundlage für eine spätere Gefahrenerkennung. Verdeckungen bleiben sichtbar;
-reale Optik und Gefahrendetektion sind noch zu entwickeln. Das Video zeigt
-rund 100 Sekunden Modellzeit bei 1× Wiedergabe.
+Beide Armkameras zeigen ihre simulierten Bilder synchron zum Ablauf: Die Greiferkamera blickt auf Finger und Gefäß. Die hintere Übersichtskamera erfasst mit etwa 120° horizontalem Bildwinkel die Arbeitszone und ihre Zugänge – als Grundlage für eine spätere Gefahrenerkennung. Verdeckungen bleiben sichtbar; reale Optik und Gefahrendetektion sind noch zu entwickeln. Das Video zeigt rund 100 Sekunden Modellzeit bei 1× Wiedergabe.
 
-Roboter sollen zügig arbeiten und Menschen tatsächlich Zeit verschaffen.
-Getragene Proben benötigen dabei fließende Bewegungen mit begrenzter
-Beschleunigung und begrenztem Ruck. Die gezeigte Bahn ist im Modell geprüft;
-reale Sensorik, Fehlerreaktionen und Hardwarebetrieb bleiben zu entwickeln.
+Roboter sollen zügig arbeiten und Menschen tatsächlich Zeit verschaffen. Getragene Proben benötigen dabei fließende Bewegungen mit begrenzter Beschleunigung und begrenztem Ruck. Die gezeigte Bahn ist im Modell geprüft; reale Sensorik, Fehlerreaktionen und Hardwarebetrieb bleiben zu entwickeln.
 
-[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) ·
-[Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) ·
-[Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) ·
-[Modellstand und Herkunft der Medien](docs/media/README.md)
+[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) · [Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) · [Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) · [Modellstand und Herkunft der Medien](docs/media/README.md)
 
-Ein weiteres Beispiel ist die [direkte Entnahme aus H02 mit Ablage im Rack](docs/h02-rack-transfer.md).
-Hier greift ein Arm derselben Konstruktion ein Gefäß aus seinem offenen Halter und setzt es
-zwischen bereits belegten Rackplätzen ab. Der vollständige Weg einschließlich
-Greiferöffnung und Rückzug ist für beide Gefäßvarianten in FreeCAD und
-SolidCraft geprüft.
+Ein weiteres Beispiel ist die [direkte Entnahme aus H02 mit Ablage im Rack](docs/h02-rack-transfer.md). Hier greift ein Arm derselben Konstruktion ein Gefäß aus seinem offenen Halter und setzt es zwischen bereits belegten Rackplätzen ab. Der vollständige Weg einschließlich Greiferöffnung und Rückzug ist für beide Gefäßvarianten in FreeCAD und SolidCraft geprüft.
 
 ## Die gemeinsame Arbeitsumgebung
 
-Ein Workflow braucht mehr als erreichbare Geräte: Gefäße müssen bereitstehen,
-Werkzeuge zugänglich sein und Proben zwischen Arbeitsplätzen wechseln können.
-Das Modell unserer Arbeitsumgebung hilft, diese Zusammenhänge schon am Rechner
-zu untersuchen und die Aufgaben zwischen Menschen und Robotern aufzuteilen.
+Ein Workflow braucht mehr als erreichbare Geräte: Gefäße müssen bereitstehen, Werkzeuge zugänglich sein und Proben zwischen Arbeitsplätzen wechseln können. Das Modell unserer Arbeitsumgebung hilft, diese Zusammenhänge schon am Rechner zu untersuchen und die Aufgaben zwischen Menschen und Robotern aufzuteilen.
 
-Der [Laborraum L01 mit Möbeln und Geräten](docs/lab-layout-l01.md) beschreibt
-einen Arbeitsplatz im Detail. Das [Gebäudemodell](docs/building-stack.md)
-ergänzt Labore, Flure, Büros und Aufenthaltsbereiche. Auch Denk- und
-Schreibplätze und die Küche gehören zu diesem Forschungsalltag. Die
-[Modellgalerie](docs/models/README.md) führt durch Räume, Möbel, Geräte und ihre
-Aufstellungen. Gebäudeabmessungen sind teilweise Darstellungsannahmen;
-reale Transportwege müssen gesondert geprüft werden.
+Der [Laborraum L01 mit Möbeln und Geräten](docs/lab-layout-l01.md) beschreibt einen Arbeitsplatz im Detail. Das [Gebäudemodell](docs/building-stack.md) ergänzt Labore, Flure, Büros und Aufenthaltsbereiche. Auch Denk- und Schreibplätze und die Küche gehören zu diesem Forschungsalltag. Die [Modellgalerie](docs/models/README.md) führt durch Räume, Möbel, Geräte und ihre Aufstellungen. Gebäudeabmessungen sind teilweise Darstellungsannahmen; reale Transportwege müssen gesondert geprüft werden.
 
 ### Interaktiver Gebäuderundgang
 
@@ -101,48 +46,29 @@ reale Transportwege müssen gesondert geprüft werden.
 
 [**Gebäuderundgang im Browser starten →**](https://smoe.github.io/DIYLabBot/)
 
-Doktorandenraum, Labor, Küche und Atrium lassen sich ohne CAD-Installation
-besichtigen. Der erste Aufruf lädt etwa 37 MB; WebGL 2 wird benötigt.
-[Bedienung, Modellquellen und Prüfgrenzen](docs/building-walkthrough.md).
+Doktorandenraum, Labor, Küche und Atrium lassen sich ohne CAD-Installation besichtigen. Der erste Aufruf lädt etwa 37 MB; WebGL 2 wird benötigt. [Bedienung, Modellquellen und Prüfgrenzen](docs/building-walkthrough.md).
 
 ## Biologische Workflows gemeinsam ausführen
 
-Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält
-ihre Identität über Entnahmen, Messungen und Transporte hinweg; ihre Übergaben
-und verbrauchten Mengen werden dokumentiert. Menschliche Arbeitsschritte und
-Botengänge gehören ausdrücklich dazu. So lässt sich ein Ablauf schrittweise
-automatisieren.
+Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält ihre Identität über Entnahmen, Messungen und Transporte hinweg; ihre Übergaben und verbrauchten Mengen werden dokumentiert. Menschliche Arbeitsschritte und Botengänge gehören ausdrücklich dazu. So lässt sich ein Ablauf schrittweise automatisieren.
 
 Bereits ausführbare **synthetische Softwareabläufe** zeigen beispielsweise:
 
-- [Zentrifugieren, NanoDrop und Qubit 4](docs/synthetic-lab-workflow.md) mit
-  gemeinsamem Probenbestand und nachvollziehbaren Entnahmen.
-- [DNA-Extraktion mit NanoDrop, Qubit und TapeStation](docs/extraction-analytics.md)
-  von der Ausgangsprobe bis zur Bewertung des erhaltenen DNA-Produkts.
-- [Asynchronen Labortransport](docs/async-lab-transport.md) mit bestätigten
-  Übergaben und ausdrücklichem Abgleich bei unklaren Ergebnissen.
+- [Zentrifugieren, NanoDrop und Qubit 4](docs/synthetic-lab-workflow.md) mit gemeinsamem Probenbestand und nachvollziehbaren Entnahmen.
+- [DNA-Extraktion mit NanoDrop, Qubit und TapeStation](docs/extraction-analytics.md) von der Ausgangsprobe bis zur Bewertung des erhaltenen DNA-Produkts.
+- [Asynchronen Labortransport](docs/async-lab-transport.md) mit bestätigten Übergaben und ausdrücklichem Abgleich bei unklaren Ergebnissen.
 
-Diese Abläufe verwenden Testdaten und simulierte Rückmeldungen. Sie erlauben,
-Prozesslogik und Fehlerfälle zu untersuchen; reale Gerätebedienung und biologische
-Ergebnisse benötigen eigene Nachweise. Die automatische Zuordnung einer
-biologischen Versuchsabsicht zu geeigneten Robotern und Geräten bleibt ein
-[Entwicklungsziel](ARCHITECTURE.md#sila-fähigkeiten-und-gentle-ressourcenbindung).
+Diese Abläufe verwenden Testdaten und simulierte Rückmeldungen. Sie erlauben, Prozesslogik und Fehlerfälle zu untersuchen; reale Gerätebedienung und biologische Ergebnisse benötigen eigene Nachweise. Die automatische Zuordnung einer biologischen Versuchsabsicht zu geeigneten Robotern und Geräten bleibt ein [Entwicklungsziel](ARCHITECTURE.md#sila-fähigkeiten-und-gentle-ressourcenbindung).
 
 ## Mitentwickeln
 
-Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen.
-FreeCAD und SolidCraft erzeugen daraus unabhängig ihre Modelle; ROS 2/RViz
-nutzt daraus abgeleitete Roboterbeschreibungen und vorbereitete Armprogramme.
-Änderungen sollen so in Konstruktion, Bewegungsprüfung und Ablaufmodell
-nachvollziehbar bleiben.
+Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen. FreeCAD und SolidCraft erzeugen daraus unabhängig ihre Modelle; ROS 2/RViz nutzt daraus abgeleitete Roboterbeschreibungen und vorbereitete Armprogramme. Änderungen sollen so in Konstruktion, Bewegungsprüfung und Ablaufmodell nachvollziehbar bleiben.
 
 Für den Einstieg:
 
-- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und
-  [Entwicklungsplan](docs/development-plan.md).
+- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und [Entwicklungsplan](docs/development-plan.md).
 - [Architektur](ARCHITECTURE.md) und [gemeinsames Modell](docs/shared-model.md).
-- [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und
-  [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
+- [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
 
 ```sh
 python3 -m unittest discover -s tests -v
@@ -150,12 +76,6 @@ python3 scripts/tool_paths.py
 python3 scripts/build_models.py --ros2
 ```
 
-Quell- und Kinematiktests laufen ohne CAD; Prüfungen noch nicht erzeugter
-CAD-/ROS-Ausgaben werden übersprungen. Für den Modellaufbau müssen FreeCAD und
-SolidCraft CLI lokal installiert sein. Optionen und Umgebungsvariablen für die
-Laufzeiten beschreibt [tool_paths.py](scripts/tool_paths.py).
+Quell- und Kinematiktests laufen ohne CAD; Prüfungen noch nicht erzeugter CAD-/ROS-Ausgaben werden übersprungen. Für den Modellaufbau müssen FreeCAD und SolidCraft CLI lokal installiert sein. Optionen und Umgebungsvariablen für die Laufzeiten beschreibt [tool_paths.py](scripts/tool_paths.py).
 
-Versioniert werden Modellquellen, Generatoren, Laufzeitcode, Tests und
-Dokumentation. Native CAD-Dateien und vollständige Prüfberichte entstehen lokal;
-die aktuellen Dateipfade stehen in den jeweiligen Build-Berichten. Ausgewählte
-Bilder und Demos bleiben als nachvollziehbare Modellstände im Repository.
+Versioniert werden Modellquellen, Generatoren, Laufzeitcode, Tests und Dokumentation. Native CAD-Dateien und vollständige Prüfberichte entstehen lokal; die aktuellen Dateipfade stehen in den jeweiligen Build-Berichten. Ausgewählte Bilder und Demos bleiben als nachvollziehbare Modellstände im Repository.
