@@ -1,0 +1,115 @@
+{
+  "format": "solidcraftbot.water-practice-l01-motion/1",
+  "mode": "synthetic_display_fixture",
+  "sources": {
+    "model/robot.json": {
+      "source": "model/robot.json",
+      "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+    },
+    "model/analytics-tools.shared.json": {
+      "source": "model/analytics-tools.shared.json",
+      "source_sha256": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae"
+    },
+    "model/tr01-l01-workcell.protocol.json": {
+      "source": "model/tr01-l01-workcell.protocol.json",
+      "source_sha256": "37061bdf8fa04562cd9ff716c424f42f7d1b7ca53095babe005d682024a51c59"
+    },
+    "model/cf01-unload-demo.motion.json": {
+      "source": "model/cf01-unload-demo.motion.json",
+      "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+    },
+    "model/water-transfer-practice.protocol.json": {
+      "source": "model/water-transfer-practice.protocol.json",
+      "source_sha256": "b2cbcb707aae805a82351a2117668a691a55a71cb71696fa9598855b50e2abf7"
+    },
+    "model/water-transfer-practice.fixture.json": {
+      "source": "model/water-transfer-practice.fixture.json",
+      "source_sha256": "2e37a9d231b763a4a5b2468f7d114ebf00fc467561c3a30debc3cbb0d3f8d87a"
+    }
+  },
+  "paths": {
+    "A": {
+      "actor": "ArmDNA",
+      "station": "DNA",
+      "source_mm": [
+        2890,
+        2530,
+        900
+      ],
+      "target_mm": [
+        2970,
+        2530,
+        900
+      ]
+    },
+    "B": {
+      "actor": "ArmC",
+      "station": "CF01",
+      "source_mm": [
+        820,
+        5700,
+        900
+      ],
+      "target_mm": [
+        900,
+        5700,
+        900
+      ]
+    },
+    "C": {
+      "actor": "ArmA",
+      "station": "QC",
+      "source_mm": [
+        4050,
+        3200,
+        900
+      ],
+      "target_mm": [
+        4130,
+        3200,
+        900
+      ]
+    }
+  },
+  "fixture_case": "workpiece",
+  "pipette_case": "pipette",
+  "insertion_below_rim_mm": 33,
+  "transit_above_rim_mm": 25,
+  "path_samples": 129,
+  "fluid_display_full_height_mm": 32,
+  "holds_s": {
+    "aspirate": 1,
+    "dispense": 1
+  },
+  "empty_tcp_limits": {
+    "velocity_mm_s": 400,
+    "acceleration_mm_s2": 800,
+    "jerk_mm_s3": 8000
+  },
+  "limits_qualified": false,
+  "human_comparison_s": null,
+  "limitations": [
+    "Concept pipette, unqualified dose and fixtures; preinstalled water-only tips; no tool or tip changing mechanism",
+    "Water levels show fixture amount fractions, not measured vessel calibration",
+    "Separate animation clock; journal replay does not actuate devices; E4 decisions unchanged"
+  ],
+  "bound_subdivisions": 8,
+  "empty_tcp_limits_rationale": "Unqualified empty-tool display caps; no biological water limits applied. Joint limits remain those of the existing empty-arm profile. Human speed comparison and real actuator capability remain open.",
+  "bound_method": "upright_chain_with_actual_polynomial_residuals",
+  "approach_samples": 65,
+  "retreat_samples": 129,
+  "progress_law": "quintic_rest_to_rest",
+  "retiming": {
+    "method": "smooth_density_coordinate_descent",
+    "centres": 9,
+    "width": 0.16,
+    "steps": [
+      1,
+      0.5,
+      0.25,
+      0.125,
+      0.0625
+    ],
+    "passes": 2
+  }
+}
