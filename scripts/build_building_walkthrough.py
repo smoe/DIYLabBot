@@ -41,9 +41,10 @@ def embed_html(template, payload):
 
 def reports_from_program(program):
     sources = program['scene_sources']
-    if set(sources) != {'building', 'lab'}:
-        raise ValueError('Separate building and local L01 scene sources are required')
-    return {scene: mesh_export.project_path(ref['build_report']) for scene, ref in sources.items()}
+    if set(sources) != {'building'} or 'equipment_source' not in program:
+        raise ValueError('One building scene and its checked equipment source are required')
+    sources = {**sources, 'lab': program['equipment_source']}
+    return {name: mesh_export.project_path(ref['build_report']) for name, ref in sources.items()}
 
 
 def ensure_reports(program, args):
@@ -67,12 +68,17 @@ def ensure_reports(program, args):
         reports['building'] = ROOT/'exports/generated'/native['revision']/'build-report.json'
     # L01 is deliberately reused rather than rebuilding its unrelated gallery.
     checked = {scene: mesh_export.checked_report(path, scene) for scene, path in reports.items()}
+    expected = {'building': program['scene_sources']['building'], 'lab': program['equipment_source']}
+    for name, report in checked.items():
+        if (report['source_sha256'] != expected[name]['source_sha256']
+                or name == 'building' and report.get('source') != expected[name]['source']):
+            raise ValueError('Native report does not match the requested walkthrough source: '+name)
     return reports, checked
 
 
 def validate_bundle(bundle):
-    if bundle.get('format') != mesh_export.FORMAT or set(bundle.get('scenes', {})) != {'building', 'lab'}:
-        raise ValueError('A checked two-scene native mesh bundle is required')
+    if bundle.get('format') != mesh_export.FORMAT or set(bundle.get('scenes', {})) != {'building'}:
+        raise ValueError('One checked furnished building mesh scene is required')
     mesh_export.verify_pins(bundle['source_files_sha256'])
     for scene, data in bundle['scenes'].items():
         groups = data.get('groups', [])
@@ -119,6 +125,8 @@ def build(args):
     mesh_export.verify_pins(pins)
     payload = {**program, 'scenes': bundle['scenes'], 'source_files_sha256': pins,
                'limitations': list(dict.fromkeys(program.get('limitations', [])+bundle.get('limitations', [])))}
+    payload['isolation']['body_ids'] = sorted(set(payload['isolation']['body_ids']) |
+        {group['id'] for group in bundle['scenes']['building']['groups'] if group.get('laboratory_id')})
     index = output/'index.html'
     index.write_text(embed_html(TEMPLATE.read_text(encoding='utf-8'), payload), encoding='utf-8')
     manifest = output/'manifest.json'

@@ -29,7 +29,7 @@
     },
     "motion": {
       "source": "model/tr01-l01.motion.json",
-      "source_sha256": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+      "source_sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
     }
   },
   "vehicle": {
@@ -67,7 +67,7 @@
       }
     },
     "TS01": {
-      "label": "TapeStation \u2013 manuelle Assistenz",
+      "label": "TapeStation – manuelle Assistenz",
       "source_key": "tapestation",
       "handoff": "synthetic_operator_confirmation",
       "registered_parking_pose": {

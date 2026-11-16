@@ -150,9 +150,35 @@ Für L01 sind Raumgeometrie, Möbelkatalog und Möblierung bereits getrennte Que
 `model/lab-room-l01.shared.json` bindet ihre Revisionen als Komposition. Die
 bestehenden Körper-IDs, Bezugssysteme und Gerätepositionen sind zu erhalten.
 Gebäudekonturen nicht in Möbeltypen und Möbelrezepte nicht in Aufstellungen
-kopieren. Flur-/Mehrraumtopologie und allgemeine Gerätebindungen an Möbelrahmen
-sind nächste Schritte, noch keine implementierten Funktionen. Vor entsprechenden
-Änderungen auch `ARCHITECTURE.md` lesen.
+kopieren. Allgemeine Laufzeitbindungen zwischen Räumen und Geräten bleiben
+nächste Schritte. Vor entsprechenden Änderungen auch `ARCHITECTURE.md` lesen.
+
+`model/furnishings/building-laboratories.json` bindet L01 ausdrücklich an
+`OG3` / `R3_003` der Gebäudekomposition. Die vier unabhängigen Raumparameter
+aus den tatsächlichen Innenflächen und halber Wandstärke ableiten; vorhandene
+L01-Bereichs-/Durchgangsprüfungen nicht lockern. Möbel und Geräte mit Maßstab 1
+platzieren. Die Gebäudehülle bleibt maßgeblich; L01-Boden, -Wände und -Glas
+nicht duplizieren. Die übernommene Betonstütze ist im F03-Plan unbelegt und
+muss als Annahme erkennbar bleiben. Fassadenabweichung und enge Durchgänge im
+abgeleiteten Interface ausweisen; keine metrische Registrierung behaupten.
+
+Der Rundgang verwendet eine Gebäudeszene. Isolierte Laboransicht bedeutet
+Filterung derselben Weltkörper; Standalone-L01 für Ablauftests bleibt eine
+Ableitung derselben Definition. Native Gebäudeausgaben enthalten die
+gebundenen Möbel-/Strukturkörper; Gerätegruppen werden derzeit nur im Browser
+aus dem geprüften L01-Layout starr gebunden. Native Geräte im Gebäude-CAD als
+fehlende Zielunterstützung melden. Typweite Artikulationen und Labormöbel-
+Gelenke einmal ableiten statt Objekte je Instanz zu listen.
+
+Benannte Arbeitsflächen/Rackplätze und der Türgraph Büro–Flur–Labor sind
+geometrische beziehungsweise topologische Schnittstellen. Sie buchen keinen
+Materialtransfer, binden keine T2/T3-Endpunkte und erzeugen keine Roboterbahn.
+Der Browseraufzug verwendet die bestehende einzelne Kabine und aktive Ports;
+an Bord die Kamera absolut an die Kabine binden und freie Bewegung sperren.
+Native EG-Referenz, Browserfahrt und realen Aufzugsbetrieb getrennt führen;
+`lift_operation_implemented` bleibt `false`. Neue native und Browsernachweise
+separat erzeugen. Historische Medien/Provenienz nicht umschreiben; den neuen
+Pages-Stand erst nach ausdrücklicher Veröffentlichungsfreigabe pushen.
 
 Synthetische Minimalumgebungen sind ebenfalls Teil des Zielmodells: unbegrenzter
 Raum, eine Referenzbank und kompakte Geräteaufstellung für Kommunikations- und
@@ -867,8 +893,9 @@ Die bestätigte Aufzugzuordnung lautet außen =
 `W049` zum Flur `C3_020`, innen = `W062` zum `NorthCore` der Obergeschossvorlage.
 Im EG gelten die entsprechenden eigenen Flurflächen; deren Darstellung ist
 weiterhin kein Nachweis einer navigierbaren oder qualifizierten Verbindung.
-EG beidseitig, Obergeschosse nur außen; KG nur innen als vorgemerkte Regel
-ohne Kellerhöhe oder Kellergeometrie führen. Türseiten nicht aus Blickrichtung
+EG beidseitig, Obergeschosse nur außen; KG nur innen. Halte, aktive Seiten
+und Höhen aus dem bestehenden Aufzuginterface übernehmen; die Kellerhöhe
+bleibt eine Darstellungsannahme. Türseiten nicht aus Blickrichtung
 oder Gebäudeschwerpunkten neu erraten. Öffnungen in den tatsächlichen
 Wandkörpern prüfen, nicht nur Türrahmen vor geschlossene Wände setzen.
 Treppenläufe und Podeste aus einem Rezept erzeugen; obere Platten mit

@@ -1,8 +1,8 @@
-"""Tessellate checked final native bodies for two separate walkthrough scenes.
+"""Tessellate checked building bodies and instance L01 equipment into that frame.
 
 This adapter reads final placed BReps, including their Boolean openings.  It
-does not rebuild walls from their bounds or register the local L01 room into
-the uncalibrated building frame.  Importing the packing/verification helpers
+does not rebuild walls from bounds or assert surveyed building registration.
+Importing the packing/verification helpers
 does not require FreeCAD; only ``export`` loads the native runtime.
 """
 from array import array
@@ -200,6 +200,8 @@ def building_manifest(report):
         raise ValueError('The native building proof has another body manifest')
     levels = {level['id'] for level in contract['levels']}
     assigned = {body: room['level'] for room in contract.get('furnishings', {}).get('rooms', []) for body in room['body_ids']}
+    assigned.update({body: laboratory['level_id'] for laboratory in contract.get('laboratories', [])
+                     for body in laboratory['furniture_body_ids']})
     for name, body in bodies.items():
         prefix = name.split('__', 1)[0]
         body['_walkthrough_level'] = body.get('level_id', assigned.get(name, prefix if prefix in levels else None))
@@ -251,7 +253,115 @@ def native_face_mesh(shape, deflection_mm, angular_deflection_rad, MeshPart):
     return vertices, triangles, normals
 
 
-def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflection_rad=.35):
+def rigid_point(matrix, point, vector=False):
+    return tuple(sum(matrix[axis][column]*point[column] for column in range(3))
+                 +(0 if vector else matrix[axis][3]) for axis in range(3))
+
+
+def validate_rigid(matrix):
+    if (not isinstance(matrix, list) or len(matrix) != 4
+            or any(not isinstance(row, list) or len(row) != 4 for row in matrix)
+            or any(type(value) not in (int, float) or not math.isfinite(value) for row in matrix for value in row)
+            or matrix[3] != [0, 0, 0, 1]):
+        raise ValueError('Finite rigid placement matrix required')
+    columns = [[matrix[row][column] for row in range(3)] for column in range(3)]
+    if any(abs(sum(a*b for a, b in zip(columns[i], columns[j]))-(1 if i == j else 0)) > 1e-8
+           for i in range(3) for j in range(3)):
+        raise ValueError('Equipment placement must not scale or shear native geometry')
+    a, b, c = columns
+    determinant = a[0]*(b[1]*c[2]-b[2]*c[1])-a[1]*(b[0]*c[2]-b[2]*c[0])+a[2]*(b[0]*c[1]-b[1]*c[0])
+    if determinant < 1-1e-8:
+        raise ValueError('Equipment placement must preserve handedness')
+
+
+def rigid_bounds(matrix, bounds):
+    points = [rigid_point(matrix, [bounds['max' if bits & (1 << axis) else 'min'][axis]
+                                  for axis in range(3)]) for bits in range(8)]
+    return {'min': [min(point[axis] for point in points) for axis in range(3)],
+            'max': [max(point[axis] for point in points) for axis in range(3)]}
+
+
+def combine_scenes(building, equipment):
+    """Join already world-placed display arrays without another geometry source."""
+    if any(scene.get('coordinate_frame') != 'building_presentation' or scene.get('units') != 'mm'
+           or scene.get('up_axis') != 'Z' or scene.get('handedness') != 'right' for scene in (building, equipment)):
+        raise ValueError('Both mesh inputs must already use the same building frame and units')
+    result = dict(building)
+    vertex_offset, index_offset = building['vertex_count'], building['index_count']
+    for key, kind in [('positions_base64', 'f'), ('normals_base64', 'f'), ('indices_base64', 'I')]:
+        arrays = []
+        for scene in (building, equipment):
+            values = array(kind)
+            values.frombytes(base64.b64decode(scene[key], validate=True))
+            if sys.byteorder != 'little':
+                values.byteswap()
+            arrays.append(values)
+        if kind == 'I':
+            arrays[1] = array('I', (value+vertex_offset for value in arrays[1]))
+        arrays[0].extend(arrays[1])
+        result[key] = packed(arrays[0])
+    result['groups'] = building['groups']+[
+        {**group, 'index_start': group['index_start']+index_offset} for group in equipment['groups']]
+    if len({group['id'] for group in result['groups']}) != len(result['groups']):
+        raise ValueError('Building and equipment native body IDs must be disjoint')
+    for key in ('vertex_count', 'index_count', 'native_body_count', 'native_face_count', 'degenerate_triangles_omitted'):
+        result[key] = building[key]+equipment[key]
+    result['maximum_float32_error_mm'] = max(building['maximum_float32_error_mm'], equipment['maximum_float32_error_mm'])
+    result['bounds_mm'] = {key: [operation(scene['bounds_mm'][key][axis] for scene in (building, equipment))
+        for axis in range(3)] for key, operation in [('min', min), ('max', max)]}
+    result['equipment_instances'] = equipment['equipment_instances']
+    result['auxiliary_instances'] = equipment['auxiliary_instances']
+    result['equipment_placement_checks'] = equipment['equipment_placement_checks']
+    result['equipment_tessellation_deflection_mm'] = equipment['linear_tessellation_deflection_mm']
+    result['scope'] = 'One building frame: checked native building plus rigidly placed checked L01 equipment; no duplicated laboratory shell'
+    return result
+
+
+def equipment_placement_checks(groups, laboratories, wall_tolerance):
+    import relative_floorplan as floor
+    checks = []
+    for laboratory in laboratories:
+        polygon = laboratory['interior_polygon_mm']
+        sign = 1 if floor.signed_area(polygon) > 0 else -1
+        for device in laboratory['device_instances']:
+            bodies = [group for group in groups if group.get('laboratory_id') == laboratory['id']
+                      and (group['instance_id'] == device['id'] or group.get('supporting_device_id') == device['id'])]
+            if not bodies:
+                raise ValueError('Missing native equipment instance: '+device['id'])
+            bounds = {key: [operation(group['bounds_mm'][key][axis] for group in bodies)
+                           for axis in range(3)] for key, operation in [('min', min), ('max', max)]}
+            points = [[bounds[x][0], bounds[y][1]] for x in ('min', 'max') for y in ('min', 'max')]
+            clearance = min(sign*((b[0]-a[0])*(point[1]-a[1])-(b[1]-a[1])*(point[0]-a[0]))/math.dist(a, b)
+                for a, b in zip(polygon, polygon[1:]+polygon[:1]) for point in points)
+            if clearance < -wall_tolerance-1e-6 or not device['host_anchor_checked']:
+                raise ValueError('Native laboratory equipment loses room or host: '+device['id'])
+            checks.append({'laboratory_id': laboratory['id'], 'instance_id': device['id'],
+                'body_count': len(bodies), 'bounds_mm': bounds, 'host': device['host'],
+                'host_anchor_checked': device['host_anchor_checked'], 'minimum_room_clearance_mm': clearance,
+                'wall_face_tolerance_mm': wall_tolerance, 'passed': True,
+                'scope': 'Conservative native instance bounds in the source room; host anchor and plane from the shared placement compiler'})
+    return checks
+
+
+def native_equipment_bindings(laboratories):
+    """Include the functional arm risers produced by the same layout definition."""
+    import lab_layout_model as layout
+    result = []
+    for laboratory in laboratories:
+        devices = laboratory['device_instances']
+        result.extend((laboratory, device) for device in devices)
+        source = json.loads(project_path(laboratory['layout_source']['source']).read_text())
+        for prop in layout.primitives(source):
+            owners = [device for device in devices if device['asset'] == 'arm' and device['host'] == prop['host']
+                      and all(abs(device['standalone_pose'][axis][3]-prop['xyz'][axis]) < 1e-7 for axis in (0, 1))]
+            if len(owners) != 1:
+                raise ValueError('A functional layout support needs one source arm owner: '+prop['id'])
+            result.append((laboratory, {**owners[0], 'id': prop['id'],
+                'body_prefix': laboratory['id']+'_'+prop['id']+'_', 'supporting_device_id': owners[0]['id']}))
+    return result
+
+
+def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflection_rad=.35, laboratories=None):
     import MeshPart
     styles = native_styles(path)
     if scene == 'building':
@@ -268,8 +378,17 @@ def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflectio
             raise ValueError('Native final body identities differ from the checked '+scene+' manifest')
         mesh = MeshBuilder()
         native_faces = 0
+        devices = native_equipment_bindings(laboratories or [])
+        for laboratory, device in devices:
+            validate_rigid(device['transform'])
+        coverage = {laboratory['id']+'.'+device['id']: 0 for laboratory, device in devices}
         for obj in sorted(objects, key=lambda entry: entry.SourceBody):
             name = obj.SourceBody
+            match = [(laboratory, device) for laboratory, device in devices if name.startswith(device['id']+'__')]
+            if laboratories is not None and not match:
+                continue
+            if len(match) > 1:
+                raise ValueError('Ambiguous native equipment instance: '+name)
             shape = geo.world_shape(obj)
             if shape.isNull() or not shape.isValid() or not shape.Solids:
                 raise ValueError('Invalid final native body: '+name)
@@ -278,19 +397,42 @@ def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflectio
             bb = shape.BoundBox
             bounds = {'min': [bb.XMin, bb.YMin, bb.ZMin], 'max': [bb.XMax, bb.YMax, bb.ZMax]}
             role = str(getattr(obj, 'ModelRole', expected[name].get('role', 'native_geometry')))
-            mesh.add(name, points, triangles, styles[name], normals=normals,
-                     role=role, level_id=expected[name].get('_walkthrough_level'),
-                     instance_id=str(getattr(obj, 'LayoutInstance', getattr(obj, 'RigidLink', ''))), bbox=bounds)
+            identity, level = name, expected[name].get('_walkthrough_level')
+            instance_id = str(getattr(obj, 'LayoutInstance', getattr(obj, 'RigidLink', '')))
+            if match:
+                laboratory, device = match[0]
+                transform = device['transform']
+                points = [rigid_point(transform, point) for point in points]
+                normals = [rigid_point(transform, normal, vector=True) for normal in normals]
+                bounds = rigid_bounds(transform, bounds)
+                identity = device['body_prefix']+name[len(device['id']+'__'):]
+                level, instance_id = laboratory['level_id'], device['id']
+                coverage[laboratory['id']+'.'+instance_id] += 1
+            mesh.add(identity, points, triangles, styles[name], normals=normals,
+                     role=role, level_id=level, instance_id=instance_id, bbox=bounds)
+            if match:
+                mesh.groups[-1].update(laboratory_id=laboratory['id'], original_body_id=name)
+                if device.get('supporting_device_id'):
+                    mesh.groups[-1]['supporting_device_id'] = device['supporting_device_id']
+        if devices:
+            for laboratory, device in devices:
+                key = laboratory['id']+'.'+device['id']
+                if coverage[key] != report['layout_validation']['instance_metrics'][device['id']]['body_count']:
+                    raise ValueError('Incomplete native equipment coverage: '+key)
         result = mesh.result()
-        result.update({'coordinate_frame': 'building_presentation' if scene == 'building' else 'l01_local',
+        result.update({'coordinate_frame': 'building_presentation' if scene == 'building' or devices else 'l01_local',
                        'units': 'mm', 'up_axis': 'Z', 'handedness': 'right',
                        'linear_tessellation_deflection_mm': deflection_mm,
                        'angular_tessellation_deflection_rad': angular_deflection_rad,
                        'normals': 'Area-weighted within each original BRep face; sharp face boundaries retained',
                        'native_triangulation_cache': 'Cleared before explicit tolerance meshing; BRep unchanged',
                        'native_face_count': native_faces,
-                       'native_body_count': len(objects), 'native_revision': report['revision'],
+                       'native_body_count': len(mesh.groups), 'native_revision': report['revision'],
                        'scope': 'Final native placed Boolean BRep surfaces; Float32 display mesh, no box substitutes'})
+        if devices:
+            auxiliary = {laboratory['id']+'.'+device['id'] for laboratory, device in devices if device.get('supporting_device_id')}
+            result['equipment_instances'] = [{'id': key, 'body_count': value} for key, value in coverage.items() if key not in auxiliary]
+            result['auxiliary_instances'] = [{'id': key, 'body_count': value} for key, value in coverage.items() if key in auxiliary]
         return result
     finally:
         App.closeDocument(doc.Name)
@@ -305,6 +447,10 @@ def export(building_report, lab_report, output, building_deflection_mm=3., lab_d
     reports = {'building': project_path(building_report), 'lab': project_path(lab_report)}
     before = {name: digest(path) for name, path in reports.items()}
     checked = {name: checked_report(path, name) for name, path in reports.items()}
+    import building_stack as stack
+    building_spec = stack.load(project_path(checked['building']['source']))
+    building_parameters = stack.parameters(building_spec)
+    laboratories = stack.interfaces(building_spec, building_parameters)['laboratories']
     import FreeCAD as App
     sys.path.insert(0, str(ROOT/'scripts/freecad'))
     import solidcraftbot_freecad as geo
@@ -313,7 +459,8 @@ def export(building_report, lab_report, output, building_deflection_mm=3., lab_d
     for scene, report in checked.items():
         native = project_path(report['files']['freecad'])
         scenes[scene] = export_scene(scene, report, native,
-            building_deflection_mm if scene == 'building' else lab_deflection_mm, App, geo, angular_deflection_rad)
+            building_deflection_mm if scene == 'building' else lab_deflection_mm, App, geo, angular_deflection_rad,
+            laboratories=laboratories if scene == 'lab' else None)
         for name, value in report['source_files_sha256'].items():
             if name in pins and pins[name] != value:
                 raise ValueError('Conflicting source revisions in the native scenes: '+name)
@@ -326,10 +473,14 @@ def export(building_report, lab_report, output, building_deflection_mm=3., lab_d
         if digest(reports[scene]) != before[scene]:
             raise ValueError('A native build report changed during export')
     pins[str(Path(__file__).relative_to(ROOT))] = digest(__file__)
+    scenes['lab']['equipment_placement_checks'] = equipment_placement_checks(
+        scenes['lab']['groups'], laboratories, building_parameters['display_thickness']/2)
+    scenes = {'building': combine_scenes(scenes['building'], scenes['lab'])}
     result = {'format': FORMAT, 'scenes': scenes, 'source_files_sha256': pins,
               'limitations': ['Native CAD qualification remains the scope of each pinned build report.',
                   'Tessellation and Float32 positions approximate display surfaces; they are not collision or navigation proofs.',
-                  'Building presentation and local L01 are separate frames; no unmeasured L01-to-building registration is asserted.']}
+                  'L01 equipment is rigidly instanced into a source-derived building room variant; surveyed registration remains unqualified.',
+                  'The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only.']}
     verify_pins(pins)
     target = Path(output)
     target.parent.mkdir(parents=True, exist_ok=True)

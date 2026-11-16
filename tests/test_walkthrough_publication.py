@@ -55,6 +55,32 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'manifest'):
             self.verify(self.payload, lambda m: m['source_files_sha256'].update({'model/current.json': '0'*64}))
 
+    def test_laboratory_and_lift_contracts_cannot_drift_behind_valid_geometry(self):
+        for key in ('laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
+            self.program[key] = {'current': key}
+            payload = copy.deepcopy(self.payload)
+            payload[key] = {'obsolete': key}
+            with self.subTest(key=key), self.assertRaisesRegex(ValueError, key):
+                self.verify(payload)
+            self.program.pop(key)
+
+    def test_checked_browser_equipment_and_functional_supports_extend_native_coverage(self):
+        from unittest.mock import patch
+        program = {'laboratories': [{'id': 'Lab'}],
+                   'equipment_source': {'build_report': 'fixture.json', 'source_sha256': 'a'*64}}
+        report = {'source_sha256': 'a'*64, 'layout_validation': {
+            'scene_geometry': [{'body': 'Arm__Housing'}, {'body': 'MountArm__Frame'}, {'body': 'People_study'}],
+            'instance_metrics': {'Arm': {'body_count': 1}, 'MountArm': {'body_count': 1}}}}
+        bindings = [({}, {'id': 'Arm', 'body_prefix': 'Lab_Arm_'}),
+                    ({}, {'id': 'MountArm', 'body_prefix': 'Lab_MountArm_'})]
+        with patch.object(publication.native_mesh, 'checked_report', return_value=report), \
+                patch.object(publication.native_mesh, 'native_equipment_bindings', return_value=bindings):
+            self.assertEqual(publication.required_body_ids(program, {'Wall'}),
+                             {'Wall', 'Lab_Arm_Housing', 'Lab_MountArm_Frame'})
+            report['layout_validation']['instance_metrics']['Arm']['body_count'] = 2
+            with self.assertRaisesRegex(ValueError, 'Incomplete'):
+                publication.required_body_ids(program, {'Wall'})
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -98,6 +98,22 @@ def z_checks(geometry, contract):
     ground = contract['ground_fill_probe']
     expected = (seen | set(ground.get('target_bodies', [ground.get('target_body')])) | set(contract['marker_body_ids'])
                 | set(contract.get('furnishings', {}).get('body_ids', [])) | set(contract.get('exterior', {}).get('body_ids', [])) | set(contract.get('circulation', {}).get('body_ids', [])) | set(contract.get('roof', {}).get('body_ids', [])))
+    level_by_id = {level['id']: level for level in levels}
+    for laboratory in contract.get('laboratories', []):
+        names = laboratory['furniture_body_ids']
+        if (not names or len(names) != len(set(names)) or set(names) & expected
+                or laboratory['level_id'] not in level_by_id or not set(names) <= set(bodies)):
+            raise ValueError('Laboratory native bodies need a disjoint complete storey scope')
+        level = level_by_id[laboratory['level_id']]
+        lower = level['z_mm']
+        upper = min(level['clear_top_mm'], lower+laboratory['evaluated_parameters_mm']['room_height'])
+        passed = all(bodies[name]['bbox']['min'][2] >= lower-1e-6
+                     and bodies[name]['bbox']['max'][2] <= upper+1e-6 for name in names)
+        checks.append({'id': laboratory['id']+'_RoomHeight', 'passed': passed,
+                       'level_id': laboratory['level_id'], 'body_ids': names,
+                       'floor_presentation_mm': lower, 'room_top_presentation_mm': upper,
+                       'scope': 'Referenced laboratory furniture and illustrative support; native equipment excluded'})
+        expected.update(names)
     if expected != set(bodies): raise ValueError('Every native body must belong to an explicit scoped role')
     for a, b in zip(levels, levels[1:]):
         gap = b['slab_bottom_mm']-a['slab_top_mm']

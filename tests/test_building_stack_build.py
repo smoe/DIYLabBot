@@ -32,6 +32,23 @@ class BuildingBuildTests(unittest.TestCase):
             self.assertFalse(all(c['passed']for c in build.z_checks(mutated,contract)))
         with self.assertRaises(ValueError):build.z_checks(geometry+[{'body':'Unscoped'}],contract)
 
+    def test_referenced_laboratory_bodies_have_disjoint_native_vertical_scope(self):
+        geometry,contract=self.scene();datum=contract['levels'][3]['z_mm']
+        laboratory={'id':'FixtureLab','level_id':'L3','furniture_body_ids':['LabWorktop','LabSupport'],
+                    'evaluated_parameters_mm':{'room_height':2800}}
+        contract['laboratories']=[laboratory]
+        geometry.extend([{'body':'LabWorktop','bbox':{'min':[0,0,datum+850],'max':[100,100,datum+900]}},
+                         {'body':'LabSupport','bbox':{'min':[0,0,datum],'max':[20,20,datum+2800]}}])
+        checks=build.z_checks(geometry,contract)
+        self.assertTrue(all(check['passed']for check in checks))
+        self.assertEqual(next(c for c in checks if c['id']=='FixtureLab_RoomHeight')['level_id'],'L3')
+        for edge,value in [('min',datum-1),('max',datum+2801)]:
+            changed=copy.deepcopy(geometry);changed[-1]['bbox'][edge][2]=value
+            self.assertFalse(all(check['passed']for check in build.z_checks(changed,contract)))
+        changed=copy.deepcopy(contract);changed['laboratories'][0]['furniture_body_ids'].append('Floor0')
+        with self.assertRaisesRegex(ValueError,'disjoint complete'):build.z_checks(geometry,changed)
+        with self.assertRaisesRegex(ValueError,'disjoint complete'):build.z_checks(geometry[:-1],contract)
+
     def test_exact_polygon_ground_volume_retains_collinear_vertices_and_concave_variants(self):
         probe={'points_mm':[[0,0],[2,0],[4,0],[4,3],[0,3]],'offset_mm':-250,'depth_mm':250}
         self.assertEqual(build.prism_volume(probe),3000.)
@@ -159,6 +176,7 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
         expected|={item['probe']['id']for item in build.circulation_probe_specs(contract)}
         expected|={item['probe']['id']for item in build.roof_probe_specs(contract)}
         expected_z={level['id']for level in contract['levels']}
+        expected_z|={laboratory['id']+'_RoomHeight'for laboratory in contract.get('laboratories',[])}
         expected_z|={a['id']+'_to_'+b['id']for a,b in zip(contract['levels'],contract['levels'][1:])}
         if contract.get('exterior'):
             expected_z|={body+'_Grade'for body in contract['exterior']['site_body_ids']}|{'FoyerFacade_Height'}

@@ -53,10 +53,10 @@ def load(*, validate_builds=True):
     return s
 
 
-def parameters(s):
+def parameters(s, room_overrides=None):
     ref=s['assets']['room']
     source=room.load(assembly.validate_reference(ref))
-    p={**room.parameters(source),**s['parameters']}
+    p={**room.parameters(source, room_overrides),**s['parameters']}
     # Device dimensions are derived views of their catalog profiles, not copies
     # in the room or placement source. They may drive placement expressions.
     for item in s['instances']:

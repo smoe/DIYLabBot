@@ -44,6 +44,38 @@
           "measured_hinge": false,
           "native_articulation": false,
           "swing_clearance_checked": false
+        },
+        "presentation": {
+          "label": "Kühlschrank {room}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 1.2,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 2000,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
         }
       }
     },
@@ -87,7 +119,105 @@
           "measured_hinge": false,
           "native_articulation": false,
           "swing_clearance_checked": false
+        },
+        "presentation": {
+          "label": "Mikrowelle {room}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.8,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 1500,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
         }
+      }
+    }
+  },
+  "lab_joints": {
+    "revolute": {
+      "label": "Schranktür {instance} · {room}",
+      "commands": {
+        "open": "Öffnen",
+        "close": "Schließen",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Geschlossen",
+        "opening": "Wird geöffnet",
+        "open": "Offen",
+        "closing": "Wird geschlossen"
+      },
+      "duration": {
+        "value": 1.2,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1100,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    },
+    "prismatic": {
+      "label": "Hocker {instance} · {room}",
+      "commands": {
+        "open": "Anheben",
+        "close": "Absenken",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Tief",
+        "opening": "Wird angehoben",
+        "open": "Hoch",
+        "closing": "Wird abgesenkt"
+      },
+      "duration": {
+        "value": 1.2,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1000,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
       }
     }
   }

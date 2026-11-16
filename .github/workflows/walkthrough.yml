@@ -18,10 +18,11 @@ jobs:
           python-version: '3.12'
       - name: Check furniture, devices, door bindings and stale-publication detection
         run: |
-          for suite in office_computers furniture_articulation building_furnishings building_walkthrough building_walkthrough_export walkthrough_publication; do
+          for suite in office_computers furniture_articulation building_furnishings building_laboratories typewide_articulations walkthrough_room_lift building_walkthrough building_walkthrough_export walkthrough_publication; do
             python -m unittest discover -s tests -p "test_${suite}.py" -v || exit 1
           done
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: node tests/check_walkthrough_interaction.cjs
+      - run: node tests/check_walkthrough_lift.cjs

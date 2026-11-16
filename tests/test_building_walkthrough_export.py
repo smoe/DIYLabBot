@@ -161,6 +161,19 @@ class NativeMaterialTests(unittest.TestCase):
 
 
 class StandalonePageTests(unittest.TestCase):
+    def test_another_valid_native_source_cannot_replace_the_requested_building(self):
+        from unittest.mock import patch
+        program = {'scene_sources': {'building': {'source': 'model/requested.json', 'source_sha256': 'a'*64}},
+                   'equipment_source': {'source_sha256': 'b'*64}}
+        args = SimpleNamespace(building_report=None, rebuild_building=False, no_rebuild=True)
+        foreign = {'source': 'model/foreign.json', 'source_sha256': 'a'*64}
+        def report(path, name):
+            return foreign if name == 'building' else {'source_sha256': 'b'*64}
+        with patch.object(builder, 'reports_from_program', return_value={'building': Path('building.json'), 'lab': Path('lab.json')}), \
+                patch.object(export, 'checked_report', side_effect=report):
+            with self.assertRaisesRegex(ValueError, 'requested walkthrough source'):
+                builder.ensure_reports(program, args)
+
     def test_model_labels_cannot_close_the_embedded_data_script(self):
         template = '<script type="application/json">__WALKTHROUGH_DATA__</script>'
         rendered = builder.embed_html(template, {'label': '</script><script>alert(1)</script>\u2028'})

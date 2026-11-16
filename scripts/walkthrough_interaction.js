@@ -63,6 +63,72 @@
     }
     return {pick};
   }
-  const api={createPicker};
+  // Joint values remain in their source units: degrees for hinges, mm for sliders.
+  function jointMatrix(joint,value,reference){
+    if(!joint||!['revolute','prismatic'].includes(joint.type)||!Array.isArray(joint.axis)||joint.axis.length!==3||!joint.axis.every(Number.isFinite)
+      ||Math.abs(Math.hypot(...joint.axis)-1)>1e-7||!Number.isFinite(value)||!Number.isFinite(reference))throw Error('A finite joint value and unit axis are required.');
+    const out=new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]),delta=value-reference;
+    if(delta===0)return out;
+    if(joint.type==='prismatic'){
+      for(let i=0;i<3;i++)out[12+i]=joint.axis[i]===0?0:joint.axis[i]*delta/1000;
+      return out;
+    }
+    if(joint.type!=='revolute'||!Array.isArray(joint.origin_mm)||joint.origin_mm.length!==3||!joint.origin_mm.every(Number.isFinite))throw Error('A supported joint and finite hinge origin are required.');
+    const [x,y,z]=joint.axis,[px,py,pz]=joint.origin_mm.map(v=>v/1000),angle=delta*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),t=1-c;
+    out.set([t*x*x+c,t*x*y+s*z,t*x*z-s*y,0,t*x*y-s*z,t*y*y+c,t*y*z+s*x,0,t*x*z+s*y,t*y*z-s*x,t*z*z+c,0,0,0,0,1]);
+    out[12]=px-(out[0]*px+out[4]*py+out[8]*pz);out[13]=py-(out[1]*px+out[5]*py+out[9]*pz);out[14]=pz-(out[2]*px+out[6]*py+out[10]*pz);
+    return out;
+  }
+  // Boarding owns only the passenger attachment. The existing articulated object
+  // remains the single authority for cabin position, current floor and motion.
+  function createLiftSession(config,object,request){
+    const finite3=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
+    if(!config||!object?.config||object.config.id!==config.object_id||object.config.joint.type!=='prismatic'
+      ||!Array.isArray(config.ports)||!finite3(config.cabin_bounds_mm?.min)||!finite3(config.cabin_bounds_mm?.max)
+      ||!Number.isFinite(config.speed_mm_s)||config.speed_mm_s<=0)throw Error('A source-bound lift cabin and ports are required.');
+    const ports=config.ports.filter(p=>p.active),reference=object.config.states[object.config.reference_state];
+    if(!Number.isFinite(reference)||!ports.length||ports.some(p=>!finite3(p.cabin_entry_mm)||!finite3(p.exit_eye_mm)
+      ||!Number.isFinite(object.config.states[p.level_id])))throw Error('Active lift ports need source-derived boarding and exit points.');
+    let passenger=null;
+    const status=(name,extra={})=>({status:name,id:config.object_id,...extra});
+    const activePort=id=>ports.find(p=>p.id===id);
+    function nearby(eye,reach){
+      if(!finite3(eye)||!Number.isFinite(reach)||reach<=0)return null;
+      return ports.map(port=>({port,distance:Math.hypot(...eye.map((v,i)=>v-port.exit_eye_mm[i]))}))
+        .filter(v=>v.distance<=reach).sort((a,b)=>a.distance-b.distance)[0]?.port||null;
+    }
+    function call(portId){
+      const port=activePort(portId);if(!port)return status('unknown_target');
+      if(object.transition)return status('rejected_busy');
+      if(passenger)return status('rejected_aboard');
+      return request(port.level_id);
+    }
+    function board(portId,eye,reach){
+      const port=activePort(portId);if(!port)return status('unknown_target');
+      if(object.transition)return status('rejected_busy');
+      if(passenger)return status('already_aboard');
+      if(object.state!==port.level_id)return status('rejected_not_here');
+      if(!finite3(eye)||!Number.isFinite(reach)||reach<=0||Math.hypot(...eye.map((v,i)=>v-port.exit_eye_mm[i]))>reach)return status('rejected_out_of_reach');
+      passenger={port_id:port.id,reference_eye_mm:port.cabin_entry_mm.map((v,i)=>v-object.config.joint.axis[i]*(object.value-reference))};
+      return status('accepted',{eye_mm:attachedEye()});
+    }
+    function select(levelId){
+      if(object.transition)return status('rejected_busy');
+      if(!passenger)return status('rejected_not_aboard');
+      if(!ports.some(p=>p.level_id===levelId))return status('unknown_target');
+      return request(levelId);
+    }
+    function exit(side){
+      if(object.transition)return status('rejected_busy');
+      if(!passenger)return status('rejected_not_aboard');
+      const port=ports.find(p=>p.level_id===object.state&&p.side===side);
+      if(!port)return status('rejected_inactive_exit');
+      passenger=null;return status('accepted',{eye_mm:[...port.exit_eye_mm],level_id:port.level_id,port_id:port.id});
+    }
+    function attachedEye(){return passenger?passenger.reference_eye_mm.map((v,i)=>v+object.config.joint.axis[i]*(object.value-reference)):null;}
+    return {nearby,call,board,select,exit,attachedEye,
+      get boarded(){return Boolean(passenger);},get portId(){return passenger?.port_id||null;}};
+  }
+  const api={createPicker,jointMatrix,createLiftSession};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.WalkthroughInteraction=api;
 })(globalThis);

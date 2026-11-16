@@ -1,0 +1,21 @@
+{
+  "format": "solidcraftbot.building-laboratories/1",
+  "laboratories": [
+    {
+      "id": "Lab3003",
+      "room": "3.003",
+      "level": "OG3",
+      "area": "R3_003",
+      "entrance_wall": "W036",
+      "room_source": {
+        "source": "model/lab-room-l01.shared.json",
+        "source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
+      },
+      "layout_source": {
+        "source": "model/lab-layout-l01.shared.json",
+        "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+      },
+      "basis": "unmeasured_room_binding"
+    }
+  ]
+}

@@ -9,13 +9,13 @@
   "assets": {
     "room": {
       "source": "model/lab-room-l01.shared.json",
-      "source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "report": "cad/lab-room-l01/shared-build-report.json",
       "case": "default"
     },
     "arm": {
       "source": "model/robot.json",
-      "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+      "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
       "report": "exports/generated/build-report.json",
       "case": "default"
     },

@@ -24,7 +24,12 @@ class ArticulationTests(unittest.TestCase):
         cls.interface = stack.interfaces(cls.building, cls.p)
         cls.expanded = stack.expanded(cls.building, cls.p)
         cls.plans = {v['id']: stack.level_plan(cls.building, v['id']) for v in cls.interface['levels']}
-        cls.objects = cls.derive(cls.spec['objects'])
+        # The source no longer needs a per-instance list. Retain one explicit
+        # request fixture to exercise compatibility/error handling separately.
+        cls.requests = [{'id': 'Kitchen1008.Fridge.Door', 'room': 'Kitchen1008',
+                         'instance': 'Fridge', 'articulation': 'Door',
+                         **copy.deepcopy(cls.art['types']['fridge']['Door']['presentation'])}]
+        cls.objects = cls.derive([])
 
     @classmethod
     def derive(cls, requests):
@@ -33,7 +38,7 @@ class ArticulationTests(unittest.TestCase):
 
     def test_only_door_and_handle_move(self):
         room = next(v for v in self.interface['furnishings']['rooms'] if v['id'] == 'Kitchen1008')
-        obj = self.objects[0]
+        obj = next(v for v in self.objects if v['id'] == 'Kitchen1008.Fridge.Door')
         self.assertEqual(set(obj['moving_body_ids']), set(room['fridge_door_body_ids']))
         self.assertEqual(len(obj['moving_body_ids']), 2)
         self.assertFalse(any('Penguin' in n or 'Shelf' in n or 'Shell' in n for n in obj['moving_body_ids']))
@@ -44,6 +49,11 @@ class ArticulationTests(unittest.TestCase):
         self.assertEqual(set(obj['moving_body_ids']),
             {'Kitchen1008_Microwave_'+part for part in ('Door', 'Window', 'Handle')})
         self.assertEqual(obj['states'], {'closed': 0, 'open': 90})
+        self.assertEqual(obj['label'], 'Mikrowelle 1.008')
+        self.assertEqual(obj['duration_s'], 0.8)
+        self.assertEqual(obj['view_label'], 'Ansehen')
+        self.assertEqual(obj['commands']['open'], {'label': 'Öffnen', 'target_state': 'open'})
+        self.assertEqual(self.art['types']['microwave']['Door']['presentation']['view_distance']['value'], 1500)
         hinge = obj['joint']['origin_mm']
         handle = next(v['shape'] for v in self.expanded['operations']
                       if v['id'] == 'Kitchen1008_Microwave_Handle')
@@ -56,7 +66,7 @@ class ArticulationTests(unittest.TestCase):
         self.assertTrue(all(value is False for value in obj['qualification'].values()))
 
     def test_hinge_is_the_ordered_top_left_footprint_vertex(self):
-        obj = self.objects[0]
+        obj = next(v for v in self.objects if v['id'] == 'Kitchen1008.Fridge.Door')
         operation = next(o for o in self.expanded['operations'] if o['id'] == 'Kitchen1008_Fridge_Door')
         shape = operation['shape']; points = shape['points']
         self.assertGreater(floor.signed_area(points), 0)
@@ -66,7 +76,7 @@ class ArticulationTests(unittest.TestCase):
         self.assertEqual(obj['joint']['axis'], [0, 0, 1])
 
     def test_positive_rotation_moves_handle_outward(self):
-        obj = self.objects[0]; hinge = obj['joint']['origin_mm']
+        obj = next(v for v in self.objects if v['id'] == 'Kitchen1008.Fridge.Door'); hinge = obj['joint']['origin_mm']
         shape = next(o['shape'] for o in self.expanded['operations'] if o['id'] == 'Kitchen1008_Fridge_Handle')
         center = [sum(pt[i] for pt in shape['points'])/4 for i in (0, 1)]
         delta = [center[i]-hinge[i] for i in (0, 1)]
@@ -76,7 +86,7 @@ class ArticulationTests(unittest.TestCase):
         self.assertEqual(obj['states'][obj['reference_state']], 0)
 
     def test_object_view_stays_in_source_kitchen(self):
-        obj = self.objects[0]; plan = self.plans[obj['level_id']]
+        obj = next(v for v in self.objects if v['id'] == 'Kitchen1008.Fridge.Door'); plan = self.plans[obj['level_id']]
         eye = [v/self.p['display_scale'] for v in obj['viewpoint']['eye_mm'][:2]]
         room = next(v for v in self.interface['furnishings']['rooms'] if v['id'] == 'Kitchen1008')
         self.assertTrue(any(floor.point_membership(eye, floor.outline(plan, name)) == 1 for name in room['template_areas']))
@@ -94,7 +104,7 @@ class ArticulationTests(unittest.TestCase):
 
     def test_unknown_object_references_are_rejected(self):
         for key in ('room', 'instance', 'articulation'):
-            requests = copy.deepcopy(self.spec['objects']); requests[0][key] = 'Unknown'
+            requests = copy.deepcopy(self.requests); requests[0][key] = 'Unknown'
             requests[0]['id'] = '.'.join(requests[0][k] for k in ('room', 'instance', 'articulation'))
             with self.subTest(reference=key), self.assertRaises(ValueError): self.derive(requests)
 
@@ -120,21 +130,21 @@ class ArticulationTests(unittest.TestCase):
                 validator.validate(source)
 
     def test_object_view_cannot_leave_kitchen_even_with_valid_parameter(self):
-        requests = copy.deepcopy(self.spec['objects']); requests[0]['view_distance']['value'] = 3000
+        requests = copy.deepcopy(self.requests); requests[0]['view_distance']['value'] = 3000
         with self.assertRaisesRegex(ValueError, 'outside kitchen'): self.derive(requests)
 
     def test_typed_assumptions_and_duplicate_objects_are_rejected(self):
         for field, value in [('duration', -1), ('duration', float('nan')), ('view_distance', True), ('view_distance', 10000)]:
-            requests = copy.deepcopy(self.spec['objects']); requests[0][field]['value'] = value
+            requests = copy.deepcopy(self.requests); requests[0][field]['value'] = value
             with self.subTest(field=field,value=value), self.assertRaises(ValueError): articulation.validate_requests(requests)
-        with self.assertRaises(ValueError): articulation.validate_requests(self.spec['objects']*2)
+        with self.assertRaises(ValueError): articulation.validate_requests(self.requests*2)
 
     def test_articulation_preserves_native_dependencies_and_files(self):
         paths = stack.source_dependencies(self.building)
         self.assertNotIn(Path(articulation.__file__), paths)
         self.assertNotIn(ROOT/self.spec['articulation_source']['source'], paths)
         pins = {path: hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
-        self.derive(self.spec['objects'])
+        self.derive([])
         for path, before in pins.items():
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), before, str(path))
 

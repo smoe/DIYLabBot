@@ -1,6 +1,6 @@
 {
   "format": "solidcraftbot.curated-model-gallery/1",
-  "prepared_on": "2026-11-11",
+  "prepared_on": "2026-11-16",
   "catalog_sha256": "337a306d8257027b55b41a7c5a8b28a6c3c3a2c9e93a4fb037fa48b9be1625ed",
   "render_generator": "scripts/render_model_gallery.py",
   "render_generator_sha256": "1a0002e505f65a8b169cab1ffe008cc07f9976e63ad630b20d7beff47d0113ca",
@@ -13,9 +13,9 @@
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "visible_bodies": [
         "ConcreteSupport",
@@ -28,8 +28,8 @@
         "W02Glazing",
         "W03Glazing"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 126923,
         "height": 700,
@@ -241,7 +241,7 @@
         "snapshot",
         "tmp/model-gallery/l01-geometry.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/l01-geometry.png",
         "--width",
@@ -257,9 +257,9 @@
       "bytes": 126923,
       "dependency_files_sha256": {
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -282,9 +282,9 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "IslandLeft",
       "furniture_type": "storage_bench",
@@ -327,8 +327,8 @@
         "distance": 5811.824055147869,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 69664,
         "height": 595,
@@ -584,7 +584,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-storage-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-storage-bench.png",
         "--width",
@@ -600,9 +600,9 @@
       "bytes": 69664,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -612,9 +612,9 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "WindowBenchLeft",
       "furniture_type": "open_shaped_bench",
@@ -623,8 +623,8 @@
         "WindowBenchLeft_Leg2",
         "WindowBenchLeft_Worktop"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 36771,
         "height": 700,
@@ -842,7 +842,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-open-shaped-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-open-shaped-bench.png",
         "--width",
@@ -858,9 +858,9 @@
       "bytes": 36771,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -870,17 +870,17 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "IslandShelf_Board",
       "furniture_type": "shelf_board",
       "visible_bodies": [
         "IslandShelf_Board"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 36435,
         "height": 700,
@@ -1100,7 +1100,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-shelf-board.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-shelf-board.png",
         "--width",
@@ -1116,9 +1116,9 @@
       "bytes": 36435,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -1128,17 +1128,17 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "IslandShelf_Post1",
       "furniture_type": "upright",
       "visible_bodies": [
         "IslandShelf_Post1"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 18906,
         "height": 700,
@@ -1358,7 +1358,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-upright.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-upright.png",
         "--width",
@@ -1374,9 +1374,9 @@
       "bytes": 18906,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -1386,9 +1386,9 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "IslandCupboard1",
       "furniture_type": "cupboard",
@@ -1396,8 +1396,8 @@
         "IslandCupboard1",
         "IslandCupboard1_Shelf"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 50688,
         "height": 595,
@@ -1616,7 +1616,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-cupboard.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-cupboard.png",
         "--width",
@@ -1632,9 +1632,9 @@
       "bytes": 50688,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -1644,17 +1644,17 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "HeatingCoverLeft",
       "furniture_type": "side_gap_cover",
       "visible_bodies": [
         "HeatingCoverLeft"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 34796,
         "height": 700,
@@ -1874,7 +1874,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-side-gap-cover.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-side-gap-cover.png",
         "--width",
@@ -1890,9 +1890,9 @@
       "bytes": 34796,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -1902,17 +1902,17 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "SupportGapCover",
       "furniture_type": "support_gap_cover",
       "visible_bodies": [
         "SupportGapCover"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 54851,
         "height": 700,
@@ -2132,7 +2132,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-support-gap-cover.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-support-gap-cover.png",
         "--width",
@@ -2148,9 +2148,9 @@
       "bytes": 54851,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -2223,16 +2223,16 @@
       "id": "l01-furnished",
       "image": "images/l01-furnished.png",
       "source_files_sha256": {
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 174667,
         "height": 595,
@@ -2246,7 +2246,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/l01-furnished.png",
         "--width",
@@ -2261,8 +2261,8 @@
       "image_sha256": "03bda7bdd7c7022ae54322120bf656d6826d1ebb8ed77122dd14f8698692f937",
       "bytes": 174667,
       "dependency_files_sha256": {
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       }
@@ -2271,11 +2271,11 @@
       "id": "l01-overview",
       "image": "images/l01-overview.png",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
         "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
       },
       "build_report": "cad/lab-layout-l01/shared-build-report.json",
-      "build_report_sha256": "f8f8eb5a01eab7455c67957da7d79130defae0b3b005cfa746eda5dc4ef27532",
+      "build_report_sha256": "0739b2b21689fe3434c731c586d21627213f3d26ebce7910a6ee7ccbdc51028f",
       "build_passed": true,
       "representation": "Native L01 assembly overview with source-referenced equipment; static and sampled device-access checks, no operational robot program",
       "camera": {
@@ -2289,10 +2289,10 @@
         "distance": 18000,
         "fov": 0.6
       },
-      "native_model": "cad/generated/lab-layout-l01-040c5407d04c/LabLayout_L01.sc",
-      "native_model_sha256": "170b02973ff97d8a73ece63782fe68b2db645108147de98d643b221f1604a5eb",
+      "native_model": "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.sc",
+      "native_model_sha256": "00a820290ee97ebb395c3bff3c44b4d7627f35612ed75b6ff7696c5c235bb5ce",
       "renderer_result": {
-        "bytes": 215964,
+        "bytes": 216003,
         "height": 525,
         "path": "docs/models/images/l01-overview.png",
         "renderer": "cpu",
@@ -2304,7 +2304,7 @@
         "solidcraft-cli",
         "snapshot",
         "--in",
-        "cad/generated/lab-layout-l01-040c5407d04c/LabLayout_L01.sc",
+        "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.sc",
         "--out",
         "docs/models/images/l01-overview.png",
         "--width",
@@ -2316,15 +2316,15 @@
         "--no-grid",
         "--no-axes"
       ],
-      "image_sha256": "09f3c0b38ce2812a5eb8daced77a10559faff3374c3cc92c45d5d6cd79b5cc17",
-      "bytes": 215964,
+      "image_sha256": "00057919703a8541d6a7f7e80857d57acad9e14b57b5ea0c22e472637474c90c",
+      "bytes": 216003,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
+        "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
         "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
@@ -2354,34 +2354,30 @@
         "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
         "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
-      },
-      "visual_review": {
-        "passed": true,
-        "scope": "Native full scene and planning envelope, or projected exported routes inspected; complete frame and readable station labels; geometry proof remains separate"
       }
     },
     {
       "id": "l01-equipment",
       "image": "images/l01-equipment.svg",
       "source_files_sha256": {
-        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
-        "model/tr01-l01.motion.json": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
+        "model/tr01-l01.motion.json": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
       },
       "representation": "Source-derived current floor/worktop outline and device-reference-point plan; not a full CAD assembly render",
       "instances": 17,
       "motion_report": "cad/tr01-l01/shared-build-report.json",
-      "motion_report_sha256": "f6fdff1435f13bff59a5cb1748caff789b83a09021ba51d916960332aef4d3cf",
-      "motion_program_sha256": "c3b8394243600e28a8b4f865593b9d6a75974c9908e480c097c02aeede0ce354",
+      "motion_report_sha256": "9388d1d5d010d593a7c693ca5cbfd44e31cee9c3c7df42b1e31d353217c74da1",
+      "motion_program_sha256": "13c4a10d4d5ea30687f09fda5eedc02b3bab8731ef1dcbd58cb99905224a9293",
       "route_display": "Projected exported C2 pose curves and source parking reference points; diagram is not the clearance proof",
       "image_sha256": "a87b0fd293874a8b6c89f853424577b61fdd5200563f07b663d80245238e9853",
       "bytes": 22485,
       "dependency_files_sha256": {
-        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
+        "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
         "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
@@ -2411,7 +2407,11 @@
         "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
         "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
         "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
-        "model/tr01-l01.motion.json": "8b22a1991012b83844c6deab4b7db72aa13f6d5b5e3797e129f6cc5850fd8de2"
+        "model/tr01-l01.motion.json": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+      },
+      "reviewed_image_reuse": {
+        "method": "Exact byte equality after re-rendering the existing SVG from the current checked TR01 route report and integrated L01 sources.",
+        "unchanged_image_sha256": "a87b0fd293874a8b6c89f853424577b61fdd5200563f07b663d80245238e9853"
       }
     },
     {
@@ -3802,9 +3802,9 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "Stool1",
       "furniture_type": "lab_stool",
@@ -3824,8 +3824,8 @@
         "Stool1_Seat",
         "Stool1_SeatStem"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 39782,
         "height": 595,
@@ -4032,7 +4032,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-lab-stool.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-lab-stool.png",
         "--width",
@@ -4048,9 +4048,9 @@
       "bytes": 39782,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -4060,9 +4060,9 @@
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
       },
       "build_report": "cad/lab-room-l01/shared-build-report.json",
-      "build_report_sha256": "673e359cf268cd19ec4b960aa8a744e2e0f98b08c91f088871045638521c5b96",
+      "build_report_sha256": "37339353d718bfd259e97bea6f86c354fcd86b6f7b88996160ab6a9ef501059d",
       "build_passed": true,
-      "build_source_sha256": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+      "build_source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
       "source_equivalence": null,
       "example_instance": "WetStation",
       "furniture_type": "wet_bench",
@@ -4086,8 +4086,8 @@
         "WetStation_Tap",
         "WetStation_Worktop"
       ],
-      "native_model": "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
-      "native_model_sha256": "c2d2d7944b1ad1579e5ff9bcaf791a8f1608e2ce1b85bdb2e81fcdda2be77cc4",
+      "native_model": "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
+      "native_model_sha256": "f4800297223f5285c41cc1809377fb4fc1c19680a22a68702b553e194b53e56d",
       "renderer_result": {
         "bytes": 74004,
         "height": 595,
@@ -4290,7 +4290,7 @@
         "snapshot",
         "tmp/model-gallery/furniture-wet-bench.commands.json",
         "--in",
-        "cad/generated/lab-room-l01-2d6780f5dcaf/default.sc",
+        "cad/generated/lab-room-l01-8827f0e318a4/default.sc",
         "--out",
         "docs/models/images/furniture-wet-bench.png",
         "--width",
@@ -4306,9 +4306,9 @@
       "bytes": 74004,
       "dependency_files_sha256": {
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25"
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
       }
     },
     {
@@ -4598,17 +4598,20 @@
       "id": "building-stack",
       "image": "images/building-stack.svg",
       "source_files_sha256": {
-        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+        "model/building-stack.shared.json": "0dfc62c4a318c820b01a7d10a27ec20cc75459d0f04943b268cde1747b29ca0f",
         "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
-        "model/building-walkthrough.shared.json": "b015e6ca37ba97bc16a10a2f00e84cf4db182452ba5e5ef9e8f46ec9779adc42"
+        "model/building-walkthrough.shared.json": "e4673a49022cb5a23ab3555cc41027c3a8dc8ff1ac7a15957538ad0e2f731211",
+        "model/furnishings/building-laboratories.json": "3dd087dbd41ab605cc11b6463576fc18be667b89ff83c126fef3b273bebdd233",
+        "model/furniture/social.articulations.json": "518fa49f54765a55b9a81c9ef2c78d9895f8a171140796da6139a959d4456bb2"
       },
       "representation": "Source-derived five-storey concept section; uncalibrated XY, assumed heights, no transport or safety qualification",
       "producer_files_sha256": {
         "scripts/render_building_stack_section.py": "6e67b7d1807167d68c6c726a2275524b4d3464bf54a7df29ed055afd13799e08",
-        "model/building-stack.schema.json": "c690a5b9d3edda74c03407a1221157c12a8c0caf8dc61e4c2cc218a6ac12dba5",
-        "scripts/building_stack.py": "3a0da0931561d7f54a5dce9472ad78b1c241ef710d683bfdff7e480bf5cd9379",
-        "scripts/building_circulation.py": "970cb94a062eead119d674344e0df235644213ede352706d777ef20a169077c0",
+        "model/building-stack.schema.json": "7016f486c95048ef1b67d2f42570eda8f156f9f384109335ee6c66d3fef46240",
+        "scripts/building_stack.py": "967720dd543309e61e8e3cf3fc730c44d84af3092d0f74710df3cc547a88c463",
+        "scripts/building_circulation.py": "da0be0bc51015b5b5717d9f80567eba42972ec88873ca4bad9c2d0e1cab09dc9",
         "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
+        "scripts/building_guards.py": "297b418ad939086e9130aaa0604a4153e41adb5e79e04f3efbc53812200f3d28",
         "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
         "scripts/ground_floor_model.py": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a",
         "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
@@ -4618,15 +4621,25 @@
         "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
         "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
         "scripts/room_geometry_model.py": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711",
-        "model/building-furnishings.schema.json": "0a2a14f28baeef63902ea0194ea89e7169a49f8171963977302a6750a3d0da6e",
+        "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
         "model/social-furniture-catalog.schema.json": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f",
-        "scripts/building_furnishings.py": "2e9bdd5afe9c1589f75af37091e99b2d93ba1bc207080ce5165163806441a77c",
+        "scripts/building_furnishings.py": "edc841bc2c1910f212109f3f4ff7e7ce8e03d8ee221be8c959471d5e086c88ed",
         "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
+        "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
         "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
         "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
+        "model/building-laboratories.schema.json": "18a40a6c752c043b3f67f39ebde489ce39124516e752ddb01101041c04b71a47",
+        "scripts/building_laboratories.py": "c176cbf191bf3f3fb9212e6146dc48dbd2df94f1e186de2fd79a351f34137694",
+        "scripts/lab_room_model.py": "a8aa368a14ed149caf91256564087cf2487a32496419d76684e9b08fa05cac1e",
+        "scripts/lab_layout_model.py": "2a7260ef4884955e6c2a7451a5655d36ad1d32d43f6ea48c9362be6b6e8aae75",
+        "scripts/furniture_model.py": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a",
+        "model/room-composition.schema.json": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d",
+        "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
+        "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
+        "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
         "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
         "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
-        "scripts/building_exterior.py": "50fb3d5fbb1d24dac633e55141316ca5bad2aba376a99459035425d64372e407",
+        "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
         "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
         "scripts/building_doors.py": "e9ce88597416a3e84d9f4ad84678047efdc065e2c0dc6f2c592be2f3b63bd7ed",
         "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
@@ -4639,21 +4652,19 @@
       "image_sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151",
       "bytes": 10540,
       "dependency_files_sha256": {
-        "model/building-stack.shared.json": "4738e0660ae1dc07a13f7670b2fa7eb66bc709e7c7a3c9c845cc5fdcce34424a",
+        "model/building-stack.shared.json": "0dfc62c4a318c820b01a7d10a27ec20cc75459d0f04943b268cde1747b29ca0f",
         "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
         "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
         "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
         "model/basement-kg.shared.json": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4",
-        "model/furnishings/building-social.json": "3c7f99fba9767bd62f3bb57666cabd372837b549c4bb8f4dd11aaa1cb77eef1b",
-        "model/furniture/social.catalog.json": "b661a34de9306a66d63018720d3a5f19b85ee70c99468c77a4b197d7c33deb50",
-        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
-        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
-        "model/building-walkthrough.shared.json": "b015e6ca37ba97bc16a10a2f00e84cf4db182452ba5e5ef9e8f46ec9779adc42",
-        "model/lab-layout-l01.shared.json": "040c5407d04cb34e250003acc649b0b47b7c7af2169b64f0a47486d13af41228",
-        "model/lab-room-l01.shared.json": "2d6780f5dcaf08ea7edd09b6d5aaf77ca1ec2cf3941d252457dfb18241311bf4",
+        "model/furnishings/building-social.json": "c27f86d7acfd063026df3a790dd4794e060253917d06e195dec2958016861ec0",
+        "model/furniture/social.catalog.json": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745",
+        "model/furnishings/building-laboratories.json": "3dd087dbd41ab605cc11b6463576fc18be667b89ff83c126fef3b273bebdd233",
+        "model/lab-room-l01.shared.json": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea",
         "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-        "model/furnishings/l01.furnishings.json": "b36978bda3155e2be685fd57e8f8378e37510a31c0253e52727490e0ce182d25",
-        "model/robot.json": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+        "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
+        "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
         "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
         "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
         "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/cad-reference.step": "ad57a738b8121acc7ec7bdee7e19377863817fb0aeac37bc47dd513e50bf0f4c",
@@ -4682,7 +4693,15 @@
         "model/lab-equipment.shared.json": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728",
         "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
         "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
-        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+        "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
+        "model/building-doors.shared.json": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8",
+        "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+        "model/building-walkthrough.shared.json": "e4673a49022cb5a23ab3555cc41027c3a8dc8ff1ac7a15957538ad0e2f731211",
+        "model/furniture/social.articulations.json": "518fa49f54765a55b9a81c9ef2c78d9895f8a171140796da6139a959d4456bb2"
+      },
+      "reviewed_image_reuse": {
+        "method": "Exact byte equality after re-rendering this diagram from the integrated source and producer files.",
+        "unchanged_image_sha256": "51ebb742399602a16866d9c9389334d16d93821f23717d6d38b47e52dd835151"
       }
     },
     {
@@ -4731,14 +4750,15 @@
   "visual_review": {
     "passed": true,
     "reviewed_on": "2026-11-12",
-    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the S01 source-derived state plan; separate static poses do not establish robot motion or real inventory. Reviewed the derived F03 vector plan with all area labels and explicit uncertainties; the private original photograph is excluded. Reviewed the source-derived four-storey section: four levels, closed ground atrium, open upper floors, height assumptions and conceptual exchange arrows are legible; no original image or transport qualification. Reviewed updated building section with owner-confirmed lift door policy; separate native views show both continuous stair cores and one cabin. No building access or safety qualification. Reviewed EG vectors, one internal stair, independent lift, separate external metal stair and crowned glass roof with explicit unqualified dimensions. Original photographs remain excluded. Reviewed the rotated X-axis glass roof over the source-contoured atrium and all four corridors, its updated Y/Z principle diagram and explicit unqualified approximation. Original photographs remain excluded. Reviewed the 16 November camera-aligned robot preview from its checked SolidCraft model. Wide view cones are hidden for legible arm framing; camera bodies and mounts remain visible. Other scene previews retain their pinned historical robot revision.",
+    "notes": "Visually reviewed the corrected cabinet preview with mounted bar handles on every leaf and only one pair opened to 75 degrees, plus the updated wet bench, fume-hood base, furnished room and complete L01 overview. Other curated previews retain their previous recorded review. Sampled native geometric checks are not continuous-motion or safety qualification. Reviewed the updated four-family glassware overview, including the measuring cylinder and marker writing; the other previews retain their recorded review. Reviewed the S01 source-derived state plan; separate static poses do not establish robot motion or real inventory. Reviewed the derived F03 vector plan with all area labels and explicit uncertainties; the private original photograph is excluded. Reviewed the source-derived four-storey section: four levels, closed ground atrium, open upper floors, height assumptions and conceptual exchange arrows are legible; no original image or transport qualification. Reviewed updated building section with owner-confirmed lift door policy; separate native views show both continuous stair cores and one cabin. No building access or safety qualification. Reviewed EG vectors, one internal stair, independent lift, separate external metal stair and crowned glass roof with explicit unqualified dimensions. Original photographs remain excluded. Reviewed the rotated X-axis glass roof over the source-contoured atrium and all four corridors, its updated Y/Z principle diagram and explicit unqualified approximation. Original photographs remain excluded. Reviewed the 16 November camera-aligned robot preview from its checked SolidCraft model. Wide view cones are hidden for legible arm framing; camera bodies and mounts remain visible. Other scene previews retain their pinned historical robot revision. Reviewed the integrated L01 overview rendered from the current checked both-CAD layout with the current camera-equipped robot source. The source-derived equipment plan and building section were re-rendered and retain exact image bytes. Only these three records were refreshed; independent historical robot-scene records and images retain their existing revisions.",
     "k01_reviewed": true,
     "s01_state_plan_reviewed": true,
     "floor_f03_reviewed": true,
     "building_stack_reviewed": true,
     "building_stack_circulation_reviewed": true,
     "building_correction_reviewed": true,
-    "robot_cameras_reviewed_on": "2026-11-16"
+    "robot_cameras_reviewed_on": "2026-11-16",
+    "integrated_l01_reviewed_on": "2026-11-16"
   },
   "limits": "Documentation views and explicitly labelled diagrams; no new hardware, manufacturing or full-path qualification. Historical README media provenance remains unchanged."
 }

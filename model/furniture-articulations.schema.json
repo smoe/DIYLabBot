@@ -4,7 +4,8 @@
   "required": [
     "format",
     "catalog",
-    "types"
+    "types",
+    "lab_joints"
   ],
   "properties": {
     "format": {
@@ -48,7 +49,8 @@
             "states",
             "reference_state",
             "basis",
-            "qualification"
+            "qualification",
+            "presentation"
           ],
           "properties": {
             "id": {
@@ -158,12 +160,167 @@
                   "const": false
                 }
               }
+            },
+            "presentation": {
+              "$ref": "#/$defs/presentation"
             }
           }
+        }
+      }
+    },
+    "lab_joints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revolute",
+        "prismatic"
+      ],
+      "properties": {
+        "revolute": {
+          "$ref": "#/$defs/presentation"
+        },
+        "prismatic": {
+          "$ref": "#/$defs/presentation"
         }
       }
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Illustrative furniture hinge references; native geometry remains static"
+  "title": "Type-wide illustrative furniture articulations; native geometry remains static",
+  "$defs": {
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "commands",
+        "state_labels",
+        "duration",
+        "view_distance"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commands": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "open",
+            "close",
+            "view"
+          ],
+          "properties": {
+            "open": {
+              "type": "string",
+              "minLength": 1
+            },
+            "close": {
+              "type": "string",
+              "minLength": 1
+            },
+            "view": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "state_labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "closed",
+            "opening",
+            "open",
+            "closing"
+          ],
+          "properties": {
+            "closed": {
+              "type": "string",
+              "minLength": 1
+            },
+            "opening": {
+              "type": "string",
+              "minLength": 1
+            },
+            "open": {
+              "type": "string",
+              "minLength": 1
+            },
+            "closing": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "duration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            },
+            "unit": {
+              "const": "s"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 10
+              }
+            },
+            "basis": {
+              "const": "presentation_assumption"
+            }
+          }
+        },
+        "view_distance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 300,
+              "maximum": 3000
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "minimum": 300,
+                "maximum": 3000
+              }
+            },
+            "basis": {
+              "const": "presentation_assumption"
+            }
+          }
+        }
+      }
+    }
+  }
 }

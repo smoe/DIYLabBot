@@ -106,7 +106,7 @@ def validate(spec):
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact({k: v for k, v in spec['sources'].items() if k != 'furnishings'}, 'floorplan room_geometry ground_floor basement', 'stack sources')
+    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
@@ -451,6 +451,14 @@ def interfaces(spec, p):
                 require(any(group['level_id'] == room['level'] and group['wall'] == anchor['wall_id']
                             for group in data.get('exterior', {}).get('side_window_groups', [])),
                         'A window-bound furniture layout requires a constructed exterior window on its storey')
+    if 'laboratories' in spec['sources']:
+        import building_laboratories
+        laboratories = building_laboratories.compile(spec['sources']['laboratories'], {name: value[0] for name, value in bases.items()}, p, levels)
+        data['laboratories'] = laboratories['laboratories']
+        data['places'] = laboratories['places']
+        if 'furnishings' in spec['sources']:
+            data['places'].extend(building_laboratories.social_places(spec['sources']['furnishings'], furnished))
+        data['topology'] = laboratories['topology']
     return data
 
 
@@ -499,6 +507,10 @@ def expanded(spec, p):
         result['bodies'] = [v for v in result['bodies'] if v['id'] not in omitted]
         result['operations'] = [v for v in result['operations'] if v['body'] not in omitted]
         for key in ('components', 'bodies', 'operations'): result[key].extend(extension[key])
+    if 'laboratories' in spec['sources']:
+        import building_laboratories
+        laboratories = building_laboratories.compile(spec['sources']['laboratories'], {name: value[0] for name, value in bases.items()}, p, data['levels'])
+        for key in ('components', 'bodies', 'operations'): result[key].extend(laboratories[key])
     return result
 
 
@@ -536,6 +548,9 @@ def source_dependencies(spec):
         if furnishings.read(spec['sources']['furnishings']).get('atrium_seating'):
             import atrium_seating
             paths.extend(atrium_seating.dependencies())
+    if 'laboratories' in spec['sources']:
+        import building_laboratories
+        paths.extend(building_laboratories.dependencies(spec['sources']['laboratories']))
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))

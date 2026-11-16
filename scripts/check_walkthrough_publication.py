@@ -8,8 +8,32 @@ from urllib.request import urlopen
 
 import building_walkthrough as walkthrough
 import building_stack as stack
+import export_building_walkthrough_freecad as native_mesh
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def required_body_ids(program, building_ids):
+    """Native building plus each checked, source-bound equipment/support body."""
+    result = set(building_ids)
+    laboratories = program.get('laboratories', [])
+    if not laboratories:
+        return result
+    source = program['equipment_source']
+    report = native_mesh.checked_report(native_mesh.project_path(source['build_report']), 'lab')
+    if report['source_sha256'] != source['source_sha256']:
+        raise ValueError('Equipment proof differs from the published source contract')
+    source_ids = [row['body'] for row in report['layout_validation']['scene_geometry']]
+    for laboratory, device in native_mesh.native_equipment_bindings(laboratories):
+        originals = [name for name in source_ids if name.startswith(device['id']+'__')]
+        expected = report['layout_validation']['instance_metrics'][device['id']]['body_count']
+        if not originals or len(originals) != expected:
+            raise ValueError('Incomplete checked equipment body coverage: '+device['id'])
+        placed = {device['body_prefix']+name[len(device['id']+'__'):] for name in originals}
+        if len(placed) != len(originals) or placed & result:
+            raise ValueError('Ambiguous published equipment body IDs: '+device['id'])
+        result.update(placed)
+    return result
 
 
 def check(html, manifest, program=None, body_ids=None):
@@ -24,6 +48,9 @@ def check(html, manifest, program=None, body_ids=None):
     program = walkthrough.compile() if program is None else program
     for key in ('objects', 'interaction', 'stops', 'levels', 'settings', 'rendering', 'hidden_body_ids'):
         require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
+    for key in ('laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
+        if key in program:
+            require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
     expected = dict(program['source_files_sha256'])
     for name in ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
                  'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js'):
@@ -35,7 +62,8 @@ def check(html, manifest, program=None, body_ids=None):
                 'Stale publication manifest: '+name)
     if body_ids is None:
         source = stack.load()
-        body_ids = {v['id'] for v in stack.expanded(source, stack.parameters(source))['bodies']}
+        body_ids = required_body_ids(program,
+            {v['id'] for v in stack.expanded(source, stack.parameters(source))['bodies']})
     actual = [v['id'] for v in payload['scenes']['building']['groups']]
     require(len(actual) == len(set(actual)) and set(actual) == set(body_ids),
             'Published building body coverage differs from current source')

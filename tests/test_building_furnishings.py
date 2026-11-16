@@ -241,7 +241,15 @@ class FurnishingsTests(unittest.TestCase):
         self.assertEqual(set(status['current_sources_sha256']), set(proof['source_files_sha256'])|{'scripts/worktop_equipment.py'})
         for name,digest in status['current_sources_sha256'].items():
             self.assertEqual(hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest(),digest,name)
-        self.assert_media_source_binding(proof, compatibility, status['last_compatible_sources_sha256'], media_camera_digest(walkthrough.compile()), site)
+        # The equipped lab now belongs to the building frame. Its intentional
+        # camera/scene change is recorded separately from the preserved PNGs.
+        current_camera=media_camera_digest(walkthrough.compile())
+        self.assertEqual(status['current_camera_projection'],
+                         {'fields':list(MEDIA_CAMERA_FIELDS),'sha256':current_camera})
+        self.assertIs(status['camera_projection_matches_historical'],False)
+        archived_camera=compatibility['camera_projection']['sha256']
+        self.assertNotEqual(current_camera,archived_camera)
+        self.assert_media_source_binding(proof, compatibility, status['last_compatible_sources_sha256'], archived_camera, site)
         for image in proof['images']:
             data=(stack.ROOT/image['path']).read_bytes()
             self.assertEqual(data[:8],b'\x89PNG\r\n\x1a\n')

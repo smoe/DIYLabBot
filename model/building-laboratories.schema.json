@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "building-laboratories.schema.json",
+  "title": "Referenced laboratories bound to destination building rooms",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "laboratories"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.building-laboratories/1"
+    },
+    "laboratories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "room",
+          "level",
+          "area",
+          "entrance_wall",
+          "room_source",
+          "layout_source",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "room": {
+            "type": "string",
+            "minLength": 1
+          },
+          "level": {
+            "type": "string",
+            "minLength": 1
+          },
+          "area": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entrance_wall": {
+            "type": "string",
+            "minLength": 1
+          },
+          "room_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "source_sha256"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^model/.*\\.json$"
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "layout_source": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "source_sha256"
+            ],
+            "properties": {
+              "source": {
+                "type": "string",
+                "pattern": "^model/.*\\.json$"
+              },
+              "source_sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "basis": {
+            "const": "unmeasured_room_binding"
+          }
+        }
+      }
+    }
+  }
+}

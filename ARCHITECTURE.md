@@ -91,8 +91,9 @@ der Überführung dieser Altstände in aktuelle Transportprogramme.
 Räume und Flure sollen später eine gemeinsame Umgebung bilden. Gemeinsam
 verwendete Türen und Öffnungen werden dabei einmal beschrieben; die verbundenen
 Bereiche referenzieren dieselbe Öffnungs-ID. Raumgeometrie und die Topologie der
-Verbindungen sind getrennte Informationen. Die Mehrraum- und Flurtopologie ist
-in diesem ersten Schritt noch nicht implementiert. Die separate
+Verbindungen sind getrennte Informationen. Eine allgemeine laufzeitgebundene Mehrraum- und Flurtopologie ist
+weiterhin offen. Die Laborbindung ergänzt inzwischen einen getrennten
+Türgraphen für Büro–Flur–Labor und benannte Weltplätze ohne T2/T3-Anbindung. Die separate
 [relative Geschossansicht F03](docs/floorplan-f03.md) ergänzt inzwischen einen
 einmalig beschriebenen Wand-/Öffnungsgraphen und Bereichsnachbarschaften;
 metrische Gebäudeintegration, Passierbarkeit und Navigation bleiben offen.
@@ -107,7 +108,9 @@ Glasdach bildet den oberen Abschluss. Der Kellerplan ist separat nachgezeichnet;
 Kellerhöhe, metrische Registrierung und Aufmaß stehen aus. KG verwendet vorläufig
 denselben Darstellungsabstand unter EG.
 Die horizontale Darstellungsproportion verweist auf die ungemessene L01-Breite,
-ohne F03 zu kalibrieren oder Möbel und Geräte zu übertragen. Geschossinstanzen
+ohne F03 zu kalibrieren oder automatisch Einrichtungen zu übertragen. Die
+ausdrücklich referenzierte Laborbindung für 3.003 ergänzt diese Übernahme
+gezielt aus derselben L01-Definition. Geschossinstanzen
 besitzen eigene IDs; Raumnummern der Vorlage sind keine bestätigten Nummern
 der anderen Geschosse. Das blaue Austauschvolumen ist ein Konzeptmarker für
 den Antrag, keine ausgewählte Fördertechnik, Transportbahn oder Zugangszusage.
@@ -118,9 +121,15 @@ Komposition aus den Quellbezügen abgeleitet: ein inneres rechtes Treppenhaus
 vom Dach zum Boden, mit EG-Ende neben Zugang 22. Ein Flur und seitlicher Versatz
 trennen sie vom alleinstehenden Aufzug. Verbundene Läufe und Podeste besitzen
 passende Geschossöffnungen; Metalltreads und Stringer sind eigene Darstellrollen.
-Aufzugschacht,
-eine stationäre Kabine und geschossabhängige Türseiten sind getrennt vom
-blauen Atrium-Marker. Die vom Eigentümer bestätigten Seiten sind außen links
+Aufzugschacht, eine im nativen CAD stationäre EG-Kabinenreferenz und
+geschossabhängige Türseiten sind getrennt vom blauen Atrium-Marker. Der
+Rundgang bewegt genau diese Kabine als prismatisches Browserobjekt. Ruf,
+Einstieg, Geschosswahl und erlaubter Ausstieg verwenden die bestehenden
+aktiven Ports und Höhen. Die Kamera folgt an Bord absolut der Kabine;
+freie Bewegung und Blickpunkt-/Geschosswechsel sind dort gesperrt. Die
+Darstellungsfahrt verwendet ein glattes quintisches Profil mit einer
+ausdrücklichen Geschwindigkeitsannahme; sie ergänzt weder Türblätter noch
+reale Steuerung. `lift_operation_implemented` bleibt `false`. Die vom Eigentümer bestätigten Seiten sind außen links
 zum Flur `C3_020` und innen rechts zum `NorthCore`. EG erhält beide Seiten,
 die Obergeschosse nur außen und KG nur innen. Der Kellerstopp und die
 KG–EG-Treppe besitzen statische Konzeptgeometrie mit angenommener Höhe. `NorthCore` bleibt in der Obergeschossvorlage unbekannt.
@@ -185,6 +194,55 @@ Ein optionales Anforderungsprofil kann später erwartete Möbel- und Gerätearte
 benennen. Solche Anforderungen erzeugen noch keine tatsächlich aufgestellten
 Gegenstände. Bewegliche Geräte behalten ihre Identität beim Raumwechsel;
 Betriebspositionen werden später von der geplanten Aufstellung getrennt.
+
+## L01 im gemeinsamen Gebäudebezug
+
+`model/furnishings/building-laboratories.json` ist eine optionale,
+referenzierende Quelle von `model/building-stack.shared.json`. Ihre Instanz
+`Lab3003` benennt `OG3`, Raum `R3_003`, Eingangswand `W036` und die gepinnten
+L01-Raum- und Layoutquellen. Raummaße und Gerätepositionen werden nicht
+kopiert. `building_laboratories.py` leitet die Innenkontur mit halber
+Wandstärke ab und bindet `room_width`, `left_depth`, `right_depth` und
+`facade_bulge` an die bestehenden unabhängigen L01-Parameter. Bestehende
+Bereichs-, Möbel- und Durchgangsprüfungen bleiben wirksam.
+
+Die neu ausgewerteten Möbel erhalten im Gebäude Maßstab 1, eindeutige
+Instanzpräfixe, erhaltene Rollen und gemeinsam transformierte Rahmen/Gelenke.
+Die L01-Hüllrollen entfallen zugunsten der tatsächlichen Gebäudehülle.
+Die illustrative Betonstütze bleibt aus demselben Rezept erhalten, wird aber
+als im F03-Plan unbelegt geführt. Die analytisch ausgewiesene maximale lokale Y-Abweichung der
+quadratischen Fassadennäherung und der rund 904 mm breite Fensterdurchgang
+sind offene praktische Grenzen; die Bindung ist keine metrische Registrierung
+und keine Platzierungsqualifikation.
+
+Die native Gebäudefassung enthält die 183 gebundenen Möbel-/Strukturkörper.
+Der Browser ergänzt genau einmal die 17 nativen Gerätegruppen des geprüften
+Standalone-L01-Layouts über `Gebäude · gebundene Pose · Standalone-Pose⁻¹`.
+Die drei funktionalen Arm-Unterbauten stammen ebenfalls aus dieser Layoutquelle.
+Native Gerätekörper im Gebäude-CAD bleiben fehlende Zielunterstützung.
+Der Rundgang besitzt eine Gebäudeszene; Laborisolation ist ein Filter in
+diesem Weltbezug. Der eigenständig erzeugbare L01-Aufbau bleibt für Ablauftests
+aus derselben Definition erhalten.
+
+Artikulationen gehören zum Typ beziehungsweise Möbelrezept. Sozialmöbel
+verwenden `social.articulations.json` für alle platzierten Instanzen;
+Labormöbel liefern ihre Gelenke direkt. Beschriftungen, Zustände und Dauer
+stehen nicht je Instanz in der Aufstellung. Die 31 Labor-Schranktürgelenke
+und drei Hockerlifte verwenden dieselbe Auswahl-, Reichweiten- und
+Befehlsroutine wie die bestehende Kühlschranktür der Küche. Browserbewegung
+ändert die geschlossene native CAD-Referenz nicht.
+
+Benannte Arbeitsflächen, Rackplätze und der Türgraph
+`R3_002–D3_002N–Flur–D3_003A/B–R3_003` sind abgeleitete Schnittstellen.
+Geometrie, Topologie und Material-/Transportlaufzeit bleiben getrennt.
+Eine Büro–Labor-Materialübergabe, logische T2/T3-Endpunktbindung und
+Transporterbahn sind nächste Schritte, keine Funktion dieser Erweiterung.
+Der neue FreeCAD-Gebäudenachweis umfasst 2.121 Körper; Standalone-L01 besteht
+beide CADs. Die vollständige Chrome-Prüfung bestätigt den direkten Büro–Flur–
+Labor-Weg, Schranktür und Hockerlift sowie die Aufzugfahrt mit Kameramitnahme
+und geschossgebundenen Ausstiegen. Der vollständige SolidCraft-Gebäudeneuaufbau
+ist ausgelassen. Historische Medien und Berichte bleiben ihren Revisionen
+zugeordnet; Einzelheiten stehen im Rundgang- und Gebäudebericht.
 
 ## Implementierter erster Schritt für L01
 
