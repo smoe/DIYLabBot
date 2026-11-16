@@ -169,6 +169,10 @@ die weiteren Abnahmen der [Roadmap](../ROADMAP.md).
 
 ## Separate technische Wasserübung
 
+Die [3D-Wasserübung in L01](water-practice-l01-animation.md) ergänzt sichtbare
+Pipettierbahnen, Bench-Sperren und den Abgleich ohne erneute Zugabe als
+separaten Darstellungsmodus; sie führt keine Laufzeitaktionen aus.
+
 `python3 scripts/run_water_transfer_practice.py prepare` zeigt den eigenständigen
 Vertrag und die unausgefüllte Inventarvorlage. Er liest keine E4-Profile und
 legt keinen Store an. Die Reihenfolge stammt einmalig aus
