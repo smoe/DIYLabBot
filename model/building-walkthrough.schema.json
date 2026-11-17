@@ -17,7 +17,8 @@
     "articulation_source",
     "objects",
     "interaction",
-    "elevator"
+    "elevator",
+    "mechanisms"
   ],
   "properties": {
     "format": {
@@ -561,6 +562,280 @@
               "items": {
                 "type": "number",
                 "minimum": 100,
+                "maximum": 3000
+              }
+            },
+            "basis": {
+              "const": "presentation_assumption"
+            }
+          }
+        },
+        "door_duration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            },
+            "unit": {
+              "const": "s"
+            },
+            "range": {
+              "const": [
+                0.1,
+                10
+              ]
+            },
+            "basis": {
+              "const": "presentation_assumption"
+            }
+          }
+        }
+      }
+    },
+    "mechanisms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "room_doors",
+        "equipment"
+      ],
+      "properties": {
+        "room_doors": {
+          "$ref": "#/$defs/mechanism_presentation"
+        },
+        "equipment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "freezer_minus20",
+            "fume_hood_1200",
+            "nanodrop",
+            "qubit"
+          ],
+          "properties": {
+            "freezer_minus20": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "presentation",
+                "roles"
+              ],
+              "properties": {
+                "presentation": {
+                  "$ref": "#/$defs/mechanism_presentation"
+                },
+                "roles": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "fume_hood_1200": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "presentation",
+                "roles"
+              ],
+              "properties": {
+                "presentation": {
+                  "$ref": "#/$defs/mechanism_presentation"
+                },
+                "roles": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "nanodrop": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "presentation",
+                "roles"
+              ],
+              "properties": {
+                "presentation": {
+                  "$ref": "#/$defs/mechanism_presentation"
+                },
+                "roles": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "qubit": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "presentation",
+                "roles"
+              ],
+              "properties": {
+                "presentation": {
+                  "$ref": "#/$defs/mechanism_presentation"
+                },
+                "roles": {
+                  "type": "object",
+                  "minProperties": 1,
+                  "additionalProperties": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "mechanism_presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "label",
+        "commands",
+        "state_labels",
+        "duration",
+        "view_distance"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "commands": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "open",
+            "close",
+            "view"
+          ],
+          "properties": {
+            "open": {
+              "type": "string",
+              "minLength": 1
+            },
+            "close": {
+              "type": "string",
+              "minLength": 1
+            },
+            "view": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "state_labels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "closed",
+            "opening",
+            "open",
+            "closing"
+          ],
+          "properties": {
+            "closed": {
+              "type": "string",
+              "minLength": 1
+            },
+            "opening": {
+              "type": "string",
+              "minLength": 1
+            },
+            "open": {
+              "type": "string",
+              "minLength": 1
+            },
+            "closing": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "duration": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 0.1,
+              "maximum": 10
+            },
+            "unit": {
+              "const": "s"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 10
+              }
+            },
+            "basis": {
+              "const": "presentation_assumption"
+            }
+          }
+        },
+        "view_distance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "unit",
+            "range",
+            "basis"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "minimum": 300,
+              "maximum": 3000
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "minimum": 300,
                 "maximum": 3000
               }
             },

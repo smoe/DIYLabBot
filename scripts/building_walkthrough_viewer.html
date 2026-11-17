@@ -153,15 +153,28 @@
       objectStates.set(config.id,object);objectSceneIds.add(config.scene);
       for(const body of config.moving_body_ids){const key=config.scene+':'+body;if(bodyOwners.has(key)||!data.scenes[config.scene].groups.some(g=>g.id===body))throw Error('Missing or multiply bound moving body.');bodyOwners.set(key,object);}
     }
+    for(const object of objectStates.values()){
+      const ancestors=new Set([object.config.id]);let parent=object.config.parent_object_id;
+      while(parent){if(ancestors.has(parent)||!objectStates.has(parent))throw Error('Unknown or cyclic articulation parent.');ancestors.add(parent);parent=objectStates.get(parent).config.parent_object_id;}
+      for(const entry of Object.values(object.config.commands))for(const rule of entry.requires||[]){
+        const other=objectStates.get(rule.object_id);if(!other||!Number.isFinite(other.config.states[rule.state]))throw Error('Unknown articulation guard.');
+      }
+    }
     const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
-    const elevator=elevatorConfig?WalkthroughInteraction.createLiftSession(elevatorConfig,elevatorObject,name=>command(elevatorConfig.object_id,name)):null;
+    const liftDoors=elevatorConfig?WalkthroughInteraction.createLiftDoorCycle(elevatorConfig,objectStates,driveObject):null;
+    const elevator=elevatorConfig?WalkthroughInteraction.createLiftSession(elevatorConfig,elevatorObject,name=>command(elevatorConfig.object_id,name),liftDoors):null;
     const liftPanel=document.getElementById('walkthrough-lift'),liftLabel=document.getElementById('walkthrough-lift-label'),liftStatus=document.getElementById('walkthrough-lift-status');
     const liftFloors=document.getElementById('walkthrough-lift-floors'),liftActions=document.getElementById('walkthrough-lift-actions');
     const portById=new Map((elevatorConfig?.ports||[]).map(port=>[port.id,port])),triggerPorts=new Map();
     for(const port of elevatorConfig?.ports||[])if(port.active)for(const body of port.trigger_body_ids||[])triggerPorts.set(body,port);
     let liftUIKey=null,lastLiftCommand=null;
     function updateObjectUI(){dirty=true;}
-    function objectMatrix(object){return WalkthroughInteraction.jointMatrix(object.config.joint,object.value,object.config.states[object.config.reference_state]);}
+    function objectMatrix(object,closed=false){
+      const value=closed&&Number.isFinite(object.config.states.closed)?object.config.states.closed:object.value;
+      const local=WalkthroughInteraction.jointMatrix(object.config.joint,value,object.config.states[object.config.reference_state]);
+      const parent=object.config.parent_object_id?objectStates.get(object.config.parent_object_id):null;
+      return parent?multiply(objectMatrix(parent),local):local;
+    }
     function syncLiftCamera(){
       const attached=elevator?.attachedEye();if(!attached)return;
       eye=attached.map(v=>v/1000);sceneId='building';
@@ -175,7 +188,7 @@
     }
     function updateLiftUI(){
       const boarded=Boolean(elevator?.boarded),nearby=elevator&&!isolated&&sceneId==='building'?elevator.nearby(eye.map(v=>v*1000),reach*1000):null;
-      const busy=Boolean(elevatorObject?.transition),key=JSON.stringify([boarded,nearby?.id,busy,elevatorObject?.state,elevatorObject?.targetState,lastLiftCommand?.status]);
+      const busy=Boolean(elevatorObject?.transition||liftDoors?.busy),key=JSON.stringify([boarded,nearby?.id,busy,liftDoors?.phase,elevatorObject?.state,elevatorObject?.targetState,lastLiftCommand?.status]);
       for(const node of [...stopsNode.querySelectorAll('button'),document.getElementById('walkthrough-previous'),document.getElementById('walkthrough-next'),document.getElementById('walkthrough-return'),isolationButton])node.disabled=boarded;
       levelSelect.disabled=boarded||sceneId!=='building';
       for(const node of document.querySelectorAll('[data-move]'))node.disabled=boarded;
@@ -183,7 +196,8 @@
       liftFloors.replaceChildren();liftActions.replaceChildren();if(!elevator)return;
       liftLabel.textContent=elevatorObject.config.label;
       const label=elevatorObject.config.state_labels[elevatorObject.state]||elevatorObject.state;
-      liftStatus.textContent=(busy?'Travelling to '+(elevatorObject.config.state_labels[elevatorObject.targetState]||elevatorObject.targetState):label)+(lastLiftCommand?' · '+lastLiftCommand.status:'');
+      const phaseLabel={closing:'Türen schließen',opening:'Türen öffnen',travelling:'Fahrt'}[liftDoors?.phase];
+      liftStatus.textContent=(busy?(phaseLabel||'Fahrt')+' · '+(elevatorObject.config.state_labels[liftDoors?.destination||elevatorObject.targetState]||elevatorObject.targetState):label)+(lastLiftCommand?' · '+lastLiftCommand.status:'');
       function button(parent,text,action,attrs={}){const node=document.createElement('button');node.type='button';node.className='quiet-button';node.textContent=text;for(const [k,v] of Object.entries(attrs))node.setAttribute(k,v);node.addEventListener('click',action);parent.append(node);return node;}
       if(boarded){
         for(const level of levels.filter(level=>elevatorConfig.ports.some(p=>p.active&&p.level_id===level.id)))button(liftFloors,level.label||level.id,()=>recordLift(elevator.select(level.id)),{'data-lift-floor':level.id,'aria-label':'Travel to '+(level.label||level.id)});
@@ -212,10 +226,21 @@
       syncLiftCamera();return active;
     }
     function command(id,name){
+      if(id===elevatorConfig?.object_id&&liftDoors)return liftDoors.request(name);
+      if(objectStates.get(id)?.config.mechanism==='lift_door')return {status:'rejected_automatic_door',id};
+      return driveObject(id,name);
+    }
+    function driveObject(id,name){
       advanceObjects(performance.now());const object=objectStates.get(id),target=object?.config.commands[name]?.target_state;
       if(!object||!target||!Number.isFinite(object.config.states[target]))return {status:'unknown_target',id};
       if(object.transition)return {status:'rejected_busy',id,state:object.state};
       if(object.state===target)return {status:'already_in_state',id,state:object.state};
+      const blockers=WalkthroughInteraction.commandBlockers(objectStates,id,name);
+      if(blockers.length){
+        const labels=object.config.commands[name].requires.filter(rule=>blockers.includes(rule.object_id)).map(rule=>(objectStates.get(rule.object_id)?.config.label||rule.object_id)+(rule.state==='closed'?' schließen':' vollständig öffnen'));
+        announcement.textContent=object.config.label+': Bitte zuerst '+labels.join(', ')+'.';
+        return {status:'rejected_interlock',id,blockers};
+      }
       const isLift=id===elevatorConfig?.object_id;
       object.targetState=target;object.state=isLift?'moving':target==='open'?'opening':'closing';
       const duration=isLift?1.875*Math.abs(object.config.states[target]-object.value)/elevatorConfig.speed_mm_s:object.config.duration_s;
@@ -246,7 +271,8 @@
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
         targetForBody:id=>triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
-        transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;}});
+        transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
+        referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
     function interact(x,y,input){
       advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
@@ -317,7 +343,12 @@
       gl.disable(gl.BLEND);gl.depthMask(true);
       for(const group of scene.opaque){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
-      scene.transparent.sort((a,b)=>dot(b.centre.map((v,i)=>v-eye[i]),b.centre.map((v,i)=>v-eye[i]))-dot(a.centre.map((v,i)=>v-eye[i]),a.centre.map((v,i)=>v-eye[i])));
+      for(const group of scene.transparent){
+        const m=group.object?objectMatrix(group.object):null,p=group.centre;
+        const centre=m?[0,1,2].map(i=>m[i]*p[0]+m[i+4]*p[1]+m[i+8]*p[2]+m[i+12]):p;
+        const offset=centre.map((v,i)=>v-eye[i]);group.distanceSquared=dot(offset,offset);
+      }
+      scene.transparent.sort((a,b)=>b.distanceSquared-a.distanceSquared);
       for(const group of scene.transparent){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
       gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();updateLiftUI();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
@@ -332,7 +363,7 @@
     }
     function tick(now){
       frameRequest=null;
-      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);const animating=advanceObjects(now);if(dirty){render();dirty=false;}if(keys.size||animating)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
+      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);const animating=advanceObjects(now),liftActive=liftDoors?.advance();if(dirty){render();dirty=false;}if(keys.size||animating||liftActive)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
       catch(error){keys.clear();fail(error);}
     }
     function setStop(id){
@@ -386,14 +417,14 @@
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
-      get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
+      get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},
       get frames(){return frames;},get renderer(){return 'webgl2';},
       get sceneStats(){const scene=sceneCache.get(sceneKey(sceneId));return scene?{triangles:scene.triangles,native_groups:scene.nativeGroups,opaque_batches:scene.opaque.length,transparent_groups:scene.transparent.length,display_opacity_overrides:scene.opacityOverrides}:null;}
     });
-    setStop(data.default_stop_id||data.default_stop||stops[0].id);prepareScene(sceneId);render();dirty=false;loading.hidden=true;root.dataset.ready='true';
+    liftDoors?.initialize();setStop(data.default_stop_id||data.default_stop||stops[0].id);prepareScene(sceneId);render();dirty=false;loading.hidden=true;root.dataset.ready='true';
   }catch(error){fail(error);}
 })();
 </script>

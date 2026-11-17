@@ -6,7 +6,9 @@ import furniture_articulation as articulation
 
 
 def validate(source):
-    articulation.exact(source, 'id speed', 'walkthrough elevator')
+    articulation.exact(source, 'id speed'+(' door_duration' if 'door_duration' in source else ''), 'walkthrough elevator')
+    if 'door_duration' in source:
+        articulation.parameter(source['door_duration'], 's', (.1, 10))
     articulation.require(isinstance(source['id'], str) and source['id'], 'Elevator interface ID required')
     return articulation.parameter(source['speed'], 'mm/s', (100, 3000))
 
@@ -50,7 +52,7 @@ def compile(source, building, parameters, interface, expanded, plan, eye_height)
     obj = {'id': object_id, 'label': 'Aufzug', 'scene': 'building', 'level_id': reference,
         'joint': {'id': 'Travel', 'type': 'prismatic', 'origin_mm': centre,
                   'axis': [0, 0, 1], 'limits_mm': limits},
-        'front': [1, 0, 0], 'moving_body_ids': cabins,
+        'front': [1, 0, 0], 'moving_body_ids': cabins+lift.get('fittings', {}).get('attached_body_ids', []),
         'states': states, 'reference_state': reference,
         'commands': {key: {'label': value['label'], 'target_state': key}
                      for key, value in levels.items()},
@@ -69,4 +71,28 @@ def compile(source, building, parameters, interface, expanded, plan, eye_height)
     for port in ports:
         articulation.require(all(math.isfinite(v) for v in port['cabin_entry_mm']+port['exit_eye_mm']),
                              'Finite source-derived lift ports required')
+    if 'fittings' in lift:
+        articulation.require('door_duration' in source, 'Lift doors require an explicit motion duration')
+        door_objects = []
+        for group in lift['fittings']['door_groups']:
+            cabin = group['parent'] == 'cabin'
+            port = None if cabin else next(port for port in ports if port['id'] == group['port_id'])
+            door_objects.append({'id': group['id'], 'label': 'Aufzugtür', 'scene': 'building',
+                'level_id': reference if cabin else port['level_id'], 'joint': group['joint'],
+                'parent_object_id': object_id if cabin else None, 'mechanism': 'lift_door',
+                'side': group['side'], 'port_id': group['port_id'], 'front': [1, 0, 0],
+                'moving_body_ids': group['moving_body_ids'],
+                'states': dict(zip(('closed', 'open'), group['joint']['limits_mm'])), 'reference_state': 'closed',
+                'commands': {name: {'label': label, 'target_state': state}
+                             for name, label, state in [('open', 'Öffnen', 'open'), ('close', 'Schließen', 'closed')]},
+                'state_labels': {'closed': 'Geschlossen', 'opening': 'Wird geöffnet', 'open': 'Offen', 'closing': 'Wird geschlossen'},
+                'duration_s': articulation.parameter(source['door_duration'], 's', (.1, 10)),
+                'view_label': 'Aufzugtür ansehen', 'basis': 'presentation_assumption',
+                'qualification': {'lift_operation_implemented': False, 'collision_checked': False}})
+        config['door_objects'] = door_objects
+        config['fittings'] = lift['fittings']['placements']
+        for port in ports:
+            port['door_object_ids'] = [door['id'] for door in door_objects
+                if port['active'] and door['side'] == port['side'] and (door['port_id'] == port['id'] or door['parent_object_id'] == object_id)]
+            port['trigger_body_ids'] += [body for door in door_objects if door['port_id'] == port['id'] for body in door['moving_body_ids']]
     return obj, config

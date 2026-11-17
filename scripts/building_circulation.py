@@ -9,6 +9,7 @@ import re
 
 import relative_floorplan as floor
 import building_guards as guards
+import lift_fittings
 
 
 def require(condition, message):
@@ -23,7 +24,9 @@ def validate_source(source):
     exact(source, 'status served_extent elevator stairs external_stair qualification limitations', 'circulation')
     require(source['status'] == 'owner_requested_concept_geometry', 'Static owner-requested circulation concept required')
     require(source['served_extent'] == {'from_level': 'KG', 'to_level': 'OG3'}, 'Requested served extent is KG to OG3, with explicit basement concept geometry')
-    lift = source['elevator']; exact(lift, 'id area reference_opening sides default_sides stop_overrides deferred_stops cabin_level post_wall_factor cabin_wall_factor cabin_clearance_factor', 'elevator')
+    lift = source['elevator']; exact(lift, 'id area reference_opening sides default_sides stop_overrides deferred_stops cabin_level post_wall_factor cabin_wall_factor cabin_clearance_factor'+(' fittings' if 'fittings' in lift else ''), 'elevator')
+    if 'fittings' in lift:
+        lift_fittings.validate(lift['fittings'])
     require(lift['id'] == 'BuildingLift' and lift['cabin_level'] == 'EG', 'One cabin indication at EG required')
     exact(lift['sides'], 'outward inward', 'confirmed sides')
     for side, declaration in lift['sides'].items():
@@ -179,6 +182,7 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
             wx = bbox[0] if side == 'outward' else bbox[2]; target = level['id']+'__Wall_'+declaration['wall']; is_active = side in active
             name = 'LiftPort_'+level['id']+'_'+side
             port = {'id': name, 'level_id': level['id'], 'side': side, 'wall': declaration['wall'], 'active': is_active, 'z_mm': level['z_mm'], 'frame_body_id': None}; ports.append(port)
+            port.update(plane_x_mm=wx, height_mm=door_h, wall_thickness_mm=thickness)
             if side == 'outward':
                 cut_points = rectangle(wx-thickness, lo, cabin_rect[0]+cw+thickness*.1, hi)
                 open_points = rectangle(wx-thickness*.4, lo+inset, cabin_rect[0]+cw-inset, hi-inset)
@@ -200,6 +204,13 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
                 points = rectangle(wx-thickness*.25, lo+inset, wx+thickness*.25, hi-inset); height = door_h-2*inset
                 volume = thickness*.5*(width-2*inset)*height
                 closed.append(probe(name+'_Closed', points, level['z_mm']+inset, height, [target], 'filled', {target: volume}))
+    fittings = None
+    if 'fittings' in lift:
+        fittings = lift_fittings.compile(lift['fittings'], cabin_rect, cw, (lo, hi), ports,
+            next(level['z_mm'] for level in levels if level['id'] == lift['cabin_level']), levels)
+        for key in ('bodies', 'operations'):
+            result[key].extend(fittings[key])
+        detail.extend(body['id'] for body in fittings['bodies'])
     stairs = []; recipe = source['stairs']; n = recipe['risers_per_flight']; join = slab*recipe['join_slab_fraction']
     require(0 < join < slab/4, 'Small positive stair fusion overlap required')
     for instance in recipe['instances']:
@@ -484,4 +495,10 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
         'guard_clearance_probes': guard_clearances, 'guard_safety_qualified': False,
         'ground_visibility_ids': [cabin]+[port['frame_body_id'] for port in ports if port['level_id'] == 'EG' and port['frame_body_id']]+[stair['connectors'][0]['body_id'] for stair in stairs]+[ext_connectors[0]['body_id'], metal_landings[0]]+ground_guard_ids,
         'basement_geometry_implemented': True, 'headroom_qualified': False, 'egress_qualified': False, 'limitations': list(source['limitations'])}
+    if fittings:
+        result['interface']['elevator']['fittings'] = {key: fittings[key] for key in ('door_groups', 'attached_body_ids', 'placements')}
+        result['interface']['ground_visibility_ids'].extend(fittings['attached_body_ids'])
+        result['interface']['ground_visibility_ids'].extend(body for group in fittings['door_groups']
+            if group['parent'] == 'cabin' or any(port['id'] == group['port_id'] and port['level_id'] == lift['cabin_level'] for port in ports)
+            for body in group['moving_body_ids'])
     return result

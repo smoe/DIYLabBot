@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "0dfc62c4a318c820b01a7d10a27ec20cc75459d0f04943b268cde1747b29ca0f"
+      "source_sha256": "7eed558ca9977f61292f07611d262609443174c0ec0e5453bd980d6d481c1fb4"
     }
   },
   "settings": {
@@ -106,9 +106,9 @@
     "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
     "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
     "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer.",
-    "Furniture opening is a browser-only illustrative articulation; FreeCAD and SolidCraft retain the closed reference geometry.",
+    "Interactive opening is a browser-only illustration derived from shared joints and native reference poses; it does not control hardware.",
     "No door-swing clearance, collision, hardware or robot-command qualification.",
-    "The single elevator cabin and boarded camera move only in the browser; no real lift control, door leaves or navigation qualification is implemented.",
+    "The single elevator cabin and boarded camera move only in the browser; doors open only at active destination ports; real lift control and navigation qualification remain unimplemented.",
     "Native building CAD contains the bound laboratory furniture; equipment is instanced into its browser view from the checked L01 layout."
   ],
   "rendering": {
@@ -143,6 +143,201 @@
         3000
       ],
       "basis": "presentation_assumption"
+    },
+    "door_duration": {
+      "value": 0.65,
+      "unit": "s",
+      "range": [
+        0.1,
+        10
+      ],
+      "basis": "presentation_assumption"
+    }
+  },
+  "mechanisms": {
+    "room_doors": {
+      "label": "Raumtür · {room}",
+      "commands": {
+        "open": "Öffnen",
+        "close": "Schließen",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Geschlossen",
+        "opening": "Wird geöffnet",
+        "open": "Offen",
+        "closing": "Wird geschlossen"
+      },
+      "duration": {
+        "value": 0.8,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1100,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    },
+    "equipment": {
+      "freezer_minus20": {
+        "presentation": {
+          "label": "Gefrierschrank · {articulation}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.8,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 850,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        },
+        "roles": {
+          "outer_door": "Tür",
+          "plastic_drawer": "Schublade"
+        }
+      },
+      "fume_hood_1200": {
+        "presentation": {
+          "label": "Abzug · {articulation}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.8,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 1200,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        },
+        "roles": {
+          "vertical_sash": "Frontscheibe",
+          "hinged_cabinet_door": "Unterschrankklappe"
+        }
+      },
+      "nanodrop": {
+        "presentation": {
+          "label": "NanoDrop · {articulation}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.5,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 600,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        },
+        "roles": {
+          "sampling_lever": "Hebel"
+        }
+      },
+      "qubit": {
+        "presentation": {
+          "label": "Qubit · {articulation}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.5,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 600,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        },
+        "roles": {
+          "chamber_cover": "Deckel"
+        }
+      }
     }
   }
 }

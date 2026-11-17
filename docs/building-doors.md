@@ -112,8 +112,10 @@ Die 60 mm beschreiben die angenommene äußere Türblattstärke. Blechaufbau,
 Versteifungen, Beschläge, Dichtungen, Glasbefestigung und tatsächliche Masse
 sind offen. Die Bestätigung
 „schwere Stahltür“ belegt keine Brand-, Strahlen-, Druck- oder Einbruchschutzklasse.
-Die offenen Stellungen bleiben illustrative statische Prüfstellungen;
-Türschwenkwege und reale Begehbarkeit sind nicht qualifiziert.
+Die nativen offenen Stellungen bleiben illustrative statische Prüfstellungen.
+Im [Gebäuderundgang](walkthrough-mechanisms.md) lassen sich dieselben Blätter
+einschließlich ihrer Verglasung öffnen und schließen; Türschwenkwege und reale
+Begehbarkeit sind nicht qualifiziert.
 Der Glasfarbton und die Deckkraft von 0,3 sind Darstellungsannahmen, keine
 optischen Messwerte. Glasart, Beschläge, Rahmen, Schutzklasse und tatsächliche
 Masse bleiben offen; das transparente Blatt beschreibt keine geprüfte Glastür.

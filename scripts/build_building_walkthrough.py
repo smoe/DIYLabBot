@@ -51,6 +51,8 @@ def ensure_reports(program, args):
     reports = reports_from_program(program)
     if args.building_report is not None:
         reports['building'] = mesh_export.project_path(args.building_report)
+    if getattr(args, 'lab_report', None) is not None:
+        reports['lab'] = mesh_export.project_path(args.lab_report)
     rebuild = bool(args.rebuild_building)
     try:
         mesh_export.checked_report(reports['building'], 'building')
@@ -97,6 +99,7 @@ def build(args):
     # final source/proof set before pinning the browser artifact.
     program = model.compile(args.source)
     program['scene_sources']['building']['build_report'] = str(reports['building'].relative_to(ROOT))
+    program['equipment_source']['build_report'] = str(reports['lab'].relative_to(ROOT))
     source_pins = merge_pins(program['source_files_sha256'],
         {str(path.relative_to(ROOT)): mesh_export.digest(path)
          for path in (Path(__file__), ROOT/'scripts/export_building_walkthrough_freecad.py', TEMPLATE, INTERACTION_SCRIPT)})
@@ -170,6 +173,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', default=None, help='Shared walkthrough source (default: model/building-walkthrough.shared.json)')
     parser.add_argument('--building-report', default=None, help='Versioned checked FreeCAD building report (default: shared current report)')
+    parser.add_argument('--lab-report', default=None, help='Versioned checked L01 report (default: shared current report)')
     parser.add_argument('--output-dir', default=None, help='New project-local output directory; existing outputs are preserved')
     parser.add_argument('--rebuild-building', action='store_true', help='Rebuild native FreeCAD even when the building proof is current')
     parser.add_argument('--no-rebuild', action='store_true', help='Require a current checked building cache instead of rebuilding stale inputs')

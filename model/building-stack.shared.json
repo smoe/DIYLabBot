@@ -150,7 +150,27 @@
       "cabin_level": "EG",
       "post_wall_factor": 0.4,
       "cabin_wall_factor": 0.5,
-      "cabin_clearance_factor": 0.25
+      "cabin_clearance_factor": 0.25,
+      "fittings": {
+        "recipe": "opposed_sliding_doors/1",
+        "leaf_thickness_mm": 18,
+        "leaf_gap_mm": 4,
+        "north_clearance_mm": 12,
+        "panel": {
+          "side": "northwest",
+          "width_mm": 150,
+          "height_mm": 380,
+          "depth_mm": 25,
+          "bottom_mm": 1050
+        },
+        "telephone": {
+          "side": "northeast",
+          "width_mm": 130,
+          "height_mm": 250,
+          "depth_mm": 45,
+          "bottom_mm": 1250
+        }
+      }
     },
     "stairs": {
       "recipe": "illustrative_two_flight_turnback_v1",

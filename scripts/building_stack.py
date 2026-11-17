@@ -543,6 +543,7 @@ def solidcraft_commands(spec, p):
 def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
     paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', ROOT/'scripts/building_guards.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
+    paths.append(ROOT/'scripts/lift_fittings.py')
     if 'furnishings' in spec['sources']:
         paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
         if furnishings.read(spec['sources']['furnishings']).get('atrium_seating'):

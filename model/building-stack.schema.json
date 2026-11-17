@@ -593,6 +593,110 @@
               "type": "number",
               "exclusiveMinimum": 0,
               "maximum": 1
+            },
+            "fittings": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "leaf_thickness_mm",
+                "leaf_gap_mm",
+                "north_clearance_mm",
+                "panel",
+                "telephone"
+              ],
+              "properties": {
+                "recipe": {
+                  "const": "opposed_sliding_doors/1"
+                },
+                "leaf_thickness_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 200
+                },
+                "leaf_gap_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 200
+                },
+                "north_clearance_mm": {
+                  "type": "number",
+                  "exclusiveMinimum": 0,
+                  "maximum": 200
+                },
+                "panel": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "side",
+                    "width_mm",
+                    "height_mm",
+                    "depth_mm",
+                    "bottom_mm"
+                  ],
+                  "properties": {
+                    "side": {
+                      "const": "northwest"
+                    },
+                    "width_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "height_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "depth_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "bottom_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    }
+                  }
+                },
+                "telephone": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "side",
+                    "width_mm",
+                    "height_mm",
+                    "depth_mm",
+                    "bottom_mm"
+                  ],
+                  "properties": {
+                    "side": {
+                      "const": "northeast"
+                    },
+                    "width_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "height_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "depth_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "bottom_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    }
+                  }
+                }
+              }
             }
           }
         },

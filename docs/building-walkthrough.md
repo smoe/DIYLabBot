@@ -325,8 +325,11 @@ eines artikulierten Sozialmöbeltyps (einschließlich Kühlschrank und Mikrowell
 `model/furniture/social.articulations.json`. Im Labor stammen die 31
 Schranktürgelenke und drei Hockerlifte direkt aus den gebundenen Möbelrezepten.
 Die Hockerlifte verwenden prismatische Gelenke und die typspezifischen
-Heben-/Senken-Befehle. Die Raumtüren der Gebäudehülle erhalten dadurch noch
-keine beweglichen Türblätter. Die Kamera-Hilfe `viewObject` bleibt
+Heben-/Senken-Befehle. Auch alle vorhandenen Raumtüren der Gebäudehülle lassen
+sich öffnen und schließen, einschließlich der Stahltüren im Keller. Blatt,
+Guckfenster und Ringe bewegen sich gemeinsam um den vorhandenen Anschlag.
+Die [Geräte- und Aufzugbedienung](walkthrough-mechanisms.md) ergänzt Gefrierschubladen,
+Abzug, Qubit, NanoDrop und automatisch betätigte Aufzugtüren. Die Kamera-Hilfe `viewObject` bleibt
 nur in der Test-API und hat keine Taste in der Oberfläche.
 
 Blickpunkt- und Geschosswechsel sowie der Laborfilter erhalten die

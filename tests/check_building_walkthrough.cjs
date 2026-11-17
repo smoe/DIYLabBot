@@ -684,7 +684,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     progress('same-frame laboratory isolation passed');
 
     const lift=model.elevator,liftObject=model.objects.find(object=>object.id===lift.object_id);
-    assert(lift&&liftObject&&liftObject.moving_body_ids.length===1,'Exactly one native cabin moves');
+    assert(lift&&liftObject&&liftObject.moving_body_ids.filter(id=>nativeById.get(id)?.role==='concept_existing_elevator_cabin').length===1,'Exactly one native cabin moves with its fittings');
     const port=(level,side='outward')=>lift.ports.find(port=>port.level_id===level&&port.side===side&&port.active);
     const liftState=surface=>surface.evaluate(()=>window.__buildingWalkthrough.elevator);
     const cabinState=surface=>surface.evaluate(id=>window.__buildingWalkthrough.objects.find(object=>object.id===id),lift.object_id);
@@ -694,12 +694,14 @@ const {chromium} = require(process.argv[3] || 'playwright');
       return shown;
     }
     async function enter(surface,selectedPort){
+      await surface.waitForFunction(()=>!window.__buildingWalkthrough.elevator.door_phase||window.__buildingWalkthrough.elevator.door_phase==='idle');
       await surface.locator(`[data-lift-enter="${selectedPort.id}"]`).click();
       const state=await liftState(surface);assert.equal(state.boarded,true);
       const eye=await surface.evaluate(()=>window.__buildingWalkthrough.camera.eye_mm);
       assert(cameraDistance(eye,state.attached_eye_mm)<1e-6,'Boarded camera follows the absolute cabin state');
     }
     async function exit(surface,selectedPort){
+      await surface.waitForFunction(()=>!window.__buildingWalkthrough.elevator.door_phase||window.__buildingWalkthrough.elevator.door_phase==='idle');
       await surface.locator(`[data-lift-exit="${selectedPort.side}"]`).click();
       assert.equal((await liftState(surface)).boarded,false);
       const eye=await surface.evaluate(()=>window.__buildingWalkthrough.camera.eye_mm);
@@ -737,7 +739,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     await page.screenshot({path:path.join(output,'browser-lift-mobile.png'),fullPage:true});
     await exit(page,port('KG','inward'));
     await page.setViewportSize({width:1280,height:950});
-    report.elevator={id:lift.object_id,native_cabin_count:liftObject.moving_body_ids.length,
+    report.elevator={id:lift.object_id,native_cabin_count:1,cabin_attached_bodies:liftObject.moving_body_ids,
       reduced_motion:true,public_frame_call:true,public_boarding:true,eg_identity:true,og3_return_pose:true,
       active_exit_sides:{EG:egSides,OG3:ogSides,KG:kgSides},mobile_overlay:true};
     progress('reduced-motion elevator and exit policies passed');

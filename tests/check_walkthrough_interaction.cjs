@@ -26,4 +26,11 @@ picker=createPicker(mesh([upright]));const options={reach:3,targetForBody,transf
 assert.equal(picker.pick([0,0,0],[1,0,0],options),null,'Mouse must hit the current open leaf');
 assert.equal(picker.pick([0,-2,0],[0,1,0],options).target_id,'Door','Picking follows a rotated leaf');
 assert.equal(picker.pick([0,0,0],[1,0,0],{...options,includeReference:true}).target_id,'Door','Space can close an open doorway');
-console.log('Passed 10 native-mesh picking checks: reach, direction, occlusion, exact triangles, nearest target, rotated leaf, reference doorway');
+// Native equipment and room-door meshes can start open. Their keyboard target
+// is the derived closed surface, not an invisible copy at the native open pose.
+const movedNative={id:'Door',points:upright.points.map(p=>[p[0],p[1]+5,p[2]]),indices:upright.indices};
+picker=createPicker(mesh([movedNative]));
+const closedReference=new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,-5,0,1]);
+assert.equal(picker.pick([0,0,0],[1,0,0],{reach:3,targetForBody,includeReference:true,referenceTransformForBody:()=>closedReference}).target_id,'Door');
+assert.equal(picker.pick([0,0,0],[1,0,0],{reach:3,targetForBody}),null,'Mouse cannot click the invisible closed reference');
+console.log('Passed native-mesh picking checks, including closed references derived from initially open meshes.');

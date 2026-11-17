@@ -13,6 +13,7 @@ import assembly_model as assembly
 import building_stack as stack
 import relative_floorplan as floor
 import furniture_articulation as articulation
+import walkthrough_mechanisms as mechanisms
 import walkthrough_elevator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,7 +41,7 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator', 'walkthrough')
+    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator mechanisms', 'walkthrough')
     require(spec['format'] == FORMAT and isinstance(spec['id'], str) and
             re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Walkthrough identity required')
     exact(spec['interaction'], 'reach', 'interaction policy')
@@ -48,6 +49,7 @@ def validate(spec):
     exact(spec['articulation_source'], 'source source_sha256', 'articulation reference')
     articulation.validate(articulation.read(spec['articulation_source']))
     articulation.validate_requests(spec['objects'])
+    mechanisms.validate(spec['mechanisms'])
     walkthrough_elevator.validate(spec['elevator'])
     exact(spec['sources'], 'building', 'scene sources')
     for ref in spec['sources'].values():
@@ -214,9 +216,13 @@ def compile(source=None):
         expanded, {v['id']: stack.level_plan(building, v['id']) for v in levels}, spec['settings']['eye_height_mm'])
     objects += articulation.compile_lab_objects(spec['articulation_source'], interface, expanded,
         {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
+    objects += mechanisms.room_doors(spec['mechanisms']['room_doors'], interface, expanded,
+        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
+    objects += mechanisms.equipment(spec['mechanisms']['equipment'], interface, spec['settings']['eye_height_mm'])
     lift_object, elevator = walkthrough_elevator.compile(spec['elevator'], building, p, interface,
         expanded, stack.level_plan(building, 'OG3'), spec['settings']['eye_height_mm'])
     objects.append(lift_object)
+    objects.extend(elevator.pop('door_objects', []))
     plan = stack.level_plan(building, laboratory['level_id'])
     area = next(value for value in plan['areas'] if value['id'] == laboratory['area'])
     wall_ids = {edge['wall'] for edge in area['boundary']}
@@ -230,7 +236,7 @@ def compile(source=None):
             shell.update([window['glass_body'], window['frame_body']])
     isolation = {'label': 'Labor isoliert anzeigen', 'body_ids': sorted(shell |
         set(laboratory['furniture_body_ids']))}
-    paths = [*articulation.dependencies(spec['articulation_source']), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
+    paths = [*articulation.dependencies(spec['articulation_source']), *mechanisms.dependencies(), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
              *stack.source_dependencies(building), ROOT/'scripts/walkthrough_elevator.py',
              ROOT/'scripts/atrium_seating.py']
     pins = {str(item.resolve().relative_to(ROOT)): digest(item) for item in dict.fromkeys(paths)}
