@@ -1,0 +1,260 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "recipe",
+    "parameters",
+    "objectives",
+    "reference",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.microscope/1"
+    },
+    "id": {
+      "const": "MicroscopeMI01"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "recipe": {
+      "const": "upright_trinocular_fluorescence_v1"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "base_width",
+        "base_depth",
+        "stage_z",
+        "head_z",
+        "interpupillary_distance"
+      ],
+      "properties": {
+        "base_width": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ],
+          "properties": {
+            "expression": {
+              "type": "number",
+              "minimum": 300,
+              "maximum": 360
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "const": [
+                300,
+                360
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "base_depth": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ],
+          "properties": {
+            "expression": {
+              "type": "number",
+              "minimum": 400,
+              "maximum": 460
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "const": [
+                400,
+                460
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "stage_z": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ],
+          "properties": {
+            "expression": {
+              "type": "number",
+              "minimum": 200,
+              "maximum": 225
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "const": [
+                200,
+                225
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "head_z": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ],
+          "properties": {
+            "expression": {
+              "type": "number",
+              "minimum": 440,
+              "maximum": 470
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "const": [
+                440,
+                470
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "interpupillary_distance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ],
+          "properties": {
+            "expression": {
+              "type": "number",
+              "minimum": 54,
+              "maximum": 74
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "const": [
+                54,
+                74
+              ]
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "objectives": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "band_color",
+          "length_mm"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9]+x$"
+          },
+          "band_color": {
+            "type": "string",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "length_mm": {
+            "type": "number",
+            "minimum": 50,
+            "maximum": 86
+          }
+        }
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "url",
+        "use",
+        "dimensions_measured"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "minLength": 1
+        },
+        "use": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dimensions_measured": {
+          "const": false
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schema/microscope-mi01.schema.json"
+}

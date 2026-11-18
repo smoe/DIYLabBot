@@ -1,5 +1,11 @@
 # Gebäude · Keller, EG, drei Obergeschosse und Dach
 
+In Raum **3.007** steht das [Forschungsmikroskop MI01](microscope-mi01.md)
+auf einer aus dem bestehenden Möbelkatalog abgeleiteten Bank. Gerät und
+Aufstellung besitzen getrennte Quellen; der Rundgang hat dafür einen eigenen
+Blickpunkt. Das Mikroskop wird direkt aus seiner gemeinsamen Definition auch
+in die native Gebäudefassung übernommen.
+
 Die [geschossübergreifende Hüllenregistrierung](building-alignment.md) bringt
 KG und EG vollständig auf die Außenkontur der Obergeschosse. Aufzug und inneres
 Treppenhaus bleiben dabei im gemeinsamen vertikalen Bezug fest.

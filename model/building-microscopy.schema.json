@@ -1,0 +1,201 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schema/building-microscopy.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "level",
+        "area",
+        "catalog",
+        "bench",
+        "basis"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.microscopy-furnishings/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "type": "string",
+          "minLength": 1
+        },
+        "area": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "bench": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "parameter_overrides_mm",
+            "anchor"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "type": {
+              "type": "string",
+              "minLength": 1
+            },
+            "parameter_overrides_mm": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "number"
+              }
+            },
+            "anchor": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "wall",
+                "fraction",
+                "back_gap_mm"
+              ],
+              "properties": {
+                "wall": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "fraction": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                },
+                "back_gap_mm": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 500
+                }
+              }
+            }
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "furnishings",
+        "instrument",
+        "placement",
+        "basis"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.microscopy-equipment/1"
+        },
+        "furnishings": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "instrument": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "source_sha256"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1
+            },
+            "source_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          }
+        },
+        "placement": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "support",
+            "uv",
+            "yaw_deg"
+          ],
+          "properties": {
+            "id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "support": {
+              "type": "string",
+              "minLength": 1
+            },
+            "uv": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "yaw_deg": {
+              "enum": [
+                0,
+                180
+              ]
+            }
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  ]
+}

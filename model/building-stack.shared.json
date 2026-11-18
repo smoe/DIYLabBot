@@ -25,6 +25,10 @@
     "laboratories": {
       "source": "model/furnishings/building-laboratories.json",
       "source_sha256": "3dd087dbd41ab605cc11b6463576fc18be667b89ff83c126fef3b273bebdd233"
+    },
+    "microscopy": {
+      "source": "model/equipment/microscopy-3007.json",
+      "source_sha256": "275026bb03c011028873c4bbac8f31c26b9bb56be64449c863100c075c0974e5"
     }
   },
   "calibration": null,

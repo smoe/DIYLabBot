@@ -114,6 +114,15 @@ def z_checks(geometry, contract):
                        'floor_presentation_mm': lower, 'room_top_presentation_mm': upper,
                        'scope': 'Referenced laboratory furniture and illustrative support; native equipment excluded'})
         expected.update(names)
+    if contract.get('microscopy'):
+        station=contract['microscopy'];names=station['body_ids'];level=level_by_id[station['level_id']]
+        if not names or len(names)!=len(set(names)) or set(names)&expected or not set(names)<=set(bodies):
+            raise ValueError('Microscopy needs disjoint, complete native body coverage')
+        checks.append({'id':station['id']+'_RoomHeight','level_id':level['id'],'body_ids':names,
+            'passed':all(bodies[name]['bbox']['min'][2]>=level['z_mm']-1e-6
+                         and bodies[name]['bbox']['max'][2]<=level['clear_top_mm'] for name in names),
+            'scope':'Source-bound microscopy bench and instrument'})
+        expected.update(names)
     if expected != set(bodies): raise ValueError('Every native body must belong to an explicit scoped role')
     for a, b in zip(levels, levels[1:]):
         gap = b['slab_bottom_mm']-a['slab_top_mm']
@@ -737,7 +746,7 @@ def build(args):
             'atrium_access_floor_probes':contract.get('atrium_access_floor_probes',[]),
             'backends':args.backend,'cross_cad_checked':args.backend=='both','closed_body_count':len(expanded['bodies']),
             'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids'])-len(contract.get('furnishings', {}).get('body_ids', [])),'marker_body_ids':contract['marker_body_ids'],
-            'furnishings':contract.get('furnishings'),
+            'furnishings':contract.get('furnishings'), 'microscopy':contract.get('microscopy'),
             'coordinate_meaning':NOTICE,'metric_scale_known':False,'assumed_dimensions':contract['assumed_dimensions'],
             'solidcraft_checks':sc_checks,'freecad_checks_passed':None if fc_checks is None else fc_checks['passed'],'body_comparisons':cross,
             'native_corridor_roof_checks_passed':{'solidcraft':None if sc_checks is None else sc_checks.get('native_corridor_roof_checks_passed'),

@@ -1,0 +1,14 @@
+{
+  "format": "solidcraftbot.microscopy-furnishings/1",
+  "id": "Microscopy3007",
+  "level": "OG3",
+  "area": "R3_007",
+  "catalog": {"source": "model/furniture/social.catalog.json", "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"},
+  "bench": {
+    "id": "Bench",
+    "type": "desk",
+    "parameter_overrides_mm": {"length": 1400, "depth": 800, "height": 780, "top_t": 45},
+    "anchor": {"wall": "W031", "fraction": 0.5, "back_gap_mm": 100}
+  },
+  "basis": "Owner requests a microscope in 3.007; supporting bench and its placement are assumptions at scale 1, derived from the existing room walls"
+}

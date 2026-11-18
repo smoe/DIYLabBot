@@ -1,0 +1,32 @@
+{
+  "format": "solidcraftbot.microscope/1",
+  "id": "MicroscopeMI01",
+  "status": "Detailed upright research microscope concept; illustrative geometry, not a selected manufacturer instrument",
+  "units": {"length": "mm", "angle": "deg"},
+  "recipe": "upright_trinocular_fluorescence_v1",
+  "parameters": {
+    "base_width": {"expression": 320, "unit": "mm", "range": [300, 360], "description": "Assumed width of the microscope foot"},
+    "base_depth": {"expression": 420, "unit": "mm", "range": [400, 460], "description": "Assumed depth of the microscope foot"},
+    "stage_z": {"expression": 210, "unit": "mm", "range": [200, 225], "description": "Illustrative specimen stage height"},
+    "head_z": {"expression": 448, "unit": "mm", "range": [440, 470], "description": "Binocular tube root height"},
+    "interpupillary_distance": {"expression": 64, "unit": "mm", "range": [54, 74], "description": "Illustrative eyepiece separation"}
+  },
+  "objectives": [
+    {"id": "40x", "band_color": "#2e89c8", "length_mm": 84},
+    {"id": "60x", "band_color": "#305790", "length_mm": 82},
+    {"id": "100x", "band_color": "#deded5", "length_mm": 86},
+    {"id": "4x", "band_color": "#c44b43", "length_mm": 61},
+    {"id": "10x", "band_color": "#e3ba47", "length_mm": 69},
+    {"id": "20x", "band_color": "#4b9f75", "length_mm": 77}
+  ],
+  "reference": {
+    "url": "https://www.microscope.healthcare.nikon.com/products/upright-microscopes/eclipse-ni-series",
+    "use": "Visual and configuration reference for research microscope components; independent geometry, no manufacturer CAD or logos",
+    "dimensions_measured": false
+  },
+  "limitations": [
+    "Illustrative static instrument, including camera and fluorescence housing; no optical performance or control interface is implemented",
+    "Objective labels and colors identify visible concept parts; focal lengths, numerical apertures, working distances and magnification are not calibrated",
+    "No vibration isolation, structural, electrical, photobiological or hardware qualification"
+  ]
+}

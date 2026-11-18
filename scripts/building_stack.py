@@ -106,7 +106,7 @@ def validate(spec):
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
+    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories', 'microscopy'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
@@ -459,6 +459,10 @@ def interfaces(spec, p):
         if 'furnishings' in spec['sources']:
             data['places'].extend(building_laboratories.social_places(spec['sources']['furnishings'], furnished))
         data['topology'] = laboratories['topology']
+    if 'microscopy' in spec['sources']:
+        import building_microscopy
+        data['microscopy'] = building_microscopy.compile(spec['sources']['microscopy'],
+            {name: value[0] for name, value in bases.items()}, p, levels)['interface']
     return data
 
 
@@ -511,6 +515,11 @@ def expanded(spec, p):
         import building_laboratories
         laboratories = building_laboratories.compile(spec['sources']['laboratories'], {name: value[0] for name, value in bases.items()}, p, data['levels'])
         for key in ('components', 'bodies', 'operations'): result[key].extend(laboratories[key])
+    if 'microscopy' in spec['sources']:
+        import building_microscopy
+        microscopy = building_microscopy.compile(spec['sources']['microscopy'],
+            {name: value[0] for name, value in bases.items()}, p, data['levels'])
+        for key in ('components', 'bodies', 'operations'): result[key].extend(microscopy[key])
     return result
 
 
@@ -552,6 +561,9 @@ def source_dependencies(spec):
     if 'laboratories' in spec['sources']:
         import building_laboratories
         paths.extend(building_laboratories.dependencies(spec['sources']['laboratories']))
+    if 'microscopy' in spec['sources']:
+        import building_microscopy
+        paths.extend(building_microscopy.dependencies(spec['sources']['microscopy']))
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))

@@ -95,6 +95,12 @@ def validate(spec):
             exact(anchor, 'kind access_id setback_mm target_height_mm', 'access entry anchor')
             require(stop['scene'] == 'building' and isinstance(anchor['access_id'], str) and anchor['access_id'], 'Building access reference required')
             number(anchor['setback_mm'], 300, 1500, 'access camera setback')
+        elif kind == 'microscopy':
+            exact(anchor, 'kind station eye_offset_mm target_height_mm', 'microscopy viewpoint')
+            require(isinstance(anchor['station'], str) and anchor['station'], 'Microscopy station required')
+            require(isinstance(anchor['eye_offset_mm'], list) and len(anchor['eye_offset_mm']) == 3, 'Three camera offsets required')
+            for value in anchor['eye_offset_mm']:
+                number(value, -2000, 2000, 'microscopy camera offset')
         else:
             raise ValueError('Unsupported camera anchor kind')
         number(anchor['target_height_mm'], 100, 2200, 'target height')
@@ -183,7 +189,17 @@ def compile(source=None):
         require(stop['level_id'] in level_z, 'Unknown viewpoint level')
         anchor = stop['anchor']
         if stop['scene'] == 'building':
-            if anchor['kind'] == 'access_entry':
+            if anchor['kind'] == 'microscopy':
+                station=interface.get('microscopy')
+                require(station is not None and station['id']==anchor['station'] and station['level_id']==stop['level_id'],
+                        'Viewpoint must reference an installed microscope on this floor')
+                angle=math.radians(station['instrument_yaw_deg']);c,s=math.cos(angle),math.sin(angle)
+                x,y,z=anchor['eye_offset_mm'];base=station['support_origin_mm']
+                eye=[base[0]+c*x-s*y,base[1]+s*x+c*y,base[2]+z]
+                target=station['specimen_mm'][:2]+[level_z[stop['level_id']]+anchor['target_height_mm']]
+                require(floor.point_membership(eye[:2],station['room_interior_polygon_mm'])==1,
+                        'Microscopy camera must stay in its source room')
+            elif anchor['kind'] == 'access_entry':
                 access = next((value for value in interface['atrium_accesses']
                                if value['id'] == anchor['access_id'] and value['level_id'] == stop['level_id']), None)
                 seating = next((value for value in interface['furnishings'].get('seating_groups', [])
@@ -246,7 +262,8 @@ def compile(source=None):
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
             'interaction': {'reach_mm': articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))},
             'objects': objects, 'elevator': elevator, 'isolation': isolation,
-            'laboratories': laboratories, 'places': interface['places'], 'topology': interface['topology'],
+            'laboratories': laboratories, 'microscopy': interface.get('microscopy'),
+            'places': interface['places'], 'topology': interface['topology'],
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/building-stack/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},

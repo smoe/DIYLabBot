@@ -94,7 +94,20 @@ const {chromium} = require(process.argv[3] || 'playwright');
     'The corrected doctoral room retains its four source-defined workstations');
   assert(officeComputerCoverage.some(instance=>instance.id==='Office3009.Computer'),
     'The latest master office workstation remains in the building');
-  for (const id of ['phd', 'lab', 'kitchen', 'atrium', 'seating']) {
+  const microscopy=model.microscopy;
+  assert(microscopy&&microscopy.level_id==='OG3'&&microscopy.area==='R3_007');
+  assert.equal(microscopy.scale,1,'The microscope retains its own dimensions');
+  const microscopeSource=pinnedJson(microscopy.instrument_source.source);
+  const microscopeGroups=microscopy.instrument_body_ids.map(id=>nativeById.get(id));
+  assert(microscopeGroups.every(group=>group&&group.level_id==='OG3'&&group.index_count>0));
+  assert.equal(microscopeGroups.filter(group=>group.role==='microscope_objective').length,microscopeSource.objectives.length);
+  assert.equal(microscopeGroups.filter(group=>group.role==='microscope_support_foot').length,4);
+  const microscopeTop=nativeById.get(microscopy.support_body_id);
+  for(const group of microscopeGroups){
+    assert(group.bounds_mm.min[2]>=microscopeTop.bounds_mm.max[2]-.001,'All microscope parts stand above the bench');
+    for(const axis of [0,1])assert(group.bounds_mm.min[axis]>=microscopeTop.bounds_mm.min[axis]-.001&&group.bounds_mm.max[axis]<=microscopeTop.bounds_mm.max[axis]+.001);
+  }
+  for (const id of ['phd', 'lab', 'microscopy', 'kitchen', 'atrium', 'seating']) {
     assert(model.stops.some(stop => stop.id === id), `The ${id} viewpoint is required.`);
   }
   assert(!/<script[^>]+src=|<link[^>]+href=["']https?:/i.test(html), 'The viewer must work without external libraries.');
@@ -131,6 +144,9 @@ const {chromium} = require(process.argv[3] || 'playwright');
       browser: {engine: 'chromium', version: browser.version(),launch_profile:gpuProfile}, viewpoints: [], detail_views: [], interactions: []};
     report.social_source_coverage={furnishings_sha256:model.source_files_sha256[socialSourceName],
       catalog_sha256:socialSource.catalog.source_sha256,office_computers:officeComputerCoverage,articulated_instances:socialObjectCoverage};
+    report.microscopy={id:microscopy.id,room:microscopy.area,level:microscopy.level_id,
+      native_body_count:microscopeGroups.length,source_sha256:microscopy.instrument_source.source_sha256,
+      complete_source_coverage:true,bench_support_checked:true,scale:1};
     // New traversal tests drive exactly the pointer and keyboard controls exposed
     // to visitors. They read camera state for feedback but never assign a camera.
     const nativePositions = Buffer.from(nativeScene.positions_base64, 'base64');

@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "7eed558ca9977f61292f07611d262609443174c0ec0e5453bd980d6d481c1fb4"
+      "source_sha256": "2f2288035a30fae5342b90dda1d9e2d6d33f15ba438297d84cedcf1e9d6cfcfb"
     }
   },
   "settings": {
@@ -48,6 +48,22 @@
         "inset_mm": 1100,
         "target_height_mm": 1250,
         "look_at": "room_end"
+      }
+    },
+    {
+      "id": "microscopy",
+      "label": "Mikroskop · 3.007",
+      "scene": "building",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "microscopy",
+        "station": "Microscopy3007",
+        "eye_offset_mm": [
+          580,
+          -950,
+          620
+        ],
+        "target_height_mm": 1110
       }
     },
     {
