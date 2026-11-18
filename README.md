@@ -70,6 +70,8 @@ Für den Einstieg:
 - [Architektur](ARCHITECTURE.md) und [gemeinsames Modell](docs/shared-model.md).
 - [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
 
+Der lokale Modellaufbau erzeugt nicht versionierte CAD-, Mesh- und ROS-Dateien: Der abgegrenzte Referenzbuild mit `--ros2` belegt rund 116 MB (Dezimalmaß; bestehende Ausgaben gemessen, kein Speicherhöchstbedarf; Messumfang und Quellstand im lokalen [Build-Bericht](exports/generated/storage-reference-2026-11-18/build-report.json)). Die darin erfassten Revisionsverzeichnisse unter `cad/generated/` und `exports/generated/` sowie die erzeugten Mesh-, URDF- und Konfigurationsdateien unter `ros2_ws/src/solidcraftbot_ros/` sind gitignored und per Build neu erzeugbar; nur diese Ausgaben können gelöscht werden, nicht pauschal `exports/` mit seinen Laufzeitdaten und Originalbelegen, und weitere Buildrevisionen benötigen zusätzlichen Platz.
+
 ```sh
 python3 -m unittest discover -s tests -v
 python3 scripts/tool_paths.py
