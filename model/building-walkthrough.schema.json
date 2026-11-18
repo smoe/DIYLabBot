@@ -292,6 +292,40 @@
                     "maximum": 2200
                   }
                 }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "station",
+                  "opening",
+                  "inset_mm",
+                  "target_height_mm"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "kitchenette"
+                  },
+                  "station": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "opening": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "inset_mm": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 600
+                  },
+                  "target_height_mm": {
+                    "type": "number",
+                    "minimum": 100,
+                    "maximum": 2200
+                  }
+                }
               }
             ]
           }

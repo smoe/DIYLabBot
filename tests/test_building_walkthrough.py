@@ -23,13 +23,14 @@ class WalkthroughTests(unittest.TestCase):
 
     def test_all_requested_places_have_finite_interior_viewpoints(self):
         stops = {stop['id']: stop for stop in self.program['stops']}
-        self.assertEqual(set(stops), {'phd', 'lab', 'microscopy', 'kitchen', 'atrium', 'seating'})
+        self.assertEqual(set(stops), {'phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating'})
         for stop in stops.values():
             self.assertTrue(all(math.isfinite(v) for v in stop['eye_mm']+stop['target_mm']))
             self.assertGreater(math.dist(stop['eye_mm'], stop['target_mm']), 100)
             if stop['scene'] == 'building':
                 anchor = stop['anchor']
                 areas = ([self.program['microscopy']['area']] if anchor['kind'] == 'microscopy'
+                         else [self.program['kitchenette']['area']] if anchor['kind'] == 'kitchenette'
                          else [self.building['atrium_access']['corridor_area']] if anchor['kind'] == 'access_entry'
                          else anchor.get('areas', [anchor.get('area')]))
                 point = [v/self.parameters['display_scale'] for v in stop['eye_mm'][:2]]

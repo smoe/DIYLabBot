@@ -107,7 +107,24 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert(group.bounds_mm.min[2]>=microscopeTop.bounds_mm.max[2]-.001,'All microscope parts stand above the bench');
     for(const axis of [0,1])assert(group.bounds_mm.min[axis]>=microscopeTop.bounds_mm.min[axis]-.001&&group.bounds_mm.max[axis]<=microscopeTop.bounds_mm.max[axis]+.001);
   }
-  for (const id of ['phd', 'lab', 'microscopy', 'kitchen', 'atrium', 'seating']) {
+  const kitchen3008=model.kitchenette;
+  assert(kitchen3008&&kitchen3008.level_id==='OG3'&&kitchen3008.area==='R3_008A');
+  assert.equal(kitchen3008.scale,1);
+  const kitchenEquipment=pinnedJson(kitchen3008.equipment_source.source);
+  pinnedJson(kitchenEquipment.furnishings.source);
+  const kitchenGroups=kitchen3008.body_ids.map(id=>nativeById.get(id));
+  assert(kitchenGroups.every(group=>group&&group.level_id==='OG3'&&group.index_count>0),'Complete native kitchen coverage in the first room');
+  assert.equal(kitchen3008.door_sweep_checks.length,2);
+  for(const check of kitchen3008.door_sweep_checks){
+    assert.equal(check.opening_axis[0],-1);assert.equal(Math.abs(check.opening_axis[1]),0);
+    assert(check.minimum_clearance_mm>100);
+    const door=model.objects.find(o=>o.id==='OG3.'+check.opening_id+'.Door');
+    assert(door&&Math.abs(door.front[0]+1)<1e-8&&Math.abs(door.front[1])<1e-8,'The rendered room door opens toward the window');
+  }
+  for(const level of ['KG','EG'])assert.deepEqual(model.elevator.ports.filter(p=>p.level_id===level&&p.active).map(p=>p.side),['inward']);
+  assert.equal(model.elevator.fittings.panel.side,'northwest');
+  assert(model.elevator.fittings.interior.rail_body_ids.every(id=>nativeById.has(id)));
+  for (const id of ['phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating']) {
     assert(model.stops.some(stop => stop.id === id), `The ${id} viewpoint is required.`);
   }
   assert(!/<script[^>]+src=|<link[^>]+href=["']https?:/i.test(html), 'The viewer must work without external libraries.');
@@ -147,6 +164,8 @@ const {chromium} = require(process.argv[3] || 'playwright');
     report.microscopy={id:microscopy.id,room:microscopy.area,level:microscopy.level_id,
       native_body_count:microscopeGroups.length,source_sha256:microscopy.instrument_source.source_sha256,
       complete_source_coverage:true,bench_support_checked:true,scale:1};
+    report.kitchen3008={room:kitchen3008.area,scale:1,native_body_count:kitchenGroups.length,
+      complete_source_coverage:true,room_door_sweeps:kitchen3008.door_sweep_checks};
     // New traversal tests drive exactly the pointer and keyboard controls exposed
     // to visitors. They read camera state for feedback but never assign a camera.
     const nativePositions = Buffer.from(nativeScene.positions_base64, 'base64');
@@ -701,7 +720,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
 
     const lift=model.elevator,liftObject=model.objects.find(object=>object.id===lift.object_id);
     assert(lift&&liftObject&&liftObject.moving_body_ids.filter(id=>nativeById.get(id)?.role==='concept_existing_elevator_cabin').length===1,'Exactly one native cabin moves with its fittings');
-    const port=(level,side='outward')=>lift.ports.find(port=>port.level_id===level&&port.side===side&&port.active);
+    const port=(level,side=(['KG','EG'].includes(level)?'inward':'outward'))=>lift.ports.find(port=>port.level_id===level&&port.side===side&&port.active);
     const liftState=surface=>surface.evaluate(()=>window.__buildingWalkthrough.elevator);
     const cabinState=surface=>surface.evaluate(id=>window.__buildingWalkthrough.objects.find(object=>object.id===id),lift.object_id);
     async function checkExitButtons(surface,level){
@@ -738,6 +757,12 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert.equal((await liftState(page)).state,'OG3');assert.equal((await liftState(page)).boarded,false,'Calling does not board the passenger');
     const upperReferenceMatrix=(await cabinState(page)).model_matrix;
     await enter(page,upperPort);
+    const panelTarget=lift.fittings.panel.center_mm.map((v,i)=>v+(i===2?liftObject.states.OG3-lift.reference_z_mm:0));
+    await controls.lookAt(panelTarget);
+    await page.screenshot({path:path.join(output,'browser-lift-controls.png'),fullPage:true});
+    const opposite=lift.ports.find(p=>p.level_id==='OG3'&&p.side==='inward');
+    await controls.lookAt([opposite.plane_x_mm,opposite.cabin_entry_mm[1],opposite.z_mm+1100]);
+    await page.screenshot({path:path.join(output,'browser-lift-opposite-side.png'),fullPage:true});
     assert(await page.locator('#walkthrough-level').isDisabled());
     assert(await page.locator('#walkthrough-isolate').isDisabled());
     assert((await page.locator('#walkthrough-stops button').evaluateAll(nodes=>nodes.every(node=>node.disabled))));

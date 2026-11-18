@@ -47,20 +47,41 @@ const {chromium}=require(process.argv[3]||'playwright');
     // Mouse events use the actual moved handle surfaces, without bypassing the
     // triangle picker, reach limit or occlusion test. viewObject only positions
     // the QA camera; it does not perform the interaction.
+    async function lookAt(point){
+      const camera=await page.evaluate(()=>window.__buildingWalkthrough.camera);
+      const d=point.map((v,i)=>v-camera.eye_mm[i]);
+      const turn=Math.atan2(Math.sin(Math.atan2(d[1],d[0])-camera.yaw_rad),Math.cos(Math.atan2(d[1],d[0])-camera.yaw_rad));
+      const dx=-turn/model.settings.look_sensitivity,dy=-(Math.atan2(d[2],Math.hypot(d[0],d[1]))-camera.pitch_rad)/model.settings.look_sensitivity;
+      if(Math.hypot(dx,dy)<.05)return;
+      const box=await page.locator('#walkthrough-canvas').boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
+      const steps=Math.max(1,Math.ceil(Math.abs(dx)/(box.width*.25)),Math.ceil(Math.abs(dy)/(box.height*.25)));
+      for(let n=0;n<steps;n++){
+        await page.mouse.move(x,y);await page.mouse.down();
+        if(Math.hypot(dx/steps,dy/steps)<8)await page.mouse.move(x+12,y,{steps:2});
+        await page.mouse.move(x+dx/steps,y+dy/steps,{steps:4});await page.mouse.up();
+      }
+    }
     async function clickObject(id,expected){
       const config=objects.get(id);
-      await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),id);
-      const preferred=config.moving_body_ids.map(id=>native.get(id)).filter(g=>/handle|grip/.test(g.role));
+      // Use the public kitchen entrance view: the generic appliance QA view
+      // sits behind this small room's parked-open entrance leaf.
+      if(id.startsWith('Kitchen3008.'))await page.locator('#walkthrough-stops button[data-stop="kitchen3008"]').click();
+      else await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),id);
+      const preferred=config.moving_body_ids.map(id=>native.get(id)).filter(g=>/handle|grip/i.test(g.role+' '+g.id));
       const candidates=preferred.length?preferred:[native.get(config.moving_body_ids[0])];
       let success=false;
       for(const group of candidates){
         const point=group.bounds_mm.min.map((v,i)=>(v+group.bounds_mm.max[i])/2);
-        const pixel=await page.evaluate(({id,point})=>{
+        const world=await page.evaluate(({id,point})=>{
           const viewer=window.__buildingWalkthrough,m=viewer.objects.find(o=>o.id===id).model_matrix,p=point.map(v=>v/1000);
-          const world=[0,1,2].map(r=>(m[r]*p[0]+m[r+4]*p[1]+m[r+8]*p[2]+m[r+12])*1000),projected=viewer.projectPoint(world);
+          return [0,1,2].map(r=>(m[r]*p[0]+m[r+4]*p[1]+m[r+8]*p[2]+m[r+12])*1000);
+        },{id,point});
+        if(id.startsWith('Kitchen3008.'))await lookAt(world);
+        const pixel=await page.evaluate(world=>{
+          const projected=window.__buildingWalkthrough.projectPoint(world);
           const canvas=document.querySelector('#walkthrough-canvas'),rect=canvas.getBoundingClientRect();
           return {x:rect.left+projected.x*rect.width/canvas.width,y:rect.top+projected.y*rect.height/canvas.height,visible:projected.visible};
-        },{id,point});
+        },world);
         if(!pixel.visible)continue;
         await page.mouse.click(pixel.x,pixel.y);
         const hit=await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction);
@@ -71,13 +92,15 @@ const {chromium}=require(process.argv[3]||'playwright');
       report.public_interactions.push({id,input:'click',state:expected});
     }
     for(const id of [outer,freezer+'Drawer04','Lab3003.Hood01.Sash','Lab3003.Hood01.HoodBase_Door1',
-      'Lab3003.Hood01.HoodBase_Door2','Lab3003.Hood01.HoodBase_Door3','Lab3003.NanoDrop01.Hinge','Lab3003.Qubit01.Hinge']){
+      'Lab3003.Hood01.HoodBase_Door2','Lab3003.Hood01.HoodBase_Door3','Lab3003.NanoDrop01.Hinge','Lab3003.Qubit01.Hinge',
+      'Kitchen3008.Fridge.Door','Kitchen3008.Microwave.Door']){
       await command(id,'close');await clickObject(id,'open');
       await page.screenshot({path:path.join(output,'mechanisms-'+id.split('.').slice(1).join('-')+'-open.png')});
       await clickObject(id,'closed');
       if(id===outer)await command(id,'open');
     }
-    for(const room of [objects.get('OG3.D3_002N.Door'),objects.get('OG3.D3_002_001.Door'),rooms.find(o=>o.level_id==='KG')]){
+    for(const room of [objects.get('OG3.D3_002N.Door'),objects.get('OG3.D3_002_001.Door'),
+      objects.get('OG3.D3_008A.Door'),objects.get('OG3.D3_008AB.Door'),rooms.find(o=>o.level_id==='KG')]){
       await command(room.id,'close');await clickObject(room.id,'open');
       await page.locator('#walkthrough-canvas').focus();await page.keyboard.press('Space');await settled(room.id,'closed');
       report.public_interactions.push({id:room.id,input:'space',state:'closed'});

@@ -135,11 +135,17 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
     catalog = validate(source)
     furnishings = read(building['sources']['furnishings'])
     require(source['catalog'] == furnishings['catalog'], 'Articulation and furnishings catalog pins must match')
+    rooms=list(furnishings['rooms']);room_reports=list(interface['furnishings']['rooms'])
+    if interface.get('kitchenette'):
+        kitchen=interface['kitchenette'];equipment=read(kitchen['equipment_source'])
+        require(equipment['catalog']==source['catalog'], 'Kitchen appliances reuse the articulated catalog revision')
+        rooms.append({**kitchen,'instances':equipment['instances']})
+        room_reports.append(kitchen)
     body_ids = {body['id'] for body in expanded['bodies']}
     operations = {op['body']: op for op in expanded['operations'] if op['action'] == 'create'}
     requested = {item['id']: item for item in objects}
     placed = []
-    for room in furnishings['rooms']:
+    for room in rooms:
         for instance in room['instances']:
             for identity, joint in source['types'].get(instance['type'], {}).items():
                 object_id = '.'.join((room['id'], instance['id'], identity))
@@ -151,7 +157,7 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         parts = {v['id']: v for v in catalog['types'][instance['type']] if v['action'] == 'create'}
         prefix = room['id']+'_'+instance['id']+'_'
         moving = [prefix+parts[name]['body'] for name in joint['moving_parts']]
-        room_report = next(v for v in interface['furnishings']['rooms'] if v['id'] == room['id'])
+        room_report = next(v for v in room_reports if v['id'] == room['id'])
         require(set(moving) <= body_ids & set(room_report['body_ids']), 'Missing placed articulated bodies')
         shape = operations[prefix+parts[joint['hinge']['part']]['body']]['shape']
         require(shape['kind'] == 'polygon_prism' and shape['plane'] == 'XY' and len(shape['points']) == 4, 'Placed box footprint required')

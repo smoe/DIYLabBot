@@ -1,0 +1,33 @@
+{
+  "format": "solidcraftbot.kitchenette-equipment/1",
+  "furnishings": {
+    "source": "model/furnishings/kitchen-3008.json",
+    "source_sha256": "c3294f590196b4820f4bd3d5a0a695b5dc2f9bd8de0bf9b1d8cda7e3f7dbadb2"
+  },
+  "catalog": {
+    "source": "model/furniture/social.catalog.json",
+    "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"
+  },
+  "instances": [
+    {
+      "id": "Fridge",
+      "type": "fridge",
+      "slot": "fridge"
+    },
+    {
+      "id": "Microwave",
+      "type": "microwave",
+      "slot": "microwave",
+      "colors": {
+        "Case": "#b7bdc0",
+        "Door": "#b7bdc0"
+      }
+    },
+    {
+      "id": "Kettle",
+      "type": "kettle",
+      "slot": "kettle"
+    }
+  ],
+  "basis": "Reuse the existing appliance definitions; brand and exact appliance models are not asserted."
+}

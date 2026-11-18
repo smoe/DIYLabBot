@@ -101,6 +101,10 @@ def validate(spec):
             require(isinstance(anchor['eye_offset_mm'], list) and len(anchor['eye_offset_mm']) == 3, 'Three camera offsets required')
             for value in anchor['eye_offset_mm']:
                 number(value, -2000, 2000, 'microscopy camera offset')
+        elif kind == 'kitchenette':
+            exact(anchor, 'kind station opening inset_mm target_height_mm', 'kitchen viewpoint')
+            require(isinstance(anchor['station'],str) and isinstance(anchor['opening'],str), 'Kitchen and entrance references required')
+            number(anchor['inset_mm'],0,600,'kitchen entry inset')
         else:
             raise ValueError('Unsupported camera anchor kind')
         number(anchor['target_height_mm'], 100, 2200, 'target height')
@@ -189,7 +193,16 @@ def compile(source=None):
         require(stop['level_id'] in level_z, 'Unknown viewpoint level')
         anchor = stop['anchor']
         if stop['scene'] == 'building':
-            if anchor['kind'] == 'microscopy':
+            if anchor['kind'] == 'kitchenette':
+                station=interface.get('kitchenette')
+                require(station is not None and station['id']==anchor['station'] and station['level_id']==stop['level_id'],
+                        'Kitchen viewpoint must reference the installed room')
+                entry={'kind':'room_entry','areas':station['template_areas'],'opening':anchor['opening'],
+                       'inset_mm':anchor['inset_mm'],'target_height_mm':anchor['target_height_mm'],'look_at':'room_end'}
+                eye,_=building_camera(entry,stack.level_plan(building,stop['level_id']),p['display_scale'],
+                    level_z[stop['level_id']],spec['settings']['eye_height_mm'])
+                target=station['target_mm'][:2]+[level_z[stop['level_id']]+anchor['target_height_mm']]
+            elif anchor['kind'] == 'microscopy':
                 station=interface.get('microscopy')
                 require(station is not None and station['id']==anchor['station'] and station['level_id']==stop['level_id'],
                         'Viewpoint must reference an installed microscope on this floor')
@@ -262,7 +275,7 @@ def compile(source=None):
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
             'interaction': {'reach_mm': articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))},
             'objects': objects, 'elevator': elevator, 'isolation': isolation,
-            'laboratories': laboratories, 'microscopy': interface.get('microscopy'),
+            'laboratories': laboratories, 'microscopy': interface.get('microscopy'), 'kitchenette':interface.get('kitchenette'),
             'places': interface['places'], 'topology': interface['topology'],
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/building-stack/shared-build-report.json'}

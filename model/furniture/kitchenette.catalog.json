@@ -1,0 +1,17 @@
+{
+  "format": "solidcraftbot.kitchenette-furniture/1",
+  "recipe": "blue_compact_kitchen/1",
+  "parameters": {
+    "width": {"value": 1560, "unit": "mm", "range": [1500, 1800]},
+    "depth": {"value": 620, "unit": "mm", "range": [610, 650]},
+    "counter_height": {"value": 870, "unit": "mm", "range": [860, 920]},
+    "counter_thickness": {"value": 40, "unit": "mm", "range": [30, 45]},
+    "fridge_bay": {"value": 580, "unit": "mm", "range": [580, 620]},
+    "drawer_bay": {"value": 400, "unit": "mm", "range": [380, 420]},
+    "upper_bottom": {"value": 1500, "unit": "mm", "range": [1450, 1550]},
+    "upper_height": {"value": 800, "unit": "mm", "range": [750, 850]},
+    "upper_depth": {"value": 420, "unit": "mm", "range": [420, 450]}
+  },
+  "colors": {"blue":"#1675b5", "carcass":"#eeeae1", "counter":"#edece6", "plinth":"#c0b5a3", "metal":"#abb3b6", "dark":"#263237", "tile":"#f1eee7", "cloth":"#80779f"},
+  "basis": "Owner photograph from the aisle, 2026-11-18; blue fronts, white counter and tiles, sink/drainer, five drawers and microwave cubby. Dimensions are unmeasured presentation assumptions."
+}

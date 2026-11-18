@@ -1,0 +1,514 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schema/kitchenette.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "recipe",
+        "parameters",
+        "colors",
+        "basis"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.kitchenette-furniture/1"
+        },
+        "recipe": {
+          "const": "blue_compact_kitchen/1"
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width",
+            "depth",
+            "counter_height",
+            "counter_thickness",
+            "fridge_bay",
+            "drawer_bay",
+            "upper_bottom",
+            "upper_height",
+            "upper_depth"
+          ],
+          "properties": {
+            "width": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "depth": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "counter_height": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "counter_thickness": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "fridge_bay": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "drawer_bay": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "upper_bottom": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "upper_height": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            },
+            "upper_depth": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "unit",
+                "range"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "minItems": 2,
+                  "maxItems": 2,
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "colors": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "blue",
+            "carcass",
+            "counter",
+            "plinth",
+            "metal",
+            "dark",
+            "tile",
+            "cloth"
+          ],
+          "properties": {
+            "blue": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "carcass": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "counter": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "plinth": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "metal": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "dark": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "tile": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            "cloth": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "room",
+        "level",
+        "area",
+        "catalog",
+        "anchor",
+        "basis"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.kitchenette-furnishings/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "room": {
+          "type": "string",
+          "minLength": 1
+        },
+        "level": {
+          "const": "OG3"
+        },
+        "area": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "anchor": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "wall",
+            "fraction",
+            "back_gap_mm"
+          ],
+          "properties": {
+            "wall": {
+              "type": "string",
+              "minLength": 1
+            },
+            "fraction": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "back_gap_mm": {
+              "type": "number",
+              "minimum": 8,
+              "maximum": 100
+            }
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "furnishings",
+        "catalog",
+        "instances",
+        "basis"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.kitchenette-equipment/1"
+        },
+        "furnishings": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "catalog": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
+        },
+        "instances": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "type",
+              "slot"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "enum": [
+                  "fridge",
+                  "microwave",
+                  "kettle"
+                ]
+              },
+              "slot": {
+                "enum": [
+                  "fridge",
+                  "microwave",
+                  "kettle"
+                ]
+              },
+              "colors": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "pattern": "^#[0-9a-fA-F]{6}$"
+                }
+              }
+            }
+          }
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  ]
+}

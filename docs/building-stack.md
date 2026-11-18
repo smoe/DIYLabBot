@@ -1,5 +1,10 @@
 # Gebäude · Keller, EG, drei Obergeschosse und Dach
 
+Die [blaue Küche in 3.008](kitchen-3008.md) steht im ersten Raum vom Flur aus.
+Die beiden Raumtüren öffnen in Richtung Fenster. Die Kabinenfotos vom
+18. November 2026 korrigieren außerdem den Aufzug: KG und EG öffnen nur die
+Seite ohne Bedienpanel, die Obergeschosse die gegenüberliegende Seite.
+
 In Raum **3.007** steht das [Forschungsmikroskop MI01](microscope-mi01.md)
 auf einer aus dem bestehenden Möbelkatalog abgeleiteten Bank. Gerät und
 Aufstellung besitzen getrennte Quellen; der Rundgang hat dafür einen eigenen
@@ -286,7 +291,7 @@ eine Aufzugseite, keinen Gebäudeausgang.
 
 | Stopp | Türseiten | Geometrie |
 |---|---|---|
-| EG | Außen und innen | Modellierte Öffnungen und Rahmen |
+| EG | Nur innen, gegenüber dem Bedienpanel | Modellierte Öffnung und Rahmen |
 | 1.–3. OG | Nur außen | Innere Seiten bleiben geschlossen |
 | KG | Nur innen | Eigene Raumquelle; Höhe vorläufig angenommen |
 
@@ -295,7 +300,12 @@ für die Aufzugdarstellung. Die tatsächlichen Zielwände werden geschnitten;
 Rahmen stehen nicht vor ungebrochenen Wandkörpern. Im Browser begrenzt
 dieselbe aktive Portliste die Ausstiegsseiten. Die bewegte EG-Kabine besitzt
 weiter ihre beiden Öffnungen; die inneren Schachtwände der Obergeschosse
-bleiben dennoch geschlossen. Es werden keine Türblätter ergänzt.
+bleiben dennoch geschlossen. Kabinen- und aktive Schachttüren besitzen
+verschiebbare Blätter. Die Edelstahloptik, zwei Handlaufhöhen, dunkler Boden
+und horizontale Tastenreihe folgen den Kabinenfotos; Maße bleiben angenommen.
+Panel und Telefon bleiben an den zuvor bestätigten nordwestlichen bzw.
+nordöstlichen Positionen. Das dargestellte Anzeigenfeld hat keine eigene
+Live-Geschossanzeige; der Browser zeigt den Fahrzustand im Bedienmenü.
 
 Die Browserfahrt verschiebt genau eine Kabine und die absolut daran gebundene
 Kamera. Die übrige freie Navigation ist an Bord gesperrt. Halte und Höhen

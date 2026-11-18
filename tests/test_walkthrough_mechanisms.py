@@ -70,7 +70,7 @@ class MechanismTests(unittest.TestCase):
         self.assertIn('LiftControlPanel', cabin['moving_body_ids'])
         self.assertIn('LiftTelephone', cabin['moving_body_ids'])
         doors = [o for o in self.objects.values() if o.get('mechanism') == 'lift_door']
-        self.assertEqual(len(doors), 16)
+        self.assertEqual(len(doors), 14)
         self.assertEqual(len([o for o in doors if o['parent_object_id'] == cabin['id']]), 4)
         for door in doors:
             self.assertEqual(door['commands']['open']['target_state'], 'open')

@@ -35,7 +35,7 @@ def invented_plan():
 
 class StackTests(unittest.TestCase):
     def setUp(self):
-        self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec.pop('alignment', None); self.spec['sources'].pop('furnishings', None); self.spec['sources'].pop('laboratories', None); self.spec['sources'].pop('microscopy', None)
+        self.spec = json.loads(model.SOURCE.read_text()); self.spec.pop('exterior', None); self.spec.pop('alignment', None); self.spec['sources'].pop('furnishings', None); self.spec['sources'].pop('laboratories', None); self.spec['sources'].pop('microscopy', None); self.spec['sources'].pop('kitchenette', None)
         self.spec['circulation']['stairs'].pop('guard_profile_ref', None)
         for instance in self.spec['circulation']['stairs']['instances']:
             instance.pop('top_guard_wall', None)

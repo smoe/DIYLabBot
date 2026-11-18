@@ -1,0 +1,17 @@
+{
+  "format": "solidcraftbot.kitchenette-furnishings/1",
+  "id": "Kitchen3008",
+  "room": "3.008",
+  "level": "OG3",
+  "area": "R3_008A",
+  "catalog": {
+    "source": "model/furniture/kitchenette.catalog.json",
+    "source_sha256": "984da3f305f3d21c67839634271f0a1166b7545763181d19eacf90cb6de5c7d7"
+  },
+  "anchor": {
+    "wall": "W030",
+    "fraction": 0.5,
+    "back_gap_mm": 15
+  },
+  "basis": "First room off the aisle; kitchen along its south wall, refrigerator nearest the aisle. Scale 1; source room geometry is uncalibrated."
+}

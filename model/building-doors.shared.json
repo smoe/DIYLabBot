@@ -39,7 +39,9 @@
       "R3_008B"
     ],
     "OG3": [
-      "R3_009"
+      "R3_009",
+      "R3_008A",
+      "R3_008B"
     ]
   },
   "exclude_label_terms": [
@@ -82,6 +84,30 @@
         "opens_into": "R0_013"
       },
       "basis": "Owner correction 2026-11-15: logistics room for post and waste; dark blue/near-black steel, right-hinged viewed coming from outside. Opening direction owner-confirmed; Owner confirms no viewing windows; 90-degree display pose illustrative; protection ratings not confirmed."
+    },
+    {
+      "level_id": "OG3",
+      "opening_id": "D3_008A",
+      "type": "plain",
+      "material": "wood",
+      "pose": {
+        "approach_from": "C3_020",
+        "hinge_side": "right",
+        "opens_into": "R3_008A"
+      },
+      "basis": "Owner photo and clarification 2026-11-18: only the room doors of 3.008 open away from the aisle toward the window. North hinge jamb is a presentation assumption that keeps the open leaf away from the kitchenette appliances."
+    },
+    {
+      "level_id": "OG3",
+      "opening_id": "D3_008AB",
+      "type": "plain",
+      "material": "wood",
+      "pose": {
+        "approach_from": "R3_008A",
+        "hinge_side": "right",
+        "opens_into": "R3_008B"
+      },
+      "basis": "Owner photo and clarification 2026-11-18: only the room doors of 3.008 open away from the aisle toward the window. North hinge jamb is a presentation assumption that keeps the open leaf away from the kitchenette appliances."
     }
   ]
 }

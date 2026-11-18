@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "2f2288035a30fae5342b90dda1d9e2d6d33f15ba438297d84cedcf1e9d6cfcfb"
+      "source_sha256": "08c6df5e4c1582a7da7b8fa2a0ef58bc0c6ef11e52a704c538ae48a7f11aaf1f"
     }
   },
   "settings": {
@@ -64,6 +64,19 @@
           620
         ],
         "target_height_mm": 1110
+      }
+    },
+    {
+      "id": "kitchen3008",
+      "label": "Küche 3.008",
+      "scene": "building",
+      "level_id": "OG3",
+      "anchor": {
+        "kind": "kitchenette",
+        "station": "Kitchen3008",
+        "opening": "D3_008A",
+        "inset_mm": 250,
+        "target_height_mm": 1300
       }
     },
     {

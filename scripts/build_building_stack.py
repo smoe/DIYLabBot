@@ -114,14 +114,14 @@ def z_checks(geometry, contract):
                        'floor_presentation_mm': lower, 'room_top_presentation_mm': upper,
                        'scope': 'Referenced laboratory furniture and illustrative support; native equipment excluded'})
         expected.update(names)
-    if contract.get('microscopy'):
-        station=contract['microscopy'];names=station['body_ids'];level=level_by_id[station['level_id']]
+    for station in [contract[key] for key in ('microscopy','kitchenette') if contract.get(key)]:
+        names=station['body_ids'];level=level_by_id[station['level_id']]
         if not names or len(names)!=len(set(names)) or set(names)&expected or not set(names)<=set(bodies):
-            raise ValueError('Microscopy needs disjoint, complete native body coverage')
+            raise ValueError('Bound room equipment needs disjoint, complete native body coverage')
         checks.append({'id':station['id']+'_RoomHeight','level_id':level['id'],'body_ids':names,
             'passed':all(bodies[name]['bbox']['min'][2]>=level['z_mm']-1e-6
                          and bodies[name]['bbox']['max'][2]<=level['clear_top_mm'] for name in names),
-            'scope':'Source-bound microscopy bench and instrument'})
+            'scope':'Source-bound room furniture and equipment'})
         expected.update(names)
     if expected != set(bodies): raise ValueError('Every native body must belong to an explicit scoped role')
     for a, b in zip(levels, levels[1:]):
@@ -173,15 +173,15 @@ def circulation_geometry(contract, geometry):
     circ = contract.get('circulation')
     if not circ: return []
     bodies = {body['body']: body for body in geometry}; levels = contract['levels']
-    elevator = circ['elevator']; expected_doors = {'KG': ['inward'], 'EG': ['outward', 'inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']}
+    elevator = circ['elevator']; expected_doors = {'KG': ['inward'], 'EG': ['inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']}
     if elevator['doors_by_level'] != expected_doors:
         raise ValueError('Elevator door policy must distinguish EG and upper levels')
     ports = elevator['ports']; active = [port for port in ports if port['active'] is True]
     inactive = [port for port in ports if port['active'] is False]
-    if (len(ports) != 10 or len(active) != 6 or len(inactive) != 4
+    if (len(ports) != 10 or len(active) != 5 or len(inactive) != 5
             or {(port['level_id'], port['side']) for port in active} != {(level, side) for level, sides in expected_doors.items() for side in sides}
             or {(port['level_id'], port['side']) for port in inactive} != {(level['id'], side) for level in levels for side in ('inward', 'outward') if side not in expected_doors[level['id']]}):
-        raise ValueError('Exactly six active and four explicitly closed elevator faces required')
+        raise ValueError('Exactly five active and five explicitly closed elevator faces required')
     closed_targets = {probe['target_body'] for probe in circ['closed_door_probes']}
     if closed_targets != {port['level_id']+'__Wall_'+port['wall'] for port in inactive}:
         raise ValueError('Every inactive upper inward face requires its associated wall-material witness')
@@ -373,7 +373,7 @@ def circulation_probe_specs(contract):
     connectors = [connector for stair in stairs for connector in stair['connectors']]
     connector_count = len(connectors)
     expected_holes = sum(connector.get('slab_hole_probe_id', 'legacy') is not None for connector in connectors)
-    expected_counts = {'door_probes': 6, 'closed_door_probes': 4, 'slab_hole_probes': expected_holes,
+    expected_counts = {'door_probes': 5, 'closed_door_probes': 5, 'slab_hole_probes': expected_holes,
                        'connection_witnesses': connector_count*3, 'shaft_witnesses': 4,
                        'external_access_witnesses': sum(len(stair['connectors']) for stair in circ.get('external_stairs', []))}
     if any(len(circ.get(key, [])) != count for key, count in expected_counts.items()):
@@ -746,7 +746,7 @@ def build(args):
             'atrium_access_floor_probes':contract.get('atrium_access_floor_probes',[]),
             'backends':args.backend,'cross_cad_checked':args.backend=='both','closed_body_count':len(expanded['bodies']),
             'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids'])-len(contract.get('furnishings', {}).get('body_ids', [])),'marker_body_ids':contract['marker_body_ids'],
-            'furnishings':contract.get('furnishings'), 'microscopy':contract.get('microscopy'),
+            'furnishings':contract.get('furnishings'), 'microscopy':contract.get('microscopy'), 'kitchenette':contract.get('kitchenette'),
             'coordinate_meaning':NOTICE,'metric_scale_known':False,'assumed_dimensions':contract['assumed_dimensions'],
             'solidcraft_checks':sc_checks,'freecad_checks_passed':None if fc_checks is None else fc_checks['passed'],'body_comparisons':cross,
             'native_corridor_roof_checks_passed':{'solidcraft':None if sc_checks is None else sc_checks.get('native_corridor_roof_checks_passed'),

@@ -162,6 +162,24 @@
               }
             }
           ]
+        },
+        "kitchenette": {
+          "allOf": [
+            {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            {
+              "required": [
+                "source_sha256"
+              ],
+              "propertyNames": {
+                "enum": [
+                  "source",
+                  "source_sha256"
+                ]
+              }
+            }
+          ]
         }
       }
     },
@@ -583,7 +601,6 @@
             "stop_overrides": {
               "const": {
                 "EG": [
-                  "outward",
                   "inward"
                 ],
                 "KG": [
@@ -711,6 +728,58 @@
                       "type": "number",
                       "exclusiveMinimum": 0,
                       "exclusiveMaximum": 2000
+                    }
+                  }
+                },
+                "interior": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "wall_color",
+                    "floor_color",
+                    "rail_radius_mm",
+                    "rail_offset_mm",
+                    "rail_end_margin_mm",
+                    "rail_heights_mm",
+                    "basis"
+                  ],
+                  "properties": {
+                    "wall_color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "floor_color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "rail_radius_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 1500
+                    },
+                    "rail_offset_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 1500
+                    },
+                    "rail_end_margin_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 1500
+                    },
+                    "rail_heights_mm": {
+                      "type": "array",
+                      "minItems": 2,
+                      "maxItems": 2,
+                      "items": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "exclusiveMaximum": 1500
+                      }
+                    },
+                    "basis": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   }
                 }

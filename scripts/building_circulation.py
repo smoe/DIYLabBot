@@ -35,7 +35,7 @@ def validate_source(source):
     for name in [lift['id'], lift['area'], lift['reference_opening'], *[s['wall'] for s in lift['sides'].values()]]:
         require(isinstance(name, str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', name), 'Stable ASCII circulation reference required')
     require(lift['sides']['outward']['wall'] != lift['sides']['inward']['wall'], 'Opposite elevator sides required')
-    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['outward', 'inward'], 'KG': ['inward']}, 'Owner-confirmed active stop policy required')
+    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['inward'], 'KG': ['inward']}, 'Owner-confirmed active stop policy required')
     require(lift['deferred_stops'] == [], 'All declared stops now have concept geometry')
     for name in ('post_wall_factor', 'cabin_wall_factor', 'cabin_clearance_factor'):
         require(type(lift[name]) in (int, float) and math.isfinite(lift[name]) and 0 < lift[name] <= 1, 'Positive illustrative lift proportion required')
@@ -172,7 +172,7 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
             name = 'LiftFrame_'+level['id']+'_'+tag; shaft_ids.append(body(name, 'concept_elevator_shaft_frame', '#c47a35')); box(name+'_Box', name, origin, size)
     cabin_rect = [inner[0]+post+gap, inner[1]+post+gap, inner[2]-post-gap, inner[3]-post-gap]
     require(cabin_rect[0]+2*cw < cabin_rect[2] and cabin_rect[1]+cw < lo < hi < cabin_rect[3]-cw, 'Cabin shell cannot fit the shared source door interval')
-    cabin = body('BuildingLiftCabin', 'concept_existing_elevator_cabin', '#b887aa'); detail.extend(shaft_ids+[cabin])
+    cabin = body('BuildingLiftCabin', 'concept_existing_elevator_cabin', lift.get('fittings',{}).get('interior',{}).get('wall_color','#b887aa')); detail.extend(shaft_ids+[cabin])
     box(cabin+'_Outer', cabin, [cabin_rect[0], cabin_rect[1], -cw], [cabin_rect[2]-cabin_rect[0], cabin_rect[3]-cabin_rect[1], door_h+3*cw])
     box(cabin+'_Hollow', cabin, [cabin_rect[0]+cw, cabin_rect[1]+cw, 0], [cabin_rect[2]-cabin_rect[0]-2*cw, cabin_rect[3]-cabin_rect[1]-2*cw, door_h+cw], 'cut')
     inset = min(width, door_h, thickness, cw)/10; doors_by_level = {}; ports = []; door_frames = []
@@ -189,6 +189,10 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
             else:
                 cut_points = rectangle(cabin_rect[2]-cw-thickness*.1, lo, wx+thickness, hi)
                 open_points = rectangle(cabin_rect[2]-cw+inset, lo+inset, wx+thickness*.4, hi-inset)
+            # A pass-through cabin has both apertures, independently of which
+            # landing is active at its native EG reference position.
+            if level['id'] == lift['cabin_level']:
+                cut_prism(name+'_CabinCut', cabin, cut_points, level['z_mm'], door_h)
             if is_active:
                 frame = 'LiftDoorFrame_'+level['id']+'_'+side
                 door_frames.append(body(frame, 'concept_lift_door_frame', '#d39343')); detail.append(frame); port['frame_body_id'] = frame
@@ -198,7 +202,7 @@ def compile(source, plan, p, levels, ground_plan=None, ground_support_area=None,
                 cut_prism(name+'_WallCut', target, cut_points, level['z_mm'], door_h)
                 targets = [target, frame]
                 if level['id'] == lift['cabin_level']:
-                    cut_prism(name+'_CabinCut', cabin, cut_points, level['z_mm'], door_h); targets.append(cabin)
+                    targets.append(cabin)
                 door_probes.append(probe(name+'_Open', open_points, level['z_mm']+inset, door_h-2*inset, targets))
             else:
                 points = rectangle(wx-thickness*.25, lo+inset, wx+thickness*.25, hi-inset); height = door_h-2*inset

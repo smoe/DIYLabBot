@@ -115,9 +115,9 @@ class BuildingBuildTests(unittest.TestCase):
         probe={'id':'Synthetic','kind':'polygon_prism','points_mm':[[0,0],[2,0],[2,3],[0,3]],'offset_mm':0,'depth_mm':2,'target_bodies':['Wall']}
         circ={key:[]for key in ['door_probes','closed_door_probes','slab_hole_probes','connection_witnesses','shaft_witnesses']}
         circ['stairs']=[{'connectors':[{}, {}, {}]}]
-        for key,count in [('door_probes',6),('slab_hole_probes',3)]:
+        for key,count in [('door_probes',5),('slab_hole_probes',3)]:
             circ[key]=[{**probe,'id':key+str(i)}for i in range(count)]
-        circ['closed_door_probes']=[{**probe,'id':'closed'+str(i),'target_body':'Wall','expected_volume_mm3':12.}for i in range(4)]
+        circ['closed_door_probes']=[{**probe,'id':'closed'+str(i),'target_body':'Wall','expected_volume_mm3':12.}for i in range(5)]
         for key,count in [('connection_witnesses',9),('shaft_witnesses',4)]:
             circ[key]=[{**probe,'id':key+str(i),'target_bodies':['Connector','Floor'],'expected_volumes_mm3':{'Connector':12.,'Floor':12.}}for i in range(count)]
         checks=build.circulation_probe_specs({'circulation':circ})
@@ -134,11 +134,11 @@ class BuildingBuildTests(unittest.TestCase):
 
     def test_elevator_open_and_closed_faces_and_stair_endpoints_are_distinct(self):
         levels=[{'id':name,'z_mm':i*4250.,'slab_bottom_mm':i*4250.-250}for i,name in enumerate(['KG','EG','OG1','OG2','OG3'])]
-        ports=[{'level_id':level['id'],'side':side,'active':(side=='inward' if i==0 else i==1 or side=='outward'),'wall':side+'Wall'}for i,level in enumerate(levels)for side in ['outward','inward']]
+        ports=[{'level_id':level['id'],'side':side,'active':(side=='inward' if i in (0,1) else side=='outward'),'wall':side+'Wall'}for i,level in enumerate(levels)for side in ['outward','inward']]
         connectors=[{'body_id':'East'+str(i),'from_level':a['id'],'to_level':b['id']}for i,(a,b)in enumerate(zip(levels,levels[1:]))]
         geometry=[{'body':c['body_id'],'component':'EastStair','bbox':{'min':[0,0,levels[i]['z_mm']-5.],'max':[1,1,levels[i+1]['z_mm']]}}for i,c in enumerate(connectors)]
         geometry += [{'body':name,'component':'BuildingLift','bbox':{'min':[0,0,0],'max':[1,1,16750]}}for name in ['Shaft','Cabin','Frame']]
-        circ={'elevator':{'doors_by_level':{'KG':['inward'],'EG':['outward','inward'],'OG1':['outward'],'OG2':['outward'],'OG3':['outward']},'ports':ports,
+        circ={'elevator':{'doors_by_level':{'KG':['inward'],'EG':['inward'],'OG1':['outward'],'OG2':['outward'],'OG3':['outward']},'ports':ports,
                          'deferred_stops':[],
                          'shaft_body_ids':['Shaft'],'cabin_body_ids':['Cabin'],'door_frame_body_ids':['Frame'],'component_id':'BuildingLift',
                          'served_extent':{'from_level':'KG','to_level':'OG3'}},
@@ -146,7 +146,7 @@ class BuildingBuildTests(unittest.TestCase):
                          'served_extent':{'from_level':'KG','to_level':'OG3'},
                          'planned_connectors':[]}],
               'body_ids':[body['body']for body in geometry],
-              'detail_visibility_ids':['Shaft','Cabin'], 'closed_door_probes':[{'target_body':level['id']+'__Wall_'+side+'Wall'}for level in levels for side in ['inward','outward'] if not (side=='inward' if level['id']=='KG' else level['id']=='EG' or side=='outward')]}
+              'detail_visibility_ids':['Shaft','Cabin'], 'closed_door_probes':[{'target_body':level['id']+'__Wall_'+side+'Wall'}for level in levels for side in ['inward','outward'] if not (side=='inward' if level['id'] in ('KG','EG') else side=='outward')]}
         contract={'levels':levels,'circulation':circ}
         self.assertEqual(len(build.circulation_geometry(contract,geometry)),6)
         self.assertTrue(all(c['passed']for c in build.circulation_geometry(contract,geometry)))
@@ -177,6 +177,7 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
         expected|={item['probe']['id']for item in build.roof_probe_specs(contract)}
         expected_z={level['id']for level in contract['levels']}
         expected_z|={laboratory['id']+'_RoomHeight'for laboratory in contract.get('laboratories',[])}
+        expected_z|={contract[key]['id']+'_RoomHeight'for key in ('microscopy','kitchenette') if contract.get(key)}
         expected_z|={a['id']+'_to_'+b['id']for a,b in zip(contract['levels'],contract['levels'][1:])}
         if contract.get('exterior'):
             expected_z|={body+'_Grade'for body in contract['exterior']['site_body_ids']}|{'FoyerFacade_Height'}

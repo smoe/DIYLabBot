@@ -1,7 +1,8 @@
 # Gebäude im Browser erkunden
 
-Der Rundgang bietet fünf direkte Blickpunkte: Doktorandenraum **3.002**,
-Labor **3.003**, Küche **1.008**, den Blick durch den **Freiraum / das Atrium**
+Der Rundgang bietet sieben direkte Blickpunkte: Doktorandenraum **3.002**,
+Labor **3.003**, Mikroskop **3.007**, Küchen **3.008** und **1.008**,
+den Blick durch den **Freiraum / das Atrium**
 und den **Kernbereich im 3. OG**.
 Von dort lässt sich die Kamera frei bewegen. Die Flächen stammen aus den
 fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
@@ -48,7 +49,7 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 
 ## Bedienung
 
-- Die fünf Ortsknöpfe öffnen die jeweiligen Blickpunkte.
+- Die sieben Ortsknöpfe öffnen die jeweiligen Blickpunkte.
 - Der Ortstitel bezeichnet den zuletzt gewählten Blickpunkt; freies Gehen
   schaltet diese Beschriftung nicht automatisch auf den betretenen Raum um.
 - **WASD / Pfeiltasten** bewegen die Kamera; **Ziehen** mit Maus oder Finger
@@ -85,7 +86,7 @@ Darstellungseinpassung skaliert. Die Eingangssituation soll den Schrankzugang
 frei halten; ein realer Türschwenkweg wird durch den Blickpunkt nicht geprüft.
 Raumgröße und Möbeleinpassung bleiben ungemessene Darstellungsannahmen.
 
-Alle fünf Blickpunkte verwenden dieselbe Gebäudeszene. Der Laborblick wird
+Alle sieben Blickpunkte verwenden dieselbe Gebäudeszene. Der Laborblick wird
 wie die anderen Raumblicke an einer tatsächlichen Eingangstür berechnet.
 Vom Doktorandenraum führt die Darstellung über `D3_002N`, den gemeinsamen
 Flur und `D3_003A` oder `D3_003B` in das ausgestattete Labor; dafür ist kein
@@ -390,8 +391,8 @@ Der Aufzug bleibt eine einzelne Kabine der vorhandenen Quelle `BuildingLift`.
 Am aktiven Geschossrahmen ruft ein Klick oder die Leertaste die Kabine.
 Das Overlay in Aufzugnähe bietet „Call lift“ und nach der Ankunft „Enter“.
 An Bord erscheinen die Geschossknöpfe und die zulässigen Ausstiegsseiten.
-KG erlaubt nur den inneren Ausgang, EG beide Seiten und die Obergeschosse
-nur den äußeren Ausgang. Halte, Höhen und aktive Seiten stammen aus
+KG und EG erlauben nur den inneren Ausgang, auf der Seite ohne Bedienpanel;
+die Obergeschosse nur den äußeren Ausgang. Halte, Höhen und aktive Seiten stammen aus
 `interface.circulation.elevator`, nicht aus einer zweiten Geschossliste.
 
 Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
@@ -412,6 +413,9 @@ diese Kabine verschoben, während Schacht, Geschossrahmen und Nachbarkörper
 stehen bleiben. Die geschlossene innere Schachtwand bleibt in den
 Obergeschossen erhalten, obwohl die EG-Kabine zwei Öffnungen besitzt.
 
-Es gibt keine Aufzugtürblätter, reale Steuerung oder Schutzfunktion.
+Die verschiebbaren Kabinen- und Schachttüren schließen vor der Fahrt und
+öffnen erst nach der Ankunft auf der aktiven Seite. Edelstahloberflächen,
+Handläufe und Tastenreihe folgen den Eigentümerfotos; Maße sind angenommen.
+Eine reale Steuerung oder Schutzfunktion wird nicht implementiert.
 `lift_operation_implemented` bleibt `false`; die Browserfahrt ist keine
 mechanische, zeitliche oder sicherheitstechnische Aufzugsqualifikation.

@@ -29,6 +29,10 @@
     "microscopy": {
       "source": "model/equipment/microscopy-3007.json",
       "source_sha256": "275026bb03c011028873c4bbac8f31c26b9bb56be64449c863100c075c0974e5"
+    },
+    "kitchenette": {
+      "source": "model/equipment/kitchen-3008.json",
+      "source_sha256": "7987a6967891a97fbcac5e701e4a3575e2e6811e4064dbf25f5e166427ac2378"
     }
   },
   "calibration": null,
@@ -143,7 +147,6 @@
       ],
       "stop_overrides": {
         "EG": [
-          "outward",
           "inward"
         ],
         "KG": [
@@ -163,9 +166,9 @@
         "panel": {
           "side": "northwest",
           "width_mm": 150,
-          "height_mm": 380,
+          "height_mm": 1150,
           "depth_mm": 25,
-          "bottom_mm": 1050
+          "bottom_mm": 750
         },
         "telephone": {
           "side": "northeast",
@@ -173,6 +176,18 @@
           "height_mm": 250,
           "depth_mm": 45,
           "bottom_mm": 1250
+        },
+        "interior": {
+          "wall_color": "#aeb5b8",
+          "floor_color": "#55575b",
+          "rail_radius_mm": 16,
+          "rail_offset_mm": 65,
+          "rail_end_margin_mm": 120,
+          "rail_heights_mm": [
+            260,
+            950
+          ],
+          "basis": "Owner cabin photographs 2026-11-18: stainless surfaces, dark floor, two handrail heights and horizontal floor-button row. Unmeasured dimensions; display has no simulated live readout."
         }
       }
     },
@@ -202,13 +217,13 @@
       "basement_geometry_implemented": true
     },
     "limitations": [
-      "Door-side roles are owner-confirmed; the opposite port is a stack-only concept override, not an observation added to the F03 trace.",
+      "Owner cabin photographs 2026-11-18 confirm the side away from the controls for KG and EG; upper floors use the controls side. Opposite shaft openings remain a stack-level derivation.",
       "Existing building lift and cabin are distinct from the blue Atrium future-exchange marker.",
       "Cabin, shaft frame and two-flight stairs are static illustrative geometry, not selected equipment, normative stair design or an operating lift.",
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG–EG is a static concept connector with assumed floor pitch; basement inward-only lift policy is modeled.",
+      "KG and EG use only the inward port, away from the northwest control panel; cabin geometry has both door apertures for upper-floor travel.",
       "Internal stair guards reuse the atrium profile at #/exterior; dimensions, attachment and clearances are illustrative, not a qualified fall-protection or stair design."
     ],
     "served_extent": {
@@ -325,7 +340,7 @@
     "door_leaf_mm": 40,
     "doors": {
       "source": "model/building-doors.shared.json",
-      "source_sha256": "d9aa36439ff67efddae034df37089fb3ba2a71d3815ce222904207ca171410e8"
+      "source_sha256": "fb268ebcf78fd727121d9d3ab5ab2703814c370aeff1df191e525ea26e965d51"
     },
     "guard_boundaries": [
       "W068",
