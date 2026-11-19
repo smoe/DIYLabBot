@@ -1,4 +1,4 @@
-"""Reproducible scene build: native source snapshots, SolidCraft composition, QA."""
+"""Build the shared L01 scene in FreeCAD, optionally compare SolidCraft."""
 from pathlib import Path
 import argparse
 import tool_paths
@@ -13,6 +13,41 @@ from build_instrument_concepts import freecad_environment
 
 
 def write(path,data): Path(path).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')
+
+
+def source_snapshot(s):
+    """Freeze construction inputs before native work, including vendor bytes."""
+    paths=[model.SOURCE,Path(__file__),model.ROOT/'scripts/lab_layout_model.py',
+           model.ROOT/'scripts/build_lab_layout_freecad.py',model.ROOT/'scripts/lab_room_model.py',
+           model.ROOT/'scripts/build_lab_room_freecad.py']
+    paths += [model.ROOT/ref['source'] for ref in s['assets'].values()]
+    paths += room.source_dependencies(room.load(model.assembly.validate_reference(s['assets']['room'])))
+    paths += [model.ROOT/'scripts'/name for name in [
+        'assembly_model.py','robot_spec.py','robot_components.py','robot_cameras.py','robot_services.py',
+        'servo_mounting_design.py','x6_mounting_design.py','centrifuge_model.py','centrifuge_mechanisms.py','sample_transport_model.py','tip_collector_model.py',
+        'build_neutral_freecad.py','build_centrifuge_freecad.py','build_sample_transport_freecad.py',
+        'build_tip_collector_freecad.py','lab_equipment.py','build_lab_equipment_freecad.py',
+        'build_tube_carrier_freecad.py','tube_carrier_model.py','tube_cam_model.py',
+        'instrument_concept.py','tapestation_model.py','build_instrument_concepts.py','build_tube_carrier.py',
+        'tool_paths.py','freecad/solidcraftbot_freecad.py','freecad/persist_station_view.py','freecad/persist_view.py']]
+    paths += [model.ROOT/'model'/name for name in ['assembly-reference.schema.json','lab-layout.schema.json','lab-equipment.schema.json']]
+    arm=model.robot.load(model.ROOT/s['assets']['arm']['source'])
+    if 'vendor_library' in arm:
+        import robot_components
+        paths.append(model.ROOT/arm['vendor_library']['path'])
+        for part in robot_components.library(arm)['parts'].values():
+            paths += [model.ROOT/part[key]['path'] for key in ('interface_spec','interface_check') if key in part]
+            paths += [model.ROOT/section['step'] for section in part['sections'].values()]
+    return {str(path.relative_to(model.ROOT)):model.digest(path) for path in paths}
+
+
+def verify_source_snapshot(context):
+    pins=context.get('source_files_sha256')
+    if not pins: raise ValueError('Prepared source snapshot missing; prepare the layout again')
+    for name,expected in pins.items():
+        path=model.assembly.project_path(name,model.ROOT)
+        if not path.is_file() or model.digest(path)!=expected:
+            raise ValueError('Layout input changed during build; rebuild: '+name)
 
 
 def native_arm(s,snapshot,cad,out,args):
@@ -52,17 +87,29 @@ def native_arm(s,snapshot,cad,out,args):
                                        'report':str(report_path.relative_to(model.ROOT)),'report_sha256':model.digest(report_path)})
 
 
-def prepare(args):
-    s=model.load(); stem='lab-layout-l01-'+model.digest(model.SOURCE)[:12]; revision=stem; n=1
+def prepare_native(args):
+    s=model.load(validate_builds=args.backend!='freecad')
+    pins=source_snapshot(s)
+    stem='lab-layout-l01-'+model.digest(model.SOURCE)[:12]; revision=stem; n=1
     while (model.ROOT/'cad/generated'/revision).exists():n+=1;revision=stem+'-r'+str(n)
     cad=model.ROOT/'cad/generated'/revision;out=model.ROOT/'exports/generated'/revision;cad.mkdir(parents=True);out.mkdir(parents=True)
-    context={'revision':revision,'cad':str(cad),'out':str(out),'source_sha256':model.digest(model.SOURCE)}
+    context={'revision':revision,'cad':str(cad),'out':str(out),'source_sha256':pins[str(model.SOURCE.relative_to(model.ROOT))],
+             'backends':args.backend,'source_files_sha256':pins}
     path=out/'context.json';write(path,context)
     subprocess.run([args.freecad_python,str(model.ROOT/'scripts/build_lab_layout_freecad.py'),str(path)],check=True,cwd=model.ROOT,env=freecad_environment(args.freecad_python))
     context=json.loads(path.read_text(encoding='utf-8'))
+    if context.get('source_files_sha256')!=pins or context.get('source_sha256')!=pins[str(model.SOURCE.relative_to(model.ROOT))] or context.get('backends')!=args.backend:
+        raise ValueError('Foreign native layout context or changed source snapshot')
     validation=json.loads((out/'layout-validation.json').read_text(encoding='utf-8'))
-    if model.digest(model.SOURCE)!=context['source_sha256']: raise ValueError('Layout source changed during preparation; rebuild')
+    verify_source_snapshot(context)
     if not validation['passed']: raise ValueError('Layout checks failed; inspect '+str(out/'layout-validation.json'))
+    return s,context
+
+
+def prepare(args):
+    s,context=prepare_native(args)
+    if args.backend=='freecad':return context
+    cad=Path(context['cad']);out=Path(context['out']);path=out/'context.json'
     room_source=room.load(model.assembly.validate_reference(s['assets']['room']))
     commands=room.solidcraft_commands(room_source,room.parameters(room_source))
     for snapshot in context['snapshots']:
@@ -94,6 +141,10 @@ def prepare(args):
 
 
 def finish(context,args):
+    if context.get('backends','both')!=args.backend:
+        raise ValueError('Prepared layout backend differs; use the same --backend')
+    verify_source_snapshot(context)
+    if args.backend=='freecad':return finish_freecad(context)
     out=Path(context['out']);cad=Path(context['cad']);s=model.load();scene=cad/'LabLayout_L01.sc';measure=out/'solidcraft-scene.json'
     if model.digest(model.SOURCE)!=context['source_sha256']: raise ValueError('Layout source changed since preparation; rebuild')
     if not scene.exists():subprocess.run([args.solidcraft_cli,'run',str(out/'scene.commands.json'),'--save',str(scene),'--json-out',str(measure),'--quiet'],check=True,cwd=model.ROOT)
@@ -144,20 +195,14 @@ def finish(context,args):
     # FreeCAD bodies using their own measured bounds.
     fc_geometry=native['scene_geometry']
     presentation=persist(context['scene_file'],style_spec,fc_geometry)
-    paths=[model.SOURCE,model.ROOT/'scripts/lab_layout_model.py',Path(__file__),model.ROOT/'scripts/build_lab_layout_freecad.py',model.ROOT/'scripts/lab_room_model.py',model.ROOT/'scripts/build_lab_room_freecad.py']
-    paths += [model.ROOT/ref['source'] for ref in s['assets'].values()]
-    paths += room.source_dependencies(room.load(model.assembly.validate_reference(s['assets']['room'])))
-    paths += [model.ROOT/'scripts'/name for name in ['assembly_model.py','robot_spec.py','robot_components.py','centrifuge_model.py','sample_transport_model.py','tip_collector_model.py','build_neutral_freecad.py','build_centrifuge_freecad.py','build_sample_transport_freecad.py','build_tip_collector_freecad.py']]
-    paths += [model.ROOT/'model/assembly-reference.schema.json',model.ROOT/'model/lab-layout.schema.json']
-    paths += [model.ROOT/'scripts'/name for name in ['lab_equipment.py','build_lab_equipment_freecad.py','build_tube_carrier_freecad.py','tube_carrier_model.py','tube_cam_model.py']]
-    paths += [model.ROOT/'model/lab-equipment.schema.json']
-    paths += [model.ROOT/'scripts/instrument_concept.py',model.ROOT/'scripts/tapestation_model.py']
+    verify_source_snapshot(context)
     report={'format':'solidcraftbot.lab-layout-build/1','revision':context['revision'],'source_sha256':context['source_sha256'],
+        'backends':'both','freecad_checks_passed':native['passed'],'cross_cad_checked':True,
         'passed':native['passed'] and presentation['passed'] and all(c['passed'] for c in checks+device_comparisons+rigid_checks),'layout_validation':native,'instance_cross_cad':checks,
         'equipment_body_comparisons':device_comparisons,'presentation':presentation,
         'arm_rigid_placement_checks':rigid_checks,'arm_rigid_metric_derivations':recovered,
         'direct_world_measurements_complete':not recovered,
-        'source_files_sha256':{str(p.relative_to(model.ROOT)):model.digest(p) for p in paths},'asset_sources':s['assets'],
+        'source_files_sha256':context['source_files_sha256'],'asset_sources':s['assets'],
         'files':{'solidcraft':str(scene.relative_to(model.ROOT)),'freecad':str(Path(context['scene_file']).relative_to(model.ROOT)),
                  'validation':str((out/'layout-validation.json').relative_to(model.ROOT)),
                  'solidcraft_measurements':str(measure.relative_to(model.ROOT))},
@@ -179,10 +224,48 @@ def finish(context,args):
     print(json.dumps({'passed':report['passed'],'instances':len(checks),'static_interferences':len(native['static_interferences']),'vehicle_samples':native['vehicle_route']['samples']}),flush=True)
 
 
-def main():
+def finish_freecad(context):
+    """Publish actual native validation without inventing another CAD's checks."""
+    verify_source_snapshot(context)
+    out=Path(context['out']);s=model.load(validate_builds=False)
+    native=json.loads((out/'layout-validation.json').read_text(encoding='utf-8'))
+    if native.get('passed') is not True or native.get('geometry_valid') is not True:
+        raise ValueError('A successful complete native L01 validation is required')
+    geometry=native.get('scene_geometry',[])
+    names=[body['body'] for body in geometry]
+    if not names or len(names)!=len(set(names)) or len(names)!=native.get('body_count') or native.get('invalid_objects')!=[]:
+        raise ValueError('Complete unique native L01 bodies are required')
+    sys.path.insert(0,str(model.ROOT/'scripts/freecad'));from persist_station_view import persist
+    presentation=persist(context['scene_file'],{'bodies':[{'id':name,'appearance':style} for name,style in context['styles'].items()]},geometry)
+    if presentation['passed'] is not True:raise ValueError('Native L01 presentation metadata failed')
+    verify_source_snapshot(context)
+    files={'freecad':str(Path(context['scene_file']).relative_to(model.ROOT)),
+           'validation':str((out/'layout-validation.json').relative_to(model.ROOT))}
+    report={'format':'solidcraftbot.lab-layout-build/1','revision':context['revision'],
+        'source_sha256':context['source_sha256'],'backends':'freecad','freecad_checks_passed':True,
+        'cross_cad_checked':False,'passed':True,'layout_validation':native,'presentation':presentation,
+        'freecad_runtime':context.get('freecad_runtime'),
+        'source_files_sha256':context['source_files_sha256'],'asset_sources':s['assets'],
+        'files':files,'artifact_sha256':{key:model.digest(model.ROOT/path) for key,path in files.items()},
+        'limitations':s['limitations']+[
+            'Independent FreeCAD construction and sampled static layout/access validation only; no SolidCraft or cross-CAD comparison in this build.',
+            'Saved presentation metadata is not a GUI, browser, continuous-motion, human-access or hardware safety qualification.']}
+    write(out/'build-report.json',report)
+    target=model.ROOT/'cad/lab-layout-l01';target.mkdir(exist_ok=True);write(target/'shared-build-report.json',report)
+    print(json.dumps({'passed':True,'backends':'freecad','cross_cad_checked':False,'bodies':native['body_count'],
+                      'vehicle_samples':native['vehicle_route']['samples']}),flush=True)
+    return report
+
+
+def main(argv=None):
     parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--prepare-only',action='store_true');parser.add_argument('--finish',type=Path)
+    parser.add_argument('--backend',choices=['both','freecad'],default='both')
     tool_paths.add_tool_arguments(parser, freecad=True, solidcraft=True)
-    args=parser.parse_args(); tool_paths.resolve_tool_arguments(parser, args)
+    args=parser.parse_args(argv)
+    if args.backend=='freecad':
+        args.freecad_python=args.freecad_python or tool_paths.default_freecad_python()
+        if not args.freecad_python:parser.error('FreeCAD Python not found; pass --freecad-python or set '+tool_paths.FREECAD_ENV)
+    else:tool_paths.resolve_tool_arguments(parser, args)
     context=json.loads(args.finish.read_text(encoding='utf-8')) if args.finish else prepare(args)
     if not args.prepare_only:finish(context,args)
 

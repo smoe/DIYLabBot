@@ -214,6 +214,31 @@ separate Prüfung des erzeugten nativen Rundgangs mit
 `tests/check_building_walkthrough.cjs`; die Quellenprüfung allein belegt keine
 erfolgreiche Pages-Bereitstellung.
 
+Die CI installiert die Schema-Prüfer aus
+`requirements/walkthrough-test.lock` mit verpflichtenden Paketprüfsummen.
+Sie erzeugt die vollständige L01-Aufstellung mit dem unabhängigen FreeCAD-Backend
+neu, bevor sie Rackplatzrahmen gegen die nativen Gefäßmittelpunkte und Basis-Z-Werte
+prüft. Die Linux-Laufzeit ist die offizielle
+[FreeCAD-1.1.4-AppImage](https://github.com/FreeCAD/FreeCAD/releases/tag/1.1.4) mit fester
+SHA-256-Prüfsumme; sie wird ohne FUSE entpackt. Ein fehlendes Paket, ein fehlender
+oder veralteter nativer Bericht und ein unerwarteter Test-Skip lassen den Job
+fehlschlagen. Die lokalen optionalen Testaufrufe behalten ihr bisheriges Verhalten.
+
+Der strenge Teststarter lässt sich auch lokal verwenden:
+
+```sh
+python3 -m pip install --require-hashes -r requirements/walkthrough-test.lock
+python3 scripts/build_lab_layout.py --backend freecad
+python3 scripts/check_walkthrough_regressions.py --pattern test_building_laboratories.py --report exports/ci/walkthrough/building_laboratories.json
+```
+
+CI-Artefakte halten Testzahlen, den nativen Bericht, die geometrische Auswertung
+und die erzeugte FCStd-Datei sieben Tage fest. Der neue Aufbau belegt FreeCAD
+und die jeweils ausgeführten geometrischen Prüfungen; ein CAD-Vergleich mit
+SolidCraft, WebGL-/Browserbedienung, öffentliche HTTPS-Bereitstellung, reale
+Begehbarkeit, Hardware und Sicherheit bleiben separate Nachweise. Dieser Job
+veröffentlicht weder neue README-Medien noch einen neuen Pages-Rundgang.
+
 ## Nachweise
 
 **Integration mit dem aktuellen `master` am 16. November 2026:**

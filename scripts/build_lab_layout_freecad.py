@@ -62,7 +62,10 @@ def source_document(s,item,path):
 
 
 def prepare(context):
-    s=model.load(); p=model.parameters(s); out=Path(context['out']); cad=Path(context['cad']); assets=cad/'assets'; assets.mkdir(exist_ok=True)
+    from build_lab_layout import verify_source_snapshot
+    verify_source_snapshot(context)
+    s=model.load(validate_builds=context.get('backends','both')!='freecad')
+    p=model.parameters(s); out=Path(context['out']); cad=Path(context['cad']); assets=cad/'assets'; assets.mkdir(exist_ok=True)
     room_source=room.load(model.assembly.validate_reference(s['assets']['room']))
     doc=room_backend.build(room_source,room.parameters(room_source),cad/'LabLayout_L01.FCStd')
     for key,value in s['parameters'].items():
@@ -161,9 +164,11 @@ def prepare(context):
         for key,value in [('SourceBody',corridor['id']),('RigidLink','Guides'),('ModelRole','planning_overlay'),('LayoutInstance','Guides')]: obj.addProperty('App::PropertyString',key,'Layout');setattr(obj,key,value)
         scene_styles[corridor['id']]={'color':corridor['color'],'opacity':0.32};scene_meta[corridor['id']]={'instance':'Guides','role':'planning_overlay'}
     doc.recompute();doc.save()
-    context.update({'snapshots':snapshots,'styles':scene_styles,'body_metadata':scene_meta,'scene_file':str(cad/'LabLayout_L01.FCStd')})
+    context.update({'snapshots':snapshots,'styles':scene_styles,'body_metadata':scene_meta,'scene_file':str(cad/'LabLayout_L01.FCStd'),
+                    'freecad_runtime':{'version':App.Version(),'python':sys.version}})
     (out/'context.json').write_text(json.dumps(context,indent=2)+'\n',encoding='utf-8')
     validate(doc,s,context,access_models)
+    verify_source_snapshot(context)
     for source_doc in list(cached.values()):
         if source_doc.Name in App.listDocuments(): App.closeDocument(source_doc.Name)
     App.closeDocument(doc.Name)

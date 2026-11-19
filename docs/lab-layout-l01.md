@@ -25,7 +25,15 @@ validation evidence and render paths. Run:
 python scripts/build_lab_layout.py
 ```
 
-`--prepare-only` builds the source snapshots and native SolidCraft insert
+For an independent native FreeCAD check, use
+`python scripts/build_lab_layout.py --backend freecad`. This builds the full
+scene directly from the shared sources and vendor originals, without prior
+SolidCraft builds. The resulting source- and artifact-bound report explicitly
+records `cross_cad_checked: false`; it contains no SolidCraft comparisons.
+The default `--backend both` retains the existing combined build. These are
+geometric placement/access checks, not hardware, navigation or safety qualification.
+
+`--prepare-only` with the default combined backend builds the source snapshots and native SolidCraft insert
 models. It requires both CAD runtimes. For the final scene through SolidCraft
 MCP, execute the generated `scene.commands.json`, save the scene and measurements at
 the paths in its context, then use `--finish <context.json>`. When MCP restricts

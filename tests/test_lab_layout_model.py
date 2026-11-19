@@ -142,8 +142,6 @@ class LabLayoutNativeEvidenceTests(unittest.TestCase):
         native=report['layout_validation']
         self.assertEqual(native['invalid_objects'],[])
         self.assertEqual(len(native['equipment_body_metrics']),87)
-        self.assertEqual(len(report['equipment_body_comparisons']),87)
-        self.assertTrue(all(c['passed'] for c in report['equipment_body_comparisons']))
         self.assertTrue(all(c['passed'] for c in native['equipment_placement']))
         self.assertEqual({c['instance'] for c in native['equipment_access']},{'Balance01','Freezer01','Fridge01','WaterBath01','Hood01'})
         self.assertEqual(sum(len(c['samples']) for c in native['equipment_access']),171)
@@ -155,15 +153,25 @@ class LabLayoutNativeEvidenceTests(unittest.TestCase):
         self.assertEqual(len(approaches),15)
         self.assertTrue(all(p['passed'] for p in approaches))
         self.assertTrue(all(p['obstruction_mm']<1e-6 for p in approaches if p['accessible']))
-        for group in ('native_arm_models','native_equipment_models'):
-            self.assertEqual(len(report[group]),3 if group=='native_arm_models' else 5)
-            for asset in report[group].values():self.assertEqual(model.digest(model.ROOT/asset['path']),asset['sha256'])
-        self.assertEqual(set(report['native_station_models']),{'CF01'})
-        self.assertTrue(all(c['passed'] for c in report['arm_rigid_placement_checks']))
-        for entry in report['arm_rigid_metric_derivations']:
-            self.assertIn('_housing_Part',entry['body'])
-            self.assertEqual(model.digest(model.ROOT/entry['local_metrics']),entry['local_metrics_sha256'])
-        self.assertEqual(report['direct_world_measurements_complete'],not report['arm_rigid_metric_derivations'])
+        if report.get('backends','both')=='freecad':
+            self.assertIs(report['freecad_checks_passed'],True)
+            self.assertIs(report['cross_cad_checked'],False)
+            self.assertEqual(set(report['files']),{'freecad','validation'})
+            for field in ('equipment_body_comparisons','instance_cross_cad','native_arm_models',
+                          'native_equipment_models','native_station_models','arm_rigid_placement_checks'):
+                self.assertNotIn(field,report)
+        else:
+            self.assertEqual(len(report['equipment_body_comparisons']),87)
+            self.assertTrue(all(c['passed'] for c in report['equipment_body_comparisons']))
+            for group in ('native_arm_models','native_equipment_models'):
+                self.assertEqual(len(report[group]),3 if group=='native_arm_models' else 5)
+                for asset in report[group].values():self.assertEqual(model.digest(model.ROOT/asset['path']),asset['sha256'])
+            self.assertEqual(set(report['native_station_models']),{'CF01'})
+            self.assertTrue(all(c['passed'] for c in report['arm_rigid_placement_checks']))
+            for entry in report['arm_rigid_metric_derivations']:
+                self.assertIn('_housing_Part',entry['body'])
+                self.assertEqual(model.digest(model.ROOT/entry['local_metrics']),entry['local_metrics_sha256'])
+            self.assertEqual(report['direct_world_measurements_complete'],not report['arm_rigid_metric_derivations'])
 
 
 if __name__ == '__main__':
