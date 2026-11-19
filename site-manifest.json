@@ -2,14 +2,14 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "860ff7a5ce76e3324624fe147daa839ffc4c7ced",
-  "integrated_commit": "860ff7a5ce76e3324624fe147daa839ffc4c7ced",
-  "export_revision": "building-walkthrough-fe12b0404dcc",
+  "source_commit": "ed675e3834c7d5b998ab18f83f1e9e07bff8d4e5",
+  "integrated_commit": "ed675e3834c7d5b998ab18f83f1e9e07bff8d4e5",
+  "export_revision": "building-walkthrough-c51575bdfc35",
   "html": {
-    "sha256": "607486a880507899d4567711103e52dd5acd153f597f3a163fd63c970315adb7",
+    "sha256": "ffbce0bd63a44b3b0c18f0d18836b44ea761f911cb597298e769615d838714a5",
     "bytes": 38880351
   },
-  "source_manifest_sha256": "5655d2ce1f1930b1e37590f025ed82a5ed3e306ca1879ca256e3b5bd50f3e11b",
+  "source_manifest_sha256": "f44e42db932f97b1ddab624507a4f6f1b09b3e807313b135e7b7142b09de6548",
   "source_files_sha256": {
     "model/furniture/social.articulations.json": "518fa49f54765a55b9a81c9ef2c78d9895f8a171140796da6139a959d4456bb2",
     "model/furniture-articulations.schema.json": "32afd0b574a7e70829b623f659ca4b5855c226696ee5a50c7614664fca9b85ec",
@@ -21,11 +21,11 @@
     "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
     "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
     "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
-    "model/building-walkthrough.shared.json": "b43b742e47e153d104860cdf0cb8d7a39fa1fa8ec1c5e581c4373102c5a69f14",
+    "model/building-walkthrough.shared.json": "f08b9819d742e2c94ad0fe616e537cf9b19df00b44fb605f82e949e93a05a3fe",
     "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
     "scripts/building_walkthrough.py": "6dc665979a939ea99666c74b34fcd9e49bcb4798c760406b9825ccebf80a4868",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
-    "model/building-stack.shared.json": "08c6df5e4c1582a7da7b8fa2a0ef58bc0c6ef11e52a704c538ae48a7f11aaf1f",
+    "model/building-stack.shared.json": "67d498054f7a8dc29213fa1ca923b2d38a02d0f0e77d4e2584a702c94ad27d81",
     "model/building-stack.schema.json": "6fd0a04bd09c89b842bcf88596d4708da58c3a72b10eace69e0a7d2c5d84d64c",
     "scripts/building_stack.py": "634b17ca785fd6bb769e378c139e770ea52c87fc82bdf76e2768f88f3cea1a1b",
     "scripts/building_circulation.py": "818ecc95503b30342eefa9e7f430d04bd96ff05840c6ba650f2297899fe5dd66",
@@ -72,9 +72,9 @@
     "model/tapestation.shared.json": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6",
     "model/nanodrop-concept.shared.json": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02",
     "model/qubit-4-concept.shared.json": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71",
-    "model/equipment/microscopy-3007.json": "275026bb03c011028873c4bbac8f31c26b9bb56be64449c863100c075c0974e5",
+    "model/equipment/microscopy-3007.json": "9a2a67f00c1254577423413cd5590da55a8aa6fb3eff36c509ba5c9c71a8a5cc",
     "model/furnishings/microscopy-3007.json": "2d1648dadd0c3c54fbbebc8cf59e539ce449ef6e4a1edb245024d11f949f1be4",
-    "model/microscope-mi01.shared.json": "0580b0e09dd3c816ed0e95c1d3d296d19d0b95e3344155f0c4e9b276abb7205b",
+    "model/microscope-mi01.shared.json": "304adecf33ce234f657e4c37ee5373f90ac4aa8e233bb92c628e6fc77617b6fc",
     "scripts/building_microscopy.py": "d6ee3f5f872983e7037783fa78447b80265a58af661a537dd47e7bae37567258",
     "scripts/microscope_model.py": "1fd57c12c5254bf5609ad204d88f7ccc308267da09fea54a681e9ddd95be6f05",
     "model/microscope-mi01.schema.json": "048c83064a28d33677a71417d53f5a55ca5c79d2fdf143efab5fe05be602de6c",
@@ -99,7 +99,7 @@
     "scripts/export_building_walkthrough_freecad.py": "ab1b9b62dee88b9be417c9486d4c7a52ec4d0696f6d138fc14e46d8c78093ecc",
     "scripts/building_walkthrough_viewer.html": "ca3ec90d1162c1cba0d902f818a608973621a3bdfd29b6481c00ab6f41a7a37c",
     "scripts/walkthrough_interaction.js": "1256a76142fb1ec4b549ce73c32d5258413e9ba85ac4ebb30b519b83987f9c11",
-    "cad/building-stack/shared-build-report.json": "f9065cd201824ee42726d8514854ea3d3854a21c25566ad5caf34a8460183c98",
+    "cad/building-stack/shared-build-report.json": "eabf9040c941853d7df9261db866ea7eb948e357f55fd31e6cd8ad71692583c0",
     "cad/lab-layout-l01/shared-build-report.json": "0739b2b21689fe3434c731c586d21627213f3d26ebce7910a6ee7ccbdc51028f",
     "scripts/build_building_stack.py": "cc54265cdf94f0e32a56b12031a3e140eaffdbf30237d3bedd2fdb65ed4ea9b6",
     "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
@@ -113,9 +113,9 @@
     "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
     "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
     "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
-    "cad/generated/building-stack-08c6df5e4c15/overview.FCStd": "b0cd699934cf7c3d186a7033180e5420c180c1ede5d034d03e9e979184d44804",
-    "exports/generated/building-stack-08c6df5e4c15/overview.case.json": "dbaa9ac09b9363220f527b75a6426b83b54c2f00638ef587bab5b41f94c38d88",
-    "exports/generated/building-stack-08c6df5e4c15/overview.freecad.json": "ab0bb38f20fa3c08a284a9ac737408e9ce51a465f1d48b1719c29a290dcfc18c",
+    "cad/generated/building-stack-67d498054f7a/overview.FCStd": "8e33a8dc2679542fc0221580c7167e7b3625f7f74f67ae7623554394880e097d",
+    "exports/generated/building-stack-67d498054f7a/overview.case.json": "e11b422baa203e544b14aaf5bf0d7bfa814b5231474dff48a16c24b90ff9a88b",
+    "exports/generated/building-stack-67d498054f7a/overview.freecad.json": "4d91f7abe00b8fffc963f47b36f5e66dab4f021f67761ed91212f80d7ce9a527",
     "scripts/build_lab_layout.py": "a54d0c890b5b077d2743ef414bf21614f7ed23ef89dafd3630fa5a7fd0a4d9d1",
     "scripts/build_lab_layout_freecad.py": "6a3e1badea46829cae5d6ec621a576c51c5b900e59fadeddcf667d7c11c40c34",
     "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
@@ -138,10 +138,10 @@
   "native_builds": {
     "building": {
       "report": "cad/building-stack/shared-build-report.json",
-      "report_sha256": "f9065cd201824ee42726d8514854ea3d3854a21c25566ad5caf34a8460183c98",
-      "revision": "building-stack-08c6df5e4c15",
-      "source_sha256": "08c6df5e4c1582a7da7b8fa2a0ef58bc0c6ef11e52a704c538ae48a7f11aaf1f",
-      "native_sha256": "b0cd699934cf7c3d186a7033180e5420c180c1ede5d034d03e9e979184d44804"
+      "report_sha256": "eabf9040c941853d7df9261db866ea7eb948e357f55fd31e6cd8ad71692583c0",
+      "revision": "building-stack-67d498054f7a",
+      "source_sha256": "67d498054f7a8dc29213fa1ca923b2d38a02d0f0e77d4e2584a702c94ad27d81",
+      "native_sha256": "8e33a8dc2679542fc0221580c7167e7b3625f7f74f67ae7623554394880e097d"
     },
     "lab": {
       "report": "cad/lab-layout-l01/shared-build-report.json",
@@ -152,8 +152,8 @@
     }
   },
   "local_browser_evidence": {
-    "report": "exports/validation/doom-controls/browser-r3-integration/browser-controls-report.json",
-    "sha256": "ca634df3e7b27850c047534765a25762ab3aa326a345cc71f33e37d2eed5dc35",
+    "report": "exports/validation/doom-controls/browser-r6-current/browser-controls-report.json",
+    "sha256": "4f51738624215faf50c292a94a346545170283789cc9d79aa4e2b4762ff9cb88",
     "passed": true,
     "scope": "Targeted Doom-style keyboard, modifier, focus and presentation-lift input checks in actual Chrome; not a full re-execution of every device workflow or a new geometry/safety qualification.",
     "timing": "A real requestAnimationFrame smoke precedes Playwright-controlled frame time; no real-time performance claim.",
@@ -185,8 +185,8 @@
   "published_on": "2026-11-19",
   "update": "Doom-like arrow turning and Alt/Option strafing, preserving the current camera-contact policy, technical-door startup poses and presentation-lift restrictions.",
   "source_export_evidence": {
-    "report": "exports/building-walkthrough/building-walkthrough-fe12b0404dcc/build-report.json",
-    "sha256": "b76aee7ed2111e97dd6a068550afea4ddb56956964daf6cd3d5355fd26598dbf",
-    "scope": "Current-source HTML/mesh export reusing the exact pinned checked native build artifacts; no new full-native qualification."
+    "report": "exports/building-walkthrough/building-walkthrough-c51575bdfc35/build-report.json",
+    "sha256": "3da379406e80c62583b848fec674b33603b2788a65016d20c19aedbb6816c5a6",
+    "scope": "Current-source HTML/mesh export using the exact pinned successful building and L01 reports. Each native report retains its own backend and validation scope; publication adds no surveyed metric, registration, collision-free route or hardware qualification."
   }
 }
