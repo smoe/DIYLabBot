@@ -2,8 +2,8 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "ed675e3834c7d5b998ab18f83f1e9e07bff8d4e5",
-  "integrated_commit": "ed675e3834c7d5b998ab18f83f1e9e07bff8d4e5",
+  "source_commit": "4be6920d70d0067ef295ccb616f304728b8f83dc",
+  "integrated_commit": "4be6920d70d0067ef295ccb616f304728b8f83dc",
   "export_revision": "building-walkthrough-c51575bdfc35",
   "html": {
     "sha256": "ffbce0bd63a44b3b0c18f0d18836b44ea761f911cb597298e769615d838714a5",
@@ -183,7 +183,7 @@
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
   "published_on": "2026-11-19",
-  "update": "Doom-like arrow turning and Alt/Option strafing, preserving the current camera-contact policy, technical-door startup poses and presentation-lift restrictions.",
+  "update": "Current master 65859a3: all runtime/native source pins match the checked c51575bdfc35 export; includes the merged complete office/laboratory/EG route regression. Normal walkthrough only; BF01 is not included.",
   "source_export_evidence": {
     "report": "exports/building-walkthrough/building-walkthrough-c51575bdfc35/build-report.json",
     "sha256": "3da379406e80c62583b848fec674b33603b2788a65016d20c19aedbb6816c5a6",
