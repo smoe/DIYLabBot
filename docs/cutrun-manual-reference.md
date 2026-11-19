@@ -19,7 +19,7 @@ zugeordnete QC-Originale. Er erzwingt die vollständige lokale Stufenfolge
 S01–S12 einschließlich getrennter Inputführung und phasenbezogener
 Zeit-/Temperaturbelege. Er führt keine biochemischen Arbeitsgänge aus;
 die Abnahme nach O12 und der tatsächliche E4-Referenznachweis bleiben offen.
-Die [Wasch- und Reagenzerweiterung](cutrun-manual-recipe.md) ergänzt jetzt
+Die [Wasch- und Reagenzerweiterung](cutrun-manual-runtime.md#merged-cutrun-manual-recipe) ergänzt jetzt
 die ausgewählten Reagenzansätze, Waschgruppen, Fraktionswechsel und
 tatsächlichen Säulenbeladungen im gemeinsamen Ledger.
 

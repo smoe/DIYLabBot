@@ -20,7 +20,7 @@ Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
 | [Extraktionsvorbereitung](docs/extraction-automation.md) | Bereits vorbereitete RNA-/DNA-Ketten und deren Bedarf am gemeinsamen Materiallebenszyklus |
 | [Materiallebenszyklus](docs/material-lifecycle.md) | Gemeinsamer E2-Vertrag, typisierte Buchungen, Produkte und dauerhaft laufexklusive Reagenzaliquots im bisherigen Journal |
 | [Manueller CUT&RUN-Referenzlauf](docs/cutrun-manual-reference.md) | E4-Vorbereitung, konkrete Eigentümerentscheidungen und noch offene operative Nachweise |
-| [Wasch- und Reagenzvertrag](docs/cutrun-manual-recipe.md) | Ausgewählte Waschgruppen, Arbeitsmischungen, Istverbräuche und Fraktionen auf demselben Ledger; offene lokale Parameter |
+| [Wasch- und Reagenzvertrag](docs/cutrun-manual-runtime.md#merged-cutrun-manual-recipe) | Ausgewählte Waschgruppen, Arbeitsmischungen, Istverbräuche und Fraktionen auf demselben Ledger; offene lokale Parameter |
 | [Manueller Laufzeitvertrag](docs/cutrun-manual-runtime.md) | Getrennte /3-Engines für Aufzeichnung und vollständige lokale SOP-Stufenfolge, phasenbezogene Zeit-/Temperaturbelege, Materialbuchungen und manuelle QC; keine Geräteausführung |
 | [Lokaler SOP-Entwurf 0.1](docs/cutrun-manual-sop-draft.md) | Manuelle Arbeitsfolge, gebundene aktuelle CST-Quelle, offene Parameter und ausdrücklich gekennzeichnete Paper-Abweichungen |
 | [Stock-Plan](docs/stock-continuation.md) | Dauerhafte Bestandsköpfe, atomare Buchungen und Schutz vor veralteten Schreibern; Reagenzvorräte bisher ausgeschlossen |
@@ -166,7 +166,7 @@ Wiederanlauf hält Stufenabsichten und Zeitlücken fest; Widersprüche können
 frühere Abschlüsse entwerten. Der Schutzstopp bleibt auch bei Abweichungen
 erfassbar, ohne einen nominalen Stufenabschluss zu behaupten.
 
-Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-recipe.md) ergänzt
+Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-runtime.md#merged-cutrun-manual-recipe) ergänzt
 die ausgewählten Waschfolgen, belegte Arbeitsmischungen, Komponentenverbräuche
 und tatsächliche Fraktions-/Säulenübergänge im vorhandenen Ledger. Lokale
 Mengen, Wiederholungen und Vorbereitungsbindungen bleiben zunächst offen.
