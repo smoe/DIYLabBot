@@ -28,7 +28,7 @@
     },
     "microscopy": {
       "source": "model/equipment/microscopy-3007.json",
-      "source_sha256": "275026bb03c011028873c4bbac8f31c26b9bb56be64449c863100c075c0974e5"
+      "source_sha256": "9a2a67f00c1254577423413cd5590da55a8aa6fb3eff36c509ba5c9c71a8a5cc"
     },
     "kitchenette": {
       "source": "model/equipment/kitchen-3008.json",
