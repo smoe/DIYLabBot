@@ -1,0 +1,35 @@
+{
+  "format": "solidcraftbot.furnishings/1",
+  "id": "SYN.Pipetting.Bench",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "parameters": {},
+  "anchors": {},
+  "expressions": {},
+  "instances": [
+    {
+      "id": "PipettingBench",
+      "type": "reference_worktop",
+      "component": "PS01Scene",
+      "bindings": {
+        "width": 1200,
+        "length": 800,
+        "height": 18
+      },
+      "xyz": [
+        -600,
+        -400,
+        -18
+      ],
+      "yaw_deg": 0,
+      "frames": {
+        "Top": "PS01.Worktop"
+      }
+    }
+  ],
+  "limitations": [
+    "Reference surface only; load, mounting and real workbench remain unqualified."
+  ]
+}

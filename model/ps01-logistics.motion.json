@@ -1,0 +1,42 @@
+{
+  "format": "solidcraftbot.ps01-logistics-motion/1",
+  "mode": "synthetic_geometry_only",
+  "logistics": {
+    "source": "model/ps01-logistics.shared.json",
+    "source_sha256": "f91d6243f8ceacd23d8d3d68565b94da45881423ddd8ebfaaf410c038c7f2fc1"
+  },
+  "arm_limits": {
+    "source": "model/cf01-unload-demo.motion.json",
+    "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+  },
+  "sample_limits": {
+    "source": "model/h02-rack-transfer.scene.json",
+    "source_sha256": "207b690e60926171311ef7a55da6855a88d2af50d39cc29ed14dd5f0062e55bd"
+  },
+  "vehicle_limits": {
+    "source": "model/tr01-l01.motion.json",
+    "source_sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+  },
+  "path": {
+    "clearance_above_worktop_mm": 140,
+    "corner_trim_mm": 100,
+    "reference_step_mm": 40,
+    "time_quantum_s": 0.001,
+    "fk_subdivisions": 4,
+    "collision_sample_step_s": 0.1,
+    "minimum_clearance_mm": 0.1,
+    "fk_max_subdivisions": 256
+  },
+  "demonstration": {
+    "carrier_id": "Carrier.Rack01",
+    "source": "PS01.Outfeed",
+    "target": "RF02.InfeedRack",
+    "playback_factor": 1,
+    "human_reference_s": null
+  },
+  "limitations": [
+    "Unmeasured box envelopes and existing provisional mechanical/sample limits; no measured dynamics or load retention qualification.",
+    "Runtime receipts and this geometric motion demonstration are separate; no motor, navigation controller, hardware or safety function is driven.",
+    "Model time and true-speed playback are kept separate; faster-than-human acceptance is unverified."
+  ]
+}

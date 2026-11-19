@@ -1,0 +1,1091 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "labware-transfer.schema.json",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.labware-transfer/1"
+        },
+        "id": {
+          "const": "LT01"
+        },
+        "units": {
+          "const": {
+            "length": "mm",
+            "angle": "deg"
+          }
+        },
+        "status": {
+          "const": "Concept; no manufacturing release"
+        },
+        "recipe": {
+          "const": "supported_carrier_and_parallel_jaw_gripper/1"
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "carrier_w": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "carrier_d": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "foot_h": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "base_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "foot_size": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "locator_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "locator_h": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "locator_clearance": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "flange_to_grip": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "mount_radius": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "mount_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "body_h": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "body_d": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "open_gap": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "finger_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "finger_d": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "lip_depth": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "lip_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "approach_clearance": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "dock_t": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "dock_w": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "dock_d": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "box_w": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "box_d": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            },
+            "box_h": {
+              "type": "object",
+              "properties": {
+                "expression": {
+                  "type": "number",
+                  "exclusiveMinimum": 0
+                },
+                "unit": {
+                  "const": "mm"
+                },
+                "range": {
+                  "type": "array",
+                  "items": {
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                  },
+                  "minItems": 2,
+                  "maxItems": 2
+                }
+              },
+              "required": [
+                "expression",
+                "unit",
+                "range"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "required": [
+            "carrier_w",
+            "carrier_d",
+            "foot_h",
+            "base_t",
+            "foot_size",
+            "locator_t",
+            "locator_h",
+            "locator_clearance",
+            "flange_to_grip",
+            "mount_radius",
+            "mount_t",
+            "body_h",
+            "body_d",
+            "open_gap",
+            "finger_t",
+            "finger_d",
+            "lip_depth",
+            "lip_t",
+            "approach_clearance",
+            "dock_t",
+            "dock_w",
+            "dock_d",
+            "box_w",
+            "box_d",
+            "box_h"
+          ],
+          "additionalProperties": false
+        },
+        "sources": {
+          "type": "object",
+          "properties": {
+            "plate": {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            "tips": {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            "rack": {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            }
+          },
+          "required": [
+            "plate",
+            "tips",
+            "rack"
+          ],
+          "additionalProperties": false
+        },
+        "jaws": {
+          "const": {
+            "joint_type": "symmetric_prismatic",
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "closed_gap_parameter": "carrier_d",
+            "open_gap_parameter": "open_gap"
+          }
+        },
+        "payloads": {
+          "const": {
+            "plate96": {
+              "operation": "referenced_plate",
+              "source": "plate"
+            },
+            "tip_box": {
+              "operation": "unmeasured_tip_box_envelope",
+              "source": "tips",
+              "basis": "synthetic_design_envelope_not_article_dimensions"
+            },
+            "tube_rack": {
+              "operation": "referenced_guided_rack",
+              "source": "rack"
+            }
+          }
+        },
+        "qualification": {
+          "const": {
+            "physical_grasp_verified": false,
+            "payload_retention_verified": false,
+            "load_capacity_kg": null,
+            "hardware_implemented": false,
+            "motion_implemented": false
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "units",
+        "status",
+        "recipe",
+        "parameters",
+        "sources",
+        "jaws",
+        "payloads",
+        "qualification",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.pipetting-transfer-setup/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "arm_instance": {
+          "const": "PS01TransferArm"
+        },
+        "ports": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "host": {
+                "const": "PS01.Worktop"
+              },
+              "xyz": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "yaw_deg": {
+                "const": 0
+              }
+            },
+            "required": [
+              "id",
+              "host",
+              "xyz",
+              "yaw_deg"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "carriers": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "host": {
+                "type": "string",
+                "minLength": 1
+              },
+              "payload": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "existing_labware",
+                          "existing_tip_stock"
+                        ]
+                      },
+                      "instance": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "instance"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "tip_reserve"
+                      },
+                      "variant": {
+                        "enum": [
+                          "tip_10_ul",
+                          "tip_200_ul",
+                          "tip_1000_ul"
+                        ]
+                      },
+                      "occupancy": {
+                        "const": "full_synthetic_fixture"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "variant",
+                      "occupancy"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "const": "guided_rack"
+                      },
+                      "occupancy": {
+                        "const": "empty_synthetic_fixture"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "occupancy"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "host",
+              "payload"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "park": {
+          "type": "object",
+          "properties": {
+            "tcp_world_mm": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "roll_deg": {
+              "const": 90
+            },
+            "jaw": {
+              "const": "open"
+            },
+            "ik_seed_deg": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 6,
+              "maxItems": 6
+            }
+          },
+          "required": [
+            "tcp_world_mm",
+            "roll_deg",
+            "jaw",
+            "ik_seed_deg"
+          ],
+          "additionalProperties": false
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "source",
+        "arm_instance",
+        "ports",
+        "carriers",
+        "park",
+        "limitations"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.pipetting-transfer-protocol/1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "mode": {
+          "const": "planning_only"
+        },
+        "setup": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "coordination": {
+          "const": {
+            "shared_zone": "PS01.Deck",
+            "transport_requires": [
+              "pipetting_arm_parked_and_clear_confirmed",
+              "no_active_liquid_transfer_confirmed",
+              "shared_zone_exclusive_claim_confirmed"
+            ],
+            "pipetting_requires": [
+              "transfer_arm_parked_and_clear_confirmed",
+              "all_labware_seated_and_identified_confirmed"
+            ],
+            "release_requires": [
+              "payload_seated_confirmed",
+              "gripper_empty_confirmed",
+              "transfer_arm_parked_and_clear_confirmed"
+            ]
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "carrier": {
+                "type": "string",
+                "minLength": 1
+              },
+              "destination": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "carrier",
+              "destination"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "limitations": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      },
+      "required": [
+        "format",
+        "id",
+        "mode",
+        "setup",
+        "coordination",
+        "steps",
+        "limitations"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

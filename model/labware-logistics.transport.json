@@ -1,0 +1,20 @@
+{
+  "format": "solidcraftbot.labware-transport-protocol/1",
+  "id": "LabwareTransport.LT01",
+  "mode": "synthetic_only",
+  "base": {
+    "source": "model/async-lab-transport.protocol.json",
+    "source_sha256": "6186308b38f02af2ffabc16e64cb9361aa1adade8aa8213ba46e5f17ac54e7af"
+  },
+  "manifest_format": "solidcraftbot.transport-cargo-manifest/1",
+  "payload_kinds": [
+    "tube_rack",
+    "well_plate",
+    "tip_box"
+  ],
+  "limitations": [
+    "One owner/store; four role receipts and existing transport transitions are inherited unchanged.",
+    "A typed carrier manifest never represents a tip box as a specimen vessel.",
+    "Transport receipts remain synthetic; no physical motion, hardware or stock ownership transfer is asserted."
+  ]
+}

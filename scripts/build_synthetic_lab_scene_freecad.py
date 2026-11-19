@@ -28,8 +28,8 @@ def primitive(shape):
     if shape['kind'] == 'box':
         return Part.makeBox(*shape['size'], App.Vector(*shape['origin']))
     if shape['kind'] == 'cone':
-        return Part.makeCone(shape['radius'], shape['top_radius'], shape['height'], App.Vector(*shape['origin']))
-    return Part.makeCylinder(shape['radius'], shape['height'], App.Vector(*shape['origin']))
+        return Part.makeCone(shape['radius'], shape['top_radius'], shape['height'], App.Vector(*shape['origin']), App.Vector(*shape.get('axis', [0, 0, 1])))
+    return Part.makeCylinder(shape['radius'], shape['height'], App.Vector(*shape['origin']), App.Vector(*shape.get('axis', [0, 0, 1])))
 
 
 def instrument_motion_validation(records, scene, data, reachability):

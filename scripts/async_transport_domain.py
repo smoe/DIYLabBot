@@ -9,16 +9,20 @@ from pathlib import Path
 import re
 
 import material_ledger as ledger
+import transport_cargo as cargo
 from manual_tasks import TaskError, digest, encoded
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / 'model/async-lab-transport.synthetic.json'
 PROTOCOL = ROOT / 'model/async-lab-transport.protocol.json'
 CONTRACT_SHA256 = digest(PROTOCOL.read_bytes())
+CARGO_PROTOCOL = ROOT / 'model/labware-logistics.transport.json'
+CARGO_CONTRACT_SHA256 = digest(CARGO_PROTOCOL.read_bytes())
 PHASES = ('requested', 'reserved', 'pickup_pending', 'in_custody', 'delivery_pending', 'completed', 'cancelled', 'cancelled_reconciled')
 STATE_FORMAT = 'solidcraftbot.async-lab-transport-state/1'
 DEFINITION_FORMAT = 'solidcraftbot.async-lab-transport/1'
 EMBEDDED_FORMAT = 'solidcraftbot.embedded-async-lab-transport/1'
+CARGO_EMBEDDED_FORMAT = 'solidcraftbot.embedded-async-lab-transport/2'
 EMBEDDED_FIELDS = ('format mode run_id session assignment_epoch rack_placements jobs inbox outbox requests resources').split()
 ROLES = ('pickup_release', 'pickup_accept', 'delivery_release', 'delivery_accept')
 TERMINAL = {'completed', 'cancelled', 'cancelled_reconciled'}
@@ -111,9 +115,11 @@ def _validate_topology(value):
     """Shared identities only; fixture inventory and owner inventory stay separate."""
     ident(value['owner_principal'])
     exact(value['protocol'], 'source source_sha256', 'protocol reference')
-    require(value['protocol']['source'] == 'model/async-lab-transport.protocol.json', 'Unexpected protocol source')
+    supported = {'model/async-lab-transport.protocol.json': CONTRACT_SHA256,
+                 'model/labware-logistics.transport.json': CARGO_CONTRACT_SHA256}
+    require(value['protocol']['source'] in supported, 'Unexpected protocol source')
     checksum(value['protocol']['source_sha256'])
-    require(value['protocol']['source_sha256'] == CONTRACT_SHA256, 'Transport contract changed')
+    require(value['protocol']['source_sha256'] == supported[value['protocol']['source']], 'Transport contract changed')
     for name, fields in [('racks', 'id initial_endpoint closed'),
                          ('endpoints', 'id site_id lab_id holder_id place_id principal'),
                          ('agents', 'id kind principal')]:
@@ -178,6 +184,9 @@ def manifest(state, rack_id):
 
 
 def _manifest(value):
+    if isinstance(value, dict):
+        cargo.validate(value, _manifest)
+        return
     require(isinstance(value, list) and value, 'Nonempty manifest required')
     slots, vessels, materials = set(), set(), set()
     for item in value:
@@ -195,6 +204,19 @@ def _manifest(value):
             materials.add(material['material_id'])
 
 
+def _content_claims(value):
+    if isinstance(value, dict):
+        return cargo.claims(value)
+    return [claim for item in value for claim in
+            ['vessel:' + item['vessel_id'], *('material:' + m['material_id'] for m in item['materials'])]]
+
+
+def _manifest_identities(value):
+    if isinstance(value, dict):
+        return cargo.identities(value)
+    return [{key: part for key, part in item.items() if key != 'content_revision'} for item in value]
+
+
 def _place_key(definition, endpoint_id):
     endpoint = _items(definition, 'endpoints')[endpoint_id]
     return 'place:' + '|'.join(endpoint[key] for key in ['site_id', 'lab_id', 'holder_id', 'place_id'])
@@ -204,9 +226,7 @@ def _job_claims(state, job):
     claims = ['rack:' + job['rack_id'], 'agent:' + job['agent_id'],
               _place_key(state['definition'], job['source_endpoint']),
               _place_key(state['definition'], job['target_endpoint'])]
-    for item in job['manifest']:
-        claims.append('vessel:' + item['vessel_id'])
-        claims.extend('material:' + m['material_id'] for m in item['materials'])
+    claims.extend(_content_claims(job['manifest']))
     return sorted(claims)
 
 
@@ -215,8 +235,7 @@ def resources(state):
     result = {'rack:' + rack for rack in state['rack_placements']}
     if '_manifests' in state:
         for items in state['_manifests'].values():
-            result.update('vessel:' + item['vessel_id'] for item in items)
-            result.update('material:' + material['material_id'] for item in items for material in item['materials'])
+            result.update(_content_claims(items))
     else:
         result.add('fixture:' + state['definition']['id'])
         result.update('vessel:' + vessel for vessel in state['inventory']['vessels'])
@@ -236,7 +255,11 @@ def decode_envelope(value):
     require(type(value['assignment_epoch']) is int and value['assignment_epoch'] > 0, 'Positive assignment epoch required')
     _manifest(value['manifest']); checksum(value['manifest_sha256']); checksum(value['contract_sha256'])
     require(value['manifest_sha256'] == hashed(value['manifest']), 'Manifest digest mismatch')
-    require(value['contract_sha256'] == CONTRACT_SHA256, 'Unknown envelope contract')
+    require(value['contract_sha256'] in {CONTRACT_SHA256, CARGO_CONTRACT_SHA256}, 'Unknown envelope contract')
+    require(isinstance(value['manifest'], dict) == (value['contract_sha256'] == CARGO_CONTRACT_SHA256),
+            'Typed cargo requires its explicit versioned transport contract')
+    if isinstance(value['manifest'], dict):
+        require(value['manifest']['carrier_id'] == value['rack_id'], 'Carrier/transport identity mismatch')
     require(value['agent_kind'] in {'human', 'robot'} and value['execution_mode'] == 'teleportation_mock', 'Only synthetic mock executors supported')
     require(value['source_endpoint'] != value['target_endpoint'] and value['pickup_handover_id'] != value['delivery_handover_id'], 'Distinct endpoints and handovers required')
     return value
@@ -365,8 +388,7 @@ def _audit_transport(state, *, historical_terminal=False):
         require(job['manifest_sha256'] == hashed(job['manifest']), 'Job manifest digest drift')
         current_manifest = manifest(state, job['rack_id'])
         if historical_terminal and job['phase'] in TERMINAL:
-            identities = lambda items: [{key: value for key, value in item.items() if key != 'content_revision'} for item in items]
-            require(identities(job['manifest']) == identities(current_manifest), 'Historical job identity/slot drift')
+            require(_manifest_identities(job['manifest']) == _manifest_identities(current_manifest), 'Historical job identity/slot drift')
         else:
             require(job['manifest'] == current_manifest, 'Job content/manifest drift')
         require(job['phase'] in PHASES and job['control'] in {'active', 'held'}, 'Invalid job phase/control')
@@ -511,7 +533,12 @@ def _reduce(state, operation, args, principal, audit_context):
                 require(entry['claim'] is None or entry['claim'] == claim, 'Conflicting worker claim')
                 entry['claim'] = copy.deepcopy(claim)
             elif operation == 'hold':
-                reason_text(args['reason']); require(job['phase'] not in TERMINAL, 'Terminal job cannot be held')
+                reason_text(args['reason'])
+                # The additive typed-cargo adapter preserves late failed
+                # support/retention observations just like late identity
+                # conflicts. Legacy v1 callers retain their original contract.
+                require(job['phase'] not in TERMINAL or isinstance(job['manifest'], dict)
+                        and args['reason'] == 'failed_handover_observation', 'Terminal job cannot be held')
                 _hold(job, args['reason'])
                 if job_id in result['outbox'] and result['outbox'][job_id]['status'] == 'dispatched':
                     result['outbox'][job_id]['status'] = 'uncertain'
@@ -578,7 +605,7 @@ def _reduce(state, operation, args, principal, audit_context):
 
 def _embedded_header(queue):
     exact(queue, EMBEDDED_FIELDS, 'embedded queue')
-    require(queue['format'] == EMBEDDED_FORMAT and queue['mode'] == 'synthetic_only', 'Unknown embedded queue version')
+    require(queue['format'] in {EMBEDDED_FORMAT, CARGO_EMBEDDED_FORMAT} and queue['mode'] == 'synthetic_only', 'Unknown embedded queue version')
     ident(queue['run_id']); ident(queue['session'])
     require(type(queue['assignment_epoch']) is int and queue['assignment_epoch'] > 0, 'Invalid embedded queue epoch')
     require(all(isinstance(queue[name], dict) for name in ['rack_placements', 'jobs', 'inbox', 'outbox', 'requests']), 'Embedded queue maps required')
@@ -589,18 +616,22 @@ def _embedded_context(queue, topology, manifests):
     _embedded_header(queue)
     exact(topology, 'owner_principal racks endpoints agents protocol', 'embedded topology')
     _validate_topology(topology)
+    typed = topology['protocol']['source_sha256'] == CARGO_CONTRACT_SHA256
+    require(queue['format'] == (CARGO_EMBEDDED_FORMAT if typed else EMBEDDED_FORMAT), 'Queue/contract version mismatch')
     racks = _items(topology, 'racks')
     require(isinstance(manifests, dict) and set(manifests) == set(racks), 'Complete existing-rack manifests required')
     normalized = {}
-    vessels, materials = set(), set()
+    identities = set()
     for rack_id, items in manifests.items():
         _manifest(items)
-        for item in items:
-            require(item['vessel_id'] not in vessels, 'Vessel appears in multiple payloads')
-            vessels.add(item['vessel_id'])
-            for material in item['materials']:
-                require(material['material_id'] not in materials, 'Material appears in multiple payloads')
-                materials.add(material['material_id'])
+        require(isinstance(items, dict) == typed, 'Manifest/contract version mismatch')
+        members = _content_claims(items)
+        require(not identities.intersection(members), 'Content appears in multiple payloads')
+        identities.update(members)
+        if typed:
+            require(items['carrier_id'] == rack_id, 'Carrier identity mismatch')
+            normalized[rack_id] = cargo.normalize(items)
+            continue
         normalized[rack_id] = sorted(copy.deepcopy(items), key=lambda item: (item['place_id'], item['vessel_id']))
         for item in normalized[rack_id]:
             item['materials'].sort(key=lambda material: material['material_id'])
@@ -624,7 +655,8 @@ def embedded_initial(topology, manifests, run_id, session):
     """
     exact(topology, 'owner_principal racks endpoints agents protocol', 'embedded topology')
     _validate_topology(topology)
-    queue = {'format': EMBEDDED_FORMAT, 'mode': 'synthetic_only', 'run_id': run_id,
+    queue = {'format': CARGO_EMBEDDED_FORMAT if topology['protocol']['source_sha256'] == CARGO_CONTRACT_SHA256 else EMBEDDED_FORMAT,
+             'mode': 'synthetic_only', 'run_id': run_id,
              'session': session, 'assignment_epoch': 1, 'rack_placements': {
                  rack['id']: {'kind': 'endpoint', 'endpoint_id': rack['initial_endpoint']}
                  for rack in topology['racks']},

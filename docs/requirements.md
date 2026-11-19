@@ -16,6 +16,7 @@
 | Stationsübergreifender Transport | Vorhandenen Bodenroboter TR01 zwischen DNA-Aufreinigung, CF01 und gemeinsamer NanoDrop-/Qubit-Station verwenden; synthetische Aufgabenübergaben sowie geometrische L01-Parkpunkte und fließende, kollisionsgeprüfte Fahrkurven sind separat implementiert; Navigation und reale Übergaben bleiben offen |
 | TapeStation TS01 | Als zunächst manuell bedienten QC-Arbeitsplatz aufnehmen; Modellwahl offen, 4200 als Planungsreferenz. Menschliche Assistenz vor automatischer Beladung vorsehen |
 | Langfristiger Volumenbereich | 1–1000 µl mit verschiedenen Werkzeugen |
+| Pipettierstation PS01 | Frei konfigurierbare Pipettieraufgaben; separater Roboter für Spitzenboxen, Well-Platten und Racks. Erstes Planungsprotokoll mit zwei unabhängigen Mengenreihen in einer 96-Well-Platte. [Aufbau und aktueller Prüfumfang](pipetting-station-ps01.md) |
 | Gefäße | Eppendorf-Gefäße, 96-Well- und 384-Well-Platten |
 | Erster begrenzter Prototyp | Budgetziel 3.000–5.000 EUR |
 | Infrastruktur | Pipetten und geeignete Labor-Messmöglichkeiten sind vorhanden |
@@ -293,9 +294,13 @@ einfachen Bohrungen. [H01](tube-carrier-h01.md) verwendet deshalb artikelabhäng
 Einsätze bei gemeinsamen äußeren Träger-/Greifschnittstellen. Maße und Passungen
 sind Konzeptannahmen; der konkrete Gefäßartikel und Messwerte bleiben offen.
 
-- Für den gewünschten Spitzenabwurf: konkrete 10-, 200- und 1000-µl-Pipetten und
-  Spitzenartikel, Kragen-/Schaftmaße, Freiraum zur Abwurfhülse, Abziehkraft und
-  zulässige Füllhöhe der Sammelbox; die Nuten im T01-Entwurf sind Platzhalter.
+- Für den gewünschten Spitzenabwurf: konkrete 10-, 200- und 1000-µl-Pipetten,
+  tolerierte Kragen-/Schaftmaße, T01-`fit_rule`, Freiraum zur Abwurfhülse,
+  Abziehkraft und zulässige Füllhöhe; die T01-Nuten bleiben Platzhalter.
+  Die [Spitzenversorgung](tip-supply.md) führt inzwischen drei belegte
+  Referenzartikel, aber noch keine bestätigte T01-Kompatibilität.
+- Spitzenversorgung: vollständige Tray-/Boxmaße und Spitzenprofile beschaffen;
+  Strip-Zugriff mit eigener Bahnprüfung sowie das Pipettierwerkzeug entwickeln.
 - Pipettenmodelle, Spitzen und Gewicht der vollständigen Werkzeuge.
 - Gefäßartikel und genaue Zielposition, Ablage- und Aufnahmeorientierung.
 - Beladung und Entnahme der Deckelstation einschließlich echter Greifergeometrie,

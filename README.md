@@ -54,6 +54,7 @@ Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält 
 
 Bereits ausführbare **synthetische Softwareabläufe** zeigen beispielsweise:
 
+- [Pipettierstation PS01](docs/pipetting-station-ps01.md) mit getrennten Armen für Pipettieren und Labware-Handhabung sowie frei kombinierbaren Transfers, Verteilungen und Mischschritten. Das erste Planungsbeispiel kombiniert zwei Flüssigkeiten entlang der beiden Achsen einer 96-Well-Platte; Mengen, Spitzenverbrauch und Well-Kapazitäten werden geprüft.
 - [Zentrifugieren, NanoDrop und Qubit 4](docs/synthetic-lab-workflow.md) mit gemeinsamem Probenbestand und nachvollziehbaren Entnahmen.
 - [DNA-Extraktion mit NanoDrop, Qubit und TapeStation](docs/extraction-analytics.md) von der Ausgangsprobe bis zur Bewertung des erhaltenen DNA-Produkts.
 - [Asynchronen Labortransport](docs/async-lab-transport.md) mit bestätigten Übergaben und ausdrücklichem Abgleich bei unklaren Ergebnissen.

@@ -1,0 +1,197 @@
+{
+  "format": "solidcraftbot.ps01-logistics/1",
+  "id": "PS01.TR01.Logistics",
+  "mode": "synthetic_only",
+  "status": "Concept; no manufacturing release",
+  "sources": {
+    "setup": {
+      "source": "model/pipetting-station-ps01.setup.json",
+      "source_sha256": "6d6ebdd687feaaca2310e526ab39aab04e043e0fa3cf9a3e07bdb9d4092ec0ea"
+    },
+    "handling": {
+      "source": "model/labware-transfer.shared.json",
+      "source_sha256": "c0e42864123cfec64db210d3cbf4725cdf960bf38014c583a4a8c99dbcb18cbc"
+    },
+    "vehicle": {
+      "source": "model/sample-transport-tr01.shared.json",
+      "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+    },
+    "tips": {
+      "source": "model/tip-supply.shared.json",
+      "source_sha256": "2729acb38f7d3dd06753e6c5ef083ae9f516daecf02543dcb6fdd8ab8f01d0f4"
+    },
+    "transport": {
+      "source": "model/labware-logistics.transport.json",
+      "source_sha256": "c1a2a0df9fa5bfd9ad3f85e26acfee9f33cb79b318268557472dd48c46c8a843"
+    }
+  },
+  "owner_principal": "Logistics.Owner",
+  "stations": [
+    {
+      "id": "PS01",
+      "worktop_xyz_mm": [
+        0,
+        0,
+        900
+      ],
+      "dock_xy_mm": [
+        200,
+        -650
+      ]
+    },
+    {
+      "id": "RF02",
+      "worktop_xyz_mm": [
+        1400,
+        0,
+        900
+      ],
+      "dock_xy_mm": [
+        1600,
+        -650
+      ]
+    }
+  ],
+  "adapter": {
+    "recipe": "tr01_lt01_supported_nest/1",
+    "bay_index": 0,
+    "base_thickness_mm": 5,
+    "locator_clearance_mm": 1,
+    "locator_height_mm": 3,
+    "locator_thickness_mm": 3,
+    "retention": "manual_fixture_confirmation",
+    "box_geometry_basis": "unmeasured_existing_LT01_envelope"
+  },
+  "fixture": [
+    {
+      "id": "Carrier.Rack01",
+      "prototype": "Carrier.Rack01",
+      "payload_id": "Rack01",
+      "initial_endpoint": "PS01.Outfeed",
+      "kind": "tube_rack",
+      "vessels": [
+        {
+          "place_id": "Slot01",
+          "vessel_id": "Logistics.Tube01",
+          "content_revision": 0,
+          "materials": [
+            {
+              "material_id": "Logistics.Sample01",
+              "origin_id": null
+            }
+          ]
+        },
+        {
+          "place_id": "Slot02",
+          "vessel_id": "Logistics.Tube02",
+          "content_revision": 0,
+          "materials": [
+            {
+              "material_id": "Logistics.Sample02",
+              "origin_id": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "Carrier.Plate01",
+      "prototype": "Carrier.Plate01",
+      "payload_id": "Plate01",
+      "initial_endpoint": "PS01.S08",
+      "kind": "well_plate"
+    },
+    {
+      "id": "Carrier.Stock10",
+      "prototype": "Carrier.Tips10",
+      "payload_id": "Stock10",
+      "initial_endpoint": "PS01.S01",
+      "kind": "tip_box",
+      "variant": "tip_10_ul",
+      "used_tip_count": 28
+    },
+    {
+      "id": "Carrier.Stock200",
+      "prototype": "Carrier.Tips200_1",
+      "payload_id": "Stock200",
+      "initial_endpoint": "PS01.S02",
+      "kind": "tip_box",
+      "variant": "tip_200_ul",
+      "used_tip_count": 48
+    },
+    {
+      "id": "Carrier.Stock1000",
+      "prototype": "Carrier.Tips1000",
+      "payload_id": "Stock1000",
+      "initial_endpoint": "PS01.S03",
+      "kind": "tip_box",
+      "variant": "tip_1000_ul",
+      "used_tip_count": 0
+    },
+    {
+      "id": "Carrier.Fresh10",
+      "prototype": "Carrier.Tips10",
+      "payload_id": "Fresh10",
+      "initial_endpoint": "RF02.S01",
+      "kind": "tip_box",
+      "variant": "tip_10_ul",
+      "used_tip_count": 0
+    },
+    {
+      "id": "Carrier.Fresh200A",
+      "prototype": "Carrier.Tips200_1",
+      "payload_id": "Fresh200A",
+      "initial_endpoint": "RF02.S02",
+      "kind": "tip_box",
+      "variant": "tip_200_ul",
+      "used_tip_count": 0
+    },
+    {
+      "id": "Carrier.Fresh200B",
+      "prototype": "Carrier.Tips200_1",
+      "payload_id": "Fresh200B",
+      "initial_endpoint": "RF02.S04",
+      "kind": "tip_box",
+      "variant": "tip_200_ul",
+      "used_tip_count": 0
+    },
+    {
+      "id": "Carrier.Fresh1000",
+      "prototype": "Carrier.Tips1000",
+      "payload_id": "Fresh1000",
+      "initial_endpoint": "RF02.S03",
+      "kind": "tip_box",
+      "variant": "tip_1000_ul",
+      "used_tip_count": 0
+    }
+  ],
+  "supply_station": "RF02",
+  "limitations": [
+    "Explicit independent fixture; admission is synthetic, not an import of previously executed pipetting.",
+    "Tip boxes reuse unmeasured LT01 planning envelopes; real article contours, retention forces and hardware remain unqualified.",
+    "Single owner/store. No cross-run stock import, network, device execution or automatic cover handling."
+  ],
+  "handoff_ports": [
+    {
+      "port": "InfeedRack",
+      "xy_mm": [
+        -170,
+        -300
+      ]
+    },
+    {
+      "port": "InfeedTips",
+      "xy_mm": [
+        0,
+        -300
+      ]
+    },
+    {
+      "port": "Outfeed",
+      "xy_mm": [
+        160,
+        -300
+      ]
+    }
+  ]
+}

@@ -239,7 +239,7 @@ def primitive_commands(identity, parts, matrix, component_suffix=''):
             if shape['kind'] == 'box':
                 args.update(corner=shape['origin'], **dict(zip(['length', 'width', 'height'], shape['size'])))
             else:
-                args.update(base=shape['origin'], axis=[0, 0, 1], radius=shape['radius'], height=shape['height'])
+                args.update(base=shape['origin'], axis=shape.get('axis', [0, 0, 1]), radius=shape['radius'], height=shape['height'])
                 if shape['kind'] == 'cone':
                     args['top_radius'] = shape['top_radius']
             commands.append({'command': 'solid.'+shape['kind'], 'params': args})

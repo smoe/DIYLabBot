@@ -1,0 +1,129 @@
+{
+  "format": "solidcraftbot.pipetting-transfer-setup/1",
+  "id": "PS01.LabwareTransfer",
+  "source": {
+    "source": "model/labware-transfer.shared.json",
+    "source_sha256": "c0e42864123cfec64db210d3cbf4725cdf960bf38014c583a4a8c99dbcb18cbc"
+  },
+  "arm_instance": "PS01TransferArm",
+  "ports": [
+    {
+      "id": "PS01.InfeedTips",
+      "host": "PS01.Worktop",
+      "xyz": [
+        400,
+        180,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "PS01.InfeedRack",
+      "host": "PS01.Worktop",
+      "xyz": [
+        400,
+        330,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "PS01.Outfeed",
+      "host": "PS01.Worktop",
+      "xyz": [
+        160,
+        -300,
+        0
+      ],
+      "yaw_deg": 0
+    }
+  ],
+  "carriers": [
+    {
+      "id": "Carrier.Plate01",
+      "host": "PS01.S08",
+      "payload": {
+        "kind": "existing_labware",
+        "instance": "Plate01"
+      }
+    },
+    {
+      "id": "Carrier.Tips10",
+      "host": "PS01.S01",
+      "payload": {
+        "kind": "existing_tip_stock",
+        "instance": "Tips10"
+      }
+    },
+    {
+      "id": "Carrier.Tips200_1",
+      "host": "PS01.S02",
+      "payload": {
+        "kind": "existing_tip_stock",
+        "instance": "Tips200_1"
+      }
+    },
+    {
+      "id": "Carrier.Tips200_2",
+      "host": "PS01.S03",
+      "payload": {
+        "kind": "existing_tip_stock",
+        "instance": "Tips200_2"
+      }
+    },
+    {
+      "id": "Carrier.Tips200_3",
+      "host": "PS01.S04",
+      "payload": {
+        "kind": "existing_tip_stock",
+        "instance": "Tips200_3"
+      }
+    },
+    {
+      "id": "Carrier.Tips1000",
+      "host": "PS01.S05",
+      "payload": {
+        "kind": "existing_tip_stock",
+        "instance": "Tips1000"
+      }
+    },
+    {
+      "id": "Carrier.ReserveTips200",
+      "host": "PS01.InfeedTips",
+      "payload": {
+        "kind": "tip_reserve",
+        "variant": "tip_200_ul",
+        "occupancy": "full_synthetic_fixture"
+      }
+    },
+    {
+      "id": "Carrier.Rack01",
+      "host": "PS01.InfeedRack",
+      "payload": {
+        "kind": "guided_rack",
+        "occupancy": "empty_synthetic_fixture"
+      }
+    }
+  ],
+  "park": {
+    "tcp_world_mm": [
+      200,
+      -310,
+      170
+    ],
+    "roll_deg": 90,
+    "jaw": "open",
+    "ik_seed_deg": [
+      0,
+      60,
+      90,
+      0,
+      70,
+      0
+    ]
+  },
+  "limitations": [
+    "The spare box is a synthetic transfer object, not admitted stock for the liquid-handling plan.",
+    "Carrier identity and source payload IDs remain unchanged by proposed transfers."
+  ]
+}
