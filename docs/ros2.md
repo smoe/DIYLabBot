@@ -10,7 +10,7 @@ Die gemeinsame Quelle enthält zusätzlich Servo- und Leitungsanforderungen.
 `config/services.json` hält die geprüfte logische Zuordnung zu den ROS-Gelenken
 und die offenen Hardware-/Kabelfragen fest. Der ROS-Laufzeitcode setzt diesen
 Vertrag noch nicht um; der Backend bleibt Mock-Hardware. Details stehen in
-[servo-cables.md](servo-cables.md).
+[servo-cables.md](servo-integration.md#merged-servo-cables).
 
 Die vorbereitete Schnittstelle liegt unter
 `ros2_ws/src/solidcraftbot_ros`. Zielumgebung ist ROS 2 Jazzy mit den

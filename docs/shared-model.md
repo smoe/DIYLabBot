@@ -158,7 +158,7 @@ sichtbaren Geometrie. Die Quelle enthält sechs Servoanforderungen, sechs logisc
 Versorgungs-/Rückmeldeverbindungen und ihre beweglichen Gelenkdurchführungen.
 Die Topologie wird geprüft; unbekannte Kabeldaten und Führungsmaße werden
 explizit als `null` geführt. Physische Kabelprüfungen und flexible Geometrie sind
-noch nicht implementiert. Details: [Servos und Leitungen](servo-cables.md).
+noch nicht implementiert. Details: [Servos und Leitungen](servo-integration.md#merged-servo-cables).
 
 ## Provisorische Kameras und Sichtkegel
 

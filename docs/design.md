@@ -505,7 +505,7 @@ Positionsrückmeldung. `services` in der gemeinsamen Quelle ordnet sie den
 Motorbauräumen zu und beschreibt logische Leitungswege.
 Die Ebene bleibt in der Bewegungsdarstellung unsichtbar. Topologieprüfungen sind
 implementiert; räumliche Kabelführung, Biege-/Torsionsnachweise und tatsächliche
-Sensorrückmeldung stehen aus. Siehe [servo-cables.md](servo-cables.md).
+Sensorrückmeldung stehen aus. Siehe [servo-cables.md](servo-integration.md#merged-servo-cables).
 
 - Lageranordnung, Vorspannung, Wellen, Passungen und Befestigungen.
 - Antriebsmomente, Übersetzungen, Regelung und Messung am Gelenkausgang.
