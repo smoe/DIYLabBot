@@ -40,6 +40,8 @@ const {chromium} = require(process.argv[3] || 'playwright');
     page = await browser.newPage({viewport: {width: 1280, height: 950}, reducedMotion: 'no-preference'});
     page.setDefaultTimeout(120000);
     const errors = [], network = [];
+    let bodySession;
+    const liveDocuments = [];
     if (liveURL) report.live = {url: liveURL.href, main_requests: [], ignored_favicon: [], unexpected_requests: network};
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => {
@@ -67,13 +69,29 @@ const {chromium} = require(process.argv[3] || 'playwright');
         if (response.url() === faviconURL)
           report.live.ignored_favicon.push({event: 'response', url: response.url(), status: response.status()});
       });
+      // The standalone native scene exceeds Chrome's default inspector cache.
+      // Read the actual main response through the same bounded, buffered session.
+      bodySession = await page.context().newCDPSession(page);
+      const resourceBuffer = htmlBytes.length * 2 + 1024 * 1024;
+      report.live.inspector_buffer_bytes = {resource: resourceBuffer, total: resourceBuffer * 2};
+      bodySession.on('Network.responseReceived', event => {
+        if (event.type === 'Document' && event.response.url === liveURL.href)
+          liveDocuments.push({request_id: event.requestId, url: event.response.url, status: event.response.status});
+      });
+      await bodySession.send('Network.enable', {maxResourceBufferSize: resourceBuffer, maxTotalBufferSize: resourceBuffer * 2});
     }
     const mainResponse = await page.goto(liveURL?.href || pathToFileURL(target).href, {waitUntil: 'load', timeout: 120000});
     if (liveURL) {
       assert(mainResponse, 'The deployed main document must have an HTTP response.');
-      const body = await mainResponse.body();
+      assert.equal(liveDocuments.length, 1, 'The buffered session observes exactly the deployed main document.');
+      const document = liveDocuments[0];
+      assert.equal(document.status, mainResponse.status(), 'Both browser sessions observe the same main response status.');
+      const captured = await bodySession.send('Network.getResponseBody', {requestId: document.request_id});
+      const body = Buffer.from(captured.body, captured.base64Encoded ? 'base64' : 'utf8');
+      await bodySession.detach();
       Object.assign(report.live, {response_url: mainResponse.url(), status: mainResponse.status(),
-        body_sha256: crypto.createHash('sha256').update(body).digest('hex'), body_bytes: body.length});
+        body_sha256: crypto.createHash('sha256').update(body).digest('hex'), body_bytes: body.length,
+        body_source: 'Network.getResponseBody from the same buffered actual HTTPS document session'});
       assert.equal(mainResponse.url(), liveURL.href, 'The browser reaches the exact requested deployment URL.');
       assert.equal(mainResponse.status(), 200, 'The deployed main document returns HTTP 200.');
       assert.equal(body.length, htmlBytes.length, 'The deployed response has the exact checked local byte length.');
