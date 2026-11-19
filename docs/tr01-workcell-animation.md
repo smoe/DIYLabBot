@@ -297,7 +297,7 @@ Bewegungsbahnen werden unverändert wiederverwendet.
 Die Auswahl **Drei Transporter** startet den separaten, lokal sensorbasierten
 Verkehrsfall mit drei verschiedenen Stationszielen und Gegenverkehr.
 Ablauf, lokale Rückzugsregel, Bench-Sperren und neue native Nachweise stehen
-in [l01-opposing-traffic.md](l01-opposing-traffic.md). Der frühere Geradenfall
+in [l01-opposing-traffic.md](l01-independent-fleet.md#merged-l01-opposing-traffic). Der frühere Geradenfall
 bleibt als separater Regressionstest erhalten.
 
 
@@ -306,4 +306,4 @@ bleibt als separater Regressionstest erhalten.
 **Drei Transporter** führt jetzt zuerst drei Beladungen, dann den bestehenden
 Gegenverkehrsfall und anschließend drei Entladungen aus. Quellen, Bench-Reservierungen,
 Beobachtungen und zusätzliche Geometrienachweise stehen in
-[l01-fleet-handoffs.md](l01-fleet-handoffs.md).
+[l01-fleet-handoffs.md](l01-independent-fleet.md#merged-l01-fleet-handoffs).
