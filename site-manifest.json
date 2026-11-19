@@ -2,14 +2,14 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "a3fa2ef465c5fcc8530057220355238dc1d6f248",
-  "integrated_commit": "a3fa2ef465c5fcc8530057220355238dc1d6f248",
-  "export_revision": "building-walkthrough-3e67fc15d7d8",
+  "source_commit": "860ff7a5ce76e3324624fe147daa839ffc4c7ced",
+  "integrated_commit": "860ff7a5ce76e3324624fe147daa839ffc4c7ced",
+  "export_revision": "building-walkthrough-fe12b0404dcc",
   "html": {
-    "sha256": "4b0c874fcbbbccbddd543908215b6f61720337adc9ccf234bba28a561445a2b3",
-    "bytes": 38878835
+    "sha256": "607486a880507899d4567711103e52dd5acd153f597f3a163fd63c970315adb7",
+    "bytes": 38880351
   },
-  "source_manifest_sha256": "36e20a7d98706427bbd5b68ad728bb5565f1a15948ac4cf9df89e53e522756a9",
+  "source_manifest_sha256": "5655d2ce1f1930b1e37590f025ed82a5ed3e306ca1879ca256e3b5bd50f3e11b",
   "source_files_sha256": {
     "model/furniture/social.articulations.json": "518fa49f54765a55b9a81c9ef2c78d9895f8a171140796da6139a959d4456bb2",
     "model/furniture-articulations.schema.json": "32afd0b574a7e70829b623f659ca4b5855c226696ee5a50c7614664fca9b85ec",
@@ -97,10 +97,10 @@
     "scripts/walkthrough_elevator.py": "a555e6c511194c32b6020fda21b910f6a50200bfeffdd03896a8813fc50e9dee",
     "scripts/build_building_walkthrough.py": "43482ab27d13b71adcec18d557031333e6386afe0f2f5e3c3f77cdf79e9ce004",
     "scripts/export_building_walkthrough_freecad.py": "ab1b9b62dee88b9be417c9486d4c7a52ec4d0696f6d138fc14e46d8c78093ecc",
-    "scripts/building_walkthrough_viewer.html": "b38a31282b8cbe31eac986abbc1e7105e227c4bf3acb7ba254f006de0437b894",
+    "scripts/building_walkthrough_viewer.html": "ca3ec90d1162c1cba0d902f818a608973621a3bdfd29b6481c00ab6f41a7a37c",
     "scripts/walkthrough_interaction.js": "1256a76142fb1ec4b549ce73c32d5258413e9ba85ac4ebb30b519b83987f9c11",
-    "exports/generated/building-stack-08c6df5e4c15/build-report.json": "f9065cd201824ee42726d8514854ea3d3854a21c25566ad5caf34a8460183c98",
-    "exports/generated/lab-layout-l01-953a32f28782/build-report.json": "0739b2b21689fe3434c731c586d21627213f3d26ebce7910a6ee7ccbdc51028f",
+    "cad/building-stack/shared-build-report.json": "f9065cd201824ee42726d8514854ea3d3854a21c25566ad5caf34a8460183c98",
+    "cad/lab-layout-l01/shared-build-report.json": "0739b2b21689fe3434c731c586d21627213f3d26ebce7910a6ee7ccbdc51028f",
     "scripts/build_building_stack.py": "cc54265cdf94f0e32a56b12031a3e140eaffdbf30237d3bedd2fdb65ed4ea9b6",
     "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
@@ -137,14 +137,14 @@
   },
   "native_builds": {
     "building": {
-      "report": "exports/generated/building-stack-08c6df5e4c15/build-report.json",
+      "report": "cad/building-stack/shared-build-report.json",
       "report_sha256": "f9065cd201824ee42726d8514854ea3d3854a21c25566ad5caf34a8460183c98",
       "revision": "building-stack-08c6df5e4c15",
       "source_sha256": "08c6df5e4c1582a7da7b8fa2a0ef58bc0c6ef11e52a704c538ae48a7f11aaf1f",
       "native_sha256": "b0cd699934cf7c3d186a7033180e5420c180c1ede5d034d03e9e979184d44804"
     },
     "lab": {
-      "report": "exports/generated/lab-layout-l01-953a32f28782/build-report.json",
+      "report": "cad/lab-layout-l01/shared-build-report.json",
       "report_sha256": "0739b2b21689fe3434c731c586d21627213f3d26ebce7910a6ee7ccbdc51028f",
       "revision": "lab-layout-l01-953a32f28782",
       "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
@@ -152,10 +152,15 @@
     }
   },
   "local_browser_evidence": {
-    "report": "exports/camera-collision-2026-11-19/browser-check.json",
-    "sha256": "3a08e18fb6a0079675d78b8e23536f12348fae4acc0ef7ff24d57c26a55e5dca",
+    "report": "exports/validation/doom-controls/browser-r3-integration/browser-controls-report.json",
+    "sha256": "ca634df3e7b27850c047534765a25762ab3aa326a345cc71f33e37d2eed5dc35",
     "passed": true,
-    "scope": "Targeted camera navigation and technical-door browser check; not a complete re-execution of every device workflow."
+    "scope": "Targeted Doom-style keyboard, modifier, focus and presentation-lift input checks in actual Chrome; not a full re-execution of every device workflow or a new geometry/safety qualification.",
+    "timing": "A real requestAnimationFrame smoke precedes Playwright-controlled frame time; no real-time performance claim.",
+    "hidden_cleanup": {
+      "proven": false,
+      "reason": "Headless Chrome did not mark the minimized page hidden."
+    }
   },
   "qualification": {
     "metric_scale_known": false,
@@ -165,18 +170,23 @@
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
-    "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
+    "Free camera translation uses a presentation-radius sphere against native mesh triangles and excludes unboarded shaft entry. This is not a human-body, escape-route or real-world safety qualification.",
     "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
     "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer.",
-    "Furniture opening is a browser-only illustrative articulation; FreeCAD and SolidCraft retain the closed reference geometry.",
+    "Interactive opening is a browser-only illustration derived from shared joints and native reference poses; it does not control hardware.",
     "No door-swing clearance, collision, hardware or robot-command qualification.",
-    "The single elevator cabin and boarded camera move only in the browser; no real lift control, door leaves or navigation qualification is implemented.",
+    "The single elevator cabin and boarded camera move only in the browser; doors open only at active destination ports; real lift control and navigation qualification remain unimplemented.",
     "Native building CAD contains the bound laboratory furniture; equipment is instanced into its browser view from the checked L01 layout.",
     "Native CAD qualification remains the scope of each pinned build report.",
     "Tessellation and Float32 positions approximate display surfaces; they are not collision or navigation proofs.",
     "L01 equipment is rigidly instanced into a source-derived building room variant; surveyed registration remains unqualified.",
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
-  "published_on": null,
-  "update": "Camera sphere contacts against native meshes, source-derived unboarded shaft exclusion, and closed technical-access startup poses; laboratory and office doors remain open."
+  "published_on": "2026-11-19",
+  "update": "Doom-like arrow turning and Alt/Option strafing, preserving the current camera-contact policy, technical-door startup poses and presentation-lift restrictions.",
+  "source_export_evidence": {
+    "report": "exports/building-walkthrough/building-walkthrough-fe12b0404dcc/build-report.json",
+    "sha256": "b76aee7ed2111e97dd6a068550afea4ddb56956964daf6cd3d5355fd26598dbf",
+    "scope": "Current-source HTML/mesh export reusing the exact pinned checked native build artifacts; no new full-native qualification."
+  }
 }
