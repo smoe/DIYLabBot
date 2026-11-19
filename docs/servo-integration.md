@@ -154,7 +154,7 @@ und zwölf M4-Ausgangsschrauben auf Ø44 mm, zusätzlich zwei Ø5-mm-Zentrierhü
 am Gehäuse. Die Platten haben jetzt entsprechend Ø3,4-mm- beziehungsweise
 Ø4,5-mm-Freibohrungen, Kopfsenkungen und zwei gesonderte Hülsenstellen. Die Hülsen sind in
 der vereinfachten Vendor-Geometrie enthalten. Der
-[Auflösungsbericht](x6-interface-resolution.md) führt Quellen und Nachweise.
+[Auflösungsbericht](x6-fits-fasteners.md#merged-x6-interface-resolution) führt Quellen und Nachweise.
 
 Vor Fertigung sind Passungen, gewählte Schrauben und zulässiger Eingriff am
 Musterteil zu prüfen. Die X6-Hülsenpassung und Schraubenlängen sind nominell

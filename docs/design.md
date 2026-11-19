@@ -73,7 +73,7 @@ Die X6-Zeichnung und das CAD stimmen nach Korrektur unserer Zuordnung überein:
 Gehäuse 10 × M3 auf Ø72,5 mm plus zwei Zentrierhülsen; Ausgang 12 × M4 auf Ø44 mm.
 Die Platten sind entsprechend korrigiert. Die [X6-Passungs- und Schraubenauslegung](x6-fits-fasteners.md)
 führt Rundbohrung/Langloch und versenkte Schraubenstapel einschließlich der
-noch zu bestätigenden Gehäusegewindetiefe. Der [X6-Bericht](x6-interface-resolution.md)
+noch zu bestätigenden Gehäusegewindetiefe. Der [X6-Bericht](x6-fits-fasteners.md#merged-x6-interface-resolution)
 und der [Integrationsbericht](servo-integration.md) beschreiben die offenen Passungen,
 Freiräume und die um 40 mm verlängerte distale J6-Anordnung. Vorgehen steht im
 [Integrationsplan](vendor-cad-plan.md), Last-/Präzisionsnachweis in der

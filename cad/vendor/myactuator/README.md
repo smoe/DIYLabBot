@@ -48,7 +48,7 @@ und nominale Motorplatten-Schnittstellen. Geschlossene äußere Schalen werden
 zu Volumenkörpern; interne Teile und Kleinteile entfallen. Die Originale bleiben
 unverändert. Der [Integrationsbericht](../../../docs/servo-integration.md)
 dokumentiert die Integration und fehlende Fertigungsqualifikation.
-Die [X6-Lochbildklärung](../../../docs/x6-interface-resolution.md) korrigiert
+Die [X6-Lochbildklärung](../../../docs/x6-fits-fasteners.md#merged-x6-interface-resolution) korrigiert
 unsere frühere Zuordnung der Maßpfeile. Die X6-Ableitung `registered-v2` enthält
 auch die beiden Zentrierhülsen und die korrigierten Motorplatten-Schnittstellen.
 

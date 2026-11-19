@@ -239,7 +239,7 @@ Der ROS-Exporter übernimmt die Vendor-Details nicht in Strukturmeshes, sondern
 erzeugt sechs Gehäusequader und getrennte Kollisionshüllen. Änderungen an
 gemeinsamen Längen bewegen auch Vendor-Platzierungen und Gelenkanker. Der
 [Integrationsbericht](servo-integration.md) erklärt die direkte J3-Anordnung,
-verlängerte J6-Baugruppe. Die [X6-Lochbildklärung](x6-interface-resolution.md)
+verlängerte J6-Baugruppe. Die [X6-Lochbildklärung](x6-fits-fasteners.md#merged-x6-interface-resolution)
 korrigiert die frühere Maßpfeilzuordnung und ergänzt die Zentrierhülsen.
 
 Die [X6-Auslegung](x6-fits-fasteners.md) ergänzt in derselben Schnittstellenquelle
