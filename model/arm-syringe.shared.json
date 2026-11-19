@@ -1,0 +1,765 @@
+{
+  "format": "solidcraftbot.arm-syringe/1",
+  "id": "SP02_Dedicated1mLArm",
+  "status": "Arm-mounted single-syringe pneumatic concept; no hardware dosing qualification",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "volume": "uL"
+  },
+  "robot": {
+    "source": "model/robot.json",
+    "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+  },
+  "syringe_library": {
+    "source": "model/syringe-pipette.shared.json",
+    "source_sha256": "017103cfbee9809631ff29fb7a005a2e2428efb0074afe55e001fde5e9b2ff1b"
+  },
+  "syringe_id": "Fine",
+  "nominal_capacity_ul": 1000,
+  "fixed_tip_head": "macro",
+  "parameters": {
+    "outboard": {
+      "value": 90,
+      "unit": "mm",
+      "range": [
+        85,
+        130
+      ],
+      "meaning": "Assumed offset of syringe axis from upper-arm center plane"
+    },
+    "pitch": {
+      "value": 2,
+      "unit": "mm",
+      "range": [
+        1,
+        4
+      ],
+      "meaning": "Assumed screw lead per revolution; not a selected spindle"
+    },
+    "hoseInnerRadius": {
+      "value": 0.25,
+      "unit": "mm",
+      "range": [
+        0.15,
+        0.4
+      ],
+      "meaning": "Assumed pneumatic tube bore; no selected material"
+    },
+    "hoseOuterRadius": {
+      "value": 0.9,
+      "unit": "mm",
+      "range": [
+        0.7,
+        1.2
+      ],
+      "meaning": "Assumed tube outside radius"
+    },
+    "hoseLength": {
+      "value": 1193,
+      "unit": "mm",
+      "range": [
+        850,
+        1250
+      ],
+      "meaning": "Provisional whole-mm common physical cut from the framed named-state band and itemized assembly tolerances; no hardware-minimum claim"
+    },
+    "hoseBendRadius": {
+      "value": 12,
+      "unit": "mm",
+      "range": [
+        12,
+        30
+      ],
+      "meaning": "Provisional hard minimum bare-hose centerline radius, not a material qualification"
+    },
+    "strokeReserve": {
+      "value": 2,
+      "unit": "mm",
+      "range": [
+        0.5,
+        5
+      ],
+      "meaning": "Assumed reserve at both piston hard ends; no qualified switch or end-stop article"
+    },
+    "socketRadialClearance": {
+      "value": 0.05,
+      "unit": "mm",
+      "range": [
+        0.02,
+        0.15
+      ],
+      "meaning": "Provisional radial tube-to-socket clearance; compression seal and tolerances unqualified"
+    },
+    "hoseInsertionDepth": {
+      "value": 6,
+      "unit": "mm",
+      "range": [
+        4,
+        10
+      ],
+      "meaning": "Tube insertion from socket mouth to annular floor"
+    },
+    "strainReliefLength": {
+      "value": 10,
+      "unit": "mm",
+      "range": [
+        5,
+        20
+      ],
+      "meaning": "Straight supported hose length beyond each socket mouth"
+    },
+    "connectorStraightLead": {
+      "value": 10,
+      "unit": "mm",
+      "range": [
+        5,
+        20
+      ],
+      "meaning": "Unbent unsupported straight hose beyond each strain relief"
+    },
+    "tipEngagementLength": {
+      "value": 8,
+      "unit": "mm",
+      "range": [
+        5,
+        12
+      ],
+      "meaning": "Axial engagement of derived SP02 shaft inside fixed macro tip"
+    },
+    "tipTaperRelief": {
+      "value": 0.05,
+      "unit": "mm",
+      "range": [
+        0.02,
+        0.15
+      ],
+      "meaning": "Radial shaft relief at tip mouth above the lower seal circle"
+    }
+  },
+  "pump_mount": {
+    "link": "L2_UpperArm",
+    "axis_direction_zero": [
+      0,
+      0,
+      -1
+    ],
+    "shoulder_offset_mm": 30,
+    "outlet_direction_zero": [
+      0,
+      0,
+      1
+    ],
+    "orientation_status": "Piston +Y points to L2 -Z; outlet -Y points to L2 +Z",
+    "longitudinal_reference": "Preserve the source SinglePumpPlate axial envelope on reversal"
+  },
+  "head_mount": {
+    "link": "L6_BareFlange",
+    "flange_gap_mm": 4,
+    "changeable_during_operation": false
+  },
+  "default_state": "working",
+  "states": {
+    "upright": {
+      "joints_deg": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "stroke_fraction": 0,
+      "valve_deg": 0,
+      "hard_end_reference": true
+    },
+    "working": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "extended": {
+      "joints_deg": [
+        -20,
+        65,
+        35,
+        0,
+        80,
+        0
+      ],
+      "stroke_fraction": 0.75,
+      "valve_deg": 0
+    },
+    "pump_advanced": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.05,
+      "valve_deg": 0
+    },
+    "pump_retracted": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.95,
+      "valve_deg": 0
+    },
+    "isolated": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 90
+    },
+    "window_back": {
+      "joints_deg": [
+        -20,
+        -30,
+        -10,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_wrist_pos": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        30,
+        75,
+        30
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_wrist_neg": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        -30,
+        75,
+        -30
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_wrist_pitch_pos": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        110,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_wrist_pitch_neg": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        0,
+        -110,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_route_shortest": {
+      "joints_deg": [
+        -160.0,
+        65,
+        -10.0,
+        30.0,
+        -55.0,
+        -30.0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_route_longest": {
+      "joints_deg": [
+        -20,
+        45,
+        60,
+        -30,
+        110,
+        30
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_carrier_mid": {
+      "joints_deg": [
+        -20,
+        45,
+        48,
+        0,
+        75,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_camera_mount": {
+      "joints_deg": [
+        -160,
+        65,
+        65,
+        -30,
+        110,
+        30
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    },
+    "window_route_shortest_revised": {
+      "joints_deg": [
+        -160,
+        -30,
+        -10,
+        30,
+        110,
+        0
+      ],
+      "stroke_fraction": 0.5,
+      "valve_deg": 0
+    }
+  },
+  "qualification": {
+    "dimensions_measured": false,
+    "dosing_accuracy_verified": false,
+    "leakage_verified": false,
+    "actuator_force_verified": false,
+    "mount_strength_verified": false,
+    "hose_full_range_verified": false,
+    "hardware_execution_implemented": false
+  },
+  "open_requirements": {
+    "syringe_article": null,
+    "tip_article": null,
+    "motor_and_spindle_article": null,
+    "clamp_fasteners_and_load": null,
+    "tube_article_and_minimum_bend_radius_mm": null,
+    "pressure_and_volume_calibration": null,
+    "usable_dose_range_ul": null,
+    "permitted_dose_error_ul": null,
+    "permitted_leak_rate_ul_s": null,
+    "position_feedback_and_endstop_articles": null,
+    "drive_nut_retention_method": null,
+    "socket_ferrules_seals_and_tolerances": null,
+    "hose_clamps_and_strain_relief": null,
+    "tip_insertion_and_retention_forces": null
+  },
+  "inspiration": {
+    "url": "https://de.aliexpress.com/item/1005013047448030.html",
+    "inspected": false,
+    "note": "User-supplied reference; browser site-safety policy prevented inspection. No product geometry or specifications assumed."
+  },
+  "limitations": [
+    "Only one nominal 1 mL syringe and one fixed tip family are carried by this arm; no 10 mL syringe or automatic tool changer.",
+    "All added mechanical dimensions, spindle lead, hose and connector details are design assumptions.",
+    "The perfusor analogy describes motor-driven piston translation; the syringe moves air rather than directly infusing liquid.",
+    "Screw rotation and carriage translation are source-coupled, but no torque, backlash, motor steps, sensors or real dose are qualified.",
+    "Arm source geometry and cameras are referenced unchanged; mounting contacts are provisional clamp envelopes.",
+    "Hose shapes are checked static routes of constant modeled length, not a dynamic hose, full-range routing, torsion, fatigue or pinch proof.",
+    "No timed robot transport, runtime sample ledger, device firmware, medical use or hardware execution is introduced.",
+    "The jointwise inspection window is a tooling-use assumption for named static builds, not a collision-free Cartesian product or a hardware controller limit. Other combinations require separate routing and collision checks.",
+    "Only named source configurations are supported static snapshots. Cartesian corner/edge trials are diagnostics; unsupported trials remain explicitly classified and are not available motions or verified operating states."
+  ],
+  "operating_window_status": "Tooling usage assumption; not robot limits or hardware qualification",
+  "operating_window_deg": {
+    "J1_BaseYaw": {
+      "range": [
+        -160,
+        160
+      ],
+      "reason": "Full source range; yaw rotates the arm and its awareness camera together."
+    },
+    "J2_Shoulder": {
+      "range": [
+        -30,
+        65
+      ],
+      "reason": "Tooling-use assumption: retain the provisional -30 deg pump/turret margin; cap at65 deg after native folded-head/base collisions at75/80 deg. The65 deg boundary and working/extended poses were checked, not hardware qualified."
+    },
+    "J3_Elbow": {
+      "range": [
+        -10,
+        65
+      ],
+      "reason": "Tooling-use assumption for the fixed macro head: native folded poses at105-135 deg hit shoulder/camera geometry; conservative finite all-body studies support a65 deg cap together with J2<=65. The -10 deg pump/forearm margin is retained; robot limits remain unchanged."
+    },
+    "J4_ForearmRoll": {
+      "range": [
+        -30,
+        30
+      ],
+      "reason": "Owner usage assumption: hose crosses forearm roll; vertical pipetting needs no larger roll."
+    },
+    "J5_WristPitch": {
+      "range": [
+        -110,
+        110
+      ],
+      "reason": "Full source range, subject to native boundary-state checks."
+    },
+    "J6_FlangeRoll": {
+      "range": [
+        -30,
+        30
+      ],
+      "reason": "Owner usage assumption: TCP lies on J6 axis and the tip is axisymmetric; pneumatic side entry still needs routing checks."
+    }
+  },
+  "hose_length_design": {
+    "allowances": [
+      {
+        "id": "cut_tolerance",
+        "value_mm": 1,
+        "reason": "Provisional cutting and trimming allowance; no measured cutting process"
+      },
+      {
+        "id": "pump_insertion_tolerance",
+        "value_mm": 0.25,
+        "reason": "Provisional pump socket depth/assembly tolerance beyond the nominal insertion already counted"
+      },
+      {
+        "id": "tip_insertion_tolerance",
+        "value_mm": 0.25,
+        "reason": "Provisional head socket depth/assembly tolerance beyond the nominal insertion already counted"
+      },
+      {
+        "id": "guide_entry_position",
+        "value_mm": 0.5,
+        "reason": "Provisional guide entry placement tolerance"
+      },
+      {
+        "id": "guide_exit_position",
+        "value_mm": 0.5,
+        "reason": "Provisional guide exit placement tolerance"
+      },
+      {
+        "id": "ordinary_clip_positions",
+        "value_mm": 1,
+        "reason": "Provisional combined placement budget for the ordinary routing clips"
+      }
+    ],
+    "scan_max_step_deg": 30,
+    "max_service_loop_mm": 80,
+    "loop_sample_step_mm": 5,
+    "cut_resolution_mm": 1,
+    "clearance_sample_step_mm": 2,
+    "clearance_minimum_step_mm": 0.05,
+    "scope": "Minimum demonstrated under stated source frames, finite loop samples and conservative source-envelope checks; all named static states retained, no continuous-motion allowance or hardware minimum claim"
+  },
+  "carrier_routing": {
+    "frames": {
+      "guide_entry": {
+        "link": "L2_UpperArm",
+        "origin": [
+          "-outboard-20",
+          120,
+          "elbow_z-20"
+        ],
+        "tangent": [
+          0,
+          0,
+          -1
+        ],
+        "x": [
+          -1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "guide_exit": {
+        "link": "L3_Elbow",
+        "origin": [
+          -10,
+          120,
+          "elbow_z+20"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "service_loop": {
+        "link": "L3_Elbow",
+        "origin": [
+          -60,
+          "80+serviceLoop",
+          "roll_z+20"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "pre_roll": {
+        "link": "L3_Elbow",
+        "origin": [
+          -60,
+          45,
+          "roll_z+50"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "roll_clip": {
+        "link": "L4_ForearmRoll",
+        "origin": [
+          0,
+          35,
+          "wrist_z-45"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 10
+      },
+      "wrist_clip": {
+        "link": "L5_WristPitch",
+        "origin": [
+          0,
+          65,
+          "wrist_z"
+        ],
+        "tangent": [
+          0,
+          1,
+          0
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 10
+      },
+      "approach_wrist": {
+        "link": "L4_ForearmRoll",
+        "origin": [
+          0,
+          45,
+          "wrist_z-15"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "post_wrist": {
+        "link": "L5_WristPitch",
+        "origin": [
+          -40,
+          80,
+          "wrist_z+35"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x": [
+          1,
+          0,
+          0
+        ],
+        "clamp_length_mm": 0
+      },
+      "pre_flange": {
+        "link": "L5_WristPitch",
+        "origin": [
+          -64,
+          0,
+          "tip_air_zero_z"
+        ],
+        "tangent": [
+          1,
+          0,
+          0
+        ],
+        "x": [
+          0,
+          1,
+          0
+        ],
+        "clamp_length_mm": 0
+      }
+    },
+    "sequence": [
+      "pump",
+      "guide_entry",
+      "guide_exit",
+      "service_loop",
+      "pre_roll",
+      "roll_clip",
+      "approach_wrist",
+      "wrist_clip",
+      "post_wrist",
+      "pre_flange",
+      "tip"
+    ],
+    "guide": {
+      "from": "guide_entry",
+      "to": "guide_exit",
+      "search_frame": "guide_entry",
+      "endpoint_straights_mm": [
+        "connectorStraightLead",
+        "connectorStraightLead"
+      ],
+      "external_straights_mm": [
+        "connectorStraightLead",
+        "connectorStraightLead"
+      ]
+    },
+    "bare_fit": {
+      "tangent_distance_multipliers": [
+        1,
+        1.5,
+        2,
+        3,
+        4,
+        6,
+        8
+      ]
+    },
+    "crossings": {
+      "J3_Elbow": "guide_exit",
+      "J4_ForearmRoll": "roll_clip",
+      "J5_WristPitch": "wrist_clip",
+      "J6_FlangeRoll": {
+        "interface": "tip",
+        "station": "unsupported_exit_mm"
+      }
+    },
+    "sample_step_mm": 3
+  },
+  "hose_carrier": {
+    "source": "model/spatial-hose-carrier.shared.json",
+    "source_sha256": "6c1a24bcb15d91d620f1a413d86410138f2390bfdb3bd774851574aa4dc21396"
+  },
+  "connections": {
+    "kind": "tube_in_socket",
+    "status": "Assumed ferrule/compression retention and seal on tube OD; not a selected or qualified fitting",
+    "pump": {
+      "body": "PumpHoseBarb",
+      "component": "PumpFrame",
+      "floor": [
+        "-spacing/2",
+        -79,
+        "axisZ"
+      ],
+      "outward": [
+        0,
+        -1,
+        0
+      ],
+      "x": [
+        1,
+        0,
+        0
+      ],
+      "outer_radius_mm": 2,
+      "through_length_mm": 2,
+      "clamp_body": "PumpHoseClamp"
+    },
+    "tip": {
+      "body": "TipSidePort",
+      "component": "WristHead",
+      "floor": [
+        -11,
+        -95,
+        "axisZ-27"
+      ],
+      "outward": [
+        -1,
+        0,
+        0
+      ],
+      "x": [
+        0,
+        1,
+        0
+      ],
+      "outer_radius_mm": 2,
+      "through_length_mm": 4,
+      "clamp_body": "TipHoseClamp"
+    }
+  },
+  "tip_seat": {
+    "kind": "relieved_shaft_single_seal_circle",
+    "status": "Derived SP02 taper seat; insertion, retention force and gas tightness unqualified",
+    "consumable_component": "ConsumableTip",
+    "shaft_body": "TipShaft",
+    "tip_body": "DisposableTip"
+  }
+}

@@ -1,0 +1,1053 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.arm-syringe/1"
+    },
+    "id": {
+      "const": "SP02_Dedicated1mLArm"
+    },
+    "status": {
+      "const": "Arm-mounted single-syringe pneumatic concept; no hardware dosing qualification"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "volume": "uL"
+      }
+    },
+    "syringe_id": {
+      "const": "Fine"
+    },
+    "nominal_capacity_ul": {
+      "const": 1000
+    },
+    "fixed_tip_head": {
+      "const": "macro"
+    },
+    "pump_mount": {
+      "const": {
+        "link": "L2_UpperArm",
+        "axis_direction_zero": [
+          0,
+          0,
+          -1
+        ],
+        "shoulder_offset_mm": 30,
+        "outlet_direction_zero": [
+          0,
+          0,
+          1
+        ],
+        "orientation_status": "Piston +Y points to L2 -Z; outlet -Y points to L2 +Z",
+        "longitudinal_reference": "Preserve the source SinglePumpPlate axial envelope on reversal"
+      }
+    },
+    "head_mount": {
+      "const": {
+        "link": "L6_BareFlange",
+        "flange_gap_mm": 4,
+        "changeable_during_operation": false
+      }
+    },
+    "default_state": {
+      "const": "working"
+    },
+    "inspiration": {
+      "const": {
+        "url": "https://de.aliexpress.com/item/1005013047448030.html",
+        "inspected": false,
+        "note": "User-supplied reference; browser site-safety policy prevented inspection. No product geometry or specifications assumed."
+      }
+    },
+    "robot": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "syringe_library": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "outboard": {
+          "$ref": "#/$defs/parameter"
+        },
+        "pitch": {
+          "$ref": "#/$defs/parameter"
+        },
+        "hoseInnerRadius": {
+          "$ref": "#/$defs/parameter"
+        },
+        "hoseOuterRadius": {
+          "$ref": "#/$defs/parameter"
+        },
+        "hoseLength": {
+          "$ref": "#/$defs/parameter"
+        },
+        "hoseBendRadius": {
+          "$ref": "#/$defs/parameter"
+        },
+        "strokeReserve": {
+          "$ref": "#/$defs/parameter"
+        },
+        "socketRadialClearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "hoseInsertionDepth": {
+          "$ref": "#/$defs/parameter"
+        },
+        "strainReliefLength": {
+          "$ref": "#/$defs/parameter"
+        },
+        "connectorStraightLead": {
+          "$ref": "#/$defs/parameter"
+        },
+        "tipEngagementLength": {
+          "$ref": "#/$defs/parameter"
+        },
+        "tipTaperRelief": {
+          "$ref": "#/$defs/parameter"
+        }
+      },
+      "required": [
+        "outboard",
+        "pitch",
+        "hoseInnerRadius",
+        "hoseOuterRadius",
+        "hoseLength",
+        "hoseBendRadius",
+        "strokeReserve",
+        "socketRadialClearance",
+        "hoseInsertionDepth",
+        "strainReliefLength",
+        "connectorStraightLead",
+        "tipEngagementLength",
+        "tipTaperRelief"
+      ],
+      "additionalProperties": false
+    },
+    "states": {
+      "type": "object",
+      "properties": {
+        "upright": {
+          "$ref": "#/$defs/state"
+        },
+        "working": {
+          "$ref": "#/$defs/state"
+        },
+        "extended": {
+          "$ref": "#/$defs/state"
+        },
+        "pump_advanced": {
+          "$ref": "#/$defs/state"
+        },
+        "pump_retracted": {
+          "$ref": "#/$defs/state"
+        },
+        "isolated": {
+          "$ref": "#/$defs/state"
+        }
+      },
+      "required": [
+        "upright",
+        "working",
+        "extended",
+        "pump_advanced",
+        "pump_retracted",
+        "isolated",
+        "window_back",
+        "window_wrist_pos",
+        "window_wrist_neg",
+        "window_wrist_pitch_pos",
+        "window_wrist_pitch_neg",
+        "window_route_shortest",
+        "window_route_longest",
+        "window_carrier_mid",
+        "window_camera_mount",
+        "window_route_shortest_revised"
+      ],
+      "additionalProperties": {
+        "$ref": "#/$defs/state"
+      },
+      "propertyNames": {
+        "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "properties": {
+        "dimensions_measured": {
+          "const": false
+        },
+        "dosing_accuracy_verified": {
+          "const": false
+        },
+        "leakage_verified": {
+          "const": false
+        },
+        "actuator_force_verified": {
+          "const": false
+        },
+        "mount_strength_verified": {
+          "const": false
+        },
+        "hose_full_range_verified": {
+          "const": false
+        },
+        "hardware_execution_implemented": {
+          "const": false
+        }
+      },
+      "required": [
+        "dimensions_measured",
+        "dosing_accuracy_verified",
+        "leakage_verified",
+        "actuator_force_verified",
+        "mount_strength_verified",
+        "hose_full_range_verified",
+        "hardware_execution_implemented"
+      ],
+      "additionalProperties": false
+    },
+    "open_requirements": {
+      "type": "object",
+      "properties": {
+        "syringe_article": {
+          "type": "null"
+        },
+        "tip_article": {
+          "type": "null"
+        },
+        "motor_and_spindle_article": {
+          "type": "null"
+        },
+        "clamp_fasteners_and_load": {
+          "type": "null"
+        },
+        "tube_article_and_minimum_bend_radius_mm": {
+          "type": "null"
+        },
+        "pressure_and_volume_calibration": {
+          "type": "null"
+        },
+        "usable_dose_range_ul": {
+          "type": "null"
+        },
+        "permitted_dose_error_ul": {
+          "type": "null"
+        },
+        "permitted_leak_rate_ul_s": {
+          "type": "null"
+        },
+        "position_feedback_and_endstop_articles": {
+          "type": "null"
+        },
+        "drive_nut_retention_method": {
+          "type": "null"
+        },
+        "socket_ferrules_seals_and_tolerances": {
+          "type": "null"
+        },
+        "hose_clamps_and_strain_relief": {
+          "type": "null"
+        },
+        "tip_insertion_and_retention_forces": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "syringe_article",
+        "tip_article",
+        "motor_and_spindle_article",
+        "clamp_fasteners_and_load",
+        "tube_article_and_minimum_bend_radius_mm",
+        "pressure_and_volume_calibration",
+        "usable_dose_range_ul",
+        "permitted_dose_error_ul",
+        "permitted_leak_rate_ul_s",
+        "position_feedback_and_endstop_articles",
+        "drive_nut_retention_method",
+        "socket_ferrules_seals_and_tolerances",
+        "hose_clamps_and_strain_relief",
+        "tip_insertion_and_retention_forces"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "operating_window_deg": {
+      "type": "object",
+      "properties": {
+        "J1_BaseYaw": {
+          "$ref": "#/$defs/operatingWindow"
+        },
+        "J2_Shoulder": {
+          "$ref": "#/$defs/operatingWindow"
+        },
+        "J3_Elbow": {
+          "$ref": "#/$defs/operatingWindow"
+        },
+        "J4_ForearmRoll": {
+          "$ref": "#/$defs/operatingWindow"
+        },
+        "J5_WristPitch": {
+          "$ref": "#/$defs/operatingWindow"
+        },
+        "J6_FlangeRoll": {
+          "$ref": "#/$defs/operatingWindow"
+        }
+      },
+      "required": [
+        "J1_BaseYaw",
+        "J2_Shoulder",
+        "J3_Elbow",
+        "J4_ForearmRoll",
+        "J5_WristPitch",
+        "J6_FlangeRoll"
+      ],
+      "additionalProperties": false
+    },
+    "operating_window_status": {
+      "const": "Tooling usage assumption; not robot limits or hardware qualification"
+    },
+    "hose_length_design": {
+      "type": "object",
+      "properties": {
+        "scan_max_step_deg": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "max_service_loop_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "loop_sample_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "cut_resolution_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "clearance_sample_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "clearance_minimum_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowances": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "value_mm": {
+                "type": "number",
+                "minimum": 0
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "id",
+              "value_mm",
+              "reason"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "scan_max_step_deg",
+        "max_service_loop_mm",
+        "loop_sample_step_mm",
+        "cut_resolution_mm",
+        "clearance_sample_step_mm",
+        "clearance_minimum_step_mm",
+        "scope",
+        "allowances"
+      ],
+      "additionalProperties": false
+    },
+    "hose_carrier": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false
+    },
+    "carrier_routing": {
+      "type": "object",
+      "properties": {
+        "frames": {
+          "type": "object",
+          "minProperties": 2,
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "link": {
+                "type": "string",
+                "minLength": 1
+              },
+              "origin": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "tangent": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "x": {
+                "type": "array",
+                "items": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "minItems": 3,
+                "maxItems": 3
+              },
+              "clamp_length_mm": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              }
+            },
+            "required": [
+              "link",
+              "origin",
+              "tangent",
+              "x",
+              "clamp_length_mm"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "sequence": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 4,
+          "uniqueItems": true
+        },
+        "guide": {
+          "type": "object",
+          "properties": {
+            "from": {
+              "type": "string"
+            },
+            "to": {
+              "type": "string"
+            },
+            "search_frame": {
+              "type": "string"
+            },
+            "endpoint_straights_mm": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "external_straights_mm": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "from",
+            "to",
+            "search_frame",
+            "endpoint_straights_mm",
+            "external_straights_mm"
+          ],
+          "additionalProperties": false
+        },
+        "bare_fit": {
+          "type": "object",
+          "properties": {
+            "tangent_distance_multipliers": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            }
+          },
+          "required": [
+            "tangent_distance_multipliers"
+          ],
+          "additionalProperties": false
+        },
+        "crossings": {
+          "type": "object",
+          "properties": {
+            "J3_Elbow": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "interface": {
+                      "enum": [
+                        "pump",
+                        "tip"
+                      ]
+                    },
+                    "station": {
+                      "enum": [
+                        "material_end_mm",
+                        "pneumatic_junction_mm",
+                        "socket_mouth_mm",
+                        "unsupported_exit_mm",
+                        "bend_start_mm"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "interface",
+                    "station"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "J4_ForearmRoll": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "interface": {
+                      "enum": [
+                        "pump",
+                        "tip"
+                      ]
+                    },
+                    "station": {
+                      "enum": [
+                        "material_end_mm",
+                        "pneumatic_junction_mm",
+                        "socket_mouth_mm",
+                        "unsupported_exit_mm",
+                        "bend_start_mm"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "interface",
+                    "station"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "J5_WristPitch": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "interface": {
+                      "enum": [
+                        "pump",
+                        "tip"
+                      ]
+                    },
+                    "station": {
+                      "enum": [
+                        "material_end_mm",
+                        "pneumatic_junction_mm",
+                        "socket_mouth_mm",
+                        "unsupported_exit_mm",
+                        "bend_start_mm"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "interface",
+                    "station"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            },
+            "J6_FlangeRoll": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "interface": {
+                      "enum": [
+                        "pump",
+                        "tip"
+                      ]
+                    },
+                    "station": {
+                      "enum": [
+                        "material_end_mm",
+                        "pneumatic_junction_mm",
+                        "socket_mouth_mm",
+                        "unsupported_exit_mm",
+                        "bend_start_mm"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "interface",
+                    "station"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "required": [
+            "J3_Elbow",
+            "J4_ForearmRoll",
+            "J5_WristPitch",
+            "J6_FlangeRoll"
+          ],
+          "additionalProperties": false
+        },
+        "sample_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "frames",
+        "sequence",
+        "guide",
+        "bare_fit",
+        "crossings",
+        "sample_step_mm"
+      ],
+      "additionalProperties": false
+    },
+    "connections": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "tube_in_socket"
+        },
+        "status": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pump": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string",
+              "minLength": 1
+            },
+            "component": {
+              "type": "string",
+              "minLength": 1
+            },
+            "floor": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "outward": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "x": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "outer_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "through_length_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "clamp_body": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "body",
+            "component",
+            "floor",
+            "outward",
+            "x",
+            "outer_radius_mm",
+            "through_length_mm",
+            "clamp_body"
+          ],
+          "additionalProperties": false
+        },
+        "tip": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string",
+              "minLength": 1
+            },
+            "component": {
+              "type": "string",
+              "minLength": 1
+            },
+            "floor": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "outward": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "x": {
+              "type": "array",
+              "items": {
+                "type": [
+                  "number",
+                  "string"
+                ]
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "outer_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "through_length_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "clamp_body": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "body",
+            "component",
+            "floor",
+            "outward",
+            "x",
+            "outer_radius_mm",
+            "through_length_mm",
+            "clamp_body"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "kind",
+        "status",
+        "pump",
+        "tip"
+      ],
+      "additionalProperties": false
+    },
+    "tip_seat": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "relieved_shaft_single_seal_circle"
+        },
+        "status": {
+          "const": "Derived SP02 taper seat; insertion, retention force and gas tightness unqualified"
+        },
+        "consumable_component": {
+          "const": "ConsumableTip"
+        },
+        "shaft_body": {
+          "const": "TipShaft"
+        },
+        "tip_body": {
+          "const": "DisposableTip"
+        }
+      },
+      "required": [
+        "kind",
+        "status",
+        "consumable_component",
+        "shaft_body",
+        "tip_body"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "syringe_id",
+    "nominal_capacity_ul",
+    "fixed_tip_head",
+    "pump_mount",
+    "head_mount",
+    "default_state",
+    "inspiration",
+    "robot",
+    "syringe_library",
+    "parameters",
+    "states",
+    "qualification",
+    "open_requirements",
+    "limitations",
+    "operating_window_deg",
+    "operating_window_status",
+    "hose_length_design",
+    "hose_carrier",
+    "carrier_routing",
+    "connections",
+    "tip_seat"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          }
+        },
+        "meaning": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "value",
+        "unit",
+        "range",
+        "meaning"
+      ],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "joints_deg": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "number"
+          }
+        },
+        "stroke_fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "valve_deg": {
+          "enum": [
+            0,
+            90
+          ]
+        },
+        "hard_end_reference": {
+          "const": true
+        }
+      },
+      "required": [
+        "joints_deg",
+        "stroke_fraction",
+        "valve_deg"
+      ],
+      "additionalProperties": false,
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "hard_end_reference"
+            ]
+          },
+          "then": {
+            "properties": {
+              "stroke_fraction": {
+                "enum": [
+                  0,
+                  1
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "operatingWindow": {
+      "type": "object",
+      "properties": {
+        "range": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "range",
+        "reason"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
