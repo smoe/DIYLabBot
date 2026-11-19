@@ -30,7 +30,7 @@ lassen sich nicht erneut frisch einführen. Das Umbenennen einer realen Probe
 oder eines realen Gefäßes ist kein zulässiger Ersatz für eine Bestandsübernahme.
 
 Die E1-Quellen bleiben führend für die vorbereiteten Materialrollen:
-[Extraktion](extraction-automation.md) und [CUT&RUN](cutrun-preflight.md).
+[Extraktion](extraction-automation.md) und [CUT&RUN](cutrun-reference-profile.md#merged-cutrun-preflight).
 `material_workflow_sources.py` kompiliert diese Quellen selbst, friert den Plan
 ein und prüft Eingangs-/Produktbindungen. Es akzeptiert keinen selbst deklarierten
 fertigen Plan als Vertrauensnachweis. Reagenzmengen werden nicht aus abstrakten
