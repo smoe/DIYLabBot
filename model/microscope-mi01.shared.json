@@ -1,7 +1,7 @@
 {
   "format": "solidcraftbot.microscope/1",
   "id": "MicroscopeMI01",
-  "status": "Detailed upright research microscope concept; illustrative geometry, not a selected manufacturer instrument",
+  "status": "Research microscope MI01; carrier microscope stand unconfirmed; existing generic upright geometry is an illustrative placeholder, not manufacturer-qualified",
   "units": {"length": "mm", "angle": "deg"},
   "recipe": "upright_trinocular_fluorescence_v1",
   "parameters": {
@@ -20,11 +20,13 @@
     {"id": "20x", "band_color": "#4b9f75", "length_mm": 77}
   ],
   "reference": {
-    "url": "https://www.microscope.healthcare.nikon.com/products/upright-microscopes/eclipse-ni-series",
-    "use": "Visual and configuration reference for research microscope components; independent geometry, no manufacturer CAD or logos",
+    "url": "https://www.zeiss.com/microscopy/de/produkte/lichtmikroskope/weitfeldmikroskope/apotome-3.html",
+    "use": "Internal owner-confirmed equipment identity and manufacturer reference: ZEISS Apotome 3 optical-sectioning system; not a display label. No carrier microscope, dimensions or component configuration inferred; independent placeholder geometry without manufacturer CAD or logos",
     "dimensions_measured": false
   },
   "limitations": [
+    "The carrier microscope stand and actual objective, camera and illumination configuration remain unconfirmed; the generic upright recipe does not establish the installed stand type",
+    "No structured-illumination grid or optical-sectioning function is modeled or controlled; optional optical-processing features are not asserted",
     "Illustrative static instrument, including camera and fluorescence housing; no optical performance or control interface is implemented",
     "Objective labels and colors identify visible concept parts; focal lengths, numerical apertures, working distances and magnification are not calibrated",
     "No vibration isolation, structural, electrical, photobiological or hardware qualification"

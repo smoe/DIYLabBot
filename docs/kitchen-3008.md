@@ -109,3 +109,5 @@ Prüfung ohne reduzierte Bewegung bestätigt die laufende Schubladenanimation,
 gemeinsame Bewegung ihrer fünf Teile und die Sperre widersprüchlicher
 Befehle während der Bewegung. Die Fenster-/Raumkorrektur und die Innenmaße
 der geschlossenen Schubladen besitzen eigene Quellregressionstests.
+
+Die freigegebene Master-Integration verwendet `building-walkthrough-c0d9af3342c1-integration`. Sie erhält Kamerakollisionen, DOOM-Tastensteuerung und die neutralen Mikroskopangaben des aktuellen Masters. Die vollständige native Expansion ist identisch zum obigen Küchenstand; die dokumentierte Geometrieäquivalenz unter `building-stack-0c206a4d386e-kitchen-integration-r2` bindet die unveränderten CAD-/Mesh-Artefakte an die aktuellen Quellen. Küchenbedienung, Kamerakontakte, Büro–Labor–Aufzug-Weg und Browser-Tastensteuerung bestehen ihre separaten Nachweise. Die Veröffentlichung wird über das Pages-Publikationsmanifest an den integrierten Git-Commit und die geprüften HTML-Bytes gebunden.

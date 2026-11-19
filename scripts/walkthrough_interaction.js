@@ -181,6 +181,88 @@
     return {nearby,call,board,select,exit,attachedEye,
       get boarded(){return Boolean(passenger);},get portId(){return passenger?.port_id||null;}};
   }
-  const api={createPicker,jointMatrix,commandBlockers,createLiftDoorCycle,createLiftSession};
+  // Sphere translation against the native triangles. Conservative advancement
+  // uses the distance function's Lipschitz bound, not fixed movement samples.
+  function createCameraCollider({positions,indices,groups,radius,margin,iterations,slides}){
+    const plus=(a,b,s=1)=>a.map((v,i)=>v+s*b[i]);
+    const length=v=>Math.hypot(...v),unit=v=>{const n=length(v);return n>1e-15?v.map(x=>x/n):null;};
+    if(![radius,margin].every(v=>Number.isFinite(v)&&v>0)||margin>=radius
+      ||!Number.isInteger(iterations)||iterations<16||!Number.isInteger(slides)||slides<1)throw Error('Invalid camera envelope.');
+    const vertex=i=>[positions[3*i],positions[3*i+1],positions[3*i+2]];
+    function edgePoint(p,a,b){const ab=sub(b,a),n=dot(ab,ab);return plus(a,ab,n?Math.max(0,Math.min(1,dot(sub(p,a),ab)/n)):0);}
+    function closest(p,a,b,c){
+      const ab=sub(b,a),ac=sub(c,a),ap=sub(p,a);
+      if(dot(cross(ab,ac),cross(ab,ac))<1e-24){
+        return [[a,b],[b,c],[c,a]].map(([x,y])=>edgePoint(p,x,y)).sort((x,y)=>length(sub(p,x))-length(sub(p,y)))[0];
+      }
+      const d1=dot(ab,ap),d2=dot(ac,ap);if(d1<=0&&d2<=0)return a;
+      const bp=sub(p,b),d3=dot(ab,bp),d4=dot(ac,bp);if(d3>=0&&d4<=d3)return b;
+      const vc=d1*d4-d3*d2;if(vc<=0&&d1>=0&&d3<=0)return plus(a,ab,d1/(d1-d3));
+      const cp=sub(p,c),d5=dot(ab,cp),d6=dot(ac,cp);if(d6>=0&&d5<=d6)return c;
+      const vb=d5*d2-d1*d6;if(vb<=0&&d2>=0&&d6<=0)return plus(a,ac,d2/(d2-d6));
+      const va=d3*d6-d5*d4;if(va<=0&&(d4-d3)>=0&&(d5-d6)>=0)return plus(b,sub(c,b),(d4-d3)/((d4-d3)+(d5-d6)));
+      const denom=1/(va+vb+vc);return plus(plus(a,ab,vb*denom),ac,vc*denom);
+    }
+    function triangleHit(p,v,a,b,c,limit){
+      const speed=length(v);if(speed<1e-15)return null;
+      let time=0,normal;
+      for(let i=0;i<iterations;i++){
+        const point=plus(p,v,time),distanceVector=sub(point,closest(point,a,b,c)),distance=length(distanceVector);
+        normal=unit(distanceVector)||unit(cross(sub(b,a),sub(c,a)))||v.map(x=>-x/speed);
+        if(distance<1e-15&&dot(normal,v)>0)normal=normal.map(x=>-x);
+        // A triangle is convex: nonnegative distance derivative cannot turn
+        // into a later collision along this straight translation.
+        if(dot(normal,v)>=-1e-12)return null;
+        const gap=distance-radius-margin;
+        if(gap<=1e-8)return {time,normal};
+        const step=gap/speed;
+        if(time+step>limit)return null;
+        time+=step;
+      }
+      return {time,normal}; // Unresolved contact is a stop, never permission.
+    }
+    function overlaps(p,v,lo,hi,limit){
+      return p.every((x,i)=>Math.min(x,x+v[i]*limit)<=hi[i]+radius+margin&&Math.max(x,x+v[i]*limit)>=lo[i]-radius-margin);
+    }
+    function boxTriangles(lo,hi){
+      const q=Array.from({length:8},(_,i)=>lo.map((x,j)=>(i&(1<<j))?hi[j]:x));
+      return [[0,2,6,4],[1,5,7,3],[0,4,5,1],[2,3,7,6],[0,1,3,2],[4,6,7,5]].flatMap(([a,b,c,d])=>[[q[a],q[b],q[c]],[q[a],q[c],q[d]]]);
+    }
+    function firstHit(p,v,{transformsForBody=()=>[null],barriers=[]}={}){
+      let best=null;
+      function consider(a,b,c,local,transform,id){
+        const hit=triangleHit(local.origin,local.direction,a,b,c,best?best.time:1);
+        if(!hit||best&&hit.time>=best.time)return;
+        const n=hit.normal;
+        const normal=transform?[0,1,2].map(i=>transform[i]*n[0]+transform[4+i]*n[1]+transform[8+i]*n[2]):n;
+        best={...hit,normal,body_id:id};
+      }
+      for(const group of groups){
+        const lo=group.bounds_mm.min.map(x=>x/1000),hi=group.bounds_mm.max.map(x=>x/1000);
+        for(const transform of transformsForBody(group.id)){
+          const local=inverseRay(p,v,transform);
+          if(!overlaps(local.origin,local.direction,lo,hi,best?best.time:1))continue;
+          for(let i=group.index_start;i<group.index_start+group.index_count;i+=3)
+            consider(vertex(indices[i]),vertex(indices[i+1]),vertex(indices[i+2]),local,transform,group.id);
+        }
+      }
+      for(const barrier of barriers)if(overlaps(p,v,barrier.min,barrier.max,best?best.time:1))
+        for(const [a,b,c] of boxTriangles(barrier.min,barrier.max))consider(a,b,c,{origin:p,direction:v},null,barrier.id);
+      return best;
+    }
+    function move(start,delta,options={}){
+      if(![...start,...delta].every(Number.isFinite))throw Error('Finite camera translation required.');
+      let point=[...start],remaining=[...delta];const contacts=[],normals=[];
+      for(let i=0;i<slides&&length(remaining)>1e-10;i++){
+        const hit=firstHit(point,remaining,options);
+        if(!hit){point=plus(point,remaining);break;}
+        point=plus(point,remaining,hit.time);remaining=remaining.map(x=>x*(1-hit.time));contacts.push(hit.body_id);normals.push(hit.normal);
+        for(const n of normals){const into=dot(remaining,n);if(into<0)remaining=plus(remaining,n,-into);}
+      }
+      return {eye:point,contacts};
+    }
+    return {move,firstHit};
+  }
+  const api={createPicker,jointMatrix,commandBlockers,createLiftDoorCycle,createLiftSession,createCameraCollider};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.WalkthroughInteraction=api;
 })(globalThis);

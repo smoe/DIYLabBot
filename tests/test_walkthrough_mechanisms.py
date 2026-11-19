@@ -65,8 +65,32 @@ class MechanismTests(unittest.TestCase):
         self.assertEqual(self.objects['Lab3003.NanoDrop01.Hinge']['states']['reference'], 65)
         self.assertEqual(self.objects['Lab3003.Qubit01.Hinge']['states']['reference'], 95)
 
+    def test_technical_accesses_start_closed_without_changing_native_reference(self):
+        closed = set()
+        for level in ('OG1', 'OG2', 'OG3'):
+            for number in ('023', '024', '025', '026', '027'):
+                identity = level+'.D3_'+number+'.Door'
+                closed.add(identity)
+                obj = self.objects[identity]
+                self.assertEqual(obj['initial_state'], 'closed')
+                self.assertEqual(obj['reference_state'], 'open')
+        for identity in ('OG3.D3_002N.Door', 'OG3.D3_003A.Door', 'OG3.D3_003B.Door', 'OG3.D3_002_001.Door'):
+            self.assertEqual(self.objects[identity]['initial_state'], 'open')
+        for identity, obj in self.objects.items():
+            if obj.get('mechanism') == 'room_door' and identity not in closed:
+                self.assertEqual(obj['initial_state'], 'open')
+
+    def test_unknown_closed_access_bindings_fail_instead_of_closing_other_rooms(self):
+        source = json.loads((walkthrough.ROOT/'model/building-walkthrough.shared.json').read_text())
+        for policy in ({'MissingFloor': ['N3_026']}, {'OG3': ['MissingArea']}):
+            with self.subTest(policy=policy), self.assertRaises(ValueError):
+                mechanisms.room_doors(source['mechanisms']['room_doors'],
+                    {'levels': [], 'exterior': {'door_bindings': {}}}, {'operations': []},
+                    {'OG3': {'areas': []}}, {}, 1600, policy)
+
     def test_lift_has_one_cabin_and_only_active_landing_doors(self):
         lift = self.program['elevator']; cabin = self.objects[lift['object_id']]
+        self.assertTrue(all(a < b for a, b in zip(lift['shaft_bounds_mm']['min'], lift['shaft_bounds_mm']['max'])))
         self.assertEqual(cabin['moving_body_ids'].count('BuildingLiftCabin'), 1)
         self.assertIn('LiftControlPanel', cabin['moving_body_ids'])
         self.assertIn('LiftTelephone', cabin['moving_body_ids'])

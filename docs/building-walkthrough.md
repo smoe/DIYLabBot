@@ -1,5 +1,13 @@
 # Gebäude im Browser erkunden
 
+Die freie Kamera prüft ihre Translation kontinuierlich mit einer als Darstellungsannahme geführten Kugel gegen die nativen Dreiecksflächen, einschließlich der aktuellen Türposen. Sie gleitet an Hindernissen entlang; nicht aufgelöste Kontakte stoppen die Bewegung. Radius, Kontaktabstand und Rechengrenzen stehen einmalig unter `navigation` in `model/building-walkthrough.shared.json`. Das ist keine geprüfte menschliche Körperhülle oder reale Schutzfunktion.
+
+Die benannten kleinen Technikzugänge `N3_023` bis `N3_027` starten auf OG1–OG3 geschlossen. Labor- und Bürotüren starten weiterhin offen. Startzustand und native Referenzpose sind getrennt: Die bestehenden offenen Referenzgeometrien werden nicht geändert. Während Türbewegungen bleibt zusätzlich die geschlossene Durchgangspose für die Kamera gesperrt. Freies Bewegen in den Aufzugschacht ist auch bei fehlender Kabine gesperrt; Einsteigen, Mitfahren und Aussteigen erfolgen über die vorhandenen Aufzugbefehle. Blickpunkt- und Geschosswechsel bleiben ausdrücklich diskrete Ansichtswechsel, keine kollisionsgeprüften Gehwege.
+
+Die unabhängigen Kontaktfälle laufen mit `node tests/check_walkthrough_camera.cjs` oder über `python3 -m unittest discover -s tests -p test_walkthrough_camera.py -v`. Sie prüfen dünne Wände bei großen Schritten, Gleiten, Ecken, Böden, offene und geschlossene bewegte Türen, Dreieckskanten und den Schachtzugang. Neue Browserausgaben benötigen einen eigenen Darstellungsnachweis; diese Funktion qualifiziert weder Türschwenkräume noch Personen- oder Hardwarebetrieb.
+
+`node tests/check_walkthrough_camera_native.cjs <index.html>` prüft zusätzlich die tatsächlichen Türblätter `D3_026`/`D3_027`, die offenen Durchgänge von 3.002/3.003 und einen absichtlich geöffneten Schachtzugang im 3. OG ohne dortige Kabine. Die Schachtsperre wird aus den gemeinsamen Rahmenkörpern abgeleitet. Das Ergebnis wird als `camera-native-contacts.json` neben dem lokalen Export abgelegt.
+
 Der Rundgang bietet sieben direkte Blickpunkte: Doktorandenraum **3.002**,
 Labor **3.003**, Mikroskop **3.007**, Küchen **3.008** und **1.008**,
 den Blick durch den **Freiraum / das Atrium**
@@ -9,8 +17,9 @@ fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
 Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
 Labor 3.003 liegt jetzt im selben Gebäudebezug wie Flur, Büros und Aufzug.
 Die [öffentliche GitHub-Pages-Seite](https://smoe.github.io/DIYLabBot/) bleibt
-eine getrennt veröffentlichte Momentaufnahme; diese Erweiterung wird erst
-nach ausdrücklicher Freigabe dorthin übertragen.
+eine getrennt veröffentlichte Momentaufnahme. Ihr tatsächlicher Quellstand
+steht im [Publikationsmanifest](https://smoe.github.io/DIYLabBot/site-manifest.json).
+Lokale Erweiterungen werden nach ausdrücklicher Freigabe dorthin übertragen.
 
 ## Erzeugen und öffnen
 
@@ -52,15 +61,26 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 - Die sieben Ortsknöpfe öffnen die jeweiligen Blickpunkte.
 - Der Ortstitel bezeichnet den zuletzt gewählten Blickpunkt; freies Gehen
   schaltet diese Beschriftung nicht automatisch auf den betretenen Raum um.
-- **WASD / Pfeiltasten** bewegen die Kamera; **Ziehen** mit Maus oder Finger
-  ändert die Blickrichtung.
-- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt die Bewegung.
-- Bildschirmknöpfe bieten dieselbe Bewegung auf Touchgeräten.
+- **W / ↑** gehen vorwärts, **S / ↓** rückwärts. **← / →** drehen die
+  Blickrichtung, wie bei der klassischen Doom-Steuerung.
+- **Alt + ← / →** bewegen die Kamera seitwärts (Strafing); auf dem Mac heißt
+  die Taste **Option / ⌥**. **A / D** erlauben dieselbe Seitwärtsbewegung direkt.
+  Alt kann auch während einer gehaltenen Pfeiltaste gedrückt oder losgelassen
+  werden; die Steuerung wechselt unmittelbar zwischen Drehen und Seitwärtsgehen.
+- **Ziehen** mit Maus oder Finger ändert weiterhin die Blickrichtung.
+- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt das Gehen.
+- Die Bildschirmknöpfe verschieben die Kamera auch auf Touchgeräten; zum
+  Umschauen ziehen. Die seitlichen Knöpfe sind als „Strafe left/right“ bezeichnet.
+- In Eingabefeldern und der Geschossauswahl steuern die Tasten die jeweiligen
+  Bedienelemente. **Ctrl / Command**-Tastenkürzel bleiben dem Browser überlassen;
+  Fokusverlust oder ein ausgeblendeter Tab beendet gehaltene Kamerabewegungen.
 - Die Geschossauswahl ändert die Kamerahöhe im Gebäude. „Return to viewpoint“
   setzt den aktuellen Blickpunkt zurück; Vollbild vergrößert die Ansicht.
 
-Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Die freie
-Kamera hat keine Kollisionsprüfung und kann Wände oder Decken durchqueren.
+Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Freie
+Verschiebungen verwenden die oben beschriebene Kamerakugel-Prüfung an den
+nativen Flächen. Sie ist keine menschliche Körperhülle und kein Nachweis
+realer Begehbarkeit.
 
 ## Gemeinsame Gebäudeszene und Laborbindung
 
@@ -299,6 +319,27 @@ Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
 Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
 Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
 
+Die Doom-artige Kamerasteuerung besitzt außerdem eine gezielte Browserprüfung:
+
+```bash
+node tests/check_walkthrough_controls_browser.cjs exports/building-walkthrough/<Revision>/index.html
+```
+
+Für die Prüfung der öffentlichen Seite kann nach dem lokalen HTML, dem
+Playwright-Modul, dem Chrome-Pfad und dem Ausgabeordner zusätzlich eine
+HTTPS-URL übergeben werden. Der Test öffnet dann diese Seite tatsächlich im
+Browser und vergleicht ihre Antwortbytes mit dem geprüften lokalen HTML.
+
+Die Prüfung erfasst Drehen, Seitwärtsgehen, während des Haltens wechselnde Modifikatortasten,
+unabhängiges Loslassen mehrerer Tasten, Eingabefokus, Browserkurzbefehle und die
+Kamerabindung im Aufzug an der tatsächlichen exportierten Szene.
+`browser-controls-report.json` und ein Screenshot entstehen im ignorierten
+Exportverzeichnis. Ein kurzer Test mit realen Animationsframes wird durch
+kontrollierte Browser-Testzeit ergänzt; daraus folgt kein Echtzeit-Leistungsnachweis.
+Eine vom Testbrowser nicht herstellbare Tab-Ausblendung wird ausdrücklich als
+ungeprüft ausgewiesen. Diese Bedienprüfung ersetzt keine vollständige erneute
+Geometrie-, Kollisions-, Aufzugs- oder Sicherheitsqualifikation.
+
 ## Typweite Möbelbefehle
 
 Bewegliche Türen werden direkt im 3D-Bild bedient: **mit der Maus auf das
@@ -397,9 +438,10 @@ die Obergeschosse nur den äußeren Ausgang. Halte, Höhen und aktive Seiten sta
 
 Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
 wird nach jeder Objektaktualisierung absolut an den Kabinenzustand gebunden;
-es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind WASD,
-Pfeiltasten, Q/E, Bildschirmbewegung, freie Geschossauswahl, Ortsknöpfe und
-Laborisolation gesperrt. Umschauen bleibt möglich. Erst ein ausdrücklich
+es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind freie
+Verschiebung über WASD, ↑/↓, Alt/Option + ←/→, Q/E und Bildschirmbewegung
+sowie freie Geschossauswahl, Ortsknöpfe und Laborisolation gesperrt.
+Umschauen mit Maus oder ←/→ bleibt möglich. Erst ein ausdrücklich
 gewählter erlaubter Ausstieg löst die Kamerabindung. Weitere Befehle während
 einer Fahrt liefern `rejected_busy`; es gibt keine automatische Warteschlange.
 
