@@ -132,7 +132,7 @@
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
-    "Viewpoint changes and free camera controls are visual exploration; collision-free walking routes, accessibility and escape routes are not checked.",
+    "Free camera translation uses a presentation-radius sphere against native mesh triangles and excludes unboarded shaft entry. This is not a human-body, escape-route or real-world safety qualification.",
     "Furniture dimensions and the number of desks remain presentation assumptions; the 3.002 arrangement and first-aid location follow the owner description.",
     "Native CAD surfaces are tessellated with the recorded deflection. The semantic ConceptExchange marker is hidden in this viewer.",
     "Interactive opening is a browser-only illustration derived from shared joints and native reference poses; it does not control hardware.",
@@ -368,5 +368,35 @@
         }
       }
     }
+  },
+  "navigation": {
+    "camera_radius_mm": 150,
+    "contact_margin_mm": 1,
+    "max_contact_iterations": 64,
+    "max_slides": 4,
+    "closed_access_areas": {
+      "OG1": [
+        "N3_023",
+        "N3_024",
+        "N3_025",
+        "N3_026",
+        "N3_027"
+      ],
+      "OG2": [
+        "N3_023",
+        "N3_024",
+        "N3_025",
+        "N3_026",
+        "N3_027"
+      ],
+      "OG3": [
+        "N3_023",
+        "N3_024",
+        "N3_025",
+        "N3_026",
+        "N3_027"
+      ]
+    },
+    "basis": "presentation_assumption"
   }
 }

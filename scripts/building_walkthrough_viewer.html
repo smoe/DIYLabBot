@@ -149,7 +149,9 @@
         ||Math.abs(Math.hypot(...config.joint.axis)-1)>1e-7||!Array.isArray(config.moving_body_ids)||!config.moving_body_ids.length
         ||!Number.isFinite(config.duration_s)||config.duration_s<=0||!Number.isFinite(config.states?.[config.reference_state]))throw Error('Invalid articulated object.');
       if(!['revolute','prismatic'].includes(config.joint.type))throw Error('Unsupported articulated joint type.');
-      const object={config,state:config.reference_state,targetState:config.reference_state,value:config.states[config.reference_state],transition:null};
+      const initial=config.initial_state||config.reference_state;
+      if(!Number.isFinite(config.states[initial]))throw Error('Invalid initial articulated pose.');
+      const object={config,state:initial,targetState:initial,value:config.states[initial],transition:null};
       objectStates.set(config.id,object);objectSceneIds.add(config.scene);
       for(const body of config.moving_body_ids){const key=config.scene+':'+body;if(bodyOwners.has(key)||!data.scenes[config.scene].groups.some(g=>g.id===body))throw Error('Missing or multiply bound moving body.');bodyOwners.set(key,object);}
     }
@@ -331,7 +333,11 @@
       function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
       attribute(attributes.position,positions);attribute(attributes.normal,normals);
       const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
-      const result={picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
+      const nav=data.navigation;if(!nav)throw Error('Source-bound camera collision profile required.');
+      const collider=WalkthroughInteraction.createCameraCollider({positions,indices,
+        groups:source.groups.filter(g=>!omitted.has(g.id)&&g.index_count),radius:nav.camera_radius_mm/1000,
+        margin:nav.contact_margin_mm/1000,iterations:nav.max_contact_iterations,slides:nav.max_slides});
+      const result={collider,picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function render(){
@@ -358,7 +364,24 @@
       let f=(keys.has('forward')?1:0)-(keys.has('back')?1:0),r=(keys.has('right')?1:0)-(keys.has('left')?1:0),z=(keys.has('up')?1:0)-(keys.has('down')?1:0);
       const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
       const speed=walkSpeed*(keys.has('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
-      eye[0]+=dx*speed*seconds;eye[1]+=dy*speed*seconds;eye[2]+=z*verticalSpeed*seconds;
+      const delta=[dx*speed*seconds,dy*speed*seconds,z*verticalSpeed*seconds];
+      if(f||r||z){
+        const barriers=[];
+        // Free movement never boards the cabin or enters the shaft. Only the
+        // existing checked boarding/exit protocol owns that transition.
+        if(elevatorConfig&&sceneId==='building'){
+          const bounds=elevatorConfig.shaft_bounds_mm;if(!bounds)throw Error('Source-derived shaft envelope required.');
+          barriers.push({id:'UnboardedLiftShaft',min:bounds.min.map(v=>v/1000),max:bounds.max.map(v=>v/1000)});
+        }
+        const result=prepareScene(sceneId).collider.move(eye,delta,{barriers,transformsForBody:id=>{
+          const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
+          const transforms=[objectMatrix(owner)];
+          // During a door transition keep the doorway guarded until fully open.
+          if(['room_door','lift_door'].includes(owner.config.mechanism)&&owner.transition)transforms.push(objectMatrix(owner,true));
+          return transforms;
+        }});
+        eye=result.eye;root.dataset.cameraBlocked=String(result.contacts.length>0);
+      }
       if(f||r||z){root.dataset.freeCamera='true';dirty=true;}
     }
     function tick(now){

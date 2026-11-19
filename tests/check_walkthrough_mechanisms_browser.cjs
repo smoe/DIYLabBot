@@ -26,11 +26,14 @@ const {chromium}=require(process.argv[3]||'playwright');
     // Every native room door completes a close/open cycle; all window details
     // share the same rigid transform. This includes every steel basement leaf.
     for(const room of rooms){
-      assert.equal((await command(room.id,'close')).status,'accepted');await settled(room.id,'closed');
+      const initial=room.initial_state||room.reference_state;
+      assert.equal((await state(room.id)).state,initial,'Source-defined initial pose');
+      assert.equal((await command(room.id,'close')).status,initial==='closed'?'already_in_state':'accepted');await settled(room.id,'closed');
       const closed=await state(room.id);assert.equal(closed.angle_deg,0);
       assert(Object.values(closed.body_angles_deg).every(v=>v===0));
       assert.equal((await command(room.id,'open')).status,'accepted');await settled(room.id,'open');
       assert.deepEqual((await state(room.id)).model_matrix,[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+      if(initial==='closed'){assert.equal((await command(room.id,'close')).status,'accepted');await settled(room.id,'closed');}
     }
     const freezer='Lab3003.Freezer01.',outer=freezer+'OuterDoor';
     assert.equal((await command(outer,'close')).status,'rejected_interlock');

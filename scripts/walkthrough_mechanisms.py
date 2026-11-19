@@ -38,10 +38,16 @@ def presentation(profile, identity, level, joint, moving, states, reference, eye
             'qualification': {key: False for key in art.QUALIFICATIONS}}
 
 
-def room_doors(profile, interface, expanded, plans, parameters, eye_height):
+def room_doors(profile, interface, expanded, plans, parameters, eye_height, closed_access_areas=None):
     operations = {op['body']: op for op in expanded['operations'] if op['action'] == 'create'}
     level_labels = {level['id']: level['label'] for level in interface['levels']}
     result = []
+    access_walls = {}
+    for level, names in (closed_access_areas or {}).items():
+        art.require(level in plans, 'Known floor for closed access areas required')
+        areas = {area['id']: area for area in plans[level]['areas']}
+        art.require(set(names) <= set(areas), 'Known closed access areas required')
+        access_walls[level] = {edge['wall'] for name in names for edge in areas[name]['boundary']}
     for key, binding in interface['exterior']['door_bindings'].items():
         level, opening_id = key.split('__', 1)
         plan = plans[level]
@@ -73,7 +79,8 @@ def room_doors(profile, interface, expanded, plans, parameters, eye_height):
             {'id': 'Door', 'type': 'revolute', 'origin_mm': hinge+[shape['offset']], 'axis': [0, 0, sign], 'limits_deg': [0, 90]},
             [binding['leaf_body_id'], *binding['detail_body_ids']], {'closed': 0, 'open': 90}, 'open',
             eye, target, level_labels[level], opening_id) | {'front': opened+[0], 'mechanism': 'room_door',
-                'opening_id': opening_id, 'material': binding['material']})
+                'opening_id': opening_id, 'material': binding['material'],
+                'initial_state': 'closed' if door['wall'] in access_walls.get(level, set()) else 'open'})
     return result
 
 

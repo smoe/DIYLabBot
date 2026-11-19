@@ -1,7 +1,7 @@
 """Derive a browser-only lift from the existing building circulation interface."""
 import math
 
-from atrium_seating import body_bounds
+from atrium_seating import body_bounds, combine_bounds
 import furniture_articulation as articulation
 
 
@@ -68,6 +68,10 @@ def compile(source, building, parameters, interface, expanded, plan, eye_height)
         'reference_level': reference, 'reference_z_mm': reference_z,
         'cabin_bounds_mm': bounds, 'ports': ports,
         'lift_operation_implemented': False}
+    if lift.get('shaft_body_ids'):
+        shaft = body_bounds([op for op in expanded['operations'] if op['body'] in lift['shaft_body_ids']])
+        articulation.require(set(shaft) == set(lift['shaft_body_ids']), 'Complete native-source shaft envelope required')
+        config['shaft_bounds_mm'] = combine_bounds(shaft.values())
     for port in ports:
         articulation.require(all(math.isfinite(v) for v in port['cabin_entry_mm']+port['exit_eye_mm']),
                              'Finite source-derived lift ports required')

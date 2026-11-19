@@ -1,5 +1,13 @@
 # Gebäude im Browser erkunden
 
+Die freie Kamera prüft ihre Translation kontinuierlich mit einer als Darstellungsannahme geführten Kugel gegen die nativen Dreiecksflächen, einschließlich der aktuellen Türposen. Sie gleitet an Hindernissen entlang; nicht aufgelöste Kontakte stoppen die Bewegung. Radius, Kontaktabstand und Rechengrenzen stehen einmalig unter `navigation` in `model/building-walkthrough.shared.json`. Das ist keine geprüfte menschliche Körperhülle oder reale Schutzfunktion.
+
+Die benannten kleinen Technikzugänge `N3_023` bis `N3_027` starten auf OG1–OG3 geschlossen. Labor- und Bürotüren starten weiterhin offen. Startzustand und native Referenzpose sind getrennt: Die bestehenden offenen Referenzgeometrien werden nicht geändert. Während Türbewegungen bleibt zusätzlich die geschlossene Durchgangspose für die Kamera gesperrt. Freies Bewegen in den Aufzugschacht ist auch bei fehlender Kabine gesperrt; Einsteigen, Mitfahren und Aussteigen erfolgen über die vorhandenen Aufzugbefehle. Blickpunkt- und Geschosswechsel bleiben ausdrücklich diskrete Ansichtswechsel, keine kollisionsgeprüften Gehwege.
+
+Die unabhängigen Kontaktfälle laufen mit `node tests/check_walkthrough_camera.cjs` oder über `python3 -m unittest discover -s tests -p test_walkthrough_camera.py -v`. Sie prüfen dünne Wände bei großen Schritten, Gleiten, Ecken, Böden, offene und geschlossene bewegte Türen, Dreieckskanten und den Schachtzugang. Neue Browserausgaben benötigen einen eigenen Darstellungsnachweis; diese Funktion qualifiziert weder Türschwenkräume noch Personen- oder Hardwarebetrieb.
+
+`node tests/check_walkthrough_camera_native.cjs <index.html>` prüft zusätzlich die tatsächlichen Türblätter `D3_026`/`D3_027`, die offenen Durchgänge von 3.002/3.003 und einen absichtlich geöffneten Schachtzugang im 3. OG ohne dortige Kabine. Die Schachtsperre wird aus den gemeinsamen Rahmenkörpern abgeleitet. Das Ergebnis wird als `camera-native-contacts.json` neben dem lokalen Export abgelegt.
+
 Der Rundgang bietet sieben direkte Blickpunkte: Doktorandenraum **3.002**,
 Labor **3.003**, Mikroskop **3.007**, Küchen **3.008** und **1.008**,
 den Blick durch den **Freiraum / das Atrium**

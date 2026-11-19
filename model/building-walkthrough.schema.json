@@ -18,7 +18,8 @@
     "objects",
     "interaction",
     "elevator",
-    "mechanisms"
+    "mechanisms",
+    "navigation"
   ],
   "properties": {
     "format": {
@@ -775,6 +776,53 @@
               }
             }
           }
+        }
+      }
+    },
+    "navigation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "camera_radius_mm",
+        "contact_margin_mm",
+        "max_contact_iterations",
+        "max_slides",
+        "closed_access_areas",
+        "basis"
+      ],
+      "properties": {
+        "camera_radius_mm": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 400
+        },
+        "contact_margin_mm": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 5
+        },
+        "max_contact_iterations": {
+          "type": "integer",
+          "minimum": 16,
+          "maximum": 128
+        },
+        "max_slides": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "closed_access_areas": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        },
+        "basis": {
+          "const": "presentation_assumption"
         }
       }
     }
