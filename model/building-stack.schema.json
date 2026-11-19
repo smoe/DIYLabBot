@@ -1195,7 +1195,10 @@
               ],
               "properties": {
                 "kind": {
-                  "const": "corridor"
+                  "enum": [
+                    "corridor",
+                    "room"
+                  ]
                 },
                 "label": {
                   "type": "string",
