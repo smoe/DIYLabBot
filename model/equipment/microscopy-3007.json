@@ -2,7 +2,7 @@
   "format": "solidcraftbot.microscopy-equipment/1",
   "furnishings": {
     "source": "model/furnishings/microscopy-3007.json",
-    "source_sha256": "2d1648dadd0c3c54fbbebc8cf59e539ce449ef6e4a1edb245024d11f949f1be4"
+    "source_sha256": "372396c92e02ac226cf6822dfceed46c0801d4d33c622c99c6d4806d63f39026"
   },
   "instrument": {
     "source": "model/microscope-mi01.shared.json",

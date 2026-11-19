@@ -189,7 +189,7 @@ def validate_plan_variants(spec, plan):
         for name, change in variant['area_overrides'].items():
             exact(change, 'kind label', 'area use override')
             require(name in areas and name not in protected and areas[name]['kind'] in {'room', 'unknown'}, 'Only existing non-core rooms or unknown areas may become access space')
-            require(change['kind'] == 'corridor' and isinstance(change['label'], str) and change['label'], 'Explicit corridor use and label required')
+            require(change['kind'] in {'corridor','room'} and isinstance(change['label'], str) and change['label'], 'Explicit corridor use and label required')
         for name, kind in variant['wall_overrides'].items():
             require(name in walls and kind == 'open_boundary' and len(incidence[name]) == 2 and not incidence[name] & protected, 'Only a referenced non-core internal boundary may be opened')
         disabled = variant['disabled_openings']

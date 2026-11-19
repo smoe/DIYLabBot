@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "08c6df5e4c1582a7da7b8fa2a0ef58bc0c6ef11e52a704c538ae48a7f11aaf1f"
+      "source_sha256": "da262900b48a02a6552b668ea11437f33e4b4add5f55f7202fabe0e0edcdb0fd"
     }
   },
   "settings": {
@@ -148,7 +148,7 @@
   },
   "articulation_source": {
     "source": "model/furniture/social.articulations.json",
-    "source_sha256": "518fa49f54765a55b9a81c9ef2c78d9895f8a171140796da6139a959d4456bb2"
+    "source_sha256": "ece5818078ba3c4228aee91a56919b4ced7bddd25fdf58ea336868f0b993da46"
   },
   "objects": [],
   "interaction": {

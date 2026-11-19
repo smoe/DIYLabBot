@@ -902,6 +902,22 @@
         }
       },
       {
+        "id": "JugCavity",
+        "body": "Jug",
+        "action": "cut",
+        "color": "#aab6ba",
+        "shape": {
+          "kind": "cylinder",
+          "origin": [
+            0,
+            0,
+            32
+          ],
+          "radius": 83,
+          "height": 232
+        }
+      },
+      {
         "id": "Lid",
         "body": "Lid",
         "color": "#293a46",
