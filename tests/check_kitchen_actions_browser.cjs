@@ -58,15 +58,25 @@ const {chromium}=require(process.argv[3]||'playwright');
     animated.on('pageerror',e=>errors.push(e.message));
     await animated.goto(pathToFileURL(file).href,{timeout:120000});
     await animated.waitForFunction(()=>window.__buildingWalkthrough?.ready,null,{timeout:120000});
+    // Advance animation time explicitly; a loaded software renderer may skip
+    // every intermediate frame within a real 1.2-second interval.
+    const epoch=new Date('2026-11-19T12:00:00Z');
+    await animated.clock.install({time:epoch});
+    await animated.clock.pauseAt(new Date(epoch.getTime()+1000));
     const drawer='Kitchen3008.Cabinet.Drawer3';
     await animated.evaluate(id=>window.__buildingWalkthrough.viewObject(id),drawer);
-    assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'open'),drawer)).status,'accepted');
-    await animated.waitForFunction(id=>{const o=window.__buildingWalkthrough.objects.find(o=>o.id===id);return o.state==='opening'&&o.displacement_mm>0&&o.displacement_mm<392;},drawer,{timeout:10000,polling:'raf'});
+    // Submit the contradictory command in the same JS turn. Two protocol
+    // round-trips may outlive the real animation on a loaded renderer.
+    const started=await animated.evaluate(id=>{const v=window.__buildingWalkthrough;return {
+      opening:v.command(id,'open'),duringOpening:v.command(id,'close')};},drawer);
+    assert.equal(started.opening.status,'accepted');assert.equal(started.duringOpening.status,'rejected_busy');
+    await animated.clock.runFor(320);
     const middle=await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id),drawer);
+    assert.equal(middle.state,'opening');assert(middle.displacement_mm>0&&middle.displacement_mm<392);
     assert(Object.values(middle.body_displacements_mm).every(v=>v===middle.displacement_mm));
-    assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),drawer)).status,'rejected_busy');
-    await animated.waitForFunction(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id).state==='open',drawer,{timeout:10000});
-    report.animated_drawer={id:drawer,intermediate_displacement_mm:middle.displacement_mm,all_five_bodies_move_together:true,busy_rejected:true};
+    await animated.clock.runFor(1500);
+    assert.equal((await animated.evaluate(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id),drawer)).state,'open');
+    report.animated_drawer={id:drawer,intermediate_displacement_mm:middle.displacement_mm,all_five_bodies_move_together:true,busy_rejected:true,timing:"Playwright-controlled animation time; rendering performance is not asserted"};
     await animated.close();
     assert.deepEqual(errors,[]);report.passed=true;
     fs.writeFileSync(path.join(path.dirname(file),'kitchen-actions-browser-report.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify(report,null,2));
