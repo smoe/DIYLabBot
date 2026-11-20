@@ -1,0 +1,329 @@
+{
+  "format": "solidcraftbot.building-fleet-demo/1",
+  "id": "BF01",
+  "units": {
+    "length": "presentation_mm",
+    "time": "s",
+    "angle": "rad"
+  },
+  "sources": {
+    "building": {
+      "path": "model/building-stack.shared.json",
+      "sha256": "2448b0f67a2456c5102c77688049cdcc707c34ad98ea1fa6ec2219eda26c22d2"
+    },
+    "walkthrough": {
+      "path": "model/building-walkthrough.shared.json",
+      "sha256": "142e6dde190af50c649f1c115f7b64399cd4577ab612177c458fb2826f37ff1d"
+    },
+    "vehicle": {
+      "path": "model/sample-transport-tr01.shared.json",
+      "sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+    },
+    "angular_profile": {
+      "path": "model/tr01-l01.motion.json",
+      "sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+    },
+    "sensor": {
+      "path": "model/l01-local-traffic.demo.json",
+      "sha256": "fa6aa501fd0857fcf5ecca250cc565ade752af71a042e940db0fc4295e4fe111"
+    },
+    "layout": {
+      "path": "model/lab-layout-l01.shared.json",
+      "sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+    },
+    "camera": {
+      "path": "model/tr01-awareness-camera.shared.json",
+      "sha256": "ccd729bbb881de0b2d626ec0e76cf7a91516b8fc6d16d38a69ba5b1f2e835a45"
+    }
+  },
+  "fleet": {
+    "count": 20,
+    "id_pattern": "BF{01..20}",
+    "variant": "Floor_T48",
+    "cover": "closed",
+    "load_state": "empty"
+  },
+  "missions": {
+    "seed": 20261120,
+    "targets": [
+      {
+        "level": "EG",
+        "area": "R0_001",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "EG",
+        "area": "R0_002",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "EG",
+        "area": "R0_003",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "EG",
+        "area": "R0_015",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "EG",
+        "area": "R0_014A",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG3",
+        "area": "R3_003",
+        "basis": "owner_description",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG3",
+        "area": "R3_001",
+        "basis": "owner_description",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG3",
+        "area": "R3_007",
+        "basis": "owner_description",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG1",
+        "area": "R3_001",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG1",
+        "area": "R3_003",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG1",
+        "area": "R3_007",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG2",
+        "area": "R3_001",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG2",
+        "area": "R3_003",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "OG2",
+        "area": "R3_007",
+        "basis": "template_area_use_unconfirmed",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "KG",
+        "area": "K0_002",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "KG",
+        "area": "K0_006",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "KG",
+        "area": "K0_009",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "KG",
+        "area": "K0_012",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      {
+        "level": "KG",
+        "area": "K0_011",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      }
+    ],
+    "deferred_targets": [
+      {
+        "level": "KG",
+        "area": "K0_013",
+        "basis": "owner_decision_2026-11-20",
+        "reason": "Explicitly deferred by owner; only existing route enters excluded R3_028 staircore."
+      }
+    ],
+    "minimum_duration_s": 600,
+    "maximum_duration_s": 7200,
+    "return_home": true,
+    "basis": "synthetic_seed_and_duration_assumption"
+  },
+  "depot": {
+    "level": "EG",
+    "areas": [
+      "R0_004",
+      "R0_013"
+    ],
+    "slots": 20,
+    "basis": "owner_assumption_E3"
+  },
+  "motion": {
+    "empty_linear_limits": {
+      "velocity_mm_s": 1000,
+      "acceleration_mm_s2": 500,
+      "jerk_mm_s3": 1000
+    },
+    "zone_velocity_mm_s": 300,
+    "angular_limits_pointer": "/limits/angular",
+    "basis": "synthetic_empty_profile_owner_assumption"
+  },
+  "sensor": {
+    "source_key": "sensor",
+    "settings_pointer": "/sensor",
+    "clearance_pointer": "/controller/clearance_mm",
+    "basis": "referenced_E5_no_override"
+  },
+  "geometry": {
+    "grid_step_mm": 50,
+    "localization_tolerance_mm": 10,
+    "height_reserve_mm": 20,
+    "floor_band_start_mm": 20,
+    "basis": "presentation_assumption"
+  },
+  "lift": {
+    "id": "BuildingLift",
+    "maximum_capacity": 2,
+    "capacity_policy": "derive_from_native_interior_or_one",
+    "basis": "owner_assumption_E7"
+  },
+  "communication": {
+    "latency_s": [
+      0.05,
+      0.25
+    ],
+    "jitter": "deterministic_sequence_hash",
+    "dropout": "during_lift_travel",
+    "basis": "synthetic_assumption"
+  },
+  "control_room": {
+    "kind": "logical_endpoint_panel",
+    "truth_access": false,
+    "basis": "owner_assumption_E6"
+  },
+  "camera_presentation": {
+    "fov_deg": 90,
+    "resolution_px": [
+      320,
+      180
+    ],
+    "selected_rate_hz": 5,
+    "mosaic_rate_hz": 1,
+    "basis": "presentation_assumption"
+  },
+  "exclusions": {
+    "areas": [
+      "R3_028",
+      "R3_017",
+      "ExternalStairGround",
+      "Atrium",
+      "LiftCore"
+    ],
+    "KG_technical_areas": [
+      "K0_001",
+      "K0_004",
+      "K0_003B",
+      "K0_003A",
+      "K0_005A",
+      "K0_005B",
+      "K0_007",
+      "K0_008",
+      "K0_010",
+      "K0_014B",
+      "K0_014C",
+      "K0_017",
+      "K0_016",
+      "K0_015",
+      "KCompressors"
+    ],
+    "closed_accesses": "walkthrough.navigation.closed_access_areas",
+    "static_TR01": "keep_as_obstacle_E8"
+  },
+  "qualification": {
+    "simulation_only": true,
+    "navigation_qualified": false,
+    "metric_scale_known": false,
+    "lift_dispatch_simulated": true,
+    "lift_operation_implemented": false,
+    "door_automation": "route_doors_open_start_state",
+    "person_safety_qualified": false,
+    "network_executed": false,
+    "hardware_executed": false,
+    "ros_compiled": false,
+    "ros_executed": false,
+    "camera_hardware_selected": false,
+    "human_comparison": "open"
+  },
+  "limitations": [
+    "Only synthetic empty vehicles; no sample, rack handoff or material ledger.",
+    "Building XY and vertical geometry are presentation assumptions, not a surveyed registration.",
+    "Anonymous first-return scans are idealized and not qualified sensor hardware. An obstacle next to known static geometry can be masked by map matching.",
+    "No people in v1; free walkthrough camera is not an obstacle. No real person-safety qualification.",
+    "Route doors must be open at start; closing a route door freezes the entire compiled preview. No real door automation.",
+    "No network, ROS or hardware execution. Camera images are synthetic scene renders, not image recognition.",
+    "Human comparison and real-world navigation remain open. K0_013 is deferred by explicit owner decision; staircore exclusion is retained."
+  ]
+}
