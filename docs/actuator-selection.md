@@ -65,6 +65,10 @@ Zunächst zwei Versorgungszweige vorsehen; Strom, Absicherung, Rückspeisung,
 Stecker und Leitungsquerschnitte nach dem tatsächlichen Lastprofil bestimmen.
 Die drei ausgewählten Ausführungen haben **keine Bremse**. Eine Haltesicherung
 oder ein Gegengewicht ist besonders für J2/J3 konstruktiv zu lösen.
+Die [Phase-1-Entscheidungsvorlage](joint-bearings-holding.md) vergleicht Lagerung,
+passiven Ausgleich und aktive Haltung ohne Erstprototyp-Bremse. Der Verzicht auf
+Zusatzhardware bleibt wegen Thermik, Spannungsverlust und offener Parklage eine
+Eigentümerentscheidung; die konstruktive Sicherungsforderung ist nicht erfüllt.
 
 ## Hohe Genauigkeit und kurze Zykluszeit
 
@@ -142,6 +146,11 @@ Es wurde keine Anfrage verschickt oder Bestellung ausgelöst.
 | Optik und Beleuchtung | 400 EUR |
 | Reserve und einfache Halter/Versuchsadapter | 500 EUR |
 | **Summe** | **4.800 EUR** |
+
+Die [Lager-/Haltekonzeptrechnung](joint-bearings-holding.md#budget-und-begrenzter-harmonic-ausstieg)
+führt die gesamte 700-EUR-Mechanikposition; ihre Gesamtsumme bleibt wegen offener
+Platten-, Struktur-, Wellen- und Haltekosten unbekannt. Bremsenansteuerung gehört
+zur getrennten Elektrikposition.
 
 Dies ist eine knappe Planungsaufteilung mit vorhandenen geeigneten Rechnern,
 Pipetten, Messmitteln und Werkstatt. Sie ersetzt keine Stückliste oder Angebote.
