@@ -8,7 +8,7 @@ bleiben verbindlich.
 Die [geometrische Integration](servo-integration.md) ist inzwischen umgesetzt:
 sechs Module, getrennte Gehäuse/Ausgänge und zwölf Motorplatten in beiden CADs,
 sechs einfache Gehäusequader für RViz. Die vermeintliche X6-Abweichung ist
-[geklärt und korrigiert](x6-interface-resolution.md); Passungen sowie die hier
+[geklärt und korrigiert](x6-fits-fasteners.md#merged-x6-interface-resolution); Passungen sowie die hier
 beschriebenen Last-/Präzisionsprüfungen bleiben offen.
 
 ## Bevorzugte Bestückung

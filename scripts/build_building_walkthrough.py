@@ -36,6 +36,7 @@ def embed_html(template, payload):
     if template.count('__WALKTHROUGH_INTERACTION__') > 1:
         raise ValueError('Only one interaction-script placeholder is allowed')
     template = template.replace('__WALKTHROUGH_INTERACTION__', INTERACTION_SCRIPT.read_text(encoding='utf-8'))
+    template = template.replace('__WALKTHROUGH_ROBOTS__', (ROOT/'scripts/templates/quintic_motion.js').read_text()+'\n'+(ROOT/'scripts/walkthrough_robots.js').read_text())
     return template.replace('__WALKTHROUGH_DATA__', data)
 
 

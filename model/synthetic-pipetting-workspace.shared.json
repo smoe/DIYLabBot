@@ -1,0 +1,26 @@
+{
+  "format": "solidcraftbot.synthetic-workspace/1",
+  "id": "SYN.Pipetting",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "sources": {
+    "environment": {
+      "source": "model/environments/synthetic-unbounded.json",
+      "source_sha256": "d490eb52e978d6153daf3f5e3286781485967ed71f12323f69a05e595cc6e604"
+    },
+    "furniture": {
+      "source": "model/furniture/reference-bench.catalog.json",
+      "source_sha256": "5d2a2fa24921e47f1a314aa728481e24e3b3a9086a432fa76331046544a445e7"
+    },
+    "furnishings": {
+      "source": "model/furnishings/pipetting-reference-bench.json",
+      "source_sha256": "67382c424828433affdedddfcd80e5d51cc7deb8eba2fab52cb70b771794cdb6"
+    },
+    "equipment": {
+      "source": "model/equipment/pipetting-workspace.json",
+      "source_sha256": "6512b89f9df53d360e2450093b84ba168e832a5d5294ca57610085ec9185b86f"
+    }
+  }
+}

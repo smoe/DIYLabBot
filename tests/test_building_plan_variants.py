@@ -75,6 +75,37 @@ class PlanVariantTests(unittest.TestCase):
         for level in ('EG', 'KG'):
             self.assertIs(stack.apply_plan_variants(self.source, self.plan, level), self.plan)
 
+    def test_unresolved_suite_partition_does_not_remove_occupied_room_floors(self):
+        before = copy.deepcopy(self.plan)
+        original = next(area for area in before['areas'] if area['id'] == 'Suite3_006AB')
+        self.assertEqual(original['kind'], 'unknown')
+        p = stack.parameters(self.source)
+        expanded = stack.expanded(self.source, p)
+        bodies = {body['id']: body for body in expanded['bodies']}
+        operations = {op['body']: op for op in expanded['operations'] if op['action'] == 'create'}
+        for index, level in enumerate(('OG1', 'OG2', 'OG3'), 1):
+            with self.subTest(level=level):
+                plan = stack.level_plan(self.source, level)
+                area = next(area for area in plan['areas'] if area['id'] == original['id'])
+                self.assertEqual(area['kind'], 'room')
+                self.assertEqual(area['boundary'], original['boundary'])
+                body = level+'__Area_Suite3_006AB'
+                self.assertEqual(bodies[body]['role'], 'concept_storey_slab')
+                shape = operations[body]['shape']
+                self.assertEqual(shape['points'], [[x*p['display_scale'], y*p['display_scale']]
+                    for x, y in floor.outline(before, original)])
+                self.assertEqual(shape['offset'], index*p['floor_pitch_mm']-p['slab_thickness_mm'])
+                self.assertEqual(shape['depth'], p['slab_thickness_mm'])
+                for unfilled in ('Atrium', 'LiftCore', 'CoreGap'):
+                    self.assertNotIn(level+'__Area_'+unfilled, bodies)
+        self.assertEqual(self.plan, before, 'The canonical trace retains its unresolved partition')
+        baseline = copy.deepcopy(self.source)
+        baseline['plan_variants'] = [v for v in baseline['plan_variants'] if v['id'] != 'SuiteFloors']
+        previous = stack.expanded(baseline, p)
+        added = {level+'__Area_Suite3_006AB' for level in ('OG1', 'OG2', 'OG3')}
+        self.assertEqual([body for body in expanded['bodies'] if body['id'] not in added], previous['bodies'])
+        self.assertEqual([op for op in expanded['operations'] if op['body'] not in added], previous['operations'])
+
     def test_guarded_source_anchor_is_level_bound_and_references_actual_edges(self):
         p = stack.parameters(self.source)
         plans = {level: stack.apply_plan_variants(self.source, self.plan, level) for level in ('OG1', 'OG2', 'OG3')}
@@ -94,6 +125,8 @@ class PlanVariantTests(unittest.TestCase):
         changes = [
             lambda spec: spec['plan_variants'][0]['levels'].append('EG'),
             lambda spec: spec['plan_variants'][0]['area_overrides'].update({'Atrium': {'kind': 'corridor', 'label': 'Filled'}}),
+            lambda spec: spec['plan_variants'][0]['area_overrides'].update({'LiftCore': {'kind': 'room', 'label': 'Filled'}}),
+            lambda spec: spec['plan_variants'][0]['area_overrides'].update({'Suite3_006AB': {'kind': 'void', 'label': 'Empty'}}),
             lambda spec: spec['plan_variants'][0]['wall_overrides'].update({'W052': 'open_boundary'}),
             lambda spec: spec['plan_variants'][1]['disabled_openings'].append('MissingDoor'),
             lambda spec: spec['plan_variants'].append(copy.deepcopy(spec['plan_variants'][0])),

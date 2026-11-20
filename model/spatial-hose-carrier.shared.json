@@ -1,0 +1,121 @@
+{
+  "format": "solidcraftbot.spatial-hose-carrier/1",
+  "id": "SP02_PartialSpatialCarrier",
+  "status": "Static conservative carrier concept; no selected article or articulated link mechanism",
+  "units": {
+    "length": "mm",
+    "angle": "rad"
+  },
+  "reference": {
+    "candidate_family": "igus triflex R TRL30.050",
+    "brochure": {
+      "path": "cad/vendor/igus/triflex-r-reference.pdf",
+      "sha256": "8daf7f369d366c74d9eeb68bdf5fa9268f1fe30aa0d55d94ecacef9470696911",
+      "url": "https://www.igus.com/us/pdf/triflexr.pdf",
+      "revision_scope": "Historical 2012 brochure, not a claim of latest production drawing; selection table on physical page 9"
+    },
+    "product_url": "https://www.igus.de/product/triflex-TRL",
+    "radius_datum_url": "https://www.igus.com/company/energy-chains-caring-for-cables-ca",
+    "radius_datum_scope": "Published bend radius refers to pivot-pin centers; this central-path proxy is not registered to actual 3D link channels",
+    "published_outer_diameter_mm": 34.5,
+    "published_bend_radius_mm": 50,
+    "published_pitch_mm": 11.3
+  },
+  "geometry": {
+    "nominal_link_count": 32,
+    "nominal_link_count_range": [
+      20,
+      120
+    ],
+    "nominal_pitch_mm": 11.3,
+    "outer_radius_mm": 17.25,
+    "inner_radius_mm": 5,
+    "minimum_centerline_bend_radius_mm": 50,
+    "pitch_scope": "Nominal arc-length collar stations; adjacent chords are shorter on bends. No rigid ball-joint pitch or manufacturer articulation model.",
+    "ring_geometry": {
+      "width_mm": 2,
+      "outer_radius_mm": 17,
+      "inner_radius_mm": 5.2
+    }
+  },
+  "guide_fit": {
+    "family": "two_exact_spatial_biarcs",
+    "offsets_xz_mm": [
+      [
+        0,
+        0
+      ],
+      [
+        -10,
+        0
+      ],
+      [
+        10,
+        0
+      ],
+      [
+        0,
+        10
+      ],
+      [
+        0,
+        -10
+      ],
+      [
+        -20,
+        0
+      ],
+      [
+        20,
+        0
+      ],
+      [
+        0,
+        20
+      ],
+      [
+        0,
+        -20
+      ],
+      [
+        -40,
+        0
+      ],
+      [
+        40,
+        0
+      ]
+    ],
+    "service_y_range_mm": [
+      0,
+      400
+    ],
+    "service_y_step_mm": 25,
+    "length_tolerance_mm": 1e-06,
+    "fit_iterations": 40,
+    "sample_step_mm": 5,
+    "scope": "Deterministic static shape fit in the caller's declared guide frame; no CAD-artifact lookup or continuous shape evolution",
+    "seed_mode": "endpoint_biarc"
+  },
+  "qualification": {
+    "channel_fit_verified": false,
+    "anchor_mounts_verified": false,
+    "dynamic_articulation_verified": false,
+    "exact_3d_radius_datum_registered": false,
+    "selected_vendor_article_fit_verified": false,
+    "hardware_execution_implemented": false
+  },
+  "open_requirements": {
+    "selected_article_or_print_design": null,
+    "channel_dimensions_and_hose_fit": null,
+    "anchor_mounts_and_fasteners": null,
+    "articulation_and_torsion_limits": null
+  },
+  "limitations": [
+    "The hollow swept body is a conservative central-path envelope, not the manufacturer's segmented two- or three-channel geometry.",
+    "A 10 mm inner diameter is an assumed hose clearance, not a documented channel size.",
+    "Decorative collars use nominal arc-length pitch; no rigid links, ball sockets, joints, gravity, strain or torsion are simulated.",
+    "The caller supplies source-bound mounting points and separate bare connector leads; this profile does not bind an arm pose.",
+    "Length and circular-arc radius fitting alone does not verify self-clearance, robot clearance, mounting strength or dynamic operation."
+  ]
+}

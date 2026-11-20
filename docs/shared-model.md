@@ -158,7 +158,7 @@ sichtbaren Geometrie. Die Quelle enthält sechs Servoanforderungen, sechs logisc
 Versorgungs-/Rückmeldeverbindungen und ihre beweglichen Gelenkdurchführungen.
 Die Topologie wird geprüft; unbekannte Kabeldaten und Führungsmaße werden
 explizit als `null` geführt. Physische Kabelprüfungen und flexible Geometrie sind
-noch nicht implementiert. Details: [Servos und Leitungen](servo-cables.md).
+noch nicht implementiert. Details: [Servos und Leitungen](servo-integration.md#merged-servo-cables).
 
 ## Provisorische Kameras und Sichtkegel
 
@@ -239,7 +239,7 @@ Der ROS-Exporter übernimmt die Vendor-Details nicht in Strukturmeshes, sondern
 erzeugt sechs Gehäusequader und getrennte Kollisionshüllen. Änderungen an
 gemeinsamen Längen bewegen auch Vendor-Platzierungen und Gelenkanker. Der
 [Integrationsbericht](servo-integration.md) erklärt die direkte J3-Anordnung,
-verlängerte J6-Baugruppe. Die [X6-Lochbildklärung](x6-interface-resolution.md)
+verlängerte J6-Baugruppe. Die [X6-Lochbildklärung](x6-fits-fasteners.md#merged-x6-interface-resolution)
 korrigiert die frühere Maßpfeilzuordnung und ergänzt die Zentrierhülsen.
 
 Die [X6-Auslegung](x6-fits-fasteners.md) ergänzt in derselben Schnittstellenquelle

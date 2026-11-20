@@ -14,6 +14,7 @@ import building_stack as stack
 import relative_floorplan as floor
 import furniture_articulation as articulation
 import walkthrough_mechanisms as mechanisms
+import walkthrough_robots
 import walkthrough_elevator
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,7 +42,17 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator mechanisms', 'walkthrough')
+    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator mechanisms navigation', 'walkthrough')
+    nav = spec['navigation']
+    exact(nav, 'camera_radius_mm contact_margin_mm max_contact_iterations max_slides closed_access_areas basis', 'navigation')
+    number(nav['camera_radius_mm'], 20, 400, 'camera radius')
+    number(nav['contact_margin_mm'], .1, 5, 'contact margin')
+    for key, lo, hi in [('max_contact_iterations', 16, 128), ('max_slides', 1, 8)]:
+        require(type(nav[key]) is int and lo <= nav[key] <= hi, 'Bounded integer navigation '+key)
+    require(nav['basis'] == 'presentation_assumption', 'Camera envelope is an explicit presentation assumption')
+    require(isinstance(nav['closed_access_areas'], dict) and all(isinstance(k, str) and isinstance(v, list)
+            and all(isinstance(a, str) for a in v) and len(v) == len(set(v))
+            for k, v in nav['closed_access_areas'].items()), 'Named access areas required')
     require(spec['format'] == FORMAT and isinstance(spec['id'], str) and
             re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Walkthrough identity required')
     exact(spec['interaction'], 'reach', 'interaction policy')
@@ -246,8 +257,11 @@ def compile(source=None):
     objects += articulation.compile_lab_objects(spec['articulation_source'], interface, expanded,
         {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
     objects += mechanisms.room_doors(spec['mechanisms']['room_doors'], interface, expanded,
-        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
+        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'],
+        spec['navigation']['closed_access_areas'])
     objects += mechanisms.equipment(spec['mechanisms']['equipment'], interface, spec['settings']['eye_height_mm'])
+    robot_objects, robots = walkthrough_robots.compile(interface)
+    objects.extend(robot_objects)
     lift_object, elevator = walkthrough_elevator.compile(spec['elevator'], building, p, interface,
         expanded, stack.level_plan(building, 'OG3'), spec['settings']['eye_height_mm'])
     objects.append(lift_object)
@@ -265,7 +279,7 @@ def compile(source=None):
             shell.update([window['glass_body'], window['frame_body']])
     isolation = {'label': 'Labor isoliert anzeigen', 'body_ids': sorted(shell |
         set(laboratory['furniture_body_ids']))}
-    paths = [*articulation.dependencies(spec['articulation_source']), *mechanisms.dependencies(), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
+    paths = [*walkthrough_robots.dependencies(), *articulation.dependencies(spec['articulation_source']), *mechanisms.dependencies(), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
              *stack.source_dependencies(building), ROOT/'scripts/walkthrough_elevator.py',
              ROOT/'scripts/atrium_seating.py']
     pins = {str(item.resolve().relative_to(ROOT)): digest(item) for item in dict.fromkeys(paths)}
@@ -274,7 +288,8 @@ def compile(source=None):
         require(pins[ref['source']] == ref['source_sha256'], 'Scene source changed while compiling: '+ref['source'])
     return {'format': FORMAT, 'id': spec['id'], 'default_stop': spec['default_stop'], 'stops': stops,
             'interaction': {'reach_mm': articulation.parameter(spec['interaction']['reach'], 'mm', (300,4000))},
-            'objects': objects, 'elevator': elevator, 'isolation': isolation,
+            'navigation': spec['navigation'],
+            'objects': objects, 'robots': robots, 'elevator': elevator, 'isolation': isolation,
             'laboratories': laboratories, 'microscopy': interface.get('microscopy'), 'kitchenette':interface.get('kitchenette'),
             'places': interface['places'], 'topology': interface['topology'],
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],

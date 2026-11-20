@@ -478,7 +478,7 @@ Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
 Das damalige kurze Video zeigt den Entnahmebaustein; die physische Beladung
 aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
 
-Die aktuelle [geglättete Entnahme](docs/cf01-smooth-unloading.md) ergänzt mit
+Die aktuelle [geglättete Entnahme](docs/centrifuge-cf01.md#cf01-smooth-unloading) ergänzt mit
 `model/cf01-unload-demo.motion.json` eine eigene, referenzierende Bewegungsquelle:
 zwölf Gefäße nach dem synthetischen Spin, Sample01–03 in ursprünglicher
 Rackreihenfolge zurück, neun verbleiben im Rotor. Ein gemeinsames kompiliertes
@@ -1045,9 +1045,10 @@ zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
 ersetzt es nicht. Probenvorbereitung und nicht qualifizierte Geräteschritte
 bleiben zunächst Personenaufgaben. Direktligation, automatisierte
 Library-Präparation und Sequenzierung gehören zu späteren, eigenen Freigaben.
-Die Abhängigkeiten und Abnahmen stehen in [ROADMAP.md](ROADMAP.md).
+Die Abhängigkeiten und Abnahmen stehen in der
+[biologischen Roadmap](docs/workflows/ROADMAP.md).
 
-Der [E1-Preflight](docs/cutrun-preflight.md) bindet Katalog, abstraktes Protokoll
+Der [E1-Preflight](docs/cutrun-reference-profile.md#merged-cutrun-preflight) bindet Katalog, abstraktes Protokoll
 und das synthetische SK-Mel-29/H3K4me3-Profil in
 `model/cutrun-automation.*.json`. Einstieg ist
 `python3 scripts/prepare_cutrun_automation.py`. Er prüft Kontroll-/Inputzweige,
@@ -1088,7 +1089,7 @@ werden im Softwarevertrag geprüft; Gerätesollwerte und einzelne Messpunkte
 genügen nicht. Beobachtungs- und Erfassungszeit bleiben getrennt. Neustart
 erneuert weder Stufe noch Frist, und spätere Widersprüche können frühere
 Abschlüsse entwerten. Der Schutzstopp bleibt unabhängig vom Nominalfortschritt
-erfassbar. Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-recipe.md)
+erfassbar. Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-runtime.md#merged-cutrun-manual-recipe)
 `cutrun_manual_recipe/1` ergänzt ausgewählte Waschgruppen, Arbeitsmischungen,
 Komponentenverbräuche und Fraktions-/Säulenübergänge im selben Ledger.
 Vorbereitete Ansätze benötigen Originalbelege; im Lauf hergestellte Mischungen

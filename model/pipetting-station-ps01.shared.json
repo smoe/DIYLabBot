@@ -1,0 +1,118 @@
+{
+  "format": "solidcraftbot.pipetting-station/1",
+  "id": "PipettingStation_PS01",
+  "revision": "PS01-01",
+  "date": "2026-11-19",
+  "status": "Concept; no manufacturing release",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "recipe": "nine_bay_open_pipetting_deck/1",
+  "parameters": {
+    "deck_w": {
+      "expression": 520,
+      "unit": "mm",
+      "range": [
+        500,
+        650
+      ],
+      "description": "Open deck width"
+    },
+    "deck_d": {
+      "expression": 360,
+      "unit": "mm",
+      "range": [
+        350,
+        500
+      ],
+      "description": "Open deck depth"
+    },
+    "deck_t": {
+      "expression": 12,
+      "unit": "mm",
+      "range": [
+        8,
+        20
+      ],
+      "description": "Design base thickness"
+    },
+    "pitch_x": {
+      "expression": 170,
+      "unit": "mm",
+      "range": [
+        160,
+        200
+      ],
+      "description": "Bay column spacing"
+    },
+    "pitch_y": {
+      "expression": 120,
+      "unit": "mm",
+      "range": [
+        110,
+        160
+      ],
+      "description": "Bay row spacing"
+    },
+    "bay_w": {
+      "expression": 150,
+      "unit": "mm",
+      "range": [
+        140,
+        155
+      ],
+      "description": "Design pad width, not a tip-box dimension"
+    },
+    "bay_d": {
+      "expression": 100,
+      "unit": "mm",
+      "range": [
+        90,
+        105
+      ],
+      "description": "Design pad depth, not a tip-box dimension"
+    },
+    "pad_t": {
+      "expression": 2,
+      "unit": "mm",
+      "range": [
+        1,
+        5
+      ],
+      "description": "Removable pad thickness"
+    }
+  },
+  "grid": {
+    "rows": 3,
+    "columns": 3,
+    "row_order": "rear_to_front",
+    "slot_prefix": "PS01.S"
+  },
+  "tool_capabilities": {
+    "tip_supply": {
+      "source": "model/tip-supply.shared.json",
+      "source_sha256": "2729acb38f7d3dd06753e6c5ef083ae9f516daecf02543dcb6fdd8ab8f01d0f4"
+    },
+    "selection": "smallest_nominal_capacity",
+    "channels": 1,
+    "minimum_qualified_volume_ul": null,
+    "resolution_ul": null,
+    "dose_accuracy_verified": false,
+    "physical_tip_change_verified": false,
+    "physical_tool_change_verified": false
+  },
+  "qualifications": {
+    "robot_motion_implemented": false,
+    "hardware_execution_implemented": false,
+    "collision_free_working_paths": false,
+    "human_speed_comparison": null,
+    "tip_box_fit_verified": false,
+    "sterility_verified": false
+  },
+  "limitations": [
+    "Deck dimensions are explicit design parameters, not a measured laboratory setup.",
+    "A free-form protocol is supported within declared labware, quantities and nominal capacities; arbitrary liquids and physical processes are not qualified.",
+    "Tip pickup heights are synthetic setup coordinates; actual tray seating and T01 tip fit remain open."
+  ]
+}

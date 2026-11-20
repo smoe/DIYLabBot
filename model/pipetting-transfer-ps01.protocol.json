@@ -1,0 +1,47 @@
+{
+  "format": "solidcraftbot.pipetting-transfer-protocol/1",
+  "id": "PS01.RestockAndUnload",
+  "mode": "planning_only",
+  "setup": {
+    "source": "model/pipetting-station-ps01.setup.json",
+    "source_sha256": "6d6ebdd687feaaca2310e526ab39aab04e043e0fa3cf9a3e07bdb9d4092ec0ea"
+  },
+  "coordination": {
+    "shared_zone": "PS01.Deck",
+    "transport_requires": [
+      "pipetting_arm_parked_and_clear_confirmed",
+      "no_active_liquid_transfer_confirmed",
+      "shared_zone_exclusive_claim_confirmed"
+    ],
+    "pipetting_requires": [
+      "transfer_arm_parked_and_clear_confirmed",
+      "all_labware_seated_and_identified_confirmed"
+    ],
+    "release_requires": [
+      "payload_seated_confirmed",
+      "gripper_empty_confirmed",
+      "transfer_arm_parked_and_clear_confirmed"
+    ]
+  },
+  "steps": [
+    {
+      "id": "NewTips",
+      "carrier": "Carrier.ReserveTips200",
+      "destination": "PS01.S07"
+    },
+    {
+      "id": "RackToDeck",
+      "carrier": "Carrier.Rack01",
+      "destination": "PS01.S09"
+    },
+    {
+      "id": "PlateOut",
+      "carrier": "Carrier.Plate01",
+      "destination": "PS01.Outfeed"
+    }
+  ],
+  "limitations": [
+    "Proposed object transfers only: no sensor feedback, executed robot motion, stock admission, material booking or successful interlock is asserted.",
+    "A filled well plate requires separately qualified liquid retention and continuous sample-motion limits before execution."
+  ]
+}

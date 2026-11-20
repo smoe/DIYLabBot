@@ -173,7 +173,7 @@ eine belegte metrische Registrierung von L01 und weiteren Aufstellungen folgen.
 ## Bestätigter Fensterbezug von 3.003
 
 Der geografische Fensterbezug ist jetzt separat als **Nordwest** festgehalten;
-[Abgleich und Ableitung](l01-orientation.md) unterscheiden den Gebäudepunkt,
+[Abgleich und Ableitung](lab-layout-l01.md#merged-l01-orientation) unterscheiden den Gebäudepunkt,
 die Eigentümerbestätigung und den nominalen Azimut von einer Vermessung.
 Die bestehende relative Zeichnungsgeometrie und `calibration: null` bleiben
 unverändert. Insbesondere ist Zeichnung-oben weiterhin nicht geografisch Nord.

@@ -1,0 +1,146 @@
+{
+  "format": "solidcraftbot.pipetting-protocol/1",
+  "id": "PS01.Matrix96",
+  "revision": 1,
+  "mode": "planning_only",
+  "units": {
+    "volume": "uL"
+  },
+  "setup": {
+    "source": "model/pipetting-station-ps01.setup.json",
+    "source_sha256": "6d6ebdd687feaaca2310e526ab39aab04e043e0fa3cf9a3e07bdb9d4092ec0ea"
+  },
+  "materials": {
+    "A": {
+      "label": "Flüssigkeit A",
+      "basis": "synthetic_example"
+    },
+    "B": {
+      "label": "Flüssigkeit B",
+      "basis": "synthetic_example"
+    },
+    "Buffer": {
+      "label": "Puffer",
+      "basis": "synthetic_example"
+    }
+  },
+  "initial_liquids": [
+    {
+      "location": {
+        "labware": "Sources",
+        "well": "A01"
+      },
+      "components_ul": {
+        "A": 4000
+      },
+      "dead_volume_ul": 200
+    },
+    {
+      "location": {
+        "labware": "Sources",
+        "well": "A02"
+      },
+      "components_ul": {
+        "B": 5000
+      },
+      "dead_volume_ul": 200
+    },
+    {
+      "location": {
+        "labware": "Sources",
+        "well": "A03"
+      },
+      "components_ul": {
+        "Buffer": 15000
+      },
+      "dead_volume_ul": 200
+    }
+  ],
+  "tip_policy": "fresh_per_transfer_chunk_or_mix",
+  "steps": [
+    {
+      "id": "HorizontalA",
+      "operation": "distribute",
+      "source": {
+        "labware": "Sources",
+        "well": "A01"
+      },
+      "target": {
+        "labware": "Plate01",
+        "wells": "all"
+      },
+      "volumes": {
+        "axis": "column",
+        "values_ul": [
+          0,
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55
+        ]
+      }
+    },
+    {
+      "id": "VerticalB",
+      "operation": "distribute",
+      "source": {
+        "labware": "Sources",
+        "well": "A02"
+      },
+      "target": {
+        "labware": "Plate01",
+        "wells": "all"
+      },
+      "volumes": {
+        "axis": "row",
+        "values_ul": [
+          0,
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70
+        ]
+      }
+    },
+    {
+      "id": "CompleteAndMix",
+      "operation": "fill_to",
+      "source": {
+        "labware": "Sources",
+        "well": "A03"
+      },
+      "target": {
+        "labware": "Plate01",
+        "wells": "all"
+      },
+      "total_volume_ul": 200,
+      "mix_after": {
+        "volume_ul": 100,
+        "cycles": 3
+      }
+    }
+  ],
+  "expectations": {
+    "target_labware": "Plate01",
+    "per_well_total_ul": 200,
+    "axis_components": {
+      "column": "A",
+      "row": "B"
+    },
+    "homogeneous": true
+  },
+  "limitations": [
+    "Synthetic perfect-volume and homogeneous-mixing arithmetic; no physical dosing or mixing evidence.",
+    "No robot motion, duration, real liquid class, sensor acknowledgement, network or stock booking is generated."
+  ]
+}

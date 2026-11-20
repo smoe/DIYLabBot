@@ -8,8 +8,9 @@ Seite ohne Bedienpanel, die Obergeschosse die gegenüberliegende Seite.
 In Raum **3.007** steht das [Forschungsmikroskop MI01](microscope-mi01.md)
 auf einer aus dem bestehenden Möbelkatalog abgeleiteten Bank. Gerät und
 Aufstellung besitzen getrennte Quellen; der Rundgang hat dafür einen eigenen
-Blickpunkt. Das Mikroskop wird direkt aus seiner gemeinsamen Definition auch
-in die native Gebäudefassung übernommen.
+Blickpunkt. Das Trägerstativ ist noch unbekannt. Die gemeinsame Definition
+liefert weiterhin das generische Darstellungsmodell für die native
+Gebäudefassung; sie belegt keine Hersteller-Geometrietreue.
 
 Die [geschossübergreifende Hüllenregistrierung](building-alignment.md) bringt
 KG und EG vollständig auf die Außenkontur der Obergeschosse. Aufzug und inneres
@@ -64,6 +65,15 @@ freien Ausschnitte mit separat eingesetzten Scheiben. Maße und Materialaufbau
 bleiben Darstellungsannahmen; reale Türbewegungen sind nicht geprüft.
 
 ## Raum- und Atriumkorrektur
+
+Die zusammengefasste Fläche **3.006A/B**, im 3. OG das bestätigte Sekretariat,
+erhält im 1.–3. OG wieder einen Geschossboden. Ihre bisherige Kennzeichnung als unbestimmter Bereich hatte
+die Bodenerzeugung unterdrückt. Die Gebäudevariante `SuiteFloors` übernimmt
+die vorhandene Kontur und Plattendicke; die innere A/B-Aufteilung bleibt
+ungeklärt. Im 3. OG ergänzt das vorhandene Seitenfensterrezept ein Außenfenster
+am fernen Fassadenende (`W001`). Das Fenster ist vom Eigentümer bestätigt;
+seine genaue Lage und Größe bleiben Darstellungsannahmen. Die ursprüngliche
+F03-Nachzeichnung bleibt unverändert.
 
 Die aktuelle Quellkorrektur stellt die Toilettenseite `R3_011` / `R3_012` /
 `CoreGap` einschließlich ihrer Grenzen und Türöffnungen wie gezeichnet wieder

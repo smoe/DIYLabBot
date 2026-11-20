@@ -1,0 +1,58 @@
+{
+  "format": "solidcraftbot.pipetting-labware/1",
+  "id": "PS01.Labware",
+  "units": {
+    "length": "mm",
+    "volume": "uL"
+  },
+  "sources": {
+    "corning96": {
+      "path": "cad/vendor/opentrons/corning_96_wellplate_360ul_flat-v1.json",
+      "url": "https://raw.githubusercontent.com/Opentrons/opentrons/759045308b15973bae25204a580d8cf91f95fd44/shared-data/labware/definitions/2/corning_96_wellplate_360ul_flat/1.json",
+      "sha256": "c13f112e52893e781c59ced9e6418ff10a5e2cc4b4877fd9559045f2f475558d",
+      "revision": "759045308b15973bae25204a580d8cf91f95fd44",
+      "retrieved_on": "2026-11-19",
+      "provenance": "Opentrons v1 labware definition, not a manufacturer CAD solid or a calibration of this station"
+    },
+    "license": {
+      "path": "cad/vendor/opentrons/LICENSE",
+      "url": "https://raw.githubusercontent.com/Opentrons/opentrons/759045308b15973bae25204a580d8cf91f95fd44/LICENSE",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    "notice": {
+      "path": "cad/vendor/opentrons/NOTICE",
+      "url": "https://raw.githubusercontent.com/Opentrons/opentrons/759045308b15973bae25204a580d8cf91f95fd44/NOTICE",
+      "sha256": "845baeed221d0f9af8c269cbe1a5b1dba32142336a25f82d89963e7884c5a315"
+    }
+  },
+  "types": {
+    "plate96": {
+      "recipe": "opentrons_circular_plate/1",
+      "source_id": "corning96",
+      "color": "#d6e3e7"
+    },
+    "reservoir3": {
+      "recipe": "rectangular_reservoir_grid/1",
+      "rows": 1,
+      "columns": 3,
+      "pitch_mm": [
+        43,
+        74
+      ],
+      "inner_size_mm": [
+        34,
+        65,
+        25
+      ],
+      "wall_mm": 3,
+      "bottom_mm": 3,
+      "capacity_ul": 40000,
+      "color": "#a7becb",
+      "basis": "Own synthetic open-reservoir design; 40000 uL planning ceiling below its geometric cavity volume; no manufactured article or dead-volume qualification"
+    }
+  },
+  "limitations": [
+    "Cylinder cavities in the plate are envelope approximations of the referenced wells, not complete manufactured wall profiles.",
+    "Well coordinates, maximum listed volume and physical fit do not establish dosing precision or chemical compatibility."
+  ]
+}

@@ -2,11 +2,11 @@
   "format": "solidcraftbot.microscopy-equipment/1",
   "furnishings": {
     "source": "model/furnishings/microscopy-3007.json",
-    "source_sha256": "2d1648dadd0c3c54fbbebc8cf59e539ce449ef6e4a1edb245024d11f949f1be4"
+    "source_sha256": "372396c92e02ac226cf6822dfceed46c0801d4d33c622c99c6d4806d63f39026"
   },
   "instrument": {
     "source": "model/microscope-mi01.shared.json",
-    "source_sha256": "0580b0e09dd3c816ed0e95c1d3d296d19d0b95e3344155f0c4e9b276abb7205b"
+    "source_sha256": "304adecf33ce234f657e4c37ee5373f90ac4aa8e233bb92c628e6fc77617b6fc"
   },
   "placement": {
     "id": "Microscope",
@@ -17,5 +17,5 @@
     ],
     "yaw_deg": 180
   },
-  "basis": "Owner-selected room 3.007; assumed microscope and bench arrangement. Static geometry without optical or hardware qualification."
+  "basis": "Owner-selected room 3.007 and equipment identity from the referenced instrument source; carrier stand unconfirmed and microscope/bench arrangement assumed. Static placeholder geometry without optical or hardware qualification."
 }

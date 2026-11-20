@@ -1,0 +1,15 @@
+{
+  "format": "solidcraftbot.walkthrough-robot-commands/1",
+  "laboratory": "Lab3003",
+  "instance": "ArmA",
+  "label": "Roboter Arm A · Labor 3.003",
+  "demo_offset_deg": [0, -6, 8, 0, 12, 20],
+  "stop_ramp_s": 0.4,
+  "empty_joint_limits": {
+    "velocity_deg_s": 60,
+    "acceleration_deg_s2": 180,
+    "jerk_deg_s3": 1800
+  },
+  "basis": "Synthetic empty-arm presentation limits; not manufacturer-qualified. No sample, tool operation or hardware command.",
+  "human_comparison": null
+}

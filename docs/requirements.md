@@ -16,6 +16,7 @@
 | Stationsübergreifender Transport | Vorhandenen Bodenroboter TR01 zwischen DNA-Aufreinigung, CF01 und gemeinsamer NanoDrop-/Qubit-Station verwenden; synthetische Aufgabenübergaben sowie geometrische L01-Parkpunkte und fließende, kollisionsgeprüfte Fahrkurven sind separat implementiert; Navigation und reale Übergaben bleiben offen |
 | TapeStation TS01 | Als zunächst manuell bedienten QC-Arbeitsplatz aufnehmen; Modellwahl offen, 4200 als Planungsreferenz. Menschliche Assistenz vor automatischer Beladung vorsehen |
 | Langfristiger Volumenbereich | 1–1000 µl mit verschiedenen Werkzeugen |
+| Pipettierstation PS01 | Frei konfigurierbare Pipettieraufgaben; separater Roboter für Spitzenboxen, Well-Platten und Racks. Erstes Planungsprotokoll mit zwei unabhängigen Mengenreihen in einer 96-Well-Platte. [Aufbau und aktueller Prüfumfang](pipetting-station-ps01.md) |
 | Gefäße | Eppendorf-Gefäße, 96-Well- und 384-Well-Platten |
 | Erster begrenzter Prototyp | Budgetziel 3.000–5.000 EUR |
 | Infrastruktur | Pipetten und geeignete Labor-Messmöglichkeiten sind vorhanden |

@@ -109,7 +109,7 @@ Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei 
 
 Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.
 
-[Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../docs/development-plan.md)
+[Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../ROADMAP.md)
 
 ### TS01 · TapeStation, manuelle QC
 
@@ -128,6 +128,8 @@ Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pi
 Diese Konstruktionen lassen sich in realen und synthetischen Aufstellungen referenzieren. Parameter und Gelenke bleiben in ihrer jeweiligen gemeinsamen Quelle.
 
 **Spitzenversorgung · 10/200/1000 µl:** Drei belegte Eppendorf-Artikel als Varianten einer gemeinsamen Quelle, mit 96 Platz-IDs in zwölf logischen Achterstreifen und expliziter Voll-/Teil-/Leerbelegung. Maß- und Rasterdefinition; native Spitzen-/Boxkörper und T01-Passung bleiben mangels vollständiger Maße offen. [Quelle](../../model/tip-supply.shared.json) · [Referenzinstanzen](../../model/tip-supply.instances.json) · [Maßbelege und Prüfgrenzen](../tip-supply.md).
+
+**Pipettierstation PS01:** Neun belegbare Deckplätze mit getrennten Pipettier- und Transportarmen, 96-Well-Platte, Reservoiren und Spitzenversorgung. Der Parallelgreifer trägt Boxen, Platten und Racks auf einheitlichen Trägern. Allgemeine Protokollplaner prüfen Mengen, Ressourcen und Labware-Ziele; native statische Aufstellung und ideale Flüssigkeitsvolumina werden separat abgeleitet. [Stationsquelle](../../model/pipetting-station-ps01.shared.json) · [96-Well-Protokoll](../../model/pipetting-matrix-96.protocol.json) · [Aufbau und Prüfgrenzen](../pipetting-station-ps01.md).
 
 | Modell | Modell | Modell |
 | --- | --- | --- |

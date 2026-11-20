@@ -20,7 +20,7 @@
     },
     "furnishings": {
       "source": "model/furnishings/building-social.json",
-      "source_sha256": "c27f86d7acfd063026df3a790dd4794e060253917d06e195dec2958016861ec0"
+      "source_sha256": "53b2d85d46da4b8c50ebfe1d6ce1f2b7bc235b1201c428d042fb30714ae25ec1"
     },
     "laboratories": {
       "source": "model/furnishings/building-laboratories.json",
@@ -28,11 +28,11 @@
     },
     "microscopy": {
       "source": "model/equipment/microscopy-3007.json",
-      "source_sha256": "275026bb03c011028873c4bbac8f31c26b9bb56be64449c863100c075c0974e5"
+      "source_sha256": "59e0f172e09c7b4452be4827cb60d96fb33d5b186acf25268389e050c5e98bb2"
     },
     "kitchenette": {
       "source": "model/equipment/kitchen-3008.json",
-      "source_sha256": "7987a6967891a97fbcac5e701e4a3575e2e6811e4064dbf25f5e166427ac2378"
+      "source_sha256": "33d8cf485422c9e855ee5c8d47a445efcf37d531b04e902f5ab390fb685fe113"
     }
   },
   "calibration": null,
@@ -124,7 +124,8 @@
     "KG facade details and exact stair geometry remain simplified; all XY coordinates are uncalibrated.",
     "The foyer glass front and very open metal rails follow private owner photographs; their registration, grid and sizes remain illustrative.",
     "Room door colour is owner-confirmed warm wood, approximated under photographic lighting. Door leaves are shown open; this is not a fire-door or egress state.",
-    "Earth at EG grade is an illustrative cutaway around the building, not a measured terrain survey."
+    "Earth at EG grade is an illustrative cutaway around the building, not a measured terrain survey.",
+    "The exterior window at the far end of secretary room 3.006A/B is owner-confirmed. Its placement on facade segment W001 and its shared side-window dimensions are presentation assumptions; the addition applies only to OG3."
   ],
   "circulation": {
     "status": "owner_requested_concept_geometry",
@@ -437,6 +438,10 @@
     "side_window_walls_by_level": {
       "OG1": [
         "W005"
+      ],
+      "OG3": [
+        "W005",
+        "W001"
       ]
     }
   },
@@ -598,6 +603,42 @@
         "D3_002_003"
       ],
       "basis": "Owner correction: the connection from doctoral room 3.002 goes to laboratory 3.001 on the left when looking from the corridor entrance toward the window; the erroneous right-side opening is closed on OG3 only."
+    },
+    {
+      "id": "Kitchen3008RearFacade",
+      "levels": [
+        "OG3"
+      ],
+      "area_overrides": {
+        "R3_009": {
+          "kind": "room",
+          "label": "3.008B (rear facade strip)"
+        }
+      },
+      "wall_overrides": {
+        "W017": "open_boundary"
+      },
+      "disabled_openings": [
+        "D3_009"
+      ],
+      "basis": "Owner correction 2026-11-19: rear room 3.008B reaches the outside facade and has a regular-size window. The former 3.009 template strip is part of 3.008B on OG3 only; its internal partition/door disappear. Existing furnishings retain stable IDs and positions; their actual use remains an assumption."
+    },
+    {
+      "id": "SuiteFloors",
+      "levels": [
+        "OG1",
+        "OG2",
+        "OG3"
+      ],
+      "area_overrides": {
+        "Suite3_006AB": {
+          "kind": "room",
+          "label": "3.006A/B (Aufteilung ungeklärt)"
+        }
+      },
+      "wall_overrides": {},
+      "disabled_openings": [],
+      "basis": "Owner confirmation, 2026-11-19: the secretary's office is 3.006A/B and is missing its floors in the walkthrough. The enclosed suite is an occupied room envelope, not a vertical void. Restore slabs on OG1–OG3 using the existing outline and storey thickness. The internal A/B partition and actual dimensions remain unresolved; room uses on the lower storeys are not inferred. Preserve the raw F03 trace, walls and openings."
     }
   ],
   "atrium_access": {

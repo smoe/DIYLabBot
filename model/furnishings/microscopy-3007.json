@@ -3,7 +3,7 @@
   "id": "Microscopy3007",
   "level": "OG3",
   "area": "R3_007",
-  "catalog": {"source": "model/furniture/social.catalog.json", "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"},
+  "catalog": {"source": "model/furniture/social.catalog.json", "source_sha256": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440"},
   "bench": {
     "id": "Bench",
     "type": "desk",

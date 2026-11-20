@@ -1,6 +1,6 @@
 # CUT&RUN-Inputsonikation über SiLA 2
 
-Der separate Adapter bietet die vorhandene [S09-Fixture-Engine](cutrun-input-sonication-runtime.md)
+Der separate Adapter bietet die vorhandene [S09-Fixture-Engine](dna-sonication.md#merged-cutrun-input-sonication-runtime)
 über TLS/gRPC auf Loopback an. Der CUT&RUN-Root bleibt Eigentümer von
 Inventar, Gewahrsam, Materialbuchungen, Originalartefakten und Reservierungen.
 Netzwerkquittungen liegen in demselben Root-Journal. Ein S09-Abschluss ist

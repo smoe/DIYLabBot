@@ -18,6 +18,20 @@ Diese Hinweise gelten für das Projekt SolidCraftBot.
   Arbeitsbaum nicht automatisch stashen, zurücksetzen oder umschalten; neue
   Arbeit bei Bedarf in einem eigenen Worktree vom aktuellen `master` beginnen.
 
+## Dokumentationsablage
+
+- Erläuterungen zu Protokollen und biologischen Workflows unter
+  `docs/workflows/` führen; dessen README und biologische Roadmap bilden den
+  Einstieg. Konstruktion und Gerätegeometrie bleiben in ihren Baugruppenleitfäden;
+  `ROADMAP.md` führt den Projekt- und mechanischen Entwicklungsplan.
+- Bestehende Ablaufdokumente mit ihrer jeweiligen Konsolidierung überführen und
+  dabei sämtliche veränderbaren Verweise und Anker aktualisieren. Prüfsummengebundene
+  Archivfassungen und benötigte Kompatibilitätspfade unverändert erhalten.
+- Der neue Ordner enthält Dokumentation. Maschinenlesbare Modell- und
+  Protokollquellen bleiben unter `model/`; Laufzeitdaten behalten ihren bisherigen
+  Speicherort. Implementierung, synthetische Nachweise und reale Qualifikation
+  weiterhin getrennt ausweisen.
+
 ## Leitidee: abstrakt beschreiben, automatisch ableiten
 
 Die führende Konstruktion ist eine CAD-unabhängige, maschinenlesbare Beschreibung
@@ -196,7 +210,7 @@ die lokale Auswahl `--transport sila2` bleibt ein Mock-Vertragsdecoder. Proben-I
 und ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
 Vor Änderungen an geglätteten CF01-Entnahmebahnen
-[docs/cf01-smooth-unloading.md](docs/cf01-smooth-unloading.md) lesen.
+[CF01-Bewegungsdokumentation](docs/centrifuge-cf01.md#cf01-smooth-unloading) lesen.
 `model/cf01-unload-demo.motion.json` referenziert vorhandene Geometrie und
 Chargenquellen; Kurven, Eigentümerereignisse und Grenzwerte einmal kompilieren
 und in nativer Prüfung, Browser und ROS-Armexport gemeinsam auswerten.
@@ -429,7 +443,7 @@ oder Geräteeffekte. Unbekannte Puls-, Kühlungs- und Gefäßparameter offen las
 ein Geräteabschluss oder NanoDrop-/Qubit-Wert belegt keine Fragmentgröße.
 Keine Sonikations-Nebenbilanz, Hardware-, ROS- oder SiLA-Ausführung ableiten.
 
-Die additive [S09-Laufzeitanbindung](docs/cutrun-input-sonication-runtime.md)
+Die additive [S09-Laufzeitanbindung](docs/dna-sonication.md#merged-cutrun-input-sonication-runtime)
 verwendet `model/cutrun-input-sonication.profile.json` und die eigene Engine
 `input_sonication_mock/1`. Ausschließlich Testuhr und Fixture-Beobachtungen
 zulassen; reale SOP-Bereitschaft und fehlendes Herstelleroriginal offen halten.
@@ -562,7 +576,8 @@ Zentrierhülsen, Ausgang 12 × M4. Dieselbe Quelle enthält nun eine Ø5-H7-Bohr
 ein radiales Entlastungslangloch und versenkte M3×10/M4×6-Schraubenstapel.
 M3×10 setzt eine bestätigte nutzbare Gewindetiefe voraus; Musterprüfung und
 mechanische Qualifikation stehen aus (siehe `docs/x6-fits-fasteners.md`,
-`docs/x6-interface-resolution.md` und `docs/servo-integration.md`).
+[X6-Schnittstellenklärung](docs/x6-fits-fasteners.md#merged-x6-interface-resolution)
+und `docs/servo-integration.md`).
 X2/X4 führen Passungen und Schraubenstapel analog in
 `model/x2-mounting-interface.json` und `model/x4-mounting-interface.json`.
 Eigene Rund-/Entlastungsstifte sitzen mit Pressschäften in den Platten und
@@ -628,7 +643,8 @@ oder Trägheit.
 
 ## Vor Änderungen lesen
 
-README.md sowie docs/requirements.md, docs/design.md und docs/development-plan.md.
+README.md sowie docs/requirements.md, docs/design.md und
+[mechanischen Entwicklungsplan](ROADMAP.md#mechanischer-entwicklungsplan).
 Für Änderungen an Quelle oder Generatoren außerdem `docs/shared-model.md` lesen;
 für ROS `docs/ros2.md`, für Kaufteile `docs/vendor-cad-plan.md` und die
 Dokumentation der jeweils betroffenen Baugruppe.

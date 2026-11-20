@@ -5,7 +5,8 @@
     "format",
     "catalog",
     "types",
-    "lab_joints"
+    "lab_joints",
+    "kitchen_joints"
   ],
   "properties": {
     "format": {
@@ -90,20 +91,64 @@
                   ],
                   "properties": {
                     "x": {
-                      "const": "min"
+                      "enum": [
+                        "min",
+                        "max"
+                      ]
                     },
                     "y": {
-                      "const": "max"
+                      "enum": [
+                        "max",
+                        "center"
+                      ]
+                    }
+                  }
+                },
+                "frame_part": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "allOf": [
+                {
+                  "if": {
+                    "properties": {
+                      "edge": {
+                        "properties": {
+                          "y": {
+                            "const": "center"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "then": {
+                    "required": [
+                      "frame_part"
+                    ]
+                  },
+                  "else": {
+                    "not": {
+                      "required": [
+                        "frame_part"
+                      ]
                     }
                   }
                 }
-              }
+              ]
             },
             "axis": {
-              "const": [
-                0,
-                0,
-                1
+              "enum": [
+                [
+                  0,
+                  0,
+                  1
+                ],
+                [
+                  0,
+                  1,
+                  0
+                ]
               ]
             },
             "front": {
@@ -169,6 +214,22 @@
       }
     },
     "lab_joints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "revolute",
+        "prismatic"
+      ],
+      "properties": {
+        "revolute": {
+          "$ref": "#/$defs/presentation"
+        },
+        "prismatic": {
+          "$ref": "#/$defs/presentation"
+        }
+      }
+    },
+    "kitchen_joints": {
       "type": "object",
       "additionalProperties": false,
       "required": [

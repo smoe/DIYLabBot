@@ -172,7 +172,7 @@ Ein bereitgestellter Google-Maps-Kartenpunkt ist lokal als Standortreferenz
 unter `exports/tr01-workcell/site-reference.json` notiert. Der Eigentümer bestätigt, dass der Pin nur das Gebäude markiert; die Lage
 des Labors innerhalb dieses Gebäudes ist dadurch noch nicht festgelegt.
 Die Fensterfront ist inzwischen als Nordwest bestätigt; der nominale
-Richtungsbezug steht in [l01-orientation.md](l01-orientation.md). Ein gemessener
+Richtungsbezug steht im [Orientierungsabschnitt](lab-layout-l01.md#merged-l01-orientation). Ein gemessener
 Azimut und die metrische Registrierung bleiben offen.
 
 ## Orientiertes Tageslicht und geworfene Schatten
@@ -297,7 +297,7 @@ Bewegungsbahnen werden unverändert wiederverwendet.
 Die Auswahl **Drei Transporter** startet den separaten, lokal sensorbasierten
 Verkehrsfall mit drei verschiedenen Stationszielen und Gegenverkehr.
 Ablauf, lokale Rückzugsregel, Bench-Sperren und neue native Nachweise stehen
-in [l01-opposing-traffic.md](l01-opposing-traffic.md). Der frühere Geradenfall
+in [l01-opposing-traffic.md](l01-independent-fleet.md#merged-l01-opposing-traffic). Der frühere Geradenfall
 bleibt als separater Regressionstest erhalten.
 
 
@@ -306,4 +306,4 @@ bleibt als separater Regressionstest erhalten.
 **Drei Transporter** führt jetzt zuerst drei Beladungen, dann den bestehenden
 Gegenverkehrsfall und anschließend drei Entladungen aus. Quellen, Bench-Reservierungen,
 Beobachtungen und zusätzliche Geometrienachweise stehen in
-[l01-fleet-handoffs.md](l01-fleet-handoffs.md).
+[l01-fleet-handoffs.md](l01-independent-fleet.md#merged-l01-fleet-handoffs).

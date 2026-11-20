@@ -31,7 +31,7 @@ def read(ref):
 
 
 def validate(source):
-    exact(source, 'format catalog types lab_joints', 'articulation source')
+    exact(source, 'format catalog types lab_joints kitchen_joints', 'articulation source')
     require(source['format'] == 'solidcraftbot.furniture-articulations/1', 'Unsupported articulation source')
     exact(source['catalog'], 'source source_sha256', 'catalog reference')
     catalog = read(source['catalog'])
@@ -47,11 +47,15 @@ def validate(source):
             moving = joint['moving_parts']
             require(isinstance(moving, list) and moving and all(isinstance(v, str) for v in moving)
                     and len(set(moving)) == len(moving) and set(moving) <= set(bodies), 'Unknown or duplicate moving parts')
-            exact(joint['hinge'], 'part edge', 'hinge')
+            require(isinstance(joint['hinge'],dict) and 'part' in joint['hinge'], 'Explicit hinge reference required')
             require(joint['hinge']['part'] in moving, 'Hinge part must move')
             hinge = bodies[joint['hinge']['part']]
-            require(hinge['shape']['kind'] == 'box', 'Hinge part must be a box')
-            require(joint['hinge']['edge'] == {'x': 'min', 'y': 'max'}, 'Supported vertical hinge edge required')
+            require(hinge['shape']['kind'] in {'box','cylinder'}, 'Supported hinge reference required')
+            round_lid=hinge['shape']['kind']=='cylinder'
+            exact(joint['hinge'], 'part edge frame_part' if round_lid else 'part edge', 'hinge')
+            if round_lid:
+                require(joint['hinge']['frame_part'] in bodies and bodies[joint['hinge']['frame_part']]['shape']['kind']=='box', 'Cylinder lid needs an explicit placed box frame')
+            require(joint['hinge']['edge'] == ({'x':'max','y':'center'} if round_lid else {'x':'min','y':'max'}), 'Supported hinge edge required')
             for field, size in [('axis', 3), ('front', 3), ('limits_deg', 2)]:
                 values = joint[field]
                 require(isinstance(values, list) and len(values) == size
@@ -60,7 +64,7 @@ def validate(source):
             exact(joint['states'], 'closed open', 'joint states')
             require(all(type(v) in (int, float) and math.isfinite(v) for v in joint['states'].values()),
                     'Finite numeric joint states required')
-            require(joint['axis'] == [0, 0, 1] and joint['front'] == [0, 1, 0], 'Local +Z axis and +Y front required')
+            require(joint['axis'] == ([0,1,0] if round_lid else [0,0,1]) and joint['front'] == [0, 1, 0], 'Supported local hinge axis and +Y viewing direction required')
             require(joint['states'] == {'closed': 0, 'open': 90} and joint['limits_deg'] == [0, 90]
                     and joint['reference_state'] == 'closed', 'Explicit closed/open reference and limits required')
             require(joint['basis'] == 'presentation_assumption', 'Illustrative articulation basis required')
@@ -68,7 +72,8 @@ def validate(source):
                     and all(v is False for v in joint['qualification'].values()), 'Articulation does not qualify measured/native/swing behaviour')
             validate_presentation(joint['presentation'])
     exact(source['lab_joints'], 'revolute prismatic', 'laboratory joint profiles')
-    for presentation in source['lab_joints'].values():
+    exact(source['kitchen_joints'], 'revolute prismatic', 'kitchen joint profiles')
+    for presentation in list(source['lab_joints'].values())+list(source['kitchen_joints'].values()):
         validate_presentation(presentation)
     return catalog
 
@@ -160,6 +165,9 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         room_report = next(v for v in room_reports if v['id'] == room['id'])
         require(set(moving) <= body_ids & set(room_report['body_ids']), 'Missing placed articulated bodies')
         shape = operations[prefix+parts[joint['hinge']['part']]['body']]['shape']
+        round_lid=shape['kind']=='cylinder'
+        lid_shape=shape
+        if round_lid:shape=operations[prefix+parts[joint['hinge']['frame_part']]['body']]['shape']
         require(shape['kind'] == 'polygon_prism' and shape['plane'] == 'XY' and len(shape['points']) == 4, 'Placed box footprint required')
         points = shape['points']
         require(floor.signed_area(points) > 0, 'Unmirrored ordered box footprint required')
@@ -169,7 +177,12 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         length = math.hypot(*front)
         require(length > 0, 'Nonzero placed front direction required')
         front = [v/length for v in front]+[0]
-        target = [sum(pt[i] for pt in points)/4 for i in (0, 1)]+[shape['offset']+shape['depth']/2]
+        axis=joint['axis']
+        if round_lid:
+            xvector=[points[1][i]-points[0][i] for i in (0,1)];xlength=math.hypot(*xvector);xvector=[v/xlength for v in xvector]
+            hinge=[lid_shape['origin'][i]+xvector[i]*lid_shape['radius'] for i in (0,1)]+[lid_shape['origin'][2]]
+            axis=front
+        target = (lid_shape['origin'][:2]+[lid_shape['origin'][2]+lid_shape['height']/2] if round_lid else [sum(pt[i] for pt in points)/4 for i in (0,1)]+[shape['offset']+shape['depth']/2])
         distance = parameter(item['view_distance'], 'mm', (300, 3000))
         level = next(v for v in interface['levels'] if v['id'] == room['level'])
         eye = [target[i]+front[i]*distance for i in (0, 1)]+[level['z_mm']+eye_height]
@@ -179,7 +192,7 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
         require(any(floor.point_membership(local, floor.outline(plan, name)) == 1
                     for name in room['template_areas'] if name in areas), 'Object viewpoint outside kitchen source areas')
         result.append({'id': object_id, 'scene': 'building', 'level_id': room['level'],
-                       'joint': {'id': joint['id'], 'type': joint['type'], 'origin_mm': hinge, 'axis': joint['axis'], 'limits_deg': joint['limits_deg']},
+                       'joint': {'id': joint['id'], 'type': joint['type'], 'origin_mm': hinge, 'axis': axis, 'limits_deg': joint['limits_deg']},
                        'front': front, 'moving_body_ids': moving, 'states': joint['states'], 'reference_state': joint['reference_state'],
                        **presentation_fields({key: item[key] for key in ('label', 'commands', 'state_labels', 'duration', 'view_distance')},
                            room=room.get('room', room['id']), instance=instance['id'], articulation=identity),
@@ -200,7 +213,10 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height)
     body_ids = {body['id'] for body in expanded['bodies']}
     operations = expanded['operations']
     result, identities, moving_owners = [], set(), set()
-    for lab in interface.get('laboratories', []):
+    stations=list(interface.get('laboratories', []))
+    if interface.get('kitchenette'):stations.append(interface['kitchenette'])
+    for lab in stations:
+        is_kitchen=lab is interface.get('kitchenette')
         require(lab['level_id'] in levels, 'Known laboratory object level required')
         plan = plans[lab['level_id']]
         polygons = [floor.outline(plan, name) for name in lab['template_areas']]
@@ -229,10 +245,14 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height)
                     and limits[0] == 0 and limits[1] > limits[0], 'Ordered zero-reference laboratory joint limits required')
             require(type(joint['value']) in (int, float) and joint['value'] == limits[0],
                     'Laboratory browser geometry must use its closed/lowered recipe reference')
+            # Kitchen recipes list the selectable front first. Aim at that front,
+            # not the centre of a deep drawer box behind several other fronts.
+            target_bodies=moving[:1] if is_kitchen else moving
             bounds = atrium_seating.combine_bounds(atrium_seating.body_bounds(
-                operation for operation in operations if operation['body'] in moving).values())
+                operation for operation in operations if operation['body'] in target_bodies).values())
             target = [(bounds['min'][i]+bounds['max'][i])/2 for i in range(3)]
-            profile = source['lab_joints'][kind]
+            profile = source['kitchen_joints' if is_kitchen else 'lab_joints'][kind]
+            if is_kitchen:profile={**profile,'label':joint['label']+' · Küche {room}'}
             distance = parameter(profile['view_distance'], 'mm', (300, 3000))
             eye = [target[i]+front[i]*distance for i in (0, 1)]+[levels[lab['level_id']]+eye_height]
             xy = [value/parameters['display_scale'] for value in eye[:2]]

@@ -1,0 +1,264 @@
+{
+  "format": "solidcraftbot.labware-transfer/1",
+  "id": "LT01",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "status": "Concept; no manufacturing release",
+  "recipe": "supported_carrier_and_parallel_jaw_gripper/1",
+  "parameters": {
+    "carrier_w": {
+      "expression": 134,
+      "unit": "mm",
+      "range": [
+        130,
+        145
+      ]
+    },
+    "carrier_d": {
+      "expression": 94,
+      "unit": "mm",
+      "range": [
+        90,
+        98
+      ]
+    },
+    "foot_h": {
+      "expression": 6,
+      "unit": "mm",
+      "range": [
+        5,
+        10
+      ]
+    },
+    "base_t": {
+      "expression": 4,
+      "unit": "mm",
+      "range": [
+        3,
+        6
+      ]
+    },
+    "foot_size": {
+      "expression": 10,
+      "unit": "mm",
+      "range": [
+        8,
+        14
+      ]
+    },
+    "locator_t": {
+      "expression": 2,
+      "unit": "mm",
+      "range": [
+        1,
+        3
+      ]
+    },
+    "locator_h": {
+      "expression": 5,
+      "unit": "mm",
+      "range": [
+        3,
+        8
+      ]
+    },
+    "locator_clearance": {
+      "expression": 0.5,
+      "unit": "mm",
+      "range": [
+        0.2,
+        1
+      ]
+    },
+    "flange_to_grip": {
+      "expression": 175,
+      "unit": "mm",
+      "range": [
+        150,
+        200
+      ]
+    },
+    "mount_radius": {
+      "expression": 25,
+      "unit": "mm",
+      "range": [
+        20,
+        25
+      ]
+    },
+    "mount_t": {
+      "expression": 6,
+      "unit": "mm",
+      "range": [
+        4,
+        8
+      ]
+    },
+    "body_h": {
+      "expression": 32,
+      "unit": "mm",
+      "range": [
+        25,
+        40
+      ]
+    },
+    "body_d": {
+      "expression": 50,
+      "unit": "mm",
+      "range": [
+        40,
+        60
+      ]
+    },
+    "open_gap": {
+      "expression": 118,
+      "unit": "mm",
+      "range": [
+        110,
+        125
+      ]
+    },
+    "finger_t": {
+      "expression": 8,
+      "unit": "mm",
+      "range": [
+        6,
+        10
+      ]
+    },
+    "finger_d": {
+      "expression": 40,
+      "unit": "mm",
+      "range": [
+        30,
+        50
+      ]
+    },
+    "lip_depth": {
+      "expression": 5,
+      "unit": "mm",
+      "range": [
+        4,
+        8
+      ]
+    },
+    "lip_t": {
+      "expression": 3,
+      "unit": "mm",
+      "range": [
+        2,
+        4
+      ]
+    },
+    "approach_clearance": {
+      "expression": 120,
+      "unit": "mm",
+      "range": [
+        100,
+        160
+      ]
+    },
+    "dock_t": {
+      "expression": 2,
+      "unit": "mm",
+      "range": [
+        1,
+        5
+      ]
+    },
+    "dock_w": {
+      "expression": 150,
+      "unit": "mm",
+      "range": [
+        145,
+        160
+      ]
+    },
+    "dock_d": {
+      "expression": 100,
+      "unit": "mm",
+      "range": [
+        98,
+        110
+      ]
+    },
+    "box_w": {
+      "expression": 128,
+      "unit": "mm",
+      "range": [
+        120,
+        130
+      ]
+    },
+    "box_d": {
+      "expression": 86,
+      "unit": "mm",
+      "range": [
+        80,
+        88
+      ]
+    },
+    "box_h": {
+      "expression": 90,
+      "unit": "mm",
+      "range": [
+        85,
+        110
+      ]
+    }
+  },
+  "sources": {
+    "plate": {
+      "source": "model/pipetting-labware.shared.json",
+      "source_sha256": "cd73c612e7e6f93c378dafff043699afcb78f57c6c4abeb16553c4253501c7b1",
+      "case": "plate96"
+    },
+    "tips": {
+      "source": "model/tip-supply.shared.json",
+      "source_sha256": "2729acb38f7d3dd06753e6c5ef083ae9f516daecf02543dcb6fdd8ab8f01d0f4"
+    },
+    "rack": {
+      "source": "model/guided-tube-rack.shared.json",
+      "source_sha256": "46506f9fc20c070a223297d6a80ad08de39bba47f278b62ddc4d77bff009857e"
+    }
+  },
+  "jaws": {
+    "joint_type": "symmetric_prismatic",
+    "axis": [
+      1,
+      0,
+      0
+    ],
+    "closed_gap_parameter": "carrier_d",
+    "open_gap_parameter": "open_gap"
+  },
+  "payloads": {
+    "plate96": {
+      "operation": "referenced_plate",
+      "source": "plate"
+    },
+    "tip_box": {
+      "operation": "unmeasured_tip_box_envelope",
+      "source": "tips",
+      "basis": "synthetic_design_envelope_not_article_dimensions"
+    },
+    "tube_rack": {
+      "operation": "referenced_guided_rack",
+      "source": "rack"
+    }
+  },
+  "qualification": {
+    "physical_grasp_verified": false,
+    "payload_retention_verified": false,
+    "load_capacity_kg": null,
+    "hardware_implemented": false,
+    "motion_implemented": false
+  },
+  "limitations": [
+    "Carrier, gripper and box envelopes are explicit design assumptions; no selected actuator or force/retention qualification.",
+    "Actual tip-box dimensions and lid handling remain open. Each nominal tip variant reuses the existing source; box solids are only planning envelopes.",
+    "Static goals do not define a continuous robot trajectory or prove mutual exclusion in hardware."
+  ]
+}

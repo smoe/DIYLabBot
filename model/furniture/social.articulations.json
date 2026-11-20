@@ -2,7 +2,7 @@
   "format": "solidcraftbot.furniture-articulations/1",
   "catalog": {
     "source": "model/furniture/social.catalog.json",
-    "source_sha256": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745"
+    "source_sha256": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440"
   },
   "types": {
     "fridge": {
@@ -153,6 +153,80 @@
           }
         }
       }
+    },
+    "kettle": {
+      "Lid": {
+        "id": "Lid",
+        "type": "revolute",
+        "moving_parts": [
+          "Lid"
+        ],
+        "hinge": {
+          "part": "Lid",
+          "edge": {
+            "x": "max",
+            "y": "center"
+          },
+          "frame_part": "Handle"
+        },
+        "axis": [
+          0,
+          1,
+          0
+        ],
+        "front": [
+          0,
+          1,
+          0
+        ],
+        "limits_deg": [
+          0,
+          90
+        ],
+        "states": {
+          "closed": 0,
+          "open": 90
+        },
+        "reference_state": "closed",
+        "basis": "presentation_assumption",
+        "qualification": {
+          "measured_hinge": false,
+          "native_articulation": false,
+          "swing_clearance_checked": false
+        },
+        "presentation": {
+          "label": "Wasserkocherdeckel {room}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.8,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 1000,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        }
+      }
     }
   },
   "lab_joints": {
@@ -200,6 +274,72 @@
         "opening": "Wird angehoben",
         "open": "Hoch",
         "closing": "Wird abgesenkt"
+      },
+      "duration": {
+        "value": 1.2,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1000,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    }
+  },
+  "kitchen_joints": {
+    "revolute": {
+      "label": "Schranktür {instance} · {room}",
+      "commands": {
+        "open": "Öffnen",
+        "close": "Schließen",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Geschlossen",
+        "opening": "Wird geöffnet",
+        "open": "Offen",
+        "closing": "Wird geschlossen"
+      },
+      "duration": {
+        "value": 1.2,
+        "unit": "s",
+        "range": [
+          0.1,
+          10
+        ],
+        "basis": "presentation_assumption"
+      },
+      "view_distance": {
+        "value": 1100,
+        "unit": "mm",
+        "range": [
+          300,
+          3000
+        ],
+        "basis": "presentation_assumption"
+      }
+    },
+    "prismatic": {
+      "label": "Hocker {instance} · {room}",
+      "commands": {
+        "open": "Ausziehen",
+        "close": "Einschieben",
+        "view": "Ansehen"
+      },
+      "state_labels": {
+        "closed": "Eingeschoben",
+        "opening": "Wird ausgezogen",
+        "open": "Ausgezogen",
+        "closing": "Wird eingeschoben"
       },
       "duration": {
         "value": 1.2,

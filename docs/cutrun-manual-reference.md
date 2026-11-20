@@ -2,7 +2,7 @@
 
 **Stand 12. November 2026: Vorbereitung begonnen, kein realer integrierter Lauf
 freigegeben oder ausgeführt.** Dieses Dossier konkretisiert E4 der
-[Roadmap](../ROADMAP.md) auf Basis des
+[Roadmap](workflows/ROADMAP.md) auf Basis des
 [Referenzprofilentwurfs](cutrun-reference-profile.md) und des geprüften
 [synthetischen E3-Laufs](cutrun-synthetic-workflow.md). Die operative SOP-Bindung
 aus E0 bleibt offen. Das Dossier ist eine Entscheidungs- und Nachweisvorlage,
@@ -19,7 +19,7 @@ zugeordnete QC-Originale. Er erzwingt die vollständige lokale Stufenfolge
 S01–S12 einschließlich getrennter Inputführung und phasenbezogener
 Zeit-/Temperaturbelege. Er führt keine biochemischen Arbeitsgänge aus;
 die Abnahme nach O12 und der tatsächliche E4-Referenznachweis bleiben offen.
-Die [Wasch- und Reagenzerweiterung](cutrun-manual-recipe.md) ergänzt jetzt
+Die [Wasch- und Reagenzerweiterung](cutrun-manual-runtime.md#merged-cutrun-manual-recipe) ergänzt jetzt
 die ausgewählten Reagenzansätze, Waschgruppen, Fraktionswechsel und
 tatsächlichen Säulenbeladungen im gemeinsamen Ledger.
 

@@ -30,7 +30,7 @@ Beide Armkameras zeigen ihre simulierten Bilder synchron zum Ablauf: Die Greifer
 
 Roboter sollen zügig arbeiten und Menschen tatsächlich Zeit verschaffen. Getragene Proben benötigen dabei fließende Bewegungen mit begrenzter Beschleunigung und begrenztem Ruck. Die gezeigte Bahn ist im Modell geprüft; reale Sensorik, Fehlerreaktionen und Hardwarebetrieb bleiben zu entwickeln.
 
-[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) · [Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) · [Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) · [Modellstand und Herkunft der Medien](docs/media/README.md)
+[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) · [Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) · [Bewegungsprofil und Prüfgrenzen](docs/centrifuge-cf01.md#cf01-smooth-unloading) · [Modellstand und Herkunft der Medien](docs/media/README.md)
 
 Ein weiteres Beispiel ist die [direkte Entnahme aus H02 mit Ablage im Rack](docs/h02-rack-transfer.md). Hier greift ein Arm derselben Konstruktion ein Gefäß aus seinem offenen Halter und setzt es zwischen bereits belegten Rackplätzen ab. Der vollständige Weg einschließlich Greiferöffnung und Rückzug ist für beide Gefäßvarianten in FreeCAD und SolidCraft geprüft.
 
@@ -50,10 +50,14 @@ Doktorandenraum, Labor, Küche und Atrium lassen sich ohne CAD-Installation besi
 
 ## Biologische Workflows gemeinsam ausführen
 
+Der [Workflow-Bereich](docs/workflows/README.md) bündelt die Einstiege und die
+[biologische Roadmap](docs/workflows/ROADMAP.md).
+
 Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält ihre Identität über Entnahmen, Messungen und Transporte hinweg; ihre Übergaben und verbrauchten Mengen werden dokumentiert. Menschliche Arbeitsschritte und Botengänge gehören ausdrücklich dazu. So lässt sich ein Ablauf schrittweise automatisieren.
 
 Bereits ausführbare **synthetische Softwareabläufe** zeigen beispielsweise:
 
+- [Pipettierstation PS01](docs/pipetting-station-ps01.md) mit getrennten Armen für Pipettieren und Labware-Handhabung sowie frei kombinierbaren Transfers, Verteilungen und Mischschritten. Das erste Planungsbeispiel kombiniert zwei Flüssigkeiten entlang der beiden Achsen einer 96-Well-Platte; Mengen, Spitzenverbrauch und Well-Kapazitäten werden geprüft.
 - [Zentrifugieren, NanoDrop und Qubit 4](docs/synthetic-lab-workflow.md) mit gemeinsamem Probenbestand und nachvollziehbaren Entnahmen.
 - [DNA-Extraktion mit NanoDrop, Qubit und TapeStation](docs/extraction-analytics.md) von der Ausgangsprobe bis zur Bewertung des erhaltenen DNA-Produkts.
 - [Asynchronen Labortransport](docs/async-lab-transport.md) mit bestätigten Übergaben und ausdrücklichem Abgleich bei unklaren Ergebnissen.
@@ -66,9 +70,11 @@ Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen. Free
 
 Für den Einstieg:
 
-- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und [Entwicklungsplan](docs/development-plan.md).
+- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und [mechanischer Entwicklungsplan](ROADMAP.md#mechanischer-entwicklungsplan).
 - [Architektur](ARCHITECTURE.md) und [gemeinsames Modell](docs/shared-model.md).
 - [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
+
+Der lokale Modellaufbau erzeugt nicht versionierte CAD-, Mesh- und ROS-Dateien: Der abgegrenzte Referenzbuild mit `--ros2` belegt rund 116 MB (Dezimalmaß; bestehende Ausgaben gemessen, kein Speicherhöchstbedarf; Messumfang und Quellstand im lokalen [Build-Bericht](exports/generated/storage-reference-2026-11-18/build-report.json)). Die darin erfassten Revisionsverzeichnisse unter `cad/generated/` und `exports/generated/` sowie die erzeugten Mesh-, URDF- und Konfigurationsdateien unter `ros2_ws/src/solidcraftbot_ros/` sind gitignored und per Build neu erzeugbar; nur diese Ausgaben können gelöscht werden, nicht pauschal `exports/` mit seinen Laufzeitdaten und Originalbelegen, und weitere Buildrevisionen benötigen zusätzlichen Platz.
 
 ```sh
 python3 -m unittest discover -s tests -v

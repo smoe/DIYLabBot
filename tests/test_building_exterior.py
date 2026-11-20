@@ -100,6 +100,32 @@ class ExteriorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'actual outer facade'):
             model.interfaces(selected,self.p)
 
+    def test_secretary_end_window_opens_the_outer_wall_on_og3_only(self):
+        groups=[group for group in self.d['exterior']['side_window_groups'] if group['wall']=='W001']
+        self.assertEqual([(group['level_id'],group['target_body']) for group in groups],
+                         [('OG3','OG3__Wall_W001')])
+        plan=model.level_plan(self.s,'OG3')
+        adjacent=[area['id'] for area in plan['areas'] if any(edge['wall']=='W001' for edge in area['boundary'])]
+        self.assertEqual(adjacent,['Suite3_006AB'],'The window must lead outdoors, not into a neighboring room')
+        walls={wall['id']:wall for wall in plan['walls']}
+        entry=next(door for door in plan['openings'] if door['id']=='D3_006')
+        end_x=[plan['vertices'][walls['W001'][key]][0] for key in ('start','end')]
+        entry_x=[plan['vertices'][walls[entry['wall']][key]][0] for key in ('start','end')]
+        self.assertLess(max(end_x),min(entry_x),'Window belongs at the far end away from the entrance')
+        group=groups[0];operations=self.e['operations'];bodies={body['id']:body for body in self.e['bodies']}
+        self.assertEqual(bodies[group['glass_body']]['role'],'concept_side_band_glass')
+        self.assertEqual(bodies[group['frame_body']]['role'],'concept_side_window_frame')
+        self.assertTrue(any(op['body']==group['target_body'] and op['action']=='cut'
+                            and op['id']==group['id']+'_WallCut' for op in operations))
+        self.assertTrue(any(probe['target_body']==group['target_body'] for probe in self.d['exterior']['window_probes']))
+        baseline=copy.deepcopy(self.s)
+        baseline['exterior']['side_window_walls_by_level']['OG3'].remove('W001')
+        if not baseline['exterior']['side_window_walls_by_level']['OG3']:
+            del baseline['exterior']['side_window_walls_by_level']['OG3']
+        before=model.interfaces(baseline,self.p)['exterior']
+        self.assertEqual([g for g in self.d['exterior']['side_window_groups'] if g['wall']!='W001'],
+                         before['side_window_groups'])
+
     def test_entrance_flanks_are_opaque_and_side_bands_have_closed_gaps(self):
         ext=self.d['exterior'];bodies={b['id']:b for b in self.e['bodies']}
         for name in ['OG3__Wall_W102']:

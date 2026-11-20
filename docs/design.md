@@ -73,7 +73,7 @@ Die X6-Zeichnung und das CAD stimmen nach Korrektur unserer Zuordnung überein:
 Gehäuse 10 × M3 auf Ø72,5 mm plus zwei Zentrierhülsen; Ausgang 12 × M4 auf Ø44 mm.
 Die Platten sind entsprechend korrigiert. Die [X6-Passungs- und Schraubenauslegung](x6-fits-fasteners.md)
 führt Rundbohrung/Langloch und versenkte Schraubenstapel einschließlich der
-noch zu bestätigenden Gehäusegewindetiefe. Der [X6-Bericht](x6-interface-resolution.md)
+noch zu bestätigenden Gehäusegewindetiefe. Der [X6-Bericht](x6-fits-fasteners.md#merged-x6-interface-resolution)
 und der [Integrationsbericht](servo-integration.md) beschreiben die offenen Passungen,
 Freiräume und die um 40 mm verlängerte distale J6-Anordnung. Vorgehen steht im
 [Integrationsplan](vendor-cad-plan.md), Last-/Präzisionsnachweis in der
@@ -505,7 +505,7 @@ Positionsrückmeldung. `services` in der gemeinsamen Quelle ordnet sie den
 Motorbauräumen zu und beschreibt logische Leitungswege.
 Die Ebene bleibt in der Bewegungsdarstellung unsichtbar. Topologieprüfungen sind
 implementiert; räumliche Kabelführung, Biege-/Torsionsnachweise und tatsächliche
-Sensorrückmeldung stehen aus. Siehe [servo-cables.md](servo-cables.md).
+Sensorrückmeldung stehen aus. Siehe [servo-cables.md](servo-integration.md#merged-servo-cables).
 
 - Lageranordnung, Vorspannung, Wellen, Passungen und Befestigungen.
 - Antriebsmomente, Übersetzungen, Regelung und Messung am Gelenkausgang.
@@ -521,7 +521,7 @@ diesem Modellstand noch nicht abgeleitet.
 
 ## Zentrifugenstation CF01
 
-Die neue [Entnahmeszene](centrifuge-cf01-robot-pickup.md) nutzt den vorhandenen
+Die neue [Entnahmeszene](centrifuge-cf01.md#cf01-robot-pickup) nutzt den vorhandenen
 Sechsachsenarm mit einem provisorischen Parallelgreifer. Das Gefäß wechselt nach
 Greifbestätigung starr zum Werkzeug, wird axial ausgezogen und aus dem
 Deckelbereich zurückgenommen. Erst danach werden Heber und Deckel bewegt.

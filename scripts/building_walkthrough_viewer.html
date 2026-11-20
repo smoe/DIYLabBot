@@ -32,7 +32,7 @@
   </header>
   <nav class="places" id="walkthrough-stops" aria-label="Room viewpoints"></nav>
   <section class="stage" id="walkthrough-stage" aria-label="Interactive building model">
-    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. Use W A S D or arrow keys to move, drag to look, Q or E to change height. Click a nearby door, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
+    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. W or Up and S or Down move forward and backward. Left and Right turn; Alt or Option plus Left or Right, or A and D, move sideways. Drag to look, Q or E change height, Shift walks faster. Click a nearby door, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
     <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
     <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
     <div class="crosshair" aria-hidden="true"></div>
@@ -41,12 +41,18 @@
       <div class="lift-floors" id="walkthrough-lift-floors" aria-label="Destination floor"></div>
       <div class="lift-actions" id="walkthrough-lift-actions"></div>
     </section>
+    <section class="lift-panel" id="walkthrough-robot" aria-label="Roboterbefehle" hidden>
+      <button class="quiet-button" id="walkthrough-robot-close" type="button" aria-label="Roboterbefehle schließen" style="float:right">×</button>
+      <p><strong id="walkthrough-robot-label"></strong><br><span id="walkthrough-robot-status" role="status"></span></p>
+      <div class="lift-actions" id="walkthrough-robot-actions"></div>
+      <p class="notice">Simulation · Leerbewegung</p>
+    </section>
     <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
       <button type="button" data-move="forward" aria-label="Move forward" title="Forward">↑</button>
-      <button type="button" data-move="left" aria-label="Move left" title="Left">←</button>
+      <button type="button" data-move="left" aria-label="Strafe left" title="Strafe left · A">←</button>
       <button type="button" data-move="back" aria-label="Move backward" title="Backward">↓</button>
-      <button type="button" data-move="right" aria-label="Move right" title="Right">→</button>
+      <button type="button" data-move="right" aria-label="Strafe right" title="Strafe right · D">→</button>
     </div>
     <div class="height-controls" aria-label="Camera height">
       <button type="button" data-move="up" aria-label="Move camera up" title="Up · E">＋</button>
@@ -64,13 +70,14 @@
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>
-    <div class="help" id="walkthrough-help">WASD / arrows: move &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
+    <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: walk faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
   </div>
   <p class="notice" id="walkthrough-notice">Concept building geometry. Lab 3.003 belongs to this building scene; its room binding is a presentation assumption, not surveyed registration. The elevator is a browser presentation, not a real lift controller.</p>
   <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
 </main>
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
-<script>__WALKTHROUGH_INTERACTION__</script>
+<script>__WALKTHROUGH_INTERACTION__
+__WALKTHROUGH_ROBOTS__</script>
 <script>
 (() => {
   'use strict';
@@ -86,7 +93,8 @@
     if(!data.scenes||!Array.isArray(data.stops)||!data.stops.length)throw Error('Scene geometry and viewpoints are required.');
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
     if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
-    const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set();
+    const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
+    const keyboardModifiers={alt:false,shift:false};
     const isolation=data.isolation||null,isolationIds=new Set(isolation?.body_ids||[]),isolationButton=document.getElementById('walkthrough-isolate');
     let isolated=false;
     isolationButton.hidden=!isolation;isolationButton.textContent=isolation?.label||'Isolate lab 3.003';
@@ -149,7 +157,9 @@
         ||Math.abs(Math.hypot(...config.joint.axis)-1)>1e-7||!Array.isArray(config.moving_body_ids)||!config.moving_body_ids.length
         ||!Number.isFinite(config.duration_s)||config.duration_s<=0||!Number.isFinite(config.states?.[config.reference_state]))throw Error('Invalid articulated object.');
       if(!['revolute','prismatic'].includes(config.joint.type))throw Error('Unsupported articulated joint type.');
-      const object={config,state:config.reference_state,targetState:config.reference_state,value:config.states[config.reference_state],transition:null};
+      const initial=config.initial_state||config.reference_state;
+      if(!Number.isFinite(config.states[initial]))throw Error('Invalid initial articulated pose.');
+      const object={config,state:initial,targetState:initial,value:config.states[initial],transition:null};
       objectStates.set(config.id,object);objectSceneIds.add(config.scene);
       for(const body of config.moving_body_ids){const key=config.scene+':'+body;if(bodyOwners.has(key)||!data.scenes[config.scene].groups.some(g=>g.id===body))throw Error('Missing or multiply bound moving body.');bodyOwners.set(key,object);}
     }
@@ -159,6 +169,36 @@
       for(const entry of Object.values(object.config.commands))for(const rule of entry.requires||[]){
         const other=objectStates.get(rule.object_id);if(!other||!Number.isFinite(other.config.states[rule.state]))throw Error('Unknown articulation guard.');
       }
+    }
+    const robots=new Map((data.robots||[]).map(c=>[c.id,WalkthroughRobots.create(c,objectStates,CF01Motion.Curve)]));
+    const robotTriggers=new Map();
+    for(const robot of robots.values())for(const id of robot.config.trigger_body_ids){
+      if(!data.scenes[robot.config.scene].groups.some(g=>g.id===id)||robotTriggers.has(id))throw Error('Missing or duplicate robot body');
+      robotTriggers.set(id,robot);objectSceneIds.add(robot.config.scene);
+    }
+    const robotPanel=document.getElementById('walkthrough-robot'),robotLabel=document.getElementById('walkthrough-robot-label'),robotStatus=document.getElementById('walkthrough-robot-status'),robotActions=document.getElementById('walkthrough-robot-actions');
+    let selectedRobot=null;
+    document.getElementById("walkthrough-robot-close").addEventListener("click",()=>{selectedRobot=null;updateRobotUI();canvas.focus();});
+    function updateRobotUI(){
+      robotPanel.hidden=!selectedRobot||sceneId!==selectedRobot.config.scene||selectedLevel!==selectedRobot.config.level_id||Boolean(elevator?.boarded);
+      if(!selectedRobot)return;
+      robotLabel.textContent=selectedRobot.config.label;
+      const state=selectedRobot.snapshot;
+      robotStatus.textContent=({idle:'Bereit',moving:'Demobewegung',homing:'Grundstellung anfahren',stopping:'Bremst ab',stopped:'Angehalten'})[state.state];
+      for(const button of robotActions.querySelectorAll('button'))button.disabled=state.busy&&button.dataset.robotCommand!=='stop';
+    }
+    function selectRobot(id){
+      selectedRobot=robots.get(id);if(!selectedRobot)return {status:'unknown_target',id};
+      clearInputKeys();robotActions.replaceChildren();
+      for(const [name,label] of Object.entries(selectedRobot.config.commands)){
+        const b=document.createElement('button');b.type='button';b.className='quiet-button';b.textContent=label;b.dataset.robotCommand=name;
+        b.addEventListener('click',()=>robotCommand(id,name));robotActions.append(b);
+      }
+      updateRobotUI();return {status:'accepted',id};
+    }
+    function robotCommand(id,name){
+      const robot=robots.get(id);if(!robot)return {status:'unknown_target',id};
+      const result=robot.command(name,performance.now());dirty=true;updateRobotUI();requestRender();return result;
     }
     const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
     const liftDoors=elevatorConfig?WalkthroughInteraction.createLiftDoorCycle(elevatorConfig,objectStates,driveObject):null;
@@ -202,19 +242,21 @@
       if(boarded){
         for(const level of levels.filter(level=>elevatorConfig.ports.some(p=>p.active&&p.level_id===level.id)))button(liftFloors,level.label||level.id,()=>recordLift(elevator.select(level.id)),{'data-lift-floor':level.id,'aria-label':'Travel to '+(level.label||level.id)});
         for(const port of elevatorConfig.ports.filter(port=>port.active&&port.level_id===elevatorObject.state))button(liftActions,'Exit · '+port.side,()=>{
-          const result=elevator.exit(port.side);if(result.status==='accepted'){eye=result.eye_mm.map(v=>v/1000);selectedLevel=result.level_id;levelSelect.value=selectedLevel;root.dataset.freeCamera='true';keys.clear();}
+          const result=elevator.exit(port.side);if(result.status==='accepted'){eye=result.eye_mm.map(v=>v/1000);selectedLevel=result.level_id;levelSelect.value=selectedLevel;root.dataset.freeCamera='true';clearInputKeys();}
           recordLift(result);
         },{'data-lift-exit':port.side});
       }else if(nearby){
         button(liftActions,'Call lift',()=>recordLift(elevator.call(nearby.id)),{'data-lift-call':nearby.id});
         const enter=button(liftActions,'Enter lift',()=>{
-          const result=elevator.board(nearby.id,eye.map(v=>v*1000),reach*1000);if(result.status==='accepted'){keys.clear();isolated=false;isolationButton.setAttribute('aria-pressed','false');}
+          const result=elevator.board(nearby.id,eye.map(v=>v*1000),reach*1000);if(result.status==='accepted'){clearInputKeys();isolated=false;isolationButton.setAttribute('aria-pressed','false');}
           recordLift(result);
         },{'data-lift-enter':nearby.id});enter.disabled=busy||elevatorObject.state!==nearby.level_id;
       }
     }
     function advanceObjects(now){
       let active=false;
+      for(const robot of robots.values()){if(robot.advance(now))active=true;}
+      if(robots.size){dirty=true;updateRobotUI();}
       for(const object of objectStates.values()){
         const motion=object.transition;if(!motion)continue;
         const u=Math.max(0,Math.min(1,(now-motion.start)/motion.duration));
@@ -252,7 +294,7 @@
     function viewObject(id){
       if(elevator?.boarded)return {status:'rejected_aboard',id};
       const object=objectStates.get(id);if(!object?.config.viewpoint)return {status:'unknown_target',id};
-      const config=object.config;keys.clear();sceneId=config.scene;selectedLevel=config.level_id;eye=config.viewpoint.eye_mm.map(v=>v/1000);
+      const config=object.config;clearInputKeys();sceneId=config.scene;selectedLevel=config.level_id;eye=config.viewpoint.eye_mm.map(v=>v/1000);
       const direction=normalize(config.viewpoint.target_mm.map((v,i)=>(v-config.viewpoint.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(direction[2]);
       for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed','false');
       levelSelect.disabled=sceneId!=='building';levelSelect.value=selectedLevel;locationLabel.textContent=config.label;contextLabel.textContent='Objektansicht · '+selectedLevel;
@@ -270,13 +312,14 @@
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
+        targetForBody:id=>robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
         referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
     function interact(x,y,input){
       advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
       if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
+      if(robots.has(hit.target_id))return lastInteraction={...selectRobot(hit.target_id),input,frame:frames};
       const port=portById.get(hit.target_id),object=objectStates.get(hit.target_id),name=object?.targetState==='closed'?'open':'close';
       const result=port?recordLift(elevator.call(port.id)):command(hit.target_id,name);
       lastInteraction={...result,input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
@@ -284,7 +327,8 @@
     function updateInteractionHint(){
       centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
       crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
-      if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
+      if(centreTarget&&robots.has(centreTarget.target_id)){interactionHint.textContent=robots.get(centreTarget.target_id).config.label+' · Klick oder Leertaste: Befehle';}
+      else if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
       const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
       canvas.style.cursor=drag?.moved?'grabbing':hover?'pointer':'grab';
     }
@@ -331,7 +375,11 @@
       function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
       attribute(attributes.position,positions);attribute(attributes.normal,normals);
       const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
-      const result={picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
+      const nav=data.navigation;if(!nav)throw Error('Source-bound camera collision profile required.');
+      const collider=WalkthroughInteraction.createCameraCollider({positions,indices,
+        groups:source.groups.filter(g=>!omitted.has(g.id)&&g.index_count),radius:nav.camera_radius_mm/1000,
+        margin:nav.contact_margin_mm/1000,iterations:nav.max_contact_iterations,slides:nav.max_slides});
+      const result={collider,picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function render(){
@@ -353,24 +401,51 @@
       gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();updateLiftUI();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
     }
+    function clearKeyboardKeys(){keyboardKeys.clear();keyboardModifiers.alt=false;keyboardModifiers.shift=false;}
+    function clearInputKeys(){keys.clear();clearKeyboardKeys();}
+    function readModifiers(event){keyboardModifiers.alt=event.altKey;keyboardModifiers.shift=event.shiftKey;}
+    function held(action){return keys.has(action)||(action==='strafe'&&keyboardModifiers.alt)||(action==='fast'&&keyboardModifiers.shift)||[...keyboardKeys].some(code=>keyNames[code]===action);}
+    function navigationHeld(){return keys.size||[...keyboardKeys].some(code=>!['fast','strafe'].includes(keyNames[code]));}
     function move(seconds){
+      const strafe=held('strafe'),turn=(held('turnLeft')?1:0)-(held('turnRight')?1:0);
+      if(turn&&!strafe&&seconds>0){yaw+=turn*Math.PI/2*seconds;root.dataset.freeCamera='true';dirty=true;}
       if(elevator?.boarded)return;
-      let f=(keys.has('forward')?1:0)-(keys.has('back')?1:0),r=(keys.has('right')?1:0)-(keys.has('left')?1:0),z=(keys.has('up')?1:0)-(keys.has('down')?1:0);
+      let f=(held('forward')?1:0)-(held('back')?1:0),
+        r=(held('right')||strafe&&held('turnRight')?1:0)-(held('left')||strafe&&held('turnLeft')?1:0),
+        z=(held('up')?1:0)-(held('down')?1:0);
       const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
-      const speed=walkSpeed*(keys.has('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
-      eye[0]+=dx*speed*seconds;eye[1]+=dy*speed*seconds;eye[2]+=z*verticalSpeed*seconds;
+      const speed=walkSpeed*(held('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
+      const delta=[dx*speed*seconds,dy*speed*seconds,z*verticalSpeed*seconds];
+      if(f||r||z){
+        const barriers=[];
+        // Free movement never boards the cabin or enters the shaft. Only the
+        // existing checked boarding/exit protocol owns that transition.
+        if(elevatorConfig&&sceneId==='building'){
+          const bounds=elevatorConfig.shaft_bounds_mm;if(!bounds)throw Error('Source-derived shaft envelope required.');
+          barriers.push({id:'UnboardedLiftShaft',min:bounds.min.map(v=>v/1000),max:bounds.max.map(v=>v/1000)});
+        }
+        const result=prepareScene(sceneId).collider.move(eye,delta,{barriers,transformsForBody:id=>{
+          const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
+          const transforms=[objectMatrix(owner)];
+          // During a door transition keep the doorway guarded until fully open.
+          if(['room_door','lift_door'].includes(owner.config.mechanism)&&owner.transition)transforms.push(objectMatrix(owner,true));
+          return transforms;
+        }});
+        eye=result.eye;root.dataset.cameraBlocked=String(result.contacts.length>0);
+      }
       if(f||r||z){root.dataset.freeCamera='true';dirty=true;}
     }
     function tick(now){
       frameRequest=null;
-      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);const animating=advanceObjects(now),liftActive=liftDoors?.advance();if(dirty){render();dirty=false;}if(keys.size||animating||liftActive)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
-      catch(error){keys.clear();fail(error);}
+      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);const animating=advanceObjects(now),liftActive=liftDoors?.advance();if(dirty){render();dirty=false;}if(navigationHeld()||animating||liftActive)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
+      catch(error){clearInputKeys();fail(error);}
     }
     function setStop(id){
+      selectedRobot=null;updateRobotUI();
       if(elevator?.boarded)return {status:'rejected_aboard'};
       if(id!=='lab'){isolated=false;isolationButton.setAttribute('aria-pressed','false');}
       const stop=stops.find(s=>s.id===id);if(!stop)throw Error('Unknown viewpoint.');
-      keys.clear();sceneId=stop.scene;stopId=stop.id;selectedLevel=stop.level_id||null;eye=stop.eye_mm.map(v=>v/1000);
+      clearInputKeys();sceneId=stop.scene;stopId=stop.id;selectedLevel=stop.level_id||null;eye=stop.eye_mm.map(v=>v/1000);
       const direction=normalize(stop.target_mm.map((v,i)=>(v-stop.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(Math.max(-.995,Math.min(.995,direction[2])));
       for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.stop===id));
       locationLabel.textContent=stop.label;
@@ -389,10 +464,20 @@
     const fullscreen=document.getElementById('walkthrough-fullscreen');fullscreen.hidden=!stageNode.requestFullscreen;
     fullscreen.addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await stageNode.requestFullscreen();requestRender();}catch(error){announcement.textContent='Full screen is not available in this browser.';}});
     document.addEventListener('fullscreenchange',()=>{fullscreen.setAttribute('aria-label',document.fullscreenElement?'Exit full screen':'Enter full screen');requestRender();});
-    const keyNames={KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'left',KeyD:'right',ArrowRight:'right',KeyQ:'down',KeyE:'up',ShiftLeft:'fast',ShiftRight:'fast'};
-    window.addEventListener('keydown',event=>{if(event.code==='Space'&&!event.ctrlKey&&!event.metaKey&&!event.altKey){if(event.target instanceof Element&&event.target.closest('button,input,select,textarea,[contenteditable=true]'))return;if(document.activeElement!==canvas&&document.activeElement!==document.body)return;event.preventDefault();if(!event.repeat)interact(0,0,'space');return;}const name=keyNames[event.code];if(!name||event.ctrlKey||event.metaKey||event.altKey||(event.target instanceof Element&&event.target.closest('input,select,textarea,[contenteditable=true]')))return;event.preventDefault();keys.add(name);requestRender();});
-    window.addEventListener('keyup',event=>{const name=keyNames[event.code];if(name){keys.delete(name);requestRender();}});
-    const clearMovement=()=>{keys.clear();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();else requestRender();});
+    const keyNames={KeyW:'forward',ArrowUp:'forward',KeyS:'back',ArrowDown:'back',KeyA:'left',ArrowLeft:'turnLeft',KeyD:'right',ArrowRight:'turnRight',KeyQ:'down',KeyE:'up',AltLeft:'strafe',AltRight:'strafe',ShiftLeft:'fast',ShiftRight:'fast'};
+    const editable=target=>target instanceof Element&&Boolean(target.closest('input,select,textarea,[contenteditable]:not([contenteditable=false])'));
+    window.addEventListener('keydown',event=>{
+      if(event.ctrlKey||event.metaKey){clearKeyboardKeys();requestRender();return;}
+      if(editable(event.target))return;
+      readModifiers(event);
+      if(event.code==='Space'&&!event.altKey){if(event.target instanceof Element&&event.target.closest('button'))return;if(document.activeElement!==canvas&&document.activeElement!==document.body)return;event.preventDefault();if(!event.repeat)interact(0,0,'space');return;}
+      if(!keyNames[event.code])return;
+      if(event.repeat&&!keyboardKeys.has(event.code)){event.preventDefault();return;}
+      event.preventDefault();keyboardKeys.add(event.code);requestRender();
+    });
+    window.addEventListener('keyup',event=>{if(event.ctrlKey||event.metaKey)clearKeyboardKeys();else{keyboardKeys.delete(event.code);readModifiers(event);}if(keyNames[event.code])requestRender();});
+    const clearMovement=()=>{clearInputKeys();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();else requestRender();});
+    document.addEventListener('focusin',event=>{if(editable(event.target))clearMovement();});
     for(const button of document.querySelectorAll('[data-move]')){
       const name=button.dataset.move;button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);keys.add(name);requestRender();});
       const stop=()=>{keys.delete(name);requestRender();};button.addEventListener('pointerup',stop);button.addEventListener('pointercancel',stop);button.addEventListener('lostpointercapture',stop);
@@ -410,12 +495,15 @@
     canvas.addEventListener('pointerup',event=>{if(!drag||drag.id!==event.pointerId)return;const click=!drag.moved;drag=null;pointerPosition=pointerCoordinates(event);if(click)interact(...pointerPosition,'click');requestRender();});
     canvas.addEventListener('pointerleave',()=>{if(!drag){pointerPosition=null;requestRender();}});
     canvas.addEventListener('pointercancel',()=>{drag=null;pointerPosition=null;});canvas.addEventListener('lostpointercapture',()=>{drag=null;});
-    canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();keys.clear();fail(Error('The graphics context was lost. Reload the viewer to continue.'));});
+    canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();clearInputKeys();fail(Error('The graphics context was lost. Reload the viewer to continue.'));});
     new ResizeObserver(requestRender).observe(stageNode);
     window.__buildingWalkthrough=Object.freeze({
       command,viewObject,projectPoint,
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
+      robotCommand, selectRobot,
+      viewRobot:id=>{const r=robots.get(id);return r?viewObject(r.config.joint_object_ids[0]):{status:"unknown_target",id};},
+      get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
       get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get isolated(){return isolated;},

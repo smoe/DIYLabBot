@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "status",
+    "sources",
+    "owner_principal",
+    "stations",
+    "handoff_ports",
+    "adapter",
+    "fixture",
+    "supply_station",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.ps01-logistics/1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "mode": {
+      "const": "synthetic_only"
+    },
+    "status": {
+      "const": "Concept; no manufacturing release"
+    },
+    "sources": {
+      "type": "object",
+      "required": [
+        "setup",
+        "handling",
+        "vehicle",
+        "tips",
+        "transport"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "setup": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "handling": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "vehicle": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "tips": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        },
+        "transport": {
+          "$ref": "assembly-reference.schema.json#/$defs/reference"
+        }
+      }
+    },
+    "owner_principal": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "stations": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "worktop_xyz_mm",
+          "dock_xy_mm"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+          },
+          "worktop_xyz_mm": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "dock_xy_mm": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "handoff_ports": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": [
+          "port",
+          "xy_mm"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "port": {
+            "enum": [
+              "InfeedRack",
+              "InfeedTips",
+              "Outfeed"
+            ]
+          },
+          "xy_mm": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      }
+    },
+    "adapter": {
+      "type": "object",
+      "required": [
+        "recipe",
+        "bay_index",
+        "base_thickness_mm",
+        "locator_clearance_mm",
+        "locator_height_mm",
+        "locator_thickness_mm",
+        "retention",
+        "box_geometry_basis"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "recipe": {
+          "const": "tr01_lt01_supported_nest/1"
+        },
+        "bay_index": {
+          "enum": [
+            0,
+            1
+          ]
+        },
+        "base_thickness_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "locator_clearance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "locator_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "locator_thickness_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "maximum": 20
+        },
+        "retention": {
+          "const": "manual_fixture_confirmation"
+        },
+        "box_geometry_basis": {
+          "const": "unmeasured_existing_LT01_envelope"
+        }
+      }
+    },
+    "fixture": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "prototype",
+              "payload_id",
+              "initial_endpoint",
+              "kind",
+              "variant",
+              "used_tip_count"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "prototype": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "payload_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "initial_endpoint": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "kind": {
+                "const": "tip_box"
+              },
+              "variant": {
+                "enum": [
+                  "tip_10_ul",
+                  "tip_200_ul",
+                  "tip_1000_ul"
+                ]
+              },
+              "used_tip_count": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 96
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "prototype",
+              "payload_id",
+              "initial_endpoint",
+              "kind"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "prototype": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "payload_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "initial_endpoint": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "kind": {
+                "const": "well_plate"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "required": [
+              "id",
+              "prototype",
+              "payload_id",
+              "initial_endpoint",
+              "kind",
+              "vessels"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "prototype": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "payload_id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "initial_endpoint": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+              },
+              "kind": {
+                "const": "tube_rack"
+              },
+              "vessels": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "place_id",
+                    "vessel_id",
+                    "content_revision",
+                    "materials"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "place_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                    },
+                    "vessel_id": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                    },
+                    "content_revision": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "materials": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "material_id",
+                          "origin_id"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "material_id": {
+                            "type": "string",
+                            "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+                          },
+                          "origin_id": {
+                            "type": [
+                              "string",
+                              "null"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "supply_station": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{1,160}$"
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

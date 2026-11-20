@@ -1,0 +1,78 @@
+{
+  "format": "solidcraftbot.equipment-layout/1",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "assets": {
+    "station": {
+      "source": "model/pipetting-station-ps01.shared.json",
+      "source_sha256": "d1178e356f7503da567c86eb3082132307223af16c93c296bfedd2e444d78c01"
+    },
+    "arm": {
+      "source": "model/robot.json",
+      "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+    },
+    "waste": {
+      "source": "model/tip-collector-t01.shared.json",
+      "source_sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a"
+    }
+  },
+  "instances": [
+    {
+      "id": "PS01",
+      "asset": "station",
+      "host": "PS01.Worktop",
+      "xyz": [
+        0,
+        0,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "PS01Arm",
+      "asset": "arm",
+      "host": "PS01.Worktop",
+      "xyz": [
+        0,
+        310,
+        0
+      ],
+      "yaw_deg": -90,
+      "overrides": {
+        "upper_len": 280,
+        "fore_len": 250
+      }
+    },
+    {
+      "id": "PS01Waste",
+      "asset": "waste",
+      "host": "PS01.Worktop",
+      "xyz": [
+        -400,
+        60,
+        0
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "PS01TransferArm",
+      "asset": "arm",
+      "host": "PS01.Worktop",
+      "xyz": [
+        400,
+        -170,
+        0
+      ],
+      "yaw_deg": 150,
+      "overrides": {
+        "upper_len": 380,
+        "fore_len": 350
+      }
+    }
+  ],
+  "limitations": [
+    "Static concept configuration; no inherited CF01, L01 or robot trajectory qualification."
+  ]
+}

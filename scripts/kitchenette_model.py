@@ -68,6 +68,8 @@ def parts(source):
         z = 103+n*drawer_height
         box('DrawerFront'+str(n+1),[3,front,z],[drawers-6,18,drawer_height-6],'blue')
         handle('DrawerHandle'+str(n+1),60,front+43,z+drawer_height-42,drawers-120)
+        box('DrawerBox'+str(n+1),[25,35,z+22],[drawers-50,front-35,min(drawer_height-36,bottom-24-(z+22))])
+        box('DrawerCavity'+str(n+1),[37,47,z+34],[drawers-74,front-59,drawer_height],action='cut',body='DrawerBox'+str(n+1))
     upper_z,upper_h,upper_d = p['upper_bottom'],p['upper_height'],p['upper_depth']
     box('UpperShell',[0,0,upper_z],[width,upper_d,upper_h])
     for name,x,w,z,hh in [('Left',18,split/2-27,upper_z+18,upper_h-36),
@@ -106,3 +108,27 @@ def appliance_origin(p, slot):
     if slot == 'microwave': return [bay+(p['fridge_bay']-520)/2,0,p['upper_bottom']+18]
     if slot == 'kettle': return [p['width']-180,340,p['counter_height']]
     raise ValueError('Unknown kitchenette appliance support: '+slot)
+
+
+def articulations(source):
+    """One recipe owns the panels, hardware and their closed-reference joints."""
+    p=parameters(source); definitions={v['id']:v for v in parts(source) if v['action']=='create'}
+    result=[]
+    def joint(identity, panel, handle, kind, label, hinge='left', extra=()):
+        shape=definitions[panel]['shape'];x,y,z=shape['origin'];w,d,h=shape['size']
+        moving=[panel]+[n for n in definitions if n==handle or n.startswith(handle+'Mount')]+list(extra)
+        origin=[x if hinge=='left' else x+w,y+d,z]
+        axis=[0,0,1] if hinge=='left' else [0,0,-1]
+        if hinge=='top':origin=[x,y+d,z+h];axis=[1,0,0]
+        # Leave room for the projecting hardware beside the installation wall.
+        limits={'limits_deg':[0,85 if panel.startswith('UpperDoor') else 90]}
+        if kind=='prismatic':axis=[0,1,0];limits={'limits_mm':[0,.7*(p['depth']-60)]}
+        result.append({'instance_id':'Cabinet','articulation_id':identity,'type':kind,
+            'origin_mm':origin,'axis':axis,'front':[0,1,0],**limits,'value':0,
+            'moving_body_ids':moving,'label':label})
+    for n in range(1,6):
+        joint('Drawer'+str(n),'DrawerFront'+str(n),'DrawerHandle'+str(n),'prismatic','Schublade '+str(n),extra=('DrawerBox'+str(n),))
+    joint('SinkDoor','SinkFront','SinkHandle','revolute','Spülenschrank')
+    for n in (1,2):joint('UpperDoor'+str(n),'UpperDoor'+str(n),'UpperHandle'+str(n),'revolute','Hängeschrank '+str(n),hinge='left' if n==1 else 'right')
+    joint('UpperFlap','UpperFlap','UpperFlapHandle','revolute','Oberes Fach',hinge='top')
+    return result

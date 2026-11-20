@@ -1,5 +1,13 @@
 # Gebäude im Browser erkunden
 
+Die freie Kamera prüft ihre Translation kontinuierlich mit einer als Darstellungsannahme geführten Kugel gegen die nativen Dreiecksflächen, einschließlich der aktuellen Türposen. Sie gleitet an Hindernissen entlang; nicht aufgelöste Kontakte stoppen die Bewegung. Radius, Kontaktabstand und Rechengrenzen stehen einmalig unter `navigation` in `model/building-walkthrough.shared.json`. Das ist keine geprüfte menschliche Körperhülle oder reale Schutzfunktion.
+
+Die benannten kleinen Technikzugänge `N3_023` bis `N3_027` starten auf OG1–OG3 geschlossen. Labor- und Bürotüren starten weiterhin offen. Startzustand und native Referenzpose sind getrennt: Die bestehenden offenen Referenzgeometrien werden nicht geändert. Während Türbewegungen bleibt zusätzlich die geschlossene Durchgangspose für die Kamera gesperrt. Freies Bewegen in den Aufzugschacht ist auch bei fehlender Kabine gesperrt; Einsteigen, Mitfahren und Aussteigen erfolgen über die vorhandenen Aufzugbefehle. Blickpunkt- und Geschosswechsel bleiben ausdrücklich diskrete Ansichtswechsel, keine kollisionsgeprüften Gehwege.
+
+Die unabhängigen Kontaktfälle laufen mit `node tests/check_walkthrough_camera.cjs` oder über `python3 -m unittest discover -s tests -p test_walkthrough_camera.py -v`. Sie prüfen dünne Wände bei großen Schritten, Gleiten, Ecken, Böden, offene und geschlossene bewegte Türen, Dreieckskanten und den Schachtzugang. Neue Browserausgaben benötigen einen eigenen Darstellungsnachweis; diese Funktion qualifiziert weder Türschwenkräume noch Personen- oder Hardwarebetrieb.
+
+`node tests/check_walkthrough_camera_native.cjs <index.html>` prüft zusätzlich die tatsächlichen Türblätter `D3_026`/`D3_027`, die offenen Durchgänge von 3.002/3.003 und einen absichtlich geöffneten Schachtzugang im 3. OG ohne dortige Kabine. Die Schachtsperre wird aus den gemeinsamen Rahmenkörpern abgeleitet. Das Ergebnis wird als `camera-native-contacts.json` neben dem lokalen Export abgelegt.
+
 Der Rundgang bietet sieben direkte Blickpunkte: Doktorandenraum **3.002**,
 Labor **3.003**, Mikroskop **3.007**, Küchen **3.008** und **1.008**,
 den Blick durch den **Freiraum / das Atrium**
@@ -9,8 +17,9 @@ fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
 Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
 Labor 3.003 liegt jetzt im selben Gebäudebezug wie Flur, Büros und Aufzug.
 Die [öffentliche GitHub-Pages-Seite](https://smoe.github.io/DIYLabBot/) bleibt
-eine getrennt veröffentlichte Momentaufnahme; diese Erweiterung wird erst
-nach ausdrücklicher Freigabe dorthin übertragen.
+eine getrennt veröffentlichte Momentaufnahme. Ihr tatsächlicher Quellstand
+steht im [Publikationsmanifest](https://smoe.github.io/DIYLabBot/site-manifest.json).
+Lokale Erweiterungen werden nach ausdrücklicher Freigabe dorthin übertragen.
 
 ## Erzeugen und öffnen
 
@@ -52,15 +61,26 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 - Die sieben Ortsknöpfe öffnen die jeweiligen Blickpunkte.
 - Der Ortstitel bezeichnet den zuletzt gewählten Blickpunkt; freies Gehen
   schaltet diese Beschriftung nicht automatisch auf den betretenen Raum um.
-- **WASD / Pfeiltasten** bewegen die Kamera; **Ziehen** mit Maus oder Finger
-  ändert die Blickrichtung.
-- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt die Bewegung.
-- Bildschirmknöpfe bieten dieselbe Bewegung auf Touchgeräten.
+- **W / ↑** gehen vorwärts, **S / ↓** rückwärts. **← / →** drehen die
+  Blickrichtung, wie bei der klassischen Doom-Steuerung.
+- **Alt + ← / →** bewegen die Kamera seitwärts (Strafing); auf dem Mac heißt
+  die Taste **Option / ⌥**. **A / D** erlauben dieselbe Seitwärtsbewegung direkt.
+  Alt kann auch während einer gehaltenen Pfeiltaste gedrückt oder losgelassen
+  werden; die Steuerung wechselt unmittelbar zwischen Drehen und Seitwärtsgehen.
+- **Ziehen** mit Maus oder Finger ändert weiterhin die Blickrichtung.
+- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt das Gehen.
+- Die Bildschirmknöpfe verschieben die Kamera auch auf Touchgeräten; zum
+  Umschauen ziehen. Die seitlichen Knöpfe sind als „Strafe left/right“ bezeichnet.
+- In Eingabefeldern und der Geschossauswahl steuern die Tasten die jeweiligen
+  Bedienelemente. **Ctrl / Command**-Tastenkürzel bleiben dem Browser überlassen;
+  Fokusverlust oder ein ausgeblendeter Tab beendet gehaltene Kamerabewegungen.
 - Die Geschossauswahl ändert die Kamerahöhe im Gebäude. „Return to viewpoint“
   setzt den aktuellen Blickpunkt zurück; Vollbild vergrößert die Ansicht.
 
-Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Die freie
-Kamera hat keine Kollisionsprüfung und kann Wände oder Decken durchqueren.
+Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Freie
+Verschiebungen verwenden die oben beschriebene Kamerakugel-Prüfung an den
+nativen Flächen. Sie ist keine menschliche Körperhülle und kein Nachweis
+realer Begehbarkeit.
 
 ## Gemeinsame Gebäudeszene und Laborbindung
 
@@ -195,6 +215,31 @@ separate Prüfung des erzeugten nativen Rundgangs mit
 `tests/check_building_walkthrough.cjs`; die Quellenprüfung allein belegt keine
 erfolgreiche Pages-Bereitstellung.
 
+Die CI installiert die Schema-Prüfer aus
+`requirements/walkthrough-test.lock` mit verpflichtenden Paketprüfsummen.
+Sie erzeugt die vollständige L01-Aufstellung mit dem unabhängigen FreeCAD-Backend
+neu, bevor sie Rackplatzrahmen gegen die nativen Gefäßmittelpunkte und Basis-Z-Werte
+prüft. Die Linux-Laufzeit ist die offizielle
+[FreeCAD-1.1.4-AppImage](https://github.com/FreeCAD/FreeCAD/releases/tag/1.1.4) mit fester
+SHA-256-Prüfsumme; sie wird ohne FUSE entpackt. Ein fehlendes Paket, ein fehlender
+oder veralteter nativer Bericht und ein unerwarteter Test-Skip lassen den Job
+fehlschlagen. Die lokalen optionalen Testaufrufe behalten ihr bisheriges Verhalten.
+
+Der strenge Teststarter lässt sich auch lokal verwenden:
+
+```sh
+python3 -m pip install --require-hashes -r requirements/walkthrough-test.lock
+python3 scripts/build_lab_layout.py --backend freecad
+python3 scripts/check_walkthrough_regressions.py --pattern test_building_laboratories.py --report exports/ci/walkthrough/building_laboratories.json
+```
+
+CI-Artefakte halten Testzahlen, den nativen Bericht, die geometrische Auswertung
+und die erzeugte FCStd-Datei sieben Tage fest. Der neue Aufbau belegt FreeCAD
+und die jeweils ausgeführten geometrischen Prüfungen; ein CAD-Vergleich mit
+SolidCraft, WebGL-/Browserbedienung, öffentliche HTTPS-Bereitstellung, reale
+Begehbarkeit, Hardware und Sicherheit bleiben separate Nachweise. Dieser Job
+veröffentlicht weder neue README-Medien noch einen neuen Pages-Rundgang.
+
 ## Nachweise
 
 **Integration mit dem aktuellen `master` am 16. November 2026:**
@@ -299,6 +344,27 @@ Fehleranzeige. Der CAD-/HTML-Build allein ist noch kein Browsernachweis.
 Statische Geometrie, Browserbedienung und reale Begehbarkeit bleiben getrennte
 Nachweise; der Rundgang qualifiziert keine Fluchtwege oder Roboterbewegungen.
 
+Die Doom-artige Kamerasteuerung besitzt außerdem eine gezielte Browserprüfung:
+
+```bash
+node tests/check_walkthrough_controls_browser.cjs exports/building-walkthrough/<Revision>/index.html
+```
+
+Für die Prüfung der öffentlichen Seite kann nach dem lokalen HTML, dem
+Playwright-Modul, dem Chrome-Pfad und dem Ausgabeordner zusätzlich eine
+HTTPS-URL übergeben werden. Der Test öffnet dann diese Seite tatsächlich im
+Browser und vergleicht ihre Antwortbytes mit dem geprüften lokalen HTML.
+
+Die Prüfung erfasst Drehen, Seitwärtsgehen, während des Haltens wechselnde Modifikatortasten,
+unabhängiges Loslassen mehrerer Tasten, Eingabefokus, Browserkurzbefehle und die
+Kamerabindung im Aufzug an der tatsächlichen exportierten Szene.
+`browser-controls-report.json` und ein Screenshot entstehen im ignorierten
+Exportverzeichnis. Ein kurzer Test mit realen Animationsframes wird durch
+kontrollierte Browser-Testzeit ergänzt; daraus folgt kein Echtzeit-Leistungsnachweis.
+Eine vom Testbrowser nicht herstellbare Tab-Ausblendung wird ausdrücklich als
+ungeprüft ausgewiesen. Diese Bedienprüfung ersetzt keine vollständige erneute
+Geometrie-, Kollisions-, Aufzugs- oder Sicherheitsqualifikation.
+
 ## Typweite Möbelbefehle
 
 Bewegliche Türen werden direkt im 3D-Bild bedient: **mit der Maus auf das
@@ -329,7 +395,7 @@ Die Hockerlifte verwenden prismatische Gelenke und die typspezifischen
 Heben-/Senken-Befehle. Auch alle vorhandenen Raumtüren der Gebäudehülle lassen
 sich öffnen und schließen, einschließlich der Stahltüren im Keller. Blatt,
 Guckfenster und Ringe bewegen sich gemeinsam um den vorhandenen Anschlag.
-Die [Geräte- und Aufzugbedienung](walkthrough-mechanisms.md) ergänzt Gefrierschubladen,
+Die [Geräte- und Aufzugbedienung](building-walkthrough.md#merged-walkthrough-mechanisms) ergänzt Gefrierschubladen,
 Abzug, Qubit, NanoDrop und automatisch betätigte Aufzugtüren. Die Kamera-Hilfe `viewObject` bleibt
 nur in der Test-API und hat keine Taste in der Oberfläche.
 
@@ -397,9 +463,10 @@ die Obergeschosse nur den äußeren Ausgang. Halte, Höhen und aktive Seiten sta
 
 Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
 wird nach jeder Objektaktualisierung absolut an den Kabinenzustand gebunden;
-es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind WASD,
-Pfeiltasten, Q/E, Bildschirmbewegung, freie Geschossauswahl, Ortsknöpfe und
-Laborisolation gesperrt. Umschauen bleibt möglich. Erst ein ausdrücklich
+es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind freie
+Verschiebung über WASD, ↑/↓, Alt/Option + ←/→, Q/E und Bildschirmbewegung
+sowie freie Geschossauswahl, Ortsknöpfe und Laborisolation gesperrt.
+Umschauen mit Maus oder ←/→ bleibt möglich. Erst ein ausdrücklich
 gewählter erlaubter Ausstieg löst die Kamerabindung. Weitere Befehle während
 einer Fahrt liefern `rejected_busy`; es gibt keine automatische Warteschlange.
 
@@ -419,3 +486,111 @@ Handläufe und Tastenreihe folgen den Eigentümerfotos; Maße sind angenommen.
 Eine reale Steuerung oder Schutzfunktion wird nicht implementiert.
 `lift_operation_implemented` bleibt `false`; die Browserfahrt ist keine
 mechanische, zeitliche oder sicherheitstechnische Aufzugsqualifikation.
+
+<a id="merged-walkthrough-mechanisms"></a>
+
+<a id="merged-walkthrough-mechanisms--türen-und-geräte-im-gebäuderundgang"></a>
+
+## Türen und Geräte im Gebäuderundgang
+
+Ein Klick auf eine nahe Tür, Klappe oder einen Griff öffnet beziehungsweise
+schließt das Teil. Alternativ darauf blicken und die Leertaste drücken.
+Die Leertaste erreicht auch die geschlossene Fläche, wenn das Blatt bereits
+weggeschwenkt ist. Davorliegende Körper sperren den Zugriff weiterhin.
+Die Reichweite bleibt der gemeinsame Rundgangparameter.
+
+Die Bedienung umfasst alle 139 vorhandenen Raumtüren auf KG, EG und OG1–OG3.
+Fensterlose Holz- und Stahlblätter, runde Guckfenster samt Ringen und das
+Glastürblatt behalten ihre bestehenden Körper und Materialien.
+
+In Labor 3.003 sind zusätzlich bedienbar:
+
+- Gefrierschranktür und alle sechs Schubladen;
+- die vertikal verschiebbare Abzugsscheibe und drei Unterschrankklappen;
+- der Qubit-Deckel und der NanoDrop-Hebel.
+
+Die Gefrierschranktür schließt erst, wenn jede Schublade vollständig
+eingeschoben ist und ihre Bewegung beendet hat. Eine Schublade lässt sich
+erst bei vollständig geöffneter Tür ausziehen. Gleichzeitig eintreffende
+Befehle prüfen aktuelle Stellung, Zielstellung und laufende Bewegung.
+Eine gesperrte Betätigung meldet die betroffenen Teile und die benötigte
+Stellung. Der geschlossene Schrank lässt sich über sein Türblatt oder seinen
+Griff wieder öffnen.
+
+<a id="merged-walkthrough-mechanisms--aufzug"></a>
+
+### Aufzug
+
+Die eine vorhandene Kabine erhält zwei gegenüberliegende Schiebetürpaare.
+Jeder aktive Geschosszugang besitzt ein eigenes Türpaar. EG öffnet beidseitig,
+OG1–OG3 nur nach außen und KG nur nach innen. Nach einem Ruf oder einer
+Zielwahl schließen zuerst die Türen. Erst nach deren Abschluss fährt die
+Kabine; am Ziel öffnen die dort aktiven Kabinen- und Geschosstüren automatisch.
+Ein- und Aussteigen ist erst nach vollständiger Öffnung möglich.
+
+Panel und Telefon folgen der beschriebenen Anordnung: Panel auf der
+nordwestlichen, Telefon auf der nordöstlichen Kabinenseite, jeweils ganz hinten.
+Die Positionen beziehen sich auf den vorhandenen Gebäuderahmen. Abmessungen
+bleiben Darstellungsannahmen. Panel, Etagenknöpfe und Telefon fahren mit der
+Kabine; ihre Türblätter kombinieren Kabinenhub und seitliche Türbewegung.
+Die Etagenwahl erfolgt weiterhin über die vorhandenen Bedienknöpfe des
+Rundgangs. Das Telefon ist ein sichtbares Ausstattungsmodell.
+
+<a id="merged-walkthrough-mechanisms--gemeinsame-quellen-und-prüfung"></a>
+
+### Gemeinsame Quellen und Prüfung
+
+`model/building-walkthrough.shared.json` enthält unter `mechanisms` ausschließlich
+typbezogene Beschriftungen, Darstellungszeiten und Betrachtungsabstände.
+`scripts/walkthrough_mechanisms.py` bindet die vorhandenen Raumtürflächen und
+die Gelenke der referenzierten Geräte. Die native Referenzstellung bleibt
+erhalten, auch beim zunächst ausgezogenen vierten Gefrierfach und bei den
+teilweise geöffneten Gerätehebeln. Die Browsertransformation wird relativ zu
+dieser Stellung ausgewertet.
+
+Die Gefrierschrankbedingungen werden aus der bestehenden `validate_pose`-Prüfung
+des Geräteproviders abgeleitet. Der Compiler vergleicht die abgeleiteten
+Zustandsbedingungen mit sämtlichen Kombinationen der Endstellungen. Die
+Bedienung verlangt konservativ die vollständig erreichte Zugangsstellung.
+
+Die Aufzugausstattung entsteht aus `circulation.elevator.fittings` der
+Gebäudequelle über `scripts/lift_fittings.py` als portable CAD-Geometrie.
+Öffnungsweiten und Schiebewege stammen aus den bestehenden Geschossöffnungen.
+`scripts/walkthrough_elevator.py` bindet dieselben Körper und Gelenke an den
+Rundgang. `scripts/walkthrough_interaction.js` führt Türfolge, Verriegelung und
+absolute Kabinenbindung aus. Bewegungen verwenden weiterhin die gemeinsame
+quintische Darstellung mit ruhigem Beginn und Ende; reduzierte Bewegung
+führt dieselben Zustandsprüfungen in identischer Reihenfolge aus.
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*walkthrough*.py' -v
+node tests/check_walkthrough_interaction.cjs
+node tests/check_walkthrough_lift.cjs
+node tests/check_walkthrough_mechanisms.cjs
+node tests/check_walkthrough_mechanisms_browser.cjs <index.html> <playwright> <chrome>
+```
+
+Die Browserprüfung betätigt alle Raumtüren, prüft jede Gefrierschublade als
+einzelne Sperrbedingung und verwendet Maus-/Tastaturereignisse auf den nativen
+Flächen. Ein zeitlich ausgeführter Aufzuglauf prüft geschlossene Türen während
+der Fahrt, mitfahrende Kabinentüren und die Zielseiten. Native Gebäudeprüfung,
+Browserbedienung und reale Ausführung bleiben getrennte Nachweise: Die native
+Gebäudedatei enthält eine statische Referenzstellung; Schwenkfreiheit,
+Quetschschutz, reale Aufzugsteuerung und Gerätehardware sind nicht qualifiziert.
+
+Der lokale Nachweis `exports/building-walkthrough/building-walkthrough-65c15de308d5/`
+enthält den geprüften Rundgang, `browser-check.json` für die bestehenden
+Bedienwege und `mechanisms-browser-report.json` für die neuen Funktionen.
+Beide Browserprüfungen bestehen, ebenso alle 49 Modell-/Rundgangtests und die
+drei JavaScript-Prüfungen für Picking, Kabinenbindung und Verriegelungen.
+Der native FreeCAD-Gebäudebericht
+`exports/generated/building-stack-7eed558ca997/build-report.json` bestätigt
+2.388 gültige Körper, 509 Geometrieprüfungen und 16 Höhenprüfungen.
+`exports/lift-fittings-7eed558ca997/validation.json` prüft die 26 neuen
+Aufzugbauteile unabhängig in SolidCraft gegen ihre abgeleiteten Maße;
+dies ist kein vollständiger SolidCraft-Gebäude- oder Kollisionsnachweis.
+Die linearen Kabinentürwege halten in der Modellprüfung Abstand zu Endwänden,
+Panel und Telefon. Der bestehende Circulation-Fixture-Test
+`test_stack_integration_preserves_source_floor_ids_and_separates_blue_marker`
+scheitert weiterhin am fehlenden Eintrag `D3_002_003`; derselbe Fehler wurde
+auch auf dem unveränderten Ausgangsstand bestätigt.

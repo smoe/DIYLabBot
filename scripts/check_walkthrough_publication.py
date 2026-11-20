@@ -46,9 +46,10 @@ def check(html, manifest, program=None, body_ids=None):
     require(match is not None, 'Missing inline walkthrough data')
     payload = json.loads(match[1])
     program = walkthrough.compile() if program is None else program
+    require(payload.get('navigation') == program.get('navigation'), 'Stale published navigation policy')
     for key in ('objects', 'interaction', 'stops', 'levels', 'settings', 'rendering', 'hidden_body_ids'):
         require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
-    for key in ('laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
+    for key in ('robots', 'laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
         if key in program:
             require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
     expected = dict(program['source_files_sha256'])
