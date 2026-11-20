@@ -2,8 +2,8 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "80abbc70980ad524fed4a23a7ac9656cd8150c65",
-  "integrated_commit": "80abbc70980ad524fed4a23a7ac9656cd8150c65",
+  "source_commit": "e913ab6abb7468bef0bc9ec790c88c2aa3acde49",
+  "integrated_commit": "e913ab6abb7468bef0bc9ec790c88c2aa3acde49",
   "export_revision": "building-walkthrough-affd28bd19ed",
   "html": {
     "sha256": "9d32976a3ecdb14526586d3d323309ba0ac6f5d097f3d4b51d514c62162dd94f",
@@ -223,7 +223,15 @@
     "source-tests.json": {
       "sha256": "42877548de0da2542b3882470977f9b0425fb20788cb9391babbde0770543413",
       "passed": true
+    },
+    "furnishings-tests.json": {
+      "sha256": "db871d86d3f78a6cd4e5ad8bdd003c89157cfa328dffc6eb43fd9ecba9a9170c",
+      "passed": true
     }
   },
-  "robot_motion_scope": "Empty-arm simulation only. Native path sampled at 13 positions against environment and non-adjacent links; adjacent mechanical joint interfaces excluded. No hardware or human-speed qualification."
+  "robot_motion_scope": "Empty-arm simulation only. Native path sampled at 13 positions against environment and non-adjacent links; adjacent mechanical joint interfaces excluded. No hardware or human-speed qualification.",
+  "source_ci": {
+    "walkthrough_regressions": "https://github.com/smoe/DIYLabBot/actions/runs/44734301920",
+    "documentation_links": "https://github.com/smoe/DIYLabBot/actions/runs/44734301969"
+  }
 }
