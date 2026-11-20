@@ -33,13 +33,17 @@ records `cross_cad_checked: false`; it contains no SolidCraft comparisons.
 The default `--backend both` retains the existing combined build. These are
 geometric placement/access checks, not hardware, navigation or safety qualification.
 
-`--prepare-only` with the default combined backend builds the source snapshots and native SolidCraft insert
-models. It requires both CAD runtimes. For the final scene through SolidCraft
+`--prepare-only` with the default combined backend builds the source snapshots
+and native SolidCraft insert models. It requires both CAD runtimes. For the final scene through SolidCraft
 MCP, execute the generated `scene.commands.json`, save the scene and measurements at
 the paths in its context, then use `--finish <context.json>`. When MCP restricts
 file access, stage the source-derived STEP snapshots in its permitted temporary
 directory and replace only those input paths. Keep the original command file
 for the reproducible CLI path.
+
+Resuming requires the same backend and unchanged captured construction inputs.
+Older unfinished contexts without source pins must be prepared again; their
+inputs are not silently backfilled or migrated.
 
 Resolve current native paths from the build report rather than an older
 revision directory. The [curated overview](models/images/l01-overview.png) and
