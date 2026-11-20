@@ -6,6 +6,10 @@ ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
 Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
 
+Die separate L01-Verbindung ist geprüft. Die weitere Flottenfreigabe stoppt
+an einer neu nachgewiesenen, bodenlosen inneren Aufzugsschwelle im EG; der
+vollständige 20-Fahrzeug-Lauf wurde deshalb nicht erzeugt.
+
 ## Bestätigte Rückstellung von K0_013
 
 Der Eigentümer hat am **20. November 2026** `KG / K0_013` für E2 ausdrücklich
@@ -164,34 +168,115 @@ Getrennte Nachweise am exakten exportierten Profil:
   10 mm Lokalisationstoleranz). 268 Intervalle und 790 exakte BRep-Abstände.
 
 Die lokalen Nachweise stehen unter `exports/building-fleet/l01-connector/`:
-`fast-motion-r2.json`, `fast-r2-mesh-check.json`,
-`fast-r2-generic-floor-union-check.json`,
-`fast-r2-native-curve-check-efficient.json` und
+`fast-motion-r2.json`, `final-current-mesh.json`,
+`final-current-floor.json`, `final-current.json` und
 `motion-generation-report.json`. Diese Qualifikation betrifft die **einzelne
 BF01-Verbindung** in der synthetischen Szene. Fahrzeugbegegnungen, alle übrigen
 Fahrwege und der vollständige Flottenlauf benötigen weiterhin eigene Nachweise.
 Reale Navigation, Personenschutz, Hardware und Aufmaß bleiben ungeprüft.
 
-## Vorbereitete, noch nicht integrierte Komponenten
+## Fortgesetzte Navigation und lokale Regelung
 
-Ressourcen-/Aufzugdienste, deterministischer Funkkanal, empfangsbasierter
-Leitstand und Missionszuweisung besitzen getrennte Unit-Tests. Die Sensorwelt
-liefert anonyme Erstreflexionen; der unabhängige Auditor prüft konservative
-Intervallabstände, mit orientierter Rechteck-Nachprüfung bei unzureichender
-Kreis-Breitphase. Diese Bausteine sind **kein ausführbarer Gesamtsimulator**.
-Es gibt keinen bestandenen Flottenlauf, kein natives vollständiges Fahrprogramm
-und keine BF01-Browseranimation oder Browserqualifikation.
+Die neuen Standardbibliothek-Module leiten 20 vorwärts zugängliche Heimplätze
+aus den beiden zulässigen EG-Depots ab (zwei in R0_004, 18 in R0_013). Feste
+Wartebuchten am Aufzug sind getrennte, reservierte Flächen; normale Fahrwege
+verwenden eigene freie Durchfahrtsknoten und meiden die Buchten. Breite Flure
+verwenden richtungsabhängige Rechtsfahrspuren mit zusätzlicher, aus der
+Sensorunsicherheit abgeleiteter Planungsreserve. Die unveränderte
+Qualifikationsreserve beträgt 85 mm. Kandidatenressourcen werden vor einer
+Ausführung anhand überlappender statischer Konfliktbereiche zusammengeführt;
+das ist noch kein nachgewiesener konfliktfreier Gesamtlauf.
 
-Die Annahmen E1–E8 bleiben: bestätigte bzw. unbestätigte Zielnutzungen (E1), die
-fünf aktiven Kellerziele mit ausdrücklicher Rückstellung K0_013 (E2), Depot nur
-in R0_004/R0_013 (E3), synthetische getrennte Leerfahrtgrenzen (E4), referenzierte
-Rundumscan-Annahme und 75 mm Abstand (E5), logischer Leitstand (E6), höchstens
-zwei nur bei nachgewiesenem Kabinenfreiraum (E7) und die vorhandene statische
-L01-TR01-Instanz als Hindernis (E8). Depotkapazität, vollständige Raumwege,
-Flotten-Abdeckung, Modellzeit, Dynamik, reale Navigation und menschlicher
-Geschwindigkeitsvergleich bleiben offen. Der Quellvertrag verwendet im EG
-und KG nur die innere aktive Aufzugseite; die ältere Dokumentationsangabe
-„EG beidseitig“ wird nicht als Verhalten übernommen.
+Die Sichtlinienverkürzung kann nun einen vollständigen Rechtecknachweis auch
+während der Rastersuche verlangen. Dadurch entstehen die Kellerverbindungen
+zu K0_009 und K0_011 ohne handeingetragene Zielkoordinaten. Die beiden
+tatsächlich exportierten C2-Kurven bestehen zusätzlich den kontinuierlichen
+Mesh-, Bodenflächen-Union- und Wartebuchtennachweis: 75,798 bzw. 70,739 s mit
+Abstandsuntergrenzen 85,0338 bzw. 85,2880 mm. Dies sind einzelne Verbindungen,
+keine Flottenbegegnungs- oder nativen vollständigen Fahrprogramme.
+
+Der lokale Regler erhält eigene Aufträge, eigene Lokalisation, verzögerte
+anonyme Scans und eigene Zusagen. Er benutzt dieselbe tatsächlich begrenzte
+Bremskurve für Reichweitenbudget und Ausführung, wartet auf die geforderte
+Frisch-frei-Beobachtung und prüft die exportierten PVA-Polynome. Körper- statt
+Kreisrückläufe vermeiden künstliche Blockaden benachbarter Fahrspuren. Ein
+Wiederanlauf bewahrt die eigene Pose einschließlich unaufgewickelter Gierrichtung.
+Die Regler-, Dienste-, Funkkanal-, Leitstand- und Sensorprüfungen belegen
+Bausteine; sie belegen weder einen integrierten Flottenlauf noch reale Sensorik.
+
+## Verbindlicher Stopp: fehlender Boden an der Aufzugsschwelle
+
+Am obligatorischen aktiven Port `LiftPort_EG_inward` verbindet die vorhandene
+Geometrie Kabinenboden und Flurboden nicht durchgehend. Die Lücke ist keine
+zu enge geplante Kurve: Ein positiver Streifen über die **gesamte aus der Quelle
+abgeleitete Türöffnung** besitzt keine tragende native Geometrie. Jede
+Verbindung von der Kabine zum Flur muss diesen Streifen queren.
+
+Der konservative Zeuge im Gebäudebezug lautet:
+
+| Koordinate | Streifen / Kontaktband in Darstellungs-mm |
+|---|---|
+| X | 12642,827703 bis 12679,952703 (Breite 37,125) |
+| Y | 15608,108108 bis 16529,729730 (vollständige Quellöffnung) |
+| Z (natives Prisma) | −20 bis +20 um die EG-Bodenhöhe |
+
+Der Mesh-Nachweis betrachtet auch andere Körper als ausgewiesene Bodenplatten:
+er projiziert sämtliche Flächen im Band Z = 0 bis +20 mm und findet im ganzen Streifen
+keine Stützung. Das unabhängige native Prisma erweitert das Z-Band auf −20
+bis +20 mm; seine Prüfung durchsucht die AABBs aller
+**2758 Gebäudekörper** und prüft die 14 nahen BReps exakt. Der Abstand des
+vollständigen Streifenprismas zur nativen Gebäudewelt beträgt mindestens
+**37,125 mm**; das Schnittvolumen ist null. Dies bestätigt einen fehlenden
+Bodensteg unabhängig von Raster, Route und Dreieckstessellierung. Die Zahl
+2758 betrifft diese fokussierte Gebäudeprüfung; der L01-Kurvennachweis
+verwendet separat die gesamte gebundene Welt mit 3441 Körpern.
+
+Aktuelle lokale Nachweise sind
+`exports/building-fleet/lift-preflight/inner-port-support-barrier.json` sowie
+`exports/building-fleet/lift-threshold/native-eg-threshold-strip.json` mit
+Reproduzierer `check_native_threshold_strip.py`. Der dauerhafte negative
+Preflight ist unabhängig aufrufbar (Exitcode 2 ist hier die beabsichtigte
+Sperre, keine bestandene Fahrt):
+
+```sh
+python3 scripts/building_fleet_lift_checks.py \
+  --walkthrough exports/building-walkthrough/pages-master-80abbc7 \
+  --output exports/building-fleet/lift-preflight/current-support-barrier.json
+```
+
+Dieser Einstieg beweist nur die Sperre; das Ausbleiben dieses speziellen
+Zeugen würde noch keine vollständige Aufzugfreigabe beweisen. Eine reale
+Radüberbrückung oder zulässige Spaltbreite ist nicht qualifiziert und ersetzt
+den geforderten geometrischen Bodenstützungsnachweis nicht. Quellen, native CAD-Ausgaben
+und Prüfberichte sind über SHA256 gebunden. Es wurden keine historischen
+Berichte umgepinnt und keine Schwelle, Tür, Kabine oder Gebäudequelle verändert.
+
+Der ursprüngliche Auftrag verlangt hier ausdrücklich Anhalten und Berichten.
+Daher gibt es keinen vollständigen Seed-Lauf, keine bestätigte Zielabdeckung,
+keine Flotten-Aufzugsstatistik, keinen nativen Gesamtkurvennachweis und kein
+qualifiziertes BF01-Browserprogramm. Unfertige Missions-, Laufzeit- und
+Browserentwürfe liegen unverändert als **ungeprüfte Gesamtintegration** unter
+`exports/building-fleet/incomplete-components/`; sie sind kein aktiver Einstieg
+unter `scripts/`. Auch der zusätzlich erkannte Bedarf einer reservierten
+Ziel-Wartebucht für gleichseitiges Aussteigen bleibt dort offen.
+
+Der nächste erforderliche Schritt ist eine ausdrücklich freigegebene
+Geometriekorrektur der befahrbaren Aufzugsschwelle in der gemeinsamen
+Gebäudequelle mit neuen nativen und Bodenstützungsnachweisen. Bis dahin
+bleiben Treppenkern-Ausschluss, alle übrigen Ziele, Bench-Sperren und
+unveränderte TR01-/L01-Quellen verbindlich. Ein Aufheben der Bodenprüfung oder
+ein erfundener virtueller Steg wäre kein zulässiger Fortsetzungsschritt.
+
+Die Annahmen E1–E8 bleiben bestehen: bestätigte bzw. unbestätigte Zielnutzungen
+(E1), fünf aktive Kellerziele und die ausdrückliche Rückstellung K0_013 (E2),
+Depot nur in R0_004/R0_013 (E3), synthetische getrennte Leerfahrtgrenzen (E4),
+referenzierte Rundumscan-Annahme und 75 mm Abstand (E5), logischer Leitstand
+(E6), höchstens zwei nur bei nachgewiesenem Kabinenfreiraum (E7) und die
+statische L01-TR01-Instanz (E8). Im EG und KG gilt die innere aktive
+Aufzugseite der Quelle; die ältere Dokumentationsangabe „EG beidseitig“
+wird nicht übernommen. Reale Navigation, menschlicher Vergleich, Personen,
+Tür-/Aufzugsautomatik, Netzwerk, Hardware und Pages bleiben ungeprüft bzw.
+unveröffentlicht.
 
 ### Unabhängige native Kontaktbestätigung
 
@@ -204,17 +289,34 @@ Abstände sind null. Quelle und native Artefakte sind im lokalen
 `check_l01_native_witnesses.py`. Das sind zwei negative statische Zeugen,
 kein vollständiger nativer Fahrweg- oder Flottennachweis.
 
-Die neue gezielte Suite besteht aus **55 Tests**: 48 für Flottenvertrag,
-Navigation einschließlich Stoppregression, vorbereitete Dienste/Kanal/Sensorik,
-Missionszuweisung und native Eingabepins sowie sieben für den Kamerakit.
-Alle bestehen ohne Skip. Die getrennten vorhandenen JavaScript-Prüfungen für
-Interaktion, Aufzug und Kamerakollision sowie die neun Markdown-Linkprüfungen
-bestehen ebenfalls. Die bisherigen L01-Verkehrsläufe werden durch die
-unveränderten Quellen nicht als neu ausgeführt ausgegeben.
+## Abschließender Prüfstand dieser Erweiterung
 
-Die vorhandene Python-Rundgangsuite meldet 58 Tests: 57 bestanden, ein
-optionaler Schema-Test wegen fehlendem `jsonschema` übersprungen. Es wurde
-nichts installiert; dieser Skip ist kein bestandener Schema-Nachweis.
-Die neue BF01-Vertragsprüfung arbeitet ohne diese optionale Bibliothek und
-besteht vollständig. Vollständige L01-Verkehrs-, Flotten-, native Programm-
-und Browserläufe wurden nach dem Stopp nicht neu ausgeführt.
+Die gezielte BF01-Pythonsuite besteht **121 Tests ohne Skip**; sie enthält
+auch die ausdrücklich aktivierte Regression am aktuellen gepinnten
+Aufzugsexport. Dazu bestehen sieben Kamerakit-Quelltests und neun
+Markdown-Linkprüfungen. Die lokalen Prüfprotokolle liegen unter
+`exports/building-fleet/l01-connector/final-bf01-tests.log` und
+`exports/building-fleet/lift-preflight/lift-check-tests.log`.
+
+Die erneut ausgeführte Python-Rundgangsuite meldet 62 Tests: 61 bestanden,
+ein optionaler Schema-Test wurde wegen fehlendem `jsonschema` übersprungen.
+Es wurde nichts installiert; der Skip ist kein bestandener Schema-Nachweis.
+Die drei bestehenden JavaScript-Prüfungen für Interaktion, Aufzug und freie
+Kamerakollision bestehen. Der normale Rundgangexport wurde nicht verändert.
+
+Die alten L01-Lokal-/Gegenverkehrstests sind in diesem isolierten Worktree
+wegen des fehlenden ignorierten
+`cad/tr01-workcell/shared-build-report.json` nicht ausführbar. Die alten
+Mehrfahrzeug-Quelltests bestehen (sieben Tests) mit einem zusätzlich
+ausdrücklich übersprungenen Programmtest mangels dessen lokalem Build.
+Der fehlende Altbuild wurde nicht durch veraltete Artefakte ersetzt. Die
+zehn geschützten Module sind bytegleich zur Arbeitsbasis `80abbc7`.
+
+Die native Einzelkurvenprüfung und die native Schwellenprüfung sind die
+oben getrennt beschriebenen Geometrienachweise. Ein vollständiger
+Flottenlauf, ein nativer Gesamtprogrammcheck und die BF01-WebGL-Prüfung
+wurden wegen des Schwellenstopps nicht ausgeführt. Der lokale
+`exports/building-fleet/l01-connector/fleet-report.json` führt deshalb
+den Status `blocked_geometry` und keinen bestandenen Gesamtlauf.
+Alle neuen Commits bleiben lokal auf `codex/building-fleet-demo`; es gab
+keinen Merge, Push oder Pages-Stand dieser Erweiterung.
