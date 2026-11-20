@@ -17,7 +17,7 @@ class OfficeComputerTests(unittest.TestCase):
         cls.source=furniture.read(cls.spec['sources']['furnishings'])
         cls.result=furniture.compile(cls.spec['sources']['furnishings'],stack.templates(cls.spec)[0],cls.p,cls.data['levels'],cls.plans)
     def test_thirteen_screen_and_mini_pc_sets(self):
-        rooms=self.result['rooms'];self.assertEqual([(r['room'],len(r.get('worktop_equipment',[]))) for r in rooms],[('1.008',0),('1.002',4),('2.002',4),('3.002',4),('3.009',1)])
+        rooms=self.result['rooms'];self.assertEqual([(r['room'],len(r.get('worktop_equipment',[]))) for r in rooms],[('1.008',0),('1.002',4),('2.002',4),('3.002',4),('3.008',1)])
         for suffix in ('MonitorScreen','MiniPC'):
             self.assertEqual(sum(b['id'].endswith('_'+suffix) for b in self.result['bodies']),13)
     def test_all_equipment_is_inside_support_footprint_and_above_top(self):

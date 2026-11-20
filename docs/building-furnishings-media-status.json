@@ -5,7 +5,7 @@
     "sha256": "0e6750bb65f980d8fb4b97af4e3141daae816eef305cd416cff7dfb81af78e20"
   },
   "historical_images_represent_current_model": false,
-  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1–OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained.",
+  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1\u2013OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained.",
   "last_compatible_sources_sha256": {
     "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
     "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
@@ -109,19 +109,19 @@
     "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
     "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
     "model/building-stack.schema.json": "fa6eae31299ebb83c808b6d2cae275ef8a54987808477c26e2c0789d1103485e",
-    "model/building-stack.shared.json": "47450ff6514c88080620da4b86507120126139b132361dead8af5258f61e0735",
+    "model/building-stack.shared.json": "2448b0f67a2456c5102c77688049cdcc707c34ad98ea1fa6ec2219eda26c22d2",
     "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
-    "model/building-walkthrough.shared.json": "1a72894d939de21b446ffc21b807be2dc724b3d810e8a0ddd3f2ff77d85c0270",
+    "model/building-walkthrough.shared.json": "142e6dde190af50c649f1c115f7b64399cd4577ab612177c458fb2826f37ff1d",
     "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
     "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
     "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
     "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
     "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
-    "model/furnishings/building-social.json": "c27f86d7acfd063026df3a790dd4794e060253917d06e195dec2958016861ec0",
+    "model/furnishings/building-social.json": "53b2d85d46da4b8c50ebfe1d6ce1f2b7bc235b1201c428d042fb30714ae25ec1",
     "model/furnishings/l01.furnishings.json": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed",
     "model/furniture-catalog.schema.json": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed",
     "model/furniture/laboratory.catalog.json": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e",
-    "model/furniture/social.catalog.json": "67ac470d94c7ea5f0e265ab0a6d2a1c7e13e8ba9b13e604c0ed0b546c09d7745",
+    "model/furniture/social.catalog.json": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440",
     "model/ground-floor-eg.shared.json": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12",
     "model/ground-floor.schema.json": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124",
     "model/lab-equipment.schema.json": "f76c820e1dad5f11aae62c7ed3e390e1a009cecc15506cab7fe24d084bc668c8",
@@ -191,7 +191,7 @@
     "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
     "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
     "tests/check_building_walkthrough.cjs": "b2c67fec99930d98af081294556478ea15a70b0ee86ca534a36bfd847a0ec9bc",
-    "tests/test_building_furnishings.py": "f74934b2a24473c291ebb26d6f2c2e1fdcbf82f08ede1e08112ed164d8d0028b"
+    "tests/test_building_furnishings.py": "f76c3c6ec4027d86ed52ece55ffa709682d73f2ab84b40618213311e9a42428d"
   },
   "current_camera_projection": {
     "fields": [

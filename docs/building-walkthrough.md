@@ -17,8 +17,9 @@ fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
 Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
 Labor 3.003 liegt jetzt im selben Gebäudebezug wie Flur, Büros und Aufzug.
 Die [öffentliche GitHub-Pages-Seite](https://smoe.github.io/DIYLabBot/) bleibt
-eine getrennt veröffentlichte Momentaufnahme; diese Erweiterung wird erst
-nach ausdrücklicher Freigabe dorthin übertragen.
+eine getrennt veröffentlichte Momentaufnahme. Ihr tatsächlicher Quellstand
+steht im [Publikationsmanifest](https://smoe.github.io/DIYLabBot/site-manifest.json).
+Lokale Erweiterungen werden nach ausdrücklicher Freigabe dorthin übertragen.
 
 ## Erzeugen und öffnen
 

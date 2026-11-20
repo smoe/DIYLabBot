@@ -39,7 +39,7 @@ class DoorTests(unittest.TestCase):
         self.assertTrue(glass['full_leaf_glazing'])
 
     def test_kitchen_and_owner_office_remain_plain(self):
-        for level,area in [('OG1','R3_008A'),('OG3','R3_009')]:
+        for level,area in [('OG1','R3_008A'),('OG3','R3_008A')]:
             self.assertTrue(all(v['type']=='plain' for v in self.bindings_for(level,area)))
 
     def test_larger_upper_and_lower_band_rooms_use_round_windows(self):
@@ -60,6 +60,8 @@ class DoorTests(unittest.TestCase):
         self.assertNotIn('OG1__D3_008AB',self.data['exterior']['door_leaves'])
         self.assertIn('OG2__D3_008AB',self.bindings)
         self.assertIn('OG3__D3_008AB',self.bindings)
+        self.assertNotIn('OG3__D3_009',self.bindings)
+        self.assertIn('OG2__D3_009',self.bindings)
 
     def test_explicit_exclusions_win_at_shared_doorways(self):
         policy=copy.deepcopy(self.policy);policy['opening_overrides']=[];policy['include_areas']={'OG3':['Lab']};policy['exclude_areas']={'OG3':['Office']};policy['default_type']='round_window'

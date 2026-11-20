@@ -108,6 +108,7 @@ def compile(ref, plans, p, levels, door_ref):
         'area':area['id'],'template_areas':[area['id']],'body_ids':result['body_ids'],
         'furniture_body_ids':furniture_ids,'appliance_body_ids':appliance_ids,
         'equipment_source':ref,'appliance_instances':instances,'appliance_supports':supports,
+        'joints':[{**j,'origin_mm':point(*j['origin_mm']), 'moving_body_ids':[prefix+'_Cabinet_'+n for n in j['moving_body_ids']]} for j in kitchen.articulations(definition)],
         'origin_mm':origin,'target_mm':point(dims['width']/2,dims['depth']/2,1200),
         'bounds_mm':whole,'room_wall_clearance_mm':clearance,'door_sweep_checks':sweep_checks,
         'scale':1,'dimensions_measured':False,'placement_qualified':False}

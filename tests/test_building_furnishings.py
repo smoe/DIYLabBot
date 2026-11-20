@@ -41,7 +41,7 @@ class FurnishingsTests(unittest.TestCase):
         cls.result = furniture.compile(cls.spec['sources']['furnishings'], stack.templates(cls.spec)[0], cls.p, cls.data['levels'], cls.level_plans)
 
     def test_owner_room_assignments(self):
-        self.assertEqual({r['room'] for r in self.result['rooms']}, {'1.008','1.002','2.002','3.002','3.009'})
+        self.assertEqual({r['room'] for r in self.result['rooms']}, {'1.008','1.002','2.002','3.002','3.008'})
         self.assertEqual({r['level'] for r in self.result['rooms'] if r['room']=='1.008'}, {'OG1'})
         self.assertEqual(set(self.result['omitted_walls']), {'OG1__Wall_W027', 'OG1__Wall_W017'})
 
@@ -50,7 +50,9 @@ class FurnishingsTests(unittest.TestCase):
         ids = {b['id'] for b in expanded['bodies']}
         for wall in ('W017','W027'):
             self.assertNotIn('OG1__Wall_'+wall,ids)
-            self.assertTrue({'OG2__Wall_'+wall,'OG3__Wall_'+wall} <= ids)
+            self.assertIn('OG2__Wall_'+wall,ids)
+            if wall=='W017':self.assertNotIn('OG3__Wall_'+wall,ids)
+            else:self.assertIn('OG3__Wall_'+wall,ids)
         self.assertEqual(len(ids),len(expanded['bodies']))
         self.assertTrue({o['body'] for o in expanded['operations']} <= ids)
 

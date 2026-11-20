@@ -67,18 +67,20 @@ class KitchenWindowPlacementTests(unittest.TestCase):
         radius = max(shape['radius'], shape.get('top_radius', shape['radius']))
         return sum((shape['origin'][i]+translation[i]-origin[i])*inward[i] for i in (0, 1))-radius
 
-    def test_unpartitioned_kitchen_reaches_outside_window_on_og1_only(self):
+    def test_kitchen_facade_bindings_are_level_specific(self):
         self.assertEqual(self.kitchen['template_areas'], ['R3_008A', 'R3_008B', 'R3_009'])
         names = {body['id'] for body in self.expanded['bodies']}
         for wall in ('W017', 'W027'):
             self.assertNotIn('OG1__Wall_'+wall, names)
-            self.assertTrue({'OG2__Wall_'+wall, 'OG3__Wall_'+wall} <= names)
+            self.assertIn('OG2__Wall_'+wall,names)
+            if wall=='W017':self.assertNotIn('OG3__Wall_'+wall,names)
+            else:self.assertIn('OG3__Wall_'+wall,names)
         self.assertEqual(next(room for room in self.source['rooms'] if room['id'] == 'Office3009')['template_areas'], ['R3_009'])
-        self.assertEqual({room['room'] for room in self.result['rooms']}, {'1.008', '1.002', '2.002', '3.002', '3.009'})
+        self.assertEqual({room['room'] for room in self.result['rooms']}, {'1.008', '1.002', '2.002', '3.002', '3.008'})
         windows = {(item['level_id'], item['wall']) for item in self.data['exterior']['side_window_groups']}
         self.assertIn(('OG1', 'W005'), windows)
         self.assertNotIn(('OG2', 'W005'), windows)
-        self.assertNotIn(('OG3', 'W005'), windows)
+        self.assertIn(('OG3', 'W005'), windows)
         self.assertNotIn('W005', self.spec['exterior']['side_window_walls'])
 
     def test_tabletops_are_adjacent_to_actual_exterior_window_inner_face(self):

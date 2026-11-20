@@ -22,7 +22,8 @@ class MechanismTests(unittest.TestCase):
 
     def test_every_native_room_leaf_and_its_glazing_move_once(self):
         rooms = [o for o in self.objects.values() if o.get('mechanism') == 'room_door']
-        self.assertEqual(len(rooms), 139)
+        self.assertEqual(len(rooms), 138)
+        self.assertNotIn('OG3.D3_009.Door',self.objects)
         self.assertEqual({o['level_id'] for o in rooms}, {'KG', 'EG', 'OG1', 'OG2', 'OG3'})
         basement = [o for o in rooms if o['level_id'] == 'KG']
         self.assertTrue(basement)

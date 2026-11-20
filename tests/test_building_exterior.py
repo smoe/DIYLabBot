@@ -119,7 +119,9 @@ class ExteriorTests(unittest.TestCase):
                             and op['id']==group['id']+'_WallCut' for op in operations))
         self.assertTrue(any(probe['target_body']==group['target_body'] for probe in self.d['exterior']['window_probes']))
         baseline=copy.deepcopy(self.s)
-        del baseline['exterior']['side_window_walls_by_level']['OG3']
+        baseline['exterior']['side_window_walls_by_level']['OG3'].remove('W001')
+        if not baseline['exterior']['side_window_walls_by_level']['OG3']:
+            del baseline['exterior']['side_window_walls_by_level']['OG3']
         before=model.interfaces(baseline,self.p)['exterior']
         self.assertEqual([g for g in self.d['exterior']['side_window_groups'] if g['wall']!='W001'],
                          before['side_window_groups'])
