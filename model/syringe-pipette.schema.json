@@ -1,0 +1,1048 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/model/syringe-pipette.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.syringe-pipette/1"
+    },
+    "id": {
+      "const": "SP01_DualSyringeConcept"
+    },
+    "recipe": {
+      "const": "isolated_air_syringes_and_exchangeable_head/1"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg",
+        "volume": "uL"
+      }
+    },
+    "target_volume_ul": {
+      "const": [
+        1,
+        1000
+      ]
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "radiusFine": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "radiusCoarse": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "glassWall": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "spacing": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "axisZ": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "pipeBore": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "pipeWall": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "headSeatRadius": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "headTravel": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "mm"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        },
+        "valveAngle": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "expression": {
+              "type": "number"
+            },
+            "unit": {
+              "const": "deg"
+            },
+            "range": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              }
+            },
+            "description": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "required": [
+            "expression",
+            "unit",
+            "range",
+            "description"
+          ]
+        }
+      },
+      "required": [
+        "radiusFine",
+        "radiusCoarse",
+        "glassWall",
+        "spacing",
+        "axisZ",
+        "pipeBore",
+        "pipeWall",
+        "headSeatRadius",
+        "headTravel",
+        "valveAngle"
+      ]
+    },
+    "syringes": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "const": "Fine"
+            },
+            "nominal_capacity_ul": {
+              "const": 1000
+            },
+            "radius_parameter": {
+              "const": "radiusFine"
+            },
+            "stroke_parameter": {
+              "const": "strokeFine"
+            },
+            "x_expression": {
+              "const": "-spacing/2"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          },
+          "required": [
+            "id",
+            "nominal_capacity_ul",
+            "radius_parameter",
+            "stroke_parameter",
+            "x_expression",
+            "color"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "id": {
+              "const": "Coarse"
+            },
+            "nominal_capacity_ul": {
+              "const": 10000
+            },
+            "radius_parameter": {
+              "const": "radiusCoarse"
+            },
+            "stroke_parameter": {
+              "const": "strokeCoarse"
+            },
+            "x_expression": {
+              "const": "spacing/2"
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          },
+          "required": [
+            "id",
+            "nominal_capacity_ul",
+            "radius_parameter",
+            "stroke_parameter",
+            "x_expression",
+            "color"
+          ]
+        }
+      ],
+      "items": false
+    },
+    "poses": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "park": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "StrokeFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "StrokeCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "HeadRemoval": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "StrokeFine",
+            "StrokeCoarse",
+            "ValveFine",
+            "ValveCoarse",
+            "HeadRemoval"
+          ]
+        },
+        "fine": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "StrokeFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "StrokeCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "HeadRemoval": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "StrokeFine",
+            "StrokeCoarse",
+            "ValveFine",
+            "ValveCoarse",
+            "HeadRemoval"
+          ]
+        },
+        "coarse": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "StrokeFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "StrokeCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "HeadRemoval": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "StrokeFine",
+            "StrokeCoarse",
+            "ValveFine",
+            "ValveCoarse",
+            "HeadRemoval"
+          ]
+        },
+        "both_closed": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "StrokeFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "StrokeCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "HeadRemoval": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "StrokeFine",
+            "StrokeCoarse",
+            "ValveFine",
+            "ValveCoarse",
+            "HeadRemoval"
+          ]
+        },
+        "head_removed": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "StrokeFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "StrokeCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveFine": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "ValveCoarse": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            },
+            "HeadRemoval": {
+              "oneOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "minLength": 1
+                }
+              ]
+            }
+          },
+          "required": [
+            "StrokeFine",
+            "StrokeCoarse",
+            "ValveFine",
+            "ValveCoarse",
+            "HeadRemoval"
+          ]
+        }
+      },
+      "required": [
+        "park",
+        "fine",
+        "coarse",
+        "both_closed",
+        "head_removed"
+      ]
+    },
+    "default_pose": {
+      "enum": [
+        "park",
+        "fine",
+        "coarse",
+        "both_closed",
+        "head_removed"
+      ]
+    },
+    "default_head": {
+      "enum": [
+        "micro",
+        "macro"
+      ]
+    },
+    "air_path": {
+      "const": {
+        "branches": [
+          {
+            "syringe": "Fine",
+            "isolation_joint": "ValveFine"
+          },
+          {
+            "syringe": "Coarse",
+            "isolation_joint": "ValveCoarse"
+          }
+        ],
+        "common_node": "Manifold",
+        "outlet": "TipHead",
+        "selector_valve_implemented": false
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dimensions_measured": {
+          "const": false
+        },
+        "dosing_accuracy_verified": {
+          "const": false
+        },
+        "leakage_verified": {
+          "const": false
+        },
+        "luer_conformity_verified": {
+          "const": false
+        },
+        "tip_compatibility_verified": {
+          "const": false
+        },
+        "actuation_implemented": {
+          "const": false
+        },
+        "robot_mount_verified": {
+          "const": false
+        }
+      },
+      "required": [
+        "dimensions_measured",
+        "dosing_accuracy_verified",
+        "leakage_verified",
+        "luer_conformity_verified",
+        "tip_compatibility_verified",
+        "actuation_implemented",
+        "robot_mount_verified"
+      ]
+    },
+    "open_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fine_syringe_article": {
+          "type": "null"
+        },
+        "coarse_syringe_article": {
+          "type": "null"
+        },
+        "valve_article": {
+          "type": "null"
+        },
+        "tip_articles": {
+          "type": "null"
+        },
+        "actual_syringe_dimensions_mm": {
+          "type": "null"
+        },
+        "permitted_dose_error_ul": {
+          "type": "null"
+        },
+        "permitted_repeatability_cv_percent": {
+          "type": "null"
+        },
+        "permitted_leak_rate_ul_s": {
+          "type": "null"
+        },
+        "test_pressure_kpa": {
+          "type": "null"
+        },
+        "hold_time_s": {
+          "type": "null"
+        },
+        "liquid_and_temperature": {
+          "type": "null"
+        },
+        "motor_torque_and_drive_pitch": {
+          "type": "null"
+        },
+        "seals_and_tolerances": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "fine_syringe_article",
+        "coarse_syringe_article",
+        "valve_article",
+        "tip_articles",
+        "actual_syringe_dimensions_mm",
+        "permitted_dose_error_ul",
+        "permitted_repeatability_cv_percent",
+        "permitted_leak_rate_ul_s",
+        "test_pressure_kpa",
+        "hold_time_s",
+        "liquid_and_temperature",
+        "motor_torque_and_drive_pitch",
+        "seals_and_tolerances"
+      ]
+    },
+    "connections": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "syringe_ports": {
+          "type": "string",
+          "minLength": 1
+        },
+        "head_coupling": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "syringe_ports",
+        "head_coupling"
+      ]
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tip_heads": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "micro": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tip_length_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "tip_top_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "tip_exit_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "wall_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "cone_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          },
+          "required": [
+            "tip_length_mm",
+            "tip_top_radius_mm",
+            "tip_exit_radius_mm",
+            "wall_mm",
+            "cone_radius_mm",
+            "color"
+          ]
+        },
+        "macro": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "tip_length_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "tip_top_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "tip_exit_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "wall_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "cone_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "color": {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            }
+          },
+          "required": [
+            "tip_length_mm",
+            "tip_top_radius_mm",
+            "tip_exit_radius_mm",
+            "wall_mm",
+            "cone_radius_mm",
+            "color"
+          ]
+        }
+      },
+      "required": [
+        "micro",
+        "macro"
+      ]
+    }
+  },
+  "required": [
+    "format",
+    "id",
+    "recipe",
+    "status",
+    "units",
+    "target_volume_ul",
+    "parameters",
+    "syringes",
+    "poses",
+    "default_pose",
+    "default_head",
+    "air_path",
+    "qualification",
+    "open_requirements",
+    "connections",
+    "limitations",
+    "tip_heads"
+  ]
+}

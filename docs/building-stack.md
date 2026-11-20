@@ -66,6 +66,15 @@ bleiben Darstellungsannahmen; reale Türbewegungen sind nicht geprüft.
 
 ## Raum- und Atriumkorrektur
 
+Die zusammengefasste Fläche **3.006A/B**, im 3. OG das bestätigte Sekretariat,
+erhält im 1.–3. OG wieder einen Geschossboden. Ihre bisherige Kennzeichnung als unbestimmter Bereich hatte
+die Bodenerzeugung unterdrückt. Die Gebäudevariante `SuiteFloors` übernimmt
+die vorhandene Kontur und Plattendicke; die innere A/B-Aufteilung bleibt
+ungeklärt. Im 3. OG ergänzt das vorhandene Seitenfensterrezept ein Außenfenster
+am fernen Fassadenende (`W001`). Das Fenster ist vom Eigentümer bestätigt;
+seine genaue Lage und Größe bleiben Darstellungsannahmen. Die ursprüngliche
+F03-Nachzeichnung bleibt unverändert.
+
 Die aktuelle Quellkorrektur stellt die Toilettenseite `R3_011` / `R3_012` /
 `CoreGap` einschließlich ihrer Grenzen und Türöffnungen wie gezeichnet wieder
 her. Die Sitzgruppen gehören in den **Kernbereich** (`NorthCore`), den
