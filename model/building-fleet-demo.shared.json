@@ -38,6 +38,10 @@
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
       "sha256": "33d1a942076bfaa1d03a7e73af48b119688f10a0490de880e487a8d779a63adf"
+    },
+    "lift_geometry": {
+      "path": "scripts/lift_fittings.py",
+      "sha256": "e41caa897213c4eadf6d7cad5a31e9dbce1b52fbd9a8289a92decaac445136d8"
     }
   },
   "fleet": {
@@ -248,6 +252,51 @@
     "floor_band_start_mm": 20,
     "basis": "presentation_assumption"
   },
+  "support_rule": {
+    "gap": {
+      "maximum": 15,
+      "unit": "presentation_mm",
+      "range": [
+        0,
+        15
+      ],
+      "operation": "morphological_closing_disk",
+      "radius": "maximum/2",
+      "open_edge_overhang": false
+    },
+    "lift_height_exception": {
+      "source_key": "building",
+      "surface_offset_reference": "circulation.elevator.fittings.placements.thresholds[].top_mm_minus_port_z_mm",
+      "unit": "presentation_mm",
+      "range_reference": "geometry.floor_band_start_mm",
+      "allowed_body_roles": [
+        "concept_lift_floor_finish",
+        "concept_lift_cabin_sill",
+        "concept_lift_landing_sill"
+      ],
+      "allowed_body_families": [
+        "LiftCabinFloorFinish",
+        "LiftCabinSill_<side>",
+        "LiftLandingSill_<level>_<side>"
+      ],
+      "conditions": [
+        "cabin_at_port_compiled_FK",
+        "active_port_doors_fully_open"
+      ]
+    },
+    "approximation": {
+      "dilation": "inscribed_polygon",
+      "erosion": "circumscribed_polygon",
+      "polygon_sides": [
+        8,
+        16,
+        32
+      ],
+      "arithmetic": "exact_rational_union",
+      "floor_area_tolerance_mm2": 0
+    },
+    "basis": "Eigentümerentscheidung 2026-11-20; synthetische Annahme; TR01 besitzt kein Rad-/Fahrwerksmodell; keine Radqualifikation"
+  },
   "lift": {
     "id": "BuildingLift",
     "maximum_capacity": 2,
@@ -329,6 +378,7 @@
     "Route doors must be open at start; closing a route door freezes the entire compiled preview. No real door automation.",
     "No network, ROS or hardware execution. Camera images are synthetic scene renders, not image recognition.",
     "Human comparison and real-world navigation remain open. K0_013 is deferred by explicit owner decision; staircore exclusion is retained.",
-    "The owner-authorized separate BF01 L01 connector preserves canonical bench zones; original L01 routes remain unchanged."
+    "The owner-authorized separate BF01 L01 connector preserves canonical bench zones; original L01 routes remain unchanged.",
+    "R1 accepts gaps up to15 presentation mm by conservative disk closing; R2 derives the lift-only support height from source sill/floor geometry. These owner assumptions do not qualify real wheels or step traversal; the whole footprint, open edges, active ports, cabin FK and fully open doors remain checked."
   ]
 }
