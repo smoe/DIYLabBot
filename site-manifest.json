@@ -2,15 +2,21 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "d707f5f7ad9bb287550bfd7f66fdd2cf0df10114",
-  "integrated_commit": "d707f5f7ad9bb287550bfd7f66fdd2cf0df10114",
-  "export_revision": "building-walkthrough-1e83647add71",
+  "source_commit": "80abbc70980ad524fed4a23a7ac9656cd8150c65",
+  "integrated_commit": "80abbc70980ad524fed4a23a7ac9656cd8150c65",
+  "export_revision": "building-walkthrough-affd28bd19ed",
   "html": {
-    "sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b",
-    "bytes": 38935248
+    "sha256": "9d32976a3ecdb14526586d3d323309ba0ac6f5d097f3d4b51d514c62162dd94f",
+    "bytes": 38956001
   },
-  "source_manifest_sha256": "5d8e38a64cca4b0c46f9ff73ebe78aebddf4a1dfde57211db9b93b1a607c3885",
+  "source_manifest_sha256": "35a933b18817ad9bcc19ad163947b643f409dedcabc9e99781518d5130572a8a",
   "source_files_sha256": {
+    "model/walkthrough-robot-commands.json": "284be8867ecc24ef395c0150f4ec2a0f645dc151ffe22613f447ae1f400f60d2",
+    "scripts/walkthrough_robots.py": "87afb5be2db91cc038d60356101859adbfad637fa3dd666c5fa509c7af0341e4",
+    "scripts/templates/quintic_motion.js": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30",
+    "scripts/walkthrough_robots.js": "60d0b66b0b776014f80e6803f4246847eef820fdc418e55a8a760178a976b630",
+    "scripts/sample_motion.py": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673",
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
     "model/furniture/social.articulations.json": "ece5818078ba3c4228aee91a56919b4ced7bddd25fdf58ea336868f0b993da46",
     "model/furniture-articulations.schema.json": "05e373c4d1a1996fddc6659e0fac81ec75009c22576ae742e3a7e01ea7824d8d",
     "scripts/furniture_articulation.py": "e307e2881ad7a373552c3f1fadadbdc07e7533bb93f758dc6be571d1e953be2f",
@@ -23,7 +29,7 @@
     "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
     "model/building-walkthrough.shared.json": "142e6dde190af50c649f1c115f7b64399cd4577ab612177c458fb2826f37ff1d",
     "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
-    "scripts/building_walkthrough.py": "6dc665979a939ea99666c74b34fcd9e49bcb4798c760406b9825ccebf80a4868",
+    "scripts/building_walkthrough.py": "856e4bb6b92d36987466e883710717f10f3449cb94b4b7b15eb1a47622bda605",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
     "model/building-stack.shared.json": "2448b0f67a2456c5102c77688049cdcc707c34ad98ea1fa6ec2219eda26c22d2",
     "model/building-stack.schema.json": "fa6eae31299ebb83c808b6d2cae275ef8a54987808477c26e2c0789d1103485e",
@@ -95,9 +101,9 @@
     "model/building-doors.schema.json": "e51a310fe28673c87d27fea3f81199740a3b2a941332c2ac4fc8972657010455",
     "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
     "scripts/walkthrough_elevator.py": "a555e6c511194c32b6020fda21b910f6a50200bfeffdd03896a8813fc50e9dee",
-    "scripts/build_building_walkthrough.py": "43482ab27d13b71adcec18d557031333e6386afe0f2f5e3c3f77cdf79e9ce004",
+    "scripts/build_building_walkthrough.py": "8444f9ec6e73f1f4b336a657cec3c619cfe3daf6367a91a5e937b788919335d0",
     "scripts/export_building_walkthrough_freecad.py": "ab1b9b62dee88b9be417c9486d4c7a52ec4d0696f6d138fc14e46d8c78093ecc",
-    "scripts/building_walkthrough_viewer.html": "ca3ec90d1162c1cba0d902f818a608973621a3bdfd29b6481c00ab6f41a7a37c",
+    "scripts/building_walkthrough_viewer.html": "ade9e3fdbd65a36acd4ca3864f99712d644a06cb174f6bdea42fc46461065de5",
     "scripts/walkthrough_interaction.js": "1256a76142fb1ec4b549ce73c32d5258413e9ba85ac4ebb30b519b83987f9c11",
     "cad/building-stack/shared-build-report.json": "adc199f0bec3a4b05ef22d4047cd0fec6482227e63db9d8f064bd156cccf450d",
     "cad/lab-layout-l01/shared-build-report.json": "d540e8a2696d2f661df21172e760de6437b9d9d862f5793b920640d95ec9dfb7",
@@ -194,36 +200,30 @@
     "L01 equipment is rigidly instanced into a source-derived building room variant; surveyed registration remains unqualified.",
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
-  "update": "Kitchen drawers, cabinet doors, kettle lids and exterior window, preserving current master building and viewer changes.",
+  "update": "Clickable simulated Arm A commands in laboratory 3.003: demo, home and smooth stop. Current master kitchen, facade and navigation retained.",
   "local_browser_evidence": {
-    "kitchen-actions-browser-report.json": {
-      "sha256": "58d1c6b26df9090f40f13ac4a5155b9827d9c8d9dda4eb8c51262c0ff04fc745",
+    "robot-commands-browser-report.json": {
+      "sha256": "574490935a85117c2cc47e3e60da899d3b142612f0a0f0049f31efdbe524f6de",
       "passed": true,
-      "html_sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b"
+      "html_sha256": "9d32976a3ecdb14526586d3d323309ba0ac6f5d097f3d4b51d514c62162dd94f"
     },
     "complete-route-check.json": {
-      "sha256": "2c67d7e2bc9efe72c3d3801f9bdff23cc03e67d77a726dc86611615ca42824b0",
+      "sha256": "c0a3fab273a5e4f3f092f3bf91cccea459daaa03cd01a2d7a64280832064ef36",
       "passed": true,
-      "html_sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b"
+      "html_sha256": "9d32976a3ecdb14526586d3d323309ba0ac6f5d097f3d4b51d514c62162dd94f"
     },
     "camera-native-contacts.json": {
-      "sha256": "ffd99ee7b0f0579fa7a17381191e022d94760055e0d7c0a7d1740d54b4da583c",
-      "passed": true,
-      "html_sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b"
+      "sha256": "8aeee85a8dc0010a35cfc566f81a47eda9eb3cfaaa1d0c85e1d73ef04c99997b",
+      "passed": true
     },
-    "local-publication-check.json": {
-      "sha256": "294fea850175038a229a86b652f8a25492df527d44b210e901e9910f36f019d9",
-      "passed": true,
-      "html_sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b"
+    "native-path-check.json": {
+      "sha256": "097d9da7c654eb77a57f16214205fc9b77ad0db28a77f98c7bd1ef0267f458f2",
+      "passed": true
     },
-    "browser-controls-report.json": {
-      "sha256": "d69631511f01419557aceb521d135c45f94fcdc5b5d5af0024b3b8b14e69bfde",
-      "passed": true,
-      "html_sha256": "e1560b850e35d53cf1caa158e76a24795acf41b3fec988c4b5bc2972f785e31b",
-      "hidden_cleanup": {
-        "proven": false,
-        "reason": "Headless Chrome did not mark the minimized page hidden."
-      }
+    "source-tests.json": {
+      "sha256": "42877548de0da2542b3882470977f9b0425fb20788cb9391babbde0770543413",
+      "passed": true
     }
-  }
+  },
+  "robot_motion_scope": "Empty-arm simulation only. Native path sampled at 13 positions against environment and non-adjacent links; adjacent mechanical joint interfaces excluded. No hardware or human-speed qualification."
 }
