@@ -18,7 +18,7 @@ jobs:
           python-version: '3.12'
       - name: Check furniture, devices, door bindings and stale-publication detection
         run: |
-          for suite in kitchen_3008 kitchen_actions kitchen_window_placement office_computers furniture_articulation building_furnishings building_laboratories typewide_articulations walkthrough_room_lift building_walkthrough building_walkthrough_export walkthrough_publication; do
+          for suite in kitchen_3008 kitchen_actions kitchen_window_placement building_exterior building_plan_variants office_computers furniture_articulation building_furnishings building_laboratories typewide_articulations walkthrough_room_lift building_walkthrough building_walkthrough_export walkthrough_publication; do
             python -m unittest discover -s tests -p "test_${suite}.py" -v || exit 1
           done
       - uses: actions/setup-node@v4
