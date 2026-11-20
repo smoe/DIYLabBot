@@ -1,0 +1,51 @@
+{
+  "format": "solidcraftbot.syringe-pipette/1",
+  "id": "SP01_DualSyringeConcept",
+  "recipe": "isolated_air_syringes_and_exchangeable_head/1",
+  "status": "Parametric unmeasured concept; no working pipette or fabrication release",
+  "units": {"length": "mm", "angle": "deg", "volume": "uL"},
+  "target_volume_ul": [1, 1000],
+  "parameters": {
+    "radiusFine": {"expression": 2.303294329808903, "unit": "mm", "range": [2, 2.8], "description": "Assumed 1 mL barrel inner radius; not a measured article"},
+    "radiusCoarse": {"expression": 7.283656203947194, "unit": "mm", "range": [6.5, 8.5], "description": "Assumed 10 mL barrel inner radius; not a measured article"},
+    "glassWall": {"expression": 1.5, "unit": "mm", "range": [1, 2.5], "description": "Assumed glass wall thickness"},
+    "spacing": {"expression": 120, "unit": "mm", "range": [105, 150], "description": "Assumed spacing of the two syringe axes"},
+    "axisZ": {"expression": 55, "unit": "mm", "range": [50, 70], "description": "Assumed syringe and valve flow-axis height"},
+    "pipeBore": {"expression": 0.8, "unit": "mm", "range": [0.6, 1.2], "description": "Assumed air-line inner radius; not a chosen hose"},
+    "pipeWall": {"expression": 0.7, "unit": "mm", "range": [0.5, 1.2], "description": "Assumed rigid air-line wall thickness"},
+    "headSeatRadius": {"expression": 9, "unit": "mm", "range": [8, 11], "description": "Assumed common head coupling outer radius; no standardized fit"},
+    "headTravel": {"expression": 55, "unit": "mm", "range": [45, 75], "description": "Illustrative separation for showing head removal"},
+    "valveAngle": {"expression": 90, "unit": "deg", "range": [90, 90], "description": "Illustrative quarter-turn isolation-valve endpoint"}
+  },
+  "syringes": [
+    {"id": "Fine", "nominal_capacity_ul": 1000, "radius_parameter": "radiusFine", "stroke_parameter": "strokeFine", "x_expression": "-spacing/2", "color": "#287fa9"},
+    {"id": "Coarse", "nominal_capacity_ul": 10000, "radius_parameter": "radiusCoarse", "stroke_parameter": "strokeCoarse", "x_expression": "spacing/2", "color": "#d38b35"}
+  ],
+  "tip_heads": {
+    "micro": {"tip_length_mm": 40, "tip_top_radius_mm": 2.5, "tip_exit_radius_mm": 0.35, "wall_mm": 0.15, "cone_radius_mm": 3.4, "color": "#45a7a0"},
+    "macro": {"tip_length_mm": 65, "tip_top_radius_mm": 5.5, "tip_exit_radius_mm": 0.6, "wall_mm": 0.25, "cone_radius_mm": 6.5, "color": "#9369ac"}
+  },
+  "default_head": "micro",
+  "poses": {
+    "park": {"StrokeFine": 0, "StrokeCoarse": 0, "ValveFine": "valveAngle", "ValveCoarse": "valveAngle", "HeadRemoval": 0},
+    "fine": {"StrokeFine": "strokeFine/2", "StrokeCoarse": 0, "ValveFine": 0, "ValveCoarse": "valveAngle", "HeadRemoval": 0},
+    "coarse": {"StrokeFine": 0, "StrokeCoarse": "strokeCoarse/2", "ValveFine": "valveAngle", "ValveCoarse": 0, "HeadRemoval": 0},
+    "both_closed": {"StrokeFine": "strokeFine/2", "StrokeCoarse": "strokeCoarse/2", "ValveFine": "valveAngle", "ValveCoarse": "valveAngle", "HeadRemoval": 0},
+    "head_removed": {"StrokeFine": 0, "StrokeCoarse": 0, "ValveFine": "valveAngle", "ValveCoarse": "valveAngle", "HeadRemoval": "headTravel"}
+  },
+  "default_pose": "fine",
+  "air_path": {"branches": [{"syringe": "Fine", "isolation_joint": "ValveFine"}, {"syringe": "Coarse", "isolation_joint": "ValveCoarse"}], "common_node": "Manifold", "outlet": "TipHead", "selector_valve_implemented": false},
+  "qualification": {"dimensions_measured": false, "dosing_accuracy_verified": false, "leakage_verified": false, "luer_conformity_verified": false, "tip_compatibility_verified": false, "actuation_implemented": false, "robot_mount_verified": false},
+  "open_requirements": {"fine_syringe_article": null, "coarse_syringe_article": null, "valve_article": null, "tip_articles": null, "actual_syringe_dimensions_mm": null, "permitted_dose_error_ul": null, "permitted_repeatability_cv_percent": null, "permitted_leak_rate_ul_s": null, "test_pressure_kpa": null, "hold_time_s": null, "liquid_and_temperature": null, "motor_torque_and_drive_pitch": null, "seals_and_tolerances": null},
+  "connections": {"syringe_ports": "Luer-Lock intended; envelope only. No standard taper, thread, fit or gas-tightness claim.", "head_coupling": "Common illustrative face-and-collar interface, independent of the pipette-tip cone"},
+  "limitations": [
+    "Every construction dimension is a design assumption; actual manufacturer dimensions and parts remain unknown.",
+    "Derived barrel stroke gives the nominal geometric swept capacity only, never a measured or calibrated dispensed volume.",
+    "Valve bores and closure witnesses illustrate topology; clearances, missing seals and pressure behavior are not qualified.",
+    "Luer-Lock collars are illustrative envelopes without standard taper or locking threads; do not manufacture or claim compatibility from them.",
+    "Micro and macro heads are independent illustrative tip profiles, not selected consumables or calibrated volume ranges.",
+    "Head removal is a CAD presentation state, not a robot tool changer. No firmware, device adapter or liquid transfer is implemented.",
+    "Motor and lead-screw shapes are envelopes without selected pitch, force, backlash, bearings or position feedback.",
+    "No robot flange attachment, reach study, workspace placement or automatic tip ejection has been qualified."
+  ]
+}

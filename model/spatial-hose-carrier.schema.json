@@ -1,0 +1,296 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Static spatial hose carrier concept",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "reference",
+    "geometry",
+    "guide_fit",
+    "qualification",
+    "open_requirements",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.spatial-hose-carrier/1"
+    },
+    "id": {
+      "const": "SP02_PartialSpatialCarrier"
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "rad"
+      }
+    },
+    "reference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_family",
+        "brochure",
+        "product_url",
+        "radius_datum_url",
+        "radius_datum_scope",
+        "published_outer_diameter_mm",
+        "published_bend_radius_mm",
+        "published_pitch_mm"
+      ],
+      "properties": {
+        "candidate_family": {
+          "type": "string"
+        },
+        "brochure": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "path",
+            "sha256",
+            "url",
+            "revision_scope"
+          ],
+          "properties": {
+            "path": {
+              "type": "string"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "url": {
+              "type": "string"
+            },
+            "revision_scope": {
+              "type": "string"
+            }
+          }
+        },
+        "product_url": {
+          "type": "string"
+        },
+        "radius_datum_url": {
+          "type": "string"
+        },
+        "radius_datum_scope": {
+          "type": "string"
+        },
+        "published_outer_diameter_mm": {
+          "const": 34.5
+        },
+        "published_bend_radius_mm": {
+          "const": 50
+        },
+        "published_pitch_mm": {
+          "const": 11.3
+        }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nominal_link_count",
+        "nominal_link_count_range",
+        "nominal_pitch_mm",
+        "outer_radius_mm",
+        "inner_radius_mm",
+        "minimum_centerline_bend_radius_mm",
+        "pitch_scope",
+        "ring_geometry"
+      ],
+      "properties": {
+        "nominal_link_count": {
+          "type": "integer",
+          "minimum": 20,
+          "maximum": 120
+        },
+        "nominal_link_count_range": {
+          "const": [
+            20,
+            120
+          ]
+        },
+        "nominal_pitch_mm": {
+          "const": 11.3
+        },
+        "outer_radius_mm": {
+          "const": 17.25
+        },
+        "inner_radius_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "minimum_centerline_bend_radius_mm": {
+          "type": "number",
+          "minimum": 50
+        },
+        "pitch_scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ring_geometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "width_mm",
+            "outer_radius_mm",
+            "inner_radius_mm"
+          ],
+          "properties": {
+            "width_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "outer_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "inner_radius_mm": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            }
+          }
+        }
+      }
+    },
+    "guide_fit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "family",
+        "offsets_xz_mm",
+        "service_y_range_mm",
+        "service_y_step_mm",
+        "length_tolerance_mm",
+        "fit_iterations",
+        "sample_step_mm",
+        "scope"
+      ],
+      "properties": {
+        "family": {
+          "const": "two_exact_spatial_biarcs"
+        },
+        "offsets_xz_mm": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 2,
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "service_y_range_mm": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "number"
+          }
+        },
+        "service_y_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "length_tolerance_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "fit_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 80
+        },
+        "sample_step_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seed_mode": {
+          "enum": [
+            "chord_midpoint",
+            "endpoint_biarc"
+          ]
+        }
+      }
+    },
+    "qualification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel_fit_verified",
+        "anchor_mounts_verified",
+        "dynamic_articulation_verified",
+        "exact_3d_radius_datum_registered",
+        "selected_vendor_article_fit_verified",
+        "hardware_execution_implemented"
+      ],
+      "properties": {
+        "channel_fit_verified": {
+          "const": false
+        },
+        "anchor_mounts_verified": {
+          "const": false
+        },
+        "dynamic_articulation_verified": {
+          "const": false
+        },
+        "exact_3d_radius_datum_registered": {
+          "const": false
+        },
+        "selected_vendor_article_fit_verified": {
+          "const": false
+        },
+        "hardware_execution_implemented": {
+          "const": false
+        }
+      }
+    },
+    "open_requirements": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selected_article_or_print_design",
+        "channel_dimensions_and_hose_fit",
+        "anchor_mounts_and_fasteners",
+        "articulation_and_torsion_limits"
+      ],
+      "properties": {
+        "selected_article_or_print_design": {
+          "type": "null"
+        },
+        "channel_dimensions_and_hose_fit": {
+          "type": "null"
+        },
+        "anchor_mounts_and_fasteners": {
+          "type": "null"
+        },
+        "articulation_and_torsion_limits": {
+          "type": "null"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}
