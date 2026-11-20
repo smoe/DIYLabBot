@@ -478,7 +478,7 @@ Greiferinventar. Die Aufzeichnung ist kein im Browser laufender Geräteadapter.
 Das damalige kurze Video zeigt den Entnahmebaustein; die physische Beladung
 aller zwölf Rotorplätze wird damit nicht als geprüft dargestellt.
 
-Die aktuelle [geglättete Entnahme](docs/cf01-smooth-unloading.md) ergänzt mit
+Die aktuelle [geglättete Entnahme](docs/centrifuge-cf01.md#cf01-smooth-unloading) ergänzt mit
 `model/cf01-unload-demo.motion.json` eine eigene, referenzierende Bewegungsquelle:
 zwölf Gefäße nach dem synthetischen Spin, Sample01–03 in ursprünglicher
 Rackreihenfolge zurück, neun verbleiben im Rotor. Ein gemeinsames kompiliertes

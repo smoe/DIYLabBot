@@ -196,7 +196,7 @@ die lokale Auswahl `--transport sila2` bleibt ein Mock-Vertragsdecoder. Proben-I
 und ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
 Vor Änderungen an geglätteten CF01-Entnahmebahnen
-[docs/cf01-smooth-unloading.md](docs/cf01-smooth-unloading.md) lesen.
+[CF01-Bewegungsdokumentation](docs/centrifuge-cf01.md#cf01-smooth-unloading) lesen.
 `model/cf01-unload-demo.motion.json` referenziert vorhandene Geometrie und
 Chargenquellen; Kurven, Eigentümerereignisse und Grenzwerte einmal kompilieren
 und in nativer Prüfung, Browser und ROS-Armexport gemeinsam auswerten.

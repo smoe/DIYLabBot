@@ -400,7 +400,7 @@ Die CF01-Deckel-/Heberfolge ist jetzt animiert; ROS-Interfaces und SiLA-FDL
 werden aus derselben Protokollquelle erzeugt. Als Nächstes in einer echten
 ROS-2-Jazzy-Umgebung kompilieren und ROS-/SiLA-Server mit einem Client prüfen.
 Der lokale Mock und die XSD-Prüfung ersetzen diese Interoperabilitätsprüfung
-nicht. Siehe [CF01-Protokoll](centrifuge-cf01-protocol.md).
+nicht. Siehe [CF01-Protokoll](centrifuge-cf01.md#cf01-protocol).
 
 Für den ergänzten [Probentransport TR01](sample-transport-tr01.md) zunächst
 Zentrifugenartikel und Chargengröße festlegen sowie ausschließlich Bodenrouten

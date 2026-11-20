@@ -521,7 +521,7 @@ diesem Modellstand noch nicht abgeleitet.
 
 ## Zentrifugenstation CF01
 
-Die neue [Entnahmeszene](centrifuge-cf01-robot-pickup.md) nutzt den vorhandenen
+Die neue [Entnahmeszene](centrifuge-cf01.md#cf01-robot-pickup) nutzt den vorhandenen
 Sechsachsenarm mit einem provisorischen Parallelgreifer. Das Gefäß wechselt nach
 Greifbestätigung starr zum Werkzeug, wird axial ausgezogen und aus dem
 Deckelbereich zurückgenommen. Erst danach werden Heber und Deckel bewegt.
