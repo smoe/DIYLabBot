@@ -29,12 +29,12 @@ def load(path=SOURCE):
     for name, definition in schema['properties'].items():
         if 'const' in definition and s[name] != definition['const']:
             raise ValueError('Unsupported dedicated 1 mL source field: '+name)
-    for key in ('robot', 'syringe_library', 'hose_carrier'):
+    for key in ('robot', 'syringe_library'):
         if not isinstance(s[key], dict) or set(s[key]) != {'source', 'source_sha256'}:
             raise ValueError('A pinned assembly reference is required: '+key)
         path = assembly_model.validate_reference(s[key])
-        if key == 'hose_carrier':
-            carrier.load(path)
+    if s['hose_carrier'] is not None:
+        raise ValueError('The link-clipped route does not use the previous R50 carrier article')
     if (s['head_mount']['changeable_during_operation'] is not False
             or s['inspiration']['inspected'] is not False):
         raise ValueError('Fixed tooling and uninspected inspiration must remain explicit')
@@ -129,7 +129,8 @@ def parameters(spec, overrides=None):
     required = {'outboard', 'pitch', 'hoseInnerRadius', 'hoseOuterRadius',
                 'hoseLength', 'hoseBendRadius', 'strokeReserve',
                 'socketRadialClearance', 'hoseInsertionDepth', 'strainReliefLength',
-                'connectorStraightLead', 'tipEngagementLength', 'tipTaperRelief'}
+                'connectorStraightLead', 'tipEngagementLength', 'tipTaperRelief',
+                'hoseClipLength', 'clipFreeLead', 'clipHoseGap', 'clipWall', 'mountGap', 'mountWall'}
     if not isinstance(spec['parameters'], dict) or set(spec['parameters']) != required:
         raise ValueError('All declared arm-pump parameters are required')
     if set(overrides)-set(spec['parameters']):
@@ -250,6 +251,8 @@ def route_parameters(spec, p, a=None, mounting=None):
 
 
 def validate_route_source(spec, p, a):
+    if 'hose_routing' in spec:
+        return validate_clipped_route_source(spec, p, a)
     config = spec['carrier_routing']
     if (not isinstance(config, dict)
             or set(config) != {'frames', 'sequence', 'guide', 'bare_fit', 'crossings', 'sample_step_mm'}):
@@ -316,6 +319,121 @@ def validate_route_source(spec, p, a):
             raise ValueError('Crossings need an explicit support or connection station')
     if crossings['J6_FlangeRoll'] != {'interface': 'tip', 'station': 'unsupported_exit_mm'}:
         raise ValueError('J6 crossing is defined by the head-mounted strain-relief exit')
+
+
+def validate_clipped_route_source(spec, p, a):
+    """Check the physical support chain before any route or CAD compilation."""
+    config = spec['hose_routing']
+    required = {'format', 'status', 'sample_step_mm', 'clips', 'sections',
+                'axial_retention_status', 'qualification'}
+    if (not isinstance(config, dict) or set(config) != required
+            or config['format'] != 'solidcraftbot.link-clipped-hose/1'
+            or any(not isinstance(config[k], str) or not config[k]
+                   for k in ('status', 'axial_retention_status'))
+            or type(config['sample_step_mm']) not in (int, float)
+            or not math.isfinite(config['sample_step_mm']) or config['sample_step_mm'] <= 0
+            or config['qualification'] != {'clip_fit_verified': False,
+                'axial_retention_verified': False, 'continuous_motion_verified': False}):
+        raise ValueError('A complete unqualified link-clipped routing recipe is required')
+    values = {**robot.parameters(a), **p}
+    flange_z = evaluate(a['flange_reference']['point'][2], values)
+    values['tip_air_zero_z'] = (flange_z+spec['head_mount']['flange_gap_mm']+p['axisZ']-21.3
+        -connection_interfaces(spec, p)['tip']['material_end_mm'][2])
+    links = {row['id'] for row in a['links']}
+    bodies = {op['body']: link['id'] for link in robot.expanded(a)['links']
+              for op in link['recipe'] if op['action'] == 'create'}
+    clips = config['clips']
+    if not isinstance(clips, dict) or len(clips) != 7:
+        raise ValueError('Seven physical hose supports are required for the four crossed joints')
+    body_ids = set()
+    def vector(v):
+        if not isinstance(v, list) or len(v) != 3:
+            raise ValueError('A hose support needs three-coordinate vectors')
+        try:
+            result = [evaluate(x, values) for x in v]
+        except (KeyError, TypeError, SyntaxError, ZeroDivisionError, OverflowError, ValueError) as error:
+            raise ValueError('Invalid source hose-support expression') from error
+        if any(type(x) not in (int, float) or not math.isfinite(x) for x in result):
+            raise ValueError('Hose support coordinates must be finite')
+        return result
+    for name, row in clips.items():
+        if (not re.fullmatch(r'[a-z][a-z0-9_]*', name) or not isinstance(row, dict)
+                or set(row) != {'link', 'body_id', 'host_body', 'center_mm', 'tangent', 'x_axis', 'mount'}
+                or row['link'] not in links or bodies.get(row['host_body']) != row['link']
+                or not isinstance(row['body_id'], str) or not row['body_id']
+                or row['body_id'] in body_ids):
+            raise ValueError('Each physical clip needs a unique body and a structural host on its link')
+        body_ids.add(row['body_id']);vector(row['center_mm'])
+        t, x = vector(row['tangent']), vector(row['x_axis'])
+        if (abs(sum(v*v for v in t)-1) > 1e-9 or abs(sum(v*v for v in x)-1) > 1e-9
+                or abs(sum(v*w for v, w in zip(t, x))) > 1e-9):
+            raise ValueError('Physical hose clips require orthonormal support frames')
+        mount = row['mount']
+        if (not isinstance(mount, dict) or set(mount)-{'kind', 'band_center_z_mm'}
+                or mount.get('kind') not in {'plate_edge', 'root_edge', 'post_collar', 'tube_band'}):
+            raise ValueError('Unknown physical clip attachment recipe')
+        if 'band_center_z_mm' in mount:
+            try:
+                band_z = evaluate(mount['band_center_z_mm'], values)
+            except (KeyError, TypeError, SyntaxError, ZeroDivisionError, OverflowError, ValueError) as error:
+                raise ValueError('Invalid clip mounting band expression') from error
+            if type(band_z) not in (int, float) or not math.isfinite(band_z):
+                raise ValueError('Clip mounting band position must be finite')
+    own = expanded(spec, p)
+    component_links = {'PumpFrame': 'L2_UpperArm', 'PumpCarriage': 'L2_UpperArm',
+        'PumpDrive': 'L2_UpperArm', 'PumpValve': 'L2_UpperArm', 'ArmBracket': 'L2_UpperArm',
+        'WristHead': 'L6_BareFlange', 'ConsumableTip': 'L6_BareFlange'}
+    component_links.update({row['component']: row['link']
+        for row in clip_geometry(spec, p)['support_interfaces'].values()})
+    bodies.update({row['id']: component_links[row['component']] for row in own['bodies']})
+    sections = config['sections'];previous = 'pump';visited = [];ids = set();crossed = set()
+    joints = {j['id']: j for j in a['joints']}
+    if not isinstance(sections, list) or len(sections) != 8:
+        raise ValueError('Four rigid link runs and four independent joint loops are required')
+    for row in sections:
+        if (not isinstance(row, dict) or not isinstance(row.get('id'), str) or not row['id']
+                or row['id'] in ids or row.get('from') != previous
+                or row.get('to') not in set(clips) | {'tip'}):
+            raise ValueError('The hose sections must form one nonduplicated pump-to-tip support chain')
+        ids.add(row['id']);previous = row['to'];visited.append(previous)
+        if row.get('kind') == 'fixed_link':
+            if (set(row) != {'id', 'kind', 'from', 'to', 'link', 'controls', 'host_bodies', 'max_offset_mm'}
+                    or row['link'] not in links or len(row['controls']) < 2
+                    or not isinstance(row['host_bodies'], list) or not row['host_bodies']
+                    or len(set(row['host_bodies'])) != len(row['host_bodies'])
+                    or any(bodies.get(name) != row['link'] for name in row['host_bodies'])
+                    or type(row['max_offset_mm']) not in (int, float)
+                    or not math.isfinite(row['max_offset_mm']) or row['max_offset_mm'] <= 0):
+                raise ValueError('Rigid hose runs require bounded source-local controls and structural hosts')
+            for point in row['controls']:vector(point)
+            for endpoint in (row['from'], row['to']):
+                if endpoint in clips and clips[endpoint]['link'] != row['link']:
+                    raise ValueError('A rigid run cannot cross a moving joint')
+        elif row.get('kind') == 'joint_loop':
+            if (set(row) != {'id', 'kind', 'from', 'to', 'joint', 'parent_link', 'max_reach_mm',
+                            'axial_range_mm', 'loop_fit'}
+                    or row['joint'] not in joints or row['joint'] in crossed
+                    or row['parent_link'] != joints[row['joint']]['parent']
+                    or type(row['max_reach_mm']) not in (int, float)
+                    or not math.isfinite(row['max_reach_mm']) or not 0 < row['max_reach_mm'] <= 80):
+                raise ValueError('Each joint needs its own bounded local flex section')
+            if (not isinstance(row['axial_range_mm'], list) or len(row['axial_range_mm']) != 2
+                    or any(type(v) not in (int, float) or not math.isfinite(v) for v in row['axial_range_mm'])
+                    or row['axial_range_mm'][0] >= row['axial_range_mm'][1]):
+                raise ValueError('Joint loops require an explicit signed axial pocket')
+            import joint_hose_routing
+            joint_hose_routing._policy(row)
+            parent_link = clips[row['from']]['link'] if row['from'] in clips else 'L2_UpperArm'
+            child_link = clips[row['to']]['link'] if row['to'] in clips else 'L6_BareFlange'
+            if (parent_link != joints[row['joint']]['parent']
+                    or child_link != joints[row['joint']]['child']):
+                raise ValueError('A joint loop must connect clips on the two adjacent source links')
+            crossed.add(row['joint'])
+        else:
+            raise ValueError('Unsupported clipped hose section')
+    if (previous != 'tip' or set(visited) != set(clips) | {'tip'}
+            or crossed != {'J3_Elbow', 'J4_ForearmRoll', 'J5_WristPitch', 'J6_FlangeRoll'}):
+        raise ValueError('Every physical clip and crossed joint must appear exactly once')
 
 
 def native_spec(spec, p):
@@ -452,7 +570,24 @@ def expanded(spec, p):
         result['joints'].append({'id': name, 'type': kind, 'parent': 'PumpFrame', 'child': child,
             'origin': origin, 'axis': axis, 'reference_x': ref, 'limit_parameter': limit,
             'limits_deg' if kind == 'revolute' else 'limits_mm': [0, p[limit]]})
+    if 'hose_routing' in spec:
+        clips = clip_geometry(spec, p)
+        for key in ('components', 'bodies', 'operations'):
+            result[key].extend(copy.deepcopy(clips[key]))
     return result
+
+
+def clip_geometry(spec, p):
+    """One portable source-derived clamp recipe, reused by both CAD adapters."""
+    import close_hose_clips
+    a = arm(spec);values = {**robot.parameters(a), **p}
+    stations = copy.deepcopy(spec['hose_routing']['clips'])
+    for row in stations.values():
+        for key in ('center_mm', 'tangent', 'x_axis'):
+            row[key] = [evaluate(v, values) for v in row[key]]
+        if 'band_center_z_mm' in row['mount']:
+            row['mount']['band_center_z_mm'] = evaluate(row['mount']['band_center_z_mm'], values)
+    return close_hose_clips.expanded(a, p, stations)
 
 
 def pump_mount_plate_axis_bounds(spec, p):
@@ -490,10 +625,13 @@ def mounts(spec, p):
     top = p['axisZ']-21.3
     head = [[1, 0, 0, flange[0]], [0, -1, 0, flange[1]-95],
             [0, 0, -1, flange[2]+spec['head_mount']['flange_gap_mm']+top], [0, 0, 0, 1]]
-    return {'PumpFrame': {'link': 'L2_UpperArm', 'zero_transform': pump},
+    result = {'PumpFrame': {'link': 'L2_UpperArm', 'zero_transform': pump},
             'WristHead': {'link': 'L6_BareFlange', 'zero_transform': head},
             'ConsumableTip': {'link': 'L6_BareFlange', 'zero_transform': head},
             'ArmBracket': {'link': 'L2_UpperArm', 'zero_transform': robot.identity()}}
+    if 'hose_routing' in spec:
+        result.update(clip_geometry(spec, p)['mounts'])
+    return result
 
 
 def allowed_contacts(spec, p=None):
@@ -527,28 +665,43 @@ def _route_clearance(spec, p, path, frames, mounted, context):
     interfaces = connection_interfaces(spec, p, mounted)
     mating = {key: [row['body'], row['clamp_body']] for key, row in interfaces.items()}
     design = spec['hose_length_design']
-    return clearance.check_route(path, context['envelopes'], {**frames, **mounted},
-        p['hoseOuterRadius'], context['carrier_profile']['geometry']['outer_radius_mm'],
+    check = clearance.check_route(path, context['envelopes'], {**frames, **mounted},
+        p['hoseOuterRadius'], (context['carrier_profile']['geometry']['outer_radius_mm']
+                              if context['carrier_profile'] is not None else p['hoseOuterRadius']),
         sample_step_mm=design.get('clearance_sample_step_mm', 2.0),
         minimum_sample_step_mm=design.get('clearance_minimum_step_mm', .05),
         socket_mating_bodies=mating)
+    if 'hose_routing' in spec:
+        check['physical_clip_fit_scope'] = ('Plastic clips have bores and nonconvex support arms; '
+            'their enclosing boxes cannot prove hose clearance. Complete native clip/hose and clip/arm '
+            'checks are separately required in every named pose.')
+    return check
 
 
 def prepare_route_context(spec, p):
     """Source-only kinematics and conservative envelopes for one evaluation."""
     a = arm(spec);own = expanded(spec, p);mounting = mounts(spec, p)
     ap = route_parameters(spec, p, a, mounting)
+    envelopes = clearance.source_envelopes(a, own, ap, p)
+    clip_ids = {row['body_id'] for row in spec.get('hose_routing', {}).get('clips', {}).values()}
     context = {'arm': a, 'parameters': ap, 'mounts': mounting, 'own': own,
-               'carrier_profile': carrier.load(ROOT/spec['hose_carrier']['source']),
-               'routing_config': spec['carrier_routing'],
+               'carrier_profile': (carrier.load(ROOT/spec['hose_carrier']['source'])
+                                   if spec['hose_carrier'] is not None else None),
+               'routing_config': spec.get('hose_routing', spec.get('carrier_routing')),
                'connection_interfaces': connection_interfaces,
-               'envelopes': clearance.source_envelopes(a, own, ap, p)}
+               'envelopes': [row for row in envelopes if row['body'] not in clip_ids]}
     def bare_span_check(path, from_frame, to_frame, frames, mounted):
         trial = dict(path)
         trial['length_accounting'] = {'parts': [{'id': from_frame+'__'+to_frame,
             'kind': 'bare_span', 'length_mm': path['length_mm']}]}
         return _route_clearance(spec, p, trial, frames, mounted, context)
     context['bare_span_clearance'] = bare_span_check
+    context['external_clearance_check'] = lambda path, frames, mounted: _route_clearance(
+        spec, p, path, frames, mounted, context)
+    if 'hose_routing' in spec:
+        import arm_hose_proximity
+        context['proximity_check'] = lambda path, frames, mounted: arm_hose_proximity.bounds(
+            path, spec, p, frames, mounted, context)
     return context
 
 
@@ -556,6 +709,17 @@ def route_at(spec, p, joints_deg, slack, *, context=None, state_id=None):
     """Compile framed physical spans; arbitrary grid points remain diagnostics."""
     context = context or prepare_route_context(spec, p)
     a = context['arm']
+    if 'hose_routing' in spec:
+        import joint_hose_routing
+        if not isinstance(slack, dict):
+            raise ValueError('The clipped hose requires a sectioned routing proof, never global slack')
+        if state_id is None or spec['states'][state_id]['joints_deg'] != list(joints_deg):
+            raise ValueError('A named source pose is required for the sectioned static hose route')
+        frames, mounted = _placements(spec, p, joints_deg, state_id, context)
+        context['state_id'] = state_id
+        path = joint_hose_routing.compile_sections(spec, p, frames, mounted, context, slack)
+        path['joints_deg'] = list(joints_deg)
+        return path
     if (len(joints_deg) != 6 or type(slack) not in (int, float)
             or not math.isfinite(slack) or not 0 <= slack <= spec['hose_length_design']['max_service_loop_mm']):
         raise ValueError('Invalid static hose scan coordinate')
@@ -581,6 +745,18 @@ def named_length_band(spec, p, *, context=None):
     if key in _NAMED_BAND_CACHE:
         return _NAMED_BAND_CACHE[key]
     context = context or prepare_route_context(spec, p)
+    if 'hose_routing' in spec:
+        import joint_hose_routing
+        poses = {name: _placements(spec, p, row['joints_deg'], name, context)
+                 for name, row in spec['states'].items()}
+        band = joint_hose_routing.design(spec, p, poses, context)
+        band['parameters'] = copy.deepcopy(p)
+        if pin_key != [(str(path), digest(path)) for path in dependencies]:
+            raise ValueError('Source files changed during the sectioned hose design')
+        band['source_files_sha256'] = {str(path.relative_to(ROOT)): checksum
+            for path, (_, checksum) in zip(dependencies, pin_key)}
+        _NAMED_BAND_CACHE[key] = band
+        return band
     design = spec['hose_length_design']
     maximum, step = design['max_service_loop_mm'], design['loop_sample_step_mm']
     intervals = math.ceil(maximum/step)
@@ -667,7 +843,15 @@ def state(spec, p, name=None, *, loop_parameter_mm=None):
     context = prepare_route_context(spec, p)
     frames, placed = _placements(spec, p, row['joints_deg'], name, context)
     q = pose(spec, p, name)
-    if loop_parameter_mm is None:
+    clipped = 'hose_routing' in spec
+    if clipped:
+        proof = named_length_band(spec, p, context=context) if loop_parameter_mm is None else loop_parameter_mm
+        if (not isinstance(proof, dict) or proof.get('format') != 'solidcraftbot.arm-hose-routing-proof/1'
+                or proof.get('passed') is not True or name not in proof.get('states', {})):
+            raise ValueError('A demonstrated sectioned hose proof is required for every named pose')
+        route = route_at(spec, p, row['joints_deg'], proof, context=context, state_id=name)
+        loop_parameter_mm = None
+    elif loop_parameter_mm is None:
         band = named_length_band(spec, p, context=context)
         if band['status'] != 'demonstrated' or name not in band['selected_states']:
             raise ValueError('Named-pose hose design is blocked: '+json.dumps(band['failures']))
@@ -684,16 +868,21 @@ def state(spec, p, name=None, *, loop_parameter_mm=None):
     source_check = _route_clearance(spec, p, route, frames, placed, context)
     if not source_check['passed']:
         raise ValueError('Static hose route is not separated from the conservative source envelopes: '+json.dumps(source_check))
+    if clipped:
+        proximity_check = context['proximity_check'](route, frames, placed)
+        if proximity_check['passed'] is not True:
+            raise ValueError('Static hose leaves its declared structural/joint pocket: '+json.dumps(proximity_check))
     crossings = {key: {'distance_to_axis_mm': value['radial_standoff_mm'],
                        'axis_point_mm': value['axis_origin_mm'], 'axis_direction': value['axis_direction'],
                        'waypoint_mm': value['point_mm'], 'frame_id': value['frame_id'],
                        'scope': 'Declared support/crossing frame; not the whole-route minimum distance'}
                  for key, value in route['framed_crossings'].items()}
-    return {'id': name, 'joints_deg': row['joints_deg'], 'stroke_mm': q['PumpStroke'],
+    result = {'id': name, 'joints_deg': row['joints_deg'], 'stroke_mm': q['PumpStroke'],
             'motor_angle_deg': q['MotorRotation'], 'valve_angle_deg': q['IsolationValve'],
             'part_matrices': placed, 'hose_path': route, 'hose_self_clearance': self_check,
             'source_clearance': source_check, 'length_accounting': route['length_accounting'],
-            'carrier': carrier.carrier_records(context['carrier_profile'], route['carrier_path']),
+            'carrier': (carrier.carrier_records(context['carrier_profile'], route['carrier_path'])
+                        if context['carrier_profile'] is not None else None),
             'hose_points_mm': route['sample_points_mm'],
             'hose_inner_radius_mm': p['hoseInnerRadius'], 'hose_outer_radius_mm': p['hoseOuterRadius'],
             'hose_slack_parameter_mm': loop_parameter_mm,
@@ -703,6 +892,24 @@ def state(spec, p, name=None, *, loop_parameter_mm=None):
             'connection_interfaces': connection_interfaces(spec, p, placed),
             'tip_seat': tip_seat(spec, p),
             'tip_tcp_mm': robot.transform(placed['ConsumableTip'], tip_seat(spec, p)['tip_tcp_mm'])}
+    if clipped:
+        result['hose_routing_design'] = {key: copy.deepcopy(proof[key]) for key in
+            ('format', 'section_lengths_mm', 'hose_length_mm', 'clip_material_stations_mm')}
+        supports = copy.deepcopy(clip_geometry(spec, p)['support_interfaces'])
+        for support in supports.values():
+            # Clip geometry is expressed in the robot's zero-pose link frame.
+            link = support.get('link', support.get('attachment_link'))
+            if link is not None:
+                matrix = frames[link]
+                for key in ('center_mm', 'hose_center_mm'):
+                    if key in support:support[key] = robot.transform(matrix, support[key])
+                for key in ('tangent', 'axis', 'x_axis'):
+                    if key in support:
+                        support[key] = [sum(matrix[i][j]*support[key][j] for j in range(3)) for i in range(3)]
+                support['host_fit_frame'] = 'source_link_local'
+        result['clip_support_interfaces'] = supports
+        result['hose_proximity'] = proximity_check
+    return result
 
 
 def samples(spec, p):
@@ -713,9 +920,16 @@ build_samples = samples
 
 
 def source_dependencies(spec):
-    return [ROOT/'scripts/arm_syringe_window.py', ROOT/'scripts/arm_syringe_routing.py',
+    common = [ROOT/'scripts/arm_syringe_routing.py',
             ROOT/'scripts/arm_syringe_clearance.py', ROOT/'scripts/robot_components.py', ROOT/'scripts/robot_cameras.py',
             ROOT/arm(spec)['vendor_library']['path'], ROOT/'scripts/spatial_hose_carrier.py',
+            ROOT/'scripts/pneumatic_hose.py', ROOT/'scripts/robot_spec.py', ROOT/'scripts/syringe_pipette.py',
+            ROOT/'scripts/assembly_model.py', ROOT/'scripts/tube_cam_model.py', ROOT/'scripts/tube_carrier_model.py',
+            ROOT/'model/syringe-pipette.schema.json']
+    if 'hose_routing' in spec:
+        return common+[ROOT/'scripts/joint_hose_routing.py', ROOT/'scripts/close_hose_clips.py',
+                       ROOT/'scripts/arm_hose_proximity.py']
+    return common+[ROOT/'scripts/arm_syringe_window.py',
             ROOT/'model/spatial-hose-carrier.schema.json', ROOT/spec['hose_carrier']['source'],
             ROOT/'cad/vendor/igus/triflex-r-reference.pdf']
 

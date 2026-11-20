@@ -37,6 +37,14 @@ class ArmSyringeWindowTests(unittest.TestCase):
     def run_scan(self, **kwargs):
         return window_scan.scan(self.spec, self.p, route_at=self.route, **kwargs)
 
+    def test_actual_clipped_route_rejects_global_scalar_scan_before_geometry(self):
+        self.assertIn('hose_routing', self.spec)
+        self.assertIsNone(self.spec['hose_carrier'])
+        with patch.object(arm_syringe, 'prepare_route_context',
+                          side_effect=AssertionError('Unsupported geometry must not be evaluated')):
+            with self.assertRaisesRegex(ValueError, 'prepare_arm_hose_routing.py'):
+                window_scan.scan(self.spec, self.p)
+
     def physical_fixture(self):
         self.spec['hose_length_design'] = {
             'allowances': [{'id': 'cut', 'value_mm': 2, 'reason': 'Synthetic cutting fixture'},
@@ -188,6 +196,11 @@ class ArmSyringeWindowTests(unittest.TestCase):
                                     for name, value in edge['fixed_joints_deg'].items()))
 
     def test_fixed_axes_do_not_multiply_edges_or_duplicate_geometry_calls(self):
+        # Exercise the retained legacy evaluator adapter, not the clipped route.
+        self.spec.pop('hose_routing')
+        profile = ROOT/'model/spatial-hose-carrier.shared.json'
+        self.spec['hose_carrier'] = {'source': str(profile.relative_to(ROOT)),
+                                    'source_sha256': arm_syringe.digest(profile)}
         for name in self.ids:
             self.spec['operating_window_deg'][name]['range'] = [0, 0]
         self.spec['states'] = {'upright': {'joints_deg': [0]*6},
@@ -304,6 +317,7 @@ class ArmSyringeWindowTests(unittest.TestCase):
         pins = report['source_pins']['files_sha256']
         self.assertIn('scripts/arm_syringe_window.py', pins)
         self.assertIn(self.spec['robot']['source'], pins)
+        self.assertNotIn('model/spatial-hose-carrier.shared.json', pins)
         self.assertTrue(all(len(value) == 64 for value in pins.values()))
         changed = self.run_scan(margin_mm=11)
         self.assertNotEqual(report['scan_input_canonical_sha256'], changed['scan_input_canonical_sha256'])

@@ -106,6 +106,69 @@ class SourceRouteClearanceTests(unittest.TestCase):
     def envelope(bounds, *, arm=True):
         return {'body': 'WitnessBody', 'component': 'Host', 'bbox': bounds, 'arm_body': arm}
 
+    def test_uncut_cylinder_proves_real_corner_clearance_inside_its_enclosing_box(self):
+        for raw_axis in ([0, 0, 1], [0, 1, 0], [1, 2, 3]):
+            norm = math.sqrt(sum(value*value for value in raw_axis))
+            axis = [value/norm for value in raw_axis]
+            planar = math.hypot(axis[0], axis[1])
+            x = [-axis[1]/planar, axis[0]/planar, 0.] if planar > 1e-9 else [1., 0., 0.]
+            y = [axis[1]*x[2]-axis[2]*x[1], axis[2]*x[0]-axis[0]*x[2],
+                 axis[0]*x[1]-axis[1]*x[0]]
+            origin = [3., -4., 2.]
+            point = lambda along, u, v: [origin[i]+along*axis[i]+u*x[i]+v*y[i] for i in range(3)]
+            body = SourceEnvelopeTests.source_rows([{'action': 'create', 'body': 'Cylinder',
+                'primitive': {'kind': 'cylinder', 'origin': origin, 'axis': raw_axis,
+                              'radius': 10., 'height': 20.}}])
+            route = self.path(point(5, 8, 8), point(15, 8, 8))
+            analytic_gap = math.hypot(8, 8)-10-.5
+            with self.subTest(axis=raw_axis):
+                self.assertGreater(analytic_gap, .8)
+                result = clearance.check_route(route, body, {'L0': robot.identity()}, .5, .5,
+                                               sample_step_mm=1.)
+                self.assertTrue(result['passed'])
+                self.assertGreater(result['minimum_margin_lower_bound_mm'], .3)
+
+    def test_cylinder_interior_and_radius_overlap_fail_even_when_cuts_remove_material(self):
+        create = {'action': 'create', 'body': 'Cylinder', 'primitive': {
+            'kind': 'cylinder', 'origin': [0, 0, 0], 'axis': [0, 0, 1], 'radius': 10., 'height': 20.}}
+        cut = {'action': 'cut', 'body': 'Cylinder', 'primitive': {
+            'kind': 'box', 'origin': [-20, -20, -1], 'size': [40, 40, 22]}}
+        before = SourceEnvelopeTests.source_rows([create])
+        after = SourceEnvelopeTests.source_rows([create, cut])
+        self.assertEqual(after, before)
+        for radial in (0., 9.9, 10.3):
+            with self.subTest(radial=radial):
+                path = self.path([radial, 0, 5], [radial, 0, 15])
+                result = clearance.check_route(path, after, {'L0': robot.identity()}, .5, .5,
+                                               sample_step_mm=1.)
+                self.assertFalse(result['passed'])
+                self.assertEqual(result['classification'], 'envelope_proximity')
+
+    def test_positive_primitive_union_keeps_its_real_gap_and_moves_all_members(self):
+        operations = [
+            {'action': 'create', 'body': 'Body', 'primitive': {
+                'kind': 'cylinder', 'origin': [0, 0, 0], 'radius': 2., 'height': 4.}},
+            {'action': 'join', 'body': 'Body', 'primitive': {
+                'kind': 'box', 'origin': [10, 0, 0], 'size': [2., 2., 4.]}},
+            {'action': 'translate', 'targets': ['Body'], 'vector': [20, -3, 7]},
+            {'action': 'cut', 'body': 'Body', 'primitive': {
+                'kind': 'box', 'origin': [-100, -100, -100], 'size': [200, 200, 200]}}]
+        bodies = SourceEnvelopeTests.source_rows(operations)
+        # Both original positive solids still obstruct after the translation.
+        for x, y in ((20, -3), (31, -2)):
+            with self.subTest(inside=(x, y)):
+                result = clearance.check_route(self.path([x, y, 8], [x, y, 10]), bodies,
+                    {'L0': robot.identity()}, .1, .1, sample_step_mm=.5)
+                self.assertFalse(result['passed'])
+        # The gap between those solids is inside their combined AABB but clear.
+        gap = clearance.check_route(self.path([25, -3, 8], [25, -3, 10]), bodies,
+            {'L0': robot.identity()}, .1, .1, sample_step_mm=.5)
+        self.assertTrue(gap['passed'])
+        # No obsolete unshifted primitive may remain in the enclosure.
+        old = clearance.check_route(self.path([0, 0, 1], [0, 0, 3]), bodies,
+            {'L0': robot.identity()}, .1, .1, sample_step_mm=.5)
+        self.assertTrue(old['passed'])
+
     def test_local_oriented_box_proves_a_gap_that_a_world_aabb_would_lose(self):
         c = math.sqrt(.5)
         matrix = [[c, -c, 0, 10], [c, c, 0, 20], [0, 0, 1, 30], [0, 0, 0, 1]]

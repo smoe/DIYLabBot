@@ -18,6 +18,7 @@ import build_arm_syringe as builder
 import pneumatic_hose as hose
 import robot_spec as robot
 import spatial_hose_carrier as carrier
+import joint_hose_routing as joint_routing
 
 CONTACT_PAIRS = frozenset(frozenset(pair) for pair in (
     ('ClampPadL0', 'Upper_plate_L'), ('ClampPadL1', 'Upper_plate_L'),
@@ -263,6 +264,99 @@ class ArmSyringeCurveComparisonTests(unittest.TestCase):
                       'hoseInsertionDepth': 6., 'strainReliefLength': 10.}
         return state, parameters
 
+    @classmethod
+    def clipped_fixture(cls, *, split=False, short_free_lead=False, first_flex_length=20.):
+        # Literal282mm material:8 independently owned20mm spans,7 real10mm
+        # support intervals and2×26mm sockets. No ignored proof file is read.
+        state, parameters = cls.fixture()
+        names = ('j3_parent', 'j3_child', 'j4_parent', 'j4_child',
+                 'j5_parent', 'j5_child', 'j6_parent')
+        segments, parts, sections, frames, stations = [], [], [], {}, {}
+        point = [0., 0., 0.];direction = [1., 0., 0.];covered = 0.
+        def line(length):
+            nonlocal point
+            end = [v+length*d for v, d in zip(point, direction)]
+            segments.append({'kind': 'line', 'start_mm': list(point), 'end_mm': end, 'length_mm': length})
+            point = end
+        def add(name, kind, length, *, subdivide=False, bend=False):
+            nonlocal direction, point, covered
+            index = len(segments);start = list(point)
+            if bend:
+                # A real R12 quarter circle fits20mm only with1mm and.15mm
+                # endpoint straights, so it must fail the separate5mm gate.
+                line(1.)
+                center = [point[0], point[1]+12., point[2]]
+                end = [center[0]+12., center[1], center[2]]
+                segments.append({'kind': 'arc', 'start_mm': list(point), 'end_mm': end,
+                    'through_mm': [center[0]+12/math.sqrt(2), center[1]-12/math.sqrt(2), center[2]],
+                    'center_mm': center, 'axis': [0., 0., 1.], 'radius_mm': 12.,
+                    'sweep_rad': math.pi/2, 'length_mm': 6*math.pi})
+                point = end;direction = [0., 1., 0.]
+                line(length-1.-6*math.pi)
+            else:
+                for amount in ([length/2, length/2] if subdivide else [length]):line(amount)
+            part = {'id': name, 'kind': kind, 'length_mm': length,
+                    'segment_start_index': index, 'segment_count': len(segments)-index}
+            parts.append(part);covered += length
+            return part, start
+        for name, kind, length in (('pump_inserted', 'inserted', 6.),
+                                   ('pump_support', 'socket_strain_relief', 10.),
+                                   ('pump_lead', 'connector_straight_lead', 10.)):
+            add(name, kind, length)
+        for index in range(8):
+            length = first_flex_length if index == 1 else 20.
+            part, _ = add('section'+str(index), 'bare_span', length,
+                          subdivide=split and index == 0, bend=short_free_lead and index == 1)
+            sections.append({key: part[key] for key in ('id', 'segment_start_index', 'segment_count')}|
+                {'kind': 'fixed_link' if index % 2 == 0 else 'joint_loop',
+                 'target_length_mm': length, 'actual_length_mm': length})
+            if index < 7:
+                name = names[index];part, start = add(name, 'clip_straight', 10.)
+                center = [(a+b)/2 for a, b in zip(start, point)]
+                stations[name] = covered-5.
+                frames[name] = {'center_mm': center, 'start_mm': start, 'end_mm': list(point),
+                                'tangent': list(direction), 'x_axis': [0., 0., 1.]}
+        for name, kind, length in (('tip_lead', 'connector_straight_lead', 10.),
+                                   ('tip_support', 'socket_strain_relief', 10.),
+                                   ('tip_inserted', 'inserted', 6.)):
+            add(name, kind, length)
+        account = {'inserted_mm': 12., 'socket_strain_relief_mm': 20.,
+            'connector_straight_leads_mm': 20., 'clip_supported_mm': 70.,
+            'carrier_supported_mm': 0., 'free_bare_spans_mm': 140.+first_flex_length,
+            'external_guide_straights_included_in_free_mm': 0., 'total_mm': covered,
+            'sum_error_mm': 0., 'parts': parts, 'scope': 'Independent clipped material fixture'}
+        path = {'format': 'solidcraftbot.static-hose-centerline/1',
+            'routing_format': joint_routing.FORMAT, 'controls_mm': [[0., 0., 0.], list(point)],
+            'segments': segments, 'sample_points_mm': [[0., 0., 0.], list(point)],
+            'length_mm': covered, 'requested_bend_radius_mm': 12.,
+            'min_bend_radius_mm': 12. if short_free_lead else None, 'qualified': False,
+            'routing_frames': frames, 'framed_crossings': {}, 'crossing_control_indices': {},
+            'clip_frames': frames, 'clip_material_stations_mm': stations,
+            'section_records': sections, 'length_accounting': account}
+        for section in sections:
+            if section['kind'] != 'joint_loop':
+                continue
+            offset = sum(row['length_mm'] for row in segments[:section['segment_start_index']])
+            length = section['actual_length_mm'];count = math.ceil(length/2.)
+            points = [carrier.path_position(path, offset+length*i/count)['point_mm']
+                      for i in range(count+1)]
+            origin_x = points[0][0]+length/2.;half_cell = length/(2*count)
+            section['local_reach'] = {
+                'maximum_radial_reach_upper_bound_mm': max(math.hypot(q[1], q[2]) for q in points)+half_cell,
+                'required_maximum_radial_reach_mm': 1000.,
+                'axial_range_outer_bound_mm': [min(q[0]-origin_x for q in points)-half_cell,
+                                              max(q[0]-origin_x for q in points)+half_cell],
+                'required_axial_range_mm': [-1000., 1000.],
+                'scope': 'Independent synthetic joint-axis interval bounds'}
+        state.update(hose_path=path, length_accounting=account, carrier=None,
+            hose_points_mm=path['sample_points_mm'], hose_slack_parameter_mm=None,
+            hose_routing_design={'format': joint_routing.PROOF_FORMAT,
+                'section_lengths_mm': {row['id']: row['target_length_mm'] for row in sections},
+                'hose_length_mm': covered, 'clip_material_stations_mm': stations},
+            clip_support_interfaces={}, hose_proximity={'passed': True})
+        parameters.update(hoseLength=covered, hoseClipLength=10., clipFreeLead=5.)
+        return state, parameters
+
     def test_collinear_subdivision_inside_one_physical_part_preserves_the_complete_core(self):
         plain, p = self.fixture()
         split, q = self.fixture(split=True)
@@ -276,6 +370,13 @@ class ArmSyringeCurveComparisonTests(unittest.TestCase):
         self.assertEqual(a['carrier_segments'], b['carrier_segments'])
         self.assertNotEqual(builder.route_derivation_diagnostics(plain['hose_path']),
                             builder.route_derivation_diagnostics(split['hose_path']))
+        plain, p = self.clipped_fixture();split, q = self.clipped_fixture(split=True)
+        a = builder.canonical_material_core(plain, p)
+        b = builder.canonical_material_core(split, q)
+        self.assertTrue(builder.compare_derived_metrics(a, b, tolerance=1e-9)['passed'])
+        material = builder.route_material_checks(plain['hose_path'], p)
+        self.assertEqual(set(material['clip_end_straights']), set(plain['hose_path']['clip_frames']))
+        self.assertTrue(all(row['passed'] for row in material['clip_end_straights'].values()))
 
     def test_curve_normalization_rejects_offline_points_changed_partitions_and_foreign_data(self):
         plain, p = self.fixture()
@@ -309,6 +410,76 @@ class ArmSyringeCurveComparisonTests(unittest.TestCase):
         state['hose_path']['carrier_path']['segments'][1]['through_mm'][2] += 1e-5
         with self.assertRaises(ValueError):
             builder.canonical_material_core(state, q)
+        state, q = self.clipped_fixture()
+        state['hose_path']['clip_frames']['j3_parent']['start_mm'][0] += .01
+        with self.assertRaises(ValueError):
+            builder.canonical_material_core(state, q)
+        short, q = self.clipped_fixture(short_free_lead=True)
+        self.assertTrue(joint_routing.validate_material_path(short['hose_path'], q)['passed'])
+        self.assertEqual(short['hose_path']['length_mm'], 282.)
+        with self.assertRaises(ValueError):
+            builder.route_material_checks(short['hose_path'], q)
+
+    def test_interval_sampling_bounds_are_diagnostics_after_independent_limit_checks(self):
+        plain, p = self.clipped_fixture(first_flex_length=72.)
+        alternate = copy.deepcopy(plain)
+
+        def record(state):
+            return next(row for row in state['hose_path']['section_records']
+                        if row['id'] == 'section1')
+
+        def reach(intervals):
+            # This literal72mm straight lies on its joint axis: radial distance0,
+            # axial endpoints-28/+44. Independent Lipschitz bounds differ only
+            # by the half-cell width when an ABI chooses36 instead of37 cells.
+            half_cell = 72./(2*intervals)
+            return {'maximum_radial_reach_upper_bound_mm': half_cell,
+                    'required_maximum_radial_reach_mm': 60.,
+                    'axial_range_outer_bound_mm': [-28.-half_cell, 44.+half_cell],
+                    'required_axial_range_mm': [-30., 55.],
+                    'scope': 'Independent straight-axis interval-bound fixture'}
+
+        record(plain)['local_reach'] = reach(36)
+        record(alternate)['local_reach'] = reach(37)
+        self.assertAlmostEqual(reach(36)['maximum_radial_reach_upper_bound_mm']-
+                               reach(37)['maximum_radial_reach_upper_bound_mm'], 1./37)
+        expected = builder.canonical_material_core(plain, p)
+        actual = builder.canonical_material_core(alternate, p)
+        self.assertTrue(builder.compare_derived_metrics(expected, actual, tolerance=1e-9)['passed'])
+        for state in (plain, alternate):
+            retained = next(row for row in builder.route_derivation_diagnostics(state['hose_path'])
+                            if row['id'] == 'section1')
+            self.assertEqual(retained['local_reach'], record(state)['local_reach'])
+        self.assertNotEqual(builder.route_derivation_diagnostics(plain['hose_path']),
+                            builder.route_derivation_diagnostics(alternate['hose_path']))
+
+        mutations = [
+            ('radial limit exceeded', 'maximum_radial_reach_upper_bound_mm', 60.000001),
+            ('axial lower limit exceeded', 'axial_range_outer_bound_mm', [-30.000001, 45.]),
+            ('axial upper limit exceeded', 'axial_range_outer_bound_mm', [-29., 55.000001]),
+            ('nonfinite radial bound', 'maximum_radial_reach_upper_bound_mm', math.nan),
+            ('nonfinite axial bound', 'axial_range_outer_bound_mm', [-29., math.inf]),
+            ('boolean radial bound', 'maximum_radial_reach_upper_bound_mm', True),
+            ('reversed axial bounds', 'axial_range_outer_bound_mm', [45., -29.]),
+        ]
+        for label, key, value in mutations:
+            changed = copy.deepcopy(alternate);record(changed)['local_reach'][key] = value
+            with self.subTest(case=label), self.assertRaises(ValueError):
+                builder.canonical_material_core(changed, p)
+        changed = copy.deepcopy(alternate)
+        record(changed)['local_reach']['required_maximum_radial_reach_mm'] = 61.
+        self.assertFalse(builder.compare_derived_metrics(expected,
+            builder.canonical_material_core(changed, p), tolerance=1e-9)['passed'])
+
+        changed, q = self.clipped_fixture(first_flex_length=72., split=True)
+        record(changed)['local_reach'] = reach(37)
+        part = next(row for row in changed['hose_path']['length_accounting']['parts']
+                    if row['id'] == 'section0')
+        index = part['segment_start_index']
+        changed['hose_path']['segments'][index]['end_mm'][1] += 1e-8
+        changed['hose_path']['segments'][index+1]['start_mm'][1] += 1e-8
+        self.assertFalse(builder.compare_derived_metrics(expected,
+            builder.canonical_material_core(changed, q), tolerance=1e-9)['passed'])
 
 
 class ArmSyringeSourceTests(unittest.TestCase):
@@ -337,14 +508,18 @@ class ArmSyringeSourceTests(unittest.TestCase):
                             for a, b in zip(row_a, row_b)), 1e-10)
 
     def test_all_leading_sources_are_pinned_and_changed_pins_fail_closed(self):
-        for field in ('robot', 'syringe_library', 'hose_carrier'):
+        for field in ('robot', 'syringe_library'):
             ref = self.spec[field]
             self.assertEqual(ref['source_sha256'], hashlib.sha256((ROOT/ref['source']).read_bytes()).hexdigest())
             with self.subTest(field=field), self.assertRaisesRegex(ValueError, 'Pinned assembly source changed'):
                 self.load_mutation(lambda source: source[field].update(source_sha256='0'*64))
+        self.assertIsNone(self.spec['hose_carrier'])
 
     def test_carrier_profile_remains_unqualified_and_rejects_claimed_acceptance(self):
-        profile = carrier.load(ROOT/self.spec['hose_carrier']['source'])
+        # The old R50 article remains an unchanged, unqualified library input;
+        # it is not delivered by this clip-only routing mode.
+        self.assertIsNone(self.spec['hose_carrier'])
+        profile = carrier.load()
         self.assertTrue(profile['qualification'])
         self.assertTrue(all(type(value) is bool and not value for value in profile['qualification'].values()))
         self.assertTrue(profile['open_requirements'])
@@ -573,9 +748,11 @@ class ArmSyringeSourceTests(unittest.TestCase):
             ('missing open requirements', lambda s: s.update(open_requirements={})),
             ('unknown open requirement', lambda s: s['open_requirements'].update(unknown=None)),
             ('missing carrier reference', lambda s: s.pop('hose_carrier')),
-            ('unknown carrier reference field', lambda s: s['hose_carrier'].update(unimplemented=1)),
-            ('absolute carrier reference', lambda s: s['hose_carrier'].update(source=str((ROOT/s['hose_carrier']['source']).resolve()))),
-            ('escaping carrier reference', lambda s: s['hose_carrier'].update(source='../'+s['hose_carrier']['source'])),
+            ('obsolete carrier article reactivated', lambda s: s.update(hose_carrier={
+                'source': 'model/spatial-hose-carrier.shared.json', 'source_sha256': '0'*64})),
+            ('unknown assembly reference field', lambda s: s['robot'].update(unimplemented=1)),
+            ('absolute assembly reference', lambda s: s['robot'].update(source=str((ROOT/s['robot']['source']).resolve()))),
+            ('escaping assembly reference', lambda s: s['robot'].update(source='../'+s['robot']['source'])),
             ('missing inspection state', lambda s: s['states'].pop('extended')),
             ('missing earlier named boundary', lambda s: s['states'].pop('window_route_shortest')),
             ('invalid inspection state name', lambda s: s['states'].update({'not a state identifier': s['states']['working']})),
@@ -610,44 +787,52 @@ class ArmSyringeSourceTests(unittest.TestCase):
             with self.subTest(source=label), self.assertRaises(ValueError):
                 self.load_mutation(mutate)
 
-    def test_framed_source_rejects_invalid_axes_sequence_guide_leads_and_crossings(self):
-        frame_id = next(iter(self.spec['carrier_routing']['frames']))
-        guide = self.spec['carrier_routing']['guide']
-        other = next(name for name in self.spec['carrier_routing']['frames']
-                     if name not in (guide['from'], guide['to']))
+    def test_clipped_source_rejects_invalid_supports_chain_joint_ownership_and_bounds(self):
+        frame_id = next(iter(self.spec['hose_routing']['clips']))
         def frame(source):
-            return source['carrier_routing']['frames'][frame_id]
+            return source['hose_routing']['clips'][frame_id]
         def route(source):
-            return source['carrier_routing']
+            return source['hose_routing']
+        def fixed(source):
+            return next(row for row in route(source)['sections'] if row['kind'] == 'fixed_link')
+        def flex(source):
+            return next(row for row in route(source)['sections'] if row['kind'] == 'joint_loop')
+        def swap_crossed_joints(source):
+            first, second = [row for row in route(source)['sections'] if row['kind'] == 'joint_loop'][:2]
+            for key in ('joint', 'parent_link'):
+                first[key], second[key] = second[key], first[key]
         mutations = [
-            ('missing framed recipe', lambda s: s.pop('carrier_routing')),
+            ('missing framed recipe', lambda s: s.pop('hose_routing')),
             ('unknown framed field', lambda s: route(s).update(unknown=1)),
             ('unknown host link', lambda s: frame(s).update(link='UnknownLink')),
-            ('incomplete vector', lambda s: frame(s).update(origin=[0, 0])),
-            ('boolean coordinate', lambda s: frame(s).update(origin=[True, 0, 0])),
-            ('nonfinite coordinate', lambda s: frame(s).update(origin=[math.nan, 0, 0])),
-            ('undefined expression', lambda s: frame(s).update(origin=['unknown_dimension', 0, 0])),
+            ('unknown clip host body', lambda s: frame(s).update(host_body='UnknownHost')),
+            ('incomplete vector', lambda s: frame(s).update(center_mm=[0, 0])),
+            ('boolean coordinate', lambda s: frame(s).update(center_mm=[True, 0, 0])),
+            ('nonfinite coordinate', lambda s: frame(s).update(center_mm=[math.nan, 0, 0])),
+            ('undefined expression', lambda s: frame(s).update(center_mm=['unknown_dimension', 0, 0])),
             ('zero tangent', lambda s: frame(s).update(tangent=[0, 0, 0])),
             ('scaled tangent', lambda s: frame(s).update(tangent=[0, 0, 2])),
-            ('parallel frame axes', lambda s: frame(s).update(x=copy.deepcopy(frame(s)['tangent']))),
-            ('negative support', lambda s: frame(s).update(clamp_length_mm=-1)),
-            ('duplicate route node', lambda s: route(s)['sequence'].append(route(s)['sequence'][1])),
-            ('reversed route', lambda s: route(s)['sequence'].reverse()),
-            ('unknown route node', lambda s: route(s)['sequence'].__setitem__(1, 'unknown_frame')),
-            ('unknown guide search frame', lambda s: route(s)['guide'].update(search_frame='unknown_frame')),
-            ('nonconsecutive guide anchors', lambda s: route(s)['guide'].update(to=other)),
-            ('duplicated anchor support', lambda s: route(s)['frames'][guide['from']].update(clamp_length_mm=1)),
-            ('missing internal guide lead', lambda s: route(s)['guide'].pop('endpoint_straights_mm')),
-            ('insufficient internal guide lead', lambda s: route(s)['guide'].update(endpoint_straights_mm=[0, 0])),
-            ('insufficient external guide lead', lambda s: route(s)['guide'].update(external_straights_mm=[0, 0])),
-            ('empty candidate family', lambda s: route(s)['bare_fit'].update(tangent_distance_multipliers=[])),
-            ('boolean candidate', lambda s: route(s)['bare_fit'].update(tangent_distance_multipliers=[True])),
-            ('nonfinite candidate', lambda s: route(s)['bare_fit'].update(tangent_distance_multipliers=[math.inf])),
+            ('parallel frame axes', lambda s: frame(s).update(x_axis=copy.deepcopy(frame(s)['tangent']))),
+            ('missing physical clip', lambda s: route(s)['clips'].pop(frame_id)),
+            ('duplicate clip body', lambda s: route(s)['clips']['j3_child'].update(body_id=frame(s)['body_id'])),
+            ('unknown mount recipe', lambda s: frame(s)['mount'].update(kind='unknown')),
+            ('negative support', lambda s: s['parameters']['hoseClipLength'].update(value=-1)),
+            ('duplicate section', lambda s: route(s)['sections'].append(copy.deepcopy(route(s)['sections'][0]))),
+            ('reversed chain', lambda s: route(s)['sections'].reverse()),
+            ('unknown endpoint', lambda s: route(s)['sections'][0].update(to='unknown_clip')),
+            ('rigid section crosses joint', lambda s: fixed(s).update(link='L3_Elbow')),
+            ('unknown structural proximity host', lambda s: fixed(s).update(host_bodies=['UnknownHost'])),
+            ('unrelated structural proximity host', lambda s: fixed(s).update(host_bodies=['Wrist_yoke_bridge'])),
+            ('nonpositive fixed offset bound', lambda s: fixed(s).update(max_offset_mm=0)),
+            ('wrong joint owner', lambda s: flex(s).update(parent_link='L6_BareFlange')),
+            ('crossings swapped between adjacent links', swap_crossed_joints),
+            ('oversized local pocket', lambda s: flex(s).update(max_reach_mm=81)),
+            ('reversed axial pocket', lambda s: flex(s).update(axial_range_mm=[2, 1])),
+            ('empty candidate family', lambda s: flex(s)['loop_fit'].update(families=[])),
+            ('boolean candidate', lambda s: flex(s)['loop_fit'].update(heights_mm=[True])),
+            ('nonfinite candidate', lambda s: flex(s)['loop_fit'].update(shifts_mm=[math.inf])),
             ('invalid sampling step', lambda s: route(s).update(sample_step_mm=0)),
-            ('missing crossing', lambda s: route(s)['crossings'].pop('J4_ForearmRoll')),
-            ('unknown crossing support', lambda s: route(s)['crossings'].update(J3_Elbow='unknown_frame')),
-            ('unknown connection station', lambda s: route(s)['crossings'].update(J5_WristPitch={'interface': 'tip', 'station': 'unknown'})),
-            ('J6 bypasses strain relief', lambda s: route(s)['crossings'].update(J6_FlangeRoll={'interface': 'tip', 'station': 'material_end_mm'})),
+            ('retention claimed verified', lambda s: route(s)['qualification'].update(axial_retention_verified=True)),
         ]
         for label, mutate in mutations:
             with self.subTest(source=label), self.assertRaises(ValueError):
@@ -1030,7 +1215,11 @@ class ArmSyringeSourceTests(unittest.TestCase):
             self.assertAlmostEqual(metrics['length_mm'], self.p['hoseLength'], places=6)
             self.assertAlmostEqual(metrics['air_volume_ul'], math.pi*self.p['hoseInnerRadius']**2*self.p['hoseLength'], places=6)
             self.assertGreaterEqual(metrics['min_bend_radius_mm'], 12-1e-8)
-            self.assertGreaterEqual(path['carrier_path']['min_bend_radius_mm'], 50-1e-8)
+            self.assertIsNone(state['carrier'])
+            self.assertNotIn('carrier_path', path)
+            self.assertEqual(path['routing_format'], joint_routing.FORMAT)
+            self.assertIsNone(state['hose_slack_parameter_mm'])
+            self.assertEqual(len(path['clip_material_stations_mm']), 7)
             self.assertTrue(all(segment['radius_mm'] >= 12-1e-8 for segment in path['segments']
                                 if segment['kind'] == 'arc'))
             self.assertFalse(path['qualified'])
@@ -1039,13 +1228,14 @@ class ArmSyringeSourceTests(unittest.TestCase):
             for first, second in zip(path['segments'], path['segments'][1:]):
                 self.assertLess(math.dist(first['end_mm'], second['start_mm']), 1e-9)
 
-    def test_named_band_itemizes_the_cut_and_retains_a_checked_route_for_every_required_state(self):
+    def test_sectioned_design_itemizes_the_cut_and_retains_fixed_material_in_every_required_state(self):
         band = model.named_length_band(self.spec, self.p)
+        self.assertEqual(band['format'], joint_routing.PROOF_FORMAT)
+        self.assertTrue(band['passed'])
         self.assertEqual(band['status'], 'demonstrated')
         self.assertEqual(set(band['states']), set(self.spec['states']))
-        self.assertEqual(set(band['selected_states']), set(self.spec['states']))
         self.assertFalse(band['failures'])
-        self.assertIn('Minimum demonstrated under stated', band['scope'])
+        self.assertTrue(band['scope'])
         self.assertTrue(all(value is False for value in band['qualification'].values()))
         self.assertTrue(band['source_files_sha256'])
         for name, checksum in band['source_files_sha256'].items():
@@ -1057,42 +1247,64 @@ class ArmSyringeSourceTests(unittest.TestCase):
         self.assertTrue(all(type(row['value_mm']) in (int, float)
                             and math.isfinite(row['value_mm']) and row['value_mm'] >= 0
                             and row['reason'].strip() for row in allowances))
-        minimum = max(row['demonstrated_min']['length_mm'] for row in band['states'].values())
-        maximum = min(row['demonstrated_max']['length_mm'] for row in band['states'].values())
+        section_ids = {row['id'] for row in self.spec['hose_routing']['sections']}
+        self.assertEqual(set(band['section_lengths_mm']), section_ids)
+        self.assertEqual(set(band['base_section_lengths_mm']), section_ids)
+        supported = (2*(self.p['hoseInsertionDepth']+self.p['strainReliefLength']+self.p['connectorStraightLead'])
+                     +len(self.spec['hose_routing']['clips'])*self.p['hoseClipLength'])
+        base_total = math.fsum(band['base_section_lengths_mm'].values())+supported
         itemized = sum(row['value_mm'] for row in allowances)
         resolution = self.spec['hose_length_design']['cut_resolution_mm']
-        expected_cut = math.ceil((minimum+itemized-1e-9)/resolution)*resolution
-        self.assertAlmostEqual(selection['max_demonstrated_min_mm'], minimum)
+        expected_cut = math.ceil((base_total+itemized-1e-9)/resolution)*resolution
+        self.assertAlmostEqual(selection['base_physical_length_mm'], base_total)
         self.assertAlmostEqual(selection['allowance_total_mm'], itemized)
-        self.assertAlmostEqual(selection['before_rounding_mm'], minimum+itemized)
-        self.assertAlmostEqual(selection['rounding_allowance_mm'], expected_cut-minimum-itemized)
-        self.assertGreaterEqual(selection['rounding_allowance_mm'], -1e-9)
-        self.assertLess(selection['rounding_allowance_mm'], resolution+1e-9)
-        self.assertTrue(selection['rounding_reason'].strip())
+        self.assertAlmostEqual(selection['rounding_mm'], expected_cut-base_total-itemized)
+        self.assertGreaterEqual(selection['rounding_mm'], -1e-9)
+        self.assertLess(selection['rounding_mm'], resolution+1e-9)
         self.assertAlmostEqual(selection['selected_cut_mm'], expected_cut)
         self.assertAlmostEqual(selection['selected_cut_mm'], self.p['hoseLength'])
-        hull = band['common_band']
-        self.assertTrue(hull['nonempty'])
-        self.assertAlmostEqual(hull['lower_mm'], minimum)
-        self.assertAlmostEqual(hull['upper_mm'], maximum)
-        self.assertLessEqual(minimum, expected_cut)
-        self.assertLessEqual(expected_cut, maximum)
-        self.assertIn('hulls only', hull['scope'])
-        for name, selected in band['selected_states'].items():
+        self.assertAlmostEqual(band['hose_length_mm'], expected_cut)
+        allocation = selection['allocation_section']
+        self.assertIn(allocation, {row['id'] for row in self.spec['hose_routing']['sections']
+                                   if row['kind'] == 'joint_loop'})
+        self.assertAlmostEqual(selection['allocated_extra_mm'], itemized+selection['rounding_mm'])
+        for section in section_ids:
+            extra = selection['allocated_extra_mm'] if section == allocation else 0
+            self.assertAlmostEqual(band['section_lengths_mm'][section], band['base_section_lengths_mm'][section]+extra)
+        self.assertAlmostEqual(math.fsum(band['section_lengths_mm'].values())+supported, expected_cut)
+        self.assertEqual(set(band['clip_material_stations_mm']), set(self.spec['hose_routing']['clips']))
+        for name, selected in band['states'].items():
             with self.subTest(state=name):
+                self.assertTrue(selected['passed'])
+                self.assertEqual(selected['joints_deg'], self.spec['states'][name]['joints_deg'])
                 self.assertTrue(selected['checks']['passed'])
-                self.assertAlmostEqual(selected['length_mm'], expected_cut, places=6)
-                self.assertAlmostEqual(selected['route']['length_mm'], expected_cut, places=6)
-                self.assertAlmostEqual(selected['material_partition']['total_mm'], expected_cut, places=6)
-                self.assertAlmostEqual(selected['extra_material_over_demonstrated_min_mm'],
-                    expected_cut-band['states'][name]['demonstrated_min']['length_mm'], places=6)
-                self.assertEqual(selected['material_partition'], selected['route']['length_accounting'])
-                self.assertTrue(all(type(row['passed']) is bool and row['classification']
-                                    for row in band['states'][name]['samples']))
+                for field in ('self_clearance', 'external_clearance', 'proximity'):
+                    self.assertTrue(selected['checks'][field]['passed'])
+                for section in self.spec['hose_routing']['sections']:
+                    if section['kind'] != 'joint_loop':continue
+                    local = selected['sections'][section['id']]['checks']
+                    self.assertTrue(local['passed'])
+                    self.assertTrue(local['self_clearance']['passed'])
+                    self.assertTrue(local['adjacent_support_self_clearance']['passed'])
+                    self.assertIs(local['adjacent_support_self_clearance']['screening_probe_only'], True)
+                    reservation = local['clip_outer_wall_keepouts']
+                    self.assertTrue(reservation['passed'])
+                    self.assertAlmostEqual(reservation['required_radial_clearance_mm'],
+                        2*self.p['hoseOuterRadius']+self.p['clipHoseGap']+self.p['clipWall'])
+                    self.assertEqual(set(reservation['clips']),
+                        set(self.spec['hose_routing']['clips']) & {section['from'], section['to']})
+                    self.assertTrue(all(row['passed'] for row in reservation['clips'].values()))
+                path = selected['path']
+                self.assertAlmostEqual(path['length_mm'], expected_cut, places=6)
+                self.assertAlmostEqual(path['length_accounting']['total_mm'], expected_cut, places=6)
+                self.assertTrue(joint_routing.validate_material_path(path, self.p, band)['passed'])
+                self.assertTrue(builder.compare_derived_metrics(path['clip_material_stations_mm'],
+                    band['clip_material_stations_mm'], tolerance=1e-7)['passed'])
                 observed = self.observed_state(name)
                 self.assertTrue(observed['source_clearance']['passed'])
+                self.assertTrue(observed['hose_proximity']['passed'])
                 self.assertEqual(observed['length_accounting'], observed['hose_path']['length_accounting'])
-                self.assertAlmostEqual(observed['hose_slack_parameter_mm'], selected['loop_parameter_mm'])
+                self.assertIsNone(observed['hose_slack_parameter_mm'])
 
     def test_material_regions_partition_actual_segments_and_count_both_insertions_once(self):
         categories = {'inserted': 'inserted_mm', 'socket_strain_relief': 'socket_strain_relief_mm',
@@ -1129,7 +1341,10 @@ class ArmSyringeSourceTests(unittest.TestCase):
                 self.assertAlmostEqual(sums['connector_straight_leads_mm'], 2*self.p['connectorStraightLead'], places=7)
                 for kind in ('inserted', 'socket_strain_relief', 'connector_straight_lead'):
                     self.assertEqual(sum(part['kind'] == kind for part in parts), 2)
-                self.assertAlmostEqual(sums['carrier_supported_mm'], path['carrier_path']['length_mm'], places=7)
+                self.assertEqual(sums['carrier_supported_mm'], 0.)
+                self.assertNotIn('carrier_path', path)
+                self.assertEqual(sum(part['kind'] == 'clip_straight' for part in parts), 7)
+                self.assertAlmostEqual(sums['clip_supported_mm'], 7*self.p['hoseClipLength'])
                 self.assertAlmostEqual(sum(sums.values()), self.p['hoseLength'], places=6)
                 self.assertAlmostEqual(account['total_mm'], self.p['hoseLength'], places=6)
                 self.assertAlmostEqual(account['total_mm'], path['length_mm'], places=7)
@@ -1193,6 +1408,108 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
         for rejected in contact['rejected_inconsistent_native_points']:
             self.assertGreater(max(rejected['distance_to_a_mm'], rejected['distance_to_b_mm']), 1e-7)
 
+    def assert_clipped_native_geometry(self, row, native, spec, p, design):
+        checked = native['clip_checks'];path = row['state']['hose_path']
+        self.assertTrue(checked['passed'])
+        self.assertEqual(set(checked['supports']), set(spec['hose_routing']['clips']))
+        self.assertTrue(all(value is False for value in checked['qualification'].values()))
+        self.assertTrue(builder.compare_derived_metrics(checked['material_stations_mm'],
+            design['clip_material_stations_mm'], tolerance=1e-7)['passed'])
+        self.assertTrue(builder.compare_derived_metrics(checked['section_lengths_mm'],
+            design['section_lengths_mm'], tolerance=1e-7)['passed'])
+        for name, support in checked['supports'].items():
+            source = spec['hose_routing']['clips'][name]
+            self.assertTrue(support['passed'])
+            self.assertEqual(support['clip_body'], source['body_id'])
+            self.assertEqual(support['host_body'], source['host_body'])
+            self.assertEqual(support['attachment_link'], source['link'])
+            self.assertLessEqual(support['frame_error_mm'], 1e-7)
+            self.assertAlmostEqual(support['physical_support_length_mm'], p['hoseClipLength'])
+            self.assertAlmostEqual(support['required_hose_gap_mm'], p['clipHoseGap'])
+            self.assertAlmostEqual(support['required_host_gap_mm'], p['mountGap'])
+            self.assertAlmostEqual(support['material_station_mm'], design['clip_material_stations_mm'][name], places=6)
+            self.assertLess(math.dist(support['center_mm'], path['clip_frames'][name]['center_mm']), 1e-7)
+            self.assertTrue(all(value is False for value in support['qualification'].values()))
+            self.assertEqual(set(support['overlap_volume_mm3']), {'hose_mm3', 'host_mm3'})
+            self.assertTrue(all(value <= 1e-5 for value in support['overlap_volume_mm3'].values()))
+            self.assertGreaterEqual(len(support['bore_witnesses']), 12)
+            for witness in support['bore_witnesses']:
+                self.assertLessEqual(witness['hose_membership_error_mm'], 1e-6)
+                self.assertLessEqual(witness['clip_membership_error_mm'], 1e-6)
+                self.assertGreater(witness['native_radial_gap_mm'], 0)
+                self.assertAlmostEqual(witness['native_radial_gap_mm'], p['clipHoseGap'], places=6)
+            self.assertTrue(support['host_witnesses'])
+            for witness in support['host_witnesses']:
+                self.assertLessEqual(witness['host_membership_error_mm'], 1e-6)
+                self.assertGreater(witness['native_clamp_gap_mm'], 0)
+                self.assertAlmostEqual(witness['native_clamp_gap_mm'], p['mountGap'], places=6)
+
+        definitions = {section['id']: section for section in spec['hose_routing']['sections']}
+        records = {section['id']: section for section in path['section_records']}
+        self.assertEqual(set(checked['fixed_sections']),
+                         {name for name, section in definitions.items() if section['kind'] == 'fixed_link'})
+        self.assertEqual(set(checked['joint_loops']),
+                         {name for name, section in definitions.items() if section['kind'] == 'joint_loop'})
+        for name, section in checked['fixed_sections'].items():
+            self.assertTrue(section['passed'])
+            self.assertEqual(section['host_bodies'], definitions[name]['host_bodies'])
+            self.assertEqual(section['maximum_allowed_distance_mm'], definitions[name]['max_offset_mm'])
+            self.assertEqual(section['sample_count'], len(section['witnesses']))
+            self.assertGreaterEqual(section['sample_count'], 2)
+            self.assertLessEqual(section['maximum_arclength_gap_mm'], 2.)
+            self.assertAlmostEqual(section['maximum_arclength_gap_mm']*(section['sample_count']-1),
+                                   records[name]['actual_length_mm'], places=6)
+            maximum = max(witness['distance_mm'] for witness in section['witnesses'])
+            self.assertAlmostEqual(section['maximum_sampled_distance_mm'], maximum, places=7)
+            self.assertAlmostEqual(section['maximum_distance_upper_bound_mm'],
+                                   maximum+section['maximum_arclength_gap_mm']/2, places=7)
+            self.assertLessEqual(section['maximum_distance_upper_bound_mm'], definitions[name]['max_offset_mm']+1e-7)
+            offset = sum(segment['length_mm'] for segment in path['segments'][:records[name]['segment_start_index']])
+            for i, witness in enumerate(section['witnesses']):
+                point = carrier.path_position(path, offset+i*section['maximum_arclength_gap_mm'])['point_mm']
+                self.assertLess(math.dist(witness['point_mm'], point), 1e-7)
+                self.assertIn(witness['host_body'], definitions[name]['host_bodies'])
+                self.assertLessEqual(witness['witness_membership_error_mm'], 1e-7)
+                self.assertAlmostEqual(math.dist(witness['point_mm'], witness['nearest_host_point_mm']),
+                                       witness['distance_mm'], places=7)
+                self.assertAlmostEqual(witness['native_distance_mm'], witness['distance_mm'], places=7)
+
+        arm = model.arm(spec);arm_parameters = robot.parameters(arm)
+        fk = robot.forward(arm, row['state']['joints_deg'])
+        for name, section in checked['joint_loops'].items():
+            definition = definitions[name]
+            joint = next(joint for joint in arm['joints'] if joint['id'] == definition['joint'])
+            self.assertTrue(section['passed'])
+            self.assertEqual(section['joint'], joint['id'])
+            self.assertEqual(section['maximum_radial_reach_mm'], definition['max_reach_mm'])
+            self.assertEqual(section['allowed_axial_range_mm'], definition['axial_range_mm'])
+            origin = robot.transform(fk[joint['parent']], [model.evaluate(v, arm_parameters) for v in joint['frame']['origin']])
+            axis = [sum(fk[joint['parent']][i][j]*model.evaluate(joint['frame']['axis'][j], arm_parameters)
+                        for j in range(3)) for i in range(3)]
+            self.assertLess(math.dist(section['joint_origin_mm'], origin), 1e-7)
+            self.assertLess(math.dist(section['joint_axis'], axis), 1e-7)
+            self.assertGreaterEqual(section['sample_count'], 2)
+            self.assertLessEqual(section['maximum_arclength_gap_mm'], 2.)
+            self.assertAlmostEqual(section['maximum_arclength_gap_mm']*(section['sample_count']-1),
+                                   records[name]['actual_length_mm'], places=6)
+            offset = sum(segment['length_mm'] for segment in path['segments'][:records[name]['segment_start_index']])
+            radial, axial = [], []
+            for i in range(section['sample_count']):
+                point = carrier.path_position(path, offset+i*section['maximum_arclength_gap_mm'])['point_mm']
+                delta = [value-start for value, start in zip(point, origin)]
+                projection = sum(a*b for a, b in zip(delta, axis))
+                axial.append(projection)
+                radial.append(math.sqrt(max(0., sum(v*v for v in delta)-projection**2)))
+            half = section['maximum_arclength_gap_mm']/2
+            self.assertAlmostEqual(section['maximum_sampled_radial_distance_mm'], max(radial), places=7)
+            self.assertAlmostEqual(section['radial_distance_upper_bound_mm'], max(radial)+half, places=7)
+            self.assertLessEqual(section['radial_distance_upper_bound_mm'], definition['max_reach_mm']+1e-7)
+            expected_axial = [min(axial)-half, max(axial)+half]
+            for actual, expected in zip(section['axial_range_bounds_mm'], expected_axial):
+                self.assertAlmostEqual(actual, expected, places=7)
+            self.assertLessEqual(definition['axial_range_mm'][0], expected_axial[0]+1e-7)
+            self.assertGreaterEqual(definition['axial_range_mm'][1], expected_axial[1]-1e-7)
+
     def test_complete_both_cad_proof_retains_current_sources_geometry_and_qualifications(self):
         path = ROOT/'cad/arm-syringe/shared-build-report.json'
         if not path.exists():
@@ -1225,114 +1542,62 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                     for name, expected in cache[field].items():
                         self.assertEqual(model.digest(ROOT/name), expected, name)
         p = model.parameters(spec)
-        scan_ref = report['window_scan']
-        self.assertEqual(model.digest(ROOT/scan_ref['path']), scan_ref['sha256'])
-        scan = json.loads((ROOT/scan_ref['path']).read_text())
-        self.assertEqual(scan['format'], 'solidcraftbot.arm-syringe-window-scan/1')
-        self.assertEqual(Path(scan['source_file']).resolve(), model.SOURCE.resolve())
-        self.assertEqual(scan['source_file_sha256'], model.digest(model.SOURCE))
-        canonical = hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
-        self.assertEqual(scan['source_pins']['evaluated_source_canonical_sha256'], canonical)
-        for name, expected in scan['source_pins']['files_sha256'].items():
-            self.assertEqual(model.digest(ROOT/name), expected, name)
-        self.assertEqual(scan['parameters'], p)
-        self.assertEqual(scan['operating_window_status'], spec['operating_window_status'])
-        for joint in model.arm(spec)['joints']:
-            scanned = scan['operating_window_deg'][joint['id']]
-            self.assertEqual(scanned['range'], spec['operating_window_deg'][joint['id']]['range'])
-            self.assertEqual(scanned['reason'], spec['operating_window_deg'][joint['id']]['reason'])
-            self.assertEqual(scanned['source_limits_deg'], joint['limits_deg'])
-            self.assertEqual(scanned['source_frame'], joint['frame'])
-        for name, value in spec['hose_length_design'].items():
-            self.assertEqual(scan['hose_length_design'][name], value)
-        self.assertAlmostEqual(scan['hose_length_design']['margin_mm'],
-                               sum(item['value_mm'] for item in spec['hose_length_design']['allowances']))
-        self.assertTrue(scan['hose_length_design']['margin_origin'])
-        self.assertEqual(scan['errors'], [])
-        self.assertTrue(scan['source_files_unchanged_during_scan'])
-        self.assertTrue(scan['source_file_unchanged_during_scan'])
-        self.assertTrue(scan['sample_coverage']['complete'])
-        self.assertEqual(scan['sample_coverage']['named_state_count'], len(spec['states']))
-        self.assertFalse(scan['sample_coverage']['named_states_outside_window'])
-        self.assertTrue(scan['sample_coverage']['named_state_support_complete'])
-        unsupported = scan['diagnostic_unsupported']
-        self.assertIsInstance(unsupported, list)
-        self.assertEqual(scan['sample_coverage']['unsupported_endpoint_observations'], len(unsupported))
-        self.assertTrue(all(item['classification'] for item in unsupported))
-        self.assertTrue(all(item['classification'] for item in scan['samples']))
-        self.assertEqual(scan['sample_coverage']['route_endpoint_calls'], 2*len(scan['samples']))
-        band = scan['named_state_band']
+        self.assertIsNone(report['window_scan'])
+        proof_ref = report['routing_proof']
+        self.assertEqual(proof_ref['format'], joint_routing.PROOF_FORMAT)
+        self.assertEqual(model.digest(ROOT/proof_ref['path']), proof_ref['sha256'])
+        band = json.loads((ROOT/proof_ref['path']).read_text())
+        builder.validate_routing_proof(band, model, spec, p)
+        self.assertTrue(band['passed'])
         self.assertEqual(band['status'], 'demonstrated')
         self.assertEqual(set(band['states']), set(spec['states']))
-        self.assertEqual(set(band['selected_states']), set(spec['states']))
-        self.assertTrue(band['common_band']['nonempty'])
-        self.assertLessEqual(band['common_band']['lower_mm'], p['hoseLength'])
-        self.assertLessEqual(p['hoseLength'], band['common_band']['upper_mm'])
-        self.assertEqual(band['cut_selection']['selected_cut_mm'], p['hoseLength'])
-        self.assertEqual(band['cut_selection']['allowances'], spec['hose_length_design']['allowances'])
-        self.assertEqual(scan['suggested_hose_length_mm'], p['hoseLength'])
-        self.assertFalse(band['failures'])
+        self.assertEqual(band['parameters'], p)
+        self.assertEqual(band['failures'], [])
+        self.assertEqual(proof_ref['state_count'], len(spec['states']))
+        self.assertAlmostEqual(band['hose_length_mm'], p['hoseLength'])
+        for key in ('format', 'section_lengths_mm', 'hose_length_mm',
+                    'clip_material_stations_mm', 'qualification'):
+            self.assertEqual(proof_ref[key], band[key])
+        self.assertTrue(band['qualification'])
         self.assertTrue(all(value is False for value in band['qualification'].values()))
-        for name, checksum in band['source_files_sha256'].items():
-            self.assertEqual(model.digest(ROOT/name), checksum)
-        self.assertTrue(scan['qualification'])
-        self.assertTrue(all(value is False for value in scan['qualification'].values()))
-        for field in ('sample_coverage', 'common_endpoint_bracket', 'extrema', 'scope', 'qualification'):
-            self.assertEqual(scan_ref[field], scan[field])
-        self.assertIs(scan_ref['named_state_support_complete'], True)
-        self.assertEqual(scan_ref['diagnostic_unsupported_count'], len(unsupported))
-        self.assertEqual(scan_ref['named_state_band'], {key: band[key] for key in
-            ('format', 'status', 'scope', 'common_band', 'cut_selection', 'qualification')})
-        self.assertFalse(scan_ref['regenerated_for_parameter_overrides'])
-        self.assertEqual(model.digest(ROOT/scan_ref['source_report']['path']), scan_ref['source_report']['sha256'])
-        self.assertEqual((ROOT/scan_ref['path']).read_bytes(), (ROOT/scan_ref['source_report']['path']).read_bytes())
+        for name, expected in band['source_files_sha256'].items():
+            self.assertEqual(model.digest(ROOT/name), expected)
+        self.assertIsNotNone(proof_ref['source_report'])
+        self.assertEqual(model.digest(ROOT/proof_ref['source_report']['path']), proof_ref['source_report']['sha256'])
+        self.assertEqual((ROOT/proof_ref['path']).read_bytes(), (ROOT/proof_ref['source_report']['path']).read_bytes())
         own = model.expanded(spec, p)
         own_ids = {row['id'] for row in own['bodies']}
         arm_operations = [op for link in robot.expanded(model.arm(spec))['links']
                           for op in link['recipe'] if op['action'] == 'create']
         arm_ids = {op['body'] for op in arm_operations}
         physical_arm_ids = {op['body'] for op in arm_operations if op['role'] != 'viewing_cone'}
-        carrier_ids = {'CarrierEnvelope', 'CarrierLinks'}
-        expected_ids = own_ids | arm_ids | {'PneumaticHose'} | carrier_ids
-        profile = carrier.load(ROOT/spec['hose_carrier']['source'])
+        expected_ids = own_ids | arm_ids | {'PneumaticHose'}
+        self.assertIsNone(spec['hose_carrier'])
+        self.assertFalse({'CarrierEnvelope', 'CarrierLinks', 'CarrierOuterGuard'} & expected_ids)
         self.assertFalse(own_ids & arm_ids)
         self.assertNotIn('CarrierOuterGuard', expected_ids)
         self.assertEqual(len(report['states']), len(spec['states']))
         for row in report['states']:
             with self.subTest(state=row['id']):
-                record = row['state']['carrier']
-                self.assertEqual(record['nominal_link_count'], profile['geometry']['nominal_link_count'])
-                self.assertEqual(record['pitch_mm'], profile['geometry']['nominal_pitch_mm'])
-                self.assertEqual(record['outer_radius_mm'], profile['geometry']['outer_radius_mm'])
-                self.assertEqual(record['inner_radius_mm'], profile['geometry']['inner_radius_mm'])
-                self.assertEqual(record['qualification'], profile['qualification'])
-                self.assertTrue(all(value is False for value in record['qualification'].values()))
-                self.assertEqual(len(record['links']), record['nominal_link_count'])
-                self.assertEqual(record['native_aliases'], [link['id'] for link in record['links']])
-                self.assertEqual(len(set(record['native_aliases'])), record['nominal_link_count'])
-                self.assertLessEqual(abs(record['path']['length_mm']-record['nominal_link_count']*record['pitch_mm']),
-                                     profile['guide_fit']['length_tolerance_mm'])
-                self.assertGreaterEqual(record['path']['min_bend_radius_mm'],
-                                        profile['geometry']['minimum_centerline_bend_radius_mm'])
+                self.assertIsNone(row['state']['carrier'])
                 expected_counts = {name: 1 for name in expected_ids}
-                expected_counts['CarrierLinks'] = record['nominal_link_count']
-                self.assertEqual({part['id'] for part in row['carrier_bodies']}, carrier_ids)
-                self.assertTrue(all(part['component'] == 'CarrierSnapshot' for part in row['carrier_bodies']))
-                self.assertEqual({part['id']: part['expected_solid_count'] for part in row['carrier_bodies']},
-                                 {name: expected_counts[name] for name in carrier_ids})
-                self.assertEqual(row['carrier_aliases'], {'CarrierLinks': record['native_aliases']})
+                self.assertEqual(row['carrier_bodies'], [])
+                self.assertEqual(row['carrier_aliases'], {})
+                self.assertIsNone(row['carrier_checks'])
                 self.assertTrue(row['passed'])
                 self.assertEqual(row['semantic_body_count'], len(expected_ids))
                 self.assertIsNone(row['state']['actual_dispensed_volume_ul'])
                 self.assertAlmostEqual(row['state']['hose_path']['length_mm'], p['hoseLength'], places=6)
-                selected = band['selected_states'][row['id']]
-                self.assertEqual(row['named_length_witness'], {key: value for key, value in selected.items() if key != 'route'})
+                selected = band['states'][row['id']]
+                self.assertEqual(row['named_length_witness'], {key: value for key, value in selected.items() if key != 'path'})
                 self.assertTrue(row['named_route_agreement']['passed'])
                 self.assertFalse(row['named_route_agreement']['mismatches'])
-                self.assertTrue(builder.compare_named_route(selected['route'], row['state'])['passed'])
-                self.assertTrue(builder.compare_derived_metrics(row['state']['length_accounting'], selected['material_partition'], tolerance=1e-7)['passed'])
+                self.assertTrue(builder.compare_named_route(selected['path'], row['state'])['passed'])
+                self.assertTrue(builder.compare_derived_metrics(row['state']['length_accounting'], selected['path']['length_accounting'], tolerance=1e-7)['passed'])
+                self.assertTrue(joint_routing.validate_material_path(row['state']['hose_path'], p, band)['passed'])
                 self.assertTrue(row['state']['source_clearance']['passed'])
-                self.assertAlmostEqual(row['state']['hose_slack_parameter_mm'], selected['loop_parameter_mm'])
+                self.assertIsNone(row['state']['hose_slack_parameter_mm'])
+                self.assertTrue(row['state']['hose_proximity']['passed'])
                 recomputed = builder.compare_derived_metrics(row['state']['metrics'],
                                                              model.state(spec, p, row['id'])['metrics'])
                 self.assertTrue(recomputed['passed'], recomputed['mismatches'])
@@ -1342,20 +1607,20 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                 self.assertGreaterEqual(material['required_bare_radius_mm'], 12)
                 if material['achieved_bare_radius_mm'] is not None:
                     self.assertGreaterEqual(material['achieved_bare_radius_mm'], material['required_bare_radius_mm']-1e-7)
-                self.assertEqual(material['required_guide_radius_mm'], 50)
-                self.assertGreaterEqual(material['achieved_guide_radius_mm'], 50-1e-7)
+                self.assertIsNone(material['required_guide_radius_mm'])
+                self.assertIsNone(material['achieved_guide_radius_mm'])
                 self.assertAlmostEqual(material['exact_segment_length_mm'], p['hoseLength'], places=6)
                 self.assertAlmostEqual(material['accounted_material_length_mm'], p['hoseLength'], places=6)
                 self.assertEqual(material['material_partition'], row['state']['length_accounting'])
                 self.assertLess(abs(material['sum_error_mm']), 1e-7)
-                leads = material['guide_end_straights']
-                self.assertTrue(leads['passed'])
-                self.assertEqual(leads['external_material_category'], 'free_bare_spans_mm')
-                self.assertEqual(leads['external_required_mm'], [p['connectorStraightLead']]*2)
-                self.assertTrue(all(actual >= required-1e-7 for actual, required in
-                                    zip(leads['internal_achieved_mm'], leads['internal_required_mm'])))
-                self.assertTrue(all(actual >= required-1e-7 for actual, required in
-                                    zip(leads['external_achieved_mm'], leads['external_required_mm'])))
+                self.assertIsNone(material['guide_end_straights'])
+                self.assertEqual(set(material['clip_end_straights']), set(spec['hose_routing']['clips']))
+                for lead in material['clip_end_straights'].values():
+                    self.assertTrue(lead['passed'])
+                    self.assertEqual(lead['required_free_leads_mm'], [p['clipFreeLead']]*2)
+                    self.assertAlmostEqual(lead['physical_support_length_mm'], p['hoseClipLength'])
+                    self.assertTrue(all(actual >= required-1e-7 for actual, required in
+                        zip(lead['achieved_free_leads_mm'], lead['required_free_leads_mm'])))
                 comparisons = row['body_comparisons']
                 self.assertEqual({item['body'] for item in comparisons}, expected_ids)
                 self.assertEqual(len(comparisons), len(expected_ids))
@@ -1366,21 +1631,13 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                 self.assertTrue(row['clearance_checks']['passed'])
                 self.assertFalse(row['clearance_checks']['interferences'])
                 categories = row['clearance_checks']['categories']
-                self.assertEqual(set(categories), {'hose_arm', 'tooling_arm', 'tooling_tooling',
-                                                    'carrier_guard_arm', 'carrier_guard_tooling'})
+                self.assertEqual(set(categories), {'hose_arm', 'tooling_arm', 'tooling_tooling'})
                 for name, category in categories.items():
                     self.assertTrue(category['passed'])
                     self.assertGreater(category['minimum_distance_mm'], 0)
                     self.assertEqual(set(category['closest_pair']), {'a', 'b'})
                     closest = frozenset(category['closest_pair'].values())
-                    if name.startswith('carrier_guard_'):
-                        self.assertIn('CarrierOuterGuard', closest)
-                        external = physical_arm_ids if name == 'carrier_guard_arm' else own_ids
-                        self.assertTrue((closest-{'CarrierOuterGuard'}).issubset(external))
-                        self.assertEqual(category['checked_pairs'], len(external))
-                        self.assertEqual(category['declared_pairs'], 0)
-                    else:
-                        self.assertTrue(closest.issubset(expected_ids))
+                    self.assertTrue(closest.issubset(expected_ids))
                     self.assertNotIn(closest, CONTACT_PAIRS)
                     self.assertGreater(category['checked_pairs'], 0)
                     self.assertGreater(category['nonallowed_pairs'], 0)
@@ -1394,12 +1651,7 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                 tolerance = row['clearance_checks']['tolerances']['overlap_zero_mm3']
                 self.assertTrue(all(item['overlap_mm3'] <= tolerance for item in contacts))
                 self.assertFalse(row['clearance_checks']['undeclared_contacts'])
-                proxy = row['clearance_checks']['clearance_proxy_policy']
-                self.assertEqual(proxy['id'], 'CarrierOuterGuard')
-                self.assertIs(proxy['delivered_material_body'], False)
-                self.assertEqual(set(proxy['external_classes_checked']), {'physical_arm_and_cameras', 'rigid_tooling'})
-                self.assertEqual(set(proxy['contained_representation_classes']),
-                                 {'routed_hose', 'carrier_shell', 'nominal_carrier_collars'})
+                self.assertIsNone(row['clearance_checks'].get('clearance_proxy_policy'))
                 self.assertEqual(set(row['files']), set(row['artifact_sha256']))
                 for name, expected in row['artifact_sha256'].items():
                     self.assertEqual(model.digest(ROOT/row['files'][name]), expected, name)
@@ -1438,10 +1690,65 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                 self.assertLessEqual(compiled['maximum_absolute_numeric_difference'], 1e-9)
                 derivation = native['route_derivation_diagnostics']
                 self.assertIs(derivation['physical_curve_equivalence_established'], True)
-                self.assertEqual(derivation['leading'], builder.route_derivation_diagnostics(row['state']['hose_path']))
+                diagnostics_agreement = builder.compare_derived_metrics(derivation['leading'],
+                    builder.route_derivation_diagnostics(row['state']['hose_path'],
+                        sample_step_mm=spec['hose_routing']['sample_step_mm']), tolerance=1e-9)
+                self.assertTrue(diagnostics_agreement['passed'], diagnostics_agreement['mismatches'])
                 self.assertEqual([part['id'] for part in derivation['independent']],
                                  [part['id'] for part in row['state']['length_accounting']['parts']])
                 self.assertTrue(derivation['scope'])
+                definitions = {item['id']: item for item in spec['hose_routing']['sections']}
+                section_records = {item['id']: item for item in row['state']['hose_path']['section_records']}
+                reach_arm = model.arm(spec);reach_parameters = robot.parameters(reach_arm)
+                reach_fk = robot.forward(reach_arm, row['state']['joints_deg'])
+                for evaluated in (derivation['leading'], derivation['independent']):
+                    for diagnostic in evaluated:
+                        definition = definitions.get(diagnostic['id'])
+                        if definition is None or definition['kind'] != 'joint_loop':
+                            continue
+                        raw = diagnostic['local_reach'];grid = diagnostic['sample_grid']
+                        self.assertEqual(raw['required_maximum_radial_reach_mm'], definition['max_reach_mm'])
+                        self.assertEqual(raw['required_axial_range_mm'], definition['axial_range_mm'])
+                        values = [raw['maximum_radial_reach_upper_bound_mm']]+raw['axial_range_outer_bound_mm']
+                        self.assertTrue(all(type(value) in (int, float) and math.isfinite(value) for value in values))
+                        self.assertLessEqual(0., raw['maximum_radial_reach_upper_bound_mm'])
+                        self.assertLessEqual(raw['maximum_radial_reach_upper_bound_mm'], definition['max_reach_mm'])
+                        low, high = raw['axial_range_outer_bound_mm']
+                        self.assertLessEqual(definition['axial_range_mm'][0], low)
+                        self.assertLessEqual(low, high)
+                        self.assertLessEqual(high, definition['axial_range_mm'][1])
+                        length, count = grid['section_length_mm'], grid['interval_count']
+                        self.assertEqual(grid['requested_maximum_interval_mm'], spec['hose_routing']['sample_step_mm'])
+                        self.assertEqual(count, max(1, math.ceil(length/grid['requested_maximum_interval_mm'])))
+                        self.assertAlmostEqual(grid['interval_width_mm']*count, length, places=9)
+                        self.assertEqual(len(grid['section_arclength_midpoints_mm']), count)
+                        self.assertEqual(len(grid['reconstructed_world_points_mm']), count)
+                        record = section_records[diagnostic['id']]
+                        self.assertAlmostEqual(length, record['actual_length_mm'], delta=1e-9)
+                        offset = sum(segment['length_mm'] for segment in
+                            row['state']['hose_path']['segments'][:record['segment_start_index']])
+                        for index, (station, point) in enumerate(zip(grid['section_arclength_midpoints_mm'],
+                                grid['reconstructed_world_points_mm'])):
+                            self.assertAlmostEqual(station, (index+.5)*grid['interval_width_mm'], places=9)
+                            expected = carrier.path_position(row['state']['hose_path'], offset+station)['point_mm']
+                            self.assertLess(math.dist(point, expected), 1e-9)
+                        joint = next(item for item in reach_arm['joints'] if item['id'] == definition['joint'])
+                        origin = robot.transform(reach_fk[joint['parent']],
+                            [model.evaluate(v, reach_parameters) for v in joint['frame']['origin']])
+                        axis = [sum(reach_fk[joint['parent']][i][j]*model.evaluate(
+                            joint['frame']['axis'][j], reach_parameters) for j in range(3)) for i in range(3)]
+                        axial, radial = [], []
+                        for point in grid['reconstructed_world_points_mm']:
+                            delta = [value-start for value, start in zip(point, origin)]
+                            along = sum(a*b for a, b in zip(delta, axis))
+                            axial.append(along)
+                            radial.append(math.sqrt(max(0., sum(v*v for v in delta)-along*along)))
+                        half = grid['interval_width_mm']/2
+                        self.assertAlmostEqual(raw['maximum_radial_reach_upper_bound_mm'],
+                                               max(radial)+half, delta=1e-7)
+                        for actual, expected in zip(raw['axial_range_outer_bound_mm'],
+                                                    [min(axial)-half, max(axial)+half]):
+                            self.assertAlmostEqual(actual, expected, delta=1e-7)
                 for source_clearance in (native['source_clearance'], native['independent_source_clearance']):
                     self.assertTrue(source_clearance['passed'])
                     self.assertGreater(source_clearance['minimum_margin_lower_bound_mm'], 0)
@@ -1452,48 +1759,9 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
                 for diagnostic in (native['hose_self_clearance'], native['independent_hose_self_clearance']):
                     self.assertTrue(diagnostic['passed'])
                     self.assertIs(diagnostic['continuous_self_clearance_verified'], False)
-                self.assertEqual(row['carrier_checks'], native['carrier_checks'])
-                checked_carrier = native['carrier_checks']
-                self.assertTrue(checked_carrier['passed'])
-                self.assertEqual(checked_carrier['expected_solid_counts'],
-                                 {name: expected_counts[name] for name in carrier_ids})
-                self.assertEqual(checked_carrier['nominal_link_count'], record['nominal_link_count'])
-                self.assertEqual(checked_carrier['nominal_arc_pitch_mm'], record['pitch_mm'])
-                self.assertGreaterEqual(checked_carrier['minimum_centerline_bend_radius_mm'],
-                                        profile['geometry']['minimum_centerline_bend_radius_mm'])
-                self.assertTrue(all(error < 1e-6 for error in checked_carrier['relative_volume_errors'].values()))
-                self.assertTrue(checked_carrier['filled_guard']['valid'])
-                self.assertEqual(checked_carrier['filled_guard']['solid_count'], 1)
-                self.assertIs(checked_carrier['filled_guard']['delivered_material_body'], False)
-                containment = checked_carrier['collar_containment']
-                self.assertTrue(containment['native_cut_valid'])
-                self.assertLessEqual(containment['outside_guard_volume_mm3'], 1e-5)
-                self.assertGreater(containment['source_local_bounds']['outer_margin_lower_bound_mm'], 0)
-                self.assertGreater(containment['source_local_bounds']['inner_margin_lower_bound_mm'], 0)
-                self.assertEqual({check['id'] for check in checked_carrier['collar_pose_checks']}, set(record['native_aliases']))
-                self.assertTrue(all(check['centroid_error_mm'] < 1e-6 for check in checked_carrier['collar_pose_checks']))
-                self.assertLess(checked_carrier['protected_centerline_shell_material_intersection_mm'], 1e-7)
-                self.assertGreater(checked_carrier['assumed_hose_to_inner_envelope_radial_gap_mm'], 0)
-                seams = checked_carrier['collar_parameterization']
-                self.assertTrue(seams['passed'])
-                self.assertEqual(seams['circular_profile_seam_deg'], 135)
-                self.assertEqual({item['id'] for item in seams['geometry_invariance']}, set(record['native_aliases']))
-                for item in seams['geometry_invariance']:
-                    self.assertTrue(item['passed'])
-                    self.assertTrue(item['valid_closed_solid'])
-                    for field in ('volume_difference_mm3', 'centroid_difference_mm', 'bounds_difference_mm'):
-                        self.assertLessEqual(item[field], 1e-7)
-                gap = checked_carrier['collar_hose_material_gap']
-                self.assertTrue(gap['passed'])
-                self.assertGreater(gap['distance_mm'], 1e-7)
-                self.assertIs(gap['common_is_empty'], True)
-                self.assertLessEqual(gap['common_volume_mm3'], 1e-5)
-                self.assertTrue(gap['witnesses'])
-                for witness in gap['witnesses']:
-                    for field in ('collar_membership_error_mm', 'hose_membership_error_mm', 'separation_error_mm'):
-                        self.assertLessEqual(witness[field], 1e-7)
-                    self.assertLessEqual(abs(math.dist(witness['collar_point_mm'], witness['hose_point_mm'])-gap['distance_mm']), 1e-7)
-                self.assertEqual(checked_carrier['qualification'], profile['qualification'])
+                self.assertIsNone(native['carrier_checks'])
+                self.assertEqual(row['clip_checks'], native['clip_checks'])
+                self.assert_clipped_native_geometry(row, native, spec, p, band)
                 self.assertEqual(row['pneumatic_connections'], native['pneumatic_connections'])
                 connections = native['pneumatic_connections']
                 self.assertTrue(connections['passed'])
@@ -1669,6 +1937,12 @@ class ArmSyringeNativeEvidenceTests(unittest.TestCase):
         self.assertAlmostEqual(drawn['radius_mm'], min(segment['radius_mm']
             for row in report['states'] for segment in row['state']['hose_path']['segments']
             if segment['kind'] == 'arc'))
+        transition = report['renders']['guide_transition']
+        witness = transition['geometry_witness']
+        self.assertEqual(witness['clip_station'], 'j4_child')
+        frame = by_state[transition['state']]['state']['hose_path']['clip_frames'][witness['clip_station']]
+        self.assertLess(math.dist(witness['clip_center_mm'], frame['center_mm']), 1e-7)
+        self.assertTrue(transition['scope'])
 
 
 if __name__ == '__main__':
