@@ -1,0 +1,868 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tip-supply.schema.json",
+  "title": "Documented tip variants, logical strips, trays and referenced occupancy snapshots",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/shared"
+    },
+    {
+      "$ref": "#/$defs/instances"
+    }
+  ],
+  "$defs": {
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id",
+        "locator"
+      ],
+      "properties": {
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "url",
+        "retrieved_on",
+        "file",
+        "sha256",
+        "scope"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "pattern": "^https://"
+        },
+        "retrieved_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "file": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]+$"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expression",
+        "unit",
+        "range"
+      ],
+      "properties": {
+        "expression": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "unit": {
+          "enum": [
+            "mm",
+            "uL",
+            "count"
+          ]
+        },
+        "range": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "source_id",
+        "locator",
+        "open_task"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "unit": {
+          "enum": [
+            "mm",
+            "g",
+            "N"
+          ]
+        },
+        "source_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locator": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "open_task": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "source_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "locator": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "source_id": {
+                "const": null
+              },
+              "locator": {
+                "const": null
+              }
+            }
+          }
+        }
+      ]
+    },
+    "article": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manufacturer",
+        "family",
+        "catalog_number",
+        "purity_grade",
+        "filtered",
+        "catalog_length_mm",
+        "tips_per_tray",
+        "trays_per_pack",
+        "source_id",
+        "locator"
+      ],
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "catalog_number": {
+          "type": "string",
+          "minLength": 1
+        },
+        "purity_grade": {
+          "type": "string",
+          "minLength": 1
+        },
+        "filtered": {
+          "const": false
+        },
+        "catalog_length_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "tips_per_tray": {
+          "const": 96
+        },
+        "trays_per_pack": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "source_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "article",
+        "overrides",
+        "dimension_evidence",
+        "unknown_measurements"
+      ],
+      "properties": {
+        "article": {
+          "$ref": "#/$defs/article"
+        },
+        "overrides": {
+          "$ref": "assembly-reference.schema.json#/$defs/overrides"
+        },
+        "dimension_evidence": {
+          "$ref": "#/$defs/evidence"
+        },
+        "unknown_measurements": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "shaft_diameter_max",
+            "collar_diameter_min",
+            "wall_thickness",
+            "tip_mass",
+            "nipple_outer_diameter",
+            "nipple_insertion_length",
+            "access_gap_above_collar",
+            "vertical_running_clearance",
+            "withdrawal_force"
+          ],
+          "properties": {
+            "shaft_diameter_max": {
+              "$ref": "#/$defs/measurement"
+            },
+            "collar_diameter_min": {
+              "$ref": "#/$defs/measurement"
+            },
+            "wall_thickness": {
+              "$ref": "#/$defs/measurement"
+            },
+            "tip_mass": {
+              "$ref": "#/$defs/measurement"
+            },
+            "nipple_outer_diameter": {
+              "$ref": "#/$defs/measurement"
+            },
+            "nipple_insertion_length": {
+              "$ref": "#/$defs/measurement"
+            },
+            "access_gap_above_collar": {
+              "$ref": "#/$defs/measurement"
+            },
+            "vertical_running_clearance": {
+              "$ref": "#/$defs/measurement"
+            },
+            "withdrawal_force": {
+              "$ref": "#/$defs/measurement"
+            }
+          }
+        }
+      }
+    },
+    "shared": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "id",
+        "revision",
+        "date",
+        "status",
+        "units",
+        "coordinates",
+        "sources",
+        "parameters",
+        "variants",
+        "geometry",
+        "fit_to",
+        "open_tasks",
+        "limitations"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.tip-supply/1"
+        },
+        "id": {
+          "const": "TipSupply"
+        },
+        "revision": {
+          "type": "string",
+          "minLength": 1
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "const": "Concept; no manufacturing release"
+        },
+        "units": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "length",
+            "angle",
+            "volume",
+            "mass",
+            "force"
+          ],
+          "properties": {
+            "length": {
+              "const": "mm"
+            },
+            "angle": {
+              "const": "deg"
+            },
+            "volume": {
+              "const": "uL"
+            },
+            "mass": {
+              "const": "g"
+            },
+            "force": {
+              "const": "N"
+            }
+          }
+        },
+        "coordinates": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "origin",
+            "x",
+            "y",
+            "z"
+          ],
+          "properties": {
+            "origin": {
+              "type": "string",
+              "minLength": 1
+            },
+            "x": {
+              "type": "string",
+              "minLength": 1
+            },
+            "y": {
+              "type": "string",
+              "minLength": 1
+            },
+            "z": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "sources": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "#/$defs/source"
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "capacity",
+            "tip_length",
+            "collar_od",
+            "inlet_id",
+            "body_diameter_callout",
+            "outlet_od",
+            "outlet_id",
+            "pitch",
+            "tray_rows",
+            "tray_columns",
+            "slot_count",
+            "strip_axis_span",
+            "tray_axis_span_x"
+          ],
+          "properties": {
+            "capacity": {
+              "$ref": "#/$defs/parameter"
+            },
+            "tip_length": {
+              "$ref": "#/$defs/parameter"
+            },
+            "collar_od": {
+              "$ref": "#/$defs/parameter"
+            },
+            "inlet_id": {
+              "$ref": "#/$defs/parameter"
+            },
+            "body_diameter_callout": {
+              "$ref": "#/$defs/parameter"
+            },
+            "outlet_od": {
+              "$ref": "#/$defs/parameter"
+            },
+            "outlet_id": {
+              "$ref": "#/$defs/parameter"
+            },
+            "pitch": {
+              "$ref": "#/$defs/parameter"
+            },
+            "tray_rows": {
+              "$ref": "#/$defs/parameter"
+            },
+            "tray_columns": {
+              "$ref": "#/$defs/parameter"
+            },
+            "slot_count": {
+              "$ref": "#/$defs/parameter"
+            },
+            "strip_axis_span": {
+              "$ref": "#/$defs/parameter"
+            },
+            "tray_axis_span_x": {
+              "$ref": "#/$defs/parameter"
+            }
+          }
+        },
+        "variants": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tip_10_ul",
+            "tip_200_ul",
+            "tip_1000_ul"
+          ],
+          "properties": {
+            "tip_10_ul": {
+              "$ref": "#/$defs/variant"
+            },
+            "tip_200_ul": {
+              "$ref": "#/$defs/variant"
+            },
+            "tip_1000_ul": {
+              "$ref": "#/$defs/variant"
+            }
+          }
+        },
+        "geometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "tip",
+            "strip",
+            "tray",
+            "box"
+          ],
+          "properties": {
+            "tip": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "length_parameter",
+                "collar_diameter_parameter",
+                "body_callout_parameter",
+                "profile_complete",
+                "body_callout_is_capture_maximum"
+              ],
+              "properties": {
+                "recipe": {
+                  "const": "documented_dimension_landmarks/1"
+                },
+                "length_parameter": {
+                  "const": "tip_length"
+                },
+                "collar_diameter_parameter": {
+                  "const": "collar_od"
+                },
+                "body_callout_parameter": {
+                  "const": "body_diameter_callout"
+                },
+                "profile_complete": {
+                  "const": false
+                },
+                "body_callout_is_capture_maximum": {
+                  "const": false
+                }
+              }
+            },
+            "strip": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "tip_count_parameter",
+                "pitch_parameter",
+                "physical_carrier_confirmed",
+                "outer_length_mm",
+                "outer_width_mm",
+                "thickness_mm",
+                "basis"
+              ],
+              "properties": {
+                "recipe": {
+                  "const": "logical_tip_column/1"
+                },
+                "tip_count_parameter": {
+                  "const": "tray_rows"
+                },
+                "pitch_parameter": {
+                  "const": "pitch"
+                },
+                "physical_carrier_confirmed": {
+                  "const": null
+                },
+                "outer_length_mm": {
+                  "const": null
+                },
+                "outer_width_mm": {
+                  "const": null
+                },
+                "thickness_mm": {
+                  "const": null
+                },
+                "basis": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "tray": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "strip_count_parameter",
+                "pitch_parameter",
+                "pitch_source_id",
+                "outer_length_mm",
+                "outer_width_mm",
+                "outer_height_mm",
+                "wall_thickness_mm",
+                "well_diameter_mm",
+                "seat_offset_from_tip_mouth_mm",
+                "basis"
+              ],
+              "properties": {
+                "recipe": {
+                  "const": "rectangular_tip_grid/1"
+                },
+                "strip_count_parameter": {
+                  "const": "tray_columns"
+                },
+                "pitch_parameter": {
+                  "const": "pitch"
+                },
+                "pitch_source_id": {
+                  "const": "spacing"
+                },
+                "outer_length_mm": {
+                  "const": null
+                },
+                "outer_width_mm": {
+                  "const": null
+                },
+                "outer_height_mm": {
+                  "const": null
+                },
+                "wall_thickness_mm": {
+                  "const": null
+                },
+                "well_diameter_mm": {
+                  "const": null
+                },
+                "seat_offset_from_tip_mouth_mm": {
+                  "const": null
+                },
+                "basis": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "box": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "recipe",
+                "outer_length_mm",
+                "outer_width_mm",
+                "outer_height_mm",
+                "wall_thickness_mm",
+                "lid_thickness_mm",
+                "basis"
+              ],
+              "properties": {
+                "recipe": {
+                  "const": "unresolved_container/1"
+                },
+                "outer_length_mm": {
+                  "const": null
+                },
+                "outer_width_mm": {
+                  "const": null
+                },
+                "outer_height_mm": {
+                  "const": null
+                },
+                "wall_thickness_mm": {
+                  "const": null
+                },
+                "lid_thickness_mm": {
+                  "const": null
+                },
+                "basis": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
+        },
+        "fit_to": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "assembly",
+            "grooves",
+            "unknown_policy"
+          ],
+          "properties": {
+            "id": {
+              "const": "tip-collector-t01"
+            },
+            "assembly": {
+              "$ref": "assembly-reference.schema.json#/$defs/reference"
+            },
+            "grooves": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tip_10_ul",
+                "tip_200_ul",
+                "tip_1000_ul"
+              ],
+              "properties": {
+                "tip_10_ul": {
+                  "const": "S"
+                },
+                "tip_200_ul": {
+                  "const": "M"
+                },
+                "tip_1000_ul": {
+                  "const": "L"
+                }
+              }
+            },
+            "unknown_policy": {
+              "const": "open; never passed when a required input is null"
+            }
+          }
+        },
+        "open_tasks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "description"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "description": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          },
+          "minItems": 1
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "instance": {
+      "allOf": [
+        {
+          "$ref": "assembly-reference.schema.json#/$defs/instance"
+        },
+        {
+          "required": [
+            "host",
+            "variant",
+            "pose"
+          ],
+          "propertyNames": {
+            "enum": [
+              "id",
+              "asset",
+              "host",
+              "xyz",
+              "yaw_deg",
+              "variant",
+              "pose",
+              "overrides"
+            ]
+          },
+          "properties": {
+            "xyz": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "variant": {
+              "enum": [
+                "tip_10_ul",
+                "tip_200_ul",
+                "tip_1000_ul"
+              ]
+            },
+            "pose": {
+              "enum": [
+                "full",
+                "partial",
+                "empty"
+              ]
+            },
+            "overrides": {
+              "type": "object",
+              "maxProperties": 0
+            }
+          }
+        }
+      ]
+    },
+    "occupancy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "occupied_slots",
+        "evidence"
+      ],
+      "properties": {
+        "occupied_slots": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-H](0[1-9]|1[0-2])$"
+          },
+          "uniqueItems": true,
+          "maxItems": 96
+        },
+        "evidence": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "reference"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "synthetic_fixture",
+                "owner_statement",
+                "measurement_record"
+              ]
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "instances": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "basis",
+        "assets",
+        "instances"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.tip-supply-instances/1"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        },
+        "assets": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {
+            "$ref": "assembly-reference.schema.json#/$defs/reference"
+          }
+        },
+        "instances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "assembly",
+              "occupancy"
+            ],
+            "properties": {
+              "assembly": {
+                "$ref": "#/$defs/instance"
+              },
+              "occupancy": {
+                "$ref": "#/$defs/occupancy"
+              }
+            }
+          },
+          "minItems": 1
+        }
+      }
+    }
+  }
+}

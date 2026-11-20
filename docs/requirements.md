@@ -293,9 +293,13 @@ einfachen Bohrungen. [H01](tube-carrier-h01.md) verwendet deshalb artikelabhäng
 Einsätze bei gemeinsamen äußeren Träger-/Greifschnittstellen. Maße und Passungen
 sind Konzeptannahmen; der konkrete Gefäßartikel und Messwerte bleiben offen.
 
-- Für den gewünschten Spitzenabwurf: konkrete 10-, 200- und 1000-µl-Pipetten und
-  Spitzenartikel, Kragen-/Schaftmaße, Freiraum zur Abwurfhülse, Abziehkraft und
-  zulässige Füllhöhe der Sammelbox; die Nuten im T01-Entwurf sind Platzhalter.
+- Für den gewünschten Spitzenabwurf: konkrete 10-, 200- und 1000-µl-Pipetten,
+  tolerierte Kragen-/Schaftmaße, T01-`fit_rule`, Freiraum zur Abwurfhülse,
+  Abziehkraft und zulässige Füllhöhe; die T01-Nuten bleiben Platzhalter.
+  Die [Spitzenversorgung](tip-supply.md) führt inzwischen drei belegte
+  Referenzartikel, aber noch keine bestätigte T01-Kompatibilität.
+- Spitzenversorgung: vollständige Tray-/Boxmaße und Spitzenprofile beschaffen;
+  Strip-Zugriff mit eigener Bahnprüfung sowie das Pipettierwerkzeug entwickeln.
 - Pipettenmodelle, Spitzen und Gewicht der vollständigen Werkzeuge.
 - Gefäßartikel und genaue Zielposition, Ablage- und Aufnahmeorientierung.
 - Beladung und Entnahme der Deckelstation einschließlich echter Greifergeometrie,

@@ -1,0 +1,509 @@
+{
+  "format": "solidcraftbot.tip-supply/1",
+  "id": "TipSupply",
+  "revision": "TSUP01",
+  "date": "2026-11-18",
+  "status": "Concept; no manufacturing release",
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "volume": "uL",
+    "mass": "g",
+    "force": "N"
+  },
+  "coordinates": {
+    "origin": "Tip mouth centre of slot A01; box bottom and tray seating offsets are unknown.",
+    "x": "Columns 01 to 12",
+    "y": "Rows A to H; each column is one logical eight-tip strip",
+    "z": "Up; tips extend along negative Z"
+  },
+  "sources": {
+    "drawing": {
+      "title": "epT.I.P.S. Technical Data Sheet",
+      "url": "https://www.eppendorf.com/product-media/doc/en/154459_Technical-Data/Eppendorf_Consumables_Technical-data_epTIPS_epTIPS-Technical-Drawing.pdf",
+      "retrieved_on": "2026-11-18",
+      "file": "eptips-technical-drawing.pdf",
+      "sha256": "5d2126ae4d45e5b15b82c6ad38370fbea8bab824031fdaff4256718a680f0462",
+      "scope": "Pages 1, 3 and 4; unfiltered 0.1–10, 2–200 and 50–1000 uL drawings. Nominal dimensions; no tolerance or mass statement."
+    },
+    "catalog": {
+      "title": "Eppendorf Main Catalog, UK version",
+      "url": "https://www.eppendorf.com/product-media/doc/en/11112106/General_Catalog_Main-Eppendorf-Catalog-UK-Version.pdf",
+      "retrieved_on": "2026-11-18",
+      "file": "eppendorf-catalog.pdf",
+      "sha256": "79217e9752536ca193f9cb5b6eb023bf6abfac8047133f9fccc73f7c3e5c4a9f",
+      "scope": "Printed page 38 / PDF page 68; PCR clean Reloads, article numbers and 10 trays of 96 tips. Listed products, not a stock or delivery guarantee."
+    },
+    "spacing": {
+      "title": "Eppendorf: epT.I.P.S. versus epT.I.P.S. 384 spacing",
+      "url": "https://www.eppendorf.com/ph-en/Products/Lab-Consumables/Pipette-Tips/epTIPS-384-p-PF-539738",
+      "retrieved_on": "2026-11-18",
+      "file": "eptips-spacing.html",
+      "sha256": "4b3c6c2af3caa3a43d95f848a54e29c1c37fa69d7d44c6b38831d4679f0a61ce",
+      "scope": "Section Tip spacing: ordinary epT.I.P.S. with 8/12-channel 9 mm cone spacing. Nominal system pitch, not a toleranced tray drawing."
+    }
+  },
+  "parameters": {
+    "capacity": {
+      "expression": 10,
+      "unit": "uL",
+      "range": [
+        10,
+        1000
+      ]
+    },
+    "tip_length": {
+      "expression": 34,
+      "unit": "mm",
+      "range": [
+        34,
+        70.7
+      ]
+    },
+    "collar_od": {
+      "expression": 6,
+      "unit": "mm",
+      "range": [
+        6,
+        8.8
+      ]
+    },
+    "inlet_id": {
+      "expression": 3.5,
+      "unit": "mm",
+      "range": [
+        3.5,
+        7.5
+      ]
+    },
+    "body_diameter_callout": {
+      "expression": 4.2,
+      "unit": "mm",
+      "range": [
+        4.2,
+        7.9
+      ]
+    },
+    "outlet_od": {
+      "expression": 0.75,
+      "unit": "mm",
+      "range": [
+        0.75,
+        1.3
+      ]
+    },
+    "outlet_id": {
+      "expression": 0.35,
+      "unit": "mm",
+      "range": [
+        0.35,
+        0.83
+      ]
+    },
+    "pitch": {
+      "expression": 9,
+      "unit": "mm",
+      "range": [
+        9,
+        9
+      ]
+    },
+    "tray_rows": {
+      "expression": 8,
+      "unit": "count",
+      "range": [
+        8,
+        8
+      ]
+    },
+    "tray_columns": {
+      "expression": 12,
+      "unit": "count",
+      "range": [
+        12,
+        12
+      ]
+    },
+    "slot_count": {
+      "expression": "tray_rows*tray_columns",
+      "unit": "count",
+      "range": [
+        96,
+        96
+      ]
+    },
+    "strip_axis_span": {
+      "expression": "(tray_rows-1)*pitch",
+      "unit": "mm",
+      "range": [
+        63,
+        63
+      ]
+    },
+    "tray_axis_span_x": {
+      "expression": "(tray_columns-1)*pitch",
+      "unit": "mm",
+      "range": [
+        99,
+        99
+      ]
+    }
+  },
+  "variants": {
+    "tip_10_ul": {
+      "article": {
+        "manufacturer": "Eppendorf",
+        "family": "epT.I.P.S. Reloads",
+        "catalog_number": "0030073754",
+        "purity_grade": "PCR clean",
+        "filtered": false,
+        "catalog_length_mm": 34,
+        "tips_per_tray": 96,
+        "trays_per_pack": 10,
+        "source_id": "catalog",
+        "locator": "Printed page 38 / PDF page 68, Reloads PCR clean column"
+      },
+      "overrides": {},
+      "dimension_evidence": {
+        "source_id": "drawing",
+        "locator": "Page 1, top left: 0.1–10 uL; filter annotations belong only to the Dualfilter alternative."
+      },
+      "unknown_measurements": {
+        "shaft_diameter_max": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the largest exposed shaft across the intended capture region and its tolerance."
+        },
+        "collar_diameter_min": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Establish the smallest retaining rim diameter including tolerance; nominal top OD is insufficient."
+        },
+        "wall_thickness": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain the wall profile; do not assume uniform thickness from one OD/ID pair."
+        },
+        "tip_mass": {
+          "value": null,
+          "unit": "g",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain mass per tip from manufacturer or a traceable weighing."
+        },
+        "nipple_outer_diameter": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Select the pipette and document its mating cone/nipple geometry."
+        },
+        "nipple_insertion_length": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Document the selected pipette insertion depth."
+        },
+        "access_gap_above_collar": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the gap to the selected pipette/ejector sleeve."
+        },
+        "vertical_running_clearance": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Specify the required operating clearance above the retaining rim."
+        },
+        "withdrawal_force": {
+          "value": null,
+          "unit": "N",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure withdrawal force for the selected tip/pipette pair."
+        }
+      }
+    },
+    "tip_200_ul": {
+      "article": {
+        "manufacturer": "Eppendorf",
+        "family": "epT.I.P.S. Reloads",
+        "catalog_number": "0030073819",
+        "purity_grade": "PCR clean",
+        "filtered": false,
+        "catalog_length_mm": 53,
+        "tips_per_tray": 96,
+        "trays_per_pack": 10,
+        "source_id": "catalog",
+        "locator": "Printed page 38 / PDF page 68, Reloads PCR clean column"
+      },
+      "overrides": {
+        "capacity": 200,
+        "tip_length": 52.7,
+        "collar_od": 7.15,
+        "inlet_id": 5.3,
+        "body_diameter_callout": 5,
+        "outlet_od": 0.9,
+        "outlet_id": 0.52
+      },
+      "dimension_evidence": {
+        "source_id": "drawing",
+        "locator": "Page 3, top right: 2–200 uL (unfiltered). Drawing length 52.7 mm differs from rounded catalog length 53 mm."
+      },
+      "unknown_measurements": {
+        "shaft_diameter_max": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the largest exposed shaft across the intended capture region and its tolerance."
+        },
+        "collar_diameter_min": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Establish the smallest retaining rim diameter including tolerance; nominal top OD is insufficient."
+        },
+        "wall_thickness": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain the wall profile; do not assume uniform thickness from one OD/ID pair."
+        },
+        "tip_mass": {
+          "value": null,
+          "unit": "g",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain mass per tip from manufacturer or a traceable weighing."
+        },
+        "nipple_outer_diameter": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Select the pipette and document its mating cone/nipple geometry."
+        },
+        "nipple_insertion_length": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Document the selected pipette insertion depth."
+        },
+        "access_gap_above_collar": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the gap to the selected pipette/ejector sleeve."
+        },
+        "vertical_running_clearance": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Specify the required operating clearance above the retaining rim."
+        },
+        "withdrawal_force": {
+          "value": null,
+          "unit": "N",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure withdrawal force for the selected tip/pipette pair."
+        }
+      }
+    },
+    "tip_1000_ul": {
+      "article": {
+        "manufacturer": "Eppendorf",
+        "family": "epT.I.P.S. Reloads",
+        "catalog_number": "0030073851",
+        "purity_grade": "PCR clean",
+        "filtered": false,
+        "catalog_length_mm": 71,
+        "tips_per_tray": 96,
+        "trays_per_pack": 10,
+        "source_id": "catalog",
+        "locator": "Printed page 38 / PDF page 68, Reloads PCR clean column"
+      },
+      "overrides": {
+        "capacity": 1000,
+        "tip_length": 70.7,
+        "collar_od": 8.8,
+        "inlet_id": 7.5,
+        "body_diameter_callout": 7.9,
+        "outlet_od": 1.3,
+        "outlet_id": 0.83
+      },
+      "dimension_evidence": {
+        "source_id": "drawing",
+        "locator": "Page 4, left: 50–1000 uL (unfiltered). Drawing length 70.7 mm differs from rounded catalog length 71 mm."
+      },
+      "unknown_measurements": {
+        "shaft_diameter_max": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the largest exposed shaft across the intended capture region and its tolerance."
+        },
+        "collar_diameter_min": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Establish the smallest retaining rim diameter including tolerance; nominal top OD is insufficient."
+        },
+        "wall_thickness": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain the wall profile; do not assume uniform thickness from one OD/ID pair."
+        },
+        "tip_mass": {
+          "value": null,
+          "unit": "g",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Obtain mass per tip from manufacturer or a traceable weighing."
+        },
+        "nipple_outer_diameter": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Select the pipette and document its mating cone/nipple geometry."
+        },
+        "nipple_insertion_length": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Document the selected pipette insertion depth."
+        },
+        "access_gap_above_collar": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure the gap to the selected pipette/ejector sleeve."
+        },
+        "vertical_running_clearance": {
+          "value": null,
+          "unit": "mm",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Specify the required operating clearance above the retaining rim."
+        },
+        "withdrawal_force": {
+          "value": null,
+          "unit": "N",
+          "source_id": null,
+          "locator": null,
+          "open_task": "Measure withdrawal force for the selected tip/pipette pair."
+        }
+      }
+    }
+  },
+  "geometry": {
+    "tip": {
+      "recipe": "documented_dimension_landmarks/1",
+      "length_parameter": "tip_length",
+      "collar_diameter_parameter": "collar_od",
+      "body_callout_parameter": "body_diameter_callout",
+      "profile_complete": false,
+      "body_callout_is_capture_maximum": false
+    },
+    "strip": {
+      "recipe": "logical_tip_column/1",
+      "tip_count_parameter": "tray_rows",
+      "pitch_parameter": "pitch",
+      "physical_carrier_confirmed": null,
+      "outer_length_mm": null,
+      "outer_width_mm": null,
+      "thickness_mm": null,
+      "basis": "Requested grouping of eight separate tips. A detachable eight-tip carrier is not documented for these reload articles."
+    },
+    "tray": {
+      "recipe": "rectangular_tip_grid/1",
+      "strip_count_parameter": "tray_columns",
+      "pitch_parameter": "pitch",
+      "pitch_source_id": "spacing",
+      "outer_length_mm": null,
+      "outer_width_mm": null,
+      "outer_height_mm": null,
+      "wall_thickness_mm": null,
+      "well_diameter_mm": null,
+      "seat_offset_from_tip_mouth_mm": null,
+      "basis": "Requested 8 x 12 topology with manufacturer-listed 96 tips per tray and nominal system pitch; tray tolerances and support geometry are unknown."
+    },
+    "box": {
+      "recipe": "unresolved_container/1",
+      "outer_length_mm": null,
+      "outer_width_mm": null,
+      "outer_height_mm": null,
+      "wall_thickness_mm": null,
+      "lid_thickness_mm": null,
+      "basis": "Container for the referenced refill tray; no measured box or detachable-strip mechanics asserted."
+    }
+  },
+  "fit_to": {
+    "id": "tip-collector-t01",
+    "assembly": {
+      "source": "model/tip-collector-t01.shared.json",
+      "source_sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a"
+    },
+    "grooves": {
+      "tip_10_ul": "S",
+      "tip_200_ul": "M",
+      "tip_1000_ul": "L"
+    },
+    "unknown_policy": "open; never passed when a required input is null"
+  },
+  "open_tasks": [
+    {
+      "id": "T01_FIT",
+      "description": "Document T01 fit_rule, tolerance extrema, sleeve gap and operating clearance for each selected tip/pipette pair."
+    },
+    {
+      "id": "PACKAGE_GEOMETRY",
+      "description": "Obtain tray/box dimensions, wall and seating geometry, mass, and evidence for any removable eight-tip carrier."
+    },
+    {
+      "id": "TIP_PROFILE",
+      "description": "Obtain complete inner/outer axial profiles and tolerance data before native tip/tray geometry or physical collision claims."
+    },
+    {
+      "id": "STRIP_ACCESS_MOTION",
+      "description": "Design strip loading and individual tip access separately, with the project motion/PVA checks."
+    },
+    {
+      "id": "PIPETTING_TOOL",
+      "description": "Select and develop pipette actuation, nipple, mounting and tip attachment/removal; outside this task."
+    },
+    {
+      "id": "T01_REVERSE_REFERENCE",
+      "description": "T01 has no validated tip-definition reference field. Keep its source and pins unchanged; add a validated reverse reference in a later collector-contract revision."
+    }
+  ],
+  "limitations": [
+    "Documented nominal landmarks and slot frames are not complete CAD solids or toleranced interfaces.",
+    "Logical occupancy is a declared snapshot, not a stock ledger, sensor confirmation or consumption transaction.",
+    "Example instances do not place equipment in L01 or the extraction station. Their later adapters must consume this source.",
+    "No pipetting tool, robot motion, manufacturing or real tip compatibility is released."
+  ]
+}

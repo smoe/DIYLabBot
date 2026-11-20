@@ -127,6 +127,8 @@ Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pi
 
 Diese Konstruktionen lassen sich in realen und synthetischen Aufstellungen referenzieren. Parameter und Gelenke bleiben in ihrer jeweiligen gemeinsamen Quelle.
 
+**Spitzenversorgung · 10/200/1000 µl:** Drei belegte Eppendorf-Artikel als Varianten einer gemeinsamen Quelle, mit 96 Platz-IDs in zwölf logischen Achterstreifen und expliziter Voll-/Teil-/Leerbelegung. Maß- und Rasterdefinition; native Spitzen-/Boxkörper und T01-Passung bleiben mangels vollständiger Maße offen. [Quelle](../../model/tip-supply.shared.json) · [Referenzinstanzen](../../model/tip-supply.instances.json) · [Maßbelege und Prüfgrenzen](../tip-supply.md).
+
 | Modell | Modell | Modell |
 | --- | --- | --- |
 | **Sechsachsiger Laborarm**<br><a href="images/robot.png"><img src="images/robot.png" alt="Sechsachsiger Laborarm" width="270"></a><br>Arm mit registrierten Servos, Montageplatten und zwei provisorischen Kameras. Die weiten Sichtkegel sind für diese Übersicht ausgeblendet.<br>[Quelle](../../model/robot.json) · [Details](../../docs/design.md) | **Mobile Armbasis MB01**<br><a href="images/mobile-base.png"><img src="images/mobile-base.png" alt="Mobile Armbasis MB01" width="270"></a><br>Der referenzierte Arm auf einer manuell versetzbaren, abgestützten Basis.<br>[Quelle](../../model/mobile-base-mb01.shared.json) · [Details](../../docs/mobile-base-mb01.md) | **Deckelstation C01**<br><a href="images/cap-station.png"><img src="images/cap-station.png" alt="Deckelstation C01" width="270"></a><br>Gemeinsame Stationskonstruktion für geführte Gefäß- und Deckelhandhabung.<br>[Quelle](../../model/tube-station-c01.shared.json) · [Details](../../docs/tube-station-c01.md) |
