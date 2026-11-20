@@ -429,7 +429,7 @@ oder Geräteeffekte. Unbekannte Puls-, Kühlungs- und Gefäßparameter offen las
 ein Geräteabschluss oder NanoDrop-/Qubit-Wert belegt keine Fragmentgröße.
 Keine Sonikations-Nebenbilanz, Hardware-, ROS- oder SiLA-Ausführung ableiten.
 
-Die additive [S09-Laufzeitanbindung](docs/cutrun-input-sonication-runtime.md)
+Die additive [S09-Laufzeitanbindung](docs/dna-sonication.md#merged-cutrun-input-sonication-runtime)
 verwendet `model/cutrun-input-sonication.profile.json` und die eigene Engine
 `input_sonication_mock/1`. Ausschließlich Testuhr und Fixture-Beobachtungen
 zulassen; reale SOP-Bereitschaft und fehlendes Herstelleroriginal offen halten.
