@@ -23,6 +23,18 @@ const {chromium}=require(process.argv[3]||'playwright');
     const state=id=>page.evaluate(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id),id);
     async function command(id,name){return page.evaluate(([id,name])=>window.__buildingWalkthrough.command(id,name),[id,name]);}
     async function settled(id,expected){await page.waitForFunction(([id,state])=>window.__buildingWalkthrough.objects.find(o=>o.id===id).state===state,[id,expected]);}
+    report.basic_laboratory_controls=[];
+    for(const lab of model.laboratories.filter(lab=>lab.furnishing_profile)){
+      const controls=model.objects.filter(o=>o.id.startsWith(lab.id+'.Hood01.'));
+      assert.equal(controls.length,4,lab.id+': source-defined sash and three cabinet doors');
+      for(const control of controls){
+        assert.equal((await command(control.id,'open')).status,'accepted');await settled(control.id,'open');
+        assert.equal((await state(control.id)).joint_value,control.states.open);
+        assert.equal((await command(control.id,'close')).status,'accepted');await settled(control.id,'closed');
+        assert.deepEqual((await state(control.id)).model_matrix,[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+        report.basic_laboratory_controls.push(control.id);
+      }
+    }
     // Every native room door completes a close/open cycle; all window details
     // share the same rigid transform. This includes every steel basement leaf.
     for(const room of rooms){
@@ -94,11 +106,27 @@ const {chromium}=require(process.argv[3]||'playwright');
       assert(success,id+': public click reaches the moving surface');await settled(id,expected);
       report.public_interactions.push({id,input:'click',state:expected});
     }
-    for(const id of [outer,freezer+'Drawer04','Lab3003.Hood01.Sash','Lab3003.Hood01.HoodBase_Door1',
+    report.laboratory_corridor_doors=[];
+    const laboratoryDoors=rooms.filter(room=>room.laboratory_corridor);
+    assert.equal(laboratoryDoors.length,27,'Every confirmed laboratory exit has a corridor opening binding');
+    for(const room of laboratoryDoors){
+      const lab=model.laboratories.find(lab=>lab.level_id===room.level_id&&lab.area===room.laboratory_corridor.laboratory);
+      assert(lab,room.id+': actual laboratory assignment required');
+      const centre=[0,1].map(i=>lab.interior_polygon_mm.reduce((sum,p)=>sum+p[i],0)/lab.interior_polygon_mm.length);
+      assert(centre.reduce((sum,v,i)=>sum+(v-room.joint.origin_mm[i])*room.front[i],0)<0,
+        room.id+': open leaf points away from the laboratory');
+      await command(room.id,'close');await settled(room.id,'closed');
+      await clickObject(room.id,'open');await clickObject(room.id,'closed');
+      await command(room.id,room.initial_state||room.reference_state);
+      await settled(room.id,room.initial_state||room.reference_state);
+      report.laboratory_corridor_doors.push(room.id);
+    }
+    for(const id of [outer,freezer+'Drawer04','Lab3001.Hood01.Sash','LabEG003.Hood01.HoodBase_Door1',
+      'Lab3003.Hood01.Sash','Lab3003.Hood01.HoodBase_Door1',
       'Lab3003.Hood01.HoodBase_Door2','Lab3003.Hood01.HoodBase_Door3','Lab3003.NanoDrop01.Hinge','Lab3003.Qubit01.Hinge',
       'Kitchen3008.Fridge.Door','Kitchen3008.Microwave.Door']){
       await command(id,'close');await clickObject(id,'open');
-      await page.screenshot({path:path.join(output,'mechanisms-'+id.split('.').slice(1).join('-')+'-open.png')});
+      await page.screenshot({path:path.join(output,'mechanisms-'+(id.startsWith('Lab3001.')||id.startsWith('LabEG003.')?id.replaceAll('.','-'):id.split('.').slice(1).join('-'))+'-open.png')});
       await clickObject(id,'closed');
       if(id===outer)await command(id,'open');
     }
@@ -108,8 +136,55 @@ const {chromium}=require(process.argv[3]||'playwright');
       await page.locator('#walkthrough-canvas').focus();await page.keyboard.press('Space');await settled(room.id,'closed');
       report.public_interactions.push({id:room.id,input:'space',state:'closed'});
     }
+    report.basic_laboratories=[];
+    await page.setViewportSize({width:1600,height:1050});
+    for(const id of ['Lab3001','LabEG003','LabEG015']){
+      const lab=model.laboratories.find(lab=>lab.id===id);
+      assert(lab&&lab.wet_pair_placed&&lab.central_double_bench_placed);
+      const sideDoors=model.objects.filter(o=>o.id.startsWith(id+'.Side_'));
+      const distance=o=>Math.hypot(...o.viewpoint.eye_mm.slice(0,2).map((v,i)=>v-lab.wet_corner.point_mm[i]));
+      sideDoors.sort((a,b)=>distance(b)-distance(a));assert(sideDoors.length);
+      await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),sideDoors[0].id);
+      const island=lab.instances.find(i=>i.id==='IslandLeft');
+      const middle=[0,1].map(i=>island.footprint_mm.reduce((sum,p)=>sum+p[i],0)/4);
+      const level=model.levels.find(level=>level.id===lab.level_id);
+      await lookAt(middle.map((v,i)=>.6*v+.4*lab.wet_corner.point_mm[i]).concat(level.z_mm+1400));
+      const screenshot='browser-basic-'+id+'.png';
+      await page.screenshot({path:path.join(output,screenshot),fullPage:true});
+      report.basic_laboratories.push({id,body_count:lab.body_ids.length,compact:lab.compact_layout,
+        screenshot,camera:await page.evaluate(()=>window.__buildingWalkthrough.camera)});
+    }
+
     // A real timed cycle checks guards during motion, not only endpoints.
     await page.emulateMedia({reducedMotion:'no-preference'});
+    report.laboratory_door_motion=[];
+    for(const target of ['closed','open']){
+      const ids=laboratoryDoors.map(room=>room.id);
+      const samples=await page.evaluate(async({ids,target})=>{
+        const viewer=window.__buildingWalkthrough,out=[];
+        for(const id of ids){
+          const result=viewer.command(id,target==='closed'?'close':'open');
+          if(result.status!=='accepted')throw Error(id+': timed command '+result.status);
+        }
+        await new Promise((resolve,reject)=>{const started=performance.now();function sample(){
+          const states=viewer.objects.filter(o=>ids.includes(o.id));
+          out.push(states.map(o=>({id:o.id,state:o.state,angle:o.joint_value})));
+          if(states.every(o=>o.state===target))resolve();
+          else if(performance.now()-started>10000)reject(Error('Laboratory door motion timeout'));
+          else requestAnimationFrame(sample);
+        // Sample rendered frames. A synchronous read after the command batch
+        // can observe performance.now() updates ahead of the next RAF timestamp.
+        }requestAnimationFrame(sample);});return out;
+      },{ids,target});
+      for(const id of ids){
+        const angles=samples.map(frame=>frame.find(o=>o.id===id).angle);
+        assert(angles.some(a=>a>0&&a<90),id+': timed intermediate pose required');
+        assert(angles.every(a=>a>=0&&a<=90),id+': hinge limits');
+        assert(angles.every((a,i)=>!i||(target==='open'?a>=angles[i-1]:a<=angles[i-1])),id+': monotone hinge motion');
+        assert.equal(angles.at(-1),target==='open'?90:0);
+      }
+      report.laboratory_door_motion.push({target,door_count:ids.length,samples:samples.length,passed:true});
+    }
     const drawer=freezer+'Drawer03';await command(drawer,'open');
     assert.equal((await command(outer,'close')).status,'rejected_interlock');
     await settled(drawer,'open');await command(drawer,'close');

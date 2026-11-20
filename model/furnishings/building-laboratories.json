@@ -17,5 +17,249 @@
       },
       "basis": "unmeasured_room_binding"
     }
+  ],
+  "basic_profile": {
+    "source": "model/furnishings/basic-laboratory.shared.json",
+    "source_sha256": "fa5fa071721229ff88de7ca1b1bf68395ed1bd77ab4943412f54894278181796"
+  },
+  "basic_laboratories": [
+    {
+      "id": "LabEG001",
+      "room": "EG 1",
+      "level": "EG",
+      "area": "R0_001",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "LabEG003",
+      "room": "EG 3",
+      "level": "EG",
+      "area": "R0_003",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "LabEG015",
+      "room": "EG 15",
+      "level": "EG",
+      "area": "R0_015",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab1001",
+      "room": "1.001",
+      "level": "OG1",
+      "area": "R3_001",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab1003",
+      "room": "1.003",
+      "level": "OG1",
+      "area": "R3_003",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab1015",
+      "room": "1.015",
+      "level": "OG1",
+      "area": "R3_015",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab1016",
+      "room": "1.016",
+      "level": "OG1",
+      "area": "R3_016",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab2001",
+      "room": "2.001",
+      "level": "OG2",
+      "area": "R3_001",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab2003",
+      "room": "2.003",
+      "level": "OG2",
+      "area": "R3_003",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab2015",
+      "room": "2.015",
+      "level": "OG2",
+      "area": "R3_015",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab2016",
+      "room": "2.016",
+      "level": "OG2",
+      "area": "R3_016",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab3001",
+      "room": "3.001",
+      "level": "OG3",
+      "area": "R3_001",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab3015",
+      "room": "3.015",
+      "level": "OG3",
+      "area": "R3_015",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    },
+    {
+      "id": "Lab3016",
+      "room": "3.016",
+      "level": "OG3",
+      "area": "R3_016",
+      "basis": "owner_confirmed_basic_furnishing_rule"
+    }
+  ],
+  "excluded_rooms": [
+    {
+      "level": "OG1",
+      "area": "R3_002",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_004",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_005",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_010",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_014",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG2",
+      "area": "R3_002",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG2",
+      "area": "R3_004",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG2",
+      "area": "R3_005",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG2",
+      "area": "R3_010",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG2",
+      "area": "R3_014",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_002",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_004",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_005",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_010",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_014",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "EG",
+      "area": "R0_014A",
+      "usage": "storage",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "Suite3_006AB",
+      "usage": "secretariat",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_009",
+      "usage": "office",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_008A",
+      "usage": "kitchen",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG1",
+      "area": "R3_008B",
+      "usage": "kitchen",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_008A",
+      "usage": "kitchen",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "OG3",
+      "area": "R3_008B",
+      "usage": "kitchen",
+      "basis": "owner_confirmed"
+    },
+    {
+      "level": "EG",
+      "area": "R0_002",
+      "usage": "non_laboratory",
+      "basis": "owner_confirmed"
+    }
   ]
 }

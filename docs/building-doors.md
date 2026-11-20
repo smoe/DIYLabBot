@@ -50,6 +50,17 @@ Referenzen. An der in der Küchenprojektion ausgelassenen Trennwand entsteht
 kein freistehendes Türblatt; die entsprechende Wand und Tür anderer Geschosse
 bleiben erhalten.
 
+Die am 20. November 2026 bestätigten Labortüren zum Gang öffnen nach außen
+in den angrenzenden Gang. `laboratory_corridor_rule` referenziert dafür die
+gemeinsame Laborzuordnung; eine zweite Liste von Laboren oder einzelnen
+Türinstanzen wird nicht geführt. Die aktuelle Zuordnung umfasst 27 Gangtüren
+der 15 Labore. Die Öffnungsseite folgt dem angrenzenden Gangpolygon, auch an
+schrägen EG-Wänden. Der vorhandene Anschlagpunkt bleibt erhalten; dessen
+Seite und der dargestellte 90-Grad-Winkel sind weiterhin ungemessen.
+Verbindungstüren zwischen Räumen und die bekannten Küchen-, Büro- und
+Kellertüren behalten ihre bisherige Ausrichtung. Dieselben nativen Blätter
+einschließlich der Guckfenster werden im Rundgang gemeinsam bewegt.
+
 ## Logistikraum im Erdgeschoss
 
 Die Eigentümerkorrektur vom 15. November 2026 bezeichnet `R0_013` als

@@ -130,7 +130,9 @@ class CurrentNativeRegression(unittest.TestCase):
     @unittest.skipUnless(os.environ.get('SOLIDCRAFTBOT_BF01_CURRENT_GEOMETRY_TESTS') == '1',
                          'Opt-in current pinned native export; fixture tests are independent')
     def test_current_reference_lift_port_is_not_supported(self):
-        mesh = navigation.NativeMesh(checks.ROOT / 'exports/building-walkthrough/pages-master-80abbc7')
+        export = os.environ.get('SOLIDCRAFTBOT_FLEET_WALKTHROUGH_EXPORT',
+                                'exports/building-walkthrough/pages-master-80abbc7')
+        mesh = navigation.NativeMesh(checks.ROOT / export)
         result = checks.support_barrier(mesh, 'LiftPort_EG_inward')
         self.assertFalse(result['passed'])
         self.assertTrue(result['rejection_proven'])

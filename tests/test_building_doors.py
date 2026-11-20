@@ -188,7 +188,10 @@ class GlassOverrideTests(unittest.TestCase):
             self.assertEqual(a,b)
 
     def test_other_og3_openings_keep_their_existing_selection(self):
-        legacy=copy.deepcopy(self.policy);legacy.pop('opening_overrides')
+        legacy=copy.deepcopy(self.policy)
+        # Remove only the glass connection under test. Kitchen 3.008 already
+        # has separate owner-confirmed poses that must remain in the baseline.
+        legacy['opening_overrides']=[o for o in legacy['opening_overrides'] if o['opening_id']!=self.door['id']]
         for door in self.plan['openings']:
             if door['kind']!='door' or door['id']==self.door['id']:continue
             with self.subTest(opening=door['id']):

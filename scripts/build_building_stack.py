@@ -106,13 +106,16 @@ def z_checks(geometry, contract):
             raise ValueError('Laboratory native bodies need a disjoint complete storey scope')
         level = level_by_id[laboratory['level_id']]
         lower = level['z_mm']
-        upper = min(level['clear_top_mm'], lower+laboratory['evaluated_parameters_mm']['room_height'])
+        upper = level['clear_top_mm']
+        if 'evaluated_parameters_mm' in laboratory:
+            upper = min(upper, lower+laboratory['evaluated_parameters_mm']['room_height'])
         passed = all(bodies[name]['bbox']['min'][2] >= lower-1e-6
                      and bodies[name]['bbox']['max'][2] <= upper+1e-6 for name in names)
         checks.append({'id': laboratory['id']+'_RoomHeight', 'passed': passed,
                        'level_id': laboratory['level_id'], 'body_ids': names,
                        'floor_presentation_mm': lower, 'room_top_presentation_mm': upper,
-                       'scope': 'Referenced laboratory furniture and illustrative support; native equipment excluded'})
+                       'scope': ('Referenced basic laboratory furniture including its fume hood' if laboratory.get('native_equipment_included')
+                                 else 'Referenced laboratory furniture and illustrative support; native equipment excluded')})
         expected.update(names)
     for station in [contract[key] for key in ('microscopy','kitchenette') if contract.get(key)]:
         names=station['body_ids'];level=level_by_id[station['level_id']]

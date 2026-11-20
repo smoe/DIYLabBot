@@ -6,9 +6,16 @@ ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
 Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
 
-Die separate L01-Verbindung ist geprüft. Die weitere Flottenfreigabe stoppt
-an einer neu nachgewiesenen, bodenlosen inneren Aufzugsschwelle im EG; der
-vollständige 20-Fahrzeug-Lauf wurde deshalb nicht erzeugt.
+Die separate L01-Verbindung wurde am früheren Gebäudestand geprüft. Mit der
+Labormöblierung und den nach außen öffnenden Labortüren sind die Gebäude- und
+Rundgangbindungen in beiden BF01-Quellen aktualisiert. Die daraus neu abgeleitete
+L01-Verbindung benötigt neue Kurven-, Boden- und native Abstandsnachweise;
+die folgenden Messwerte und Prüfberichte beschreiben ausschließlich den alten,
+jeweils gepinnten Stand. Historische Berichte werden nicht umgepinnt.
+
+Die bekannte bodenlose innere Aufzugsschwelle im EG wurde nicht korrigiert;
+die bestehende Sperre für den vollständigen 20-Fahrzeug-Lauf bleibt erhalten.
+Diese Quellenintegration erzeugt und qualifiziert keinen neuen Flottenlauf.
 
 ## Bestätigte Rückstellung von K0_013
 
@@ -319,7 +326,7 @@ wurden wegen des Schwellenstopps nicht ausgeführt. Der lokale
 `exports/building-fleet/l01-connector/fleet-report.json` führt deshalb
 den Status `blocked_geometry` und keinen bestandenen Gesamtlauf.
 Der Prüfstand `f46b8d3` entstand lokal auf `codex/building-fleet-demo` ohne
-Merge, Push oder Pages-Veröffentlichung. Die anschließende Integration in den
-aktuellen `master` ändert keine geprüfte Geometrie und führt keinen neuen
+Merge, Push oder Pages-Veröffentlichung. Die damalige Integration in den
+`master` änderte keine geprüfte Geometrie und führte keinen neuen
 Flottenlauf aus. Der oben genannte Gesamtbericht bleibt ein historischer
 Bericht zu `f46b8d3`; Push und Pages-Veröffentlichung bleiben gesperrt.

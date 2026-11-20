@@ -143,6 +143,46 @@ Standalone-L01 bleibt für Ablauftests aus derselben Definition erzeugbar.
 Typweite Browserartikulationen geben den vorhandenen Schranktürgelenken und
 Hockerliften Bedienung, ohne ihre Definition je Instanz zu kopieren.
 
+### Grundausstattung der weiteren Labore
+
+Die bestätigte Raumzuordnung umfasst 15 Labore: EG 1, 3 und 15 sowie
+die Gruppen .001, .003, .015 und .016 im 1.–3. OG. Die bestehende vollständige
+L01-Instanz in 3.003 bleibt erhalten. Die anderen 14 Räume referenzieren das
+gemeinsame Profil
+[`basic-laboratory.shared.json`](../model/furnishings/basic-laboratory.shared.json).
+Es verwendet die vorhandenen L01-Möbeltypen und `fume_hood_1200` aus dem
+Gerätekatalog. Möbelgeometrie und Abzugsmaße werden nicht je Raum kopiert.
+
+Die Gruppen .004 sind Büros; .005, .010, .014 und EG 14A sind Lagerräume.
+Diese Zuordnungen sowie die bekannten Doktorandenbüros, Küchen, das Sekretariat
+und Büro 3.009 sind ausdrücklich von der Laborausstattung ausgenommen.
+Auch EG 2 ist laut Eigentümer kein Labor; die ältere Beschriftung im Grundriss
+ist dafür nicht maßgeblich. Seine weitere Nutzung bleibt offen.
+
+`scripts/basic_laboratories.py` leitet die Aufstellung aus den tatsächlichen
+Raumpolygonen, Wandstärken und Türöffnungen ab. Die Spüle steht an der nächsten
+nutzbaren Ecke zum Aufzug, der Abzug unmittelbar daneben. In EG 3 ist die
+kleine Eingangsnische für die referenzierte Spülenbank zu kurz; die nächste
+Ecke mit ausreichender Wandlänge wird deshalb ausdrücklich im Bericht benannt.
+Seiten- und Fensterbänke folgen der jeweiligen Wandrichtung. Die beiden
+Mittelbänke stehen Rücken an Rücken mit nach außen gerichteten Schranktüren.
+
+Der Grundriss ist weiterhin ungemessen. Die Aufstellung reserviert standardmäßig
+900 mm zwischen den Möbelgrundflächen. Wo nötig verwendet die Ableitung kompakte Banktiefen innerhalb
+der bestehenden Parameterbereiche und 600 mm als ausdrücklich deklarierte
+Darstellungsannahme. Vorstehende Griffe und geöffnete Schranktüren sind damit
+keine nachgewiesene freie Gangbreite. Das ist keine Freigabe von Arbeits-, Flucht- oder
+Roboterwegen. Alle 15 zugeordneten Labore erhalten Spüle, benachbarten Abzug,
+Seiten- und Fensterbänke sowie eine doppelte Mittelbank.
+
+Die neuen Grundausstattungen einschließlich ihrer Abzüge werden sowohl vom
+FreeCAD- als auch vom SolidCraft-Adapter direkt aus derselben Quelle erzeugt.
+Im Rundgang sind Schranktüren und Abzugsscheiben bedienbar. Die vorhandenen
+17 Gerätegruppen von L01 bleiben separat aus dessen geprüftem Modell gebunden;
+deren native Integration in das Gebäude ist weiterhin nicht implementiert.
+Quellenpins, Raumprüfungen und CAD-Nachweise gehören in lokale Build-Berichte;
+historische Bilder und ihre Provenienz bleiben unverändert.
+
 **Integrierter `master`-Stand vom 16. November 2026:**
 `building-stack-0dfc62c4a318` besteht mit 2.362 geschlossenen FreeCAD-Körpern,
 509 Geometrieprüfungen und 16 Höhenprüfungen. Büro-PCs, Küchengeräte und die

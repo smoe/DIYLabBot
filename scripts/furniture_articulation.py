@@ -201,7 +201,7 @@ def compile_objects(ref, objects, building, parameters, interface, expanded, pla
     return result
 
 
-def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height):
+def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height, equipment_profiles=None):
     """Use the recipe's joints and child bodies after laboratory placement.
 
     Geometry, hinge frames, stroke and ownership come from the laboratory
@@ -253,7 +253,15 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height)
             target = [(bounds['min'][i]+bounds['max'][i])/2 for i in range(3)]
             profile = source['kitchen_joints' if is_kitchen else 'lab_joints'][kind]
             if is_kitchen:profile={**profile,'label':joint['label']+' · Küche {room}'}
+            articulation_label = joint['articulation_id']
+            if joint.get('equipment_asset') and equipment_profiles is not None:
+                equipment_profile = equipment_profiles[joint['equipment_asset']]
+                profile = {**equipment_profile['presentation'],
+                           'label': equipment_profile['presentation']['label']+' · {room}'}
+                articulation_label = equipment_profile['roles'][joint['equipment_role']]
             distance = parameter(profile['view_distance'], 'mm', (300, 3000))
+            if lab.get('furnishing_profile'):
+                distance = min(distance, .65*lab['minimum_aisle_mm'])
             eye = [target[i]+front[i]*distance for i in (0, 1)]+[levels[lab['level_id']]+eye_height]
             xy = [value/parameters['display_scale'] for value in eye[:2]]
             require(any(floor.point_membership(xy, polygon) == 1 for polygon in polygons),
@@ -264,7 +272,7 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height)
                 'front': list(front), 'moving_body_ids': list(moving),
                 'states': {'closed': limits[0], 'open': limits[1]}, 'reference_state': 'closed',
                 **presentation_fields(profile, room=lab.get('room', lab['id']),
-                    instance=joint['instance_id'], articulation=joint['articulation_id']),
+                    instance=joint['instance_id'], articulation=articulation_label),
                 'viewpoint': {'eye_mm': eye, 'target_mm': target}, 'basis': 'presentation_assumption',
                 'qualification': {key: False for key in sorted(QUALIFICATIONS)}})
     return result

@@ -330,6 +330,31 @@
           }
         ]
       }
+    },
+    "laboratory_corridor_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "room_assignments",
+        "opens_into",
+        "hinge",
+        "basis"
+      ],
+      "properties": {
+        "room_assignments": {
+          "$ref": "#/properties/catalog"
+        },
+        "opens_into": {
+          "const": "corridor"
+        },
+        "hinge": {
+          "const": "preserve_source_interval_start"
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
     }
   },
   "$schema": "https://json-schema.org/draft/2020-12/schema",

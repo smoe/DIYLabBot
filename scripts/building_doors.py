@@ -27,11 +27,13 @@ def load(ref):
 def dependencies(ref):
     policy,catalog=load(ref)
     return [ROOT/ref['source'],ROOT/policy['catalog']['source'],Path(__file__),
-        ROOT/'model/building-doors.schema.json',ROOT/'model/room-door-catalog.schema.json']
+        ROOT/'model/building-doors.schema.json',ROOT/'model/room-door-catalog.schema.json',
+        *([ROOT/policy['laboratory_corridor_rule']['room_assignments']['source']]
+          if 'laboratory_corridor_rule' in policy else [])]
 
 
 def validate(policy,catalog):
-    require(set(policy)-{'opening_overrides'}=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
+    require(set(policy)-{'opening_overrides','laboratory_corridor_rule'}=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
     require(set(catalog)=={'format','units','status','types','window','materials'},'Explicit door-catalog fields required')
     require(policy['format']=='solidcraftbot.building-doors/1','Unsupported building-door policy')
     require(catalog['format']=='solidcraftbot.room-door-catalog/1' and catalog['units']=={'length':'mm','angle':'deg'},'Typed room-door catalog required')
@@ -65,6 +67,12 @@ def validate(policy,catalog):
     if 'blue_black_steel' in catalog['materials']:
         variant=catalog['materials']['blue_black_steel']
         require(set(variant)=={'base_material','color'} and variant['base_material']=='steel' and isinstance(variant['color'],str) and re.fullmatch('#[0-9a-fA-F]{6}',variant['color']), 'Explicit steel finish variant required')
+    if 'laboratory_corridor_rule' in policy:
+        rule=policy['laboratory_corridor_rule']
+        require(isinstance(rule,dict) and set(rule)=={'room_assignments','opens_into','hinge','basis'},'Explicit laboratory corridor opening rule required')
+        require(rule['opens_into']=='corridor' and rule['hinge']=='preserve_source_interval_start', 'Laboratory doors open into the corridor at their existing source jamb')
+        require(isinstance(rule['basis'],str) and rule['basis'].strip(),'Laboratory door direction basis required')
+        laboratory_assignments(rule)
     overrides=policy.get('opening_overrides',[])
     require(isinstance(overrides,list),'Explicit per-opening door overrides required')
     identities=set()
@@ -81,6 +89,41 @@ def validate(policy,catalog):
         identities.add(identity)
         if 'pose' in override:
             pose=override['pose'];require(isinstance(pose,dict) and set(pose)=={'approach_from','hinge_side','opens_into'} and pose['hinge_side'] in {'left','right'} and all(isinstance(pose[k],str) and pose[k] for k in ('approach_from','opens_into')), 'Explicit door approach, hinge side and opening region required')
+
+
+def laboratory_assignments(rule):
+    """Read room identities from the furnishing source, without copying its geometry."""
+    source=read(rule['room_assignments'])
+    require(source.get('format')=='solidcraftbot.building-laboratories/1','Referenced laboratory room assignments required')
+    result=set()
+    for item in source['laboratories']+source.get('basic_laboratories',[]):
+        identity=(item['level'],item['area'])
+        require(identity not in result and item['level'] in LEVELS,'Unique laboratory room assignments required')
+        result.add(identity)
+    return result
+
+
+def laboratory_corridor_pose(policy,plan,level,door):
+    rule=policy.get('laboratory_corridor_rule')
+    if rule is None:return None
+    rooms=laboratory_assignments(rule)
+    adjacent=[area for area in plan['areas'] if any(edge['wall']==door['wall'] for edge in area['boundary'])]
+    labs=[area for area in adjacent if (level,area['id']) in rooms]
+    if not labs:return None
+    corridors=[area for area in adjacent if area['kind']=='corridor']
+    if not labs or not corridors:return None
+    require(len(labs)==len(corridors)==1 and len(adjacent)==2,'Unambiguous laboratory-to-corridor boundary required')
+    lab,corridor=labs[0]['id'],corridors[0]['id']
+    # Keep the existing physical jamb. Only the opening side changes; no hinge
+    # handedness is inferred from a global north/south direction or a room centre.
+    wall=next(w for w in plan['walls'] if w['id']==door['wall'])
+    a,b=[plan['vertices'][wall[k]] for k in ('start','end')]
+    hinge=[a[i]+door['interval'][0]*(b[i]-a[i]) for i in (0,1)]
+    for side in ('left','right'):
+        pose={'approach_from':lab,'hinge_side':side,'opens_into':corridor}
+        if math.dist(handed_frame(plan,door,pose,1)['hinge_mm'],hinge)<1e-8:
+            return {'pose':pose,'laboratory_corridor':{'laboratory':lab,'corridor':corridor},'pose_basis':rule['basis']}
+    raise ValueError('Existing laboratory door jamb could not be retained')
 
 
 
@@ -147,6 +190,10 @@ def select(policy,plan,canonical,level,door):
     if override is not None:
         result.update(type=override['type'],material=override['material'],reason='owner_opening_override',override_basis=override['basis'])
         if 'pose' in override:result['pose']=dict(override['pose'])
+    corridor_pose=laboratory_corridor_pose(policy,plan,level,door)
+    if corridor_pose is not None:
+        require('pose' not in result or result['pose']==corridor_pose['pose'],'Opening override conflicts with outward laboratory corridor rule')
+        result.update(corridor_pose)
     return result
 
 

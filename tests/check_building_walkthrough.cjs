@@ -19,8 +19,9 @@ const {chromium} = require(process.argv[3] || 'playwright');
   assert(model.stops.every(stop => stop.scene === 'building'), 'Every viewpoint belongs to the same building.');
   const nativeScene = model.scenes.building;
   assert.equal(nativeScene.coordinate_frame, 'building_presentation');
-  assert.equal(model.laboratories.length, 1, 'Exactly the requested laboratory is installed.');
-  const laboratory = model.laboratories[0];
+  const equippedLabs=model.laboratories.filter(lab=>lab.layout_source);
+  assert.equal(equippedLabs.length, 1, 'The existing equipment layout remains bound once.');
+  const laboratory = equippedLabs[0];
   assert.equal(laboratory.level_id, 'OG3'); assert.equal(laboratory.area, 'R3_003');
   assert.equal(laboratory.device_instances.length, 17, 'All seventeen existing equipment instances are bound.');
   const nativeIds = nativeScene.groups.map(group => group.id);
@@ -67,6 +68,18 @@ const {chromium} = require(process.argv[3] || 'playwright');
   assert.equal(socialArticulations.catalog.source_sha256,socialSource.catalog.source_sha256);
   const officeComputerCoverage=[],socialObjectCoverage=[];
   const nativeById=new Map(nativeScene.groups.map(group=>[group.id,group]));
+  const laboratorySource=pinnedJson('model/furnishings/building-laboratories.json');
+  assert.deepEqual(model.laboratories.map(lab=>lab.id).sort(),
+    [...laboratorySource.laboratories,...laboratorySource.basic_laboratories].map(lab=>lab.id).sort());
+  for(const assignment of laboratorySource.basic_laboratories){
+    const lab=model.laboratories.find(lab=>lab.id===assignment.id);
+    assert.equal(lab.level_id,assignment.level);assert.equal(lab.area,assignment.area);
+    assert(lab.wet_pair_placed,assignment.id+': sink and adjacent hood');
+    assert(lab.body_ids.every(id=>nativeById.has(id)&&nativeById.get(id).level_id===lab.level_id),
+      assignment.id+': complete native furniture coverage');
+    assert(lab.body_ids.every(id=>!model.isolation.body_ids.includes(id)),
+      'Isolating L01 must not reveal furniture from other laboratories');
+  }
   for(const room of socialSource.rooms)for(const instance of room.instances){
     const parts=socialCatalog.types[instance.type];
     const prefix=room.id+'_'+instance.id+'_';
@@ -863,6 +876,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert.deepEqual(await objectState(),fridgeBefore,'Microwave commands leave the refrigerator unchanged');
     report.microwave={mouse_open_close:true,space_open_close:true,moving_body_ids:microwave.moving_body_ids};
     report.interactions.push('latest-master microwave mouse and Space open/close','pinned office computer and social articulation coverage');
+
     progress('latest-master microwave regression passed');
 
     // A corrupt source must produce a useful visible error rather than an empty canvas.

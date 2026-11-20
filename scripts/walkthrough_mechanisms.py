@@ -80,6 +80,7 @@ def room_doors(profile, interface, expanded, plans, parameters, eye_height, clos
             [binding['leaf_body_id'], *binding['detail_body_ids']], {'closed': 0, 'open': 90}, 'open',
             eye, target, level_labels[level], opening_id) | {'front': opened+[0], 'mechanism': 'room_door',
                 'opening_id': opening_id, 'material': binding['material'],
+                **({'laboratory_corridor': binding['laboratory_corridor']} if 'laboratory_corridor' in binding else {}),
                 'initial_state': 'closed' if door['wall'] in access_walls.get(level, set()) else 'open'})
     return result
 
@@ -122,6 +123,8 @@ def command_guards(provider, expanded, states):
 def equipment(profiles, interface, eye_height):
     result = []
     for laboratory in interface.get('laboratories', []):
+        if not laboratory.get('layout_source'):
+            continue
         source = art.read(laboratory['layout_source'])
         instances = {item['id']: item for item in source['instances']}
         for device in laboratory['device_instances']:

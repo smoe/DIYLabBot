@@ -89,6 +89,112 @@
           }
         }
       }
+    },
+    "basic_profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/.*\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "basic_laboratories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "room",
+          "area",
+          "level",
+          "basis"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "room": {
+            "type": "string",
+            "minLength": 1
+          },
+          "area": {
+            "type": "string",
+            "minLength": 1
+          },
+          "level": {
+            "enum": [
+              "EG",
+              "OG1",
+              "OG2",
+              "OG3"
+            ]
+          },
+          "basis": {
+            "const": "owner_confirmed_basic_furnishing_rule"
+          }
+        }
+      }
+    },
+    "excluded_rooms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "level",
+          "area",
+          "usage",
+          "basis"
+        ],
+        "properties": {
+          "level": {
+            "enum": [
+              "EG",
+              "OG1",
+              "OG2",
+              "OG3"
+            ]
+          },
+          "area": {
+            "type": "string",
+            "minLength": 1
+          },
+          "usage": {
+            "enum": [
+              "office",
+              "storage",
+              "kitchen",
+              "secretariat",
+              "non_laboratory"
+            ]
+          },
+          "basis": {
+            "const": "owner_confirmed"
+          }
+        }
+      }
     }
+  },
+  "dependentRequired": {
+    "basic_profile": [
+      "basic_laboratories",
+      "excluded_rooms"
+    ],
+    "basic_laboratories": [
+      "basic_profile",
+      "excluded_rooms"
+    ]
   }
 }

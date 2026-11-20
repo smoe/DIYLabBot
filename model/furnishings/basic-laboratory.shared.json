@@ -1,0 +1,124 @@
+{
+  "format": "solidcraftbot.basic-laboratory-furnishings/1",
+  "id": "BasicLaboratory",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "reference_room": {
+    "source": "model/lab-room-l01.shared.json",
+    "source_sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
+  },
+  "hood_source": {
+    "source": "model/lab-equipment.shared.json",
+    "source_sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
+  },
+  "hood_profile": "fume_hood_1200",
+  "prototype_instances": {
+    "side": "LeftBench",
+    "window": "WindowBenchLeft",
+    "wet": "WetStation",
+    "island": "IslandLeft"
+  },
+  "lift_area": "LiftCore",
+  "wet_corner": "nearest_usable_lift_corner",
+  "island": "back_to_back",
+  "parameters": {
+    "wall_gap": {
+      "value": 25,
+      "unit": "mm",
+      "range": [
+        0,
+        150
+      ],
+      "basis": "presentation_assumption"
+    },
+    "minimum_aisle": {
+      "value": 900,
+      "unit": "mm",
+      "range": [
+        600,
+        1500
+      ],
+      "basis": "presentation_assumption"
+    },
+    "door_clearance": {
+      "value": 100,
+      "unit": "mm",
+      "range": [
+        0,
+        250
+      ],
+      "basis": "presentation_assumption"
+    },
+    "fixture_gap": {
+      "value": 50,
+      "unit": "mm",
+      "range": [
+        10,
+        200
+      ],
+      "basis": "presentation_assumption"
+    },
+    "minimum_run": {
+      "value": 650,
+      "unit": "mm",
+      "range": [
+        400,
+        1500
+      ],
+      "basis": "presentation_assumption"
+    },
+    "fit_increment": {
+      "value": 50,
+      "unit": "mm",
+      "range": [
+        10,
+        100
+      ],
+      "basis": "presentation_assumption"
+    },
+    "maximum_corner_setback": {
+      "value": 1500,
+      "unit": "mm",
+      "range": [
+        0,
+        2000
+      ],
+      "basis": "presentation_assumption"
+    },
+    "island_search_step": {
+      "value": 250,
+      "unit": "mm",
+      "range": [
+        100,
+        500
+      ],
+      "basis": "presentation_assumption"
+    },
+    "island_length_step": {
+      "value": 250,
+      "unit": "mm",
+      "range": [
+        100,
+        500
+      ],
+      "basis": "presentation_assumption"
+    },
+    "compact_aisle": {
+      "value": 600,
+      "unit": "mm",
+      "range": [
+        600,
+        900
+      ],
+      "basis": "presentation_assumption"
+    }
+  },
+  "basis": "Owner 2026-11-20: large upper-storey exterior rooms except known offices, kitchens and secretariat; .004 are offices, .005/.010/.014 and EG 14A are storage. EG 1, 3 and 15 are laboratories; EG 2 is explicitly excluded despite its old plan label. Existing L01 furniture types and dimensions are referenced. Sink nearest lift, hood directly adjacent, side/window benches and a central back-to-back pair.",
+  "limitations": [
+    "Unmeasured building presentation, not a surveyed fit or laboratory qualification.",
+    "Tiny entrance recesses without a wall long enough for the referenced sink are excluded from working-corner selection; this is recorded in the derived report.",
+    "Narrow rooms use compact reference bench depths and a declared 600 mm presentation aisle only when this retains the central pair; unfit rooms remain explicit review cases."
+  ]
+}

@@ -24,7 +24,7 @@
     },
     "laboratories": {
       "source": "model/furnishings/building-laboratories.json",
-      "source_sha256": "3dd087dbd41ab605cc11b6463576fc18be667b89ff83c126fef3b273bebdd233"
+      "source_sha256": "c13925ed9eec5ba487c346a9f369c4fef6c235e25ac32d4946d9e54cfbd82880"
     },
     "microscopy": {
       "source": "model/equipment/microscopy-3007.json",
@@ -341,7 +341,7 @@
     "door_leaf_mm": 40,
     "doors": {
       "source": "model/building-doors.shared.json",
-      "source_sha256": "fb268ebcf78fd727121d9d3ab5ab2703814c370aeff1df191e525ea26e965d51"
+      "source_sha256": "c6ef6a6203fc0722e1b2c050c24d9207173eb871c46eac4498c0fb8cc8f48288"
     },
     "guard_boundaries": [
       "W068",

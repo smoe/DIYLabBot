@@ -348,6 +348,8 @@ def native_equipment_bindings(laboratories):
     import lab_layout_model as layout
     result = []
     for laboratory in laboratories:
+        if not laboratory.get('layout_source'):
+            continue
         devices = laboratory['device_instances']
         result.extend((laboratory, device) for device in devices)
         source = json.loads(project_path(laboratory['layout_source']['source']).read_text())

@@ -109,5 +109,14 @@
       },
       "basis": "Owner photo and clarification 2026-11-18: only the room doors of 3.008 open away from the aisle toward the window. North hinge jamb is a presentation assumption that keeps the open leaf away from the kitchenette appliances."
     }
-  ]
+  ],
+  "laboratory_corridor_rule": {
+    "room_assignments": {
+      "source": "model/furnishings/building-laboratories.json",
+      "source_sha256": "c13925ed9eec5ba487c346a9f369c4fef6c235e25ac32d4946d9e54cfbd82880"
+    },
+    "opens_into": "corridor",
+    "hinge": "preserve_source_interval_start",
+    "basis": "Owner confirms on 2026-11-20 that every laboratory door adjoining a corridor opens outward into that corridor. Preserve the existing source jamb; hinge handedness and the 90-degree display angle remain presentation assumptions."
+  }
 }

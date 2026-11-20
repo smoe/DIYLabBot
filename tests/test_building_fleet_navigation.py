@@ -116,7 +116,7 @@ class PinTests(unittest.TestCase):
 
 
 class NativeL01StopTests(unittest.TestCase):
-    def test_actual_solids_cut_both_existing_lane_connections(self):
+    def test_outward_door_removes_front_witness_without_qualifying_route(self):
         selected=os.environ.get('SOLIDCRAFTBOT_FLEET_WALKTHROUGH_EXPORT')
         if selected:
             mesh=nav.NativeMesh(nav.ROOT/selected)  # Explicit stale input fails.
@@ -130,12 +130,15 @@ class NativeL01StopTests(unittest.TestCase):
             if mesh is None:self.skipTest('Requires a separately built current pinned native walkthrough export')
         report=nav.check_l01_feasibility(mesh)
         self.assertFalse(report['passed'])
-        self.assertTrue(report['rejection_proven'])
-        self.assertEqual(report['status'],'blocked_existing_lane_graph')
+        self.assertFalse(report['rejection_proven'])
+        self.assertEqual(report['status'],'unproven_existing_lane_graph')
         self.assertEqual(report['corner_trim_mm'],250)
         self.assertEqual(report['door_initial_state'],'open')
         self.assertEqual(report['door_reference_state'],'open')
-        self.assertTrue(all(w['membership']['inside']for w in report['witnesses']))
+        witnesses={w['lane']:w for w in report['witnesses']}
+        self.assertFalse(witnesses['front']['membership']['inside'])
+        self.assertTrue(witnesses['rear']['membership']['inside'])
+        self.assertIsNone(report['components_after_witness_cuts'])
         self.assertTrue(all(w['outside_existing_corner_blends']for w in report['witnesses']))
         self.assertFalse(report['qualification']['unconstrained_room_unreachability_claimed'])
 

@@ -90,6 +90,20 @@ class WalkthroughTests(unittest.TestCase):
         self.assertTrue(self.program['isolation']['body_ids'])
         self.assertTrue(self.program['topology'])
 
+    def test_basic_labs_have_native_hood_controls_and_do_not_change_l01_isolation(self):
+        basic = [lab for lab in self.program['laboratories'] if lab.get('furnishing_profile')]
+        self.assertEqual(len(basic), 14)
+        self.assertEqual(self.program['isolation']['laboratory_id'], 'Lab3003')
+        for lab in basic:
+            self.assertFalse(set(lab['body_ids']) & set(self.program['isolation']['body_ids']))
+            controls = [obj for obj in self.program['objects'] if obj['id'].startswith(lab['id']+'.Hood01.')]
+            self.assertEqual(len(controls), 4)
+            sash = next(obj for obj in controls if obj['joint']['type'] == 'prismatic')
+            self.assertEqual(sash['joint']['axis'], [0, 0, 1])
+            self.assertEqual(sash['states'], {'closed': 0, 'open': 500})
+            self.assertIn(lab['room'], sash['label'])
+            self.assertTrue(all(set(obj['moving_body_ids']) <= set(lab['body_ids']) for obj in controls))
+
     def test_stale_reference_and_false_qualification_are_rejected(self):
         changed = copy.deepcopy(self.source)
         changed['sources']['building']['source_sha256'] = '0'*64

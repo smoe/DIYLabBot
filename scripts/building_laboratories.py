@@ -31,21 +31,43 @@ def read(ref):
 
 
 def validate(source):
-    require(set(source) == {'format', 'laboratories'} and source['format'] == 'solidcraftbot.building-laboratories/1',
+    basic_fields = {'basic_profile', 'basic_laboratories', 'excluded_rooms'}
+    require(set(source) in ({'format', 'laboratories'}, {'format', 'laboratories'} | basic_fields)
+            and source['format'] == 'solidcraftbot.building-laboratories/1',
             'Building laboratories reference contract required')
     require(isinstance(source['laboratories'], list), 'Laboratory instances required')
-    identities = set()
+    identities, destinations = set(), set()
+    excluded = set()
+    for item in source.get('excluded_rooms', []):
+        require(set(item) == {'level', 'area', 'usage', 'basis'} and item['basis'] == 'owner_confirmed'
+                and item['usage'] in {'office', 'storage', 'kitchen', 'secretariat', 'non_laboratory'}, 'Confirmed room-use exclusion required')
+        key = (item['level'], item['area'])
+        require(key not in excluded, 'Duplicate room-use exclusion')
+        excluded.add(key)
     for item in source['laboratories']:
         require(set(item) == {'id', 'room', 'level', 'area', 'entrance_wall', 'room_source', 'layout_source', 'basis'},
                 'Only room binding and pinned sources belong to a laboratory instance')
         require(item['id'] not in identities and item['id'].isidentifier(), 'Unique laboratory identity required')
         identities.add(item['id'])
+        key = (item['level'], item['area'])
+        require(key not in destinations | excluded, 'Laboratory conflicts with another room assignment')
+        destinations.add(key)
         require(item['basis'] == 'unmeasured_room_binding', 'Explicit unmeasured binding required')
         require(all(isinstance(item[k], str) and item[k] for k in ('room', 'level', 'area', 'entrance_wall')),
                 'Laboratory destination references required')
         for key in ('room_source', 'layout_source'):
             require(set(item[key]) == {'source', 'source_sha256'}, 'Pinned primary laboratory source required')
             assembly.validate_reference(item[key], root=ROOT)
+    if 'basic_profile' in source:
+        import basic_laboratories
+        basic_laboratories.load(source['basic_profile'])
+        for item in source['basic_laboratories']:
+            require(set(item) == {'id', 'room', 'level', 'area', 'basis'}
+                    and item['basis'] == 'owner_confirmed_basic_furnishing_rule', 'Referenced basic laboratory assignment required')
+            key = (item['level'], item['area'])
+            require(item['id'].isidentifier() and item['id'] not in identities and key not in destinations | excluded,
+                    'Basic laboratory conflicts with another room assignment')
+            identities.add(item['id']); destinations.add(key)
     return source
 
 
@@ -307,12 +329,25 @@ def compile(ref, plans, p, levels):
         built = compile_instance(item, plans[item['level']], p, heights[item['level']])
         for key in ('components', 'bodies', 'operations', 'joints'): result[key].extend(built[key])
         result['laboratories'].append(built['interface']); result['places'].extend(built['interface']['places'])
-        plan = plans[item['level']]
+    if 'basic_profile' in source:
+        import basic_laboratories
+        profile = basic_laboratories.load(source['basic_profile'])
+        reference = room.load(assembly.validate_reference(profile['reference_room'], root=ROOT))
+        for item in source['basic_laboratories']:
+            require(item['level'] in heights and item['level'] in plans, 'Existing basic laboratory storey required')
+            area = next((a for a in plans[item['level']]['areas'] if a['id'] == item['area']), None)
+            require(area is not None and area['kind'] == 'room', 'Basic laboratory must reference an existing room')
+            built = basic_laboratories.compile_instance(source['basic_profile'], profile, item, plans[item['level']],
+                                                       p, heights[item['level']], reference)
+            for key in ('components', 'bodies', 'operations', 'joints'): result[key].extend(built[key])
+            result['laboratories'].append(built['interface']); result['places'].extend(built['interface']['places'])
+    for level in dict.fromkeys(item['level_id'] for item in result['laboratories']):
+        plan = plans[level]
         for opening in plan['openings']:
             if opening['kind'] != 'door': continue
             adjacent = [a['id'] for a in plan['areas'] if any(e['wall'] == opening['wall'] for e in a['boundary'])]
             if len(adjacent) == 2:
-                result['topology'].append({'id': item['level']+'.'+opening['id'], 'level_id': item['level'],
+                result['topology'].append({'id': level+'.'+opening['id'], 'level_id': level,
                                            'opening': opening['id'], 'areas': adjacent, 'passability_qualified': False})
     return result
 
@@ -345,4 +380,7 @@ def dependencies(ref):
         paths.extend(room.source_dependencies(spec))
         equipment = read(item['layout_source'])
         paths.extend(ROOT/v['source'] for v in equipment['assets'].values())
+    if 'basic_profile' in source:
+        import basic_laboratories
+        paths.extend(basic_laboratories.dependencies(source['basic_profile']))
     return list(dict.fromkeys(paths))

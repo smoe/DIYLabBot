@@ -196,8 +196,9 @@ def compile(source=None):
     levels = [{key: level[key] for key in ('id', 'label', 'z_mm')} for level in interface['levels']]
     level_z = {level['id']: level['z_mm'] for level in levels}
     laboratories = interface.get('laboratories', [])
-    require(len(laboratories) == 1, 'One source-bound laboratory is required')
-    laboratory = laboratories[0]
+    equipped = [lab for lab in laboratories if lab.get('layout_source')]
+    require(len(equipped) == 1, 'One source-bound equipment layout is required')
+    laboratory = equipped[0]
     expanded = stack.expanded(building, p)
     stops = []
     for stop in spec['stops']:
@@ -255,7 +256,8 @@ def compile(source=None):
     objects = articulation.compile_objects(spec['articulation_source'], spec['objects'], building, p, interface,
         expanded, {v['id']: stack.level_plan(building, v['id']) for v in levels}, spec['settings']['eye_height_mm'])
     objects += articulation.compile_lab_objects(spec['articulation_source'], interface, expanded,
-        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'])
+        {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'],
+        equipment_profiles=spec['mechanisms']['equipment'])
     objects += mechanisms.room_doors(spec['mechanisms']['room_doors'], interface, expanded,
         {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'],
         spec['navigation']['closed_access_areas'])
@@ -277,7 +279,7 @@ def compile(source=None):
     for window in interface['exterior'].get('side_window_groups', []):
         if window['level_id'] == laboratory['level_id'] and window['wall'] in wall_ids:
             shell.update([window['glass_body'], window['frame_body']])
-    isolation = {'label': 'Labor isoliert anzeigen', 'body_ids': sorted(shell |
+    isolation = {'label': 'Labor isoliert anzeigen', 'laboratory_id': laboratory['id'], 'body_ids': sorted(shell |
         set(laboratory['furniture_body_ids']))}
     paths = [*walkthrough_robots.dependencies(), *articulation.dependencies(spec['articulation_source']), *mechanisms.dependencies(), path, SCHEMA, Path(__file__), ROOT/'scripts/assembly_model.py',
              *stack.source_dependencies(building), ROOT/'scripts/walkthrough_elevator.py',

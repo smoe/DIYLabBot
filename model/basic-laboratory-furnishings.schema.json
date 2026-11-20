@@ -1,0 +1,205 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Referenced basic laboratory furnishing profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "id",
+    "units",
+    "reference_room",
+    "hood_source",
+    "hood_profile",
+    "prototype_instances",
+    "lift_area",
+    "wet_corner",
+    "island",
+    "parameters",
+    "basis",
+    "limitations"
+  ],
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.basic-laboratory-furnishings/1"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "reference_room": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/.*\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "hood_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/.*\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "hood_profile": {
+      "const": "fume_hood_1200"
+    },
+    "prototype_instances": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "window",
+        "wet",
+        "island"
+      ],
+      "properties": {
+        "side": {
+          "type": "string",
+          "minLength": 1
+        },
+        "window": {
+          "type": "string",
+          "minLength": 1
+        },
+        "wet": {
+          "type": "string",
+          "minLength": 1
+        },
+        "island": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "lift_area": {
+      "type": "string",
+      "minLength": 1
+    },
+    "wet_corner": {
+      "const": "nearest_usable_lift_corner"
+    },
+    "island": {
+      "const": "back_to_back"
+    },
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "wall_gap",
+        "minimum_aisle",
+        "door_clearance",
+        "fixture_gap",
+        "minimum_run",
+        "fit_increment",
+        "maximum_corner_setback",
+        "island_search_step",
+        "island_length_step",
+        "compact_aisle"
+      ],
+      "properties": {
+        "wall_gap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "minimum_aisle": {
+          "$ref": "#/$defs/parameter"
+        },
+        "door_clearance": {
+          "$ref": "#/$defs/parameter"
+        },
+        "fixture_gap": {
+          "$ref": "#/$defs/parameter"
+        },
+        "minimum_run": {
+          "$ref": "#/$defs/parameter"
+        },
+        "fit_increment": {
+          "$ref": "#/$defs/parameter"
+        },
+        "maximum_corner_setback": {
+          "$ref": "#/$defs/parameter"
+        },
+        "island_search_step": {
+          "$ref": "#/$defs/parameter"
+        },
+        "island_length_step": {
+          "$ref": "#/$defs/parameter"
+        },
+        "compact_aisle": {
+          "$ref": "#/$defs/parameter"
+        }
+      }
+    },
+    "basis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "unit",
+        "range",
+        "basis"
+      ],
+      "properties": {
+        "value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "unit": {
+          "const": "mm"
+        },
+        "range": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "basis": {
+          "const": "presentation_assumption"
+        }
+      }
+    }
+  }
+}

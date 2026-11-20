@@ -130,7 +130,8 @@ def build(args):
     payload = {**program, 'scenes': bundle['scenes'], 'source_files_sha256': pins,
                'limitations': list(dict.fromkeys(program.get('limitations', [])+bundle.get('limitations', [])))}
     payload['isolation']['body_ids'] = sorted(set(payload['isolation']['body_ids']) |
-        {group['id'] for group in bundle['scenes']['building']['groups'] if group.get('laboratory_id')})
+        {group['id'] for group in bundle['scenes']['building']['groups']
+         if group.get('laboratory_id') == payload['isolation']['laboratory_id']})
     index = output/'index.html'
     index.write_text(embed_html(TEMPLATE.read_text(encoding='utf-8'), payload), encoding='utf-8')
     manifest = output/'manifest.json'

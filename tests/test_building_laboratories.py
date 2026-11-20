@@ -123,7 +123,7 @@ class BuildingLaboratoryTests(unittest.TestCase):
         self.assertEqual(len({p['id'] for p in places}), len(places))
 
     def test_office_corridor_lab_connection_comes_from_real_openings(self):
-        edges = self.interface['topology']
+        edges = [edge for edge in self.interface['topology'] if edge['level_id'] == self.lab['level_id']]
         starts = [e for e in edges if e['opening'] == 'D3_002N']
         ends = [e for e in edges if e['opening'] in ('D3_003A', 'D3_003B')]
         self.assertEqual(len(starts), 1)
