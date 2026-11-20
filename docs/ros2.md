@@ -4,7 +4,7 @@ Für die Zentrifuge CF01 liegt inzwischen ein getrenntes generiertes Paket
 `solidcraftbot_cf01_interfaces` mit Zustandsnachricht, sieben Actions und neun
 Services vor. Es enthält keine ROS-Node; Kompilierung und ROS-Laufzeit sind
 ungeprüft. Gemeinsame SiLA-Zuordnung, Ablauf, SI-Einheiten und Mock-Prüfungen:
-[CF01-Protokoll](centrifuge-cf01-protocol.md).
+[CF01-Protokoll](centrifuge-cf01.md#cf01-protocol).
 
 Die gemeinsame Quelle enthält zusätzlich Servo- und Leitungsanforderungen.
 `config/services.json` hält die geprüfte logische Zuordnung zu den ROS-Gelenken

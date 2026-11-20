@@ -30,7 +30,7 @@ Beide Armkameras zeigen ihre simulierten Bilder synchron zum Ablauf: Die Greifer
 
 Roboter sollen zügig arbeiten und Menschen tatsächlich Zeit verschaffen. Getragene Proben benötigen dabei fließende Bewegungen mit begrenzter Beschleunigung und begrenztem Ruck. Die gezeigte Bahn ist im Modell geprüft; reale Sensorik, Fehlerreaktionen und Hardwarebetrieb bleiben zu entwickeln.
 
-[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) · [Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) · [Bewegungsprofil und Prüfgrenzen](docs/cf01-smooth-unloading.md) · [Modellstand und Herkunft der Medien](docs/media/README.md)
+[Video ansehen](docs/media/robot-demo-cameras-aligned.mp4) · [Interaktive Demo herunterladen und lokal öffnen](docs/media/robot-demo-cameras-aligned.html) · [Bewegungsprofil und Prüfgrenzen](docs/centrifuge-cf01.md#cf01-smooth-unloading) · [Modellstand und Herkunft der Medien](docs/media/README.md)
 
 Ein weiteres Beispiel ist die [direkte Entnahme aus H02 mit Ablage im Rack](docs/h02-rack-transfer.md). Hier greift ein Arm derselben Konstruktion ein Gefäß aus seinem offenen Halter und setzt es zwischen bereits belegten Rackplätzen ab. Der vollständige Weg einschließlich Greiferöffnung und Rückzug ist für beide Gefäßvarianten in FreeCAD und SolidCraft geprüft.
 

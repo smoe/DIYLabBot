@@ -196,7 +196,7 @@ die lokale Auswahl `--transport sila2` bleibt ein Mock-Vertragsdecoder. Proben-I
 und ursprüngliche Rackplätze müssen bei Hin- und Rückgabe erhalten bleiben.
 
 Vor Änderungen an geglätteten CF01-Entnahmebahnen
-[docs/cf01-smooth-unloading.md](docs/cf01-smooth-unloading.md) lesen.
+[CF01-Bewegungsdokumentation](docs/centrifuge-cf01.md#cf01-smooth-unloading) lesen.
 `model/cf01-unload-demo.motion.json` referenziert vorhandene Geometrie und
 Chargenquellen; Kurven, Eigentümerereignisse und Grenzwerte einmal kompilieren
 und in nativer Prüfung, Browser und ROS-Armexport gemeinsam auswerten.
@@ -429,7 +429,7 @@ oder Geräteeffekte. Unbekannte Puls-, Kühlungs- und Gefäßparameter offen las
 ein Geräteabschluss oder NanoDrop-/Qubit-Wert belegt keine Fragmentgröße.
 Keine Sonikations-Nebenbilanz, Hardware-, ROS- oder SiLA-Ausführung ableiten.
 
-Die additive [S09-Laufzeitanbindung](docs/cutrun-input-sonication-runtime.md)
+Die additive [S09-Laufzeitanbindung](docs/dna-sonication.md#merged-cutrun-input-sonication-runtime)
 verwendet `model/cutrun-input-sonication.profile.json` und die eigene Engine
 `input_sonication_mock/1`. Ausschließlich Testuhr und Fixture-Beobachtungen
 zulassen; reale SOP-Bereitschaft und fehlendes Herstelleroriginal offen halten.
