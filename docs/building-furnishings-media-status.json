@@ -5,7 +5,7 @@
     "sha256": "0e6750bb65f980d8fb4b97af4e3141daae816eef305cd416cff7dfb81af78e20"
   },
   "historical_images_represent_current_model": false,
-  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1\u2013OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained.",
+  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1–OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained. The robot command UI and compiler are included in the current-source projection; they do not requalify the historical room images.",
   "last_compatible_sources_sha256": {
     "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
     "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
@@ -144,7 +144,7 @@
     "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
     "scripts/build_building_stack.py": "cc54265cdf94f0e32a56b12031a3e140eaffdbf30237d3bedd2fdb65ed4ea9b6",
     "scripts/build_building_stack_freecad.py": "9deafc191c778ace9db087bd820c90cc3c97b6f59563b68237713751ba2bd346",
-    "scripts/build_building_walkthrough.py": "43482ab27d13b71adcec18d557031333e6386afe0f2f5e3c3f77cdf79e9ce004",
+    "scripts/build_building_walkthrough.py": "8444f9ec6e73f1f4b336a657cec3c619cfe3daf6367a91a5e937b788919335d0",
     "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
     "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
     "scripts/build_lab_equipment_freecad.py": "6288919f44a95ec41cfa90e84cfc602d58044e58305834e0431c16c7179aa10c",
@@ -163,8 +163,8 @@
     "scripts/building_furnishings.py": "edc841bc2c1910f212109f3f4ff7e7ce8e03d8ee221be8c959471d5e086c88ed",
     "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
     "scripts/building_stack.py": "e6c4d93440803524b6d4bc1dcefbf1d4e4060d3665f45bab803a8c394877c84f",
-    "scripts/building_walkthrough.py": "6dc665979a939ea99666c74b34fcd9e49bcb4798c760406b9825ccebf80a4868",
-    "scripts/building_walkthrough_viewer.html": "ca3ec90d1162c1cba0d902f818a608973621a3bdfd29b6481c00ab6f41a7a37c",
+    "scripts/building_walkthrough.py": "856e4bb6b92d36987466e883710717f10f3449cb94b4b7b15eb1a47622bda605",
+    "scripts/building_walkthrough_viewer.html": "ade9e3fdbd65a36acd4ca3864f99712d644a06cb174f6bdea42fc46461065de5",
     "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
     "scripts/export_building_walkthrough_freecad.py": "ab1b9b62dee88b9be417c9486d4c7a52ec4d0696f6d138fc14e46d8c78093ecc",
     "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
