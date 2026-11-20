@@ -1,5 +1,6 @@
 """Independent geometry/clearance checks for BF01 navigation primitives."""
 import math
+import os
 import hashlib
 import json
 import tempfile
@@ -115,10 +116,18 @@ class PinTests(unittest.TestCase):
 
 
 class NativeL01StopTests(unittest.TestCase):
-    @unittest.skipUnless((nav.ROOT/'exports/building-walkthrough/pages-master-0d8d52a/build-report.json').is_file(),
-                         'Requires separately built, current pinned native walkthrough export')
     def test_actual_solids_cut_both_existing_lane_connections(self):
-        mesh=nav.NativeMesh(nav.ROOT/'exports/building-walkthrough/pages-master-0d8d52a')
+        selected=os.environ.get('SOLIDCRAFTBOT_FLEET_WALKTHROUGH_EXPORT')
+        if selected:
+            mesh=nav.NativeMesh(nav.ROOT/selected)  # Explicit stale input fails.
+        else:
+            candidates=sorted((nav.ROOT/'exports/building-walkthrough').glob('*/build-report.json'),
+                              key=lambda p:p.stat().st_mtime,reverse=True)
+            mesh=None
+            for candidate in candidates:
+                try:mesh=nav.NativeMesh(candidate.parent);break
+                except ValueError:continue  # Historical caches are not current proofs.
+            if mesh is None:self.skipTest('Requires a separately built current pinned native walkthrough export')
         report=nav.check_l01_feasibility(mesh)
         self.assertFalse(report['passed'])
         self.assertTrue(report['rejection_proven'])
@@ -129,6 +138,23 @@ class NativeL01StopTests(unittest.TestCase):
         self.assertTrue(all(w['membership']['inside']for w in report['witnesses']))
         self.assertTrue(all(w['outside_existing_corner_blends']for w in report['witnesses']))
         self.assertFalse(report['qualification']['unconstrained_room_unreachability_claimed'])
+
+
+class QualifiedSearchTests(unittest.TestCase):
+    def test_edge_certificate_also_controls_visibility_shortcuts(self):
+        grid=nav.ClearanceGrid({'min':[0,0,0],'max':[2000,2000,0]},100)
+        grid.raster([[0,0],[2000,0],[2000,2000],[0,2000]],support=True);grid.finalize()
+        start,end=[300,1000],[1700,1000]
+        def qualified(a,b):
+            if (a[0]-1000)*(b[0]-1000)>0:return True
+            if a[0]==b[0]:return a[0]!=1000 or min(a[1],b[1])>=1400
+            u=(1000-a[0])/(b[0]-a[0]);y=a[1]+u*(b[1]-a[1])
+            return y>=1400
+        self.assertEqual(grid.search(start,end,50),[start,end])
+        result=grid.search(start,end,50,edge_validator=qualified)
+        self.assertGreater(len(result),2)
+        self.assertTrue(all(qualified(a,b)for a,b in zip(result,result[1:])))
+        self.assertTrue(any(p[1]>=1400 for p in result))
 
 
 if __name__=='__main__':unittest.main()

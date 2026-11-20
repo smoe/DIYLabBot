@@ -284,7 +284,7 @@ class ClearanceGrid:
             stack_.extend([(x,mid,depth+1),(mid,y,depth+1)])
         return True
 
-    def search(self,start,end,radius_mm):
+    def search(self,start,end,radius_mm,edge_validator=None):
         first,last=self.cell(start),self.cell(end)
         def usable(i):return i is not None and self.clearance_lower_mm(self.centre(i))>=radius_mm
         if not usable(first) or not usable(last):raise ValueError('Endpoint lacks conservative disc clearance')
@@ -298,6 +298,7 @@ class ClearanceGrid:
                 if not(0<=nx<self.width and 0<=ny<self.height):continue
                 j=ny*self.width+nx
                 if not usable(j) or not self.line_free(self.centre(i),self.centre(j),radius_mm):continue
+                if edge_validator is not None and not edge_validator(self.centre(i),self.centre(j)):continue
                 distance=math.hypot(dx,dy)*self.resolution_mm
                 score=cost[i]+distance*(1+radius_mm/max(radius_mm,self.clearance_lower_mm(self.centre(j))))
                 if score<cost.get(j,math.inf):
@@ -308,11 +309,11 @@ class ClearanceGrid:
         while i is not None:result.append(self.centre(i));i=previous[i]
         result.reverse();result[0]=list(start);result[-1]=list(end)
         # Endpoint replacement also needs its own proof.
-        if any(not self.line_free(a,b,radius_mm) for a,b in zip(result,result[1:])):raise ValueError('Endpoint connection failed')
+        if any(not self.line_free(a,b,radius_mm)or(edge_validator is not None and not edge_validator(a,b))for a,b in zip(result,result[1:])):raise ValueError('Endpoint connection failed')
         reduced=[result[0]];i=0
         while i<len(result)-1:
             j=len(result)-1
-            while j>i+1 and not self.line_free(result[i],result[j],radius_mm):j-=1
+            while j>i+1 and(not self.line_free(result[i],result[j],radius_mm)or(edge_validator is not None and not edge_validator(result[i],result[j]))):j-=1
             reduced.append(result[j]);i=j
         return reduced
 

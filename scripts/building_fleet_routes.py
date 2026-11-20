@@ -551,6 +551,20 @@ class Navigation:
                 if alternative:repaired.extend(alternative[1:])
                 else:failures.append('Full rectangle candidate edge '+repr((a,b))+' intersects '+repr(hit));valid=False;break
             if valid:points=repaired;break
+        if points is None:
+            # A disc shortcut may cut a corner that the full oriented body
+            # cannot pass. Repeat the source-grid search with the actual
+            # fixed-heading sweep at edges AND shortcut reduction, rather
+            # than hand-inserting a target-specific coordinate into a cache.
+            def edge_free(a,b):
+                if grid.line_free(a,b,self.radius+self.reserve):return True
+                return not self._straight_hits(level,a,b)
+            for radius in(base,max(1,base-grid.resolution_mm),max(1,base-2*grid.resolution_mm)):
+                try:
+                    candidate=grid.search(start,end,radius,edge_validator=edge_free)
+                    if all(not self._straight_hits(level,a,b)for a,b in zip(candidate,candidate[1:])):
+                        points=candidate;break
+                except ValueError as error:failures.append(str(error))
         if points is None:raise ValueError('No full-native-rectangle candidate: '+repr(failures))
         proofs=[]
         for index,(a,b)in enumerate(zip(points,points[1:])):
