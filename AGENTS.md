@@ -18,6 +18,32 @@ Diese Hinweise gelten für das Projekt SolidCraftBot.
   Arbeitsbaum nicht automatisch stashen, zurücksetzen oder umschalten; neue
   Arbeit bei Bedarf in einem eigenen Worktree vom aktuellen `master` beginnen.
 
+## Sprache und Übersetzungen
+
+- Deutsch ist die führende Sprache der redaktionellen Projektdokumentation.
+  Übersetzungen und Zusammenfassungen sind davon abgeleitete Lesefassungen,
+  keine zusätzlichen Anforderungsquellen. Die bestehenden führenden Modell-,
+  Schema- und Protokollquellen behalten ihre Rolle.
+- `README.md` ist die maßgebliche deutsche Fassung; `README.en.md` enthält
+  ihre englische Übersetzung. Beide am Anfang miteinander verlinken. Englische
+  Lesefassungen ausdrücklich als Übersetzung oder Zusammenfassung kennzeichnen
+  und auf die maßgebliche deutsche Quelle verweisen.
+- Bei fachlichen Änderungen am README die betroffenen englischen Passagen im
+  selben Auftrag abgleichen. Ist das nicht möglich, die englische Fassung
+  ausdrücklich als veraltet kennzeichnen. Gleiche Überschriftenzahlen oder ein
+  aktualisierter Quellenhash ersetzen keine inhaltliche Übersetzungsprüfung.
+- Aussagen, Zahlen, Einheiten, Entwicklungsstände und Prüfgrenzen unverändert
+  in ihrer Bedeutung übertragen. Insbesondere synthetische Abläufe und
+  Modellprüfungen nicht als reale Geräteausführung, biologische Qualifikation
+  oder Sicherheitsnachweis darstellen. Eine Übersetzung ist kein neuer Nachweis.
+- Neue Code-Bezeichner, Schema- und Protokollnamen sowie neu geschriebene oder
+  fachlich überarbeitete Code-Kommentare und Docstrings auf Englisch formulieren.
+  Bestehende Schnittstellen, IDs und Dateipfade nicht allein für sprachliche
+  Einheitlichkeit umbenennen; bestehende Kommentare nicht pauschal übersetzen.
+- Herstelleroriginale, historische Quellen, Test-Fixtures und Medien nicht zur
+  Sprachangleichung verändern. Sprachregeln sind kein Anlass für eine allgemeine
+  Überarbeitung vorhandener Dokumente oder bytegebundener Artefakte.
+
 ## Dokumentationsablage
 
 - Erläuterungen zu Protokollen und biologischen Workflows unter
