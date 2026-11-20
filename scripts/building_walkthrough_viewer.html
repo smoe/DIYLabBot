@@ -41,6 +41,12 @@
       <div class="lift-floors" id="walkthrough-lift-floors" aria-label="Destination floor"></div>
       <div class="lift-actions" id="walkthrough-lift-actions"></div>
     </section>
+    <section class="lift-panel" id="walkthrough-robot" aria-label="Roboterbefehle" hidden>
+      <button class="quiet-button" id="walkthrough-robot-close" type="button" aria-label="Roboterbefehle schließen" style="float:right">×</button>
+      <p><strong id="walkthrough-robot-label"></strong><br><span id="walkthrough-robot-status" role="status"></span></p>
+      <div class="lift-actions" id="walkthrough-robot-actions"></div>
+      <p class="notice">Simulation · Leerbewegung</p>
+    </section>
     <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
       <button type="button" data-move="forward" aria-label="Move forward" title="Forward">↑</button>
@@ -70,7 +76,8 @@
   <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
 </main>
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
-<script>__WALKTHROUGH_INTERACTION__</script>
+<script>__WALKTHROUGH_INTERACTION__
+__WALKTHROUGH_ROBOTS__</script>
 <script>
 (() => {
   'use strict';
@@ -163,6 +170,36 @@
         const other=objectStates.get(rule.object_id);if(!other||!Number.isFinite(other.config.states[rule.state]))throw Error('Unknown articulation guard.');
       }
     }
+    const robots=new Map((data.robots||[]).map(c=>[c.id,WalkthroughRobots.create(c,objectStates,CF01Motion.Curve)]));
+    const robotTriggers=new Map();
+    for(const robot of robots.values())for(const id of robot.config.trigger_body_ids){
+      if(!data.scenes[robot.config.scene].groups.some(g=>g.id===id)||robotTriggers.has(id))throw Error('Missing or duplicate robot body');
+      robotTriggers.set(id,robot);objectSceneIds.add(robot.config.scene);
+    }
+    const robotPanel=document.getElementById('walkthrough-robot'),robotLabel=document.getElementById('walkthrough-robot-label'),robotStatus=document.getElementById('walkthrough-robot-status'),robotActions=document.getElementById('walkthrough-robot-actions');
+    let selectedRobot=null;
+    document.getElementById("walkthrough-robot-close").addEventListener("click",()=>{selectedRobot=null;updateRobotUI();canvas.focus();});
+    function updateRobotUI(){
+      robotPanel.hidden=!selectedRobot||sceneId!==selectedRobot.config.scene||selectedLevel!==selectedRobot.config.level_id||Boolean(elevator?.boarded);
+      if(!selectedRobot)return;
+      robotLabel.textContent=selectedRobot.config.label;
+      const state=selectedRobot.snapshot;
+      robotStatus.textContent=({idle:'Bereit',moving:'Demobewegung',homing:'Grundstellung anfahren',stopping:'Bremst ab',stopped:'Angehalten'})[state.state];
+      for(const button of robotActions.querySelectorAll('button'))button.disabled=state.busy&&button.dataset.robotCommand!=='stop';
+    }
+    function selectRobot(id){
+      selectedRobot=robots.get(id);if(!selectedRobot)return {status:'unknown_target',id};
+      clearInputKeys();robotActions.replaceChildren();
+      for(const [name,label] of Object.entries(selectedRobot.config.commands)){
+        const b=document.createElement('button');b.type='button';b.className='quiet-button';b.textContent=label;b.dataset.robotCommand=name;
+        b.addEventListener('click',()=>robotCommand(id,name));robotActions.append(b);
+      }
+      updateRobotUI();return {status:'accepted',id};
+    }
+    function robotCommand(id,name){
+      const robot=robots.get(id);if(!robot)return {status:'unknown_target',id};
+      const result=robot.command(name,performance.now());dirty=true;updateRobotUI();requestRender();return result;
+    }
     const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
     const liftDoors=elevatorConfig?WalkthroughInteraction.createLiftDoorCycle(elevatorConfig,objectStates,driveObject):null;
     const elevator=elevatorConfig?WalkthroughInteraction.createLiftSession(elevatorConfig,elevatorObject,name=>command(elevatorConfig.object_id,name),liftDoors):null;
@@ -218,6 +255,8 @@
     }
     function advanceObjects(now){
       let active=false;
+      for(const robot of robots.values()){if(robot.advance(now))active=true;}
+      if(robots.size){dirty=true;updateRobotUI();}
       for(const object of objectStates.values()){
         const motion=object.transition;if(!motion)continue;
         const u=Math.max(0,Math.min(1,(now-motion.start)/motion.duration));
@@ -273,13 +312,14 @@
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
+        targetForBody:id=>robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
         referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
     function interact(x,y,input){
       advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
       if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
+      if(robots.has(hit.target_id))return lastInteraction={...selectRobot(hit.target_id),input,frame:frames};
       const port=portById.get(hit.target_id),object=objectStates.get(hit.target_id),name=object?.targetState==='closed'?'open':'close';
       const result=port?recordLift(elevator.call(port.id)):command(hit.target_id,name);
       lastInteraction={...result,input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
@@ -287,7 +327,8 @@
     function updateInteractionHint(){
       centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
       crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
-      if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
+      if(centreTarget&&robots.has(centreTarget.target_id)){interactionHint.textContent=robots.get(centreTarget.target_id).config.label+' · Klick oder Leertaste: Befehle';}
+      else if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
       const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
       canvas.style.cursor=drag?.moved?'grabbing':hover?'pointer':'grab';
     }
@@ -400,6 +441,7 @@
       catch(error){clearInputKeys();fail(error);}
     }
     function setStop(id){
+      selectedRobot=null;updateRobotUI();
       if(elevator?.boarded)return {status:'rejected_aboard'};
       if(id!=='lab'){isolated=false;isolationButton.setAttribute('aria-pressed','false');}
       const stop=stops.find(s=>s.id===id);if(!stop)throw Error('Unknown viewpoint.');
@@ -459,6 +501,9 @@
       command,viewObject,projectPoint,
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
+      robotCommand, selectRobot,
+      viewRobot:id=>{const r=robots.get(id);return r?viewObject(r.config.joint_object_ids[0]):{status:"unknown_target",id};},
+      get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
       get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get isolated(){return isolated;},

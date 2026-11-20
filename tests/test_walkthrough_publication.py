@@ -56,7 +56,7 @@ class PublicationTests(unittest.TestCase):
             self.verify(self.payload, lambda m: m['source_files_sha256'].update({'model/current.json': '0'*64}))
 
     def test_laboratory_and_lift_contracts_cannot_drift_behind_valid_geometry(self):
-        for key in ('laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
+        for key in ('robots', 'laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
             self.program[key] = {'current': key}
             payload = copy.deepcopy(self.payload)
             payload[key] = {'obsolete': key}

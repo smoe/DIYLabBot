@@ -59,6 +59,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
+      - run: python scripts/check_walkthrough_regressions.py --pattern test_walkthrough_robots.py --report exports/ci/walkthrough/robot-commands.json
       - run: node tests/check_walkthrough_interaction.cjs
       - run: node tests/check_walkthrough_lift.cjs
       - name: Retain test counts and native FreeCAD proof
