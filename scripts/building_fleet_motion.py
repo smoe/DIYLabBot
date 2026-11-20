@@ -238,7 +238,7 @@ def episode_dynamics(curve,radius):
     result['method']='shared polynomial extrema combined per interval; rigid-point enclosure remains conservative'
     return result
 
-def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=()):
+def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=(), *, _piece_factors=None, _attempt=0):
     """Fast straights and bounded corners on one uninterrupted C2 route.
 
     Each corner has constant positive geometric-progress speed. Acceleration
@@ -292,7 +292,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             for kind,limits in (('linear',linear),('angular',angular)):
                 bound=proof[kind][order-1]
                 if bound>1e-12:limit=min(limit,(limits[key]/bound)**(1/order))
-        piece_caps.append(limit*.995 if len(piece['controls'])>2 else limit)
+        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*(_piece_factors or {}).get(len(piece_caps),1.))
     # Constant corner progress speeds match both neighbouring line endpoints.
     # A short line must be able to connect those speeds; reduce adjacent corner
     # speeds when needed, never insert a waypoint halt.
@@ -412,6 +412,31 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                 speed=math.hypot(*(max(abs(raw['min'][k]),abs(raw['max'][k]))for k in range(2)))
                 if speed>cap*(1+1e-6):violations['zone@'+str(begin)]={'value':speed,'limit':cap}
                 zone_proofs.append({'start_s':begin,'end_s':end,'cap_mm_s':cap,'speed_upper_mm_s':speed})
+    if violations and no_stop['passed'] and _attempt<8:
+        # The fitted quantized polynomials are the authority. Tight turns can
+        # need lower local speeds than the analytic spatial proposal. Refine
+        # only the offending pieces (and adjoining corners), preserving fast
+        # distant straights and all declared source limits.
+        factors=dict(_piece_factors or {});ends=[];total=0.
+        for piece in pieces:total+=piece['weight'];ends.append(total)
+        affected={};orders={'velocity':1,'acceleration':2,'jerk':3}
+        for a,b in zip(curve.points,curve.points[1:]):
+            bound=episode_dynamics(floor.motion.Curve([a,b]),radius);scale=1.
+            for kind,limits in (('linear',declared),('angular',angular)):
+                for key,cap in limits.items():
+                    if bound[kind][key]>cap*(1+1e-6):scale=min(scale,.98*(cap/bound[kind][key])**(1/orders[key]))
+            if scale>=1:continue
+            middle=(a['time_s']+b['time_s'])/2-start_s
+            progress=clock.evaluate(min(middle,clock.times[-1]))[F[0]][0]
+            index=min(len(pieces)-1,bisect.bisect_right(ends,progress))
+            selected={index}|{i for i in(index-1,index+1)if 0<=i<len(pieces)and len(pieces[i]['controls'])>2}
+            for i in selected:affected[i]=min(affected.get(i,1.),scale)
+        if affected:
+            for i,scale in affected.items():factors[i]=factors.get(i,1.)*scale
+            report=compile_motion(path,source,zone_velocity_mm_s,start_s,reverse,zone_caps,
+                                  _piece_factors=factors,_attempt=_attempt+1)
+            report['timing'].setdefault('quantization_refinements',{str(i):v for i,v in factors.items()})
+            return report
     if violations or not no_stop['passed']:
         raise RuntimeError('Final quantized motion rejected: '+str({'limits':violations,'no_stop':no_stop}))
     result={'points':points,'scalar_clock':clock.points,'duration_s':points[-1]['time_s']-start_s,'dynamics':bounds,'no_stop':no_stop,

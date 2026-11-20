@@ -70,6 +70,18 @@ class MotionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     motion.compile_motion(motion.Path([[0,0],[1000,0]]),model.load(),zone_caps=[(0,cap)])
 
+    def test_tight_actual_route_refines_only_export_violations(self):
+        # Source-derived EG R0_014A proposal: its short linked turns used to
+        # produce1256mm/s³ after quantization despite the analytic proposal.
+        path=motion.Path([[13625,15325],[15875,18375],[18475,18775],
+                          [18725,19125],[18825,20125],[18625,20375],
+                          [18272.47820518623,20572.47820518623]])
+        result=motion.compile_motion(path,model.load(),300)
+        self.assertLessEqual(result['dynamics']['linear']['jerk'],1000.001)
+        self.assertGreater(result['dynamics']['linear']['velocity'],295)
+        self.assertTrue(result['no_stop']['passed'])
+        self.assertTrue(result['timing']['quantization_refinements'])
+
     def test_polynomial_norms_do_not_combine_orthogonal_time_spans(self):
         F=motion.F
         points=[{'time_s':0,F[0]:[0,0,0],F[1]:[100,0,0],F[2]:[0,0,0]},
