@@ -2,7 +2,7 @@
 
 **Stand 12. November 2026: Vorbereitung begonnen, kein realer integrierter Lauf
 freigegeben oder ausgeführt.** Dieses Dossier konkretisiert E4 der
-[Roadmap](../ROADMAP.md) auf Basis des
+[Roadmap](workflows/ROADMAP.md) auf Basis des
 [Referenzprofilentwurfs](cutrun-reference-profile.md) und des geprüften
 [synthetischen E3-Laufs](cutrun-synthetic-workflow.md). Die operative SOP-Bindung
 aus E0 bleibt offen. Das Dossier ist eine Entscheidungs- und Nachweisvorlage,

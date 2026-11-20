@@ -165,7 +165,7 @@ ein eigenes `/2`-Formatpaar mit synthetischen Zeit-/Temperaturregeln und
 gefäßbezogenen Schutzstopps im selben Ledger. Der generische E2-Runner bleibt
 bei `/1` und kann diese Prozessregeln nicht umgehen.
 Quellenfreigabe, reale Ausführung und biologische Bewertung bleiben
-die weiteren Abnahmen der [Roadmap](../ROADMAP.md).
+die weiteren Abnahmen der [Roadmap](workflows/ROADMAP.md).
 
 ## Separate technische Wasserübung
 

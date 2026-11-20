@@ -113,7 +113,7 @@ Versteifungen, Beschläge, Dichtungen, Glasbefestigung und tatsächliche Masse
 sind offen. Die Bestätigung
 „schwere Stahltür“ belegt keine Brand-, Strahlen-, Druck- oder Einbruchschutzklasse.
 Die nativen offenen Stellungen bleiben illustrative statische Prüfstellungen.
-Im [Gebäuderundgang](walkthrough-mechanisms.md) lassen sich dieselben Blätter
+Im [Gebäuderundgang](building-walkthrough.md#merged-walkthrough-mechanisms) lassen sich dieselben Blätter
 einschließlich ihrer Verglasung öffnen und schließen; Türschwenkwege und reale
 Begehbarkeit sind nicht qualifiziert.
 Der Glasfarbton und die Deckkraft von 0,3 sind Darstellungsannahmen, keine

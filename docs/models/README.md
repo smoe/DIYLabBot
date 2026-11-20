@@ -109,7 +109,7 @@ Referenzbank mit Arm, CF01 und Rack sowie NanoDrop/Qubit auf der Armseite. Zwei 
 
 Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.
 
-[Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../docs/development-plan.md)
+[Quelle 1](../../model/two-arm-analytics.shared.json) · [Quelle 2](../../model/analytics-tools.shared.json) · [Quelle 3](../../model/synthetic-analytics-workspace.shared.json) · [Quelle 4](../../model/furnishings/analytics-reference-bench.json) · [Quelle 5](../../model/equipment/analytics-workspace.json) · [Details](../../ROADMAP.md)
 
 ### TS01 · TapeStation, manuelle QC
 
