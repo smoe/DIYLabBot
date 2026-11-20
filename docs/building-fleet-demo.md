@@ -76,7 +76,7 @@ liegt bei den Standardparametern bei `[250, 0, 182]` mm und blickt in Fahrzeug-+
 Der lokale Bericht steht unter
 `exports/generated/tr01-awareness-ccd729bbb881-r2/build-report.json`.
 
-## Neuer verbindlicher Stopp: L01-Gangmitten
+## Historischer Stopp der ursprünglichen L01-Gangmitten
 
 Nach der Rückstellung von K0_013 sind die übrigen Ziele im optimistischen,
 registrierten Tür-/Bereichsgraphen mit den aktiven Aufzuglandeseiten verbunden.
@@ -110,17 +110,67 @@ zugelassenen Rückwärtsfällen. Das ist eine Ablehnung der **vorgeschriebenen
 bestehenden L01-Gangmitten**, keine Behauptung, dass jede denkbare neue Bahn im
 Raum unmöglich wäre.
 
-Daher wird kein vollständiges BF01-Programm erzeugt. Es wurden weder Türen
+Bis zur ausdrücklich freigegebenen separaten BF01-Verbindung wurde deshalb kein vollständiges BF01-Programm erzeugt. Es wurden weder Türen
 umgestellt, Möbel verschoben, neue Fahrspuren erfunden, Abstände verringert
-noch weitere Ziele zurückgestellt. Der nächste sinnvolle Schritt ist die
-explizite Entscheidung über eine separate BF01-Verbindungsbahn in L01, die
-anschließend unter Erhalt der Bench-Sperren geometrisch und nativ geprüft
-werden müsste. Das bisherige L01-Profil bleibt dabei eine unveränderte Referenz.
+noch weitere Ziele zurückgestellt. Diese Entscheidung wurde am 20. November 2026 ausdrücklich erteilt; die separat geprüfte Umsetzung steht im folgenden Abschnitt. Das bisherige L01-Profil bleibt dabei eine unveränderte Referenz.
 
 Die lokalen, nicht versionierten Nachweise stehen unter
 `exports/building-fleet/preflight-current/`: `audit.py`, `report.json`,
 `check_portals.py`, `portal-report.json`, `audit_l01_stop.py` und
 `l01-stop-report.json`. Aktuelle native BRep-Zeugen werden dort separat geführt.
+
+## Separat geprüfte BF01-Verbindung in L01
+
+Die [neue referenzierende Quelle](../model/building-fleet-l01-route.shared.json)
+mit eigenem [Schema](../model/building-fleet-l01-route.schema.json) ersetzt für
+BF01 die betroffene Querung. Das ursprüngliche L01-Fahrprofil und seine alten
+negativen Nachweise bleiben unverändert. Die Flottenquelle bindet die neue
+Quelle ausdrücklich über `sources.l01_route`; der normale Rundgang und die
+bisherigen L01-Demos wählen sie nicht stillschweigend aus.
+
+Die Querung wird aus der gebundenen Raumdefinition mittig zwischen der
+vorhandenen offenen Türblattspitze und der tatsächlichen Inselvorderkante
+abgeleitet. Sie liegt lokal bei Y = 1369,864865 mm. Die freie Streifenbreite
+beträgt 660,270271 mm; Fahrzeugbreite und beidseitiger Abstand von je 85 mm
+lassen darin 78,270271 mm zusätzliche Breitenreserve. Türstellungen, Möbel,
+Arme, vorhandener statischer TR01 und die ursprünglichen Bench-Zonen bleiben
+erhalten. Die Schutzbereiche werden starr in denselben Gebäudebezug übertragen,
+nicht verkleinert oder skaliert; sie bleiben durchgehend gesperrt.
+
+Die fünf C2-Teilstücke einschließlich Einfahrt durch D3_003A und Ausfahrt durch
+D3_003B sind eine durchgehende Fahrt. Die Zeitplanung behandelt schnelle Geraden
+und langsamere Kurven getrennt. Sie verzögert vor engeren Kurven bzw. Zonen und
+beschleunigt danach wieder innerhalb der unveränderten Grenzen. Wegpunkte,
+Türdurchgänge und Querungswechsel enthalten keine Ruhepunkte. Wiedergabefaktor
+ist 1; Modellzeit und spätere Browser-Wiedergabe bleiben getrennt.
+
+Das nach 1 ms Zeitquantisierung tatsächlich ausgewertete Profil dauert
+**57,947 s**. Seine oberen Schranken betragen 298,70 mm/s, 490,04 mm/s² und
+981,02 mm/s³; die Gierrate bleibt unter 0,32442 rad/s bei unverändertem Limit
+0,35 rad/s. Die gemeinsame Polynom-Auswertung prüft Beschleunigung, Ruck und
+Kein-Halt-Kriterium auch zwischen den Knoten. Es wird keine globale
+Zeitoptimalität und kein bestandener menschlicher Vergleich behauptet.
+
+Getrennte Nachweise am exakten exportierten Profil:
+
+- Kontinuierlicher Mesh-/Bench-Nachweis: mindestens 95,3788 mm Abstand nach
+  Abzug von Tessellierungs- und Float32-Reserve.
+- Exakte Unterstützung des gesamten aufgeweiteten orientierten Rechtecks
+  durch die native Bodenflächen-Union; kein Ersatz durch einen verkleinerten
+  Kollisionskreis oder reine Zellmittelpunkte.
+- Unabhängiger nativer BRep-Kurvennachweis aller 34 physischen Fahrzeug- und
+  Kamerakörper gegen die vollständige gebundene Gebäudewelt: konservative
+  Intervall-Untergrenze **90,3299 mm**, gefordert sind 85 mm (75 mm Abstand plus
+  10 mm Lokalisationstoleranz). 268 Intervalle und 790 exakte BRep-Abstände.
+
+Die lokalen Nachweise stehen unter `exports/building-fleet/l01-connector/`:
+`fast-motion-r2.json`, `fast-r2-mesh-check.json`,
+`fast-r2-generic-floor-union-check.json`,
+`fast-r2-native-curve-check-efficient.json` und
+`motion-generation-report.json`. Diese Qualifikation betrifft die **einzelne
+BF01-Verbindung** in der synthetischen Szene. Fahrzeugbegegnungen, alle übrigen
+Fahrwege und der vollständige Flottenlauf benötigen weiterhin eigene Nachweise.
+Reale Navigation, Personenschutz, Hardware und Aufmaß bleiben ungeprüft.
 
 ## Vorbereitete, noch nicht integrierte Komponenten
 

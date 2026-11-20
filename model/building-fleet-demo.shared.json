@@ -34,6 +34,10 @@
     "camera": {
       "path": "model/tr01-awareness-camera.shared.json",
       "sha256": "ccd729bbb881de0b2d626ec0e76cf7a91516b8fc6d16d38a69ba5b1f2e835a45"
+    },
+    "l01_route": {
+      "path": "model/building-fleet-l01-route.shared.json",
+      "sha256": "90d0f9ec1b355e8a8a323bc047307b708b1909382b2d72bd7df65da36619eca9"
     }
   },
   "fleet": {
@@ -324,6 +328,7 @@
     "No people in v1; free walkthrough camera is not an obstacle. No real person-safety qualification.",
     "Route doors must be open at start; closing a route door freezes the entire compiled preview. No real door automation.",
     "No network, ROS or hardware execution. Camera images are synthetic scene renders, not image recognition.",
-    "Human comparison and real-world navigation remain open. K0_013 is deferred by explicit owner decision; staircore exclusion is retained."
+    "Human comparison and real-world navigation remain open. K0_013 is deferred by explicit owner decision; staircore exclusion is retained.",
+    "The owner-authorized separate BF01 L01 connector preserves canonical bench zones; original L01 routes remain unchanged."
   ]
 }

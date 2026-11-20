@@ -137,6 +137,23 @@
             "sha256"
           ],
           "additionalProperties": false
+        },
+        "l01_route": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/building-fleet-l01-route.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
         }
       },
       "required": [
@@ -146,7 +163,8 @@
         "angular_profile",
         "sensor",
         "layout",
-        "camera"
+        "camera",
+        "l01_route"
       ],
       "additionalProperties": false
     },
