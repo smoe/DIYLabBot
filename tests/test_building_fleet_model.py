@@ -39,6 +39,17 @@ class FleetContractTests(unittest.TestCase):
         self.reject(lambda s: s['communication'].update(latency_s=[1, .5]))
         self.reject(lambda s: s['missions']['targets'][8].update(basis='owner_description'))
 
+    def test_support_rule_is_explicit_and_cannot_be_widened(self):
+        rule=model.support_settings(self.source)
+        self.assertEqual(rule['gap']['maximum'],15)
+        self.assertEqual(rule['closing_radius_mm'],7.5)
+        self.assertIn('keine Radqualifikation',rule['basis'])
+        self.reject(lambda s:s['support_rule']['gap'].update(maximum=15.5))
+        self.reject(lambda s:s['support_rule']['gap'].update(open_edge_overhang=True))
+        self.reject(lambda s:s['support_rule']['lift_height_exception'].update(offset_mm=3))
+        self.reject(lambda s:s['support_rule']['lift_height_exception']['allowed_body_roles'].append('other_floor'))
+        self.reject(lambda s:s.pop('support_rule'))
+
     def test_pin_change_fails_before_effects(self):
         source = copy.deepcopy(self.source)
         source['sources']['vehicle']['sha256'] = '0'*64

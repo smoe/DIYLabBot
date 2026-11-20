@@ -154,6 +154,24 @@
             "sha256"
           ],
           "additionalProperties": false
+        },
+        "lift_geometry": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "scripts/lift_fittings.py"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ]
         }
       },
       "required": [
@@ -164,7 +182,8 @@
         "sensor",
         "layout",
         "camera",
-        "l01_route"
+        "l01_route",
+        "lift_geometry"
       ],
       "additionalProperties": false
     },
@@ -671,6 +690,179 @@
         "minLength": 1
       },
       "minItems": 1
+    },
+    "support_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gap": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "maximum": {
+              "type": "number",
+              "const": 15
+            },
+            "unit": {
+              "type": "string",
+              "const": "presentation_mm"
+            },
+            "range": {
+              "type": "array",
+              "const": [
+                0,
+                15
+              ],
+              "items": {
+                "type": "number"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            },
+            "operation": {
+              "type": "string",
+              "const": "morphological_closing_disk"
+            },
+            "radius": {
+              "type": "string",
+              "const": "maximum/2"
+            },
+            "open_edge_overhang": {
+              "type": "boolean",
+              "const": false
+            }
+          },
+          "required": [
+            "maximum",
+            "unit",
+            "range",
+            "operation",
+            "radius",
+            "open_edge_overhang"
+          ]
+        },
+        "lift_height_exception": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "source_key": {
+              "type": "string",
+              "const": "building"
+            },
+            "surface_offset_reference": {
+              "type": "string",
+              "const": "circulation.elevator.fittings.placements.thresholds[].top_mm_minus_port_z_mm"
+            },
+            "unit": {
+              "type": "string",
+              "const": "presentation_mm"
+            },
+            "range_reference": {
+              "type": "string",
+              "const": "geometry.floor_band_start_mm"
+            },
+            "allowed_body_roles": {
+              "type": "array",
+              "const": [
+                "concept_lift_floor_finish",
+                "concept_lift_cabin_sill",
+                "concept_lift_landing_sill"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "allowed_body_families": {
+              "type": "array",
+              "const": [
+                "LiftCabinFloorFinish",
+                "LiftCabinSill_<side>",
+                "LiftLandingSill_<level>_<side>"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "conditions": {
+              "type": "array",
+              "const": [
+                "cabin_at_port_compiled_FK",
+                "active_port_doors_fully_open"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "minItems": 2,
+              "maxItems": 2
+            }
+          },
+          "required": [
+            "source_key",
+            "surface_offset_reference",
+            "unit",
+            "range_reference",
+            "allowed_body_roles",
+            "allowed_body_families",
+            "conditions"
+          ]
+        },
+        "approximation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dilation": {
+              "type": "string",
+              "const": "inscribed_polygon"
+            },
+            "erosion": {
+              "type": "string",
+              "const": "circumscribed_polygon"
+            },
+            "polygon_sides": {
+              "type": "array",
+              "const": [
+                8,
+                16,
+                32
+              ],
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "arithmetic": {
+              "type": "string",
+              "const": "exact_rational_union"
+            },
+            "floor_area_tolerance_mm2": {
+              "type": "number",
+              "const": 0
+            }
+          },
+          "required": [
+            "dilation",
+            "erosion",
+            "polygon_sides",
+            "arithmetic",
+            "floor_area_tolerance_mm2"
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "const": "Eigentümerentscheidung 2026-11-20; synthetische Annahme; TR01 besitzt kein Rad-/Fahrwerksmodell; keine Radqualifikation"
+        }
+      },
+      "required": [
+        "gap",
+        "lift_height_exception",
+        "approximation",
+        "basis"
+      ]
     }
   },
   "required": [
@@ -690,7 +882,8 @@
     "camera_presentation",
     "exclusions",
     "qualification",
-    "limitations"
+    "limitations",
+    "support_rule"
   ],
   "additionalProperties": false
 }
