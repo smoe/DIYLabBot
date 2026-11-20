@@ -267,7 +267,7 @@
         "view": "overview"
       },
       "caption": "Drei referenzierte Sechsachsarme auf zwei Bänken: CF01 links, Handhabung und Pipettierwerkzeug an der Analytikbank rechts. Getrennte Original-, Verdünnungs- und Ansatzablagen sowie passive Arbeitsaufnahmen. Statische Konzeptgeometrie; keine nachgewiesene Dosierung oder kooperative Bewegung.",
-      "documentation": "docs/development-plan.md"
+      "documentation": "ROADMAP.md"
     },
     {
       "id": "robot",

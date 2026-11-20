@@ -18,6 +18,20 @@ Diese Hinweise gelten für das Projekt SolidCraftBot.
   Arbeitsbaum nicht automatisch stashen, zurücksetzen oder umschalten; neue
   Arbeit bei Bedarf in einem eigenen Worktree vom aktuellen `master` beginnen.
 
+## Dokumentationsablage
+
+- Erläuterungen zu Protokollen und biologischen Workflows unter
+  `docs/workflows/` führen; dessen README und biologische Roadmap bilden den
+  Einstieg. Konstruktion und Gerätegeometrie bleiben in ihren Baugruppenleitfäden;
+  `ROADMAP.md` führt den Projekt- und mechanischen Entwicklungsplan.
+- Bestehende Ablaufdokumente mit ihrer jeweiligen Konsolidierung überführen und
+  dabei sämtliche veränderbaren Verweise und Anker aktualisieren. Prüfsummengebundene
+  Archivfassungen und benötigte Kompatibilitätspfade unverändert erhalten.
+- Der neue Ordner enthält Dokumentation. Maschinenlesbare Modell- und
+  Protokollquellen bleiben unter `model/`; Laufzeitdaten behalten ihren bisherigen
+  Speicherort. Implementierung, synthetische Nachweise und reale Qualifikation
+  weiterhin getrennt ausweisen.
+
 ## Leitidee: abstrakt beschreiben, automatisch ableiten
 
 Die führende Konstruktion ist eine CAD-unabhängige, maschinenlesbare Beschreibung
@@ -629,7 +643,8 @@ oder Trägheit.
 
 ## Vor Änderungen lesen
 
-README.md sowie docs/requirements.md, docs/design.md und docs/development-plan.md.
+README.md sowie docs/requirements.md, docs/design.md und
+[mechanischen Entwicklungsplan](ROADMAP.md#mechanischer-entwicklungsplan).
 Für Änderungen an Quelle oder Generatoren außerdem `docs/shared-model.md` lesen;
 für ROS `docs/ros2.md`, für Kaufteile `docs/vendor-cad-plan.md` und die
 Dokumentation der jeweils betroffenen Baugruppe.

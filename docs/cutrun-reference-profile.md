@@ -2,7 +2,7 @@
 
 **Stand 12. November 2026: publikationsbezogener In-silico-Entwurf;
 E0 ist begonnen, die konkrete SOP-Bindung bleibt offen.** Dieser Entwurf konkretisiert
-[E0 der Roadmap](../ROADMAP.md) innerhalb des
+[E0 der Roadmap](workflows/ROADMAP.md) innerhalb des
 [Architekturvertrags](../ARCHITECTURE.md#cutrun). Der
 [wirkungsfreie E1-Preflight](cutrun-reference-profile.md#merged-cutrun-preflight) ist mit maschinenlesbaren Quellen
 und Schema implementiert. Der [E3-Lauf](cutrun-synthetic-workflow.md) ergänzt
@@ -203,7 +203,7 @@ DIYLabBot-Referenzlauf nach E4 und kein E1-Profil gilt als ausführungsbereit.
 implementiert.** Der Preflight prüft und beschreibt eine Planung. Er führt keine
 Laborhandlung aus, öffnet kein Journal und reserviert oder bucht nichts.
 Die historische SOP-Bindung aus [E0](cutrun-reference-profile.md) bleibt offen.
-Die [Roadmap](../ROADMAP.md) und der
+Die [Roadmap](workflows/ROADMAP.md) und der
 [Architekturvertrag](../ARCHITECTURE.md#cutrun) unterscheiden diese Vorbereitung
 von Lebenszyklus, Ausführung, Wiederanlauf und realer Qualifikation.
 
