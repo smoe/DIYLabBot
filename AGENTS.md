@@ -562,7 +562,8 @@ Zentrierhülsen, Ausgang 12 × M4. Dieselbe Quelle enthält nun eine Ø5-H7-Bohr
 ein radiales Entlastungslangloch und versenkte M3×10/M4×6-Schraubenstapel.
 M3×10 setzt eine bestätigte nutzbare Gewindetiefe voraus; Musterprüfung und
 mechanische Qualifikation stehen aus (siehe `docs/x6-fits-fasteners.md`,
-`docs/x6-interface-resolution.md` und `docs/servo-integration.md`).
+[X6-Schnittstellenklärung](docs/x6-fits-fasteners.md#merged-x6-interface-resolution)
+und `docs/servo-integration.md`).
 X2/X4 führen Passungen und Schraubenstapel analog in
 `model/x2-mounting-interface.json` und `model/x4-mounting-interface.json`.
 Eigene Rund-/Entlastungsstifte sitzen mit Pressschäften in den Platten und

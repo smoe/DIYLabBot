@@ -172,7 +172,7 @@ Ein bereitgestellter Google-Maps-Kartenpunkt ist lokal als Standortreferenz
 unter `exports/tr01-workcell/site-reference.json` notiert. Der Eigentümer bestätigt, dass der Pin nur das Gebäude markiert; die Lage
 des Labors innerhalb dieses Gebäudes ist dadurch noch nicht festgelegt.
 Die Fensterfront ist inzwischen als Nordwest bestätigt; der nominale
-Richtungsbezug steht in [l01-orientation.md](lab-layout-l01.md#merged-l01-orientation). Ein gemessener
+Richtungsbezug steht im [Orientierungsabschnitt](lab-layout-l01.md#merged-l01-orientation). Ein gemessener
 Azimut und die metrische Registrierung bleiben offen.
 
 ## Orientiertes Tageslicht und geworfene Schatten
