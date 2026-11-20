@@ -48,7 +48,8 @@ def validate_shape(value, schema, where='$'):
         raise ValueError('Unknown choice at '+where)
     kind = schema.get('type')
     checks = {'object': lambda: type(value) is dict, 'array': lambda: type(value) is list,
-              'string': lambda: type(value) is str, 'integer': lambda: type(value) is int,
+              'string': lambda: type(value) is str, 'boolean': lambda: type(value) is bool,
+              'integer': lambda: type(value) is int,
               'number': lambda: type(value) in (int, float) and math.isfinite(value)}
     if kind and (kind not in checks or not checks[kind]()):
         raise ValueError('Invalid '+str(kind)+' at '+where)
@@ -132,3 +133,11 @@ def source_pins(source):
 
 def protected_pins():
     return {'scripts/'+name: digest(ROOT/'scripts'/name) for name in PROTECTED}
+
+
+def support_settings(source):
+    """Resolve the owner support policy without copying the source lift height."""
+    validate(source)
+    result=copy.deepcopy(source['support_rule'])
+    result['closing_radius_mm']=result['gap']['maximum']/2
+    return result
