@@ -1047,7 +1047,8 @@ zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
 ersetzt es nicht. Probenvorbereitung und nicht qualifizierte Geräteschritte
 bleiben zunächst Personenaufgaben. Direktligation, automatisierte
 Library-Präparation und Sequenzierung gehören zu späteren, eigenen Freigaben.
-Die Abhängigkeiten und Abnahmen stehen in [ROADMAP.md](ROADMAP.md).
+Die Abhängigkeiten und Abnahmen stehen in der
+[biologischen Roadmap](docs/workflows/ROADMAP.md).
 
 Der [E1-Preflight](docs/cutrun-reference-profile.md#merged-cutrun-preflight) bindet Katalog, abstraktes Protokoll
 und das synthetische SK-Mel-29/H3K4me3-Profil in

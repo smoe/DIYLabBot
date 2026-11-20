@@ -1,178 +1,531 @@
-# Roadmap: Laborabläufe und CUT&RUN
+# Projekt-Roadmap: Laborrobotik und Arbeitsabläufe
 
-**Stand 12. November 2026. E0 ist begonnen; die SOP-Bindung bleibt offen.
-E1 ist für den synthetischen Referenzfall implementiert und geprüft;
-E2 ist als gemeinsamer synthetischer Materialvertrag implementiert;
-E3 ist als synthetischer Prozessvertrag implementiert;
-E4 ist mit Vorbereitungspaket, lokalem SOP-Entwurf 0.1 und manuellem
-Stufenvertrag mit Zeit-/Temperaturbelegen begonnen;
-E5–E7 sind geplant.** Diese Datei führt Reihenfolge,
-Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
-[CUT&RUN-Ablaufvertrag](ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
-Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
+Diese Projekt-Roadmap führt den mechanischen Entwicklungsplan und den Einstieg
+in die getrennte Roadmap für biologische Laborabläufe zusammen. Anforderungen
+und Systemgrenzen stehen in [docs/requirements.md](docs/requirements.md) und
+[ARCHITECTURE.md](ARCHITECTURE.md). Die Dokumentationsumstellung erweitert
+keinen Ausführungs- oder Qualifikationsnachweis.
 
-## Bestehende Pläne weiterverwenden
+- [Mechanischer Entwicklungsplan: Arm, Optik, Werkzeuge und Abnahme](#mechanischer-entwicklungsplan)
+- [Biologische Workflows und CUT&RUN-Etappen](docs/workflows/ROADMAP.md)
 
-| Führende Detailplanung | Zuständigkeit |
+## Biologische Workflows und Protokolle
+
+Die führende [biologische Roadmap](docs/workflows/ROADMAP.md) liegt unter
+`docs/workflows/`. Sie erhält die bisherigen E0–E7-Etappen, Abhängigkeiten,
+Stoppanforderungen und technischen sowie biologischen Abnahmen vollständig.
+Die physische Entwicklung unten ersetzt weder eine freigegebene SOP noch
+einen realen Referenzlauf. Die übrigen vorhandenen Workflow-Dokumente werden
+in gesonderten Schritten migriert; gebundene Archivfassungen behalten ihre Pfade.
+
+Die folgenden Einstiegspunkte erhalten bisherige Roadmap-Anker als Navigation;
+der vollständige biologische Text wird nur im Workflow-Ordner gepflegt.
+
+<a id="roadmap-laborabläufe-und-cutrun"></a>
+
+| Bisheriger Einstieg | Führender Abschnitt |
 |---|---|
-| [Architektur](ARCHITECTURE.md#cutrun) | Quellen-/Profilbindung, Rollen, Reaktionszustand, Fähigkeiten und Systemgrenzen |
-| [Arm-Entwicklungsplan](docs/development-plan.md) | Arm, Optik, Werkzeuge und mechanische Qualifikation; der erste Wasser-Präzisionsversuch bleibt bestehen |
-| [Extraktionsvorbereitung](docs/extraction-automation.md) | Bereits vorbereitete RNA-/DNA-Ketten und deren Bedarf am gemeinsamen Materiallebenszyklus |
-| [Materiallebenszyklus](docs/material-lifecycle.md) | Gemeinsamer E2-Vertrag, typisierte Buchungen, Produkte und dauerhaft laufexklusive Reagenzaliquots im bisherigen Journal |
-| [Manueller CUT&RUN-Referenzlauf](docs/cutrun-manual-reference.md) | E4-Vorbereitung, konkrete Eigentümerentscheidungen und noch offene operative Nachweise |
-| [Wasch- und Reagenzvertrag](docs/cutrun-manual-runtime.md#merged-cutrun-manual-recipe) | Ausgewählte Waschgruppen, Arbeitsmischungen, Istverbräuche und Fraktionen auf demselben Ledger; offene lokale Parameter |
-| [Manueller Laufzeitvertrag](docs/cutrun-manual-runtime.md) | Getrennte /3-Engines für Aufzeichnung und vollständige lokale SOP-Stufenfolge, phasenbezogene Zeit-/Temperaturbelege, Materialbuchungen und manuelle QC; keine Geräteausführung |
-| [Lokaler SOP-Entwurf 0.1](docs/cutrun-manual-sop-draft.md) | Manuelle Arbeitsfolge, gebundene aktuelle CST-Quelle, offene Parameter und ausdrücklich gekennzeichnete Paper-Abweichungen |
-| [Stock-Plan](docs/stock-continuation.md) | Dauerhafte Bestandsköpfe, atomare Buchungen und Schutz vor veralteten Schreibern; Reagenzvorräte bisher ausgeschlossen |
-| [Storage-Plan](docs/automated-storage-plan.md) | K01-Bereitstellung, Regal-/Übergabekonzept und spätere Transportqualifikation; S01 bleibt ein synthetischer Fixture-Nachweis |
+| <a id="bestehende-pläne-weiterverwenden"></a>Bestehende Pläne weiterverwenden | [Abschnitt lesen](docs/workflows/ROADMAP.md#bestehende-pläne-weiterverwenden) |
+| <a id="abhängigkeiten-und-etappen"></a>Abhängigkeiten und Etappen | [Abschnitt lesen](docs/workflows/ROADMAP.md#abhängigkeiten-und-etappen) |
+| <a id="erforderliche-negative-nachweise-für-e3"></a>Erforderliche negative Nachweise für E3 | [Abschnitt lesen](docs/workflows/ROADMAP.md#erforderliche-negative-nachweise-für-e3) |
+| <a id="entscheidungen-vor-e0-freigabe"></a>Entscheidungen vor E0-Freigabe | [Abschnitt lesen](docs/workflows/ROADMAP.md#entscheidungen-vor-e0-freigabe) |
+| <a id="begonnene-e4-vorbereitung"></a>Begonnene E4-Vorbereitung | [Abschnitt lesen](docs/workflows/ROADMAP.md#begonnene-e4-vorbereitung) |
 
-Diese Detailpläne werden referenziert, nicht hier kopiert. Direkte Bereitstellung
-und serielle Bearbeitung eines Laufs sind der Ausgangspunkt. Automatisiertes
-Storage und mehrere gleichzeitig aktive Arme sind keine Voraussetzung für den
-ersten CUT&RUN-Durchstich. Die vorhandenen Quellen, Journale und synthetischen
-Geräteabläufe beweisen noch keine CUT&RUN-Fähigkeit.
+<!-- roadmap-source-begin: mechanical -->
+<a id="mechanischer-entwicklungsplan"></a>
 
-## Abhängigkeiten und Etappen
+## Entwicklungsplan für den ersten Laborarm
 
-```mermaid
-flowchart LR
-    E0["E0 · Profil und Umfang freigeben"] --> E1["E1 · Wirkungsfreier Preflight"]
-    E1 --> E2["E2 · Gemeinsamer Materiallebenszyklus"]
-    E2 --> E3["E3 · Synthetischer Lauf und Wiederanlauf"]
-    E3 --> E4["E4 · Integrierter manueller Referenzlauf"]
-    E0 --> E5["E5 · Einzelne Fähigkeiten qualifizieren"]
-    E4 --> E6["E6 · Ein automatisierter Ablauf"]
-    E5 --> E6
-    E6 --> E7["E7 · Stock, Storage und Parallelbetrieb"]
+<!-- roadmap-editorial-note -->
+Der folgende Entwicklungsplan ist vollständig aus seiner bisherigen Datei übernommen. Aussagen zu „inzwischen“, nächsten Schritten und Prüfständen gelten jeweils für die benannten Module und Ausbaustufen. Die redaktionelle Integration führt keine neue CAD-, Bewegungs-, Mess-, Netzwerk-, biologische oder Hardwarequalifikation aus.
+<!-- /roadmap-editorial-note -->
+
+Die [L01-Raumaufstellung](docs/lab-layout-l01.md) ergänzt jetzt eine gemeinsame
+Quelle für drei Arme, Stationen und Bodenfahrzeug. Nach dem Aufmaß sind
+Türschwenkräume, Anschlüsse, reale Werkzeug-/Greifräume, kollisionsgeprüfte
+Armabläufe und der gemeinsame Verkehr mit Menschen weiterzuentwickeln.
+Die erste Studie liefert statische Geometrie und Endpunkt-Reichweiten.
+
+<a id="mechanik-erste-etappe"></a>
+
+### Erste Etappe
+
+Die [mobile Basis MB01](docs/mobile-base-mb01.md) parallel als eigene Baugruppe
+qualifizieren: zunächst manuell verschieben, in kompakter Pose zur Seite stellen,
+auf drei Füßen abstützen und die lokale Aufgabe neu erfassen. Mitarbeiter können
+Parkaufwand und zurückgewonnene Bankfläche beurteilen. Wiederholtes Versetzen mit
+unterschiedlicher ungefährer Rückkehrlage soll anschließend Kamerawiedererfassung,
+Spitzen-/Gefäßfehler und Einschwingzeit prüfen. Ein Präzisionsdock oder eine
+autonome Fahrregelung ist dafür keine Vorbedingung. Masse, Stützsteifigkeit,
+Kippmomente, reale Schraubfüße, Tischkante und flexible Zuleitung vor dem Betrieb
+auslegen und prüfen; die CAD-Kontaktstellungen ersetzen diese Versuche nicht.
+
+Den aktuellen sechsachsigen Aufbau als gemeinsame Diskussionsgrundlage nutzen.
+Anhand vorhandener Pipetten die spätere Werkzeugmasse und den Schwerpunkt
+festlegen. Die Pipettenaufnahme bleibt bis zur gesonderten Konstruktion ausgelassen.
+
+Parallel einen optischen Prüfstand aus Gefäßhalter, vorhandener Pipette,
+Beleuchtung und Kameras aufbauen. Transparentes Wasser im echten Gefäß untersuchen.
+Die erste Kameraansicht wird schräg durch die Öffnung erprobt, eine zweite Ansicht
+seitlich. Reflexionen, Verdeckung und Verzerrung durch die Gefäßwand bestimmen
+die endgültige Anordnung.
+
+Der inzwischen gewünschte Aufbau umfasst zwei Armkameras zusätzlich zu mehreren
+stationären Laborkameras. Auf dem Prüfstand die Nahansicht der unteren Armkamera
+und die Weitwinkelansicht der oberen getrennt entwickeln. Die zwei zuerst
+erprobten Blickrichtungen legen noch keine zwei stationären Kameras und kein
+Stereopaar fest. Die Montagevorschläge stehen im [Kamerakonzept](docs/design.md#konzeptoption-zwei-armkameras-und-stationäre-laboransichten).
+
+V02 ist inzwischen in der gemeinsamen Armquelle und allen drei Ableitungen
+implementiert: C_tip an L6, C_scene an L1, provisorische Halter und transparente
+Sichtkegel. Das ist eine geometrische Diskussionsgrundlage für die folgenden
+optischen Versuche. Kein Kameraartikel, Halter oder Sichtfeld ist damit
+qualifiziert; die Pipettenaufnahme bleibt außerhalb des CAD-Umfangs.
+
+Vor der Kamerabeschaffung folgende Schritte durchführen:
+
+1. Für Nah- und Übersicht festlegen, welche Merkmale in welchen Arbeitsposen
+   sichtbar und messbar sein müssen; Zielgenauigkeit und zulässige Verdeckung
+   bestimmen.
+2. Mit vorhandener Kamera und einstellbarer Halterung Sicht auf Spitze,
+   Gefäßöffnung und Wandtropfen am konkreten Gefäß testen. Deckel, Rack,
+   Kühlaufnahme und Kondensat berücksichtigen. Beleuchtungsvarianten vergleichen.
+3. C_tip nahe L6 und C_scene nahe L1/L2 als Montagekandidaten vergleichen;
+   Sichtverdeckung durch den eigenen Arm, Arbeitsabstand, Schärfentiefe,
+   Haltersteifigkeit und Masse über die benötigten Arbeitsposen bewerten.
+4. Stationäre Überblicks- und Arbeitsplatzansichten an einer gemeinsamen
+   Stationsreferenz kalibrieren; Kamera-Montageglied-Beziehungen und tatsächliche
+   Spitzenlage bestimmen. Für bewegte Aufnahmen Belichtungszeitpunkt,
+   Gelenkmesswerte und Bildalter zusammen erfassen.
+5. Nach der optischen Erprobung Kameras, Objektive und Beleuchtung auswählen,
+   Kosten und Schnittstellen erfassen und die provisorischen Bauräume in der
+   Modellquelle durch die gewählten Baugruppen ersetzen. Kameraleitungen einschließlich der
+   J6-Durchführung und die betroffenen Bewegungsräume erneut prüfen.
+
+Die bisherigen 400 EUR für Optik und Beleuchtung sind durch diese Erweiterung
+nicht als ausreichendes Angebot belegt. Zahl und Kosten der stationären Kameras,
+Objektive, Halter, Beleuchtung und Rechneranschlüsse gesondert kalkulieren;
+die Gesamtbudgetgrenze bleibt bestehen.
+
+<a id="mechanik-mechanischer-nachweis"></a>
+
+### Mechanischer Nachweis
+
+Die aktuelle Standardrichtung ist [direkter Gefäßgriff mit kooperierenden Robotern](docs/requirements.md#direkter-gefäßgriff-und-kooperierende-roboter).
+Zuerst den vorhandenen Körpergreifer und die passiven Rackaufnahmen wiederverwenden,
+dann Gefäßartikel und Fingerfreigang am offenen Halter prüfen. Anfahrt, Griff,
+Auszug und Ablage mit Nachbargefäßen aus derselben gemeinsamen Geometrie ableiten
+und in beiden CADs prüfen. Erst danach eine durchgehende Bahn mit bestätigtem
+Griff und bestätigter Ablage entwickeln. Stationäre Arme und Racktransport über
+passive Docks koordinieren; die vorhandene statische Dreiarmaufstellung und
+Transport-Mocks sind kein Nachweis kooperativer Hardware. Der lokale
+[H02-Direktgriff](docs/tube-frame-h02.md#direct-pickup-variant) ist nun für beide
+Gefäßformen mit acht Nachbarn und kontinuierlichen Hüllvolumen in beiden CADs
+geprüft. Als Nächstes reale Gefäße, geschlossene Deckel und Greifkräfte
+qualifizieren und Lageunsicherheit berücksichtigen. Die
+[Arm-Erweiterung](docs/tube-frame-h02.md#full-arm-direct-pickup) leitet den lokalen
+Armweg bereits aus der Roboterquelle ab und prüft Reichweite, Selbstkollision
+und kontinuierlichen Freigang in beiden CADs.
+
+H03 ist aus dem aktiven Standardpfad zurückgestellt. Nur bei erneutem Bedarf
+an genau diesem motorlosen Vergleichskonzept wären Kurvenscheiben,
+Rollenfolger und Riegel als langsamer Prüfstand herzustellen. Federn auswählen,
+Folgerkontakt, Schließ-/Entriegelungskraft und notwendiges Roboterdrehmoment
+messen. Den Halt bei zurückgezogenem Folger sowie den unterstützten Rücklauf
+mit realen Gefäßen prüfen. Erst nach bestätigter Übernahme darf der Roboter die
+220°-Prüfstellung verlassen. Quelle und beide CADs mit
+`python scripts/build_tube_cam.py` neu ableiten; native Kurvenkopplungen mit
+`python scripts/verify_tube_cam_native.py` prüfen.
+
+Der vollständige Anschauungszyklus entsteht mit
+`python scripts/build_tube_cam_animation.py` aus einer eigenen gebundenen
+Ablaufquelle. Geprüft sind Bewegungsreihenfolge, dauernde Gefäßunterstützung,
+vollständiges Wiederaufrüsten und native Transformationsmatrizen; Betriebskräfte,
+Drehmoment und zulässige Geschwindigkeiten anschließend am langsamen Prüfstand
+bestimmen. Die im Film angenommenen Bestätigungen nicht als Sensornachweis werten.
+
+Die [bevorzugte Servoauswahl](docs/actuator-selection.md) ist inzwischen als
+[gemeinsame Geometrie](docs/servo-integration.md) mit zwölf Motorplatten integriert.
+Gehäuse-/Ausgangsrahmen sind registriert; die vermeintliche X6-Abweichung wurde
+als falsche Zuordnung der Maßpfeile geklärt und die Motorplatten korrigiert.
+Die [X6-Passungen und Schraubenstapel](docs/x6-fits-fasteners.md) sind jetzt nominell
+ausgelegt. Als Nächstes Hülsenmaße und Gehäusegewindetiefen messen, die bedingte
+M3×10-Auswahl bestätigen und eine repräsentative Aufnahme am Prüfstand
+qualifizieren. Die sechs geometrischen Gelenke sind noch keine fertig
+ausgelegten oder qualifizierten Gelenke. Der
+[CAD-Integrationsplan](docs/vendor-cad-plan.md) beschreibt die Erweiterung der
+gemeinsamen Quelle, beider CAD-Adapter und der RViz-Quaderdarstellung.
+
+Auch [X2/X4](docs/x2-x4-fits-fasteners.md) haben jetzt nominelle Schrauben- und
+Stiftauslegungen. Zunächst die Ø3-Herstellerbohrungen und nutzbaren Gewindetiefen
+messen, Fertigung der eigenen gestuften Stifte abstimmen, Presssitz und
+Steckmontage prüfen. Die reduzierten X2-Köpfe, schmalen Plattenränder und
+das vorgesehene Anziehdrehmoment am repräsentativen Prüfglied qualifizieren.
+
+Zunächst eine repräsentative Schulter- oder Ellenbogenbaugruppe fertigen und
+unter definierten Kräften vermessen. Lastfälle, Spiel, Steifigkeit und
+Positionsmessung am Ausgang bewerten. Auf dieser Basis die übrigen Gelenke auslegen.
+TCP-Genauigkeit, Nutzlast, Wiederholbarkeit, Einschwingfenster und Zykluszeit
+vorab quantifizieren. Schnelle Transfers und die optische Feinanfahrt getrennt
+vermessen; zeitgestempelte Istwerte erlauben ein gemessenes Bewegungsende.
+Mehrere Arme sollen später durch Vorbereitung und Übergaben den Durchsatz
+erhöhen. Die geforderte Genauigkeit wird weiterhin pro Arm nachgewiesen.
+
+Servoantriebe mit auslesbarer Istposition wählen; Messort, Referenz, Übersetzung,
+Abtastrate und Datenalter festlegen. Parallel die logischen Leitungswege
+in räumliche Führung, Zugentlastungen und Bewegungsreserven überführen. Biegung,
+Torsion, Freiraum und elektrische Versorgung an vorgesehenen Bahnen und
+Gelenkgrenzen prüfen. Die Serviceebene bleibt auch bei ausgeblendeten Kabeln Teil
+des gemeinsamen Modells; ihre Topologieprüfungen ersetzen diese Nachweise nicht.
+
+Anschließend den kompletten Arm referenzieren und mehrere Werkzeughaltungen
+vermessen. Messungen an der Spitze und über unterschiedliche Anfahrtrichtungen
+liefern die Grundlage für die spätere Feinanfahrt.
+
+<a id="mechanik-zielversuch-mit-einem-mikroliter"></a>
+
+### Zielversuch mit einem Mikroliter
+
+1. Gefäß und Pipettenspitze lokalisieren.
+2. Einen Mikroliter Wasser an einer definierten Wandstelle ablegen.
+3. Spitze zurückziehen und Tropfen erneut optisch lokalisieren.
+4. Bildgeführt langsam annähern und Wasser wieder aufnehmen.
+5. Restflüssigkeit und Rückgewinnung unabhängig bewerten.
+
+Als erster Versuchsplan sind 30 manuelle Referenzzyklen unter denselben
+Bedingungen vorgesehen. Die Anzahl und endgültigen Abnahmekriterien werden
+vor der robotischen Vergleichsmessung festgelegt.
+
+Auswertungen umfassen die Erkennungsquote, Positionierabweichung,
+Wiederfindungsrate, Streuung, Laufzeit und notwendige Bedienereingriffe.
+Die abgelegte und zurückgewonnene Wassermenge, Verdunstung und Messunsicherheit
+müssen nachvollziehbar bestimmt werden.
+
+Leichte Variation der Ablagestelle und Gefäßposition prüft anschließend die
+tatsächliche Wirkung der optischen Korrektur.
+
+<a id="mechanik-weitere-ausbaustufen"></a>
+
+### Weitere Ausbaustufen
+
+<a id="mechanik-optionale-prüfung-des-pipettierens-auf-eis"></a>
+
+#### Optionale Prüfung des Pipettierens auf Eis
+
+Der [Maschinenentwurf C01 und sein SiLA-2-Interaktionsprotokoll](docs/tube-station-c01.md)
+liegen als getrennte Diskussionsgrundlage vor. Vor dem Hardwarebetrieb einen
+SiLA-Simulator mit echtem Client prüfen: exklusive Roboterfreigabe, Beobachtung
+laufender Befehle, veraltete Rückmeldungen, Verbindungsabbruch, Stoppen und
+Wiederanlauf. Schema-Prüfung der Feature-XML allein belegt keine Interoperabilität.
+
+Die Station mit `python scripts/build_tube_station.py` in beiden CADs aus der
+gemeinsamen Stationsquelle erzeugen. Bei künftigen Geometrieänderungen die
+nativen Featurebäume, gemeinsamen Anker und den Körpervergleich erneut prüfen;
+die erste Prüfung umfasst vier Geometriefälle. Beladung und reale Kontaktfolge
+bleiben davon getrennte mechanische Prüfaufgaben.
+
+Vor der Fertigung den vollständigen Beladungs- und Entnahmeweg mit echtem
+Gefäß und vorgesehenem Greifer prüfen. C01 bietet nur 4 mm freien Körperbereich
+unter dem Kragen; eine erfolgreiche Deckelpose belegt keine Handhabbarkeit.
+Den [vorgeschlagenen wechselbaren Träger](docs/tube-station-c01.md#loading-review-c01-does-not-establish-automatic-tube-handling)
+zunächst manuell bestücken und als Alternative zur direkten Gefäßbeladung
+untersuchen. Docking, Stationsverriegelung, Greiferfreigang und Wärmekontakt
+gemeinsam auslegen; automatische Rack-zu-Träger-Beladung separat bewerten.
+
+Der [H01-Entwurf](docs/tube-carrier-h01.md) stellt dafür jetzt eine abstrakte gemeinsame
+Quelle und Generatoren für zwei native CADs bereit. Mit
+`python scripts/build_tube_carrier.py` beide Gefäßformen, Parametergrenzen und
+gesampelte Frontübergaben prüfen. Anschließend reale Gefäße ausmessen und einfache
+Pass-/Stabilitätsmuster drucken; erst danach Clipfreigabe, Greifer, Dockverriegelung
+und den Anschluss an C01 samt vollständigem Roboterweg konstruieren.
+
+Als erhaltene Vergleichsbasis für den optischen Prüfstand den [offenen H02-Rahmen](docs/tube-frame-h02.md) mit
+`python scripts/build_tube_frame.py` in beiden CADs erzeugen. Reale Gefäße zuerst
+manuell in offenen Mustern testen: Kippstabilität, Sicht auf Flüssigkeit und
+Wandtropfen sowie Beleuchtung. Für die aktuelle Richtung zuerst den direkten
+Körpergriff und Auszug prüfen. Bodenheber und geteilten Empfänger nur bei
+nachgewiesenem Bedarf mit gemessenen Kontaktkräften und bestätigter Übernahme
+untersuchen. Heber erst
+nach Empfangsbestätigung zurückziehen; Empfänger erst nach freiem Heber bewegen.
+Der Verlust großer Kühlkontaktflächen erfordert ein neues thermisches Konzept,
+falls die Option Pipettieren auf Eis weiterverfolgt wird.
+
+Für den zusätzlichen Kühlwunsch zunächst einen einzelnen Gefäßplatz aufbauen,
+der während Öffnen, Pipettieren und Schließen fest im Stationsrahmen bleibt.
+Einen wärmeleitenden Einsatz mit Wassereis kühlen; passende Gefäßartikel und
+Füllstände sowie die erlaubte Probentemperatur und Betriebsdauer vorab festlegen.
+Diese Option ist noch keine zusätzliche Abnahmebedingung des ersten Zielversuchs.
+
+Blocktemperatur und repräsentative Probentemperatur über Abkühlung, offene
+Pipettierphasen und wiederholte Zyklen erfassen. Für den 1-µl-Wandtropfen ein
+geeignetes Mess- oder Referenzverfahren nahe der tatsächlichen Ablagestelle
+festlegen; ein Fühler in einem vollen Vergleichsgefäß reicht dafür allein nicht.
+Gefäßpose bei schmelzendem Eis, Deckelkräfte und Verrastung im kalten Zustand,
+Kondensatführung sowie Sichtbarkeit des Tropfens prüfen. Ablage und Wiederaufnahme
+bei Raumtemperatur und unter den vorgesehenen kalten Bedingungen getrennt
+bewerten. Eine Temperaturmessung am Block ersetzt weder die Probenmessung noch
+den Volumennachweis.
+
+<a id="mechanik-weitere-entwicklung-des-arms-und-der-station"></a>
+
+#### Weitere Entwicklung des Arms und der Station
+
+Für den [Spitzenabwurf T01](docs/tip-collector-t01.md) zunächst die konkreten Spitzen
+der 10-, 200- und 1000-µl-Pipetten ausmessen. Freien Schaft, Spitzenrand und Abstand
+zur Abwurfhülse prüfen und die austauschbaren Nuten daraus dimensionieren. Am
+Prüfstand Abziehkraft, Haltekraft der Pipettenaufnahme, Verschleiß und wiederholtes
+freies Abfallen messen. Behälteranwesenheit, tatsächliche Füllgrenze und fehlende
+Spitze am Werkzeug erfassen; danach Stationsbezug und vollständige Roboterbahnen
+mit dem realen Werkzeug kalibrieren und prüfen. Die drei Volumenmarkierungen des
+CAD sind noch keine Artikelqualifikation oder Betriebsfreigabe.
+
+Die parallele T01-Entwicklung erfolgt mit `python scripts/build_tip_collector.py`.
+Änderungen der freigegebenen Entwurfsmaße in `parameters` der gemeinsamen Quelle
+übernehmen und beide CADs erneut erzeugen. Der aktuelle Vergleich deckt
+Standardmaße, eine mittlere Nut von 7 statt 6 mm und einen um 10 mm höheren
+Behälter ab; er prüft zusätzlich native Maßänderungen ohne Neuaufbau. Die
+sichtbare UMR-Schrift gehört in beiden Fassungen zur entnehmbaren Sammelbox.
+
+Änderungen jetzt in der gemeinsamen Quelle `model/robot.json` ausarbeiten.
+Beide CAD-Fassungen und die ROS-2-Dateien daraus neu erzeugen und vergleichen.
+Geometrie, Gelenkanker und Bewegungssequenzen müssen denselben Parametern folgen.
+Die alten direkt erstellten CAD-Dateien wurden auf Eigentümerwunsch gelöscht; numerische Referenzdaten und historische Prüfberichte bleiben erhalten.
+
+Die Entwicklungsschleife zunächst mit Gelenksequenzen, zeitlichen Abläufen und
+nachvollziehbaren Fehlermeldungen ausbauen. ROS 2 und RViz auf einem verfügbaren
+Jazzy-System starten und die vorbereitete Trajektorienschnittstelle integrieren.
+Danach bei einer konkreten Dynamikfrage Gazebo anbinden; zuvor Massen,
+Trägheitstensoren, Antriebseigenschaften und Kontaktannahmen bestimmen.
+
+Für eine spätere Bewegungsplanung konkrete Aufgabenposen und Bahnen mit
+Werkzeug, Gefäßhaltern und Tisch modellieren. Die derzeitige Gelenkanimation
+und die Prüfung einzelner Posen ersetzen keine vollständige Kollisionsprüfung,
+inverse Kinematik, Dynamikrechnung oder reale Positionsmessung.
+
+Nach reproduzierbarem Einzelarmbetrieb weitere Werkzeuge für 1–1000 µl,
+96-Well- und 384-Well-Gefäße entwickeln. Eine spätere zentrale Ablaufsteuerung
+reserviert gemeinsame Arbeitsbereiche für zwei oder drei Arme.
+Werkzeugpose, Gefäßbelegung und Flüssigkeitstransfer werden als definierte Zustände
+geführt; Wiederanlauf nach Unterbrechungen braucht einen geprüften Ablauf.
+
+<a id="mechanik-analytikstation-zwei-zusätzliche-arme-und-probenvorverdünnung"></a>
+
+#### Analytikstation: zwei zusätzliche Arme und Probenvorverdünnung
+
+Die [neue Zielrichtung](docs/requirements.md#gewünschte-analytikstation-mit-zwei-kooperierenden-armen)
+verwendet zwei zusätzliche, weitgehend baugleiche Sechsachsarme neben dem
+CF01-Arm. Als erster Prüfaufbau übernimmt ein Arm Gefäße und Deckel, der andere
+eine betätigbare Pipette. Damit soll die separate Pipettierpositionierapparatur
+entfallen können. Passive Gefäßhalter, Werkzeugablagen, Spitzenvorrat,
+Reagenzplätze, Abfall und die NanoDrop-Reinigung gehören zur Auslegung.
+
+1. Vorhandene Pipetten, passende Spitzen, Original-/Verdünnungsgefäße und
+   Qubit-Ansatzgefäße bestimmen. DNA- und RNA-Assays, Konzentrationsbereiche,
+   Probenverbrauch, Durchsatz sowie Dosier- und Verschleppungskriterien festlegen.
+2. Ein gemeinsames Werkzeugkonzept mit Halterung, Dosierbetätigung,
+   Spitzenaufnahme/-abwurf und optischem Spitzenbezug ausarbeiten. Masse,
+   Betätigungskräfte und Werkzeugverformung am vorhandenen Arm prüfen.
+3. Zunächst an einem ruhenden Gefäß in passiver Aufnahme Dosierabweichung,
+   Streuung und Verschleppung messen. Die optische Feinanfahrt und die
+   Volumenprüfung gesondert nachweisen; einen zweiten bewegten Gefäßbezug erst
+   nach dieser Referenzprüfung untersuchen.
+4. Zwei Instanzen derselben Armquelle samt unterschiedlichen Werkzeugen aus
+   gemeinsamen Quellen aufbauen. Gemeinsame Rahmen, Arbeitszonen, Übergaben,
+   gegenseitige Sperren und Parallelaufgaben entwickeln und in beiden CADs
+   einschließlich der Werkzeuge und Gerätedeckel prüfen.
+5. Im bestehenden Inventar-/Ablaufkern eine eigene Vorverdünnungsoperation
+   ergänzen: identifiziertes Zielgefäß, gespeicherte Transferabsichten,
+   bestätigte Probe-/Verdünnungsmittelvolumina, Mischung und Herkunftskette.
+   Weitere Qubit-Entnahmen belasten das Verdünnungsgefäß; das Original wird
+   durch denselben Transfer nicht erneut belastet. Unterbrechungen erfordern
+   den Abgleich offener Transfers und Gefäße.
+6. NanoDrop-Direktmessung und Qubit-Messung nach optionaler Vorverdünnung
+   integrieren. Ergebnisbasis und externe Verdünnungsfaktoren prüfen; eine
+   bereits vom Gerät berücksichtigte Assayverdünnung nicht doppelt anwenden.
+   DNA- und RNA-Profile getrennt qualifizieren, anschließend Parallelbetrieb
+   und Wiederanlauf der beiden Arme prüfen.
+
+Die erste statische Konzeptaufstellung wird inzwischen aus
+`model/two-arm-analytics.shared.json` erzeugt. Sie referenziert die bisherige
+CF01-Bank mit ihrem Arm und eine separate Analytikbank mit zwei identischen
+Armvarianten aus `model/robot.json`. Möbeltyp, Möblierung und Geräteausstattung
+bleiben getrennte Quellen. `model/analytics-tools.shared.json` beschreibt die
+neuen unvermessen gezeichneten Pipetten-, Gefäßhalter- und Verbrauchsteilmodelle.
+Originale, Vorverdünnungen und Qubit-Ansätze besitzen getrennte Ablagen; zwei
+passive Einzelaufnahmen stehen zwischen den Analytikarmen. Der Pipettierarm
+zeigt sein Werkzeug über der Zielaufnahme, während der Handhabungsarm über dem
+Originalrack steht.
+
+```sh
+python3 scripts/build_analytics_concept.py
+python3 -m unittest discover -s tests -p 'test_analytics_concept.py' -v
 ```
 
-Die Etappen sind Freigabebedingungen, keine Termine oder Budgetzusagen.
-Der wirkungsfreie E1-Prototyp wurde auf Eigentümerauftrag mit ausdrücklich
-synthetischen Annahmen vorgezogen. Er schließt die offene E0-/SOP-Bindung nicht
-und gibt keinen integrierten realen Lauf frei.
-E5 kann nach E0 mit geeigneten Ersatzmedien parallel beginnen. Ein unabhängig
-dokumentierter menschlicher Laborversuch darf vorher stattfinden; er wird
-dadurch noch kein nachgewiesener integrierter DIYLabBot-Referenzlauf nach E4.
-Vor der ersten realen Aktivierung in E4 müssen Eignung und Bereitschaft des
-manuellen Stoppwegs belegt sein. E5 qualifiziert zusätzlich die automatisierte
-Ausführung. E6 → E7 betrifft die Freigabe zur CUT&RUN-Integration gemeinsamer
-Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fortfahren.
+Der Einstieg verwendet geprüfte native Ursprungsmodelle und den bestehenden
+unabhängigen SolidCraft-CF01-Bericht. Dessen Pfad lässt sich mit `--core-report`
+angeben; die vorhandenen CAD-Adapter erzeugen diese Eingaben auf einem frischen
+Checkout. Quell- und Artefaktprüfsummen sowie die Gleichheit der ursprünglichen
+CF01-Konstruktion und Prüfstellungen werden vor Wiederverwendung geprüft.
+`cad/two-arm-analytics/shared-build-report.json` löst die neuen FreeCAD- und
+SolidCraft-Gesamtmodelle, Gesamtansicht, Analytikdetail und Geometrieprüfungen auf.
+Beide CADs verwenden ihre eigenen nativen Geometrien. Die Prüfung vergleicht
+Instanzvolumen und Schwerpunkte, Gelenkgrenzen, die dargestellten Werkzeugziele,
+statische Überschneidungen und die Stellflächen der neuen Ausstattung.
 
-| Etappe | Zu lieferndes Ergebnis | Abnahme vor der nächsten Freigabe | Status |
-|---|---|---|---|
-| **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Begonnen: [publikationsbezogener Melanom-/H3K4me3-Entwurf](docs/cutrun-reference-profile.md); konkrete SOP-Bindung offen |
-| **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Implementiert und synthetisch geprüft](docs/cutrun-reference-profile.md#merged-cutrun-preflight); E0-/SOP-Bindung offen |
-| **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | [Gemeinsamer synthetischer Materialvertrag implementiert und geprüft](docs/material-lifecycle.md); keine biochemische Ausführung |
-| **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | [Implementiert und synthetisch geprüft](docs/cutrun-synthetic-workflow.md); reale SOP-/Stoppqualifikation bleibt E0/E4–E6 |
-| **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | [Vorbereitung begonnen](docs/cutrun-manual-reference.md); [manueller Stufenvertrag mit Zeit-/Temperaturbelegen](docs/cutrun-manual-runtime.md) implementiert. Operative SOP-Bindung, vollständiger O12-/E4-Nachweis und realer Referenzlauf offen |
-| **E5 · Einzelne Fähigkeiten** | Pipettieren, Magnettrennung, Resuspension/Mischung, Probentemperierung und gegebenenfalls Zentrifugation/Analytik am konkreten Gefäß und Medium qualifizieren; Personenaufgaben weiter zulassen. | Vorab festgelegte Fehler-, Verlust-, Verschleppungs-, Temperatur- und Zeitgrenzen experimentell erfüllt. Stoppweg einschließlich Ausfallverhalten erprobt. Native Geometrie- und Bewegungsnachweise ergänzen die Messungen. | Offen, noch nicht geprüft |
-| **E6 · Ein automatisierter Ablauf** | Einen seriellen Ablauf desselben Profils mit eindeutig gebundenen Fähigkeiten gegen E4 vergleichen. Automatisierte und verbleibende Personenaufgaben ausweisen; noch keine frei optimierte Mehrarm-/Mehrchargenplanung. | Vorab definierte technische und biologische Vergleichskriterien erfüllt; Fristen und Probentemperatur nachgewiesen. Vollautomation nur beanspruchen, wenn alle betreffenden Schritte qualifiziert sind. | Offen, noch nicht geprüft |
-| **E7 · Bestände und Ausbau** | Laufübergreifenden Stock um die benötigten Reagenz-/Produktrollen erweitern; anschließend Storage- und Mehrarmplanung aus den verlinkten Plänen integrieren. Library-Präparation und Direktligation bleiben eigene Erweiterungsaufträge. | Bestandskopf/Lease/Fencing und Eltern-Kind-Reservierungen verhindern Doppelbelegung und Doppelverbrauch. Danach Chargen-/Armtakt, Rückhaltung, Lagerbedingungen und Wiederanlauf über alle beteiligten Ressourcen nachgewiesen. | Offen, noch nicht geprüft |
+Die bestehenden manuellen Runner führen keine externe Probenvorverdünnung aus;
+das aktuelle Qubit-Assay ist synthetisch. Die neue Ansicht enthält Konzeptkörper
+für die Werkzeuge; mechanische Pipettenauslegung, Dosierfunktion, kooperative
+Armsteuerung und durchgehende Bewegungen sind weiterhin zu entwickeln. Aus der
+statischen Darstellung folgen keine geprüften Gefäßpassungen, Dosiermengen,
+Traglasten oder sichere Zusammenarbeit. Bestehende Abläufe sind nicht an die
+neuen Konzeptgefäße gekoppelt.
 
-E2 arbeitet zunächst mit nachweislich für einen Lauf ausgegebenen Reagenzaliquots.
-Es entsteht keine zweite globale Vorratsliste. Erst E7 darf gemeinsame Vorräte
-über mehrere Läufe fortschreiben; dafür muss der bisherige Ausschluss von
-Reagenzien im Stock-Vertrag ausdrücklich erweitert werden. Ein Neustart, neues
-Profil oder Rückstellen ins Regal darf keine Mengen beziehungsweise Haltbarkeit
-zurücksetzen. Reservierungen und Abgleich gelten weiterhin innerhalb eines Laufs.
+<a id="mechanik-manuelle-aufgaben-und-messgeräte"></a>
 
-## Erforderliche negative Nachweise für E3
+#### Manuelle Aufgaben und Messgeräte
 
-Diese Fälle werden durch E3-Prozess-, `/2`-Ledger- und bestehende E2-Tests
-abgedeckt. Sie qualifizieren keine reale Durchführung:
+Der erste [synthetische NanoDrop-Ablauf](docs/nanodrop-manual-workflow.md) ist
+implementiert: gemeinsame Mikrovolumen-Protokollquelle für One und UltraC,
+transaktionales Laufprotokoll, Entnahmen und Abstammung, Dateiimport sowie
+platzweise bestätigte Rückgabe. Handarbeit und Datenübernahme, Verantwortlichkeit
+und physischer Ort sind getrennt. Tests prüfen auch Prozessabbruch und Neustart.
+Sämtliche SOPs, Bedienhandlungen und Messdateien sind vorerst synthetisch.
+Der [synthetische Qubit-4-Ablauf](docs/qubit-4-manual-workflow.md) ergänzt inzwischen
+Ansatzgefäße, Transfers, Standards, eine laufbezogene Kalibrierung und explizite
+synthetische Zeit. Beide Abläufe verwenden denselben Kern und Store.
+Der [gemeinsame synthetische Gesamtlauf](docs/synthetic-lab-workflow.md) führt zwölf
+Originalgefäße durch CF01, NanoDrop und Qubit auf einem Inventar mit dauerhaften
+Entnahmebuchungen und getrennten Stufenzuständen. Aktive CF01-Jobs werden nach
+Absturz nicht neu gestartet; ein synthetischer Abbruchabgleich ist erforderlich.
+Echte Exportqualifikation, Netzwerkadapter, ein laufübergreifendes Volumenbuch
+und eine Fortsetzung in CF01 folgen später. Das weitergehende Zielmodell steht unter
+[Manuelle Aufgaben und Messgeräte](docs/manual-tasks.md).
 
-- Abbruch vor Aktivierung sowie nach möglicher Zugabe ohne Quittung; Ca-haltige
-  Zugabe wird nicht automatisch wiederholt. Nach Kontaktverlust wird die Probe
-  als möglicherweise aktiv behandelt.
-- Unbestätigte Stoppzugabe, fehlendes Mischen, leeres Stoppreagenz und blockierter
-  Stoppzugang; kein Software-Halt wird als gestoppte Chemie ausgegeben.
-- Zeitüberschreitung, unbekannte Uhrzuordnung nach Neustart, Temperaturabweichung
-  und eine Charge, deren Stopptermine der verfügbare Dosiertakt nicht erfüllen kann.
-- Vertauschter Kontroll-/Input-Zweig oder falsche Fraktion; ein aufbewahrtes
-  Nebenprodukt beziehungsweise Produkt darf nicht automatisch als Abfall enden.
-- Doppelte Entnahme, unbekannte tatsächliche Menge, falsches Gefäß/Produkt und
-  Produkt-QC, die das Original ein zweites Mal belasten würde; ebenso die Zuteilung
-  desselben Reagenzaliquots an zwei Läufe oder dessen erneute Einführung als frisch.
-- Speicherfehler vor Wirkung, Parallelzugriff und veraltete Zustandskopie; keine
-  zweite führende Bilanz, unbelegte Freigabe oder Neuinitialisierung des Bestands.
-- Rohdatei mit unpassender Reaktions-/Versuchskennung, unzulässige QC-Methode
-  oder Signal unter Nachweisgrenze; weder Dateireihenfolge noch Nullsetzung
-  ersetzt Identität beziehungsweise Mengenwissen.
+<a id="mechanik-budgetansatz"></a>
 
-Eine chemisch nicht mehr rettbare Reaktion kann fachlich beendet werden, ohne
-Materialien ungeprüft zu entsorgen. Quarantäne, dokumentierte Abweichung und
-bestätigte Enddisposition bleiben getrennte Schritte. Der reale manuelle
-Stoppweg muss vor der ersten E4-Aktivierung bereit und geeignet sein;
-E3 beweist weder diesen realen Nachweis noch einen Hardware-Watchdog.
+### Budgetansatz
 
-## Entscheidungen vor E0-Freigabe
+Die [relative Geschossansicht F03](docs/floorplan-f03.md) wertet den privat
+bereitgestellten Plan zunächst ohne metrischen Maßstab aus. Raumkonturen,
+geteilte Wände und Türnachbarschaften ergänzen die bisherige Einraumskizze,
+ohne die L01-Quelle oder deren Aufstellung umzubinden. Das Originalfoto bleibt
+außerhalb des Repositories.
 
-Der Eigentümer hat Melanomzelllinien, H3K4me3 als technischen Einstieg und
-[PMID 41594604](https://pubmed.ncbi.nlm.nih.gov/41594604/) als methodischen und
-wissenschaftlichen Bezug festgelegt. Ausstattung ist laut Eigentümer im
-gezeichneten Labor/direkten Umfeld vorhanden; Verantwortung liegt bei ihm,
-Sicherheitsbeauftragtem und Chefin. Die aktuelle Arbeit bleibt in silico.
-Der [Referenzentwurf](docs/cutrun-reference-profile.md) führt SK-Mel-29 als
-ersten Modellkandidaten und die späteren TP73-Cofaktorziele mit Evidenzbezug.
+Für die [Raumumgebung L01](docs/lab-room-l01.md) als Nächstes ein definiertes
+Referenzmaß und die unklaren Konturen bestätigen, metrische Kalibrierung ergänzen
+und eine belegte Registrierung zu F03 herstellen. Erst auf dieser Grundlage
+Raumkontur, Türen, Fenster, Bänke und Stauraum gezielt korrigieren und beide CADs
+mit `python scripts/build_lab_room.py` neu prüfen. Geräte-, Mensch-/Maschinenwege
+und Transportprogramme benötigen anschließend eigene Nachweise; relative
+Nachbarschaft allein belegt weder Platz noch Passierbarkeit.
 
-Für die endgültige Bindung bleiben offen:
+Für die [Zentrifuge CF01](docs/centrifuge-cf01.md) zuerst die stationäre Entnahme mit
+gemessenem Gefäß und echtem Greifer untersuchen. Parallel einen qualifizierten
+Zentrifugenkern einschließlich Rotor, Verriegelung und Containment bestimmen.
+Für die stärkere Stahlfassung Stahlgüte, Tragverbindungen, Deckelunterstützung
+und Verriegelung gegen die erhebliche Deckelmasse auslegen. Netzmodul, Absicherung,
+Schutzleiter einschließlich Deckel und Isolation prüfen; Spindelgeber und
+Zählereingang anhand der abgeleiteten Bandbreite auswählen und unabhängig vom
+Stillstandswächter prüfen. Die vorhandenen Bauräume sind keine Kaufteilfreigabe.
+Den Konzeptrotor nicht als Hochgeschwindigkeitsbauteil fertigen oder einen
+Kaufrotor mit Heberbohrungen verändern. Kameramarkierungen, Kalibrierung und
+vollständige Übergabebahnen gesondert prüfen. Die lokale Mock-Schnittstelle
+ist ausführbar; Hardwaretreiber, reale Rückmeldung und ROS/SiLA folgen später.
+Die Station ist im bisherigen Armbudget nicht kalkuliert.
 
-- Konkrete Bestandskultur und ein neuer lokaler Anweisungsentwurf für das
-  gewählte Kit aus dem Paper, einschließlich Quellenbeleg, Artikeln, Zellzustand
-  und Mengen. Eine lokale SOP ist laut Eigentümer nicht vorhanden. Die
-  Kitfamilie CST CUT&RUN Assay Kit ist gewählt; der aktuelle CST-Stand 09/2026
-  ist nicht als damaliger Originalstand belegt.
-- Gewählter Verfahrenszweig, Reinigung, QC, Pausen und zulässige Abweichungen;
-  keine stillschweigende Ersetzung durch eine andere Variante.
-- Vor realer Ausführung konkrete Geräte-/Ortsbindungen und lokale Freigaben.
-  Die bestätigte Verfügbarkeit ersetzt diese Nachweise nicht, blockiert aber
-  keine gekennzeichneten synthetischen Modellfälle.
-- Abnahmekriterien und zulässige Abweichungen je Profil. Roh-DNA-QC,
-  Library-QC und externe Auswertung bleiben nach [Architektur](ARCHITECTURE.md#cutrun)
-  getrennt; ein optionaler späterer Library-Auftrag benötigt eine eigene Freigabe.
+CF01s implementierte Motor-/Brems-/Deckelgeometrie als Nächstes mit echten
+Kaufteildaten abgleichen. Rotierende Trägheit erfassen, Beschleunigung,
+Bremsenergie und thermischen Tastgrad auslegen; die Parkbremse nicht als
+Hochgeschwindigkeits-Betriebsbremse behandeln. Motorischen Deckel, Stifte,
+Endlagensensoren, Obstruktion und Haltefunktion zunächst ohne drehenden Rotor
+prüfen. Erst danach die bewertete Hardwarefolge anbinden und validieren.
 
-Mehrarmzahl, Chargengröße, benötigte Zusatzausstattung und Kosten folgen aus
-dieser Auswahl und den Nachweisen. Die zwölf CF01-Plätze, das bisherige
-Armprototypbudget und die modellierten Möbel liefern dafür keine Freigabe.
+Die Roboter-Entnahme ist inzwischen als gemeinsame kinematische Szene animiert
+und an diskreten nativen Stellungen geprüft. Als Nächstes Greifwerkzeug und
+Anbauhöhe mit echten Gefäßen bestimmen, Roboter-/Stationsrahmen kalibrieren,
+Greif-/Abwesenheits-/Freiraumsensorik einbinden und die komplette Bahn mit
+Traglast und kontinuierlicher Kollisionsprüfung qualifizieren.
 
-## Begonnene E4-Vorbereitung
+Die lokale CF01-Szene verwendet inzwischen eine podestfreie 280/250-mm-Armvariante
+und übergibt das Gefäß in ein geführtes 12-Platz-Rack. Nach den adaptiven
+geometrischen Stichproben nun reale Bankbefestigung, längere Glieder, Nutzlast,
+Antriebsmomente und Einschwingfehler gegen das ungefähr 1-mm-Transportziel
+vermessen. Rack-Unterstützung und Freigabe sensorisch bestätigen. Alle
+Beladungsreihenfolgen bei bereits belegten Nachbarplätzen separat prüfen;
+die Slot-01-Vorführung ersetzt diese Pfade nicht.
 
-Der aktuelle Auftrag benennt SK-Mel-29/H3K4me3 für den manuellen Referenzlauf.
-Das [Vorbereitungspaket](docs/cutrun-manual-reference.md) übernimmt die bekannten
-Kontextentscheidungen und trennt noch benötigte Laborunterlagen von eigenen
-Entwicklungsarbeiten. Der Eigentümer wählt das Kit aus der Publikation und hat
-keine lokale SOP. Die Entwicklung erstellt deshalb aus den ausgewählten
-Primärquellen einen lokalen Anweisungsentwurf zur fachlichen Prüfung und
-Bindung. [Fassung 0.1 liegt vor](docs/cutrun-manual-sop-draft.md), mit
-lokal gesicherter CST-Originaldatei und ausgewiesenem aktuellen Quellenstand.
-Die konkrete Bestandskultur/erste Bedingung bleibt zuzuordnen;
-anschließend Material-/Gerätezuordnung,
-manuellen Stoppweg, kontrollabhängige QC und Produktübergabe konkretisieren.
+Die CF01-Deckel-/Heberfolge ist jetzt animiert; ROS-Interfaces und SiLA-FDL
+werden aus derselben Protokollquelle erzeugt. Als Nächstes in einer echten
+ROS-2-Jazzy-Umgebung kompilieren und ROS-/SiLA-Server mit einem Client prüfen.
+Der lokale Mock und die XSD-Prüfung ersetzen diese Interoperabilitätsprüfung
+nicht. Siehe [CF01-Protokoll](docs/centrifuge-cf01.md#cf01-protocol).
 
-E4 verwendet den gemeinsamen Materiallebenszyklus als technische Grundlage,
-aber keine synthetischen Werte als reale Belege. Der
-[erste manuelle Aufzeichnungskern](docs/cutrun-manual-runtime.md) ergänzt ein
-abgeschlossenes Formatpaar /3, Quellen-/Originalarchivierung, reale UTC-/
-Monotoniebeobachtungen, expliziten Wiederanlaufabgleich und manuelle QC-Zuordnung.
-Die Profilvorlage lässt alle lokalen Laborparameter offen. Der Standard-Uhranbieter
-liefert keinen qualifizierten endlichen Zeitrahmen; neue Prozessabsichten bleiben
-an bestätigte Bindungen und geeignete Zeitbelege gebunden.
+Für den ergänzten [Probentransport TR01](docs/sample-transport-tr01.md) zunächst
+Zentrifugenartikel und Chargengröße festlegen sowie ausschließlich Bodenrouten
+aufnehmen. Tisch-/Spurwagen werden nicht weiterentwickelt. Die gemeinsame Quelle
+mit `python scripts/build_sample_transport.py` in beiden CADs prüfen. Je Armstation
+zunächst eine erreichbare Park-/Übergabepose für alle vorgesehenen Probenplätze
+mit tatsächlichem Werkzeug bestimmen. Artikelpassung, Rückhaltung, lokale
+Lageerfassung und Haltefunktion mit Mustern untersuchen; spurgenaue Fahrt ist
+keine Anforderung. Am Bodenfahrzeug Übergabehöhen, Türen, Schwellen, Kurven,
+Anhalten und Kippstabilität
+mit gemessener Dummy-Nutzlast prüfen. Anschließend Antriebe, Energieversorgung,
+Stationsverriegelung, Übergabegerät und Verkehrssteuerung auslegen. Kosten und
+Betriebsanforderungen der Transporter gesondert kalkulieren.
 
-Der zusätzliche Engine-Vertrag `cutrun_manual_sop/1` erzwingt inzwischen die
-vollständige lokale Folge S01–S12 mit getrenntem Inputpfad, aktuellen
-Material-/QC-Belegen und acht phasenbezogenen Dauer-/Temperaturprüfungen.
-Alle 32 neuen numerischen Grenzen bleiben in der Vorlage `null`.
-Wiederanlauf hält Stufenabsichten und Zeitlücken fest; Widersprüche können
-frühere Abschlüsse entwerten. Der Schutzstopp bleibt auch bei Abweichungen
-erfassbar, ohne einen nominalen Stufenabschluss zu behaupten.
+Die bevorzugte Servoauswahl aktualisiert die frühere pauschale Aufteilung.
+Die folgende Verteilung ist ein eigener Planungsansatz, keine Angebotskalkulation:
 
-Der eigene [Wasch- und Reagenzvertrag](docs/cutrun-manual-runtime.md#merged-cutrun-manual-recipe) ergänzt
-die ausgewählten Waschfolgen, belegte Arbeitsmischungen, Komponentenverbräuche
-und tatsächliche Fraktions-/Säulenübergänge im vorhandenen Ledger. Lokale
-Mengen, Wiederholungen und Vorbereitungsbindungen bleiben zunächst offen.
+| Bereich | Ansatz innerhalb 5.000 EUR Gesamtbudget |
+|---|---:|
+| Sechs Servomodule | 2.500 EUR |
+| Versorgung, Steuerungsanbindung, Verkabelung und Abschaltung | 700 EUR |
+| Motorplatten, Struktur, Lagerung und Haltesicherung | 700 EUR |
+| Optik und Beleuchtung | 400 EUR |
+| Reserve und einfache Halter/Versuchsadapter | 500 EUR |
+| **Summe** | **4.800 EUR** |
 
-Der Vertrag ist kein Geräte-Executor: reale Rezeptur-/Konzentrationsbestätigung,
-Temperatur-/Zeitqualifikation, native QC-Decoder und der reale Referenznachweis
-stehen aus. Ein geschlossener Aufzeichnungskopf
-bleibt ohne behaupteten Referenzerfolg; execution_ready bleibt falsch.
-O12 und die vollständige E4-Abnahme sind deshalb weiter offen.
+Vorhandene Pipetten, Messgeräte, Rechner und Fertigungsmöglichkeiten sind als
+Infrastruktur angesetzt. Die Uni-Werkstattzeit ist mit dem Team separat einzuplanen.
+Die untere Budgetgrenze setzt weitere geeignete vorhandene Komponenten voraus.
+Auswahl, Preisgrenzen, Präzisionsrisiko und Beschaffungsbedingungen stehen in
+[actuator-selection.md](docs/actuator-selection.md). Diese Planung betrifft einen Arm;
+weitere Arme sind gesonderte Ausbaustufen.
+
+<a id="mechanik-fachliche-referenzen"></a>
+
+### Fachliche Referenzen
+
+- [ISO 23783-2, Volumenleistung automatisierter Liquid-Handling-Systeme](https://www.iso.org/standard/76958.html)
+- [ISO 8655-6, gravimetrisches Referenzverfahren](https://www.iso.org/standard/75211.html)
+- [ANSI/SLAS-Mikroplattenstandards](https://www.slas.org/education/ansi-slas-microplate-standards/)
+- [Eppendorf, Pipettieren kleiner Volumina](https://www.eppendorf.com/jp-ja/lab-academy/topics-methods-technology/pipetting-dispensing/how-to-pipette-small-volumes-with-handheld-manual-pipettes/)
+
+Diese Referenzen ersetzen keine Auswahl- oder Leistungsprüfung des eigenen Aufbaus.
+
+<a id="mechanik-tr01-stationsübergaben-und-tapestation-12-november-2026"></a>
+
+### TR01-Stationsübergaben und TapeStation (12. November 2026)
+
+Der [synthetische Aufgabenrunner](docs/lab-station-transport.md) verbindet
+DNA-Vorbereitung, CF01, gemeinsame NanoDrop-/Qubit-Analytik und TS01 mit TR01.
+Journal, Identitätserhaltung und Wiederaufnahme mit Abgleich bleiben vom
+geometrischen Fahrprogramm getrennt. Dessen Parkpunkte und fließende,
+nativ mit Intervallhüllen geprüfte L01-Fahrkurven sind jetzt implementiert.
+Offen bleiben kalibrierte Docks, reales Fahrwerk/Navigation, dynamische
+Hindernisse und Arm-/Personenübergaben einschließlich tatsächlicher Rückmeldung.
+
+[TapeStation TS01](docs/tapestation.md) steht als manuelle Planungshülle mit PC auf
+der linken Mittelbank in L01. NanoDrop und Qubit sind am rechten Armpaar
+geometrisch ergänzt. Bestehende Geräte und Möbel behalten ihre Positionen.
+Vor realer Installation bleiben Modellwahl und gemessene Platzprüfung nötig.
+Für einen späteren Assistenzworkflow vorhandene manuelle Aufgaben und den
+gemeinsamen Material-Ledger um Assay-/Lane-Zuordnung und Originalexport
+verwenden; der Messablauf selbst ist weiterhin ein Entwurf.
+
+<a id="mechanik-bf01-gebäudeflotte-20-november-2026"></a>
+
+### BF01-Gebäudeflotte (20. November 2026)
+
+Die [separate BF01-Komposition](docs/building-fleet-demo.md) bereitet 20 leere TR01 mit referenziertem Kamerakit vor. K0_013 ist für E2 ausdrücklich zurückgestellt, ohne den Treppenkern zu öffnen. Strikte Quellenprüfung und unabhängige FreeCAD-/SolidCraft-Kameraableitung sind implementiert. Die Kontakte auf den ursprünglichen transformierten L01-Gangmitten bleiben dokumentiert. Die am 20. November separat freigegebene BF01-Verbindung besteht kontinuierliche Geometrie-, Boden- und native Kurvenprüfungen mit unveränderten Bench-Sperren. Die weitere Prüfung stoppt am nativ bestätigten bodenlosen Streifen der inneren EG-Aufzugsschwelle; ihre Geometriekorrektur benötigt eine eigene Freigabe und neue Nachweise. Die weitere Flottenintegration darf keine Ziele oder Abstände still ändern. Dienste, Funkkanal, Leitstand und Sensorbausteine sind separat getestet, aber kein Gesamtlauf oder Browser-Flottenprogramm.
+<!-- roadmap-source-end: mechanical -->

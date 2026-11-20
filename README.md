@@ -52,6 +52,9 @@ Doktorandenraum, Labor, Küche und Atrium lassen sich ohne CAD-Installation besi
 
 ## Biologische Workflows gemeinsam ausführen
 
+Der [Workflow-Bereich](docs/workflows/README.md) bündelt die Einstiege und die
+[biologische Roadmap](docs/workflows/ROADMAP.md).
+
 Die Arbeitsschritte verbinden Roboter, Geräte und Menschen. Eine Probe behält ihre Identität über Entnahmen, Messungen und Transporte hinweg; ihre Übergaben und verbrauchten Mengen werden dokumentiert. Menschliche Arbeitsschritte und Botengänge gehören ausdrücklich dazu. So lässt sich ein Ablauf schrittweise automatisieren.
 
 Bereits ausführbare **synthetische Softwareabläufe** zeigen beispielsweise:
@@ -69,7 +72,7 @@ Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen. Free
 
 Für den Einstieg:
 
-- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und [Entwicklungsplan](docs/development-plan.md).
+- [Anforderungen](docs/requirements.md), [Armentwurf](docs/design.md) und [mechanischer Entwicklungsplan](ROADMAP.md#mechanischer-entwicklungsplan).
 - [Architektur](ARCHITECTURE.md) und [gemeinsames Modell](docs/shared-model.md).
 - [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) und [Gerätekommunikation am Beispiel CF01/SiLA 2](docs/sila2-network.md).
 

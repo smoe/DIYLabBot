@@ -318,5 +318,8 @@ Flottenlauf, ein nativer Gesamtprogrammcheck und die BF01-WebGL-Prüfung
 wurden wegen des Schwellenstopps nicht ausgeführt. Der lokale
 `exports/building-fleet/l01-connector/fleet-report.json` führt deshalb
 den Status `blocked_geometry` und keinen bestandenen Gesamtlauf.
-Alle neuen Commits bleiben lokal auf `codex/building-fleet-demo`; es gab
-keinen Merge, Push oder Pages-Stand dieser Erweiterung.
+Der Prüfstand `f46b8d3` entstand lokal auf `codex/building-fleet-demo` ohne
+Merge, Push oder Pages-Veröffentlichung. Die anschließende Integration in den
+aktuellen `master` ändert keine geprüfte Geometrie und führt keinen neuen
+Flottenlauf aus. Der oben genannte Gesamtbericht bleibt ein historischer
+Bericht zu `f46b8d3`; Push und Pages-Veröffentlichung bleiben gesperrt.
