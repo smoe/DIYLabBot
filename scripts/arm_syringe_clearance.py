@@ -50,10 +50,15 @@ def primitive_bounds(shape, parameters):
 
 
 def source_envelopes(arm, own, arm_parameters, own_parameters):
-    """Return link/component-local body envelopes from shared create/union ops."""
+    """Enclose each body by its uncut positive primitives, never by a cut void.
+
+    Circular plates keep their circular enclosure: an AABB corner is empty
+    space, not evidence that a close hose touches the plate. Unsupported
+    primitives retain their conservative boxes. Native checks remain separate.
+    """
     result = []
     def collect(operations, parameters, component, arm_body):
-        bodies = {}
+        bodies = {};primitives = {}
         for operation in operations:
             action = operation['action']
             if action in ('cut', 'subtract'):
@@ -63,6 +68,8 @@ def source_envelopes(arm, own, arm_parameters, own_parameters):
                 for target in operation['targets']:
                     old = bodies[target]
                     bodies[target] = {key: [v+d for v, d in zip(values, delta)] for key, values in old.items()}
+                    for primitive in primitives[target]:
+                        primitive['origin'] = [v+d for v, d in zip(primitive['origin'], delta)]
                 continue
             if action not in ('create', 'union', 'join'):
                 raise ValueError('No conservative source envelope for action '+str(action))
@@ -70,16 +77,29 @@ def source_envelopes(arm, own, arm_parameters, own_parameters):
                 continue
             shape = operation.get('primitive', operation.get('shape'))
             bounds = primitive_bounds(shape, parameters)
+            value = lambda v: robot.evaluate(v, parameters)
+            if shape['kind'] in {'cylinder', 'cone'}:
+                enclosure = {'kind': 'cylinder', 'origin': [value(v) for v in shape['origin']],
+                    'axis': hose._unit([value(v) for v in shape.get('axis', [0, 0, 1])]),
+                    'height': value(shape.get('height', shape.get('length'))),
+                    'radius': max(value(shape['radius']), value(shape.get('top_radius', shape['radius'])))}
+            else:
+                enclosure = {'kind': 'box', 'origin': list(bounds['min']),
+                             'size': [hi-lo for lo, hi in zip(bounds['min'], bounds['max'])]}
             targets = [operation['body']] if action == 'create' else operation.get('targets', [operation.get('body')])
             for target in targets:
                 if target is None:
                     raise ValueError('A source envelope operation needs a target')
                 old = bodies.get(target)
                 bodies[target] = bounds if old is None else _box(_corners(old)+_corners(bounds))
+                if action == 'create':primitives[target] = []
+                import copy
+                primitives.setdefault(target, []).append(copy.deepcopy(enclosure))
         for name, bounds in bodies.items():
             padding = 1e-6
             padded = {'min': [v-padding for v in bounds['min']], 'max': [v+padding for v in bounds['max']]}
             result.append({'body': name, 'component': component, 'bbox': padded,
+                           'enclosing_primitives': primitives[name],
                            'numeric_envelope_padding_mm': padding, 'arm_body': arm_body})
     expanded = robot.expanded(arm)
     for link in expanded['links']:
@@ -92,6 +112,27 @@ def source_envelopes(arm, own, arm_parameters, own_parameters):
 
 def _point_box_distance(point, box):
     return math.sqrt(sum(max(0, box['min'][i]-point[i], point[i]-box['max'][i])**2 for i in range(3)))
+
+
+def _point_envelope_distance(point, body):
+    """Distance to a union of solid enclosing primitives is a safe lower bound."""
+    if 'enclosing_primitives' not in body:
+        return _point_box_distance(point, body['bbox'])
+    distances = []
+    for primitive in body['enclosing_primitives']:
+        if primitive['kind'] == 'box':
+            origin = primitive['origin']
+            box = {'min': origin, 'max': [a+b for a, b in zip(origin, primitive['size'])]}
+            distances.append(_point_box_distance(point, box))
+        elif primitive['kind'] == 'cylinder':
+            delta = hose._sub(point, primitive['origin']);axial = hose._dot(delta, primitive['axis'])
+            radial = math.sqrt(max(0., hose._dot(delta, delta)-axial*axial))
+            distances.append(math.hypot(max(0., radial-primitive['radius']),
+                                       max(0., -axial, axial-primitive['height'])))
+        else:
+            raise ValueError('Unsupported source enclosing primitive')
+    if not distances:raise ValueError('A source body needs a nonempty conservative enclosure')
+    return min(distances)-math.sqrt(3)*body.get('numeric_envelope_padding_mm', 0.)
 
 
 def check_route(path, envelopes, matrices, tube_radius, guard_radius, *, sample_step_mm=2.0,
@@ -149,7 +190,7 @@ def check_route(path, envelopes, matrices, tube_radius, guard_radius, *, sample_
                 if distance not in position_cache:
                     position_cache[distance] = carrier.path_position(path, distance)['point_mm']
                 point = position_cache[distance]
-                gap = _point_box_distance(robot.transform(inv, point), body['bbox'])-radius
+                gap = _point_envelope_distance(robot.transform(inv, point), body)-radius
                 margin = gap-width/2;evaluations += 1;finest = min(finest, width)
                 if margin <= 0 and gap > 0 and width > minimum_sample_step_mm:
                     stack.extend([(start, distance), (distance, end)]);refined += 1
@@ -168,4 +209,4 @@ def check_route(path, envelopes, matrices, tube_radius, guard_radius, *, sample_
             'witness': witness, 'maximum_sample_step_mm': sample_step_mm,
             'minimum_sample_step_mm': minimum_sample_step_mm, 'finest_interval_mm': finest,
             'refined_interval_count': refined, 'interval_evaluations': evaluations,
-            'scope': 'Source-only enclosing primitives and adaptive interval distance bounds; not motion or hardware qualification'}
+            'scope': 'Source-only uncut positive primitive enclosures and adaptive interval distance bounds; not motion or hardware qualification'}

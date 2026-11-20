@@ -56,13 +56,13 @@
       "meaning": "Assumed tube outside radius"
     },
     "hoseLength": {
-      "value": 1193,
+      "value": 1004,
       "unit": "mm",
       "range": [
-        850,
+        500,
         1250
       ],
-      "meaning": "Provisional whole-mm common physical cut from the framed named-state band and itemized assembly tolerances; no hardware-minimum claim"
+      "meaning": "Provisional common physical cut, sum of independently constant joint sections and rigid link runs; no global minimum or hardware accuracy claim"
     },
     "hoseBendRadius": {
       "value": 12,
@@ -135,6 +135,60 @@
         0.15
       ],
       "meaning": "Radial shaft relief at tip mouth above the lower seal circle"
+    },
+    "hoseClipLength": {
+      "value": 10,
+      "unit": "mm",
+      "range": [
+        6,
+        12
+      ],
+      "meaning": "Nominal straight supported length in each link-mounted plastic clip"
+    },
+    "clipFreeLead": {
+      "value": 3,
+      "unit": "mm",
+      "range": [
+        3,
+        10
+      ],
+      "meaning": "Provisional 3 mm unbent exit beyond each physical clip, within the declared adjustment range; selected with complete clip/support clearance checks, not a qualified tube requirement"
+    },
+    "clipHoseGap": {
+      "value": 0.05,
+      "unit": "mm",
+      "range": [
+        0.02,
+        0.15
+      ],
+      "meaning": "Nominal radial clearance in the assumed compression clip; axial retention unqualified"
+    },
+    "clipWall": {
+      "value": 1.2,
+      "unit": "mm",
+      "range": [
+        0.8,
+        2
+      ],
+      "meaning": "Assumed plastic hose saddle wall thickness"
+    },
+    "mountGap": {
+      "value": 0.05,
+      "unit": "mm",
+      "range": [
+        0.02,
+        0.15
+      ],
+      "meaning": "Nominal radial/face clearance of split clamp around existing arm geometry"
+    },
+    "mountWall": {
+      "value": 0.9,
+      "unit": "mm",
+      "range": [
+        0.7,
+        1.2
+      ],
+      "meaning": "Assumed split mounting collar wall thickness; strength and fit unqualified"
     }
   },
   "pump_mount": {
@@ -393,7 +447,8 @@
     "Hose shapes are checked static routes of constant modeled length, not a dynamic hose, full-range routing, torsion, fatigue or pinch proof.",
     "No timed robot transport, runtime sample ledger, device firmware, medical use or hardware execution is introduced.",
     "The jointwise inspection window is a tooling-use assumption for named static builds, not a collision-free Cartesian product or a hardware controller limit. Other combinations require separate routing and collision checks.",
-    "Only named source configurations are supported static snapshots. Cartesian corner/edge trials are diagnostics; unsupported trials remain explicitly classified and are not available motions or verified operating states."
+    "Only named source configurations are supported static snapshots. Cartesian corner/edge trials are diagnostics; unsupported trials remain explicitly classified and are not available motions or verified operating states.",
+    "The printed clip exits use a provisional 3 mm straight lead; port insertions, 10 mm socket strain reliefs and 10 mm connector straight leads are retained. Clip retention, physical tube properties and dynamic motion remain unqualified."
   ],
   "operating_window_status": "Tooling usage assumption; not robot limits or hardware qualification",
   "operating_window_deg": {
@@ -458,19 +513,19 @@
         "reason": "Provisional head socket depth/assembly tolerance beyond the nominal insertion already counted"
       },
       {
-        "id": "guide_entry_position",
+        "id": "first_clip_position",
         "value_mm": 0.5,
-        "reason": "Provisional guide entry placement tolerance"
+        "reason": "Provisional placement tolerance at the first printed hose clip"
       },
       {
-        "id": "guide_exit_position",
+        "id": "last_clip_position",
         "value_mm": 0.5,
-        "reason": "Provisional guide exit placement tolerance"
+        "reason": "Provisional placement tolerance at the final printed hose clip"
       },
       {
         "id": "ordinary_clip_positions",
         "value_mm": 1,
-        "reason": "Provisional combined placement budget for the ordinary routing clips"
+        "reason": "Provisional combined placement budget for the remaining printed hose clips; not a measured assembly tolerance"
       }
     ],
     "scan_max_step_deg": 30,
@@ -479,234 +534,9 @@
     "cut_resolution_mm": 1,
     "clearance_sample_step_mm": 2,
     "clearance_minimum_step_mm": 0.05,
-    "scope": "Minimum demonstrated under stated source frames, finite loop samples and conservative source-envelope checks; all named static states retained, no continuous-motion allowance or hardware minimum claim"
+    "scope": "Sixteen unchanged named static poses; independently fixed material lengths at every clip, bounded local joint loops; no Cartesian-window or continuous-motion claim"
   },
-  "carrier_routing": {
-    "frames": {
-      "guide_entry": {
-        "link": "L2_UpperArm",
-        "origin": [
-          "-outboard-20",
-          120,
-          "elbow_z-20"
-        ],
-        "tangent": [
-          0,
-          0,
-          -1
-        ],
-        "x": [
-          -1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "guide_exit": {
-        "link": "L3_Elbow",
-        "origin": [
-          -10,
-          120,
-          "elbow_z+20"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "service_loop": {
-        "link": "L3_Elbow",
-        "origin": [
-          -60,
-          "80+serviceLoop",
-          "roll_z+20"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "pre_roll": {
-        "link": "L3_Elbow",
-        "origin": [
-          -60,
-          45,
-          "roll_z+50"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "roll_clip": {
-        "link": "L4_ForearmRoll",
-        "origin": [
-          0,
-          35,
-          "wrist_z-45"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 10
-      },
-      "wrist_clip": {
-        "link": "L5_WristPitch",
-        "origin": [
-          0,
-          65,
-          "wrist_z"
-        ],
-        "tangent": [
-          0,
-          1,
-          0
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 10
-      },
-      "approach_wrist": {
-        "link": "L4_ForearmRoll",
-        "origin": [
-          0,
-          45,
-          "wrist_z-15"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "post_wrist": {
-        "link": "L5_WristPitch",
-        "origin": [
-          -40,
-          80,
-          "wrist_z+35"
-        ],
-        "tangent": [
-          0,
-          0,
-          1
-        ],
-        "x": [
-          1,
-          0,
-          0
-        ],
-        "clamp_length_mm": 0
-      },
-      "pre_flange": {
-        "link": "L5_WristPitch",
-        "origin": [
-          -64,
-          0,
-          "tip_air_zero_z"
-        ],
-        "tangent": [
-          1,
-          0,
-          0
-        ],
-        "x": [
-          0,
-          1,
-          0
-        ],
-        "clamp_length_mm": 0
-      }
-    },
-    "sequence": [
-      "pump",
-      "guide_entry",
-      "guide_exit",
-      "service_loop",
-      "pre_roll",
-      "roll_clip",
-      "approach_wrist",
-      "wrist_clip",
-      "post_wrist",
-      "pre_flange",
-      "tip"
-    ],
-    "guide": {
-      "from": "guide_entry",
-      "to": "guide_exit",
-      "search_frame": "guide_entry",
-      "endpoint_straights_mm": [
-        "connectorStraightLead",
-        "connectorStraightLead"
-      ],
-      "external_straights_mm": [
-        "connectorStraightLead",
-        "connectorStraightLead"
-      ]
-    },
-    "bare_fit": {
-      "tangent_distance_multipliers": [
-        1,
-        1.5,
-        2,
-        3,
-        4,
-        6,
-        8
-      ]
-    },
-    "crossings": {
-      "J3_Elbow": "guide_exit",
-      "J4_ForearmRoll": "roll_clip",
-      "J5_WristPitch": "wrist_clip",
-      "J6_FlangeRoll": {
-        "interface": "tip",
-        "station": "unsupported_exit_mm"
-      }
-    },
-    "sample_step_mm": 3
-  },
-  "hose_carrier": {
-    "source": "model/spatial-hose-carrier.shared.json",
-    "source_sha256": "6c1a24bcb15d91d620f1a413d86410138f2390bfdb3bd774851574aa4dc21396"
-  },
+  "hose_carrier": null,
   "connections": {
     "kind": "tube_in_socket",
     "status": "Assumed ferrule/compression retention and seal on tube OD; not a selected or qualified fitting",
@@ -761,5 +591,847 @@
     "consumable_component": "ConsumableTip",
     "shaft_body": "TipShaft",
     "tip_body": "DisposableTip"
+  },
+  "hose_routing": {
+    "format": "solidcraftbot.link-clipped-hose/1",
+    "status": "Provisional plastic split clamps with assumed non-sliding axial retention; no selected clip article or qualified force",
+    "sample_step_mm": 2,
+    "clips": {
+      "j3_parent": {
+        "link": "L2_UpperArm",
+        "body_id": "HoseClipJ3Parent",
+        "host_body": "Upper_plate_L",
+        "center_mm": [
+          -14,
+          -38,
+          335
+        ],
+        "tangent": [
+          0,
+          0,
+          -1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "plate_edge"
+        }
+      },
+      "j3_child": {
+        "link": "L3_Elbow",
+        "body_id": "HoseClipJ3Child",
+        "host_body": "Forearm_root",
+        "center_mm": [
+          45,
+          -38,
+          362.5
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "root_edge"
+        }
+      },
+      "j4_parent": {
+        "link": "L3_Elbow",
+        "body_id": "HoseClipJ4Parent",
+        "host_body": "J4_mount_post_0",
+        "center_mm": [
+          21,
+          35,
+          "roll_z-9"
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "post_collar"
+        }
+      },
+      "j4_child": {
+        "link": "L4_ForearmRoll",
+        "body_id": "HoseClipJ4Child",
+        "host_body": "Forearm_tube",
+        "center_mm": [
+          0,
+          34,
+          465
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "tube_band"
+        }
+      },
+      "j5_parent": {
+        "link": "L4_ForearmRoll",
+        "body_id": "HoseClipJ5Parent",
+        "host_body": "Forearm_tube",
+        "center_mm": [
+          -14,
+          38,
+          510
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "tube_band",
+          "band_center_z_mm": 475
+        }
+      },
+      "j5_child": {
+        "link": "L5_WristPitch",
+        "body_id": "HoseClipJ5Child",
+        "host_body": "J6_mount_post_1",
+        "center_mm": [
+          0,
+          38,
+          568
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "post_collar"
+        }
+      },
+      "j6_parent": {
+        "link": "L5_WristPitch",
+        "body_id": "HoseClipJ6Parent",
+        "host_body": "J6_mount_post_2",
+        "center_mm": [
+          -34,
+          0,
+          612
+        ],
+        "tangent": [
+          0,
+          0,
+          1
+        ],
+        "x_axis": [
+          1,
+          0,
+          0
+        ],
+        "mount": {
+          "kind": "post_collar"
+        }
+      }
+    },
+    "sections": [
+      {
+        "id": "upper_run",
+        "kind": "fixed_link",
+        "from": "pump",
+        "to": "j3_parent",
+        "link": "L2_UpperArm",
+        "controls": [
+          [
+            "-outboard",
+            0,
+            450
+          ],
+          [
+            "-outboard",
+            0,
+            467
+          ],
+          [
+            "-outboard+20",
+            -14,
+            467
+          ],
+          [
+            "-outboard+20",
+            -14,
+            374
+          ],
+          [
+            "-outboard+20",
+            -38,
+            374
+          ],
+          [
+            -14,
+            -38,
+            374
+          ],
+          [
+            -14,
+            -38,
+            "elbow_z-15+hoseClipLength/2"
+          ]
+        ],
+        "host_bodies": [
+          "SinglePumpPlate",
+          "Upper_plate_L",
+          "PumpHoseBarb",
+          "PumpHoseClamp"
+        ],
+        "max_offset_mm": 80
+      },
+      {
+        "id": "elbow_flex",
+        "kind": "joint_loop",
+        "from": "j3_parent",
+        "to": "j3_child",
+        "joint": "J3_Elbow",
+        "parent_link": "L2_UpperArm",
+        "max_reach_mm": 80,
+        "axial_range_mm": [
+          -115,
+          -65
+        ],
+        "loop_fit": {
+          "outward": [
+            0,
+            -1,
+            0
+          ],
+          "shift_axis": [
+            0,
+            0,
+            1
+          ],
+          "heights_mm": [
+            0,
+            4,
+            8,
+            12,
+            16,
+            20,
+            24,
+            28,
+            32,
+            36,
+            40
+          ],
+          "shifts_mm": [
+            -12,
+            0,
+            12
+          ],
+          "middle_modes": [
+            "chord",
+            "average",
+            "up",
+            "seed",
+            "minus_x",
+            "down"
+          ],
+          "handle_lengths_mm": [
+            18,
+            24,
+            30,
+            36
+          ],
+          "families": [
+            "biarc_pair",
+            "quintic_biarcs"
+          ],
+          "subdivisions": 4,
+          "length_increment_mm": 1
+        }
+      },
+      {
+        "id": "elbow_run",
+        "kind": "fixed_link",
+        "from": "j3_child",
+        "to": "j4_parent",
+        "link": "L3_Elbow",
+        "controls": [
+          [
+            45,
+            -38,
+            "elbow_z+12.5+hoseClipLength/2"
+          ],
+          [
+            45,
+            -38,
+            "elbow_z+37"
+          ],
+          [
+            45,
+            11,
+            "elbow_z+29"
+          ],
+          [
+            21,
+            35,
+            "elbow_z+29"
+          ],
+          [
+            21,
+            35,
+            "roll_z-9-hoseClipLength/2"
+          ]
+        ],
+        "host_bodies": [
+          "J3_rotating_hub",
+          "J4_mount_post_0",
+          "J4_mount_post_1",
+          "J4_mount_post_2",
+          "J4_mount_post_3"
+        ],
+        "max_offset_mm": 45
+      },
+      {
+        "id": "roll_flex",
+        "kind": "joint_loop",
+        "from": "j4_parent",
+        "to": "j4_child",
+        "joint": "J4_ForearmRoll",
+        "parent_link": "L3_Elbow",
+        "max_reach_mm": 60,
+        "axial_range_mm": [
+          -30,
+          55
+        ],
+        "loop_fit": {
+          "outward": [
+            -1,
+            0,
+            0
+          ],
+          "shift_axis": [
+            0,
+            1,
+            0
+          ],
+          "heights_mm": [
+            0.0,
+            0.5,
+            1.0,
+            1.5,
+            2.0,
+            2.5,
+            3.0,
+            3.5,
+            4.0,
+            4.5,
+            5.0,
+            5.5,
+            6.0,
+            6.5,
+            7.0,
+            7.5,
+            8.0,
+            8.5,
+            9.0,
+            9.5,
+            10.0,
+            10.5,
+            11.0,
+            11.5,
+            12.0,
+            12.5,
+            13.0,
+            13.5,
+            14.0,
+            14.5,
+            15.0,
+            15.5,
+            16.0,
+            16.5,
+            17.0,
+            17.5,
+            18.0,
+            18.5,
+            19.0,
+            19.5,
+            20.0,
+            20.5,
+            21.0,
+            21.5,
+            22.0,
+            22.5,
+            23.0,
+            23.5,
+            24.0,
+            24.5,
+            25.0,
+            25.5,
+            26.0,
+            26.5,
+            27.0,
+            27.5,
+            28.0,
+            28.5,
+            29.0,
+            29.5,
+            30.0,
+            30.5,
+            31.0,
+            31.5,
+            32.0,
+            32.5,
+            33.0,
+            33.5,
+            34.0,
+            34.5,
+            35.0,
+            35.5,
+            36.0,
+            36.5,
+            37.0,
+            37.5,
+            38.0,
+            38.5,
+            39.0,
+            39.5,
+            40.0,
+            40.5,
+            41.0,
+            41.5,
+            42.0,
+            42.5,
+            43.0,
+            43.5,
+            44.0,
+            44.5,
+            45.0,
+            45.5,
+            46.0,
+            46.5,
+            47.0,
+            47.5,
+            48.0,
+            48.5,
+            49.0,
+            49.5,
+            50.0,
+            50.5,
+            51.0,
+            51.5,
+            52.0,
+            52.5,
+            53.0,
+            53.5,
+            54.0,
+            54.5,
+            55.0,
+            55.5,
+            56.0,
+            56.5,
+            57.0,
+            57.5,
+            58.0,
+            58.5,
+            59.0,
+            59.5,
+            60.0
+          ],
+          "shifts_mm": [
+            -12,
+            0,
+            12
+          ],
+          "middle_modes": [
+            "chord",
+            "average",
+            "up",
+            "seed",
+            "down"
+          ],
+          "handle_lengths_mm": [
+            18,
+            24,
+            30,
+            36
+          ],
+          "families": [
+            "biarc_pair",
+            "quintic_biarcs"
+          ],
+          "subdivisions": 4,
+          "length_increment_mm": 1
+        }
+      },
+      {
+        "id": "forearm_run",
+        "kind": "fixed_link",
+        "from": "j4_child",
+        "to": "j5_parent",
+        "link": "L4_ForearmRoll",
+        "controls": [
+          [
+            0,
+            34,
+            "wrist_z-60+hoseClipLength/2"
+          ],
+          [
+            -14,
+            38,
+            "wrist_z-15-hoseClipLength/2"
+          ]
+        ],
+        "host_bodies": [
+          "Forearm_tube",
+          "Wrist_yoke_bridge",
+          "Wrist_cheek_R"
+        ],
+        "max_offset_mm": 25
+      },
+      {
+        "id": "pitch_flex",
+        "kind": "joint_loop",
+        "from": "j5_parent",
+        "to": "j5_child",
+        "joint": "J5_WristPitch",
+        "parent_link": "L4_ForearmRoll",
+        "max_reach_mm": 80,
+        "axial_range_mm": [
+          0,
+          50
+        ],
+        "loop_fit": {
+          "outward": [
+            0,
+            1,
+            0
+          ],
+          "shift_axis": [
+            -1,
+            0,
+            0
+          ],
+          "heights_mm": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44
+          ],
+          "shifts_mm": [
+            -12,
+            0,
+            12
+          ],
+          "middle_modes": [
+            "chord",
+            "average",
+            "up",
+            "seed",
+            "minus_x",
+            "down"
+          ],
+          "handle_lengths_mm": [
+            18,
+            24,
+            30,
+            36
+          ],
+          "families": [
+            "biarc_pair",
+            "quintic_biarcs"
+          ],
+          "subdivisions": 4,
+          "length_increment_mm": 1
+        }
+      },
+      {
+        "id": "wrist_run",
+        "kind": "fixed_link",
+        "from": "j5_child",
+        "to": "j6_parent",
+        "link": "L5_WristPitch",
+        "controls": [
+          [
+            0,
+            38,
+            "wrist_z+43+hoseClipLength/2"
+          ],
+          [
+            0,
+            38,
+            590
+          ],
+          [
+            -34,
+            38,
+            590
+          ],
+          [
+            -34,
+            0,
+            590
+          ],
+          [
+            -34,
+            0,
+            "flange_z-3-hoseClipLength/2"
+          ]
+        ],
+        "host_bodies": [
+          "A6_housing",
+          "J6_mount_post_1",
+          "J6_mount_post_2"
+        ],
+        "max_offset_mm": 35
+      },
+      {
+        "id": "flange_flex",
+        "kind": "joint_loop",
+        "from": "j6_parent",
+        "to": "tip",
+        "joint": "J6_FlangeRoll",
+        "parent_link": "L5_WristPitch",
+        "max_reach_mm": 60,
+        "axial_range_mm": [
+          -20,
+          45
+        ],
+        "loop_fit": {
+          "outward": [
+            0,
+            -1,
+            0
+          ],
+          "shift_axis": [
+            -1,
+            0,
+            0
+          ],
+          "heights_mm": [
+            -60,
+            -59,
+            -58,
+            -57,
+            -56,
+            -55,
+            -54,
+            -53,
+            -52,
+            -51,
+            -50,
+            -49,
+            -48,
+            -47,
+            -46,
+            -45,
+            -44,
+            -43,
+            -42,
+            -41,
+            -40,
+            -39,
+            -38,
+            -37,
+            -36,
+            -35,
+            -34,
+            -33,
+            -32,
+            -31,
+            -30,
+            -29,
+            -28,
+            -27,
+            -26,
+            -25,
+            -24,
+            -23,
+            -22,
+            -21,
+            -20,
+            -19,
+            -18,
+            -17,
+            -16,
+            -15,
+            -14,
+            -13,
+            -12,
+            -11,
+            -10,
+            -9,
+            -8,
+            -7,
+            -6,
+            -5,
+            -4,
+            -3,
+            -2,
+            -1,
+            0,
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60
+          ],
+          "shifts_mm": [
+            -24,
+            -12,
+            0,
+            12,
+            24
+          ],
+          "middle_modes": [
+            "chord",
+            "average",
+            "up",
+            "seed",
+            "minus_y",
+            "down"
+          ],
+          "handle_lengths_mm": [
+            18,
+            24,
+            30,
+            36
+          ],
+          "families": [
+            "biarc_pair",
+            "quintic_biarcs"
+          ],
+          "subdivisions": 4,
+          "length_increment_mm": 1
+        }
+      }
+    ],
+    "axial_retention_status": "Each clip fixes a material station by assumed compression retention; gap geometry does not prove holding force",
+    "qualification": {
+      "clip_fit_verified": false,
+      "axial_retention_verified": false,
+      "continuous_motion_verified": false
+    }
   }
 }

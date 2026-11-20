@@ -14,11 +14,135 @@ from build_arm_syringe import (audit_clearances, bbox_distance, carrier_bodies, 
                               canonical_material_core, compare_derived_metrics, digest,
                               guard_pair_groups, merge_clearance_checks, route_derivation_diagnostics,
                               pneumatic_connections, require_hose_self_clearance, write,
-                              route_material_checks,
+                              route_material_checks, clipped_mode,
                               CONTACT_DISTANCE_TOLERANCE_MM, OVERLAP_ZERO_TOLERANCE_MM3)
 
 
 FREECAD_COLLAR_SEAM_DEG = 135.
+
+
+def clipped_hose_checks(model, spec, p, state, shapes):
+    """Inspect real clip bores, host fits and complete bounded route sections."""
+    if not clipped_mode(spec):return None
+    import close_hose_clips
+    import spatial_hose_carrier as curve
+    local = close_hose_clips.expanded(model.arm(spec), p, spec['hose_routing']['clips'])
+    path = state['hose_path'];supports = {};tube = shapes['PneumaticHose']
+    rotation = lambda matrix, vector: [sum(matrix[i][j]*vector[j] for j in range(3)) for i in range(3)]
+    for name, interface in local['support_interfaces'].items():
+        matrix = state['part_matrices'][interface['component']]
+        world = lambda point: model.robot.transform(matrix, point)
+        clip, host = shapes[interface['clip_body']], shapes[interface['host_body']]
+        center = interface['center_mm'];axis = interface['axis'];x = interface['x_axis']
+        y = [axis[1]*x[2]-axis[2]*x[1], axis[2]*x[0]-axis[0]*x[2], axis[0]*x[1]-axis[1]*x[0]]
+        bore = []
+        for offset in (-interface['physical_support_length_mm']/4, 0., interface['physical_support_length_mm']/4):
+            c = [v+offset*a for v, a in zip(center, axis)]
+            for angle in (math.pi/4, 3*math.pi/4, 5*math.pi/4, 7*math.pi/4):
+                hose_point = world(radial_point(c, x, y, interface['tube_outer_radius_mm'], angle))
+                wall_point = world(radial_point(c, x, y, interface['bore_radius_mm'], angle))
+                bore.append({'hose_point_mm': hose_point, 'clip_wall_point_mm': wall_point,
+                    'hose_membership_error_mm': point_distance(tube, hose_point),
+                    'clip_membership_error_mm': point_distance(clip, wall_point),
+                    'native_radial_gap_mm': point_distance(clip, hose_point)})
+        fit = interface['host_fit'];host_points = []
+        if fit['kind'] == 'cylinder':
+            for angle in (math.pi/4, 3*math.pi/4, 5*math.pi/4, 7*math.pi/4):
+                host_points.append(radial_point(fit['center_mm'], [1, 0, 0], [0, 1, 0],
+                                                fit['source_radius_mm'], angle))
+        else:
+            origin, size = fit['origin_mm'], fit['size_mm'];end = [a+b for a, b in zip(origin, size)]
+            z = center[2]-4 if interface['mount_kind'] == 'plate_edge' else center[2]
+            edge = origin[0] if fit['source_edge'] == 'negative_x' else end[0]
+            inside = edge+1 if fit['source_edge'] == 'negative_x' else edge-1
+            host_points = [[edge, (origin[1]+end[1])/2, z], [inside, origin[1], z], [inside, end[1], z]]
+        host_rows = [{'point_mm': world(point),
+                      'host_membership_error_mm': point_distance(host, world(point)),
+                      'native_clamp_gap_mm': point_distance(clip, world(point))} for point in host_points]
+        native_center = curve.path_position(path, path['clip_material_stations_mm'][name])['point_mm']
+        expected = state['clip_support_interfaces'][name]
+        expected_center = expected['center_mm'];expected_axis = expected.get('axis', expected.get('tangent'))
+        frame_error = max(math.dist(world(center), native_center), math.dist(world(center), expected_center),
+                          math.dist(rotation(matrix, axis), expected_axis))
+        overlaps = {'hose_mm3': abs(clip.common(tube).Volume), 'host_mm3': abs(clip.common(host).Volume)}
+        passed = (frame_error <= 1e-7 and max(overlaps.values()) <= OVERLAP_ZERO_TOLERANCE_MM3
+            and all(max(row['hose_membership_error_mm'], row['clip_membership_error_mm'],
+                        abs(row['native_radial_gap_mm']-interface['radial_clearance_mm'])) <= 1e-6 for row in bore)
+            and all(max(row['host_membership_error_mm'],
+                        abs(row['native_clamp_gap_mm']-fit['radial_or_face_gap_mm'])) <= 1e-6 for row in host_rows))
+        supports[name] = {'passed': passed, 'clip_body': interface['clip_body'], 'host_body': interface['host_body'],
+            'component': interface['component'], 'attachment_link': interface['link'],
+            'center_mm': world(center), 'frame_error_mm': frame_error,
+            'physical_support_length_mm': interface['physical_support_length_mm'],
+            'required_hose_gap_mm': interface['radial_clearance_mm'],
+            'required_host_gap_mm': fit['radial_or_face_gap_mm'], 'bore_witnesses': bore,
+            'host_witnesses': host_rows, 'overlap_volume_mm3': overlaps,
+            'material_station_mm': path['clip_material_stations_mm'][name],
+            'qualification': interface['qualification']}
+
+    def actual_host_distance(point, names):
+        vertex = Part.Vertex(App.Vector(*point));candidates = []
+        rejected = []
+        for name in names:
+            distance, pairs, _ = vertex.distToShape(shapes[name])
+            for a, b in pairs:
+                pa, pb = point_values(a), point_values(b)
+                membership = max(math.dist(pa, point), point_distance(shapes[name], pb))
+                measured = math.dist(pa, pb)
+                row = {'host_body': name, 'point_mm': point, 'nearest_host_point_mm': pb,
+                       'distance_mm': measured, 'native_distance_mm': distance,
+                       'witness_membership_error_mm': membership}
+                if membership <= 1e-7 and abs(measured-distance) <= 1e-7:candidates.append(row)
+                else:rejected.append(row)
+        if not candidates:raise ValueError('No valid native host-surface witness for close hose section')
+        return min(candidates, key=lambda row: row['distance_mm']), rejected
+
+    fixed, loops = {}, {}
+    definitions = {row['id']: row for row in spec['hose_routing']['sections']}
+    arm = model.arm(spec);ap = model.robot.parameters(arm);fk = model.robot.forward(arm, state['joints_deg'])
+    for section in path['section_records']:
+        definition = definitions[section['id']]
+        index, count = section['segment_start_index'], section['segment_count']
+        offset = sum(row['length_mm'] for row in path['segments'][:index]);length = section['actual_length_mm']
+        number = max(1, math.ceil(length/2.));step = length/number
+        points = [curve.path_position(path, offset+length*i/number)['point_mm'] for i in range(number+1)]
+        if definition['kind'] == 'fixed_link':
+            witnesses, rejected = [], []
+            for point in points:
+                witness, invalid = actual_host_distance(point, definition['host_bodies'])
+                witnesses.append(witness);rejected.extend(invalid)
+            maximum = max(witnesses, key=lambda row: row['distance_mm']);upper = maximum['distance_mm']+step/2
+            fixed[section['id']] = {'passed': upper <= definition['max_offset_mm'],
+                'host_bodies': definition['host_bodies'], 'maximum_sampled_distance_mm': maximum['distance_mm'],
+                'maximum_distance_upper_bound_mm': upper, 'maximum_allowed_distance_mm': definition['max_offset_mm'],
+                'sample_count': len(points), 'maximum_arclength_gap_mm': step, 'worst_witness': maximum,
+                'witnesses': witnesses, 'rejected_kernel_witnesses': rejected,
+                'scope': 'Native distance to the union of named physical host bodies; 1-Lipschitz interval upper bound'}
+        else:
+            joint = next(row for row in arm['joints'] if row['id'] == definition['joint'])
+            parent = fk[joint['parent']];origin = model.robot.transform(parent,
+                [model.robot.evaluate(value, ap) for value in joint['frame']['origin']])
+            axis = rotation(parent, joint['frame']['axis']);radial = [];axial = []
+            for point in points:
+                delta = [a-b for a, b in zip(point, origin)];projection = sum(a*b for a, b in zip(delta, axis))
+                axial.append(projection);radial.append(math.sqrt(max(0, sum(v*v for v in delta)-projection**2)))
+            radial_upper = max(radial)+step/2;axial_bounds = [min(axial)-step/2, max(axial)+step/2]
+            limit = definition['axial_range_mm']
+            loops[section['id']] = {'passed': radial_upper <= definition['max_reach_mm']
+                and limit[0] <= axial_bounds[0] and axial_bounds[1] <= limit[1],
+                'joint': joint['id'], 'joint_origin_mm': origin, 'joint_axis': axis,
+                'maximum_sampled_radial_distance_mm': max(radial), 'radial_distance_upper_bound_mm': radial_upper,
+                'maximum_radial_reach_mm': definition['max_reach_mm'],
+                'sampled_axial_range_mm': [min(axial), max(axial)], 'axial_range_bounds_mm': axial_bounds,
+                'allowed_axial_range_mm': limit, 'sample_count': len(points), 'maximum_arclength_gap_mm': step,
+                'scope': 'Joint-local radial/axial pocket with 1-Lipschitz interval bounds; named pose only'}
+    passed = all(row['passed'] for group in (supports, fixed, loops) for row in group.values())
+    return {'passed': passed, 'supports': supports, 'fixed_sections': fixed, 'joint_loops': loops,
+        'material_stations_mm': path['clip_material_stations_mm'],
+        'section_lengths_mm': {row['id']: row['actual_length_mm'] for row in path['section_records']},
+        'scope': 'Native static fit and bounded complete-section routing; clamp closure and non-slip retention are assumptions',
+        'qualification': {'axial_retention_verified': False, 'strength_verified': False,
+                          'manufacturing_fit_verified': False, 'continuous_motion_verified': False}}
 
 
 def bounds(shape):
@@ -125,8 +249,12 @@ def add_tooling(doc, model, spec, p, source, shapes, state):
                         '; regenerate after arm pose changes',
         'OperatingWindowStatus': spec['operating_window_status'],
         'OperatingWindowDeg': json.dumps(spec['operating_window_deg'], sort_keys=True),
-        'CarrierSnapshot': 'Static conservative shell and nominal collar compound; no articulated native chain. '
-                           'Regenerate with the hose after manual arm edits.',
+        'CarrierSnapshot': ('No carrier; rigid source-derived split clips follow their host links; hose remains static.'
+                            if clipped_mode(spec) else
+                            'Static conservative shell and nominal collar compound; no articulated native chain. '
+                            'Regenerate with the hose after manual arm edits.'),
+        'ClipSupportInterfaces': json.dumps(state.get('clip_support_interfaces'), sort_keys=True),
+        'HoseRoutingDesign': json.dumps(state.get('hose_routing_design'), sort_keys=True),
         'ConnectionInterfaces': json.dumps(state['connection_interfaces'], sort_keys=True),
         'TipSeat': json.dumps(state['tip_seat'], sort_keys=True),
     }.items():
@@ -612,7 +740,7 @@ def build(case_path, output_path, report_path):
         raise ValueError('The native adapter requires its source-compiled route and selected loop witness')
     state = case['compiled_state']
     evaluated_state = model.state(spec, p, case['state'],
-                                  loop_parameter_mm=state['hose_slack_parameter_mm'])
+        loop_parameter_mm=case['routing_proof'] if clipped_mode(spec) else state['hose_slack_parameter_mm'])
     for value in (state, evaluated_state):
         clearance = value.get('source_clearance')
         if not isinstance(clearance, dict) or clearance.get('passed') is not True or not clearance.get('scope'):
@@ -624,9 +752,11 @@ def build(case_path, output_path, report_path):
     state_agreement = compare_derived_metrics(canonical_material_core(state, p),
                                              canonical_material_core(evaluated_state, p))
     derivation = {'physical_curve_equivalence_established': state_agreement['passed'],
-                  'leading': route_derivation_diagnostics(state['hose_path']),
-                  'independent': route_derivation_diagnostics(evaluated_state['hose_path']),
-                  'scope': 'Known subdivision and fitter diagnostics are retained separately; '
+                  'leading': route_derivation_diagnostics(state['hose_path'],
+                      sample_step_mm=spec['hose_routing']['sample_step_mm'] if clipped_mode(spec) else None),
+                  'independent': route_derivation_diagnostics(evaluated_state['hose_path'],
+                      sample_step_mm=spec['hose_routing']['sample_step_mm'] if clipped_mode(spec) else None),
+                  'scope': 'Known subdivision, fitter and conservative sampled-reach diagnostics are retained separately; '
                            'they cannot override raw geometry, material, radius or clearance checks'}
     metrics = case.get('metrics', state['metrics'])
     metrics_agreement = compare_derived_metrics(metrics, evaluated_state['metrics'])
@@ -692,6 +822,7 @@ def build(case_path, output_path, report_path):
     endpoints = pneumatic_connections(clearances, interfaces, mating)
     seat_report = tip_seat_checks(model, spec, p, state, shapes)
     air_report = air_path_checks(model, spec, p, state, shapes, own)
+    clip_report = clipped_hose_checks(model, spec, p, state, shapes)
     wire = pneumatic_hose.freecad_wire(Part, App, state['hose_path'])
     lumen = hose.Shape.common(wire).Length
     diagnostic = pneumatic_hose.diagnostics(state['hose_path'], state['hose_inner_radius_mm'],
@@ -714,6 +845,7 @@ def build(case_path, output_path, report_path):
                        and state_agreement['passed'] and endpoints['passed']
                        and seat_report['passed'] and air_report['passed']
                        and (carrier_report is None or carrier_report['passed'])
+                       and (clip_report is None or clip_report['passed'])
                        and max(row['error_mm'] for row in own_errors+arm_errors) < 1e-6
                        and lumen < 1e-7 and hose_volume_error < 1e-6
                        and all(row['valid'] and row['closed_solids'] and row['solid_count'] == expected_counts[name]
@@ -728,7 +860,7 @@ def build(case_path, output_path, report_path):
               'independent_route_material_checks': independent_material_checks,
               'source_clearance': state['source_clearance'],
               'independent_source_clearance': evaluated_state['source_clearance'],
-              'carrier_checks': carrier_report, 'pneumatic_connections': endpoints,
+              'carrier_checks': carrier_report, 'clip_checks': clip_report, 'pneumatic_connections': endpoints,
               'tip_seat_checks': seat_report, 'air_path_checks': air_report,
               'new_part_pose_checks': own_errors, 'clearance_checks': clearances,
               'motor_coupling_error_deg': motor_error,

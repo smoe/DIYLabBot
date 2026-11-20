@@ -35,7 +35,8 @@ def _pins(spec):
              ROOT/'model/arm-syringe.schema.json']
     paths += arm_syringe.source_dependencies(spec)
     for key in ('robot', 'syringe_library', 'hose_carrier'):
-        paths.append(ROOT/spec[key]['source'])
+        if spec.get(key) is not None:
+            paths.append(ROOT/spec[key]['source'])
     files = {}
     for path in paths:
         resolved = path.resolve()
@@ -135,6 +136,9 @@ def scan(spec, p, window=None, *, max_step_deg=None, margin_mm=None,
     the window are retained and constrain the suggested length explicitly.
     Exceptions are preserved per endpoint; incomplete scans give no proposal.
     """
+    if route_at is None and 'hose_routing' in spec:
+        raise ValueError('The link-clipped hose fixes material at each clip; '
+                         'use prepare_arm_hose_routing.py instead of a global scalar scan')
     design = spec.get('hose_length_design', {})
     source_design = design
     physical = 'allowances' in design

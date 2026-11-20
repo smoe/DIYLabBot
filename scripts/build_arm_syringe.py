@@ -214,52 +214,62 @@ def route_material_checks(path, parameters):
         totals[roles[part['kind']]] += part['length_mm']
     if any(value != 1 for value in coverage):
         raise ValueError('Every tube segment must belong to exactly one physical material span')
-    guide = path['carrier_path']
+    clipped = path.get('routing_format') == 'solidcraftbot.link-clipped-hose/1'
+    guide = path.get('carrier_path')
     guide_parts = [part for part in account['parts'] if part['kind'] == 'nominal_carrier']
-    if len(guide_parts) != 1:
-        raise ValueError('One exact nominal carrier material span is required')
-    guide_part = guide_parts[0]
-    guide_start = guide_part['segment_start_index']
-    guide_end = guide_start+guide_part['segment_count']
-    if not compare_derived_metrics(guide['segments'], segments[guide_start:guide_end], tolerance=1e-7)['passed']:
-        raise ValueError('The protected guide and its material span have different geometry')
+    if not clipped:
+        if len(guide_parts) != 1:
+            raise ValueError('One exact nominal carrier material span is required')
+        guide_part = guide_parts[0]
+        guide_start = guide_part['segment_start_index']
+        guide_end = guide_start+guide_part['segment_count']
+        if not compare_derived_metrics(guide['segments'], segments[guide_start:guide_end], tolerance=1e-7)['passed']:
+            raise ValueError('The protected guide and its material span have different geometry')
 
-    def straight_run(rows):
-        direction = None;length = 0.
-        for row in rows:
-            if row['kind'] != 'line':break
-            delta = pneumatic_hose._sub(row['end_mm'], row['start_mm'])
-            current = pneumatic_hose._unit(delta)
-            if direction is not None and pneumatic_hose._dot(direction, current) < 1-1e-10:break
-            direction = current;length += row['length_mm']
-        return length
+        def straight_run(rows):
+            direction = None;length = 0.
+            for row in rows:
+                if row['kind'] != 'line':break
+                delta = pneumatic_hose._sub(row['end_mm'], row['start_mm'])
+                current = pneumatic_hose._unit(delta)
+                if direction is not None and pneumatic_hose._dot(direction, current) < 1-1e-10:break
+                direction = current;length += row['length_mm']
+            return length
 
-    internal = guide.get('carrier_fit', {}).get('endpoint_straights_mm')
-    minimum_lead = parameters['connectorStraightLead']
-    if (not isinstance(internal, list) or len(internal) != 2
-            or any(type(value) not in (int, float) or not math.isfinite(value)
-                   or value < minimum_lead-1e-7 for value in internal)):
-        raise ValueError('Both protected guide ends need their declared internal straight leads')
-    internal_achieved = [straight_run(guide['segments']), straight_run(list(reversed(guide['segments'])))]
-    external_achieved = [straight_run(list(reversed(segments[:guide_start]))),
-                         straight_run(segments[guide_end:])]
-    # These two real straight pieces are already part of the free material sum.
-    before = next((part for part in account['parts']
-                   if part['segment_start_index']+part['segment_count'] == guide_start), None)
-    after = next((part for part in account['parts'] if part['segment_start_index'] == guide_end), None)
-    if (before is None or after is None or before['kind'] != 'bare_span' or after['kind'] != 'bare_span'
-            or any(actual < requested-1e-7 for actual, requested in zip(internal_achieved, internal))
-            or any(value < minimum_lead-1e-7 for value in external_achieved)
-            or abs(account.get('external_guide_straights_included_in_free_mm', -1)-2*minimum_lead) > 1e-7):
-        raise ValueError('Both guide transitions require external straight leads counted once as free material')
-    guide_straights = {'passed': True, 'internal_required_mm': internal,
-        'internal_achieved_mm': internal_achieved, 'external_required_mm': [minimum_lead]*2,
-        'external_achieved_mm': external_achieved,
-        'external_material_category': 'free_bare_spans_mm',
-        'scope': 'Internal leads belong to nominal carrier length; external leads already belong to free spans'}
-    guide_radii = [row['radius_mm'] for row in guide['segments'] if row['kind'] == 'arc']
-    if any(radius < required-1e-9 for radius in bare_radii) or any(radius < 50-1e-9 for radius in guide_radii):
-        raise ValueError('An achieved bare or protected bend violates its hard radius')
+        internal = guide.get('carrier_fit', {}).get('endpoint_straights_mm')
+        minimum_lead = parameters['connectorStraightLead']
+        if (not isinstance(internal, list) or len(internal) != 2
+                or any(type(value) not in (int, float) or not math.isfinite(value)
+                       or value < minimum_lead-1e-7 for value in internal)):
+            raise ValueError('Both protected guide ends need their declared internal straight leads')
+        internal_achieved = [straight_run(guide['segments']), straight_run(list(reversed(guide['segments'])))]
+        external_achieved = [straight_run(list(reversed(segments[:guide_start]))),
+                             straight_run(segments[guide_end:])]
+        # These two real straight pieces are already part of the free material sum.
+        before = next((part for part in account['parts']
+                       if part['segment_start_index']+part['segment_count'] == guide_start), None)
+        after = next((part for part in account['parts'] if part['segment_start_index'] == guide_end), None)
+        if (before is None or after is None or before['kind'] != 'bare_span' or after['kind'] != 'bare_span'
+                or any(actual < requested-1e-7 for actual, requested in zip(internal_achieved, internal))
+                or any(value < minimum_lead-1e-7 for value in external_achieved)
+                or abs(account.get('external_guide_straights_included_in_free_mm', -1)-2*minimum_lead) > 1e-7):
+            raise ValueError('Both guide transitions require external straight leads counted once as free material')
+        guide_straights = {'passed': True, 'internal_required_mm': internal,
+            'internal_achieved_mm': internal_achieved, 'external_required_mm': [minimum_lead]*2,
+            'external_achieved_mm': external_achieved,
+            'external_material_category': 'free_bare_spans_mm',
+            'scope': 'Internal leads belong to nominal carrier length; external leads already belong to free spans'}
+        guide_radii = [row['radius_mm'] for row in guide['segments'] if row['kind'] == 'arc']
+        if any(radius < required-1e-9 for radius in bare_radii) or any(radius < 50-1e-9 for radius in guide_radii):
+            raise ValueError('An achieved bare or protected bend violates its hard radius')
+    else:
+        if guide is not None or guide_parts:
+            raise ValueError('Link-clipped routing must not deliver a nominal R50 carrier')
+        guide_radii = []
+        guide_straights = None
+        clip_straights = _clipped_partition_checks(path, parameters)
+        if any(radius < required-1e-9 for radius in bare_radii):
+            raise ValueError('An achieved clipped-hose bend violates its hard radius')
     for key in MATERIAL_LENGTH_KEYS:
         if type(account.get(key)) not in (int, float) or not math.isfinite(account[key]) or account[key] < 0:
             raise ValueError('Invalid physical material length: '+key)
@@ -276,16 +286,92 @@ def route_material_checks(path, parameters):
     expected = {'inserted_mm': 2*parameters['hoseInsertionDepth'],
                 'socket_strain_relief_mm': 2*parameters['strainReliefLength'],
                 'connector_straight_leads_mm': 2*parameters['connectorStraightLead'],
-                'carrier_supported_mm': guide['length_mm']}
+                'carrier_supported_mm': 0. if clipped else guide['length_mm']}
     if any(abs(account[key]-value) > 1e-7 for key, value in expected.items()):
         raise ValueError('Socket or guide material support was omitted or counted twice')
     return {'passed': True, 'required_bare_radius_mm': required,
             'achieved_bare_radius_mm': min(bare_radii) if bare_radii else None,
-            'required_guide_radius_mm': 50., 'achieved_guide_radius_mm': min(guide_radii) if guide_radii else None,
+            'required_guide_radius_mm': None if clipped else 50., 'achieved_guide_radius_mm': min(guide_radii) if guide_radii else None,
             'guide_end_straights': guide_straights,
+            **({'clip_end_straights': clip_straights} if clipped else {}),
             'exact_segment_length_mm': exact, 'accounted_material_length_mm': total,
             'sum_error_mm': total-exact, 'material_partition': account,
             'scope': 'Achieved static radii and all hose material counted once; no physical bend or motion qualification'}
+
+
+def _clipped_partition_checks(path, parameters):
+    """Require fixed named spans and seven real, straight support stations."""
+    from close_hose_clips import STATIONS
+    import spatial_hose_carrier as curve
+    parts = path['length_accounting']['parts']
+    clips = [part for part in parts if part['kind'] == 'clip_straight']
+    sections = path.get('section_records')
+    stations = path.get('clip_material_stations_mm')
+    frames = path.get('clip_frames')
+    if (len(clips) != len(STATIONS) or not isinstance(sections, list) or len(sections) != 8
+            or not isinstance(stations, dict) or set(stations) != set(STATIONS)
+            or not isinstance(frames, dict) or set(frames) != set(STATIONS)):
+        raise ValueError('All eight sections and seven physical clip stations are required')
+    if abs(path['length_accounting']['carrier_supported_mm']) > 1e-9:
+        raise ValueError('A clipped hose cannot count carrier material')
+    bare = {part['id']: part for part in parts if part['kind'] == 'bare_span'}
+    seen = set()
+    for record in sections:
+        name = record.get('id')
+        if name in seen or name not in bare or record.get('kind') not in ('fixed_link', 'joint_loop'):
+            raise ValueError('Every fixed/flex section needs one unique material span')
+        seen.add(name);part = bare[name]
+        for key in ('segment_start_index', 'segment_count'):
+            if record.get(key) != part[key]:raise ValueError('Section/material segment ranges differ')
+        for key in ('target_length_mm', 'actual_length_mm'):
+            if abs(record[key]-part['length_mm']) > 1e-7:
+                raise ValueError('A fixed material section changed length')
+    if seen != set(bare):raise ValueError('A bare span is not owned by a fixed/flex section')
+    offset = 0.;by_station = {};straight_checks = {}
+    def straight_length(rows):
+        direction = None;total = 0.
+        for row in rows:
+            if row['kind'] != 'line':break
+            delta = [b-a for a, b in zip(row['start_mm'], row['end_mm'])]
+            unit = [v/row['length_mm'] for v in delta]
+            if direction is not None and math.dist(direction, unit) > 1e-9:break
+            direction = unit;total += row['length_mm']
+        return total
+    for part_index, part in enumerate(parts):
+        if part['kind'] == 'clip_straight':
+            candidates = [name for name, distance in stations.items()
+                          if abs(distance-(offset+part['length_mm']/2)) <= 1e-7]
+            if len(candidates) != 1 or abs(part['length_mm']-parameters['hoseClipLength']) > 1e-7:
+                raise ValueError('A physical clip must own its declared fixed straight material')
+            name = candidates[0]
+            if name in by_station:raise ValueError('A clip material station was duplicated')
+            by_station[name] = part
+            point = curve.path_position(path, stations[name])['point_mm']
+            frame = frames[name]
+            center = frame.get('center_mm', frame.get('origin_mm'))
+            if center is None or math.dist(point, center) > 1e-7:
+                raise ValueError('A clip center is not on its declared material station')
+            start, count = part['segment_start_index'], part['segment_count']
+            selected = path['segments'][start:start+count]
+            if (math.dist(selected[0]['start_mm'], frame['start_mm']) > 1e-7
+                    or math.dist(selected[-1]['end_mm'], frame['end_mm']) > 1e-7):
+                raise ValueError('The hose does not pass through the exact physical groove frame')
+            if part_index == 0 or part_index+1 == len(parts):
+                raise ValueError('Every clip needs its two adjoining free spans')
+            adjacent = [parts[part_index-1], parts[part_index+1]]
+            if any(row['kind'] != 'bare_span' for row in adjacent):
+                raise ValueError('A clip exit cannot borrow its free lead from supported material')
+            before, after = [path['segments'][row['segment_start_index']:row['segment_start_index']+row['segment_count']]
+                             for row in adjacent]
+            achieved = [straight_length(list(reversed(before))), straight_length(after)]
+            if any(length < parameters['clipFreeLead']-1e-7 for length in achieved):
+                raise ValueError('Each clip exit needs its declared unbent free lead')
+            straight_checks[name] = {'passed': True, 'required_free_leads_mm': [parameters['clipFreeLead']]*2,
+                                    'achieved_free_leads_mm': achieved,
+                                    'physical_support_length_mm': part['length_mm']}
+        offset += part['length_mm']
+    if set(by_station) != set(STATIONS):raise ValueError('A clip has no fixed material station')
+    return straight_checks
 
 
 def validate_named_band(band, spec, parameters):
@@ -563,6 +649,12 @@ def canonical_material_core(state, parameters):
         'hose_slack_parameter_mm', 'theoretical_displacement_ul', 'actual_dispensed_volume_ul',
         'metrics', 'connection_interfaces', 'tip_seat', 'tip_tcp_mm'}
     path = state['hose_path']
+    clipped = path.get('routing_format') == 'solidcraftbot.link-clipped-hose/1'
+    if clipped:
+        state_fields |= {'hose_routing_design', 'clip_support_interfaces', 'hose_proximity'}
+        account_fields -= {'service_loop_parameter_mm'}
+        route_fields = (route_fields-{'carrier_path'}) | {
+            'routing_format', 'section_records', 'clip_frames', 'clip_material_stations_mm'}
     if (set(state) != state_fields or not route_fields <= set(path)
             or not set(path) <= route_fields | {'joints_deg'}):
         raise ValueError('Foreign or missing state/route comparison fields')
@@ -652,6 +744,31 @@ def canonical_material_core(state, parameters):
             'part_matrices', 'tip_tcp_mm', 'connection_interfaces', 'tip_seat',
             'hose_inner_radius_mm', 'hose_outer_radius_mm', 'hose_slack_parameter_mm',
             'theoretical_displacement_ul', 'actual_dispensed_volume_ul', 'metrics')
+    if clipped:
+        if state['carrier'] is not None:
+            raise ValueError('A clipped route cannot carry a carrier representation')
+        section_fields = {'id', 'kind', 'from', 'to', 'link', 'joint', 'parent_link',
+            'target_length_mm', 'actual_length_mm', 'segment_start_index', 'segment_count',
+            'shape_parameters', 'local_reach', 'max_offset_mm', 'max_reach_mm', 'axial_range_mm', 'host_bodies'}
+        normalized = []
+        for record in path['section_records']:
+            if not {'id', 'kind', 'target_length_mm', 'actual_length_mm', 'segment_start_index', 'segment_count'} <= set(record) or not set(record) <= section_fields:
+                raise ValueError('Foreign or missing clipped section fields')
+            start, count = record['segment_start_index'], record['segment_count']
+            if record['kind'] == 'joint_loop' and 'local_reach' not in record:
+                raise ValueError('Every joint loop needs its independently satisfied raw reach bounds')
+            metadata = {key: copy.deepcopy(value) for key, value in record.items()
+                        if key not in ('segment_start_index', 'segment_count', 'local_reach')}
+            if 'local_reach' in record:
+                metadata['local_reach'] = canonical_reach_limits(record['local_reach'])
+            normalized.append({**metadata, 'curves': curves(path['segments'][start:start+count])})
+        route_metadata = {key: copy.deepcopy(value) for key, value in path.items()
+                          if key not in ('segments', 'sample_points_mm', 'length_accounting', 'section_records', 'joints_deg')}
+        return {**{key: state[key] for key in keys}, 'length_accounting': physical,
+            'route_metadata': route_metadata, 'section_records': normalized,
+            'hose_routing_design': state['hose_routing_design'],
+            'clip_support_interfaces': state['clip_support_interfaces'],
+            'hose_proximity': state['hose_proximity'], 'carrier': None}
     protected = curves(path['carrier_path']['segments'])
     delivered = curves(state['carrier']['path']['segments'])
     if not compare_derived_metrics(protected, delivered)['passed']:
@@ -664,11 +781,57 @@ def canonical_material_core(state, parameters):
             'carrier': {key: value for key, value in state['carrier'].items() if key != 'path'}}
 
 
-def route_derivation_diagnostics(path):
-    """Retain subdivision/fitter data separately from proven curve equality."""
-    return [{key: copy.deepcopy(value) for key, value in part.items()
-             if key in ('id', 'segment_start_index', 'segment_count', 'bare_fit')}
-            for part in path['length_accounting']['parts']]
+def canonical_reach_limits(raw):
+    """Gate each conservative witness; compare source limits, not its grid."""
+    fields = {'maximum_radial_reach_upper_bound_mm', 'required_maximum_radial_reach_mm',
+              'axial_range_outer_bound_mm', 'required_axial_range_mm', 'scope'}
+    if not isinstance(raw, dict) or set(raw) != fields:
+        raise ValueError('A complete finite sampled reach record is required')
+    number = lambda value: type(value) in (int, float) and math.isfinite(value)
+    achieved, required = raw['maximum_radial_reach_upper_bound_mm'], raw['required_maximum_radial_reach_mm']
+    actual_axis, required_axis = raw['axial_range_outer_bound_mm'], raw['required_axial_range_mm']
+    if (not number(achieved) or not number(required) or not 0 <= achieved <= required or required <= 0
+            or any(not isinstance(values, list) or len(values) != 2 or not all(number(v) for v in values)
+                   for values in (actual_axis, required_axis))
+            or not actual_axis[0] <= actual_axis[1] or not required_axis[0] < required_axis[1]
+            or actual_axis[0] < required_axis[0] or actual_axis[1] > required_axis[1]
+            or not isinstance(raw['scope'], str) or not raw['scope']):
+        raise ValueError('Every raw sampled radial/axial witness must independently satisfy its source limits')
+    return {key: copy.deepcopy(raw[key]) for key in
+            ('required_maximum_radial_reach_mm', 'required_axial_range_mm', 'scope')}
+
+
+def route_derivation_diagnostics(path, *, sample_step_mm=None):
+    """Retain raw fitting, subdivision and conservative sampled-reach witnesses.
+
+    Grid-dependent achieved bounds cannot replace exact curve equality. Both
+    raw records are checked independently, while source limits stay canonical.
+    """
+    sections = {row['id']: row for row in path.get('section_records', [])}
+    if sample_step_mm is not None and (type(sample_step_mm) not in (int, float)
+            or not math.isfinite(sample_step_mm) or sample_step_mm <= 0):
+        raise ValueError('A finite positive sampling interval is required')
+    result = []
+    for part in path['length_accounting']['parts']:
+        record = {key: copy.deepcopy(value) for key, value in part.items()
+                  if key in ('id', 'segment_start_index', 'segment_count', 'bare_fit')}
+        section = sections.get(part['id'], {})
+        if 'local_reach' in section:
+            canonical_reach_limits(section['local_reach'])
+            record['local_reach'] = copy.deepcopy(section['local_reach'])
+            if sample_step_mm is not None:
+                import spatial_hose_carrier as curve
+                length = section['actual_length_mm'];count = max(1, math.ceil(length/sample_step_mm))
+                width = length/count;stations = [(index+.5)*width for index in range(count)]
+                start = part['segment_start_index'];segments = path['segments'][start:start+part['segment_count']]
+                section_path = {'segments': segments, 'length_mm': length}
+                record['sample_grid'] = {'requested_maximum_interval_mm': sample_step_mm,
+                    'section_length_mm': length, 'interval_count': count, 'interval_width_mm': width,
+                    'section_arclength_midpoints_mm': stations,
+                    'reconstructed_world_points_mm': [curve.path_position(section_path, station)['point_mm'] for station in stations],
+                    'scope': 'Retained midpoint-grid definition and world points reconstructed from this independently evaluated exact section; no motion qualification'}
+        result.append(record)
+    return result
 
 
 def assembly_commands(model, spec, p, state_name, *, loop_parameter_mm=None):
@@ -741,11 +904,15 @@ def assembly_commands(model, spec, p, state_name, *, loop_parameter_mm=None):
                          'operating_window_deg': spec['operating_window_deg'],
                          'connection_interfaces': state['connection_interfaces'],
                          'tip_seat': state['tip_seat'],
+                         'clip_support_interfaces': state.get('clip_support_interfaces'),
+                         'hose_routing_design': state.get('hose_routing_design'),
                          'hose': 'Static shape for this named arm pose; no automatic deformation after manual arm editing',
                          'carrier': {'source': spec.get('hose_carrier'), 'delivered_bodies': [row['id'] for row in dynamic],
                              'nominal_link_count': state['carrier']['nominal_link_count'] if dynamic else 0,
-                             'scope': 'Static collar/shell representations; filled outer guard checked separately. '
-                                      'No exact vendor channels, native articulated chain, or automatic deformation.'}}}}}]
+                             'scope': ('Source-derived split clips follow their native host links; no carrier is delivered.'
+                                       if clipped_mode(spec) else
+                                       'Static collar/shell representations; filled outer guard checked separately. '
+                                       'No exact vendor channels, native articulated chain, or automatic deformation.')}}}}}]
     return commands
 
 
@@ -789,6 +956,99 @@ def source_files(model, spec):
     if hasattr(model, 'source_dependencies'):
         paths += model.source_dependencies(spec)
     return sorted(set(map(Path, paths)))
+
+
+def clipped_mode(spec):
+    return spec.get('hose_routing', {}).get('format') == 'solidcraftbot.link-clipped-hose/1'
+
+
+def validate_routing_proof(proof, model, spec, parameters):
+    """Bind solved fixed material spans to every unchanged named arm pose."""
+    if (proof.get('format') != 'solidcraftbot.arm-hose-routing-proof/1' or proof.get('passed') is not True
+            or proof.get('status') != 'demonstrated' or proof.get('failures') != []
+            or set(proof.get('states', {})) != set(spec['states'])):
+        raise ValueError('A passed clipped-hose routing proof for every named state is required')
+    qualifiers = proof.get('qualification')
+    if not isinstance(qualifiers, dict) or not qualifiers or any(value is not False for value in qualifiers.values()):
+        raise ValueError('Static clipped routing cannot claim hardware or continuous qualification')
+    pins = proof.get('source_files_sha256')
+    if not isinstance(pins, dict) or not pins:
+        raise ValueError('The routing proof must pin its leading source and producers')
+    required_paths = [model.SOURCE, Path(model.__file__), model.ROOT/'model/arm-syringe.schema.json',
+                      model.ROOT/spec['robot']['source'], model.ROOT/spec['syringe_library']['source']]
+    required_paths += model.source_dependencies(spec)
+    required = {str(Path(path).relative_to(model.ROOT)) for path in required_paths}
+    if proof.get('parameters') != parameters:
+        raise ValueError('Routing proof evaluated different source parameters')
+    if not required <= set(pins):raise ValueError('Routing proof is missing its construction source pins')
+    for name, checksum in pins.items():
+        path = (model.ROOT/name).resolve()
+        if not path.is_relative_to(model.ROOT.resolve()) or digest(path) != checksum:
+            raise ValueError('Routing-proof dependency differs: '+name)
+    sections = proof.get('section_lengths_mm')
+    expected = {row['id'] for row in spec['hose_routing']['sections']}
+    if not isinstance(sections, dict) or set(sections) != expected:
+        raise ValueError('Every fixed/flex section needs one common material length')
+    if abs(proof.get('hose_length_mm', -1)-parameters['hoseLength']) > 1e-7:
+        raise ValueError('Routing-proof material differs from the selected physical cut')
+    if any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0 for value in sections.values()):
+        raise ValueError('Every independently clamped section needs a positive finite material length')
+    selection = proof.get('cut_selection', {});base = proof.get('base_section_lengths_mm', {})
+    if set(base) != expected:
+        raise ValueError('The unallocated material section lengths are required')
+    support = 2*(parameters['hoseInsertionDepth']+parameters['strainReliefLength']+parameters['connectorStraightLead'])
+    support += len(spec['hose_routing']['clips'])*parameters['hoseClipLength']
+    base_total = sum(base.values())+support
+    allowances = spec['hose_length_design']['allowances']
+    resolution = spec['hose_length_design']['cut_resolution_mm']
+    allowance_total = sum(row['value_mm'] for row in allowances)
+    cut = math.ceil((base_total+allowance_total-1e-9)/resolution)*resolution
+    allocation = selection.get('allocation_section')
+    if (selection.get('allowances') != allowances or allocation not in sections
+            or abs(selection.get('base_physical_length_mm', -1)-base_total) > 1e-7
+            or abs(selection.get('allowance_total_mm', -1)-allowance_total) > 1e-7
+            or abs(selection.get('cut_resolution_mm', -1)-resolution) > 1e-7
+            or abs(selection.get('rounding_mm', -1)-(cut-base_total-allowance_total)) > 1e-7
+            or abs(selection.get('selected_cut_mm', -1)-cut) > 1e-7
+            or abs(selection.get('allocated_extra_mm', -1)-(cut-base_total)) > 1e-7
+            or abs(cut-parameters['hoseLength']) > 1e-7
+            or any(abs(sections[key]-base[key]-(cut-base_total if key == allocation else 0)) > 1e-7 for key in sections)
+            or abs(sum(sections.values())+support-cut) > 1e-7):
+        raise ValueError('Cut allowances and rounding must be assigned once to one solved joint span')
+    stations = proof.get('clip_material_stations_mm')
+    for name, selected in proof['states'].items():
+        if (selected.get('passed') is not True or not compare_derived_metrics(
+                selected.get('joints_deg'), spec['states'][name]['joints_deg'])['passed']):
+            raise ValueError('Routing proof changed or omitted a named arm pose: '+name)
+        path = selected['path'];route_material_checks(path, parameters)
+        if not compare_derived_metrics(path['clip_material_stations_mm'], stations)['passed']:
+            raise ValueError('A non-sliding clip changed its hose material coordinate')
+        actual = {row['id']: row['actual_length_mm'] for row in path['section_records']}
+        if not compare_derived_metrics(actual, sections)['passed']:
+            raise ValueError('A fixed/flex material section changed length at '+name)
+        checks = selected.get('checks')
+        if (not isinstance(checks, dict) or checks.get('passed') is not True
+                or any(checks.get(key, {}).get('passed') is not True for key in
+                       ('self_clearance', 'external_clearance', 'proximity'))):
+            raise ValueError('A named clipped route lacks its raw geometric checks: '+name)
+
+
+def bind_routing_proof(model, spec, parameters, overrides, out):
+    source = model.ROOT/'exports/arm-close-hose/routing-proof.json'
+    destination = out/'routing-proof.json'
+    if overrides:
+        proof = model.named_length_band(spec, parameters)
+        validate_routing_proof(proof, model, spec, parameters)
+        write(destination, proof);origin = None
+    else:
+        raw = source.read_bytes();proof = json.loads(raw)
+        validate_routing_proof(proof, model, spec, parameters)
+        destination.write_bytes(raw)
+        origin = {'path': str(source.relative_to(model.ROOT)), 'sha256': hashlib.sha256(raw).hexdigest()}
+    return {'path': str(destination.relative_to(model.ROOT)), 'sha256': digest(destination),
+        'source_report': origin, 'format': proof['format'], 'state_count': len(proof['states']),
+        **{key: proof[key] for key in ('section_lengths_mm', 'hose_length_mm', 'clip_material_stations_mm', 'qualification')},
+        'scope': proof.get('scope', 'Fixed material sections for named static arm poses only')}
 
 
 def validate_window_scan(scan, model, spec, parameters):
@@ -942,17 +1202,20 @@ def build(args):
         number += 1;revision = stem+'-r'+str(number)
     cad, out, renders = [model.ROOT/folder/revision for folder in ('cad/generated', 'exports/generated', 'renders')]
     for directory in (cad, out, renders):directory.mkdir(parents=True)
-    window_scan = bind_window_scan(model, spec, p, overrides, out)
-    bound_scan = json.loads((model.ROOT/window_scan['path']).read_text(encoding='utf-8'))
+    routing_proof = bind_routing_proof(model, spec, p, overrides, out) if clipped_mode(spec) else None
+    window_scan = None if routing_proof else bind_window_scan(model, spec, p, overrides, out)
+    bound_reference = routing_proof or window_scan
+    bound_scan = json.loads((model.ROOT/bound_reference['path']).read_text(encoding='utf-8'))
     sys.path.insert(0, str(model.ROOT/'scripts/freecad'))
     results = []
     for name in states:
         print('Arm syringe: '+name, flush=True)
-        selected = bound_scan['named_state_band']['selected_states'][name]
-        state = model.state(spec, p, name, loop_parameter_mm=selected['loop_parameter_mm'])
+        selected = bound_scan['states'][name] if routing_proof else bound_scan['named_state_band']['selected_states'][name]
+        evaluation_parameter = bound_scan if routing_proof else selected['loop_parameter_mm']
+        state = model.state(spec, p, name, loop_parameter_mm=evaluation_parameter)
         require_hose_self_clearance(state)
         material = route_material_checks(state['hose_path'], p)
-        selected_agreement = compare_named_route(selected['route'], state)
+        selected_agreement = compare_named_route(selected['path'] if routing_proof else selected['route'], state)
         if not selected_agreement['passed']:
             raise ValueError('The generated route differs from its solved named length witness: '+name)
         dynamic = carrier_bodies(state)
@@ -962,14 +1225,15 @@ def build(args):
             raise ValueError('Carrier semantic body names shadow existing geometry')
         case = {'state': name, 'overrides': overrides, 'arm_report': str(arm_report),
                 'metrics': state['metrics'], 'compiled_state': state,
-                'named_length_witness': {key: value for key, value in selected.items() if key != 'route'}}
+                'named_length_witness': {key: value for key, value in selected.items() if key not in ('route', 'path')},
+                **({'routing_proof': bound_scan} if routing_proof else {})}
         case_path = out/(name+'.case.json');write(case_path, case)
         files = {'case': case_path}
         def solidcraft_backend():
             commands_path = out/(name+'.commands.json')
             write(commands_path, {'source_sha256': digest(model.SOURCE),
                                  'commands': assembly_commands(model, spec, p, name,
-                                    loop_parameter_mm=selected['loop_parameter_mm'])})
+                                    loop_parameter_mm=evaluation_parameter)})
             sc_path, measured = cad/(name+'.sc'), out/(name+'.solidcraft.json')
             subprocess.run([args.solidcraft_cli, 'run', str(commands_path), '--in', caches['solidcraft']['path'],
                 '--save', str(sc_path), '--json-out', str(measured), '--quiet'], check=True, cwd=model.ROOT)
@@ -1010,6 +1274,7 @@ def build(args):
                 'semantic_body_count': len(arm_rows)+len(own['bodies'])+len(dynamic)+1,
                 'carrier_bodies': dynamic, 'carrier_aliases': carrier_aliases(state),
                 'carrier_checks': fc_report.get('carrier_checks') if fc_report else None,
+                'clip_checks': fc_report.get('clip_checks') if fc_report else None,
                 'pneumatic_connections': fc_report.get('pneumatic_connections') if fc_report else None,
                 'tip_seat_checks': fc_report.get('tip_seat_checks') if fc_report else None,
                 'air_path_checks': fc_report.get('air_path_checks') if fc_report else None,
@@ -1065,23 +1330,31 @@ def build(args):
                 'camera': {'target': segment['through_mm'], 'yaw': 2.79, 'pitch': .70,
                            'distance': max(120, min(300, radius*5)), 'fov': 0},
                 'geometry_witness': {'segment_index': index, 'achieved_radius_mm': radius}}
-        guide = row['state']['hose_path']['carrier_path']
-        endpoints = [guide['segments'][0]['start_mm'], guide['segments'][-1]['end_mm']]
-        guide_part = next(part for part in row['state']['length_accounting']['parts']
-                          if part['kind'] == 'nominal_carrier')
-        guide_indices = range(guide_part['segment_start_index'],
-                              guide_part['segment_start_index']+guide_part['segment_count'])
-        nearby = [(math.dist(segment['through_mm'], endpoint), index, segment, endpoint)
-                  for index, segment in enumerate(row['state']['hose_path']['segments'])
-                  if segment['kind'] == 'arc' and index not in guide_indices for endpoint in endpoints]
-        if nearby:
-            _, index, segment, endpoint = min(nearby, key=lambda value: value[0])
+        guide = row['state']['hose_path'].get('carrier_path')
+        if guide is not None:
+            endpoints = [guide['segments'][0]['start_mm'], guide['segments'][-1]['end_mm']]
+            guide_part = next(part for part in row['state']['length_accounting']['parts']
+                              if part['kind'] == 'nominal_carrier')
+            guide_indices = range(guide_part['segment_start_index'],
+                                  guide_part['segment_start_index']+guide_part['segment_count'])
+            nearby = [(math.dist(segment['through_mm'], endpoint), index, segment, endpoint)
+                      for index, segment in enumerate(row['state']['hose_path']['segments'])
+                      if segment['kind'] == 'arc' and index not in guide_indices for endpoint in endpoints]
+            if nearby:
+                _, index, segment, endpoint = min(nearby, key=lambda value: value[0])
+                plans['guide_transition'] = {'row': row,
+                    'camera': {'target': [(a+b)/2 for a, b in zip(segment['through_mm'], endpoint)],
+                               'yaw': 2.79, 'pitch': .70,
+                               'distance': max(160, math.dist(segment['through_mm'], endpoint)*3), 'fov': 0},
+                    'geometry_witness': {'segment_index': index, 'achieved_radius_mm': segment['radius_mm'],
+                                         'guide_endpoint_mm': endpoint}}
+        elif clipped_mode(spec):
+            station = row['state']['hose_path']['clip_frames']['j4_child']
+            center = station.get('center_mm', station.get('origin_mm'))
             plans['guide_transition'] = {'row': row,
-                'camera': {'target': [(a+b)/2 for a, b in zip(segment['through_mm'], endpoint)],
-                           'yaw': 2.79, 'pitch': .70,
-                           'distance': max(160, math.dist(segment['through_mm'], endpoint)*3), 'fov': 0},
-                'geometry_witness': {'segment_index': index, 'achieved_radius_mm': segment['radius_mm'],
-                                     'guide_endpoint_mm': endpoint}}
+                'camera': {'target': center, 'yaw': 2.79, 'pitch': .70, 'distance': 160., 'fov': 0},
+                'geometry_witness': {'clip_station': 'j4_child', 'clip_center_mm': center},
+                'scope': 'Close-arm split clip and local flex section; no R50 carrier is present'}
         upright = next((result for result in results if result['id'] == 'upright'), None)
         if upright is not None:
             for label, interface_name in [('pump_section', 'pump'), ('tip_section', 'tip')]:
@@ -1123,18 +1396,20 @@ def build(args):
     for cache in caches.values():
         if digest(cache['path']) != cache['sha256']:
             raise ValueError('The original arm artifact changed during composition')
-    if digest(model.ROOT/window_scan['path']) != window_scan['sha256']:
-        raise ValueError('Bound window scan changed during the native build')
+    if digest(model.ROOT/bound_reference['path']) != bound_reference['sha256']:
+        raise ValueError('Bound routing evidence changed during the native build')
     report = {'format': 'solidcraftbot.arm-syringe-build/1', 'passed': all(row['passed'] for row in results),
               'revision': revision, 'source': str(model.SOURCE.relative_to(model.ROOT)),
               'source_sha256': digest(model.SOURCE), 'source_files_sha256': pins,
               'backends': args.backend, 'arm_cache': caches,
-              'window_scan': window_scan,
+              'window_scan': window_scan, 'routing_proof': routing_proof,
               'states': results, 'renders': views, 'qualification': spec['qualification'],
               'scope': 'Source-bound dedicated 1 mL arm and named static hose configurations; no hardware execution',
               'limitations': spec['limitations']+[
                   'Construction dimension changes require regeneration; native stroke and motor rotation remain coupled.',
-                  'The saved hose and carrier are static for their named pose and must be regenerated after manual arm-joint changes.',
+                  ('The saved hose is static for its named pose; rigid clips follow their native arm links. Regenerate the hose after manual arm-joint changes.'
+                   if clipped_mode(spec) else
+                   'The saved hose and carrier are static for their named pose and must be regenerated after manual arm-joint changes.'),
                   'FreeCAD presentation metadata is saved; no FreeCAD GUI rendering qualification is claimed.'],
               'elapsed_s': time.monotonic()-started}
     write(out/'build-report.json', report)
