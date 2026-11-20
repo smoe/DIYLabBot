@@ -124,7 +124,8 @@
     "KG facade details and exact stair geometry remain simplified; all XY coordinates are uncalibrated.",
     "The foyer glass front and very open metal rails follow private owner photographs; their registration, grid and sizes remain illustrative.",
     "Room door colour is owner-confirmed warm wood, approximated under photographic lighting. Door leaves are shown open; this is not a fire-door or egress state.",
-    "Earth at EG grade is an illustrative cutaway around the building, not a measured terrain survey."
+    "Earth at EG grade is an illustrative cutaway around the building, not a measured terrain survey.",
+    "The exterior window at the far end of secretary room 3.006A/B is owner-confirmed. Its placement on facade segment W001 and its shared side-window dimensions are presentation assumptions; the addition applies only to OG3."
   ],
   "circulation": {
     "status": "owner_requested_concept_geometry",
@@ -439,7 +440,8 @@
         "W005"
       ],
       "OG3": [
-        "W005"
+        "W005",
+        "W001"
       ]
     }
   },
@@ -620,6 +622,23 @@
         "D3_009"
       ],
       "basis": "Owner correction 2026-11-19: rear room 3.008B reaches the outside facade and has a regular-size window. The former 3.009 template strip is part of 3.008B on OG3 only; its internal partition/door disappear. Existing furnishings retain stable IDs and positions; their actual use remains an assumption."
+    },
+    {
+      "id": "SuiteFloors",
+      "levels": [
+        "OG1",
+        "OG2",
+        "OG3"
+      ],
+      "area_overrides": {
+        "Suite3_006AB": {
+          "kind": "room",
+          "label": "3.006A/B (Aufteilung ungeklärt)"
+        }
+      },
+      "wall_overrides": {},
+      "disabled_openings": [],
+      "basis": "Owner confirmation, 2026-11-19: the secretary's office is 3.006A/B and is missing its floors in the walkthrough. The enclosed suite is an occupied room envelope, not a vertical void. Restore slabs on OG1–OG3 using the existing outline and storey thickness. The internal A/B partition and actual dimensions remain unresolved; room uses on the lower storeys are not inferred. Preserve the raw F03 trace, walls and openings."
     }
   ],
   "atrium_access": {
