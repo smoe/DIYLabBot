@@ -95,6 +95,10 @@ def compile(source, building, parameters, interface, expanded, plan, eye_height)
                 'qualification': {'lift_operation_implemented': False, 'collision_checked': False}})
         config['door_objects'] = door_objects
         config['fittings'] = lift['fittings']['placements']
+        if 'walking' in config['fittings']:
+            config['walking'] = config['fittings']['walking']
+        if 'controls' in config['fittings']:
+            config['controls'] = config['fittings']['controls']
         for port in ports:
             port['door_object_ids'] = [door['id'] for door in door_objects
                 if port['active'] and door['side'] == port['side'] and (door['port_id'] == port['id'] or door['parent_object_id'] == object_id)]

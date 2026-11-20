@@ -782,6 +782,140 @@
                       "minLength": 1
                     }
                   }
+                },
+                "threshold": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "landing_gap_mm",
+                    "thickness_mm",
+                    "basis"
+                  ],
+                  "properties": {
+                    "landing_gap_mm": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 20
+                    },
+                    "thickness_mm": {
+                      "type": "number",
+                      "minimum": 10,
+                      "maximum": 100
+                    },
+                    "basis": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  }
+                },
+                "controls": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "floor_labels",
+                    "button_radius_mm",
+                    "display_width_mm",
+                    "display_height_mm",
+                    "led_color",
+                    "inactive_color",
+                    "basis",
+                    "landing_panel"
+                  ],
+                  "properties": {
+                    "floor_labels": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "KG",
+                        "EG",
+                        "OG1",
+                        "OG2",
+                        "OG3"
+                      ],
+                      "properties": {
+                        "KG": {
+                          "const": "K"
+                        },
+                        "EG": {
+                          "const": "E"
+                        },
+                        "OG1": {
+                          "const": "1"
+                        },
+                        "OG2": {
+                          "const": "2"
+                        },
+                        "OG3": {
+                          "const": "3"
+                        }
+                      }
+                    },
+                    "button_radius_mm": {
+                      "type": "number",
+                      "minimum": 10,
+                      "maximum": 25
+                    },
+                    "display_width_mm": {
+                      "type": "number",
+                      "minimum": 50,
+                      "maximum": 150
+                    },
+                    "display_height_mm": {
+                      "type": "number",
+                      "minimum": 50,
+                      "maximum": 150
+                    },
+                    "led_color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "inactive_color": {
+                      "type": "string",
+                      "pattern": "^#[0-9a-fA-F]{6}$"
+                    },
+                    "basis": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "landing_panel": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "width_mm",
+                        "height_mm",
+                        "depth_mm",
+                        "bottom_mm",
+                        "jamb_offset_mm"
+                      ],
+                      "properties": {
+                        "width_mm": {
+                          "type": "number",
+                          "minimum": 10,
+                          "maximum": 1900
+                        },
+                        "height_mm": {
+                          "type": "number",
+                          "minimum": 10,
+                          "maximum": 1900
+                        },
+                        "depth_mm": {
+                          "type": "number",
+                          "minimum": 10,
+                          "maximum": 1900
+                        },
+                        "bottom_mm": {
+                          "type": "number",
+                          "minimum": 10,
+                          "maximum": 1900
+                        },
+                        "jamb_offset_mm": {
+                          "type": "number",
+                          "minimum": 10,
+                          "maximum": 1900
+                        }
+                      }
+                    }
+                  }
                 }
               }
             }

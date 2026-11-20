@@ -129,15 +129,17 @@ class PinTests(unittest.TestCase):
 class CurrentNativeRegression(unittest.TestCase):
     @unittest.skipUnless(os.environ.get('SOLIDCRAFTBOT_BF01_CURRENT_GEOMETRY_TESTS') == '1',
                          'Opt-in current pinned native export; fixture tests are independent')
-    def test_current_reference_lift_port_is_not_supported(self):
+    def test_new_sill_removes_old_barrier_without_qualifying_lift(self):
         export = os.environ.get('SOLIDCRAFTBOT_FLEET_WALKTHROUGH_EXPORT',
                                 'exports/building-walkthrough/pages-master-80abbc7')
         mesh = navigation.NativeMesh(checks.ROOT / export)
         result = checks.support_barrier(mesh, 'LiftPort_EG_inward')
         self.assertFalse(result['passed'])
-        self.assertTrue(result['rejection_proven'])
-        self.assertEqual(result['projected_contact_triangle_count'], 0)
-        self.assertGreater(result['strip_width_mm'], 37)
+        self.assertFalse(result['rejection_proven'])
+        self.assertEqual(result['status'], 'unproven')
+        self.assertGreater(result['projected_contact_triangle_count'], 0)
+        self.assertIn('LiftLandingSill_EG_inward',
+                      [body['body'] for body in result['native_candidate_groups']])
         self.assertEqual(result['source_opening_id'], 'DLift')
 
 

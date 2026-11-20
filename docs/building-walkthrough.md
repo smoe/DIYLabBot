@@ -454,20 +454,29 @@ Objektbefehle werden davon getrennt mit der tatsächlichen Browserprüfung gepr�
 ## Aufzug benutzen
 
 Der Aufzug bleibt eine einzelne Kabine der vorhandenen Quelle `BuildingLift`.
-Am aktiven Geschossrahmen ruft ein Klick oder die Leertaste die Kabine.
-Das Overlay in Aufzugnähe bietet „Call lift“ und nach der Ankunft „Enter“.
-An Bord erscheinen die Geschossknöpfe und die zulässigen Ausstiegsseiten.
+Am aktiven Geschossrahmen und am modellierten Ruftaster ruft ein Klick oder
+die Leertaste die Kabine. Nach vollständiger Türöffnung kann man mit den
+normalen Bewegungstasten hinein- und wieder hinausgehen. Die Kameraposition
+bleibt beim Überqueren der Schwelle erhalten. Das Overlay bietet ergänzend
+Ruf, Geschosswahl und die bisherigen direkten Ein-/Ausstiegshilfen.
+Die fünf physischen Kabinentasten tragen K, E, 1, 2, 3 und sind anklickbar.
+Eine rote LED-Matrix in der Kabine und je eine am aktiven Zugang jedes
+Geschosses zeigen synchron das der aktuellen Kabinenhöhe nächstgelegene
+Geschoss. Schachttaster und Anzeigen bleiben am Gebäude, die Kabinentafel
+fährt mit. Die Dimensionen bleiben ausdrücklich Darstellungsannahmen.
 KG und EG erlauben nur den inneren Ausgang, auf der Seite ohne Bedienpanel;
 die Obergeschosse nur den äußeren Ausgang. Halte, Höhen und aktive Seiten stammen aus
 `interface.circulation.elevator`, nicht aus einer zweiten Geschossliste.
 
 Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
 wird nach jeder Objektaktualisierung absolut an den Kabinenzustand gebunden;
-es werden keine kleinen Höhenänderungen aufsummiert. An Bord sind freie
-Verschiebung über WASD, ↑/↓, Alt/Option + ←/→, Q/E und Bildschirmbewegung
-sowie freie Geschossauswahl, Ortsknöpfe und Laborisolation gesperrt.
-Umschauen mit Maus oder ←/→ bleibt möglich. Erst ein ausdrücklich
-gewählter erlaubter Ausstieg löst die Kamerabindung. Weitere Befehle während
+es werden keine kleinen Höhenänderungen aufsummiert. In der geöffneten,
+angedockten Kabine ist horizontales Gehen möglich. Während Türbewegung und
+Fahrt bleibt Translation gesperrt; Umschauen bleibt möglich. Q/E, freie
+Geschossauswahl, Ortsknöpfe und Laborisolation bleiben an Bord gesperrt.
+Gehen über die aktive Ausgangsschwelle löst die Kamerabindung. Der Schacht
+bleibt außerhalb der angedockten Kabine und ihrer offenen Türöffnung
+gesperrt. Eine belegte Türschwelle verhindert den Fahrbefehl. Weitere Befehle während
 einer Fahrt liefern `rejected_busy`; es gibt keine automatische Warteschlange.
 
 Die Weglänge bestimmt die Dauer. Mit dem glatten Profil
@@ -483,9 +492,31 @@ Obergeschossen erhalten, obwohl die EG-Kabine zwei Öffnungen besitzt.
 Die verschiebbaren Kabinen- und Schachttüren schließen vor der Fahrt und
 öffnen erst nach der Ankunft auf der aktiven Seite. Edelstahloberflächen,
 Handläufe und Tastenreihe folgen den Eigentümerfotos; Maße sind angenommen.
+Kabinen- und geschossfeste Metallschwellen verkleinern den bisherigen großen
+Spalt auf angenommene 8 mm; die 3-mm-Oberkante folgt dem Kabinenbodenbelag.
+Das ist kein vollständiger Bodenstützungsnachweis für BF01: dessen Kurven,
+Unterstützungsflächen und native Abstände müssen am neuen Stand neu geprüft werden.
 Eine reale Steuerung oder Schutzfunktion wird nicht implementiert.
 `lift_operation_implemented` bleibt `false`; die Browserfahrt ist keine
 mechanische, zeitliche oder sicherheitstechnische Aufzugsqualifikation.
+
+Die Geh-/Bedienprüfung `tests/check_walkthrough_lift_walking_browser.cjs`
+verwendet echte Maus- und Tastaturereignisse am vollständigen nativen Export:
+Einsteigen ohne Positionssprung, Fahrwahl über die modellierten Tasten,
+gesperrte Translation während der Fahrt, Aussteigen an allen fünf Geschossen
+und die tatsächlich gerenderten LED-Pixel. Eine belegte Schwelle und ein
+Geschoss ohne Kabine werden als gesperrte Fälle geprüft. Die Testuhr wird
+kontrolliert; daraus folgt kein Echtzeitnachweis.
+
+Der lokale Stand `exports/building-walkthrough/building-walkthrough-13815e6fde24/`
+enthält diesen Browsernachweis. Der vollständige FreeCAD-Bau
+`exports/generated/building-stack-ac608f8fdeff/build-report.json` prüft
+4.616 geschlossene Körper, 509 Bereichsprüfungen und 32 Höhenprüfungen.
+`exports/lift-walkthrough/native-lift-validation.json` vergleicht unabhängig
+245 Aufzugkörper in SolidCraft und FreeCAD, einschließlich der 8-mm-Spalte
+an allen fünf Zugängen. Dies ist kein vollständiger SolidCraft-Gebäudenachweis.
+Der aktuelle BF01-Schwellenvorlauf findet dort die neue Landeschwelle;
+sein Ergebnis bleibt `unproven`, also keine Freigabe für eine Roboterfahrt.
 
 <a id="merged-walkthrough-mechanisms"></a>
 

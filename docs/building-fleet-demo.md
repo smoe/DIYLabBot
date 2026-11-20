@@ -13,9 +13,12 @@ L01-Verbindung benötigt neue Kurven-, Boden- und native Abstandsnachweise;
 die folgenden Messwerte und Prüfberichte beschreiben ausschließlich den alten,
 jeweils gepinnten Stand. Historische Berichte werden nicht umgepinnt.
 
-Die bekannte bodenlose innere Aufzugsschwelle im EG wurde nicht korrigiert;
-die bestehende Sperre für den vollständigen 20-Fahrzeug-Lauf bleibt erhalten.
-Diese Quellenintegration erzeugt und qualifiziert keinen neuen Flottenlauf.
+Die anschließend vom Eigentümer angeforderte Schwellenkorrektur ergänzt
+Kabinen- und Landeschwellen mit angenommenen 8 mm Trennspalt. Der frühere
+breite bodenlose Streifen ist damit ein historischer Befund. Neue vollständige
+Bodenstützungs- und Kurvennachweise für BF01 stehen aus; die fehlende alte
+Stoppbedingung ist keine Freigabe. Diese Quellenintegration erzeugt und
+qualifiziert keinen neuen Flottenlauf.
 
 ## Bestätigte Rückstellung von K0_013
 

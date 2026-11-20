@@ -17,6 +17,7 @@
     @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
     @media(max-width:650px){.interaction-hint{bottom:110px;max-width:calc(100% - 24px);width:max-content;font-size:11px}}
     .lift-panel{position:absolute;right:18px;top:72px;z-index:2;max-width:calc(100% - 36px);width:260px;max-height:calc(100% - 90px);overflow:auto;overscroll-behavior:contain;padding:12px;background:#fffef6f5;border:1px solid #ced8cc;border-radius:10px;color:#294d3f;font-size:12px}.lift-panel[hidden]{display:none}.lift-panel p{margin:0 0 9px;line-height:1.5}.lift-actions,.lift-floors{display:flex;gap:6px;flex-wrap:wrap}.lift-floors{margin-bottom:8px}.lift-panel button{min-height:38px}.lift-panel button:disabled,.quiet-button:disabled,.place:disabled{opacity:.55;cursor:default}.lift-status{font-size:11px;color:#64766a}.isolation-button[aria-pressed=true]{background:#d7e6d7}
+    .lift-readout{display:inline-block;background:#18171c;color:#ff3156;font:700 32px monospace;min-width:48px;text-align:center;padding:4px 10px;border-radius:5px;margin:0 0 10px}.lift-floors button{border-radius:50%;min-width:40px;padding:8px;font-weight:700}.lift-floors button[aria-pressed=true]{border-color:#f54e71;box-shadow:0 0 0 2px #f54e7155}
     @media(max-width:650px){.lift-panel{right:12px;top:65px;width:230px;padding:9px;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
@@ -38,6 +39,7 @@
     <div class="crosshair" aria-hidden="true"></div>
     <section class="lift-panel" id="walkthrough-lift" aria-label="Elevator controls" hidden>
       <p><strong id="walkthrough-lift-label">Building lift</strong><br><span class="lift-status" id="walkthrough-lift-status" role="status"></span></p>
+      <output class="lift-readout" id="walkthrough-lift-readout" aria-label="Current lift floor">E</output>
       <div class="lift-floors" id="walkthrough-lift-floors" aria-label="Destination floor"></div>
       <div class="lift-actions" id="walkthrough-lift-actions"></div>
     </section>
@@ -114,7 +116,7 @@ __WALKTHROUGH_ROBOTS__</script>
       void main(){vec4 world=modelMatrix*vec4(position,1.);worldPosition=world.xyz;worldNormal=mat3(modelMatrix)*normal;gl_Position=viewProjection*world;}`;
     const fragmentSource=`#version 300 es
       precision highp float;
-      in vec3 worldPosition;in vec3 worldNormal;uniform vec4 materialColor;uniform vec3 eye;
+      in vec3 worldPosition;in vec3 worldNormal;uniform vec4 materialColor;uniform vec3 eye;uniform bool emissive;
       out vec4 outColor;
       void main(){
         vec3 n=normalize(worldNormal);if(!gl_FrontFacing)n=-n;
@@ -122,7 +124,7 @@ __WALKTHROUGH_ROBOTS__</script>
         float sunlight=.36*max(dot(n,normalize(vec3(-.45,-.35,1.))),0.);
         float fill=.12*max(dot(n,normalize(vec3(.7,.3,.35))),0.);
         vec3 linear=pow(max(materialColor.rgb,vec3(0.)),vec3(2.2));
-        vec3 lit=pow(linear*(hemi+sunlight+fill),vec3(1./2.2));
+        vec3 lit=emissive?materialColor.rgb:pow(linear*(hemi+sunlight+fill),vec3(1./2.2));
         float fog=smoothstep(45.,170.,distance(worldPosition,eye));
         outColor=vec4(mix(lit,vec3(.79,.85,.84),fog*.38),materialColor.a);
       }`;
@@ -130,7 +132,7 @@ __WALKTHROUGH_ROBOTS__</script>
     const program=gl.createProgram(),vertex=shader(gl.VERTEX_SHADER,vertexSource),fragment=shader(gl.FRAGMENT_SHADER,fragmentSource);
     gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
     gl.deleteShader(vertex);gl.deleteShader(fragment);gl.useProgram(program);
-    const uniforms=Object.fromEntries(['viewProjection','modelMatrix','materialColor','eye'].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const uniforms=Object.fromEntries(['viewProjection','modelMatrix','materialColor','eye','emissive'].map(name=>[name,gl.getUniformLocation(program,name)]));
     const attributes={position:gl.getAttribLocation(program,'position'),normal:gl.getAttribLocation(program,'normal')};
     gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(.79,.85,.84,1);
     let sceneId=null,stopId=null,selectedLevel=null,eye=[0,0,0],yaw=0,pitch=0,drag=null,dirty=true,lastTime=null,frames=0;
@@ -207,6 +209,12 @@ __WALKTHROUGH_ROBOTS__</script>
     const liftFloors=document.getElementById('walkthrough-lift-floors'),liftActions=document.getElementById('walkthrough-lift-actions');
     const portById=new Map((elevatorConfig?.ports||[]).map(port=>[port.id,port])),triggerPorts=new Map();
     for(const port of elevatorConfig?.ports||[])if(port.active)for(const body of port.trigger_body_ids||[])triggerPorts.set(body,port);
+    const liftControls=elevatorConfig?.controls,controlTargets=new Map(),controlBodies=new Map(),ledBodies=new Map();
+    const ledColor=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).concat(1);
+    for(const button of liftControls?.floor_buttons||[]){const id='LiftFloor.'+button.level_id;controlTargets.set(id,{kind:'floor',...button});for(const body of button.body_ids)controlBodies.set(body,id);}
+    for(const panel of liftControls?.landing_panels||[]){const id='LiftCall.'+panel.port_id;controlTargets.set(id,{kind:'call',...panel});for(const body of panel.button_body_ids)controlBodies.set(body,id);}
+    for(const display of liftControls?.displays||[])for(const cell of display.cells)ledBodies.set(cell.body_id,cell.levels);
+    const liftReadout=document.getElementById('walkthrough-lift-readout');
     let liftUIKey=null,lastLiftCommand=null;
     function updateObjectUI(){dirty=true;}
     function objectMatrix(object,closed=false){
@@ -228,19 +236,19 @@ __WALKTHROUGH_ROBOTS__</script>
     }
     function updateLiftUI(){
       const boarded=Boolean(elevator?.boarded),nearby=elevator&&!isolated&&sceneId==='building'?elevator.nearby(eye.map(v=>v*1000),reach*1000):null;
-      const busy=Boolean(elevatorObject?.transition||liftDoors?.busy),key=JSON.stringify([boarded,nearby?.id,busy,liftDoors?.phase,elevatorObject?.state,elevatorObject?.targetState,lastLiftCommand?.status]);
+      const busy=Boolean(elevatorObject?.transition||liftDoors?.busy),key=JSON.stringify([boarded,nearby?.id,busy,liftDoors?.phase,elevatorObject?.state,elevatorObject?.targetState,lastLiftCommand?.status,elevator?.displayLevel()]);
       for(const node of [...stopsNode.querySelectorAll('button'),document.getElementById('walkthrough-previous'),document.getElementById('walkthrough-next'),document.getElementById('walkthrough-return'),isolationButton])node.disabled=boarded;
       levelSelect.disabled=boarded||sceneId!=='building';
-      for(const node of document.querySelectorAll('[data-move]'))node.disabled=boarded;
+      for(const node of document.querySelectorAll('[data-move]'))node.disabled=boarded&&(!elevator.walkingAllowed||['up','down'].includes(node.dataset.move));
       liftPanel.hidden=!elevator||(!boarded&&!nearby);if(key===liftUIKey)return;liftUIKey=key;
       liftFloors.replaceChildren();liftActions.replaceChildren();if(!elevator)return;
-      liftLabel.textContent=elevatorObject.config.label;
+      liftLabel.textContent=elevatorObject.config.label;liftReadout.textContent=liftControls?.floor_labels[elevator.displayLevel()]||elevator.displayLevel();
       const label=elevatorObject.config.state_labels[elevatorObject.state]||elevatorObject.state;
       const phaseLabel={closing:'Türen schließen',opening:'Türen öffnen',travelling:'Fahrt'}[liftDoors?.phase];
       liftStatus.textContent=(busy?(phaseLabel||'Fahrt')+' · '+(elevatorObject.config.state_labels[liftDoors?.destination||elevatorObject.targetState]||elevatorObject.targetState):label)+(lastLiftCommand?' · '+lastLiftCommand.status:'');
       function button(parent,text,action,attrs={}){const node=document.createElement('button');node.type='button';node.className='quiet-button';node.textContent=text;for(const [k,v] of Object.entries(attrs))node.setAttribute(k,v);node.addEventListener('click',action);parent.append(node);return node;}
       if(boarded){
-        for(const level of levels.filter(level=>elevatorConfig.ports.some(p=>p.active&&p.level_id===level.id)))button(liftFloors,level.label||level.id,()=>recordLift(elevator.select(level.id)),{'data-lift-floor':level.id,'aria-label':'Travel to '+(level.label||level.id)});
+        for(const level of levels.filter(level=>elevatorConfig.ports.some(p=>p.active&&p.level_id===level.id)))button(liftFloors,liftControls?.floor_labels[level.id]||level.label||level.id,()=>recordLift(elevator.select(level.id)),{'data-lift-floor':level.id,'aria-label':'Travel to '+(level.label||level.id),'aria-pressed':String(elevatorObject.targetState===level.id)});
         for(const port of elevatorConfig.ports.filter(port=>port.active&&port.level_id===elevatorObject.state))button(liftActions,'Exit · '+port.side,()=>{
           const result=elevator.exit(port.side);if(result.status==='accepted'){eye=result.eye_mm.map(v=>v/1000);selectedLevel=result.level_id;levelSelect.value=selectedLevel;root.dataset.freeCamera='true';clearInputKeys();}
           recordLift(result);
@@ -268,7 +276,10 @@ __WALKTHROUGH_ROBOTS__</script>
       syncLiftCamera();return active;
     }
     function command(id,name){
-      if(id===elevatorConfig?.object_id&&liftDoors)return liftDoors.request(name);
+      if(id===elevatorConfig?.object_id&&liftDoors){
+        if(name!==elevatorObject.state&&elevator.doorwayOccupied(eye.map(v=>v*1000),data.navigation.camera_radius_mm+data.navigation.contact_margin_mm))return {status:'rejected_doorway_occupied',id};
+        return liftDoors.request(name);
+      }
       if(objectStates.get(id)?.config.mechanism==='lift_door')return {status:'rejected_automatic_door',id};
       return driveObject(id,name);
     }
@@ -312,7 +323,7 @@ __WALKTHROUGH_ROBOTS__</script>
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
+        targetForBody:id=>controlBodies.get(id)||robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
         referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
@@ -321,13 +332,15 @@ __WALKTHROUGH_ROBOTS__</script>
       if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
       if(robots.has(hit.target_id))return lastInteraction={...selectRobot(hit.target_id),input,frame:frames};
       const port=portById.get(hit.target_id),object=objectStates.get(hit.target_id),name=object?.targetState==='closed'?'open':'close';
-      const result=port?recordLift(elevator.call(port.id)):command(hit.target_id,name);
+      const control=controlTargets.get(hit.target_id);
+      const result=control?recordLift(control.kind==='floor'?elevator.select(control.level_id):elevator.call(control.port_id)):port?recordLift(elevator.call(port.id)):command(hit.target_id,name);
       lastInteraction={...result,input,distance_mm:hit.distance_m*1000,frame:frames};return lastInteraction;
     }
     function updateInteractionHint(){
       centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
       crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
       if(centreTarget&&robots.has(centreTarget.target_id)){interactionHint.textContent=robots.get(centreTarget.target_id).config.label+' · Klick oder Leertaste: Befehle';}
+      else if(centreTarget&&controlTargets.has(centreTarget.target_id)){const c=controlTargets.get(centreTarget.target_id);interactionHint.textContent=c.kind==='floor'?'Floor '+c.label+' · Click or Space':'Call lift · Click or Space';}
       else if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
       const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
       canvas.style.cursor=drag?.moved?'grabbing':hover?'pointer':'grab';
@@ -361,7 +374,7 @@ __WALKTHROUGH_ROBOTS__</script>
         pickGroups.push(group);
         const local=indices.subarray(group.index_start,group.index_start+group.index_count),color=[...group.color,opacity];
         const owner=bodyOwners.get(id+':'+group.id);
-        if(owner){const bb=group.bounds_mm;const batch={id:group.id,object:owner,color,parts:[local],count:local.length,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)};(opacity>=.99?movingOpaque:transparent).push(batch);}
+        if(owner||ledBodies.has(group.id)){const bb=group.bounds_mm;const batch={id:group.id,object:owner,color,parts:[local],count:local.length,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)};(opacity>=.99?movingOpaque:transparent).push(batch);}
         else if(opacity>=.99){const key=JSON.stringify(color);if(!opaque.has(key))opaque.set(key,{color,parts:[],count:0});const batch=opaque.get(key);batch.parts.push(local);batch.count+=local.length;}
         else{
           const bb=group.bounds_mm||group.bbox_mm;
@@ -389,7 +402,9 @@ __WALKTHROUGH_ROBOTS__</script>
       gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
       const scene=prepareScene(sceneId);gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,cameraMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);
       gl.disable(gl.BLEND);gl.depthMask(true);
-      for(const group of scene.opaque){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
+      for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id);const on=levelsOn?.includes(elevator.displayLevel());
+        gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
+      gl.uniform1i(uniforms.emissive,0);
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
       for(const group of scene.transparent){
         const m=group.object?objectMatrix(group.object):null,p=group.centre;
@@ -409,21 +424,16 @@ __WALKTHROUGH_ROBOTS__</script>
     function move(seconds){
       const strafe=held('strafe'),turn=(held('turnLeft')?1:0)-(held('turnRight')?1:0);
       if(turn&&!strafe&&seconds>0){yaw+=turn*Math.PI/2*seconds;root.dataset.freeCamera='true';dirty=true;}
-      if(elevator?.boarded)return;
+      if(elevator?.boarded&&!elevator.walkingAllowed)return;
       let f=(held('forward')?1:0)-(held('back')?1:0),
         r=(held('right')||strafe&&held('turnRight')?1:0)-(held('left')||strafe&&held('turnLeft')?1:0),
-        z=(held('up')?1:0)-(held('down')?1:0);
+        z=elevator?.boarded?0:(held('up')?1:0)-(held('down')?1:0);
       const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
       const speed=walkSpeed*(held('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
       const delta=[dx*speed*seconds,dy*speed*seconds,z*verticalSpeed*seconds];
       if(f||r||z){
-        const barriers=[];
-        // Free movement never boards the cabin or enters the shaft. Only the
-        // existing checked boarding/exit protocol owns that transition.
-        if(elevatorConfig&&sceneId==='building'){
-          const bounds=elevatorConfig.shaft_bounds_mm;if(!bounds)throw Error('Source-derived shaft envelope required.');
-          barriers.push({id:'UnboardedLiftShaft',min:bounds.min.map(v=>v/1000),max:bounds.max.map(v=>v/1000)});
-        }
+        const before=eye.map(v=>v*1000);
+        const barriers=sceneId==='building'&&elevator?elevator.walkingBarriers().map(b=>({id:b.id,min:b.min.map(v=>v/1000),max:b.max.map(v=>v/1000)})):[];
         const result=prepareScene(sceneId).collider.move(eye,delta,{barriers,transformsForBody:id=>{
           const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
           const transforms=[objectMatrix(owner)];
@@ -432,6 +442,7 @@ __WALKTHROUGH_ROBOTS__</script>
           return transforms;
         }});
         eye=result.eye;root.dataset.cameraBlocked=String(result.contacts.length>0);
+        if(elevator&&sceneId==='building'){const movement=elevator.walkStep(before,eye.map(v=>v*1000));if(movement.status==='walked_out'){selectedLevel=movement.level_id;levelSelect.value=selectedLevel;locationLabel.textContent='Free camera · '+selectedLevel;contextLabel.textContent='Building';}syncLiftCamera();}
       }
       if(f||r||z){root.dataset.freeCamera='true';dirty=true;}
     }
@@ -505,7 +516,7 @@ __WALKTHROUGH_ROBOTS__</script>
       viewRobot:id=>{const r=robots.get(id);return r?viewObject(r.config.joint_object_ids[0]):{status:"unknown_target",id};},
       get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
-      get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
+      get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,display_level:elevator.displayLevel(),walking_allowed:elevator.walkingAllowed,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},

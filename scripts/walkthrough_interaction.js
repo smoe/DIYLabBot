@@ -178,7 +178,63 @@
       passenger=null;return status('accepted',{eye_mm:[...port.exit_eye_mm],level_id:port.level_id,port_id:port.id});
     }
     function attachedEye(){return passenger?passenger.reference_eye_mm.map((v,i)=>v+object.config.joint.axis[i]*(object.value-reference)):null;}
-    return {nearby,call,board,select,exit,attachedEye,
+    const usablePorts=()=>ports.filter(p=>object.state===p.level_id&&!busy()&&(!doorCycle||doorCycle.canUsePort(p)));
+    function walkingBounds(){
+      const bounds=config.walking?.cabin_interior_bounds_mm;
+      return bounds?{min:bounds.min.map((v,i)=>v+(i===2?object.value-reference:0)),
+                    max:bounds.max.map((v,i)=>v+(i===2?object.value-reference:0))}:null;
+    }
+    function walkStep(from,to){
+      const bounds=walkingBounds(),open=usablePorts();
+      if(!bounds||!finite3(from)||!finite3(to)||!open.length)return status('no_walk_transition');
+      const [lo,hi]=config.walking.opening_y_mm;
+      const inHeight=to[2]>bounds.min[2]&&to[2]<bounds.max[2];
+      const interior=inHeight&&to.slice(0,2).every((v,i)=>v>=bounds.min[i]&&v<=bounds.max[i]);
+      if(!passenger&&interior){
+        const port=open.find(p=>to[1]>lo&&to[1]<hi&&(p.side==='outward'?from[0]<=bounds.min[0]:from[0]>=bounds.max[0]));
+        if(port)passenger={port_id:port.id,reference_eye_mm:to.map((v,i)=>v-(i===2?object.value-reference:0))};
+      }else if(passenger){
+        const port=open.find(p=>inHeight&&to[1]>lo&&to[1]<hi&&(p.side==='outward'?to[0]<p.plane_x_mm-p.wall_thickness_mm/2:to[0]>p.plane_x_mm+p.wall_thickness_mm/2));
+        if(port){passenger=null;return status('walked_out',{level_id:port.level_id,port_id:port.id});}
+      }
+      if(passenger){passenger.reference_eye_mm=to.map((v,i)=>v-(i===2?object.value-reference:0));return status('walking_aboard');}
+      return status('no_walk_transition');
+    }
+    function doorwayOccupied(eye,radius){
+      const b=walkingBounds();if(!b||!finite3(eye)||!Number.isFinite(radius)||radius<=0)return false;
+      const [lo,hi]=config.walking.opening_y_mm;
+      return ports.some(p=>p.level_id===object.state&&eye[2]>p.z_mm&&eye[2]<p.z_mm+p.height_mm
+        &&eye[1]>lo-radius&&eye[1]<hi+radius&&(p.side==='outward'
+          ?eye[0]>p.plane_x_mm-p.wall_thickness_mm/2-radius&&eye[0]<b.min[0]+radius
+          :eye[0]<p.plane_x_mm+p.wall_thickness_mm/2+radius&&eye[0]>b.max[0]-radius));
+    }
+    function walkingBarriers(){
+      if(!config.shaft_bounds_mm)return [];
+      let boxes=[config.shaft_bounds_mm];const b=walkingBounds(),open=usablePorts();
+      // Carve only the docked cabin and its fully open active doorway from the
+      // shaft exclusion. Other floors, inactive sides and the shaft roof remain
+      // guarded; native walls/doors still participate in continuous collision.
+      if(b&&open.length){
+        const [lo,hi]=config.walking.opening_y_mm,cuts=[b,...open.map(p=>({
+          min:[Math.min(p.exit_eye_mm[0],b.min[0]),lo,p.z_mm],
+          max:[Math.max(p.exit_eye_mm[0],b.max[0]),hi,p.z_mm+p.height_mm]}))];
+        for(const cut of cuts)boxes=boxes.flatMap(box=>{
+          const low=box.min.map((v,i)=>Math.max(v,cut.min[i])),high=box.max.map((v,i)=>Math.min(v,cut.max[i]));
+          if(low.some((v,i)=>v>=high[i]))return [box];
+          const remaining=[],middle={min:[...box.min],max:[...box.max]};
+          for(let axis=0;axis<3;axis++){
+            if(middle.min[axis]<low[axis]){const piece={min:[...middle.min],max:[...middle.max]};piece.max[axis]=low[axis];remaining.push(piece);middle.min[axis]=low[axis];}
+            if(middle.max[axis]>high[axis]){const piece={min:[...middle.min],max:[...middle.max]};piece.min[axis]=high[axis];remaining.push(piece);middle.max[axis]=high[axis];}
+          }return remaining;
+        });
+      }
+      return boxes.map((b,i)=>({id:'LiftShaftGuard'+i,min:[...b.min],max:[...b.max]}));
+    }
+    function displayLevel(){
+      const ids=Object.keys(object.config.states);return ids.reduce((best,id)=>Math.abs(object.config.states[id]-object.value)<Math.abs(object.config.states[best]-object.value)?id:best,ids[0]);
+    }
+    return {nearby,call,board,select,exit,attachedEye,walkStep,walkingBarriers,doorwayOccupied,displayLevel,
+      get walkingAllowed(){return Boolean(config.walking&&usablePorts().length);},
       get boarded(){return Boolean(passenger);},get portId(){return passenger?.port_id||null;}};
   }
   // Sphere translation against the native triangles. Conservative advancement

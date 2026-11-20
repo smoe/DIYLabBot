@@ -126,7 +126,9 @@ geschossabhängige Türseiten sind getrennt vom blauen Atrium-Marker. Der
 Rundgang bewegt genau diese Kabine als prismatisches Browserobjekt. Ruf,
 Einstieg, Geschosswahl und erlaubter Ausstieg verwenden die bestehenden
 aktiven Ports und Höhen. Die Kamera folgt an Bord absolut der Kabine;
-freie Bewegung und Blickpunkt-/Geschosswechsel sind dort gesperrt. Die
+bei vollständig offenen Türen ist Gehen in der Kabine und über die aktive
+Schwelle möglich. Während Türbewegung und Fahrt bleibt Translation gesperrt;
+Blickpunkt-/Geschosswechsel bleiben an Bord gesperrt. Die
 Darstellungsfahrt verwendet ein glattes quintisches Profil mit einer
 ausdrücklichen Geschwindigkeitsannahme; sie ergänzt weder Türblätter noch
 reale Steuerung. `lift_operation_implemented` bleibt `false`. Die vom Eigentümer bestätigten Seiten sind außen links
@@ -244,7 +246,7 @@ und geschossgebundenen Ausstiegen. Der vollständige SolidCraft-Gebäudeneuaufba
 ist ausgelassen. Historische Medien und Berichte bleiben ihren Revisionen
 zugeordnet; Einzelheiten stehen im Rundgang- und Gebäudebericht.
 
-Die additive [BF01-Komposition](docs/building-fleet-demo.md) referenziert 20 leere TR01-Instanzen und einen separat abgeleiteten Kamerakit. K0_013 ist für E2 ausdrücklich zurückgestellt; Treppenkern und geschützte L01-/TR01-Quellen bleiben unverändert. Die erste native Kameraableitung besteht unabhängig in beiden CADs. Die ursprünglichen transformierten L01-Gangmitten besitzen zwei tatsächliche Kontakte. Eine ausdrücklich freigegebene, separat referenzierte BF01-Querung umgeht diese und besteht nun den kontinuierlichen Mesh-/Boden- sowie nativen Kurvennachweis unter Erhalt der Bench-Sperren. Die weiterführende Prüfung weist nun einen bodenlosen Streifen über die gesamte innere EG-Aufzugstüröffnung nach; die Programmerzeugung stoppt bis zu einer ausdrücklich freigegebenen und neu geprüften Gebäudegeometrie. Vorbereitete Dienste, Kanal- und Sensorbausteine sind kein integrierter Flottenlauf, Materialtransport oder Hardwareadapter.
+Die additive [BF01-Komposition](docs/building-fleet-demo.md) referenziert 20 leere TR01-Instanzen und einen separat abgeleiteten Kamerakit. K0_013 ist für E2 ausdrücklich zurückgestellt; Treppenkern und geschützte L01-/TR01-Quellen bleiben unverändert. Die erste native Kameraableitung besteht unabhängig in beiden CADs. Die ursprünglichen transformierten L01-Gangmitten besitzen zwei tatsächliche Kontakte. Eine ausdrücklich freigegebene, separat referenzierte BF01-Querung umgeht diese und besteht nun den kontinuierlichen Mesh-/Boden- sowie nativen Kurvennachweis unter Erhalt der Bench-Sperren. Die weiterführende Prüfung wies am damaligen Stand einen bodenlosen Streifen über die gesamte innere EG-Aufzugstüröffnung nach. Die später angeforderte Schwellenkorrektur ergänzt Modellkörper mit 8 mm angenommenem Trennspalt; vollständige Boden- und Kurvennachweise für diesen Stand stehen aus. Vorbereitete Dienste, Kanal- und Sensorbausteine sind kein integrierter Flottenlauf, Materialtransport oder Hardwareadapter.
 
 ## Implementierter erster Schritt für L01
 

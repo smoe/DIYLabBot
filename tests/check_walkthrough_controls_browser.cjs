@@ -310,8 +310,11 @@ const {chromium} = require(process.argv[3] || 'playwright');
     await release(); attached(await read());
     await canvas.focus(); await down('ArrowRight');
     {const [a, b] = await segment(); turned(a, b, -1, 'Arrow yaw aboard the stationary lift'); attached(b);}
-    await down('AltLeft'); await down('w'); await down('e'); await down('ShiftLeft');
-    {const [a, b] = await segment(); stationary(a, b, 'All translation remains locked aboard'); attached(b);}
+    await release(); await down('w'); await down('e');
+    {const [a, b] = await segment();
+      assert(distance(a.camera.eye_mm, b.camera.eye_mm) > 30, 'Horizontal walking is available in the docked open cabin');
+      assert.equal(a.camera.eye_mm[2], b.camera.eye_mm[2], 'Vertical movement remains attached to the cabin floor');
+      attached(b);}
     await release();
     const origin = (await read()).elevator.state;
     const destination = Object.keys(liftObject.states).filter(level => level !== origin)
@@ -334,7 +337,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert(distance(exited.camera.eye_mm, exitPort.exit_eye_mm) < .01, 'Exit uses the source-derived port');
     await settled('Exiting clears queued translation and yaw'); await release();
     report.lift = {from: origin, to: destination, ride_before: rideBefore, ride_after: rideAfter};
-    report.checks.push('boarding/exit clear queued inputs', 'stationary and travelling lift attachment', 'lift yaw allowed and translation locked');
+    report.checks.push('boarding/exit clear queued inputs', 'stationary and travelling lift attachment', 'docked cabin walking; travel translation locked; yaw allowed');
     progress('stationary and travelling lift controls passed');
 
     await reset(); await page.locator('#controls-browser-fixture').evaluate(node => node.remove());

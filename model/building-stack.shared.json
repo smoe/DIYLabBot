@@ -188,7 +188,34 @@
             260,
             950
           ],
-          "basis": "Owner cabin photographs 2026-11-18: stainless surfaces, dark floor, two handrail heights and horizontal floor-button row. Unmeasured dimensions; display has no simulated live readout."
+          "basis": "Owner cabin photographs 2026-11-18: stainless surfaces, dark floor, two handrail heights and horizontal floor-button row. Unmeasured dimensions; controls and floor displays are browser simulations."
+        },
+        "controls": {
+          "floor_labels": {
+            "KG": "K",
+            "EG": "E",
+            "OG1": "1",
+            "OG2": "2",
+            "OG3": "3"
+          },
+          "button_radius_mm": 10,
+          "display_width_mm": 100,
+          "display_height_mm": 90,
+          "led_color": "#ff3156",
+          "inactive_color": "#28161a",
+          "landing_panel": {
+            "width_mm": 160,
+            "height_mm": 380,
+            "depth_mm": 25,
+            "bottom_mm": 1050,
+            "jamb_offset_mm": 100
+          },
+          "basis": "Owner five-button cabin photograph; live browser floor indication, dimensions are presentation assumptions."
+        },
+        "threshold": {
+          "landing_gap_mm": 8,
+          "thickness_mm": 35,
+          "basis": "Owner-requested reduced landing gap; unmeasured presentation geometry."
         }
       }
     },

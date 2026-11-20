@@ -1,9 +1,13 @@
 """Portable lift leaves, cabin controls and telephone in the existing lift frame."""
 import math
 
+GLYPHS = {'K': ['101','110','100','110','101'], 'E': ['111','100','110','100','111'],
+          '1': ['010','110','010','010','111'], '2': ['111','001','111','100','111'],
+          '3': ['111','001','111','001','111']}
+
 
 def validate(source):
-    if set(source)-{'interior'} != {'recipe', 'leaf_thickness_mm', 'leaf_gap_mm', 'north_clearance_mm', 'panel', 'telephone'} or source['recipe'] != 'opposed_sliding_doors/1':
+    if set(source)-{'interior', 'controls', 'threshold'} != {'recipe', 'leaf_thickness_mm', 'leaf_gap_mm', 'north_clearance_mm', 'panel', 'telephone'} or source['recipe'] != 'opposed_sliding_doors/1':
         raise ValueError('Explicit lift fitting recipe required')
     for key in ('leaf_thickness_mm', 'leaf_gap_mm', 'north_clearance_mm'):
         if type(source[key]) not in (int, float) or not math.isfinite(source[key]) or not 0 < source[key] <= 200:
@@ -24,6 +28,26 @@ def validate(source):
         values=[interior[k] for k in ('rail_radius_mm','rail_offset_mm','rail_end_margin_mm')]+interior['rail_heights_mm']
         if len(interior['rail_heights_mm'])!=2 or any(type(v) not in (int,float) or not math.isfinite(v) or not 0<v<1500 for v in values):
             raise ValueError('Two bounded handrail heights and positive rail dimensions required')
+    if 'controls' in source:
+        controls = source['controls']
+        if set(controls) != {'floor_labels','button_radius_mm','display_width_mm','display_height_mm','led_color','inactive_color','landing_panel','basis'} or controls['floor_labels'] != {'KG':'K','EG':'E','OG1':'1','OG2':'2','OG3':'3'}:
+            raise ValueError('Five owner-labelled lift floors required')
+        import re
+        if any(not re.fullmatch('#[0-9a-fA-F]{6}', controls[k]) for k in ('led_color','inactive_color')):
+            raise ValueError('Explicit LED colors required')
+        landing = controls['landing_panel']
+        if set(landing) != {'width_mm','height_mm','depth_mm','bottom_mm','jamb_offset_mm'}:
+            raise ValueError('Explicit landing panel dimensions required')
+        for value in [controls[k] for k in ('button_radius_mm','display_width_mm','display_height_mm')]+list(landing.values()):
+            if type(value) not in (float,int) or not math.isfinite(value) or not 0 < value < 2000:
+                raise ValueError('Positive bounded control dimensions required')
+    if 'threshold' in source:
+        t=source['threshold']
+        if set(t) != {'landing_gap_mm','thickness_mm','basis'} or not isinstance(t['basis'],str):
+            raise ValueError('Explicit threshold assumption required')
+        for key,low,high in [('landing_gap_mm',1,20),('thickness_mm',10,100)]:
+            if type(t[key]) not in (float,int) or not math.isfinite(t[key]) or not low<=t[key]<=high:
+                raise ValueError('Bounded threshold dimensions required')
 
 
 def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels):
@@ -40,6 +64,7 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
     if low_width <= gap*2 or hi+high_width+gap > panel_start:
         raise ValueError('Open lift leaves must clear the cabin end walls, panel and telephone')
     result = {'bodies': [], 'operations': [], 'door_groups': [], 'attached_body_ids': []}
+    controls=source.get('controls'); floor_buttons=[]; displays=[]; landing_panels=[]; thresholds=[]
     def box(name, origin, size, role, color, attached=False):
         if any(v <= 0 for v in size):
             raise ValueError('Positive lift fitting shape required')
@@ -50,12 +75,26 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
         if attached:
             result['attached_body_ids'].append(name)
         return name
-    def cylinder(name, origin, radius, length, axis, role, color):
+    def cylinder(name, origin, radius, length, axis, role, color, attached=True):
         if radius<=0 or length<=0:raise ValueError('Positive lift cylinder required')
         result['bodies'].append({'id':name,'component':'BuildingLift','role':role,'appearance':{'color':color,'opacity':1}})
         result['operations'].append({'id':name+'_Cylinder','body':name,'action':'create',
             'shape':{'kind':'cylinder','origin':origin,'radius':radius,'height':length,'axis':axis}})
-        result['attached_body_ids'].append(name)
+        if attached: result['attached_body_ids'].append(name)
+        return name
+    def display(identity, face, yy, zz, sign, attached, port_id=None):
+        w,h=controls['display_width_mm'],controls['display_height_mm']
+        box(identity,[face if sign>0 else face-3,yy-w/2,zz-h/2],[3,w,h],
+            'concept_lift_floor_display','#17171c',attached)
+        cells=[];step=min(w/5,h/7)
+        for row in range(5):
+            for col in range(3):
+                levels_on=[level for level,letter in controls['floor_labels'].items() if GLYPHS[letter][row][col]=='1']
+                cell=identity+'_LED_'+str(row)+'_'+str(col)
+                box(cell,[face+3 if sign>0 else face-4,yy+sign*(col-1)*step-step*.35,zz+(2-row)*step-step*.35],
+                    [1,step*.7,step*.7],'concept_lift_floor_led',controls['led_color'] if 'EG' in levels_on else controls['inactive_color'],attached)
+                cells.append({'body_id':cell,'levels':levels_on})
+        displays.append({'id':identity,'port_id':port_id,'cells':cells})
     def leaves(identity, side, x, z, height, port_id=None):
         for tag, start, end, sign, travel in [('Low', lo+gap, middle-gap/2, -1, low_width+gap), ('High', middle+gap/2, hi-gap, 1, high_width+gap)]:
             name = identity+'_'+tag
@@ -91,22 +130,24 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
             step = item['width_mm']/(len(levels)+1)
             face=x+item['depth_mm'];button_z=reference_z+item['bottom_mm']+item['height_mm']*.35
             for index, level in enumerate(levels):
-                yy=y+(index+1)*step;radius=min(11,step*.42)
+                yy=y+(index+1)*step;radius=controls['button_radius_mm'] if controls else min(11,step*.42)
+                if radius>=step*.48: raise ValueError('Floor button rims overlap')
                 cylinder('LiftFloorButtonRim_'+level['id'],[face,yy,button_z],radius,3,[1,0,0],'concept_lift_button_rim','#d7dbdc')
                 cylinder('LiftFloorButton_'+level['id'],[face+3,yy,button_z],radius-2,2,[1,0,0],'concept_lift_floor_button','#656b70')
-                # Small source-derived K/E/1/2/3 labels, never a claimed live floor readout.
-                letter={'KG':'K','EG':'E','OG1':'1','OG2':'2','OG3':'3'}.get(level['id'],'E')
-                glyphs={'K':['101','110','100','110','101'],'E':['111','100','110','100','111'],
-                        '1':['010','110','010','010','111'],'2':['111','001','111','100','111'],'3':['111','001','111','001','111']}
-                for row,line in enumerate(glyphs[letter]):
+                letter=(controls['floor_labels'] if controls else {'KG':'K','EG':'E','OG1':'1','OG2':'2','OG3':'3'}).get(level['id'],'E')
+                button_ids=['LiftFloorButtonRim_'+level['id'],'LiftFloorButton_'+level['id']]
+                label_step=radius/4
+                for row,line in enumerate(GLYPHS[letter]):
                     for col,bit in enumerate(line):
-                        if bit=='1':box('LiftButtonLabel_'+level['id']+'_'+str(row)+'_'+str(col),
-                            [face+5,yy-3+col*2,button_z+5-row*2],[.6,1.6,1.6],'concept_lift_button_label','#eef0ef',True)
+                        if bit=='1':button_ids.append(box('LiftButtonLabel_'+level['id']+'_'+str(row)+'_'+str(col),
+                            [face+5,yy+(col-1.4)*label_step,button_z+(2-row)*label_step],[.6,label_step*.8,label_step*.8],'concept_lift_button_label','#eef0ef',True))
+                floor_buttons.append({'level_id':level['id'],'label':letter,'body_ids':button_ids})
             for index in range(3):
                 cylinder('LiftAuxButton'+str(index),[face,y+(index+1)*item['width_mm']/4,button_z-42],10,4,[1,0,0],
                     'concept_lift_auxiliary_button','#d2b446' if index==1 else '#b1b8ba')
-            box('LiftFloorDisplay',[face,y+item['width_mm']*.15,reference_z+item['bottom_mm']+item['height_mm']-120],
-                [3,item['width_mm']*.7,60],'concept_lift_floor_display','#201e23',True)
+            if controls:display('LiftFloorDisplay',face,y+item['width_mm']/2,reference_z+item['bottom_mm']+item['height_mm']-90,1,True)
+            else:box('LiftFloorDisplay',[face,y+item['width_mm']*.15,reference_z+item['bottom_mm']+item['height_mm']-120],
+                     [3,item['width_mm']*.7,60],'concept_lift_floor_display','#201e23',True)
         else:
             # Receiver grip plus two wider earpieces, mounted on the east face.
             box('LiftTelephoneReceiver', [x-12, y+item['width_mm']*.35, reference_z+item['bottom_mm']+20],
@@ -114,6 +155,42 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
             for tag, z in [('Bottom', 20), ('Top', item['height_mm']-55)]:
                 box('LiftTelephoneReceiver'+tag, [x-20, y+item['width_mm']*.18, reference_z+item['bottom_mm']+z],
                     [22, item['width_mm']*.64, 35], 'concept_lift_telephone_receiver', '#d7dfe3', True)
+    if controls:
+        p=controls['landing_panel']
+        if p['width_mm']<controls['display_width_mm']+20 or p['height_mm']<controls['display_height_mm']+4*controls['button_radius_mm']:
+            raise ValueError('Landing controls must fit their panel')
+        for port in ports:
+            if not port['active']: continue
+            sign=-1 if port['side']=='outward' else 1
+            surface=port['plane_x_mm']+sign*port['wall_thickness_mm']/2
+            face=surface+sign*p['depth_mm']; yy=hi+p['jamb_offset_mm']+p['width_mm']/2; z=port['z_mm']+p['bottom_mm']
+            identity='LiftLandingPanel_'+port['level_id']+'_'+port['side']
+            box(identity,[min(surface,face),yy-p['width_mm']/2,z],[p['depth_mm'],p['width_mm'],p['height_mm']],
+                'concept_lift_landing_panel','#aeb5b8')
+            display(identity+'_Display',face,yy,z+p['height_mm']-controls['display_height_mm']/2-20,sign,False,port['id'])
+            radius=controls['button_radius_mm']; button=identity+'_Call'
+            cylinder(button+'_Rim',[face,yy,z+65],radius+3,3,[sign,0,0],'concept_lift_button_rim','#d7dbdc',False)
+            cylinder(button,[face+sign*3,yy,z+65],radius,3,[sign,0,0],'concept_lift_call_button','#e7e9e9',False)
+            landing_panels.append({'port_id':port['id'],'body_id':identity,'button_body_ids':[button,button+'_Rim']})
+        placements['controls']={'floor_labels':controls['floor_labels'],'floor_buttons':floor_buttons,
+            'landing_panels':landing_panels,'displays':displays,'led_color':controls['led_color'],'inactive_color':controls['inactive_color']}
+    if 'threshold' in source:
+        t=source['threshold']; ztop=3 if 'interior' in source else 0
+        for side,edge,inside in [('outward',x0,x0+cabin_wall),('inward',x1,x1-cabin_wall)]:
+            box('LiftCabinSill_'+side,[min(edge,inside),lo,reference_z+ztop-t['thickness_mm']],
+                [abs(edge-inside),hi-lo,t['thickness_mm']],'concept_lift_cabin_sill','#bcc3c7',True)
+        for port in ports:
+            if not port['active']:continue
+            sign=-1 if port['side']=='outward' else 1;edge=x0 if sign<0 else x1
+            start=edge+sign*t['landing_gap_mm'];end=port['plane_x_mm']+sign*port['wall_thickness_mm']/2
+            if sign*(end-start)<=0:raise ValueError('Threshold must connect the landing toward the cabin')
+            identity='LiftLandingSill_'+port['level_id']+'_'+port['side']
+            box(identity,[min(start,end),lo,port['z_mm']+ztop-t['thickness_mm']],
+                [abs(end-start),hi-lo,t['thickness_mm']],'concept_lift_landing_sill','#bcc3c7')
+            thresholds.append({'port_id':port['id'],'body_id':identity,'gap_mm':t['landing_gap_mm'],'cabin_edge_x_mm':edge,'landing_edge_x_mm':start,'opening_y_mm':[lo,hi],'top_mm':port['z_mm']+ztop})
+        placements['thresholds']=thresholds
+    placements['walking']={'cabin_interior_bounds_mm':{'min':[x0+cabin_wall,y0+cabin_wall,reference_z],
+        'max':[x1-cabin_wall,y1-cabin_wall,reference_z+height]},'opening_y_mm':[lo,hi]}
     result['placements'] = placements
     if 'interior' in source:
         interior=source['interior'];r=interior['rail_radius_mm'];offset=interior['rail_offset_mm'];margin=interior['rail_end_margin_mm']
@@ -131,5 +208,5 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
                     cylinder(name+'_Bracket'+str(n),[start+length*fraction,yy,reference_z+z],r*.45,offset,
                         [0,direction,0],'concept_lift_handrail_bracket','#b3bbbe')
         result['placements']['interior']={'rail_body_ids':[b['id'] for b in result['bodies'] if b['role']=='concept_lift_handrail'],
-            'floor_body_id':'LiftCabinFloorFinish','dimensions_measured':False,'live_display_implemented':False}
+            'floor_body_id':'LiftCabinFloorFinish','dimensions_measured':False,'live_display_implemented':bool(controls)}
     return result
