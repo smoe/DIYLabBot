@@ -667,11 +667,13 @@
                     "width_mm",
                     "height_mm",
                     "depth_mm",
-                    "bottom_mm"
+                    "bottom_mm",
+                    "entry_end_clearance_mm",
+                    "handrail_clearance_mm"
                   ],
                   "properties": {
                     "side": {
-                      "const": "northwest"
+                      "const": "southwest"
                     },
                     "width_mm": {
                       "type": "number",
@@ -689,6 +691,16 @@
                       "exclusiveMaximum": 2000
                     },
                     "bottom_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "entry_end_clearance_mm": {
+                      "type": "number",
+                      "exclusiveMinimum": 0,
+                      "exclusiveMaximum": 2000
+                    },
+                    "handrail_clearance_mm": {
                       "type": "number",
                       "exclusiveMinimum": 0,
                       "exclusiveMaximum": 2000

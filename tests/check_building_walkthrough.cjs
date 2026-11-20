@@ -135,7 +135,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert(door&&Math.abs(door.front[0]+1)<1e-8&&Math.abs(door.front[1])<1e-8,'The rendered room door opens toward the window');
   }
   for(const level of ['KG','EG'])assert.deepEqual(model.elevator.ports.filter(p=>p.level_id===level&&p.active).map(p=>p.side),['inward']);
-  assert.equal(model.elevator.fittings.panel.side,'northwest');
+  assert.equal(model.elevator.fittings.panel.side,'southwest');
   assert(model.elevator.fittings.interior.rail_body_ids.every(id=>nativeById.has(id)));
   for (const id of ['phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating']) {
     assert(model.stops.some(stop => stop.id === id), `The ${id} viewpoint is required.`);

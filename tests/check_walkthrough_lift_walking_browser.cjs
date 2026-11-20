@@ -34,7 +34,9 @@ const {chromium}=require(process.argv[3]||'playwright');
     }
     async function point(id,sign=1){
       const b=groups.get(id).bounds_mm,s=await read();
-      return [b[sign>0?'max':'min'][0],(b.min[1]+b.max[1])/2,(b.min[2]+b.max[2])/2+(moving.has(id)?s.lift.value_mm-lift.reference_z_mm:0)];
+      const axis=lift.fittings.panel.body_ids.includes(id)?1:0;
+      return [0,1,2].map(i=>(i===axis?b[sign>0?'max':'min'][i]:(b.min[i]+b.max[i])/2)
+        +(i===2&&moving.has(id)?s.lift.value_mm-lift.reference_z_mm:0));
     }
     async function clickBody(id,sign=1){
       const target=await point(id,sign);await lookAt(target);
@@ -64,18 +66,28 @@ const {chromium}=require(process.argv[3]||'playwright');
     async function checkDisplay(display,sign){
       const centre=await point(display.id+'_LED_2_1',sign);await lookAt(centre);await page.clock.runFor(30);
       const expected=(await read()).lift.display_level,positions=[];
-      for(const cell of display.cells)positions.push({point:await point(cell.body_id,sign),on:cell.levels.includes(expected)});
+      for(const cell of display.cells)positions.push({id:cell.body_id,point:await point(cell.body_id,sign),on:cell.levels.includes(expected)});
       const pixels=await page.evaluate(points=>{
         const canvas=document.querySelector('canvas'),gl=canvas.getContext('webgl2');
-        return points.map(({point,on})=>{const p=window.__buildingWalkthrough.projectPoint(point),rgba=new Uint8Array(4);
+        return points.map(({id,point,on})=>{const p=window.__buildingWalkthrough.projectPoint(point),rgba=new Uint8Array(4);
           gl.readPixels(Math.floor(p.x),canvas.height-1-Math.floor(p.y),1,1,gl.RGBA,gl.UNSIGNED_BYTE,rgba);
-          return {on,visible:p.visible,rgba:Array.from(rgba)};});
+          return {id,on,visible:p.visible,projected:p,rgba:Array.from(rgba)};});
       },positions);
-      for(const pixel of pixels){assert(pixel.visible,display.id+': LED is visible');assert.equal(pixel.rgba[0]>170&&pixel.rgba[1]<140,pixel.on,display.id+': '+JSON.stringify(pixel));}
+      try{for(const pixel of pixels){assert(pixel.visible,display.id+': LED is visible');assert.equal(pixel.rgba[0]>170&&pixel.rgba[1]<140,pixel.on,display.id+': '+JSON.stringify(pixel));}}
+      catch(error){
+        report.display_failure={id:display.id,expected,positions,pixels,state:await read()};
+        await page.screenshot({path:path.join(output,'lift-display-failure.png')});throw error;
+      }
       assert.equal(await page.locator('#walkthrough-lift-readout').textContent(),lift.controls.floor_labels[expected]);
       return {id:display.id,level:expected,pixels};
     }
-    await settle();await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),lift.object_id);await page.clock.runFor(30);
+    await settle();
+    // The existing 2.8 m cellar leaf intersects the shaft when open. Keep this
+    // control/walking scenario explicit; it is not a clearance proof for DK015.
+    report.room_door_setup={id:'KG.DK015.Door',state:'closed',reason:'Existing open cellar leaf intrudes into the cabin; separate room-door geometry issue.'};
+    const setup=await page.evaluate(id=>window.__buildingWalkthrough.command(id,'close'),report.room_door_setup.id);
+    assert(['accepted','already_in_state'].includes(setup.status));await page.clock.runFor(1000);
+    await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),lift.object_id);await page.clock.runFor(30);
     const ground=lift.ports.find(p=>p.active&&p.level_id==='EG');
     assert.equal((await page.evaluate(id=>window.__buildingWalkthrough.command(id,'OG3'),lift.object_id)).status,'accepted');await settle();
     await walk(ground.cabin_entry_mm,{blocked:true});assert(!(await read()).lift.boarded);
@@ -99,7 +111,10 @@ const {chromium}=require(process.argv[3]||'playwright');
       assert(after.camera.eye_mm.every((v,i)=>Math.abs(v-after.lift.attached_eye_mm[i])<.01));
       await settle();assert.equal((await read()).lift.state,destination);
       const cabinDisplay=await checkDisplay(lift.controls.displays.find(d=>d.port_id===null),1);
-      if(['KG','OG3'].includes(destination))await page.screenshot({path:path.join(output,'lift-cabin-'+destination+'.png')});
+      if(['KG','OG3'].includes(destination)){
+        const s=await read();await lookAt(lift.fittings.panel.center_mm.map((v,i)=>v+(i===2?s.lift.value_mm-lift.reference_z_mm:0)));
+        await page.clock.runFor(30);await page.screenshot({path:path.join(output,'lift-cabin-'+destination+'.png')});
+      }
       const exit=lift.ports.find(p=>p.active&&p.level_id===destination);
       await walk(exit.exit_eye_mm);assert(!(await read()).lift.boarded,'Ordinary walking exits at '+destination);
       const outDisplay=await checkDisplay(lift.controls.displays.find(d=>d.port_id===exit.id),exit.side==='outward'?-1:1);

@@ -12,9 +12,11 @@ def validate(source):
     for key in ('leaf_thickness_mm', 'leaf_gap_mm', 'north_clearance_mm'):
         if type(source[key]) not in (int, float) or not math.isfinite(source[key]) or not 0 < source[key] <= 200:
             raise ValueError('Bounded positive lift fitting dimension required')
-    for name, side in [('panel', 'northwest'), ('telephone', 'northeast')]:
+    for name, side in [('panel', 'southwest'), ('telephone', 'northeast')]:
         item = source[name]
-        if set(item) != {'side', 'width_mm', 'height_mm', 'depth_mm', 'bottom_mm'} or item['side'] != side:
+        fields = {'side', 'width_mm', 'height_mm', 'depth_mm', 'bottom_mm'}
+        if name == 'panel': fields |= {'entry_end_clearance_mm', 'handrail_clearance_mm'}
+        if set(item) != fields or item['side'] != side:
             raise ValueError('Owner-confirmed lift fitting side required')
         if any(type(item[k]) not in (int, float) or not math.isfinite(item[k]) or not 0 < item[k] < 2000 for k in item if k != 'side'):
             raise ValueError('Positive lift panel/telephone dimensions required')
@@ -60,8 +62,12 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
     low_width = min((hi-lo)/2, lo-(y0+cabin_wall+2*gap))
     middle = lo+low_width
     high_width = hi-middle
-    panel_start = min(y1-cabin_wall-source['north_clearance_mm']-source[name]['width_mm'] for name in ('panel', 'telephone'))
-    if low_width <= gap*2 or hi+high_width+gap > panel_start:
+    phone_start = y1-cabin_wall-source['north_clearance_mm']-source['telephone']['width_mm']
+    panel = source['panel']
+    panel_right = x0+cabin_wall+panel['entry_end_clearance_mm']+panel['width_mm']
+    if (low_width <= gap*2 or hi+high_width+gap > phone_start
+            or panel['entry_end_clearance_mm'] <= thickness+2*gap
+            or panel_right+panel['handrail_clearance_mm'] >= x1-cabin_wall):
         raise ValueError('Open lift leaves must clear the cabin end walls, panel and telephone')
     result = {'bodies': [], 'operations': [], 'door_groups': [], 'attached_body_ids': []}
     controls=source.get('controls'); floor_buttons=[]; displays=[]; landing_panels=[]; thresholds=[]
@@ -116,9 +122,12 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
     placements = {}
     for name in ('panel', 'telephone'):
         item = source[name]
-        y = y1-cabin_wall-source['north_clearance_mm']-item['width_mm']
-        x = x0+cabin_wall if name == 'panel' else x1-cabin_wall-item['depth_mm']
-        if y <= hi+gap or item['bottom_mm']+item['height_mm'] >= height:
+        # Author the panel once in a depth/width frame, then turn that frame
+        # onto the right-hand side wall seen from the upper-floor entrance.
+        first_operation = len(result['operations'])
+        y = 0 if name == 'panel' else phone_start
+        x = 0 if name == 'panel' else x1-cabin_wall-item['depth_mm']
+        if (name == 'telephone' and y <= hi+gap) or item['bottom_mm']+item['height_mm'] >= height:
             raise ValueError('Lift fittings must fit behind the door opening and below the cabin roof')
         identity = 'LiftControlPanel' if name == 'panel' else 'LiftTelephone'
         box(identity, [x, y, reference_z+item['bottom_mm']], [item['depth_mm'], item['width_mm'], item['height_mm']],
@@ -148,6 +157,21 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
             if controls:display('LiftFloorDisplay',face,y+item['width_mm']/2,reference_z+item['bottom_mm']+item['height_mm']-90,1,True)
             else:box('LiftFloorDisplay',[face,y+item['width_mm']*.15,reference_z+item['bottom_mm']+item['height_mm']-120],
                      [3,item['width_mm']*.7,60],'concept_lift_floor_display','#201e23',True)
+            def panel_point(point):
+                return [panel_right-point[1], y0+cabin_wall+point[0], point[2]]
+            panel_operations = result['operations'][first_operation:]
+            for operation in panel_operations:
+                shape = operation['shape']; shape['origin'] = panel_point(shape['origin'])
+                if shape['kind'] == 'box':
+                    depth, width, height_mm = shape['size']
+                    shape['origin'][0] -= width
+                    shape['size'] = [width, depth, height_mm]
+                elif shape['kind'] == 'cylinder':
+                    axis = shape['axis']; shape['axis'] = [-axis[1], axis[0], axis[2]]
+                else: raise ValueError('Unsupported cabin panel primitive')
+            placements[name].update(center_mm=panel_point(placements[name]['center_mm']),
+                face_normal=[0,1,0], body_ids=[o['body'] for o in panel_operations],
+                entry_side='outward', wall='south')
         else:
             # Receiver grip plus two wider earpieces, mounted on the east face.
             box('LiftTelephoneReceiver', [x-12, y+item['width_mm']*.35, reference_z+item['bottom_mm']+20],
@@ -198,14 +222,19 @@ def compile(source, cabin_rect, cabin_wall, opening, ports, reference_z, levels)
             raise ValueError('Handrails must clear the wall, controls and opposite end faces')
         box('LiftCabinFloorFinish',[x0+cabin_wall,y0+cabin_wall,reference_z],
             [x1-x0-2*cabin_wall,y1-y0-2*cabin_wall,3],'concept_lift_floor_finish',interior['floor_color'],True)
-        start=x0+cabin_wall+margin;length=x1-x0-2*(cabin_wall+margin)
+        start=x0+cabin_wall+margin;end=x1-cabin_wall-margin
         for side,yy,direction in [('South',y0+cabin_wall+offset,-1),('North',y1-cabin_wall-offset,1)]:
             for index,z in enumerate(interior['rail_heights_mm']):
                 if not r+3<z<height-r:raise ValueError('Lift rail height leaves its cabin')
+                rail_start=start
+                if side=='South' and z+r>panel['bottom_mm'] and z-r<panel['bottom_mm']+panel['height_mm']:
+                    rail_start=max(start,panel_right+panel['handrail_clearance_mm'])
+                length=end-rail_start
+                if length<=0:raise ValueError('Handrail must retain a positive length beside the cabin panel')
                 name='LiftHandrail_'+side+'_'+str(index)
-                cylinder(name,[start,yy,reference_z+z],r,length,[1,0,0],'concept_lift_handrail','#c7ccce')
+                cylinder(name,[rail_start,yy,reference_z+z],r,length,[1,0,0],'concept_lift_handrail','#c7ccce')
                 for n,fraction in enumerate((.1,.5,.9)):
-                    cylinder(name+'_Bracket'+str(n),[start+length*fraction,yy,reference_z+z],r*.45,offset,
+                    cylinder(name+'_Bracket'+str(n),[rail_start+length*fraction,yy,reference_z+z],r*.45,offset,
                         [0,direction,0],'concept_lift_handrail_bracket','#b3bbbe')
         result['placements']['interior']={'rail_body_ids':[b['id'] for b in result['bodies'] if b['role']=='concept_lift_handrail'],
             'floor_body_id':'LiftCabinFloorFinish','dimensions_measured':False,'live_display_implemented':bool(controls)}

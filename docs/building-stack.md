@@ -353,12 +353,16 @@ weiter ihre beiden Öffnungen; die inneren Schachtwände der Obergeschosse
 bleiben dennoch geschlossen. Kabinen- und aktive Schachttüren besitzen
 verschiebbare Blätter. Die Edelstahloptik, zwei Handlaufhöhen, dunkler Boden
 und horizontale Tastenreihe folgen den Kabinenfotos; Maße bleiben angenommen.
-Panel und Telefon bleiben an den zuvor bestätigten nordwestlichen bzw.
-nordöstlichen Positionen. Das dargestellte Anzeigenfeld hat keine eigene
-Live-Geschossanzeige; der Browser zeigt den Fahrzustand im Bedienmenü.
+Die Eigentümerkorrektur setzt Panel und Anzeige auf die rechte Seitenwand
+nahe dem Eingang aus den Obergeschossen: südliche Wand, westliches Ende.
+Der obere Handlauf endet mit angenommenen 50 mm Abstand vor dem Panel;
+die untere Leiste läuft darunter weiter. Das Telefon bleibt im Nordosten.
+Die Anzeige und die fünf Kabinentasten K/E/1/2/3 sind im Browser funktional;
+die äußeren Anzeigen und Ruftaster bleiben an ihren bestehenden Positionen.
 
 Die Browserfahrt verschiebt genau eine Kabine und die absolut daran gebundene
-Kamera. Die übrige freie Navigation ist an Bord gesperrt. Halte und Höhen
+Kamera. Bei vollständig geöffneten Türen ist Gehen möglich; während
+Türbewegung und Fahrt bleibt Translation gesperrt. Halte und Höhen
 kommen aus dem bestehenden Aufzuginterface; die Fahrtzeit folgt einer
 ausdrücklich synthetischen Geschwindigkeitsannahme. Bedienung und Grenzen
 stehen im [Rundgang](building-walkthrough.md#aufzug-benutzen).

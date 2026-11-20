@@ -460,6 +460,10 @@ normalen Bewegungstasten hinein- und wieder hinausgehen. Die Kameraposition
 bleibt beim Überqueren der Schwelle erhalten. Das Overlay bietet ergänzend
 Ruf, Geschosswahl und die bisherigen direkten Ein-/Ausstiegshilfen.
 Die fünf physischen Kabinentasten tragen K, E, 1, 2, 3 und sind anklickbar.
+Sie sitzen zusammen mit der Anzeige auf der rechten Seitenwand, wenn man
+vom Obergeschoss aus eintritt, nahe diesem Eingang. Der obere Handlauf
+endet mit 50 mm angenommenem Freiraum vor der Tafel; der untere läuft darunter
+weiter. Die äußeren Anzeigen und Ruftaster behalten ihre Positionen.
 Eine rote LED-Matrix in der Kabine und je eine am aktiven Zugang jedes
 Geschosses zeigen synchron das der aktuellen Kabinenhöhe nächstgelegene
 Geschoss. Schachttaster und Anzeigen bleiben am Gebäude, die Kabinentafel
@@ -518,6 +522,30 @@ an allen fünf Zugängen. Dies ist kein vollständiger SolidCraft-Gebäudenachwe
 Der aktuelle BF01-Schwellenvorlauf findet dort die neue Landeschwelle;
 sein Ergebnis bleibt `unproven`, also keine Freigabe für eine Roboterfahrt.
 
+Die anschließende Seitenwandkorrektur wird durch
+`exports/generated/building-stack-1b1aa4eb058a/build-report.json` und
+`exports/lift-side-panel/native-lift-validation.json` belegt. Die 245
+Aufzugkörper stimmen in FreeCAD und SolidCraft überein. 792 Prüfungen der
+konservativen Körpergrenzen über die vollständigen linearen Kabinentürhübe
+zeigen Abstand zu Panel, Telefon und Handläufen. Der obere Handlauf hält
+die angenommenen 50 mm zum Panel ein; alle 95 Körper der äußeren Anzeigen
+und Ruftaster bleiben geometrisch unverändert.
+Der Browsernachweis unter
+`exports/building-walkthrough/building-walkthrough-732b237ba8fe/` prüft
+alle fünf physischen Geschosstasten, die LED-Pixel und Ein-/Aussteigen
+mit 271 Gehschritten ohne Browserfehler.
+
+Dabei bleibt die vorhandene Kellertür `KG.DK015.Door` ausdrücklich geschlossen:
+ihr im Altmodell etwa 2,8 m langes offenes Blatt ragt in die Kabine und verdeckt
+die neue Anzeige. Diese unveränderte Raumtürgeometrie benötigt eine separate
+Grundriss-/Türkorrektur. Der Browserbericht benennt die geschlossene Stellung;
+die Aufzugprüfungen sind kein Freiraumnachweis gegenüber dieser Kellertür.
+Die zusätzliche vollständige Prüfung `tests/check_building_walkthrough.cjs`
+bestand die nativen Bindungen, sieben Ansichten sowie Kühlgeräte-/Bewegungsfälle,
+lief dann jedoch auf dem Gangweg vom Büro zum Labor in einen 180-s-Timeout.
+`exports/lift-side-panel/walkthrough-browser.log` hält diesen Fehler fest;
+ein bestandener Gesamtrundgang wird für diese Korrektur nicht behauptet.
+
 <a id="merged-walkthrough-mechanisms"></a>
 
 <a id="merged-walkthrough-mechanisms--türen-und-geräte-im-gebäuderundgang"></a>
@@ -553,16 +581,17 @@ Griff wieder öffnen.
 ### Aufzug
 
 Die eine vorhandene Kabine erhält zwei gegenüberliegende Schiebetürpaare.
-Jeder aktive Geschosszugang besitzt ein eigenes Türpaar. EG öffnet beidseitig,
-OG1–OG3 nur nach außen und KG nur nach innen. Nach einem Ruf oder einer
+Jeder aktive Geschosszugang besitzt ein eigenes Türpaar. EG und KG öffnen
+nach innen, OG1–OG3 nach außen. Nach einem Ruf oder einer
 Zielwahl schließen zuerst die Türen. Erst nach deren Abschluss fährt die
 Kabine; am Ziel öffnen die dort aktiven Kabinen- und Geschosstüren automatisch.
 Ein- und Aussteigen ist erst nach vollständiger Öffnung möglich.
 
-Panel und Telefon folgen der beschriebenen Anordnung: Panel auf der
-nordwestlichen, Telefon auf der nordöstlichen Kabinenseite, jeweils ganz hinten.
-Die Positionen beziehen sich auf den vorhandenen Gebäuderahmen. Abmessungen
-bleiben Darstellungsannahmen. Panel, Etagenknöpfe und Telefon fahren mit der
+Nach der Eigentümerkorrektur sitzt das Panel auf der rechten Seitenwand
+beim Eintritt aus den Obergeschossen, nahe diesem Türende. Im Gebäuderahmen
+ist dies die südliche Wand am westlichen Ende. Der obere Handlauf ist dort
+verkürzt. Das Telefon bleibt im Nordosten. Abmessungen bleiben
+Darstellungsannahmen. Panel, Etagenknöpfe und Telefon fahren mit der
 Kabine; ihre Türblätter kombinieren Kabinenhub und seitliche Türbewegung.
 Die Etagenwahl erfolgt weiterhin über die vorhandenen Bedienknöpfe des
 Rundgangs. Das Telefon ist ein sichtbares Ausstattungsmodell.

@@ -107,9 +107,10 @@ class MechanismTests(unittest.TestCase):
                 self.assertEqual(obj['side'], port['side'])
                 self.assertTrue(obj['parent_object_id'] == cabin['id'] or obj['port_id'] == port['id'])
         panel, phone = (lift['fittings'][name] for name in ('panel', 'telephone'))
-        self.assertEqual(panel['side'], 'northwest'); self.assertEqual(phone['side'], 'northeast')
+        self.assertEqual(panel['side'], 'southwest'); self.assertEqual(phone['side'], 'northeast')
         self.assertLess(panel['center_mm'][0], phone['center_mm'][0])
-        self.assertGreater(panel['center_mm'][1], lift['cabin_bounds_mm']['max'][1]-500)
+        self.assertLess(panel['center_mm'][1], lift['cabin_bounds_mm']['min'][1]+500)
+        self.assertEqual(panel['face_normal'], [0,1,0])
         self.assertGreater(phone['center_mm'][1], lift['cabin_bounds_mm']['max'][1]-500)
 
     def test_new_dependencies_are_pinned(self):
@@ -127,7 +128,14 @@ class FittingValidationTests(unittest.TestCase):
                   'plane_x_mm': 9900, 'wall_thickness_mm': 180, 'height_mm': 2150, 'z_mm': 0}]
         result = lift_fittings.compile(source, rectangle, 90, opening, ports, 0, [{'id': 'EG'}])
         shapes = {op['body']: op['shape'] for op in result['operations']}
-        control_y = min(shapes[name]['origin'][1] for name in ('LiftControlPanel', 'LiftTelephone'))
+        def bounds(shape):
+            origin=shape['origin']
+            if shape['kind']=='box':return origin,[v+w for v,w in zip(origin,shape['size'])]
+            axis=shape['axis'];radius=shape['radius'];length=shape['height']
+            extent=[radius*(1-v*v)**.5 for v in axis]
+            return ([origin[i]+min(0,axis[i]*length)-extent[i]for i in range(3)],
+                    [origin[i]+max(0,axis[i]*length)+extent[i]for i in range(3)])
+        controls=result['placements']['panel']['body_ids']+['LiftTelephone','LiftTelephoneReceiver','LiftTelephoneReceiverBottom','LiftTelephoneReceiverTop']
         for door in result['door_groups']:
             if door['parent'] != 'cabin': continue
             shape = shapes[door['moving_body_ids'][0]]
@@ -135,10 +143,15 @@ class FittingValidationTests(unittest.TestCase):
             swept_min = shape['origin'][1]+min(0, travel)
             swept_max = shape['origin'][1]+shape['size'][1]+max(0, travel)
             self.assertGreater(swept_min, rectangle[1]+90)
-            self.assertLess(swept_max, control_y)
+            self.assertLess(swept_max, rectangle[3]-90)
+            swept_lo,swept_hi=bounds(shape);swept_lo=list(swept_lo);swept_hi=list(swept_hi)
+            swept_lo[1]=swept_min;swept_hi[1]=swept_max
+            for body in controls:
+                lo,hi=bounds(shapes[body])
+                self.assertTrue(any(swept_hi[i]<lo[i] or hi[i]<swept_lo[i] for i in range(3)),body)
             opened = [shape['origin'][1]+travel, shape['origin'][1]+shape['size'][1]+travel]
             self.assertTrue(opened[1] < opening[0] or opened[0] > opening[1])
-        changed = copy.deepcopy(source); changed['panel']['width_mm'] = 400
+        changed = copy.deepcopy(source); changed['panel']['entry_end_clearance_mm'] = 20
         with self.assertRaisesRegex(ValueError, 'clear'):
             lift_fittings.compile(changed, rectangle, 90, opening, ports, 0, [{'id': 'EG'}])
 

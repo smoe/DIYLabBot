@@ -5,7 +5,7 @@
     "sha256": "0e6750bb65f980d8fb4b97af4e3141daae816eef305cd416cff7dfb81af78e20"
   },
   "historical_images_represent_current_model": false,
-  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1–OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained. The robot command UI and compiler are included in the current-source projection; they do not requalify the historical room images. The current lift projection adds walk-through thresholds and live cabin/landing controls; the historical room images remain unchanged.",
+  "reason": "Preserved room PNGs predate the 13 office monitor/mini-PC sets and the separate hollow microwave-type case and door. Their last compatible source bindings remain historical; current rendering is the separately checked walkthrough. No geometric compatibility for the changed furniture is asserted. The internal stair guard and its OG3 wall closure are documented separately in docs/media/stairwell-railing.provenance.json; the historical room PNGs remain unchanged. The merged current-source projection additionally reflects room-bound Lab3003, type-wide furniture articulation including the existing microwave, and the current arm asset; none of these changes requalifies the historical images. The current one-building-scene lab viewpoint and removal of the separate lab scene deliberately change the complete camera projection; the archived camera projection and images remain historical. The current projection also includes the room 3.007 microscope, room 3.008 kitchenette and revised elevator cabin and door bindings; these changes do not requalify the historical media. The current building also restores the three Suite3_006AB floor slabs on OG1–OG3; the historical room images and their original source bindings remain unchanged. The current model additionally includes the confirmed exterior end window in secretary room 3.006A/B on OG3 and the master camera-contact update; the historical source bindings and PNG bytes are retained. The robot command UI and compiler are included in the current-source projection; they do not requalify the historical room images. The current lift projection adds walk-through thresholds and live cabin/landing controls; the historical room images remain unchanged. The cabin panel is now on the right side wall near the upper-floor entrance with a shortened upper handrail; this does not requalify the historical room images.",
   "last_compatible_sources_sha256": {
     "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
     "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
@@ -108,10 +108,10 @@
     "model/building-doors.shared.json": "c6ef6a6203fc0722e1b2c050c24d9207173eb871c46eac4498c0fb8cc8f48288",
     "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
     "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
-    "model/building-stack.schema.json": "2552f0ecc6b3c46c749ad37141efccd9e536ff7a2bcb3d0b909e15178f81e6a8",
-    "model/building-stack.shared.json": "ac608f8fdeff2f7a8b519e505c208f87243517b94841568023f7ed31983fc82b",
+    "model/building-stack.schema.json": "548b1e5bd12f77ba97bc246b9556a73b2f01e018e41bc3716b4c41cba47c7083",
+    "model/building-stack.shared.json": "1b1aa4eb058a057960c72b99faf74da00a561179cf53ca53e159164b15056fb3",
     "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
-    "model/building-walkthrough.shared.json": "fb3a1feec9937c4642155280b1fa621c248a706573c6bdf6eda2476b5f85345c",
+    "model/building-walkthrough.shared.json": "e61b010ff8c0b479ba78d599bb7495c27e685ad58cdda1c0f522860de461aa01",
     "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
     "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
     "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
@@ -190,7 +190,7 @@
     "scripts/tube_carrier_model.py": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69",
     "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
     "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
-    "tests/check_building_walkthrough.cjs": "ae57e52ad38826add98cdafba8672a6d757c2aa17dfe28cf2f64fd35a3919a9b",
+    "tests/check_building_walkthrough.cjs": "d52bf285c1f88427d85819cf314f3221487ca64d63e02e1bce04263ff3cdc95f",
     "tests/test_building_furnishings.py": "f76c3c6ec4027d86ed52ece55ffa709682d73f2ab84b40618213311e9a42428d"
   },
   "current_camera_projection": {

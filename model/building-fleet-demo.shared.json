@@ -9,11 +9,11 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "ac608f8fdeff2f7a8b519e505c208f87243517b94841568023f7ed31983fc82b"
+      "sha256": "1b1aa4eb058a057960c72b99faf74da00a561179cf53ca53e159164b15056fb3"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "fb3a1feec9937c4642155280b1fa621c248a706573c6bdf6eda2476b5f85345c"
+      "sha256": "e61b010ff8c0b479ba78d599bb7495c27e685ad58cdda1c0f522860de461aa01"
     },
     "vehicle": {
       "path": "model/sample-transport-tr01.shared.json",
@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "f16964ee339c40d5b21ca9ae7108fa00b4271599778efdfd9562e024f3b906a2"
+      "sha256": "1a6d718a8dc35637c65a090914f4dcfb3b2492d4875506973ccf36de7e34d6d9"
     }
   },
   "fleet": {

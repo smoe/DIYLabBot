@@ -165,11 +165,13 @@
         "leaf_gap_mm": 4,
         "north_clearance_mm": 12,
         "panel": {
-          "side": "northwest",
+          "side": "southwest",
           "width_mm": 150,
           "height_mm": 1150,
           "depth_mm": 25,
-          "bottom_mm": 750
+          "bottom_mm": 750,
+          "entry_end_clearance_mm": 120,
+          "handrail_clearance_mm": 50
         },
         "telephone": {
           "side": "northeast",
@@ -188,7 +190,7 @@
             260,
             950
           ],
-          "basis": "Owner cabin photographs 2026-11-18: stainless surfaces, dark floor, two handrail heights and horizontal floor-button row. Unmeasured dimensions; controls and floor displays are browser simulations."
+          "basis": "Owner cabin photographs 2026-11-18: stainless surfaces, dark floor, two handrail heights and horizontal floor-button row. Unmeasured dimensions; controls and floor displays are browser simulations. Owner correction 2026-11-20: cabin display and buttons on the right side wall when entering from the upper floors, near that entrance; the upper handrail ends before the panel."
         },
         "controls": {
           "floor_labels": {
@@ -251,7 +253,7 @@
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG and EG use only the inward port, away from the northwest control panel; cabin geometry has both door apertures for upper-floor travel.",
+      "KG and EG use only the inward port. The cabin controls are on the right side wall near the opposite upper-floor entrance; the cabin has both door apertures.",
       "Internal stair guards reuse the atrium profile at #/exterior; dimensions, attachment and clearances are illustrative, not a qualified fall-protection or stair design."
     ],
     "served_extent": {
