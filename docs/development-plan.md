@@ -460,3 +460,7 @@ Vor realer Installation bleiben Modellwahl und gemessene Platzprüfung nötig.
 Für einen späteren Assistenzworkflow vorhandene manuelle Aufgaben und den
 gemeinsamen Material-Ledger um Assay-/Lane-Zuordnung und Originalexport
 verwenden; der Messablauf selbst ist weiterhin ein Entwurf.
+
+## BF01-Gebäudeflotte (20. November 2026)
+
+Die [separate BF01-Komposition](building-fleet-demo.md) bereitet 20 leere TR01 mit referenziertem Kamerakit vor. K0_013 ist für E2 ausdrücklich zurückgestellt, ohne den Treppenkern zu öffnen. Strikte Quellenprüfung und unabhängige FreeCAD-/SolidCraft-Kameraableitung sind implementiert. Die Navigation ist nach tatsächlichen Kontakten auf den bestehenden transformierten L01-Gangmitten angehalten. Eine neue L01-Verbindungsbahn benötigt eine eigene ausdrückliche Entscheidung und neue Geometrienachweise; weitere Ziele oder Abstände werden nicht still geändert. Dienste, Funkkanal, Leitstand und Sensorbausteine sind separat getestet, aber kein Gesamtlauf oder Browser-Flottenprogramm.
