@@ -1,5 +1,7 @@
 # SolidCraftBot
 
+[English translation](README.en.md) · Die deutsche Fassung ist maßgeblich.
+
 **Robotik, die Zeit für Forschung schafft.**
 
 Damit Robotik im Forschungslabor Akzeptanz findet, muss ihr Zweck deutlich werden: Es geht hier nicht um Hochdurchsatz. Roboter sollen diejenigen Arbeiten übernehmen, die Menschen nicht selbst erledigen müssen. So können Forschende in derselben Zeit nachdenken, Ergebnisse aufschreiben, Verfahren verbessern und mit Kolleginnen und Kollegen diskutieren.
