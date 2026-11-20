@@ -1,0 +1,60 @@
+{
+  "format": "solidcraftbot.building-fleet-l01-route/1",
+  "id": "BF01_L01_Connector",
+  "mode": "synthetic_opt_in",
+  "sources": {
+    "building": {
+      "path": "model/building-stack.shared.json",
+      "sha256": "2448b0f67a2456c5102c77688049cdcc707c34ad98ea1fa6ec2219eda26c22d2"
+    },
+    "walkthrough": {
+      "path": "model/building-walkthrough.shared.json",
+      "sha256": "142e6dde190af50c649f1c115f7b64399cd4577ab612177c458fb2826f37ff1d"
+    },
+    "motion": {
+      "path": "model/tr01-l01.motion.json",
+      "sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+    },
+    "work_areas": {
+      "path": "model/tr01-l01-workcell.protocol.json",
+      "sha256": "37061bdf8fa04562cd9ff716c424f42f7d1b7ca53095babe005d682024a51c59"
+    },
+    "camera_vehicle": {
+      "path": "model/tr01-awareness-camera.shared.json",
+      "sha256": "ccd729bbb881de0b2d626ec0e76cf7a91516b8fc6d16d38a69ba5b1f2e835a45"
+    }
+  },
+  "host": {
+    "laboratory": "Lab3003",
+    "level": "OG3",
+    "area": "R3_003"
+  },
+  "route": {
+    "entry_opening": "D3_003A",
+    "exit_opening": "D3_003B",
+    "entry_lane": "right",
+    "exit_lane": "left",
+    "connector": "midgap_open_exit_leaf_and_island_front",
+    "ingress": "lane_aligned_through_source_openings",
+    "reverse": false
+  },
+  "curve": {
+    "kind": "existing_C2_CornerPath",
+    "corner_trim": "motion_source#/curve/corner_trim_mm"
+  },
+  "bench_exclusion": {
+    "source": "work_areas#/work_areas",
+    "binding": "same_local_coordinates_rigid_bound_room_transform",
+    "scaling": false,
+    "all_occupied_or_unknown": true
+  },
+  "basis": "explicit_owner_authorized_separate_BF01_connector_preserve_bench_and_stairs",
+  "qualification": {
+    "simulation_only": true,
+    "native_curve_qualified": false,
+    "navigation_qualified": false,
+    "metric_scale_known": false,
+    "hardware_executed": false,
+    "person_safety_qualified": false
+  }
+}

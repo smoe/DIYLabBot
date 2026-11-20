@@ -1,0 +1,474 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Referenced empty TR01 awareness kit",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "status",
+    "units",
+    "transport",
+    "variant",
+    "load_state",
+    "cover_state",
+    "parameters",
+    "camera",
+    "qualification",
+    "limitations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.tr01-awareness-camera/1"
+    },
+    "id": {
+      "const": "TR01_AwarenessKit"
+    },
+    "status": {
+      "const": "concept_not_for_manufacture"
+    },
+    "units": {
+      "const": {
+        "length": "mm",
+        "angle": "deg"
+      }
+    },
+    "transport": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "const": "model/sample-transport-tr01.shared.json"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "[0-9a-f]{64}"
+        }
+      }
+    },
+    "variant": {
+      "const": "Floor_T48"
+    },
+    "load_state": {
+      "const": "empty"
+    },
+    "cover_state": {
+      "const": "closed"
+    },
+    "parameters": {
+      "type": "object",
+      "required": [
+        "camera_width",
+        "camera_height",
+        "camera_depth",
+        "camera_lens_radius",
+        "camera_lens_length",
+        "camera_clearance",
+        "camera_mount_width",
+        "camera_mount_thickness",
+        "camera_mount_clearance",
+        "camera_view_range",
+        "camera_view_radius"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "camera_width": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                24,
+                40
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_height": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                20,
+                32
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_depth": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                24,
+                40
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_lens_radius": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                6,
+                10
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_lens_length": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                6,
+                12
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_clearance": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                10,
+                24
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_mount_width": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                14,
+                24
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_mount_thickness": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                6,
+                12
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_mount_clearance": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                4,
+                10
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_view_range": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                1000,
+                2200
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        },
+        "camera_view_radius": {
+          "type": "object",
+          "required": [
+            "unit",
+            "expression",
+            "range",
+            "basis"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "unit": {
+              "const": "mm"
+            },
+            "expression": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "range": {
+              "const": [
+                500,
+                1500
+              ]
+            },
+            "basis": {
+              "const": "synthetic_camera_envelope_presentation_assumption"
+            }
+          }
+        }
+      }
+    },
+    "camera": {
+      "$ref": "camera.schema.json",
+      "properties": {
+        "frame": {
+          "const": {
+            "origin": [
+              "floor_length/2",
+              0,
+              "navigation_top+camera_clearance+camera_height/2"
+            ],
+            "axis": [
+              1,
+              0,
+              0
+            ],
+            "x": [
+              0,
+              -1,
+              0
+            ]
+          }
+        },
+        "body_size_mm": {
+          "const": [
+            "camera_width",
+            "camera_height",
+            "camera_depth"
+          ]
+        },
+        "lens": {
+          "const": {
+            "radius_mm": "camera_lens_radius",
+            "length_mm": "camera_lens_length"
+          }
+        },
+        "mount_boxes": {
+          "const": [
+            {
+              "origin": [
+                "navigation_front+camera_mount_clearance",
+                "-camera_mount_width/2",
+                "chassis_top"
+              ],
+              "size": [
+                "camera_mount_thickness",
+                "camera_mount_width",
+                "navigation_top+camera_clearance-chassis_top"
+              ]
+            }
+          ]
+        },
+        "connection": {
+          "const": {
+            "controller": "TR01_unselected_controller",
+            "route_links": [
+              "Car"
+            ],
+            "interface": null,
+            "cable": null,
+            "strain_relief": null,
+            "max_frame_age_ms": null
+          }
+        },
+        "purpose": {
+          "const": "awareness"
+        }
+      }
+    },
+    "qualification": {
+      "const": {
+        "camera_hardware_selected": false,
+        "occlusion_checked": false,
+        "manufacturing_released": false,
+        "navigation_qualified": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  }
+}

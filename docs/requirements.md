@@ -14,6 +14,7 @@
 | Ausbau | Ein Arm zu Beginn, später möglicherweise drei Arme an einer Station |
 | Analytikstation | Zwei zusätzliche, weitgehend baugleiche Sechsachsarme für Tube-Handhabung, Pipettieren, Verdünnung, NanoDrop und Qubit; zusammen mit dem CF01-Arm drei Arme im Zielaufbau |
 | Stationsübergreifender Transport | Vorhandenen Bodenroboter TR01 zwischen DNA-Aufreinigung, CF01 und gemeinsamer NanoDrop-/Qubit-Station verwenden; synthetische Aufgabenübergaben sowie geometrische L01-Parkpunkte und fließende, kollisionsgeprüfte Fahrkurven sind separat implementiert; Navigation und reale Übergaben bleiben offen |
+| Gebäudeflotte BF01 | 20 leere TR01 als separate synthetische Gebäudedemo; E2 ohne ausdrücklich zurückgestelltes K0_013, Treppenkern ausgeschlossen. Quellen, Kamerakit und separate L01-Verbindung geprüft; vollständiger Flottenlauf durch fehlende native Bodenstützung an der EG-Aufzugsschwelle gesperrt. [Stand und Grenzen](building-fleet-demo.md) |
 | TapeStation TS01 | Als zunächst manuell bedienten QC-Arbeitsplatz aufnehmen; Modellwahl offen, 4200 als Planungsreferenz. Menschliche Assistenz vor automatischer Beladung vorsehen |
 | Langfristiger Volumenbereich | 1–1000 µl mit verschiedenen Werkzeugen |
 | Pipettierstation PS01 | Frei konfigurierbare Pipettieraufgaben; separater Roboter für Spitzenboxen, Well-Platten und Racks. Erstes Planungsprotokoll mit zwei unabhängigen Mengenreihen in einer 96-Well-Platte. [Aufbau und aktueller Prüfumfang](pipetting-station-ps01.md) |

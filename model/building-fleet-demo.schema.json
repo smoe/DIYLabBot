@@ -1,0 +1,696 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BF01 synthetic empty building fleet v1",
+  "type": "object",
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.building-fleet-demo/1"
+    },
+    "id": {
+      "const": "BF01"
+    },
+    "units": {
+      "const": {
+        "length": "presentation_mm",
+        "time": "s",
+        "angle": "rad"
+      }
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "building": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/building-stack.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "walkthrough": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/building-walkthrough.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "vehicle": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/sample-transport-tr01.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "angular_profile": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/tr01-l01.motion.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "sensor": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/l01-local-traffic.demo.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "layout": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/lab-layout-l01.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "camera": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/tr01-awareness-camera.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "l01_route": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "const": "model/building-fleet-l01-route.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "building",
+        "walkthrough",
+        "vehicle",
+        "angular_profile",
+        "sensor",
+        "layout",
+        "camera",
+        "l01_route"
+      ],
+      "additionalProperties": false
+    },
+    "fleet": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "const": 20
+        },
+        "id_pattern": {
+          "const": "BF{01..20}"
+        },
+        "variant": {
+          "const": "Floor_T48"
+        },
+        "cover": {
+          "const": "closed"
+        },
+        "load_state": {
+          "const": "empty"
+        }
+      },
+      "required": [
+        "count",
+        "id_pattern",
+        "variant",
+        "cover",
+        "load_state"
+      ],
+      "additionalProperties": false
+    },
+    "missions": {
+      "type": "object",
+      "properties": {
+        "seed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2147483647
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "enum": [
+                  "KG",
+                  "EG",
+                  "OG1",
+                  "OG2",
+                  "OG3"
+                ]
+              },
+              "area": {
+                "type": "string",
+                "minLength": 1
+              },
+              "basis": {
+                "type": "string",
+                "minLength": 1
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0.001,
+                "maximum": 100
+              },
+              "minimum_visits": {
+                "const": 1
+              },
+              "kind": {
+                "const": "inspection_pass"
+              }
+            },
+            "required": [
+              "level",
+              "area",
+              "basis",
+              "weight",
+              "minimum_visits",
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "deferred_targets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "level": {
+                "const": "KG"
+              },
+              "area": {
+                "const": "K0_013"
+              },
+              "basis": {
+                "const": "owner_decision_2026-11-20"
+              },
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "level",
+              "area",
+              "basis",
+              "reason"
+            ],
+            "additionalProperties": false
+          },
+          "minItems": 1
+        },
+        "minimum_duration_s": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 86400
+        },
+        "maximum_duration_s": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 86400
+        },
+        "return_home": {
+          "const": true
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "seed",
+        "targets",
+        "deferred_targets",
+        "minimum_duration_s",
+        "maximum_duration_s",
+        "return_home",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "depot": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "const": "EG"
+        },
+        "areas": {
+          "const": [
+            "R0_004",
+            "R0_013"
+          ]
+        },
+        "slots": {
+          "const": 20
+        },
+        "basis": {
+          "const": "owner_assumption_E3"
+        }
+      },
+      "required": [
+        "level",
+        "areas",
+        "slots",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "motion": {
+      "type": "object",
+      "properties": {
+        "empty_linear_limits": {
+          "type": "object",
+          "properties": {
+            "velocity_mm_s": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1000
+            },
+            "acceleration_mm_s2": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 500
+            },
+            "jerk_mm_s3": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 1000
+            }
+          },
+          "required": [
+            "velocity_mm_s",
+            "acceleration_mm_s2",
+            "jerk_mm_s3"
+          ],
+          "additionalProperties": false
+        },
+        "zone_velocity_mm_s": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 300
+        },
+        "angular_limits_pointer": {
+          "const": "/limits/angular"
+        },
+        "basis": {
+          "const": "synthetic_empty_profile_owner_assumption"
+        }
+      },
+      "required": [
+        "empty_linear_limits",
+        "zone_velocity_mm_s",
+        "angular_limits_pointer",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "sensor": {
+      "type": "object",
+      "properties": {
+        "source_key": {
+          "const": "sensor"
+        },
+        "settings_pointer": {
+          "const": "/sensor"
+        },
+        "clearance_pointer": {
+          "const": "/controller/clearance_mm"
+        },
+        "basis": {
+          "const": "referenced_E5_no_override"
+        }
+      },
+      "required": [
+        "source_key",
+        "settings_pointer",
+        "clearance_pointer",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "geometry": {
+      "type": "object",
+      "properties": {
+        "grid_step_mm": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 100
+        },
+        "localization_tolerance_mm": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 50
+        },
+        "height_reserve_mm": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "floor_band_start_mm": {
+          "const": 20
+        },
+        "basis": {
+          "const": "presentation_assumption"
+        }
+      },
+      "required": [
+        "grid_step_mm",
+        "localization_tolerance_mm",
+        "height_reserve_mm",
+        "floor_band_start_mm",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "lift": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "const": "BuildingLift"
+        },
+        "maximum_capacity": {
+          "const": 2
+        },
+        "capacity_policy": {
+          "const": "derive_from_native_interior_or_one"
+        },
+        "basis": {
+          "const": "owner_assumption_E7"
+        }
+      },
+      "required": [
+        "id",
+        "maximum_capacity",
+        "capacity_policy",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "communication": {
+      "type": "object",
+      "properties": {
+        "latency_s": {
+          "type": "array",
+          "items": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 10
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "jitter": {
+          "const": "deterministic_sequence_hash"
+        },
+        "dropout": {
+          "const": "during_lift_travel"
+        },
+        "basis": {
+          "const": "synthetic_assumption"
+        }
+      },
+      "required": [
+        "latency_s",
+        "jitter",
+        "dropout",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "control_room": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "const": "logical_endpoint_panel"
+        },
+        "truth_access": {
+          "const": false
+        },
+        "basis": {
+          "const": "owner_assumption_E6"
+        }
+      },
+      "required": [
+        "kind",
+        "truth_access",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "camera_presentation": {
+      "type": "object",
+      "properties": {
+        "fov_deg": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 170
+        },
+        "resolution_px": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 16,
+            "maximum": 2048
+          },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "selected_rate_hz": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 30
+        },
+        "mosaic_rate_hz": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10
+        },
+        "basis": {
+          "const": "presentation_assumption"
+        }
+      },
+      "required": [
+        "fov_deg",
+        "resolution_px",
+        "selected_rate_hz",
+        "mosaic_rate_hz",
+        "basis"
+      ],
+      "additionalProperties": false
+    },
+    "exclusions": {
+      "type": "object",
+      "properties": {
+        "areas": {
+          "const": [
+            "R3_028",
+            "R3_017",
+            "ExternalStairGround",
+            "Atrium",
+            "LiftCore"
+          ]
+        },
+        "KG_technical_areas": {
+          "const": [
+            "K0_001",
+            "K0_004",
+            "K0_003B",
+            "K0_003A",
+            "K0_005A",
+            "K0_005B",
+            "K0_007",
+            "K0_008",
+            "K0_010",
+            "K0_014B",
+            "K0_014C",
+            "K0_017",
+            "K0_016",
+            "K0_015",
+            "KCompressors"
+          ]
+        },
+        "closed_accesses": {
+          "const": "walkthrough.navigation.closed_access_areas"
+        },
+        "static_TR01": {
+          "const": "keep_as_obstacle_E8"
+        }
+      },
+      "required": [
+        "areas",
+        "KG_technical_areas",
+        "closed_accesses",
+        "static_TR01"
+      ],
+      "additionalProperties": false
+    },
+    "qualification": {
+      "type": "object",
+      "properties": {
+        "simulation_only": {
+          "const": true
+        },
+        "navigation_qualified": {
+          "const": false
+        },
+        "metric_scale_known": {
+          "const": false
+        },
+        "lift_dispatch_simulated": {
+          "const": true
+        },
+        "lift_operation_implemented": {
+          "const": false
+        },
+        "door_automation": {
+          "const": "route_doors_open_start_state"
+        },
+        "person_safety_qualified": {
+          "const": false
+        },
+        "network_executed": {
+          "const": false
+        },
+        "hardware_executed": {
+          "const": false
+        },
+        "ros_compiled": {
+          "const": false
+        },
+        "ros_executed": {
+          "const": false
+        },
+        "camera_hardware_selected": {
+          "const": false
+        },
+        "human_comparison": {
+          "const": "open"
+        }
+      },
+      "required": [
+        "simulation_only",
+        "navigation_qualified",
+        "metric_scale_known",
+        "lift_dispatch_simulated",
+        "lift_operation_implemented",
+        "door_automation",
+        "person_safety_qualified",
+        "network_executed",
+        "hardware_executed",
+        "ros_compiled",
+        "ros_executed",
+        "camera_hardware_selected",
+        "human_comparison"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    }
+  },
+  "required": [
+    "format",
+    "id",
+    "units",
+    "sources",
+    "fleet",
+    "missions",
+    "depot",
+    "motion",
+    "sensor",
+    "geometry",
+    "lift",
+    "communication",
+    "control_room",
+    "camera_presentation",
+    "exclusions",
+    "qualification",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

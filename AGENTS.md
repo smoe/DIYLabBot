@@ -245,6 +245,12 @@ zeitgebundene Armkanal enthält noch keinen stations-/sensorabhängigen
 Abbruchzweig. Geänderte Bahn- und Stationsfenster benötigen neue native
 Prüfungen aller jeweils bewegten Gruppen, auch bei durchgehend offenem Deckel.
 
+## BF01: separate synthetische Gebäudeflotte
+
+Vor BF01-Änderungen [docs/building-fleet-demo.md](docs/building-fleet-demo.md) lesen. K0_013 ist für E2 ausdrücklich zurückgestellt; alle anderen Ziele und der Treppenkern-Ausschluss bleiben verbindlich. Gepinnte TR01-/L01-Module und Quellen nicht für die Flotte ändern. Ein neuer Geometriebefund sperrt die Programmerzeugung; Kreis-/Rasteralarme allein beweisen keine Unpassierbarkeit. Der Kontaktbefund am ursprünglichen L01-Ganggraphen bleibt historisch gültig. BF01 wählt stattdessen ausdrücklich `model/building-fleet-l01-route.shared.json`; dessen separat geprüfte Verbindung erhält die Bench-Sperren und verändert das ursprüngliche Fahrprofil nicht. Neue exportierte Kurven benötigen jeweils eigene Grenz-, Boden- und native Abstandsnachweise. Am aktiven EG-Innenport ist jetzt ein durchgängiger bodenloser Schwellenstreifen nativ nachgewiesen; bis zu einer ausdrücklich freigegebenen Gebäudegeometriekorrektur kein vollständiges Flottenprogramm erzeugen und die Bodenprüfung nicht umgehen.
+
+Aufzugparameter und aktive Seiten aus dem Rundgang übernehmen. Boarding, Parken, freie Türlinie, vollständige Türöffnung und Ausfahrt benötigen eigene synthetische Beobachtungen; Zeitablauf ersetzt sie nicht. Fahrzeugregler erhalten nur eigene Zustände, anonyme verzögerte Scans und eigene Ressourcenzusagen. Der Leitstand verarbeitet ausschließlich empfangene Meldungen. Eine spätere Browserflotte spielt nur das einmal kompilierte und geprüfte Programm ab, sperrt manuelle Aufzugbefehle und friert beim Schließen einer Routentür gemeinsam ein. Kein Merge, Push oder Pages-Stand ohne ausdrückliche Freigabe.
+
 ## Manuelle Aufgaben und Laufzeitdaten
 
 NanoDrop- und Qubit-4-Abläufe sind vollständig synthetisch. Vor Änderungen

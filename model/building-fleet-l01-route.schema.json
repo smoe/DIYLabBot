@@ -1,0 +1,280 @@
+{
+  "type": "object",
+  "properties": {
+    "format": {
+      "type": "string",
+      "const": "solidcraftbot.building-fleet-l01-route/1"
+    },
+    "id": {
+      "type": "string",
+      "const": "BF01_L01_Connector"
+    },
+    "mode": {
+      "type": "string",
+      "const": "synthetic_opt_in"
+    },
+    "sources": {
+      "type": "object",
+      "properties": {
+        "building": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "model/building-stack.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "walkthrough": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "model/building-walkthrough.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "motion": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "model/tr01-l01.motion.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "work_areas": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "model/tr01-l01-workcell.protocol.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        },
+        "camera_vehicle": {
+          "type": "object",
+          "properties": {
+            "path": {
+              "type": "string",
+              "const": "model/tr01-awareness-camera.shared.json"
+            },
+            "sha256": {
+              "type": "string",
+              "pattern": "[0-9a-f]{64}"
+            }
+          },
+          "required": [
+            "path",
+            "sha256"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "building",
+        "walkthrough",
+        "motion",
+        "work_areas",
+        "camera_vehicle"
+      ],
+      "additionalProperties": false
+    },
+    "host": {
+      "type": "object",
+      "properties": {
+        "laboratory": {
+          "type": "string",
+          "const": "Lab3003"
+        },
+        "level": {
+          "type": "string",
+          "const": "OG3"
+        },
+        "area": {
+          "type": "string",
+          "const": "R3_003"
+        }
+      },
+      "required": [
+        "laboratory",
+        "level",
+        "area"
+      ],
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "object",
+      "properties": {
+        "entry_opening": {
+          "type": "string",
+          "const": "D3_003A"
+        },
+        "exit_opening": {
+          "type": "string",
+          "const": "D3_003B"
+        },
+        "entry_lane": {
+          "type": "string",
+          "const": "right"
+        },
+        "exit_lane": {
+          "type": "string",
+          "const": "left"
+        },
+        "connector": {
+          "type": "string",
+          "const": "midgap_open_exit_leaf_and_island_front"
+        },
+        "ingress": {
+          "type": "string",
+          "const": "lane_aligned_through_source_openings"
+        },
+        "reverse": {
+          "const": false
+        }
+      },
+      "required": [
+        "entry_opening",
+        "exit_opening",
+        "entry_lane",
+        "exit_lane",
+        "connector",
+        "ingress",
+        "reverse"
+      ],
+      "additionalProperties": false
+    },
+    "curve": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "const": "existing_C2_CornerPath"
+        },
+        "corner_trim": {
+          "type": "string",
+          "const": "motion_source#/curve/corner_trim_mm"
+        }
+      },
+      "required": [
+        "kind",
+        "corner_trim"
+      ],
+      "additionalProperties": false
+    },
+    "bench_exclusion": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string",
+          "const": "work_areas#/work_areas"
+        },
+        "binding": {
+          "type": "string",
+          "const": "same_local_coordinates_rigid_bound_room_transform"
+        },
+        "scaling": {
+          "const": false
+        },
+        "all_occupied_or_unknown": {
+          "const": true
+        }
+      },
+      "required": [
+        "source",
+        "binding",
+        "scaling",
+        "all_occupied_or_unknown"
+      ],
+      "additionalProperties": false
+    },
+    "basis": {
+      "type": "string",
+      "const": "explicit_owner_authorized_separate_BF01_connector_preserve_bench_and_stairs"
+    },
+    "qualification": {
+      "type": "object",
+      "properties": {
+        "simulation_only": {
+          "const": true
+        },
+        "native_curve_qualified": {
+          "const": false
+        },
+        "navigation_qualified": {
+          "const": false
+        },
+        "metric_scale_known": {
+          "const": false
+        },
+        "hardware_executed": {
+          "const": false
+        },
+        "person_safety_qualified": {
+          "const": false
+        }
+      },
+      "required": [
+        "simulation_only",
+        "native_curve_qualified",
+        "navigation_qualified",
+        "metric_scale_known",
+        "hardware_executed",
+        "person_safety_qualified"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "format",
+    "id",
+    "mode",
+    "sources",
+    "host",
+    "route",
+    "curve",
+    "bench_exclusion",
+    "basis",
+    "qualification"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Explicit opt-in BF01 connector in bound L01; existing global motion policy unchanged"
+}

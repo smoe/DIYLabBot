@@ -40,6 +40,8 @@ Ein Workflow braucht mehr als erreichbare Geräte: Gefäße müssen bereitstehen
 
 Der [Laborraum L01 mit Möbeln und Geräten](docs/lab-layout-l01.md) beschreibt einen Arbeitsplatz im Detail. Das [Gebäudemodell](docs/building-stack.md) ergänzt Labore, Flure, Büros und Aufenthaltsbereiche. Auch Denk- und Schreibplätze und die Küche gehören zu diesem Forschungsalltag. Die [Modellgalerie](docs/models/README.md) führt durch Räume, Möbel, Geräte und ihre Aufstellungen. Gebäudeabmessungen sind teilweise Darstellungsannahmen; reale Transportwege müssen gesondert geprüft werden.
 
+Die separate [Gebäudeflotte BF01](docs/building-fleet-demo.md) ist in Vorbereitung: Quellen, Kamerakit und eine separate BF01-Verbindung in L01 sind geprüft; die weitere Flottenfreigabe stoppt an einer nativ nachgewiesenen bodenlosen Aufzugsschwelle im EG. Eine vollständige 20-Fahrzeug-Animation liegt noch nicht vor.
+
 ### Interaktiver Gebäuderundgang
 
 [![Gebäuderundgang starten – Blick in das Atrium](docs/media/atrium-accesses.png)](https://smoe.github.io/DIYLabBot/)

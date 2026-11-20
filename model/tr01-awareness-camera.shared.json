@@ -1,0 +1,199 @@
+{
+  "format": "solidcraftbot.tr01-awareness-camera/1",
+  "id": "TR01_AwarenessKit",
+  "status": "concept_not_for_manufacture",
+  "units": {
+    "length": "mm",
+    "angle": "deg"
+  },
+  "transport": {
+    "source": "model/sample-transport-tr01.shared.json",
+    "source_sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+  },
+  "variant": "Floor_T48",
+  "load_state": "empty",
+  "cover_state": "closed",
+  "parameters": {
+    "camera_width": {
+      "unit": "mm",
+      "expression": 28,
+      "range": [
+        24,
+        40
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_height": {
+      "unit": "mm",
+      "expression": 24,
+      "range": [
+        20,
+        32
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_depth": {
+      "unit": "mm",
+      "expression": 28,
+      "range": [
+        24,
+        40
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_lens_radius": {
+      "unit": "mm",
+      "expression": 8,
+      "range": [
+        6,
+        10
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_lens_length": {
+      "unit": "mm",
+      "expression": 8,
+      "range": [
+        6,
+        12
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_clearance": {
+      "unit": "mm",
+      "expression": 12,
+      "range": [
+        10,
+        24
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_mount_width": {
+      "unit": "mm",
+      "expression": 18,
+      "range": [
+        14,
+        24
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_mount_thickness": {
+      "unit": "mm",
+      "expression": 8,
+      "range": [
+        6,
+        12
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_mount_clearance": {
+      "unit": "mm",
+      "expression": 6,
+      "range": [
+        4,
+        10
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_view_range": {
+      "unit": "mm",
+      "expression": 2200,
+      "range": [
+        1000,
+        2200
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    },
+    "camera_view_radius": {
+      "unit": "mm",
+      "expression": 1100,
+      "range": [
+        500,
+        1500
+      ],
+      "basis": "synthetic_camera_envelope_presentation_assumption"
+    }
+  },
+  "camera": {
+    "id": "TR01_Awareness",
+    "action": "camera",
+    "purpose": "awareness",
+    "status": "provisional",
+    "manufacturing_released": false,
+    "part": null,
+    "frame": {
+      "origin": [
+        "floor_length/2",
+        0,
+        "navigation_top+camera_clearance+camera_height/2"
+      ],
+      "axis": [
+        1,
+        0,
+        0
+      ],
+      "x": [
+        0,
+        -1,
+        0
+      ]
+    },
+    "body_size_mm": [
+      "camera_width",
+      "camera_height",
+      "camera_depth"
+    ],
+    "lens": {
+      "radius_mm": "camera_lens_radius",
+      "length_mm": "camera_lens_length"
+    },
+    "mount_boxes": [
+      {
+        "origin": [
+          "navigation_front+camera_mount_clearance",
+          "-camera_mount_width/2",
+          "chassis_top"
+        ],
+        "size": [
+          "camera_mount_thickness",
+          "camera_mount_width",
+          "navigation_top+camera_clearance-chassis_top"
+        ]
+      }
+    ],
+    "view": {
+      "kind": "illustrative_circular_cone",
+      "range_mm": "camera_view_range",
+      "far_radius_mm": "camera_view_radius",
+      "opacity": 0.1,
+      "occlusion_checked": false
+    },
+    "color": [
+      48,
+      108,
+      146
+    ],
+    "connection": {
+      "controller": "TR01_unselected_controller",
+      "route_links": [
+        "Car"
+      ],
+      "interface": null,
+      "cable": null,
+      "strain_relief": null,
+      "max_frame_age_ms": null
+    },
+    "aim_note": "Forward +X, optical +X to vehicle right (-Y); frame derived from transporter chassis and navigation-sensor envelopes. Uncalibrated synthetic camera, no image recognition."
+  },
+  "qualification": {
+    "camera_hardware_selected": false,
+    "occlusion_checked": false,
+    "manufacturing_released": false,
+    "navigation_qualified": false
+  },
+  "limitations": [
+    "Camera and mount dimensions are synthetic presentation envelopes, not selected hardware.",
+    "Closed transport cover and empty racks retained; no tubes or samples instantiated.",
+    "Frame is not a calibration; no driver, image recognition, wiring or sensor qualification."
+  ]
+}
