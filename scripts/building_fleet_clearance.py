@@ -128,13 +128,20 @@ _TOPOLOGY_CACHE={}
 
 
 class ClearanceCertificate:
-    def __init__(self,mesh,level,config,extra_exclusions=(),benchareas_ifL01=True):
+    def __init__(self,mesh,level,config,extra_exclusions=(),benchareas_ifL01=True,lift_context=None):
         model.validate(config);self.mesh=mesh;self.level=level;self.config=config
+        self.lift_context=lift_context
+        if lift_context is not None:
+            from building_fleet_lift_geometry import PortSupportContext
+            if not isinstance(lift_context,PortSupportContext)or lift_context.level!=level or lift_context.source!=config:
+                raise ValueError('A source-matched lift support context is required')
+        from building_fleet_floor import floor_support
+        self.floor_bank=floor_support(mesh,level,config)
         vehicle=geometry.vehicle_envelope();self.L=max(abs(vehicle['min'][0]),abs(vehicle['max'][0]));self.W=max(abs(vehicle['min'][1]),abs(vehicle['max'][1]));self.radius=math.hypot(self.L,self.W)
         sensor=model.resolved_sensor(config);self.reserve=sensor['clearance_mm']+config['geometry']['localization_tolerance_mm'];self.mesh_error=mesh.scene['linear_tessellation_deflection_mm']+math.sqrt(3)*mesh.scene['maximum_float32_error_mm']
         levels={v['id']:v for v in mesh.manifest['levels']}
         if level not in levels:raise ValueError('Known source floor required')
-        z=levels[level]['z_mm'];self.floor_triangles=[];self.obstacles=[];self.obstacle_names=[]
+        z=levels[level]['z_mm'];self.floor_triangles=self.floor_bank.triangles;self.obstacles=[];self.obstacle_names=[]
         hidden=mesh.manifest.get('hidden_body_ids',{});hidden=set(hidden.get('building',[])if isinstance(hidden,dict)else hidden)
         dynamic=set(next(o for o in mesh.manifest['objects']if o['id']==mesh.manifest['elevator']['object_id'])['moving_body_ids'])
         for obj in mesh.manifest['objects']:
@@ -143,10 +150,7 @@ class ClearanceCertificate:
             if group['id']in hidden or group['role']=='viewing_cone':continue
             bounds=mesh.bounds(group)
             support=group['role']=='concept_storey_slab'and abs(bounds['max'][2]-z)<.05
-            if support:
-                for tri in mesh.triangles(group):
-                    if all(abs(v[2]-z)<.05 for v in tri):self.floor_triangles.append([p[:2]for p in tri])
-                continue
+            if support:continue
             if group['id']in dynamic or group['role']in nav.DYNAMIC_ROLES:continue
             low=z+config['geometry']['floor_band_start_mm']-self.mesh_error;high=z+vehicle['height_mm']+config['geometry']['height_reserve_mm']+self.mesh_error
             if bounds['max'][2]<low or bounds['min'][2]>high:continue
@@ -159,6 +163,7 @@ class ClearanceCertificate:
         entry=topo[level];plan=entry['plan'];scale=entry['display_scale']
         for area in plan['areas']:
             if area['id']in entry['excluded_areas']:
+                if area['id']=='LiftCore'and lift_context is not None:continue
                 self.obstacles.append([[v*scale for v in point]for point in nav.floor.area_points(plan,area)]);self.obstacle_names.append('ExcludedArea.'+area['id'])
         for exclusion in extra_exclusions:
             if not isinstance(exclusion,dict)or set(exclusion)!={'id','polygon_mm'}:raise ValueError('Extra exclusion needs id and polygon_mm')
@@ -182,14 +187,38 @@ class ClearanceCertificate:
             if best==0:break
         return best-self.mesh_error,name
 
-    def support(self,xy,yaw,movement):
-        L=self.L+self.reserve+self.mesh_error+movement;W=self.W+self.reserve+self.mesh_error+movement;rectangle=_rectangle(xy,yaw,L,W);lo=[min(p[k]for p in rectangle)for k in range(2)];hi=[max(p[k]for p in rectangle)for k in range(2)]
-        return floor_union_covers(self.floor_index.query(lo,hi),xy,yaw,L,W)
+    def support(self,xy,yaw,movement,*,start_s=None,end_s=None,curve_ref=None):
+        L=self.L+self.reserve+self.mesh_error+movement;W=self.W+self.reserve+self.mesh_error+movement
+        result=self.floor_bank.covers(xy,yaw,L,W,curve_ref=curve_ref)
+        if self.lift_context is None:return result
+        if start_s is None or end_s is None:raise ValueError('The compiled lift support interval is required')
+        triangles,body_ids=self.floor_bank.selected(xy,yaw,L,W)
+        return self.lift_context.support(xy,yaw,L,W,start_s=start_s,end_s=end_s,
+            ordinary_triangles=triangles,ordinary_body_ids=body_ids,
+            ordinary_result=result,curve_ref=curve_ref)
 
     def check(self,curve,max_depth=24):
         first=curve.evaluate(curve.times[0])[floor.F[0]];cell=self.start_grid.cell(first[:2])
-        if cell is None or self.start_grid.blocked[cell]:return {'passed':False,'reason':'initial_pose_not_proven_outside_closed_projected_solids'}
-        accepted=[];evaluations=0;queue=[(a,b,0)for a,b in zip(curve.times,curve.times[1:])]
+        if self.lift_context is None and(cell is None or self.start_grid.blocked[cell]):return {'passed':False,'reason':'initial_pose_not_proven_outside_closed_projected_solids'}
+        if self.lift_context is not None:
+            # The semantic shaft mask may be removed only for an allocated
+            # port stage. Keep an independent physical closed-solid test:
+            # raster filling a hollow cabin would incorrectly block boarding.
+            from building_fleet_lift_checks import posed_mesh
+            actual=posed_mesh(self.mesh,self.lift_context.timeline.values(curve.times[0]))
+            z=next(row['z_mm']for row in actual.manifest['levels']if row['id']==self.level)
+            low=z+self.config['geometry']['floor_band_start_mm'];high=z+geometry.vehicle_envelope()['height_mm']
+            for group in actual.scene['groups']:
+                if group['role']=='viewing_cone':continue
+                bounds=actual.bounds(group)
+                if any(not bounds['min'][k]<=first[k]<=bounds['max'][k]for k in range(2)):continue
+                a,b=max(low,bounds['min'][2]),min(high,bounds['max'][2])
+                if b<=a:continue
+                membership=nav.closed_mesh_membership(actual,group['id'],[*first[:2],(a+b)/2])
+                if membership['inside']or membership['boundary']:
+                    return {'passed':False,'reason':'initial_pose_inside_or_on_closed_native_solid',
+                            'body_id':group['id'],'membership':membership}
+        accepted=[];evaluations=0;applications=[];queue=[(a,b,0)for a,b in zip(curve.times,curve.times[1:])]
         while queue:
             start,end,depth=queue.pop();mid=(start+end)/2;pose=curve.evaluate(mid)[floor.F[0]];bounds=_extrema(curve,start,end)
             translation=math.hypot(*[max(abs(bounds[k][i]-pose[i])for k in ('min','max'))for i in range(2)]);turn=max(abs(bounds[k][2]-pose[2])for k in ('min','max'));movement=math.nextafter(translation+self.radius*turn,math.inf)
@@ -197,22 +226,27 @@ class ClearanceCertificate:
             if distance<self.reserve:return {'passed':False,'reason':'midpoint_mesh_or_exclusion_clearance','time_s':[start,end],'midpoint_pose_mm_rad':pose,'midpoint_clearance_mm':distance,'limiting_body':body,'evaluations':evaluations}
             # An impossible static midpoint cannot be repaired by splitting;
             # a larger interval-support failure may be a conservative envelope.
-            support=self.support(pose[:2],pose[2],movement)if lower>=self.reserve else None
+            def floor_at(inflation,left,right):
+                try:return self.support(pose[:2],pose[2],inflation,start_s=left,end_s=right,
+                    curve_ref={'level':self.level,'time_s':[left,right]})
+                except ValueError as exc:return {'passed':False,'reason':str(exc),'lift_gate_failed':True}
+            support=floor_at(movement,start,end)if lower>=self.reserve else None
             if lower>=self.reserve and support['passed']:
-                accepted.append({'time_s':[start,end],'clearance_lower_mm':lower,'limiting_body':body,'floor_support':True,'depth':depth});continue
+                applications.extend(support.get('applications',[]))
+                accepted.append({'time_s':[start,end],'clearance_lower_mm':lower,'limiting_body':body,'floor_support':True,'support_rule_applied':support.get('rule_applied',False),'height_exception_applied':support.get('lift_height_exception_applied',False),'depth':depth});continue
             if depth>=max_depth:return {'passed':False,'reason':'interval_clearance_or_exact_floor_union_unresolved','time_s':[start,end],'midpoint_pose_mm_rad':pose,'interval_clearance_lower_mm':lower,'floor_union':support,'limiting_body':body,'evaluations':evaluations}
-            if support is not None and not self.support(pose[:2],pose[2],0)['passed']:return {'passed':False,'reason':'midpoint_expanded_oriented_rectangle_lacks_floor_union','time_s':[start,end],'midpoint_pose_mm_rad':pose,'floor_union':self.support(pose[:2],pose[2],0),'evaluations':evaluations}
+            if support is not None and not floor_at(0,mid,mid)['passed']:return {'passed':False,'reason':'midpoint_expanded_oriented_rectangle_lacks_floor_union','time_s':[start,end],'midpoint_pose_mm_rad':pose,'floor_union':floor_at(0,mid,mid),'evaluations':evaluations}
             queue.extend([(start,mid,depth+1),(mid,end,depth+1)])
-        return {'passed':True,'minimum_interval_clearance_lower_mm':min(v['clearance_lower_mm']for v in accepted),'intervals':accepted,'evaluations':evaluations,'minimum_clearance_mm':self.reserve,'mesh_reserve_mm':self.mesh_error,'floor_support_method':'exact rational union of locally clipped native horizontal floor triangles; expanded oriented rectangle; no circumscribed disc erosion','qualification':{'native_BRep_curve_checked':False,'dynamic_lift_checked':False,'bench_zones_changed':False},'scope':'Continuous actual PVA x/y/yaw projected-surface and excluded-area clearance plus whole-rectangle floor-union coverage; static enclosed-body start membership checked. Independent native BRep and lift-stage proofs remain required.'}
+        return {'passed':True,'minimum_interval_clearance_lower_mm':min(v['clearance_lower_mm']for v in accepted),'intervals':accepted,'evaluations':evaluations,'minimum_clearance_mm':self.reserve,'mesh_reserve_mm':self.mesh_error,'support_applications':applications,'lift_support':self.lift_context.report()if self.lift_context else None,'floor_support_method':'canonical exact native union plus conservative owner disk closing; full expanded oriented rectangle and source-gated lift-only raised surfaces','qualification':{'native_BRep_curve_checked':False,'dynamic_lift_checked':False,'bench_zones_changed':False},'scope':'Continuous actual PVA x/y/yaw projected-surface and excluded-area clearance plus whole-rectangle floor-union coverage; static enclosed-body start membership checked. Independent native BRep and lift-stage proofs remain required.'}
 
 
 _CACHE={}
-def check_motion(mesh,curve,level,config,extra_exclusions=(),benchareas_ifL01=True):
+def check_motion(mesh,curve,level,config,extra_exclusions=(),benchareas_ifL01=True,lift_context=None):
     model.validate(config)
     bench_revision=''
     if level=='OG3':
         import building_fleet_l01 as l01
         l01.load();bench_revision=model.digest(l01.SOURCE)
-    key=(id(mesh),level,bench_revision,json.dumps(config,sort_keys=True,allow_nan=False),json.dumps(extra_exclusions,sort_keys=True,allow_nan=False),benchareas_ifL01)
-    if key not in _CACHE:_CACHE[key]=ClearanceCertificate(mesh,level,config,extra_exclusions,benchareas_ifL01)
+    key=(id(mesh),level,bench_revision,json.dumps(config,sort_keys=True,allow_nan=False),json.dumps(extra_exclusions,sort_keys=True,allow_nan=False),benchareas_ifL01,id(lift_context))
+    if key not in _CACHE:_CACHE[key]=ClearanceCertificate(mesh,level,config,extra_exclusions,benchareas_ifL01,lift_context)
     return _CACHE[key].check(curve)

@@ -166,15 +166,26 @@ class NativeMesh:
     def bounds(self, group):
         bounds=group['bounds_mm']
         if group['id']not in self.transforms:return bounds
+        # A posed mesh is a shallow copy with a different articulation tree.
+        # Fence cached bounds by this instance and by its numeric joint values.
+        chain=self.transforms[group['id']]
+        signature=tuple((id(obj),obj['states'][obj.get('initial_state',obj['reference_state'])],
+                         obj['states'][obj['reference_state']])for obj in chain)
+        key=(id(self),group['id'],signature)
+        cache=getattr(self,'_posed_bounds_cache',None)
+        if cache is None:self._posed_bounds_cache=cache={}
+        if key in cache:return cache[key]
         points=[]
         for x in (bounds['min'][0],bounds['max'][0]):
             for y in (bounds['min'][1],bounds['max'][1]):
                 for z in (bounds['min'][2],bounds['max'][2]):
                     point=[x,y,z]
-                    for obj in self.transforms[group['id']]:point=initial_transform(obj,point)
+                    for obj in chain:point=initial_transform(obj,point)
                     points.append(point)
-        return {'min':[min(p[k]for p in points)for k in range(3)],
+        result={'min':[min(p[k]for p in points)for k in range(3)],
                 'max':[max(p[k]for p in points)for k in range(3)]}
+        cache[key]=result
+        return result
 
     def triangles(self, group):
         for i in range(group['index_start'],group['index_start']+group['index_count'],3):
@@ -191,6 +202,7 @@ class ClearanceGrid:
     def __init__(self, bounds, resolution_mm=50):
         if not math.isfinite(resolution_mm) or resolution_mm <= 0:
             raise ValueError('Positive raster resolution required')
+        self.floor_support=None;self._floor_edges={}
         self.resolution_mm = resolution_mm
         self.origin = [math.floor(v/resolution_mm)*resolution_mm-resolution_mm for v in bounds['min'][:2]]
         self.width,self.height = [math.ceil((v-self.origin[k])/resolution_mm)+2 for k,v in enumerate(bounds['max'][:2])]
@@ -273,8 +285,8 @@ class ClearanceGrid:
         # a query anywhere inside its cell rather than at its centre.
         return max(0,math.sqrt(self.distance_squared[i])*self.resolution_mm-math.sqrt(2)*self.resolution_mm)
 
-    def line_free(self,a,b,radius_mm):
-        """Adaptive Lipschitz certificate; no sample-only free-space claim."""
+    def proposal_line_free(self,a,b,radius_mm):
+        """Conservative raster proposal; never a native floor qualification."""
         stack_=[(a,b,0)]
         while stack_:
             x,y,depth=stack_.pop();length=math.dist(x,y)
@@ -284,26 +296,55 @@ class ClearanceGrid:
             stack_.extend([(x,mid,depth+1),(mid,y,depth+1)])
         return True
 
+    def line_free(self,a,b,radius_mm):
+        """Adaptive Lipschitz and canonical whole-sweep floor certificate."""
+        if not self.proposal_line_free(a,b,radius_mm):return False
+        provider=getattr(self,'floor_support',None)
+        if provider is not None:
+            key=(tuple(a),tuple(b),radius_mm)
+            cache=getattr(self,'_floor_edges',{})
+            if key not in cache:
+                proof=provider.line(a,b,radius_mm,curve_ref={'scope':'static_route_edge','level':provider.level,'points_mm':[list(a),list(b)]})
+                if len(cache)>20000:cache.clear()
+                cache[key]=proof['passed'];self._floor_edges=cache
+            return cache[key]
+        return True
+
     def search(self,start,end,radius_mm,edge_validator=None):
         first,last=self.cell(start),self.cell(end)
-        def usable(i):return i is not None and self.clearance_lower_mm(self.centre(i))>=radius_mm
+        centres={};clearances={};edge_results={}
+        def centre(i):
+            if i not in centres:centres[i]=self.centre(i)
+            return centres[i]
+        def clearance(i):
+            if i not in clearances:clearances[i]=self.clearance_lower_mm(centre(i))
+            return clearances[i]
+        def usable(i):return i is not None and clearance(i)>=radius_mm
         if not usable(first) or not usable(last):raise ValueError('Endpoint lacks conservative disc clearance')
-        queue=[(0,first)];cost={first:0};previous={first:None}
+        queue=[(0,first,0)];cost={first:0};previous={first:None}
         while queue:
-            _,i=heapq.heappop(queue)
+            _,i,pushed_cost=heapq.heappop(queue)
+            if pushed_cost!=cost[i]:continue
             if i==last:break
             x,y=i%self.width,i//self.width
             for dx,dy in ((1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)):
                 nx,ny=x+dx,y+dy
                 if not(0<=nx<self.width and 0<=ny<self.height):continue
                 j=ny*self.width+nx
-                if not usable(j) or not self.line_free(self.centre(i),self.centre(j),radius_mm):continue
-                if edge_validator is not None and not edge_validator(self.centre(i),self.centre(j)):continue
+                if not usable(j):continue
+                # Both adjacent cell-centre endpoint clearances are cached.
+                # The same Lipschitz bound certifies their whole short edge;
+                # unresolved edges retain the adaptive proposal check.
                 distance=math.hypot(dx,dy)*self.resolution_mm
-                score=cost[i]+distance*(1+radius_mm/max(radius_mm,self.clearance_lower_mm(self.centre(j))))
+                if min(clearance(i),clearance(j))-distance/2<radius_mm and not self.proposal_line_free(centre(i),centre(j),radius_mm):continue
+                if edge_validator is not None:
+                    edge=(i,j)
+                    if edge not in edge_results:edge_results[edge]=edge_validator(centre(i),centre(j))
+                    if not edge_results[edge]:continue
+                score=cost[i]+distance*(1+radius_mm/max(radius_mm,clearance(j)))
                 if score<cost.get(j,math.inf):
                     cost[j]=score;previous[j]=i
-                    heapq.heappush(queue,(score+math.dist(self.centre(j),end),j))
+                    heapq.heappush(queue,(score+math.dist(centre(j),end),j,score))
         if last not in previous:raise ValueError('No conservative disc route; rectangle qualification required before declaring inaccessible')
         result=[];i=last
         while i is not None:result.append(self.centre(i));i=previous[i]
@@ -333,11 +374,17 @@ def topology(spec=None, navigation=None, excluded_by_level=None):
     return result
 
 
-def build_grid(mesh, level, vehicle_height_mm, resolution_mm=50, topological=None):
+def build_grid(mesh, level, vehicle_height_mm, resolution_mm=50, topological=None, support_config=None):
     """Slice checked native triangle surfaces, with floors and forbidden areas."""
     topological=topology() if topological is None else topological;entry=topological[level]
     z=next(row['z_mm'] for row in mesh.manifest['levels'] if row['id']==level)
     grid=ClearanceGrid(mesh.scene['bounds_mm'],resolution_mm)
+    if support_config is None:
+        import building_fleet_model as fleet_model
+        support_config=fleet_model.load()
+    from building_fleet_floor import floor_support
+    grid.floor_support=floor_support(mesh,level,support_config)
+    for triangle in grid.floor_support.triangles:grid.raster(triangle,True)
     dynamic_ids=set(next(o for o in mesh.manifest['objects'] if o['id']==mesh.manifest['elevator']['object_id'])['moving_body_ids'])
     for obj in mesh.manifest['objects']:
         if obj.get('mechanism')=='lift_door':dynamic_ids.update(obj['moving_body_ids'])
@@ -345,7 +392,8 @@ def build_grid(mesh, level, vehicle_height_mm, resolution_mm=50, topological=Non
         if group['id'] in dynamic_ids or group['role'] in DYNAMIC_ROLES:continue
         bounds=mesh.bounds(group)
         support=group['role']=='concept_storey_slab' and abs(bounds['max'][2]-z)<.05
-        if not support and (bounds['max'][2]<z+20 or bounds['min'][2]>z+vehicle_height_mm):continue
+        if support:continue
+        if bounds['max'][2]<z+20 or bounds['min'][2]>z+vehicle_height_mm:continue
         polygons=[]
         for triangle in mesh.triangles(group):
             if support:
@@ -360,6 +408,27 @@ def build_grid(mesh, level, vehicle_height_mm, resolution_mm=50, topological=Non
         polygon=floor.area_points(plan,area)
         grid.raster([[v*scale for v in point] for point in polygon])
     return grid.finalize()
+
+
+def _native_band_index(mesh, lower, upper):
+    """Index immutable posed native bounds; retain exact clipped polygons."""
+    key=(id(mesh),id(mesh.transforms),lower,upper)
+    cache=getattr(mesh,'_fleet_band_cache',None)
+    if cache is None:mesh._fleet_band_cache=cache={}
+    if key in cache:return cache[key]
+    rows=[];cells={};large=[];step=1000
+    for group in mesh.scene['groups']:
+        if group['role']in DYNAMIC_ROLES:continue
+        bounds=mesh.bounds(group)
+        if bounds['max'][2]<lower or bounds['min'][2]>upper:continue
+        i=len(rows);rows.append((group,bounds))
+        axes=[range(math.floor(bounds['min'][k]/step),math.floor(bounds['max'][k]/step)+1)for k in range(2)]
+        if len(axes[0])*len(axes[1])>10000:large.append(i)
+        else:
+            for x in axes[0]:
+                for y in axes[1]:cells.setdefault((x,y),[]).append(i)
+    result=(rows,cells,large,{},step);cache[key]=result
+    return result
 
 
 def native_rectangle_collisions(mesh, level, start, end, yaw_rad,
@@ -382,15 +451,16 @@ def native_rectangle_collisions(mesh, level, start, end, yaw_rad,
     body=set();lower=z+20;upper=z+height_mm
     bound_min=[min(start[k],end[k])-math.hypot(half_length_mm+reserve_mm,width) for k in range(2)]
     bound_max=[max(start[k],end[k])+math.hypot(half_length_mm+reserve_mm,width) for k in range(2)]
-    for group in mesh.scene['groups']:
-        if group['role']in DYNAMIC_ROLES:continue
-        bounds=mesh.bounds(group)
-        if bounds['max'][2]<lower or bounds['min'][2]>upper:continue
-        # Transformable groups can move outside their reference box, so only
-        # use the reference XY broad phase for bodies without articulation.
-        if group['id']not in mesh.transforms and any(bounds['max'][k]<bound_min[k]or bounds['min'][k]>bound_max[k]for k in range(2)):continue
-        for triangle in mesh.triangles(group):
-            polygon=clip_height(triangle,lower,upper)
+    rows,cells,large,polygons,step=_native_band_index(mesh,lower,upper)
+    candidates=set(large)
+    for x in range(math.floor(bound_min[0]/step),math.floor(bound_max[0]/step)+1):
+        for y in range(math.floor(bound_min[1]/step),math.floor(bound_max[1]/step)+1):candidates.update(cells.get((x,y),[]))
+    for i in sorted(candidates):
+        group,bounds=rows[i]
+        # These bounds already include the complete source articulation chain.
+        if any(bounds['max'][k]<bound_min[k]or bounds['min'][k]>bound_max[k]for k in range(2)):continue
+        if i not in polygons:polygons[i]=[p for tri in mesh.triangles(group)if(p:=clip_height(tri,lower,upper))]
+        for polygon in polygons[i]:
             local=[[(p[0]-start[0])*tangent[0]+(p[1]-start[1])*tangent[1],
                     (p[0]-start[0])*normal[0]+(p[1]-start[1])*normal[1]]for p in polygon]
             if polygon_touches_box(local,lo,-width,hi,width):body.add(group['id']);break

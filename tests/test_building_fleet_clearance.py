@@ -57,6 +57,9 @@ class ExactFloorUnionTests(unittest.TestCase):
         checker=c.ClearanceCertificate.__new__(c.ClearanceCertificate)
         checker.L=2;checker.W=.5;checker.radius=math.hypot(2,.5);checker.reserve=0;checker.mesh_error=0
         checker.floor_index=c.PolygonIndex(rectangle(-5,-1.2,5,1.2));checker.distance=lambda xy,yaw:(500,'no_fixture_obstacles')
+        from building_fleet_support import support_covers
+        checker.floor_bank=SimpleNamespace(covers=lambda xy,yaw,L,W,**kw:support_covers(rectangle(-5,-1.2,5,1.2),xy,yaw,L,W,15))
+        checker.lift_context=None;checker.level='EG'
         checker.start_grid=SimpleNamespace(cell=lambda p:0,blocked=bytearray([0]))
         points=[{'time_s':t,'pose_mm_rad':[x,0,0],'velocity_mm_rad_s':[.1,0,w],'acceleration_mm_rad_s2':[0,0,0]}for t,x,w in [(0,0,6.4),(1,.1,-6.4)]]
         curve=c.floor.motion.Curve(c.floor.canonical(points))
