@@ -55,6 +55,9 @@ Das Lochbild am freien Flansch ist ein Konzeptdetail ohne erklärte Normschnitts
 Gefräste Aluminiumseitenplatten und Querverbände bilden den Oberarm.
 Gabeln und beidseitige Lagerstellen sind an Schulter und Handgelenk vorgesehen.
 Die Rohrform des distalen Unterarms schafft einen kompakten Querschnitt.
+Die [Lagerungs- und Haltesicherungsentscheidung](joint-bearings-holding.md)
+führt Lastannahmen und Gegenlagerkonzepte als Phase-1-Vorschlag. Lagersitze,
+Plattenrevisionen und Tragfähigkeit sind damit noch nicht freigegeben.
 
 Im früheren A01 war der Ellenbogenantrieb als Motorbauraum näher zur Schulter und als
 Riemenübertragungsbauraum am Oberarm dargestellt. Übersetzung, Riemenbreite,

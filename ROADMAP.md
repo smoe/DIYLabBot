@@ -111,6 +111,12 @@ die Gesamtbudgetgrenze bleibt bestehen.
 
 ### Mechanischer Nachweis
 
+Die [Lagerungs- und Haltesicherungsentscheidung](docs/joint-bearings-holding.md)
+ergänzt Phase 1 mit Lastrechnung, Lageralternativen und ausdrücklich bremsenfreier
+Erstprototyp-Präferenz. Kippmomentfreigabe, statische Thermik, Spannungsverlust,
+SP02-taugliches Parken und vollständiges 700-EUR-Mechanikbudget bleiben offen;
+Geometrieänderungen folgen erst nach Eigentümerentscheidung in Phase 2.
+
 Die aktuelle Standardrichtung ist [direkter Gefäßgriff mit kooperierenden Robotern](docs/requirements.md#direkter-gefäßgriff-und-kooperierende-roboter).
 Zuerst den vorhandenen Körpergreifer und die passiven Rackaufnahmen wiederverwenden,
 dann Gefäßartikel und Fingerfreigang am offenen Halter prüfen. Anfahrt, Griff,

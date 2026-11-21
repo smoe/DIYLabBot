@@ -100,6 +100,10 @@ Fertigungsfreigabe entsteht.
 | J5 | L4_ForearmRoll | L5_WristPitch | X2-Gabel, Gegenlager und enger Bewegungsfreiraum |
 | J6 | L5_WristPitch | L6_BareFlange | X2-Ausgang auf den allgemeinen freien Flansch adaptieren |
 
+Die [Phase-1-Lagerkonzepte](joint-bearings-holding.md#lageralternativen-maße-und-analytischer-bauraum)
+vergleichen alle drei Gelenkgruppen. Zusätzliche Sitze und Plattenrevisionen
+bleiben Phase 2; Hüllmaße belegen keinen freien Lagerbauraum.
+
 Ein Hersteller-Außenmodell darf nicht vollständig mit dem Kindlink rotieren:
 das Gehäuse bleibt am Elternlink, nur der Ausgang dreht relativ dazu. Auch ein
 in SolidCraft als starre Gruppe importiertes STEP braucht diese ausdrücklich

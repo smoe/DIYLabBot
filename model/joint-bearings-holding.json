@@ -1,0 +1,1144 @@
+{
+  "format": "solidcraftbot.joint-bearings-holding/1",
+  "status": "proposal_pending_owner_decision",
+  "phase": 1,
+  "created_on": "2026-11-20",
+  "source_refs": {
+    "robot": {
+      "path": "model/robot.json",
+      "sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+    },
+    "actuators": {
+      "path": "model/actuator-selection.json",
+      "sha256": "c1fa98452af47f02aa2f7dc5534b34f5886106a6a2064a6237822734910bb900"
+    },
+    "sp02": {
+      "path": "model/arm-syringe.shared.json",
+      "sha256": "48da6c4acaac5aa53bdeeee8f57f7bf440ec62cb59698f645f022e6c32845c53"
+    },
+    "motion": {
+      "path": "model/cf01-unload-demo.motion.json",
+      "sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+    },
+    "mobile_base": {
+      "path": "model/mobile-base-mb01.shared.json",
+      "sha256": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573"
+    },
+    "component_library": {
+      "path": "cad/vendor/myactuator/component-library.json",
+      "sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa"
+    },
+    "geometry_report": {
+      "path": "cad/vendor/myactuator/geometry-check.json",
+      "sha256": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2"
+    },
+    "x2_interface": {
+      "path": "model/x2-mounting-interface.json",
+      "sha256": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b"
+    },
+    "x4_interface": {
+      "path": "model/x4-mounting-interface.json",
+      "sha256": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c"
+    },
+    "x6_interface": {
+      "path": "model/x6-mounting-interface.json",
+      "sha256": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0"
+    },
+    "roadmap": {
+      "path": "ROADMAP.md",
+      "sha256": "5fdc7c4b8c80cdb3636abd9bfec1736c750156e1cedcb5e7ce0c4eb23b3ce30a"
+    }
+  },
+  "vendor_evidence": {
+    "sources": {
+      "RMD-X2-P28-7-E_vendor-document-1": {
+        "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-1.pdf",
+        "sha256": "7568346b16edb1d297cf6f67aca3d71f3551a7743ad71c6c00ceed2f6a584f11",
+        "archive_member_name": "RMD-X2-P28-7 电机组合图-A0.PDF",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_77b7670917e14f6b8256b4db4d912857.zip?dn=RMD-X2-P28-7+260920.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "RMD-X2-P28-7-E_vendor-document-2": {
+        "path": "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/vendor-document-2.pdf",
+        "sha256": "66d2e63668eff87b2e5761ab2a344170ca0544e478bc79ec0da6315914043b9b",
+        "archive_member_name": "X2-7 Motor Parameter 260903.pdf",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_77b7670917e14f6b8256b4db4d912857.zip?dn=RMD-X2-P28-7+260920.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "RMD-X4-P36-36-E-L_vendor-document-1": {
+        "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-1.pdf",
+        "sha256": "151d6cfc286e95899e7d2009677fedbc37d65af804aa17be21021acfd68cbd8b",
+        "archive_member_name": "RMD-X4-P36-36-E-L-中英文产品规格书 V1.0.pdf",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_8106ede9e38f497b8c12545bab3f95d5.zip?dn=RMD-X4-P36-36-E-L+261019.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "RMD-X4-P36-36-E-L_vendor-document-2": {
+        "path": "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/vendor-document-2.pdf",
+        "sha256": "e411f04bc8b18a744783dd34d421fe1a5c818c68ea04bc442ad492848687390a",
+        "archive_member_name": "X4-36-L Motor Parameter  260820.pdf",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_8106ede9e38f497b8c12545bab3f95d5.zip?dn=RMD-X4-P36-36-E-L+261019.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "RMD-X6-P20-60-E_vendor-document-1": {
+        "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-1.pdf",
+        "sha256": "725f36b26a6f5c42e138ca2b732225948df593b5e3732ef0f5fb62142ac06fc6",
+        "archive_member_name": "RMD-X6-P20-60 2D-A0.PDF",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_4231acdf891b41f3a56bb690f4c1d312.zip?dn=RMD-X6-P20-60+260920.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "RMD-X6-P20-60-E_vendor-document-2": {
+        "path": "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/vendor-document-2.pdf",
+        "sha256": "421836cfee9c20996c14ba099b8b77b8f4e861acefa8b3c56a8b59615f873e1d",
+        "archive_member_name": "X6-60 Motor Parameter 260903.pdf",
+        "original_archive_url": "https://www.myactuator.com/_files/archives/cab28a_4231acdf891b41f3a56bb690f4c1d312.zip?dn=RMD-X6-P20-60+260920.zip",
+        "original_download_page": "https://www.myactuator.com/downloads-xseries",
+        "repository_retrieved_on": "2026-10-28",
+        "byte_checksum_matches_manifest": true
+      },
+      "cad/vendor/myactuator/manifest.json": {
+        "path": "cad/vendor/myactuator/manifest.json",
+        "sha256": "fb05d5e7f6a53ce89591f14c18d7e9b14068a4e59a9b8531f0fb2c3a55072c15"
+      },
+      "cad/vendor/myactuator/component-library.json": {
+        "path": "cad/vendor/myactuator/component-library.json",
+        "sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa"
+      },
+      "cad/vendor/myactuator/geometry-check.json": {
+        "path": "cad/vendor/myactuator/geometry-check.json",
+        "sha256": "afa13372c33fc3856a4fb88a7c01a4685a198e48fbe818da5fc0f3da390b8aa2"
+      },
+      "model/actuator-selection.json": {
+        "path": "model/actuator-selection.json",
+        "sha256": "c1fa98452af47f02aa2f7dc5534b34f5886106a6a2064a6237822734910bb900"
+      },
+      "current_primary_web_1": {
+        "url": "https://www.myactuator.com/downloads-xseries",
+        "accessed_on": "2026-11-20",
+        "supports": "Current official listing of all three exact selected models and downloadable original manufacturer packages. No archive was downloaded."
+      },
+      "current_primary_web_2": {
+        "url": "https://www.myactuator.com/x2-7details",
+        "accessed_on": "2026-11-20",
+        "supports": "Current official exact model identity, order-key7 described as peak torque; no brake proof."
+      },
+      "current_primary_web_3": {
+        "url": "https://www.myactuator.com/x4-36-l-details",
+        "accessed_on": "2026-11-20",
+        "supports": "Current official exact model identity; order-key36 described as peak torque, contrary to quantitative PDFs distinction peak30/stall36. HTML technical table is a raster image, which web tool failed to retrieve."
+      },
+      "current_primary_web_4": {
+        "url": "https://www.myactuator.com/x6-60details",
+        "accessed_on": "2026-11-20",
+        "supports": "Current official exact model identity, order-key60 described as peak torque; no brake proof."
+      },
+      "current_primary_web_5": {
+        "url": "https://www.lyprs.com/jiaochagunzi/baobicrbt.html",
+        "accessed_on": "2026-11-20",
+        "supports": "Independent bearing manufacturer PRS identifies XRBT305 as an ultrathin crossed cylindrical roller bearing,30x41x5mm; does not prove supplier, internal fit or permissible loads of the installed X4 bearing. Its different ratings must not replace actuator values."
+      }
+    },
+    "actuators": {
+      "RMD-X2-P28-7-E": {
+        "source": "RMD-X2-P28-7-E_vendor-document-2",
+        "pdf_page_1_based": 1,
+        "printed_page": "04",
+        "mass_status": "vendor_published_not_physically_measured",
+        "peak_torque_nm": 7,
+        "stall_torque_nm": null,
+        "static_continuous_holding_torque_nm": null,
+        "rated_torque_interpretation": "Published as Rated Torque; these local parameter/dimension sheets do not establish indefinite zero-speed holding capability or installation thermal conditions.",
+        "backlash_arcmin": 15,
+        "backlash_operator": "<=",
+        "output_bearing_published_description": "Deep Groove Ball Bearings",
+        "bearing_type": "deep_groove_ball",
+        "axial_tensile_published_kn": 0.25,
+        "axial_compressive_published_kn": 0.25,
+        "axial_unspecified_direction_published_kn": null,
+        "axial_original_label": "Axial Load / Tensile load; Compressive load",
+        "radial_published_kn": 1,
+        "radial_original_label": "Radial Load",
+        "load_value_interpretation": "Published directional force values without simultaneous force/moment/lifetime/mounting conditions; suitable for a labelled comparison, not proof of installed allowable loading.",
+        "allowable_overturning_moment_nm": null,
+        "combined_load_equation": null,
+        "bearing_life_basis": null,
+        "backdrive_torque_nm": 0.4,
+        "backdrive_status": "vendor_nominal_typical_friction_value_not_guaranteed_holding_torque",
+        "guaranteed_unpowered_holding_torque_nm": null,
+        "output_encoder_mapping_status": "explicit_input_output_labels_in_parameter_sheet",
+        "selected_variant_brake": false,
+        "selected_brake_evidence": {
+          "printed_page": "03",
+          "pdf_page_1_based": 1,
+          "brief_quote": "N (without Brake)"
+        },
+        "braked_selected_model_available": null,
+        "brake_location_in_load_path": null,
+        "brake_holding_torque_nm": null,
+        "brake_mass_kg": null,
+        "brake_envelope_mm": null,
+        "brake_control_voltage_v": null,
+        "brake_control_current_a": null,
+        "brake_switching_time_s": null,
+        "brake_hand_release": null,
+        "brake_price_eur": null,
+        "short_circuit_braking": null,
+        "dynamic_braking_on_power_loss": null,
+        "braking_evidence_scope": "No supporting statement in the six local original PDFs or the current official HTML product pages; absence in this reviewed corpus is not proof of absence in other manufacturer manuals.",
+        "brief_quotes": [
+          "Backdrive Torque",
+          "Backlash",
+          "Output Bearing Type"
+        ],
+        "stall_test_points": [
+          {
+            "torque_nm": 3.75,
+            "temperature_rise_c": 20,
+            "stall_duration_s": 15,
+            "phase_current_arms": 4.3
+          },
+          {
+            "torque_nm": 5,
+            "temperature_rise_c": 48,
+            "stall_duration_s": 10,
+            "phase_current_arms": 5.7
+          },
+          {
+            "torque_nm": 6.25,
+            "temperature_rise_c": 31,
+            "stall_duration_s": 8,
+            "phase_current_arms": 7.4
+          },
+          {
+            "torque_nm": 7.5,
+            "temperature_rise_c": 59,
+            "stall_duration_s": 5,
+            "phase_current_arms": 8.6
+          }
+        ],
+        "mass_and_rated_torque_source_ref": "actuators",
+        "encoder_bits_source_ref": "actuators"
+      },
+      "RMD-X4-P36-36-E-L": {
+        "source": "RMD-X4-P36-36-E-L_vendor-document-2",
+        "pdf_page_1_based": 1,
+        "printed_page": "02",
+        "mass_status": "vendor_published_not_physically_measured",
+        "peak_torque_nm": 30,
+        "stall_torque_nm": 36,
+        "static_continuous_holding_torque_nm": null,
+        "rated_torque_interpretation": "At rated voltage/speed, +/-90 degree swing and 5-second position holds near the optimal efficiency point; not an unlimited static holding rating.",
+        "backlash_arcmin": 15,
+        "backlash_operator": "=",
+        "output_bearing_published_description": "XRBT 305",
+        "bearing_type": "crossed_roller_family_inferred_from_XRBT305_independent_primary_catalog_not_confirmed_supplier",
+        "axial_tensile_published_kn": null,
+        "axial_compressive_published_kn": null,
+        "axial_unspecified_direction_published_kn": 1.0,
+        "axial_original_label": "Axial Load C",
+        "radial_published_kn": 1.3,
+        "radial_original_label": "Radial Load Cr",
+        "load_value_interpretation": "Published C/Cr-labelled values; the specification does not define C/Cr or state lifetime, combined-load, preload, mounting, or allowable overturning-moment conditions. A rating interpretation is possible but not proven; do not assert either basic bearing ratings or permissible installed operating loads.",
+        "allowable_overturning_moment_nm": null,
+        "combined_load_equation": null,
+        "bearing_life_basis": null,
+        "backdrive_torque_nm": 0.2,
+        "backdrive_status": "vendor_nominal_typical_friction_value_not_guaranteed_holding_torque",
+        "guaranteed_unpowered_holding_torque_nm": null,
+        "output_encoder_mapping_status": "18-bit output is the user-supplied module mapping; the original X4 PDFs show only ABS 17BIT/18BIT without input/output labels, so the mapping is not independently explicit in these PDFs.",
+        "selected_variant_brake": false,
+        "selected_brake_evidence": {
+          "printed_page": "01",
+          "pdf_page_1_based": 1,
+          "brief_quote": "N (without Brake)"
+        },
+        "braked_selected_model_available": null,
+        "brake_location_in_load_path": null,
+        "brake_holding_torque_nm": null,
+        "brake_mass_kg": null,
+        "brake_envelope_mm": null,
+        "brake_control_voltage_v": null,
+        "brake_control_current_a": null,
+        "brake_switching_time_s": null,
+        "brake_hand_release": null,
+        "brake_price_eur": null,
+        "short_circuit_braking": null,
+        "dynamic_braking_on_power_loss": null,
+        "braking_evidence_scope": "No supporting statement in the six local original PDFs or the current official HTML product pages; absence in this reviewed corpus is not proof of absence in other manufacturer manuals.",
+        "brief_quotes": [
+          "Backdrive Torque",
+          "Backlash",
+          "Output Shaft Bearing Model"
+        ],
+        "full_specification_locators": {
+          "rated_peak_stall": {
+            "source": "RMD-X4-P36-36-E-L_vendor-document-1",
+            "pdf_page_1_based": 8,
+            "printed_page": "7"
+          },
+          "backlash_backdrive_bearing_loads_encoder": {
+            "source": "RMD-X4-P36-36-E-L_vendor-document-1",
+            "pdf_page_1_based": 9,
+            "printed_page": "8"
+          },
+          "mass_dimensions_rating_notes": {
+            "source": "RMD-X4-P36-36-E-L_vendor-document-1",
+            "pdf_page_1_based": 10,
+            "printed_page": "9"
+          },
+          "thermal_tests": {
+            "source": "RMD-X4-P36-36-E-L_vendor-document-1",
+            "pdf_page_1_based": 12,
+            "printed_page": "11"
+          }
+        },
+        "zero_speed_thermal_observations": [
+          {
+            "torque_nm": 8.5,
+            "duration_s": 5400,
+            "vendor_label": "Thermal Equilibrium",
+            "motor_initial_c": 27,
+            "motor_final_c": 98,
+            "board_initial_c": 27,
+            "board_final_c": 90,
+            "duration_original_print": "90′"
+          },
+          {
+            "torque_nm": 10.5,
+            "duration_s": 551,
+            "vendor_label": null,
+            "motor_initial_c": 26,
+            "motor_final_c": 100,
+            "board_initial_c": 27,
+            "board_final_c": 82,
+            "duration_original_print": "9′11″"
+          },
+          {
+            "torque_nm": 21,
+            "duration_s": 44,
+            "vendor_label": null,
+            "motor_initial_c": 27,
+            "motor_final_c": 100,
+            "board_initial_c": 27,
+            "board_final_c": 56,
+            "duration_original_print": "44″"
+          },
+          {
+            "torque_nm": 31.5,
+            "duration_s": 7,
+            "vendor_label": null,
+            "motor_initial_c": 27,
+            "motor_final_c": 100,
+            "board_initial_c": 27,
+            "board_final_c": 48,
+            "duration_original_print": "7″"
+          },
+          {
+            "torque_nm": 34,
+            "duration_s": 2,
+            "vendor_label": null,
+            "motor_initial_c": 27,
+            "motor_final_c": 100,
+            "board_initial_c": 27,
+            "board_final_c": 45,
+            "duration_original_print": "2″"
+          }
+        ],
+        "thermal_interpretation": "Observed manufacturer test points, not a universal temperature limit, duty-cycle specification, or proof for this arm installation. No interpolation into a safe hold duration.",
+        "mass_and_rated_torque_source_ref": "actuators",
+        "encoder_bits_source_ref": "actuators"
+      },
+      "RMD-X6-P20-60-E": {
+        "source": "RMD-X6-P20-60-E_vendor-document-2",
+        "pdf_page_1_based": 1,
+        "printed_page": "22",
+        "mass_status": "vendor_published_not_physically_measured",
+        "peak_torque_nm": 60,
+        "stall_torque_nm": null,
+        "static_continuous_holding_torque_nm": null,
+        "rated_torque_interpretation": "Published as Rated Torque; these local parameter/dimension sheets do not establish indefinite zero-speed holding capability or installation thermal conditions.",
+        "backlash_arcmin": 15,
+        "backlash_operator": "<=",
+        "output_bearing_published_description": "Crossed Roller Bearings",
+        "bearing_type": "crossed_roller",
+        "axial_tensile_published_kn": 1.8,
+        "axial_compressive_published_kn": 0.8,
+        "axial_unspecified_direction_published_kn": null,
+        "axial_original_label": "Axial Load / Tensile load; Compressive load",
+        "radial_published_kn": 2,
+        "radial_original_label": "Radial Load",
+        "load_value_interpretation": "Published directional force values without simultaneous force/moment/lifetime/mounting conditions; suitable for a labelled comparison, not proof of installed allowable loading.",
+        "allowable_overturning_moment_nm": null,
+        "combined_load_equation": null,
+        "bearing_life_basis": null,
+        "backdrive_torque_nm": 1.6,
+        "backdrive_status": "vendor_nominal_typical_friction_value_not_guaranteed_holding_torque",
+        "guaranteed_unpowered_holding_torque_nm": null,
+        "output_encoder_mapping_status": "explicit_input_output_labels_in_parameter_sheet",
+        "selected_variant_brake": false,
+        "selected_brake_evidence": {
+          "printed_page": "21",
+          "pdf_page_1_based": 1,
+          "brief_quote": "N (without Brake)"
+        },
+        "braked_selected_model_available": null,
+        "brake_location_in_load_path": null,
+        "brake_holding_torque_nm": null,
+        "brake_mass_kg": null,
+        "brake_envelope_mm": null,
+        "brake_control_voltage_v": null,
+        "brake_control_current_a": null,
+        "brake_switching_time_s": null,
+        "brake_hand_release": null,
+        "brake_price_eur": null,
+        "short_circuit_braking": null,
+        "dynamic_braking_on_power_loss": null,
+        "braking_evidence_scope": "No supporting statement in the six local original PDFs or the current official HTML product pages; absence in this reviewed corpus is not proof of absence in other manufacturer manuals.",
+        "brief_quotes": [
+          "Backdrive Torque",
+          "Backlash",
+          "Output Bearing Type"
+        ],
+        "stall_test_points": [
+          {
+            "torque_nm": 30,
+            "temperature_rise_c": 17,
+            "stall_duration_s": 15,
+            "phase_current_arms": 12.7
+          },
+          {
+            "torque_nm": 40,
+            "temperature_rise_c": 29,
+            "stall_duration_s": 10,
+            "phase_current_arms": 17.7
+          },
+          {
+            "torque_nm": 50,
+            "temperature_rise_c": 37,
+            "stall_duration_s": 8,
+            "phase_current_arms": 22.6
+          },
+          {
+            "torque_nm": 60,
+            "temperature_rise_c": 24,
+            "stall_duration_s": 5,
+            "phase_current_arms": 28.3
+          }
+        ],
+        "mass_and_rated_torque_source_ref": "actuators",
+        "encoder_bits_source_ref": "actuators"
+      }
+    }
+  },
+  "research": {
+    "sources": {
+      "skf_6001_original": {
+        "url": "https://nabico.co.ke/product_datasheets/22973/22973-6001-2RSH%20-%20Deep%20groove%20ball%20bearings%20_%20SKF.pdf",
+        "author": "SKF",
+        "host": "Nabico manufacturer-document mirror",
+        "pages": [
+          2,
+          3,
+          4
+        ],
+        "document_date": "2024-03-06",
+        "retrieved_on": "2026-11-20",
+        "evidence": "SKF-generated product print; dimensions pp.2-3, ratings and engineering mass p.4. Source is authored by SKF despite distributor hosting. Screenshot of p.4 requested successfully; p.3 screenshot cache-miss. Numerical page text inspected."
+      },
+      "skf_61806_original": {
+        "url": "https://docs.rs-online.com/1f16/A700000007139341.pdf",
+        "author": "SKF",
+        "host": "RS manufacturer-document mirror",
+        "pages": [
+          1,
+          2
+        ],
+        "document_date": "2020-09-30",
+        "retrieved_on": "2026-11-20",
+        "evidence": "SKF-generated PDF; dimensions and abutments p.1, ratings and mass p.2. Both screenshots requested; text verified."
+      },
+      "skf_7201": {
+        "url": "https://www.skf.com/uk/products/rolling-bearings/ball-bearings/angular-contact-ball-bearings/single-row-angular-contact-ball-bearings/productid-7201%20BEP",
+        "author": "SKF",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Manufacturer search-index product content verified; direct open yielded no readable page. Product net weight and ratings in indexed content."
+      },
+      "motionparts_6001": {
+        "url": "https://motionparts.de/products/6001-2rsh-skf",
+        "author": "Motionparts",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Direct retailer shop page; exact designation and single-unit gross/net prices explicitly displayed. No order or inquiry."
+      },
+      "motionparts_61806": {
+        "url": "https://motionparts.de/products/61806-2rs1-skf",
+        "author": "Motionparts",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Direct retailer shop page; exact designation and single-unit gross/net prices explicitly displayed. Canonical German page chosen over stale collection/English copies."
+      },
+      "tools_7201": {
+        "url": "https://tools.de/products/schraegkugellager-7201-bep-von-skf-12-mm-innen-32-mm-aussen",
+        "author": "tools.de",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Retailer original product listing, exact designation, gross25.51/net21.44 EUR. Search-index content inspected."
+      },
+      "ganter_617": {
+        "url": "https://www.ganternorm.com/de/produkte/3.1-Rasten-Arretieren-Sperren-mit-Bolzen-und-Kugeln/Rastbolzen-Arretierbolzen/GN-617-Rastbolzen-Edelstahl-ohne-Rastsperre",
+        "author": "Otto Ganter",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Manufacturer table and designation list; pin tolerance and guide H7; no public price for exact selected8AKNI variant obtained."
+      },
+      "ganter_617_pdf": {
+        "url": "https://live-katalog.ganternorm.com/pdf/ganter/de/617.pdf?dispositiontype=attachment",
+        "author": "Otto Ganter",
+        "pages": [
+          1
+        ],
+        "retrieved_on": "2026-11-20"
+      },
+      "ganter_pin_strength": {
+        "url": "https://live-katalog.ganternorm.com/pdf/ganter/de/rastbolzen_festigkeit.pdf?dispositiontype=attachment",
+        "author": "Otto Ganter",
+        "pages": [
+          1
+        ],
+        "retrieved_on": "2026-11-20",
+        "evidence": "Bending calculation W=pi*d^3/32; allowable force depends on guide-to-hole gap, material and safety factor. Published values explicitly nonbinding guidelines, not application qualification."
+      },
+      "ace_gs1550": {
+        "url": "https://www.ace-ace.de/de/produkte/geschwindigkeitsregulierung/industrie-gasdruckfedern/gs-8-bis-gs-70/gs-15/gs-15-50.html",
+        "author": "ACE",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Manufacturer B2B shop, net list price51.04EUR excluding shipping,50mm stroke127mm extended,400N max,6mm rod,66g commercial mass,progression30-40%. Configured force/end fittings not chosen."
+      },
+      "kendrion_pm22": {
+        "url": "https://www.kendrion.com/en/productfinder/group/product/brakes/86-62109h00-0060",
+        "author": "Kendrion",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Manufacturer product22Nm static,1.1kg,115OD56length,40ID,30hubdiameter,keyway,24V17W. Currentless braking documented. Generic shaft-brake candidate only; mounting behind a MYACTUATOR gear not manufacturer-validated."
+      },
+      "harmonic_quote": {
+        "url": "https://www.mybotshop.de/MYACTUATOR-RH-Serie-Harmonic-Module-dual-encoder",
+        "author": "MYBOTSHOP",
+        "retrieved_on": "2026-11-20",
+        "evidence": "Family listing MBS-MYA-07, RH14/17Lite/17/20/25/32, dual encoder, with/withoutbrake selectors, price on request. No exact article selected, no compatibility/holding-moment claim, no inquiry sent."
+      }
+    },
+    "products": [
+      {
+        "id": "skf_6001_2rsh",
+        "manufacturer": "SKF",
+        "designation": "6001-2RSH",
+        "bearing_type": "single_row_deep_groove_ball_bearing_sealed",
+        "standard_designation": "6001",
+        "boundary_dimension_standard": null,
+        "dimensions_mm": {
+          "bore": 12,
+          "outside": 28,
+          "width": 8
+        },
+        "nominal_shaft_seat_diameter_mm": 12,
+        "nominal_housing_seat_diameter_mm": 28,
+        "shaft_tolerance": null,
+        "housing_tolerance": null,
+        "shaft_abutment_diameter_mm": {
+          "minimum": 14,
+          "maximum": 15
+        },
+        "housing_abutment_diameter_max_mm": 26,
+        "fillet_radius_max_mm": 0.3,
+        "basic_dynamic_load_rating_n": 5400,
+        "basic_static_load_rating_n": 2360,
+        "permissible_axial_operating_load_n": null,
+        "permissible_tilting_moment_nm": null,
+        "engineering_mass_kg": 0.022,
+        "logistics_mass_kg": 0.0206,
+        "mass_qualified": false,
+        "mass_note": "The manufacturer print contains22g engineeringmass and20.6g logisticsmass;22g is a sourced conservative component-only planning value, not measured assembly mass. Rings/grease and batch differences require confirmation.",
+        "datasheet_source": "skf_6001_original",
+        "price": {
+          "currency": "EUR",
+          "quantity": 1,
+          "gross": 2.77,
+          "net": 2.33,
+          "vat_rate": null,
+          "shipping_included": false,
+          "retrieved_on": "2026-11-20",
+          "source": "motionparts_6001"
+        },
+        "fit_status": "requires_new_trunnion_and_bearing_housing_not_existing_plate_fit"
+      },
+      {
+        "id": "skf_61806_2rs1",
+        "manufacturer": "SKF",
+        "designation": "61806-2RS1",
+        "bearing_type": "single_row_thin_section_deep_groove_ball_bearing_sealed",
+        "standard_designation": "61806",
+        "boundary_dimension_standard": null,
+        "dimensions_mm": {
+          "bore": 30,
+          "outside": 42,
+          "width": 7
+        },
+        "nominal_shaft_seat_diameter_mm": 30,
+        "nominal_housing_seat_diameter_mm": 42,
+        "shaft_tolerance": null,
+        "housing_tolerance": null,
+        "shaft_abutment_diameter_mm": {
+          "minimum": 32,
+          "maximum": 32.5
+        },
+        "housing_abutment_diameter_max_mm": 40,
+        "fillet_radius_max_mm": 0.3,
+        "basic_dynamic_load_rating_n": 4100,
+        "basic_static_load_rating_n": 2900,
+        "permissible_axial_operating_load_n": null,
+        "permissible_tilting_moment_nm": null,
+        "engineering_mass_kg": 0.025,
+        "mass_qualified": false,
+        "datasheet_source": "skf_61806_original",
+        "price": {
+          "currency": "EUR",
+          "quantity": 1,
+          "gross": 15.95,
+          "net": 13.4,
+          "vat_rate": null,
+          "shipping_included": false,
+          "retrieved_on": "2026-11-20",
+          "source": "motionparts_61806"
+        },
+        "fit_status": "requires_new_30mm_hollow_shaft_and_42mm_bearing_housing_cable_path_unproven",
+        "source_difference_note": "Manufacturer2020PDF gives25g andC4.1kN. SKF German general-catalogue search index also showsC4.49kN/25g for same designation; other retailer fields show22g/24.1g. Do not silently replace reference or assert current production ratings. Use pinned4100N only for concept comparison; procurement revision verification remains open."
+      },
+      {
+        "id": "skf_7201_bep",
+        "manufacturer": "SKF",
+        "designation": "7201 BEP",
+        "bearing_type": "single_row_angular_contact_ball_bearing_open",
+        "standard_designation": "7201",
+        "boundary_dimension_standard": null,
+        "dimensions_mm": {
+          "bore": 12,
+          "outside": 32,
+          "width": 10
+        },
+        "nominal_shaft_seat_diameter_mm": 12,
+        "nominal_housing_seat_diameter_mm": 32,
+        "shaft_tolerance": null,
+        "housing_tolerance": null,
+        "contact_angle_deg": 40,
+        "basic_dynamic_load_rating_n": 7610,
+        "basic_static_load_rating_n": 3800,
+        "permissible_axial_operating_load_n": null,
+        "permissible_tilting_moment_nm": null,
+        "engineering_mass_kg": 0.0356,
+        "mass_qualified": false,
+        "matched_arrangement": false,
+        "universally_matchable": false,
+        "datasheet_source": "skf_7201",
+        "price": {
+          "currency": "EUR",
+          "quantity": 1,
+          "gross": 25.51,
+          "net": 21.44,
+          "vat_rate": null,
+          "shipping_included": false,
+          "retrieved_on": "2026-11-20",
+          "source": "tools_7201"
+        },
+        "fit_status": "requires_new_shaft_housing_axial_adjustment_and_lubrication",
+        "pairing_note": "An opposed two-bearing arrangement is a design concept. These are not universally matchable bearings. No specified pair preload follows from buying twoBEP bearings."
+      }
+    ],
+    "bearing_concepts": [
+      {
+        "id": "pitch_existing_output_only",
+        "group": "pitch",
+        "joints": [
+          "J2",
+          "J3",
+          "J5"
+        ],
+        "kind": "cantilever_existing_servo_output_bearing",
+        "additional_product_quantities": {},
+        "new_plate_revision_required": false,
+        "qualified": false,
+        "allowable_tilting_moment_nm": null,
+        "feasibility": "conditional_on_vendor_output_bearing_allowable_moment_axial_load_mount_stiffness_and_thermal_hold_evidence",
+        "new_spacing_mm": null
+      },
+      {
+        "id": "roll_existing_output_only",
+        "group": "roll",
+        "joints": [
+          "J4",
+          "J6"
+        ],
+        "kind": "cantilever_existing_servo_output_bearing",
+        "additional_product_quantities": {},
+        "new_plate_revision_required": false,
+        "qualified": false,
+        "allowable_tilting_moment_nm": null,
+        "feasibility": "conditional_on_vendor_output_bearing_allowable_moment_axial_load_mount_stiffness_and_thermal_hold_evidence",
+        "new_spacing_mm": null
+      },
+      {
+        "id": "base_existing_output_only",
+        "group": "base",
+        "joints": [
+          "J1"
+        ],
+        "kind": "cantilever_existing_servo_output_bearing",
+        "additional_product_quantities": {},
+        "new_plate_revision_required": false,
+        "qualified": false,
+        "allowable_tilting_moment_nm": null,
+        "feasibility": "conditional_on_vendor_output_bearing_allowable_moment_axial_load_mount_stiffness_and_thermal_hold_evidence",
+        "new_spacing_mm": null
+      },
+      {
+        "id": "pitch_opposite_6001",
+        "group": "pitch",
+        "joints": [
+          "J2",
+          "J3",
+          "J5"
+        ],
+        "kind": "opposite_fork_support_deep_groove_radial_floating",
+        "additional_product_quantities_per_joint": {
+          "skf_6001_2rsh": 1
+        },
+        "new_plate_revision_required": true,
+        "affected_plate_or_structure_ids": {
+          "J2": [
+            "A2_housing_plate",
+            "A2_output_plate",
+            "Shoulder_cheek_L",
+            "Shoulder_cheek_R"
+          ],
+          "J3": [
+            "A3_housing_plate",
+            "A3_output_plate"
+          ],
+          "J5": [
+            "A5_housing_plate",
+            "A5_output_plate",
+            "Wrist_cheek_L",
+            "Wrist_cheek_R"
+          ]
+        },
+        "new_trunnion_mass_kg": null,
+        "new_housing_mass_kg": null,
+        "new_spacing_mm": null,
+        "housing_retention_thickness_mm": null,
+        "qualifications": [
+          "Extra opposite radial support can form a moment reaction couple only at a defined nonzero bearing-centre separation.",
+          "Keep one axial locating system; resolve alignment, thermal float and servo bearing overconstraint.",
+          "No shaft, matching bearing pocket, or retention is defined. The bearing width and source plate thickness must be evaluated by the calculator; a boss or separate carrier may be required.",
+          "Existing support material and SP02 hose clips/loops may not be displaced."
+        ],
+        "qualified": false
+      },
+      {
+        "id": "pitch_opposed_angular_pair",
+        "group": "pitch",
+        "joints": [
+          "J2",
+          "J3",
+          "J5"
+        ],
+        "kind": "separate_back_to_back_angular_contact_support_pair",
+        "additional_product_quantities_per_joint": {
+          "skf_7201_bep": 2
+        },
+        "new_plate_revision_required": true,
+        "affected_plate_or_structure_ids": {
+          "J2": [
+            "A2_housing_plate",
+            "A2_output_plate"
+          ],
+          "J3": [
+            "A3_housing_plate",
+            "A3_output_plate"
+          ],
+          "J5": [
+            "A5_housing_plate",
+            "A5_output_plate"
+          ]
+        },
+        "new_trunnion_mass_kg": null,
+        "new_housing_mass_kg": null,
+        "new_spacing_mm": null,
+        "qualifications": [
+          "Both ring widths, spacer, retainer, and centre spacing must be evaluated; their nominal widths are not the resulting fork span.",
+          "Preload/clearance, alignment, lubrication and stiffness must be designed; twoBEP bearings are not a matched pair.",
+          "Higher prototype complexity than one opposite deep-groove support."
+        ],
+        "qualified": false
+      },
+      {
+        "id": "roll_thin_section_support",
+        "group": "roll",
+        "joints": [
+          "J4",
+          "J6"
+        ],
+        "kind": "separate_radial_support_around_hollow_coupler",
+        "additional_product_quantities_per_joint": {
+          "skf_61806_2rs1": 1
+        },
+        "new_plate_revision_required": true,
+        "affected_plate_or_structure_ids": {
+          "J4": [
+            "A4_housing_plate",
+            "A4_output_plate"
+          ],
+          "J6": [
+            "A6_housing_plate",
+            "A6_output_plate"
+          ]
+        },
+        "new_hollow_shaft_mass_kg": null,
+        "new_housing_mass_kg": null,
+        "new_spacing_mm": null,
+        "available_cable_bore_mm": null,
+        "qualifications": [
+          "30mm bearing bore is occupied by shaft material. Usable cable bore equals30mm minus two wall thicknesses and runout/assembly allowances; wallthickness is unknown.",
+          "An additional radial support only reduces bending if axially separated from the existing effective support.",
+          "X2 plate central opening and coupler are not a30mm shaft seat."
+        ],
+        "qualified": false
+      },
+      {
+        "id": "base_separate_thin_ring_pair",
+        "group": "base",
+        "joints": [
+          "J1"
+        ],
+        "kind": "axially_separated_thin_section_radial_support_pair",
+        "additional_product_quantities_per_joint": {
+          "skf_61806_2rs1": 2
+        },
+        "new_plate_revision_required": true,
+        "affected_plate_or_structure_ids": {
+          "J1": [
+            "A1_housing_plate",
+            "A1_output_plate",
+            "Base_plate"
+          ]
+        },
+        "new_hollow_shaft_mass_kg": null,
+        "new_housing_mass_kg": null,
+        "new_spacing_mm": null,
+        "available_cable_bore_mm": null,
+        "qualifications": [
+          "Both bearing widths, pair centre spacing, axial locating, baseplate load path, and retainers must be evaluated; the resulting span remains undefined.",
+          "The base yaw axis needs overturning-moment support and cable clearance; vertical axis needs no gravityholding brake.",
+          "Mobilebase accelerations remain an open loadcase."
+        ],
+        "qualified": false
+      }
+    ],
+    "holding_concepts": [
+      {
+        "id": "counterweight",
+        "stage": "passive_first",
+        "article": null,
+        "source_kind": "engineering_concept_no_procurement_selection",
+        "mass_kg": null,
+        "price_eur_gross": null,
+        "dimensions_mm": null,
+        "arm_mount_points": null,
+        "residual_torque_nm": null,
+        "power_loss_holding_verified": false,
+        "notes": [
+          "A fixed proximal counterweight can balance one chosen gravity harmonic but cannot automatically cancel the articulated downstreamCOM through the entireq2/q3/q5 window with and without sample.",
+          "A J3 counterweight increases J2 load and moving inertia. Evaluate together against fast motion and SP02 reservations.",
+          "No material-density based invented mass, envelope or price."
+        ]
+      },
+      {
+        "id": "gas_spring_reference",
+        "stage": "passive_first",
+        "manufacturer": "ACE",
+        "designation": "GS-15-50",
+        "source": "ace_gs1550",
+        "selected_configuration": null,
+        "stroke_mm": 50,
+        "extended_length_mm": 127,
+        "rod_diameter_mm": 6,
+        "maximum_extension_force_n": 400,
+        "force_progression_percent_range": [
+          30,
+          40
+        ],
+        "commercial_mass_kg": 0.066,
+        "mount_points": null,
+        "effective_moment_arm_mm": null,
+        "residual_torque_nm": null,
+        "power_loss_holding_verified": false,
+        "price": {
+          "currency": "EUR",
+          "net": 51.04,
+          "gross": null,
+          "vat_rate": null,
+          "kind": "manufacturer_base_type_list_price_excluding_shipping_configuration_accessories_unconfirmed",
+          "retrieved_on": "2026-11-20"
+        },
+        "notes": [
+          "Product reference only; actualF1 and endfittings not selected.",
+          "Gasforce varies with stroke and temperature; manufacturernotes require an external endstop. No wholewindowbalance claim.",
+          "Manufacturer recommends roddownward mounting and warns elevated breakaway after longrest."
+        ]
+      },
+      {
+        "id": "active_hold_then_park",
+        "stage": "prototype_operating_procedure",
+        "additional_hardware_price_eur_gross": 0,
+        "power_loss_holding_verified": false,
+        "hold_duration_s": null,
+        "thermal_acceptance": null,
+        "notes": [
+          "Only candidate without added components; admissibility depends on documented continuous/staticthermal limits and actual hold duration.",
+          "Unexpected powerloss during a samplehold remains an explicitly quantified ownerdecision.",
+          "ExistingMB01 park withJ3=90deg lies outsideSP02<=65deg; no tool-fitted qualified park is inferred.",
+          "Handfolding/regeneration into drivers requires manufacturerconfirmation."
+        ]
+      },
+      {
+        "id": "park_indexing_pin_reference",
+        "stage": "passive_park_only",
+        "manufacturer": "Otto Ganter",
+        "designation": "GN617-8-AK-NI",
+        "source": "ganter_617",
+        "pin_diameter_nominal_mm": 8,
+        "pin_diameter_limits_mm": [
+          7.95,
+          7.98
+        ],
+        "guide_fit_class": "H7",
+        "mount_thread": "M16x1.5",
+        "knob_diameter_mm": 31,
+        "nominal_overall_length_mm": 69,
+        "pin_projection_mm": 8,
+        "material": "1.4305 stainless steel guide/pin; chemically nickel-plated pin",
+        "mass_kg": null,
+        "price_eur_gross": null,
+        "radial_distance_from_joint_axis_mm": null,
+        "guide_to_receiving_hole_gap_mm": null,
+        "qualified_holding_torque_nm": null,
+        "power_loss_holding_verified": false,
+        "notes": [
+          "Positive parking engagement only after confirmed stationary supported pose. It cannot catch arbitrary poses on powerloss.",
+          "Manufacturer spring force is insertion force, not permissible torque.",
+          "Ganter bending guideline depends on pin diameter, guide gap, material and safetyfactor; bracket bearing stress and mounting thread/fasteners remain unverified.",
+          "Size and receivinglug require a separate mount; no existing platefit is established."
+        ]
+      },
+      {
+        "id": "permanent_magnet_brake_followup",
+        "stage": "future_model_only_not_prototype_recommendation",
+        "manufacturer": "Kendrion",
+        "designation": "8662109H00-0060",
+        "source": "kendrion_pm22",
+        "manufacturer_order_text": "86 62109H00-0060",
+        "torque_nm": 22,
+        "torque_definition": "M4_static",
+        "mass_kg": 1.1,
+        "dimensions_mm": {
+          "outside_diameter": 115,
+          "length": 56,
+          "inner_diameter": 40,
+          "hub_diameter": 30,
+          "mount_pitch_circle": 102
+        },
+        "nominal_voltage_v": 24,
+        "nominal_power_w": 17,
+        "shaft_keyway": true,
+        "currentless_braking": true,
+        "system_fail_safe_qualified": false,
+        "hand_release": "not_documented_for_article_manufacturer_field_dash",
+        "price_eur_gross": null,
+        "price_eur_net": null,
+        "vendor_verified_myactuator_output_mount": false,
+        "position_in_force_chain": "Proposed separate joint-outputshaft -> keyed hub/armature -> permanentmagnetbrakebody -> stationarysupport. Manufacturer documents keyedhub shaftbrake; this proposed placement and MYACTUATOR coupling are not validated.",
+        "residual_application_motion_mm": null,
+        "elastic_compliance_mm_per_nm": null,
+        "electrical_budget_line": "supply_control_wiring_shutdown_separate_from_700EUR_mechanics",
+        "notes": [
+          "No documented brakeversion of selectedMYACTUATOR modules is inferred.",
+          "Do not call this an already-compatible outputbrake. Externaloutputadapter would require plate/structure redesign.",
+          "No pricequote/inquiry sent. Nominalstatic torque alone does not prove whole-arm safety or emergency stopping qualification."
+        ]
+      },
+      {
+        "id": "harmonic_escape",
+        "stage": "bounded_followup_only",
+        "vendor_family": "MYACTUATOR RH",
+        "vendor_listing": "MBS-MYA-07",
+        "source": "harmonic_quote",
+        "specific_article": null,
+        "torque_nm": null,
+        "mass_kg": null,
+        "dimensions_mm": null,
+        "price_eur_gross": null,
+        "price_eur_net": null,
+        "budget_delta_eur": null,
+        "quote_requested": false,
+        "notes": [
+          "Shop says priceonrequest. No numerical replacementbudget can be derived.",
+          "Familywith/withoutbrake selector does not document outputside brake position or suitability.",
+          "Treat as quote-dependent exit, not a sourced dropin substitute."
+        ]
+      }
+    ]
+  },
+  "assumptions": {
+    "gravity_m_s2": {
+      "value": 9.80665,
+      "unit": "m/s2",
+      "reason": "Konventionelle Normfallbeschleunigung als Rechenannahme; kein gemessener Ortswert."
+    },
+    "torque_safety_factor": {
+      "value": 1.5,
+      "unit": "1",
+      "reason": "Vorgeschlagener Konzeptfaktor gegen den berechneten Lastfall; keine Sicherheitsqualifikation."
+    },
+    "backdrive_safety_factor": {
+      "value": 2,
+      "unit": "1",
+      "reason": "Abstand zum typischen Rücktreibmoment für den synthetischen Vergleich; ein typischer Reibwert ist kein garantiertes Haltemoment."
+    },
+    "planning_link_masses_kg": {
+      "L1_Turret": {
+        "value": 0.4,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      },
+      "L2_UpperArm": {
+        "value": 0.45,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      },
+      "L3_Elbow": {
+        "value": 0.3,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      },
+      "L4_ForearmRoll": {
+        "value": 0.3,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      },
+      "L5_WristPitch": {
+        "value": 0.2,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      },
+      "L6_BareFlange": {
+        "value": 0.15,
+        "unit": "kg",
+        "reason": "Unvermessene Planungsannahme für Struktur, Platten und gegebenenfalls Kamera; Servomassen und SP02 sind ausgeschlossen. Kein belegter Massenwert und keine nachgewiesene obere Grenze."
+      }
+    },
+    "planning_tool_mass_kg": {
+      "value": 0.5,
+      "unit": "kg",
+      "reason": "Eigentümervorschlag für einen ausdrücklich synthetischen Werkzeug-Massenpunkt an flange_reference. Die SP02-Masse ist unbekannt; die reale Pumpe sitzt an L2. Der Flansch-Massenpunkt ist deshalb weder eine belegte Massenverteilung noch eine nachgewiesene Lastobergrenze."
+    },
+    "planning_sample_mass_kg": {
+      "value": 0.02,
+      "unit": "kg",
+      "reason": "Vorgeschlagener, ungemessener Zuschlag für Gefäß und Probe; keine Zusicherung einer zulässigen Nutzlast."
+    },
+    "servo_com_rule": "entire_module_at_output_face_owned_by_housing_parent_assumed",
+    "link_com_rule": "midpoint_adjacent_joint_origins_last_to_flange",
+    "tool_com_rule": "flange_reference_surrogate",
+    "counterweight_arm_scale": {
+      "value": 1,
+      "unit": "1",
+      "reason": "Analytischer Hebel spiegelt das aus der Quelle gelesene Nicksegment; keine installierte Ausgleichskonstruktion oder Bauraumzusage."
+    },
+    "hold_duration_s": null,
+    "physical_stop_angles_deg": null,
+    "first_contact_pose_deg": null,
+    "axial_load_share": "servo_locating_counterbearing_axially_floating_assumption",
+    "support_centres_measured_mm": null,
+    "counterbearing_span_rule": "vendor_module_depth_plus_two_source_plate_thicknesses",
+    "counterbearing_span_status": "analytical_example_only_not_available_or_measured_fork_spacing"
+  },
+  "numerical": {
+    "torque_tolerance_nm": 0.01,
+    "max_cells": 12000
+  },
+  "later_brake_tcp_tolerance": {
+    "value": 0.2,
+    "unit": "mm",
+    "status": "proposed",
+    "applies_to": "later_brake_model_only"
+  },
+  "owner_requirements": {
+    "priority": "Eigentümervorgabe: Lagerung und belastbare Kenntnis von Spiel und Nachgiebigkeit zuerst; so wenige zusätzliche Bauteile wie möglich, die möglichst schnell funktionieren.",
+    "holding_order": "Passiven einfachen Ausgleich, betriebliches Verfahren und formschlüssige Parksicherung vor einer Bremse bewerten.",
+    "prototype_brake_policy": "Die Empfehlung für den Erstprototypen enthält keine Bremse. Das ist eine Eigentümervorgabe und keine technische Herleitung von Sicherheit.",
+    "normal_sample_holds": "Aufgabenvorgabe: Der Arm hält auch im Normalbetrieb mit Probe, etwa bei Übergaben. Im Erstprototypen übernimmt dies aktive Servohaltung als eigener thermischer Lastfall; Haltedauern und zulässige statische Thermik bleiben offen.",
+    "power_loss": "Spannungsverlust im Arbeitsbereich muss als Sicherheitsbefund quantifiziert und dem Eigentümer zur Entscheidung vorgelegt werden. Unbekannte physische Anschläge und Erstkontakte bleiben null; Gelenkgrenzen sind kein Nachweis eines mechanischen Anschlags.",
+    "position_shift": "Spiel und Nachgiebigkeit sind im Erstprototypen Messziele. Die vorgeschlagene Betätigungstoleranz gilt erst für das spätere Modell mit Bremse.",
+    "motion": "Keine Haltesicherung an Transit- oder Freiraummarken einsetzen. Erforderliche Griff-, Übergabe-, Ablage- und Parkhalte sowie spätere Schaltzeiten getrennt führen.",
+    "folding": "Handfalten und Zur-Seite-Stellen ohne Bremse benötigen zulässige Handrücktreibung und geklärte Rückspeisung in die Treiber. Eine spätere Bremse benötigt eine eigene Entscheidung über Haltesicherheit und Freigabemechanik.",
+    "sp02": "SP02-Clipträger, Schlauchschleifen und Betriebsfenster erhalten. Die vorhandene MB01-Parkpose ist kein freigegebener SP02-Parkzustand."
+  },
+  "recommendation": {
+    "bearing_pitch": "pitch_opposite_6001",
+    "bearing_roll": "roll_existing_output_only",
+    "bearing_base": "base_existing_output_only",
+    "prototype_holding": [
+      "active_hold_then_park"
+    ],
+    "brake_in_first_prototype": false,
+    "prototype_released": false,
+    "owner_decisions_pending": true,
+    "reason": "Bedingte Konzeptpräferenz nach Lagerung und Einfachheit: ein gegenüberliegendes Radialgegenlager zuerst untersuchen; bestehende Ausgangslager an Rollgelenken und Basis nur nach geklärten Kippmomenten und Steifigkeiten. Kein neuer Sitz oder Gabelabstand ist freigegeben, Plattenrevisionen gehören zu Phase 2. Aktive Haltung mit bestätigter abgestützter Parklage ist das minimale betriebliche Konzept; statische Thermik, Haltedauer, unerwarteter Spannungsverlust und die Kollision der MB01-Parkpose mit dem SP02-Betriebsfenster verhindern eine Freigabe."
+  },
+  "open_measurements": {
+    "real_link_masses_kg": null,
+    "real_tool_mass_kg": null,
+    "elastic_compliance_mm_per_nm": null,
+    "brake_application_shift_mm": null,
+    "installed_bearing_center_offsets_mm": null,
+    "physical_contact_pose": null
+  },
+  "budget": {
+    "mechanical_allowance_eur": 700,
+    "source_ref": "roadmap",
+    "currency": "EUR",
+    "basis": "gross",
+    "unknown_rows": [
+      "motor_plates_and_structure",
+      "shafts_and_spacers",
+      "bearing_housings_and_retention",
+      "parking_or_hold_hardware",
+      "counterbalance",
+      "additional_material"
+    ],
+    "electrical_brake_controls_eur": null
+  },
+  "unknown_manufacturer_questions": [
+    "Meaning and simultaneous applicability of published radial and axial loads, allowable overturning moments, bearing life/preload and installation assumptions.",
+    "Minimum guaranteed unpowered backdrive threshold over wear, lubrication, temperature and direction; allowable manual backdrive and driver energy regeneration.",
+    "Indefinite zero-speed holding torque, cooling conditions, permissible hold duration/duty at each load.",
+    "Exact X4 output encoder bit mapping.",
+    "Availability of braked variants of the exact selected modules, brake location relative to gearbox, holding/release data, and documented driver behavior on power loss.",
+    "Confirm bearing revision, permissible shaft/housing fits, preload, axial floating arrangement, centre spacing, and usable installed cable passage for each proposed support.",
+    "Confirm the sourced bearing engineering masses and current catalogue revisions before procurement; listed basic load ratings are not permissible complete joint loads."
+  ],
+  "physical_qualification": false
+}
