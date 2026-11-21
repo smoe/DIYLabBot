@@ -6,7 +6,7 @@ from functools import lru_cache
 import l01_local_traffic as local
 import tr01_floor_motion as floor
 from building_fleet_model import reference, resolved_sensor
-from building_fleet_motion import Path, transition, perception_speed_limit, compile_motion, episode_dynamics, spatial_bounds
+from building_fleet_motion import Path, transition, perception_speed_limit, compile_motion, episode_dynamics, spatial_bounds, interval_extrema
 F = floor.F
 
 
@@ -256,7 +256,7 @@ class Controller(local.LocalController):
                 for start,end in zip(cuts,cuts[1:]):
                     if end-start<1e-9:continue
                     cap=self._zone_cap_at(origin+clock.evaluate((start+end)/2)[F[0]][0])
-                    raw=floor.extrema(curve,start,end,1)
+                    raw=interval_extrema(curve,start,end,1)
                     speed=math.hypot(*[max(abs(raw['min'][k]),abs(raw['max'][k]))for k in range(2)])
                     if speed>cap*(1+1e-6):valid=False
                     zone_maxima[str(cap)]=max(zone_maxima.get(str(cap),0),speed)
@@ -407,25 +407,54 @@ class Controller(local.LocalController):
         curve = floor.motion.Curve(floor.canonical(self.recorded[i:i+2]))
         return curve.evaluate(captured_s)[F[0]]
 
-    def project_ahead(self,point,lookahead_mm=None):
+    def _projection_window(self,lookahead_mm):
+        """Cache only this vehicle's immutable future centreline samples."""
         end=self.goal if lookahead_mm is None else min(self.goal,self.y+lookahead_mm)
-        best=(math.inf,self.y)
-        samples=self.path.samples
-        if not hasattr(self,'_sample_ends'):self._sample_ends=[row[1]for row in samples]
-        first=max(0,bisect.bisect_left(self._sample_ends,self.y)-1)
+        key=(id(self.path),self.y,end)
+        if getattr(self,'_projection_window_key',None)==key:return self._projection_segments
+        if getattr(self,'_projection_path',None)is not self.path:
+            self._sample_ends=[row[1]for row in self.path.samples];self._projection_path=self.path
+        samples=self.path.samples;first=max(0,bisect.bisect_left(self._sample_ends,self.y)-1);segments=[]
         for a,b,pa,pb in samples[first:]:
             if a>end+1e-9:break
             if b<self.y-1e-9:continue
             left=max(a,self.y);right=min(b,end)
             if right<left:continue
-            # Immutable own future path only; no nearest past branch can mask
-            # an obstacle in a loop or an adjacent returning aisle.
-            p=self.path.evaluate(left)[0][:2];q=self.path.evaluate(right)[0][:2]
+            # Cached full-sample positions are the same Path.evaluate results
+            # used previously. Only an actually clipped endpoint is evaluated.
+            p=pa if left==a else self.path.evaluate(left)[0][:2]
+            q=pb if right==b else self.path.evaluate(right)[0][:2]
             delta=[q[k]-p[k]for k in range(2)];norm=sum(v*v for v in delta)
+            bounds=(min(p[0],q[0]),min(p[1],q[1]),max(p[0],q[0]),max(p[1],q[1]))
+            roundoff=32*math.ulp(max(1.,*[abs(v)for v in p+q]))
+            segments.append((left,right,p,delta,norm,bounds,roundoff))
+        self._projection_window_key=key;self._projection_segments=segments
+        return segments
+
+    def project_ahead(self,point,lookahead_mm=None,maximum_lateral_mm=None):
+        """Exact ordered nearest future sample, with a conservative broad phase.
+
+        An optional lateral bound may discard results beyond that bound. The
+        ordinary API retains the previous closest-point arithmetic and tie
+        order. AABB lower bounds only omit candidates unable to improve it;
+        their roundoff allowance does not alter any returned exact distance.
+        """
+        if maximum_lateral_mm is not None and(type(maximum_lateral_mm)not in(int,float)or not math.isfinite(maximum_lateral_mm)or maximum_lateral_mm<0):
+            raise ValueError('Finite nonnegative projection lateral bound required')
+        best=(math.inf,self.y);query_roundoff=32*math.ulp(max(1.,abs(point[0]),abs(point[1])))
+        for left,right,p,delta,norm,bounds,roundoff in self._projection_window(lookahead_mm):
+            threshold=best[0]if maximum_lateral_mm is None else min(best[0],maximum_lateral_mm)
+            dx=max(bounds[0]-point[0],0.,point[0]-bounds[2])
+            dy=max(bounds[1]-point[1],0.,point[1]-bounds[3])
+            # L-infinity distance to the segment's AABB is a lower bound.
+            # Outward allowance covers binary64 endpoint/residual arithmetic;
+            # near ties always take the unchanged exact closest-point branch.
+            lower=max(dx,dy)-max(roundoff,query_roundoff)
+            if lower>threshold:continue
             u=max(0.,min(1.,sum((point[k]-p[k])*delta[k]for k in range(2))/norm))if norm else 0.
             distance=math.hypot(*(point[k]-p[k]-u*delta[k]for k in range(2)))
             if distance<best[0]:best=distance,left+u*(right-left)
-        return best
+        return best if maximum_lateral_mm is None or best[0]<=maximum_lateral_mm else(math.inf,self.y)
 
     def _observed_gap(self,scan,now):
         if scan is None:return 0.,'scan_missing_or_stale'
@@ -445,7 +474,8 @@ class Controller(local.LocalController):
         for side,forward in scan['returns_local_mm']:
             if self.static_return and self.static_return(pose,[side,forward]):continue
             point=[pose[0]+c*forward-s*side,pose[1]+s*forward+c*side]
-            lateral,along=self.project_ahead(point,self.settings['range_mm']+self.radius)
+            lateral,along=self.project_ahead(point,self.settings['range_mm']+self.radius,
+                self.radius+self.settings['clearance_mm']+inflation)
             piece=min(len(self.path.pieces)-1,bisect.bisect_right(self.path.ends,along))
             straight=len(self.path.pieces[piece]['controls'])==2
             half_width=self.half_width if straight else self.radius
