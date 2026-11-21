@@ -3,7 +3,7 @@ import hashlib
 import json
 import math
 import os
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import struct
 import subprocess
 
@@ -84,8 +84,10 @@ def test_every_installed_visual_mesh_exists_and_uses_metres(package_share, insta
         uri = node.get("filename")
         prefix = "package://solidcraftbot_ros/meshes/"
         assert uri.startswith(prefix), uri
-        mesh = (package_share / "meshes" / uri[len(prefix):]).resolve()
-        assert mesh.is_relative_to((package_share / "meshes").resolve()), uri
+        relative = PurePosixPath(uri[len(prefix):])
+        assert relative.parts and not relative.is_absolute() and ".." not in relative.parts, uri
+        # Symlink installations legitimately resolve meshes into the source tree.
+        mesh = (package_share / "meshes" / Path(*relative.parts)).resolve()
         referenced.add(mesh)
     assert len(referenced) >= 7
     for mesh in referenced:
