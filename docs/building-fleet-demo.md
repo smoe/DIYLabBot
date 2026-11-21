@@ -23,10 +23,97 @@ jeweils gepinnten Stand. Historische Berichte werden nicht umgepinnt.
 
 Die anschließend vom Eigentümer angeforderte Schwellenkorrektur ergänzt
 Kabinen- und Landeschwellen mit angenommenen 8 mm Trennspalt. Der frühere
-breite bodenlose Streifen ist damit ein historischer Befund. Neue vollständige
-Bodenstützungs- und Kurvennachweise für BF01 stehen aus; die fehlende alte
-Stoppbedingung ist keine Freigabe. Diese Quellenintegration erzeugt und
-qualifiziert keinen neuen Flottenlauf.
+breite bodenlose Streifen ist damit ein historischer Befund. Die neue native
+Nachmessung am Startstand `84c61cb` bestätigt die 8-mm-Fuge an allen fünf
+aktiven Ports. Die neue Stützregel und ihre Grenzen stehen im folgenden
+Abschnitt; eine bestandene Portprüfung qualifiziert keinen vollständigen
+Flottenlauf.
+
+## Eigentümerregel für Bodenstützung und Aufzug
+
+`support_rule` in der BF01-Quelle führt die Entscheidung vom **20. November
+2026** mit Einheiten, Wertebereichen und ihrer Grundlage. Die Gebäudequelle
+und die gepinnte TR01-Konstruktion werden dafür nicht geändert;
+`floor_threshold_height_mm` bleibt `null`. Die 15-mm-Grenze und der aus der
+Aufzugquelle abgeleitete derzeitige +3-mm-Versatz sind **synthetische
+Eigentümerannahmen ohne Rad-/Fahrwerksqualifikation**.
+
+- **R1:** Die gesamte aufgeweitete orientierte Fahrzeughülle muss durch die
+  native Bodenflächen-Union nach konservativer morphologischer Kreisschließung
+  gestützt sein. Der Radius ist die halbe Spaltgrenze (15 mm / 2). Die Regel
+  gilt überall in BF01; sie erlaubt keinen Überhang an offenen Kanten.
+- **R2:** Nur `LiftCabinFloorFinish`, `LiftCabinSill_<side>` und
+  `LiftLandingSill_<level>_<side>` dürfen am Aufzug den aus den tatsächlichen
+  Quellflächen abgeleiteten Höhenversatz haben. Andere erhöhte Körper zählen
+  nicht als Boden. Eine geänderte Quellhöhe verlangt einen neuen Nachweis.
+- **R3:** Portquerungen benötigen über ihr vollständiges Prüfintervall die
+  tatsächliche Kabinen-FK am betreffenden Geschoss und vollständig offene
+  aktive Türen. Ein schon geparktes Fahrzeug wird starr an die absolute
+  Kabinenhöhe gebunden; seine Unterstützung durch den echten Kabinenfinish
+  ist ein eigener Invariantennachweis und erlaubt keine Portquerung.
+
+Der gemeinsame Standardbibliothekskern verwendet exakte rationale
+Weltkoordinaten und eine Flächenprüfung ohne Akzeptanztoleranz. Eine innen
+liegende Polygonscheibe beim Dilatieren und eine außen liegende beim Erodieren
+liefern ausschließlich eine Teilmenge der exakten Kreisschließung. Die
+Prüfungen bestehen bei 8 und 15,0 mm Spalt und scheitern bei 15,5 mm, beim
+historischen 297-mm-Spalt sowie bei Überhang an offenen Kanten. Auch kleinste
+positive Flächenfehler werden nicht über eine Flächentoleranz gelöscht.
+
+Jede tatsächlich benötigte Flächenzugabe wird mit Weltkoordinaten, Breite,
+angrenzenden Quellkörpern und betroffenen Kurven im jeweiligen neuen
+Prüfbericht geführt. Raster und Suchnachbarn sind nur Routenvorschläge;
+akzeptierte Verbindungen, Sichtlinienverkürzungen, vollständige Rechtecke und
+exportierte C2-Kurven erhalten die kanonische Bodenprüfung. Eine reduzierte
+Suchhülle ist keine Freigabehülle. Bench-Zonen und Treppenkern bleiben gesperrt.
+
+### Unabhängige Nachmessung der fünf aktiven Ports
+
+Die native BRep-Prüfung versetzt die vorhandene Kabine per Quell-FK an jedes
+Geschoss und untersucht die vollständige Türbreite, die Bodenflächen und den
+Anschluss unter der Wand. Die nachstehenden Koordinaten sind abgeleitete
+Darstellungs-mm, kein Aufmaß. Die gemeinsame Y-Spanne der Türöffnung beträgt
+15608,108108 bis 16529,729730 mm.
+
+| Aktiver Port | X der ungestützten Fuge | Breite | Quellhöhenversatz |
+|---|---|---|---|
+| KG innen | 12605,702703–12613,702703 | 8,0 mm | +3,0 mm |
+| EG innen | 12605,702703–12613,702703 | 8,0 mm | +3,0 mm |
+| OG1 außen | 10099,810811–10107,810811 | 8,0 mm | +3,0 mm |
+| OG2 außen | 10099,810811–10107,810811 | 8,0 mm | +3,0 mm |
+| OG3 außen | 10099,810811–10107,810811 | 8,0 mm | +3,0 mm |
+
+Es wurde kein zusätzlicher breiter dunkler Schlitz gefunden. Die lange graue
+Schwelle zwischen Kabinen- und Schachttür ist reale Modellgeometrie; die
+Landeschwelle überlappt den Flurboden unter der Wand. Die Messung betrachtet
+13 zulässige Stützkörper aus 4616 Gebäudekörpern; sie behauptet keinen
+vollständigen Kollisionsnachweis der gebundenen Welt mit insgesamt 5299
+Körpern. Der neue lokale Messbericht ist
+`exports/building-fleet/support-84c61cb/lift-native-surfaces-r4.json`.
+Historische Berichte bleiben unverändert; neue Revisionsnachweise erhalten
+eigene Dateien und aktuelle Quellen-/Artefaktpins.
+
+Alle 15 Portkurven (fünf Ports, jeweils Einfahrt und beide
+Ausfahrrichtungen) bestanden am jeweils gepinnten Zwischenstand die
+kontinuierliche kanonische Stützungs- und Meshprüfung sowie die unabhängige
+native Intervallprüfung. Die konservativen
+Abstandsuntergrenzen betragen mindestens 87,85855 mm bzw. 86,816 mm bei
+geforderten 85 mm. Die native Prüfung verwendet die vollständige gebundene
+Welt mit 5299 Körpern und eine geprüfte geschlossene native Hülle aller 34
+physischen Fahrzeug-/Kamerakörper; reicht deren konservative Untergrenze
+nicht, bleibt die exakte Prüfung der Einzelkörper erforderlich. Der
+nichtphysische Sichtkegel zählt nicht zur Fahrzeughülle.
+
+Die lokalen Berichte heißen `lift-c2-support-r4.json` und
+`lift-native-curves-r3.json` im selben Ausgabeordner. Sie binden die
+tatsächlich exportierten PVA-Kurven, Quell-FK und Artefakte. Sie belegen
+Portquerungen, keine ausgeführten Kabinenparkmanöver oder vollständigen
+Flottenbegegnungen. Nach einer weiteren BF01-internen Optimierung der reinen
+Positionsauswertung ist ihr Modul-Pin historisch; trotz separat geprüfter
+bytegleicher Positionen sind frische Kurvennachweise für den endgültigen
+Quellstand weiterhin erforderlich. Die unabhängige Flächenmessung und die
+Negativkontrollen für falsches Geschoss und geschlossene Türen bleiben
+quellaktuell. `lift_operation_implemented` bleibt `false`.
 
 ## Bestätigte Rückstellung von K0_013
 
@@ -53,6 +140,84 @@ Treppenbereiche `R3_028`, `R3_017`, `ExternalStairGround`, Atrium und Schacht
 bleiben gesperrt; der Schacht wird ausschließlich über den Aufzugablauf genutzt.
 
 ## Arbeitsstand und Nachweisgrenzen
+
+### BF01-2: Stopp am Laufzeitbudget
+
+Der Folgeauftrag wurde auf dem geprüften `master`-Stand `84c61cb` im separaten
+Worktree `exports/worktrees/building-fleet-support-rule` und Branch
+`codex/building-fleet-support-rule` bearbeitet. Die neue Vorbereitung aus dem
+aktuellen möblierten Rundgang umfasst 20 Heimplätze, 19 Pflichtziele, 100
+Endpunkte, 3128 vollständige Routen und 35 geschlossene Konfliktressourcen.
+2783 Routen enthalten vorab geprüfte Korrekturen stumpfer Kreuzungsumwege;
+sie ersetzen keine vollständigen Raumdurchfahrten durch lokale Teilstücke.
+
+Die abgeschlossene Vorbereitung benötigte **2009,411 s (33,5 Minuten)**,
+noch ohne den integrierten Flottenlauf, dessen nativen Gesamtnachweis und
+Browserprüfung. Der Quellstand und diese Messung stehen im ignorierten
+`exports/building-fleet/support-84c61cb/static-preparation-r8/preparation.json`.
+Der vollständige Ressourcenkatalog und seine Cache-Rekonstruktion stimmen
+überein; `resource-cache-roundtrip.json` dokumentiert diesen statischen
+Vergleich. Das ist keine Bewegungsqualifikation.
+
+Damit ist das Laufzeitziel von zehn Minuten bereits in der Vorbereitung
+deutlich überschritten. Gemäß der ausdrücklichen Stoppbedingung des Auftrags
+wurde die weitere Programmerzeugung angehalten. Der unveränderte Seed
+`20261120` wurde nicht durch einen günstigeren ersetzt. Ein früherer
+diagnostischer Lauf erreichte 68,7 s Modellzeit und ist ausdrücklich
+unvollständig; er belegt weder alle Ziele noch die Heimkehr aller Fahrzeuge.
+Ein bestandener vollständiger 20-Fahrzeug-Lauf, ein nativer Gesamtprogrammcheck
+und eine tatsächliche BF01-WebGL-Prüfung liegen nicht vor.
+
+Eine zusätzliche Ablaufprüfung weist außerdem einen erreichbaren
+Wartebuchtenzyklus nach: neun Fahrzeuge können ihre aktuellen Buchten so
+belegen, dass alle zugewiesenen Folgemissionen auf volle andere Geschosse
+warten. Der Nachweis steht in
+`exports/building-fleet/support-84c61cb/audit_waiting_capacity_cycle.json`;
+er ist ein reproduzierbarer Dienst-/Planerzustand, kein im obigen Seed-Lauf
+beobachteter Deadlock. Die atomare Zusage von Start- und Zielbucht vor dem
+Aufzugruf allein verhindert diesen Folgezustand nicht.
+
+Der nächste konkrete Schritt ist eine getrennte Korrektur der
+Auftragszulassung: die Zielbucht bereits vor Vergabe eines geschossübergreifenden
+Auftrags fest zusagen, höchstens einen Folge-Geschosswechsel vormerken und
+diese Vormerkung erst nach beobachteter vollständiger Ausfahrt aktivieren.
+Erforderliches Warten muss an einer bereits eigenen Wartebucht oder am eigenen
+EG-Heimplatz erfolgen, einschließlich korrekter Durchgangstoken. Neue
+Flurparkplätze, Bench-Ausweichflächen, Freigaben allein durch Zeitablauf und
+höhere Bewegungsgrenzen sind keine Lösung. Anschließend ist die Vorbereitung
+mit unveränderter vollständiger Routensemantik zu beschleunigen und erneut zu
+messen, bevor der ursprüngliche Seed vollständig geprüft wird.
+
+Die unabhängige Exportprüfung muss dabei auch um die Bindung zwischen
+ursprünglich ausgegebenem Auftrag, eigener Quittung und Abschlussbeleg anhand
+derselben Missionskennung ergänzt werden. Die bisherige Zuordnung nach
+Fahrzeug, Raum und Zeitpunkt allein reicht dafür nicht aus. Bedingte
+Folgebuchten dürfen vor ihrer beobachteten Aktivierung außerdem keine
+geometrische Betretungserlaubnis geben.
+
+Die neuen Python-Implementierungen für Ablauf, Prüfung und Browserbau sind
+prüfbare Bausteine. Der Browserbau verlangt einen exakt an das Programm
+gebundenen nativen Gesamtnachweis und die unabhängige Exportprüfung; ohne
+diese Nachweise entsteht keine freigegebene Flottenanimation. Es wurde weder
+gemergt noch gepusht oder auf Pages veröffentlicht. Die offenen biologischen
+E4-Entscheidungen sind unverändert.
+
+Der neue lokale Gesamtstatus steht unter
+`exports/building-fleet/support-84c61cb/fleet-report.json` mit
+`status: blocked_performance` und `complete_fleet_qualified: false`.
+Die abschließende BF01-Pythonsuite umfasst 261 Tests: 259 bestanden, zwei
+native Opt-in-Fälle wurden übersprungen. Der separate installierte
+FreeCAD-Vertragstest bestand zuvor alle 20 Fälle. Sieben Kamerakit-Quelltests
+und neun Markdown-Linktests bestehen ebenfalls. Die Rundgangsuite umfasst
+63 Tests, davon einen übersprungenen optionalen `jsonschema`-Test; die drei
+bestehenden JavaScript-Rundgangprüfungen bestehen. Die reine neue
+Node-Prüfung bestätigt PVA-/Meldungswiedergabe, Steuerungssperren,
+verlustfreie Projektion und Bytegleichheit des normalen Rundgangs, ersetzt
+aber keine tatsächliche WebGL-Prüfung. Die alten L01-Lokal-/Gegenverkehrstests
+benötigen weiterhin den fehlenden aktuellen ignorierten Workcell-Build;
+veraltete Artefakte wurden nicht als Ersatz übernommen. Eine separate
+Schutzprüfung bestätigt 157 unveränderte Konstruktions-/TR01-/L01-Quelldateien
+gegen die Arbeitsbasis `84c61cb`.
 
 Die Rückstellung hebt nur die zuvor nachgewiesene topologische Sperre für
 K0_013 auf. Sie ist keine Freigabe anderer Ziele, Türen, Depots oder Fahrwege.
@@ -236,10 +401,10 @@ Wiederanlauf bewahrt die eigene Pose einschließlich unaufgewickelter Gierrichtu
 Die Regler-, Dienste-, Funkkanal-, Leitstand- und Sensorprüfungen belegen
 Bausteine; sie belegen weder einen integrierten Flottenlauf noch reale Sensorik.
 
-## Verbindlicher Stopp: fehlender Boden an der Aufzugsschwelle
+## Historischer Stopp vor der Schwellenkorrektur: fehlender Aufzugboden
 
-Am obligatorischen aktiven Port `LiftPort_EG_inward` verbindet die vorhandene
-Geometrie Kabinenboden und Flurboden nicht durchgehend. Die Lücke ist keine
+Am obligatorischen aktiven Port `LiftPort_EG_inward` verband die damals gepinnte
+Geometrie Kabinenboden und Flurboden nicht durchgehend. Die Lücke war keine
 zu enge geplante Kurve: Ein positiver Streifen über die **gesamte aus der Quelle
 abgeleitete Türöffnung** besitzt keine tragende native Geometrie. Jede
 Verbindung von der Kabine zum Flur muss diesen Streifen queren.
@@ -277,26 +442,28 @@ python3 scripts/building_fleet_lift_checks.py \
   --output exports/building-fleet/lift-preflight/current-support-barrier.json
 ```
 
-Dieser Einstieg prüft den konkreten Zeugen für eine Stützungslücke.
-Eine vollständige Aufzugfreigabe erfordert weitere Nachweise. Eine reale
-Radüberbrückung oder zulässige Spaltbreite ist nicht qualifiziert und ersetzt
-den geforderten geometrischen Bodenstützungsnachweis nicht. Quellen, native CAD-Ausgaben
+Dieser Einstieg prüft einen konkreten Zeugen für eine Stützungslücke;
+das Ausbleiben dieses Zeugen beweist keine vollständige Aufzugfreigabe. Heute gilt
+die oben dokumentierte Eigentümerannahme für höchstens 15 mm geschlossene
+Bodenlücke; eine reale Radüberbrückung bleibt unqualifiziert. Der geometrische
+Bodenstützungsnachweis bleibt erforderlich. Quellen, native CAD-Ausgaben
 und Prüfberichte sind über SHA256 gebunden. Es wurden keine historischen
 Berichte umgepinnt und keine Schwelle, Tür, Kabine oder Gebäudequelle verändert.
 
-Der ursprüngliche Auftrag verlangt hier ausdrücklich Anhalten und Berichten.
-Daher gibt es keinen vollständigen Seed-Lauf, keine bestätigte Zielabdeckung,
+Der ursprüngliche Auftrag verlangte hier ausdrücklich Anhalten und Berichten.
+Daher gab es damals keinen vollständigen Seed-Lauf, keine bestätigte Zielabdeckung,
 keine Flotten-Aufzugsstatistik, keinen nativen Gesamtkurvennachweis und kein
-qualifiziertes BF01-Browserprogramm. Unfertige Missions-, Laufzeit- und
-Browserentwürfe liegen unverändert als **ungeprüfte Gesamtintegration** unter
-`exports/building-fleet/incomplete-components/`; sie sind kein aktiver Einstieg
-unter `scripts/`. Auch der zusätzlich erkannte Bedarf einer reservierten
-Ziel-Wartebucht für gleichseitiges Aussteigen bleibt dort offen.
+qualifiziertes BF01-Browserprogramm. Die damaligen unfertigen Missions-,
+Laufzeit- und Browserentwürfe bleiben unter
+`exports/building-fleet/incomplete-components/` erhalten. Der Folgeauftrag
+BF01-2 überprüft die wiederverwendeten Bausteine erneut, ergänzt insbesondere
+die atomare Zusage von Start- und Ziel-Wartebucht vor dem Aufzugruf und prüft
+die Gesamtintegration separat. Alte Entwürfe sind kein neuer Nachweis.
 
-Der nächste erforderliche Schritt ist eine ausdrücklich freigegebene
+Der damals erforderliche nächste Schritt war eine ausdrücklich freigegebene
 Geometriekorrektur der befahrbaren Aufzugsschwelle in der gemeinsamen
-Gebäudequelle mit neuen nativen und Bodenstützungsnachweisen. Bis dahin
-bleiben Treppenkern-Ausschluss, alle übrigen Ziele, Bench-Sperren und
+Gebäudequelle mit neuen nativen und Bodenstützungsnachweisen. Für den
+Folgeauftrag bleiben Treppenkern-Ausschluss, alle übrigen Ziele, Bench-Sperren und
 unveränderte TR01-/L01-Quellen verbindlich. Ein Aufheben der Bodenprüfung oder
 ein erfundener virtueller Steg wäre kein zulässiger Fortsetzungsschritt.
 
@@ -322,7 +489,7 @@ Abstände sind null. Quelle und native Artefakte sind im lokalen
 `check_l01_native_witnesses.py`. Das sind zwei negative statische Zeugen,
 kein vollständiger nativer Fahrweg- oder Flottennachweis.
 
-## Abschließender Prüfstand dieser Erweiterung
+## Historischer Prüfstand vor BF01-2
 
 Die gezielte BF01-Pythonsuite besteht **121 Tests ohne Skip**; sie enthält
 auch die ausdrücklich aktivierte Regression am aktuellen gepinnten

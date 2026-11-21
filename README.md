@@ -44,7 +44,7 @@ Ein Workflow braucht mehr als erreichbare Geräte: Gefäße müssen bereitstehen
 
 Der [Laborraum L01 mit Möbeln und Geräten](docs/lab-layout-l01.md) beschreibt einen Arbeitsplatz im Detail. Das [Gebäudemodell](docs/building-stack.md) ergänzt Labore, Flure, Büros und Aufenthaltsbereiche. Auch Denk- und Schreibplätze und die Küche gehören zu diesem Forschungsalltag. Die [Modellgalerie](docs/models/README.md) führt durch Räume, Möbel, Geräte und ihre Aufstellungen. Gebäudeabmessungen sind teilweise Darstellungsannahmen; reale Transportwege müssen gesondert geprüft werden.
 
-Die separate [Gebäudeflotte BF01](docs/building-fleet-demo.md) ist in Vorbereitung: Quellen, Kamerakit und eine separate BF01-Verbindung in L01 sind geprüft; die weitere Flottenfreigabe stoppt an einer nativ nachgewiesenen bodenlosen Aufzugsschwelle im EG. Eine vollständige 20-Fahrzeug-Animation liegt noch nicht vor.
+Die separate [Gebäudeflotte BF01](docs/building-fleet-demo.md) ist in Vorbereitung: Die ergänzten Aufzugsschwellen haben an allen fünf aktiven Zugängen nativ gemessene 8-mm-Fugen. Die neue Bodenregel erlaubt bis 15 mm geschlossene Lücken und ausschließlich den aus der Quelle abgeleiteten Schwellenversatz; dies sind synthetische Eigentümerannahmen ohne Radqualifikation. Die neue Routenvorbereitung benötigt bereits 33,5 Minuten und überschreitet damit das Laufzeitziel deutlich. Der Auftrag ist an dieser Stoppbedingung angehalten; der vollständige 20-Fahrzeug-Lauf, dessen nativer Gesamtnachweis und die Flottenanimation sind nicht freigegeben.
 
 ### Interaktiver Gebäuderundgang
 
