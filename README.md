@@ -14,6 +14,8 @@ Wir wollen unsere Roboter **selbst bauen, verändern und reparieren können**. E
 
 Unser Ziel ist, biologische Workflows zunächst vollständig am Rechner modellieren und erproben zu können. Deshalb beschreiben wir neben den Robotern auch die Geräte, Materialien, Abläufe und die gemeinsame Arbeitsumgebung.
 
+Das Modell soll dem gebauten Roboter so nah wie möglich bleiben. Konstruktion, Abläufe und Prüfgrenzen beschreiben wir in gemeinsamen Quellen, aus denen Modelle, Ansichten und Simulationen unabhängig abgeleitet werden. So bleibt nachvollziehbar, was geprüft ist, was noch offen ist und was am realen Aufbau nachgewiesen werden muss.
+
 ## Unser Laborroboter
 
 Der sechsachsige Laborarm ist unser erster Roboterentwurf. Unterschiedliche Werkzeuge sollen ihn für die Handhabung von Gefäßen, das Pipettieren und die Bedienung von Laborgeräten einsetzbar machen. Die Armkonstruktion endet an einem allgemeinen Werkzeugflansch; die Pipettierfunktion ist noch zu entwickeln.
@@ -71,6 +73,10 @@ Diese Abläufe verwenden Testdaten und simulierte Rückmeldungen. Sie erlauben, 
 ## Mitentwickeln
 
 Konstruktion und Abläufe stehen in gemeinsamen, maschinenlesbaren Quellen. FreeCAD und SolidCraft erzeugen daraus unabhängig ihre Modelle; ROS 2/RViz nutzt daraus abgeleitete Roboterbeschreibungen und vorbereitete Armprogramme. Änderungen sollen so in Konstruktion, Bewegungsprüfung und Ablaufmodell nachvollziehbar bleiben.
+
+**Programmieren mit ROS 2.** Roboterbeschreibungen (URDF), Meshes und vorbereitete Bewegungsprogramme werden aus den gemeinsamen Quellen unter `ros2_ws/` erzeugt. Ziel ist ROS 2 Jazzy mit `ros2_control`, etwa auf Ubuntu 24.04; die Hardwareanbindung ist bislang Mock, ROS-Laufzeit und reale Antriebe sind nicht geprüft. Als Installationstest dienen der Modellbuild mit `python3 scripts/build_models.py --ros2` und der [Daten-Dry-run ohne ROS](docs/centrifuge-cf01.md#cf01-smooth-unloading) mit `PYTHONPATH=… python3 -m solidcraftbot_ros.demo --config … --scenario … --dry-run` (Pfade und Szenario aus dem jeweiligen Build einsetzen). Ein ausführbares ROS-Tutorial folgt erst in der RoboStack/pixi-Phase; den vorbereiteten Einstieg beschreibt [ROS 2/RViz](docs/ros2.md).
+
+**Gerätekommunikation über SiLA 2.** Für die Anbindung an Laborgeräte und Workflow-Orchestratoren orientieren wir uns am offenen Laborstandard SiLA 2. Für den CF01-Simulator ist bereits eine getrennte [SiLA-2-Schnittstelle über TLS/gRPC](docs/sila2-network.md) implementiert und lokal geprüft. Reale Geräteanbindungen und die automatische Zuordnung von Fähigkeiten und Ressourcen über GENtle bleiben Entwicklungsziele.
 
 Für den Einstieg:
 
