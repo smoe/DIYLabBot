@@ -24,7 +24,7 @@ const {chromium}=require(process.argv[3]||'playwright');
       const turn=Math.atan2(Math.sin(Math.atan2(d[1],d[0])-camera.yaw_rad),Math.cos(Math.atan2(d[1],d[0])-camera.yaw_rad));
       const dx=-turn/data.settings.look_sensitivity,dy=-(Math.atan2(d[2],Math.hypot(d[0],d[1]))-camera.pitch_rad)/data.settings.look_sensitivity;
       if(Math.hypot(dx,dy)<.05)return;
-      const box=await page.locator('canvas').boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
+      const box=await page.locator('#walkthrough-canvas').boundingBox(),x=box.x+box.width/2,y=box.y+box.height/2;
       const count=Math.max(1,Math.ceil(Math.abs(dx)/(box.width*.22)),Math.ceil(Math.abs(dy)/(box.height*.22)));
       for(let n=0;n<count;n++){
         await page.mouse.move(x,y);await page.mouse.down();
@@ -42,7 +42,7 @@ const {chromium}=require(process.argv[3]||'playwright');
       const target=await point(id,sign);await lookAt(target);
       const p=await page.evaluate(p=>{const v=window.__buildingWalkthrough.projectPoint(p),c=document.querySelector('canvas');return {...v,width:c.width,height:c.height};},target);
       assert(p.visible,id+': visible native button');
-      const box=await page.locator('canvas').boundingBox();await page.mouse.click(box.x+p.x*box.width/p.width,box.y+p.y*box.height/p.height);
+      const box=await page.locator('#walkthrough-canvas').boundingBox();await page.mouse.click(box.x+p.x*box.width/p.width,box.y+p.y*box.height/p.height);
       await page.clock.runFor(20);
       const result=await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction);
       assert(['accepted','already_in_state'].includes(result?.status),id+': '+JSON.stringify(result));
@@ -50,7 +50,7 @@ const {chromium}=require(process.argv[3]||'playwright');
     }
     async function walk(target,{blocked=false,untilBoarded=false}={}){
       const before=await read();await lookAt([target[0],target[1],before.camera.eye_mm[2]]);
-      await page.locator('canvas').focus();await page.keyboard.down('w');
+      await page.locator('#walkthrough-canvas').focus();await page.keyboard.down('w');
       let previous=before.camera.eye_mm,stalled=0,reached=false;
       try{for(let n=0;n<100;n++){
         await page.clock.runFor(50);const s=await read(),eye=s.camera.eye_mm,distance=Math.hypot(eye[0]-target[0],eye[1]-target[1]);
@@ -106,7 +106,7 @@ const {chromium}=require(process.argv[3]||'playwright');
       const selection=lift.controls.floor_buttons.find(b=>b.level_id===destination);
       await clickBody(selection.body_ids[1]);
       await page.clock.fastForward(2000);const during=await read();
-      await page.locator('canvas').focus();await page.keyboard.down('w');await page.clock.runFor(150);await page.keyboard.up('w');
+      await page.locator('#walkthrough-canvas').focus();await page.keyboard.down('w');await page.clock.runFor(150);await page.keyboard.up('w');
       const after=await read();assert.deepEqual(after.camera.eye_mm.slice(0,2),during.camera.eye_mm.slice(0,2),'Walking locked while moving');
       assert(after.camera.eye_mm.every((v,i)=>Math.abs(v-after.lift.attached_eye_mm[i])<.01));
       await settle();assert.equal((await read()).lift.state,destination);

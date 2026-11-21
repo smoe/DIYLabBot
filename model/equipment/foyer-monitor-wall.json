@@ -1,0 +1,53 @@
+{
+  "format": "solidcraftbot.foyer-monitor-wall/1",
+  "id": "FoyerMonitorWall",
+  "level": "EG",
+  "area": "R0_019",
+  "catalog": {
+    "source": "model/furniture/social.catalog.json",
+    "source_sha256": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440"
+  },
+  "monitor_type": {
+    "extends": "office_computer",
+    "omit_parts": [
+      "MonitorStand",
+      "MonitorFoot",
+      "MiniPC",
+      "MiniPCPower"
+    ],
+    "parts": [
+      {
+        "id": "WallMount",
+        "body": "WallMount",
+        "color": "#505B65",
+        "action": "create",
+        "shape": {
+          "kind": "box",
+          "origin": [
+            -80,
+            -30,
+            260
+          ],
+          "size": [
+            160,
+            30,
+            160
+          ]
+        }
+      }
+    ]
+  },
+  "anchor": {
+    "wall": "W052",
+    "fraction": 0.5,
+    "back_gap_mm": 30
+  },
+  "grid": {
+    "rows": 3,
+    "columns": 3,
+    "horizontal_gap_mm": 40,
+    "vertical_gap_mm": 40,
+    "case_bottom_mm": 1100
+  },
+  "basis": "Owner-selected 3x3 display array on the EG lift wall facing the foyer; all dimensions, mounting and ergonomics are unqualified presentation assumptions."
+}

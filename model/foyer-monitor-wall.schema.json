@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Static EG foyer monitor wall, presentation assumptions",
+  "type": "object",
+  "required": [
+    "format",
+    "id",
+    "level",
+    "area",
+    "catalog",
+    "monitor_type",
+    "anchor",
+    "grid",
+    "basis"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "format": {
+      "const": "solidcraftbot.foyer-monitor-wall/1"
+    },
+    "id": {
+      "const": "FoyerMonitorWall"
+    },
+    "level": {
+      "const": "EG"
+    },
+    "area": {
+      "const": "R0_019"
+    },
+    "catalog": {
+      "type": "object",
+      "required": [
+        "source",
+        "source_sha256"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string",
+          "pattern": "^model/[^.].*\\.json$"
+        },
+        "source_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "monitor_type": {
+      "type": "object",
+      "required": [
+        "extends",
+        "omit_parts",
+        "parts"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "extends": {
+          "const": "office_computer"
+        },
+        "omit_parts": {
+          "const": [
+            "MonitorStand",
+            "MonitorFoot",
+            "MiniPC",
+            "MiniPCPower"
+          ]
+        },
+        "parts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "body",
+              "color",
+              "action",
+              "shape"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "id": {
+                "const": "WallMount"
+              },
+              "body": {
+                "const": "WallMount"
+              },
+              "color": {
+                "type": "string",
+                "pattern": "^#[0-9a-fA-F]{6}$"
+              },
+              "action": {
+                "const": "create"
+              },
+              "shape": {
+                "type": "object",
+                "required": [
+                  "kind",
+                  "origin",
+                  "size"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "kind": {
+                    "const": "box"
+                  },
+                  "origin": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": -500,
+                      "maximum": 1000
+                    }
+                  },
+                  "size": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "number",
+                      "minimum": 1,
+                      "maximum": 500
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "anchor": {
+      "type": "object",
+      "required": [
+        "wall",
+        "fraction",
+        "back_gap_mm"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "wall": {
+          "const": "W052"
+        },
+        "fraction": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "back_gap_mm": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 100
+        }
+      }
+    },
+    "grid": {
+      "type": "object",
+      "required": [
+        "rows",
+        "columns",
+        "horizontal_gap_mm",
+        "vertical_gap_mm",
+        "case_bottom_mm"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "rows": {
+          "const": 3
+        },
+        "columns": {
+          "const": 3
+        },
+        "horizontal_gap_mm": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "vertical_gap_mm": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "case_bottom_mm": {
+          "type": "number",
+          "minimum": 500,
+          "maximum": 2000
+        }
+      }
+    },
+    "basis": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}

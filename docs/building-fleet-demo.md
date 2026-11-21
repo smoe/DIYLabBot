@@ -6,6 +6,12 @@ ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
 Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
 
+Die [Foyer-Kamerawand](foyer-camera-wall.md) ergänzt neue Gebäudekörper.
+Die aktiven Gebäude-, Rundgang- und Konnektorpins sind nachgeführt; ältere
+Navigationscaches, Freiraum-, Boden- und Fahrtnachweise qualifizieren diese
+Revision nicht. Der aktuelle Flottennachweis bleibt **unproven**.
+Die separaten BF01-Kameraeinträge enthalten keine Bilder oder Fahrzeugposen.
+
 Die separate L01-Verbindung wurde am früheren Gebäudestand geprüft. Mit der
 Labormöblierung und den nach außen öffnenden Labortüren sind die Gebäude- und
 Rundgangbindungen in beiden BF01-Quellen aktualisiert. Die daraus neu abgeleitete

@@ -1,5 +1,10 @@
 # Gebäude im Browser erkunden
 
+Die [Kamerawand im EG-Foyer](foyer-camera-wall.md) ergänzt neun auswählbare
+Modellansichten an der Aufzugaußenwand. Ein Monitorklick öffnet die
+Großansicht. Transporter ohne Kamera beziehungsweise ohne laufenden Player
+liefern keine Bilder; reale Streams und Aufzeichnungen sind nicht angebunden.
+
 Die freie Kamera prüft ihre Translation kontinuierlich mit einer als Darstellungsannahme geführten Kugel gegen die nativen Dreiecksflächen, einschließlich der aktuellen Türposen. Sie gleitet an Hindernissen entlang; nicht aufgelöste Kontakte stoppen die Bewegung. Radius, Kontaktabstand und Rechengrenzen stehen einmalig unter `navigation` in `model/building-walkthrough.shared.json`. Das ist keine geprüfte menschliche Körperhülle oder reale Schutzfunktion.
 
 Die benannten kleinen Technikzugänge `N3_023` bis `N3_027` starten auf OG1–OG3 geschlossen. Labor- und Bürotüren starten weiterhin offen. Startzustand und native Referenzpose sind getrennt: Die bestehenden offenen Referenzgeometrien werden nicht geändert. Während Türbewegungen bleibt zusätzlich die geschlossene Durchgangspose für die Kamera gesperrt. Freies Bewegen in den Aufzugschacht ist auch bei fehlender Kabine gesperrt; Einsteigen, Mitfahren und Aussteigen erfolgen über die vorhandenen Aufzugbefehle. Blickpunkt- und Geschosswechsel bleiben ausdrücklich diskrete Ansichtswechsel, keine kollisionsgeprüften Gehwege.

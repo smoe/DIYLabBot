@@ -1,0 +1,85 @@
+{
+  "format": "solidcraftbot.foyer-camera-wall/1",
+  "id": "FoyerCameraWall",
+  "sources": {
+    "walkthrough": {
+      "source": "model/building-walkthrough.shared.json",
+      "source_sha256": "fde14b3ee3ecfb3e5760e406cdad994ab85fe728c8ed985068afa7b3604f17ad"
+    },
+    "fleet": {
+      "source": "model/building-fleet-demo.shared.json",
+      "source_sha256": "60db3897e43c489bd03c91c878f4f2654682ff1a5a236b197e2e3789443b6f9c"
+    }
+  },
+  "settings": {
+    "resolution_px": [
+      320,
+      180
+    ],
+    "mosaic_rate_hz": 1,
+    "selected_rate_hz": 5,
+    "virtual_fov_y_deg": 60,
+    "near_mm": 0.5,
+    "modeled_far_mm": 5000,
+    "virtual_near_mm": 25,
+    "far_mm": 180000,
+    "stale_after_s": 5,
+    "history_enabled": false
+  },
+  "asset_policy": {
+    "arm": {
+      "mode": "arm_cameras",
+      "label": "Roboterarm"
+    },
+    "centrifuge": {
+      "mode": "overview",
+      "label": "Zentrifuge"
+    },
+    "transporter": {
+      "mode": "no_camera",
+      "label": "Transporter"
+    },
+    "tip_collector": {
+      "mode": "overview",
+      "label": "Spitzensammelstation"
+    },
+    "tube_rack": {
+      "mode": "exclude",
+      "label": "Rack"
+    },
+    "analytical_balance": {
+      "mode": "overview",
+      "label": "Waage"
+    },
+    "freezer_minus20": {
+      "mode": "overview",
+      "label": "Gefriergerät"
+    },
+    "fridge_4c": {
+      "mode": "overview",
+      "label": "Kühlgerät"
+    },
+    "water_bath_13l": {
+      "mode": "overview",
+      "label": "Wasserbad"
+    },
+    "fume_hood_1200": {
+      "mode": "overview",
+      "label": "Abzug"
+    },
+    "tapestation": {
+      "mode": "overview",
+      "label": "TapeStation"
+    },
+    "nanodrop": {
+      "mode": "overview",
+      "label": "NanoDrop"
+    },
+    "qubit": {
+      "mode": "overview",
+      "label": "Qubit"
+    }
+  },
+  "basic_laboratory_hoods": true,
+  "microscopy": true
+}

@@ -37,7 +37,26 @@ def embed_html(template, payload):
         raise ValueError('Only one interaction-script placeholder is allowed')
     template = template.replace('__WALKTHROUGH_INTERACTION__', INTERACTION_SCRIPT.read_text(encoding='utf-8'))
     template = template.replace('__WALKTHROUGH_ROBOTS__', (ROOT/'scripts/templates/quintic_motion.js').read_text()+'\n'+(ROOT/'scripts/walkthrough_robots.js').read_text())
+    template = template.replace('__WALKTHROUGH_MONITORS__', (ROOT/'scripts/monitor_frustum.js').read_text()+'\n'+(ROOT/'scripts/camera_monitor_wall.js').read_text())
     return template.replace('__WALKTHROUGH_DATA__', data)
+
+
+def add_monitor_wall(program):
+    """Compose registry metadata above the walkthrough/fleet dependency graph."""
+    import building_stack
+    import monitor_camera_registry
+    building = building_stack.load(ROOT/program['scene_sources']['building']['source'])
+    interface = building_stack.interfaces(building, building_stack.parameters(building))
+    wall = interface.get('monitor_wall')
+    if wall is None:
+        return program
+    registry = monitor_camera_registry.compile(program, interface)
+    pins = registry.pop('source_files_sha256')
+    program['source_files_sha256'] = merge_pins(program['source_files_sha256'], pins)
+    program['camera_wall'] = {**wall, **registry}
+    program['stops'].append({'id': 'camera-wall', 'label': 'Kamerawand · EG', 'scene': 'building',
+        'level_id': wall['level_id'], **wall['viewpoint']})
+    return program
 
 
 def reports_from_program(program):
@@ -98,12 +117,13 @@ def build(args):
     reports, checked = ensure_reports(program, args)
     # A rebuild can replace a checked report pointer; recompile against the
     # final source/proof set before pinning the browser artifact.
-    program = model.compile(args.source)
+    program = add_monitor_wall(model.compile(args.source))
     program['scene_sources']['building']['build_report'] = str(reports['building'].relative_to(ROOT))
     program['equipment_source']['build_report'] = str(reports['lab'].relative_to(ROOT))
     source_pins = merge_pins(program['source_files_sha256'],
         {str(path.relative_to(ROOT)): mesh_export.digest(path)
-         for path in (Path(__file__), ROOT/'scripts/export_building_walkthrough_freecad.py', TEMPLATE, INTERACTION_SCRIPT)})
+         for path in (Path(__file__), ROOT/'scripts/export_building_walkthrough_freecad.py', TEMPLATE, INTERACTION_SCRIPT,
+                      ROOT/'scripts/camera_monitor_wall.js', ROOT/'scripts/monitor_frustum.js')})
     signature_pins = merge_pins(source_pins, {str(path.relative_to(ROOT)): mesh_export.digest(path) for path in reports.values()})
     key = hashlib.sha256(json.dumps(signature_pins, sort_keys=True).encode()).hexdigest()
     stem = 'building-walkthrough-'+key[:12]
