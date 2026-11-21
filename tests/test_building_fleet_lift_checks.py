@@ -143,5 +143,101 @@ class CurrentNativeRegression(unittest.TestCase):
         self.assertEqual(result['source_opening_id'], 'DLift')
 
 
+class LiftGateTests(unittest.TestCase):
+    def fixture(self):
+        from types import SimpleNamespace
+        cabin = {'id':'Cabin','joint':{'type':'prismatic','axis':[0,0,1]},
+                 'states':{'EG':0.,'OG1':4250.},'reference_state':'EG',
+                 'moving_body_ids':['CabinFloor'],'parent_object_id':None}
+        door = {'id':'Door','joint':{'type':'prismatic','axis':[0,1,0]},
+                'states':{'closed':0.,'open':100.},'reference_state':'closed',
+                'moving_body_ids':['DoorBody'],'parent_object_id':'Cabin',
+                'mechanism':'lift_door'}
+        mesh = SimpleNamespace(manifest={'elevator':{'object_id':'Cabin','ports':[
+            {'id':'P','active':True,'level_id':'OG1','z_mm':4250.,'side':'outward',
+             'door_object_ids':['Door']}]},'objects':[cabin,door]})
+        timeline = SimpleNamespace(values=lambda t:{'Cabin':4250.,'Door':100.})
+        return mesh,timeline
+
+    def test_compiled_numeric_gate_requires_correct_floor_and_fully_open_doors(self):
+        from types import SimpleNamespace
+        mesh,timeline = self.fixture()
+        self.assertEqual(checks.gate_at(mesh,'P',timeline,1)['cabin_z_mm'],4250.)
+        for values in ({'Cabin':0.,'Door':100.},{'Cabin':4250.,'Door':99.},
+                       {'Cabin':4250.}):
+            with self.subTest(values=values),self.assertRaises(ValueError):
+                checks.gate_at(mesh,'P',SimpleNamespace(values=lambda t,v=values:v),1)
+        mesh.manifest['elevator']['ports'][0]['active']=False
+        with self.assertRaises(ValueError):checks.gate_at(mesh,'P',timeline,1)
+
+    def test_absolute_pose_applies_child_then_cabin_once_without_editing_source(self):
+        mesh,_ = self.fixture()
+        mesh._posed_bounds_cache={'old_pose':'bounds'};mesh._fleet_band_cache={'old_pose':'band'}
+        posed = checks.posed_mesh(mesh,{'Cabin':4250.,'Door':100.})
+        self.assertEqual(posed._posed_bounds_cache,{})
+        self.assertEqual(posed._fleet_band_cache,{})
+        self.assertEqual(mesh._posed_bounds_cache,{'old_pose':'bounds'})
+        self.assertEqual(mesh._fleet_band_cache,{'old_pose':'band'})
+        point = [12.,34.,0.]
+        for obj in posed.transforms['DoorBody']:
+            point = navigation.initial_transform(obj,point)
+        self.assertEqual(point,[12.,134.,4250.])
+        self.assertNotIn('bf01_compiled_pose',mesh.manifest['objects'][0]['states'])
+        self.assertEqual(mesh.manifest['objects'][1]['states']['open'],100.)
+        with self.assertRaises(ValueError):checks.posed_mesh(mesh,{'Cabin':9000.})
+        with self.assertRaises(ValueError):checks.posed_mesh(mesh,{'not-a-source-object':0})
+
+
+class RaisedSurfaceTests(unittest.TestCase):
+    class Mesh:
+        def __init__(self, wrong_top=False, wrong_role=False):
+            self.manifest = {'elevator': {'object_id':'Cabin', 'ports':[
+                {'id':'P','active':True,'level_id':'EG','z_mm':0.,'side':'inward','door_object_ids':['Door']}]},
+                'objects':[{'id':'Cabin','joint':{'type':'prismatic','axis':[0,0,1]},
+                            'states':{'EG':0.,'OG1':4250.},'reference_state':'EG',
+                            'moving_body_ids':['LiftCabinFloorFinish','LiftCabinSill_inward']},
+                           {'id':'Door','joint':{'type':'prismatic','axis':[0,1,0]},
+                            'states':{'closed':0.,'open':100.},'reference_state':'closed','moving_body_ids':[]}]}
+            roles = [('Slab','concept_storey_slab',0.),
+                     ('UnrelatedRaisedSlab','concept_storey_slab',3.),
+                     ('LiftCabinFloorFinish','concept_lift_floor_finish',3.),
+                     ('LiftCabinSill_inward','concept_lift_cabin_sill',4. if wrong_top else 3.),
+                     ('LiftLandingSill_EG_inward','wrong_role' if wrong_role else'concept_lift_landing_sill',3.)]
+            self.scene={'maximum_float32_error_mm':0.,'groups':[
+                {'id':name,'role':role,'triangle':[[0.,0.,z],[100.,0.,z],[0.,100.,z]]}for name,role,z in roles]}
+            self.transforms={}
+        def bounds(self,group):
+            tri=list(self.triangles(group))[0]
+            return {'min':[min(p[k]for p in tri)for k in range(3)],'max':[max(p[k]for p in tri)for k in range(3)]}
+        def triangles(self,group):
+            tri=[]
+            for raw in group['triangle']:
+                point=list(raw)
+                for obj in self.transforms.get(group['id'],[]):point=navigation.initial_transform(obj,point)
+                tri.append(point)
+            return iter([tri])
+
+    def contract(self):
+        return {'height_offset_mm':3.,'ports':{'P':{'z_mm':0.,'height_offset_mm':3.,
+            'source_surface_ids':['LiftCabinFloorFinish','LiftCabinSill_inward','LiftLandingSill_EG_inward']}}}
+
+    def test_only_exact_source_raise_families_count_as_floor(self):
+        from types import SimpleNamespace
+        timeline=SimpleNamespace(values=lambda t:{'Cabin':0.,'Door':100.})
+        with patch.object(checks,'source_surface_contract',return_value=self.contract()):
+            result=checks.surface_rows_at(self.Mesh(),'P',timeline,1.)
+        bodies={row['body_id']for row in result['surface_rows']}
+        self.assertIn('Slab',bodies);self.assertIn('LiftCabinFloorFinish',bodies)
+        self.assertNotIn('UnrelatedRaisedSlab',bodies)
+        self.assertEqual(sum(row['height_exception_applied']for row in result['surface_rows']),3)
+
+    def test_changed_raised_top_or_wrong_role_fails(self):
+        from types import SimpleNamespace
+        timeline=SimpleNamespace(values=lambda t:{'Cabin':0.,'Door':100.})
+        for mesh in(self.Mesh(wrong_top=True),self.Mesh(wrong_role=True)):
+            with self.subTest(mesh=mesh),patch.object(checks,'source_surface_contract',return_value=self.contract()),self.assertRaises(ValueError):
+                checks.surface_rows_at(mesh,'P',timeline,1.)
+
+
 if __name__ == '__main__':
     unittest.main()
