@@ -1,5 +1,8 @@
 """Own-state/controller timing regressions; no world state is passed to a car."""
 import copy
+import bisect
+import random
+from types import MethodType
 import math
 from pathlib import Path
 import sys
@@ -9,6 +12,24 @@ import building_fleet_control as control
 import building_fleet_model as model
 import building_fleet_motion as motion
 F=control.F
+
+
+def reference_project_ahead(car,point,lookahead_mm=None,maximum_lateral_mm=None):
+    """Preserved original arithmetic/order; the new lateral hint is ignored."""
+    end=car.goal if lookahead_mm is None else min(car.goal,car.y+lookahead_mm)
+    best=(math.inf,car.y);samples=car.path.samples
+    ends=[row[1]for row in samples];first=max(0,bisect.bisect_left(ends,car.y)-1)
+    for a,b,pa,pb in samples[first:]:
+        if a>end+1e-9:break
+        if b<car.y-1e-9:continue
+        left=max(a,car.y);right=min(b,end)
+        if right<left:continue
+        p=car.path.evaluate(left)[0][:2];q=car.path.evaluate(right)[0][:2]
+        delta=[q[k]-p[k]for k in range(2)];norm=sum(v*v for v in delta)
+        u=max(0.,min(1.,sum((point[k]-p[k])*delta[k]for k in range(2))/norm))if norm else 0.
+        distance=math.hypot(*(point[k]-p[k]-u*delta[k]for k in range(2)))
+        if distance<best[0]:best=distance,left+u*(right-left)
+    return best
 
 
 class ControllerTests(unittest.TestCase):
@@ -177,6 +198,63 @@ class ControllerTests(unittest.TestCase):
         c.y=c.path.length;c.heading_offset=0.
         c.recorded=[{'pose_mm_rad':[1999,0,2*math.pi-.001]}]
         self.assertAlmostEqual(c.pose()[2],2*math.pi)
+
+    def test_projection_matches_original_random_loops_reverse_and_clipped_boundaries(self):
+        rng=random.Random(20261121)
+        routes=[[[0,0],[3000,0]],[[0,0],[1500,0],[1500,1500],[0,1500],[0,0],[1000,0]],
+                [[1e9,-1e9],[1e9+2000,-1e9],[1e9+2000,-1e9+1500],[1e9,-1e9+1500]]]
+        for route in routes:
+            path=motion.Path(route,trim_mm=75);car=control.Controller.__new__(control.Controller)
+            car.path=path;car.goal=path.length
+            edge=path.samples[len(path.samples)//2][0]
+            progresses=[0.,path.length*.21,edge,math.nextafter(edge,-math.inf),math.nextafter(edge,math.inf),path.length]
+            for progress in progresses:
+                car.y=progress;car.heading_offset=math.pi if rng.random()<.5 else 0.
+                xy=path.evaluate(progress)[0][:2]
+                points=[[xy[0]+rng.uniform(-2500,2500),xy[1]+rng.uniform(-2500,2500)]for _ in range(8)]
+                points.extend([path.samples[0][2],path.samples[-1][3],xy,
+                    [math.nextafter(xy[0],math.inf),math.nextafter(xy[1],-math.inf)]])
+                for lookahead in(None,0.,19.125,800.,1e7):
+                    for point in points:
+                        expected=reference_project_ahead(car,point,lookahead)
+                        self.assertEqual(car.project_ahead(point,lookahead),expected,(route,progress,lookahead,point))
+                        limited=car.project_ahead(point,lookahead,400.)
+                        self.assertEqual(limited,expected if expected[0]<=400 else(math.inf,progress))
+
+    def test_projection_reuses_full_samples_and_only_evaluates_clipped_endpoints(self):
+        path=motion.Path([[0,0],[3000,0],[3000,2000]],trim_mm=125)
+        car=control.Controller.__new__(control.Controller);car.path=path;car.goal=path.length;car.y=123.456
+        original=path.evaluate;calls=[]
+        def counted(value):calls.append(value);return original(value)
+        path.evaluate=counted
+        for i in range(180):car.project_ahead([i*10.,1000.],2200.)
+        self.assertEqual(len(calls),2,'Only the two window-clipped endpoints need Path.evaluate')
+        car.y+=.001;car.project_ahead([1,1000],2200.)
+        self.assertEqual(len(calls),4,'Own progress invalidates the exact future-window cache')
+        with self.assertRaises(ValueError):car.project_ahead([0,0],2200.,float('nan'))
+
+    def test_projection_keeps_observed_gaps_and_actual_decisions_identical(self):
+        car=self.controller(zone_caps=[(0,300)]);legacy=copy.deepcopy(car)
+        legacy.project_ahead=MethodType(reference_project_ahead,legacy)
+        for tick in range(60):
+            now=round(tick*.05,3);captured=max(0.,round(now-.1,3))
+            # An unknown forward return triggers the same bounded stop; later
+            # disappearance must retain the same fresh-clear restart clock.
+            rays=[[0.,700.]]if .85<=now<1.4 else[]
+            scan={'captured_s':captured,'returns_local_mm':rays}
+            self.assertEqual(car.decide(now,scan),legacy.decide(now,copy.deepcopy(scan)))
+            self.assertEqual(car.advance(now,round(now+.05,3)),legacy.advance(now,round(now+.05,3)))
+        self.assertEqual(car.events,legacy.events);self.assertEqual(car.recorded,legacy.recorded)
+        # Full beam sets on curved/reversed geometry retain the same observed
+        # gap even when the optional lateral broad phase discards far returns.
+        car.path=motion.Path([[0,0],[2500,0],[2500,2000],[500,2000]],trim_mm=125)
+        car.goal=car.path.length;car.y=car.path.length*.4;car.heading_offset=math.pi
+        car.recorded=[{'pose_mm_rad':car.path.evaluate(car.y)[0]}];car.record_times=[0.]
+        pose=car.pose();car.own_pose_at=lambda at:pose[:]
+        legacy=copy.copy(car);legacy.project_ahead=MethodType(reference_project_ahead,legacy)
+        vectors=[[1800*math.sin(math.radians(i)),1800*math.cos(math.radians(i))]for i in range(0,360,2)]
+        self.assertEqual(car._observed_gap({'captured_s':0.,'returns_local_mm':vectors},0.),
+                         legacy._observed_gap({'captured_s':0.,'returns_local_mm':vectors},0.))
 
     def test_sensor_range_negative_time_and_reduced_radius_rejected(self):
         c=self.controller()

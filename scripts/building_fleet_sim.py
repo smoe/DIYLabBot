@@ -5,6 +5,7 @@ anonymous first-return scan; controllers must receive neither ``truth`` nor
 this world's internal spatial index. These primitives do not themselves claim
 a completed fleet mission or a native BRep proof.
 """
+import collections
 import math
 
 from l01_local_traffic import ray_disc,ray_box
@@ -116,17 +117,27 @@ class SensorWorld:
     """Synthetic 360-degree horizontal first-return model, one level at a time.
 
     Static segments must be native height-band slices in the initial door pose.
-    Vehicle returns are conservative discs. Floors, scan error bounds and stale
-    delivery are separate contracts; this ideal generator adds no random noise.
+    Vehicle returns use full conservative oriented rectangles, with an explicit
+    disc-only fixture fallback. Floors, error bounds and stale delivery remain
+    separate contracts; this ideal generator adds no random noise.
     """
-    def __init__(self, settings, static_segments_by_level, cell_mm=500, cabin_segments_by_sides=None):
+    def __init__(self, settings, static_segments_by_level, cell_mm=500, cabin_segments_by_sides=None, landing_segments_by_level_sides=None):
         self.settings = dict(settings)
         step = settings['angular_step_deg']
         if type(step) is not int or step <= 0 or 360 % step or settings['range_mm'] <= 0:
             raise ValueError('A full-circle integer beam grid and positive range required')
         self.static = {level:SegmentIndex(segments,cell_mm) for level,segments in static_segments_by_level.items()}
         self.cabin={tuple(sides):SegmentIndex(segments,cell_mm)for sides,segments in(cabin_segments_by_sides or{}).items()}
+        self.landings={(level,tuple(sides)):SegmentIndex(segments,cell_mm)
+                       for(level,sides),segments in(landing_segments_by_level_sides or{}).items()}
         self.scans = 0; self.rays = 0;self.rectangle_rays=0;self.disc_rays=0
+        self._beam_angles=tuple((math.radians(degrees),math.sin(math.radians(degrees)),
+                                math.cos(math.radians(degrees)))for degrees in range(0,360,step))
+        self.peer_candidates=0;self.range_pruned_peers=0
+        self._raw_cache=collections.OrderedDict();self._raw_cache_limit=128
+        self.raw_cache_hits=0;self.raw_cache_misses=0;self.raw_rays=0
+        self._static_cache=collections.OrderedDict();self._static_cache_limit=128
+        self.static_cache_hits=0;self.static_cache_misses=0;self.static_rays=0
 
     @staticmethod
     def visible(own, other, lift):
@@ -138,32 +149,112 @@ class SensorWorld:
             return True
         return bool(lift['doors_open'] and own['level'] == other['level'] == lift['level'])
 
+    @staticmethod
+    def rectangle_can_return(ox,oy,c,s,box,sensor_range):
+        """Reject only boxes no source beam can reach before the range cap.
+
+        Each computed peer-frame direction component is bounded by the outward
+        rounded L1 rotation norm, since both source beam components lie in
+        [-1,1]. A positive slab-entry numerator uses exactly the subtraction
+        and division of ray_box. Monotone floating-point division therefore
+        proves that every possible entry is at or beyond the range cap. This
+        bounds the complete rectangle, including rotated corners; no centre
+        distance or approximate angular visibility test discards a peer.
+        """
+        bound=math.nextafter(abs(c)+abs(s),math.inf)
+        if (not all(math.isfinite(v)for v in (ox,oy,bound,*box))or bound<=0
+                or box[0]>box[2]or box[1]>box[3]):return True
+        for origin,minimum,maximum in zip((ox,oy),box[:2],box[2:]):
+            gap=minimum-origin if origin<minimum else origin-maximum if origin>maximum else 0.
+            if gap/bound>=sensor_range:return False
+        return True
+
+    @staticmethod
+    def _exact_key(value):
+        # Numeric equality alone collapses signed zero and large int/float
+        # distinctions. Keep the actual arithmetic inputs, with no rounding.
+        if type(value)is float:return ('float',value.hex())
+        if isinstance(value,(list,tuple)):return tuple(SensorWorld._exact_key(v)for v in value)
+        return (type(value).__name__,value)
+
+    def _first_returns(self,x,y,yaw,static,landing,cabin,peers):
+        """Raw ideal distances only; no timestamps, output lists or noise."""
+        sensor_range=self.settings['range_mm'];distances=[]
+        directions=tuple((math.cos(yaw+angle),math.sin(yaw+angle))for angle,_,_ in self._beam_angles)
+        key=(self._exact_key((x,y,yaw,sensor_range)),static,landing,cabin)
+        static_distances=self._static_cache.get(key)
+        if static_distances is None:
+            self.static_cache_misses+=1;values=[]
+            for dx,dy in directions:
+                distance=static.ray((x,y),(dx,dy),sensor_range)if static is not None else sensor_range
+                if landing is not None:distance=min(distance,landing.ray((x,y),(dx,dy),sensor_range))
+                if cabin is not None:distance=min(distance,cabin.ray((x,y),(dx,dy),sensor_range))
+                values.append(distance)
+            static_distances=tuple(values);self.static_rays+=len(directions)
+            if self._static_cache_limit:
+                self._static_cache[key]=static_distances
+                if len(self._static_cache)>self._static_cache_limit:self._static_cache.popitem(last=False)
+        else:
+            self.static_cache_hits+=1;self._static_cache.move_to_end(key)
+        # The original source-min order is unchanged; every peer minimum is
+        # evaluated against current geometry even if the static part is reused.
+        for (dx,dy),distance in zip(directions,static_distances):
+            for peer in peers:
+                if peer[0]=='rectangle':
+                    _,c,s,ox,oy,box=peer
+                    rx,ry=dx*c+dy*s,-dx*s+dy*c
+                    measured=ray_box(ox,oy,rx,ry,box);self.rectangle_rays+=1
+                else:
+                    _,cx,cy,radius=peer
+                    measured=ray_disc(x,y,dx,dy,cx,cy,radius);self.disc_rays+=1
+                distance=min(distance,measured)
+            distances.append(distance)
+        self.raw_rays+=len(self._beam_angles)
+        return tuple(distances)
+
     def scan(self, vehicle_id, truth, now, lift):
         own = truth[vehicle_id]; x,y,yaw = own['pose_mm']; sensor_range = self.settings['range_mm']
         if own['level'] not in self.static:
             raise ValueError('Native static scan geometry missing at the own level')
-        others=[p for key,p in truth.items()if key!=vehicle_id and self.visible(own,p,lift)]
-        returns = []
-        for degrees in range(0,360,self.settings['angular_step_deg']):
-            angle = math.radians(degrees); heading = yaw+angle; dx,dy = math.cos(heading),math.sin(heading)
-            on_floor=abs(own.get('floor_z_mm',own['z_mm'])-own['z_mm'])<1e-6
-            distance=self.static[own['level']].ray((x,y),(dx,dy),sensor_range)if on_floor else sensor_range
-            sides=tuple(sorted(lift.get('open_sides',())))if lift['doors_open']else()
-            cabin=self.cabin.get(sides)
-            if cabin is not None and(own.get('aboard',False)or abs(own['z_mm']-lift.get('z_mm',math.inf))<1e-6):
-                distance=min(distance,cabin.ray((x,y),(dx,dy),sensor_range))
-            for other in others:
-                if 'footprint_mm'in other:
-                    cx,cy,heading=other['pose_mm'];c,s=math.cos(heading),math.sin(heading)
-                    length,width=other['footprint_mm']
-                    ox,oy=(x-cx)*c+(y-cy)*s,-(x-cx)*s+(y-cy)*c
-                    rx,ry=dx*c+dy*s,-dx*s+dy*c
-                    measured=ray_box(ox,oy,rx,ry,[-length/2,-width/2,length/2,width/2]);self.rectangle_rays+=1
-                else:
-                    measured=ray_disc(x,y,dx,dy,*other['pose_mm'][:2],other['radius_mm']);self.disc_rays+=1
-                distance=min(distance,measured)
+        on_floor=abs(own.get('floor_z_mm',own['z_mm'])-own['z_mm'])<1e-6
+        static=self.static[own['level']]if on_floor else None
+        sides=tuple(sorted(lift.get('open_sides',())))if lift['doors_open']else()
+        landed=(on_floor and own['level']==lift.get('level')
+                and abs(own['z_mm']-lift.get('z_mm',math.inf))<1e-6)
+        landing=self.landings.get((own['level'],sides if landed else()),self.landings.get((own['level'],())))if on_floor else None
+        cabin=self.cabin.get(sides)if(own.get('aboard',False)or abs(own['z_mm']-lift.get('z_mm',math.inf))<1e-6)else None
+        peers=[];peer_keys=[]
+        for key,other in truth.items():
+            if key==vehicle_id or not self.visible(own,other,lift):continue
+            self.peer_candidates+=1
+            if 'footprint_mm'in other:
+                cx,cy,heading=other['pose_mm'];c,s=math.cos(heading),math.sin(heading)
+                length,width=other['footprint_mm'];box=(-length/2,-width/2,length/2,width/2)
+                ox,oy=(x-cx)*c+(y-cy)*s,-(x-cx)*s+(y-cy)*c
+                if not self.rectangle_can_return(ox,oy,c,s,box,sensor_range):
+                    self.range_pruned_peers+=1;continue
+                peers.append(('rectangle',c,s,ox,oy,box));shape=other['footprint_mm']
+            else:
+                peers.append(('disc',*other['pose_mm'][:2],other['radius_mm']));shape=other['radius_mm']
+            peer_keys.append(self._exact_key((other['pose_mm'],shape,other['level'],other['z_mm'],other.get('aboard',False),peers[-1])))
+        # All lift branches are resolved above into the actual selected source
+        # indexes and visible peer geometry. These are precisely the immutable
+        # inputs to _first_returns; unrelated lift travel cannot change them.
+        key=(self._exact_key((own['pose_mm'],own['level'],own['z_mm'],own.get('floor_z_mm',own['z_mm']),own.get('aboard',False))),
+             self._exact_key(sensor_range),static,landing,cabin,tuple(peer_keys))
+        distances=self._raw_cache.get(key)
+        if distances is None:
+            self.raw_cache_misses+=1
+            distances=self._first_returns(x,y,yaw,static,landing,cabin,peers)
+            if self._raw_cache_limit:
+                self._raw_cache[key]=distances
+                if len(self._raw_cache)>self._raw_cache_limit:self._raw_cache.popitem(last=False)
+        else:
+            self.raw_cache_hits+=1;self._raw_cache.move_to_end(key)
+        returns=[]
+        for (_,local_side,local_forward),distance in zip(self._beam_angles,distances):
             if distance < sensor_range:
-                returns.append([math.sin(angle)*distance,math.cos(angle)*distance])
+                returns.append([local_side*distance,local_forward*distance])
         self.scans += 1; self.rays += 360//self.settings['angular_step_deg']
         return {'captured_s':now, 'returns_local_mm':returns}
 
@@ -172,6 +263,18 @@ class SensorWorld:
                 'static_index':'uniform cells, exact ray/segment first intersections',
                 'dynamic_returns':'anonymous full oriented native-envelope rectangles at own cabin height; explicit disc-only fixture fallback',
                 'rectangle_ray_tests':self.rectangle_rays,'disc_fixture_ray_tests':self.disc_rays,
+                'visible_peer_candidates':self.peer_candidates,'whole_rectangle_range_rejections':self.range_pruned_peers,
+                'raw_beam_evaluations':self.raw_rays,
+                'source_geometry_beam_evaluations':self.static_rays,
+                'source_geometry_cache':{'hits':self.static_cache_hits,'misses':self.static_cache_misses,
+                    'entries':len(self._static_cache),'capacity':self._static_cache_limit,
+                    'key':'exact own ray frame/range and strong selected immutable source indices',
+                    'value':'ordered static, landing and cabin minimum only; current peers are merged afterward'},
+                'raw_first_return_cache':{'hits':self.raw_cache_hits,'misses':self.raw_cache_misses,
+                    'entries':len(self._raw_cache),'capacity':self._raw_cache_limit,
+                    'key':'exact own pose, immutable selected source indexes, ordered relevant exact peer geometry; no pose quantization',
+                    'value':'immutable ideal capped beam distances only; timestamps and output lists are fresh'},
+                'landing_door_returns':'source closed doors on non-cabin floors; source open active-side pose only at the fully open aligned cabin',
                 'people_simulated':False, 'real_sensor_qualified':False}
 
 

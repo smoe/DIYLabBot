@@ -1,10 +1,16 @@
 """Static conflict closure must precede independent own vehicle grants."""
 from pathlib import Path
 from types import SimpleNamespace
+import copy
+import hashlib
+import json
+import tempfile
 import sys
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from building_fleet_resources import ResourceCatalog,_positive_overlap
+import building_fleet_model as model
+from building_fleet_motion import Path as MotionPath
 
 
 def navigation(rooms=()):
@@ -47,6 +53,52 @@ class StaticResourcesTests(unittest.TestCase):
         first=[[0,0],[1,0],[1,1],[0,1]]
         self.assertFalse(_positive_overlap(first,[[1,0],[2,0],[2,1],[1,1]]))
         self.assertTrue(_positive_overlap(first,[[.9,0],[2,0],[2,1],[.9,1]]))
+
+
+class ResourceCacheTests(unittest.TestCase):
+    def setup_cache(self,folder):
+        nav=navigation();nav._cache_pins=lambda:{'tests/test_building_fleet_resources.py':model.digest(Path(__file__))}
+        routes=[route('EG.merge.A',1000),route('EG.merge.B',1050),route('EG.other',4000)]
+        catalog=ResourceCatalog(nav,routes);catalog.write_cache(folder,routes)
+        return nav,routes,catalog
+
+    def mutate(self,folder,change):
+        path=Path(folder);data=json.loads((path/'closure.json').read_text());change(data)
+        raw=(json.dumps(data,sort_keys=True,separators=(',',':'))+'\n').encode();(path/'closure.json').write_bytes(raw)
+        report=json.loads((path/'cache-report.json').read_text());report.update(bytes=len(raw),artifact_sha256=hashlib.sha256(raw).hexdigest())
+        (path/'cache-report.json').write_text(json.dumps(report))
+
+    def test_json_roundtrip_regenerates_guards_and_identical_future_spans(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,routes,fresh=self.setup_cache(folder);cached=ResourceCatalog.from_cache(nav,routes,folder)
+            self.assertEqual(cached.report(),fresh.report())
+            for points in [[[0,0],[2000,0]],[[5000,0],[0,0]],[[0,100],[2000,100]]]:
+                path=MotionPath(points);self.assertEqual(cached.spans('EG',path),fresh.spans('EG',path))
+            payload=json.loads((Path(folder)/'closure.json').read_text())
+            self.assertEqual(set(payload),{'canonical'});self.assertNotIn('passed',payload)
+
+    def test_changed_route_bank_and_payload_bytes_are_rejected(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,routes,_=self.setup_cache(folder);other=copy.deepcopy(routes);other[0]['points_mm'][0][0]+=.01
+            with self.assertRaisesRegex(ValueError,'route-bank'):ResourceCatalog.from_cache(nav,other,folder)
+            path=Path(folder)/'closure.json';path.write_bytes(path.read_bytes()+b' ')
+            with self.assertRaisesRegex(ValueError,'bytes changed'):ResourceCatalog.from_cache(nav,routes,folder)
+
+    def test_rehashed_cache_cannot_split_current_native_guard_overlap(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,routes,_=self.setup_cache(folder)
+            def split(data):
+                for alias in ('EG.merge.A','EG.merge.B'):
+                    data['canonical'][alias]='EG.resource.'+hashlib.sha256(alias.encode()).hexdigest()[:16]
+            self.mutate(folder,split)
+            with self.assertRaisesRegex(ValueError,'splits'):ResourceCatalog.from_cache(nav,routes,folder)
+
+    def test_rehashed_unknown_alias_or_wrong_deterministic_identity_is_rejected(self):
+        for change in [lambda data:data['canonical'].update({'EG.fake':'EG.resource.fake'}),
+                       lambda data:data['canonical'].update({'EG.other':'EG.resource.fake'})]:
+            with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+                nav,routes,_=self.setup_cache(folder);self.mutate(folder,change)
+                with self.assertRaises(ValueError):ResourceCatalog.from_cache(nav,routes,folder)
 
 
 if __name__=='__main__':unittest.main()

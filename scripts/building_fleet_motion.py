@@ -6,6 +6,8 @@ this module. Scans carry only delayed anonymous local first returns.
 import bisect
 import copy
 import math
+from types import SimpleNamespace
+from functools import lru_cache
 
 from cf01_unload_path import CornerPath
 import l01_local_traffic as local
@@ -121,13 +123,16 @@ class Path:
         self._line(cursor,points[-1])
         if not self.length:
             raise ValueError('Nonempty path required')
-        self.samples = []
+        self.samples = [];previous_progress=None;previous_position=None
         for index, piece in enumerate(self.pieces):
             before = self.ends[index-1] if index else 0
             count = max(1,math.ceil(piece['weight']/25))
             for i in range(count):
                 a,b = before+piece['weight']*i/count,before+piece['weight']*(i+1)/count
-                self.samples.append((a,b,self.evaluate(a)[0][:2],self.evaluate(b)[0][:2]))
+                first=previous_position[:]if a==previous_progress else self.position(a)
+                last=self.position(b)
+                self.samples.append((a,b,first,last))
+                previous_progress,previous_position=b,last
 
     def _line(self, a, b):
         if math.dist(a,b) > 1e-8:
@@ -162,6 +167,22 @@ class Path:
         yaw3 = cross2/norm2-2*cross1*n1/norm2**2-cross*n2/norm2**2+2*cross*n1*n1/norm2**3
         return [*position[:2],math.atan2(d1[1],d1[0])], [*d1[:2],yaw1], [*d2[:2],yaw2], [*d3[:2],yaw3]
 
+    def position(self, progress):
+        """Return the exact source XY position without unused yaw/PVA work.
+
+        The first derivative retains evaluate's non-cusp validation, including
+        during initial sample construction. All scalar selection and Bezier
+        arithmetic for position are identical to evaluate().
+        """
+        s=max(0.,min(self.length,progress))
+        index=min(len(self.pieces)-1,bisect.bisect_right(self.ends,s))
+        before=self.ends[index-1]if index else 0.;piece=self.pieces[index]
+        u=max(0,min(1,(s-before)/piece['weight']))
+        position=CornerPath._bezier(piece['controls'],u)
+        d1=CornerPath._bezier(piece['derivatives'][0],u)
+        if d1[0]**2+d1[1]**2<1e-12:raise ValueError('Non-cusped spatial route required')
+        return position[:2]
+
     def project(self, xy):
         best = (math.inf,0.)
         for a,b,pa,pb in self.samples:
@@ -187,6 +208,13 @@ def _bezier_split(values):
 
 
 def spatial_bounds(piece, subdivisions=128):
+    """Reuse exact immutable derivative geometry; isolate every returned proof."""
+    key=tuple(tuple(tuple(point)for point in controls)for controls in piece['derivatives'])
+    return copy.deepcopy(_cached_spatial_bounds(key,subdivisions))
+
+
+@lru_cache(maxsize=128)
+def _cached_spatial_bounds(derivative_controls, subdivisions):
     """Binary64 interval enclosures from subdivided Bezier control hulls.
 
     Sampling never supplies these bounds. Positive tangent-norm lower bounds
@@ -200,7 +228,7 @@ def spatial_bounds(piece, subdivisions=128):
         if x.lo<=1e-12:raise ValueError('Unresolved spatial tangent norm')
         return I(math.nextafter(1/x.hi,-math.inf),math.nextafter(1/x.lo,math.inf))
     def absolute(x):return max(abs(x.lo),abs(x.hi))
-    pending=[piece['derivatives']]; depth=0
+    pending=[derivative_controls]; depth=0
     while 2**depth<subdivisions:
         nxt=[]
         for row in pending:
@@ -226,17 +254,39 @@ def spatial_bounds(piece, subdivisions=128):
 
 
 
+def interval_extrema(curve,start=None,end=None,order=0):
+    """Preserve the shared closed-interval extrema, including BOTH knot sides.
+
+    Bisect only restricts the unchanged coefficient/time arrays passed to the
+    protected floor primitive. At an exact start knot the preceding segment
+    remains present, and at an exact end knot the following one remains too.
+    """
+    start=curve.times[0]if start is None else start
+    end=curve.times[-1]if end is None else end
+    first=max(0,bisect.bisect_left(curve.times,start)-1)
+    stop=min(len(curve.segments),bisect.bisect_right(curve.times,end))
+    window=SimpleNamespace(times=curve.times[first:stop+1],segments=curve.segments[first:stop])
+    return floor.extrema(window,start,end,order)
+
+
 def episode_dynamics(curve,radius):
-    """Shared polynomial extrema, combined within each time interval only."""
-    result=floor.dynamics(curve,radius)
-    linear=[0.,0.,0.]
+    """Shared per-interval extrema; no second whole-curve root solve.
+
+    Linear and angular maxima retain their previous values. Carried-point
+    bounds now combine each actual interval's rigid-yaw enclosure over the
+    union, preserving conservatism while avoiding unrelated-interval maxima.
+    The authoritative rigid-point formula remains in protected floor.dynamics.
+    """
+    result={kind:dict.fromkeys(('velocity','acceleration','jerk'),0.)
+            for kind in('linear','angular','carried_points')}
     for a,b in zip(curve.points,curve.points[1:]):
-        local_bounds=floor.motion.bounds([a,b])
-        for k,field in enumerate(F[1:]):
-            linear[k]=max(linear[k],math.hypot(*local_bounds[field]['max_abs'][:2]))
-    result['linear']=dict(zip(('velocity','acceleration','jerk'),linear))
-    result['method']='shared polynomial extrema combined per interval; rigid-point enclosure remains conservative'
+        local_bounds=floor.dynamics([a,b],radius)
+        for kind in result:
+            for key,value in local_bounds[kind].items():result[kind][key]=max(result[kind][key],value)
+    result.update(radius_mm=radius,
+        method='shared polynomial extrema once per actual interval; unchanged linear/angular maxima; carried-point bound is the union of per-interval shared rigid-yaw enclosures')
     return result
+
 
 def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=(), *, _piece_factors=None, _attempt=0):
     """Fast straights and bounded corners on one uninterrupted C2 route.
@@ -408,7 +458,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                 if end-begin<1e-9:continue
                 middle=clock.evaluate(min((begin+end)/2,clock.times[-1]))[F[0]][0]
                 cap=zone_at(middle)/.995
-                raw=floor.extrema(curve,start_s+begin,start_s+end,1)
+                raw=interval_extrema(curve,start_s+begin,start_s+end,1)
                 speed=math.hypot(*(max(abs(raw['min'][k]),abs(raw['max'][k]))for k in range(2)))
                 if speed>cap*(1+1e-6):violations['zone@'+str(begin)]={'value':speed,'limit':cap}
                 zone_proofs.append({'start_s':begin,'end_s':end,'cap_mm_s':cap,'speed_upper_mm_s':speed})

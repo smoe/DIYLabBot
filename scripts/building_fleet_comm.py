@@ -48,7 +48,7 @@ def validate_payload(kind, payload):
             raise ValueError('Unknown event or event fields')
         if payload['event'] == 'inspection_completed':
             details = payload['details']
-            if set(details) != {'level', 'area'} or any(not isinstance(details[k], str) or not details[k] for k in details):
+            if set(details) not in ({'level','area'},{'level','area','mission_id'}) or any(not isinstance(details[k],str)or not details[k]for k in details):
                 raise ValueError('Inspection coverage requires a reported level and area')
     elif kind == 'perception':
         if set(payload) != {'captured_s', 'pose_mm', 'level', 'scan', 'camera_ref'}:
