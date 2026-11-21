@@ -278,6 +278,8 @@ Prüfungen aller jeweils bewegten Gruppen, auch bei durchgehend offenem Deckel.
 
 Vor BF01-Änderungen [docs/building-fleet-demo.md](docs/building-fleet-demo.md) lesen. K0_013 ist für E2 ausdrücklich zurückgestellt; alle anderen Ziele und der Treppenkern-Ausschluss bleiben verbindlich. Gepinnte TR01-/L01-Module und Quellen nicht für die Flotte ändern. Ein neuer Geometriebefund sperrt die Programmerzeugung; Kreis-/Rasteralarme allein beweisen keine Unpassierbarkeit. Der Kontaktbefund am ursprünglichen L01-Ganggraphen bleibt historisch gültig. BF01 wählt stattdessen ausdrücklich `model/building-fleet-l01-route.shared.json`; dessen separat geprüfte Verbindung erhält die Bench-Sperren und verändert das ursprüngliche Fahrprofil nicht. Neue exportierte Kurven benötigen jeweils eigene Grenz-, Boden- und native Abstandsnachweise. Der frühere breite bodenlose Streifen am EG-Innenport ist historisch nachgewiesen. Die ausdrücklich angeforderte Schwellenkorrektur ergänzt reale Modellkörper mit 8 mm angenommenem Trennspalt; vor einem vollständigen Flottenprogramm neue Boden- und Kurvennachweise erzeugen und die Bodenprüfung nicht umgehen.
 
+`support_rule` führt die Eigentümerannahmen vom 20.11.2026: R1 erlaubt weltweit in BF01 ausschließlich konservative Kreisschließung bis 15 mm Bodenlücke (Radius aus der halben Spaltgrenze), niemals Überhang an offenen Kanten. Jede Flächenzugabe mit Koordinaten, Breite, Körpern und Kurven berichten. R2 erlaubt nur den aus der Quelle abgeleiteten Höhenversatz von Kabinenfinish, Kabinen- und Landeschwellen am Aufzug. R3 verlangt an Portquerungen tatsächliche Kabinen-FK am Geschoss und vollständig offene aktive Türen über das gesamte Prüfintervall. Ein fest geparktes, an die Kabine gebundenes Fahrzeug benötigt einen eigenen Nachweis der starren Unterstützung durch den echten Kabinenboden; dieser erlaubt keine Portquerung. Andere Höhenversätze und eine pauschale Aufzugausnahme bleiben verboten. Die 15-mm-Grenze und der derzeitige +3-mm-Versatz sind synthetische Eigentümerannahmen ohne Rad-/Fahrwerksqualifikation; TR01s `floor_threshold_height_mm` bleibt `null`.
+
 Aufzugparameter und aktive Seiten aus dem Rundgang übernehmen. Boarding, Parken, freie Türlinie, vollständige Türöffnung und Ausfahrt benötigen eigene synthetische Beobachtungen; Zeitablauf ersetzt sie nicht. Fahrzeugregler erhalten nur eigene Zustände, anonyme verzögerte Scans und eigene Ressourcenzusagen. Der Leitstand verarbeitet ausschließlich empfangene Meldungen. Eine spätere Browserflotte spielt nur das einmal kompilierte und geprüfte Programm ab, sperrt manuelle Aufzugbefehle und friert beim Schließen einer Routentür gemeinsam ein. Kein Merge, Push oder Pages-Stand ohne ausdrückliche Freigabe.
 
 ## Manuelle Aufgaben und Laufzeitdaten
@@ -944,7 +946,7 @@ Die bestätigte Aufzugzuordnung lautet außen =
 `W049` zum Flur `C3_020`, innen = `W062` zum `NorthCore` der Obergeschossvorlage.
 Im EG gelten die entsprechenden eigenen Flurflächen; deren Darstellung ist
 weiterhin kein Nachweis einer navigierbaren oder qualifizierten Verbindung.
-EG beidseitig, Obergeschosse nur außen; KG nur innen. Halte, aktive Seiten
+EG nur innen, Obergeschosse nur außen; KG nur innen. Halte, aktive Seiten
 und Höhen aus dem bestehenden Aufzuginterface übernehmen; die Kellerhöhe
 bleibt eine Darstellungsannahme. Türseiten nicht aus Blickrichtung
 oder Gebäudeschwerpunkten neu erraten. Öffnungen in den tatsächlichen

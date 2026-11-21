@@ -44,7 +44,7 @@ A workflow needs more than equipment within reach: vessels must be ready, tools 
 
 The [L01 laboratory room with furniture and equipment](docs/lab-layout-l01.md) describes a workplace in detail. The [building model](docs/building-stack.md) adds laboratories, corridors, offices and common areas. Places for thinking and writing, as well as the kitchen, are also part of this everyday research environment. The [model gallery](docs/models/README.md) guides you through rooms, furniture, equipment and their layouts. Some building dimensions are assumptions made for visualization; real transport routes must be checked separately.
 
-The separate [BF01 building fleet](docs/building-fleet-demo.md) is in preparation: its sources, camera kit and a separate BF01 connection in L01 have been checked; further fleet approval is blocked by a ground-floor lift threshold that native inspection found to have no supporting floor. A complete 20-vehicle animation is not yet available.
+The separate [BF01 building fleet](docs/building-fleet-demo.md) is in preparation: native measurements of the added lift sills show 8 mm gaps at all five active entrances. The new floor rule permits closed gaps up to 15 mm and only the source-derived sill height offset; these are synthetic owner assumptions without wheel qualification. Preparing the new routes alone takes 33.5 minutes, substantially exceeding the runtime target. Work has stopped at this task-defined condition; the complete 20-vehicle run, its full native audit and the fleet animation have not been approved.
 
 ### Interactive building walkthrough
 
