@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "1a6d718a8dc35637c65a090914f4dcfb3b2492d4875506973ccf36de7e34d6d9"
+      "sha256": "13c0c5d2389ff7888e20e81231b739d405fb6d34ca9fa3800af954a9673e1ce4"
     }
   },
   "fleet": {

@@ -15,7 +15,7 @@
   },
   "workspace": {
     "source": "model/synthetic-cf01-workspace.shared.json",
-    "source_sha256": "a3853d4f9bf104c5cf0ec53cf470d7ba687697e400861941eed2d4520ea9d0c2"
+    "source_sha256": "f4c190cebe4e9f5d6e002619d4e52ec47787e5b1d230c9810b4cf75578876093"
   },
   "bindings": {
     "rack_instance": "Rack",
@@ -34,7 +34,7 @@
   "stage_profiles": {
     "cf01": {
       "source": "model/cf01-rack-batch.protocol.json",
-      "source_sha256": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681"
+      "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614"
     },
     "nanodrop": {
       "source": "model/nanodrop-manual.synthetic.json",

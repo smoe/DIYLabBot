@@ -2,8 +2,8 @@
   "format": "solidcraftbot.cf01-unload-demo/1",
   "id": "SYN.CF01.ThreeConsecutiveUnloads",
   "sources": {
-    "pickup": {"source": "model/centrifuge-cf01.robot-pickup.shared.json", "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"},
-    "batch": {"source": "model/cf01-rack-batch.protocol.json", "source_sha256": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681"},
+    "pickup": {"source": "model/centrifuge-cf01.robot-pickup.shared.json", "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"},
+    "batch": {"source": "model/cf01-rack-batch.protocol.json", "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614"},
     "open_lid_index": {"source": "model/cf01-open-lid-index.protocol.json", "source_sha256": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f"}
   },
   "initial_state": "full_rotor_after_spin",

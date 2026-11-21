@@ -4,7 +4,7 @@
   "sources": {
     "pickup": {
       "source": "model/h02-direct-pickup.scene.json",
-      "source_sha256": "54888857ac82ab7a8aaabc3306dd6fa364933a37854a0d09cee14925370ac73a"
+      "source_sha256": "e9710e38f67af7e6b3ae33af0a9c74b066e95f9e59b947d5004a1c902eda4b0e"
     },
     "robot": {
       "source": "model/robot.json",
@@ -12,7 +12,7 @@
     },
     "motion_limits": {
       "source": "model/cf01-unload-demo.motion.json",
-      "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
     }
   },
   "arm_fixture": {

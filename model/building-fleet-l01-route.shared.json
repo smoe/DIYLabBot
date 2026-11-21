@@ -17,7 +17,7 @@
     },
     "work_areas": {
       "path": "model/tr01-l01-workcell.protocol.json",
-      "sha256": "37061bdf8fa04562cd9ff716c424f42f7d1b7ca53095babe005d682024a51c59"
+      "sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
     },
     "camera_vehicle": {
       "path": "model/tr01-awareness-camera.shared.json",

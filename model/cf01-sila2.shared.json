@@ -339,7 +339,7 @@
   },
   "network_batch": {
     "source": "model/cf01-rack-batch.protocol.json",
-    "source_sha256": "da39b92cda9293858de7c5e7c096ce5ea1a6bd2a59743cf3b478f9a00e844681",
+    "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614",
     "runner": "scripts/cf01_rack_batch.py",
     "limitations": [
       "Real TLS/gRPC against one synthetic station; no hardware spin or transporter execution",

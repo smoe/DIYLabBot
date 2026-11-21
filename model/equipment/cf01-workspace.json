@@ -7,7 +7,7 @@
   "assets": {
     "arm": {
       "source": "model/robot.json",
-      "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+      "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
     },
     "centrifuge": {
       "source": "model/centrifuge-cf01.shared.json",

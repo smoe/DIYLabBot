@@ -3,7 +3,7 @@
   "mode": "synthetic_display_only",
   "serial_source": {
     "source": "model/l01-fleet-handoffs.demo.json",
-    "source_sha256": "c24cb34262bd8ff7539c8953c441fdab110c5be7f8aa757fa28160e74ff7928b"
+    "source_sha256": "0641bdf09ef29c43449e1a88c597813fc9822edad4a58d0dd004982aec12daf6"
   },
   "controller": {
     "integration_step_s": 0.05,

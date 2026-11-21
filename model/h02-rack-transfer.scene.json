@@ -9,7 +9,7 @@
   "sources": {
     "pickup": {
       "source": "model/h02-arm-pickup.scene.json",
-      "source_sha256": "f016aa44005934804b695bd0be10ce168a74020b2cf5fb1562dbcb285810163e"
+      "source_sha256": "1519ae36ef1e2842f08d0cf25f4bbf059fd4e9d22fbe0b9bd81bf3ffe556662b"
     },
     "rack": {
       "source": "model/guided-tube-rack.shared.json",

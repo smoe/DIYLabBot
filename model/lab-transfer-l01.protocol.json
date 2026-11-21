@@ -327,7 +327,7 @@
     "layout_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247",
     "limits_reference": {
       "source": "model/cf01-unload-demo.motion.json",
-      "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a",
+      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3",
       "pointer": "/limits"
     },
     "joint_curve": "C2_quintic",

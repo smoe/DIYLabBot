@@ -7,11 +7,11 @@
   },
   "arm_limits": {
     "source": "model/cf01-unload-demo.motion.json",
-    "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+    "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
   },
   "sample_limits": {
     "source": "model/h02-rack-transfer.scene.json",
-    "source_sha256": "207b690e60926171311ef7a55da6855a88d2af50d39cc29ed14dd5f0062e55bd"
+    "source_sha256": "81e7a1cf9e72b3683a11ca6fb26adf33de0709b72870401ebf60117eaecfa3dc"
   },
   "vehicle_limits": {
     "source": "model/tr01-l01.motion.json",

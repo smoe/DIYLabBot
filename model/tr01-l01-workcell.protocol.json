@@ -21,11 +21,11 @@
   },
   "tool_reference": {
     "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-    "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
+    "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
   },
   "limits_reference": {
     "source": "model/cf01-unload-demo.motion.json",
-    "source_sha256": "f3823710ef89753c366ee29403f722878169e40f208f3b1cdb23280c8186e99a"
+    "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
   },
   "cargo_slot_body": "B1_Tube24",
   "actors": {

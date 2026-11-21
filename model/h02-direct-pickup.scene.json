@@ -13,7 +13,7 @@
     },
     "gripper": {
       "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-      "source_sha256": "bca7acca63a4cb59e0fda7a0a1a3eabe5740a7cbc4c5c055d12aad972c106b5f"
+      "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
     }
   },
   "holder_parts": [
