@@ -25,6 +25,7 @@ class ResourceServices:
         self.resources = dict(resources); self.maximum_queue = maximum_queue
         self.owners = {}; self.holds = {}; self.queues = {}; self.requests = {}; self.events = []
         self.waiting_places = copy.deepcopy(waiting_places or {}); self.wait_owners = {}; self.wait_holds = {}
+        self.exit_wait_holds = {}; self.waiting_events = []
 
     def request(self, vehicle, resource, now):
         finite(now)
@@ -80,10 +81,73 @@ class ResourceServices:
                 return {'status':'granted', 'level':level, 'slot':index, 'pose_mm':copy.deepcopy(place)}
         return {'status':'rejected_full', 'level':level}
 
-    def release_waiting_place(self, vehicle):
+    def _waiting_grant(self, key, role):
+        level, index = key
+        return {'status':'granted', 'level':level, 'slot':index,
+                'pose_mm':copy.deepcopy(self.waiting_places[level][index]), 'role':role}
+
+    def own_waiting_grants(self, vehicle):
+        """Return only this vehicle's start/exit reservation, never peer data."""
+        return {'start':self._waiting_grant(self.wait_holds[vehicle], 'start')
+                    if vehicle in self.wait_holds else {'status':'none'},
+                'destination':self._waiting_grant(self.exit_wait_holds[vehicle], 'destination')
+                    if vehicle in self.exit_wait_holds else {'status':'none'}}
+
+    def admit_lift_trip(self, vehicle, start_level, destination_level, now):
+        """Atomically hold source and destination bays before a lift request.
+
+        An already occupied current bay may be reused, but a destination claim
+        is never acquired after departure. Both levels participate in one
+        admission decision, eliminating partial cross-level hold-and-wait.
+        The exit claim stays fenced until an actual body-clear observation
+        promotes it to the vehicle's current-floor waiting reservation.
+        """
+        finite(now)
+        if (not isinstance(vehicle,str) or not vehicle or start_level==destination_level
+                or start_level not in self.waiting_places or destination_level not in self.waiting_places):
+            raise ValueError('Known own vehicle and distinct source waiting levels required')
+        current=self.wait_holds.get(vehicle);destination=self.exit_wait_holds.get(vehicle)
+        if current is not None and current[0]!=start_level:
+            raise ValueError('Release or promote the previous waiting grant before a new trip')
+        if destination is not None and destination[0]!=destination_level:
+            raise ValueError('An allocated destination bay cannot silently change')
+        def available(level,old):
+            if old is not None:
+                if self.wait_owners.get(old)!=vehicle:raise ValueError('Waiting ownership mismatch')
+                return old
+            return next(((level,i)for i in range(len(self.waiting_places[level]))
+                         if(level,i)not in self.wait_owners),None)
+        start=available(start_level,current);end=available(destination_level,destination)
+        if start is None or end is None:
+            return {'status':'rejected_full','level':start_level if start is None else destination_level}
+        for old,key,role,holds in ((current,start,'start',self.wait_holds),
+                                   (destination,end,'destination',self.exit_wait_holds)):
+            if old is None:
+                self.wait_owners[key]=vehicle;holds[vehicle]=key
+                self.waiting_events.append({'event':'waiting_granted','vehicle_id':vehicle,
+                    'level':key[0],'slot':key[1],'role':role,'time_s':now})
+        return {'status':'granted',**self.own_waiting_grants(vehicle)}
+
+    def promote_destination_waiting_place(self,vehicle,level,now):
+        finite(now)
+        if vehicle in self.wait_holds or vehicle not in self.exit_wait_holds:
+            raise ValueError('Promotion requires released source bay and allocated destination')
+        key=self.exit_wait_holds[vehicle]
+        if key[0]!=level or self.wait_owners.get(key)!=vehicle:
+            raise ValueError('Destination promotion must match the observed own floor')
+        del self.exit_wait_holds[vehicle];self.wait_holds[vehicle]=key
+        self.waiting_events.append({'event':'waiting_promoted','vehicle_id':vehicle,
+            'level':key[0],'slot':key[1],'role':'start','time_s':now})
+        return self._waiting_grant(key,'start')
+
+    def release_waiting_place(self, vehicle, now=None):
+        if now is not None:finite(now)
         if vehicle not in self.wait_holds:
             raise ValueError('Vehicle has no lift waiting place')
         key = self.wait_holds.pop(vehicle); del self.wait_owners[key]
+        if now is not None:
+            self.waiting_events.append({'event':'waiting_released','vehicle_id':vehicle,
+                'level':key[0],'slot':key[1],'role':'start','time_s':now})
 
 
 def cabin_lanes(interior_bounds_mm, footprint_mm, clearance_mm, maximum=2):
@@ -176,10 +240,17 @@ class LiftService:
         grant = {'status':'waiting' if r['slot'] is None else 'assigned', 'start_port':r['start_port'], 'destination_port':r['end_port']}
         if r['slot'] is not None:
             grant.update(slot=r['slot'], cabin_pose_mm=copy.deepcopy(self.lanes[r['slot']]['pose_mm']))
+        # A narrow physical doorway is crossed by one allocated lane at a
+        # time. These own grants use only explicit parked/body-clear acks,
+        # never peer positions or a fleet-wide traversal schedule.
+        boarding=next((v for v in self.batch if not self.requests[v]['parked']),None)
+        alighting=next((v for v in self.batch if self.requests[v]['parked']and not self.requests[v]['exited']
+                        and self.ports[self.requests[v]['end_port']]['level_id']==self.level),None)
         grant['boarding_ready'] = (r['slot'] is not None and self.phase == 'boarding' and self.doors_open
-                                   and self.ports[r['start_port']]['level_id'] == self.level and not r['boarded'])
+                                   and self.ports[r['start_port']]['level_id'] == self.level and not r['boarded']
+                                   and boarding==vehicle)
         grant['exit_ready'] = (r['parked'] and not r['exited'] and self.phase == 'alighting' and self.doors_open
-                              and self.ports[r['end_port']]['level_id'] == self.level)
+                              and self.ports[r['end_port']]['level_id'] == self.level and alighting==vehicle)
         return grant
 
     def _phase(self, name):
@@ -232,9 +303,9 @@ class LiftService:
                 self.phase_started = now; return
             if self.phase == 'closing_passengers' and any(not self.requests[v]['parked'] for v in self.batch if not self.requests[v]['exited']):
                 raise ValueError('Cannot close before all assigned vehicles report parked')
-            if now-self.phase_started >= self.door_duration:
+            if now-self.phase_started >= self.door_duration-1e-9:
                 self.doors_open = False
-                self.schedule.append({'kind':'doors', 'start_s':self.phase_started, 'end_s':now, 'level':self.level, 'target':'closed'})
+                self.schedule.append({'kind':'doors', 'start_s':self.phase_started, 'end_s':round(self.phase_started+self.door_duration,9), 'level':self.level, 'target':'closed'})
                 if self.phase == 'closing_pickup':
                     target = self.ports[self.requests[self.batch[0]]['start_port']]['level_id']; purpose = 'pickup'
                 else:
@@ -246,14 +317,14 @@ class LiftService:
             self.z = t['from_z_mm']+(t['to_z_mm']-t['from_z_mm'])*(10*u**3-15*u**4+6*u**5)
             if u >= 1:
                 self.level = t['to_level']; self.z = t['to_z_mm']; self._phase('opening_pickup' if t['purpose'] == 'pickup' else 'opening_exit')
-        elif self.phase.startswith('opening') and now-self.phase_started >= self.door_duration:
+        elif self.phase.startswith('opening') and now-self.phase_started >= self.door_duration-1e-9:
             self.doors_open = True
-            self.schedule.append({'kind':'doors', 'start_s':self.phase_started, 'end_s':now, 'level':self.level, 'target':'open'})
+            self.schedule.append({'kind':'doors', 'start_s':self.phase_started, 'end_s':round(self.phase_started+self.door_duration,9), 'level':self.level, 'target':'open'})
             self._phase('boarding' if self.phase == 'opening_pickup' else 'alighting')
 
     def board(self, vehicle, own_scan_clear):
         r = self.requests.get(vehicle)
-        if type(own_scan_clear) is not bool or not own_scan_clear or not r or r['slot'] is None or self.phase != 'boarding' or not self.doors_open or self.ports[r['start_port']]['level_id'] != self.level:
+        if type(own_scan_clear) is not bool or not own_scan_clear or not r or not(self.own_grant(vehicle).get('boarding_ready')or r.get('boarded')) or self.phase!='boarding':
             return {'status':'rejected_not_ready'}
         if r['boarded']:
             return {'status':'accepted', 'slot':r['slot']}
@@ -272,7 +343,7 @@ class LiftService:
 
     def exit(self, vehicle, own_scan_clear):
         r = self.requests.get(vehicle)
-        if type(own_scan_clear) is not bool or not own_scan_clear or not r or not r['parked'] or self.phase != 'alighting' or not self.doors_open or self.ports[r['end_port']]['level_id'] != self.level:
+        if type(own_scan_clear) is not bool or not own_scan_clear or not r or not self.own_grant(vehicle).get('exit_ready'):
             return {'status':'rejected_not_ready'}
         start, end = self.ports[r['start_port']], self.ports[r['end_port']]
         result = {'status':'accepted', 'port':end['id'], 'direction':'reverse' if start['side'] == end['side'] else 'forward'}

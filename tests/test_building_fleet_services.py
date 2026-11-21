@@ -58,6 +58,58 @@ class ResourceTests(unittest.TestCase):
         with self.assertRaises(ValueError): services.cabin_lanes({'min':[0,0,0],'max':[650,900,2000]},[512,412],75)
 
 
+class LiftAdmissionTests(unittest.TestCase):
+    def service(self,capacity=2):
+        return services.ResourceServices({}, {level:[[100*i,200,0]for i in range(capacity)]for level in('EG','KG')})
+
+    def test_trip_admission_is_atomic_when_destination_is_full(self):
+        owner=self.service(1)
+        owner.request_waiting_place('BF02','KG')
+        result=owner.admit_lift_trip('BF01','EG','KG',0)
+        self.assertEqual(result,{'status':'rejected_full','level':'KG'})
+        self.assertNotIn('BF01',owner.wait_holds)
+        self.assertNotIn('BF01',owner.exit_wait_holds)
+        self.assertNotIn(('EG',0),owner.wait_owners)
+
+    def test_same_side_destination_is_fenced_before_departure(self):
+        owner=self.service(1)
+        first=owner.admit_lift_trip('BF01','EG','KG',0)
+        self.assertEqual(first['status'],'granted')
+        self.assertEqual(owner.own_waiting_grants('BF01')['destination']['level'],'KG')
+        self.assertEqual(owner.request_waiting_place('BF02','KG')['status'],'rejected_full')
+        owner.release_waiting_place('BF01',1)
+        self.assertEqual(owner.request_waiting_place('BF02','KG')['status'],'rejected_full')
+        promoted=owner.promote_destination_waiting_place('BF01','KG',2)
+        self.assertEqual(promoted['slot'],0)
+        self.assertNotIn('BF01',owner.exit_wait_holds)
+        self.assertEqual(owner.own_waiting_grants('BF01')['start']['level'],'KG')
+
+    def test_opposing_admitted_trips_have_reserved_exits_and_no_peer_payload(self):
+        owner=self.service(2)
+        a=owner.admit_lift_trip('BF01','EG','KG',0)
+        b=owner.admit_lift_trip('BF02','KG','EG',.1)
+        self.assertEqual(a['status'],b['status'])
+        self.assertEqual(a['status'],'granted')
+        self.assertNotIn('BF02',repr(owner.own_waiting_grants('BF01')))
+        self.assertNotEqual(owner.wait_holds['BF01'],owner.exit_wait_holds['BF02'])
+        before=copy.deepcopy(owner.wait_owners)
+        self.assertEqual(owner.admit_lift_trip('BF01','EG','KG',1)['status'],'granted')
+        self.assertEqual(before,owner.wait_owners)
+        owner.release_waiting_place('BF01',1)
+        owner.promote_destination_waiting_place('BF01','KG',2)
+        owner.release_waiting_place('BF02',3)
+        owner.promote_destination_waiting_place('BF02','EG',4)
+        self.assertEqual(owner.admit_lift_trip('BF01','KG','EG',5)['status'],'granted')
+
+    def test_unknown_or_changed_destination_cannot_drop_an_existing_claim(self):
+        owner=self.service();owner.admit_lift_trip('BF01','EG','KG',0)
+        before=copy.deepcopy(owner.wait_owners)
+        with self.assertRaises(ValueError):owner.admit_lift_trip('BF01','KG','EG',1)
+        with self.assertRaises(ValueError):owner.promote_destination_waiting_place('BF01','KG',1)
+        with self.assertRaises(ValueError):owner.release_waiting_place('BF01',float('nan'))
+        self.assertEqual(before,owner.wait_owners)
+
+
 class LiftTests(unittest.TestCase):
     def advance_to(self, lift, phase, clear=True):
         for _ in range(10000):
@@ -119,6 +171,27 @@ class LiftTests(unittest.TestCase):
         self.advance_to(lift,'alighting')
         self.assertEqual(lift.exit('BF01',True)['direction'],'reverse')
         with self.assertRaises(ValueError): lift.attached_pose('BF01')
+
+    def test_narrow_port_grants_serialize_crossings_without_reducing_cabin_capacity(self):
+        lift,_=fixture();lift.request('BF01','EG','OG1',0);lift.request('BF02','EG','OG1',0);lift.tick(0,True)
+        self.assertTrue(lift.own_grant('BF01')['boarding_ready'])
+        self.assertFalse(lift.own_grant('BF02')['boarding_ready'])
+        self.assertEqual(lift.board('BF02',True)['status'],'rejected_not_ready')
+        lift.board('BF01',True);lift.park('BF01')
+        self.assertTrue(lift.own_grant('BF02')['boarding_ready'])
+        lift.board('BF02',True);lift.park('BF02');self.advance_to(lift,'alighting')
+        self.assertEqual(lift.maximum_occupancy,2)
+        self.assertFalse(lift.own_grant('BF02')['exit_ready'])
+        self.assertEqual(lift.exit('BF02',True)['status'],'rejected_not_ready')
+        self.assertEqual(lift.exit('BF01',True)['status'],'accepted')
+        self.assertTrue(lift.own_grant('BF02')['exit_ready'])
+        self.assertEqual(lift.exit('BF02',True)['status'],'accepted')
+
+    def test_door_schedule_keeps_source_duration_when_tick_float_subtracts_low(self):
+        lift,source=fixture();lift.request('BF01','EG','OG1',0);lift.tick(0,True)
+        lift.board('BF01',True);lift.park('BF01');self.advance_to(lift,'alighting')
+        for row in lift.schedule:
+            if row['kind']=='doors':self.assertAlmostEqual(row['end_s']-row['start_s'],source['door_duration']['value'],places=8)
 
     def test_door_observation_and_clock_are_explicit(self):
         lift, _ = fixture()

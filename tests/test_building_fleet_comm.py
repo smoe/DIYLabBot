@@ -100,4 +100,13 @@ class ControlRoomTests(unittest.TestCase):
         self.assertEqual(panel.snapshot(1)['vehicles'], {})
 
 
+class InspectionIdentityTests(unittest.TestCase):
+    def test_received_completion_may_bind_own_mission_without_extra_pose_or_peer_fields(self):
+        payload={'event':'inspection_completed','details':{'level':'EG','area':'R0_001','mission_id':'mission-1'}}
+        comm.validate_payload('event',payload)
+        for extra in [{'peer_id':'BF02'},{'mission_id':None},{'pose_mm':[1,2,3]}]:
+            altered=copy.deepcopy(payload);altered['details'].update(extra)
+            with self.subTest(extra=extra),self.assertRaises(ValueError):comm.validate_payload('event',altered)
+
+
 if __name__ == '__main__': unittest.main()
