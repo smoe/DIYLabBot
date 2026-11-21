@@ -17,8 +17,64 @@ Die vorbereitete Schnittstelle liegt unter
 passenden `ros2_control`-Paketen, beispielsweise unter Ubuntu 24.04.
 Auf dem Windows-Entwicklungsrechner ist keine nutzbare ROS-2-Laufzeit vorhanden;
 auch der Zugriff auf die WSL-Distributionen war hier nicht möglich.
-Die folgenden Startbefehle sind vorbereitet, bisher aber nicht im laufenden
-ROS-System geprüft.
+Die GitHub-CI prüft das Paket unter Linux mit ROS 2 Jazzy und Mock-Hardware.
+Ihr Laufzeittest aktiviert die beiden Controller, beobachtet sechs Gelenke
+und bestätigt ein stationäres Action-Ziel. Eine bewegte Trajektorie, die
+Windows-Laufzeit und reale Hardware werden dadurch nicht qualifiziert.
+
+## GitHub-CI für das Armpaket
+
+Der Workflow [ROS 2 Jazzy package](../.github/workflows/ros2.yml) reagiert auf
+Änderungen an ROS-Paket, Modellquellen, Generatoren und Herstellerbibliothek
+sowie auf Pull Requests. Er lässt sich auch manuell starten. Das offizielle
+Image `ros:jazzy-ros-base-noble` ist über seinen Registry-Digest gebunden.
+Die zusätzlichen Laufzeit- und Testabhängigkeiten werden aus dem Paketmanifest
+mit `rosdep` über die offiziellen ROS-/Ubuntu-Paketquellen installiert.
+Die verwendeten `.deb`-Versionen werden als `debian-packages.tsv` aufbewahrt;
+der Image-Digest allein sperrt diese später aufgelösten Abhängigkeiten nicht.
+Ein Container ist somit kein Verzicht auf ROS-`.deb`-Pakete.
+
+1. `scripts/build_ros2_freecad.py` baut den Arm direkt aus `model/robot.json`
+   und den unveränderten Hersteller-STEPs in FreeCAD. Es verwendet dieselben
+   nativen Konstruktions- und ROS-Exporter wie der vollständige Aufbau, benötigt
+   aber weder SolidCraft noch einen früheren Build-Bericht. Statische
+   Körpergültigkeit, Home-FK, Quellen- und Artefaktprüfsummen werden festgehalten.
+2. `colcon build --symlink-install --packages-select solidcraftbot_ros` baut
+   und installiert das Python-Paket mit den erzeugten Dateien. Das ist kein
+   Nachweis einer projektspezifischen C++-Kompilierung.
+3. `colcon test` prüft installierte URDF-/Mesh-/Konfigurationsdateien, die
+   Protokollvalidierung und den installierten `run_protocol --dry-run`.
+   Der kopflose Launch mit `rviz:=false` muss beide Controller aktivieren,
+   sechs endliche Home-Gelenkwerte liefern und ein Halteziel über
+   `FollowJointTrajectory` erfolgreich quittieren. Der Test bewegt den Arm
+   nicht und führt die historische lineare Demo nicht aus.
+4. `colcon test-result --verbose` und `scripts/check_ros2_ci_results.py`
+   lassen fehlende Ergebnisse, übersprungene Tests und einen fehlenden
+   Live-Mock-Test fehlschlagen. Logs, JUnit-Ergebnisse, Exportbericht,
+   Paketversionen und Laufzeitbeobachtungen bleiben sieben Tage als
+   GitHub-Actions-Artefakte erhalten, auch bei einem Fehlschlag.
+
+Die CI installiert keine lokale RoboStack-/pixi-Umgebung. Sie prüft nur
+`solidcraftbot_ros`; die gesonderten CF01-/DNA-Interfacepakete werden hier
+nicht gebaut. Der neue FreeCAD-Einstieg liefert keinen CAD-übergreifenden
+Vergleich oder Bewegungs-/Kollisionsnachweis. Controller-Splinekonfiguration,
+ROS-Ausführung bewegter Programme, RViz-Darstellung, Gazebo, Dynamik und
+Hardware bleiben separat nachzuweisen.
+
+Für dieselben Tests in einer bereits vorhandenen Jazzy-Umgebung:
+
+```sh
+python3 scripts/build_ros2_freecad.py
+source /opt/ros/jazzy/setup.bash
+rosdep install --from-paths ros2_ws/src/solidcraftbot_ros --ignore-src --rosdistro jazzy -y
+cd ros2_ws
+colcon build --symlink-install --packages-select solidcraftbot_ros
+source install/setup.bash
+SOLIDCRAFTBOT_ROS_INTEGRATION_TESTS=1 colcon test --packages-select solidcraftbot_ros --return-code-on-test-failure
+colcon test-result --verbose
+cd ..
+python3 scripts/check_ros2_ci_results.py ros2_ws/build/solidcraftbot_ros --report exports/ros2-ci/test-results.json
+```
 
 ## Erzeugen
 

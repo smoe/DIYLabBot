@@ -5,7 +5,7 @@
   <description>Generated UMR six-axis robot description and mock trajectory interface.</description>
   <maintainer email="maintainers@example.invalid">SolidCraftBot contributors</maintainer>
   <license>UNLICENSED</license>
-  <buildtool_depend>ament_python</buildtool_depend>
+  <buildtool_depend>python3-setuptools</buildtool_depend>
   <exec_depend>rclpy</exec_depend>
   <exec_depend>ament_index_python</exec_depend>
   <exec_depend>launch</exec_depend>
@@ -19,5 +19,8 @@
   <exec_depend>trajectory_msgs</exec_depend>
   <exec_depend>control_msgs</exec_depend>
   <exec_depend>rviz2</exec_depend>
+  <test_depend>python3-pytest</test_depend>
+  <test_depend>action_msgs</test_depend>
+  <test_depend>controller_manager_msgs</test_depend>
   <export><build_type>ament_python</build_type></export>
 </package>
