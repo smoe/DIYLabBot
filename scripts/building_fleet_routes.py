@@ -180,7 +180,8 @@ class Navigation:
 
     def _cache_pins(self):
         names=('building_fleet_routes.py','building_fleet_navigation.py','building_fleet_geometry.py',
-               'building_fleet_sim.py','tr01_camera_model.py','building_fleet_l01.py')
+               'building_fleet_sim.py','tr01_camera_model.py','building_fleet_l01.py',
+               'building_fleet_floor.py','building_fleet_support.py','building_fleet_clearance.py')
         l01=model.reference(self.config,'l01_route')
         for ref in l01['sources'].values():model.resolve_pin(ref)
         return {**model.source_pins(self.config),**model.protected_pins(),
@@ -259,6 +260,8 @@ class Navigation:
         n.navigation_margin_mm=model.reference(config,'walkthrough')['navigation']['contact_margin_mm']
         if payload['envelope']!=n.envelope or payload['reserve_mm']!=n.reserve or payload['height_mm']!=n.height:raise ValueError('Cached vehicle envelope or reserve differs')
         n.grids={level:decode_grid(grid)for level,grid in payload['grids'].items()};n.portals=payload['portals']
+        from building_fleet_floor import floor_support
+        for level,grid in n.grids.items():grid.floor_support=floor_support(n.mesh,level,config);grid._floor_edges={}
         n.road_hubs=payload['road_hubs'];n.waiting_bay_polygons=payload['waiting_bay_polygons']
         n.homes=payload['homes'];n.waits=payload['waits'];n.inspections={(row['level'],row['area']):row['data']for row in payload['inspections']}
         n.cabin_interior_mm=payload['cabin_interior_mm'];n.level_z=payload['level_z'];n.depot_rows=payload['depot_rows']
@@ -513,6 +516,16 @@ class Navigation:
             if nav.polygon_touches_box(poly,lo,-half_width,hi,half_width):hits.append('ReservedLiftWaitingBay.'+level+'.'+str(slot))
         hits.extend(nav.native_rectangle_collisions(self.mesh,level,a,b,yaw,self.envelope['length_mm']/2,
             self.envelope['width_mm']/2,self.height,self.reserve))
+        if not hits:
+            from building_fleet_floor import floor_support
+            import building_fleet_support as support_rule
+            bank=floor_support(self.mesh,level,self.config)
+            mesh_error=self.mesh.scene['linear_tessellation_deflection_mm']+math.sqrt(3)*self.mesh.scene['maximum_float32_error_mm']
+            proof=bank.covers([(x+y)/2 for x,y in zip(a,b)],yaw,
+                math.dist(a,b)/2+self.envelope['length_mm']/2+self.reserve+mesh_error,
+                self.envelope['width_mm']/2+self.reserve+mesh_error,
+                curve_ref={'scope':'fixed_heading_route','level':level,'points_mm':[list(a),list(b)]})
+            if not proof['passed']:hits.append('NativeFloorSupportR1')
         self._straight_cache[key]=hits[:];self._straight_cache[(level,tuple(b),tuple(a))]=hits[:]
         return hits
 
@@ -557,7 +570,7 @@ class Navigation:
             # fixed-heading sweep at edges AND shortcut reduction, rather
             # than hand-inserting a target-specific coordinate into a cache.
             def edge_free(a,b):
-                if grid.line_free(a,b,self.radius+self.reserve):return True
+                if grid.proposal_line_free(a,b,self.radius+self.reserve):return True
                 return not self._straight_hits(level,a,b)
             for radius in(base,max(1,base-grid.resolution_mm),max(1,base-2*grid.resolution_mm)):
                 try:
