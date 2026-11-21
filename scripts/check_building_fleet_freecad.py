@@ -6,7 +6,10 @@ The checker does not generate missions, geometry, lift policy or motion points.
 """
 import argparse
 import bisect
+import copy
 import itertools
+import hashlib
+from fractions import Fraction
 from types import SimpleNamespace
 import json
 import math
@@ -14,12 +17,13 @@ from pathlib import Path
 import sys
 import time
 import export_building_walkthrough_freecad as native
-from export_building_fleet_vehicle_freecad import checked_camera_report
+from export_building_fleet_vehicle_freecad import checked_camera_report, kit
 import tr01_floor_motion as floor
 import building_fleet_model as fleet
 import walkthrough_world
 
 ROOT=Path(__file__).resolve().parents[1]
+_NATIVE_WORLD_CACHE={}
 
 
 def finite(value):
@@ -41,6 +45,24 @@ def box_distance(a,b):
 def shape_bounds(shape):
     bb=shape.BoundBox
     return {'min':[bb.XMin,bb.YMin,bb.ZMin],'max':[bb.XMax,bb.YMax,bb.ZMax]}
+
+
+def native_envelope(bounds,App,Part):
+    """A full closed native prism enclosing the complete native source AABB.
+
+    Round construction coordinates outward, then require actual native prism
+    bounds to enclose the source bounds with no tolerance allowance.
+    """
+    lo=[finite(v)for v in bounds['min']];hi=[finite(v)for v in bounds['max']]
+    if len(lo)!=3 or len(hi)!=3 or any(a>=b for a,b in zip(lo,hi)):raise ValueError('Nondegenerate native solid bounds required')
+    origin=[math.nextafter(v,-math.inf)for v in lo];sizes=[]
+    for minimum,maximum in zip(origin,hi):
+        exact=Fraction(maximum)-Fraction(minimum);size=float(exact)
+        if Fraction(size)<exact:size=math.nextafter(size,math.inf)
+        sizes.append(size)
+    prism=Part.makeBox(*sizes,App.Vector(*origin));actual=shape_bounds(prism)
+    if any(actual['min'][i]>lo[i]or actual['max'][i]<hi[i]for i in range(3)):raise ValueError('Native enclosing prism lost source containment')
+    return prism
 
 
 def inflate_box(bounds,amount):
@@ -107,11 +129,11 @@ def quintic_fraction(start,end,t):
 
 
 class LiftTimeline:
-    """Evaluate the already compiled service schedule, without dispatch policy."""
+    """Evaluate the compiled source schedule with indexed state snapshots."""
     def __init__(self,config,schedule):
-        self.config=config;self.schedule=schedule
+        self.config=copy.deepcopy(config);config=self.config;self.schedule=copy.deepcopy(schedule)
         previous=-math.inf
-        for row in schedule:
+        for row in self.schedule:
             if row['kind']not in ('travel','doors'):raise ValueError('Unknown compiled lift segment')
             start,end=finite(row['start_s']),finite(row['end_s'])
             if start<previous or end<=start:raise ValueError('Ordered positive lift segments required')
@@ -119,30 +141,43 @@ class LiftTimeline:
             if row['kind']=='doors' and row['target']not in ('open','closed'):raise ValueError('Door endpoint required')
         self.doors={o['id']:o for o in config.get('door_objects',[])}
         if any(name not in self.doors for port in config['ports']for name in port.get('door_object_ids',[])):raise ValueError('Full source lift-door object map required')
+        state={name:o['states']['closed']for name,o in self.doors.items()}
+        state[config['object_id']]=config['reference_z_mm']
+        for port in config['ports']:
+            if port['active']and port['level_id']==config['reference_level']:
+                for name in port.get('door_object_ids',[]):state[name]=self.doors[name]['states']['open']
+        self._initial=dict(state);self._starts=[];self._before=[];self._after=[]
+        for row in self.schedule:
+            self._starts.append(row['start_s']);self._before.append(dict(state))
+            self._apply(state,row,1.)
+            self._after.append(dict(state))
+        self._event_times=sorted({v for row in self.schedule for v in (row['start_s'],row['end_s'])})
+
+    def _apply(self,state,row,u):
+        if row['kind']=='travel':state[self.config['object_id']]=row['from_z_mm']+(row['to_z_mm']-row['from_z_mm'])*u
+        else:
+            for port in self.config['ports']:
+                if port['active']and port['level_id']==row['level']:
+                    for name in port.get('door_object_ids',[]):
+                        obj=self.doors[name];initial=state[name];target=obj['states'][row['target']]
+                        state[name]=initial+(target-initial)*u
 
     def values(self,t):
-        z=self.config['reference_z_mm'];values={name:o['states']['closed']for name,o in self.doors.items()}
-        for port in self.config['ports']:
-            if port['active']and port['level_id']==self.config['reference_level']:
-                for name in port.get('door_object_ids',[]):values[name]=self.doors[name]['states']['open']
-        for row in self.schedule:
-            if t<row['start_s']:break
-            u=quintic_fraction(row['start_s'],row['end_s'],t)
-            if row['kind']=='travel':z=row['from_z_mm']+(row['to_z_mm']-row['from_z_mm'])*u
-            else:
-                for port in self.config['ports']:
-                    if port['active']and port['level_id']==row['level']:
-                        for name in port.get('door_object_ids',[]):
-                            obj=self.doors[name];target=obj['states'][row['target']];initial=values[name]
-                            values[name]=initial+(target-initial)*u
-        values[self.config['object_id']]=z
-        return values
+        finite(t);index=bisect.bisect_right(self._starts,t)-1
+        if index<0:return dict(self._initial)
+        row=self.schedule[index]
+        if t>=row['end_s']:return dict(self._after[index])
+        state=dict(self._before[index]);self._apply(state,row,quintic_fraction(row['start_s'],row['end_s'],t))
+        return state
+
+    def events(self,start,end):
+        """Return only compiled critical events strictly inside the interval."""
+        return self._event_times[bisect.bisect_right(self._event_times,start):bisect.bisect_left(self._event_times,end)]
 
     def z(self,t):return self.values(t)[self.config['object_id']]
 
     def z_bound(self,start,end,mid):
-        times=[start,end]+[v for row in self.schedule for v in (row['start_s'],row['end_s'])if start<v<end]
-        z=self.z(mid)
+        times=[start,end,*self.events(start,end)];z=self.z(mid)
         return max(abs(self.z(t)-z)for t in times)
 
 
@@ -204,9 +239,35 @@ def checked_walkthrough(path):
     return report,reports,manifest,{g['id']for g in mesh['groups']}
 
 
+def _world_input_key(reports,manifest,expected,bindings,App,geo):
+    """Revalidate bytes before every use of a process-local native snapshot."""
+    for report in reports.values():
+        native.verify_pins(report['source_files_sha256'])
+        native.verify_pins({report['files'][name]:digest for name,digest in report['artifact_sha256'].items()})
+    payload={'reports':reports,'manifest':manifest,'expected':sorted(expected),'bindings':bindings}
+    encoded=json.dumps(payload,sort_keys=True,separators=(',',':'),allow_nan=False).encode()
+    return hashlib.sha256(encoded).hexdigest(),id(App),id(geo)
+
+
+def _world_rows(snapshot):
+    # Shapes in the private snapshot are read-only. Placement, cutting and any
+    # other mutating operation must operate on a copied shape. Audit rows and
+    # their bounds are separate mutable containers for each invocation.
+    return {name:{'shape':shape,'bounds':{key:list(values)for key,values in bounds},'role':role}
+        for name,shape,bounds,role in snapshot}
+
+
 def native_world(reports,manifest,expected,App,geo):
-    """Load BReps and the exact equipment bindings used by the checked mesh."""
-    world={};bindings=native.native_equipment_bindings(manifest.get('laboratories',[]))
+    """Load pinned BReps once per process; return isolated per-audit rows.
+
+    Large source documents take minutes to restore. Reuse only the unchanged
+    original shapes, never a world after door posing or contact-layer cutting.
+    Every reuse still verifies all source/artifact bytes and exact bindings.
+    """
+    bindings=native.native_equipment_bindings(manifest.get('laboratories',[]))
+    key=_world_input_key(reports,manifest,expected,bindings,App,geo)
+    if key in _NATIVE_WORLD_CACHE:return _world_rows(_NATIVE_WORLD_CACHE[key])
+    world={}
     for kind,report in reports.items():
         doc=App.openDocument(str(native.project_path(report['files']['freecad'])))
         try:
@@ -224,7 +285,10 @@ def native_world(reports,manifest,expected,App,geo):
                     world[identity]={'shape':shape,'bounds':shape_bounds(shape),'role':str(getattr(obj,'ModelRole','native_geometry'))}
         finally:App.closeDocument(doc.Name)
     if set(world)!=expected:raise ValueError('Native audit does not cover the exact walkthrough bodies')
-    return world
+    if _world_input_key(reports,manifest,expected,bindings,App,geo)!=key:raise ValueError('Native inputs changed during document restoration')
+    snapshot=tuple((name,row['shape'],tuple((axis,tuple(values))for axis,values in row['bounds'].items()),row['role'])for name,row in world.items())
+    _NATIVE_WORLD_CACHE.clear();_NATIVE_WORLD_CACHE[key]=snapshot
+    return _world_rows(snapshot)
 
 
 def object_transform(obj,value,App):
@@ -254,10 +318,20 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
     sys.path.insert(0,str(ROOT/'scripts/freecad'));import solidcraftbot_freecad as geo
     world=native_world(reports,manifest,expected,App,geo);doc=App.openDocument(str(native.project_path(camera_report['files']['freecad'])))
     try:
-        vehicle_parts=[geo.world_shape(o).copy()for o in geo.features(doc)if o.ModelRole!='viewing_cone']
+        meta={body['id']:body for body in kit.expanded(kit.load())['bodies']};objects_in_vehicle=geo.features(doc)
+        if len(objects_in_vehicle)!=len(meta)or {str(o.SourceBody)for o in objects_in_vehicle}!=set(meta):raise ValueError('Native physical vehicle coverage differs from source')
+        vehicle_parts=[];physical_body_ids=[]
+        for obj in objects_in_vehicle:
+            identity=str(obj.SourceBody);body=meta[identity]
+            if str(obj.ModelRole)!=body['role']:raise ValueError('Native vehicle role differs from source: '+identity)
+            if body['role']=='viewing_cone':continue
+            shape=geo.world_shape(obj).copy()
+            if shape.isNull()or not shape.isValid()or not shape.Solids:raise ValueError('Invalid native physical vehicle body: '+identity)
+            vehicle_parts.append(shape);physical_body_ids.append(identity)
         vehicle=Part.makeCompound(vehicle_parts)
     finally:App.closeDocument(doc.Name)
     bounds=shape_bounds(vehicle);radius=math.hypot(max(abs(v)for v in [bounds['min'][0],bounds['max'][0]]),max(abs(v)for v in [bounds['min'][1],bounds['max'][1]]))
+    vehicle_envelope=native_envelope(bounds,App,Part)
     support_exclusions=[]
     for name,body in world.items():
         if body['role']=='concept_existing_elevator_cabin':
@@ -272,16 +346,21 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
         while parent:chain.append(objects[parent]);parent=objects[parent].get('parent_object_id')
         for name in obj['moving_body_ids']:body_chains[name]=chain
     default_values={name:o['states'][o.get('initial_state',o['reference_state'])]for name,o in objects.items()}
-    count={'intervals':0,'exact_body_distances':0,'exact_vehicle_distances':0,'broadphase_rejections':0,'refinements':0};minimum={'static_mm':math.inf,'vehicle_mm':math.inf};failures=[]
-    def moved_body(name,t):
-        shape=world[name]['shape'].copy();values={**default_values,**lift.values(t)}
+    count={'intervals':0,'exact_body_distances':0,'exact_vehicle_distances':0,'envelope_body_distances':0,'envelope_vehicle_distances':0,'envelope_certificates':0,'broadphase_rejections':0,'refinements':0};minimum={'static_mm':math.inf,'vehicle_mm':math.inf};failures=[]
+    def moved_body(name,t,base=None,values=None):
+        shape=(world[name]['shape']if base is None else base).copy()
+        values={**default_values,**lift.values(t)}if values is None else values
         for obj in body_chains.get(name,[]):shape.Placement=object_transform(obj,values[obj['id']],App).multiply(shape.Placement)
         return shape
-    def obstacle_inflation(name,start,end,exclude_cabin=False):
-        mid=(start+end)/2;sample_times=[start,end]+[v for r in lift.schedule for v in (r['start_s'],r['end_s'])if start<v<end];values={t:{**default_values,**lift.values(t)}for t in sample_times+[mid]};amount=0
+    def obstacle_inflation(name,start,end,exclude_cabin=False,states=None):
+        mid=(start+end)/2
+        if states is None:
+            times=[start,end,*lift.events(start,end),mid]
+            states={t:{**default_values,**lift.values(t)}for t in times}
+        amount=0
         for obj in body_chains.get(name,[]):
             if exclude_cabin and obj['id']==manifest['elevator']['object_id']:continue
-            delta=max(abs(values[t][obj['id']]-values[mid][obj['id']])for t in sample_times)
+            delta=max(abs(values[obj['id']]-states[mid][obj['id']])for values in states.values())
             if obj['joint']['type']=='prismatic':amount+=delta
             else:
                 origin=obj['joint']['origin_mm'];bb=world[name]['bounds'];r=math.sqrt(sum(max(abs(bb[k][i]-origin[i])for k in ('min','max'))**2 for i in range(3)));amount+=r*math.radians(delta)
@@ -297,21 +376,27 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
             body.update(shape=shape,bounds=shape_bounds(shape))
     dynamic &= set(world)
     index=SpatialIndex({name:body['bounds']for name,body in world.items()if name not in dynamic})
-    exact_cache={}
+    exact_cache={};envelope_cache={}
+    dynamic_envelopes={name:native_envelope(world[name]['bounds'],App,Part)for name in dynamic}
     def interval(start,end,depth):
         mid=(start+end)/2;count['intervals']+=1;vehicles=[];access_issues=[]
         inflations={t.identity:t.inflation(start,end,radius)for t in trajectories}
         if max(inflations.values())>reserve/2 and depth<maximum_depth and end-start>minimum_step_s:
             count['refinements']+=1
             return interval(start,mid,depth+1)and interval(mid,end,depth+1)
-        placed_parts={}
+        placed_parts={};placements={}
+        def physical_parts(identity):
+            if identity not in placed_parts:
+                parts=[];placement=placements[identity]
+                for local in vehicle_parts:
+                    part=local.copy();part.Placement=placement.multiply(part.Placement);parts.append((part,shape_bounds(part)))
+                placed_parts[identity]=parts
+            return placed_parts[identity]
         for trajectory in trajectories:
-            pose=trajectory.pose(mid);shape=vehicle.copy();shape.Placement=App.Placement(App.Vector(*pose[:3]),App.Rotation(App.Vector(0,0,1),math.degrees(pose[3]))).multiply(shape.Placement)
+            pose=trajectory.pose(mid);placement=App.Placement(App.Vector(*pose[:3]),App.Rotation(App.Vector(0,0,1),math.degrees(pose[3])))
+            placements[trajectory.identity]=placement
+            shape=vehicle_envelope.copy();shape.Placement=placement.multiply(shape.Placement)
             bb=shape_bounds(shape);movement=inflations[trajectory.identity];episode=trajectory.episode(mid)
-            parts=[]
-            for local in vehicle_parts:
-                part=local.copy();part.Placement=App.Placement(App.Vector(*pose[:3]),App.Rotation(App.Vector(0,0,1),math.degrees(pose[3]))).multiply(part.Placement);parts.append((part,shape_bounds(part)))
-            placed_parts[trajectory.identity]=parts
             if episode['attached_cabin']:
                 cabin=manifest['elevator']['cabin_bounds_mm']
                 if any(bb['min'][axis]<cabin['min'][axis]+reserve or bb['max'][axis]>cabin['max'][axis]-reserve for axis in (0,1)):raise ValueError('Cabin-attached vehicle is outside cabin envelope')
@@ -330,26 +415,43 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
                             break
             vehicles.append((trajectory,shape,bb,movement,pose))
         near=access_issues;accepted={'static_mm':math.inf,'vehicle_mm':math.inf}
-        dynamic_shapes={name:moved_body(name,mid)for name in dynamic}
+        states={t:{**default_values,**lift.values(t)}for t in {start,end,mid,*lift.events(start,end)}}
+        dynamic_bounds={name:shape_bounds(moved_body(name,mid,base=dynamic_envelopes[name],values=states[mid]))for name in dynamic}
+        dynamic_shapes={};obstacle_movements={}
+        def dynamic_shape(name):
+            if name not in dynamic_shapes:dynamic_shapes[name]=moved_body(name,mid,values=states[mid])
+            return dynamic_shapes[name]
+        def body_movement(name,exclude_cabin=False):
+            key=(name,exclude_cabin)
+            if key not in obstacle_movements:obstacle_movements[key]=obstacle_inflation(name,start,end,exclude_cabin,states)
+            return obstacle_movements[key]
         for trajectory,shape,bb,movement,pose in vehicles:
             candidates=set(index.query(inflate_box(bb,reserve+movement)))|dynamic
             count['broadphase_rejections']+=len(world)-len(candidates)
             for name in sorted(candidates):
-                body=world[name];obstacle=dynamic_shapes[name]if name in dynamic else body['shape'];ob=shape_bounds(obstacle)if name in dynamic else body['bounds'];omove=obstacle_inflation(name,start,end)if name in dynamic else 0
+                body=world[name];ob=dynamic_bounds[name]if name in dynamic else body['bounds'];omove=body_movement(name)if name in dynamic else 0
                 # Ground-contact layers below the source20mm band are not side
                 # obstacles. The navigation compiler separately proves support.
                 relative_z=lift.z_bound(start,end,mid)if trajectory.episode(mid)['attached_cabin']else 0
                 shared_cabin=trajectory.episode(mid)['attached_cabin']and any(o['id']==manifest['elevator']['object_id']for o in body_chains.get(name,[]))
                 if ob['max'][2]+(0 if shared_cabin else omove)<=pose[2]+spec['geometry']['floor_band_start_mm']-(0 if shared_cabin else relative_z):continue
                 relative_movement=trajectory.inflation(start,end,radius,include_z=False)if shared_cabin else movement
-                if shared_cabin:omove=obstacle_inflation(name,start,end,exclude_cabin=True)
+                if shared_cabin:omove=body_movement(name,exclude_cabin=True)
                 lower=box_distance(bb,ob)-relative_movement-omove
                 if lower>=reserve:
                     accepted['static_mm']=min(accepted['static_mm'],lower);count['broadphase_rejections']+=1;continue
                 key=(trajectory.identity,name,*pose)
+                obstacle=dynamic_shape(name)if name in dynamic else body['shape']
+                if name not in dynamic and key in envelope_cache:enclosing_distance=envelope_cache[key]
+                else:
+                    enclosing_distance=shape.distToShape(obstacle)[0];count['envelope_body_distances']+=1
+                    if name not in dynamic:envelope_cache[key]=enclosing_distance
+                envelope_lower=math.nextafter(enclosing_distance-relative_movement-omove,-math.inf)
+                if envelope_lower>=reserve:
+                    accepted['static_mm']=min(accepted['static_mm'],envelope_lower);count['envelope_certificates']+=1;continue
                 if name not in dynamic and key in exact_cache:distance=exact_cache[key]
                 else:
-                    distance=parts_distance(placed_parts[trajectory.identity],[(obstacle,ob)],count,'exact_body_distances')
+                    distance=parts_distance(physical_parts(trajectory.identity),[(obstacle,ob)],count,'exact_body_distances')
                     if name not in dynamic:exact_cache[key]=distance
                 lower=math.nextafter(distance-relative_movement-omove,-math.inf)
                 if lower<reserve:near.append({'vehicle':trajectory.identity,'body':name,'lower_mm':lower,'sample_mm':distance})
@@ -364,7 +466,11 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
                 lower=box_distance(bb,ob)-pair_movement
                 if lower>=reserve:
                     accepted['vehicle_mm']=min(accepted['vehicle_mm'],lower);count['broadphase_rejections']+=1;continue
-                distance=parts_distance(placed_parts[a.identity],placed_parts[b.identity],count,'exact_vehicle_distances');lower=math.nextafter(distance-pair_movement,-math.inf)
+                enclosing_distance=shape.distToShape(other)[0];count['envelope_vehicle_distances']+=1
+                envelope_lower=math.nextafter(enclosing_distance-pair_movement,-math.inf)
+                if envelope_lower>=reserve:
+                    accepted['vehicle_mm']=min(accepted['vehicle_mm'],envelope_lower);count['envelope_certificates']+=1;continue
+                distance=parts_distance(physical_parts(a.identity),physical_parts(b.identity),count,'exact_vehicle_distances');lower=math.nextafter(distance-pair_movement,-math.inf)
                 if lower<reserve:near.append({'vehicle':a.identity,'other_vehicle':b.identity,'lower_mm':lower,'sample_mm':distance})
                 else:accepted['vehicle_mm']=min(accepted['vehicle_mm'],lower)
         if near:
@@ -384,7 +490,7 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
         if not passed:break
     native.verify_pins(program['source_files_sha256']);checked_camera_report(camera);checked_walkthrough(walk)
     if native.digest(program_path)!=before:raise ValueError('Program changed during native audit')
-    result={'format':'solidcraftbot.building-fleet-native-curve-audit/1'if _curve_probe else 'solidcraftbot.building-fleet-native-audit/1','passed':passed,'program':{'path':str(program_path.relative_to(ROOT)),'sha256':before},'source_files_sha256':{**program['source_files_sha256'],str(Path(__file__).relative_to(ROOT)):native.digest(__file__)},'audit_scope':'standalone_curve_only'if _curve_probe else 'full_fleet_program','minimum_clearance_mm':reserve,'support_contact_exclusions':support_exclusions,'minimum_interval_lower_bounds_mm':{k:None if math.isinf(v)else v for k,v in minimum.items()},'counts':count,'failures':failures,'elapsed_s':time.monotonic()-started,'qualification':{'hardware_executed':False,'navigation_qualified':False,'person_safety_qualified':False},'scope':'Exact native BRep distances at interval midpoints, reduced by polynomial-extrema vehicle translation/yaw and compiled lift/door motion bounds. Unresolved intervals fail. Complete walkthrough bodies include identically bound L01 equipment. Supporting surfaces below navigation20mm band excluded from obstacle separation; ground support, shaft authorization and resource/lift sequencing require their separate compiler proofs.'}
+    result={'format':'solidcraftbot.building-fleet-native-curve-audit/1'if _curve_probe else 'solidcraftbot.building-fleet-native-audit/1','passed':passed,'program':{'path':str(program_path.relative_to(ROOT)),'sha256':before},'source_files_sha256':{**program['source_files_sha256'],str(Path(__file__).relative_to(ROOT)):native.digest(__file__)},'audit_scope':'standalone_curve_only'if _curve_probe else 'full_fleet_program','minimum_clearance_mm':reserve,'native_body_count':len(expected),'physical_vehicle_body_ids':sorted(physical_body_ids),'physical_vehicle_body_count':len(physical_body_ids),'vehicle_envelope':{'source_native_bounds_mm':bounds,'envelope_native_bounds_mm':shape_bounds(vehicle_envelope),'full_closed_prism':True,'source_containment_checked':True,'placement_basis':'identical source rigid placement for enclosing prism and physical-part fallback'},'support_contact_exclusions':support_exclusions,'minimum_interval_lower_bounds_mm':{k:None if math.isinf(v)else v for k,v in minimum.items()},'counts':count,'failures':failures,'elapsed_s':time.monotonic()-started,'qualification':{'hardware_executed':False,'navigation_qualified':False,'person_safety_qualified':False},'scope':'Conservative full closed native enclosing prisms, with exact native physical-part fallback where their distance is insufficient, evaluated at interval midpoints and reduced by polynomial-extrema vehicle translation/yaw and compiled lift/door motion bounds. Unresolved intervals fail. Complete walkthrough bodies include identically bound L01 equipment. Supporting surfaces below navigation20mm band excluded from obstacle separation; ground support, shaft authorization and resource/lift sequencing require their separate compiler proofs.'}
     output=native.project_path(output);output.parent.mkdir(parents=True,exist_ok=True)
     if output.exists():raise FileExistsError(output)
     output.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n')
