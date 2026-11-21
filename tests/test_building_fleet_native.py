@@ -2,11 +2,14 @@
 import copy
 import hashlib
 import json
+import os
 from pathlib import Path
 import shutil
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
@@ -143,6 +146,127 @@ class NativeIntervalContractTests(unittest.TestCase):
         self.assertEqual(c.parts_distance(first,second,count,'kernel'),expected)
         self.assertLess(count['kernel'],len(first)*len(second))
         with self.assertRaises(ValueError):c.parts_distance([],second,count,'kernel')
+
+
+class NativeWorldSnapshotTests(unittest.TestCase):
+    """Reuse original native shapes without reusing posed audit dictionaries."""
+    def setUp(self):
+        import check_building_fleet_freecad as checker
+        self.checker=checker;checker._NATIVE_WORLD_CACHE.clear()
+        self.addCleanup(checker._NATIVE_WORLD_CACHE.clear)
+        self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)
+        self.root=Path(self.temp.name)
+        for name in ['source','cad']:(self.root/name).write_text(name)
+        digest=lambda name:hashlib.sha256((self.root/name).read_bytes()).hexdigest()
+        self.reports={'building':{'source_files_sha256':{'source':digest('source')},
+            'files':{'freecad':'cad'},'artifact_sha256':{'freecad':digest('cad')}}}
+        class Shape:
+            BoundBox=SimpleNamespace(XMin=0,YMin=0,ZMin=0,XMax=1,YMax=2,ZMax=3)
+            Solids=[True]
+            def copy(self):return Shape()
+            def isNull(self):return False
+            def isValid(self):return True
+        self.opens=[]
+        self.app=SimpleNamespace(openDocument=lambda path:self.opens.append(path)or SimpleNamespace(Name='source'),closeDocument=lambda name:None)
+        self.geo=SimpleNamespace(features=lambda doc:[SimpleNamespace(SourceBody='Body',ModelRole='native_geometry')],world_shape=lambda obj:Shape())
+        self.bindings=[];self.manifest={'laboratories':[]}
+        original_verify=checker.native.verify_pins
+        patches=[patch.object(checker.native,'project_path',lambda name,root=None:self.root/name),
+            patch.object(checker.native,'verify_pins',lambda pins:original_verify(pins,self.root)),
+            patch.object(checker.native,'native_equipment_bindings',lambda labs:self.bindings)]
+        for active in patches:active.start();self.addCleanup(active.stop)
+
+    def world(self,**kwargs):
+        return self.checker.native_world(self.reports,kwargs.get('manifest',self.manifest),kwargs.get('expected',{'Body'}),self.app,self.geo)
+
+    def test_reuse_is_source_pinned_and_rows_are_isolated(self):
+        first=self.world();original_shape=first['Body']['shape']
+        first['Body']['shape']='posed copy';first['Body']['bounds']['min'][0]=-900
+        second=self.world()
+        self.assertEqual(len(self.opens),1)
+        self.assertIs(second['Body']['shape'],original_shape)
+        self.assertEqual(second['Body']['bounds']['min'],[0,0,0])
+        self.assertIsNot(first['Body'],second['Body'])
+
+    def test_changed_source_and_artifact_fail_before_cache_reuse(self):
+        self.world()
+        for name in ['source','cad']:
+            with self.subTest(name=name):
+                path=self.root/name;before=path.read_bytes();path.write_bytes(before+b'changed')
+                with self.assertRaises(ValueError):self.world()
+                path.write_bytes(before)
+        self.assertEqual(len(self.opens),1)
+
+    def test_manifest_bindings_and_expected_ids_are_exact_cache_inputs(self):
+        self.world();self.world(manifest={'laboratories':[],'objects':[{'id':'different'}]})
+        self.assertEqual(len(self.opens),2)
+        self.bindings=[({'id':'lab'},{'id':'device','transform':[[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]]})]
+        self.world();self.assertEqual(len(self.opens),3)
+        with self.assertRaises(ValueError):self.world(expected={'Missing'})
+        self.assertEqual(len(self.opens),4)
+
+    def test_changed_input_during_restore_is_not_cached(self):
+        original=self.geo.features
+        def changed(doc):
+            (self.root/'source').write_text('changed during restoration')
+            return original(doc)
+        self.geo.features=changed
+        with self.assertRaises(ValueError):self.world()
+        self.assertFalse(self.checker._NATIVE_WORLD_CACHE)
+
+
+class NativeEnvelopeAndTimelineTests(unittest.TestCase):
+    def module(self):
+        import check_building_fleet_freecad
+        return check_building_fleet_freecad
+
+    def test_unsorted_queries_replay_source_states_and_critical_events(self):
+        c=self.module();doors=[{'id':name,'states':{'closed':0.,'open':100.}}for name in ['EGdoor','OGdoor']]
+        config={'reference_z_mm':0.,'reference_level':'EG','object_id':'Lift','door_objects':doors,
+                'ports':[{'active':True,'level_id':level,'door_object_ids':[name]}for level,name in [('EG','EGdoor'),('OG1','OGdoor')]]}
+        schedule=[{'kind':'doors','start_s':0,'end_s':1,'level':'EG','target':'closed'},
+                  {'kind':'travel','start_s':1,'end_s':3,'from_z_mm':0,'to_z_mm':4250},
+                  {'kind':'doors','start_s':3,'end_s':4,'level':'OG1','target':'open'},
+                  {'kind':'doors','start_s':4,'end_s':5,'level':'OG1','target':'closed'},
+                  {'kind':'travel','start_s':5,'end_s':7,'from_z_mm':4250,'to_z_mm':0},
+                  {'kind':'doors','start_s':7,'end_s':8,'level':'EG','target':'open'}]
+        timeline=c.LiftTimeline(config,schedule)
+        expected={8:(0,100,0),-1:(0,100,0),3.5:(4250,0,50),.5:(0,50,0),6:(2125,0,0),2:(2125,0,0),7.5:(0,50,0)}
+        for time,(z,eg,og)in expected.items():self.assertEqual(timeline.values(time),{'Lift':z,'EGdoor':eg,'OGdoor':og})
+        self.assertEqual(timeline.events(1,7),[3,4,5]);self.assertEqual(timeline.z_bound(1,7,4),4250)
+        config['door_objects'][0]['states']['open']=9000;schedule[0]['target']='open'
+        self.assertEqual(timeline.values(.5)['EGdoor'],50)
+
+    def test_outward_native_prism_coordinates_keep_large_and_short_spans(self):
+        c=self.module()
+        def box(dx,dy,dz,origin):
+            return SimpleNamespace(BoundBox=SimpleNamespace(XMin=origin[0],YMin=origin[1],ZMin=origin[2],XMax=origin[0]+dx,YMax=origin[1]+dy,ZMax=origin[2]+dz))
+        app=SimpleNamespace(Vector=lambda *values:values);part=SimpleNamespace(makeBox=box)
+        for bounds in [{'min':[1e9,-1e9,-1],'max':[1e9+1,-1e9+1,2]},
+                       {'min':[-1.,-2.,-3.],'max':[1.,2.,3.]},
+                       {'min':[1e-300,-1e-300,1e-299],'max':[2e-300,1e-300,2e-299]}]:
+            actual=c.shape_bounds(c.native_envelope(bounds,app,part))
+            self.assertTrue(all(actual['min'][i]<=bounds['min'][i]and actual['max'][i]>=bounds['max'][i]for i in range(3)))
+        part.makeBox=lambda *args:SimpleNamespace(BoundBox=SimpleNamespace(XMin=0,YMin=0,ZMin=0,XMax=.5,YMax=.5,ZMax=.5))
+        with self.assertRaisesRegex(ValueError,'lost source containment'):c.native_envelope({'min':[0,0,0],'max':[1,1,1]},app,part)
+        with self.assertRaises(ValueError):c.native.validate_rigid([[-1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])
+
+    @unittest.skipUnless(os.environ.get('SOLIDCRAFTBOT_BF01_NATIVE_ENVELOPE_TESTS')=='1',
+                         'Opt-in installed FreeCAD native pose-containment fixture')
+    def test_native_concave_body_remains_inside_prism_at_translated_yaw_poses(self):
+        import FreeCAD as App
+        import Part
+        c=self.module()
+        physical=Part.makeBox(300,40,200).fuse(Part.makeBox(40,300,200))
+        physical=physical.cut(Part.makeCylinder(10,200,App.Vector(20,20,0)))
+        prism=c.native_envelope(c.shape_bounds(physical),App,Part)
+        for translation,yaw in [([0,0,0],0),([10000,16000,12750],37),([-10000,16000,-4250],-90)]:
+            placement=App.Placement(App.Vector(*translation),App.Rotation(App.Vector(0,0,1),yaw))
+            body=physical.copy();body.Placement=placement.multiply(body.Placement)
+            envelope=prism.copy();envelope.Placement=placement.multiply(envelope.Placement)
+            bb,eb=c.shape_bounds(body),c.shape_bounds(envelope)
+            self.assertTrue(all(eb['min'][i]<=bb['min'][i]and eb['max'][i]>=bb['max'][i]for i in range(3)))
+            self.assertEqual(body.cut(envelope).Volume,0)
 
 
 if __name__=='__main__':unittest.main()

@@ -6,6 +6,8 @@ door-state, capacity or lift-operation certificate. No lift-stage waiver is
 implemented here.
 """
 import argparse
+import copy
+from functools import lru_cache
 import json
 import math
 from pathlib import Path
@@ -142,6 +144,236 @@ def support_barrier(mesh, port_id):
                                                 'building_fleet_navigation.py')}},
         'artifact_sha256': report['artifact_sha256']})
     return result
+
+
+
+@lru_cache(maxsize=4)
+def _source_surface_contract(building_sha256, fittings_sha256):
+    """Resolve R2 from the existing portable lift construction, never a copy."""
+    building = stack.load()
+    parameters = stack.parameters(building)
+    interface = stack.interfaces(building, parameters)
+    elevator = interface['circulation']['elevator']
+    fittings = elevator.get('fittings', {})
+    thresholds = fittings.get('placements', {}).get('thresholds', [])
+    if not thresholds:
+        raise ValueError('Source lift threshold geometry is required')
+    ports = {row['id']: row for row in elevator['ports'] if row['active']}
+    levels = {row['id']: row['z_mm'] for row in interface['levels']}
+    reference_level = elevator['cabin_level']
+    reference_z = levels[reference_level]
+    rows = {}
+    offsets = set()
+    for threshold in thresholds:
+        ident = threshold['port_id']
+        if ident not in ports or ident in rows:
+            raise ValueError('Exactly one source threshold per active port required')
+        port = ports[ident]
+        offset = threshold['top_mm'] - port['z_mm']
+        if not math.isfinite(offset) or offset < 0:
+            raise ValueError('Finite source-derived nonnegative lift top offset required')
+        offsets.add(offset)
+        side = port['side']
+        plan = stack.level_plan(building, port['level_id'])
+        landing_areas = [area['id'] for area in plan['areas']
+                         if area['id'] != building['circulation']['elevator']['area']
+                         and any(edge['wall'] == port['wall'] for edge in area['boundary'])]
+        if len(landing_areas) != 1:
+            raise ValueError('A unique source-adjacent landing floor is required')
+        rows[ident] = {**copy.deepcopy(port),
+                      'landing_floor_body_ids': [port['level_id'] + '__Area_' + a for a in landing_areas],
+                      'source_threshold': copy.deepcopy(threshold),
+                      'height_offset_mm': offset,
+                      'source_surface_ids': ['LiftCabinFloorFinish', 'LiftCabinSill_' + side,
+                                             threshold['body_id']]}
+    if set(rows) != set(ports) or len(offsets) != 1:
+        raise ValueError('All active source ports need the same declared lift surface offset')
+    return {'format': 'solidcraftbot.bf01-lift-source-surfaces/1',
+            'reference_level': reference_level, 'reference_z_mm': reference_z,
+            'height_offset_mm': offsets.pop(), 'ports': rows,
+            'allowed_roles': {'LiftCabinFloorFinish': 'concept_lift_floor_finish',
+                             'LiftCabinSill_': 'concept_lift_cabin_sill',
+                             'LiftLandingSill_': 'concept_lift_landing_sill'},
+            'source_files_sha256': {'model/building-stack.shared.json': building_sha256,
+                                   'scripts/lift_fittings.py': fittings_sha256},
+            'derivation': 'circulation.elevator.fittings.placements.thresholds[].top_mm minus matching port.z_mm',
+            'qualification': 'Owner synthetic support assumption only; no wheel or chassis qualification'}
+
+
+def source_surface_contract():
+    """Return the current source-derived R2 body identities and top offset."""
+    return copy.deepcopy(_source_surface_contract(
+        model.digest(ROOT / 'model/building-stack.shared.json'),
+        model.digest(ROOT / 'scripts/lift_fittings.py')))
+
+
+def active_port(mesh, port_id):
+    rows = [p for p in mesh.manifest['elevator']['ports'] if p['id'] == port_id and p['active']]
+    if len(rows) != 1:
+        raise ValueError('One current active source lift port required')
+    return rows[0]
+
+
+def gate_at(mesh, port_id, timeline, time_s):
+    """Require actual compiled cabin FK and fully open source door values."""
+    port = active_port(mesh, port_id)
+    if type(time_s) not in (int, float) or not math.isfinite(time_s):
+        raise ValueError('Finite compiled model time required')
+    values = timeline.values(time_s)
+    cabin_id = mesh.manifest['elevator']['object_id']
+    if abs(values[cabin_id] - port['z_mm']) > 1e-7:
+        raise ValueError('Cabin is not at the active port level')
+    objects = {obj['id']: obj for obj in mesh.manifest['objects']}
+    doors = port.get('door_object_ids', [])
+    if not doors or any(ident not in objects or ident not in values for ident in doors):
+        raise ValueError('Complete source door values required')
+    if any(abs(values[ident] - objects[ident]['states']['open']) > 1e-7 for ident in doors):
+        raise ValueError('All cabin and landing doors must be fully open')
+    return {'port_id': port_id, 'level_id': port['level_id'], 'cabin_z_mm': values[cabin_id],
+            'time_s': time_s, 'fully_open_door_ids': list(doors)}
+
+
+def posed_mesh(mesh, values):
+    """Evaluate the existing native articulation tree at absolute values."""
+    result = copy.copy(mesh)
+    result._posed_bounds_cache = {}
+    result._fleet_band_cache = {}
+    result.manifest = copy.deepcopy(mesh.manifest)
+    objects = {obj['id']: obj for obj in result.manifest['objects']}
+    # Replacing only the reference-relative scalar leaves the shared joint
+    # convention unchanged; native vertices themselves are never edited.
+    for ident, value in values.items():
+        if ident not in objects:
+            raise ValueError('Unknown source articulation: ' + ident)
+        obj = objects[ident]
+        if type(value) not in (int, float) or not math.isfinite(value):
+            raise ValueError('Finite absolute articulation value required')
+        lo, hi = min(obj['states'].values()), max(obj['states'].values())
+        if not lo - 1e-7 <= value <= hi + 1e-7:
+            raise ValueError('Articulation value outside source states')
+        obj['states']['bf01_compiled_pose'] = value
+        obj['initial_state'] = 'bf01_compiled_pose'
+    result.transforms = {}
+    for obj in objects.values():
+        chain = [obj]
+        parent = obj.get('parent_object_id')
+        while parent:
+            chain.append(objects[parent]); parent = objects[parent].get('parent_object_id')
+        for body in obj['moving_body_ids']:
+            result.transforms[body] = chain
+    return result
+
+
+def fully_open_values(mesh, port_id):
+    """Construct a measurement-only source pose, not an execution grant."""
+    port = active_port(mesh, port_id)
+    objects = {obj['id']: obj for obj in mesh.manifest['objects']}
+    result = {mesh.manifest['elevator']['object_id']: port['z_mm']}
+    for obj in objects.values():
+        if obj.get('mechanism') == 'lift_door':
+            result[obj['id']] = obj['states']['open' if obj['id'] in port['door_object_ids'] else 'closed']
+    return result
+
+
+def surface_rows_at(mesh, port_id, timeline, time_s):
+    """Collect ordinary slabs and only source-allowed raised lift surfaces.
+
+    The numeric compiled FK/open-door gate is mandatory. This function never
+    adds a virtual support rectangle and never treats unrelated raised bodies
+    as floors. The shared support engine consumes the actual top triangles.
+    """
+    gate = gate_at(mesh, port_id, timeline, time_s)
+    contract = source_surface_contract()
+    entry = contract['ports'].get(port_id)
+    if entry is None or entry['z_mm'] != gate['cabin_z_mm']:
+        raise ValueError('Port disagrees with the current support construction')
+    posed = posed_mesh(mesh, timeline.values(time_s))
+    z = entry['z_mm']; raised = z + entry['height_offset_mm']
+    allowed = dict(zip(entry['source_surface_ids'],
+                       ['concept_lift_floor_finish', 'concept_lift_cabin_sill',
+                        'concept_lift_landing_sill']))
+    tolerance = mesh.scene.get('maximum_float32_error_mm', 0.) + 1e-8
+    rows = []; found = set()
+    for group in mesh.scene['groups']:
+        identity = group['id']; role = group['role']; bounds = posed.bounds(group)
+        if identity in allowed:
+            if role != allowed[identity] or abs(bounds['max'][2] - raised) > tolerance:
+                raise ValueError('Raised lift body role/top differs from the source: ' + identity)
+            expected = raised; found.add(identity)
+        elif role == 'concept_storey_slab' and abs(bounds['max'][2] - z) <= tolerance:
+            expected = z
+        else:
+            continue
+        triangles = [[p[:2] for p in tri] for tri in posed.triangles(group)
+                     if all(abs(p[2] - expected) <= tolerance for p in tri)]
+        if not triangles:
+            raise ValueError('Source support body has no native horizontal top: ' + identity)
+        rows.append({'body_id': identity, 'role': role,
+                     'top_z_mm': expected, 'triangles_mm': triangles,
+                     'height_exception_applied': identity in allowed})
+    if found != set(allowed):
+        raise ValueError('A source-required raised lift support body is missing')
+    return {'gate': gate, 'surface_rows': rows,
+            'source_derived_height_offset_mm': entry['height_offset_mm'],
+            'source_contract': contract}
+
+
+
+def source_open_timeline(mesh, port_id, source):
+    """A source-timed measurement pose sequence, never a fleet-service grant."""
+    from check_building_fleet_freecad import timeline_from_manifest
+    port = active_port(mesh, port_id)
+    config = mesh.manifest['elevator']
+    walk = model.reference(source, 'walkthrough')
+    duration = walk['elevator']['door_duration']['value']
+    schedule = []
+    now = 0.
+    if port['level_id'] != config['reference_level']:
+        schedule.append({'kind':'doors','start_s':now,'end_s':now+duration,
+                         'level':config['reference_level'],'target':'closed'})
+        now += duration
+        travel = 1.875*abs(port['z_mm']-config['reference_z_mm'])/config['speed_mm_s']
+        schedule.append({'kind':'travel','start_s':now,'end_s':now+travel,
+                         'from_z_mm':config['reference_z_mm'],'to_z_mm':port['z_mm'],
+                         'to_level':port['level_id'],'purpose':'standalone_port_geometry_pose'})
+        now += travel
+        schedule.append({'kind':'doors','start_s':now,'end_s':now+duration,
+                         'level':port['level_id'],'target':'open'})
+        now += duration
+    return timeline_from_manifest(mesh.manifest,schedule), math.ceil(now*1000)/1000
+
+
+def port_motion_cases(mesh, source, port_id):
+    """Compile entry, same-side reverse exit and opposite-side forward exit."""
+    import building_fleet_motion as motion
+    port = active_port(mesh,port_id)
+    timeline,start = source_open_timeline(mesh,port_id,source)
+    outside = port['exit_eye_mm'][:2]
+    inside = port['cabin_entry_mm'][:2]
+    cases=[]
+    for name,points,reverse in [('entry',[outside,inside],False),
+                                ('same_side_reverse_exit',[inside,outside],True),
+                                ('opposite_side_forward_exit',[inside,outside],False)]:
+        path=motion.Path(points)
+        program=motion.compile_motion(path,source,source['motion']['zone_velocity_mm_s'],
+                                      start_s=start,reverse=reverse)
+        cases.append({'id':port_id+'.'+name,'port_id':port_id,'level_id':port['level_id'],
+                      'kind':name,'reverse':reverse,'points_xy_mm':points,
+                      'motion':program,'timeline':timeline})
+    return cases
+
+
+def check_port_curve(mesh, curve, port_id, timeline, source, *, vehicle_id=None,
+                     extra_exclusions=(),curve_ref=None):
+    """Use the ordinary continuous checker with the narrowly gated lift context."""
+    from building_fleet_lift_geometry import PortSupportContext
+    port=active_port(mesh,port_id)
+    context=PortSupportContext(mesh,source,port_id,timeline,vehicle_id=vehicle_id)
+    result=clearance.check_motion(mesh,curve,port['level_id'],source,
+                                 extra_exclusions=extra_exclusions,lift_context=context)
+    return {**result,'port_id':port_id,'lift_support':context.report(),
+            'curve_ref':curve_ref,
+            'scope':'Actual exported PVA through real native floor/sill surfaces under R1/R2/R3; whole-floor exclusions retained except the allocated source LiftCore stage. Native BRep motion audit and resource ownership are separate.'}
 
 
 def main():
