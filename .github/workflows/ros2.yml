@@ -1,0 +1,116 @@
+name: ROS 2 Jazzy package
+
+on:
+  push:
+    paths: ['ros2_ws/**', 'model/**', 'scripts/**', 'cad/vendor/**', 'tests/test_ros2_ci_results.py', '.github/workflows/ros2.yml']
+  pull_request:
+    paths: ['ros2_ws/**', 'model/**', 'scripts/**', 'cad/vendor/**', 'tests/test_ros2_ci_results.py', '.github/workflows/ros2.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ros2-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jazzy-mock:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    container:
+      # Official ROS image, independently verified registry digest; Jazzy on Noble.
+      image: ros:jazzy-ros-base-noble@sha256:5147d3ae250ce754afd399f6bfec15b33dd4e473ca357e30432a3182031bfad6
+    defaults:
+      run:
+        shell: bash
+    env:
+      ROS_DISTRO: jazzy
+      ROS_DOMAIN_ID: '61'
+      ROS_AUTOMATIC_DISCOVERY_RANGE: LOCALHOST
+      RMW_IMPLEMENTATION: rmw_fastrtps_cpp
+      QT_QPA_PLATFORM: offscreen
+      PYTHONUNBUFFERED: '1'
+      SOLIDCRAFTBOT_ROS_INTEGRATION_TESTS: '1'
+      FREECAD_APPIMAGE_URL: https://github.com/FreeCAD/FreeCAD/releases/download/1.1.4/FreeCAD_1.1.4-Linux-x86_64-py311.AppImage
+      FREECAD_APPIMAGE_SHA256: f6dc6ba676e5ac96a565ebc8d657232f94c6158e85b4352141bd1a46f6b43434
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install declared Jazzy dependencies
+        run: |
+          set -eo pipefail
+          apt-get update
+          apt-get install --no-install-recommends -y \
+            ca-certificates curl git python3-pytest python3-yaml \
+            libgl1 libegl1 libxkbcommon0 libxrender1 libxext6 libsm6 libice6
+          source /opt/ros/jazzy/setup.bash
+          rosdep update --rosdistro jazzy
+          rosdep install --from-paths ros2_ws/src/solidcraftbot_ros --ignore-src --rosdistro jazzy -y
+          rosdep check --from-paths ros2_ws/src/solidcraftbot_ros --ignore-src --rosdistro jazzy
+          mkdir -p exports/ros2-ci
+          dpkg-query -W -f='${binary:Package}\t${Version}\n' 'ros-jazzy-*' \
+            python3-pytest python3-colcon-core > exports/ros2-ci/debian-packages.tsv
+      - name: Check CI result guards
+        run: python3 scripts/check_walkthrough_regressions.py --pattern test_ros2_ci_results.py --report exports/ros2-ci/result-guard-tests.json
+      - name: Prepare verified FreeCAD runtime
+        run: |
+          set -euo pipefail
+          curl --fail --location --retry 3 --output "$RUNNER_TEMP/freecad.AppImage" "$FREECAD_APPIMAGE_URL"
+          printf '%s  %s\n' "$FREECAD_APPIMAGE_SHA256" "$RUNNER_TEMP/freecad.AppImage" | sha256sum --check --strict
+          chmod +x "$RUNNER_TEMP/freecad.AppImage"
+          mkdir "$RUNNER_TEMP/freecad-runtime"
+          cd "$RUNNER_TEMP/freecad-runtime"
+          "$RUNNER_TEMP/freecad.AppImage" --appimage-extract > /dev/null
+          cat > "$RUNNER_TEMP/freecad-python" <<'SH'
+          #!/usr/bin/env bash
+          set -euo pipefail
+          task_freecad_root="$(dirname "$(readlink -f "$0")")/freecad-runtime/squashfs-root"
+          export PYTHONPATH="$task_freecad_root/usr/lib"
+          export PYTHONNOUSERSITE=1
+          exec "$task_freecad_root/AppRun" python "$@"
+          SH
+          chmod +x "$RUNNER_TEMP/freecad-python"
+          "$RUNNER_TEMP/freecad-python" -c 'import FreeCAD, Part; assert FreeCAD.Version()[:3] == ["1", "1", "4"]; print(FreeCAD.Version())'
+          printf 'SOLIDCRAFTBOT_FREECAD_PYTHON=%s\n' "$RUNNER_TEMP/freecad-python" >> "$GITHUB_ENV"
+      - name: Generate native ROS assets without SolidCraft
+        run: python3 scripts/build_ros2_freecad.py
+      - name: Build and install solidcraftbot_ros
+        run: |
+          set -eo pipefail
+          source /opt/ros/jazzy/setup.bash
+          cd ros2_ws
+          colcon build --symlink-install --packages-select solidcraftbot_ros --event-handlers console_direct+
+      - name: Test installed assets, protocol and live mock controllers
+        run: |
+          set -eo pipefail
+          source /opt/ros/jazzy/setup.bash
+          source ros2_ws/install/setup.bash
+          export SOLIDCRAFTBOT_ROS_EVIDENCE_DIR="$GITHUB_WORKSPACE/exports/ros2-ci/runtime"
+          cd ros2_ws
+          colcon test --packages-select solidcraftbot_ros --return-code-on-test-failure --event-handlers console_direct+ --pytest-args -v
+      - name: Require test results including live mock without skips
+        if: ${{ !cancelled() }}
+        run: |
+          set -eo pipefail
+          source /opt/ros/jazzy/setup.bash
+          cd ros2_ws
+          colcon test-result --verbose
+          cd ..
+          python3 scripts/check_ros2_ci_results.py ros2_ws/build/solidcraftbot_ros --report exports/ros2-ci/test-results.json
+      - name: Retain ROS build, native export and runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ros2-jazzy-${{ github.run_id }}-${{ github.run_attempt }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            exports/ros2-ci/
+            exports/generated/ros2-freecad-*/build-report.json
+            exports/generated/ros2-freecad-*/native-report.json
+            ros2_ws/log/
+            ros2_ws/build/solidcraftbot_ros/*.xml
+            ros2_ws/build/solidcraftbot_ros/test_results/
+            ros2_ws/src/solidcraftbot_ros/urdf/
+            ros2_ws/src/solidcraftbot_ros/meshes/
+            ros2_ws/src/solidcraftbot_ros/config/
