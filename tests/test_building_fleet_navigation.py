@@ -4,6 +4,8 @@ import os
 import hashlib
 import json
 import tempfile
+import copy
+from types import SimpleNamespace
 from pathlib import Path
 import random
 import shutil
@@ -186,6 +188,31 @@ class NativeL01StopTests(unittest.TestCase):
 
 
 class QualifiedSearchTests(unittest.TestCase):
+    def test_speculative_neighbors_do_not_qualify_the_accepted_floor(self):
+        grid=nav.ClearanceGrid({'min':[0,0,0],'max':[2000,2000,0]},100)
+        grid.raster([[0,0],[2000,0],[2000,2000],[0,2000]],True);grid.finalize()
+        calls=[]
+        grid.floor_support=SimpleNamespace(level='EG',line=lambda a,b,r,**kw:(calls.append((a,b))or{'passed':False}))
+        self.assertTrue(grid.proposal_line_free([300,1000],[1700,1000],50))
+        self.assertEqual(calls,[])
+        with self.assertRaisesRegex(ValueError,'Endpoint connection failed'):
+            grid.search([300,1000],[1700,1000],50)
+        self.assertTrue(calls)
+
+    def test_posed_bounds_index_keeps_an_articulated_obstacle(self):
+        mesh=nav.NativeMesh.__new__(nav.NativeMesh)
+        obj={'joint':{'type':'prismatic','axis':[1,0,0]},'states':{'ref':0,'posed':1000},
+             'reference_state':'ref','initial_state':'posed'}
+        group={'id':'door','role':'door','bounds_mm':{'min':[0,-100,0],'max':[10,100,300]}}
+        mesh.transforms={'door':[obj]};mesh.scene={'groups':[group]}
+        mesh.manifest={'levels':[{'id':'EG','z_mm':0}]}
+        mesh.triangles=lambda g:iter([[[1000,-100,0],[1000,100,0],[1000,100,300]]])
+        self.assertEqual(nav.native_rectangle_collisions(mesh,'EG',[900,0],[1100,0],0,20,20,200),['door'])
+        self.assertEqual(nav.native_rectangle_collisions(mesh,'EG',[0,0],[100,0],0,20,20,200),[])
+        posed=copy.copy(mesh);posed.transforms={'door':[dict(obj,states={'ref':0,'posed':2000})]}
+        self.assertEqual(posed.bounds(group)['min'][0],2000)
+        self.assertEqual(nav.native_rectangle_collisions(posed,'EG',[900,0],[1100,0],0,20,20,200),[])
+
     def test_edge_certificate_also_controls_visibility_shortcuts(self):
         grid=nav.ClearanceGrid({'min':[0,0,0],'max':[2000,2000,0]},100)
         grid.raster([[0,0],[2000,0],[2000,2000],[0,2000]],support=True);grid.finalize()
