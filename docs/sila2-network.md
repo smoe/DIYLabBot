@@ -151,6 +151,8 @@ synthetic workflow clock; the new read-only path does not bypass that guard.
 
 ## Deutsch: Bedienung und Grenzen
 
+Schritt für Schritt mit Beispieldateien und tatsächlich beobachteten Ausgaben: [Tutorial: SiLA-2-Schnittstelle des CF01-Simulators](tutorial-cf01-sila2.md).
+
 Abhängigkeiten in einer eigenen Python-Umgebung installieren:
 
 ```sh

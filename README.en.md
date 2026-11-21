@@ -82,6 +82,7 @@ To get started:
 - [Requirements](docs/requirements.md), [arm design](docs/design.md) and [mechanical development plan](ROADMAP.md#mechanischer-entwicklungsplan).
 - [Architecture](ARCHITECTURE.md) and [shared model](docs/shared-model.md).
 - [FreeCAD](docs/freecad.md), [ROS 2/RViz](docs/ros2.md) and [equipment communication using CF01/SiLA 2 as an example](docs/sila2-network.md).
+- [Tutorial: SiLA 2 interface of the CF01 simulator](docs/tutorial-cf01-sila2.md#english-translation).
 
 The local model build generates unversioned CAD, mesh and ROS files: the bounded reference build with `--ros2` occupies around 116 MB (decimal units; measured existing outputs, not peak storage demand; scope and source revision are recorded in the local [build report](exports/generated/storage-reference-2026-11-18/build-report.json)). The revision directories recorded there under `cad/generated/` and `exports/generated/`, as well as the generated mesh, URDF and configuration files under `ros2_ws/src/solidcraftbot_ros/`, are gitignored and can be rebuilt. Only these outputs may be deleted; do not delete `exports/` wholesale, because it also contains runtime data and original evidence. Additional build revisions require additional space.
 
