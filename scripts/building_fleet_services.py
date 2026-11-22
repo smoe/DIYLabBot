@@ -26,6 +26,8 @@ class ResourceServices:
         self.owners = {}; self.holds = {}; self.queues = {}; self.requests = {}; self.events = []
         self.waiting_places = copy.deepcopy(waiting_places or {}); self.wait_owners = {}; self.wait_holds = {}
         self.exit_wait_holds = {}; self.waiting_events = []
+        self.next_wait_holds={};self.bookings={};self.mission_bookings={}
+        self.active_bookings={};self.next_bookings={};self.wait_bindings={};self.booking_events=[]
 
     def request(self, vehicle, resource, now):
         finite(now)
@@ -81,17 +83,94 @@ class ResourceServices:
                 return {'status':'granted', 'level':level, 'slot':index, 'pose_mm':copy.deepcopy(place)}
         return {'status':'rejected_full', 'level':level}
 
-    def _waiting_grant(self, key, role):
+    def _waiting_grant(self, key, role, booking_id=None):
         level, index = key
-        return {'status':'granted', 'level':level, 'slot':index,
+        result={'status':'granted', 'level':level, 'slot':index,
                 'pose_mm':copy.deepcopy(self.waiting_places[level][index]), 'role':role}
+        if booking_id is not None:result.update(booking_id=booking_id,mission_id=self.bookings[booking_id]['mission_id'])
+        return result
 
     def own_waiting_grants(self, vehicle):
         """Return only this vehicle's start/exit reservation, never peer data."""
-        return {'start':self._waiting_grant(self.wait_holds[vehicle], 'start')
+        return {'start':self._waiting_grant(self.wait_holds[vehicle], 'start',self.wait_bindings.get(vehicle))
                     if vehicle in self.wait_holds else {'status':'none'},
-                'destination':self._waiting_grant(self.exit_wait_holds[vehicle], 'destination')
-                    if vehicle in self.exit_wait_holds else {'status':'none'}}
+                'destination':self._waiting_grant(self.exit_wait_holds[vehicle], 'destination',self.active_bookings.get(vehicle))
+                    if vehicle in self.exit_wait_holds else {'status':'none'},
+                'lookahead_destination':self._waiting_grant(self.next_wait_holds[vehicle], 'lookahead_destination',self.next_bookings.get(vehicle))
+                    if vehicle in self.next_wait_holds else {'status':'none'}}
+
+    def _free_bay(self,level):
+        return next(((level,i)for i in range(len(self.waiting_places[level]))if(level,i)not in self.wait_owners),None)
+
+    def can_book_mission(self,vehicle,start_level,destination_level,source_role='start'):
+        if start_level==destination_level or start_level not in self.waiting_places or destination_level not in self.waiting_places:return False
+        if source_role=='arrival':
+            source=self.exit_wait_holds.get(vehicle)
+            return (source is not None and source[0]==start_level and vehicle in self.active_bookings
+                    and self.wait_owners.get(source)==vehicle
+                    and self.bookings[self.active_bookings[vehicle]]['state']=='boarded'
+                    and vehicle not in self.next_bookings and self._free_bay(destination_level)is not None)
+        if source_role!='start':raise ValueError('Only current or incoming own source roles are supported')
+        if vehicle in self.active_bookings or vehicle in self.exit_wait_holds:return False
+        source=self.wait_holds.get(vehicle)
+        if source is not None and self.wait_owners.get(source)!=vehicle:raise ValueError('Waiting ownership mismatch')
+        return ((source is None or source[0]==start_level)and(source is not None or self._free_bay(start_level)is not None)
+                and self._free_bay(destination_level)is not None)
+
+    def _booking_event(self,event,booking,now):
+        self.booking_events.append({'event':event,'time_s':now,**copy.deepcopy(booking)})
+
+    def _bound_event(self,event,vehicle,key,role,booking,now):
+        self.waiting_events.append({'event':event,'vehicle_id':vehicle,'level':key[0],'slot':key[1],
+            'role':role,'booking_id':booking['booking_id'],'mission_id':booking['mission_id'],'time_s':now})
+
+    def book_mission(self,vehicle,mission_id,start_level,destination_level,now,source_role='start'):
+        """Fence all endpoints before issuing this immutable foreign mission."""
+        finite(now)
+        if not isinstance(mission_id,str)or not mission_id:raise ValueError('Named boundary mission required')
+        if mission_id in self.mission_bookings:
+            old=self.bookings[self.mission_bookings[mission_id]]
+            if any(old[k]!=v for k,v in [('vehicle_id',vehicle),('from_level',start_level),('to_level',destination_level),('source_role',source_role)]):
+                raise ValueError('A mission booking cannot change identity or route')
+            return copy.deepcopy(old)
+        if not self.can_book_mission(vehicle,start_level,destination_level,source_role):return None
+        booking_id='booking-'+str(len(self.bookings)+1)
+        if source_role=='arrival':
+            start=self.exit_wait_holds[vehicle];end=self._free_bay(destination_level)
+            self.next_wait_holds[vehicle]=end;self.next_bookings[vehicle]=booking_id;self.wait_owners[end]=vehicle
+            state='conditional'
+        else:
+            start=self.wait_holds.get(vehicle)or self._free_bay(start_level);end=self._free_bay(destination_level)
+            new_start=vehicle not in self.wait_holds
+            if vehicle not in self.wait_holds:
+                self.wait_holds[vehicle]=start;self.wait_owners[start]=vehicle
+            self.exit_wait_holds[vehicle]=end;self.wait_owners[end]=vehicle;self.active_bookings[vehicle]=booking_id
+            self.wait_bindings[vehicle]=booking_id;state='active'
+        booking={'booking_id':booking_id,'vehicle_id':vehicle,'mission_id':mission_id,
+            'from_level':start_level,'to_level':destination_level,'source_role':source_role,
+            'start':{'level':start[0],'slot':start[1]},'destination':{'level':end[0],'slot':end[1]},
+            'state':state,'created_s':now,'activated_s':now if state=='active'else None}
+        self.bookings[booking_id]=booking;self.mission_bookings[mission_id]=booking_id
+        if source_role=='start':self._bound_event('waiting_granted'if new_start else'waiting_bound',vehicle,start,'start',booking,now)
+        self._bound_event('waiting_granted',vehicle,end,'lookahead_destination'if state=='conditional'else'destination',booking,now)
+        self._booking_event('booking_fenced',booking,now)
+        return copy.deepcopy(booking)
+
+    def require_mission_booking(self,vehicle,mission_id,start_level,destination_level):
+        bid=self.mission_bookings.get(mission_id);booking=self.bookings.get(bid)
+        if (booking is None or self.active_bookings.get(vehicle)!=bid or booking['state']!='active'
+                or booking['vehicle_id']!=vehicle or booking['from_level']!=start_level or booking['to_level']!=destination_level
+                or self.wait_holds.get(vehicle)!=(booking['start']['level'],booking['start']['slot'])
+                or self.exit_wait_holds.get(vehicle)!=(booking['destination']['level'],booking['destination']['slot'])
+                or any(self.wait_owners.get((p['level'],p['slot']))!=vehicle for p in(booking['start'],booking['destination']))):
+            raise ValueError('An active mission-bound source and destination booking is required')
+        return copy.deepcopy(booking)
+
+    def mark_mission_boarded(self,vehicle,mission_id,now):
+        finite(now);bid=self.active_bookings.get(vehicle);booking=self.bookings.get(bid)
+        if booking is None or booking['mission_id']!=mission_id or booking['state']!='active':raise ValueError('Own active boarding mission required')
+        self.require_mission_booking(vehicle,mission_id,booking['from_level'],booking['to_level'])
+        booking['state']='boarded';self._booking_event('booking_boarded',booking,now)
 
     def admit_lift_trip(self, vehicle, start_level, destination_level, now):
         """Atomically hold source and destination bays before a lift request.
@@ -135,19 +214,45 @@ class ResourceServices:
         key=self.exit_wait_holds[vehicle]
         if key[0]!=level or self.wait_owners.get(key)!=vehicle:
             raise ValueError('Destination promotion must match the observed own floor')
+        bid=self.active_bookings.get(vehicle);next_id=self.next_bookings.get(vehicle)
+        if bid is not None and self.bookings[bid]['state']!='boarded':
+            raise ValueError('Body-clear promotion requires observed prior boarding')
+        if next_id is not None:
+            booking=self.bookings[next_id]
+            if (booking['start']['level'],booking['start']['slot'])!=key or booking['state']!='conditional':
+                raise ValueError('Conditional future source differs from observed arrival')
         del self.exit_wait_holds[vehicle];self.wait_holds[vehicle]=key
         self.waiting_events.append({'event':'waiting_promoted','vehicle_id':vehicle,
             'level':key[0],'slot':key[1],'role':'start','time_s':now})
-        return self._waiting_grant(key,'start')
+        bid=self.active_bookings.pop(vehicle,None)
+        if bid is not None:
+            booking=self.bookings[bid]
+            self.waiting_events[-1].update(booking_id=bid,mission_id=booking['mission_id'])
+            booking['state']='arrived';self.wait_bindings[vehicle]=bid;self._booking_event('booking_arrived',booking,now)
+        next_id=self.next_bookings.pop(vehicle,None)
+        if next_id is not None:
+            booking=self.bookings[next_id]
+            end=self.next_wait_holds.pop(vehicle);self.exit_wait_holds[vehicle]=end
+            self.active_bookings[vehicle]=next_id;self.wait_bindings[vehicle]=next_id
+            booking.update(state='active',activated_s=now)
+            self._bound_event('waiting_role_activated',vehicle,end,'destination',booking,now)
+            self._bound_event('waiting_bound',vehicle,key,'start',booking,now)
+            self._booking_event('booking_activated',booking,now)
+        return self._waiting_grant(key,'start',self.wait_bindings.get(vehicle))
 
     def release_waiting_place(self, vehicle, now=None):
         if now is not None:finite(now)
         if vehicle not in self.wait_holds:
             raise ValueError('Vehicle has no lift waiting place')
+        bound=self.wait_bindings.get(vehicle)
+        if bound is not None and self.bookings[bound]['state']=='active':
+            raise ValueError('An active trip source stays fenced until observed cabin parking')
         key = self.wait_holds.pop(vehicle); del self.wait_owners[key]
+        bid=self.wait_bindings.pop(vehicle,None)
         if now is not None:
             self.waiting_events.append({'event':'waiting_released','vehicle_id':vehicle,
                 'level':key[0],'slot':key[1],'role':'start','time_s':now})
+            if bid is not None:self.waiting_events[-1].update(booking_id=bid,mission_id=self.bookings[bid]['mission_id'])
 
 
 def cabin_lanes(interior_bounds_mm, footprint_mm, clearance_mm, maximum=2):

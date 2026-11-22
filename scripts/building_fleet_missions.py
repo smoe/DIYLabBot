@@ -118,7 +118,7 @@ class MissionPlanner:
                         if 'sources' in source else nav.corner_trim_mm)
         self.states = {vehicle: {'queue': [], 'seen': {}, 'completed': set(),
                         'active': None, 'terminal': None, 'done': False,
-                        'requested': False, 'home_confirmation': None} for vehicle in nav.homes}
+                        'requested': False, 'admission_deferred':False, 'home_confirmation': None} for vehicle in nav.homes}
         self.ports = {p['level_id']: copy.deepcopy(p)
                       for p in nav.mesh.manifest['elevator']['ports'] if p['active']}
         if len(self.ports) != sum(p['active'] for p in nav.mesh.manifest['elevator']['ports']):
@@ -227,7 +227,8 @@ class MissionPlanner:
 
     def receive_assignment(self, vehicle, mission):
         state = self._state(vehicle)
-        if (not isinstance(mission, dict) or set(mission) != {'mission_id', 'vehicle_id', 'assigned_s', 'goal'}
+        required={'mission_id','vehicle_id','assigned_s','goal'}
+        if (not isinstance(mission, dict) or not required<=set(mission)or set(mission)-required-{'source_level','booking_id'}
                 or mission.get('vehicle_id') != vehicle):
             raise ValueError('Assignment must identify its own vehicle')
         if _number(mission['assigned_s']) < 0:
@@ -240,6 +241,11 @@ class MissionPlanner:
                 raise ValueError('Conflicting replay of own assignment')
             return False
         goal = mission.get('goal', {})
+        if 'source_level'in mission:
+            if mission['source_level']not in self.ports:raise ValueError('Known own assignment source level required')
+            if goal.get('level')!=mission['source_level']:
+                if not isinstance(mission.get('booking_id'),str)or not mission['booking_id']:raise ValueError('Foreign mission requires its fenced booking')
+            elif mission.get('booking_id')is not None:raise ValueError('A local goal must not claim a foreign booking')
         if goal.get('kind') == 'inspection_pass':
             if (goal.get('level'), goal.get('area')) not in self.variants:
                 raise ValueError('Assignment is outside source inspection map')
@@ -254,7 +260,7 @@ class MissionPlanner:
         else:
             raise ValueError('Unknown mission kind')
         state['seen'][mid] = copy.deepcopy(mission)
-        state['queue'].append(copy.deepcopy(mission)); state['requested'] = False
+        state['queue'].append(copy.deepcopy(mission)); state['requested'] = False;state['admission_deferred']=False
         return True
 
     def _snapshot(self, own):
@@ -326,13 +332,23 @@ class MissionPlanner:
                 boundary = mission; break
             inspections.append(mission)
         if boundary is None:
-            return self._request(own, level)
-        goal = boundary['goal']
-        if goal['level'] != level:
+            if not inspections and not prefix:return self._request(own,level)
+            if not prefix and not state['admission_deferred']:return self._request(own,level)
+            waiting=grants.get('waiting_place',{})
+            if waiting.get('status')=='granted'and waiting.get('level')==level:
+                slot=waiting['slot'];endpoints=self.wait_approaches[level,slot]
+                terminal={'kind':'capacity_wait','level':level,'slot':slot}
+            elif level==self.nav.homes[vehicle]['level']:
+                home=self.nav.homes[vehicle];endpoints=[[home['arrival_xy_mm'],home['pose_mm_rad'][:2]]]
+                terminal={'kind':'capacity_home','level':level}
+            else:raise ValueError('No owned capacity endpoint on the current foreign floor')
+        elif boundary['goal']['level'] != level:
+            goal=boundary['goal']
             slot = self._wait(own, grants, goal['level'])
             if isinstance(slot, dict): return slot
             endpoints = self.wait_approaches[level, slot]
-            terminal = {'kind': 'lift_wait', 'level': level, 'slot': slot, 'to_level': goal['level']}
+            terminal = {'kind': 'lift_wait', 'level': level, 'slot': slot, 'to_level': goal['level'],
+                        'mission_id':boundary['mission_id'],'booking_id':boundary.get('booking_id')}
         else:
             home = self.nav.homes[vehicle]
             endpoints = [[home['arrival_xy_mm'], home['pose_mm_rad'][:2]]]
@@ -368,7 +384,7 @@ class MissionPlanner:
                     offset = _append(points, route['points_mm'])
                     zones.extend({**z, 'start_index': z['start_index']+offset, 'end_index': z['end_index']+offset} for z in route.get('zone_segments', []))
                     _append(points, ending)
-                    if terminal['kind']=='home' and prefix and grants.get('waiting_place',{}).get('status')=='granted':
+                    if terminal['kind']in('home','capacity_home')and prefix and grants.get('waiting_place',{}).get('status')=='granted':
                         waiting=grants['waiting_place']
                         marks.append({'point_index':len(prefix)-1,'event':'waiting_place_released',
                                       'details':{'level':waiting['level'],'slot':waiting['slot']}})
@@ -476,7 +492,11 @@ class MissionPlanner:
             return self._request(own, own['level'])
         goal = queue[0]['goal']
         terminal = state['terminal']
-        if terminal and terminal['kind'] == 'same_side_exit_stop':
+        if terminal and terminal['kind']=='capacity_wait'and goal['level']!=own['level']:
+            state['terminal']={'kind':'lift_wait','level':own['level'],'slot':terminal['slot'],
+                'to_level':goal['level'],'mission_id':queue[0]['mission_id'],'booking_id':queue[0].get('booking_id')}
+            terminal=state['terminal']
+        if terminal and terminal['kind']in('same_side_exit_stop','capacity_wait'):
             slot = terminal['slot']; wait = self.nav.waits[own['level']][slot]
             port = self.ports[own['level']]; direction = 1 if math.cos(wait[2]) > 0 else -1
             clear_x = port['plane_x_mm']-direction*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
@@ -489,7 +509,8 @@ class MissionPlanner:
         if terminal and terminal['kind'] == 'lift_wait':
             lift = own_grants.get('lift', {'status': 'none'})
             if lift.get('status') == 'none':
-                return {'kind': 'call_lift', 'from_level': own['level'], 'to_level': terminal['to_level']}
+                return {'kind': 'call_lift', 'from_level': own['level'], 'to_level': terminal['to_level'],
+                        'mission_id':terminal['mission_id'],'booking_id':terminal.get('booking_id')}
             return self._board(own, lift)
         return self._floor_leg(own, own_grants)
 
@@ -504,7 +525,8 @@ class MissionPlanner:
                 raise ValueError('Unconfirmed drive arrival cannot advance mission state')
             state['active'] = None; state['terminal'] = copy.deepcopy(action['terminal'])
         elif action['kind']=='request_mission':
-            if result.get('status')=='pending_admission':state['requested']=False
+            if result.get('status')in('pending_admission','already_queued','already_queued_foreign'):state['requested']=False
+            if result.get('status')=='pending_admission':state['admission_deferred']=True
         elif action['kind'] == 'complete':
             if state['home_confirmation'] != action.get('mission_id'):
                 raise ValueError('Home completion was not issued from an observed own home pose')

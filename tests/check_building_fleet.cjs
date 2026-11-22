@@ -25,6 +25,12 @@ const pythonRoom=JSON.parse(cp.execFileSync('python3',['-c',"import json,sys;sys
 assert.deepEqual(received,pythonRoom,'Browser control-room reducer must match independent Python receiver');
 const mutableSnapshot=projection.at(7);mutableSnapshot.vehicles.BF01.heartbeat.pose_mm[0]=999;assert.equal(projection.at(7).vehicles.BF01.heartbeat.pose_mm[0],1,'Snapshots cannot modify received projection state');
 assert.equal(view.targetLabel({level:'OG1',area:'R3_003',basis:'template_area_use_unconfirmed'}),'OG1 · Vorlagefläche R3_003 (Nutzung unbestätigt)');
+assert.equal(view.stateLabel('capacity_wait'),'wartet auf zulässigen Folgeauftrag');
+assert.equal(view.stateLabel('capacity_home'),'vorläufig am eigenen Stellplatz');
+const capacityMessage={...messages[0],received_s:5,payload:{...messages[0].payload,mode:'capacity_home'}};
+assert.equal(view.controlRoom([capacityMessage],4).vehicles.BF01,undefined,'Provisional home state must not appear before receipt');
+assert.equal(view.controlRoom([capacityMessage],5).vehicles.BF01.heartbeat.mode,'capacity_home');
+assert.equal(view.controlRoom([capacityMessage],5).events.length,0,'A provisional home heartbeat is not final home completion');
 assert.equal(view.receivedLift(projection.at(5.9).events).queue.length,0);assert.equal(view.receivedLift(projection.at(7).events).queue[0].vehicle_id,'BF01','Lift queue is built only from received service events');
 const validationFixture={...liftFixture,format:'solidcraftbot.building-fleet-program/1',complete:true,duration_s:4,levels:[{id:'EG',z_mm:0}],targets:[],room_route_object_ids:[],camera_captures:{},trajectories:Array.from({length:20},(_,i)=>({vehicle_id:'BF'+String(i+1).padStart(2,'0'),episodes:[{level_id:'EG',mode:'hold',start_s:0,end_s:4,attached_cabin:false,points:[point(0,[0,0,0]),point(4,[0,0,0])]}]})),received_messages:[]};
 assert.throws(()=>view.validateProgram({...validationFixture,complete:false}),/Complete compiled/);

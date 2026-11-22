@@ -52,7 +52,7 @@ def navigation(source,args):
 
 
 def generator_pins():
-    names=('building_fleet_checks.py','building_fleet_geometry_checks.py','building_fleet_depot.py','building_fleet_zones.py',
+    names=('building_fleet_checks.py','building_fleet_assignment_checks.py','building_fleet_geometry_checks.py','building_fleet_depot.py','building_fleet_zones.py',
            'building_fleet_runner.py','building_fleet_missions.py','building_fleet_resources.py',
            'building_fleet_motion.py','building_fleet_control.py','building_fleet_services.py',
            'building_fleet_dispatch.py','building_fleet_comm.py','building_fleet_sim.py',
@@ -136,7 +136,10 @@ def compile_fleet(args):
         report={'format':'solidcraftbot.building-fleet-report/1','passed':checked['passed'],
             'program':artifact(path),'export_check':artifact(out/'export-check.json'),'native_check':artifact(proof),
             'source_files_sha256':pins,'seed':program['seed'],'model_time_s':program['duration_s'],
-            'playback_factor':1,'elapsed_s':elapsed,'runtime_budget_target_s':600,'runtime_budget_met':runtime_elapsed<=600,
+            'playback_factor':1,'elapsed_s':elapsed,'runtime_budget_target_s':600,
+            'runtime_budget_scope':'Navigation/route/catalog preparation plus seeded world compilation; native and independent export audits reported separately',
+            'compilation_elapsed_s':preparation_elapsed+runtime_elapsed,
+            'runtime_budget_met':preparation_elapsed+runtime_elapsed<=600,
             'phase_elapsed_s':{'preparation':preparation_elapsed,'simulation':runtime_elapsed,
                                'native':native_elapsed,'independent_export':time.monotonic()-export_started},
             'program_bytes':path.stat().st_size,'statistics':program['statistics'],

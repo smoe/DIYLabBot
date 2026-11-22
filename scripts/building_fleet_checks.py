@@ -27,14 +27,15 @@ F=motion.F
 FORMAT='solidcraftbot.building-fleet-export-check/2'
 CHECKS=('coverage','homes','dynamics','no_stop','support','collision','resources','lift','perception','telemetry')
 ALLOWED_HOLDS=frozenset({'protective_stop','resource_wait','lift_wait','lift_parked',
-                         'lift_travel','lift_door_sequence','home'})
+                         'lift_travel','lift_door_sequence','home','capacity_wait','capacity_home'})
 GENERATORS=('building_fleet_checks.py','building_fleet_support.py','building_fleet_floor.py',
     'building_fleet_motion.py','building_fleet_clearance.py','building_fleet_navigation.py',
     'building_fleet_control.py','building_fleet_services.py','building_fleet_sim.py',
     'building_fleet_lift_checks.py','building_fleet_lift_geometry.py','building_fleet_runner.py',
     'building_fleet_missions.py','building_fleet_resources.py','building_fleet_comm.py',
     'building_fleet_dispatch.py','building_fleet_depot.py','building_fleet_routes.py',
-    'building_fleet_geometry.py','building_fleet_geometry_checks.py','building_fleet_zones.py','tr01_camera_model.py')
+    'building_fleet_geometry.py','building_fleet_geometry_checks.py','building_fleet_zones.py',
+    'building_fleet_assignment_checks.py','tr01_camera_model.py')
 
 
 def finite(value,minimum=-math.inf):
@@ -84,7 +85,7 @@ def check_resource_history(events,duration,vehicle_ids):
 def _covered(windows,vehicle,resource,a,b):
     return any(left<=a+1e-7 and right>=b-1e-7 for left,right in windows.get((vehicle,resource),()))
 
-def check_resource_occupancy(trajectories,catalog,windows,homes=None):
+def check_resource_occupancy(trajectories,catalog,windows,homes=None,*,parked_bays=None):
     """Interval-enclose actual XY against immutable guarded conflict regions.
 
     Parked depot homes are obstacles, not moving claimants. Every driving
@@ -97,7 +98,7 @@ def check_resource_occupancy(trajectories,catalog,windows,homes=None):
     checks=0
     for trajectory in trajectories:
         for episode in trajectory.episodes:
-            if episode['attached_cabin']or episode.get('lift_phase')in('boarding','alighting'):continue
+            if episode['attached_cabin']:continue
             if homes is not None and episode['mode']=='hold':
                 p=episode['points'][0]
                 state={'level':episode['level_id'],'aboard':False,'pose_mm':p['pose_mm_rad'],
@@ -123,6 +124,8 @@ def check_resource_occupancy(trajectories,catalog,windows,homes=None):
             def interval(a,b,depth=0):
                 nonlocal checks
                 checks+=1;mid=(a+b)/2;pose=curve.evaluate(mid)[F[0]][:2]
+                if parked_bays is not None and any(left<=a+1e-8 and right>=b-1e-8
+                        for left,right in parked_bays.get((trajectory.identity,id(episode)),())):return
                 raw=curve_extrema(curve,a,b)
                 delta=math.hypot(*(max(abs(raw[k][i]-pose[i])for k in('min','max'))for i in range(2)))
                 pending=[]
@@ -132,7 +135,8 @@ def check_resource_occupancy(trajectories,catalog,windows,homes=None):
                 if not pending:return
                 if b-a<=.0005 or depth>=24:raise ValueError('Driving curve lacks its own exclusive resource: '+str((trajectory.identity,level,a,b,[r['resource']for r in pending])))
                 interval(a,mid,depth+1);interval(mid,b,depth+1)
-            cuts=sorted({*curve.times,*[t for (vehicle,_),rows in windows.items()if vehicle==trajectory.identity for pair in rows for t in pair if episode['start_s']<t<episode['end_s']]})
+            cuts=sorted({*curve.times,*[t for (vehicle,_),rows in windows.items()if vehicle==trajectory.identity for pair in rows for t in pair if episode['start_s']<t<episode['end_s']],
+                *[t for pair in(parked_bays or{}).get((trajectory.identity,id(episode)),())for t in pair if episode['start_s']<t<episode['end_s']]})
             for a,b in zip(cuts,cuts[1:]):interval(a,b)
     return {'passed':True,'intervals':checks,'method':'actual exported XY polynomial enclosures against immutable guarded regions and own grant intervals'}
 
@@ -143,7 +147,7 @@ def check_coverage(program,trajectories,navigation,source):
     for message in program['received_messages']:
         comm.validate(message)
         if message['kind']=='event'and message['payload']['event']=='inspection_completed':
-            d=message['payload']['details'];key=(message['vehicle_id'],d['level'],d['area'],message['sent_s'])
+            d=message['payload']['details'];key=(message['vehicle_id'],d['level'],d['area'],message['sent_s'],d.get('mission_id'))
             reported[key]=True
     for row in program['inspection_witnesses']:
         identity=row['vehicle_id'];key=(row['level'],row['area']);t=row['time_s'];mission=row['mission_id']
@@ -152,7 +156,7 @@ def check_coverage(program,trajectories,navigation,source):
         state=episode['curve'].evaluate(t)
         if episode['mode']!='driving'or episode['level_id']!=key[0]or math.hypot(*state[F[1]][:2])<=1e-5:raise ValueError('Inspection is a moving actual pass, never a planned or stationary visit')
         if not point_in_polygon(state[F[0]][:2],navigation.polygons[key[0]][key[1]]):raise ValueError('Inspection witness lies outside its source-bound room')
-        if not any(v==identity and lev==key[0]and area==key[1]and abs(sent-t)<1e-6 for v,lev,area,sent in reported):raise ValueError('Actual inspection lacks its received completion event')
+        if not any(v==identity and lev==key[0]and area==key[1]and mid==mission and abs(sent-t)<1e-6 for v,lev,area,sent,mid in reported):raise ValueError('Actual inspection lacks its exact mission-bound received completion event')
         counts[key]+=1
     if any(counts[k]<r['minimum_visits']for k,r in target.items()):raise ValueError('Actual received coverage is incomplete')
     return [{'level':k[0],'area':k[1],'visits':counts[k],'basis':r['basis']}for k,r in target.items()]
@@ -326,28 +330,52 @@ def check_depot(trajectories,navigation,catalog,windows):
             'basis':'actual polynomial intervals versus depot rooms/own exclusive grants; all other source homes retained as physical envelopes'}
 
 
-def check_waiting_history(events,duration,navigation,vehicle_ids):
-    """Recheck source and destination bay exclusivity through promotion."""
-    owners={};held={};windows={};starts={};previous=-math.inf
+def _waiting_replay(events,duration,navigation,vehicle_ids):
+    """Keep capacity reservations distinct from physical occupancy permission."""
+    owners={};held={};windows=collections.defaultdict(list);previous=-math.inf
+    def close(own,at):
+        row=held.pop(own)
+        windows[(own[0],row['key'])].append({**row,'end_s':at,'role':own[1]})
+        return row
     for row in events:
         t=finite(row['time_s'],0);vehicle=row['vehicle_id'];key=(row['level'],row['slot']);event=row['event'];role=row['role']
-        if t<previous or t>duration or vehicle not in vehicle_ids or role not in('start','destination'):raise ValueError('Chronological own waiting-place history required')
+        base={'event','vehicle_id','level','slot','role','time_s'}
+        if set(row)not in(base,base|{'booking_id','mission_id'}):raise ValueError('Only own named waiting-place observations are permitted')
+        if t<previous or t>duration or vehicle not in vehicle_ids or role not in('start','destination','lookahead_destination'):raise ValueError('Chronological own waiting-place history required')
+        if abs(t*1000-round(t*1000))>1e-5:raise ValueError('Waiting observations must use actual source time quantization')
         previous=t
         if key[0]not in navigation.waits or type(key[1])is not int or not 0<=key[1]<len(navigation.waits[key[0]]):raise ValueError('Waiting bay differs from prepared source layout')
+        binding={field:row.get(field)for field in('booking_id','mission_id')}
+        if 'booking_id'in row and any(not isinstance(value,str)or not value for value in binding.values()):raise ValueError('Waiting bindings require both immutable mission and booking identities')
         own=(vehicle,role)
         if event=='waiting_granted':
             if key in owners or own in held:raise ValueError('Waiting-place grant overlaps another owner')
-            owners[key]=own;held[own]=key;starts[own]=t
+            owners[key]=own;held[own]={'key':key,'start_s':t,**binding}
         elif event=='waiting_released':
-            if held.get(own)!=key or owners.get(key)!=own:raise ValueError('Waiting-place release lacks its exact own grant')
-            windows.setdefault((vehicle,key),[]).append((starts.pop(own),t));del held[own];del owners[key]
+            if role!='start'or own not in held or held[own]['key']!=key or owners.get(key)!=own or any(held[own][field]!=value for field,value in binding.items()):raise ValueError('Waiting-place release lacks its exact own grant')
+            close(own,t);del owners[key]
         elif event=='waiting_promoted':
             old=(vehicle,'destination')
-            if role!='start'or own in held or held.get(old)!=key or owners.get(key)!=old:raise ValueError('Destination promotion lacks source release and exact destination grant')
-            held[own]=held.pop(old);owners[key]=own;starts[own]=starts.pop(old)
+            if role!='start'or own in held or old not in held or held[old]['key']!=key or owners.get(key)!=old or any(held[old][field]!=value for field,value in binding.items()):raise ValueError('Destination promotion lacks source release and exact destination grant')
+            close(old,t);held[own]={'key':key,'start_s':t,**binding};owners[key]=own
+        elif event=='waiting_role_activated':
+            old=(vehicle,'lookahead_destination')
+            if (role!='destination'or own in held or old not in held or held[old]['key']!=key
+                    or owners.get(key)!=old or(vehicle,'start')not in held
+                    or any(held[old][field]!=value for field,value in binding.items())):raise ValueError('Conditional destination activation lacks observed source promotion and exact lookahead grant')
+            close(old,t);held[own]={'key':key,'start_s':t,**binding};owners[key]=own
+        elif event=='waiting_bound':
+            if role!='start'or own not in held or held[own]['key']!=key or owners.get(key)!=own or binding['booking_id']is None:raise ValueError('A mission binding cannot create or move an own physical source grant')
+            close(own,t);held[own]={'key':key,'start_s':t,**binding}
         else:raise ValueError('Unknown waiting-place observation')
     if held:raise ValueError('Terminal program retains waiting-place reservations')
-    return {'passed':True,'events':len(events),'grant_windows':sum(map(len,windows.values())),'basis':'source bay identities, dual-end admission exclusivity and explicit promotion/release replay'}
+    return dict(windows)
+
+
+def check_waiting_history(events,duration,navigation,vehicle_ids):
+    windows=_waiting_replay(events,duration,navigation,vehicle_ids)
+    return {'passed':True,'events':len(events),'grant_windows':sum(map(len,windows.values())),
+            'basis':'exclusive source bays, immutable mission bindings, conditional capacity fences, explicit activation/promotion/release; no conditional occupancy permission'}
 
 
 def check_telemetry(program,trajectories,source,navigation):
@@ -655,24 +683,25 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
             'derived_limit':limit,'basis':'raw own anonymous scan/capture/decision replay, source static matching and exclusive fixed-home invariant, actual selected stop polynomials, full reaction/staleness/closing envelope and fresh-clear restart; no perception pass flags consumed'}
 
 
-def check_waiting_occupancy(trajectories,navigation,events,duration):
+def check_waiting_occupancy(trajectories,navigation,events,duration,*,lift_requests=()):
     """Every unowned bay remains excluded between actual grant boundaries."""
     from building_fleet_sim import footprint,polygon_distance
     replay=check_waiting_history(events,duration,navigation,{t.identity for t in trajectories})
-    windows={};held={};starts={}
-    for row in events:
-        own=(row['vehicle_id'],row['role']);key=(row['level'],row['slot']);event=row['event'];at=row['time_s']
-        if event=='waiting_granted':held[own]=key;starts[own]=at
-        elif event=='waiting_promoted':
-            old=(row['vehicle_id'],'destination');held[own]=held.pop(old);starts[own]=starts.pop(old)
-        else:
-            windows.setdefault((own[0],key),[]).append((starts.pop(own),at));del held[own]
-    cuts=[t for rows in windows.values()for pair in rows for t in pair];intervals=refinements=0
+    windows=_waiting_replay(events,duration,navigation,{t.identity for t in trajectories})
+    cuts=[row[field]for rows in windows.values()for row in rows for field in('start_s','end_s')];intervals=refinements=0
     size=[navigation.envelope['length_mm'],navigation.envelope['width_mm']]
     def visit(trajectory,e,key,polygon,a,b,depth=0):
         nonlocal intervals,refinements
         intervals+=1
-        if any(x<=a+1e-7 and y>=b-1e-7 for x,y in windows.get((trajectory.identity,key),[])):return
+        for row in windows.get((trajectory.identity,key),[]):
+            if row['start_s']>a+1e-7 or row['end_s']<b-1e-7:continue
+            if row['role']=='start':return
+            if row['role']=='destination'and e.get('lift_phase')=='alighting'and any(
+                    request['vehicle_id']==trajectory.identity and request.get('booking_id')==row['booking_id']
+                    and request.get('mission_id')==row['mission_id'] and request['destination_port']==e.get('port_id')
+                    and request['requested_s']<=a+1e-7 and request['exited_s']>=a-1e-7
+                    and(request['destination_waiting_bay']['level'],request['destination_waiting_bay']['slot'])==key
+                    for request in lift_requests):return
         raw=curve_extrema(e['curve'],a,b,1)
         movement=(math.hypot(*(max(abs(raw[k][i])for k in('min','max'))for i in range(2)))+
                   navigation.radius*max(abs(raw[k][2])for k in('min','max')))*(b-a)/2
@@ -688,6 +717,91 @@ def check_waiting_occupancy(trajectories,navigation,events,duration):
                 for a,b in _cut_intervals(trajectory,e['start_s'],e['end_s'],[*e['curve'].times,*cuts]):visit(trajectory,e,(level,slot),polygon,a,b)
     return {**replay,'occupancy_intervals':intervals,'refinements':refinements,
             'occupancy_basis':'oriented actual bodies, polynomial interval displacement, every live grant/release boundary and recursive conservative exclusion; ungranted re-entry forbidden'}
+
+
+def _source_rest(episode,expected):
+    """An exactly constant exported curve at the named source pose."""
+    if episode['mode']!='hold'or episode['attached_cabin']:return False
+    first=episode['points'][0]['pose_mm_rad']
+    if len(first)!=3 or any(type(v)not in(int,float)or not math.isfinite(v)for v in first):return False
+    if not _same_pose(first[:2],expected[:2])or abs(math.remainder(first[2]-expected[2],2*math.pi))>1e-6:return False
+    return all(p['pose_mm_rad']==first and all(v==0 for field in motion.floor.PUBLIC[1:]for v in p[field])for p in episode['points'])
+
+
+def check_capacity_parking(program,trajectories,navigation,catalog,resource_windows):
+    """Qualify each parked-bay exception from actual own observations/PVA.
+
+    This is used only after independent all-vehicle waiting-bay exclusion has
+    passed. A parked source bay remains fenced and excluded from every other
+    vehicle. Its corridor token is reacquired before any departure movement.
+    """
+    identities={t.identity for t in trajectories};by_id={t.identity:t for t in trajectories}
+    windows=_waiting_replay(program['waiting_events'],program['duration_s'],navigation,identities)
+    parked=collections.defaultdict(list);parking_count=capacity_count=0
+    fields={'event','vehicle_id','time_s','level','slot','booking_id','released_resource',
+            'pose_mm_rad','velocity_mm_rad_s','acceleration_mm_rad_s2','condition'}
+    previous=-math.inf
+    for row in program.get('bay_parking_events',[]):
+        if set(row)!=fields or row['event']!='waiting_bay_parked':raise ValueError('Closed original own parked-bay observation required')
+        at=finite(row['time_s'],0);vehicle=row['vehicle_id'];key=(row['level'],row['slot'])
+        if at<previous or at>program['duration_s']or vehicle not in identities:raise ValueError('Chronological own parked-bay observations required')
+        previous=at
+        if key[0]not in navigation.waits or type(key[1])is not int or not 0<=key[1]<len(navigation.waits[key[0]]):raise ValueError('Parked bay must reference the actual source layout')
+        expected=navigation.waits[key[0]][key[1]];trajectory=by_id[vehicle];episode=trajectory.episode(at)
+        jet=episode['curve'].evaluate(at)
+        if (episode['attached_cabin']or episode['level_id']!=key[0]
+                or not _same_pose(jet[F[0]][:2],expected[:2])
+                or abs(math.remainder(jet[F[0]][2]-expected[2],2*math.pi))>1e-6
+                or any(abs(v)>1e-7 for field in F[1:3]for v in jet[field])):raise ValueError('A corridor token can be parked only at actual exact own bay rest')
+        for public,field in zip(motion.floor.PUBLIC,F):
+            if not _same_pose(row[public],jet[field]):raise ValueError('Parked-bay observation differs from actual exported own PVA')
+        grants=[r for r in windows.get((vehicle,key),[])if r['role']=='start'and r['start_s']<=at+1e-8 and r['end_s']>at+1e-8
+                and r['booking_id']==row['booking_id']]
+        if len(grants)!=1:raise ValueError('Parked bay requires its own live mission-bound current-source grant')
+        if row['condition']!='exclusive_current_bay_at_exact_source_pose_and_rest; every_other_curve_excludes_occupied_bay':raise ValueError('Parked bay lacks its declared exclusive-source/exclusion condition')
+        released=row['released_resource']
+        if released is not None:
+            if released not in catalog['resources']or not any(abs(right-at)<1e-7 and left<=at for left,right in resource_windows.get((vehicle,released),())):
+                raise ValueError('Parked corridor release lacks its original own token grant/release')
+        elif any(left<at-1e-8 and right>at+1e-8 for (owner,_),rows in resource_windows.items()if owner==vehicle for left,right in rows):
+            raise ValueError('A parked observation cannot hide a retained corridor token')
+        # Rebinding the same physical source at an activation boundary does not
+        # remove its reservation. Extend only through contiguous start roles.
+        end=grants[0]['end_s']
+        for grant in sorted(windows.get((vehicle,key),[]),key=lambda r:r['start_s']):
+            if grant['role']=='start'and grant['start_s']<=end+1e-8 and grant['end_s']>end:end=grant['end_s']
+        for e in trajectory.episodes:
+            if e['end_s']<=at or e['start_s']>=end:continue
+            if not _source_rest(e,expected):
+                if e['start_s']>=at-1e-8:break
+                continue
+            left,right=max(at,e['start_s']),min(end,e['end_s'])
+            if left<right:parked[(vehicle,id(e))].append((left,right))
+        parking_count+=1
+    for trajectory in trajectories:
+        home=navigation.homes[trajectory.identity];home_since=None
+        for episode in trajectory.episodes:
+            at_home=episode['level_id']==home['level']and _source_rest(episode,home['pose_mm_rad'])
+            home_since=episode['start_s']if at_home and home_since is None else home_since if at_home else None
+            reason=episode.get('hold_reason')
+            if reason not in('capacity_wait','capacity_home'):continue
+            if episode.get('hold_condition')not in('own_admissible_successor_assignment','actual_functional_'+reason+'_arrival'):
+                raise ValueError('Capacity rest needs its actual source assignment/admission condition')
+            if reason=='capacity_home':
+                if not at_home:raise ValueError('A provisional capacity home is the exact own source home, never final completion')
+                if any(row['role']=='start'and row['start_s']<home_since-1e-8 and row['end_s']>episode['start_s']+1e-8
+                       for (vehicle,_),rows in windows.items()if vehicle==trajectory.identity for row in rows):raise ValueError('Provisional home retained its old arrival bay after physical clearance')
+            else:
+                possible=[]
+                for (vehicle,key),rows in windows.items():
+                    if vehicle!=trajectory.identity or key[0]!=episode['level_id']:continue
+                    if _source_rest(episode,navigation.waits[key[0]][key[1]]):possible.extend((key,row)for row in rows if row['role']=='start')
+                cuts=sorted({episode['start_s'],episode['end_s'],*[row[field]for _,row in possible for field in('start_s','end_s')if episode['start_s']<row[field]<episode['end_s']]})
+                if not possible or any(not any(row['start_s']<=a+1e-8 and row['end_s']>=b-1e-8 for _,row in possible)for a,b in zip(cuts,cuts[1:])):
+                    raise ValueError('Capacity wait must remain at an exactly occupied own current source bay')
+            capacity_count+=1
+    return ({'passed':True,'parking_observations':parking_count,'capacity_hold_episodes':capacity_count,
+             'corridor_release_basis':'original parked observation, exact own bay pose/zero PVA, current exclusive start grant, actual token release; every other curve independently excludes the source bay; departure requires ordinary resource coverage'},dict(parked))
 
 
 def _context(program,source,navigation):
@@ -752,8 +866,12 @@ def check_program(program_path,source=None,navigation=None,*,resource_catalog=No
         except (ValueError,RuntimeError,KeyError,TypeError,ArithmeticError,IndexError)as exc:
             checks[name]={'passed':False,'error':type(exc).__name__+': '+str(exc)}
     def coverage():
+        from building_fleet_assignment_checks import check_assignments
+        assignments=check_assignments(program,trajectories,navigation,source)
+        if assignments.get('passed')is not True:raise ValueError('Actual issued/received mission and booking lifecycle did not pass independent replay')
         rows=check_coverage(program,trajectories,navigation,source)
         return {'passed':True,'targets':rows,'source_target_count':len(source['missions']['targets']),
+                'mission_assignments':assignments,
                 'basis':'unique moving actual polynomial room witnesses and received completion events; authoritative source polygons'}
     run('coverage',coverage);run('homes',lambda:check_homes(trajectories,navigation,program))
     try:
@@ -767,8 +885,10 @@ def check_program(program_path,source=None,navigation=None,*,resource_catalog=No
     def resources():
         windows=check_resource_history(program['resource_events'],program['duration_s'],{t.identity for t in trajectories});cache['windows']=windows
         if any(resource not in catalog['resources']for _,resource in windows):raise ValueError('A grant uses a resource outside the canonical source catalog')
-        return {'passed':True,'occupancy':check_resource_occupancy(trajectories,catalog,windows,navigation.homes),
-                'waiting':check_waiting_occupancy(trajectories,navigation,program['waiting_events'],program['duration_s']),
+        waiting=check_waiting_occupancy(trajectories,navigation,program['waiting_events'],program['duration_s'],lift_requests=program.get('lift_requests',()))
+        parking,parked=check_capacity_parking(program,trajectories,navigation,catalog,windows)
+        return {'passed':True,'occupancy':check_resource_occupancy(trajectories,catalog,windows,navigation.homes,parked_bays=parked),
+                'waiting':waiting,'capacity_parking':parking,
                 'conditional_depot':check_depot(trajectories,navigation,catalog,windows)}
     run('resources',resources)
     run('telemetry',lambda:check_telemetry(program,trajectories,source,navigation))

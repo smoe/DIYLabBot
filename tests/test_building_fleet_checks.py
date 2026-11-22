@@ -69,6 +69,9 @@ class ExportChecks(unittest.TestCase):
         catalog={'regions':[{'level':'EG','resource':'R','polygon':[[-10,-10],[10,-10],[10,10],[-10,10]]}],'room_polygons':[],'room_guard_mm':0}
         with self.assertRaisesRegex(ValueError,'exclusive resource'):checks.check_resource_occupancy([car],catalog,{})
         self.assertTrue(checks.check_resource_occupancy([car],catalog,{('BF01','R'):[(0,1)]})['passed'])
+        car.episodes[0]['lift_phase']='alighting'
+        with self.assertRaisesRegex(ValueError,'exclusive resource'):
+            checks.check_resource_occupancy([car],catalog,{})
 
     def test_waiting_bay_ungranted_reentry_is_not_hidden_between_nodes(self):
         car=trajectory('BF01',[point(0,-100,vx=200),point(1,100,vx=200)])
@@ -96,6 +99,9 @@ class ExportChecks(unittest.TestCase):
                'payload':{'event':'inspection_completed','details':{'level':'EG','area':'A','mission_id':'M'}}}
         p={'received_messages':[event],'inspection_witnesses':[{'vehicle_id':'BF01','level':'EG','area':'A','time_s':.5,'mission_id':'M'}]}
         self.assertEqual(checks.check_coverage(p,[car],nav,source)[0]['visits'],1)
+        event['payload']['details']['mission_id']='forged'
+        with self.assertRaisesRegex(ValueError,'exact mission-bound'):checks.check_coverage(p,[car],nav,source)
+        event['payload']['details']['mission_id']='M'
         p['received_messages']=[]
         with self.assertRaisesRegex(ValueError,'received completion'):checks.check_coverage(p,[car],nav,source)
         p['received_messages']=[event];p['inspection_witnesses'][0]['time_s']=.1

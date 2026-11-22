@@ -57,6 +57,13 @@ class FleetContractTests(unittest.TestCase):
             model.validate(source)
         self.assertEqual(model.resolved_sensor(self.source)['clearance_mm'], 75)
 
+    def test_foreign_admission_policy_cannot_skip_fences_or_activation(self):
+        policy=model.admission_settings(self.source)
+        self.assertEqual(policy['maximum_foreign_boundaries'],1)
+        self.reject(lambda s:s['missions'].pop('admission_policy'))
+        self.reject(lambda s:s['missions']['admission_policy'].update(maximum_foreign_boundaries=2))
+        self.reject(lambda s:s['missions']['admission_policy'].update(lookahead_source='time_only'))
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -377,6 +377,7 @@ class WorldRunner:
         self.world=world_model.SensorWorld(self.sensor,static,cabin_segments_by_sides=cabins,landing_segments_by_level_sides=landings)
         self.auditor=world_model.IntervalAuditor(navigation.reserve,static)
         self.resources=service_model.ResourceServices(catalog.resources,navigation.waits)
+        self.admission_policy=model.admission_settings(source)
         depot_level=source['depot']['level']
         self.depot_polygons={(depot_level,area):copy.deepcopy(navigation.polygons[depot_level][area])for area in source['depot']['areas']}
         self.depot_aliases={key:catalog.canonical[catalog.room_alias[key]]for key in self.depot_polygons}
@@ -390,6 +391,7 @@ class WorldRunner:
         self.resource_events=[];self.resource_cursor=0;self.inspection_witnesses=[];self.camera_captures={};self.geometry_checks=[];self.driver_checks=[]
         self.lift_requests=[];self.lift_events=[];self.lift_cursor=0;self._motion_cache={};self._geometry_cache={}
         self.route_door_ids=set();self.home_events=[]
+        self.mission_receipts=[];self.mission_acknowledgements=[];self.bay_parking_events=[]
         self.vehicles={};self.latest_scans={};self.capture_history={};self.decision={};self.leg_counter=0
         self.heartbeat_step=round(1/self.dt);self.perception_step=round(.5/self.dt);self.scan_step=round(self.sensor['period_s']/self.dt)
         if self.scan_step*self.dt!=self.sensor['period_s']:raise ValueError('Sensor period must be representable on the source integration step')
@@ -465,18 +467,29 @@ class WorldRunner:
     def request_mission(self,identity,level,now):
         row=self.vehicles[identity]
         if row['mission_pending']:return{'status':'pending'}
+        action=row.get('action')
+        if action is not None and action['terminal']['kind']in('capacity_home','capacity_wait'):
+            # This endpoint was selected after a failed admission. Preserve
+            # that compiled leg, and retry after its observed owned-bay/home
+            # arrival rather than creating an avoidable mid-leg successor.
+            return{'status':'pending_admission'}
         queued=[m for m in self.planner.states[identity]['queue']if m['mission_id']not in self.planner.states[identity]['completed']]
         if any(m['goal']['kind']=='home'for m in queued):return{'status':'already_queued'}
-        grants=self.resources.own_waiting_grants(identity)
-        available=any(g.get('status')=='granted'and g['level']==level for g in grants.values())or any(
-            (level,i)not in self.resources.wait_owners for i in range(len(self.nav.waits[level])))
-        returning=(self.dispatcher.returning or(now>=self.source['missions']['minimum_duration_s']and
-            all(self.dispatcher.visits[k]>=r['minimum_visits']for k,r in self.dispatcher.targets.items())))
-        # At an existing functional rest, bound same-floor prefetch while the
-        # future lift endpoint is full. No inspection endpoint becomes a rest,
-        # and no unbounded queue of unusable lookahead assignments accumulates.
-        if queued and not available and not returning:return{'status':'pending_admission'}
-        message=self.dispatcher.assign(identity,level,now,lift_wait_available=available)
+        # A cabin passenger plans relative to its own incoming floor. The
+        # future source is a reference to that passenger's fenced exit bay.
+        if row['aboard']:
+            grant=self.lift.own_grant(identity)
+            level=self.lift.ports[grant['destination_port']]['level_id'];role='arrival'
+        else:level=row['level'];role='start'
+        if any(m['goal']['level']!=level for m in queued):return{'status':'already_queued_foreign'}
+        allowed={destination for destination in self.nav.waits if destination!=level and
+            self.resources.can_book_mission(identity,level,destination,role)}
+        # At most one local batch and one fenced foreign boundary can await
+        # this vehicle. A full destination never creates an unusable mission.
+        if not queued or(self.dispatcher.ready_to_return(now)and self.nav.homes[identity]['level']==level):allowed.add(level)
+        def book(mid,goal):return self.resources.book_mission(identity,mid,level,goal['level'],now,role)
+        message=self.dispatcher.assign(identity,level,now,admissible_levels=allowed,book_goal=book)
+        if message is None:return{'status':'pending_admission'}
         self.downlink.emit(identity,'event',{'event':'mission_assigned','details':{'mission':message}},now)
         row['mission_pending']=True;return{'status':'pending','mission_id':message['mission_id']}
 
@@ -484,14 +497,20 @@ class WorldRunner:
         for message in self.downlink.deliver(now):
             if message['kind']!='event'or message['payload']['event']!='mission_assigned':continue
             mission=message['payload']['details']['mission'];identity=message['vehicle_id']
+            if self.dispatcher.missions.get(mission.get('mission_id'))!=mission or mission.get('vehicle_id')!=identity:
+                raise RuntimeError('Received assignment differs from its immutable issued mission')
             self.vehicles[identity]['mission_pending']=False
             self.planner.receive_assignment(identity,copy.deepcopy(mission))
-            self.event(identity,'mission_assigned',{'mission_id':mission['mission_id'],'goal':mission['goal'],'acknowledged':True},now)
+            self.mission_receipts.append({'vehicle_id':identity,'mission_id':mission['mission_id'],'received_s':now})
+            self.event(identity,'mission_assigned',{'mission_id':mission['mission_id'],'goal':mission['goal'],
+                'source_level':mission['source_level'],'booking_id':mission['booking_id'],'acknowledged':True},now)
         for message in self.uplink.deliver(now):
             self.control_room.receive(message)
             if message['kind']!='event':continue
             event=message['payload']['event'];details=message['payload']['details'];identity=message['vehicle_id']
-            if event=='mission_assigned'and details.get('acknowledged'):self.dispatcher.acknowledge(identity,details['mission_id'])
+            if event=='mission_assigned'and details.get('acknowledged'):
+                self.dispatcher.acknowledge(identity,details['mission_id'])
+                self.mission_acknowledgements.append({'vehicle_id':identity,'mission_id':details['mission_id'],'received_s':now})
             if event in('inspection_completed','home_reached')and details.get('mission_id'):
                 self.dispatcher.receive_completion(identity,details['mission_id'])
 
@@ -684,7 +703,28 @@ class WorldRunner:
         target=grant['pose_mm']
         if math.dist(row['pose_mm_rad'][:2],target[:2])>1e-6 or abs(math.remainder(row['pose_mm_rad'][2]-target[2],2*math.pi))>1e-6:
             raise RuntimeError('Lift waiting state does not match actual own bay localization')
+        if grant.get('role')!='start'or self.resources.wait_owners.get((grant['level'],grant['slot']))!=identity:
+            raise RuntimeError('A physical waiting rest requires its exclusive current source role')
         return grant
+
+    def park_waiting_bay(self,identity,driver):
+        """Release the corridor token only at an observed exclusive bay rest.
+
+        The bay reservation remains fenced. Canonical geometry excludes this
+        full bay from every other vehicle's nominal and executed curve. Their
+        anonymous scans still see the parked vehicle as a dynamic obstacle.
+        """
+        grant=self.require_own_waiting_pose(identity);row=self.vehicles[identity]
+        _,velocity,acceleration=driver.path.pva(driver.y,driver.v,driver.a)
+        if max(abs(v)for v in velocity+acceleration)>1e-7:
+            raise RuntimeError('A waiting bay cannot release its corridor token while moving')
+        held=self.resources.holds.get(identity)
+        self.bay_parking_events.append({'event':'waiting_bay_parked','vehicle_id':identity,'time_s':self.now,
+            'level':grant['level'],'slot':grant['slot'],'booking_id':grant.get('booking_id'),
+            'released_resource':held,'pose_mm_rad':row['pose_mm_rad'][:],
+            'velocity_mm_rad_s':velocity,'acceleration_mm_rad_s2':acceleration,
+            'condition':'exclusive_current_bay_at_exact_source_pose_and_rest; every_other_curve_excludes_occupied_bay'})
+        if held:self.release_resource(identity,held,self.now)
 
     def idle_action(self,identity):
         row=self.vehicles[identity]
@@ -698,20 +738,18 @@ class WorldRunner:
                     self.planner.on_action_result(identity,action,result,self.now)
                     row['hold_reason']='resource_wait';row['hold_condition']='own_future_lift_endpoint_admission';return
             elif kind=='request_wait':
-                result=self.resources.admit_lift_trip(identity,action['level'],action['to_level'],self.now)
-                if result['status']!='granted':
-                    row['hold_reason']='lift_wait';row['hold_condition']='own_source_waiting_bay_grant';return
+                raise RuntimeError('A foreign assignment must already contain its own fenced waiting endpoints')
             elif kind=='call_lift':
-                if row['phase']!='lift_wait':raise RuntimeError('Lift call requires observed own waiting arrival')
+                if row['phase']not in('lift_wait','capacity_wait'):raise RuntimeError('Lift call requires observed own waiting arrival')
                 wait=self.require_own_waiting_pose(identity)
-                admission=self.resources.admit_lift_trip(identity,action['from_level'],action['to_level'],self.now)
-                if admission['status']!='granted':
-                    row['hold_reason']='lift_wait';row['hold_condition']='own_atomic_source_and_destination_waiting_admission';return
+                booking=self.resources.require_mission_booking(identity,action['mission_id'],action['from_level'],action['to_level'])
+                if booking['booking_id']!=action['booking_id']:raise RuntimeError('Lift call changed its immutable mission booking')
                 result=self.lift.request(identity,action['from_level'],action['to_level'],self.now)
                 request=self.lift.requests[identity]
                 self.lift_requests.append({'vehicle_id':identity,'start_port':request['start_port'],
                     'destination_port':request['end_port'],'slot':None,'requested_s':self.now,'assigned_s':None,
-                    'destination_waiting_bay':copy.deepcopy(admission['destination'])})
+                    'mission_id':action['mission_id'],'booking_id':booking['booking_id'],
+                    'destination_waiting_bay':copy.deepcopy(self.resources.own_waiting_grants(identity)['destination'])})
                 self.drain_lift_events()
             elif kind=='complete':
                 if not self.own(identity)['home']:raise RuntimeError('Final home completion requires actual own home localization')
@@ -798,20 +836,31 @@ class WorldRunner:
             result=self.lift.board(identity,True)
             if result['status']!='accepted':raise RuntimeError('Actual cabin parking lacks an open-port own grant')
             self.lift.park(identity);row['aboard']=True;row['phase']='aboard'
+            bid=self.resources.active_bookings[identity]
+            self.resources.mark_mission_boarded(identity,self.resources.bookings[bid]['mission_id'],self.now)
             self.resources.release_waiting_place(identity,self.now);self.drain_lift_events()
         elif kind=='lift_wait':
             self.require_own_waiting_pose(identity,terminal['slot']);row['phase']='lift_wait'
         elif kind=='same_side_exit_stop':
             self.require_own_waiting_pose(identity,terminal['slot']);row['phase']='landing'
-        elif kind=='home':
+        elif kind=='capacity_wait':
+            self.require_own_waiting_pose(identity,terminal['slot']);row['phase']='capacity_wait'
+            row['hold_reason']='capacity_wait';row['hold_condition']='own_admissible_successor_assignment'
+        elif kind in('home','capacity_home'):
             if not self.own(identity)['home']:raise RuntimeError('Home drive ended outside actual own source home')
-            row['phase']='home'
+            row['phase']=kind
+            if kind=='capacity_home':
+                row['hold_reason']='capacity_home';row['hold_condition']='own_admissible_successor_assignment'
         else:raise ValueError('Unknown physical drive endpoint '+str(kind))
         actual=floor.motion.Curve(floor.canonical(driver.recorded))
         if row['level']==self.source['depot']['level']:
             proof=fixed_home_curve_proof(actual,identity,self.nav.homes,self.nav.envelope,self.nav.reserve,row['level'])
             self.depot_checks.append({'vehicle_id':identity,'leg_id':row['leg_id'],'phase':'executed','proof':proof})
         self.check_geometry(identity,action,actual,'executed')
+        if kind in('lift_wait','same_side_exit_stop','capacity_wait'):self.park_waiting_bay(identity,driver)
+        if kind=='capacity_home':
+            held=self.resources.holds.get(identity)
+            if held:self.release_resource(identity,held,self.now)
         self.driver_checks.append({'vehicle_id':identity,'leg_id':row['leg_id'],'perception_limit':copy.deepcopy(driver.perception_limit),
             'perception_audit':copy.deepcopy(driver.perception_audit),'profiles':copy.deepcopy(driver.profile_checks)})
         self.planner.on_action_result(identity,action,{'status':'arrived','terminal':copy.deepcopy(terminal),
@@ -888,7 +937,8 @@ class WorldRunner:
             mode='hold';attached=False
             terminal=row['action']['terminal']['kind']if driver is not None and row['action']is not None else None
             if driver is not None and driver.mode=='arrived':
-                reason={'cabin_park':'lift_parked','lift_wait':'lift_wait','same_side_exit_stop':'lift_wait','home':'home'}[terminal]
+                reason={'cabin_park':'lift_parked','lift_wait':'lift_wait','same_side_exit_stop':'lift_wait','home':'home',
+                    'capacity_wait':'capacity_wait','capacity_home':'capacity_home'}[terminal]
                 condition='actual_functional_'+terminal+'_arrival'
             else:
                 reason=('resource_wait'if driver is not None and driver.reason=='resource_wait'else'protective_stop')if driver is not None else row['hold_reason']
@@ -969,7 +1019,9 @@ class WorldRunner:
 
     def completed(self):
         return(all(r['done']and self.own(i)['home']for i,r in self.vehicles.items())and
-            not self.resources.holds and not self.resources.wait_holds and not self.resources.exit_wait_holds and not self.lift.requests and not self.uplink.pending and not self.downlink.pending and
+            not self.resources.holds and not self.resources.wait_holds and not self.resources.exit_wait_holds and
+            not self.resources.next_wait_holds and not self.resources.active_bookings and not self.resources.next_bookings and
+            not self.lift.requests and not self.uplink.pending and not self.downlink.pending and
             not any(self.uplink.buffer.values())and not any(self.downlink.buffer.values())and
             self.dispatcher.acks<=self.dispatcher.completed)
 
@@ -977,7 +1029,10 @@ class WorldRunner:
         maximum=self.source['missions']['maximum_duration_s'];step=0
         while self.now<maximum-1e-8:
             self.deliver_messages(self.now)
-            for identity in self.vehicles:self.idle_action(identity)
+            for identity in self.vehicles:
+                if self.vehicles[identity]['aboard']and not self.vehicles[identity]['mission_pending']:
+                    self.request_mission(identity,self.vehicles[identity]['level'],self.now)
+                self.idle_action(identity)
             self.observe(step)
             end=round((step+1)*self.dt,3);self.advance_world(end);step+=1
             if self.progress is not None and step%round(10/self.dt)==0:
@@ -998,6 +1053,10 @@ class WorldRunner:
             'lift_requests':copy.deepcopy(self.lift_requests),'lift_events':copy.deepcopy(self.lift_events),
             'trajectories':[{'vehicle_id':i,'episodes':copy.deepcopy(r['episodes'])}for i,r in self.vehicles.items()],
             'waiting_events':copy.deepcopy(self.resources.waiting_events),
+            'mission_assignments':copy.deepcopy(list(self.dispatcher.missions.values())),
+            'mission_receipts':copy.deepcopy(self.mission_receipts),'mission_acknowledgements':copy.deepcopy(self.mission_acknowledgements),
+            'mission_bookings':copy.deepcopy(list(self.resources.bookings.values())),
+            'booking_events':copy.deepcopy(self.resources.booking_events),'bay_parking_events':copy.deepcopy(self.bay_parking_events),
             'inspection_witnesses':copy.deepcopy(self.inspection_witnesses),'resource_events':copy.deepcopy(self.resource_events),
             'received_messages':copy.deepcopy(self.control_room.messages),'camera_captures':copy.deepcopy(self.camera_captures),
             'resource_catalog':self.catalog.report(),'trajectory_checks':{'passed':bool(complete),'reserve_mm':self.nav.reserve,**self.auditor.statistics()},
@@ -1051,6 +1110,7 @@ def compile_program(source,navigation,output_dir,*,progress=None,geometry_checke
                 'building_fleet_motion.py','building_fleet_dispatch.py','building_fleet_resources.py','building_fleet_depot.py','building_fleet_zones.py',
                 'building_fleet_geometry_checks.py','building_fleet_lift_geometry.py','building_fleet_lift_checks.py',
                 'building_fleet_clearance.py','building_fleet_floor.py','building_fleet_support.py',
+                'building_fleet_assignment_checks.py',
                 'check_building_fleet_freecad.py')
     artifact_refs=copy.deepcopy(artifacts or {})
     artifact_pins={}
