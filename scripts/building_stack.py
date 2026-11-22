@@ -102,7 +102,7 @@ def parameters(spec, overrides=None):
 
 
 def validate(spec):
-    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior', 'alignment', 'plan_variants', 'atrium_access'}}
+    spec = _spec(spec); leading = {k: v for k, v in spec.items() if k not in {'_source', 'exterior', 'alignment', 'plan_variants', 'atrium_access', 'room_signs'}}
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
@@ -471,6 +471,12 @@ def interfaces(spec, p):
         import foyer_monitor_wall
         data['monitor_wall'] = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
             {name: value[0] for name, value in bases.items()}, p, levels)['interface']
+    if 'room_signs' in spec:
+        import building_room_signs
+        omitted = set(data.get('furnishings', {}).get('omitted_walls', [])) | set(data.get('exterior', {}).get('omitted_body_ids', []))
+        data['room_signs'] = building_room_signs.compile(spec['room_signs'], spec,
+            {name: value[0] for name, value in bases.items()}, p, levels, omitted,
+            door_geometry=extension if 'exterior' in spec else None)['interface']
     return data
 
 
@@ -538,6 +544,13 @@ def expanded(spec, p):
         displays = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
             {name: value[0] for name, value in bases.items()}, p, data['levels'])
         for key in ('components', 'bodies', 'operations'): result[key].extend(displays[key])
+    if 'room_signs' in spec:
+        import building_room_signs
+        omitted = set(data.get('furnishings', {}).get('omitted_walls', [])) | set(data.get('exterior', {}).get('omitted_body_ids', []))
+        signs = building_room_signs.compile(spec['room_signs'], spec,
+            {name: value[0] for name, value in bases.items()}, p, data['levels'], omitted,
+            door_geometry=extension if 'exterior' in spec else None)
+        for key in ('components', 'bodies', 'operations'): result[key].extend(signs[key])
     return result
 
 
@@ -555,12 +568,15 @@ def displacement(source, component, values):
 
 def solidcraft_commands(spec, p):
     raw = _spec(spec)
+    source = expanded(spec, p)
+    import building_room_signs
     class Provider:
         SOURCE = Path(raw.get('_source', {}).get('path', __file__))
-        expanded = staticmethod(expanded)
+        expanded = staticmethod(lambda _spec, _p: building_room_signs.physical_source(source))
         pose = staticmethod(pose)
         samples = staticmethod(samples)
     commands = portable.solidcraft_commands(native_spec(raw, p), p, provider=Provider)
+    commands.extend(building_room_signs.solidcraft_ink_commands(source))
     for command in commands:
         if command['command'] == 'document.metadata.set':
             command['params']['values'] = {'org.solidcraftbot.building-stack': {'source_id': raw['id'], 'metric_scale_known': False, 'coordinate_meaning': {'xy': 'presentation_mm', 'z': 'assumed_mm'}, 'transport_implemented': False}}
@@ -571,6 +587,7 @@ def source_dependencies(spec):
     spec = _spec(spec); plan, reference = templates(spec)
     paths = [SCHEMA, Path(__file__), ROOT/'scripts/building_circulation.py', ROOT/'scripts/building_roof.py', ROOT/'scripts/building_guards.py', *ground.source_dependencies(level_plan(spec, 'EG')), *ground.source_dependencies(level_plan(spec, 'KG')), ROOT/'scripts/assembly_model.py', ROOT/'model/assembly-reference.schema.json', ROOT/'scripts/room_geometry_model.py', ROOT/spec['sources']['room_geometry']['source'], *floor.source_dependencies(plan)]
     paths.append(ROOT/'scripts/lift_fittings.py')
+    paths.extend([ROOT/'scripts/tube_cam_model.py', ROOT/'scripts/tube_frame_model.py', ROOT/'scripts/sample_transport_model.py'])
     if 'furnishings' in spec['sources']:
         paths.extend(furnishings.dependencies(spec['sources']['furnishings']))
         if furnishings.read(spec['sources']['furnishings']).get('atrium_seating'):
@@ -591,5 +608,8 @@ def source_dependencies(spec):
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))
+    if 'room_signs' in spec:
+        import building_room_labels
+        paths.extend([ROOT/'scripts/building_room_signs.py', ROOT/'scripts/marker_label.py', *building_room_labels.dependencies(spec)])
     if '_source' in spec: paths.insert(0, Path(spec['_source']['path']))
     return list(dict.fromkeys(paths))

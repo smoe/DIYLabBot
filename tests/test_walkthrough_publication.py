@@ -55,8 +55,8 @@ class PublicationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'manifest'):
             self.verify(self.payload, lambda m: m['source_files_sha256'].update({'model/current.json': '0'*64}))
 
-    def test_laboratory_and_lift_contracts_cannot_drift_behind_valid_geometry(self):
-        for key in ('robots', 'laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
+    def test_scene_contracts_cannot_drift_behind_valid_geometry(self):
+        for key in ('robots', 'laboratories', 'equipment_source', 'elevator', 'places', 'topology', 'room_signs'):
             self.program[key] = {'current': key}
             payload = copy.deepcopy(self.payload)
             payload[key] = {'obsolete': key}

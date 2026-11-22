@@ -26,6 +26,12 @@ eine getrennt veröffentlichte Momentaufnahme. Ihr tatsächlicher Quellstand
 steht im [Publikationsmanifest](https://smoe.github.io/DIYLabBot/site-manifest.json).
 Lokale Erweiterungen werden nach ausdrücklicher Freigabe dorthin übertragen.
 
+## Raumschilder
+
+Der lokale Stand enthält 80 Raumschilder in KG, EG und OG1–OG3: 75 direkt rechts neben der Tür und fünf an der unmittelbar anschließenden rechten Nischenwand. Die bekannten Bezeichnungen stammen aus dem jeweiligen Geschossplan und den vorhandenen, gepinnten Raumzuordnungen, etwa Doktorandenraum, Labor, Mikroskop oder Küche. Die Schildschrift erscheint in Großbuchstaben; die ursprüngliche Bezeichnung und ihre Herkunft bleiben im Interface erhalten. F03-Nummern werden nicht pauschal auf andere Geschosse übertragen, unbekannte Nutzungen nicht erfunden. Ein Schild setzt eine eindeutige, erhaltene direkte Flurtür voraus. Benannte Flächen ohne eine solche Tür stehen unter `unplaced_rooms`; Verbindungstüren zwischen Räumen begründen kein zusätzliches Flurschild.
+
+„Rechts neben der Tür“ gilt vom Flur mit Blick auf die Tür, unabhängig von Planrichtung oder Türanschlag. Die Platzierung berücksichtigt die gesamte Schildplatte samt Schriftstärke, benachbarte Wandstücke, Öffnungen und die modellierten offenen Türblätter; bei Bedarf werden der Türabstand vergrößert oder die Schildbreite reduziert. Eine linke Ausweichposition wird nicht erzeugt. Platte und Schriftstriche sind portable native Geometrie aus derselben Quelle. Der neue vollständige FreeCAD-Aufbau stimmt im strengen Vergleich aller 160 Schildkörper mit der separat erzeugten SolidCraft-Fassung überein; deren unveränderte Geometriebefehle sind für den aktuellen Quellstand ausdrücklich nachgewiesen. Vier zusätzliche, aus der Quelle abgeleitete Prüfblickpunkte im Browser bestätigen die Schilddarstellung. Die Laufwegprüfung zur Labortür B ist dagegen mit sichtbaren wie ausgeblendeten Schildern blockiert und damit nicht bestanden. Abmessungen und Positionen bleiben ungemessene Darstellungsannahmen, `signage_qualified` bleibt `false`. Die öffentliche GitHub-Pages-Momentaufnahme wird erst nach gesonderter Freigabe erneuert.
+
 ## Erzeugen und öffnen
 
 ```bash

@@ -294,6 +294,7 @@ def compile(source=None):
             'objects': objects, 'robots': robots, 'elevator': elevator, 'isolation': isolation,
             'laboratories': laboratories, 'microscopy': interface.get('microscopy'), 'kitchenette':interface.get('kitchenette'),
             'places': interface['places'], 'topology': interface['topology'],
+            'room_signs': interface.get('room_signs'),
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/building-stack/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},

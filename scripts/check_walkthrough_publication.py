@@ -55,6 +55,7 @@ def check(html, manifest, program=None, body_ids=None):
         if key in program:
             require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
     require(payload.get('camera_wall') == program.get('camera_wall'), 'Stale published walkthrough: camera_wall')
+    require(payload.get('room_signs') == program.get('room_signs'), 'Stale published walkthrough: room_signs')
     expected = dict(program['source_files_sha256'])
     renderer_sources = ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
                         'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js')
