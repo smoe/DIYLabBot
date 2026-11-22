@@ -20,6 +20,7 @@ def main():
     names.append('lab-glassware.schema.json')
     names.append('lab-equipment.schema.json')
     names.extend(['lab-transfer-l01.schema.json','cf01-unload-demo.schema.json'])
+    names.extend(['robot-type.schema.json', 'robot-revisions.schema.json'])
     schemas = {}
     for name in names:
         path = ROOT/'model'/name
@@ -33,6 +34,13 @@ def main():
         data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
         Draft202012Validator(schemas[name],registry=registry).validate(data)
         print(document+': schema passed')
+    for document, name in [
+        ('robot-types/arm-nobrake.type.json', 'robot-type.schema.json'),
+        ('robot-revisions.json', 'robot-revisions.schema.json'),
+    ]:
+        data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))
+        Draft202012Validator(schemas[name], registry=registry).validate(data)
+        print(document + ': schema passed')
     for family in ['nanodrop-concept', 'qubit-4-concept']:
         document = family + '.shared.json'
         data = json.loads((ROOT/'model'/document).read_text(encoding='utf-8'))

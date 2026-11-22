@@ -598,6 +598,58 @@ Es wurden daher keine neuen nativen CAD-Dateien oder qualifizierten
 Build-Berichte erzeugt. Die ausgewählte README-Demo ist weiterhin der explizit
 historische, mit Prüfsummen dokumentierte Stand.
 
+### Roboterfamilie, Typ und Revision
+
+[Die Familienquelle](../model/robot.json) beschreibt den Arm, den die bisherigen
+Aufstellungen und Generatoren laden. [Der Typ `arm_nobrake`](../model/robot-types/arm-nobrake.type.json)
+benennt den bremsenfreien Konstruktionszweig und bindet die Antriebsauswahl.
+Seine Optionsmenge ist leer. Eine Revision bindet einen konkreten Stand eines
+Typs. Bei späteren Entwicklungsständen wird der [Katalog](../model/robot-revisions.json)
+um Einträge ergänzt. Jede bestehende Revisionskennung bleibt an ihren Stand gebunden.
+Instanzparameter gelten für eine einzelne Auswertung und werden mit der
+vorhandenen Maßparameterprüfung auf die gewählte Revision angewandt.
+
+`arm_nobrake@R0` verweist auf den bytegenau archivierten Armstand `978fa3557abc…`.
+Der Einstieg gibt die geprüfte Armquelle und ihre Herkunft als JSON aus.
+
+```sh
+python3 scripts/robot_revision.py arm_nobrake@R0
+```
+
+Der Python-Einstieg `load_robot_revision()` in [robot_revision.py](../scripts/robot_revision.py)
+akzeptiert den Alias oder die vollständige Revisionsprüfsumme und optional
+deklarierte Maßparameter, etwa `overrides={"upper_len": 220}`. Die
+Quellprüfsumme bezeichnet die exakten Archivbytes. Die Materialisierungsprüfsumme
+bezeichnet das kanonisch serialisierte Arm-JSON vor der Auswertung von
+Instanzparametern und vor dem Ableiten der Geometrie. Die Revisionsprüfsumme
+bindet zusätzlich den Typ, die Datenabhängigkeiten und den Stand der
+beteiligten Python-Module. Der Katalog verwendet hierfür sortierte JSON-Schlüssel,
+kompakte Trenner und UTF-8.
+
+Zum geprüften Satz gehören die Komponentenbibliothek, ihre
+Schnittstellendaten und geometrischen Prüfdokumente sowie die referenzierten
+STEP-Dateien. Die Antriebsauswahl ist eine deklarierte Typbindung. Das
+MB01-Manifest wird ebenfalls gebunden, auch wenn die bisherige Armvalidierung
+davon lediglich die Existenz prüft. Das Laden verlangt alle gebundenen
+Dateistände und meldet Abweichungen. Liegen Begleitdateien später in einer
+anderen Fassung vor, lässt sich der gebundene Stand über den passenden
+Git-Checkout wiederherstellen.
+
+Die [abgeleitete Bestandsaufnahme](robot-revision-inventory.json) dokumentiert
+direkte Armreferenzen und die relevanten indirekten Lesepfade. Sie kann mit
+`python3 scripts/report_robot_revision_inventory.py --check` geprüft werden.
+Die alten Pins insbesondere bei H02, TR01 und Analytik sind als Befunde erfasst.
+H02s Szenenvalidierung, Kinematik und native Herkunftsangabe brauchen für eine
+spätere Umstellung dieselbe aufgelöste Armrevision. Die allgemeine
+Baugruppenreferenz und bestehende Generatoren verwenden bislang ihren
+bisherigen Ladeweg.
+
+Die R0-Prüfungen decken Quellen, Kinematik, CAD-Befehlslisten und Steuerdaten
+ohne CAD ab. Native CAD-/ROS-Builds sowie Geometrie-, Kollisions-, Bewegungs-,
+Hardware- und Sicherheitsqualifikation bleiben getrennte Nachweise. Die
+[Lager- und Haltekonzepte](joint-bearings-holding.md) verbleiben in ihrer
+dokumentierten Konzeptphase.
+
 
 ### Synthetic CF01 composition
 

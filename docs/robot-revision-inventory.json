@@ -1,0 +1,433 @@
+{
+  "format": "solidcraftbot.robot-revision-inventory/1",
+  "derived": true,
+  "review_baseline_commit": "7537f9e4a1f3adecb6217faa64aabcbdc231f68a",
+  "scope": {
+    "model_glob": "model/**/*.json",
+    "excluded_subtree": "model/history/",
+    "exact_literal": "model/robot.json",
+    "include_object_keys": true,
+    "consumer_context": "Explicit source review, not exhaustive call-graph inference",
+    "git_independence": "No live HEAD, timestamps or absolute checkout paths in generated output"
+  },
+  "current_source": {
+    "path": "model/robot.json",
+    "raw_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+  },
+  "classification_meanings": {
+    "current": "Immediate raw pin matches current robot bytes, or a reviewed current consumer context; no qualification claim.",
+    "historical_mixed": "Known old raw robot pin or reviewed chain mixing old pins/current reads. Not historical_consistent and not native qualification.",
+    "unpinned": "No adjacent source pin; a schema pathname constraint or metadata alone does not resolve a revision.",
+    "mismatched_unresolved": "Other nonmatching pin; no historical provenance inferred."
+  },
+  "known_historical_pin": {
+    "raw_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7",
+    "provenance": "docs/line-ending-migration.json robot entry new_sha256 and Git blob 6a25eeb:model/robot.json; historical byte identity only"
+  },
+  "summary": {
+    "direct_occurrences": 17,
+    "direct_files": 15,
+    "classification_counts": {
+      "current": 7,
+      "historical_mixed": 4,
+      "unpinned": 6
+    }
+  },
+  "direct_references": [
+    {
+      "file": "model/actuator-selection.json",
+      "json_pointer": "/geometry_source",
+      "occurrence": "value",
+      "role": "descriptive_source_metadata",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/actuator-selection.json",
+      "json_pointer": "/joint_bindings_source",
+      "occurrence": "value",
+      "role": "descriptive_source_metadata",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/analytics-tools.shared.json",
+      "json_pointer": "/robot_mount/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+      },
+      "classification": "historical_mixed"
+    },
+    {
+      "file": "model/arm-syringe.shared.json",
+      "json_pointer": "/robot/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/equipment/analytics-workspace.json",
+      "json_pointer": "/assets/arm/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+      },
+      "classification": "historical_mixed"
+    },
+    {
+      "file": "model/equipment/cf01-workspace.json",
+      "json_pointer": "/assets/arm/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/equipment/pipetting-workspace.json",
+      "json_pointer": "/assets/arm/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/h02-arm-pickup.scene.json",
+      "json_pointer": "/sources/robot/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+      },
+      "classification": "historical_mixed"
+    },
+    {
+      "file": "model/joint-bearings-holding.json",
+      "json_pointer": "/source_refs/robot/path",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/lab-layout-l01.shared.json",
+      "json_pointer": "/assets/arm/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/mobile-base-mb01.shared.json",
+      "json_pointer": "/arm_source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/mobile-base.schema.json",
+      "json_pointer": "/properties/arm_source/const",
+      "occurrence": "value",
+      "role": "schema_path_constraint",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/robot-type.schema.json",
+      "json_pointer": "/properties/family/const",
+      "occurrence": "value",
+      "role": "schema_path_constraint",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/robot-types/arm-nobrake.type.json",
+      "json_pointer": "/family",
+      "occurrence": "value",
+      "role": "type_family_reference",
+      "pin_fields": {},
+      "classification": "unpinned"
+    },
+    {
+      "file": "model/tr01-l01-workcell.protocol.json",
+      "json_pointer": "/arm_source/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "2fa84f95044690321ab774a1af807c404ee0e77a98b7770d5402f45313afa8e7"
+      },
+      "classification": "historical_mixed"
+    },
+    {
+      "file": "model/water-practice-l01.motion.json",
+      "json_pointer": "/sources/model~1robot.json",
+      "occurrence": "key",
+      "role": "source_map_key",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    },
+    {
+      "file": "model/water-practice-l01.motion.json",
+      "json_pointer": "/sources/model~1robot.json/source",
+      "occurrence": "value",
+      "role": "source_reference",
+      "pin_fields": {
+        "source_sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+      },
+      "classification": "current"
+    }
+  ],
+  "reviewed_consumer_contexts": [
+    {
+      "id": "legacy-default-and-generic-reference-gate",
+      "classification": "current",
+      "models": [],
+      "finding": "The legacy default is the current robot file. Generic assembly validation compares raw file bytes; instance loading and artifact resolution use that same strict gate. No generic historical revision resolution is inferred.",
+      "evidence": [
+        {
+          "file": "scripts/robot_spec.py",
+          "sha256": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
+          "required_snippets": [
+            "SPEC = ROOT / \"model/robot.json\""
+          ]
+        },
+        {
+          "file": "scripts/assembly_model.py",
+          "sha256": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
+          "required_snippets": [
+            "robot.digest(path)!=ref['source_sha256']",
+            "path = validate_reference(ref)",
+            "source = validate_reference(ref, root)"
+          ]
+        }
+      ],
+      "model_sha256": {}
+    },
+    {
+      "id": "h02-validation-build-and-native-metadata",
+      "classification": "historical_mixed",
+      "models": [
+        "model/h02-arm-pickup.scene.json",
+        "model/h02-rack-transfer.scene.json"
+      ],
+      "finding": "H02's historical arm pin fails against the current alias before Program can load it. Build dependency collection repeats generic validation. The FreeCAD adapter builds program.arm, but the shared native builder stamps and checks current robot.SPEC hashes. A source-only historical resolver would not repair this native chain; historical native use remains unsupported without separate adaptation and new evidence.",
+      "evidence": [
+        {
+          "file": "scripts/h02_arm_pickup.py",
+          "sha256": "b44f467ee4934a6969428cb9321e3498273266951529e225540118306cf69d78",
+          "required_snippets": [
+            "for ref in s['sources'].values():assembly.validate_reference(ref)",
+            "self.arm=robot.load(assembly.validate_reference(s['sources']['robot']))"
+          ]
+        },
+        {
+          "file": "scripts/build_h02_arm_pickup.py",
+          "sha256": "3df483b743fe6269aecf7c80e9f46816ad6918adb804686cb240f747dec9d58c",
+          "required_snippets": [
+            "*[model.assembly.validate_reference(r) for r in program.definition['sources'].values()]",
+            "paths.update(model.assembly.validate_reference(r) for r in program.transfer['sources'].values())"
+          ]
+        },
+        {
+          "file": "scripts/build_h02_arm_freecad.py",
+          "sha256": "49873bc14c92e7eaf130559f84c33f04dc8a75b089221a958c4bc763a0072ca7",
+          "required_snippets": [
+            "doc=arm_native.build(program.arm,cad/'arm-source.FCStd')"
+          ]
+        },
+        {
+          "file": "scripts/build_neutral_freecad.py",
+          "sha256": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+          "required_snippets": [
+            "controller.SpecSHA256=model.digest(model.SPEC)",
+            "result={\"spec_sha256\":model.digest(model.SPEC)",
+            "if doc.Controller.SpecSHA256!=model.digest(model.SPEC):"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/h02-arm-pickup.scene.json": "1519ae36ef1e2842f08d0cf25f4bbf059fd4e9d22fbe0b9bd81bf3ffe556662b",
+        "model/h02-rack-transfer.scene.json": "81e7a1cf9e72b3683a11ca6fb26adf33de0709b72870401ebf60117eaecfa3dc"
+      }
+    },
+    {
+      "id": "tr01-workcell-and-l01-instances",
+      "classification": "historical_mixed",
+      "models": [
+        "model/tr01-l01-workcell.protocol.json",
+        "model/lab-layout-l01.shared.json"
+      ],
+      "finding": "TR01 validates its historical arm_source even when an actor later obtains its arm from current L01 instances. New actors fall back to the explicit arm_source. These paths mix current layout binding and an older arm pin; the inventory does not make them one historical revision.",
+      "evidence": [
+        {
+          "file": "scripts/tr01_workcell.py",
+          "sha256": "96aaddc54185fed89cc9edea8690d49d18aa63bfb0f0bf0fc1571fc338f37c89",
+          "required_snippets": [
+            "for key in ('layout','floor_motion','arm_source','tool_reference','limits_reference'):floor.assembly.validate_reference(s[key])",
+            "source=floor.layout.instance_source(layout,original) if original else floor.robot.load(floor.assembly.validate_reference(s['arm_source']))"
+          ]
+        },
+        {
+          "file": "scripts/lab_layout_model.py",
+          "sha256": "2a7260ef4884955e6c2a7451a5655d36ad1d32d43f6ea48c9362be6b6e8aae75",
+          "required_snippets": [
+            "assembly.validate_reference(ref)",
+            "assembly.resolve_artifact(ref)",
+            "return assembly.load_instance(provider(kind),s['assets'][key],overrides,parameters(s))"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/tr01-l01-workcell.protocol.json": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0",
+        "model/lab-layout-l01.shared.json": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+      }
+    },
+    {
+      "id": "analytics-tools-workspace-and-native-context",
+      "classification": "historical_mixed",
+      "models": [
+        "model/analytics-tools.shared.json",
+        "model/equipment/analytics-workspace.json",
+        "model/two-arm-analytics.shared.json"
+      ],
+      "finding": "Both the analytical tool mount and analytical workspace arm carry the old arm pin. Tool validation, corner-post construction and arm instances pass through generic validation. The concept build additionally obtains the vendor library from the current CF01 pickup composition. Fixing one mount reference would not qualify or consistently migrate this complete chain.",
+      "evidence": [
+        {
+          "file": "scripts/analytics_concept.py",
+          "sha256": "dfa9092ebd26dda2fbe292f10223d1f05483624bdce4e423d77380ae9d50985a",
+          "required_snippets": [
+            "assembly.validate_reference(spec['robot_mount'])",
+            "arm = robot.load(assembly.validate_reference(spec['robot_mount']))",
+            "variants = [assembly.load_instance(robot, v['source'], v.get('overrides')) for v in arms.values()]"
+          ]
+        },
+        {
+          "file": "scripts/build_analytics_concept.py",
+          "sha256": "9bd3704a297c92cdfc0622dc5924ddd337372e6c459014c74277657f0d34b6e9",
+          "required_snippets": [
+            "scene = pickup.load()",
+            "library = robot_components.library(pickup.arm_source(scene))"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/analytics-tools.shared.json": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+        "model/equipment/analytics-workspace.json": "777771e9d0dbe4455e06174df5d3a3fad2e67e5a9b5b494e919f72ff3b2e5873",
+        "model/two-arm-analytics.shared.json": "e923fbb7d402bc88a595252cdfbb519492e0e5f66860bb23d564013e6808e8cf"
+      }
+    },
+    {
+      "id": "cf01-composed-arm-source",
+      "classification": "current",
+      "models": [
+        "model/equipment/cf01-workspace.json",
+        "model/synthetic-cf01-workspace.shared.json",
+        "model/centrifuge-cf01.robot-pickup.shared.json"
+      ],
+      "finding": "The CF01 scene stores no direct robot filename. Workspace binding injects it from the pinned equipment asset, and the pickup loader then reads that path with its parameter overrides. Absence from the exact-literal list does not mean absence of a robot dependency.",
+      "evidence": [
+        {
+          "file": "scripts/synthetic_workspace.py",
+          "sha256": "35f7a05fda6313d9d4957cde58270c3a8cfcd4a6744e29ccc9871ed5991a9fe6",
+          "required_snippets": [
+            "assembly.validate_reference(ref)",
+            "result['sources'].update(robot=arm['source']['source'],centrifuge=station['source']['source'])"
+          ]
+        },
+        {
+          "file": "scripts/centrifuge_robot_pickup.py",
+          "sha256": "8e4f01910e9e6ecbd828486f60ab5cdf783dfecbefc3a3ae97edfcfee5da477a",
+          "required_snippets": [
+            "def arm_source(scene):return robot.load(ROOT/scene['sources']['robot'],scene.get('robot_parameter_overrides_mm'))"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/equipment/cf01-workspace.json": "7f73ac895134cc06e7abd3ef268ed9b65f46381b026f84b483e286ee722d65e4",
+        "model/synthetic-cf01-workspace.shared.json": "f4c190cebe4e9f5d6e002619d4e52ec47787e5b1d230c9810b4cf75578876093",
+        "model/centrifuge-cf01.robot-pickup.shared.json": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+      }
+    },
+    {
+      "id": "mb01-unpinned-arm-load",
+      "classification": "unpinned",
+      "models": [
+        "model/mobile-base-mb01.shared.json",
+        "model/mobile-base.schema.json"
+      ],
+      "finding": "MB01 resolves its unpinned arm_source directly and loads current file bytes. Its schema const fixes only a pathname. The reverse robot.mobile_base reference is checked for identity, not a pinned arm revision.",
+      "evidence": [
+        {
+          "file": "scripts/mobile_base_model.py",
+          "sha256": "b94f18411268c546021176eb2763a35874142b3991668be9422277bb4538dd36",
+          "required_snippets": [
+            "arm_path = (ROOT/spec['arm_source']).resolve()",
+            "arm = robot.load(arm_path)",
+            "arm.get('mobile_base',{}).get('source')"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/mobile-base-mb01.shared.json": "6933fa268668aa0f6ff959eaca0ac77381bb1a55e609b51c18c48ce3b401e573",
+        "model/mobile-base.schema.json": "d44f9e887433a79de884a3ddb3605f9d3287de4f38b6f2289cc99bff11fc082d"
+      }
+    },
+    {
+      "id": "water-practice-current-default-and-old-transitive-pins",
+      "classification": "historical_mixed",
+      "models": [
+        "model/water-practice-l01.motion.json",
+        "model/analytics-tools.shared.json",
+        "model/tr01-l01-workcell.protocol.json"
+      ],
+      "finding": "Water practice pins the current robot in its input map but kinematics calls robot.load() without an explicit reference. Its analytics/TR01 dependencies still contain older robot pins. A separate named L01 context-equivalence check strips source_sha256 fields and compares default geometry/poses; that limited equivalence is not historical robot resolution or renewed native/motion qualification.",
+      "evidence": [
+        {
+          "file": "scripts/water_practice_l01.py",
+          "sha256": "042c8f1d941a2b84498ea82454cb42eaa255cfc8d84d9f0a1ae6e05fdbd45536",
+          "required_snippets": [
+            "if digest(ROOT/ref['source']) != ref['source_sha256']:",
+            "arm = robot.load()",
+            "kit = read(ROOT/'model/analytics-tools.shared.json')"
+          ]
+        },
+        {
+          "file": "scripts/water_practice_context.py",
+          "sha256": "6dc3be2ae0ee3ff4014f910971a5395cb4a9ef349164619677821f637a1b4f33",
+          "required_snippets": [
+            "if k!='source_sha256'",
+            "if set(changed)-EQUIVALENCE_CANDIDATES:",
+            "Default room geometry and all layout poses only; not parameter variants"
+          ]
+        }
+      ],
+      "model_sha256": {
+        "model/water-practice-l01.motion.json": "54462a30ec3949857c35a7dacf1357921ab90c737bf9f279e8cdb03666e2ad64",
+        "model/analytics-tools.shared.json": "39a930958184872c67344942e6a02377f23a174518589bb111cea7a98b720cae",
+        "model/tr01-l01-workcell.protocol.json": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+      }
+    }
+  ],
+  "qualification_limits": [
+    "Inventory only: no consumer, schema, existing source pin or historical evidence is migrated.",
+    "No CAD builds, native or collision/motion checks, hardware execution or biological qualification are performed.",
+    "An opt-in robot resolver is not generic assembly-reference support or historical native build support.",
+    "Matching the main robot hash does not establish a complete, consistently pinned dependency closure."
+  ]
+}
