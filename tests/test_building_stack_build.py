@@ -35,17 +35,21 @@ class BuildingBuildTests(unittest.TestCase):
     def test_referenced_laboratory_bodies_have_disjoint_native_vertical_scope(self):
         geometry,contract=self.scene();datum=contract['levels'][3]['z_mm']
         laboratory={'id':'FixtureLab','level_id':'L3','furniture_body_ids':['LabWorktop','LabSupport'],
+                    'body_ids':['LabWorktop','LabSupport','LabIceMaker'],
                     'evaluated_parameters_mm':{'room_height':2800}}
         contract['laboratories']=[laboratory]
         geometry.extend([{'body':'LabWorktop','bbox':{'min':[0,0,datum+850],'max':[100,100,datum+900]}},
-                         {'body':'LabSupport','bbox':{'min':[0,0,datum],'max':[20,20,datum+2800]}}])
+                         {'body':'LabSupport','bbox':{'min':[0,0,datum],'max':[20,20,datum+2800]}},
+                         {'body':'LabIceMaker','bbox':{'min':[0,0,datum+900],'max':[60,60,datum+1499]}}])
         checks=build.z_checks(geometry,contract)
         self.assertTrue(all(check['passed']for check in checks))
-        self.assertEqual(next(c for c in checks if c['id']=='FixtureLab_RoomHeight')['level_id'],'L3')
+        room_check=next(c for c in checks if c['id']=='FixtureLab_RoomHeight')
+        self.assertEqual(room_check['level_id'],'L3')
+        self.assertIn('LabIceMaker',room_check['body_ids'])
         for edge,value in [('min',datum-1),('max',datum+2801)]:
             changed=copy.deepcopy(geometry);changed[-1]['bbox'][edge][2]=value
             self.assertFalse(all(check['passed']for check in build.z_checks(changed,contract)))
-        changed=copy.deepcopy(contract);changed['laboratories'][0]['furniture_body_ids'].append('Floor0')
+        changed=copy.deepcopy(contract);changed['laboratories'][0]['body_ids'].append('Floor0')
         with self.assertRaisesRegex(ValueError,'disjoint complete'):build.z_checks(geometry,changed)
         with self.assertRaisesRegex(ValueError,'disjoint complete'):build.z_checks(geometry[:-1],contract)
 

@@ -135,7 +135,7 @@ def z_checks(geometry, contract):
                 | set(contract.get('furnishings', {}).get('body_ids', [])) | set(contract.get('exterior', {}).get('body_ids', [])) | set(contract.get('circulation', {}).get('body_ids', [])) | set(contract.get('roof', {}).get('body_ids', [])))
     level_by_id = {level['id']: level for level in levels}
     for laboratory in contract.get('laboratories', []):
-        names = laboratory['furniture_body_ids']
+        names = laboratory['body_ids']
         if (not names or len(names) != len(set(names)) or set(names) & expected
                 or laboratory['level_id'] not in level_by_id or not set(names) <= set(bodies)):
             raise ValueError('Laboratory native bodies need a disjoint complete storey scope')
@@ -149,7 +149,7 @@ def z_checks(geometry, contract):
         checks.append({'id': laboratory['id']+'_RoomHeight', 'passed': passed,
                        'level_id': laboratory['level_id'], 'body_ids': names,
                        'floor_presentation_mm': lower, 'room_top_presentation_mm': upper,
-                       'scope': ('Referenced basic laboratory furniture including its fume hood' if laboratory.get('native_equipment_included')
+                       'scope': ('Referenced basic laboratory furniture and native appliances' if laboratory.get('native_equipment_included')
                                  else 'Referenced laboratory furniture and illustrative support; native equipment excluded')})
         expected.update(names)
     for station in [contract[key] for key in ('microscopy','kitchenette','monitor_wall') if contract.get(key)]:
