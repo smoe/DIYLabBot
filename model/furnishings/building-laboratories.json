@@ -119,7 +119,17 @@
       "room": "3.016",
       "level": "OG3",
       "area": "R3_016",
-      "basis": "owner_confirmed_basic_furnishing_rule"
+      "basis": "owner_confirmed_basic_furnishing_rule",
+      "ice_maker": {
+        "id": "IceMakerIM01",
+        "source": {
+          "source": "model/ice-maker-im01.shared.json",
+          "source_sha256": "e9d9826f966dfb47256a045143db5fae21b208559007273b18fa0f80d23b5f97"
+        },
+        "variant": "countertop",
+        "support": "WetStation_DripTray",
+        "front_inset_mm": 10
+      }
     }
   ],
   "excluded_rooms": [

@@ -11,6 +11,8 @@ Die aktiven Gebäude-, Rundgang- und Konnektorpins sind nachgeführt; ältere
 Navigationscaches, Freiraum-, Boden- und Fahrtnachweise qualifizieren diese
 Revision nicht. Der aktuelle Flottennachweis bleibt **unproven**.
 Die separaten BF01-Kameraeinträge enthalten keine Bilder oder Fahrzeugposen.
+Die Eismaschine im Labor 3.016 ist Teil der aktuellen Gebäudegeometrie.
+Für diesen Stand wurde kein neuer Flottennachweis erzeugt.
 
 Die separate L01-Verbindung wurde am früheren Gebäudestand geprüft. Mit der
 Labormöblierung und den nach außen öffnenden Labortüren sind die Gebäude- und

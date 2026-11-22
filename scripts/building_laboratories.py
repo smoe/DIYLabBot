@@ -62,8 +62,11 @@ def validate(source):
         import basic_laboratories
         basic_laboratories.load(source['basic_profile'])
         for item in source['basic_laboratories']:
-            require(set(item) == {'id', 'room', 'level', 'area', 'basis'}
+            require(set(item)-{'ice_maker'} == {'id', 'room', 'level', 'area', 'basis'}
                     and item['basis'] == 'owner_confirmed_basic_furnishing_rule', 'Referenced basic laboratory assignment required')
+            if 'ice_maker' in item:
+                import building_ice_maker
+                building_ice_maker.source_path(item['ice_maker'])
             key = (item['level'], item['area'])
             require(item['id'].isidentifier() and item['id'] not in identities and key not in destinations | excluded,
                     'Basic laboratory conflicts with another room assignment')
@@ -383,4 +386,8 @@ def dependencies(ref):
     if 'basic_profile' in source:
         import basic_laboratories
         paths.extend(basic_laboratories.dependencies(source['basic_profile']))
+        for item in source['basic_laboratories']:
+            if 'ice_maker' in item:
+                import building_ice_maker
+                paths.extend(building_ice_maker.dependencies(item['ice_maker']))
     return list(dict.fromkeys(paths))

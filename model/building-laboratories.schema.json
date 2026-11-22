@@ -143,6 +143,18 @@
           },
           "basis": {
             "const": "owner_confirmed_basic_furnishing_rule"
+          },
+          "ice_maker": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["id", "source", "variant", "support", "front_inset_mm"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "source": {"$ref": "#/properties/basic_profile"},
+              "variant": {"const": "countertop"},
+              "support": {"type": "string", "minLength": 1},
+              "front_inset_mm": {"type": "number", "minimum": 0}
+            }
           }
         }
       }

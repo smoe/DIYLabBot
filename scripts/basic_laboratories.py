@@ -450,10 +450,16 @@ def compile_instance(profile_ref, source, item, plan, parameters, z, reference=N
                           'source_instance': source['prototype_instances'].get(fixture['kind']),
                           'layout_kind': fixture['kind'], 'footprint_mm': fixture['polygon_mm'],
                           'access_polygon_mm': fixture['access_polygon_mm'], 'walls': fixture['walls']})
+    furniture_ids = [b['id'] for b in result['bodies']]
+    appliances = []
+    if 'ice_maker' in item:
+        import building_ice_maker
+        wet, = [fixture for fixture in design['fixtures'] if fixture['kind'] == 'wet']
+        appliances.append(building_ice_maker.add_to_wet_bench(item['ice_maker'], item, wet, result, numeric_shape))
     body_ids = [b['id'] for b in result['bodies']]
     result['interface'] = {'id': item['id'], 'room': item['room'], 'level_id': item['level'], 'area': item['area'],
         'template_areas': [item['area']], 'furnishing_profile': profile_ref,
-        'body_ids': body_ids, 'furniture_body_ids': body_ids, 'native_equipment_included': True,
+        'body_ids': body_ids, 'furniture_body_ids': furniture_ids, 'native_equipment_included': True,
         'device_instances': [], 'frames': frames, 'joints': result['joints'], 'instances': instances, 'places': places,
         'interior_polygon_mm': design['outline'], 'wet_corner': design['corner'],
         'wet_corner_candidates': design['corner_candidates'], 'door_keepouts': design['keepouts'],
@@ -465,4 +471,6 @@ def compile_instance(profile_ref, source, item, plan, parameters, z, reference=N
                                 'method': 'polygon_containment_and_boundary_distance', 'wall_margin_mm': design['wall_margin_mm']},
         'limitations': design['notes'], 'placement_qualified': False, 'metric_registration_qualified': False,
         'source_refs': {'profile': profile_ref, 'room': source['reference_room'], 'hood': source['hood_source']}}
+    if appliances:
+        result['interface']['native_appliances'] = appliances
     return result

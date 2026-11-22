@@ -172,6 +172,65 @@ class BuildingLaboratoryTests(unittest.TestCase):
             actual=laboratories.transformed(devices[place['rack_instance']]['transform'],point)
             for value,expected in zip(actual,place['origin_mm']):self.assertAlmostEqual(value,expected,places=6)
 
+    def test_countertop_ice_maker_is_native_only_in_laboratory_3016(self):
+        placements = [(lab, item) for lab in self.interface['laboratories']
+                      for item in lab.get('native_appliances', [])
+                      if item['id'] == 'IceMakerIM01']
+        self.assertEqual(len(placements), 1)
+        lab, appliance = placements[0]
+        self.assertEqual((lab['id'], lab['room'], lab['level_id'], lab['area']),
+                         ('Lab3016', '3.016', 'OG3', 'R3_016'))
+        self.assertEqual(appliance['variant'], 'countertop')
+        self.assertEqual(appliance['support_body_id'], 'Lab3016_WetStation_DripTray')
+        self.assertTrue(appliance['body_ids'])
+        self.assertEqual(len(appliance['body_ids']), len(set(appliance['body_ids'])))
+        self.assertTrue(set(appliance['body_ids']) <= set(lab['body_ids']))
+        self.assertFalse(set(appliance['body_ids']) & set(lab['furniture_body_ids']))
+        self.assertEqual(lab['device_instances'], [])
+        expanded = stack.expanded(self.spec, self.p)
+        native_bodies = {body['id'] for body in expanded['bodies']}
+        native_creates = {operation['body'] for operation in expanded['operations']
+                          if operation['action'] == 'create'}
+        self.assertTrue(set(appliance['body_ids']) <= native_bodies & native_creates)
+
+    def test_ice_maker_feet_rest_on_the_actual_drip_tray_inner_floor(self):
+        import basic_laboratories
+        lab = next(lab for lab in self.interface['laboratories'] if lab['id'] == 'Lab3016')
+        appliance = next(item for item in lab.get('native_appliances', [])
+                         if item['id'] == 'IceMakerIM01')
+        expanded = stack.expanded(self.spec, self.p)
+        hollows = [operation['shape'] for operation in expanded['operations']
+                   if operation['body'] == appliance['support_body_id']
+                   and operation['action'] == 'cut'
+                   and operation['shape']['kind'] == 'polygon_prism']
+        self.assertEqual(len(hollows), 1)
+        hollow = hollows[0]
+        polygon = hollow['points']
+        self.assertEqual(hollow['plane'], 'XY')
+        self.assertAlmostEqual(appliance['support_floor_z_mm'], hollow['offset'])
+        self.assertAlmostEqual(appliance['origin_mm'][2], hollow['offset'])
+        self.assertEqual(len(appliance['front']), 3)
+        for actual, expected in zip(appliance['front'], (1, 0, 0)):
+            self.assertAlmostEqual(actual, expected)
+        for point in appliance['footprint_mm']:
+            self.assertGreaterEqual(laboratories.floor.point_membership(point[:2], polygon), 0)
+        pads = [operation['shape'] for operation in expanded['operations']
+                if operation['body'] in appliance['body_ids']
+                and operation['action'] == 'create' and 'FootPad_' in operation['body']]
+        self.assertEqual(len(pads), 4)
+        self.assertEqual(len(appliance['foot_centres_mm']), len(pads))
+        for point in appliance['foot_centres_mm']:
+            self.assertEqual(len(point), 3)
+            self.assertTrue(all(math.isfinite(value) for value in point))
+            self.assertAlmostEqual(point[2], hollow['offset'])
+            pad = next((pad for pad in pads if math.dist(pad['origin'], point) < 1e-6), None)
+            self.assertIsNotNone(pad, 'The reported contact must come from a real native foot pad')
+            self.assertEqual(pad['kind'], 'cylinder')
+            self.assertGreater(laboratories.floor.point_membership(point[:2], polygon), 0)
+            clearance = min(basic_laboratories.point_segment(point[:2], a, b)
+                            for a, b in zip(polygon, polygon[1:]+polygon[:1]))
+            self.assertGreaterEqual(clearance+1e-6, pad['radius'])
+
     def test_dependency_pins(self):
         paths = stack.source_dependencies(self.spec)
         for path in (laboratories.SCHEMA, ROOT/'scripts/building_laboratories.py',

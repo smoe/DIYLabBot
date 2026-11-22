@@ -24,8 +24,11 @@ Die [gemeinsame Modellquelle](../model/ice-maker-im01.shared.json) bestimmt
 beide Varianten über die Höhe des Eisfachs. X verläuft über die Gerätebreite,
 Y von der Front zur Rückwand und Z ab der Auflage nach oben. Für eine spätere
 Aufstellung liegt `Z=0` beim Standgerät auf dem Boden und beim Tischgerät auf
-der Arbeitsplatte. Das Modell zeigt die Entnahmeklappe in einer festen offenen
-Position. Eisproduktion, Versorgung, Gerätelast und Einbaufreiräume sind offen.
+der Arbeitsplatte. Im Gebäudemodell steht ein Tischgerät im Labor 3.016 auf
+der Abtropfwanne neben dem Waschbecken. Die vier Füße stehen auf dem Wannenboden.
+Die Gerätefront zeigt zum Gang entlang der Arbeitsplatte. Das Modell zeigt die
+Entnahmeklappe in einer festen offenen Position. Eisproduktion, Versorgung,
+Gerätelast und Einbaufreiräume sind offen.
 
 Der [Generator](../scripts/build_ice_maker.py) baut beide Varianten unabhängig
 für FreeCAD und SolidCraft. `--backend freecad` oder `--backend solidcraft`
