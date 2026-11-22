@@ -301,6 +301,12 @@ def object_transform(obj,value,App):
 
 def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_depth=18,*,_curve_probe=False):
     started=time.monotonic();program_path=native.project_path(program_path);program=fleet.read_json(program_path);native.verify_pins(program['source_files_sha256']);before=native.digest(program_path)
+    spec=fleet.load()
+    if not _curve_probe:
+        if program.get('format')!='solidcraftbot.building-fleet-program/1'or program.get('complete')is not True:
+            raise ValueError('Complete compiled fleet programme required for a full native audit')
+        if type(program.get('seed'))is not int or program['seed']!=spec['missions']['seed']:
+            raise ValueError('Full native audit seed must match the current source configuration')
     expected={'BF01'}if _curve_probe else {'BF%02d'%i for i in range(1,21)}
     if len(program.get('trajectories',[]))!=len(expected)or {r['vehicle_id']for r in program['trajectories']}!=expected:raise ValueError('Complete expected native audit trajectory set required')
     if _curve_probe and program.get('scope')!='standalone_curve_only':raise ValueError('Separate native curve-probe scope required')
@@ -308,7 +314,7 @@ def audit(program_path,output,maximum_step_s=30.,minimum_step_s=.001,maximum_dep
         if not 0<finite(v)<=30:raise ValueError('Bounded positive audit step required')
     if minimum_step_s>maximum_step_s or type(maximum_depth)is not int or not 1<=maximum_depth<=24:raise ValueError('Bounded refinement settings required')
     walk=reference(program['artifacts']['walkthrough_report']);camera=reference(program['artifacts']['camera_report']);walk_report,reports,manifest,expected=checked_walkthrough(walk);camera_report=checked_camera_report(camera)
-    spec=fleet.load();sensor=json.loads((ROOT/spec['sources']['sensor']['path']).read_text());reserve=sensor['controller']['clearance_mm']+spec['geometry']['localization_tolerance_mm']
+    sensor=json.loads((ROOT/spec['sources']['sensor']['path']).read_text());reserve=sensor['controller']['clearance_mm']+spec['geometry']['localization_tolerance_mm']
     levels={v['id']:v for v in program['levels']}if isinstance(program['levels'],list)else program['levels']
     expected_levels={v['id']:v['z_mm']for v in manifest['levels']}
     if set(levels)!=set(expected_levels)or any(levels[k]['z_mm']!=z for k,z in expected_levels.items()):raise ValueError('Program levels differ from source heights')
