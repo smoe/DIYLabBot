@@ -1,0 +1,43 @@
+{
+  "format": "solidcraftbot.ice-maker/1",
+  "id": "IceMakerIM01",
+  "status": "Exterior and storage-bin concept for space planning",
+  "units": {"length": "mm"},
+  "recipe": "sloped_front_open_ice_bin_v1",
+  "parameters": {
+    "width": {"expression": 400, "unit": "mm", "range": [380, 440], "description": "Overall case width"},
+    "depth": {"expression": 385, "unit": "mm", "range": [365, 430], "description": "Overall case depth"},
+    "foot_height": {"expression": 34, "unit": "mm", "range": [30, 40], "description": "Same floor clearance for both variants, assumed"},
+    "service_height": {"expression": 284, "unit": "mm", "range": [270, 300], "description": "Case height below the bin floor, assumed"},
+    "bin_height": {"expression": 395, "unit": "mm", "range": [235, 395], "description": "Unlined bin height, the variant driving dimension"},
+    "top_band": {"expression": 46, "unit": "mm", "range": [40, 50], "description": "Enclosure height above the bin opening, assumed"},
+    "side_wall": {"expression": 38, "unit": "mm", "range": [32, 44], "description": "Casing thickness beside the bin, assumed"},
+    "front_wall": {"expression": 80.5, "unit": "mm", "range": [70, 90], "description": "Front recess from the outer face to the lower bin, assumed"},
+    "rear_wall": {"expression": 52.5, "unit": "mm", "range": [45, 60], "description": "Rear recess from cabinet to bin, assumed"},
+    "liner": {"expression": 3, "unit": "mm", "range": [2, 4], "description": "Illustrative bin liner thickness"},
+    "front_setback": {"expression": 32, "unit": "mm", "range": [28, 36], "description": "Backward slope at the top of the front, assumed"},
+    "bin_floor": {"expression": "foot_height + service_height", "unit": "mm", "range": [300, 340], "description": "Bin floor below the liner"},
+    "bin_top": {"expression": "bin_floor + bin_height", "unit": "mm", "range": [535, 735], "description": "Top of the bin and serving opening"},
+    "opening_height": {"expression": "120 + (bin_height - 235) / 4", "unit": "mm", "range": [120, 160], "description": "Serving opening height derived with bin size"},
+    "sill": {"expression": "bin_top - opening_height", "unit": "mm", "range": [415, 575], "description": "Lowest point of the front opening"},
+    "panel_top": {"expression": "sill - 45", "unit": "mm", "range": [370, 530], "description": "Top of the lower stainless front panel"},
+    "total_height": {"expression": "bin_top + top_band", "unit": "mm", "range": [575, 785], "description": "Overall cabinet and foot height"}
+  },
+  "variants": {
+    "floor_standing": {"label": "Standgerät", "support": "floor", "overrides": {}},
+    "countertop": {"label": "Tischgerät", "support": "worktop", "overrides": {"bin_height": 235}}
+  },
+  "reference": {
+    "manufacturer": "VEVOR",
+    "model": "CIM-360T",
+    "photo_sku": "YTSZBJFB100LH5H89001V2",
+    "photo_url": "https://img.vevorstatic.com/de%2FYTSZBJFB100LH5H89001V2%2Fgoods_img_big-v3%2Fcommercial-ice-maker-m100-1.2.jpg?timestamp=1795176387000&format=webp&format=webp",
+    "specification_url": "https://www.vevor.com/other-c_45583/vevor-commercial-ice-maker-machine-100-lbs-24h-with-30-lbs-storage-capacity-built-in-freestanding-under-counter-stainless-steel-ice-maker-with-led-display-self-cleaning-for-home-bar-restaurant-p_010982478769",
+    "scope": "Photo references the V2 SKU. The manufacturer's listing for the related V1 SKU with the same CIM-360T model number gives 400 x 385 x 759 mm, used as the nominal standing envelope. Detail dimensions and the compact variant are layout assumptions."
+  },
+  "limitations": [
+    "Stationary open-access presentation with a separate fixed flap and an empty lined bin.",
+    "Geometric storage volume is the rectangular clear bin space below the front sill, with no claim about ice packing, mass or manufacturer capacity.",
+    "No internal ice production mechanism, refrigeration, electrical/water connections, or installation qualification."
+  ]
+}
