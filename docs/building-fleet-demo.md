@@ -139,7 +139,223 @@ bleiben gesperrt; der Schacht wird ausschließlich über den Aufzugablauf genutz
 
 ## Arbeitsstand und Nachweisgrenzen
 
-### BF01-2: Stopp am Laufzeitbudget
+### Aktuelle Fortsetzung: Missionszulassung und Katalogberechnung
+
+Der Folgeauftrag setzt die Arbeit auf dem geprüften `master`-Stand `680652f`
+fort. Der private Branch wurde darauf rebasiert; der ursprüngliche Seed
+`20261120`, die 19 Pflichtziele, die Bench-Sperren und der Ausschluss des
+Treppenkerns bleiben erhalten. Die nachstehende frühere Laufzeitunterbrechung
+und ihre Berichte bleiben als historische Befunde bestehen.
+
+Die Missionszulassung sichert Start- und Zielbucht **vor** Ausgabe eines
+geschossübergreifenden Auftrags und bindet die Zusage an dessen unveränderliche
+Missionskennung. Nach bestätigtem Kabinenparken darf höchstens ein weiterer
+Geschosswechsel die bereits zugesagte Ankunftsbucht als künftigen Start
+vormerken; diese Vormerkung wird
+erst nach beobachteter vollständiger Ausfahrt aktiv. Sie erlaubt vorher weder
+das Betreten ihrer Zielbucht noch einen weiteren Aufzugruf. Notwendiges
+Kapazitätswarten erfolgt an einer eigenen Bucht oder am eigenen Heimplatz;
+ein vorläufiger Heimplatz ist kein abgeschlossener Heimkehrauftrag. Ein
+Durchgangstoken darf an einer exakt beobachteten eigenen Parkposition nur
+freigegeben werden, wenn die exklusive Buchtenzusage bestehen bleibt und alle
+anderen Bahnen deren vollständige Fahrzeughülle ausschließen.
+
+Eine unabhängige Prüfung verbindet die ursprünglich ausgegebenen Aufträge,
+den mit demselben Seed wiederholten Abwärtskanal, die tatsächlich empfangenen
+eigenen Quittungen, die Aufzugbeobachtungen und die Abschlussbelege anhand
+derselben Missionskennung. Sie übernimmt keine Planer-Abschlussflags.
+Der Dienstregressionstest des früheren Neun-Buchten-Zyklus kann nach zehn
+zulässigen, missionsgebundenen synthetischen Buchungszyklen weiterhin neue
+Arbeit vergeben. Dieser Test simuliert Boarding und Ankunft ohne Fahrgeometrie.
+Dies ist noch kein Nachweis des vollständigen Flottenprogramms.
+
+Der Katalog verwendet konservative räumliche Vorauswahl und begrenzte Caches
+für unveränderte exakte Distanzabfragen. Die vollständigen Raumdurchfahrten,
+Rohressourcen und Fortschrittsintervalle bleiben erhalten. Am eingefrorenen
+Vergleichsstand benötigte der Katalog für alle **3128 vollständigen Routen
+235,881 s**. Die Summe separat gemessener Navigation, Routengraph- und
+Katalogphasen betrug **331,284 s**; sie belegt keine durchgehende
+Vorbereitung in dieser Zeit. Ein direkter Vergleich derselben 64 Routen benötigte vorher
+6,140 s und danach 2,557 s (2,40-fach), bei exakt gleichen Katalogausgaben und
+Abfragen in beiden Fahrtrichtungen. Der vollständige frühere Zeitwert unten
+ist dagegen kein isolierter Katalogvergleich. Die neuen Messungen stehen in
+`exports/building-fleet/support-680652f/catalog-performance-r1/`.
+Die endgültigen Aufzugvarianten benötigen einen eigenen aktuellen Katalog
+und neue Bewegungsnachweise; alte Caches werden nicht umgepinnt.
+Der zweite integrierte Versuch benötigte bis zu seinem Geometrieabbruch
+1095,628 s, davon 262,597 s für den Weltlauf einschließlich dessen
+Initialisierung; die Differenz von 833,032 s entfällt auf die vorgelagerte
+integrierte Vorbereitung. Diese Laufzeit ist vom isolierten Katalogvergleich
+zu unterscheiden und überschreitet bereits das Zehn-Minuten-Ziel.
+
+`building_fleet_port_paths.py` leitet die Einfahrt, Ausfahrt und Abfahrt aus
+der eigenen Bucht aus Quellöffnung, tatsächlichen vollständig offenen
+Türblättern, Fahrzeughülle und zugeteilter Kabinenspur ab. Die festen
+Varianten werden vor dem Schließen des Katalogs registriert. Nur die engen
+Port-Ecken erhalten kleinere Eckkappen; anschließende normale Flur- und
+L01-Ecken behalten ihre ursprüngliche Geometrie. Eckkappen, Ereignisfortschritt,
+Zonen und die tatsächlich ausgeführte PVA werden gemeinsam exportiert und
+unabhängig rekonstruiert. Die Bremsauswahl prüft für jede Kandidatenfamilie
+dieselbe vollständige Sicht-, Reaktions- und Annäherungsbilanz. Ein kürzerer
+zulässiger Bremsverlauf ersetzt einen konservativ zu langen Kandidaten;
+die Grenzen und das nominale Fahrprofil werden dafür nicht angehoben.
+
+Der erste integrierte Versuch wurde bei 0,15 s Modellzeit geordnet
+unterbrochen. Eine gleichzeitig geprüfte OG3-Buchtenabfahrt hatte zum anderen
+geparkten Fahrzeug nur 38 mm nativen Abstand statt der erforderlichen 85 mm.
+Die neue lokale Umfahrung erhält den öffentlichen Flurknoten und seine
+Anfahrtangente. Sie wird aus den vollständigen anderen Buchtenflächen und der
+vorhandenen Sensorreserve abgeleitet; neue Flurparkplätze und kleinere
+Sicherheitsbereiche werden nicht eingeführt. Der fehlgeschlagene Lauf bleibt
+unter `support-680652f/full-seed-r1/` ausdrücklich unvollständig erhalten.
+
+Ein weiterer belegter Scan-Fehlalarm wird durch einen einseitigen Nachweis
+gegen die gesamte eigene aufgeweitete Rechteckbahn ausgeschlossen. Gerade
+Teilstücke verwenden ihren vollständigen Rechtecksweep, Kurven konservative
+Intervallhüllen aus Translation und Rotation. Die Sensorreserve bleibt gleich;
+Kontakte, Grenzfälle und unaufgelöste Intervalle behalten den ursprünglichen
+Alarm. Weder fremde Fahrzeugkennungen noch deren Positionen oder Zusagen gehen
+in diese Prüfung ein. Ein kurzer eigener Goalclock-Rest darf zuletzt als
+Stoppkandidat dienen, wenn seine tatsächliche PVA und sein vollständiges
+Beobachtungsbudget erneut bestehen. Die neuen tatsächlichen Controllerläufe
+erreichen beide OG3-Buchtenausgänge und die nötige EG-Umfahrung ohne
+Schutzstopp; ihre Grenzen, ihre Frisch-frei-Bedingung und das
+Reichweitenbudget bestehen in diesen Peer-Scan-Fixtures ohne echte
+Türreturns. Die zusätzliche Prüfung geschlossener Türen und der
+Gesamtlauf benötigen eigene Belege.
+
+Am Zwischenstand vor der zusätzlichen Prüfung geschlossener Türen bestanden
+alle zehn korrigierten Buchtenabfahrten ihre eigene
+kanonische und native Prüfung mit unveränderter 85-mm-Reserve. Die unteren
+Grenzen betragen 85,2260 mm zur vollständigen nativen Welt und 88,2894 mm zu
+den anderen realen Fahrzeugkörpern. Der neue Bericht ist
+`support-680652f/port-helper-final-r2/native-departures-r1.json`. Ein exakt
+gleicher Einzelkandidat wird mit nachgewiesener binary64-PVA-/FK-/Fixture-
+Gleichheit und aktuellem vollständigem Physik-Byteaudit referenziert; neun
+Fälle wurden frisch geprüft. Alte Zertifikate behalten ihre Bytes und Pins.
+Alle 20 neu abgeleiteten Boarding-Geometrien und PVA sind binär gleich zur
+erhaltenen Vorphase. Diese separaten Portprofile verwenden eine deklarierte
+300-mm/s-Zonenobergrenze; die tatsächlichen zusammengesetzten Seed-Kurven
+mit den Runner-Zonenfenstern benötigen weiterhin ihren Gesamtnachweis.
+
+Der aktuelle Bericht
+`support-680652f/port-helper-final-r3/native-departures-r1.json` prüft
+alle zehn Buchtenabfahrten frisch mit tatsächlich geschlossenen
+Aufzugtüren und den aktuellen Quellen. Alle bestehen mit mindestens
+148,277689 mm Abstand zur Gebäudewelt und 88,328467 mm zu anderen
+realen Fahrzeugkörpern; der kanonische Mindestabstand beträgt 90,207443 mm.
+Die zusätzliche Abfahrecke verwendet das Maximum aus physischer Reserve
+und voller Sensorreserve. Der Generator prüft die X-Invarianz aller
+zugehörigen Tür- und Elternachsen, sodass dieser Abstand auch bei
+geschlossenen Türen gilt. Dies betrifft allein die Abfahrt aus der eigenen
+Bucht; Boarding-Geometrie, feste Buchten und Kabinenspuren bleiben erhalten.
+Auch dieser Nachweis gilt für separate Portprofile mit
+300-mm/s-Zonenobergrenze, nicht für das vollständige Seed-Programm.
+
+Der zweite integrierte Versuch wurde ebenfalls vor der Ausführung abgelehnt:
+Die nominale Raum-/Heimfahrt von BF06 hatte ohne eigene Buchtenzusage nur
+84,917825 mm Abstand zur reservierten EG-Bucht1. Alle vier vorhandenen
+Inspektionsvarianten teilten dieselbe 152,171°-Transitkehre. Ihre sichere
+Verbindung wurde allein vom achsenweise aufgeweiteten Bay-Vorfilter
+verworfen. Nur solche Voralarme werden nun durch den vollständigen
+konstanten-Yaw-Rechtecksweep mit euklidischem Abstand und unveränderter
+Reserve verfeinert; andere Treffer und der vollständige Bodentest bleiben
+erhalten. Die vorhandene Shared-Splice-Reparatur registriert die neue
+Verbindung vor dem Katalogabschluss, ohne eine Rauminspektion zu verkürzen.
+
+Der deshalb ehrlich neu abgeleitete Cache `support-680652f/navigation-r2/`
+enthält unveränderte Heim-, Warte-, Hub- und Kabinenschnittstellen; kein
+R1-Cache wurde umgepinnt. Navigation und Routengraph benötigten ohne den
+Ressourcenkatalog 161,414 s und
+registrierte 2895 statt 2783 generische Splice-Reparaturen, entsprechend
+3314 festen Routen. Originalmission6 behält ihre Identität, ihr Ziel und
+ihren Heimabschluss. Ihre tatsächliche retimierte, quantisierte
+nominale Controller-PVA besteht ohne Bay-Ausnahme den vollständigen kanonischen
+Nachweis mit mindestens 103,604940 mm Abstand und ohne Zwischenhalt.
+Der eigenständige Bericht ist
+`support-680652f/bf06-actual-controller-pva-r1/report.json`; er belegt diesen
+Regressionsfall ohne SensorWorld, keinen vollständigen Flottenlauf.
+
+Der dritte integrierte Versuch bestand elf nominale Startbahnprüfungen,
+wurde aber bei 0,2 s Modellzeit geordnet unterbrochen. Die zusätzliche
+unabhängige Prüfung fand eine Prüferlücke: Mehrere fremde Missionen konnten
+dieselbe Buchungskennung beanspruchen; ein Mengenvergleich verlor diese
+Doppelbelegung. Zwei synthetische Gegenbeispiele auf Basis der
+Ein-Fahrzeug-Testfixture wurden vom alten Prüfer
+akzeptiert, darunter eine Mission mit späterer fremder Buchung. Sie stehen
+unter `support-680652f/assignment-booking-bijection-bypass-r1/`.
+Das ist kein beobachteter Fehler der tatsächlich ausgegebenen Missionen.
+Der korrigierte Prüfer verlangt die eindeutige Bindung jeder Mission an
+ihre eigene vorher angelegte Buchung. Alle 16 fokussierten Tests bestehen;
+beide Gegenbeispiele werden abgelehnt, die gültige bedingte Folgebuchung
+bleibt zulässig. Der Versuch unter
+`support-680652f/full-seed-r3/` bleibt ausdrücklich unvollständig erhalten;
+seine Weltlauf-Initialisierung benötigte bis zum Abbruch 1602,910 s.
+Navigation und statischer Katalog bleiben durch diese reine Prüferänderung
+unverändert und dürfen nur mit ihren weiterhin passenden Quellpins
+wiederverwendet werden.
+
+Am aktuellen eingefrorenen Integrationsstand bestehen 344 von 346 Python-Tests
+in 118,882 s; zwei optionale Prüfungen sind übersprungen
+(`support-680652f/bf01-integration-tests-r6.log`). Die separate Ausführung der 22
+nativen Hüllenregressionen mit installiertem FreeCAD besteht vollständig.
+Dies ersetzt weder den ursprünglichen Seed-Lauf noch dessen nativen
+Gesamtprogrammnachweis. Die aktuelle Byteprüfung bestätigt außerdem
+154 unveränderte Konstruktionsdateien gegenüber `master` `680652f` und
+alle 160 im Bericht aufgeführten unveränderten Referenzen der
+geschützten/physikalischen Quellkette.
+Der Bericht heißt `protected-source-byte-audit-r2.json` unter
+`exports/building-fleet/support-680652f/`.
+
+Der vierte integrierte Versuch verwendet unverändert Seed `20261120`,
+alle 20 Fahrzeuge und den quellgebundenen 3314-Routen-Katalog des dritten
+Versuchs. Alle 20 nominalen Startbahnen bestehen ihr kanonisches
+Geometriegate. Der tatsächliche Weltlauf bricht jedoch bei **75,2 s
+Modellzeit** selbst mit
+`No bounded own protective-stop enclosure; replan before execution` ab.
+`interrupted` ist `false`; ein manueller Abbruch wurde nicht gesendet.
+Betroffen ist BF04 mit `mission-4` nach EG/R0_001. Der letzte erfolgreiche
+Entscheid bei 75,15 s erlaubt noch `clear_scan`; nach weiteren 50 ms eigener
+Beschleunigung gelingt der Schutzbremsnachweis nicht mehr. Der Befund
+belegt die fehlende Freigabe, keine bereits erfolgte Kollision.
+Der begrenzte Repro unter
+`support-680652f/full-seed-r4-failure-analysis/report.json` verwendet die
+tatsächlichen Eingaben und rekonstruiert auf dem geraden Teilstück den
+skalaren Zustand aus den tatsächlichen kartesischen Jets. Die ursprüngliche
+Stoppfamilie reproduziert den Fehler ohne nominale Neukompilierung.
+Alle 20 abgefragten Roh-Stoppbudgets sind negativ; der beste geprüfte
+Abstand zum unveränderten Beobachtungsbudget beträgt −35,368515 mm.
+Dies beweist keine physikalische Unmöglichkeit aller denkbaren Stopps.
+Der gesonderte nächste Korrekturschritt ist eine Weiterfahrfreigabe, die
+die erforderliche Bremsreserve für den folgenden 50-ms-Schritt nachweist
+und vor deren Verlust bremst. Außerdem bleiben die Kosten der wiederholten
+PVA-/Zonenextrema außerhalb der beschleunigten Katalogberechnung offen.
+
+Die CLI benötigt bis zu diesem Fehler **3043,275 s (50,7 min)**, davon
+2980,044 s für Weltinitialisierung und Weltlauf einschließlich der
+nominalen Bahnvorbereitung. Der Durchsatz zwischen 10 und 30 s Modellzeit
+beträgt 78,656 s Wandzeit; die bis 10 s aufgelaufenen 2740,558 s sind
+ausdrücklich keine isolierte Katalogmessung. Die Grenze von zehn Minuten
+für Vorbereitung und Programmerzeugung zusammen wird deutlich verfehlt.
+Die Stoppregel aus Abschnitt 12 des vorliegenden BF01-Auftrags bleibt
+maßgeblich; weitere Vollversuche werden an diesem Stand nicht gestartet.
+Höhere Bewegungsgrenzen, ein anderer Seed oder beschleunigte Wiedergabe
+ersetzen den fehlenden Nachweis nicht.
+
+`support-680652f/full-seed-r4/runtime-failure.json` und
+`compile-failure.json` dokumentieren den Fehler und
+`complete_fleet_qualified: false`. Das erhaltene `partial-program.json`
+ist unvollständig. `assessment.json` daneben bündelt die unveränderten
+Artefaktreferenzen, Testergebnisse und Prüfgrenzen ausdrücklich als
+fehlgeschlagene Bewertung. Die tatsächlichen eigenen Eingaben enthalten 15060
+anonyme Scans, 20 eigene Pfade, 30001 Entscheidungen und 1467 Stoppuhren;
+die Gzip-Datei bleibt unter derselben Ausgabe erhalten. Alle 203
+Laufzeit-Quell-/Artefaktpins stimmen nach dem Abbruch weiterhin mit ihren
+Startwerten überein. Ein vollständiges Programm, dessen nativer
+Gesamtnachweis, die unabhängige Exportfreigabe und eine BF01-Browserfreigabe
+liegen nicht vor. Die separaten Portnachweise bleiben davon getrennt.
+
+### Historisch: BF01-2-Stopp am Laufzeitbudget
 
 Der Folgeauftrag wurde auf dem geprüften `master`-Stand `84c61cb` im separaten
 Worktree `exports/worktrees/building-fleet-support-rule` und Branch
