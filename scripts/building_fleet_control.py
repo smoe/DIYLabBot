@@ -162,6 +162,8 @@ class Controller(local.LocalController):
         self.perception_audit={'checks':0,'minimum_range_margin_mm':None,'maximum_required_gap_mm':0.,'scope':'actual checked stop at each own decision state; discrete 0.05 s synthetic controller clock'}
         self.nominal_clock,self.nominal_clock_proof=self._bounded_start_clock(self.nominal_clock,0.)
         self.profile_checks.append({'kind':'nominal_clock','proof':self.nominal_clock_proof})
+        self.continuation_stop_clock=None;self.step_end_s=None
+        self._step_certificate=None;self._fallback=None
 
     @property
     def progress(self):
@@ -267,10 +269,12 @@ class Controller(local.LocalController):
     def set_plan(self,curve,now,mode,kind=None):
         if abs(now*1000-round(now*1000))>1e-6:raise ValueError('Controller start time must lie on the 1 ms grid')
         continuation=getattr(curve,'_bf01_continuation',None)
+        self._step_certificate=None
         if continuation is not None:
             if self.plan is not continuation:raise ValueError('Stale own final-braking continuation')
             self.mode=mode;self.plan_kind=kind;return
         if getattr(curve,'_bf01_origin',None)!=self.y:curve=self._quantized_clock(curve,self.y)
+        self._brake_cache=None
         super().set_plan(curve,now,mode);self.plan_kind=kind
         if kind=='goal':
             self._final_tail_time=curve.times[0]
@@ -376,8 +380,20 @@ class Controller(local.LocalController):
             +(self._zone_cap_at(self.y)+closing)*reaction+closing*clock.times[-1])
         return self.settings['range_mm']-self.radius-inflation-required
 
-    def _checked_brake(self,strict=False):
+    def _checked_brake(self,strict=False,*,candidate_ok=None):
         if self.v<1e-8 and abs(self.a)<1e-8:return None
+        accept=(lambda clock:True)if candidate_ok is None else candidate_ok
+        key=(self.y,self.v,self.a)
+        if self._brake_cache is not None and self._brake_cache[0]==key:
+            clock=self._brake_cache[1]
+            if strict and not getattr(clock,'_bf01_continuation',None):
+                valid,_=self._admissible(clock,self.y)
+                if not valid:clock=None
+            if clock is not None and accept(clock):return clock
+        retained=self._fallback_suffix()
+        if retained is not None and accept(retained):
+            self._brake_cache=(key,retained)
+            return retained
         if self.mode=='braking'and self.plan is not None and self.plan_kind=='protective_stop':
             elapsed=self.now-self.plan_start;points=[local.point(0,0,self.v,self.a)]
             for node in self.plan.points:
@@ -385,11 +401,13 @@ class Controller(local.LocalController):
             result=floor.motion.Curve(points)if len(points)>1 else None
             if result is not None and self._stop_observation_margin(result)<0:
                 raise RuntimeError('Actual protective-stop continuation exceeds the unchanged observation budget')
+            if result is not None and not accept(result):raise RuntimeError('Active protective stop does not meet the required continuation context')
             return result
-        key=(self.y,self.v,self.a)
-        if self._brake_cache is not None and self._brake_cache[0]==key:clock=self._brake_cache[1]
-        else:
+        clock=None
+        if clock is None:
             clock=self._final_deceleration()
+            if clock is not None and(strict and not self._admissible(clock,self.y)[0]or not accept(clock)):
+                clock=None
             if clock is None:
                 rejected=[]
                 closing=max(self._zone_cap_at(self.y),self.settings['maximum_obstacle_closing_speed_mm_s'])
@@ -401,7 +419,10 @@ class Controller(local.LocalController):
                     if self._stop_observation_margin(candidate)<0:continue
                     if row['interval_bounds']is None:row['interval_bounds']=[floor.motion.bounds([a,b])for a,b in zip(row['clock'],row['clock'][1:])]
                     bounds=list(row['interval_bounds']);bounds[0]=floor.motion.bounds(points[:2])
-                    if self._analytic_stop_ok(candidate,bounds):clock=candidate;clock._bf01_origin=self.y;break
+                    if self._analytic_stop_ok(candidate,bounds):
+                        if strict and not self._admissible(candidate,self.y)[0]:continue
+                        if not accept(candidate):continue
+                        clock=candidate;clock._bf01_origin=self.y;break
                     if all(bound[F[1]]['min'][0]>=-1e-8 for bound in bounds):rejected.append(candidate)
                 if clock is None:
                     # Independent absolute derivative bounds can reject a
@@ -411,7 +432,7 @@ class Controller(local.LocalController):
                     # and the no-stop rule still apply without wider padding.
                     for candidate in rejected:
                         valid,actual=self._admissible(candidate,self.y)
-                        if valid and self._stop_observation_margin(candidate)>=0:
+                        if valid and self._stop_observation_margin(candidate)>=0 and accept(candidate):
                             clock=candidate;clock._bf01_origin=self.y
                             self.profile_checks.append({'kind':'exact_stop_fallback','progress_mm':self.y,
                                 'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
@@ -441,7 +462,7 @@ class Controller(local.LocalController):
                         if (scalar[F[1]]['min'][0]>=-1e-8 and all(scalar[field]['max_abs'][0]<=self.limits[name]*(1+1e-6)
                                 for field,name in zip(F[1:],('velocity','acceleration','jerk')))):
                             valid,actual=self._admissible(candidate,self.y)
-                            if valid and self._stop_observation_margin(candidate)>=0:
+                            if valid and self._stop_observation_margin(candidate)>=0 and accept(candidate):
                                 clock=candidate;clock._bf01_origin=self.y
                                 self.profile_checks.append({'kind':'exact_stop_extension','progress_mm':self.y,
                                     'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
@@ -455,7 +476,7 @@ class Controller(local.LocalController):
                 suffix=self._final_deceleration(require_monotone=False)
                 if suffix is not None and floor.motion.bounds(suffix)[F[1]]['min'][0]>=-1e-8:
                     valid,actual=self._admissible(suffix,self.y)
-                    if valid and self._stop_observation_margin(suffix)>=0:
+                    if valid and self._stop_observation_margin(suffix)>=0 and accept(suffix):
                         clock=suffix
                         self.profile_checks.append({'kind':'validated_goal_suffix_stop','progress_mm':self.y,
                             'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
@@ -633,6 +654,148 @@ class Controller(local.LocalController):
                 gap=min(gap,ahead-self.half_length-inflation)
         return gap,'perception_range_budget'if gap==visible_gap else'local_obstacle'
 
+    def _visible_gap(self):
+        inflation=(self.settings['range_error_mm']+self.settings['range_mm']*
+            math.sin(math.radians(self.settings['angular_step_deg']))+
+            self.source['geometry']['localization_tolerance_mm'])
+        return self.settings['range_mm']-self.radius-inflation
+
+    def _clock_requirement(self,clock,origin):
+        """Bound every suffix using one maximum source cap, never samples."""
+        finish=origin+clock.points[-1][F[0]][0]
+        cap=max([self._zone_cap_at(origin),self._zone_cap_at(finish),
+            *[min(self.settings['desired_speed_mm_s'],value)for at,value in self.zone_caps
+              if origin<=at<=finish]])
+        closing=max(cap,self.settings['maximum_obstacle_closing_speed_mm_s'])
+        up=lambda value:math.nextafter(value,math.inf)
+        reaction=up(up(self.settings['period_s']+self.settings['latency_s'])+self.settings['stale_after_s'])
+        required=up(up(up(self.settings['clearance_mm']+clock.points[-1][F[0]][0])+
+            up(up(cap+closing)*reaction))+up(closing*clock.times[-1]))
+        return required,cap,closing
+
+    def _remaining_observation(self,anchor):
+        up=lambda value:math.nextafter(value,math.inf)
+        down=lambda value:math.nextafter(value,-math.inf)
+        moved=up(self.y-anchor['origin_mm']);age=up(self.now-anchor['time_s'])
+        return down(down(anchor['gap_mm']-moved)-up(anchor['closing_mm_s']*age))
+
+    def _valid_stop_clock(self,clock,origin):
+        if clock is None:return False
+        if (clock.times[0]!=0 or abs(clock.points[0][F[0]][0])>1e-9 or
+                any(abs(t*1000-round(t*1000))>1e-6 for t in clock.times)or
+                abs(clock.points[0][F[1]][0]-self.v)>1e-8 or
+                abs(clock.points[0][F[2]][0]-self.a)>1e-8 or
+                any(abs(clock.points[-1][f][0])>1e-8 for f in F[1:3])or
+                origin+clock.points[-1][F[0]][0]>self.goal+1e-5):return False
+        scalar=floor.motion.bounds(clock)
+        if scalar[F[1]]['min'][0]<-1e-8:return False
+        if any(scalar[f]['max_abs'][0]>self.limits[k]*(1+1e-6)
+                for f,k in zip(F[1:],('velocity','acceleration','jerk'))):return False
+        return self._admissible(clock,origin)[0]
+
+    def _fallback_suffix(self):
+        """Keep the last proved stop, including its original observation age."""
+        saved=getattr(self,'_fallback',None)
+        if saved is None or saved['path']is not self.path:return None
+        elapsed=round(self.now-saved['start_s'],3);clock=saved['clock']
+        if not 0<=elapsed<clock.times[-1]:return None
+        jet=clock.evaluate(elapsed)
+        expected=(saved['origin_mm']+jet[F[0]][0],jet[F[1]][0],jet[F[2]][0])
+        if expected!=(self.y,self.v,self.a):return None
+        points=[local.point(0,0,self.v,self.a)]
+        for node in clock.points:
+            absolute=round(saved['start_s']+node['time_s'],3)
+            if absolute>self.now+1e-9:
+                points.append(local.point(round(absolute-self.now,3),
+                    saved['origin_mm']+node[F[0]][0]-self.y,node[F[1]][0],node[F[2]][0]))
+        if len(points)<2:return None
+        suffix=floor.motion.Curve(points);suffix._bf01_origin=self.y
+        required,_,closing=self._clock_requirement(suffix,self.y)
+        anchor=saved['anchor'];available=self._remaining_observation(anchor)
+        if (closing>anchor['closing_mm_s'] or required>available or
+                not self._valid_stop_clock(suffix,self.y)):
+            raise RuntimeError('Stored own stop suffix lost its unchanged proof')
+        suffix._bf01_fallback_anchor=copy.deepcopy(anchor)
+        return suffix
+
+    def _planned_prefix(self,end):
+        """Actual own scalar clock jets, including a short ramp's coast tail."""
+        finish=end;plan_end=None
+        if self.plan is not None:
+            plan_end=round(self.plan_start+self.plan.times[-1],3)
+            if self.plan_kind in('goal','protective_stop'):finish=min(finish,plan_end)
+        cuts={finish}
+        if self.plan is not None:
+            cuts.update(round(self.plan_start+p['time_s'],3)for p in self.plan.points
+                        if self.now<round(self.plan_start+p['time_s'],3)<finish)
+            if self.now<plan_end<finish:cuts.add(plan_end)
+        points=[local.point(0,0,self.v,self.a)]
+        for at in sorted(t for t in cuts if t>self.now+1e-9):
+            if self.plan is None:
+                dt=at-self.now;state=(self.y+self.v*dt+.5*self.a*dt*dt,self.v+self.a*dt,self.a)
+            elif at<=plan_end:
+                jet=self.plan.evaluate(round(at-self.plan_start,3))
+                state=(self.plan_origin+jet[F[0]][0],jet[F[1]][0],jet[F[2]][0])
+            else:
+                jet=self.plan.points[-1];dt=at-plan_end
+                state=(self.plan_origin+jet[F[0]][0]+jet[F[1]][0]*dt+.5*jet[F[2]][0]*dt*dt,
+                       jet[F[1]][0]+jet[F[2]][0]*dt,jet[F[2]][0])
+            points.append(local.point(round(at-self.now,3),state[0]-self.y,state[1],state[2]))
+        return floor.motion.Curve(points)if len(points)>1 else None
+
+    def _preview_stop(self,end,gap,scan):
+        """A whole next prefix plus an exact-PVA end stop; no future scan."""
+        if scan is None or end-scan['captured_s']>self.settings['stale_after_s']+1e-9:return None
+        prefix=self._planned_prefix(end)
+        if prefix is None:return None
+        tail=prefix.points[-1];duration=prefix.times[-1]
+        if abs(tail[F[1]][0])<1e-8 and abs(tail[F[2]][0])<1e-8:
+            combined=prefix
+        else:
+            probe=copy.copy(self);probe.y=self.y+tail[F[0]][0]
+            probe.v=tail[F[1]][0];probe.a=tail[F[2]][0];probe.now=round(self.now+duration,3)
+            probe._fallback=None;probe._brake_cache=None;probe._geometry_cache={}
+            probe.profile_checks=[]
+            selected=[]
+            def complete_candidate(stop):
+                points=copy.deepcopy(prefix.points)
+                points.extend(local.point(round(duration+p['time_s'],3),tail[F[0]][0]+p[F[0]][0],
+                    p[F[1]][0],p[F[2]][0])for p in stop.points[1:])
+                clock=floor.motion.Curve(points);clock._bf01_origin=self.y
+                required,_,_=self._clock_requirement(clock,self.y)
+                if required>=min(gap,self._visible_gap())or not self._valid_stop_clock(clock,self.y):return False
+                selected.append((stop,clock));return True
+            try:stop=probe._checked_brake(strict=True,candidate_ok=complete_candidate)
+            except RuntimeError:return None
+            if stop is None:return None
+            combined=next(clock for candidate,clock in selected if candidate is stop)
+            combined._bf01_profile_checks=copy.deepcopy(probe.profile_checks)
+        combined._bf01_origin=self.y
+        return combined
+
+    def _approve_step(self,clock,end,gap,scan,*,inherited=False):
+        """Commit only a complete witness; the old fallback survives failure."""
+        if clock is None:return False
+        required,cap,closing=self._clock_requirement(clock,self.y)
+        if inherited:
+            anchor=copy.deepcopy(getattr(clock,'_bf01_fallback_anchor',None))
+            if anchor is None:return False
+            available=self._remaining_observation(anchor)
+            if closing>anchor['closing_mm_s']or required>available:return False
+        else:
+            if (scan is None or end-scan['captured_s']>self.settings['stale_after_s']+1e-9
+                    or gap<=required or self._visible_gap()<required):return False
+            anchor={'time_s':self.now,'captured_s':scan['captured_s'],'origin_mm':self.y,
+                    'gap_mm':min(gap,self._visible_gap()),'closing_mm_s':closing,'cap_mm_s':cap}
+        if not self._valid_stop_clock(clock,self.y):return False
+        self.continuation_stop_clock=clock;self.step_end_s=end
+        self._step_certificate={'start_s':self.now,'end_s':end,'origin_mm':self.y,
+            'state':(self.y,self.v,self.a),'plan':self.plan,'path':self.path,'clock':clock}
+        self._fallback={'clock':clock,'start_s':self.now,'origin_mm':self.y,
+                        'path':self.path,'anchor':anchor}
+        if not inherited:self.profile_checks.extend(getattr(clock,'_bf01_profile_checks',[]))
+        return True
+
     def _goal_plan(self,now):
         if self.v>1e-7 or abs(self.a)>1e-7:raise RuntimeError('A resumed episode must begin at a confirmed stop')
         if self.goal-self.y<1e-5:self.mode='arrived';return
@@ -674,9 +837,15 @@ class Controller(local.LocalController):
             raw=floor.motion.Curve([local.point(p['time_s']*factor,p[F[0]][0],p[F[1]][0]/factor,p[F[2]][0]/factor**2)for p in raw.points])
         raise RuntimeError('No bounded forward recovery from the confirmed stopped pose')
 
-    def decide(self, now, scan, grant_permits=True):
+    def decide(self, now, scan, grant_permits=True, *, step_end_s=None):
         if type(grant_permits) is not bool:
             raise ValueError('Own resource grant must be explicit')
+        end=round(now+.05,3)if step_end_s is None else step_end_s
+        if (type(end)not in(int,float)or not math.isfinite(end)or not 0<end-now<=.050000001
+                or abs(end*1000-round(end*1000))>1e-6 or abs(now-self.now)>1e-8):
+            raise ValueError('Own next step must be contiguous, on the 1 ms grid and no longer than 50 ms')
+        end=round(end,3);self.step_end_s=end;self.continuation_stop_clock=None;self._step_certificate=None
+        initial_mode=self.mode
         candidate=copy.deepcopy(scan)if scan is not None else self.last_scan
         gap,reason=self._observed_gap(candidate,now)
         if scan is not None:self.last_scan=candidate
@@ -686,59 +855,92 @@ class Controller(local.LocalController):
         closing = max(self._zone_cap_at(self.y),self.settings['maximum_obstacle_closing_speed_mm_s'])
         reaction = self.settings['period_s']+self.settings['latency_s']+self.settings['stale_after_s']
         required = self.settings['clearance_mm']+distance+(self._zone_cap_at(self.y)+closing)*reaction+closing*duration
-        if self.mode in('waiting','braking'):
+        def launch_requirement():
             launch_speed=self._zone_cap_at(self.y)
             launch=_qualified_scalar_stop(launch_speed,0.,self.limits['acceleration'],self.limits['jerk'],closing)
             if launch is None:raise RuntimeError('Proposed launch has no qualified stopping envelope')
             launch_time=launch['duration_s'];launch_distance=launch['distance_mm']
-            required=max(required,self.settings['clearance_mm']+launch_distance+(launch_speed+closing)*reaction+closing*launch_time)
-        inflation=self.settings['range_error_mm']+self.settings['range_mm']*math.sin(math.radians(self.settings['angular_step_deg']))+self.source['geometry']['localization_tolerance_mm']
-        visible=self.settings['range_mm']-self.radius-inflation
-        self.perception_audit['checks']+=1
-        self.perception_audit['minimum_range_margin_mm']=visible-required if self.perception_audit['minimum_range_margin_mm']is None else min(self.perception_audit['minimum_range_margin_mm'],visible-required)
-        self.perception_audit['maximum_required_gap_mm']=max(self.perception_audit['maximum_required_gap_mm'],required)
+            return self.settings['clearance_mm']+launch_distance+(launch_speed+closing)*reaction+closing*launch_time
+        if initial_mode in('waiting','braking'):required=max(required,launch_requirement())
         obstructed = not grant_permits or gap <= required
         if self.mode == 'arrived':
             return {'mode':self.mode,'reason':'functional_endpoint'}
-        if obstructed:
-            self.clear_since = None; self.reason = reason if grant_permits else 'resource_wait'
-            if stop and self.plan_kind != 'protective_stop':
-                stop=self._checked_brake(strict=True)
-                duration=stop.times[-1];distance=stop.points[-1][F[0]][0]
-                required=max(required,self.settings['clearance_mm']+distance+(self._zone_cap_at(self.y)+closing)*reaction+closing*duration)
+        def braking_now(why):
+            nonlocal stop
+            self.clear_since=None;self.reason=why
+            if stop is None:
+                self.plan=None;self.mode='waiting';return
+            stop=self._checked_brake(strict=True)
+            inherited=hasattr(stop,'_bf01_fallback_anchor')
+            if self.plan_kind!='protective_stop':
                 self.set_plan(stop,now,'braking','protective_stop');self.stops+=1
-                self.events.append({'time_s':now,'event':'protective_stop','reason':self.reason})
+                self.events.append({'time_s':now,'event':'protective_stop','reason':why})
+            if not self._approve_step(stop,end,gap,candidate,inherited=inherited):
+                raise RuntimeError('No retained or newly proved own stopping fallback for this step')
+        if obstructed:
+            braking_now(reason if grant_permits else 'resource_wait')
         else:
             if self.clear_since is None:
                 self.clear_since = now
             if self.mode == 'waiting' and now-self.clear_since < self.settings['clear_observation_s']:
                 self.reason = 'fresh_clear_observation'
-            elif self.mode != 'braking':
-                if self.mode == 'waiting':
-                    self.events.append({'time_s':now,'event':'resumed','clear_observation_s':now-self.clear_since})
-                    self.reason = 'clear_scan'
+            elif self.mode=='braking':
+                if stop is None:raise RuntimeError('Moving protective stop lost its retained clock')
+                if not self._approve_step(stop,end,gap,candidate,
+                        inherited=hasattr(stop,'_bf01_fallback_anchor')):
+                    raise RuntimeError('Active protective stop lost its proved suffix')
+            else:
+                launching=self.mode=='waiting'
+                if launching:
                     self._goal_plan(now)
-                elif self.plan is None:
+                elif self.plan is None and self.plan_kind=='goal':
                     raise RuntimeError('Driving lost its precompiled own motion clock')
+                if self.mode!='arrived':
+                    proposed=self._preview_stop(end,gap,candidate)
+                    if proposed is not None and self._approve_step(proposed,end,gap,candidate):
+                        self.reason='clear_scan'
+                        if launching:self.events.append({'time_s':now,'event':'resumed',
+                            'clear_observation_s':now-self.clear_since})
+                    elif launching:
+                        # The proposed goal has not moved. Do not advertise a
+                        # resume or discard a previous valid fallback.
+                        self.plan=None;self.mode='waiting';self.reason='next_step_stop_unproven'
+                    else:braking_now('next_step_stop_unproven')
+        if self.mode in('waiting','braking')or initial_mode in('waiting','braking'):
+            required=max(required,launch_requirement())
+        if self.continuation_stop_clock is not None:
+            required=max(required,self._clock_requirement(self.continuation_stop_clock,self.y)[0])
+        visible=self._visible_gap();self.perception_audit['checks']+=1
+        self.perception_audit['minimum_range_margin_mm']=visible-required if self.perception_audit['minimum_range_margin_mm']is None else min(self.perception_audit['minimum_range_margin_mm'],visible-required)
+        self.perception_audit['maximum_required_gap_mm']=max(self.perception_audit['maximum_required_gap_mm'],required)
         return {'mode':self.mode,'reason':self.reason,'scan_age_s':now-self.last_scan['captured_s'] if self.last_scan else None,
                 'observed_gap_mm':gap if math.isfinite(gap) else None,'required_gap_mm':required}
 
     def advance(self, start, end):
-        if end <= start or end-start > .050000001:
+        if end <= start or end-start > .050000001 or abs(end*1000-round(end*1000))>1e-6:
             raise ValueError('BF01 uses positive integration steps no larger than 0.05 s')
         if abs(start-self.now)>1e-8:
             raise ValueError('Controller intervals must be contiguous')
-        if self.plan:
-            plan_end=self.plan_start+self.plan.times[-1]
-            for knot in self.plan.points:
-                t=self.plan_start+knot['time_s']
+        end=round(end,3);certificate=getattr(self,'_step_certificate',None)
+        moving=self.plan is not None or abs(self.v)>1e-8 or abs(self.a)>1e-8
+        if moving:
+            if (certificate is None or certificate['start_s']!=round(start,3)or end>certificate['end_s']
+                    or certificate['state']!=(self.y,self.v,self.a)or certificate['plan']is not self.plan
+                    or certificate['path']is not self.path):
+                raise RuntimeError('Positive own advance requires its unchanged proved step certificate')
+            clock=certificate['clock'];origin=certificate['origin_mm'];duration=round(end-start,3)
+            for knot in clock.points:
+                t=round(start+knot['time_s'],3)
                 if start+1e-9<t<end-1e-9:
-                    self.y=self.plan_origin+knot[F[0]][0];self.v=knot[F[1]][0];self.a=knot[F[2]][0]
+                    self.y=origin+knot[F[0]][0];self.v=knot[F[1]][0];self.a=knot[F[2]][0]
                     self._record(t)
-            self.y,self.v,self.a=self.evaluate(min(end,plan_end))
+            jet=clock.evaluate(min(duration,clock.times[-1]))
+            self.y=origin+jet[F[0]][0];self.v=jet[F[1]][0];self.a=jet[F[2]][0]
+        if self.plan:
+            plan_end=round(self.plan_start+self.plan.times[-1],3)
             if end>=plan_end-1e-9:
                 kind=self.plan_kind;self.plan=None
-                if kind=='goal':
+                if kind=='goal'or self.goal-self.y<1e-5:
                     self.mode='arrived';self.v=self.a=0
                 elif kind=='protective_stop':
                     self.mode='waiting';self.v=self.a=0
@@ -746,16 +948,9 @@ class Controller(local.LocalController):
                     # A positive-speed ramp ending between integration ticks
                     # continues coasting over the remainder. Clamping its pose
                     # while retaining velocity would contradict its own PVA.
-                    remaining=max(0.,end-plan_end)
-                    self.y+=self.v*remaining+.5*self.a*remaining*remaining
-                    self.v+=self.a*remaining
                     self.mode='driving'
-        elif self.mode=='driving' and self.v>0:
-            remaining=end-start
-            self.y+=self.v*remaining+.5*self.a*remaining*remaining
-            self.v+=self.a*remaining
         if self.y>self.goal+1e-5 or self.v < -1e-6:
             raise RuntimeError('Controller left its monotone own route')
-        self.now=end;self._record(end)
+        self.now=end;self._step_certificate=None;self._record(end)
         return {'progress_mm':self.y,'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,
                 'pose_mm_rad':self.pose(),'mode':self.mode}

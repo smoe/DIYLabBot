@@ -118,11 +118,11 @@ def compile_fleet(args):
         runtime_started=time.monotonic()
         program=compile_program(source,nav,out,prepared=prepared,progress=progress,
                                 geometry_checker=GeometryChecks(source,nav),artifacts={
-                                    'walkthrough_report':artifact(nav.mesh.export/'build-report.json'),
+                                    'walkthrough_report':artifact(nav.mesh.world_report_path),
                                     'camera_report':artifact(camera)})
         runtime_elapsed=time.monotonic()-runtime_started;native.verify_pins(pins)
         program['source_files_sha256'].update(pins)
-        program['artifacts']={'walkthrough_report':artifact(nav.mesh.export/'build-report.json'),
+        program['artifacts']={'walkthrough_report':artifact(nav.mesh.world_report_path),
                               'camera_report':artifact(camera)}
         path=out/'program.json';write(path,program);records=runtime_records(program,out)
         python=args.freecad_python or tool_paths.default_freecad_python()

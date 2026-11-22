@@ -1,0 +1,436 @@
+{
+  "scope": "Historical synthetic R4 braking-readiness fixture. Isolated exact own scalar decisions and path; tests use the maximally favorable valid empty scan, not a claimed native-world replay. No geometric, biological or hardware qualification.",
+  "source_evidence": {
+    "path": "exports/building-fleet/support-680652f/full-seed-r4-failure-analysis/report.json",
+    "sha256": "6505747574bea21be572f276e07f57bb3d1d4073acd13c793e92aefd53fe07b5"
+  },
+  "vehicle_id": "BF04",
+  "mission": [
+    {
+      "mission_id": "mission-4",
+      "vehicle_id": "BF04",
+      "assigned_s": 0.0,
+      "goal": {
+        "level": "EG",
+        "area": "R0_001",
+        "basis": "plan_label",
+        "weight": 1,
+        "minimum_visits": 1,
+        "kind": "inspection_pass"
+      },
+      "booking_id": null,
+      "source_level": "EG"
+    }
+  ],
+  "own_path": {
+    "kind": "own_path",
+    "id": "a6acb9fa7f5b0462d388aa2f90e1c88fab5cec6d601c7ceb074f888862d125af",
+    "points_mm": [
+      [
+        12200,
+        21800
+      ],
+      [
+        12200.0,
+        22870.772793294684
+      ],
+      [
+        11175.0,
+        22375.0
+      ],
+      [
+        10975.0,
+        21775.0
+      ],
+      [
+        11125.50912543089,
+        20119.399620260214
+      ],
+      [
+        11225.0,
+        19025.0
+      ],
+      [
+        13896.875,
+        17600.0
+      ],
+      [
+        14225.0,
+        17425.0
+      ],
+      [
+        14475.0,
+        16825.0
+      ],
+      [
+        14375.0,
+        16325.0
+      ],
+      [
+        14075.0,
+        16025.0
+      ],
+      [
+        14175.0,
+        15775.0
+      ],
+      [
+        14475.112612612613,
+        14805.405405405405
+      ],
+      [
+        15878.84455173867,
+        10270.271448228912
+      ],
+      [
+        16125.0,
+        9475.0
+      ],
+      [
+        16227.38960314303,
+        7905.026085140208
+      ],
+      [
+        16575.0,
+        2575.0
+      ],
+      [
+        16944.279606957127,
+        2441.6654654992512
+      ],
+      [
+        19125.0,
+        1654.2801536522852
+      ],
+      [
+        19595.719846347714,
+        1654.2801536522852
+      ],
+      [
+        19595.719846347714,
+        2595.719846347715
+      ],
+      [
+        18654.280153652286,
+        2595.719846347715
+      ],
+      [
+        18654.280153652286,
+        1654.2801536522852
+      ],
+      [
+        19125.0,
+        1654.2801536522852
+      ],
+      [
+        16944.279606957127,
+        2441.6654654992512
+      ],
+      [
+        16575.0,
+        2575.0
+      ],
+      [
+        16227.38960314303,
+        7905.026085140208
+      ],
+      [
+        16125.0,
+        9475.0
+      ],
+      [
+        15878.84455173867,
+        10270.271448228912
+      ],
+      [
+        14475.112612612613,
+        14805.405405405403
+      ],
+      [
+        14175.0,
+        15775.0
+      ],
+      [
+        14075.0,
+        16025.0
+      ],
+      [
+        14375.0,
+        16325.0
+      ],
+      [
+        14475.0,
+        16775.0
+      ],
+      [
+        14275.0,
+        17375.0
+      ],
+      [
+        13853.125,
+        17600.0
+      ],
+      [
+        11275.0,
+        18975.0
+      ],
+      [
+        11045.08089444117,
+        20124.59552779415
+      ],
+      [
+        11025.0,
+        20225.0
+      ],
+      [
+        11325.0,
+        20525.0
+      ],
+      [
+        12200.0,
+        20729.227206705316
+      ],
+      [
+        12200.0,
+        21800.0
+      ]
+    ],
+    "corner_trim_mm": 250,
+    "zone_caps": [
+      [
+        0.0,
+        300
+      ],
+      [
+        5120.810006056679,
+        1000
+      ],
+      [
+        11849.259890734358,
+        300
+      ],
+      [
+        17494.298505058912,
+        1000
+      ],
+      [
+        19102.384251969703,
+        300
+      ],
+      [
+        40187.48658104936,
+        1000
+      ],
+      [
+        41795.57232796015,
+        300
+      ],
+      [
+        47440.61094228471,
+        1000
+      ],
+      [
+        54160.86448363632,
+        300
+      ],
+      [
+        57223.33887984593,
+        1000
+      ]
+    ],
+    "reverse": false
+  },
+  "decisions": [
+    {
+      "time_s": 74.6,
+      "progress_mm": 6174.599701693008,
+      "velocity_mm_s": 146.5710981726685,
+      "acceleration_mm_s2": 279.24435329093996,
+      "captured_s": 74.5,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.09999999999999432,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1310.5514792919425
+      }
+    },
+    {
+      "time_s": 74.65,
+      "progress_mm": 6182.28329057962,
+      "velocity_mm_s": 160.88792441184893,
+      "acceleration_mm_s2": 293.10040770361786,
+      "captured_s": 74.5,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.15000000000000568,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1349.2142976914245
+      }
+    },
+    {
+      "time_s": 74.7,
+      "progress_mm": 6190.699220124773,
+      "velocity_mm_s": 175.84831008577984,
+      "acceleration_mm_s2": 304.98673068112475,
+      "captured_s": 74.6,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.10000000000000853,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1399.4794863100678
+      }
+    },
+    {
+      "time_s": 74.75,
+      "progress_mm": 6199.877206135913,
+      "velocity_mm_s": 191.3537686227069,
+      "acceleration_mm_s2": 314.9033222234649,
+      "captured_s": 74.6,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.15000000000000568,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1464.620909794749
+      }
+    },
+    {
+      "time_s": 74.8,
+      "progress_mm": 6209.842040091897,
+      "velocity_mm_s": 207.30581345087177,
+      "acceleration_mm_s2": 322.85018233063823,
+      "captured_s": 74.7,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.09999999999999432,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1473.4087483299777
+      }
+    },
+    {
+      "time_s": 74.85,
+      "progress_mm": 6220.61358914299,
+      "velocity_mm_s": 223.6059579985161,
+      "acceleration_mm_s2": 328.82731100264476,
+      "captured_s": 74.7,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.14999999999999147,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1519.2494476679235
+      }
+    },
+    {
+      "time_s": 74.9,
+      "progress_mm": 6232.206796110879,
+      "velocity_mm_s": 240.1557156938863,
+      "acceleration_mm_s2": 332.8347082394855,
+      "captured_s": 74.8,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.10000000000000853,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1563.479772113501
+      }
+    },
+    {
+      "time_s": 74.95,
+      "progress_mm": 6244.631679488647,
+      "velocity_mm_s": 256.8565999652146,
+      "acceleration_mm_s2": 334.872374041158,
+      "captured_s": 74.8,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.15000000000000568,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1633.903362775608
+      }
+    },
+    {
+      "time_s": 75.0,
+      "progress_mm": 6257.893333440802,
+      "velocity_mm_s": 273.6101242407475,
+      "acceleration_mm_s2": 334.9403084076638,
+      "captured_s": 74.9,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.09999999999999432,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1695.9370978394795
+      }
+    },
+    {
+      "time_s": 75.05,
+      "progress_mm": 6271.991927803261,
+      "velocity_mm_s": 290.3178019487264,
+      "acceleration_mm_s2": 333.0385113390028,
+      "captured_s": 74.9,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.14999999999999147,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1712.7406391107988
+      }
+    },
+    {
+      "time_s": 75.1,
+      "progress_mm": 6286.922708083352,
+      "velocity_mm_s": 306.88114651739306,
+      "acceleration_mm_s2": 329.1669828351751,
+      "captured_s": 75.0,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.09999999999999432,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1747.4487407434244
+      }
+    },
+    {
+      "time_s": 75.15,
+      "progress_mm": 6302.675995459818,
+      "velocity_mm_s": 323.2016713749938,
+      "acceleration_mm_s2": 323.3257228961786,
+      "captured_s": 75.0,
+      "decision": {
+        "mode": "driving",
+        "reason": "clear_scan",
+        "scan_age_s": 0.15000000000000568,
+        "observed_gap_mm": 1769.6301761562704,
+        "required_gap_mm": 1746.1417882466044
+      }
+    }
+  ],
+  "state75_2_inferred": {
+    "progress_mm": 6319.237186782806,
+    "velocity_mm_s": 339.18088994976097,
+    "acceleration_mm_s2": 315.5147315220167,
+    "zone_cap_mm_s": 513.8043076638132,
+    "current_piece_controls": [
+      [
+        11445.588235294117,
+        18907.352941176472,
+        0.0
+      ],
+      [
+        14142.96875,
+        17468.75,
+        0.0
+      ]
+    ],
+    "cartesian_reconstruction_max_residual": {
+      "position_mm": 0.0,
+      "velocity_mm_s": 0.0,
+      "acceleration_mm_s2": 2.842170943040401e-14
+    }
+  }
+}

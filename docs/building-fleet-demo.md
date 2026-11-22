@@ -141,7 +141,55 @@ bleiben gesperrt; der Schacht wird ausschließlich über den Aufzugablauf genutz
 
 ## Arbeitsstand und Nachweisgrenzen
 
-### Aktuelle Fortsetzung: Missionszulassung und Katalogberechnung
+### Folgeschrittnachweis auf dem Stand `f1eb858`
+
+Die Weiterfahrfreigabe bindet den nächsten Integrationsschritt von höchstens
+50 ms an eine vollständige Rückfallkurve: tatsächlicher eigener Präfix plus
+exakt anschließender Stopp. Die gesamte quantisierte Kurve muss die
+PVA-, Zonen- und Kein-Halt-Grenzen erfüllen; der Übergang bleibt C2.
+Eigenfortschritt, zusätzliche Annäherungszeit und die höchste relevante
+Quell-Zonenkappe gehen in dieselbe vollständige Beobachtungsbilanz ein.
+Der bisherige verzögerte Scan wird auch am Schrittende mit seinem wirklichen
+Alter ausgewertet. Eine zukünftige freie Beobachtung wird nicht angenommen.
+
+Eine neue Kurve ersetzt den gespeicherten Rückfall erst nach erfolgreicher
+Prüfung. Fehlt die Reserve oder wird der Scan zu alt, wird dessen bereits
+geprüfter Suffix ausgeführt. Dies gilt auch für Schutzbremsungen; eine neue
+Anfahrt benötigt erst ihren konkreten Präfixnachweis und die bestehende
+Frisch-frei-Bedingung. Ein früher funktionaler Endhalt bleibt über den Rest
+des Integrationsschritts konstant. `advance` führt ausschließlich den
+zertifizierten Präfix einschließlich seiner inneren Knoten aus.
+
+Der neue Rohdatenvertrag
+`solidcraftbot.building-fleet-own-input-evidence/2` ergänzt `step_end_s`
+und `continuation_stop_clock`. Letzteres referenziert die unveränderte
+Clockbank für die gesamte Präfix-/Stoppkurve. Die unabhängige Exportprüfung
+bindet alle Präfixintervalle an die tatsächlich exportierte PVA und prüft
+Bilanz, Scan-Alter, gespeicherten Rückfall und Wiederanlauf erneut. Alte
+`/1`-Traces bleiben historische Belege; sie qualifizieren diesen Vertrag nicht.
+
+Nach dem Rebase auf `master` `f1eb858` wird ausschließlich der separate
+physische `world-build-report.json` verwendet. Die aktuelle Welt mit
+5519 Körpern wurde mit 155 unveränderten physischen Pins frisch gebunden;
+native Mesh-/CAD-Daten wurden nur nach exaktem Bytevergleich wiederverwendet.
+Navigation und Routenkatalog werden daraus neu abgeleitet. Browser-Overlay
+und dessen Kameraeinträge gehören nicht zu den physikalischen Eingaben.
+Die aktive Kamera-Overlay-Komposition bindet das aktualisierte BF-Profil
+mit dessen aktuellem Quellenhash; dieser reine Kompositionspin verändert
+keine physische Geometrie oder historischen Nachweise.
+Der alte Seed-Lauf und seine folgenden Befunde bleiben ihren ursprünglichen
+Quellen und Berichten zugeordnet. Ein neuer vollständiger Lauf steht aus.
+
+Die aktuelle BF01-Suite besteht mit 376 von 377 Tests in 342,360 s; eine
+optionale native Prüfung läuft separat. Alle 22 Hüllenregressionen bestehen
+mit installiertem FreeCAD. Die zehn neuen Controllerfälle enthalten den
+portablen historischen BF04-Zustand; beide bisherigen stoppfreien Corner-/S-
+Regressionen behalten ihre Erwartungen. Vierzehn unabhängige
+Folgeschrittprüfungen und echte kurze `/2`-Rohtraces decken zusätzlich
+Schutzbremsung, gespeicherten Rückfall und frischen Wiederanlauf ab. Dies
+ersetzt den vollständigen Seed-, Native- und Browsernachweis nicht.
+
+### Stand `680652f`: Missionszulassung und Katalogberechnung
 
 Der Folgeauftrag setzt die Arbeit auf dem geprüften `master`-Stand `680652f`
 fort. Der private Branch wurde darauf rebasiert; der ursprüngliche Seed

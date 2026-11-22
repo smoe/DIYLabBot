@@ -554,6 +554,102 @@ def _own_path_bank_row(row,limits):
     return digest,{'path':path,'caps':caps,'reverse':row['reverse'],'geometry':{}}
 
 
+def _same_curve_interval(first,first_origin,second,second_origin,start,end):
+    """Bound the difference of every common quintic interval, not just ticks."""
+    # Both exported and bank clocks use integer milliseconds. Adding their
+    # origins must not manufacture an extra sub-ULP interpolation interval.
+    def nodes(curve,origin):
+        left=max(0,bisect.bisect_left(curve.times,start-origin)-1)
+        right=min(len(curve.points),bisect.bisect_right(curve.times,end-origin)+1)
+        return {round(origin+p['time_s'],3):p for p in curve.points[left:right]}
+    first_nodes=nodes(first,first_origin);second_nodes=nodes(second,second_origin)
+    cuts=sorted({start,end,*[t for t in first_nodes if start<t<end],
+                 *[t for t in second_nodes if start<t<end]})
+    for left,right in zip(cuts,cuts[1:]):
+        difference=[]
+        for at in(left,right):
+            a=first_nodes[at]if at in first_nodes else first.evaluate(at-first_origin)
+            b=second_nodes[at]if at in second_nodes else second.evaluate(at-second_origin)
+            difference.append({'time_s':at-left,**{field:[x-y for x,y in zip(a[field],b[field])]
+                for field in F[:3]}})
+        bounds=motion.floor.motion.bounds(difference)
+        if any(value>1e-5 for field in F[:3]for value in bounds[field]['max_abs']):
+            return False
+    return True
+
+
+def _match_exported_prefix(trajectory,at,end,curve):
+    """Bind a zero-origin own clock to all actually exported prefix intervals."""
+    first=max(0,bisect.bisect_right(trajectory.starts,at)-1)
+    last=min(len(trajectory.episodes),bisect.bisect_left(trajectory.starts,end)+1)
+    for episode in trajectory.episodes[first:last]:
+        left=max(at,episode['start_s']);right=min(end,episode['end_s'])
+        if right<=left:continue
+        if episode['attached_cabin']or not _same_curve_interval(episode['curve'],0.,curve,at,left,right):
+            raise ValueError('Continuation differs from the actual exported PVA prefix between knots')
+
+
+def _continuation_requirement(car,clock):
+    """Keep the full source budget over the complete prefix-plus-stop curve."""
+    distance=clock.points[-1][F[0]][0]
+    finish=car.y+distance
+    cap=max(car._zone_cap_at(car.y),car._zone_cap_at(finish),
+        *[min(car.settings['desired_speed_mm_s'],value)for at,value in car.zone_caps if car.y<at<finish])
+    closing=max(cap,car.settings['maximum_obstacle_closing_speed_mm_s'])
+    up=lambda value:math.nextafter(value,math.inf)
+    reaction=up(up(car.settings['period_s']+car.settings['latency_s'])+car.settings['stale_after_s'])
+    return up(up(up(car.settings['clearance_mm']+distance)+up(up(cap+closing)*reaction))+
+              up(closing*clock.times[-1]))
+
+
+def _check_continuation(row,car,trajectory,clocks,scan,gap,visible,previous):
+    """Independently qualify the actual next tick and its retained stop suffix.
+
+    A new permission uses only the current delayed scan. If that permission
+    fails, an already proved fallback may finish braking without inventing a
+    newer observation. The whole remaining curve must be the same fallback.
+    """
+    at=row['time_s'];end=finite(row['step_end_s'],at)
+    expected=min(round(at+.05,3),trajectory.episodes[-1]['end_s'])
+    if end!=expected or end<=at:
+        raise ValueError('Continuation must cover the complete actual next 50 ms integration step')
+    if row['mode']not in('waiting','driving','braking','arrived'):
+        raise ValueError('Continuation needs an actual declared controller mode')
+    identity=(row['vehicle_id'],row['path_id'],trajectory.episode(at).get('leg_id'))
+    digest=row['continuation_stop_clock']
+    if digest is None:
+        if row['mode']not in('waiting','arrived')or abs(car.v)>1e-8 or abs(car.a)>1e-8:
+            raise ValueError('Moving decision lacks its prefix-plus-stop continuation clock')
+        pose=car.pose()
+        constant=motion.floor.motion.Curve([{'time_s':t,F[0]:pose[:],F[1]:[0.,0.,0.],F[2]:[0.,0.,0.]}
+            for t in(0.,end-at)])
+        _match_exported_prefix(trajectory,at,end,constant)
+        if row['mode']=='arrived'and abs(car.goal-car.y)>1e-5:
+            raise ValueError('Functional endpoint rest does not reach the original own goal')
+        return {'required_gap_mm':None,'fallback':previous,'checked':False}
+    if type(digest)is not str or not digest:raise ValueError('Named continuation stop clock required')
+    if row['mode']in('waiting','arrived')or(row['mode']=='braking'and abs(car.v)<1e-8 and abs(car.a)<1e-8):
+        raise ValueError('Waiting, functional rest or braking from rest cannot conceal a moving launch')
+    clock=clocks.get(digest)
+    if clock is None:raise ValueError('Continuation references a missing original stop clock')
+    if (abs(clock.points[0][F[1]][0]-car.v)>1e-6 or abs(clock.points[0][F[2]][0]-car.a)>1e-6
+            or car.y+clock.points[-1][F[0]][0]>car.goal+1e-5 or not car._admissible(clock,car.y)[0]):
+        raise ValueError('Prefix-plus-stop continuation fails its actual initial PVA or source bounds')
+    cartesian=car._cartesian_curve(clock,car.y)
+    _match_exported_prefix(trajectory,at,end,cartesian)
+    required=_continuation_requirement(car,clock)
+    fresh=(scan is not None and end-scan['captured_s']<=car.settings['stale_after_s']+1e-8)
+    if row['own_grant_permits']and fresh and gap>required and math.nextafter(visible,-math.inf)>=required:
+        certificate={'identity':identity,'at':at,'curve':cartesian}
+        return {'required_gap_mm':required,'fallback':certificate,'checked':True}
+    if row['mode']!='braking'or previous is None or previous['identity']!=identity:
+        raise ValueError('Next own step lacks a same-scan stopping reserve or an already proved braking fallback')
+    finish=round(max(at+clock.times[-1],previous['at']+previous['curve'].times[-1]),3)
+    if not _same_curve_interval(cartesian,at,previous['curve'],previous['at'],at,finish):
+        raise ValueError('Braking continuation changed the previously proved complete fallback suffix')
+    return {'required_gap_mm':required,'fallback':previous,'checked':True}
+
+
 def check_perception(program,trajectories,source,navigation,catalog,windows):
     """Audit original anonymous inputs and actual selected stop curves.
 
@@ -565,7 +661,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
     from building_fleet_runner import native_scan_geometry
     from building_fleet_sim import SegmentIndex
     evidence=program.get('own_input_evidence')
-    if not isinstance(evidence,dict)or evidence.get('format')!='solidcraftbot.building-fleet-own-input-evidence/1':
+    if not isinstance(evidence,dict)or evidence.get('format')!='solidcraftbot.building-fleet-own-input-evidence/2':
         raise ValueError('Original own-input trace required; perception compiler flags are insufficient')
     path=model.resolve_pin({'path':evidence['path'],'sha256':evidence['sha256']})
     cfg=model.resolved_sensor(source);linear=source['motion']['empty_linear_limits']
@@ -582,7 +678,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
         cfg['range_error_mm']+source['geometry']['localization_tolerance_mm'])for t in trajectories}
     by_id={t.identity:t for t in trajectories};ports={p['id']:p for p in navigation.mesh.manifest['elevator']['ports']if p['active']}
     paths={};clocks={};scan_history={t.identity:collections.deque(maxlen=8)for t in trajectories};decisions={t.identity:set()for t in trajectories}
-    counts=collections.Counter();groups={};minimum=math.inf;checked_stops=0;scan_previous={};global_time=-math.inf
+    counts=collections.Counter();groups={};minimum=math.inf;checked_stops=0;checked_continuations=0;scan_previous={};global_time=-math.inf
     perceptions=collections.defaultdict(list)
     for m in program['received_messages']:
         if m['kind']=='perception':perceptions[(m['vehicle_id'],m['payload']['captured_s'])].append(m['payload']['scan'])
@@ -621,7 +717,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
                     if summary!=reported:raise ValueError('Received perception summary is not the original anonymous scan')
                 scan_history[identity].append(row)
             elif kind=='decision':
-                fields={'kind','vehicle_id','time_s','path_id','progress_mm','velocity_mm_s','acceleration_mm_s2','zone_cap_mm_s','captured_s','own_grant_permits','selected_stop_clock','own_conditional_home_map_grant','decision','mode','observation_range_margin_mm'}
+                fields={'kind','vehicle_id','time_s','path_id','progress_mm','velocity_mm_s','acceleration_mm_s2','zone_cap_mm_s','captured_s','own_grant_permits','selected_stop_clock','continuation_stop_clock','step_end_s','own_conditional_home_map_grant','decision','mode','observation_range_margin_mm'}
                 if set(row)!=fields:raise ValueError('Only declared own state, anonymous scan and own grants may enter decision evidence')
                 identity=row['vehicle_id'];at=finite(row['time_s'],0)
                 if identity not in by_id or at<global_time-1e-8 or abs(at/.05-round(at/.05))>1e-7 or at in decisions[identity]:raise ValueError('Unique chronological actual0.05s decision states required')
@@ -668,6 +764,11 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
                     launch=_qualified_scalar_stop(expected_cap,0.,limits['acceleration'],limits['jerk'],closing)
                     if launch is None:raise ValueError('Source launch cap has no independently bounded stopping family')
                     required=max(required,cfg['clearance_mm']+launch['distance_mm']+(expected_cap+closing)*reaction+closing*launch['duration_s'])
+                continuation=_check_continuation(row,car,trajectory,clocks,scan,gap,visible,group.get('fallback'))
+                group['fallback']=continuation['fallback']
+                if continuation['checked']:
+                    checked_continuations+=1
+                    required=max(required,continuation['required_gap_mm'])
                 minimum=min(minimum,visible-required)
                 if visible<required-1e-6:raise ValueError('Actual selected stop/reaction/closing envelope exceeds finite sensor range')
                 if decision['mode']!=mode or type(row['own_grant_permits'])is not bool:raise ValueError('Decision mode and explicit own grant differ')
@@ -692,8 +793,9 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
                 at=round(tick*.05,3);expected+=1
                 if at not in decisions[trajectory.identity]:raise ValueError('Exported driving interval lacks its actual controller-input observation')
     return {'passed':True,'trace':{'path':evidence['path'],'sha256':evidence['sha256']},'rows':dict(counts),
-            'driving_decision_coverage':expected,'checked_selected_stops':checked_stops,'minimum_range_margin_mm':minimum,
-            'derived_limit':limit,'basis':'raw own anonymous scan/capture/decision replay, source static matching and exclusive fixed-home invariant, actual selected stop polynomials, full reaction/staleness/closing envelope and fresh-clear restart; no perception pass flags consumed'}
+            'driving_decision_coverage':expected,'checked_selected_stops':checked_stops,
+            'checked_continuations':checked_continuations,'minimum_range_margin_mm':minimum,
+            'derived_limit':limit,'basis':'raw own anonymous scan/capture/decision replay, source static matching and exclusive fixed-home invariant, actual selected stops and full next-tick prefix-plus-stop polynomials, original-scan reaction/staleness/closing envelope, retained braking fallback and fresh-clear restart; no perception pass flags consumed'}
 
 
 def check_waiting_occupancy(trajectories,navigation,events,duration,*,lift_requests=()):
