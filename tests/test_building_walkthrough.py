@@ -23,12 +23,17 @@ class WalkthroughTests(unittest.TestCase):
 
     def test_all_requested_places_have_finite_interior_viewpoints(self):
         stops = {stop['id']: stop for stop in self.program['stops']}
-        self.assertEqual(set(stops), {'phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating'})
+        self.assertEqual(set(stops), {'phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating', 'seminar'})
         for stop in stops.values():
             self.assertTrue(all(math.isfinite(v) for v in stop['eye_mm']+stop['target_mm']))
             self.assertGreater(math.dist(stop['eye_mm'], stop['target_mm']), 100)
             if stop['scene'] == 'building':
                 anchor = stop['anchor']
+                if anchor['kind'] == 'seminar':
+                    room = self.program['seminar_room']
+                    self.assertEqual((stop['level_id'], room['area_id']), ('EG', 'R0_010'))
+                    self.assertEqual(floor.point_membership(stop['eye_mm'][:2], room['room_interior_polygon_mm']), 1)
+                    continue
                 areas = ([self.program['microscopy']['area']] if anchor['kind'] == 'microscopy'
                          else [self.program['kitchenette']['area']] if anchor['kind'] == 'kitchenette'
                          else [self.building['atrium_access']['corridor_area']] if anchor['kind'] == 'access_entry'
@@ -40,6 +45,21 @@ class WalkthroughTests(unittest.TestCase):
         self.assertLess(stops['seating']['target_mm'][1], stops['seating']['eye_mm'][1])
         target = [value/self.parameters['display_scale'] for value in stops['seating']['target_mm'][:2]]
         self.assertEqual(floor.point_membership(target, floor.outline(self.plan, 'NorthCore')), 1)
+
+    def test_window_hinges_follow_native_seminar_sashes(self):
+        room = self.program['seminar_room']
+        sashes = room['window_front']['sashes']
+        objects = {obj['id']: obj for obj in self.program['objects'] if obj.get('mechanism') == 'window'}
+        self.assertEqual(set(objects), {sash['id']+'.Hinge' for sash in sashes})
+        for sash in sashes:
+            obj = objects[sash['id']+'.Hinge']
+            self.assertEqual(obj['level_id'], 'EG')
+            self.assertEqual(obj['initial_state'], 'closed')
+            self.assertEqual(obj['reference_state'], 'closed')
+            self.assertEqual(obj['moving_body_ids'], sash['moving_body_ids'])
+            self.assertEqual(obj['states'], {'closed': 0, 'open': sash['angle_deg']})
+            self.assertEqual(obj['joint']['origin_mm'], sash['origin_mm'])
+            self.assertNotIn(sash['fixed_frame_body_id'], obj['moving_body_ids'])
 
     def test_room_camera_follows_source_door_changes(self):
         plan = copy.deepcopy(self.plan)

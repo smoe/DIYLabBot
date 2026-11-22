@@ -8,6 +8,7 @@ import json
 import math
 from pathlib import Path
 import re
+from urllib.parse import urlsplit
 
 import assembly_model as assembly
 import building_stack as stack
@@ -42,7 +43,19 @@ def digest(path):
 
 
 def validate(spec):
-    exact(spec, 'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator mechanisms navigation', 'walkthrough')
+    exact({key: value for key, value in spec.items() if key != 'seminar_film'},
+          'format id sources settings rendering default_stop stops qualification limitations articulation_source objects interaction elevator mechanisms navigation', 'walkthrough')
+    if 'seminar_film' in spec:
+        film = spec['seminar_film']
+        exact(film, 'title source_url video_url', 'seminar film')
+        require(isinstance(film['title'], str) and film['title'].strip(), 'A film title is required')
+        for name, host, prefix in [('source_url', 'commons.wikimedia.org', '/wiki/File:'),
+                                   ('video_url', 'upload.wikimedia.org', '/wikipedia/commons/')]:
+            value = film[name]
+            require(isinstance(value, str), 'A film URL is required')
+            url = urlsplit(value)
+            require(url.scheme == 'https' and url.netloc == host and url.path.startswith(prefix)
+                    and not url.query and not url.fragment, 'A direct Wikimedia film source is required')
     nav = spec['navigation']
     exact(nav, 'camera_radius_mm contact_margin_mm max_contact_iterations max_slides closed_access_areas basis', 'navigation')
     number(nav['camera_radius_mm'], 20, 400, 'camera radius')
@@ -116,9 +129,13 @@ def validate(spec):
             exact(anchor, 'kind station opening inset_mm target_height_mm', 'kitchen viewpoint')
             require(isinstance(anchor['station'],str) and isinstance(anchor['opening'],str), 'Kitchen and entrance references required')
             number(anchor['inset_mm'],0,600,'kitchen entry inset')
+        elif kind == 'seminar':
+            exact(anchor, 'kind room', 'seminar viewpoint')
+            require(isinstance(anchor['room'], str) and anchor['room'], 'A furnished seminar room is required')
         else:
             raise ValueError('Unsupported camera anchor kind')
-        number(anchor['target_height_mm'], 100, 2200, 'target height')
+        if kind != 'seminar':
+            number(anchor['target_height_mm'], 100, 2200, 'target height')
         ids.append(stop['id'])
     require(len(ids) == len(set(ids)) and spec['default_stop'] in ids, 'Unique viewpoints and known default required')
     return spec
@@ -183,6 +200,49 @@ def building_camera(anchor, plan, scale, z, eye_height):
     return eye_xy+[z+eye_height], target_xy+[z+anchor['target_height_mm']]
 
 
+
+def seminar_window_objects(profile, seminar, expanded):
+    """Bind each source sash to one closed-reference browser hinge."""
+    if seminar is None or 'window_front' not in seminar:
+        return []
+    front = seminar['window_front']
+    require(isinstance(front, dict) and isinstance(front.get('sashes'), list) and front['sashes'],
+            'An installed window front needs its source sashes')
+    native_ids = {body['id'] for body in expanded['bodies']}
+    identities, driven = set(), set()
+    result = []
+    def vector(value):
+        return (isinstance(value, list) and len(value) == 3 and
+                all(type(v) in (int, float) and math.isfinite(v) for v in value))
+    for sash in front['sashes']:
+        require(isinstance(sash.get('id'), str) and sash['id'] and sash['id'] not in identities,
+                'Unique source window sash identity required')
+        require(isinstance(sash.get('label'), str) and sash['label'].strip() and
+                isinstance(sash.get('wall_id'), str) and sash['wall_id'], 'Named source window sash required')
+        moving = sash.get('moving_body_ids')
+        require(isinstance(moving, list) and moving and all(isinstance(v, str) for v in moving)
+                and len(moving) == len(set(moving)) and set(moving) <= native_ids and not set(moving) & driven,
+                'Every moving sash body must exist and have one hinge owner')
+        require(vector(sash.get('origin_mm')) and vector(sash.get('axis')) and
+                abs(math.hypot(*sash['axis'])-1) < 1e-7, 'Finite unit-axis window hinge required')
+        angle = sash.get('angle_deg')
+        require(type(angle) in (int, float) and math.isfinite(angle) and 0 < abs(angle) <= 180,
+                'Finite nonzero signed source window opening required')
+        view = sash.get('viewpoint')
+        require(isinstance(view, dict) and vector(view.get('eye_mm')) and vector(view.get('target_mm'))
+                and math.dist(view['eye_mm'], view['target_mm']) > 1, 'Source window viewpoint required')
+        identity = sash['id']+'.Hinge'
+        obj = mechanisms.presentation(profile, identity, seminar['level_id'],
+            {'id': 'Hinge', 'type': 'revolute', 'origin_mm': sash['origin_mm'], 'axis': sash['axis'],
+             'limits_deg': sorted((0, angle))}, moving, {'closed': 0, 'open': angle}, 'closed',
+            view['eye_mm'], view['target_mm'], seminar['id'], sash['label'])
+        obj.update(label=sash['label'], mechanism='window', initial_state='closed',
+                   seminar_room_id=seminar['id'], sash_id=sash['id'], wall_id=sash['wall_id'])
+        result.append(obj)
+        identities.add(sash['id']); driven.update(moving)
+    return result
+
+
 def compile(source=None):
     path = SOURCE if source is None else Path(source)
     if not path.is_absolute():
@@ -199,13 +259,20 @@ def compile(source=None):
     equipped = [lab for lab in laboratories if lab.get('layout_source')]
     require(len(equipped) == 1, 'One source-bound equipment layout is required')
     laboratory = equipped[0]
+    seminar = interface.get('seminar_room')
+    require('seminar_film' not in spec or seminar is not None, 'A seminar film needs an installed screen')
     expanded = stack.expanded(building, p)
     stops = []
     for stop in spec['stops']:
         require(stop['level_id'] in level_z, 'Unknown viewpoint level')
         anchor = stop['anchor']
         if stop['scene'] == 'building':
-            if anchor['kind'] == 'kitchenette':
+            if anchor['kind'] == 'seminar':
+                require(seminar is not None and seminar['id'] == anchor['room'] and seminar['level_id'] == stop['level_id'],
+                        'Seminar viewpoint must reference the furnished room on its actual floor')
+                eye = seminar['viewpoint']['eye_mm']
+                target = seminar['viewpoint']['target_mm']
+            elif anchor['kind'] == 'kitchenette':
                 station=interface.get('kitchenette')
                 require(station is not None and station['id']==anchor['station'] and station['level_id']==stop['level_id'],
                         'Kitchen viewpoint must reference the installed room')
@@ -262,6 +329,7 @@ def compile(source=None):
         {v['id']: stack.level_plan(building, v['id']) for v in levels}, p, spec['settings']['eye_height_mm'],
         spec['navigation']['closed_access_areas'])
     objects += mechanisms.equipment(spec['mechanisms']['equipment'], interface, spec['settings']['eye_height_mm'])
+    objects += seminar_window_objects(spec['mechanisms']['room_doors'], seminar, expanded)
     robot_objects, robots = walkthrough_robots.compile(interface)
     objects.extend(robot_objects)
     lift_object, elevator = walkthrough_elevator.compile(spec['elevator'], building, p, interface,
@@ -295,6 +363,7 @@ def compile(source=None):
             'laboratories': laboratories, 'microscopy': interface.get('microscopy'), 'kitchenette':interface.get('kitchenette'),
             'places': interface['places'], 'topology': interface['topology'],
             'room_signs': interface.get('room_signs'),
+            **({'seminar_room': {**seminar, 'film': spec.get('seminar_film')}} if seminar is not None else {}),
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],
             'scene_sources': {name: {**ref, 'build_report': 'cad/building-stack/shared-build-report.json'}
                               for name, ref in spec['sources'].items()},

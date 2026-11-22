@@ -327,10 +327,29 @@
                     "maximum": 2200
                   }
                 }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["kind", "room"],
+                "properties": {
+                  "kind": {"const": "seminar"},
+                  "room": {"type": "string", "minLength": 1}
+                }
               }
             ]
           }
         }
+      }
+    },
+    "seminar_film": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "source_url", "video_url"],
+      "properties": {
+        "title": {"type": "string", "minLength": 1},
+        "source_url": {"type": "string", "pattern": "^https://commons\\.wikimedia\\.org/wiki/File:[^?#]+$"},
+        "video_url": {"type": "string", "pattern": "^https://upload\\.wikimedia\\.org/wikipedia/commons/[^?#]+$"}
       }
     },
     "qualification": {

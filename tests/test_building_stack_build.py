@@ -181,7 +181,7 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
         expected|={item['probe']['id']for item in build.roof_probe_specs(contract)}
         expected_z={level['id']for level in contract['levels']}
         expected_z|={laboratory['id']+'_RoomHeight'for laboratory in contract.get('laboratories',[])}
-        expected_z|={contract[key]['id']+'_RoomHeight'for key in ('microscopy','kitchenette','monitor_wall') if contract.get(key)}
+        expected_z|={contract[key]['id']+'_RoomHeight'for key in ('microscopy','kitchenette','monitor_wall','seminar_room') if contract.get(key)}
         if contract.get('monitor_wall'):
             expected_z|={monitor['id']+'_ScreenFront' for monitor in contract['monitor_wall']['monitors']}
             expected_z.add(contract['monitor_wall']['id']+'_ForeignBounds')

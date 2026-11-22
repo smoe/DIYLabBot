@@ -20,6 +20,8 @@
     .lift-readout{display:inline-block;background:#18171c;color:#ff3156;font:700 32px monospace;min-width:48px;text-align:center;padding:4px 10px;border-radius:5px;margin:0 0 10px}.lift-floors button{border-radius:50%;min-width:40px;padding:8px;font-weight:700}.lift-floors button[aria-pressed=true]{border-color:#f54e71;box-shadow:0 0 0 2px #f54e7155}
     @media(max-width:650px){.lift-panel{right:12px;top:65px;width:230px;padding:9px;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+    .seminar-projection{position:absolute;right:18px;top:72px;z-index:2;max-width:calc(100% - 36px);width:260px;padding:12px;background:#fffef6f5;border:1px solid #ced8cc;border-radius:10px;color:#294d3f;font-size:12px}.seminar-projection[hidden]{display:none}.seminar-projection p{margin:7px 0;line-height:1.5}.seminar-projection-actions{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.seminar-projection a{color:#395447}
+    .seminar-projection{max-height:calc(100% - 90px);overflow:auto}.seminar-window-panel{position:absolute;right:18px;top:72px;z-index:2;width:260px;max-width:calc(100% - 36px);max-height:calc(100% - 90px);overflow:auto;padding:12px;background:#fffef6f5;border:1px solid #ced8cc;border-radius:10px;color:#294d3f;font-size:12px}.seminar-window-panel[hidden],.seminar-window-controls[hidden]{display:none}.seminar-projection .seminar-window-controls{margin-top:10px;padding-top:10px;border-top:1px solid #ced8cc}.seminar-window-controls summary{cursor:pointer}.seminar-window-controls label{display:block;margin:9px 0 5px}.seminar-window-controls select{width:100%;margin-bottom:7px}.seminar-window-controls p{margin:7px 0 0;font-size:11px}
     .camera-wall-panel{position:absolute;inset:74px 18px 18px;z-index:4;overflow:auto;padding:16px;background:#fffdf7f5;border:1px solid #b8c9be;border-radius:10px;max-width:800px;margin:auto;color:#243f35}
     .camera-wall-panel[hidden]{display:none}.camera-wall-panel h2{font-size:18px;margin:0 0 12px}.camera-wall-panel>button{float:right}.camera-wall-panel label{display:block;font-size:12px;margin-bottom:5px}.camera-wall-panel select{width:100%;padding:8px;margin-bottom:12px}.camera-wall-panel canvas{height:auto;aspect-ratio:16/9;width:100%;cursor:default;background:#142526}.camera-wall-panel p{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
   </style>
@@ -35,7 +37,7 @@
   </header>
   <nav class="places" id="walkthrough-stops" aria-label="Room viewpoints"></nav>
   <section class="stage" id="walkthrough-stage" aria-label="Interactive building model">
-    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. W or Up and S or Down move forward and backward. Left and Right turn; Alt or Option plus Left or Right, or A and D, move sideways. Drag to look, Q or E change height, Shift walks faster. Click a nearby door, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
+    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. W or Up and S or Down move forward and backward. Left and Right turn; Alt or Option plus Left or Right, or A and D, move sideways. Drag to look, Q or E change height, Shift walks faster. Click a nearby door or window, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
     <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
     <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
     <div class="crosshair" aria-hidden="true"></div>
@@ -74,7 +76,7 @@
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>
-    <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: walk faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
+    <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: walk faster &nbsp; · &nbsp; Tür/Fenster anklicken · nahe Tür/Fenster: Leertaste</div>
   </div>
   <p class="help" id="walkthrough-lab-route" hidden>Vom Doktorandenraum rückwärts in den Flur gehen. Dann nach rechts zur ersten Tür mit dem Schild „3.003 Labor“ und dort eintreten.</p>
   <p class="notice" id="walkthrough-notice">Concept building geometry. Lab 3.003 belongs to this building scene; its room binding is a presentation assumption, not surveyed registration. The elevator is a browser presentation, not a real lift controller.</p>
@@ -83,7 +85,8 @@
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
 <script>__WALKTHROUGH_INTERACTION__
 __WALKTHROUGH_ROBOTS__
-__WALKTHROUGH_MONITORS__</script>
+__WALKTHROUGH_MONITORS__
+__WALKTHROUGH_SEMINAR__</script>
 <script>
 (() => {
   'use strict';
@@ -104,7 +107,9 @@ __WALKTHROUGH_MONITORS__</script>
     const hiddenIds=data.hidden_body_ids||{},meshCache=new Map(),sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
     const monitorConfig=data.camera_wall||null,monitorFrames=new Map((monitorConfig?.monitors||[]).map(m=>[m.screen_body_id,m.screen_frame]));
     const monitorTriggers=new Map((monitorConfig?.monitors||[]).flatMap((m,i)=>m.body_ids.map(id=>[id,i])));
-    let monitorWall=null;
+    const seminarConfig=data.seminar_room?.film?data.seminar_room:null;
+    if(seminarConfig)monitorFrames.set(seminarConfig.screen_body_id,seminarConfig.screen_frame);
+    let monitorWall=null,seminarProjection=null,windowControls=null;
     const keyboardModifiers={alt:false,shift:false};
     const isolation=data.isolation||null,isolationIds=new Set(isolation?.body_ids||[]),isolationButton=document.getElementById('walkthrough-isolate');
     let isolated=false;
@@ -446,8 +451,9 @@ __WALKTHROUGH_MONITORS__</script>
       for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id);const on=levelsOn?.includes(elevator.displayLevel());
         const model=group.object?objectMatrix(group.object):identity();
         if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;
-        const screen=monitorFrames.get(group.id),texture=textures?.get(group.id);gl.uniform1i(uniforms.screenEnabled,Boolean(screen&&texture));
-        if(screen&&texture){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(uniforms.screenTexture,0);gl.uniform3fv(uniforms.screenOrigin,screen.origin_mm.map(v=>v/1000));gl.uniform3fv(uniforms.screenRight,screen.x_axis);gl.uniform3fv(uniforms.screenUp,screen.y_axis);gl.uniform3fv(uniforms.screenNormal,screen.normal);gl.uniform2fv(uniforms.screenSize,[screen.width_mm/1000,screen.height_mm/1000]);}
+        const isProjection=group.id===seminarConfig?.screen_body_id;
+        const screen=monitorFrames.get(group.id),texture=isProjection?seminarProjection?.texture:textures?.get(group.id);gl.uniform1i(uniforms.screenEnabled,Boolean(screen&&texture));
+        if(screen&&texture){gl.uniform1f(uniforms.screenImageAspect,isProjection?seminarProjection.aspect:monitorConfig.settings.resolution_px[0]/monitorConfig.settings.resolution_px[1]);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(uniforms.screenTexture,0);gl.uniform3fv(uniforms.screenOrigin,screen.origin_mm.map(v=>v/1000));gl.uniform3fv(uniforms.screenRight,screen.x_axis);gl.uniform3fv(uniforms.screenUp,screen.y_axis);gl.uniform3fv(uniforms.screenNormal,screen.normal);gl.uniform2fv(uniforms.screenSize,[screen.width_mm/1000,screen.height_mm/1000]);}
         gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,model);gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);drawnGroups++;drawnTriangles+=group.count/3;}
       gl.uniform1i(uniforms.emissive,0);gl.uniform1i(uniforms.screenEnabled,0);
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
@@ -464,6 +470,8 @@ __WALKTHROUGH_MONITORS__</script>
     }
     function render(){
       syncLiftCamera();
+      seminarProjection?.update({sceneId,eye_mm:eye.map(v=>v*1000),isolated});
+      updateWindowControls();
       labRouteHint.hidden=stopId!=='phd'||selectedLevel!==doctoralLevel||elevator?.boarded===true;
       const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
@@ -491,6 +499,49 @@ __WALKTHROUGH_MONITORS__</script>
           return dot(side,f.normal)>0&&Math.hypot(...side)<=maxViewDistance&&projectPoint(f.origin_mm).visible;
         }),requestRender,focusMain:()=>canvas.focus()});
     }
+    if(seminarConfig){
+      if(!data.scenes.building.groups.some(group=>group.id===seminarConfig.screen_body_id))throw Error('Missing native seminar projection surface');
+      seminarProjection=SeminarProjection.create({config:seminarConfig,gl,host:stageNode,requestRender});
+    }
+    function inSeminarRoom(){
+      return Boolean(data.seminar_room&&sceneId==='building'&&!isolated&&!elevator?.boarded&&
+        SeminarProjection.insideRoom(data.seminar_room,eye.map(value=>value*1000)));
+    }
+    function updateWindowControls(){
+      if(!windowControls)return;
+      const visible=inSeminarRoom(),object=objectStates.get(windowControls.select.value);
+      const key=JSON.stringify([visible,object.config.id,object.state,object.targetState,Boolean(object.transition)]);
+      if(key===windowControls.uiKey)return;windowControls.uiKey=key;
+      windowControls.panel.hidden=!visible;
+      if(windowControls.standalone)windowControls.container.hidden=!visible;
+      const action=object.targetState==='closed'?'open':'close';
+      windowControls.button.disabled=Boolean(object.transition)||!visible;
+      windowControls.button.textContent=object.config.commands[action].label;
+      windowControls.button.setAttribute('aria-label',object.config.label+' · '+object.config.commands[action].label);
+      windowControls.status.textContent=object.config.state_labels[object.state];
+    }
+    function operateWindow(id,name){
+      if(!windowControls?.ids.has(id))return {status:'unknown_target',id};
+      if(!inSeminarRoom())return {status:'rejected_outside_room',id};
+      const result=command(id,name);updateWindowControls();return result;
+    }
+    const sashes=[...objectStates.values()].filter(object=>object.config.mechanism==='window'&&
+      object.config.seminar_room_id===data.seminar_room?.id);
+    if(sashes.length){
+      const filmPanel=document.getElementById('seminar-projection'),container=filmPanel||document.createElement('section');
+      if(!filmPanel){container.className='seminar-window-panel';container.hidden=true;container.setAttribute('aria-label','Fenster im Seminarraum');stageNode.append(container);}
+      const panel=document.createElement('details');panel.id='seminar-window-controls';panel.className='seminar-window-controls';panel.hidden=true;
+      const summary=document.createElement('summary');summary.textContent='Fenster im Seminarraum';
+      const select=document.createElement('select');select.id='seminar-window-select';select.className='level-select';
+      const label=document.createElement('label');label.htmlFor=select.id;label.textContent='Fensterflügel wählen';
+      for(const object of sashes){const option=document.createElement('option');option.value=object.config.id;option.textContent=object.config.label;select.append(option);}
+      const button=document.createElement('button');button.id='seminar-window-toggle';button.type='button';button.className='quiet-button';
+      const status=document.createElement('p');status.id='seminar-window-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');
+      panel.append(summary,label,select,button,status);container.append(panel);
+      windowControls={panel,container,standalone:!filmPanel,select,button,status,uiKey:null,ids:new Set(sashes.map(object=>object.config.id))};
+      select.addEventListener('change',updateWindowControls);
+      button.addEventListener('click',()=>{const object=objectStates.get(select.value);operateWindow(object.config.id,object.targetState==='closed'?'open':'close');});
+    }
     function clearKeyboardKeys(){keyboardKeys.clear();keyboardModifiers.alt=false;keyboardModifiers.shift=false;}
     function clearInputKeys(){keys.clear();clearKeyboardKeys();}
     function readModifiers(event){keyboardModifiers.alt=event.altKey;keyboardModifiers.shift=event.shiftKey;}
@@ -513,7 +564,7 @@ __WALKTHROUGH_MONITORS__</script>
           const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
           const transforms=[objectMatrix(owner)];
           // During a door transition keep the doorway guarded until fully open.
-          if(['room_door','lift_door'].includes(owner.config.mechanism)&&owner.transition)transforms.push(objectMatrix(owner,true));
+          if(['room_door','lift_door','window'].includes(owner.config.mechanism)&&owner.transition)transforms.push(objectMatrix(owner,true));
           return transforms;
         }});
         eye=result.eye;root.dataset.cameraBlocked=String(result.contacts.length>0);
@@ -584,7 +635,7 @@ __WALKTHROUGH_MONITORS__</script>
     canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();clearInputKeys();fail(Error('The graphics context was lost. Reload the viewer to continue.'));});
     new ResizeObserver(requestRender).observe(stageNode);
     window.__buildingWalkthrough=Object.freeze({
-      command,viewObject,projectPoint,
+      command,viewObject,projectPoint,operateWindow,
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
       robotCommand, selectRobot,
@@ -592,6 +643,8 @@ __WALKTHROUGH_MONITORS__</script>
       assignMonitor:(index,id)=>monitorWall?.assign(index,id)||{status:'unavailable'},
       captureMonitor:index=>monitorWall?.captureSlot(index)||{status:'unavailable'},
       get monitorWall(){return monitorWall?.snapshot||null;},
+      get seminar(){return seminarProjection?.snapshot||null;},
+      get seminarWindows(){return windowControls?{visible:inSeminarRoom(),selected_id:windowControls.select.value,ids:[...windowControls.ids]}:null;},
       viewRobot:id=>{const r=robots.get(id);return r?viewObject(r.config.joint_object_ids[0]):{status:"unknown_target",id};},
       get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},

@@ -34,6 +34,10 @@
       "source": "model/equipment/kitchen-3008.json",
       "source_sha256": "33d8cf485422c9e855ee5c8d47a445efcf37d531b04e902f5ab390fb685fe113"
     },
+    "seminar_room": {
+      "source": "model/furnishings/seminar-eg10.json",
+      "source_sha256": "91f84368bf9fba27aaf1eca1f31d4502fc98dd5690674607af9e1c2fb9b3823f"
+    },
     "monitor_wall": {
       "source": "model/equipment/foyer-monitor-wall.json",
       "source_sha256": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31"

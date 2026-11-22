@@ -198,6 +198,15 @@
               }
             }
           ]
+        },
+        "seminar_room": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "source_sha256"],
+          "properties": {
+            "source": {"const": "model/furnishings/seminar-eg10.json"},
+            "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
         }
       }
     },

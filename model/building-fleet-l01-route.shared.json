@@ -5,11 +5,11 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "72bc5ddbb82922956631d6d8972b7e52a8edeed5ea4bbd85f8247c1b5e7efbd9"
+      "sha256": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "cd67363058d8f78582030623295c89127e7c4eb9b7b50bea00ec6cf715b9b7b4"
+      "sha256": "7601a1b1a6266dc71bc60d4cce644abb1c284f4716beee82c48294222fa9cde7"
     },
     "motion": {
       "path": "model/tr01-l01.motion.json",

@@ -138,7 +138,11 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
   for(const level of ['KG','EG'])assert.deepEqual(model.elevator.ports.filter(p=>p.level_id===level&&p.active).map(p=>p.side),['inward']);
   assert.equal(model.elevator.fittings.panel.side,'southwest');
   assert(model.elevator.fittings.interior.rail_body_ids.every(id=>nativeById.has(id)));
-  for (const id of ['phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating']) {
+  const seminar = model.seminar_room;
+  assert.equal(seminar.area_id, 'R0_010');
+  assert(seminar.body_ids.includes(seminar.screen_body_id));
+  assert(seminar.body_ids.every(id => nativeById.get(id)?.level_id === 'EG'), 'Seminar geometry comes from the native EG scene.');
+  for (const id of ['phd', 'lab', 'microscopy', 'kitchen3008', 'kitchen', 'atrium', 'seating', 'seminar']) {
     assert(model.stops.some(stop => stop.id === id), `The ${id} viewpoint is required.`);
   }
   assert(!/<script[^>]+src=|<link[^>]+href=["']https?:/i.test(html), 'The viewer must work without external libraries.');
@@ -155,6 +159,9 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
   try {
     const page = await browser.newPage({viewport: {width: 1280, height: 950}, reducedMotion: 'reduce'});
     const errors = [], network = [];
+    // Model and camera regression tests run without external film data.
+    const filmUrl = seminar.film?.video_url;
+    if (filmUrl) await page.route(url => url.href === filmUrl, route => route.fulfill({status: 204}));
     page.on('pageerror', error => errors.push(error.message));
     page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
     page.on('request', request => {if (/^https?:/.test(request.url())) network.push(request.url());});
@@ -314,6 +321,25 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
       const screenshot = `browser-${String(stop.id).replace(/[^a-z0-9_-]/gi, '-')}.png`;
       await page.screenshot({path: path.join(output, screenshot), fullPage: true});
       report.viewpoints.push({id: stop.id, scene: stop.scene, stats: state.stats, pixels, screenshot});
+      if (stop.id === 'seminar') {
+        const sashes = seminar.window_front.sashes;
+        assert(sashes.length > 1);
+        await page.locator('#seminar-window-controls summary').click();
+        const selector = page.locator('#seminar-window-select');
+        assert.equal(await selector.locator('option').count(), sashes.length);
+        await selector.selectOption(sashes[0].id+'.Hinge');
+        const toggle = page.locator('#seminar-window-toggle');
+        const hingeIds = sashes.map(sash => sash.id+'.Hinge');
+        const readWindows = () => page.evaluate(ids => window.__buildingWalkthrough.objects.filter(obj => ids.includes(obj.id)), hingeIds);
+        await toggle.click();
+        await page.waitForFunction(id => window.__buildingWalkthrough.objects.find(obj => obj.id === id)?.state === 'open',
+          sashes[0].id+'.Hinge');
+        const open = await readWindows();
+        assert.deepEqual(open.filter(obj => obj.state === 'open').map(obj => obj.id), [sashes[0].id+'.Hinge']);
+        await toggle.click();
+        await page.waitForFunction(id => window.__buildingWalkthrough.objects.find(obj => obj.id === id)?.state === 'closed',
+          sashes[0].id+'.Hinge');
+      }
       progress('viewpoint '+stop.id+' passed');
     }
 
@@ -409,7 +435,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     await page.setViewportSize({width: 390, height: 844});
     await page.locator('#walkthrough-return').click();
     await page.screenshot({path: path.join(output, 'browser-mobile.png'), fullPage: true});
-    assert.equal(network.length, 0, 'The viewer makes no network requests');
+    assert(network.every(url => url === filmUrl), 'Only the configured film may request external data');
     assert.deepEqual(errors, [], 'No browser or renderer errors');
     assert((await read()).frames > initial.frames, 'Controls request new rendered frames');
 

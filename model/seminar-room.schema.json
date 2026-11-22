@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://solidcraftbot.local/schema/seminar-room.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "level", "area", "units", "catalog", "anchor", "window_front", "screen", "seating", "projector", "viewpoint", "basis"],
+  "properties": {
+    "format": {"const": "solidcraftbot.seminar-room/1"},
+    "id": {"const": "SeminarEG10"},
+    "level": {"const": "EG"},
+    "area": {"const": "R0_010"},
+    "units": {"const": {"length": "mm"}},
+    "catalog": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "source_sha256"],
+      "properties": {"source": {"const": "model/furniture/social.catalog.json"}, "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+    },
+    "anchor": {
+      "type": "object", "additionalProperties": false, "required": ["wall", "fraction"],
+      "properties": {"wall": {"const": "EW092"}, "fraction": {"type": "number", "minimum": 0, "maximum": 1}}
+    },
+    "window_front": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "area",
+        "wall_ids",
+        "sill_mm",
+        "head_mm",
+        "jamb_mm",
+        "mullion_mm",
+        "max_sash_width_mm",
+        "frame_mm",
+        "sash_depth_mm",
+        "glass_mm",
+        "open_angle_deg",
+        "basis"
+      ],
+      "properties": {
+        "id": {
+          "const": "SeminarEG10Windows"
+        },
+        "area": {
+          "const": "R0_010"
+        },
+        "wall_ids": {
+          "const": [
+            "EW093",
+            "EW094",
+            "EW095",
+            "EW096"
+          ]
+        },
+        "sill_mm": {
+          "type": "number",
+          "minimum": 800,
+          "maximum": 1400
+        },
+        "head_mm": {
+          "type": "number",
+          "minimum": 2500,
+          "maximum": 3800
+        },
+        "jamb_mm": {
+          "type": "number",
+          "minimum": 40,
+          "maximum": 100
+        },
+        "mullion_mm": {
+          "type": "number",
+          "minimum": 40,
+          "maximum": 100
+        },
+        "max_sash_width_mm": {
+          "type": "number",
+          "minimum": 650,
+          "maximum": 1300
+        },
+        "frame_mm": {
+          "type": "number",
+          "minimum": 20,
+          "maximum": 60
+        },
+        "sash_depth_mm": {
+          "type": "number",
+          "minimum": 35,
+          "maximum": 90
+        },
+        "glass_mm": {
+          "type": "number",
+          "minimum": 3,
+          "maximum": 12
+        },
+        "open_angle_deg": {
+          "type": "number",
+          "minimum": 30,
+          "maximum": 90
+        },
+        "basis": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "screen": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width_mm", "height_mm", "bottom_mm", "back_gap_mm", "frame_mm", "case_depth_mm", "surface_depth_mm", "mount_width_mm", "mount_height_mm"],
+      "properties": {
+        "width_mm": {"type": "number", "minimum": 1200, "maximum": 3600},
+        "height_mm": {"type": "number", "minimum": 675, "maximum": 2025},
+        "bottom_mm": {"type": "number", "minimum": 900, "maximum": 1800},
+        "back_gap_mm": {"type": "number", "minimum": 10, "maximum": 100},
+        "frame_mm": {"type": "number", "minimum": 10, "maximum": 50},
+        "case_depth_mm": {"type": "number", "minimum": 10, "maximum": 60},
+        "surface_depth_mm": {"type": "number", "minimum": 1, "maximum": 5},
+        "mount_width_mm": {"type": "number", "minimum": 20, "maximum": 120},
+        "mount_height_mm": {"type": "number", "minimum": 50, "maximum": 200}
+      }
+    },
+    "seating": {
+      "type": "object", "additionalProperties": false,
+      "required": ["desk_type", "chair_type", "rows", "chairs_per_table", "desk_overrides_mm", "desk_length_min_mm", "desk_length_max_mm", "table_gap_mm", "window_margin_mm", "door_side_clearance_mm", "door_opening_id", "door_sweep_margin_mm", "front_row_depth_mm", "row_pitch_mm", "chair_setback_mm", "chair_spacing_mm"],
+      "properties": {
+        "desk_type": {"const": "desk"}, "chair_type": {"const": "dining_chair"},
+        "rows": {"const": 3}, "chairs_per_table": {"const": 2},
+        "desk_overrides_mm": {
+          "type": "object", "additionalProperties": false, "required": ["length", "depth", "height"],
+          "properties": {"length": {"type": "number", "minimum": 1200, "maximum": 1800}, "depth": {"type": "number", "minimum": 600, "maximum": 800}, "height": {"type": "number", "minimum": 700, "maximum": 800}}
+        },
+        "desk_length_min_mm": {"type": "number", "minimum": 1200, "maximum": 1600},
+        "desk_length_max_mm": {"type": "number", "minimum": 1400, "maximum": 1800},
+        "table_gap_mm": {"type": "number", "minimum": 0, "maximum": 50},
+        "window_margin_mm": {"type": "number", "minimum": 50, "maximum": 250},
+        "door_side_clearance_mm": {"type": "number", "minimum": 1200, "maximum": 1800},
+        "door_opening_id": {"const": "D0_010"},
+        "door_sweep_margin_mm": {"type": "number", "minimum": 0, "maximum": 200},
+        "front_row_depth_mm": {"type": "number", "minimum": 700, "maximum": 1500},
+        "row_pitch_mm": {"type": "number", "minimum": 1200, "maximum": 1700},
+        "chair_setback_mm": {"type": "number", "minimum": 550, "maximum": 800},
+        "chair_spacing_mm": {"type": "number", "minimum": 550, "maximum": 900}
+      }
+    },
+    "projector": {
+      "type": "object", "additionalProperties": false,
+      "required": ["depth_mm", "drop_mm", "width_mm", "case_depth_mm", "height_mm", "lens_radius_mm", "lens_length_mm", "lens_glass_depth_mm", "mount_radius_mm", "ceiling_plate_width_mm", "ceiling_plate_depth_mm", "ceiling_plate_thickness_mm"],
+      "properties": {
+        "depth_mm": {"type": "number", "minimum": 1800, "maximum": 3500},
+        "drop_mm": {"type": "number", "minimum": 350, "maximum": 1000},
+        "width_mm": {"type": "number", "minimum": 200, "maximum": 500},
+        "case_depth_mm": {"type": "number", "minimum": 150, "maximum": 400},
+        "height_mm": {"type": "number", "minimum": 80, "maximum": 180},
+        "lens_radius_mm": {"type": "number", "minimum": 15, "maximum": 45},
+        "lens_length_mm": {"type": "number", "minimum": 20, "maximum": 80},
+        "lens_glass_depth_mm": {"type": "number", "minimum": 1, "maximum": 5},
+        "mount_radius_mm": {"type": "number", "minimum": 10, "maximum": 30},
+        "ceiling_plate_width_mm": {"type": "number", "minimum": 100, "maximum": 300},
+        "ceiling_plate_depth_mm": {"type": "number", "minimum": 100, "maximum": 300},
+        "ceiling_plate_thickness_mm": {"type": "number", "minimum": 10, "maximum": 40}
+      }
+    },
+    "viewpoint": {
+      "type": "object", "additionalProperties": false,
+      "required": ["depth_mm", "lateral_mm", "eye_height_mm", "target_depth_mm", "target_lateral_mm", "target_height_mm", "clearance_mm"],
+      "properties": {
+        "depth_mm": {"type": "number", "minimum": 3500, "maximum": 5500},
+        "lateral_mm": {"type": "number", "minimum": -3000, "maximum": 3000},
+        "eye_height_mm": {"type": "number", "minimum": 950, "maximum": 2000},
+        "target_depth_mm": {"type": "number", "minimum": 1000, "maximum": 3500},
+        "target_lateral_mm": {"type": "number", "minimum": -2000, "maximum": 2000},
+        "target_height_mm": {"type": "number", "minimum": 900, "maximum": 1600},
+        "clearance_mm": {"type": "number", "minimum": 151, "maximum": 300}
+      }
+    },
+    "basis": {"type": "string", "minLength": 1}
+  }
+}

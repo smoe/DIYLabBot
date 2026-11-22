@@ -13,10 +13,11 @@ Die unabhängigen Kontaktfälle laufen mit `node tests/check_walkthrough_camera.
 
 `node tests/check_walkthrough_camera_native.cjs <index.html>` prüft zusätzlich die tatsächlichen Türblätter `D3_026`/`D3_027`, die offenen Durchgänge von 3.002/3.003 und einen absichtlich geöffneten Schachtzugang im 3. OG ohne dortige Kabine. Die Schachtsperre wird aus den gemeinsamen Rahmenkörpern abgeleitet. Das Ergebnis wird als `camera-native-contacts.json` neben dem lokalen Export abgelegt.
 
-Der Rundgang bietet sieben direkte Blickpunkte: Doktorandenraum **3.002**,
-Labor **3.003**, Mikroskop **3.007**, Küchen **3.008** und **1.008**,
-den Blick durch den **Freiraum / das Atrium**
-und den **Kernbereich im 3. OG**.
+Über acht Blickpunkte gelangt man direkt in den Doktorandenraum **3.002**,
+das Labor **3.003**, zum Mikroskop in **3.007**, in die Küchen **3.008**
+und **1.008**, an den **Freiraum / das Atrium**, in den **Kernbereich im 3. OG**
+und in den **Seminarraum 10 im EG**. Im Foyer kommt der Blickpunkt
+**Kamerawand** hinzu.
 Von dort lässt sich die Kamera frei bewegen. Die Flächen stammen aus den
 fertigen nativen CAD-Körpern einschließlich ihrer Booleschen Öffnungen;
 Raumwände, Fenster und Möbel werden nicht als Ersatzquader nachgezeichnet.
@@ -69,7 +70,15 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 
 ## Bedienung
 
-- Die sieben Ortsknöpfe öffnen die jeweiligen Blickpunkte.
+- Die Ortsknöpfe öffnen die jeweiligen Blickpunkte.
+- Im **Seminarraum 10 im EG** spielt die Projektionsfläche das Original
+  *Steamboat Willie* (1928) in Endlosschleife. Die Wiedergabe startet stumm
+  und pausiert beim Verlassen des Raums. Über die Bedienelemente lässt sich
+  der Film pausieren und der Ton einschalten. Die Filmwiedergabe benötigt
+  Internetzugang. [Filmquelle bei Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Steamboat_Willie_(1928)_by_Walt_Disney.webm)
+- Im Seminarraum lässt sich unter **Fenster im Seminarraum** jeder Flügel
+  einzeln auswählen und öffnen oder schließen. Beim Start sind alle Flügel
+  geschlossen.
 - Der Ortstitel bezeichnet den zuletzt gewählten Blickpunkt; freies Gehen
   schaltet diese Beschriftung nicht automatisch auf den betretenen Raum um.
 - **W / ↑** gehen vorwärts, **S / ↓** rückwärts. **← / →** drehen die
@@ -125,7 +134,7 @@ Darstellungseinpassung skaliert. Die Eingangssituation soll den Schrankzugang
 frei halten; ein realer Türschwenkweg wird durch den Blickpunkt nicht geprüft.
 Raumgröße und Möbeleinpassung bleiben ungemessene Darstellungsannahmen.
 
-Alle sieben Blickpunkte verwenden dieselbe Gebäudeszene. Der Laborblick wird
+Alle acht Blickpunkte verwenden dieselbe Gebäudeszene. Der Laborblick wird
 wie die anderen Raumblicke an einer tatsächlichen Eingangstür berechnet.
 Vom Doktorandenraum führt die Darstellung über `D3_002N`, den gemeinsamen
 Flur und `D3_003A` oder `D3_003B` in das ausgestattete Labor; dafür ist kein
