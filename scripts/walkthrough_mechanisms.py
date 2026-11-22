@@ -17,14 +17,21 @@ from tube_cam_model import matrix
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = {'freezer_minus20', 'fume_hood_1200', 'nanodrop', 'qubit'}
+COLD_STORAGE = {'fridge_4c', 'freezer_minus20'}
 
 
 def validate(source):
     art.exact(source, 'room_doors equipment', 'mechanism profiles')
     art.validate_presentation(source['room_doors'])
-    art.require(set(source['equipment']) == ASSETS, 'Requested equipment profiles required')
-    for item in source['equipment'].values():
-        art.exact(item, 'presentation roles', 'equipment mechanism profile')
+    art.require(ASSETS <= set(source['equipment']) <= ASSETS | COLD_STORAGE,
+                'Requested equipment profiles required')
+    for asset, item in source['equipment'].items():
+        has_initial_state = 'initial_state' in item
+        art.exact(item, 'presentation roles initial_state' if has_initial_state else 'presentation roles',
+                  'equipment mechanism profile')
+        if has_initial_state:
+            art.require(asset in COLD_STORAGE and item['initial_state'] == 'closed',
+                        'A separate closed initial pose is supported for cold storage only')
         art.validate_presentation(item['presentation'])
         art.require(isinstance(item['roles'], dict) and item['roles'] and
                     all(isinstance(v, str) and v for v in item['roles'].values()), 'Device role labels required')
@@ -181,6 +188,8 @@ def equipment(profiles, interface, eye_height):
                     [device['body_prefix']+body['id'] for body in bodies], values, initial,
                     eye, target, laboratory['room'], label)
                 obj.update(front=front, mechanism='equipment', asset=item['asset'])
+                if 'initial_state' in profile:
+                    obj['initial_state'] = profile['initial_state']
                 obj['state_labels']['reference'] = 'Teilweise geöffnet'
                 for command, requirements in guards[joint['id']].items():
                     obj['commands'][command]['requires'] = [{'object_id': prefix+g['joint'], 'state': g['state']} for g in requirements]

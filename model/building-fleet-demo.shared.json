@@ -13,7 +13,7 @@
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "9346c61abeddb153c703c076ef12f5dbcb8a266a9b6b53c4440fb6a6e0ad14c4"
+      "sha256": "5d4a808828e9acd750ffcd7db9192f701ea39b76f449c221c6759ac5809ef2a2"
     },
     "vehicle": {
       "path": "model/sample-transport-tr01.shared.json",
@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "bdf542d0a0b0078d1313409aa490ef565db39b1eac8c997fb69286e654a66bb0"
+      "sha256": "c800a29878ce44f60c9d7e9af7fa19ea4143b6861e933ec2ecb1736336a37174"
     }
   },
   "fleet": {

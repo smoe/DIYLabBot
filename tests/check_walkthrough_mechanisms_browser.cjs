@@ -23,6 +23,16 @@ const {chromium}=require(process.argv[3]||'playwright');
     const state=id=>page.evaluate(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id),id);
     async function command(id,name){return page.evaluate(([id,name])=>window.__buildingWalkthrough.command(id,name),[id,name]);}
     async function settled(id,expected){await page.waitForFunction(([id,state])=>window.__buildingWalkthrough.objects.find(o=>o.id===id).state===state,[id,expected]);}
+    const freezer='Lab3003.Freezer01.',outer=freezer+'OuterDoor';
+    report.freezer_initial_states=[];
+    for(const id of [outer,...Array.from({length:6},(_,index)=>freezer+'Drawer'+String(index+1).padStart(2,'0'))]){
+      assert.equal(objects.get(id).initial_state,'closed',id+': explicit closed startup policy');
+      const initial=await state(id);
+      assert.equal(initial.state,'closed',id+': starts closed');
+      assert.equal(initial.target_state,'closed',id+': starts without an opening intent');
+      assert.equal(initial.joint_value,objects.get(id).states.closed,id+': closed joint endpoint');
+      report.freezer_initial_states.push({id,state:initial.state,joint_value:initial.joint_value});
+    }
     report.basic_laboratory_controls=[];
     for(const lab of model.laboratories.filter(lab=>lab.furnishing_profile)){
       const controls=model.objects.filter(o=>o.id.startsWith(lab.id+'.Hood01.'));
@@ -47,7 +57,9 @@ const {chromium}=require(process.argv[3]||'playwright');
       assert.deepEqual((await state(room.id)).model_matrix,[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
       if(initial==='closed'){assert.equal((await command(room.id,'close')).status,'accepted');await settled(room.id,'closed');}
     }
-    const freezer='Lab3003.Freezer01.',outer=freezer+'OuterDoor';
+    // Establish an open drawer explicitly before testing the closure interlock.
+    assert.equal((await command(outer,'open')).status,'accepted');await settled(outer,'open');
+    assert.equal((await command(freezer+'Drawer04','open')).status,'accepted');await settled(freezer+'Drawer04','open');
     assert.equal((await command(outer,'close')).status,'rejected_interlock');
     for(let n=1;n<=6;n++)await command(freezer+'Drawer'+String(n).padStart(2,'0'),'close');
     assert.equal((await command(outer,'close')).status,'accepted');

@@ -691,26 +691,11 @@
             "qubit"
           ],
           "properties": {
+            "fridge_4c": {
+              "$ref": "#/$defs/cold_storage_mechanism"
+            },
             "freezer_minus20": {
-              "type": "object",
-              "additionalProperties": false,
-              "required": [
-                "presentation",
-                "roles"
-              ],
-              "properties": {
-                "presentation": {
-                  "$ref": "#/$defs/mechanism_presentation"
-                },
-                "roles": {
-                  "type": "object",
-                  "minProperties": 1,
-                  "additionalProperties": {
-                    "type": "string",
-                    "minLength": 1
-                  }
-                }
-              }
+              "$ref": "#/$defs/cold_storage_mechanism"
             },
             "fume_hood_1200": {
               "type": "object",
@@ -828,6 +813,20 @@
     }
   },
   "$defs": {
+    "cold_storage_mechanism": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["presentation", "roles"],
+      "properties": {
+        "presentation": {"$ref": "#/$defs/mechanism_presentation"},
+        "roles": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "initial_state": {"const": "closed"}
+      }
+    },
     "mechanism_presentation": {
       "type": "object",
       "additionalProperties": false,

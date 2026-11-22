@@ -9,7 +9,7 @@
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "9346c61abeddb153c703c076ef12f5dbcb8a266a9b6b53c4440fb6a6e0ad14c4"
+      "sha256": "5d4a808828e9acd750ffcd7db9192f701ea39b76f449c221c6759ac5809ef2a2"
     },
     "motion": {
       "path": "model/tr01-l01.motion.json",

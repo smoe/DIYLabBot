@@ -52,7 +52,7 @@ class MechanismTests(unittest.TestCase):
     def test_equipment_reuses_source_joints_and_reference_poses(self):
         source = layout.load(validate_builds=False)
         for item in source['instances']:
-            if item['asset'] not in mechanisms.ASSETS:
+            if item['asset'] not in mechanisms.ASSETS | mechanisms.COLD_STORAGE:
                 continue
             provider = layout.provider(item['asset']); spec = layout.instance_source(source, item)
             p = provider.parameters(spec); expanded = provider.expanded(spec, p)
@@ -64,6 +64,65 @@ class MechanismTests(unittest.TestCase):
                 self.assertEqual(obj['states']['open'], joint.get('limits_deg', joint.get('limits_mm'))[1])
         self.assertEqual(self.objects['Lab3003.NanoDrop01.Hinge']['states']['reference'], 65)
         self.assertEqual(self.objects['Lab3003.Qubit01.Hinge']['states']['reference'], 95)
+
+    def test_installed_cold_storage_starts_closed_with_original_access_references(self):
+        source = layout.load(validate_builds=False)
+        profiles = json.loads((ROOT/'model/building-walkthrough.shared.json').read_text())['mechanisms']['equipment']
+        for identity, asset in (('Fridge01','fridge_4c'),('Freezer01','freezer_minus20')):
+            with self.subTest(identity=identity):
+                item = next(item for item in source['instances'] if item['id'] == identity)
+                self.assertEqual((item['asset'],item['pose']),(asset,'access'))
+                self.assertEqual(profiles[asset]['initial_state'],'closed')
+                provider = layout.provider(asset); spec = layout.instance_source(source,item)
+                p = provider.parameters(spec); native = provider.expanded(spec,p)
+                reference = provider.pose(spec,p,item['pose'])
+                prefix = 'Lab3003.'+identity+'.'
+                bound = {name: obj for name,obj in self.objects.items() if name.startswith(prefix)}
+                self.assertEqual(set(bound),{prefix+joint['id'] for joint in native['joints']})
+                initial = {}
+                for joint in native['joints']:
+                    obj = bound[prefix+joint['id']]
+                    self.assertEqual(obj['initial_state'],'closed')
+                    initial[joint['id']] = obj['states'][obj['initial_state']]
+                    self.assertEqual(initial[joint['id']],0)
+                    self.assertEqual(obj['states'][obj['reference_state']],reference[joint['id']])
+                    self.assertEqual(obj['commands']['open']['target_state'],'open')
+                    self.assertEqual(obj['commands']['close']['target_state'],'closed')
+                    self.assertEqual(obj['moving_body_ids'],['Lab3003_'+identity+'_'+body['id']
+                        for body in native['bodies'] if body['component'] == joint['child']])
+                provider.validate_pose(native,initial)
+                self.assertGreater(reference['OuterDoor'],0)
+        fridge = self.objects['Lab3003.Fridge01.OuterDoor']
+        self.assertEqual(fridge['reference_state'],'open')
+        self.assertEqual(fridge['moving_body_ids'],['Lab3003_Fridge01_'+name for name in
+            ('OuterDoor','OuterHandle','HandleSupport0','HandleSupport1')])
+        self.assertEqual(fridge['commands']['open']['requires'],[])
+        self.assertEqual(fridge['commands']['close']['requires'],[])
+        self.assertEqual(self.objects['Lab3003.Freezer01.Drawer04']['reference_state'],'open')
+
+    def test_both_kitchen_refrigerators_retain_closed_initial_and_native_states(self):
+        for identity in ('Kitchen1008.Fridge.Door','Kitchen3008.Fridge.Door'):
+            with self.subTest(identity=identity):
+                obj = self.objects[identity]
+                self.assertEqual(obj.get('initial_state',obj['reference_state']),'closed')
+                self.assertEqual(obj['reference_state'],'closed')
+                self.assertEqual(obj['states'],{'closed':0,'open':90})
+                self.assertEqual(obj['commands']['open']['target_state'],'open')
+                self.assertEqual(obj['commands']['close']['target_state'],'closed')
+                self.assertEqual(len(obj['moving_body_ids']),2)
+                self.assertEqual({name.rsplit('_',1)[-1] for name in obj['moving_body_ids']},{'Door','Handle'})
+
+    def test_closed_runtime_policy_is_optional_and_limited_to_cold_storage(self):
+        source = json.loads((ROOT/'model/building-walkthrough.shared.json').read_text())['mechanisms']
+        for asset,value in (('fridge_4c','open'),('freezer_minus20',False),('nanodrop','closed')):
+            changed = copy.deepcopy(source)
+            changed['equipment'][asset]['initial_state'] = value
+            with self.subTest(asset=asset,value=value),self.assertRaises(ValueError):
+                mechanisms.validate(changed)
+        legacy = copy.deepcopy(source)
+        legacy['equipment'].pop('fridge_4c')
+        legacy['equipment']['freezer_minus20'].pop('initial_state')
+        mechanisms.validate(legacy)
 
     def test_technical_accesses_start_closed_without_changing_native_reference(self):
         closed = set()

@@ -150,6 +150,13 @@ derselben Abbildung. Die drei funktionalen Arm-Unterbauten werden aus derselben 
 Studienkörper `People_*` und Fahrzeugrouten entfallen.
 Native Geräte im Gebäude-CAD sind weiterhin fehlende Zielunterstützung.
 
+Im Rundgang starten der Kühlschrank und der Gefrierschrank im Labor sowie
+beide Küchenkühlschränke geschlossen. Ihre Türen lassen sich per Klick oder
+Leertaste öffnen und schließen. Beim Gefrierschrank muss die Außentür offen
+sein, bevor eine Schublade herausgezogen wird. Vor dem Schließen der Tür
+müssen die Schubladen wieder eingeschoben sein. Der Browser verwendet dafür
+die vorhandenen Gerätegelenke und rechnet vom nativen Referenzzustand aus.
+
 Die Fassadenpolylinie und die quadratische L01-Näherung stimmen nicht exakt
 überein. Ihr Bericht berechnet die maximale lokale Y-Differenz einschließlich der
 Extremstellen jedes Segmentes analytisch; aktuell sind es rund 52

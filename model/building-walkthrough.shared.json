@@ -217,7 +217,46 @@
       }
     },
     "equipment": {
+      "fridge_4c": {
+        "presentation": {
+          "label": "Kühlschrank · {articulation}",
+          "commands": {
+            "open": "Öffnen",
+            "close": "Schließen",
+            "view": "Ansehen"
+          },
+          "state_labels": {
+            "closed": "Geschlossen",
+            "opening": "Wird geöffnet",
+            "open": "Offen",
+            "closing": "Wird geschlossen"
+          },
+          "duration": {
+            "value": 0.8,
+            "unit": "s",
+            "range": [
+              0.1,
+              10
+            ],
+            "basis": "presentation_assumption"
+          },
+          "view_distance": {
+            "value": 850,
+            "unit": "mm",
+            "range": [
+              300,
+              3000
+            ],
+            "basis": "presentation_assumption"
+          }
+        },
+        "roles": {
+          "outer_door": "Tür"
+        },
+        "initial_state": "closed"
+      },
       "freezer_minus20": {
+        "initial_state": "closed",
         "presentation": {
           "label": "Gefrierschrank · {articulation}",
           "commands": {
