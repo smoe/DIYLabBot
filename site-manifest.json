@@ -2,20 +2,20 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "77fe6f7046356670f9b696feec01c3af70e10db0",
+  "source_commit": "5a89a32b4fcf471c40cc73e2b803a3a6762a3c68",
   "export_revision": "browser",
   "html": {
-    "sha256": "86bdbb8c2bc1c37f2cc57b5218523ee921ebd3902d3c9ce42df4a84ba3714390",
-    "bytes": 51858831
+    "sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3",
+    "bytes": 51910063
   },
-  "source_manifest_sha256": "abb364de9f64d1341943e975dda11f398f42ddde02ab174477fca947b7d6d2b4",
+  "source_manifest_sha256": "8166ad86353f6c2a8792ad4f82444849388cb6fc61de10abaaf7e4d54a5cbff0",
   "native_builds": {
     "building": {
-      "report": "exports/generated/building-stack-5f194cc11884/build-report.json",
-      "report_sha256": "64d6f02e766a3b69465e34584992a04a05cd3c72020b9f0dd4b37fe6eb1847b7",
-      "revision": "building-stack-5f194cc11884",
-      "source_sha256": "5f194cc11884941e0db1d6f32666d43ee61d5cf80509436eaaf899635251eeb2",
-      "native_sha256": "cd28712d3d0b855a87267caeb3516cd104929d884b1c64267f1e8568948aa128"
+      "report": "exports/generated/building-stack-f9af02de40c9/build-report.json",
+      "report_sha256": "c9e4a43ffc69ec997732bdee58dc70bc3e39201244fcee70a1bfb6e741a4b7db",
+      "revision": "building-stack-f9af02de40c9",
+      "source_sha256": "f9af02de40c9e33d3d55ec7c09fd342de3bfefe6e30aebfeb6873e324cd498e4",
+      "native_sha256": "e5f4b45d318ba75a1eb3b2e108a34b0af31609f2148640caa8ab1d0edede334a"
     },
     "lab": {
       "report": "cad/lab-layout-l01/shared-build-report.json",
@@ -42,11 +42,11 @@
     "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
     "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
     "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
-    "model/building-walkthrough.shared.json": "3e9580de0f2f52c09f399647d39b015ffbbe05aff05efd0a9c3ffac2552d6ec2",
+    "model/building-walkthrough.shared.json": "9346c61abeddb153c703c076ef12f5dbcb8a266a9b6b53c4440fb6a6e0ad14c4",
     "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
     "scripts/building_walkthrough.py": "b85eff3ea686af25e16ca45d7b39de50cc07d0f1d6f48e6f30ef52f306ca5323",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
-    "model/building-stack.shared.json": "5f194cc11884941e0db1d6f32666d43ee61d5cf80509436eaaf899635251eeb2",
+    "model/building-stack.shared.json": "f9af02de40c9e33d3d55ec7c09fd342de3bfefe6e30aebfeb6873e324cd498e4",
     "model/building-stack.schema.json": "8f5e4d734a0f043575c6a1fc704e719c2bb4ca6041864d10d8b05636d6d1b5c5",
     "scripts/building_stack.py": "a12595dd75a62eece1acf4bd7c6516320048cbd30e47c74b961c466e16740924",
     "scripts/building_circulation.py": "818ecc95503b30342eefa9e7f430d04bd96ff05840c6ba650f2297899fe5dd66",
@@ -111,9 +111,9 @@
     "scripts/building_kitchenette.py": "8b289280ac599f3ec90047a4484cab24b346cee7aaf4b297c6c3128679ca39b0",
     "scripts/kitchenette_model.py": "ab265df45feef8e8541dd343894337e37285635c858c9a5a0dcc2d794183ede6",
     "model/kitchenette.schema.json": "7cc0e99113241351096349042c8bd3991ca38085881cf5c7794dacf024af1abb",
-    "model/equipment/foyer-monitor-wall.json": "ab5e2dfdb5ac3840f7db95b51b18b2fe92454f7bc3971611d353259a39e107d8",
-    "model/foyer-monitor-wall.schema.json": "8c0ce524acc2e2687beeb719fd3438b0821fc135e414d26208c414e3c33ec183",
-    "scripts/foyer_monitor_wall.py": "4006009eacb115beba6dea71437f108b8746e0b32eb5a609edd5881028c51cd0",
+    "model/equipment/foyer-monitor-wall.json": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31",
+    "model/foyer-monitor-wall.schema.json": "3b7a25c8a667d92236facd17fe3142b141ec164b60b2206bddea028b8f303d61",
+    "scripts/foyer_monitor_wall.py": "ad6638d326eda0505f1296fcf67dbb5af3b7d9073d0549b7596acfdc791560c9",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
     "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
@@ -127,19 +127,19 @@
     "scripts/marker_label.py": "a4df191542b968cf01370fbbadf8b0ed417914f9811ee7720840d64f712e46fd",
     "scripts/building_room_labels.py": "a0ddfb72c9f203e8b85f0af5588ec38c586ef8754dd210f64a12caa3a79e88ed",
     "scripts/walkthrough_elevator.py": "d92b22b1e9c1ee97116bf936d3057eb7ebf644e29e7adaee0cff246fc6bab21f",
-    "model/foyer-camera-wall.shared.json": "c014a8a08e7bec3966f4cc18b7d72d140e07ab375599f55c37c49868b2c42878",
+    "model/foyer-camera-wall.shared.json": "d4c3d3c640a0e83547e55360935b90ddc45cee522a5f12babe10685e0fa5a16b",
     "model/foyer-camera-wall.schema.json": "e0796ea57a15c80363311f5e49e4a6e12b3a7cd99294a63094dc8be986ee671c",
-    "scripts/monitor_camera_registry.py": "8e631db70056b894770403c7a7599b8b17b9ef4509cc60d51d4147953a9a8637",
-    "model/building-fleet-demo.shared.json": "98343270bb7ffc8dd83efaf4f097559f1f98f845c408b65b68ebe80fa61901dd",
+    "scripts/monitor_camera_registry.py": "1cbfc3345e90d9c774f547fb0cd98d458b0d1e9063578286a2345e163889c641",
+    "model/building-fleet-demo.shared.json": "24d6e2e904c9423d6bd6ac39063ae486bc03f9d0b0ac14c61566da82d3f8f954",
     "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
     "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
     "scripts/build_building_walkthrough.py": "fd67d8993dea140de1535cf93a178071e26f0ea2f178ee0235d9dea5edb56adf",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
     "scripts/building_walkthrough_viewer.html": "d088598f4b7142b597045b48b0d33d0b9c3bdcb327f98e722fdbcff7527762ee",
     "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
-    "scripts/camera_monitor_wall.js": "daf69c892924aed2fb32617e77edb50802eba151e1dd1bcd1a76d7ce34f3902a",
+    "scripts/camera_monitor_wall.js": "41807e395c5220052a271d4131437301cba34b11c02f8a44532209fbea3638ba",
     "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1",
-    "exports/generated/building-stack-5f194cc11884/build-report.json": "64d6f02e766a3b69465e34584992a04a05cd3c72020b9f0dd4b37fe6eb1847b7",
+    "exports/generated/building-stack-f9af02de40c9/build-report.json": "c9e4a43ffc69ec997732bdee58dc70bc3e39201244fcee70a1bfb6e741a4b7db",
     "cad/lab-layout-l01/shared-build-report.json": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6",
     "scripts/build_building_stack.py": "cf1cadee7e3a1e4c7b7718738a91e778405561df8d4427d9475edc7e99cf49f0",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
@@ -152,9 +152,9 @@
     "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
     "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
     "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
-    "cad/generated/building-stack-5f194cc11884/overview.FCStd": "cd28712d3d0b855a87267caeb3516cd104929d884b1c64267f1e8568948aa128",
-    "exports/generated/building-stack-5f194cc11884/overview.case.json": "379bec1f53121ed100a1a3a83c0d15869af483be63f2242a8d25267a4094c126",
-    "exports/generated/building-stack-5f194cc11884/overview.freecad.json": "c1b41b3cf8996c5a2ff980d6cefc135e7f899dd9b4c85167174b4c8fc791a8af",
+    "cad/generated/building-stack-f9af02de40c9/overview.FCStd": "e5f4b45d318ba75a1eb3b2e108a34b0af31609f2148640caa8ab1d0edede334a",
+    "exports/generated/building-stack-f9af02de40c9/overview.case.json": "9139bc5f2ca76c68f6188f5de03a160e542b2a5896f9e369c16696b178c697de",
+    "exports/generated/building-stack-f9af02de40c9/overview.freecad.json": "cdac18cdd5959d66927a50fc13ab9e019947ca06adcce531bce517f895c898d9",
     "scripts/build_lab_layout.py": "643e7d3ecd969c89ae6e010e49b650a17a36175a414a1e4fe38584b788bb1197",
     "scripts/build_lab_layout_freecad.py": "a1e6aa9137f54572605c2cb3fd4e75d1b824b325d2af70c3f4e4c9e91e76ef22",
     "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
@@ -192,8 +192,7 @@
   "qualification": {
     "metric_scale_known": false,
     "lab_to_building_registered": false,
-    "collision_checked": false,
-    "signage_qualified": false
+    "collision_checked": false
   },
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
@@ -211,27 +210,22 @@
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
   "local_browser_evidence": {
-    "signage-browser-check.json": {
-      "sha256": "76e5f43789569d9a07a132ef17c330a54b820c61506028786c3ca657d3f114e1",
-      "passed": true,
-      "html_sha256": "86bdbb8c2bc1c37f2cc57b5218523ee921ebd3902d3c9ce42df4a84ba3714390"
-    },
     "camera-wall-browser-report-metal.json": {
-      "sha256": "9ee2429aa89d7dcc50ca9c3550e270dcf95e856c3dfa70dfa6af67b31fd82ada",
+      "sha256": "918cc4314fa07b55ab026c55d34920e6269d6e697e5d0f7973dc76ef1a6e3301",
       "passed": true,
-      "html_sha256": "86bdbb8c2bc1c37f2cc57b5218523ee921ebd3902d3c9ce42df4a84ba3714390"
+      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
     },
     "robot-commands-browser-report.json": {
-      "sha256": "0706aab034b908ce73ca795eab44eae4be7836d0253e26e1107a1e300fa5b2bf",
+      "sha256": "b1c45b0a1ca3a45dd8ae8dc5578cf91ff4ecc2708b7e95d37feee2bfc1fd948c",
       "passed": true,
-      "html_sha256": "86bdbb8c2bc1c37f2cc57b5218523ee921ebd3902d3c9ce42df4a84ba3714390"
+      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
+    },
+    "signage-browser-check.json": {
+      "sha256": "1cf8a73ac730f97b7cba691b2569d9ddf9ca48c0db618ca6b3a0e43411679990",
+      "passed": true,
+      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
     }
   },
-  "full_browser_regression": {
-    "passed": false,
-    "finding": "Existing camera obstruction at OG3 laboratory door D3_003B.",
-    "report_sha256": "667c005fbca91b42ceb7e559d60fb82282b0c6c1edb22f0301558f815889ed46",
-    "route_geometry_evidence_sha256": "504e0b42eb8d398a36786524c27630c95e178a616570e2a81823778b4b4528f7"
-  },
-  "update": "80 corridor-facing room signs on all five levels, with the foyer camera wall and robot controls included."
+  "update": "Twenty foyer displays in five columns and four rows, plus 80 corridor-facing room signs. Fleet cameras remain disconnected.",
+  "integrated_commit": "5a89a32b4fcf471c40cc73e2b803a3a6762a3c68"
 }
