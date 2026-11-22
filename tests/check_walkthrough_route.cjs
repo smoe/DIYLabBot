@@ -2,6 +2,7 @@
 // Exercises actual native contacts and the existing lift state machine. No CAD.
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),crypto=require('node:crypto');
 const engine=require('../scripts/walkthrough_interaction.js');
+const {detourOpenDoor}=require('./walkthrough_route_detour.cjs');
 const file=path.resolve(process.argv[2]),html=fs.readFileSync(file),source=fs.readFileSync(path.join(__dirname,'../scripts/walkthrough_interaction.js'));
 assert(html.includes(source),'The downloaded page must embed this exact collision/lift engine');
 const data=JSON.parse(html.toString('utf8').match(/<script id="walkthrough-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
@@ -35,7 +36,13 @@ function walk(label,target){const goal=target.map(v=>v/1000);assert(Math.abs(eye
 function outside(stop){const d=stop.target_mm.map((v,i)=>i===2?0:v-stop.eye_mm[i]),n=Math.hypot(...d);return stop.eye_mm.map((v,i)=>i===2?v:v-d[i]/n*(stop.anchor.inset_mm+500));}
 cycle.initialize();settle();record('start');
 const officeOutside=outside(phd),labOutside=outside(lab);
-walk('office 3.002 to corridor',officeOutside);walk('corridor to laboratory entrance',labOutside);walk('enter laboratory 3.003',lab.eye_mm);walk('leave laboratory',labOutside);
+walk('office 3.002 to corridor',officeOutside);
+const nearDoor='OG3.D3_003B.Door';
+const detour=detourOpenDoor({data,positions,indices,from:officeOutside,to:labOutside,doorId:nearDoor,
+  state:objects.get(nearDoor).state,waypointToleranceMm:5});
+assert(detour.evidence.length,'The A-side route must pass around the open B leaf');
+for(const [index,point] of detour.waypoints.entries())walk('corridor to laboratory entrance, leg '+(index+1),point);
+walk('enter laboratory 3.003',lab.eye_mm);walk('leave laboratory',labOutside);
 const corridor=mesh.groups.find(g=>g.id==='OG3__Area_C3_020'),x=(corridor.bounds_mm.min[0]+corridor.bounds_mm.max[0])/2;
 const upper=data.elevator.ports.find(p=>p.active&&p.level_id==='OG3'),ground=data.elevator.ports.find(p=>p.active&&p.level_id==='EG');
 walk('corridor corner',[x,labOutside[1],upper.exit_eye_mm[2]]);walk('corridor to lift',[x,upper.exit_eye_mm[1],upper.exit_eye_mm[2]]);walk('lift call point',upper.exit_eye_mm);
@@ -52,9 +59,10 @@ for(const sample of trace.filter(s=>s.kind==='walk')){
  assert(below,'An actual native floor must support every walked route sample');floorBodies.add(below.body_id);
 }
 assert([...initialRoomStates].every(([id,state])=>objects.get(id).state===state),'The entire route preserves room-door states');
-const officeAndLabOpen=['OG3.D3_002N.Door','OG3.D3_003A.Door'].every(id=>objects.get(id).state==='open');
+const officeAndLabOpen=['OG3.D3_002N.Door','OG3.D3_003A.Door',nearDoor].every(id=>objects.get(id).state==='open');
 const technicalClosed=[...objects.values()].filter(o=>o.config.mechanism==='room_door'&&o.config.initial_state==='closed').every(o=>o.state==='closed');
 assert(officeAndLabOpen&&technicalClosed,'Open passages and closed technical accesses stay distinct');
 const report={passed:true,html_sha256:crypto.createHash('sha256').update(html).digest('hex'),events,trace,initial_doors_preserved:true,office_and_laboratory_open:officeAndLabOpen,technical_accesses_closed:technicalClosed,lift_destination:cabin.state,boarded_after_exit:session.boarded};
+report.temporary_obstacles=detour.evidence;
 report.supporting_native_floor_bodies=[...floorBodies];
 fs.writeFileSync(path.join(path.dirname(file),'complete-route-check.json'),JSON.stringify(report,null,2)+'\n');console.log(JSON.stringify({...report,trace:`${trace.length} sampled positions`},null,2));

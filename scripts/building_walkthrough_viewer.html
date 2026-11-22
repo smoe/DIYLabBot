@@ -76,6 +76,7 @@
     </div>
     <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: walk faster &nbsp; · &nbsp; Tür anklicken / nahe Tür: Leertaste</div>
   </div>
+  <p class="help" id="walkthrough-lab-route" hidden>Vom Doktorandenraum rückwärts in den Flur gehen. Dann nach rechts zur ersten Tür mit dem Schild „3.003 Labor“ und dort eintreten.</p>
   <p class="notice" id="walkthrough-notice">Concept building geometry. Lab 3.003 belongs to this building scene; its room binding is a presentation assumption, not surveyed registration. The elevator is a browser presentation, not a real lift controller.</p>
   <div class="visually-hidden" aria-live="polite" id="walkthrough-announcement"></div>
 </main>
@@ -89,6 +90,7 @@ __WALKTHROUGH_MONITORS__</script>
   const root=document.getElementById('building-walkthrough'),canvas=document.getElementById('walkthrough-canvas');
   const loading=document.getElementById('walkthrough-loading'),errorPanel=document.getElementById('walkthrough-error');
   const locationLabel=document.getElementById('walkthrough-location'),contextLabel=document.getElementById('walkthrough-context');
+  const labRouteHint=document.getElementById('walkthrough-lab-route');
   const stopsNode=document.getElementById('walkthrough-stops'),levelSelect=document.getElementById('walkthrough-level');
   const announcement=document.getElementById('walkthrough-announcement'),stageNode=document.getElementById('walkthrough-stage');
   let gl=null,frameRequest=null;
@@ -97,6 +99,7 @@ __WALKTHROUGH_MONITORS__</script>
     const data=JSON.parse(document.getElementById('walkthrough-data').textContent);
     if(!data.scenes||!Array.isArray(data.stops)||!data.stops.length)throw Error('Scene geometry and viewpoints are required.');
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
+    const doctoralLevel=stops.find(stop=>stop.id==='phd')?.level_id;
     if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
     const hiddenIds=data.hidden_body_ids||{},meshCache=new Map(),sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
     const monitorConfig=data.camera_wall||null,monitorFrames=new Map((monitorConfig?.monitors||[]).map(m=>[m.screen_body_id,m.screen_frame]));
@@ -461,6 +464,7 @@ __WALKTHROUGH_MONITORS__</script>
     }
     function render(){
       syncLiftCamera();
+      labRouteHint.hidden=stopId!=='phd'||selectedLevel!==doctoralLevel||elevator?.boarded===true;
       const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
       if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
       gl.viewport(0,0,width,height);drawScene(prepareScene(sceneId),cameraMatrix(width/height),eye);

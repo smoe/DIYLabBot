@@ -7,6 +7,7 @@ const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require(process.argv[3] || 'playwright');
+const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
 
 (async () => {
   assert(process.argv[2], 'A generated walk-through HTML file is required.');
@@ -566,8 +567,8 @@ const {chromium} = require(process.argv[3] || 'playwright');
     report.interactions.push('native door picking','mouse click open/close','Space near doorway','open/close','reduced and animated hinge motion','persistent in-memory scene state');
     progress('fridge and movement regressions passed');
 
-    // The original user route must reach equipped 3.003 without a scene switch
-    // or a laboratory viewpoint jump. Door centres follow the room-entry anchors.
+    // Follow the viewer's hint through the nearer lab door into the east aisle.
+    // Keep the existing A-side camera point for the lab viewpoint and exit.
     const controls=publicControls(page),labStop=model.stops.find(stop=>stop.id==='lab');
     function entryOutside(stop){
       assert.equal(stop.anchor.kind,'room_entry');
@@ -576,8 +577,17 @@ const {chromium} = require(process.argv[3] || 'playwright');
       return stop.eye_mm.map((value,axis)=>axis===2?value:value-inward[axis]*(stop.anchor.inset_mm+500));
     }
     const phdOutside=entryOutside(phd),labOutside=entryOutside(labStop);
+    const nearDoor=model.objects.find(object=>object.level_id===labStop.level_id&&object.opening_id==='D3_003B');
+    assert(nearDoor?.mechanism==='room_door'&&nearDoor.initial_state==='open');
+    const nearDoorCenter=[...nearDoor.viewpoint.target_mm.slice(0,2),labStop.eye_mm[2]];
+    const approachInset=500;
+    const nearDoorOutside=nearDoorCenter.map((value,axis)=>value+nearDoor.front[axis]*approachInset);
+    const nearDoorInside=nearDoorCenter.map((value,axis)=>value-nearDoor.front[axis]*approachInset);
+    const nearDoorEntry={level_id:labStop.level_id,eye_mm:nearDoorInside,
+      target_mm:nearDoorInside.map((value,axis)=>value-nearDoor.front[axis]*approachInset),
+      anchor:{opening:nearDoor.opening_id,inset_mm:approachInset}};
     const officeLink=model.topology.find(edge=>edge.opening===phd.anchor.opening&&edge.level_id===phd.level_id);
-    const laboratoryLink=model.topology.find(edge=>edge.opening===labStop.anchor.opening&&edge.level_id===labStop.level_id);
+    const laboratoryLink=model.topology.find(edge=>edge.opening===nearDoor.opening_id&&edge.level_id===labStop.level_id);
     assert(officeLink.areas.includes('R3_002')&&laboratoryLink.areas.includes(laboratory.area));
     const commonCorridor=officeLink.areas.find(area=>laboratoryLink.areas.includes(area));
     assert(commonCorridor,'Office and laboratory doors connect to the same source corridor');
@@ -614,7 +624,7 @@ const {chromium} = require(process.argv[3] || 'playwright');
       return {opening:stop.anchor.opening,wall_body_id:walls[0].id,origin_mm:origin,inward:normal,tangent,
         aperture_tangent_interval_mm:[-low,high]};
     }
-    const doorways=[doorway(phd),doorway(labStop)];
+    const doorways=[doorway(phd),doorway(nearDoorEntry)];
     const routeFloorIds=[...phd.anchor.areas,commonCorridor,...labStop.anchor.areas].map(area=>phd.level_id+'__Area_'+area);
     const routeFloorTriangles=routeFloorIds.flatMap(id=>{
       const group=groupById.get(id);assert(group,`The source route floor ${id} is present`);
@@ -630,6 +640,11 @@ const {chromium} = require(process.argv[3] || 'playwright');
     });
     await page.setViewportSize({width:1280,height:950});
     await page.locator('#walkthrough-stops button[data-stop="phd"]').click();await waitForStop('phd');
+    const routeHint=page.locator('#walkthrough-lab-route');
+    await routeHint.waitFor({state:'visible'});
+    assert.match(await routeHint.textContent(),/ersten Tür.*3\.003 Labor/);
+    const nearDoorState=()=>page.evaluate(id=>window.__buildingWalkthrough.objects.find(object=>object.id===id)?.state,nearDoor.id);
+    assert.equal(await nearDoorState(),'open');
     await page.evaluate(()=>{
       const viewer=window.__buildingWalkthrough,trace={active:true,samples:[{frame:viewer.frames,time_ms:performance.now(),eye_mm:viewer.camera.eye_mm}]};
       window.__walkthroughRouteQA=trace;
@@ -643,8 +658,10 @@ const {chromium} = require(process.argv[3] || 'playwright');
       requestAnimationFrame(sample);
     });
     const route=[];
-    for(const [label,point] of [['office exit',phdOutside],['corridor at laboratory door',labOutside],['laboratory interior',labStop.eye_mm]]){
+    for(const [label,point] of [['office exit',phdOutside],['corridor at laboratory door B',nearDoorOutside],
+      ['entry through laboratory door B into the lab',nearDoorInside]]){
       const observed=await controls.walkTo(point);
+      assert.equal(await nearDoorState(),'open','Walking preserves the state of the outward-opening door');
       assert.equal((await controls.state()).scene,'building');
       assert.equal((await controls.state()).stop,'phd','Walking must not invoke the lab viewpoint shortcut');
       route.push({label,target_mm:point,observed_mm:observed});
@@ -662,6 +679,11 @@ const {chromium} = require(process.argv[3] || 'playwright');
       assert(Math.abs(sample.eye_mm[2]-sourceLevel.z_mm-model.settings.eye_height_mm)<.01,'The office/lab route remains on OG3');
       assert(onRouteFloor(sample.eye_mm),`A rendered route sample left the source office/corridor/lab floors: ${JSON.stringify(sample)}`);
     }
+    const doorBounds=nearDoor.moving_body_ids.map(id=>groupById.get(id).bounds_mm);
+    const routeDoorClearance=Math.min(...routeTrace.map(sample=>Math.min(...doorBounds.map(bounds=>
+      Math.hypot(...sample.eye_mm.map((value,axis)=>Math.max(bounds.min[axis]-value,0,value-bounds.max[axis])))))));
+    assert(routeDoorClearance>=model.navigation.camera_radius_mm+model.navigation.contact_margin_mm,
+      'The rendered camera path clears the open B leaf and all of its details');
     const crossings=[];
     for(const [index,door] of doorways.entries()){
       for(let i=1;i<routeTrace.length;i++){
@@ -680,6 +702,8 @@ const {chromium} = require(process.argv[3] || 'playwright');
     report.laboratory={id:laboratory.id,level:laboratory.level_id,room:laboratory.area,
       equipment_instances:equipment.map(value=>({id:value.id,body_count:value.body_count})),
       duplicate_shell:false,corridor:commonCorridor,door_route:[officeLink.opening,laboratoryLink.opening],
+      near_door_open_preserved:true,walking_hint_visible:true,
+      minimum_open_door_bounds_distance_mm:routeDoorClearance,
       public_control_route:route,rendered_camera_trace:routeTrace,native_floor_body_ids:routeFloorIds,native_doorway_crossings:crossings,
       scope:'Free-camera traversal through native doorway apertures and source floor footprints; physical passability remains unqualified'};
     progress('public 3.002 to equipped 3.003 route passed');
@@ -759,9 +783,23 @@ const {chromium} = require(process.argv[3] || 'playwright');
     assert(corridorGroup,'Native corridor floor is needed to guide the approach to the lift');
     const corridorX=centre(corridorGroup.bounds_mm)[0],upperPort=port('OG3');assert(upperPort);
     async function approachLift(surface,driver,fromOffice=false){
-      if(fromOffice){await surface.locator('#walkthrough-stops button[data-stop="phd"]').click();await driver.walkTo(phdOutside);}
-      else await driver.walkTo(labOutside);
-      await driver.walkTo([corridorX,labOutside[1],upperPort.exit_eye_mm[2]]);
+      const corridorCorner=[corridorX,labOutside[1],upperPort.exit_eye_mm[2]];
+      if(fromOffice){
+        await surface.locator('#walkthrough-stops button[data-stop="phd"]').click();
+        await driver.walkTo(phdOutside);
+        const positions=Float32Array.from({length:nativePositions.length/4},(_,i)=>nativePositions.readFloatLE(i*4)/1000);
+        const indices=Uint32Array.from({length:nativeIndices.length/4},(_,i)=>nativeIndices.readUInt32LE(i*4));
+        const current=await driver.state();
+        const doorState=current.objects.find(object=>object.id===nearDoor.id).state;
+        const detour=detourOpenDoor({data:model,positions,indices,from:phdOutside,to:corridorCorner,doorId:nearDoor.id,state:doorState});
+        assert(detour.evidence.length,'The office-to-lift route goes around the open B leaf');
+        for(const point of detour.waypoints)await driver.walkTo(point);
+        assert.equal((await driver.state()).objects.find(object=>object.id===nearDoor.id).state,doorState);
+        report.elevator.office_approach_detour=detour.evidence;
+      }else{
+        await driver.walkTo(labOutside);
+        await driver.walkTo(corridorCorner);
+      }
       await driver.walkTo([corridorX,upperPort.exit_eye_mm[1],upperPort.exit_eye_mm[2]]);
       await driver.walkTo(upperPort.exit_eye_mm);
       return driver.activate(upperPort.id,upperPort.trigger_body_ids,'space');

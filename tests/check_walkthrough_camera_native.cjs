@@ -21,6 +21,37 @@ for(const id of ['OG3.D3_026.Door','OG3.D3_027.Door','OG3.D3_002N.Door','OG3.D3_
  else assert(side<0,`${id}: open laboratory/office doorway unexpectedly blocked: ${result.contacts}`);
  evidence.doors.push({id,initial_state:o.initial_state,reference_state:o.reference_state,remaining_side_m:side,contacts:result.contacts,query_ms:performance.now()-now});
 }
+// Crossing the corridor toward entry A meets the outward-open B leaf.
+// Compare its closed state only as a counterprobe; preserve the published defaults.
+const office=data.stops.find(stop=>stop.id==='phd'),laboratory=data.stops.find(stop=>stop.id==='lab');
+assert(office&&laboratory,'Existing office and laboratory viewpoints are required');
+assert.equal(office.level_id,laboratory.level_id);
+function corridorOutside(stop){
+ const direction=stop.target_mm.map((value,axis)=>axis===2?0:value-stop.eye_mm[axis]),length=Math.hypot(...direction);
+ assert(length>0&&Number.isFinite(stop.anchor.inset_mm),'Source-derived room-entry direction and inset');
+ return stop.eye_mm.map((value,axis)=>axis===2?value:value-direction[axis]/length*(stop.anchor.inset_mm+500));
+}
+const officeOutside=corridorOutside(office),labAOutside=corridorOutside(laboratory);
+const corridorStart=officeOutside.map(value=>value/1000),corridorDelta=labAOutside.map((value,axis)=>value/1000-corridorStart[axis]);
+const doorB=objects.get(office.level_id+'.D3_003B.Door');assert(doorB,'Existing laboratory entry B');
+assert.equal(doorB.initial_state||doorB.reference_state,'open','The published B leaf stays outward-open by default');
+const defaultBTransforms=new Map(doorB.moving_body_ids.map(id=>[id,transforms.get(id)]));
+let openBHit,closedBHit;
+try{
+ openBHit=collider.firstHit(corridorStart,corridorDelta,options);
+ assert(openBHit&&doorB.moving_body_ids.includes(openBHit.body_id),
+  'The straight office-to-A corridor sweep must first meet the actual open B leaf/glass/rim: '+JSON.stringify(openBHit));
+ for(const id of doorB.moving_body_ids)transforms.set(id,[matrix(doorB,'closed')]);
+ closedBHit=collider.firstHit(corridorStart,corridorDelta,options);
+ assert(!closedBHit||!doorB.moving_body_ids.includes(closedBHit.body_id),
+  'Closing only B in the counterprobe must remove its corridor contact: '+JSON.stringify(closedBHit));
+}finally{
+ for(const [id,value] of defaultBTransforms)transforms.set(id,value);
+}
+for(const [id,value] of defaultBTransforms)assert.strictEqual(transforms.get(id),value,'Restore every default B transform');
+evidence.open_B_corridor_obstruction={office_outside_mm:officeOutside,laboratory_A_outside_mm:labAOutside,
+ default_state:doorB.initial_state||doorB.reference_state,open_first_hit:openBHit,closed_counterprobe_first_hit:closedBHit,
+ default_transforms_restored:true};
 for(const stop of data.stops){const p=stop.eye_mm.map(v=>v/1000),result=collider.move(p,[.005,0,0],options);evidence.viewpoints.push({id:stop.id,contacts:result.contacts});assert(result.eye.every(Number.isFinite));}
 const closed=data.objects.filter(o=>o.mechanism==='room_door'&&o.initial_state==='closed');assert.equal(closed.length,15);
 // Adversarial case: even if landing leaves are fully open at an unoccupied
