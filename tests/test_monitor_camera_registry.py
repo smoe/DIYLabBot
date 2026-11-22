@@ -57,6 +57,8 @@ class CameraRegistryTests(unittest.TestCase):
             ref['source_sha256'] = registry.digest(ROOT / ref['source'])
         self.write_source()
         self.program = {'objects': copy.deepcopy(self.objects), 'stops': copy.deepcopy(self.stops),
+                        'levels': [{'id': 'OG3', 'z_mm': 12750}, {'id': 'EG', 'z_mm': 0},
+                                   {'id': 'OG1', 'z_mm': 4250}],
                         'source_files_sha256': {self.spec['sources']['walkthrough']['source']:
                                                self.spec['sources']['walkthrough']['source_sha256']}}
 
@@ -65,6 +67,12 @@ class CameraRegistryTests(unittest.TestCase):
 
     def compiled(self, interface=None):
         return registry.compile(self.program, interface or self.interface, self.source)
+
+    def available_startup_ids(self, result):
+        return sorted(c['id'] for c in result['cameras'] if c['availability'] == 'available'
+                      and c['category'] == 'robot') + sorted(
+                          c['id'] for c in result['cameras'] if c['availability'] == 'available'
+                          and c['category'] == 'device')
 
     def test_six_arm_cameras_bind_the_correct_native_camera_body(self):
         result = self.compiled()
@@ -135,20 +143,53 @@ class CameraRegistryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'virtual-overview far clipping plane'):
             self.compiled()
 
+    def test_mosaic_view_distance_is_required_bounded_and_exported_in_mm(self):
+        key = 'mosaic_max_view_distance_mm'
+        self.assertEqual(self.compiled()['settings'][key], self.spec['settings'][key])
+        valid = self.spec['settings'].pop(key)
+        self.write_source()
+        with self.assertRaisesRegex(ValueError, 'Missing camera-wall schema field'):
+            self.compiled()
+        for value in (999, 30001, str(valid), True):
+            with self.subTest(value=value):
+                self.spec['settings'][key] = value
+                self.write_source()
+                with self.assertRaisesRegex(ValueError, key):
+                    self.compiled()
+        self.spec['settings'][key] = 10000
+        self.write_source()
+        self.assertEqual(self.compiled()['settings'][key], 10000)
+
     def test_static_transporter_has_no_camera_and_disconnected_fleet_has_no_poses(self):
         result = self.compiled()
         tr = next(c for c in result['cameras'] if c['device_id'] == 'Lab3003.TR01')
+        self.assertEqual(tr['category'], 'transporter')
         self.assertEqual(tr['availability'], 'no_camera')
         self.assertIsNone(tr['eye_mm'])
-        fleet = [c for c in result['cameras'] if c['category'] == 'fleet']
+        fleet = [c for c in result['cameras'] if c['availability'] == 'not_connected']
         self.assertEqual(len(fleet), 20)
         self.assertEqual([c['device_id'] for c in fleet], ['BF01.BF' + str(n).zfill(2) for n in range(1, 21)])
         for camera in fleet:
-            self.assertEqual(camera['availability'], 'not_connected')
+            self.assertEqual(camera['category'], 'transporter')
+            self.assertEqual(camera['kind'], 'modeled_camera')
             self.assertIsNone(camera['eye_mm'])
             self.assertIsNone(camera['target_mm'])
         self.assertFalse(result['fleet_connected'])
         self.assertFalse(result['message_source_connected'])
+
+    def test_menu_categories_and_room_order_are_derived_deterministically(self):
+        interface = copy.deepcopy(self.interface)
+        for identity, room in [('GroundA', 'EG 15'), ('GroundB', 'EG 3')]:
+            interface['laboratories'].append({'id': identity, 'room': room, 'level_id': 'EG',
+                                              'instances': [{'id': 'Hood', 'layout_kind': 'hood'}]})
+        cameras = self.compiled(interface)['cameras']
+        interface['laboratories'].reverse()
+        self.assertEqual(cameras, self.compiled(interface)['cameras'])
+        self.assertEqual(list(dict.fromkeys(c['category'] for c in cameras)), ['transporter', 'robot', 'device'])
+        self.assertEqual([c['device_id'] for c in cameras[:21]],
+                         [f'BF01.BF{n:02d}' for n in range(1, 21)] + ['Lab3003.TR01'])
+        devices = [c['location'] for c in cameras if c['category'] == 'device']
+        self.assertEqual(devices, ['EG 3', 'EG 15', '1.001'] + ['3.003'] * devices.count('3.003') + ['3.007'])
 
     def test_bound_hood_and_microscope_are_included_but_racks_and_desks_are_not(self):
         result = self.compiled()
@@ -182,7 +223,7 @@ class CameraRegistryTests(unittest.TestCase):
             self.program['objects'].append({'id': identity + '.Hood.Sash', 'viewpoint': self.objects[-1]['viewpoint']})
         first, second = self.compiled(interface), self.compiled(interface)
         self.assertEqual(first, second)
-        available = [c['id'] for c in first['cameras'] if c['availability'] == 'available']
+        available = self.available_startup_ids(first)
         self.assertGreater(len(available), 20)
         self.assertEqual(first['default_assignments'], available[:20])
         self.assertEqual(len(set(first['default_assignments'])), 20)
@@ -190,7 +231,7 @@ class CameraRegistryTests(unittest.TestCase):
 
     def test_default_assignments_follow_wall_size_and_leave_missing_views_unassigned(self):
         result = self.compiled()
-        available = [c['id'] for c in result['cameras'] if c['availability'] == 'available']
+        available = self.available_startup_ids(result)
         self.assertLess(len(available), 20)
         self.assertEqual(result['default_assignments'], available + [None] * (20 - len(available)))
 
@@ -202,7 +243,7 @@ class CameraRegistryTests(unittest.TestCase):
     def test_changed_pin_and_wrong_program_revision_fail_before_registry_creation(self):
         self.spec['sources']['fleet']['source_sha256'] = '0' * 64
         self.write_source()
-        with self.assertRaisesRegex(ValueError, 'changed|Changed|hash|SHA|checksum'):
+        with self.assertRaisesRegex(ValueError, 'overlay fleet pin failed'):
             self.compiled()
         self.spec['sources']['fleet']['source_sha256'] = registry.digest(ROOT / self.spec['sources']['fleet']['source'])
         self.write_source()

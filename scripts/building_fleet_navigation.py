@@ -10,7 +10,6 @@ an oriented-footprint proof before a route may be compiled.
 import array
 import base64
 import collections
-import hashlib
 import heapq
 import json
 import math
@@ -20,6 +19,7 @@ import sys
 import building_stack as stack
 import relative_floorplan as floor
 import robot_spec as robot
+import walkthrough_world
 
 ROOT = Path(__file__).resolve().parents[1]
 EXCLUDED = frozenset({'R3_028', 'R3_017', 'ExternalStairGround', 'Atrium', 'LiftCore'})
@@ -131,23 +131,9 @@ def initial_transform(obj, point):
 
 class NativeMesh:
     def __init__(self, export, root=ROOT):
-        root=Path(root).resolve();self.export=Path(export).resolve()
-        if not self.export.is_relative_to(root):raise ValueError('Project-local fleet export required')
-        report = json.loads((self.export/'build-report.json').read_text())
-        if report.get('format')!='solidcraftbot.building-walkthrough-build/1' or report.get('passed') is not True or not report.get('source_files_sha256') or set(report.get('files',{}))!={'html','native_mesh','manifest'}:
-            raise ValueError('A successful current walkthrough export is required')
-        for name, digest in report['source_files_sha256'].items():
-            path = (root/name).resolve()
-            if not path.is_relative_to(root):raise ValueError('External source pin: '+name)
-            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
-                raise ValueError('Stale walkthrough source: '+name)
-        for key,name in report['files'].items():
-            path=(self.export/Path(name).name).resolve()
-            if not path.is_relative_to(self.export) or not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest()!=report['artifact_sha256'][key]:
-                raise ValueError('Changed walkthrough artifact: '+name)
-        self.manifest = json.loads((self.export/'manifest.json').read_text())
-        bundle=json.loads((self.export/'native-mesh.json').read_text())
-        if self.manifest.get('format')!='solidcraftbot.building-walkthrough/1' or bundle.get('format')!='solidcraftbot.building-walkthrough-mesh/1':raise ValueError('Unsupported checked export format')
+        self.export = Path(export).resolve()
+        self.world_report_path = self.export / walkthrough_world.REPORT
+        _, self.manifest, bundle = walkthrough_world.read(self.export, root)
         self.scene=bundle['scenes']['building']
         self.positions = array.array('f'); self.positions.frombytes(base64.b64decode(self.scene['positions_base64']))
         self.indices = array.array('I'); self.indices.frombytes(base64.b64decode(self.scene['indices_base64']))

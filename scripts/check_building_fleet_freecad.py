@@ -17,6 +17,7 @@ import export_building_walkthrough_freecad as native
 from export_building_fleet_vehicle_freecad import checked_camera_report
 import tr01_floor_motion as floor
 import building_fleet_model as fleet
+import walkthrough_world
 
 ROOT=Path(__file__).resolve().parents[1]
 
@@ -193,14 +194,13 @@ class Trajectory:
 
 
 def checked_walkthrough(path):
-    report=json.loads(path.read_text())
-    if report.get('passed')is not True or report.get('format')!='solidcraftbot.building-walkthrough-build/1':raise ValueError('Successful current walkthrough report required')
-    native.verify_pins(report['source_files_sha256'])
-    native.verify_pins({report['files'][k]:h for k,h in report['artifact_sha256'].items()})
+    if path.name != walkthrough_world.REPORT:
+        raise ValueError('Select the separate world-build-report.json for the BF01 audit')
+    report,manifest,bundle=walkthrough_world.read(path.parent, ROOT)
     reports={k:native.checked_report(v['report'],k)for k,v in report['native_builds'].items()}
     for k,v in report['native_builds'].items():
         if native.digest(native.project_path(v['report']))!=v['report_sha256']:raise ValueError('Changed native proof')
-    manifest=json.loads(native.project_path(report['files']['manifest']).read_text());mesh=json.loads(native.project_path(report['files']['native_mesh']).read_text())['scenes']['building']
+    mesh=bundle['scenes']['building']
     return report,reports,manifest,{g['id']for g in mesh['groups']}
 
 

@@ -6,11 +6,14 @@ import json
 import tempfile
 from pathlib import Path
 import random
+import shutil
 import sys
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_fleet_navigation as nav
+import monitor_camera_registry as registry
 
 
 class DistanceTransformTests(unittest.TestCase):
@@ -79,23 +82,20 @@ class PinTests(unittest.TestCase):
     def fixture(self,root):
         source=root/'source.json';source.write_text('{}')
         bundle=root/'export';bundle.mkdir()
-        files={'html':'index.html','manifest':'manifest.json','native_mesh':'native-mesh.json'}
-        (bundle/'index.html').write_text('checked')
-        (bundle/'manifest.json').write_text(json.dumps({'format':'solidcraftbot.building-walkthrough/1','objects':[]}))
-        (bundle/'native-mesh.json').write_text(json.dumps({'format':'solidcraftbot.building-walkthrough-mesh/1','scenes':{'building':{'positions_base64':'','indices_base64':'','groups':[]}}}))
-        digest=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-        report={'format':'solidcraftbot.building-walkthrough-build/1','passed':True,
-                'source_files_sha256':{'source.json':digest(source)},
-                'files':{k:'export/'+name for k,name in files.items()},
-                'artifact_sha256':{k:digest(bundle/name)for k,name in files.items()}}
-        (bundle/'build-report.json').write_text(json.dumps(report))
-        return bundle,report
+        pins={'source.json':hashlib.sha256(source.read_bytes()).hexdigest()}
+        (bundle/'native-mesh.json').write_text(json.dumps({
+            'format':'solidcraftbot.building-walkthrough-mesh/1', 'source_files_sha256':pins,
+            'scenes':{'building':{'positions_base64':'','indices_base64':'','groups':[]}}}))
+        path=nav.walkthrough_world.write(bundle, {
+            'format':'solidcraftbot.building-walkthrough/1','objects':[],
+            'source_files_sha256':pins}, {}, root)
+        return bundle,json.loads(path.read_text())
 
     def test_consumed_bundle_and_source_pins_are_checked(self):
         with tempfile.TemporaryDirectory()as folder:
             root=Path(folder);bundle,report=self.fixture(root)
             nav.NativeMesh(bundle,root=root)
-            (bundle/'manifest.json').write_text('{}')
+            (bundle/'world-manifest.json').write_text('{}')
             with self.assertRaisesRegex(ValueError,'Changed walkthrough artifact'):
                 nav.NativeMesh(bundle,root=root)
         with tempfile.TemporaryDirectory()as folder:
@@ -110,9 +110,51 @@ class PinTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'Project-local'):
                 nav.NativeMesh(bundle,root=root/'other')
             report['source_files_sha256']={'../outside.json':'0'*64}
-            (bundle/'build-report.json').write_text(json.dumps(report))
+            (bundle/nav.walkthrough_world.REPORT).write_text(json.dumps(report))
             with self.assertRaisesRegex(ValueError,'External source pin'):
                 nav.NativeMesh(bundle,root=root)
+
+    def test_fleet_drift_invalidates_overlay_but_monitor_geometry_invalidates_world(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            composition = 'model/foyer-camera-wall.shared.json'
+            geometry = 'model/equipment/foyer-monitor-wall.json'
+            spec = registry.read_json(registry.SOURCE)
+            fleet = spec['sources']['fleet']['source']
+            walkthrough = spec['sources']['walkthrough']['source']
+            schema = registry.SCHEMA.relative_to(nav.ROOT)
+            for name in (composition, schema, geometry, fleet, walkthrough):
+                target = root / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(nav.ROOT / name, target)
+
+            folder = root / 'export'
+            folder.mkdir()
+            pins = {name: registry.digest(root / name) for name in (geometry, walkthrough)}
+            mesh = {'format': 'solidcraftbot.building-walkthrough-mesh/1',
+                    'source_files_sha256': pins,
+                    'scenes': {'building': {'positions_base64': '', 'indices_base64': '', 'groups': []}}}
+            (folder / 'native-mesh.json').write_text(json.dumps(mesh))
+            report_path = nav.walkthrough_world.write(folder, {
+                'format': 'solidcraftbot.building-walkthrough/1', 'objects': [], 'source_files_sha256': pins}, {}, root)
+            report = json.loads(report_path.read_text())
+            self.assertEqual(report['source_files_sha256'], pins)
+            self.assertFalse({fleet, composition} & report['source_files_sha256'].keys())
+
+            with patch.object(registry, 'ROOT', root), patch.object(registry, 'SCHEMA', root / schema):
+                registry.load(root / composition)
+                (root / fleet).write_bytes((root / fleet).read_bytes() + b'\n')
+                nav.NativeMesh(folder, root)
+                with self.assertRaisesRegex(ValueError, 'overlay fleet pin failed'):
+                    registry.load(root / composition)
+                (root / walkthrough).write_bytes((root / walkthrough).read_bytes() + b'\n')
+                with self.assertRaisesRegex(ValueError, 'overlay walkthrough pin failed'):
+                    registry.load(root / composition)
+
+            shutil.copyfile(nav.ROOT / walkthrough, root / walkthrough)
+            (root / geometry).write_bytes((root / geometry).read_bytes() + b'\n')
+            with self.assertRaisesRegex(ValueError, 'Stale walkthrough source: .*foyer-monitor-wall.json'):
+                nav.NativeMesh(folder, root)
 
 
 class NativeL01StopTests(unittest.TestCase):
@@ -121,7 +163,7 @@ class NativeL01StopTests(unittest.TestCase):
         if selected:
             mesh=nav.NativeMesh(nav.ROOT/selected)  # Explicit stale input fails.
         else:
-            candidates=sorted((nav.ROOT/'exports/building-walkthrough').glob('*/build-report.json'),
+            candidates=sorted((nav.ROOT/'exports/building-walkthrough').glob('*/'+nav.walkthrough_world.REPORT),
                               key=lambda p:p.stat().st_mtime,reverse=True)
             mesh=None
             for candidate in candidates:

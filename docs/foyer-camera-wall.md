@@ -25,10 +25,12 @@ Geräteübersichten. Beim Start zeigen die 20 Monitore unterschiedliche Ansichte
 Über die Auswahl auf jedem Monitor sind alle 25 erreichbar.
 Für CF01, Spitzensammelstation T01, Waage, Kühlschrank,
 Wasserbad und TapeStation fehlen quellgebundene Blickpunkte. Diese sechs
-Einträge zeigen kein erfundenes Bild. Der statische L01-TR01 hat **keine
-Kamera modelliert**. Die 20 vorgesehenen BF01-Kameras stehen separat als
-**Flotte nicht angebunden** zur Auswahl, ohne Bilder oder automatische
-Belegung eines Monitors.
+Einträge sind als **Kein Blickpunkt vorhanden** gekennzeichnet. Die Auswahl
+beginnt mit **Transporter** und 21 Einträgen. Sie führt BF01 bis BF20 als
+**Flotte nicht angebunden** und L01-TR01 als **Keine Kamera modelliert**.
+Danach folgen **Roboterkameras** und **Geräte**, letztere nach Geschoss und
+Raum sortiert. Die Standardbelegung verwendet weiterhin die verfügbaren
+Ansichten in derselben Reihenfolge wie vor der Umstellung.
 
 Bildalter ist verstrichene **Browserzeit** seit der Berechnung des Bildes.
 Vorhandene Arm-Modellzeit wird separat angezeigt. Veraltete Bilder,
@@ -49,12 +51,27 @@ Rückabstand sind Darstellungsannahmen. Die Typmaße ergeben 2860 × 1440 mm.
 Wandlänge und Randabstände werden aus den gemeinsamen Quellen berechnet und
 nativ gegengeprüft. Vermessung, Montagefestigkeit und Ergonomie fehlen.
 
-`model/foyer-camera-wall.shared.json` ist die äußere Komposition. Sie pinnt
-Rundgang und Flotte und führt die Assettyp-Richtlinie und Bildparameter.
-Der Rundgang referenziert die Flotte nicht zurück. Das Register ist eine
-Ableitung, kein zusätzlicher Gerätebestand. BF01-Einträge enthalten keine
-Fahrzeugpose, Bilder oder Simulatorwahrheit. Ein späterer Leitstandsadapter
-muss zugestellte Frames verwenden.
+`model/foyer-camera-wall.shared.json` führt die Quellenpins für Rundgang
+und Flotte sowie die Assettyp-Richtlinie und Bildparameter. Die native
+Welt und die Kamerawand haben getrennte Abhängigkeiten.
+
+```mermaid
+flowchart LR
+    Native["Gebäude und L01 mit nativen Monitorkörpern"] --> World["Geprüfter Weltexport"]
+    World --> BF01["BF01-Weltprüfung"]
+    World --> Browser["Interaktiver Rundgang"]
+    Fleet["BF01-Quelle"] --> Overlay["Geprüftes Kamerawand-Overlay"]
+    Wall["Kamerawand-Komposition und Rundgangquelle"] --> Overlay
+    Overlay --> Browser
+```
+
+BF01 prüft `world-build-report.json`, `world-manifest.json` und
+`native-mesh.json` aus dem Rundgang-Export. Diese Welteingabe bindet weder
+die Flottenquelle noch die Kamerawand-Komposition. Die physischen
+Monitorkörper bleiben Teil der Welt. Beim Browserexport werden Rundgang-
+und Flottenpin des Overlays separat geprüft. Ein veralteter Pin bricht den
+Export mit Angabe des betroffenen Bezugs ab. BF01-Einträge im Register
+enthalten ausschließlich abgeleitete Metadaten ohne Fahrzeugpose oder Bild.
 
 ## Darstellung und Prüfung
 
@@ -68,11 +85,21 @@ Sichtkegel. Grenzkontakte bleiben erhalten; Geschosse oder verdeckende Wände
 werden nicht pauschal entfernt. Bewegte Körper verwenden dieselbe
 Objektmatrix wie im Renderer.
 
+Hauptansicht und Kamerapässe teilen dekodierte Geometrie sowie Positions-
+und Normalenpuffer. Ein eigener Indexpuffer erhält die Zeichenreihenfolge der
+Kamerapässe. Der Browserbericht misst Puffer- und Upload-Zahlen vor und nach
+dem ersten Kamerabild, Vorbereitungszeit und Zeichenintervalle der Hauptansicht.
+
 Startparameter: 320×180 Pixel, bis 1 Hz je Mosaikbild, bis 5 Hz für die
-ausgewählte Ansicht. Szenendurchläufe werden verteilt und nur bei sichtbarer
-Wand oder offener Großansicht angefordert. Ein fester Satz Bildpuffer wird
-wiederverwendet. Gemessene Raten und Renderzeiten gehören zum Browserbericht;
-die Sollrate ist kein Nachweis ihrer Einhaltung oder realer Sicherheit.
+ausgewählte Ansicht. Das Mosaik aktualisiert nur bei Augenhöhe innerhalb der
+aus dem Gebäudemodell abgeleiteten EG-Lichthöhe, derzeit 0 bis unter 4.000
+Darstellungs-mm. Das Auge muss vor der Bildschirmfläche liegen und ihr
+Mittelpunkt im Sichtkegel. Die Entfernung zum Mittelpunkt beträgt höchstens
+15.000 Darstellungs-mm. Diese Annahme deckt das modellierte Foyer ab und ist
+im Schema auf 1.000 bis 30.000 mm begrenzt. Eine geöffnete Großansicht
+aktualisiert auch außerhalb der Grenze. Ein fester Satz Bildpuffer wird
+wiederverwendet. Gemessene Raten und Renderzeiten gehören zum Browserbericht.
+Die Sollrate ist kein Nachweis ihrer Einhaltung oder realer Sicherheit.
 Die nächste Fälligkeit beginnt nach Abschluss eines Bildes. Auch bei einer
 langsamen Großansicht erhalten die übrigen sichtbaren Monitore weitere Bilder.
 
@@ -102,6 +129,34 @@ Quellhüllen mit 2 m Abstand zum Monitorarray. Ausgeschlossene Körper und ihre
 Abstandsuntergrenzen werden protokolliert. Das ist kein vollständiger
 SolidCraft-Gebäudevergleich. Geprüft werden statische Körper; Türschwenkräume,
 reale Gangfreiheit, Montagefestigkeit und Sicherheitsqualifikation bleiben offen.
+
+## Prüfung der getrennten Welteingabe und Kamerawand
+
+Für diese Prüfung wurde der Rundgang aus den vorhandenen geprüften CAD-Dateien
+neu exportiert. Der Weltexport enthält 5.519 Körper, darunter die 60
+Monitorkörper. Eine Testkopie mit geänderter BF01-Flottengröße lässt sich
+weiter als Welt laden. Dasselbe Beispiel scheitert am Flottenpin des
+Overlays. Ein geänderter Monitorabstand oder ein verändertes Weltmesh
+sperrt dagegen den Weltlader.
+
+Die Referenzpixel der veröffentlichten 5×4-Fassung stimmen jeweils im
+gleichen Chrome-Renderer überein. Beim ersten Kamerabild steigen die
+`createBuffer`-Aufrufe von drei auf vier. Zwei Positions-/Normalenpuffer
+mit zusammen rund 24,58 MB Upload-Daten bleiben erhalten. Der zusätzliche
+Indexpuffer lädt rund 11,52 MB. Die Zahl der Base64-Dekodierungen bleibt
+bei drei. Die Bytezahlen zählen WebGL-Uploads.
+
+| Lokaler Chrome-Renderer | Vorbereitung der Kameraszene | Zeichenintervalle der Hauptansicht bei aktivem Mosaik, Median / 95. Perzentil |
+| --- | ---: | ---: |
+| Metal, Apple M1 | 22,5 ms | 49,8 / 72,1 ms |
+| SwiftShader | 22,8 ms | 1.008,2 / 1.689,8 ms |
+
+In beiden Renderern aktualisieren alle 20 Monitore am Foyerblickpunkt.
+In OG1, OG3 und an einer entfernten EG-Testposition wurden jeweils über
+drei Sekunden null automatische Mosaikpässe gezählt. Eine geöffnete
+Großansicht aktualisierte auch an der entfernten Position.
+Die Messungen gelten für den lokalen Prüfstand. Die Rohberichte liegen
+unter `exports/verification/foyer-camera-wall-decoupling/`.
 
 ## Prüfstand der 5×4-Fassung
 

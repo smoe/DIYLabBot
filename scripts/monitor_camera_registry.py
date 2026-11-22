@@ -1,8 +1,8 @@
 """Derive a read-only model-view registry from the bound building inventory.
 
-The outer composition references the walkthrough and fleet, never vice versa.
-Fleet entries are metadata only: this module receives no vehicle poses, images,
-telemetry, control ports, or authoritative fleet state.
+Only the browser overlay depends on both the walkthrough and the fleet source.
+The native walkthrough world used by BF01 has no camera overlay dependency.
+Fleet entries carry no vehicle poses, frames, telemetry, or control ports.
 """
 import hashlib
 import json
@@ -109,11 +109,14 @@ def load(source=SOURCE):
     if spec['format'] != FORMAT or spec['id'] != 'FoyerCameraWall':
         raise ValueError('Unknown camera-wall composition')
     exact(spec['sources'], 'walkthrough fleet', 'camera-wall sources')
-    for ref in spec['sources'].values():
+    for role, ref in spec['sources'].items():
         exact(ref, 'source source_sha256', 'camera-wall reference')
-        assembly.validate_reference(ref, root=ROOT)
+        try:
+            assembly.validate_reference(ref, root=ROOT)
+        except (ValueError, OSError) as exc:
+            raise ValueError(f'Camera-wall overlay {role} pin failed: {ref["source"]}') from exc
     settings = spec['settings']
-    exact(settings, 'resolution_px mosaic_rate_hz selected_rate_hz virtual_fov_y_deg near_mm modeled_far_mm virtual_near_mm far_mm stale_after_s history_enabled', 'camera-wall settings')
+    exact(settings, 'resolution_px mosaic_rate_hz mosaic_max_view_distance_mm selected_rate_hz virtual_fov_y_deg near_mm modeled_far_mm virtual_near_mm far_mm stale_after_s history_enabled', 'camera-wall settings')
     resolution = settings['resolution_px']
     if not isinstance(resolution, list) or len(resolution) != 2 or any(type(v) is not int or not 16 <= v <= 1920 for v in resolution):
         raise ValueError('Bounded integer camera resolution required')
@@ -214,6 +217,13 @@ def _viewpoint(objects, identity):
     return min(candidates, key=lambda obj: obj['id'])['viewpoint'] if candidates else None
 
 
+def _device_location_key(camera, level_heights):
+    level = camera['level_id'] or ''
+    room = tuple(int(part) if index % 2 else part.casefold()
+                 for index, part in enumerate(re.split(r'(\d+)', camera['location'])))
+    return level_heights.get(level, math.inf), level, room
+
+
 def compile(program, interface, source=SOURCE):
     """Return derived views; no state, camera frame, or inventory is persisted."""
     path, spec = load(source)
@@ -293,7 +303,7 @@ def compile(program, interface, source=SOURCE):
         vehicle = prefix + str(n).zfill(len(start))
         camera = _overview('BF01.' + vehicle, vehicle + ' · Flottenkamera',
                            {'id': 'BF01', 'room': 'Flotte nicht angebunden', 'level_id': None},
-                           None, settings, 'fleet')
+                           None, settings, 'transporter')
         camera.update(kind='modeled_camera', availability='not_connected',
                       near_mm=settings['near_mm'], far_mm=settings['modeled_far_mm'],
                       origin_label='Vorgesehene Modellkamera · Flotte nicht angebunden',
@@ -305,10 +315,14 @@ def compile(program, interface, source=SOURCE):
     for camera in cameras:
         if camera['availability'] == 'missing_viewpoint':
             gaps.append({'device_id': camera['device_id'], 'reason': 'missing_viewpoint'})
-    order = {'transporter': 0, 'robot': 1, 'device': 2, 'fleet': 3}
+    order = {'transporter': 0, 'robot': 1, 'device': 2}
     cameras.sort(key=lambda camera: (order[camera['category']], camera['device_id'], camera['id']))
+    # Keep the first available views in stable identity order for the startup mosaic.
     defaults = [camera['id'] for camera in cameras if camera['availability'] == 'available'][:monitor_count]
     defaults += [None] * (monitor_count - len(defaults))
+    level_heights = {level['id']: level['z_mm'] for level in program.get('levels', [])}
+    cameras.sort(key=lambda camera: (order[camera['category']],
+                                    _device_location_key(camera, level_heights) if camera['category'] == 'device' else ()))
     return {'format': FORMAT, 'id': spec['id'], 'cameras': cameras, 'gaps': gaps,
             'default_assignments': defaults, 'settings': dict(settings),
             'source_files_sha256': pins,

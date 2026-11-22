@@ -16,7 +16,8 @@ class PublicationTests(unittest.TestCase):
         self.program['source_files_sha256'] = {'model/current.json': 'a'*64}
         self.payload = copy.deepcopy(self.program)
         for name in ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
-                     'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js'):
+                     'scripts/walkthrough_world.py', 'scripts/building_walkthrough_viewer.html',
+                     'scripts/walkthrough_interaction.js'):
             self.payload['source_files_sha256'][name] = hashlib.sha256((publication.ROOT/name).read_bytes()).hexdigest()
         self.payload['scenes'] = {'building': {'groups': [{'id': 'Computer_MonitorScreen'}, {'id': 'Door'}]}}
 
