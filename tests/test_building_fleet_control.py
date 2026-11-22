@@ -7,6 +7,7 @@ import math
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_fleet_control as control
 import building_fleet_model as model
@@ -169,6 +170,45 @@ class ControllerTests(unittest.TestCase):
         front,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[[0.,1000.]]},0.)
         self.assertEqual(parallel,empty)
         self.assertLess(front,parallel)
+
+    def test_current_tangent_does_not_invent_a_hazard_beyond_a_future_bend(self):
+        c=control.Controller.__new__(control.Controller)
+        c.path=motion.Path([[0,0],[1000,0],[1000,2000]],trim_mm=100)
+        c.goal=c.path.length;c.y=300.;c.source=self.source;c.settings=model.resolved_sensor(self.source)
+        c.radius=math.hypot(256,206);c.half_length=256.;c.half_width=206.;c.heading_offset=0.;c.static_return=None
+        c.record_times=[0.];c.now=0.;c.recorded=[{'pose_mm_rad':c.path.evaluate(c.y)[0]}]
+        empty,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[]},0.)
+        beyond_bend,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[[0.,1700.]]},0.)
+        on_future_curve,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[[800.,700.]]},0.)
+        immediate_body,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[[50.,100.]]},0.)
+        self.assertEqual(beyond_bend,empty)
+        self.assertLess(on_future_curve,empty)
+        self.assertLess(immediate_body,c.settings['clearance_mm'])
+
+    def test_short_s_curve_has_an_actual_quantized_stop_when_analytic_bounds_reject(self):
+        c=self.controller(motion.Path([[0,0],[1000,0],[1000,160],[2000,160]]),zone_caps=[(0,300)])
+        self.run_controller(c,maximum_s=120)
+        self.assert_bounded_recording(c)
+        self.assertEqual(c.stops,0)
+        self.assertTrue(any(row['kind']=='exact_stop_fallback'for row in c.profile_checks))
+
+    def test_extended_stop_search_remains_bounded_by_observation_and_rejects_failed_pva(self):
+        c=self.controller(motion.Path([[0,0],[1000,0],[1000,160],[2000,160]]),zone_caps=[(0,300)])
+        c.y=1000.;c.v=5.;c.a=0.;c.plan=None;attempts=[]
+        def reject(clock,origin):attempts.append(clock);return False,{}
+        c._admissible=reject
+        with patch.object(control,'_scalar_stop_catalogue',return_value=iter(())):
+            with self.assertRaisesRegex(RuntimeError,'No bounded'):c._checked_brake()
+        self.assertTrue(attempts)
+        reaction=c.settings['period_s']+c.settings['latency_s']+c.settings['stale_after_s']
+        closing=max(c._zone_cap_at(c.y),c.settings['maximum_obstacle_closing_speed_mm_s'])
+        inflation=c.settings['range_error_mm']+c.settings['range_mm']*math.sin(math.radians(c.settings['angular_step_deg']))+c.source['geometry']['localization_tolerance_mm']
+        visible=c.settings['range_mm']-c.radius-inflation
+        for clock in attempts:
+            distance=clock.points[-1][F[0]][0]
+            required=c.settings['clearance_mm']+distance+(c._zone_cap_at(c.y)+closing)*reaction+closing*clock.times[-1]
+            self.assertLess(required,visible)
+            self.assertLessEqual(c.y+distance,c.goal)
 
     def test_unwrapped_initial_heading_is_equivalent_and_requires_rest(self):
         c=self.controller();c.align_initial_heading(2*math.pi)

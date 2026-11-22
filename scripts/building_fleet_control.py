@@ -379,6 +379,7 @@ class Controller(local.LocalController):
         else:
             clock=self._final_deceleration()
             if clock is None:
+                rejected=[]
                 closing=max(self._zone_cap_at(self.y),self.settings['maximum_obstacle_closing_speed_mm_s'])
                 rows=_scalar_stop_catalogue(round(self.v,5),round(self.a,5),self.limits['acceleration'],self.limits['jerk'],closing)
                 for row in rows:
@@ -388,6 +389,51 @@ class Controller(local.LocalController):
                     if row['interval_bounds']is None:row['interval_bounds']=[floor.motion.bounds([a,b])for a,b in zip(row['clock'],row['clock'][1:])]
                     bounds=list(row['interval_bounds']);bounds[0]=floor.motion.bounds(points[:2])
                     if self._analytic_stop_ok(candidate,bounds):clock=candidate;clock._bf01_origin=self.y;break
+                    if all(bound[F[1]]['min'][0]>=-1e-8 for bound in bounds):rejected.append(candidate)
+                if clock is None:
+                    # Independent absolute derivative bounds can reject a
+                    # valid correlated Cartesian PVA, especially in a short
+                    # cabin curve. Only the actual quantized exported curve
+                    # may accept such a candidate; all source limits, zones
+                    # and the no-stop rule still apply without wider padding.
+                    for candidate in rejected:
+                        valid,actual=self._admissible(candidate,self.y)
+                        if valid:
+                            clock=candidate;clock._bf01_origin=self.y
+                            self.profile_checks.append({'kind':'exact_stop_fallback','progress_mm':self.y,
+                                'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
+                            break
+                if clock is None:
+                    # The scalar family is finite. A tight yaw curve may
+                    # require a longer, lower-acceleration stop even at very
+                    # low linear speed. Search only within the unchanged
+                    # observation budget, never past the own route endpoint.
+                    _,velocity,acceleration=self.path.pva(self.y,self.v,self.a)
+                    duration=max(.01,self.v/self.limits['acceleration'],
+                        math.sqrt(self.v/self.limits['jerk']),abs(self.a)/self.limits['jerk'],
+                        1.5*abs(velocity[2])/self.angular['acceleration'],
+                        math.sqrt(6*abs(velocity[2])/self.angular['jerk']),
+                        abs(acceleration[2])/self.angular['jerk'])
+                    reaction=self.settings['period_s']+self.settings['latency_s']+self.settings['stale_after_s']
+                    inflation=self.settings['range_error_mm']+self.settings['range_mm']*math.sin(math.radians(self.settings['angular_step_deg']))+self.source['geometry']['localization_tolerance_mm']
+                    available=self.settings['range_mm']-self.radius-inflation-self.settings['clearance_mm']-(self._zone_cap_at(self.y)+closing)*reaction
+                    while duration*closing<available:
+                        duration=math.ceil(duration*1000)/1000
+                        if self.a<0 and duration>3*self.v/(-self.a)+1e-8:break
+                        distance=self.v*duration/2+self.a*duration*duration/12
+                        if distance<=0 or self.y+distance>self.goal+1e-5 or distance+closing*duration>=available:break
+                        raw=floor.motion.Curve([local.point(0,0,self.v,self.a),local.point(duration,distance,0,0)])
+                        candidate=self._quantized_clock(raw,self.y)
+                        scalar=floor.motion.bounds(candidate)
+                        if (scalar[F[1]]['min'][0]>=-1e-8 and all(scalar[field]['max_abs'][0]<=self.limits[name]*(1+1e-6)
+                                for field,name in zip(F[1:],('velocity','acceleration','jerk')))):
+                            valid,actual=self._admissible(candidate,self.y)
+                            if valid:
+                                clock=candidate;clock._bf01_origin=self.y
+                                self.profile_checks.append({'kind':'exact_stop_extension','progress_mm':self.y,
+                                    'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
+                                break
+                        duration*=1.1
             if clock is None:raise RuntimeError('No bounded own protective-stop enclosure; replan before execution')
             self._brake_cache=(key,clock)
         if strict and not getattr(clock,'_bf01_continuation',None):
@@ -484,7 +530,12 @@ class Controller(local.LocalController):
                 gap=min(gap,along-self.y-half_length-inflation)
             relative=[point[k]-own[k]for k in range(2)];ahead=relative[0]*tc+relative[1]*ts
             sideways=abs(-relative[0]*ts+relative[1]*tc)
-            if ahead>=0 and sideways<=self.half_width+self.settings['clearance_mm']+inflation:
+            # Immediate body protection must not extrapolate the current
+            # tangent indefinitely beyond a bend in the own future curve.
+            # The future-path projection above retains every forward hazard
+            # on that curve. This second test covers its current body only.
+            if (0<=ahead<=self.half_length+self.settings['clearance_mm']+inflation
+                    and sideways<=self.half_width+self.settings['clearance_mm']+inflation):
                 gap=min(gap,ahead-self.half_length-inflation)
         return gap,'perception_range_budget'if gap==visible_gap else'local_obstacle'
 
