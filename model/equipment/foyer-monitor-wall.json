@@ -43,11 +43,11 @@
     "back_gap_mm": 30
   },
   "grid": {
-    "rows": 3,
-    "columns": 3,
+    "rows": 4,
+    "columns": 5,
     "horizontal_gap_mm": 40,
     "vertical_gap_mm": 40,
     "case_bottom_mm": 1100
   },
-  "basis": "Owner-selected 3x3 display array on the EG lift wall facing the foyer; all dimensions, mounting and ergonomics are unqualified presentation assumptions."
+  "basis": "Owner-selected display array on the EG lift wall facing the foyer; all dimensions, mounting and ergonomics are unqualified presentation assumptions."
 }

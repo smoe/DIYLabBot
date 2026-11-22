@@ -1,7 +1,7 @@
 # Gebäude im Browser erkunden
 
-Die [Kamerawand im EG-Foyer](foyer-camera-wall.md) ergänzt neun auswählbare
-Modellansichten an der Aufzugaußenwand. Ein Monitorklick öffnet die
+Die [Kamerawand im EG-Foyer](foyer-camera-wall.md) zeigt auswählbare
+Modellansichten auf 20 Monitoren an der Aufzugaußenwand. Ein Monitorklick öffnet die
 Großansicht. Transporter ohne Kamera beziehungsweise ohne laufenden Player
 liefern keine Bilder; reale Streams und Aufzeichnungen sind nicht angebunden.
 

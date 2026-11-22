@@ -15,37 +15,48 @@ import build_foyer_monitor_wall_native as builder
 
 
 class NativeScopeTests(unittest.TestCase):
-    def fixture(self):
+    def fixture(self, rows=4, columns=5):
         wall = {'level_id':'EG','area':'R0_019','wall':'W052',
-                'wall_body_id':'EG__Wall_W052','body_ids':[],'monitors':[]}
+                'wall_body_id':'EG__Wall_W052','body_ids':[],'monitors':[],
+                'grid_rows':rows,'grid_columns':columns}
         geometry = []; operations = []
-        for index in range(9):
+        for index in range(rows*columns):
+            row,column = divmod(index,columns)
+            x,z = column*20,(rows-1-row)*20
             identity = 'Monitor'+str(index)
             bodies = [identity+'_'+part for part in ('Case','Screen','Mount')]
             wall['monitors'].append({'id':identity,'body_ids':bodies,
                 'case_body_id':bodies[0],'screen_body_id':bodies[1],
-                'screen_frame':{'origin_mm':[index*20+5,2,5], 'x_axis':[1,0,0],
+                'screen_frame':{'origin_mm':[x+5,2,z+5], 'x_axis':[1,0,0],
                     'y_axis':[0,0,1],'normal':[0,-1,0],'width_mm':10,'height_mm':10}})
             wall['body_ids'].extend(bodies)
             for offset,name in enumerate(bodies):
-                lo = [index*20,offset*2,0]; hi = [index*20+10,offset*2+1,10]
+                lo = [x,offset*2,z]; hi = [x+10,offset*2+1,z+10]
                 geometry.append({'body':name,'bbox':{'min':lo,'max':hi}})
                 operations.append({'body':name,'action':'create','shape':{
                     'kind':'box','origin':lo,'size':[10,1,10]}})
         return wall,geometry,operations
 
-    def test_nine_complete_instances_use_all_native_body_ids(self):
-        wall,geometry,operations = self.fixture()
-        names = [row['body'] for row in geometry]+[wall['wall_body_id']]
-        self.assertEqual(len(audit.validate_scope(wall,names)),9)
-        geometry.append({'body':wall['wall_body_id'],'bbox':{'min':[-1,-1,-1],'max':[1,1,1]}})
-        self.assertTrue(all(row['passed'] for row in audit.geometry_checks(wall,geometry,operations)))
+    def test_complete_instances_use_all_bodies_in_the_declared_grid(self):
+        for rows,columns in ((4,5),(3,3)):
+            with self.subTest(rows=rows,columns=columns):
+                wall,geometry,operations = self.fixture(rows,columns)
+                names = [row['body'] for row in geometry]+[wall['wall_body_id']]
+                self.assertEqual(len(audit.validate_scope(wall,names)),rows*columns)
+                geometry.append({'body':wall['wall_body_id'],'bbox':{'min':[-1,-1,-1],'max':[1,1,1]}})
+                checks = audit.geometry_checks(wall,geometry,operations)
+                self.assertEqual(len(checks),4*rows*columns)
+                self.assertTrue(all(row['passed'] for row in checks))
 
     def test_duplicate_missing_or_wrong_facing_instances_fail(self):
         wall,geometry,_ = self.fixture(); names = [row['body']for row in geometry]+[wall['wall_body_id']]
         for change in (
+            lambda w:w.pop('grid_rows'),
+            lambda w:w.update(grid_columns=4),
             lambda w:w['monitors'].pop(),
             lambda w:w['monitors'][1].update(id=w['monitors'][0]['id']),
+            lambda w:w['monitors'][0]['body_ids'].pop(),
+            lambda w:w['monitors'][0].update(screen_body_id=w['monitors'][0]['case_body_id']),
             lambda w:w['monitors'][0]['screen_frame'].update(normal=[0,1,0]),
             lambda w:w['monitors'][0]['screen_frame'].update(width_mm=float('nan')),
             lambda w:w.update(area='Other'),
@@ -54,6 +65,7 @@ class NativeScopeTests(unittest.TestCase):
             with self.subTest(change=change),self.assertRaises(ValueError):
                 audit.validate_scope(broken,names)
         with self.assertRaises(ValueError):audit.validate_scope(wall,names[:-1])
+        with self.assertRaises(ValueError):audit.validate_scope(wall,names[1:])
 
     def test_measurement_drift_fails_without_loading_cad(self):
         wall,geometry,operations = self.fixture()

@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "73a7d98121d856452b0310cf3fdb26e59f57793d8ba435f238de75418bacd4aa"
+      "source_sha256": "691355b3701ccb23acd1b3125b1114f4038ee4ece283408183775ed82520e9db"
     }
   },
   "settings": {

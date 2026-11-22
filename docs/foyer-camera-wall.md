@@ -1,6 +1,6 @@
 # Kamerawand im EG-Foyer
 
-Die Außenwand des Aufzugs zum Foyer trägt neun Monitore im Raster 3×3.
+Die Außenwand des Aufzugs zum Foyer trägt 20 Monitore in fünf Spalten und vier Reihen.
 Der Blickpunkt **Kamerawand · EG** im Gebäuderundgang führt dorthin.
 Einen Monitor anklicken oder aus der Nähe mit der Leertaste auswählen:
 Die Großansicht bietet die Kameraauswahl für diesen Platz. **Schließen**
@@ -21,7 +21,9 @@ sind ausgenommen. Eine Gerätequelle allein ist keine aufgestellte Instanz.
 Unklassifizierte Gerätetypen und fehlende Blickpunkte erscheinen als Lücken.
 
 Aktuell sind **25 Ansichten verfügbar**: sechs Armkameras und 19 virtuelle
-Geräteübersichten. Für CF01, Spitzensammelstation T01, Waage, Kühlschrank,
+Geräteübersichten. Beim Start zeigen die 20 Monitore unterschiedliche Ansichten.
+Über die Auswahl auf jedem Monitor sind alle 25 erreichbar.
+Für CF01, Spitzensammelstation T01, Waage, Kühlschrank,
 Wasserbad und TapeStation fehlen quellgebundene Blickpunkte. Diese sechs
 Einträge zeigen kein erfundenes Bild. Der statische L01-TR01 hat **keine
 Kamera modelliert**. Die 20 vorgesehenen BF01-Kameras stehen separat als
@@ -38,12 +40,12 @@ nicht „keine Störung“.
 
 `model/equipment/foyer-monitor-wall.json` führt Aufstellung und lokale
 Typableitung des vorhandenen Bürodisplays; der Katalog bleibt unverändert.
-Der aufgelöste EG-Plan liefert W052 und die Foyerseite R0_019. Neun Instanzen
-bestehen jeweils aus Gehäuse, Bildschirm und Halter. Dieselben 27 Körper
+Der aufgelöste EG-Plan liefert W052 und die Foyerseite R0_019. Die 20 Instanzen
+bestehen jeweils aus Gehäuse, Bildschirm und Halter. Dieselben 60 Körper
 werden unabhängig in FreeCAD und SolidCraft erzeugt und bleiben gebäudefest.
 
 Maßstab 1, 40 mm Zwischenräume, 1100 mm Gehäuseunterkante und 30 mm
-Rückabstand sind Darstellungsannahmen. Die Typmaße ergeben 1700×1070 mm.
+Rückabstand sind Darstellungsannahmen. Die Typmaße ergeben 2860 × 1440 mm.
 Wandlänge und Randabstände werden aus den gemeinsamen Quellen berechnet und
 nativ gegengeprüft. Vermessung, Montagefestigkeit und Ergonomie fehlen.
 
@@ -101,7 +103,22 @@ Abstandsuntergrenzen werden protokolliert. Das ist kein vollständiger
 SolidCraft-Gebäudevergleich. Geprüft werden statische Körper; Türschwenkräume,
 reale Gangfreiheit, Montagefestigkeit und Sicherheitsqualifikation bleiben offen.
 
-## Prüfstand dieser Erweiterung
+## Prüfstand der 5×4-Fassung
+
+Der native Vergleich bestätigt 20 Instanzen mit 60 Monitorkörpern. FreeCAD
+prüft das vollständige Gebäude, SolidCraft die separat erzeugte Nachbarschaft
+mit 211 Körpern. In der statischen Aufstellung betragen die kleinsten Abstände
+zu anderen Körpern in beiden CADs rund 123 Darstellungs-mm. Die vorgesehenen
+Halterkontakte an W052 werden getrennt ausgewiesen.
+
+Die 102 gezielten Python-Tests und der Chrome-Test mit Metal bestehen. Vom
+EG-Blickpunkt sind alle Bildflächen sichtbar. Ein Klick auf Monitor 20 und die
+Leertaste auf dem mittleren Monitor öffnen die jeweilige Großansicht. Während
+der Großansicht aktualisieren auch die übrigen Monitore weiter. Im kurzen
+Messfenster auf Apple M1 erreichten die 20 Mosaikbilder je rund 1 Hz und die
+Großansicht rund 4,6 Hz. Die Messung gilt für diesen lokalen Prüfstand.
+
+## Prüfstand der früheren 3×3-Fassung
 
 123 unterschiedliche Python-Prüffälle bestehen ohne Skip. Zusätzlich bestehen
 die Node-Prüfungen zu Kameramathematik und konservativem Sichtkegel sowie die

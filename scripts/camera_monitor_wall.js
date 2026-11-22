@@ -24,13 +24,19 @@
   function imageSize(value){if(!Array.isArray(value)||value.length!==2||value.some(v=>!Number.isInteger(v)||v<16||v>1920))throw Error('Invalid monitor image size');return value.slice();}
   const unavailable={no_camera:'Keine Kamera modelliert',not_connected:'Flotte nicht angebunden',missing_viewpoint:'Kein Blickpunkt vorhanden'};
   function create({config,wall,gl,host,capture,visible,requestRender,focusMain}){
-    if(!wall||wall.monitors.length!==9||!Array.isArray(config.cameras))throw Error('Nine source-bound monitors required');
+    const rows=wall?.grid_rows,columns=wall?.grid_columns;
+    if(!Number.isInteger(rows)||rows<1||!Number.isInteger(columns)||columns<1||
+      !Array.isArray(wall.monitors)||wall.monitors.length!==rows*columns||!Array.isArray(config.cameras))throw Error('Source-bound monitor grid required');
     const [width,height]=imageSize(config.settings.resolution_px);
     const mosaicMs=1000/config.settings.mosaic_rate_hz,selectedMs=1000/config.settings.selected_rate_hz;
     if(!(mosaicMs>=1000/30&&selectedMs>=1000/30))throw Error('Invalid monitor refresh rate');
+    const mosaicSpacingMs=mosaicMs/wall.monitors.length;
     const cameras=new Map(config.cameras.map(c=>[c.id,c]));
     if(cameras.size!==config.cameras.length)throw Error('Duplicate monitor camera');
-    let selected=null,timer=null,disposed=false,nextCapture=0,cursor=0;
+    const defaults=config.default_assignments;
+    if(!Array.isArray(defaults)||defaults.length!==wall.monitors.length||
+      defaults.some(id=>id!==null&&cameras.get(id)?.availability!=='available'))throw Error('Invalid default monitor assignments');
+    let selected=null,timer=null,disposed=false,nextCapture=0,cursor=0,lastCaptureWasSelected=false;
     const panel=document.createElement('section');panel.className='camera-wall-panel';panel.hidden=true;panel.setAttribute('aria-label','Kameraansicht');
     const close=document.createElement('button');close.type='button';close.className='quiet-button';close.textContent='Schließen';
     const title=document.createElement('h2'),select=document.createElement('select'),label=document.createElement('label');
@@ -39,6 +45,9 @@
     const details=document.createElement('p'),notice=document.createElement('p');details.setAttribute('role','status');notice.className='notice';
     notice.textContent='Modellansichten · keine Aufzeichnung · keine Meldungsquelle angebunden';
     const options=new Map();
+    if(defaults.includes(null)){
+      const option=document.createElement('option');option.value='';option.textContent='Keine Bildquelle';option.disabled=true;select.append(option);
+    }
     for(const c of cameras.values()){
       const group=c.availability==='not_connected'?'BF01 · nicht angebunden':c.availability==='available'?'Verfügbare Ansichten':'Ohne Bildquelle';
       if(!options.has(group)){const node=document.createElement('optgroup');node.label=group;options.set(group,node);select.append(node);}
@@ -47,8 +56,10 @@
     panel.append(close,title,label,select,image,details,notice);host.append(panel);
     const large=image.getContext('2d'),scratch=document.createElement('canvas');scratch.width=width;scratch.height=height;
     const scratchContext=scratch.getContext('2d');
+    const bitmap=new ImageData(width,height),pixels=new Uint8Array(bitmap.data.buffer);
     function texture(){const t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);return t;}
-    const slots=wall.monitors.map((monitor,i)=>{const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;return {monitor,camera_id:config.default_assignments[i]||config.cameras[0]?.id,canvas,context:canvas.getContext('2d'),texture:texture(),frames:0,last_capture:null,first_capture:null,last_status:0,duration_ms:0,next_due:i*mosaicMs/9,error:null,hash:null,frame:null};});
+    const startedAt=performance.now();
+    const slots=wall.monitors.map((monitor,i)=>{const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;return {monitor,camera_id:defaults[i],canvas,context:canvas.getContext('2d'),texture:texture(),frames:0,last_capture:null,first_capture:null,last_status:0,duration_ms:0,next_due:startedAt+i*mosaicSpacingMs,error:null,hash:null,frame:null};});
     const framebuffer=gl.createFramebuffer(),color=texture(),depth=gl.createRenderbuffer();
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,width,height,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
     gl.bindRenderbuffer(gl.RENDERBUFFER,depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT24,width,height);
@@ -56,6 +67,7 @@
     if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)throw Error('Monitor framebuffer incomplete');gl.bindFramebuffer(gl.FRAMEBUFFER,null);
     function state(slot){
       if(slot.error)return 'Darstellungsfehler';
+      if(slot.camera_id===null)return 'Keine Bildquelle';
       const missing=unavailable[cameras.get(slot.camera_id)?.availability];if(missing)return missing;
       if(document.hidden)return 'Anzeige pausiert';
       if(slot.last_capture===null)return 'Bild wird vorbereitet';
@@ -63,7 +75,8 @@
     }
     function caption(slot,now){
       const camera=cameras.get(slot.camera_id),age=slot.last_capture===null?null:Math.max(0,now-slot.last_capture)/1000;
-      return [camera?.label||'Keine Bildquelle',camera?.id+' · '+(camera?.location||camera?.level_id||'Nicht angebunden'),state(slot)+(age===null?'':' · Bildalter '+age.toFixed(1)+' s Browserzeit'),camera?.origin_label||'Keine Bildquelle'];
+      const status=state(slot)+(age===null?'':' · Bildalter '+age.toFixed(1)+' s Browserzeit');
+      return camera?[camera.label,camera.id+' · '+(camera.location||camera.level_id||'Nicht angebunden'),status,camera.origin_label]:[status];
     }
     function decorate(slot,now){
       const camera=cameras.get(slot.camera_id),ctx=slot.context;
@@ -75,42 +88,54 @@
     function upload(slot){gl.bindTexture(gl.TEXTURE_2D,slot.texture);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,slot.canvas);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);}
     function placeholder(slot){const ctx=slot.context;ctx.fillStyle='#142526';ctx.fillRect(0,0,width,height);ctx.fillStyle='#f1eee2';ctx.font='12px sans-serif';caption(slot,performance.now()).forEach((text,i)=>ctx.fillText(text,10,35+i*25,width-20));upload(slot);}
     slots.forEach(placeholder);
-    function refreshUI(){if(selected===null)return;const slot=slots[selected];title.textContent=slot.monitor.label;select.value=slot.camera_id;large.drawImage(slot.canvas,0,0);details.textContent=caption(slot,performance.now()).join(' · ')+(slot.frame?.model_time_s===null||slot.frame?.model_time_s===undefined?'':' · Arm-Modellzeit '+slot.frame.model_time_s.toFixed(2)+' s')+(slot.error?' · '+slot.error:'');}
+    function refreshUI(){if(selected===null)return;const slot=slots[selected];title.textContent=slot.monitor.label;select.value=slot.camera_id??'';large.drawImage(slot.canvas,0,0);details.textContent=caption(slot,performance.now()).join(' · ')+(slot.frame?.model_time_s===null||slot.frame?.model_time_s===undefined?'':' · Arm-Modellzeit '+slot.frame.model_time_s.toFixed(2)+' s')+(slot.error?' · '+slot.error:'');}
     function assign(index,id){const slot=slots[index];if(!slot||!cameras.has(id))return {status:'unknown_target'};slot.camera_id=id;slot.error=null;slot.frames=0;slot.hash=null;slot.frame=null;slot.last_capture=null;slot.first_capture=null;slot.next_due=0;placeholder(slot);refreshUI();requestRender();return {status:'accepted'};}
     function open(index){if(!slots[index])return {status:'unknown_target'};selected=index;panel.hidden=false;refreshUI();select.focus();slots[index].next_due=0;return {status:'accepted',id:slots[index].monitor.id};}
     function shut(){panel.hidden=true;selected=null;focusMain();requestRender();}
     close.addEventListener('click',shut);panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();shut();}});
     select.addEventListener('change',()=>assign(selected,select.value));
-    function captureSlot(index,now=performance.now()){
-      const slot=slots[index],camera=cameras.get(slot?.camera_id);if(!slot||!camera)return {status:'unknown_target'};
-      if(camera.availability!=='available'){placeholder(slot);refreshUI();return {status:camera.availability};}
+    function captureSlot(index,wallVisible=visible()){
+      const slot=slots[index];if(!slot)return {status:'unknown_target'};
+      const camera=cameras.get(slot.camera_id);if(!camera)return {status:'unassigned'};
+      if(camera.availability!=='available')return {status:camera.availability};
       const started=performance.now();
       try{
         gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);gl.viewport(0,0,width,height);
-        const frame=capture(camera,width,height),pixels=new Uint8Array(width*height*4);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+        const frame=capture(camera,width,height);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
         const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('Camera drawing error '+code);
         // RGB already includes glass blended over the opaque scene background.
         // Copying residual GL alpha would blend older placeholder text into a frame.
         for(let i=3;i<pixels.length;i+=4)pixels[i]=255;
         slot.hash=digest(pixels);slot.frame=frame;
-        const bitmap=new ImageData(new Uint8ClampedArray(pixels.buffer),width,height);scratchContext.putImageData(bitmap,0,0);
+        scratchContext.putImageData(bitmap,0,0);
         const ctx=slot.context;ctx.save();ctx.translate(0,height);ctx.scale(1,-1);ctx.drawImage(scratch,0,0);ctx.restore();
         slot.last_capture=performance.now();if(slot.first_capture===null)slot.first_capture=slot.last_capture;slot.frames++;slot.error=null;slot.duration_ms=performance.now()-started;decorate(slot,slot.last_capture);upload(slot);
       }catch(error){slot.error=error.message||String(error);placeholder(slot);}
       finally{gl.bindFramebuffer(gl.FRAMEBUFFER,null);gl.viewport(0,0,gl.canvas.width,gl.canvas.height);}
-      refreshUI();if(visible())requestRender();return {status:slot.error?'error':'captured'};
+      if(index===selected)refreshUI();if(wallVisible)requestRender();return {status:slot.error?'error':'captured'};
     }
+    const due=(slot,now)=>slot.next_due<=now&&cameras.get(slot.camera_id)?.availability==='available';
     function tick(){
-      if(disposed)return;const now=performance.now();
-      if(!document.hidden&&(selected!==null||visible())){
-        // At most one scene pass per timer turn; spread mosaic work across a second.
+      if(disposed)return;const now=performance.now(),wallVisible=!document.hidden&&visible();
+      if(!document.hidden&&(selected!==null||wallVisible)){
+        // Use one pass per turn. Alternate when a selected and a mosaic view are both due.
         if(now>=nextCapture){
-          let index=selected!==null&&slots[selected].next_due<=now?selected:null;
-          if(index===null&&visible())for(let n=0;n<9;n++){const i=(cursor+n)%9;if(slots[i].next_due<=now){index=i;cursor=(i+1)%9;break;}}
-          if(index!==null){captureSlot(index,now);const completed=performance.now();slots[index].next_due=completed+(index===selected?selectedMs:mosaicMs);nextCapture=completed+Math.min(30,mosaicMs/9);}
+          const selectedDue=selected!==null&&due(slots[selected],now);
+          let index=selectedDue&&!lastCaptureWasSelected?selected:null;
+          if(index===null&&wallVisible)for(let n=0;n<slots.length;n++){
+            const i=(cursor+n)%slots.length;
+            if(i!==selected&&due(slots[i],now)){index=i;cursor=(i+1)%slots.length;break;}
+          }
+          if(index===null&&selectedDue)index=selected;
+          if(index!==null){
+            captureSlot(index,wallVisible);const completed=performance.now();lastCaptureWasSelected=index===selected;
+            slots[index].next_due=completed+(lastCaptureWasSelected?selectedMs:mosaicMs);
+            nextCapture=completed+Math.min(30,mosaicSpacingMs);
+          }
         }
-        for(const slot of slots)if(slot.last_capture!==null&&now-slot.last_status>1000){decorate(slot,now);upload(slot);requestRender();}
-        refreshUI();
+        for(const [i,slot] of slots.entries())if((wallVisible||i===selected)&&!slot.error&&slot.last_capture!==null&&now-slot.last_status>1000){
+          decorate(slot,now);upload(slot);if(i===selected)refreshUI();if(wallVisible)requestRender();
+        }
       }
       timer=setTimeout(tick,30);
     }
@@ -120,7 +145,7 @@
     window.addEventListener('pageshow',()=>{if(!disposed&&timer===null)tick();});
     gl.canvas.addEventListener('webglcontextlost',dispose,{once:true});
     return {open,assign,captureSlot,dispose,get selected(){return selected;},get textures(){return disposed?new Map():new Map(slots.map(s=>[s.monitor.screen_body_id,s.texture]));},
-      get snapshot(){const now=performance.now();return {selected,texture_count:disposed?0:10,framebuffer_count:disposed?0:1,resolution_px:[width,height],slots:slots.map(s=>({id:s.monitor.id,camera_id:s.camera_id,status:state(s),error:s.error,frames:s.frames,image_hash:s.hash,frame:s.frame,captured_browser_ms:s.last_capture,age_s:s.last_capture===null?null:(now-s.last_capture)/1000,render_duration_ms:s.duration_ms,measured_rate_hz:s.frames<2?null:(s.frames-1)*1000/(s.last_capture-s.first_capture)}))};}};
+      get snapshot(){const now=performance.now();return {selected,texture_count:disposed?0:slots.length+1,framebuffer_count:disposed?0:1,renderbuffer_count:disposed?0:1,resolution_px:[width,height],slots:slots.map(s=>({id:s.monitor.id,camera_id:s.camera_id,status:state(s),error:s.error,frames:s.frames,image_hash:s.hash,frame:s.frame,captured_browser_ms:s.last_capture,age_s:s.last_capture===null?null:(now-s.last_capture)/1000,render_duration_ms:s.duration_ms,measured_rate_hz:s.frames<2?null:(s.frames-1)*1000/(s.last_capture-s.first_capture)}))};}};
   }
   const api={pose,projection,digest,imageSize,create};if(typeof module!=='undefined'&&module.exports)module.exports=api;scope.CameraMonitorWall=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -36,7 +36,7 @@
     },
     "monitor_wall": {
       "source": "model/equipment/foyer-monitor-wall.json",
-      "source_sha256": "ab5e2dfdb5ac3840f7db95b51b18b2fe92454f7bc3971611d353259a39e107d8"
+      "source_sha256": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31"
     }
   },
   "calibration": null,

@@ -30,6 +30,12 @@ def number(value, minimum, maximum, where):
     return value
 
 
+def monitor_count(rows, columns):
+    if type(rows) is not int or type(columns) is not int or rows < 1 or columns < 1:
+        raise ValueError('Monitor grid dimensions must be positive integers')
+    return rows*columns
+
+
 def validate(source):
     exact(source, 'format id level area catalog monitor_type anchor grid basis', 'monitor source')
     if (source['format'] != 'solidcraftbot.foyer-monitor-wall/1'
@@ -44,8 +50,7 @@ def validate(source):
     number(anchor['back_gap_mm'], 1, 100, 'monitor wall gap')
     grid = source['grid']
     exact(grid, 'rows columns horizontal_gap_mm vertical_gap_mm case_bottom_mm', 'monitor grid')
-    if type(grid['rows']) is not int or type(grid['columns']) is not int or (grid['rows'], grid['columns']) != (3, 3):
-        raise ValueError('The owner-selected monitor grid must contain nine displays')
+    monitor_count(grid['rows'], grid['columns'])
     for field in ('horizontal_gap_mm', 'vertical_gap_mm'):
         number(grid[field], 1, 200, 'monitor spacing')
     number(grid['case_bottom_mm'], 500, 2000, 'monitor mounting height')
@@ -132,10 +137,13 @@ def compile(ref, plans, p, levels):
                 'body_ids': ids, 'case_body_id': name+'_MonitorCase', 'screen_body_id': name+'_MonitorScreen',
                 'screen_frame': {'origin_mm': origin, 'x_axis': [-v for v in right]+[0], 'y_axis': [0, 0, 1],
                                  'normal': front+[0], 'width_mm': screen['size'][0], 'height_mm': screen['size'][2]}})
-    target = centre+[level['z_mm']+grid['case_bottom_mm']+height/2]
-    target = [target[i]+front[i]*(p['display_thickness']/2+anchor['back_gap_mm']+screen['origin'][1]+screen['size'][1]) for i in (0,1)]+[target[2]]
+    # Aim the walkthrough crosshair at a screen even when the grid centre is a gap.
+    centre_monitor = ((grid['rows']-1)//2)*grid['columns']+(grid['columns']-1)//2
+    target = monitors[centre_monitor]['screen_frame']['origin_mm']
     eye = [target[i]+front[i]*1800 for i in (0,1)]+[level['z_mm']+1600]
     polygon = [[v*p['display_scale'] for v in xy] for xy in floor.outline(plan, area)]
+    if floor.point_membership(eye[:2], polygon) != 1:
+        raise ValueError('Monitor viewpoint must be inside the source foyer area')
     for op in result['operations']:
         bb = bounds.shape_bounds(op['shape'])
         if any(floor.point_membership([x,y],polygon)<0 for x in (bb['min'][0],bb['max'][0]) for y in (bb['min'][1],bb['max'][1])):
@@ -143,6 +151,7 @@ def compile(ref, plans, p, levels):
     result['interface'] = {'id': source['id'], 'level_id': source['level'], 'area': source['area'],
         'wall': wall, 'wall_body_id': source['level']+'__Wall_'+wall, 'scale': 1,
         'body_ids': all_ids, 'monitors': monitors, 'wall_length_mm': length,
+        'grid_rows': grid['rows'], 'grid_columns': grid['columns'],
         'wall_end_margin_mm': edge_margin, 'grid_width_mm': width, 'grid_height_mm': height,
         'case_bottom_mm': grid['case_bottom_mm'], 'back_gap_mm': anchor['back_gap_mm'],
         'viewpoint': {'eye_mm': eye, 'target_mm': target}, 'front': front+[0],
@@ -169,16 +178,32 @@ def clearance_pairs(interface, geometry):
     return pairs
 
 
+def validate_instances(interface, body_names):
+    """Require one disjoint case, screen and mount per declared grid position."""
+    count = monitor_count(interface.get('grid_rows'), interface.get('grid_columns'))
+    monitors = interface.get('monitors', [])
+    bodies = {name for monitor in monitors for name in monitor['body_ids']}
+    expected = interface.get('body_ids', [])
+    if (len(monitors) != count or len({monitor['id'] for monitor in monitors}) != count
+            or len(bodies) != count*3 or len(expected) != count*3
+            or bodies != set(expected) or not bodies <= set(body_names)
+            or interface['wall_body_id'] in bodies):
+        raise ValueError(f'{count} complete disjoint native monitor instances are required')
+    for monitor in monitors:
+        display = {monitor['case_body_id'], monitor['screen_body_id']}
+        if (len(monitor['body_ids']) != 3 or len(display) != 2
+                or not display <= set(monitor['body_ids'])):
+            raise ValueError('Each native monitor must have distinct case, screen and mount bodies')
+    return monitors
+
+
 def native_bounds_checks(interface, geometry):
     """Check complete native instance bounds and world separation in either CAD."""
     if not interface:
         return []
     by_id = {entry['body']: entry for entry in geometry}
-    own = set(interface['body_ids'])
-    if len(own) != 27 or not own <= set(by_id):
-        raise ValueError('Nine complete native monitor instances required')
     checks = []
-    for monitor in interface['monitors']:
+    for monitor in validate_instances(interface, by_id):
         case = by_id[monitor['case_body_id']]['bbox']
         screen = by_id[monitor['screen_body_id']]['bbox']
         normal = monitor['screen_frame']['normal']
