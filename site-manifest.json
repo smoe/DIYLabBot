@@ -2,16 +2,17 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "5a89a32b4fcf471c40cc73e2b803a3a6762a3c68",
+  "source_commit": "7537f9e4a1f3adecb6217faa64aabcbdc231f68a",
+  "integrated_commit": "7537f9e4a1f3adecb6217faa64aabcbdc231f68a",
   "export_revision": "browser",
   "html": {
-    "sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3",
-    "bytes": 51910063
+    "sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6",
+    "bytes": 51911770
   },
-  "source_manifest_sha256": "8166ad86353f6c2a8792ad4f82444849388cb6fc61de10abaaf7e4d54a5cbff0",
+  "source_manifest_sha256": "d19584f48b3273050684c2aa9840667d987680f675d9b47fe7687500d575c4df",
   "native_builds": {
     "building": {
-      "report": "exports/generated/building-stack-f9af02de40c9/build-report.json",
+      "report": "cad/building-stack/shared-build-report.json",
       "report_sha256": "c9e4a43ffc69ec997732bdee58dc70bc3e39201244fcee70a1bfb6e741a4b7db",
       "revision": "building-stack-f9af02de40c9",
       "source_sha256": "f9af02de40c9e33d3d55ec7c09fd342de3bfefe6e30aebfeb6873e324cd498e4",
@@ -127,19 +128,10 @@
     "scripts/marker_label.py": "a4df191542b968cf01370fbbadf8b0ed417914f9811ee7720840d64f712e46fd",
     "scripts/building_room_labels.py": "a0ddfb72c9f203e8b85f0af5588ec38c586ef8754dd210f64a12caa3a79e88ed",
     "scripts/walkthrough_elevator.py": "d92b22b1e9c1ee97116bf936d3057eb7ebf644e29e7adaee0cff246fc6bab21f",
-    "model/foyer-camera-wall.shared.json": "d4c3d3c640a0e83547e55360935b90ddc45cee522a5f12babe10685e0fa5a16b",
-    "model/foyer-camera-wall.schema.json": "e0796ea57a15c80363311f5e49e4a6e12b3a7cd99294a63094dc8be986ee671c",
-    "scripts/monitor_camera_registry.py": "1cbfc3345e90d9c774f547fb0cd98d458b0d1e9063578286a2345e163889c641",
-    "model/building-fleet-demo.shared.json": "24d6e2e904c9423d6bd6ac39063ae486bc03f9d0b0ac14c61566da82d3f8f954",
-    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
-    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
-    "scripts/build_building_walkthrough.py": "fd67d8993dea140de1535cf93a178071e26f0ea2f178ee0235d9dea5edb56adf",
+    "scripts/build_building_walkthrough.py": "e6df6c1a96e051dbdbec95f7f6b9d6601b74f0bdd24751dd828158b4768e0d6c",
+    "scripts/walkthrough_world.py": "e49ae5853a9ae0b83137cf4a350038674607834552b091cd6f448fb2ecbf66dd",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
-    "scripts/building_walkthrough_viewer.html": "d088598f4b7142b597045b48b0d33d0b9c3bdcb327f98e722fdbcff7527762ee",
-    "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
-    "scripts/camera_monitor_wall.js": "41807e395c5220052a271d4131437301cba34b11c02f8a44532209fbea3638ba",
-    "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1",
-    "exports/generated/building-stack-f9af02de40c9/build-report.json": "c9e4a43ffc69ec997732bdee58dc70bc3e39201244fcee70a1bfb6e741a4b7db",
+    "cad/building-stack/shared-build-report.json": "c9e4a43ffc69ec997732bdee58dc70bc3e39201244fcee70a1bfb6e741a4b7db",
     "cad/lab-layout-l01/shared-build-report.json": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6",
     "scripts/build_building_stack.py": "cf1cadee7e3a1e4c7b7718738a91e778405561df8d4427d9475edc7e99cf49f0",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
@@ -148,6 +140,7 @@
     "scripts/extraction_kit_station.py": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203",
     "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
     "scripts/build_neutral_freecad.py": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f",
+    "scripts/robot_cameras.py": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd",
     "scripts/freecad/solidcraftbot_freecad.py": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84",
     "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
     "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
@@ -158,6 +151,7 @@
     "scripts/build_lab_layout.py": "643e7d3ecd969c89ae6e010e49b650a17a36175a414a1e4fe38584b788bb1197",
     "scripts/build_lab_layout_freecad.py": "a1e6aa9137f54572605c2cb3fd4e75d1b824b325d2af70c3f4e4c9e91e76ef22",
     "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
+    "scripts/robot_components.py": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe",
     "scripts/robot_services.py": "62efbf2f4c59676167968fc5efc9ad4b065a85debcbf943f714d38f9f72117e8",
     "scripts/servo_mounting_design.py": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d",
     "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927",
@@ -187,7 +181,15 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef",
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
-    "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4"
+    "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4",
+    "model/foyer-camera-wall.shared.json": "71d9aff55bdbf15ec2c6c6c8dc8056c547b1055d7f2d845d543ec2b6018e2296",
+    "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
+    "scripts/monitor_camera_registry.py": "aefee896a12abc0ee2bb555ffb969356f22afb47e944d75b8f5f868f98d4006f",
+    "model/building-fleet-demo.shared.json": "24d6e2e904c9423d6bd6ac39063ae486bc03f9d0b0ac14c61566da82d3f8f954",
+    "scripts/building_walkthrough_viewer.html": "5395eebf9ca6a66f1198cd15093f3e58de3f26dbfb68b9db76e7ecdbfa98730c",
+    "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
+    "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
+    "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1"
   },
   "qualification": {
     "metric_scale_known": false,
@@ -211,21 +213,20 @@
   ],
   "local_browser_evidence": {
     "camera-wall-browser-report-metal.json": {
-      "sha256": "918cc4314fa07b55ab026c55d34920e6269d6e697e5d0f7973dc76ef1a6e3301",
+      "sha256": "8055c0ac43c944cbd98ae290ec4d07c524a76834d1a451256b1b4eb76d2ecc08",
       "passed": true,
-      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
+      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
+    },
+    "camera-wall-browser-report-swiftshader.json": {
+      "sha256": "6bb092e8e60f1340e55dc1fdc7a41b8b0338b520985cd5c323cdc9f1ea581180",
+      "passed": true,
+      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
     },
     "robot-commands-browser-report.json": {
-      "sha256": "b1c45b0a1ca3a45dd8ae8dc5578cf91ff4ecc2708b7e95d37feee2bfc1fd948c",
+      "sha256": "4d96945ddaafc8f3b56d7e31df8a5f8600a2f02f5c0b55a447529977ac2f6e8c",
       "passed": true,
-      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
-    },
-    "signage-browser-check.json": {
-      "sha256": "1cf8a73ac730f97b7cba691b2569d9ddf9ca48c0db618ca6b3a0e43411679990",
-      "passed": true,
-      "html_sha256": "93314c6a4966ee093faf8981b504e6ccb1f259a3eb5346552c5ffa063c67bdc3"
+      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
     }
   },
-  "update": "Twenty foyer displays in five columns and four rows, plus 80 corridor-facing room signs. Fleet cameras remain disconnected.",
-  "integrated_commit": "5a89a32b4fcf471c40cc73e2b803a3a6762a3c68"
+  "update": "Verified 5 by 4 foyer wall with shared GPU geometry, ground-floor viewing limits and transporter-first camera selection. Camera images are synthetic. The BF01 world is independent of the browser overlay."
 }
