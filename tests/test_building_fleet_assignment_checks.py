@@ -11,7 +11,7 @@ import building_fleet_comm as comm
 import tr01_floor_motion as floor
 
 
-def fixture():
+def fixture(reused_booking=None):
     home={'level':'EG','area':'H','slot':0,'pose_mm_rad':[0,0,0]}
     target={'kind':'inspection_pass','level':'OG1','area':'R','basis':'fixture','weight':1,'minimum_visits':1}
     source={'missions':{'seed':20261120,'targets':[target],'minimum_duration_s':1.,'maximum_duration_s':5.},
@@ -20,6 +20,13 @@ def fixture():
                   'source_level':'EG','booking_id':'booking-1'},
                  {'mission_id':'mission-2','vehicle_id':'BF01','assigned_s':1.,'goal':{'kind':'home',**home},
                   'source_level':'OG1','booking_id':'booking-2'}]
+    receipt_times={'mission-1':.1,'mission-2':1.1}
+    if reused_booking is not None:
+        extra={**copy.deepcopy(assignments[0]),'mission_id':'mission-X','assigned_s':.05,
+               'booking_id':reused_booking}
+        assignments.insert(1,extra)
+        # The .05 + .1 wire due time is just after .15 on the 50 ms world clock.
+        receipt_times['mission-X']=.2
     def snapshot(number,start,end,created,state='active'):
         return {'booking_id':'booking-'+str(number),'vehicle_id':'BF01','mission_id':'mission-'+str(number),
                 'from_level':start,'to_level':end,'source_role':'start','start':{'level':start,'slot':0},
@@ -36,13 +43,15 @@ def fixture():
     for step in range(42):
         now=round(step*.05,3)
         if now in blackouts:channel.set_connected('BF01',blackouts[now],now)
-        for mission,receipt in zip(assignments,(.1,1.1)):
-            if now==receipt:
+        for mission in assignments:
+            if now==receipt_times[mission['mission_id']]:
                 channel.emit('BF01','event',{'event':'mission_assigned','details':{
                     'mission_id':mission['mission_id'],'goal':mission['goal'],'source_level':mission['source_level'],
                     'booking_id':mission['booking_id'],'acknowledged':True}},now)
         if now==.8:channel.emit('BF01','event',{'event':'inspection_completed',
             'details':{'mission_id':'mission-1','level':'OG1','area':'R'}},now)
+        if reused_booking is not None and now==.85:channel.emit('BF01','event',{'event':'inspection_completed',
+            'details':{'mission_id':'mission-X','level':'OG1','area':'R'}},now)
         if now==1.9:channel.emit('BF01','event',{'event':'home_reached',
             'details':{'mission_id':'mission-2','level':'EG','slot':0}},now)
         messages.extend(channel.deliver(now))
@@ -60,7 +69,8 @@ def fixture():
     waiting.append({'event':'waiting_released','time_s':1.9,'role':'start','level':'EG','slot':0,
                     'vehicle_id':'BF01','mission_id':'mission-2','booking_id':'booking-2'})
     program={'duration_s':2.05,'mission_assignments':assignments,'waiting_events':waiting,
-        'mission_receipts':[{'vehicle_id':'BF01','mission_id':'mission-'+str(i),'received_s':t}for i,t in((1,.1),(2,1.1))],
+        'mission_receipts':[{'vehicle_id':'BF01','mission_id':m['mission_id'],'received_s':receipt_times[m['mission_id']]}
+                            for m in assignments],
         'mission_acknowledgements':ack_records,'received_messages':messages,
         'inspection_witnesses':[{'vehicle_id':'BF01','mission_id':'mission-1','level':'OG1','area':'R','time_s':.8}],
         'booking_events':events,'mission_bookings':final,
@@ -69,6 +79,9 @@ def fixture():
             for i,a,b,r,exit_time in((1,'E','O',.2,.7),(2,'O','E',1.2,1.8))],
         'lift_events':[{'vehicle_id':'BF01','event':name,'time_s':t}for name,t in(
             ('lift_boarded',.3),('lift_exited',.7),('lift_boarded',1.3),('lift_exited',1.8))]}
+    if reused_booking is not None:
+        program['inspection_witnesses'].append({'vehicle_id':'BF01','mission_id':'mission-X',
+            'level':'OG1','area':'R','time_s':.85})
     nav=NS(homes={'BF01':home},level_z={'EG':0,'OG1':1000},waits={'EG':[[0,0,0]],'OG1':[[0,0,0]]},
            mesh=NS(manifest={'elevator':{'ports':[{'id':'E','active':True,'level_id':'EG'},
                                                  {'id':'O','active':True,'level_id':'OG1'}]}}))
@@ -103,6 +116,14 @@ class AssignmentTests(unittest.TestCase):
     def test_foreign_booking_must_exist_before_assignment(self):
         p,tr,n,s=fixture();p['booking_events'][0]['created_s']=.05;p['booking_events'][0]['time_s']=.05
         with self.assertRaisesRegex(ValueError,'before issuance'):checks.check_assignments(p,tr,n,s)
+
+    def test_foreign_mission_cannot_reuse_an_existing_missions_booking(self):
+        with self.assertRaisesRegex(ValueError,'exactly one issued mission'):
+            checks.check_assignments(*fixture(reused_booking='booking-1'))
+
+    def test_foreign_mission_cannot_borrow_a_later_missions_booking(self):
+        with self.assertRaisesRegex(ValueError,'exactly one issued mission'):
+            checks.check_assignments(*fixture(reused_booking='booking-2'))
 
     def test_body_clear_arrival_needs_actual_lift_observation(self):
         p,tr,n,s=fixture();p['lift_events'][1]['time_s']=.75
