@@ -7,6 +7,7 @@ import json
 import tempfile
 import sys
 import unittest
+from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 from building_fleet_resources import ResourceCatalog,_positive_overlap
 import building_fleet_model as model
@@ -83,6 +84,15 @@ class ResourceCacheTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'route-bank'):ResourceCatalog.from_cache(nav,other,folder)
             path=Path(folder)/'closure.json';path.write_bytes(path.read_bytes()+b' ')
             with self.assertRaisesRegex(ValueError,'bytes changed'):ResourceCatalog.from_cache(nav,routes,folder)
+
+    def test_current_generator_and_navigation_pins_cannot_be_relabelled(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,routes,_=self.setup_cache(folder)
+            actual=model.digest
+            with patch.object(model,'digest',side_effect=lambda path:'0'*64 if Path(path).name=='building_fleet_resources.py'else actual(path)):
+                with self.assertRaisesRegex(ValueError,'pins are stale'):ResourceCatalog.from_cache(nav,routes,folder)
+            nav._cache_pins=lambda:{'tests/test_building_fleet_resources.py':'0'*64}
+            with self.assertRaisesRegex(ValueError,'pins are stale'):ResourceCatalog.from_cache(nav,routes,folder)
 
     def test_rehashed_cache_cannot_split_current_native_guard_overlap(self):
         with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
