@@ -124,7 +124,7 @@
         "id": "IceMakerIM01",
         "source": {
           "source": "model/ice-maker-im01.shared.json",
-          "source_sha256": "e9d9826f966dfb47256a045143db5fae21b208559007273b18fa0f80d23b5f97"
+          "source_sha256": "e2b6bbbef43439449d971f643ac189ff26fd98954bc6f0c6b40e5f21ad2f6f99"
         },
         "variant": "countertop",
         "support": "WetStation_DripTray",

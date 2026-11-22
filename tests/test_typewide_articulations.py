@@ -156,6 +156,81 @@ class TypewideArticulationTests(unittest.TestCase):
             with self.subTest(key=key), self.assertRaises(ValueError):
                 self.derive_lab(broken, expanded)
 
+    def native_appliance_fixture(self):
+        import ice_maker_model
+        interface, expanded = self.lab_fixture()
+        lab = interface['laboratories'][0]
+        lab.update(id='Lab3016', room='3.016')
+        renamed = {name: name.replace('Lab3003_', 'Lab3016_', 1)
+                   for name in lab['furniture_body_ids']}
+        lab['furniture_body_ids'] = [renamed[name] for name in lab['furniture_body_ids']]
+        for body in expanded['bodies']:
+            body['id'] = renamed[body['id']]
+        for operation in expanded['operations']:
+            operation['id'] = operation['body'] = renamed[operation['body']]
+        for joint in lab['joints']:
+            joint['moving_body_ids'] = [renamed[name] for name in joint['moving_body_ids']]
+        spec = ice_maker_model.variant(ice_maker_model.load(), 'countertop')
+        source = ice_maker_model.expanded(spec, ice_maker_model.parameters(spec))
+        stationary = [body['id'] for body in source['bodies'] if body['id'] != 'HopperFlap']
+        flap = 'Lab3016_IceMakerIM01_HopperFlap'
+        native_ids = [flap]+['Lab3016_IceMakerIM01_'+name for name in stationary]
+        expanded['bodies'].extend({'id': name} for name in native_ids)
+        expanded['operations'].append({'id': flap, 'body': flap, 'action': 'create',
+            'shape': {'kind': 'box', 'origin': [4000, 4000, 1400], 'size': [8, 320, 120]}})
+        lab['body_ids'] = lab['furniture_body_ids']+native_ids
+        lab['native_appliances'] = [{'id': 'IceMakerIM01', 'variant': 'countertop',
+                                    'body_ids': native_ids}]
+        lab['joints'].append({'instance_id': 'IceMakerIM01', 'articulation_id': 'Flap',
+            'type': 'revolute',
+            'origin_mm': [4000, 4000, 1520], 'axis': [0, -1, 0], 'front': [1, 0, 0],
+            'limits_deg': [0, 85], 'value': 0, 'moving_body_ids': [flap]})
+        return interface, expanded
+
+    def test_native_ice_maker_flap_uses_existing_hinge_commands_only_for_its_leaf(self):
+        interface, expanded = self.native_appliance_fixture()
+        objects = self.derive_lab(interface, expanded)
+        flap = next(obj for obj in objects if obj['id'] == 'Lab3016.IceMakerIM01.Flap')
+        self.assertEqual(flap['joint']['type'], 'revolute')
+        self.assertEqual(flap['joint']['axis'], [0, -1, 0])
+        self.assertEqual(flap['joint']['limits_deg'], [0, 85])
+        self.assertEqual(flap['reference_state'], 'closed')
+        self.assertEqual(flap['states'], {'closed': 0, 'open': 85})
+        self.assertEqual(flap['commands']['open'], {'label': 'Öffnen', 'target_state': 'open'})
+        self.assertEqual(flap['commands']['close'], {'label': 'Schließen', 'target_state': 'closed'})
+        self.assertEqual(flap['moving_body_ids'], ['Lab3016_IceMakerIM01_HopperFlap'])
+        lab = interface['laboratories'][0]
+        appliance_ids = set(lab['native_appliances'][0]['body_ids'])
+        self.assertGreater(len(appliance_ids), 20)
+        stationary = appliance_ids-set(flap['moving_body_ids'])
+        self.assertFalse(stationary & {body for obj in objects for body in obj['moving_body_ids']})
+        furniture_objects = [obj for obj in objects if obj is not flap]
+        self.assertEqual({body for obj in furniture_objects for body in obj['moving_body_ids']},
+                         set(lab['furniture_body_ids']))
+        self.assertFalse(any(flap['qualification'].values()))
+
+    def test_native_appliance_cannot_borrow_other_appliance_or_furniture_bodies(self):
+        interface, expanded = self.native_appliance_fixture()
+        other = 'Lab3016_OtherAppliance_Leaf'
+        expanded['bodies'].append({'id': other})
+        interface['laboratories'][0]['body_ids'].append(other)
+        interface['laboratories'][0]['native_appliances'].append({'id': 'OtherAppliance', 'body_ids': [other]})
+        for borrowed in (other, interface['laboratories'][0]['furniture_body_ids'][0]):
+            broken = copy.deepcopy(interface)
+            joint = broken['laboratories'][0]['joints'][-1]
+            joint['moving_body_ids'] = [borrowed]
+            # Remove the other joints so duplicate-moving-body rejection cannot
+            # conceal an incorrectly broadened appliance ownership rule.
+            broken['laboratories'][0]['joints'] = [joint]
+            with self.subTest(borrowed=borrowed), self.assertRaises(ValueError):
+                self.derive_lab(broken, expanded)
+        broken = copy.deepcopy(interface)
+        joint = broken['laboratories'][0]['joints'][0]
+        joint['moving_body_ids'] = ['Lab3016_IceMakerIM01_HopperFlap']
+        broken['laboratories'][0]['joints'] = [joint]
+        with self.assertRaises(ValueError):
+            self.derive_lab(broken, expanded)
+
     def test_type_templates_cannot_access_attributes_or_nonsemantic_fields(self):
         for label in ['{room.__class__}', '{unknown}', '{room!r}', '{room:>20}']:
             source = copy.deepcopy(self.source)

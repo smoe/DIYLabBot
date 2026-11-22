@@ -23,7 +23,7 @@ COLD_STORAGE = {'fridge_4c', 'freezer_minus20'}
 def validate(source):
     art.exact(source, 'room_doors equipment', 'mechanism profiles')
     art.validate_presentation(source['room_doors'])
-    art.require(ASSETS <= set(source['equipment']) <= ASSETS | COLD_STORAGE,
+    art.require(ASSETS <= set(source['equipment']) <= ASSETS | COLD_STORAGE | {'ice_maker_im01'},
                 'Requested equipment profiles required')
     for asset, item in source['equipment'].items():
         has_initial_state = 'initial_state' in item

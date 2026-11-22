@@ -220,6 +220,8 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height,
         require(lab['level_id'] in levels, 'Known laboratory object level required')
         plan = plans[lab['level_id']]
         polygons = [floor.outline(plan, name) for name in lab['template_areas']]
+        appliance_bodies = {item['id']: set(item['body_ids']) for item in lab.get('native_appliances', [])}
+        furniture_bodies = set(lab['furniture_body_ids'])
         for joint in lab['joints']:
             kind = 'prismatic' if joint['type'] == 'slider' else joint['type']
             require(kind in source['lab_joints'], 'Unsupported laboratory recipe joint')
@@ -227,8 +229,9 @@ def compile_lab_objects(ref, interface, expanded, plans, parameters, eye_height,
             require(identity not in identities, 'Duplicate laboratory object identity')
             identities.add(identity)
             moving = joint['moving_body_ids']
+            owned_bodies = appliance_bodies.get(joint['instance_id'], furniture_bodies)
             require(isinstance(moving, list) and moving and len(set(moving)) == len(moving)
-                    and set(moving) <= body_ids & set(lab['furniture_body_ids']), 'Missing laboratory articulated bodies')
+                    and set(moving) <= body_ids & owned_bodies, 'Missing laboratory articulated bodies')
             require(not set(moving) & moving_owners, 'A laboratory body cannot belong to two browser joints')
             moving_owners.update(moving)
             origin, axis, front = (joint[name] for name in ('origin_mm', 'axis', 'front'))

@@ -1,8 +1,8 @@
 """Build the standalone ice maker in either native CAD from one shared source.
 
 The two cases are explicit appliance variants. Native probes check the modeled
-empty bin, envelope and support pads; they do not qualify refrigeration,
-plumbing, food contact or suitability of a real countertop.
+empty bin, envelope, support pads and sampled flap motion; they do not qualify
+refrigeration, plumbing, food contact or suitability of a real countertop.
 """
 import argparse
 import json
@@ -72,6 +72,65 @@ def geometry_checks(spec, p, geometry):
     return checks
 
 
+def flap_checks(doc, spec, p, access, opening_origin, opening_size, native):
+    """Rotate copied native flap BReps without changing the static document."""
+    import FreeCAD as App
+    joint = model.flap_interface(spec, p)
+    low, high = joint['limits_deg']
+    if (low != 0 or not 0 < high <= 90 or len(joint['origin_mm']) != 3
+            or len(joint['axis']) != 3 or math.dist(joint['axis'], [0, 0, 0]) < 1e-9):
+        raise ValueError('A finite top-hinged flap range from the closed reference is required')
+    objects = {obj.SourceBody: obj for obj in native.objects(doc)}
+    closed = native.motion.world_shape(objects[joint['body_id']])
+    fixed = {name: native.motion.world_shape(obj) for name, obj in objects.items()
+             if name != joint['body_id']}
+    pivot, axis = App.Vector(*joint['origin_mm']), App.Vector(*joint['axis'])
+
+    def access_overlaps(shape):
+        overlaps = []
+        for name, body in {**fixed, joint['body_id']: shape}.items():
+            if body.BoundBox.intersect(access.BoundBox):
+                volume = body.common(access).Volume
+                if volume > 1e-5:
+                    overlaps.append({'body': name, 'intersection_mm3': volume})
+        return overlaps
+
+    samples, witnesses = [], []
+    overlaps = access_overlaps(closed)
+    witnesses.append({'id': 'ClosedFlapBlocksCentralAccess', 'angle_deg': low,
+                      'origin_mm': opening_origin, 'size_mm': opening_size,
+                      'overlaps': overlaps,
+                      'passed': {row['body'] for row in overlaps} == {joint['body_id']}})
+    count = math.ceil((high-low)/5)
+    for index in range(count+1):
+        angle = low+(high-low)*index/count
+        shape = closed.copy()
+        shape.rotate(pivot, axis, angle-low)
+        collisions, distances = [], []
+        for name, body in fixed.items():
+            distances.append((shape.distToShape(body)[0], name))
+            if shape.BoundBox.intersect(body.BoundBox):
+                volume = shape.common(body).Volume
+                if volume > 1e-5:
+                    collisions.append({'body': name, 'intersection_mm3': volume})
+        distance, nearest = min(distances)
+        samples.append({'angle_deg': angle,
+                        'valid_solid': shape.isValid() and len(shape.Solids) == 1 and shape.Volume > 0,
+                        'minimum_distance_mm': distance, 'nearest_body': nearest,
+                        'collisions': collisions})
+        samples[-1]['passed'] = samples[-1]['valid_solid'] and not collisions
+    overlaps = access_overlaps(shape)
+    witnesses.append({'id': 'OpenFlapClearsCentralAccess', 'angle_deg': high,
+                      'origin_mm': opening_origin, 'size_mm': opening_size,
+                      'overlaps': overlaps, 'passed': not overlaps})
+    return witnesses, {'id': 'NativeFlapSwing', 'joint': joint,
+                       'checked_fixed_body_ids': sorted(fixed), 'samples': samples,
+                       'maximum_sample_step_deg': (high-low)/count,
+                       'intersection_tolerance_mm3': 1e-5,
+                       'passed': all(row['passed'] for row in samples+witnesses),
+                       'scope': 'Finite rotations of a copied native flap BRep against all fixed appliance bodies and one central straight-access witness. Saved CAD remains a static closed reference; no native actuation, continuous swept-volume, building-clearance, seal or hardware qualification.'}
+
+
 def freecad_build(case, output, report, compare_step=None):
     import FreeCAD as App
     import Import
@@ -105,7 +164,7 @@ def freecad_build(case, output, report, compare_step=None):
         checks.append({'id': 'EmptyBinBelowSill', 'boundary_inset_mm': inset,
                        'probe_volume_l': probe.Volume/1e6, 'overlaps': overlaps,
                        'passed': not overlaps})
-        # Probe only the central lower opening, below the static display flap.
+        # The same central straight-access witness must be blocked and cleared.
         opening = interface['opening_z_mm']
         half_width = min(40., sizes[0]/4)
         front = -interface['envelope_mm'][1]/2-1
@@ -114,16 +173,8 @@ def freecad_build(case, output, report, compare_step=None):
         if min(opening_size)<=0:
             raise ValueError('Positive central front opening probe required')
         access = Part.makeBox(*opening_size, App.Vector(*opening_origin))
-        opening_overlaps = []
-        for obj in native.objects(doc):
-            shape = native.motion.world_shape(obj)
-            if shape.BoundBox.intersect(access.BoundBox):
-                volume = shape.common(access).Volume
-                if volume>1e-5:
-                    opening_overlaps.append({'body': obj.SourceBody, 'intersection_mm3': volume})
-        checks.append({'id': 'CentralFrontOpening', 'origin_mm': opening_origin,
-                       'size_mm': opening_size, 'overlaps': opening_overlaps,
-                       'passed': not opening_overlaps})
+        access_checks, motion_checks = flap_checks(doc, spec, p, access, opening_origin, opening_size, native)
+        checks.extend(access_checks)
         bin_volume = math.prod(sizes)/1e6
         checks.append({'id': 'ModeledBinVolume', 'actual_l': bin_volume,
                        'expected_l': interface['bin_below_sill_l'],
@@ -157,13 +208,14 @@ def freecad_build(case, output, report, compare_step=None):
     presentation = persist(output, source, geometry)
     passed = (all(check['passed'] for check in checks+external_step+roundtrip+reopen_checks)
               and interference['passed'] and not interference['within_rigid_components']
-              and presentation['passed'])
+              and motion_checks['passed'] and presentation['passed'])
     result = {'passed': passed, 'geometry': geometry, 'geometric_checks': checks,
               'interference': interference, 'step_comparison': external_step,
               'step_roundtrip': roundtrip, 'freecad_step': relative(step_path),
+              'flap_motion': motion_checks,
               'reopened_comparison': reopen_checks, 'presentation': presentation,
               'freecad_version': App.Version(),
-              'scope': 'Static BReps, source envelope, empty modeled bin, central front opening, four support pads and STEP roundtrip; no appliance performance or installation qualification.'}
+              'scope': 'Closed-reference BReps, source envelope, empty modeled bin, four support pads, closed/open central-access witnesses, finite native flap-angle samples and STEP roundtrip; no continuous swept-volume, appliance performance or installation qualification.'}
     write(report, result)
     if not passed:
         raise AssertionError('Native ice-maker checks failed: '+str(report))

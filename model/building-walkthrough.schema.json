@@ -694,6 +694,10 @@
             "fridge_4c": {
               "$ref": "#/$defs/cold_storage_mechanism"
             },
+            "ice_maker_im01": {
+              "$ref": "#/$defs/cold_storage_mechanism",
+              "not": {"required": ["initial_state"]}
+            },
             "freezer_minus20": {
               "$ref": "#/$defs/cold_storage_mechanism"
             },

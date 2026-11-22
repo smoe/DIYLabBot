@@ -4,6 +4,7 @@
   "status": "Exterior and storage-bin concept for space planning",
   "units": {"length": "mm"},
   "recipe": "sloped_front_open_ice_bin_v1",
+  "flap_open_angle_deg": 85,
   "parameters": {
     "width": {"expression": 400, "unit": "mm", "range": [380, 440], "description": "Overall case width"},
     "depth": {"expression": 385, "unit": "mm", "range": [365, 430], "description": "Overall case depth"},
@@ -21,6 +22,9 @@
     "opening_height": {"expression": "120 + (bin_height - 235) / 4", "unit": "mm", "range": [120, 160], "description": "Serving opening height derived with bin size"},
     "sill": {"expression": "bin_top - opening_height", "unit": "mm", "range": [415, 575], "description": "Lowest point of the front opening"},
     "panel_top": {"expression": "sill - 45", "unit": "mm", "range": [370, 530], "description": "Top of the lower stainless front panel"},
+    "flap_setback": {"expression": 18, "unit": "mm", "range": [12, 24], "description": "Hinge depth from the front datum"},
+    "flap_thickness": {"expression": 6, "unit": "mm", "range": [4, 7], "description": "Panel thickness centred on the hinge axis"},
+    "flap_edge_gap": {"expression": 4, "unit": "mm", "range": [4, 6], "description": "Clearance around the panel inside the bin opening"},
     "total_height": {"expression": "bin_top + top_band", "unit": "mm", "range": [575, 785], "description": "Overall cabinet and foot height"}
   },
   "variants": {
@@ -36,7 +40,7 @@
     "scope": "Photo references the V2 SKU. The manufacturer's listing for the related V1 SKU with the same CIM-360T model number gives 400 x 385 x 759 mm, used as the nominal standing envelope. Detail dimensions and the compact variant are layout assumptions."
   },
   "limitations": [
-    "Stationary open-access presentation with a separate fixed flap and an empty lined bin.",
+    "Closed CAD reference with a separate flap. Its top hinge and travel are presentation assumptions for the walkthrough.",
     "Geometric storage volume is the rectangular clear bin space below the front sill, with no claim about ice packing, mass or manufacturer capacity.",
     "No internal ice production mechanism, refrigeration, electrical/water connections, or installation qualification."
   ]

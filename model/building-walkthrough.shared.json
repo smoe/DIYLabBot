@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "d785eed130686222cdb24b7dbd05909a958bf5bc6fa5feb6c3db4f1eef8fda36"
+      "source_sha256": "72bc5ddbb82922956631d6d8972b7e52a8edeed5ea4bbd85f8247c1b5e7efbd9"
     }
   },
   "settings": {
@@ -217,6 +217,16 @@
       }
     },
     "equipment": {
+      "ice_maker_im01": {
+        "presentation": {
+          "label": "Eismaschine · {articulation}",
+          "commands": {"open": "Öffnen", "close": "Schließen", "view": "Ansehen"},
+          "state_labels": {"closed": "Geschlossen", "opening": "Wird geöffnet", "open": "Offen", "closing": "Wird geschlossen"},
+          "duration": {"value": 0.65, "unit": "s", "range": [0.1, 10], "basis": "presentation_assumption"},
+          "view_distance": {"value": 850, "unit": "mm", "range": [300, 3000], "basis": "presentation_assumption"}
+        },
+        "roles": {"hopper_flap": "Klappe"}
+      },
       "fridge_4c": {
         "presentation": {
           "label": "Kühlschrank · {articulation}",

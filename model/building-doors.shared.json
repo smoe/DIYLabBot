@@ -113,7 +113,7 @@
   "laboratory_corridor_rule": {
     "room_assignments": {
       "source": "model/furnishings/building-laboratories.json",
-      "source_sha256": "2788da7c3cc5b1aa4dda5e7f3d6b56879d748735ea6b759962cae7c4b8f8ccfd"
+      "source_sha256": "315735d8c867f193da63ca6011b24c69cd05e95bb03efd9f67dc4cfeda6f44d6"
     },
     "opens_into": "corridor",
     "hinge": "preserve_source_interval_start",

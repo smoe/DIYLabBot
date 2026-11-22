@@ -21,6 +21,9 @@ def load(path=SOURCE):
     if (spec['format'] != 'solidcraftbot.ice-maker/1' or spec['units'] != {'length': 'mm'}
             or spec['recipe'] != 'sloped_front_open_ice_bin_v1' or set(spec['variants']) != set(VARIANTS)):
         raise ValueError('Unsupported ice maker contract')
+    angle = spec['flap_open_angle_deg']
+    if type(angle) not in (int, float) or not 75 <= angle <= 90:
+        raise ValueError('Flap travel must lift the panel outward without going past horizontal')
     for name, support in VARIANTS.items():
         case = spec['variants'][name]
         if case['support'] != support or set(case['overrides']) != (set() if name == 'floor_standing' else {'bin_height'}):
@@ -48,12 +51,27 @@ def parameters(spec):
             or values['depth'] - values['front_wall'] - values['rear_wall'] - 2*values['liner'] <= 0
             or values['sill'] <= values['bin_floor'] + values['liner']):
         raise ValueError('Positive clear ice storage dimensions required')
+    gap = values['flap_edge_gap']
+    half = values['flap_thickness']/2
+    if not (half < gap < min(values['opening_height']/2, values['width']/2-values['side_wall']-values['liner'])
+            and half < values['flap_setback'] < values['front_wall']-half):
+        raise ValueError('Flap must clear the sill, roof and bin liner throughout its outward travel')
     return values
 
 
 def support_points():
     return [('46-width/2', '48-depth/2'), ('width/2-46', '48-depth/2'),
             ('46-width/2', 'depth/2-48'), ('width/2-46', 'depth/2-48')]
+
+
+def flap_origin():
+    return [0, '-depth/2+flap_setback', 'bin_top-flap_edge_gap']
+
+
+def flap_interface(spec, p):
+    return {'id': 'Flap', 'body_id': 'HopperFlap',
+            'origin_mm': [evaluate(v, p) for v in flap_origin()],
+            'axis': [-1, 0, 0], 'limits_deg': [0, spec['flap_open_angle_deg']]}
 
 
 def interfaces(spec, p):
@@ -132,9 +150,11 @@ def expanded(spec, p):
         [clear_width, 'liner', 'bin_height-liner'], '#416db1', 'bin_liner')
     box('BinFrontLiner', [left+'+liner', bin_front, 'bin_floor+liner'],
         [clear_width, 'liner', 'sill-bin_floor-liner'], blue, 'bin_liner')
-    create('HopperFlapOpen', profile(left+'+liner', clear_width, [
-        [front, 'bin_top-23'], [front+'+7', 'bin_top-29'],
-        [front+'+78', 'bin_top-6'], [front+'+76', 'bin_top']]), '#343c46', 'illustrative_open_flap')
+    _, hinge_y, hinge_z = flap_origin()
+    box('HopperFlap',
+        [left+'+liner+flap_edge_gap', hinge_y+'-flap_thickness/2', 'sill+flap_edge_gap'],
+        [clear_width+'-2*flap_edge_gap', 'flap_thickness', hinge_z+'-sill-flap_edge_gap'],
+        '#343c46', 'hopper_flap')
 
     box('ControlBezel', [-52, front+'+0.8', 'panel_top-79'], [104, 1.2, 62], '#2c3338', 'control_panel')
     box('Display', [-23, front, 'panel_top-52'], [46, 0.8, 22], '#142630', 'display')

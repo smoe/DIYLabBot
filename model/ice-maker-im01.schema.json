@@ -3,17 +3,18 @@
   "title": "Ice Maker IM01 Shared Model",
   "type": "object",
   "additionalProperties": false,
-  "required": ["format", "id", "status", "units", "recipe", "parameters", "variants", "reference", "limitations"],
+  "required": ["format", "id", "status", "units", "recipe", "flap_open_angle_deg", "parameters", "variants", "reference", "limitations"],
   "properties": {
     "format": {"const": "solidcraftbot.ice-maker/1"},
     "id": {"const": "IceMakerIM01"},
     "status": {"type": "string", "minLength": 1},
     "units": {"const": {"length": "mm"}},
     "recipe": {"const": "sloped_front_open_ice_bin_v1"},
+    "flap_open_angle_deg": {"type": "number", "minimum": 75, "maximum": 90},
     "parameters": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["width", "depth", "foot_height", "service_height", "bin_height", "top_band", "side_wall", "front_wall", "rear_wall", "liner", "front_setback", "bin_floor", "bin_top", "opening_height", "sill", "panel_top", "total_height"],
+      "required": ["width", "depth", "foot_height", "service_height", "bin_height", "top_band", "side_wall", "front_wall", "rear_wall", "liner", "front_setback", "bin_floor", "bin_top", "opening_height", "sill", "panel_top", "flap_setback", "flap_thickness", "flap_edge_gap", "total_height"],
       "properties": {
         "width": {"$ref": "#/$defs/driving"},
         "depth": {"$ref": "#/$defs/driving"},
@@ -31,6 +32,9 @@
         "opening_height": {"$ref": "#/$defs/derived"},
         "sill": {"$ref": "#/$defs/derived"},
         "panel_top": {"$ref": "#/$defs/derived"},
+        "flap_setback": {"$ref": "#/$defs/driving"},
+        "flap_thickness": {"$ref": "#/$defs/driving"},
+        "flap_edge_gap": {"$ref": "#/$defs/driving"},
         "total_height": {"$ref": "#/$defs/derived"}
       }
     },

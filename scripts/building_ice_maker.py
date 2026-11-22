@@ -109,6 +109,15 @@ def add_to_wet_bench(placement, item, fixture, result, numeric_shape):
     result['components'].append({'id': prefix, 'grounded': True})
     result['bodies'].extend(bodies)
     result['operations'].extend(ops)
+    flap = appliance.flap_interface(spec, values)
+    result['joints'].append({
+        'id': prefix+'_'+flap['id'], 'type': 'revolute',
+        'instance_id': placement['id'], 'articulation_id': flap['id'],
+        'origin_mm': point(*flap['origin_mm']), 'axis': vector(flap['axis']), 'front': front+[0],
+        'moving_body_ids': [prefix+'_'+flap['body_id']],
+        'limits_deg': flap['limits_deg'], 'value': flap['limits_deg'][0],
+        'equipment_asset': 'ice_maker_im01', 'equipment_role': 'hopper_flap',
+    })
     return {'id': placement['id'], 'source': placement['source'], 'variant': placement['variant'],
             'support_body_id': support, 'origin_mm': origin, 'front': front+[0],
             'support_floor_z_mm': hollow['offset'], 'foot_centres_mm': [p['origin'] for p in pads],
