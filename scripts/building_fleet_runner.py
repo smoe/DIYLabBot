@@ -236,6 +236,7 @@ class EvidenceWriter:
         return key
     def route(self,action,caps):
         row={'points_mm':action['points_mm'],'corner_trim_mm':action['corner_trim_mm'],'zone_caps':caps,'reverse':action['reverse']}
+        if action.get('corner_trim_caps'):row['corner_trim_caps']=copy.deepcopy(action['corner_trim_caps'])
         data=json.dumps(row,sort_keys=True,separators=(',',':'),allow_nan=False);key=hashlib.sha256(data.encode()).hexdigest()
         if key not in self.path_keys:self.write('own_path',id=key,**row);self.path_keys.add(key)
         return key
@@ -249,11 +250,11 @@ class EvidenceWriter:
 
 def point_progress(path,points,trim):
     """Ordered original-node event progress, including repeated loop positions."""
-    trims=[0.]*len(points)
+    trims=[0.]*len(points);caps={r['point_index']:r['maximum_trim_mm']for r in getattr(path,'corner_trim_caps',[])}
     for i in range(1,len(points)-1):
         a=[points[i][k]-points[i-1][k]for k in range(2)];b=[points[i+1][k]-points[i][k]for k in range(2)]
         if abs(a[0]*b[1]-a[1]*b[0])<=1e-9*math.hypot(*a)*math.hypot(*b)and sum(x*y for x,y in zip(a,b))>0:continue
-        trims[i]=min(trim,math.dist(points[i-1],points[i])*.25,math.dist(points[i],points[i+1])*.25)
+        trims[i]=min(trim,caps.get(i,trim),math.dist(points[i-1],points[i])*.25,math.dist(points[i],points[i+1])*.25)
     result=[0.];distance=extra=0.
     for i in range(1,len(points)):
         distance+=math.dist(points[i-1],points[i]);extra+=trims[i-1]/3
@@ -657,13 +658,13 @@ class WorldRunner:
         shape=route_shape(action['points_mm'])
         if self.progress is not None:self.progress({'phase':'own_drive_prepare','vehicle_id':identity,
             'level':row['level'],'model_time_s':self.now,'points':len(action['points_mm']),**shape})
-        path=Path(action['points_mm'],action['corner_trim_mm'])
+        path=Path(action['points_mm'],action['corner_trim_mm'],corner_trim_caps=action.get('corner_trim_caps'))
         if math.dist(path.evaluate(0)[0][:2],row['pose_mm_rad'][:2])>1e-6:raise RuntimeError('Own route does not begin at observed localization')
         from building_fleet_zones import progress_windows
         source_zones=progress_windows(path,self.zone_regions[row['level']],
             self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm,self.source['motion']['zone_velocity_mm_s'])
         caps=zone_caps(self.source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],source_zones)
-        key=json.dumps([action['points_mm'],action['corner_trim_mm'],caps,action['reverse']],sort_keys=True)
+        key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse']],sort_keys=True)
         if key not in self._motion_cache:self._motion_cache[key]=compile_motion(path,self.source,reverse=action['reverse'],zone_caps=caps)
         driver=Controller(path,self.source,caps,own_start_s=self.now,radius_mm=self.nav.radius,
             static_return=self.static_return(row['level'],action.get('lift_phase'),identity),motion_program=self._motion_cache[key])
@@ -945,7 +946,8 @@ class WorldRunner:
                 condition=('own_exclusive_resource_grant'if reason=='resource_wait'else'fresh_clear_anonymous_scan')if driver is not None else row['hold_condition']
         action=row['action'];metadata={'level_id':row['level'],'mode':mode,'attached_cabin':attached,
             'hold_reason':reason,'hold_condition':condition,'leg_id':row['leg_id']if driver is not None else None}
-        if action is not None and action.get('lift_phase'):
+        if (action is not None and action.get('lift_phase')and
+                (action['lift_phase']['kind']=='boarding'or row['aboard'])):
             metadata.update(lift_phase=action['lift_phase']['kind'],lift_stage=copy.deepcopy(action['lift_phase']),
                 port_id=action['port_id'],cabin_slot=action['cabin_slot'],reverse=action['reverse'])
         elif attached:
@@ -955,7 +957,8 @@ class WorldRunner:
         if previous is not None:
             last=previous['points'][-1]
             if abs(last['time_s']-start)>1e-8 or any(abs(a-b)>1e-6 for field in('pose_mm_rad','velocity_mm_rad_s','acceleration_mm_rad_s2')for a,b in zip(last[field],points[0][field])):raise RuntimeError('Actual world episodes lost PVA continuity')
-        same=previous is not None and all(previous.get(k)==v for k,v in metadata.items())
+        same=(previous is not None and set(previous)-{'start_s','end_s','points'}==set(metadata)
+            and all(previous.get(k)==v for k,v in metadata.items()))
         if same:
             previous['end_s']=end
             if mode in('hold','lift'):previous['points'][-1]=points[-1]
@@ -983,6 +986,9 @@ class WorldRunner:
                     gate_at(self.nav.mesh,action['port_id'],timeline,start)
             own_state={'progress_mm':driver.y,'velocity_mm_s':driver.v,'acceleration_mm_s2':driver.a}
             self.decision[identity]=driver.decide(start,self.latest_scans.get(identity),grant_permits=bool(permit))
+            margin=driver.perception_audit['minimum_range_margin_mm']
+            if margin is None or not math.isfinite(margin)or margin<0:
+                raise RuntimeError('Actual own stopping proof exceeds its source observation budget: '+str((identity,start,margin)))
             if self.evidence is not None:
                 scan=self.latest_scans.get(identity);stop=driver._checked_brake()
                 self.evidence.write('decision',vehicle_id=identity,time_s=start,path_id=self.vehicles[identity]['evidence_path_id'],
@@ -1044,8 +1050,13 @@ class WorldRunner:
     def program(self,complete=True):
         if complete and not self.completed():raise RuntimeError('An incomplete world cannot be emitted as a completed fleet program')
         limits=[r['perception_limit']for r in self.driver_checks]
-        checked=bool(limits)and all(r['perception_audit']['checks']>0 for r in self.driver_checks)
+        checked=bool(limits)and all(r['perception_audit']['checks']>0 and
+            type(r['perception_audit'].get('minimum_range_margin_mm'))in(int,float)and
+            math.isfinite(r['perception_audit']['minimum_range_margin_mm'])and
+            r['perception_audit']['minimum_range_margin_mm']>=0 for r in self.driver_checks)
         maximum=max((r['required_range_mm']for r in limits),default=math.inf)
+        if complete and(not checked or maximum>self.sensor['range_mm']):
+            raise RuntimeError('A complete fleet needs every actual own stopping-range proof')
         return {'format':'solidcraftbot.building-fleet-program/1','complete':bool(complete),'seed':self.source['missions']['seed'],
             'duration_s':self.now,'levels':copy.deepcopy(self.nav.mesh.manifest['levels']),
             'room_route_object_ids':sorted(self.route_door_ids),'targets':copy.deepcopy(self.source['missions']['targets']),
@@ -1060,7 +1071,7 @@ class WorldRunner:
             'inspection_witnesses':copy.deepcopy(self.inspection_witnesses),'resource_events':copy.deepcopy(self.resource_events),
             'received_messages':copy.deepcopy(self.control_room.messages),'camera_captures':copy.deepcopy(self.camera_captures),
             'resource_catalog':self.catalog.report(),'trajectory_checks':{'passed':bool(complete),'reserve_mm':self.nav.reserve,**self.auditor.statistics()},
-            'perception_checks':{'passed':checked and maximum<=self.sensor['range_mm'],'stop_family_checked':checked,
+            'perception_checks':{'passed':bool(complete)and checked and maximum<=self.sensor['range_mm'],'stop_family_checked':checked,
                 'maximum_required_range_mm':maximum if math.isfinite(maximum)else None,'drivers':copy.deepcopy(self.driver_checks)},
             'statistics':{'coverage':self.dispatcher.coverage(),'radio':self.uplink.statistics(),'sensor':self.world.statistics(),
                 'lift':self.lift.statistics(),'cabin_capacity':copy.deepcopy(self.cabin_capacity_report),
@@ -1111,6 +1122,7 @@ def compile_program(source,navigation,output_dir,*,progress=None,geometry_checke
                 'building_fleet_geometry_checks.py','building_fleet_lift_geometry.py','building_fleet_lift_checks.py',
                 'building_fleet_clearance.py','building_fleet_floor.py','building_fleet_support.py',
                 'building_fleet_assignment_checks.py',
+                'building_fleet_port_paths.py',
                 'check_building_fleet_freecad.py')
     artifact_refs=copy.deepcopy(artifacts or {})
     artifact_pins={}

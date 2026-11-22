@@ -95,6 +95,27 @@ class RuntimeBoundaryTests(unittest.TestCase):
         world.vehicles['BF01']['z_mm']=4250
         with self.assertRaises(RuntimeError):world.require_port_body_clear('BF01','P')
 
+    def test_alighting_metadata_ends_after_actual_body_clear_without_pva_break(self):
+        world=self.stub();row=world.vehicles['BF01']
+        row['aboard']=True;row['leg_id']=1
+        row['action']={'terminal':{'kind':'capacity_wait'},'lift_phase':{'kind':'alighting','slot':0},
+            'port_id':'P','cabin_slot':0,'reverse':False}
+        driver=SimpleNamespace(mode='waiting',reason='local_obstacle')
+        def point(t,x,v):return{'time_s':t,'pose_mm_rad':[x,0.,0.],
+            'velocity_mm_rad_s':[v,0.,0.],'acceleration_mm_rad_s2':[0.,0.,0.]}
+        world.append_episode('BF01',0,.05,[point(0,0,100),point(.05,5,100)],driver,{'phase':'alighting'})
+        self.assertEqual(row['episodes'][0]['lift_phase'],'alighting')
+        # The world observes and acknowledges full body-clear after this
+        # frame. Its next drive/hold frames are ordinary floor episodes.
+        row['aboard']=False
+        world.append_episode('BF01',.05,.1,[point(.05,5,100),point(.1,10,0)],driver,{'phase':'idle'})
+        world.append_episode('BF01',.1,.15,[point(.1,10,0),point(.15,10,0)],driver,{'phase':'idle'})
+        self.assertEqual(len(row['episodes']),3)
+        self.assertNotIn('lift_phase',row['episodes'][1]);self.assertNotIn('lift_phase',row['episodes'][2])
+        self.assertEqual(row['episodes'][2]['hold_reason'],'protective_stop')
+        self.assertEqual(row['episodes'][0]['points'][-1],row['episodes'][1]['points'][0])
+        self.assertEqual(row['episodes'][1]['points'][-1],row['episodes'][2]['points'][0])
+
     def test_repeated_source_door_passages_have_monotone_own_markers(self):
         world=self.stub();world.route_door_ids=set()
         world.nav.portals={'EG':[{'opening':'D','centre_mm':[0,0],'normal':[1,0],
@@ -111,6 +132,12 @@ class RuntimeBoundaryTests(unittest.TestCase):
     def test_runtime_requires_a_canonical_geometry_checker(self):
         with self.assertRaisesRegex(ValueError,'Canonical'):
             WorldRunner({},None,None,None,None)
+
+    def test_complete_program_rejects_a_negative_actual_range_margin(self):
+        world=object.__new__(WorldRunner);world.completed=lambda:True;world.sensor={'range_mm':2200}
+        world.driver_checks=[{'perception_limit':{'required_range_mm':1000},
+            'perception_audit':{'checks':1,'minimum_range_margin_mm':-1.}}]
+        with self.assertRaisesRegex(RuntimeError,'every actual'):world.program()
 
     def test_public_compile_preserves_original_seed_on_runtime_failure(self):
         source=runner.model.load();nav=SimpleNamespace(homes={'BF%02d'%i:{}for i in range(1,21)},config=source)

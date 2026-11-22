@@ -35,7 +35,7 @@ GENERATORS=('building_fleet_checks.py','building_fleet_support.py','building_fle
     'building_fleet_missions.py','building_fleet_resources.py','building_fleet_comm.py',
     'building_fleet_dispatch.py','building_fleet_depot.py','building_fleet_routes.py',
     'building_fleet_geometry.py','building_fleet_geometry_checks.py','building_fleet_zones.py',
-    'building_fleet_assignment_checks.py','tr01_camera_model.py')
+    'building_fleet_assignment_checks.py','building_fleet_port_paths.py','tr01_camera_model.py')
 
 
 def finite(value,minimum=-math.inf):
@@ -536,6 +536,24 @@ def check_lift_program(program,trajectories,navigation,source,lift):
             'basis':'actual source-timed schedule, native cabin lane assignment, own lifecycle events, numeric FK/open-door gates and continuous exported door-curtain exclusion'}
 
 
+def _own_path_bank_row(row,limits):
+    """Reconstruct only the original own geometry, including optional trims."""
+    fields={'points_mm','corner_trim_mm','zone_caps','reverse'}
+    optional={'corner_trim_caps'}if 'corner_trim_caps'in row else set()
+    if set(row)!={'kind','id',*fields,*optional}or row['kind']!='own_path':
+        raise ValueError('Own path bank contains unexpected controller knowledge')
+    if optional and type(row['corner_trim_caps'])is not list:
+        raise ValueError('Explicit own corner trim caps must be a JSON list')
+    data={k:row[k]for k in fields|optional}
+    digest=hashlib.sha256(json.dumps(data,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+    if digest!=row['id']:raise ValueError('Changed own path bank identity')
+    options={'corner_trim_caps':row['corner_trim_caps']}if optional else{}
+    path=motion.Path(row['points_mm'],row['corner_trim_mm'],**options);caps=row['zone_caps']
+    if type(row['reverse'])is not bool or any(len(v)!=2 or not 0<=finite(v[0])<=path.length or not 0<finite(v[1])<=limits['velocity']for v in caps)or caps!=sorted(caps)or len({v[0]for v in caps})!=len(caps):
+        raise ValueError('Source-bounded ordered own zone caps required')
+    return digest,{'path':path,'caps':caps,'reverse':row['reverse'],'geometry':{}}
+
+
 def check_perception(program,trajectories,source,navigation,catalog,windows):
     """Audit original anonymous inputs and actual selected stop curves.
 
@@ -573,14 +591,9 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
             if len(line)>16*1024*1024:raise ValueError('Unbounded own-input evidence row')
             row=json.loads(line,parse_constant=lambda _:(_ for _ in()).throw(ValueError('Nonfinite trace JSON')));kind=row.get('kind');counts[kind]+=1
             if kind=='own_path':
-                fields={'points_mm','corner_trim_mm','zone_caps','reverse'}
-                if set(row)!={'kind','id',*fields}:raise ValueError('Own path bank contains unexpected controller knowledge')
-                data={k:row[k]for k in fields};digest=hashlib.sha256(json.dumps(data,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
-                if digest!=row['id']or digest in paths:raise ValueError('Changed/duplicate own path bank identity')
-                path_curve=motion.Path(row['points_mm'],row['corner_trim_mm']);caps=row['zone_caps']
-                if type(row['reverse'])is not bool or any(len(v)!=2 or not 0<=finite(v[0])<=path_curve.length or not 0<finite(v[1])<=limits['velocity']for v in caps)or caps!=sorted(caps)or len({v[0]for v in caps})!=len(caps):
-                    raise ValueError('Source-bounded ordered own zone caps required')
-                paths[digest]={'path':path_curve,'caps':caps,'reverse':row['reverse'],'geometry':{}}
+                digest,bank=_own_path_bank_row(row,limits)
+                if digest in paths:raise ValueError('Duplicate own path bank identity')
+                paths[digest]=bank
             elif kind=='stop_clock':
                 if set(row)!={'kind','id','points'}:raise ValueError('Stop bank contains unexpected fields')
                 digest=hashlib.sha256(json.dumps(row['points'],separators=(',',':'),allow_nan=False).encode()).hexdigest()

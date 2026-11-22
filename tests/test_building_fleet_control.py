@@ -185,6 +185,42 @@ class ControllerTests(unittest.TestCase):
         self.assertLess(on_future_curve,empty)
         self.assertLess(immediate_body,c.settings['clearance_mm'])
 
+    def test_immediate_rectangle_keeps_radial_boundaries_without_square_corner_halos(self):
+        c=control.Controller.__new__(control.Controller);c.source=self.source;c.settings=model.resolved_sensor(self.source)
+        c.radius=math.hypot(256,206);c.half_length=256.;c.half_width=206.;c.static_return=None
+        inflation=c.settings['clearance_mm']+c.settings['range_error_mm']+c.settings['range_mm']*math.sin(math.radians(c.settings['angular_step_deg']))+self.source['geometry']['localization_tolerance_mm']
+        # Isolate the immediate body component; the unchanged future-path
+        # component has its own actual forward-hazard regressions above.
+        c.project_ahead=lambda *args:(math.inf,c.y)
+        for offset in(0.,1e9):
+            for travel in(0.,.7,2.3):
+                cs,sn=math.cos(travel),math.sin(travel)
+                c.path=motion.Path([[offset,-offset],[offset+2000*cs,-offset+2000*sn]])
+                c.y=0.;c.goal=c.path.length;c.now=0.;c.record_times=[0.]
+                for reverse in(0.,math.pi):
+                    c.heading_offset=reverse;pose=c.path.evaluate(0)[0];pose[2]+=reverse;c.recorded=[{'pose_mm_rad':pose}]
+                    empty,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[]},0.)
+                    for angle in(0.,.3,.7,math.pi/2):
+                        for delta in(-.001,0.,.001):
+                            ahead=c.half_length+(inflation+delta)*math.cos(angle)
+                            side=c.half_width+(inflation+delta)*math.sin(angle)
+                            dx,dy=cs*ahead-sn*side,sn*ahead+cs*side
+                            ray=[-math.sin(pose[2])*dx+math.cos(pose[2])*dy,
+                                 math.cos(pose[2])*dx+math.sin(pose[2])*dy]
+                            gap,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[ray]},0.)
+                            if delta<=0:self.assertLess(gap,empty,(offset,travel,reverse,angle,delta))
+                            else:self.assertEqual(gap,empty,(offset,travel,reverse,angle,delta))
+
+    def test_current_body_front_side_and_corner_still_detect_unknown_returns(self):
+        c=control.Controller.__new__(control.Controller);c.source=self.source;c.settings=model.resolved_sensor(self.source)
+        c.path=motion.Path([[0,0],[2000,0]]);c.goal=c.path.length;c.y=0.;c.radius=math.hypot(256,206)
+        c.half_length=256.;c.half_width=206.;c.heading_offset=0.;c.static_return=None;c.now=0.;c.record_times=[0.]
+        c.recorded=[{'pose_mm_rad':[0.,0.,0.]}];c.project_ahead=lambda *args:(math.inf,c.y)
+        empty,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[]},0.)
+        for ray in([0.,300.],[250.,50.],[250.,300.]):
+            gap,_=c._observed_gap({'captured_s':0.,'returns_local_mm':[ray]},0.)
+            self.assertLess(gap,empty)
+
     def test_short_s_curve_has_an_actual_quantized_stop_when_analytic_bounds_reject(self):
         c=self.controller(motion.Path([[0,0],[1000,0],[1000,160],[2000,160]]),zone_caps=[(0,300)])
         self.run_controller(c,maximum_s=120)
@@ -209,6 +245,39 @@ class ControllerTests(unittest.TestCase):
             required=c.settings['clearance_mm']+distance+(c._zone_cap_at(c.y)+closing)*reaction+closing*clock.times[-1]
             self.assertLess(required,visible)
             self.assertLessEqual(c.y+distance,c.goal)
+
+    def test_recorded_cabin_state_chooses_a_faster_exact_stop_inside_observation_budget(self):
+        # Preserved diagnostic geometry/state from the R3 OG3 bay1→lane0
+        # controller trace. The former analytic-first winner needed 1875 mm;
+        # an existing exact Cartesian candidate needs only about 773 mm.
+        points=[[8725.,16475.],[9281.219033984651,16475.],
+            [9281.219033984651,16328.23312254141],[9521.589703556314,16112.137952915458],
+            [10639.689802960147,15907.813256329951],[11356.756756756757,15907.813256329951]]
+        c=self.controller(motion.Path(points),zone_caps=[(0,300)])
+        c.y=2274.2061753266926;c.v=157.60920044906106;c.a=1.535680909329833e-13
+        c.mode='driving';c.plan=None
+        clock=c._checked_brake(strict=True)
+        self.assertLess(clock.times[-1],4.04)
+        self.assertGreaterEqual(c._stop_observation_margin(clock),0)
+        self.assertTrue(c._admissible(clock,c.y)[0])
+        self.assertTrue(any(row['kind']=='exact_stop_fallback'for row in c.profile_checks))
+
+    def test_short_own_goal_suffix_is_a_last_validated_budget_bound_stop(self):
+        points=[[8725.,16475.],[9281.219033984651,16475.],
+            [9281.219033984651,16190.370669571663],[8611.321545995319,16190.370669571663],
+            [8271.30401003135,15925.],[8225.,15925.]]
+        c=self.controller(motion.Path(points),zone_caps=[(0,300)])
+        c.set_plan(c.nominal_clock,.6,'driving','goal');c.now=58.
+        jet=c.plan.evaluate(57.4);c.y,c.v,c.a=[jet[field][0]for field in F[:3]]
+        c.recorded=[{'time_s':58.,'pose_mm_rad':c.path.evaluate(c.y)[0]}];c.record_times=[58.]
+        self.assertAlmostEqual(c.goal-c.y,15.403095133384435)
+        self.assertIsNone(c._final_deceleration())
+        clock=c._checked_brake(strict=True)
+        self.assertIs(clock._bf01_continuation,c.plan)
+        self.assertAlmostEqual(clock.points[-1][F[0]][0],c.goal-c.y)
+        self.assertGreaterEqual(c._stop_observation_margin(clock),0)
+        self.assertTrue(c._admissible(clock,c.y)[0])
+        self.assertTrue(any(row['kind']=='validated_goal_suffix_stop'for row in c.profile_checks))
 
     def test_unwrapped_initial_heading_is_equivalent_and_requires_rest(self):
         c=self.controller();c.align_initial_heading(2*math.pi)

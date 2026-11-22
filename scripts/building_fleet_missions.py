@@ -96,8 +96,8 @@ def waypoint_progress(path, points):
     return result
 
 
-def _path(points, trim):
-    path = Path(points, trim)
+def _path(points, trim, corner_trim_caps=None):
+    path = Path(points, trim,corner_trim_caps=corner_trim_caps)
     for j, piece in enumerate(path.pieces):
         before = path.ends[j-1] if j else 0.
         # Explicitly reject a reversal/cusp; a route knot may not disguise a
@@ -131,6 +131,10 @@ class MissionPlanner:
         self.cabin_lanes_override = cabin_lanes(nav.cabin_interior_mm,
             [nav.envelope['length_mm'], nav.envelope['width_mm']], self.passing_gap_mm,
             maximum=source['lift']['maximum_capacity'])
+        self.port_paths=None
+        if 'sources'in source:
+            from building_fleet_port_paths import PortPaths
+            self.port_paths=PortPaths(source,nav)
         self.variants = {key: inspection_variants(row) for key, row in nav.inspections.items()}
         self.wait_approaches = {}
         self.prepare_endpoints()
@@ -218,6 +222,20 @@ class MissionPlanner:
                            [home['arrival_xy_mm'],home['pose_mm_rad'][:2]],home.get('aisle_loop_mm',[])):
                 if len(points)>1:routes.append({'level':home['level'],'points_mm':copy.deepcopy(points),
                     'corner_trim_mm':self.trim_mm,'resources':[],'curve_qualified':False})
+        if self.port_paths is not None:
+            for level,places in self.nav.waits.items():
+                for slot in range(len(places)):
+                    routes.append({**self.port_paths.waiting_departure(level,slot),'resources':[],
+                        'private_waiting_slot':slot,'curve_qualified':False})
+                    for cabin in range(len(self.cabin_lanes_override)):
+                        board=self.port_paths.boarding(level,slot,cabin,self.cabin_lanes_override)
+                        exit_row=self.port_paths.alighting(level,slot,cabin,self.cabin_lanes_override)
+                        for row in(board,exit_row):
+                            routes.append({**row,'resources':[],'private_waiting_slot':slot,'curve_qualified':False})
+                        for approach in self.wait_approaches[level,slot]:
+                            points=copy.deepcopy(exit_row['points_mm']);_append(points,list(reversed(approach)))
+                            routes.append({**exit_row,'points_mm':points,'resources':[],
+                                'private_waiting_slot':slot,'curve_qualified':False})
         return routes
 
     def _state(self, vehicle):
@@ -293,9 +311,9 @@ class MissionPlanner:
             raise ValueError('Own waiting grant pose differs from source bay')
         return slot
 
-    def _drive(self, vehicle, level, points, zones, marks, terminal, reverse=False, lift_phase=None, initial_yaw=None):
+    def _drive(self, vehicle, level, points, zones, marks, terminal, reverse=False, lift_phase=None, initial_yaw=None,corner_trim_caps=None):
         trim = self.trim_mm
-        path = _path(points, trim)
+        path = _path(points, trim,corner_trim_caps)
         if initial_yaw is not None:
             actual = path.evaluate(0)[0][2]+(math.pi if reverse else 0.)
             if abs(math.atan2(math.sin(actual-initial_yaw), math.cos(actual-initial_yaw))) > 1e-6:
@@ -307,6 +325,7 @@ class MissionPlanner:
                   'zone_segments': zones, 'markers': markers, 'terminal': terminal,
                   'reverse': reverse, 'allow_lift': lift_phase is not None,
                   'corner_trim_mm': trim, 'prefetch_level': terminal.get('to_level', level)}
+        if path.corner_trim_caps:action['corner_trim_caps']=copy.deepcopy(path.corner_trim_caps)
         if lift_phase is not None:
             action['lift_phase'] = copy.deepcopy(lift_phase)
             action['port_id'] = lift_phase['start_port' if lift_phase['kind'] == 'boarding' else 'destination_port']
@@ -322,7 +341,7 @@ class MissionPlanner:
                 and math.dist(actual[:2], expected[:2]) <= tolerance
                 and abs(math.atan2(math.sin(actual[2]-expected[2]), math.cos(actual[2]-expected[2]))) < 1e-6)
 
-    def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None):
+    def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None,prefix_caps=None):
         vehicle, level = own['vehicle_id'], own['level']; state = self.states[vehicle]
         queue = [m for m in state['queue'] if m['mission_id'] not in state['completed']]
         inspections = []; boundary = None
@@ -389,7 +408,7 @@ class MissionPlanner:
                         marks.append({'point_index':len(prefix)-1,'event':'waiting_place_released',
                                       'details':{'level':waiting['level'],'slot':waiting['slot']}})
                     action = self._drive(vehicle, level, points, zones, marks, terminal, lift_phase=lift_phase,
-                                         initial_yaw=own['pose_mm_rad'][2])
+                                         initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=prefix_caps)
                     return action
                 except ValueError as error:
                     failures.append(str(error))
@@ -435,6 +454,14 @@ class MissionPlanner:
         park = self.cabin_lanes_override[slot]['pose_mm'][:2]
         if not _same(park, grant['cabin_pose_mm'][:2]):
             raise ValueError('Lift and mission planner disagree on physical cabin lane')
+        if self.port_paths is not None:
+            waiting_slot=next((i for i,wait in enumerate(self.nav.waits[own['level']])if _same(wait[:2],own['pose_mm_rad'][:2])),None)
+            if waiting_slot is None:raise ValueError('Boarding requires the actual own source waiting pose')
+            geometry=self.port_paths.boarding(own['level'],waiting_slot,slot,self.cabin_lanes_override)
+            return self._drive(own['vehicle_id'],own['level'],geometry['points_mm'],[],[],
+                {'kind':'cabin_park','slot':slot,'from_level':own['level'],
+                 'to_level':next(p['level_id']for p in self.ports.values()if p['id']==meta['destination_port'])},
+                lift_phase=meta,initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=geometry['corner_trim_caps'])
         x, _ = self._inside_align(port); centre_y = port['cabin_entry_mm'][1]
         outside = port['plane_x_mm']+(1 if port['exit_eye_mm'][0] > port['plane_x_mm'] else -1)*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
         points = []; _append(points, [own['pose_mm_rad'][:2], [outside, own['pose_mm_rad'][1]],
@@ -452,6 +479,23 @@ class MissionPlanner:
         port = self.ports[own['level']]
         if port['id'] != meta['destination_port']:
             raise ValueError('Exit port differs from observed own floor')
+        if self.port_paths is not None:
+            waiting=grants.get('waiting_place',{})
+            if waiting.get('status')!='granted'or waiting.get('level')!=own['level']:
+                raise ValueError('An arrival requires its own preallocated destination bay')
+            slot=waiting['slot'];geometry=self.port_paths.alighting(own['level'],slot,meta['slot'],self.cabin_lanes_override)
+            marks=[{'point_index':geometry['body_clear_waypoint_on_reverse'],'event':'lift_exited',
+                'details':{'direction':'reverse'if meta['same_side']else'forward'}}]
+            if meta['same_side']:
+                return self._drive(own['vehicle_id'],own['level'],geometry['points_mm'],[],marks,
+                    {'kind':'same_side_exit_stop','level':own['level'],'slot':slot},True,meta,
+                    initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=geometry['corner_trim_caps'])
+            failures=[]
+            for approach in self.wait_approaches[own['level'],slot]:
+                prefix=copy.deepcopy(geometry['points_mm']);_append(prefix,list(reversed(approach)))
+                try:return self._floor_leg(own,grants,prefix,marks,meta,geometry['corner_trim_caps'])
+                except ValueError as error:failures.append(str(error))
+            raise ValueError('No continuous own private exit approach: '+str(failures[:3]))
         x, direction = self._inside_align(port)
         outside_sign = -direction
         outside_x = port['plane_x_mm']+outside_sign*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
@@ -498,6 +542,11 @@ class MissionPlanner:
             terminal=state['terminal']
         if terminal and terminal['kind']in('same_side_exit_stop','capacity_wait'):
             slot = terminal['slot']; wait = self.nav.waits[own['level']][slot]
+            if self.port_paths is not None:
+                departure=self.port_paths.waiting_departure(own['level'],slot)
+                if not _same(departure['points_mm'][0],own['pose_mm_rad'][:2]):
+                    raise ValueError('Waiting departure must begin at the observed own bay')
+                return self._floor_leg(own,own_grants,departure['points_mm'],prefix_caps=departure['corner_trim_caps'])
             port = self.ports[own['level']]; direction = 1 if math.cos(wait[2]) > 0 else -1
             clear_x = port['plane_x_mm']-direction*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
             hub = self.nav.road_hubs[own['level']]

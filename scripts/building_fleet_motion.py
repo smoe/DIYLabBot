@@ -101,14 +101,26 @@ def perception_speed_limit(sensor, limits, radius, proposed):
 
 class Path:
     """Open C2 centreline from the shared CornerPath; no automatic knot stops."""
-    def __init__(self, points_xy_mm, trim_mm=250):
-        if len(points_xy_mm) < 2 or trim_mm <= 0:
+    def __init__(self, points_xy_mm, trim_mm=250, corner_trim_caps=None):
+        if len(points_xy_mm) < 2 or type(trim_mm)not in(int,float)or not math.isfinite(trim_mm)or trim_mm <= 0:
             raise ValueError('A positive-trim route with distinct endpoints required')
         points = [[float(p[0]),float(p[1]),0.] for p in points_xy_mm]
         if any(len(p) != 2 or not all(math.isfinite(v) for v in p) for p in points_xy_mm):
             raise ValueError('Finite XY route points required')
         if any(math.dist(a,b) < 1e-6 for a,b in zip(points,points[1:])):
             raise ValueError('Duplicate route points')
+        if corner_trim_caps is None:corner_trim_caps=[]
+        if not isinstance(corner_trim_caps,list):raise ValueError('Corner caps must be a JSON list')
+        caps={}
+        for row in corner_trim_caps:
+            if not isinstance(row,dict)or set(row)!={'point_index','maximum_trim_mm'}:
+                raise ValueError('Closed per-corner trim cap required')
+            index,maximum=row['point_index'],row['maximum_trim_mm']
+            if (type(index)is not int or not 1<=index<len(points)-1 or index in caps or
+                    type(maximum)not in(int,float)or not math.isfinite(maximum)or not 0<maximum<=trim_mm):
+                raise ValueError('Unique inner corner and positive cap within the global trim required')
+            caps[index]=maximum
+        self.corner_trim_caps=[{'point_index':i,'maximum_trim_mm':caps[i]}for i in sorted(caps)]
         self.pieces = []; self.ends = []; self.length = 0.; cursor = points[0]
         for index, corner in enumerate(points[1:-1], 1):
             incoming = [corner[i]-points[index-1][i] for i in range(2)]
@@ -116,7 +128,7 @@ class Path:
             cross = incoming[0]*outgoing[1]-incoming[1]*outgoing[0]
             if abs(cross) <= 1e-9*math.hypot(*incoming)*math.hypot(*outgoing) and sum(a*b for a,b in zip(incoming,outgoing)) > 0:
                 continue
-            trim = min(trim_mm, math.dist(points[index-1],corner)*.25, math.dist(corner,points[index+1])*.25)
+            trim = min(trim_mm,caps.get(index,trim_mm), math.dist(points[index-1],corner)*.25, math.dist(corner,points[index+1])*.25)
             blend = CornerPath(points[index-1],corner,points[index+1],0,0,trim)
             self._line(cursor,blend.controls[0]); self._add(blend.controls,7*trim/3)
             cursor = blend.controls[-1]

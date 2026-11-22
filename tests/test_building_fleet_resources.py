@@ -55,6 +55,25 @@ class StaticResourcesTests(unittest.TestCase):
         self.assertFalse(_positive_overlap(first,[[1,0],[2,0],[2,1],[1,1]]))
         self.assertTrue(_positive_overlap(first,[[.9,0],[2,0],[2,1],[.9,1]]))
 
+    def test_optional_corner_caps_preserve_complete_catalog_path_and_spans(self):
+        row={'level':'EG','points_mm':[[-500,0],[0,0],[0,400],[700,400]],
+             'corner_trim_mm':250,'corner_trim_caps':[
+                 {'point_index':2,'maximum_trim_mm':20},
+                 {'point_index':1,'maximum_trim_mm':10}],
+             'resources':[{'id':'EG.turn','kind':'passage','start_index':0,'end_index':3}]}
+        original=copy.deepcopy(row);catalog=ResourceCatalog(navigation(),[row])
+        expected=MotionPath(row['points_mm'],250,corner_trim_caps=row['corner_trim_caps'])
+        self.assertEqual(catalog.paths[0][1].pieces,expected.pieces)
+        normalized=catalog.normalize(row)
+        self.assertEqual(normalized['corner_trim_caps'],sorted(row['corner_trim_caps'],key=lambda c:c['point_index']))
+        self.assertEqual(normalized['resource_spans'],catalog.spans('EG',expected))
+        self.assertEqual(row,original)
+        legacy=route('EG.legacy',3000)
+        self.assertNotIn('corner_trim_caps',ResourceCatalog(navigation(),[legacy]).normalize(legacy))
+        invalid={**row,'corner_trim_caps':None}
+        with self.assertRaisesRegex(ValueError,'JSON list'):ResourceCatalog(navigation(),[invalid])
+        with self.assertRaisesRegex(ValueError,'JSON list'):catalog.normalize(invalid)
+
 
 class ResourceCacheTests(unittest.TestCase):
     def setup_cache(self,folder):
@@ -85,12 +104,23 @@ class ResourceCacheTests(unittest.TestCase):
             path=Path(folder)/'closure.json';path.write_bytes(path.read_bytes()+b' ')
             with self.assertRaisesRegex(ValueError,'bytes changed'):ResourceCatalog.from_cache(nav,routes,folder)
 
+    def test_changed_corner_caps_invalidate_complete_route_bank_cache(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav=navigation();nav._cache_pins=lambda:{}
+            row={'level':'EG','points_mm':[[0,0],[1000,0],[1000,1000]],
+                 'corner_trim_mm':250,'corner_trim_caps':[{'point_index':1,'maximum_trim_mm':25}],
+                 'resources':[{'id':'EG.turn','kind':'passage','start_index':0,'end_index':2}]}
+            ResourceCatalog(nav,[row]).write_cache(folder,[row])
+            changed=copy.deepcopy(row);changed['corner_trim_caps'][0]['maximum_trim_mm']=30
+            with self.assertRaisesRegex(ValueError,'route-bank'):ResourceCatalog.from_cache(nav,[changed],folder)
+
     def test_current_generator_and_navigation_pins_cannot_be_relabelled(self):
         with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
             nav,routes,_=self.setup_cache(folder)
             actual=model.digest
-            with patch.object(model,'digest',side_effect=lambda path:'0'*64 if Path(path).name=='building_fleet_resources.py'else actual(path)):
-                with self.assertRaisesRegex(ValueError,'pins are stale'):ResourceCatalog.from_cache(nav,routes,folder)
+            for generator in ('building_fleet_resources.py','building_fleet_port_paths.py'):
+                with patch.object(model,'digest',side_effect=lambda path:'0'*64 if Path(path).name==generator else actual(path)):
+                    with self.assertRaisesRegex(ValueError,'pins are stale'):ResourceCatalog.from_cache(nav,routes,folder)
             nav._cache_pins=lambda:{'tests/test_building_fleet_resources.py':'0'*64}
             with self.assertRaisesRegex(ValueError,'pins are stale'):ResourceCatalog.from_cache(nav,routes,folder)
 
