@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
@@ -200,6 +201,27 @@ class NativeBuildInputEvidenceTests(unittest.TestCase):
         report = json.loads(path.read_text());report['artifact_sha256'].pop('solidcraft_measurements')
         path.write_text(json.dumps(report))
         with self.assertRaises(ValueError):audit.build_input_evidence(path,report,self.root)
+
+
+class NativeAuditSourcePinTests(unittest.TestCase):
+    def test_export_helper_drift_is_rejected_by_audit_source_pins(self):
+        helper_name = 'scripts/export_building_walkthrough_freecad.py'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            auditor = root/'scripts/check_foyer_monitor_wall_native.py'
+            helper = root/helper_name
+            auditor.parent.mkdir()
+            auditor.write_bytes(Path(audit.__file__).read_bytes())
+            helper_bytes = Path(audit.native.__file__).read_bytes()
+            helper.write_bytes(helper_bytes)
+
+            with patch.object(audit, '__file__', str(auditor)), patch.object(audit.native, '__file__', str(helper)):
+                pins = audit.audit_source_pins(root)
+                self.assertEqual(pins[helper_name], hashlib.sha256(helper_bytes).hexdigest())
+                audit.native.verify_pins(pins, root)
+                helper.write_bytes(helper_bytes + b'\n# Drift after the audit snapshot.\n')
+                with self.assertRaisesRegex(ValueError, helper_name):
+                    audit.native.verify_pins(pins, root)
 
 
 if __name__ == '__main__':

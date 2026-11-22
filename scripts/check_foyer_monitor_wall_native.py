@@ -25,6 +25,12 @@ VOLUME_TOLERANCE_MM3 = 1e-5
 DIMENSION_TOLERANCE_MM = 0.01
 
 
+def audit_source_pins(root=ROOT):
+    """Capture the audit code and its report-verification helper before use."""
+    paths = [Path(filename).resolve() for filename in (__file__, native.__file__)]
+    return {path.relative_to(root).as_posix(): native.digest(path) for path in paths}
+
+
 def build_input_evidence(path, report, root=ROOT):
     """Bind the original report bytes and every artifact it supplied to this audit."""
     root = Path(root).resolve()
@@ -246,6 +252,7 @@ def freecad_worker(job):
 
 
 def check(report_path, output, *, freecad_python, solidcraft_cli, solidcraft_report=None):
+    pins = audit_source_pins()
     report_path = native.project_path(report_path)
     build_digest = native.digest(report_path)
     report = native.checked_report(report_path, 'building')
@@ -277,18 +284,17 @@ def check(report_path, output, *, freecad_python, solidcraft_cli, solidcraft_rep
             raise ValueError('Provide a separate current SolidCraft scope report for a FreeCAD-only building')
     native_builds = {'freecad':fc_input,'solidcraft':build_input_evidence(scope_path,sc_report)}
     verify_build_input_evidence(native_builds)
+    for record in native_builds.values():
+        for name, expected in record['source_files_sha256'].items():
+            if pins.setdefault(name, expected) != expected:
+                raise ValueError('Native audit and build source snapshots disagree: '+name)
+    native.verify_pins(pins)
     output = native.project_path(output)
     if not output.is_relative_to(ROOT/'exports'):
         raise ValueError('New native monitor evidence belongs under exports/')
     if output.exists():
         raise FileExistsError('Native monitor audits preserve existing results: '+str(output))
     output.mkdir(parents=True)
-    for name,expected in sc_report['source_files_sha256'].items():
-        if name in report['source_files_sha256'] and report['source_files_sha256'][name] != expected:
-            raise ValueError('CAD source snapshots disagree: '+name)
-    pins = {**report['source_files_sha256'],**sc_report['source_files_sha256'],
-            str(Path(__file__).relative_to(ROOT)):native.digest(__file__)}
-    native.verify_pins(pins)
     sc_raw = json.loads(native.project_path(sc_report['files']['solidcraft_measurements']).read_text())
     sc_geometry = common.measurements(sc_raw, selected_source, backend='solidcraft')
     monitors = validate_scope(wall, [row['body'] for row in sc_geometry])
