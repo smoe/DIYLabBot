@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "robot-revisions.schema.json",
+  "title": "Explicit robot revision catalog",
+  "type": "object",
+  "required": ["format", "revisions"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": "solidcraftbot.robot-revisions/1"},
+    "revisions": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*@R[0-9]+$"},
+      "additionalProperties": {"$ref": "#/$defs/revision"}
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "revision": {
+      "type": "object",
+      "required": ["type", "type_sha256", "family_snapshot", "family_sha256", "dependencies_sha256", "producers_sha256", "materialized_sha256", "revision_sha256"],
+      "additionalProperties": false,
+      "properties": {
+        "type": {"type": "string", "pattern": "^model/robot-types/[a-z0-9_-]+\\.type\\.json$"},
+        "type_sha256": {"$ref": "#/$defs/sha256"},
+        "family_snapshot": {"type": "string", "pattern": "^model/history/robot-[0-9a-f]{12}\\.json$"},
+        "family_sha256": {"$ref": "#/$defs/sha256"},
+        "dependencies_sha256": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"pattern": "^(model/|cad/vendor/)[A-Za-z0-9_./-]+$"},
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "producers_sha256": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"pattern": "^scripts/[A-Za-z0-9_]+\\.py$"},
+          "additionalProperties": {"$ref": "#/$defs/sha256"}
+        },
+        "materialized_sha256": {"$ref": "#/$defs/sha256"},
+        "revision_sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  }
+}

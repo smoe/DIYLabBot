@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "robot-type.schema.json",
+  "title": "Robot type definition",
+  "type": "object",
+  "required": ["format", "id", "family", "options", "bindings"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": "solidcraftbot.robot-type/1"},
+    "id": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "family": {"const": "model/robot.json"},
+    "options": {"type": "object", "maxProperties": 0},
+    "bindings": {
+      "type": "object",
+      "required": ["actuator_selection"],
+      "additionalProperties": false,
+      "properties": {
+        "actuator_selection": {"const": "model/actuator-selection.json"}
+      }
+    }
+  }
+}

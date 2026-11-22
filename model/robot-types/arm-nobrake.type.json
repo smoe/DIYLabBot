@@ -1,0 +1,9 @@
+{
+  "format": "solidcraftbot.robot-type/1",
+  "id": "arm_nobrake",
+  "family": "model/robot.json",
+  "options": {},
+  "bindings": {
+    "actuator_selection": "model/actuator-selection.json"
+  }
+}
