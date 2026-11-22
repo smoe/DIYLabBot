@@ -148,6 +148,45 @@ class NativeIntervalContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):c.parts_distance([],second,count,'kernel')
 
 
+class NativeProgramHeaderTests(unittest.TestCase):
+    """Partial or foreign fleet records cannot acquire a full-native scope."""
+    def test_full_audit_header_fails_before_resolving_native_artifacts(self):
+        import check_building_fleet_freecad as c
+        seed=c.fleet.load()['missions']['seed'];before=sys.modules.get('FreeCAD')
+        with tempfile.TemporaryDirectory()as directory:
+            path=Path(directory)/'programme.json'
+            for changes in [{'complete':False},{'complete':1},{'format':'other'},
+                            {'seed':seed+1},{'seed':str(seed)},{'seed':True}]:
+                program={'format':'solidcraftbot.building-fleet-program/1','complete':True,
+                         'seed':seed,'source_files_sha256':{'fixture':'0'*64},**changes}
+                path.write_text(json.dumps(program))
+                with self.subTest(changes=changes),patch.object(c.native,'project_path',return_value=path),\
+                     patch.object(c.native,'verify_pins'),\
+                     patch.object(c,'checked_walkthrough',side_effect=AssertionError('Native artifacts reached before header rejection')):
+                    with self.assertRaises(ValueError):c.audit(path,Path(directory)/'out.json')
+        self.assertIs(sys.modules.get('FreeCAD'),before)
+
+    def test_complete_new_audit_fields_and_standalone_probe_retain_their_boundaries(self):
+        import check_building_fleet_freecad as c
+        seed=c.fleet.load()['missions']['seed'];before=sys.modules.get('FreeCAD')
+        with tempfile.TemporaryDirectory()as directory:
+            path=Path(directory)/'programme.json'
+            for probe in [False,True]:
+                program={'format':'standalone_fixture'if probe else'solidcraftbot.building-fleet-program/1',
+                         'complete':not probe,'seed':seed,'scope':'standalone_curve_only'if probe else'full_fleet_program',
+                         'source_files_sha256':{'fixture':'0'*64},
+                         'trajectories':[{'vehicle_id':'BF%02d'%i}for i in range(1,2 if probe else 21)],
+                         'artifacts':{'walkthrough_report':{},'camera_report':{}},
+                         'capacity_audit_fields':{'fixture':'extra programme evidence'}}
+                path.write_text(json.dumps(program))
+                with self.subTest(probe=probe),patch.object(c.native,'project_path',return_value=path),\
+                     patch.object(c.native,'verify_pins'),patch.object(c,'reference',return_value=path),\
+                     patch.object(c,'checked_walkthrough',side_effect=RuntimeError('native-artifact-boundary')):
+                    with self.assertRaisesRegex(RuntimeError,'native-artifact-boundary'):
+                        c.audit(path,Path(directory)/'out.json',_curve_probe=probe)
+        self.assertIs(sys.modules.get('FreeCAD'),before)
+
+
 class NativeWorldSnapshotTests(unittest.TestCase):
     """Reuse original native shapes without reusing posed audit dictionaries."""
     def setUp(self):
