@@ -10,6 +10,7 @@ import copy
 import hashlib
 import json
 import math
+import sys
 from pathlib import Path as FilePath
 from functools import lru_cache
 
@@ -30,6 +31,30 @@ def _point_distance(point,poly):
     from building_fleet_sim import point_segment_distance
     if _inside(point,poly):return 0.
     return min(point_segment_distance(point,a,b)for a,b in zip(poly,poly[1:]+poly[:1]))
+
+
+_BROAD_PHASE_MIN=math.sqrt(math.sqrt(sys.float_info.min))
+_BROAD_PHASE_MAX=math.sqrt(math.sqrt(sys.float_info.max))
+
+
+def _broad_phase_finite(values):
+    """Keep overflow/underflow-prone arithmetic on the original predicate."""
+    return all(math.isfinite(v)and(v==0 or _BROAD_PHASE_MIN<=abs(v)<=_BROAD_PHASE_MAX)for v in values)
+
+
+def _bounds_may_reach(point,bounds,threshold):
+    """One-sided broad phase; the original polygon distance decides contact.
+
+    Roundoff padding covers the subtraction/multiply/divide chain in the
+    original ray and segment predicates, including cancellation at large
+    offsets. Ambiguous boundary queries therefore keep the original test.
+    This numerical envelope changes no physical guard or distance threshold.
+    """
+    lo,hi=bounds
+    if not _broad_phase_finite((*point,*lo,*hi,threshold)):return True
+    padding=32*max(math.ulp(v)for v in(*point,*lo,*hi,threshold))
+    reach=threshold+padding
+    return all(lo[k]-point[k]<=reach and point[k]-hi[k]<=reach for k in range(2))
 
 
 def _positive_overlap(a,b):
@@ -95,7 +120,26 @@ class ResourceCatalog:
         # rounds coordinates and cannot retain an unbounded runtime path bank.
         self._polygon_refs={id(p):p for _,_,p in self.room_polygons}
         self._polygon_refs.update({id(row['polygon']):row['polygon']for row in self.regions})
+        self._polygon_bounds={identity:_bounds(polygon)for identity,polygon in self._polygon_refs.items()}
+        self._polygon_numeric_safe={identity:_broad_phase_finite(v for point in polygon for v in point)
+                                    for identity,polygon in self._polygon_refs.items()}
+        exact_geometry={};self._polygon_canonical={}
+        for identity,polygon in self._polygon_refs.items():
+            key=tuple(tuple(point)for point in polygon)
+            self._polygon_canonical[identity]=exact_geometry.setdefault(key,identity)
         self._distance=lru_cache(maxsize=32768)(lambda point,identity:_point_distance(point,self._polygon_refs[identity]))
+        self._within=lru_cache(maxsize=65536)(lambda point,identity,threshold:
+            (not self._polygon_numeric_safe[identity]or _bounds_may_reach(point,self._polygon_bounds[identity],threshold))
+            and self._distance(point,self._polygon_canonical[identity])<=threshold)
+        self._room_index=collections.defaultdict(list);self._rooms_by_level=collections.defaultdict(list)
+        self._unindexed_rooms=collections.defaultdict(list);self._room_numeric_padding={}
+        for index,(level,_,polygon)in enumerate(self.room_polygons):
+            self._rooms_by_level[level].append(index)
+            if not self._polygon_numeric_safe[id(polygon)]:
+                self._unindexed_rooms[level].append(index);continue
+            self._room_numeric_padding[level]=max(self._room_numeric_padding.get(level,20),
+                32*max(math.ulp(v)for point in polygon for v in point))
+            for key in self._cells(level,self._polygon_bounds[id(polygon)],padding=0):self._room_index[key].append(index)
         self._static_paths={(level,id(path)):path for level,path in self.paths};self._raw_alias_windows={}
         # Geometry closes differing aliases before any vehicle requests a token.
         index=collections.defaultdict(list)
@@ -109,6 +153,14 @@ class ResourceCatalog:
         # A path can only hold one narrow token. Close overlaps of conservative
         # progress windows as a static relation too, not as a runtime shortcut.
         self._index=index
+        # A finer lookup partitions the same immutable polygons; guard size is
+        # only a bin width here, never a changed physical conflict envelope.
+        self._query_cell_size=self.guard;self._query_index=collections.defaultdict(list)
+        self._region_coarse_bounds=[]
+        for i,row in enumerate(self.regions):
+            self._region_coarse_bounds.append(tuple(tuple(math.floor(v/1000)for v in pair)for pair in row['bounds']))
+            for key in self._query_cells(row['level'],row['bounds'],0):self._query_index[key].append(i)
+        self._candidates=lru_cache(maxsize=32768)(self._candidate_indices)
         if _cached_canonical is not None:
             self._restore_closure(_cached_canonical)
             self._frozen=True
@@ -260,22 +312,56 @@ class ResourceCatalog:
         samples=[(a,b,tuple(path.position((a+b)/2)),(b-a)/2+1e-6)for a,b,_,_ in path.samples]
         # Select rooms actually visited by the centreline; their fixed portal
         # guards separately cover nearby paths that merely skim an open door.
-        visited=[]
-        for lev,alias,polygon in self.room_polygons:
-            if lev==level and any(self._distance(centre,id(polygon))<=movement for _,_,centre,movement in samples):
-                visited.append((alias,polygon))
+        visited_indices=set()
+        for _,_,centre,movement in samples:
+            for index in self._candidates(level,centre,movement,True):
+                if index in visited_indices:continue
+                _,_,polygon=self.room_polygons[index]
+                if self._within(centre,id(polygon),movement):visited_indices.add(index)
+        visited=[self.room_polygons[index][1:]for index in sorted(visited_indices)]
         for a,b,centre,movement in samples:
-            candidates=set()
-            for key in self._cells(level,([v-movement for v in centre],[v+movement for v in centre]),padding=20):
-                candidates.update(self._index.get(key,()))
             aliases=set()
-            for i in candidates:
+            for i in self._candidates(level,centre,movement,False):
                 row=self.regions[i]
-                if self._distance(centre,id(row['polygon']))<=movement:aliases.add(row['alias'])
+                if self._within(centre,id(row['polygon']),movement):aliases.add(row['alias'])
             for alias,polygon in visited:
-                if self._distance(centre,id(polygon))<=self.guard+movement:aliases.add(alias)
+                if self._within(centre,id(polygon),self.guard+movement):aliases.add(alias)
             for alias in aliases:marked[alias].append((a,b))
         return dict(marked)
+
+    def _candidate_indices(self,level,centre,movement,rooms):
+        """Exact query keys and immutable per-floor indices; no live path bank."""
+        index=self._room_index if rooms else self._query_index
+        # Retain the former 20mm bin padding and enlarge it only for numerical
+        # cancellation at unusually large coordinate offsets. Final distance
+        # decisions still use the original, unexpanded movement threshold.
+        safe=_broad_phase_finite((*centre,movement))
+        if rooms and not safe:return frozenset(self._rooms_by_level.get(level,()))
+        if not rooms and not safe:
+            result=set()
+            for key in self._cells(level,([v-movement for v in centre],[v+movement for v in centre]),padding=20):
+                result.update(self._index.get(key,()))
+            return frozenset(result)
+        padding=max(20,32*max(math.ulp(v)for v in(*centre,movement)))if safe else 20
+        if rooms:padding=max(padding,self._room_numeric_padding.get(level,20))
+        result=set(self._unindexed_rooms.get(level,()))if rooms else set()
+        bounds=([v-movement for v in centre],[v+movement for v in centre])
+        cells=self._cells(level,bounds,padding)if rooms else self._query_cells(level,bounds,padding)
+        for key in cells:
+            result.update(index.get(key,()))
+        if not rooms:
+            # Preserve the former coarse-bin selection exactly as an outer
+            # gate, including its original floating-point boundary arithmetic.
+            qlo=[math.floor((v-movement-20)/1000)for v in centre]
+            qhi=[math.floor((v+movement+20)/1000)for v in centre]
+            result={i for i in result if all(self._region_coarse_bounds[i][0][k]<=qhi[k]
+                                           and self._region_coarse_bounds[i][1][k]>=qlo[k]for k in range(2))}
+        return frozenset(result)
+
+    def _query_cells(self,level,bounds,padding):
+        lo,hi=bounds;size=self._query_cell_size
+        for x in range(math.floor((lo[0]-padding)/size),math.floor((hi[0]+padding)/size)+1):
+            for y in range(math.floor((lo[1]-padding)/size),math.floor((hi[1]+padding)/size)+1):yield level,x,y
 
     def _spans(self,level,path,canonical=True):
         identity=(level,id(path));raw=self._raw_alias_windows.get(identity)
