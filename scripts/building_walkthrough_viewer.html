@@ -20,6 +20,8 @@
     .lift-readout{display:inline-block;background:#18171c;color:#ff3156;font:700 32px monospace;min-width:48px;text-align:center;padding:4px 10px;border-radius:5px;margin:0 0 10px}.lift-floors button{border-radius:50%;min-width:40px;padding:8px;font-weight:700}.lift-floors button[aria-pressed=true]{border-color:#f54e71;box-shadow:0 0 0 2px #f54e7155}
     @media(max-width:650px){.lift-panel{right:12px;top:65px;width:230px;padding:9px;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+    .camera-wall-panel{position:absolute;inset:74px 18px 18px;z-index:4;overflow:auto;padding:16px;background:#fffdf7f5;border:1px solid #b8c9be;border-radius:10px;max-width:800px;margin:auto;color:#243f35}
+    .camera-wall-panel[hidden]{display:none}.camera-wall-panel h2{font-size:18px;margin:0 0 12px}.camera-wall-panel>button{float:right}.camera-wall-panel label{display:block;font-size:12px;margin-bottom:5px}.camera-wall-panel select{width:100%;padding:8px;margin-bottom:12px}.camera-wall-panel canvas{height:auto;aspect-ratio:16/9;width:100%;cursor:default;background:#142526}.camera-wall-panel p{font-size:12px;line-height:1.5;overflow-wrap:anywhere}
   </style>
 </head>
 <body>
@@ -79,7 +81,8 @@
 </main>
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
 <script>__WALKTHROUGH_INTERACTION__
-__WALKTHROUGH_ROBOTS__</script>
+__WALKTHROUGH_ROBOTS__
+__WALKTHROUGH_MONITORS__</script>
 <script>
 (() => {
   'use strict';
@@ -96,6 +99,9 @@ __WALKTHROUGH_ROBOTS__</script>
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
     if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
     const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
+    const monitorConfig=data.camera_wall||null,monitorFrames=new Map((monitorConfig?.monitors||[]).map(m=>[m.screen_body_id,m.screen_frame]));
+    const monitorTriggers=new Map((monitorConfig?.monitors||[]).flatMap((m,i)=>m.body_ids.map(id=>[id,i])));
+    let monitorWall=null;
     const keyboardModifiers={alt:false,shift:false};
     const isolation=data.isolation||null,isolationIds=new Set(isolation?.body_ids||[]),isolationButton=document.getElementById('walkthrough-isolate');
     let isolated=false;
@@ -117,8 +123,10 @@ __WALKTHROUGH_ROBOTS__</script>
     const fragmentSource=`#version 300 es
       precision highp float;
       in vec3 worldPosition;in vec3 worldNormal;uniform vec4 materialColor;uniform vec3 eye;uniform bool emissive;
+      uniform bool screenEnabled;uniform sampler2D screenTexture;uniform vec3 screenOrigin;uniform vec3 screenRight;uniform vec3 screenUp;uniform vec3 screenNormal;uniform vec2 screenSize;uniform float screenImageAspect;
       out vec4 outColor;
       void main(){
+        if(screenEnabled&&dot(normalize(worldNormal),screenNormal)>.99){vec3 d=worldPosition-screenOrigin;float ratio=screenSize.x/screenSize.y;vec2 span=ratio>screenImageAspect?vec2(screenImageAspect/ratio,1.):vec2(1.,ratio/screenImageAspect);vec2 uv=vec2(dot(d,screenRight),dot(d,screenUp))/screenSize/span+.5;outColor=vec4(.03,.06,.06,1.);if(all(greaterThanEqual(uv,vec2(0.)))&&all(lessThanEqual(uv,vec2(1.))))outColor=vec4(texture(screenTexture,uv).rgb,1.);return;}
         vec3 n=normalize(worldNormal);if(!gl_FrontFacing)n=-n;
         float hemi=.52+.13*(n.z*.5+.5);
         float sunlight=.36*max(dot(n,normalize(vec3(-.45,-.35,1.))),0.);
@@ -132,7 +140,7 @@ __WALKTHROUGH_ROBOTS__</script>
     const program=gl.createProgram(),vertex=shader(gl.VERTEX_SHADER,vertexSource),fragment=shader(gl.FRAGMENT_SHADER,fragmentSource);
     gl.attachShader(program,vertex);gl.attachShader(program,fragment);gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));
     gl.deleteShader(vertex);gl.deleteShader(fragment);gl.useProgram(program);
-    const uniforms=Object.fromEntries(['viewProjection','modelMatrix','materialColor','eye','emissive'].map(name=>[name,gl.getUniformLocation(program,name)]));
+    const uniforms=Object.fromEntries(['viewProjection','modelMatrix','materialColor','eye','emissive','screenEnabled','screenTexture','screenOrigin','screenRight','screenUp','screenNormal','screenSize','screenImageAspect'].map(name=>[name,gl.getUniformLocation(program,name)]));
     const attributes={position:gl.getAttribLocation(program,'position'),normal:gl.getAttribLocation(program,'normal')};
     gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LEQUAL);gl.disable(gl.CULL_FACE);gl.clearColor(.79,.85,.84,1);
     let sceneId=null,stopId=null,selectedLevel=null,eye=[0,0,0],yaw=0,pitch=0,drag=null,dirty=true,lastTime=null,frames=0;
@@ -323,13 +331,14 @@ __WALKTHROUGH_ROBOTS__</script>
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>controlBodies.get(id)||robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
+        targetForBody:id=>monitorTriggers.has(id)?'monitor:'+monitorTriggers.get(id):controlBodies.get(id)||robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
         referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
     function interact(x,y,input){
       advanceObjects(performance.now());const hit=pickAt(x,y,input==='space');
       if(!hit)return lastInteraction={status:'no_target',input,frame:frames};
+      if(hit.target_id.startsWith('monitor:')){clearInputKeys();return lastInteraction={...monitorWall.open(Number(hit.target_id.split(':')[1])),input,frame:frames};}
       if(robots.has(hit.target_id))return lastInteraction={...selectRobot(hit.target_id),input,frame:frames};
       const port=portById.get(hit.target_id),object=objectStates.get(hit.target_id),name=object?.targetState==='closed'?'open':'close';
       const control=controlTargets.get(hit.target_id);
@@ -339,7 +348,8 @@ __WALKTHROUGH_ROBOTS__</script>
     function updateInteractionHint(){
       centreTarget=pickAt(0,0,true);interactionHint.hidden=!centreTarget;
       crosshair.classList.toggle('is-interactive',Boolean(centreTarget));
-      if(centreTarget&&robots.has(centreTarget.target_id)){interactionHint.textContent=robots.get(centreTarget.target_id).config.label+' · Klick oder Leertaste: Befehle';}
+      if(centreTarget?.target_id.startsWith('monitor:')){interactionHint.textContent='Kamerawand · Klick oder Leertaste: Kamera auswählen';}
+      else if(centreTarget&&robots.has(centreTarget.target_id)){interactionHint.textContent=robots.get(centreTarget.target_id).config.label+' · Klick oder Leertaste: Befehle';}
       else if(centreTarget&&controlTargets.has(centreTarget.target_id)){const c=controlTargets.get(centreTarget.target_id);interactionHint.textContent=c.kind==='floor'?'Floor '+c.label+' · Click or Space':'Call lift · Click or Space';}
       else if(centreTarget){const port=portById.get(centreTarget.target_id),object=objectStates.get(centreTarget.target_id),name=object?.targetState==='closed'?'open':'close';interactionHint.textContent=port?'Building lift · '+port.level_id+' · Space: call lift':object.config.label+' · '+object.config.state_labels[object.state]+' · Leertaste: '+object.config.commands[name].label;}
       const hover=pointerPosition&&!drag?.moved&&pickAt(pointerPosition[0],pointerPosition[1]);
@@ -353,8 +363,8 @@ __WALKTHROUGH_ROBOTS__</script>
       for(let i=0;i<count;i++)result[i]=kind==='float'?view.getFloat32(i*4,true):view.getUint32(i*4,true);
       return result;
     }
-    function prepareScene(id){
-      const key=sceneKey(id);if(sceneCache.has(key))return sceneCache.get(key);
+    function prepareScene(id,complete=false){
+      const key=complete?id+':monitor-complete':sceneKey(id);if(sceneCache.has(key))return sceneCache.get(key);
       const source=data.scenes[id];
       if(!Number.isSafeInteger(source.vertex_count)||source.vertex_count<3||!Number.isSafeInteger(source.index_count)||source.index_count<3||!Array.isArray(source.groups))throw Error('A complete native mesh scene is required.');
       const positions=decode(source.positions_base64,'float',source.vertex_count*3,'positions'),normals=decode(source.normals_base64,'float',source.vertex_count*3,'normals'),indices=decode(source.indices_base64,'uint',source.index_count,'indices');
@@ -366,7 +376,7 @@ __WALKTHROUGH_ROBOTS__</script>
       for(const group of coverage){if(group.index_start!==expected||!Number.isSafeInteger(group.index_count)||group.index_count<0||group.index_count%3)throw Error('Native mesh groups must partition all triangles.');expected+=group.index_count;}
       if(expected!==source.index_count)throw Error('The native mesh group manifest omits triangles.');
       for(const group of source.groups){
-        if(omitted.has(group.id)||(isolated&&!isolationIds.has(group.id)))continue;
+        if(omitted.has(group.id)||(isolated&&!complete&&!isolationIds.has(group.id))||(complete&&group.role==='viewing_cone'))continue;
         if(!finite3(group.color)||group.color.some(v=>v<0||v>1)||!Number.isFinite(group.opacity)||group.opacity<0||group.opacity>1)throw Error('Native material metadata is invalid.');
         const opacity=Object.hasOwn(opacityByRole,group.role)?opacityByRole[group.role]:group.opacity;
         if(opacity!==group.opacity)opacityOverrides++;
@@ -374,7 +384,7 @@ __WALKTHROUGH_ROBOTS__</script>
         pickGroups.push(group);
         const local=indices.subarray(group.index_start,group.index_start+group.index_count),color=[...group.color,opacity];
         const owner=bodyOwners.get(id+':'+group.id);
-        if(owner||ledBodies.has(group.id)){const bb=group.bounds_mm;const batch={id:group.id,object:owner,color,parts:[local],count:local.length,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)};(opacity>=.99?movingOpaque:transparent).push(batch);}
+        if(owner||ledBodies.has(group.id)||monitorFrames.has(group.id)||complete){const bb=group.bounds_mm;const batch={id:group.id,object:owner,color,parts:[local],count:local.length,bounds:bb,centre:bb.min.map((v,i)=>(v+bb.max[i])/2000)};(opacity>=.99?movingOpaque:transparent).push(batch);}
         else if(opacity>=.99){const key=JSON.stringify(color);if(!opaque.has(key))opaque.set(key,{color,parts:[],count:0});const batch=opaque.get(key);batch.parts.push(local);batch.count+=local.length;}
         else{
           const bb=group.bounds_mm||group.bbox_mm;
@@ -389,32 +399,61 @@ __WALKTHROUGH_ROBOTS__</script>
       attribute(attributes.position,positions);attribute(attributes.normal,normals);
       const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
       const nav=data.navigation;if(!nav)throw Error('Source-bound camera collision profile required.');
-      const collider=WalkthroughInteraction.createCameraCollider({positions,indices,
+      const collider=complete?null:WalkthroughInteraction.createCameraCollider({positions,indices,
         groups:source.groups.filter(g=>!omitted.has(g.id)&&g.index_count),radius:nav.camera_radius_mm/1000,
         margin:nav.contact_margin_mm/1000,iterations:nav.max_contact_iterations,slides:nav.max_slides});
-      const result={collider,picker:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
+      const result={collider,picker:complete?null:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
-    function render(){
-      syncLiftCamera();
-      const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
-      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
-      gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
-      const scene=prepareScene(sceneId);gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,cameraMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);
+    function drawScene(scene,viewProjection,viewEye,feed=false){
+      gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
+      gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,viewProjection);gl.uniform3fv(uniforms.eye,viewEye);
       gl.disable(gl.BLEND);gl.depthMask(true);
+      const textures=feed?null:monitorWall?.textures;
+      if(monitorConfig)gl.uniform1f(uniforms.screenImageAspect,monitorConfig.settings.resolution_px[0]/monitorConfig.settings.resolution_px[1]);
+      let drawnGroups=0,drawnTriangles=0;
       for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id);const on=levelsOn?.includes(elevator.displayLevel());
-        gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-      gl.uniform1i(uniforms.emissive,0);
+        const model=group.object?objectMatrix(group.object):identity();
+        if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;
+        const screen=monitorFrames.get(group.id),texture=textures?.get(group.id);gl.uniform1i(uniforms.screenEnabled,Boolean(screen&&texture));
+        if(screen&&texture){gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,texture);gl.uniform1i(uniforms.screenTexture,0);gl.uniform3fv(uniforms.screenOrigin,screen.origin_mm.map(v=>v/1000));gl.uniform3fv(uniforms.screenRight,screen.x_axis);gl.uniform3fv(uniforms.screenUp,screen.y_axis);gl.uniform3fv(uniforms.screenNormal,screen.normal);gl.uniform2fv(uniforms.screenSize,[screen.width_mm/1000,screen.height_mm/1000]);}
+        gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,model);gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);drawnGroups++;drawnTriangles+=group.count/3;}
+      gl.uniform1i(uniforms.emissive,0);gl.uniform1i(uniforms.screenEnabled,0);
       gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
       for(const group of scene.transparent){
         const m=group.object?objectMatrix(group.object):null,p=group.centre;
         const centre=m?[0,1,2].map(i=>m[i]*p[0]+m[i+4]*p[1]+m[i+8]*p[2]+m[i+12]):p;
-        const offset=centre.map((v,i)=>v-eye[i]);group.distanceSquared=dot(offset,offset);
+        const offset=centre.map((v,i)=>v-viewEye[i]);group.distanceSquared=dot(offset,offset);
       }
       scene.transparent.sort((a,b)=>b.distanceSquared-a.distanceSquared);
-      for(const group of scene.transparent){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-      gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();updateLiftUI();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
+      for(const group of scene.transparent){const model=group.object?objectMatrix(group.object):identity();if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;gl.uniformMatrix4fv(uniforms.modelMatrix,false,model);gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);drawnGroups++;drawnTriangles+=group.count/3;}
+      gl.depthMask(true);gl.disable(gl.BLEND);
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
+      return {drawn_native_groups:drawnGroups,drawn_triangles:drawnTriangles};
+    }
+    function render(){
+      syncLiftCamera();
+      const ratio=Math.min(1.75,devicePixelRatio||1),width=Math.max(1,Math.round(canvas.clientWidth*ratio)),height=Math.max(1,Math.round(canvas.clientHeight*ratio));
+      if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
+      gl.viewport(0,0,width,height);drawScene(prepareScene(sceneId),cameraMatrix(width/height),eye);
+      updateInteractionHint();updateLiftUI();frames++;root.dataset.frames=String(frames);root.dataset.scene=sceneId;root.dataset.stop=stopId;
+    }
+    function captureMonitor(camera,width,height){
+      const owner=camera.mount_body_id?bodyOwners.get('building:'+camera.mount_body_id):null;
+      const frame=CameraMonitorWall.pose(camera,owner?objectMatrix(owner):null);
+      const metrics=drawScene(prepareScene('building',true),CameraMonitorWall.projection(camera,frame,width/height),frame.eye_mm.map(v=>v/1000),true);
+      const robot=owner&&robots.get(owner.config.robot_id);
+      return {...frame,...metrics,model_time_s:robot?.snapshot.time_s??null,source_kind:camera.kind};
+    }
+    if(monitorConfig){
+      const sourceIds=new Set(data.scenes.building.groups.map(g=>g.id));
+      for(const id of monitorTriggers.keys())if(!sourceIds.has(id))throw Error('Missing native monitor body: '+id);
+      objectSceneIds.add('building');
+      monitorWall=CameraMonitorWall.create({config:monitorConfig,wall:monitorConfig,gl,host:stageNode,capture:captureMonitor,
+        visible:()=>!isolated&&sceneId==='building'&&monitorConfig.monitors.some(m=>{
+          const f=m.screen_frame,side=eye.map((v,i)=>v-f.origin_mm[i]/1000);
+          return dot(side,f.normal)>0&&projectPoint(f.origin_mm).visible;
+        }),requestRender,focusMain:()=>canvas.focus()});
     }
     function clearKeyboardKeys(){keyboardKeys.clear();keyboardModifiers.alt=false;keyboardModifiers.shift=false;}
     function clearInputKeys(){keys.clear();clearKeyboardKeys();}
@@ -513,6 +552,10 @@ __WALKTHROUGH_ROBOTS__</script>
       get interactionTarget(){return centreTarget?{...centreTarget,distance_mm:centreTarget.distance_m*1000}:null;},
       get lastInteraction(){return lastInteraction?{...lastInteraction}:null;},
       robotCommand, selectRobot,
+      selectMonitor:index=>monitorWall?.open(index)||{status:'unavailable'},
+      assignMonitor:(index,id)=>monitorWall?.assign(index,id)||{status:'unavailable'},
+      captureMonitor:index=>monitorWall?.captureSlot(index)||{status:'unavailable'},
+      get monitorWall(){return monitorWall?.snapshot||null;},
       viewRobot:id=>{const r=robots.get(id);return r?viewObject(r.config.joint_object_ids[0]):{status:"unknown_target",id};},
       get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},

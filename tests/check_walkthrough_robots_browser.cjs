@@ -34,7 +34,7 @@ const {pathToFileURL}=require('node:url');const {chromium}=require(process.argv[
   assert.deepEqual(await page.evaluate(ids=>window.__buildingWalkthrough.objects.filter(o=>!ids.includes(o.id)).map(o=>[o.id,o.joint_value]),robot.joint_object_ids),unchanged);
   await page.locator('[data-robot-command=home]').click({force:true});await page.clock.fastForward(robot.duration_s*1000+500);
   await page.evaluate(id=>window.__buildingWalkthrough.viewRobot(id),id);await page.clock.fastForward(20);
-  await page.locator('canvas').focus();await page.keyboard.press('Space');await page.clock.fastForward(20);
+  await page.locator('#walkthrough-canvas').focus();await page.keyboard.press('Space');await page.clock.fastForward(20);
   assert.equal((await page.evaluate(()=>window.__buildingWalkthrough.lastInteraction)).id,id,'Face robot and Space opens its commands');
   assert.deepEqual(errors,[]);
   const report={passed:true,html_sha256:crypto.createHash('sha256').update(html).digest('hex'),mouse_selection:true,space_selection:true,demo:true,home:true,smooth_stop:true,other_objects_unchanged:true,errors,timing:'Playwright-controlled animation time; no real-time performance claim.'};

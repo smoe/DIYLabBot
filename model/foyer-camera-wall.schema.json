@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Outer foyer camera-wall composition; synthetic views only",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "sources", "settings", "asset_policy", "basic_laboratory_hoods", "microscopy"],
+  "properties": {
+    "format": {"const": "solidcraftbot.foyer-camera-wall/1"},
+    "id": {"const": "FoyerCameraWall"},
+    "sources": {
+      "type": "object", "additionalProperties": false,
+      "required": ["walkthrough", "fleet"],
+      "properties": {"walkthrough": {"$ref": "#/$defs/reference"}, "fleet": {"$ref": "#/$defs/reference"}}
+    },
+    "settings": {
+      "type": "object", "additionalProperties": false,
+      "required": ["resolution_px", "mosaic_rate_hz", "selected_rate_hz", "virtual_fov_y_deg", "near_mm", "modeled_far_mm", "virtual_near_mm", "far_mm", "stale_after_s", "history_enabled"],
+      "properties": {
+        "resolution_px": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 16, "maximum": 1920}},
+        "mosaic_rate_hz": {"type": "number", "minimum": 0.1, "maximum": 30},
+        "selected_rate_hz": {"type": "number", "minimum": 0.1, "maximum": 30},
+        "virtual_fov_y_deg": {"type": "number", "minimum": 1, "maximum": 150},
+        "near_mm": {"type": "number", "minimum": 0.01, "maximum": 100, "description": "Modeled-camera near clipping plane in mm; presentation assumption, not a sensor limit."},
+        "modeled_far_mm": {"type": "number", "minimum": 1, "maximum": 1000000, "description": "Modeled-camera far clipping plane in mm; presentation assumption independent of optical range and illustrative cone length."},
+        "virtual_near_mm": {"type": "number", "minimum": 0.01, "maximum": 100, "description": "Virtual-overview near clipping plane in mm; presentation assumption for depth precision."},
+        "far_mm": {"type": "number", "minimum": 1, "maximum": 1000000, "description": "Virtual-overview far clipping plane in mm; presentation assumption, not a sensor range."},
+        "stale_after_s": {"type": "number", "minimum": 1, "maximum": 120},
+        "history_enabled": {"const": false}
+      }
+    },
+    "asset_policy": {
+      "type": "object", "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {
+        "type": "object", "additionalProperties": false,
+        "required": ["mode", "label"],
+        "properties": {"mode": {"enum": ["arm_cameras", "overview", "no_camera", "exclude"]}, "label": {"type": "string", "minLength": 1}}
+      }
+    },
+    "basic_laboratory_hoods": {"const": true},
+    "microscopy": {"const": true}
+  },
+  "$defs": {
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["source", "source_sha256"],
+      "properties": {"source": {"type": "string", "pattern": "^model/[A-Za-z0-9_./-]+[.]json$"}, "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+    }
+  }
+}

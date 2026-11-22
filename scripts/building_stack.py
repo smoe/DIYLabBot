@@ -106,7 +106,7 @@ def validate(spec):
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories', 'microscopy', 'kitchenette'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
+    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories', 'microscopy', 'kitchenette', 'monitor_wall'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
@@ -467,6 +467,10 @@ def interfaces(spec, p):
         import building_kitchenette
         data['kitchenette'] = building_kitchenette.compile(spec['sources']['kitchenette'],
             {name: value[0] for name, value in bases.items()}, p, levels, spec['exterior']['doors'])['interface']
+    if 'monitor_wall' in spec['sources']:
+        import foyer_monitor_wall
+        data['monitor_wall'] = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
+            {name: value[0] for name, value in bases.items()}, p, levels)['interface']
     return data
 
 
@@ -529,6 +533,11 @@ def expanded(spec, p):
         kitchenette = building_kitchenette.compile(spec['sources']['kitchenette'],
             {name: value[0] for name, value in bases.items()}, p, data['levels'], spec['exterior']['doors'])
         for key in ('components', 'bodies', 'operations'): result[key].extend(kitchenette[key])
+    if 'monitor_wall' in spec['sources']:
+        import foyer_monitor_wall
+        displays = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
+            {name: value[0] for name, value in bases.items()}, p, data['levels'])
+        for key in ('components', 'bodies', 'operations'): result[key].extend(displays[key])
     return result
 
 
@@ -576,6 +585,9 @@ def source_dependencies(spec):
     if 'kitchenette' in spec['sources']:
         import building_kitchenette
         paths.extend(building_kitchenette.dependencies(spec['sources']['kitchenette']))
+    if 'monitor_wall' in spec['sources']:
+        import foyer_monitor_wall
+        paths.extend(foyer_monitor_wall.dependencies(spec['sources']['monitor_wall']))
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))

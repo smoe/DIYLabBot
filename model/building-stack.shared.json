@@ -33,6 +33,10 @@
     "kitchenette": {
       "source": "model/equipment/kitchen-3008.json",
       "source_sha256": "33d8cf485422c9e855ee5c8d47a445efcf37d531b04e902f5ab390fb685fe113"
+    },
+    "monitor_wall": {
+      "source": "model/equipment/foyer-monitor-wall.json",
+      "source_sha256": "ab5e2dfdb5ac3840f7db95b51b18b2fe92454f7bc3971611d353259a39e107d8"
     }
   },
   "calibration": null,
