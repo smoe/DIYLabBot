@@ -217,6 +217,10 @@ def _viewpoint(objects, identity):
 def compile(program, interface, source=SOURCE):
     """Return derived views; no state, camera frame, or inventory is persisted."""
     path, spec = load(source)
+    monitors = (interface.get('monitor_wall') or {}).get('monitors')
+    if not isinstance(monitors, list) or not monitors:
+        raise ValueError('Source-bound monitor instances required for camera assignments')
+    monitor_count = len(monitors)
     settings = spec['settings']
     walkthrough_ref = spec['sources']['walkthrough']
     if program.get('source_files_sha256', {}).get(walkthrough_ref['source']) != walkthrough_ref['source_sha256']:
@@ -303,8 +307,8 @@ def compile(program, interface, source=SOURCE):
             gaps.append({'device_id': camera['device_id'], 'reason': 'missing_viewpoint'})
     order = {'transporter': 0, 'robot': 1, 'device': 2, 'fleet': 3}
     cameras.sort(key=lambda camera: (order[camera['category']], camera['device_id'], camera['id']))
-    defaults = [camera['id'] for camera in cameras if camera['availability'] == 'available'][:9]
-    defaults += [None] * (9 - len(defaults))
+    defaults = [camera['id'] for camera in cameras if camera['availability'] == 'available'][:monitor_count]
+    defaults += [None] * (monitor_count - len(defaults))
     return {'format': FORMAT, 'id': spec['id'], 'cameras': cameras, 'gaps': gaps,
             'default_assignments': defaults, 'settings': dict(settings),
             'source_files_sha256': pins,

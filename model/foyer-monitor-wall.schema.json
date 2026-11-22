@@ -168,10 +168,12 @@
       "additionalProperties": false,
       "properties": {
         "rows": {
-          "const": 3
+          "type": "integer",
+          "minimum": 1
         },
         "columns": {
-          "const": 3
+          "type": "integer",
+          "minimum": 1
         },
         "horizontal_gap_mm": {
           "type": "number",

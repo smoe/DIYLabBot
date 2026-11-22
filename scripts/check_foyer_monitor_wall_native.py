@@ -16,6 +16,7 @@ import build_extraction_kit_station as common
 import build_foyer_monitor_wall_native as scoped
 import building_stack as building
 import export_building_walkthrough_freecad as native
+import foyer_monitor_wall
 import microscope_model
 import tool_paths
 
@@ -80,16 +81,10 @@ def box_distance(first, second):
 def validate_scope(wall, body_names):
     if wall.get('level_id') != 'EG' or wall.get('wall') != 'W052' or wall.get('area') != 'R0_019':
         raise ValueError('The explicit EG foyer wall is required')
-    monitors = wall.get('monitors', [])
-    ids = [row['id'] for row in monitors]
-    bodies = [name for row in monitors for name in row['body_ids']]
-    if (len(monitors) != 9 or len(set(ids)) != 9 or len(set(bodies)) != len(bodies)
-            or set(bodies) != set(wall['body_ids']) or not set(bodies) <= set(body_names)
-            or wall['wall_body_id'] not in body_names):
-        raise ValueError('Nine complete disjoint native monitor instances are required')
+    if wall['wall_body_id'] not in body_names:
+        raise ValueError('The intended native mounting wall is required')
+    monitors = foyer_monitor_wall.validate_instances(wall, body_names)
     for row in monitors:
-        if not {row['screen_body_id'], row['case_body_id']} <= set(row['body_ids']):
-            raise ValueError('A monitor needs its actual case and screen bodies')
         frame = row['screen_frame']
         vectors = [frame[k] for k in ('origin_mm', 'x_axis', 'y_axis', 'normal')]
         values = [v for vector in vectors for v in vector] + [frame['width_mm'], frame['height_mm']]
@@ -332,6 +327,7 @@ def check(report_path, output, *, freecad_python, solidcraft_cli, solidcraft_rep
     fc = json.loads((output/'freecad.json').read_text())
     comparison = common.compare(sc_geometry,fc['scoped_geometry'])
     result = {'format':FORMAT,'passed':sc['passed'] and fc['passed'] and all(row['passed']for row in comparison),'instances':len(monitors),
+              'grid_rows':wall['grid_rows'],'grid_columns':wall['grid_columns'],
               'body_count':len(selected),'source_files_sha256':pins,
               'native_build':{'path':str(report_path.relative_to(ROOT)),'sha256':build_digest},
               'native_builds':native_builds,

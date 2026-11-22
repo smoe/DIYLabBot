@@ -36,7 +36,9 @@ class CameraRegistryTests(unittest.TestCase):
              'device_instances': [], 'instances': [
                  {'id': 'Hood', 'layout_kind': 'hood'},
                  {'id': 'Desk', 'layout_kind': 'side'}]}],
-            'microscopy': {'id': 'Microscopy3007', 'level_id': 'OG3'}}
+            'microscopy': {'id': 'Microscopy3007', 'level_id': 'OG3'},
+            'monitor_wall': {'grid_rows': 4, 'grid_columns': 5,
+                             'monitors': [{'id': f'FoyerMonitorWall.M{i:02d}'} for i in range(1, 21)]}}
         cls.objects = [
             {'id': 'Lab3003.NanoDrop01.Lid', 'viewpoint': {'eye_mm': [21000, 31000, 14000], 'target_mm': [21000, 32000, 13900]}},
             {'id': 'Lab3003.Qubit01.Lid', 'viewpoint': {'eye_mm': [22000, 31000, 14000], 'target_mm': [22000, 32000, 13900]}},
@@ -172,13 +174,30 @@ class CameraRegistryTests(unittest.TestCase):
         self.assertIn({'device_id': 'Lab3003.Balance01', 'reason': 'missing_viewpoint'}, result['gaps'])
 
     def test_default_slots_only_use_available_views_and_derivation_is_deterministic(self):
-        first, second = self.compiled(), self.compiled()
+        interface = copy.deepcopy(self.interface)
+        for index in range(12):
+            identity = f'BasicLabExtra{index:02d}'
+            interface['laboratories'].append({'id': identity, 'level_id': 'OG1',
+                                              'instances': [{'id': 'Hood', 'layout_kind': 'hood'}]})
+            self.program['objects'].append({'id': identity + '.Hood.Sash', 'viewpoint': self.objects[-1]['viewpoint']})
+        first, second = self.compiled(interface), self.compiled(interface)
         self.assertEqual(first, second)
-        available = {c['id'] for c in first['cameras'] if c['availability'] == 'available'}
-        self.assertEqual(len(first['default_assignments']), 9)
-        self.assertEqual(len(set(first['default_assignments'])), 9)
-        self.assertTrue(set(first['default_assignments']) <= available)
+        available = [c['id'] for c in first['cameras'] if c['availability'] == 'available']
+        self.assertGreater(len(available), 20)
+        self.assertEqual(first['default_assignments'], available[:20])
+        self.assertEqual(len(set(first['default_assignments'])), 20)
         self.assertFalse(first['settings']['history_enabled'])
+
+    def test_default_assignments_follow_wall_size_and_leave_missing_views_unassigned(self):
+        result = self.compiled()
+        available = [c['id'] for c in result['cameras'] if c['availability'] == 'available']
+        self.assertLess(len(available), 20)
+        self.assertEqual(result['default_assignments'], available + [None] * (20 - len(available)))
+
+        interface = copy.deepcopy(self.interface)
+        wall = interface['monitor_wall']
+        wall.update(grid_rows=2, grid_columns=2, monitors=wall['monitors'][:4])
+        self.assertEqual(self.compiled(interface)['default_assignments'], available[:4])
 
     def test_changed_pin_and_wrong_program_revision_fail_before_registry_creation(self):
         self.spec['sources']['fleet']['source_sha256'] = '0' * 64
