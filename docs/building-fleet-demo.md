@@ -178,7 +178,8 @@ Die aktive Kamera-Overlay-Komposition bindet das aktualisierte BF-Profil
 mit dessen aktuellem Quellenhash; dieser reine Kompositionspin verändert
 keine physische Geometrie oder historischen Nachweise.
 Der alte Seed-Lauf und seine folgenden Befunde bleiben ihren ursprünglichen
-Quellen und Berichten zugeordnet. Ein neuer vollständiger Lauf steht aus.
+Quellen und Berichten zugeordnet. Ein vollständig bestandener Lauf steht
+weiterhin aus; der neue Vollversuch ist nachstehend dokumentiert.
 
 Die aktuelle BF01-Suite besteht mit 376 von 377 Tests in 342,360 s; eine
 optionale native Prüfung läuft separat. Alle 22 Hüllenregressionen bestehen
@@ -188,6 +189,47 @@ Regressionen behalten ihre Erwartungen. Vierzehn unabhängige
 Folgeschrittprüfungen und echte kurze `/2`-Rohtraces decken zusätzlich
 Schutzbremsung, gespeicherten Rückfall und frischen Wiederanlauf ab. Dies
 ersetzt den vollständigen Seed-, Native- und Browsernachweis nicht.
+
+#### Vollversuch mit Seed `20261120`
+
+Der auf Implementierungscommit `1a5238a` eingefrorene dritte Versuch
+`exports/building-fleet/guard-f1eb858/full-seed-r3/` verwendet weiterhin
+20 Fahrzeuge, 19 Pflichtziele, unveränderte Bewegungsgrenzen und
+Wiedergabefaktor 1. Alle 20 ersten nominalen Fahrkurven wurden geprüft.
+Der tatsächliche gemeinsame Lauf passierte die frühere BF04-Fehlerstelle
+bei 75,2 s und protokollierte bei 420 s den ersten Zielbesuch.
+
+Bei 616,0 s Modellzeit wurde die nächste BF04-Kurve noch während ihrer
+Erzeugung verworfen: Nach der Zeitquantisierung beträgt die obere
+Ruckgrenze 1433,6473387483768 mm/s³ bei erlaubten 1000 mm/s³.
+Die Kein-Halt-Prüfung besteht; acht lokale Nachskalierungen beseitigten
+die Rucküberschreitung nicht. Die verworfene Kurve wurde nicht gefahren.
+Dieser neue Befund betrifft die Erzeugung der nächsten Fahrkurve,
+nicht die zuvor fehlende Reserve für den nächsten Integrationsschritt.
+Der Motioncompiler und seine Grenzen wurden in diesem Auftrag nicht
+zusätzlich verändert.
+
+Der CLI-Versuch endete nach 4222,601 s (70,377 min); damit ist auch
+das 600-s-Rechenzeitziel verfehlt. Der geschlossene `/2`-Rohtrace enthält
+123200 Scans, 246314 Entscheidungen, 23801 Stoppkurven und 20 eigene
+Pfade. `runtime-failure.json`, `compile-failure.json` und
+`partial-program.json` erhalten den unvollständigen Stand: ein Zielbesuch,
+kein Fahrzeug am endgültigen Heimplatz. Der separate Analysebericht
+`exports/building-fleet/guard-f1eb858/full-seed-r3-analysis/report.json`
+bindet Fehler, Teilprogramm, Rohdaten und die noch vorhandenen Eingaben.
+Ein vollständiges Programm wurde nicht erzeugt; dessen native Prüfung,
+unabhängiger Gesamtexportnachweis und Browserlauf wurden nicht gestartet.
+
+Der vorherige zweite Versuch wurde durch eine Turn-Unterbrechung beendet;
+er ist kein bestandener Lauf und kein beobachteter Simulationsfehler.
+Die separat gesicherten vollständigen BF04-Rohdatensätze von 74 bis 76 s
+zeigen eine Schutzbremsung ab 75,05 s. Bei 75,20 s bleibt für die gesamte
+Restbremskurve aus der konservativ fortgeschriebenen ursprünglichen
+Beobachtung eine nachgerechnete Reserve von 17,101 mm. Die 41 Präfixe
+passen zur jeweils nächsten aufgezeichneten PVA. Die Berichte unter
+`full-seed-r2-interruption/` und `full-seed-r2-bf04-prefix/` desselben
+Exportverzeichnisses unterscheiden diese Teilprüfung ausdrücklich vom
+fehlenden tatsächlichen Gesamtexport und nativen Abstandsnachweis.
 
 ### Stand `680652f`: Missionszulassung und Katalogberechnung
 
