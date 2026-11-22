@@ -181,6 +181,20 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
         if contract.get('monitor_wall'):
             expected_z|={monitor['id']+'_ScreenFront' for monitor in contract['monitor_wall']['monitors']}
             expected_z.add(contract['monitor_wall']['id']+'_ForeignBounds')
+        signs=contract.get('room_signs',{}).get('signs',[])
+        expected_z|={sign['id']+'_RoomHeight'for sign in signs}
+        self.assertEqual(len(signs),80)
+        self.assertIs(contract['room_signs']['signage_qualified'],False)
+        sign_bodies=[name for sign in signs for name in sign['body_ids']]
+        self.assertEqual(len(sign_bodies),160);self.assertEqual(len(set(sign_bodies)),160)
+        self.assertEqual(set(contract['room_signs']['body_ids']),set(sign_bodies))
+        level_by_id={level['id']:level for level in contract['levels']}
+        self.assertEqual({sign['level_id']for sign in signs},set(level_by_id))
+        for sign in signs:
+            self.assertEqual(len(sign['body_ids']),2)
+            self.assertTrue(sign['body_ids'][0].endswith('_Plate'))
+            self.assertTrue(sign['body_ids'][1].endswith('_Ink'))
+            self.assertTrue(all(name.startswith(sign['level_id']+'__')for name in sign['body_ids']))
         expected_z|={a['id']+'_to_'+b['id']for a,b in zip(contract['levels'],contract['levels'][1:])}
         if contract.get('exterior'):
             expected_z|={body+'_Grade'for body in contract['exterior']['site_body_ids']}|{'FoyerFacade_Height'}
@@ -189,6 +203,44 @@ class BuildingNativeEvidenceTests(unittest.TestCase):
             proof=report['solidcraft_checks']if backend=='solidcraft'else json.loads((ROOT/report['files']['freecad_validation']).read_text())
             self.assertTrue(proof['passed']);self.assertEqual({c['id']for c in proof['probe_checks']},expected)
             self.assertEqual({c['id']for c in proof['z_checks']},expected_z);self.assertEqual(len(proof['z_checks']),len(expected_z));self.assertTrue(all(c['passed']for c in proof['z_checks']+proof['probe_checks']))
+            heights={check['id']:check for check in proof['z_checks']}
+            for sign in signs:
+                checked=heights[sign['id']+'_RoomHeight']
+                self.assertEqual(checked['level_id'],sign['level_id'])
+                self.assertEqual(checked['body_ids'],sign['body_ids'])
+                self.assertTrue(checked['passed'])
+            if backend=='freecad':
+                rows=proof['geometry'];geometry={row['body']:row for row in rows}
+                self.assertEqual(len(rows),len(geometry))
+                inks={sign['body_ids'][1]for sign in signs}
+                for row in rows:
+                    self.assertIs(row['valid'],True);self.assertIs(row['closed_solids'],True)
+                    self.assertIs(type(row['solid_count']),int)
+                    self.assertGreaterEqual(row['solid_count'],1)
+                    if row['body']not in inks:self.assertEqual(row['solid_count'],1)
+                for sign in signs:
+                    level=level_by_id[sign['level_id']]
+                    plate,ink=(geometry[name]for name in sign['body_ids'])
+                    for row in (plate,ink):
+                        self.assertEqual(row['component'],'RoomSigns')
+                        self.assertGreater(row['volume_mm3'],0)
+                        self.assertGreaterEqual(row['bbox']['min'][2],level['z_mm']-1e-6)
+                        self.assertLessEqual(row['bbox']['max'][2],level['clear_top_mm'])
+                    expected_center=[value+normal*spec['room_signs']['thickness_mm']/2
+                                     for value,normal in zip(sign['center_mm'],sign['front_normal'])]
+                    self.assertLess(math.dist(plate['world_center_of_mass_mm'],expected_center),1e-5)
+                    self.assertAlmostEqual(plate['bbox']['max'][2]-plate['bbox']['min'][2],
+                                           spec['room_signs']['height_mm'],delta=1e-5)
+                    footprint=[[sign['center_mm'][i]+sign['right_vector'][i]*along+
+                                sign['front_normal'][i]*depth for i in (0,1)]
+                               for along,depth in [(-sign['width_mm']/2,0),(sign['width_mm']/2,0),
+                                   (sign['width_mm']/2,spec['room_signs']['thickness_mm']+spec['room_signs']['line_width_mm']),
+                                   (-sign['width_mm']/2,spec['room_signs']['thickness_mm']+spec['room_signs']['line_width_mm'])]]
+                    for axis in (0,1):
+                        self.assertGreaterEqual(ink['bbox']['min'][axis],min(p[axis]for p in footprint)-1e-5)
+                        self.assertLessEqual(ink['bbox']['max'][axis],max(p[axis]for p in footprint)+1e-5)
+                    self.assertGreaterEqual(ink['bbox']['min'][2],sign['center_mm'][2]-sign['height_mm']/2-1e-5)
+                    self.assertLessEqual(ink['bbox']['max'][2],sign['center_mm'][2]+sign['height_mm']/2+1e-5)
             if contract.get('circulation'):
                 stairs=contract['circulation']['stairs']
                 self.assertEqual([stair['area']for stair in stairs],['R3_028'])

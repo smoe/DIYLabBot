@@ -16,6 +16,7 @@ from types import SimpleNamespace
 import build_building_stack as evidence
 import build_extraction_kit_station as common
 import building_stack as building
+import building_room_signs as room_signs
 import microscope_model
 import tool_paths
 import tube_carrier_model as portable
@@ -30,13 +31,30 @@ def distance(first,second):
                             second['min'][i]-first['max'][i])**2 for i in range(3)))
 
 
+def shape_bounds(shape):
+    """Bound glyph cylinders in their declared world frame before pruning."""
+    if shape['kind'] != 'cylinder_bundle':
+        return microscope_model.shape_bounds(shape)
+    room_signs.validate_bundle(shape)
+    frame = shape['frame']; axes = [frame[key] for key in ('x','y','z')]
+    boxes = []
+    for span in shape['glyph_spans']:
+        for cylinder in shape['cylinders'][span['start']:span['start']+span['count']]:
+            local = [a+b for a,b in zip(cylinder['origin'],span['offset_mm'])]
+            origin = [frame['origin'][i]+sum(local[j]*axes[j][i] for j in range(3)) for i in range(3)]
+            axis = [sum(cylinder['axis'][j]*axes[j][i] for j in range(3)) for i in range(3)]
+            boxes.append(microscope_model.shape_bounds({**cylinder,'kind':'cylinder','origin':origin,'axis':axis}))
+    return {edge:[fn(box[edge][i] for box in boxes) for i in range(3)]
+            for edge,fn in [('min',min),('max',max)]}
+
+
 def source_bounds(source):
     """Positive primitive unions conservatively enclose every subsequent cut."""
     boxes = {}
     for operation in source['operations']:
         if operation['action'] == 'cut':
             continue
-        box = microscope_model.shape_bounds(operation['shape'])
+        box = shape_bounds(operation['shape'])
         if any(not math.isfinite(v)for edge in ('min','max')for v in box[edge]):
             raise ValueError('Finite source bounds required')
         name = operation['body']
@@ -70,6 +88,16 @@ def select_scope(source,wall,radius=DEFAULT_RADIUS_MM):
                     'method':'Union AABBs of every positive shared primitive; subtraction cannot enlarge them. Selected before reading CAD output.'}
 
 
+def solidcraft_scope_commands(source, spec, params):
+    """Reuse the building's physical and glyph lowering for the selected bodies."""
+    physical = room_signs.physical_source(source)
+    provider = SimpleNamespace(SOURCE=building.SOURCE,expanded=lambda *_:physical,
+                               pose=lambda *_:{},samples=lambda *_:[])
+    commands = portable.solidcraft_commands(spec,params,provider)
+    commands.extend(room_signs.solidcraft_ink_commands(source))
+    return commands
+
+
 def build(args):
     start = time.monotonic()
     spec = building.load(); params = building.parameters(spec)
@@ -85,9 +113,7 @@ def build(args):
     out.mkdir(parents=True);cad.mkdir(parents=True)
     files = {'commands':out/'commands.json','solidcraft':cad/'FoyerMonitorScope.sc',
              'solidcraft_measurements':out/'solidcraft.json'}
-    provider = SimpleNamespace(SOURCE=building.SOURCE,expanded=lambda *_:subset,
-                               pose=lambda *_:{},samples=lambda *_:[])
-    commands = portable.solidcraft_commands(building.native_spec(spec,params),params,provider)
+    commands = solidcraft_scope_commands(subset,building.native_spec(spec,params),params)
     common.write(files['commands'],{'commands':commands})
     common.verify_pins(pins)
     print('Building SolidCraft monitor scope:',len(subset['bodies']),'of',len(source['bodies']),'shared bodies',flush=True)

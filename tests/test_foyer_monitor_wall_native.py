@@ -142,6 +142,75 @@ class SourceNeighbourhoodTests(unittest.TestCase):
         with self.assertRaises(ValueError):builder.select_scope(source,wall)
 
 
+class RoomSignNeighbourhoodTests(unittest.TestCase):
+    def bundle(self, origin=(100,200,300)):
+        return {'kind':'cylinder_bundle','combine':'union','coordinate_frame':'glyph_local_mm',
+            'cylinders':[
+                {'origin':[0,0,0],'axis':[1,0,0],'radius':.5,'height':4},
+                {'origin':[0,0,0],'axis':[0,1,0],'radius':.5,'height':3}],
+            'glyph_spans':[{'start':0,'count':1,'offset_mm':[10,20,0]},
+                           {'start':1,'count':1,'offset_mm':[15,20,0]}],
+            'frame':{'origin':list(origin),'x':[0,1,0],'y':[0,0,1],'z':[1,0,0]}}
+
+    def ink(self, source, name, shape):
+        source['bodies'].append({'id':name,'component':'RoomSigns','role':'room_sign_ink',
+            'geometry_semantics':'disconnected_surface_annotation',
+            'appearance':{'color':'#192e3a','opacity':1}})
+        source['operations'].append({'id':name,'body':name,'action':'create','shape':shape})
+
+    def test_bundle_bounds_include_glyph_offsets_and_the_full_world_frame(self):
+        source={'bodies':[],'operations':[]}
+        self.ink(source,'Ink',self.bundle());before=copy.deepcopy(source)
+        # The first stroke points along world Y, the second along world Z.
+        self.assertEqual(builder.source_bounds(source)['Ink'],
+                         {'min':[99.5,210,319.5],'max':[100.5,215.5,323]})
+        self.assertEqual(source,before)
+
+    def test_nearby_ink_is_retained_and_remote_ink_has_a_real_pruning_bound(self):
+        source,wall=SourceNeighbourhoodTests().source()
+        self.ink(source,'NearInk',self.bundle((0,20,0)))
+        self.ink(source,'FarInk',self.bundle((5000,20,0)))
+        selected,scope=builder.select_scope(source,wall,radius=100)
+        self.assertIn('NearInk',{row['id']for row in selected['bodies']})
+        self.assertNotIn('FarInk',{row['id']for row in selected['bodies']})
+        self.assertGreater(scope['excluded_body_lower_bounds_mm']['FarInk'],4800)
+        self.assertEqual(set(scope['source_body_bounds_mm']),{row['id']for row in source['bodies']})
+
+    def test_invalid_bundle_cannot_be_silently_removed_from_the_neighbourhood(self):
+        for mutate in (lambda s:s['glyph_spans'][1].update(start=0),
+                       lambda s:s['frame'].update(z=[-1,0,0]),
+                       lambda s:s['cylinders'][0].update(radius=float('nan'))):
+            source={'bodies':[],'operations':[]};shape=self.bundle();mutate(shape)
+            self.ink(source,'Ink',shape)
+            with self.subTest(shape=shape),self.assertRaises(ValueError):builder.source_bounds(source)
+
+    def test_scope_commands_lower_disjoint_glyphs_without_a_native_bundle_primitive(self):
+        source={'id':'Fixture','status':'synthetic','components':[{'id':'RoomSigns','grounded':True}],
+                'bodies':[{'id':'Screen','component':'RoomSigns','appearance':{'color':'#ffffff','opacity':1}}],
+                'operations':[{'id':'Screen','body':'Screen','action':'create',
+                               'shape':{'kind':'box','origin':[0,0,0],'size':[10,1,10]}}],
+                'joints':[]}
+        self.ink(source,'Ink',self.bundle());before=copy.deepcopy(source)
+        commands=builder.solidcraft_scope_commands(source,{'id':'Fixture','status':'synthetic','parameters':{}},{})
+        self.assertEqual(source,before)
+        self.assertFalse(any(row['command']=='solid.cylinder_bundle'for row in commands))
+        self.assertEqual(len([row for row in commands if row['command']=='solid.box']),1)
+        self.assertEqual(len([row for row in commands if row['command']=='solid.cylinder']),2)
+        joined=[row['params']for row in commands if row['command']=='solid.combine']
+        self.assertEqual(len(joined),1)
+        self.assertEqual((joined[0]['target'],joined[0]['tools']),('Ink',['Ink_Glyph1']))
+        self.assertEqual([row['params']['bodies']for row in commands
+                          if row['command']=='component.move_bodies'],[['Screen'],['Ink']])
+        # The existing audit importer accepts a closed disconnected annotation
+        # as one semantic SolidCraft body, while retaining its closure gate.
+        raw={'bodies':[{'name':'Ink','closed':True,'volume_mm3':1,
+                       'center_of_mass':[100,213,321],
+                       'bbox':builder.source_bounds(source)['Ink']}]}
+        self.assertEqual(audit.common.measurements(raw,{'bodies':[source['bodies'][-1]]},backend='solidcraft')[0]['body'],'Ink')
+        raw['bodies'][0]['closed']=False
+        with self.assertRaises(ValueError):audit.common.measurements(raw,{'bodies':[source['bodies'][-1]]},backend='solidcraft')
+
+
 class NativeBuildInputEvidenceTests(unittest.TestCase):
     """Synthetic fixture bytes test provenance checks, not a native CAD pass."""
     def setUp(self):

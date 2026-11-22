@@ -17,6 +17,41 @@ NOTICE = 'Presentation mm: XY uncalibrated and fitted to an unmeasured L01 conce
 write, relative = common.write, common.relative
 
 
+def checked_measurements(report, source, *, backend):
+    """Keep physical parts single-solid; paint may contain disjoint closed strokes."""
+    key = 'bodies' if backend == 'solidcraft' else 'geometry'
+    name_key = 'name' if backend == 'solidcraft' else 'body'
+    metadata = {body['id']: body for body in source['bodies']}
+    annotation_ids = {name for name, body in metadata.items() if body.get('role') == 'room_sign_ink'
+                      and body.get('geometry_semantics') == 'disconnected_surface_annotation'}
+    rows = report[key]
+    names = [row[name_key] for row in rows]
+    if len(metadata) != len(source['bodies']) or len(set(names)) != len(names) or set(names) != set(metadata):
+        raise ValueError('Complete unique building body identities required')
+    if backend == 'solidcraft':
+        return common.measurements(report, source, backend=backend)
+    physical = [row for row in rows if row['body'] not in annotation_ids]
+    if any(type(row.get('solid_count')) is not int for row in physical):
+        raise ValueError('Integer native solid counts required')
+    normalized = common.measurements({'geometry': physical},
+        {**source, 'bodies': [body for body in source['bodies'] if body['id'] not in annotation_ids]}, backend=backend)
+    for row in rows:
+        if row['body'] not in annotation_ids:
+            continue
+        center = row['world_center_of_mass_mm']; box = row['bbox']
+        values = [row['volume_mm3'], *center, *box['min'], *box['max']]
+        if (row.get('valid') is not True or row.get('closed_solids') is not True
+                or type(row.get('solid_count')) is not int or row['solid_count'] < 1
+                or any(type(v) not in (int, float) or not math.isfinite(v) for v in values)
+                or row['volume_mm3'] <= 0 or len(center) != 3
+                or any(len(box[k]) != 3 for k in ('min', 'max'))
+                or any(a >= b for a, b in zip(box['min'], box['max']))):
+            raise ValueError('Invalid closed room-sign paint annotation: '+row['body'])
+        normalized.append({key: row[key] for key in ('body', 'volume_mm3', 'world_center_of_mass_mm', 'bbox')})
+    by_id = {row['body']: row for row in normalized}
+    return [by_id[name] for name in names]
+
+
 def snapshot(spec, source):
     paths = [source, Path(__file__), ROOT/'scripts/build_building_stack_freecad.py',
              ROOT/'scripts/build_relative_floorplan.py', ROOT/'scripts/build_extraction_kit_station.py',
@@ -129,6 +164,15 @@ def z_checks(geometry, contract):
     if contract.get('monitor_wall'):
         import foyer_monitor_wall
         checks.extend(foyer_monitor_wall.native_bounds_checks(contract['monitor_wall'], geometry))
+    for sign in contract.get('room_signs', {}).get('signs', []):
+        names = sign['body_ids']; level = level_by_id[sign['level_id']]
+        if len(names) != 2 or set(names) & expected or not set(names) <= set(bodies):
+            raise ValueError('Room plaques require disjoint complete native body coverage')
+        checks.append({'id': sign['id']+'_RoomHeight', 'level_id': level['id'], 'body_ids': names,
+                       'passed': all(bodies[name]['bbox']['min'][2] >= level['z_mm']-1e-6
+                                     and bodies[name]['bbox']['max'][2] <= level['clear_top_mm'] for name in names),
+                       'scope': 'Corridor wall plaque and disconnected paint annotation'})
+        expected.update(names)
     if expected != set(bodies): raise ValueError('Every native body must belong to an explicit scoped role')
     for a, b in zip(levels, levels[1:]):
         gap = b['slab_bottom_mm']-a['slab_top_mm']
@@ -691,7 +735,7 @@ def build(args):
         cmd=[args.solidcraft_cli,'run',str(paths['commands']),'--save',str(paths['solidcraft']),'--json-out',str(paths['solidcraft_measurements']),'--quiet']
         if args.backend=='both': paths['step']=out/'overview.step'; cmd+=['--out',str(paths['step'])]
         subprocess.run(cmd,check=True,cwd=ROOT,stdout=subprocess.DEVNULL)
-        sc=common.measurements(json.loads(paths['solidcraft_measurements'].read_text()),expanded,backend='solidcraft')
+        sc=checked_measurements(json.loads(paths['solidcraft_measurements'].read_text()),expanded,backend='solidcraft')
         sc_checks=sc_audit(args,spec,p,paths['solidcraft'],out,sc,paths)
     if args.backend in {'both','freecad'}:
         paths.update(freecad=cad/'overview.FCStd',freecad_validation=out/'overview.freecad.json')
@@ -700,7 +744,7 @@ def build(args):
         subprocess.run(cmd,check=True,cwd=ROOT,env=common.freecad_environment(args.freecad_python))
         fc_checks=json.loads(paths['freecad_validation'].read_text())
         if fc_checks['source_files_sha256']!=pins or fc_checks['source_sha256']!=digest: raise ValueError('Foreign FreeCAD proof inputs')
-        fc=common.measurements(fc_checks,expanded,backend='freecad')
+        fc=checked_measurements(fc_checks,expanded,backend='freecad')
     cross=floor.comparison(sc,fc) if args.backend=='both' else None
     passed=(sc_checks is None or sc_checks['passed']) and (fc_checks is None or fc_checks['passed']) and (cross is None or all(c['passed']for c in cross))
     if not passed: write(out/'failed-checks.json',{'solidcraft':sc_checks,'freecad':fc_checks,'cross':cross}); raise AssertionError('Building native scoped proof failed')

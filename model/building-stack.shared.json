@@ -679,5 +679,24 @@
     "plan_variant": "AtriumAccess",
     "corridor_area": "C3_021",
     "atrium_area": "Atrium"
+  },
+  "room_signs": {
+    "format": "solidcraftbot.corridor-room-signs/1",
+    "selection": "known_room_corridor_doors",
+    "side": "right_from_corridor",
+    "width_mm": 220,
+    "minimum_width_mm": 80,
+    "height_mm": 110,
+    "center_height_mm": 1550,
+    "jamb_gap_mm": 10,
+    "wall_gap_mm": 1,
+    "thickness_mm": 3,
+    "text_height_mm": 16,
+    "line_width_mm": 0.7,
+    "text_margin_mm": 8,
+    "background_color": "#f6f2e8",
+    "ink_color": "#192e3a",
+    "basis": "unmeasured_presentation_assumption",
+    "letter_case": "uppercase"
   }
 }

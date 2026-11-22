@@ -1419,6 +1419,104 @@
           "minLength": 1
         }
       }
+    },
+    "room_signs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "format",
+        "selection",
+        "side",
+        "width_mm",
+        "minimum_width_mm",
+        "height_mm",
+        "center_height_mm",
+        "jamb_gap_mm",
+        "wall_gap_mm",
+        "thickness_mm",
+        "text_height_mm",
+        "line_width_mm",
+        "text_margin_mm",
+        "background_color",
+        "ink_color",
+        "basis",
+        "letter_case"
+      ],
+      "properties": {
+        "format": {
+          "const": "solidcraftbot.corridor-room-signs/1"
+        },
+        "selection": {
+          "const": "known_room_corridor_doors"
+        },
+        "side": {
+          "const": "right_from_corridor"
+        },
+        "width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "minimum_width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "center_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "jamb_gap_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "wall_gap_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "thickness_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "text_height_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "line_width_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "text_margin_mm": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "exclusiveMaximum": 3000
+        },
+        "background_color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "ink_color": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "basis": {
+          "const": "unmeasured_presentation_assumption"
+        },
+        "letter_case": {
+          "const": "uppercase"
+        }
+      }
     }
   }
 }
