@@ -34,7 +34,7 @@ class BoundaryTests(unittest.TestCase):
 
     def test_only_own_source_waiting_slot_is_exempted(self):
         checker=self.fixture()
-        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':[100,0,0]}}
+        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':[100,0,0],'role':'start'}}
         self.assertEqual(checker.own_slot(grant,'EG'),0)
         cert=checker.certificate('EG',0)
         self.assertNotIn('ReservedLiftWaitingBay.EG.0',cert.obstacle_names)
@@ -46,6 +46,35 @@ class BoundaryTests(unittest.TestCase):
         checker=self.fixture()
         for grant in ({},{'waiting_place':{'status':'waiting'}},{'waiting_place':{'status':'granted','level':'OG3','slot':0}}):
             self.assertIsNone(checker.own_slot(grant,'EG'))
+
+    def test_conditional_successor_is_not_physical_permission(self):
+        checker=self.fixture()
+        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':[100,0,0],
+                               'role':'lookahead_destination'}}
+        for arrival in(False,True):
+            with self.assertRaisesRegex(ValueError,'conditional'):
+                checker.own_slot(grant,'EG',allow_arrival=arrival)
+        grant['waiting_place']['role']='destination'
+        with self.assertRaisesRegex(ValueError,'alighting'):checker.own_slot(grant,'EG')
+        self.assertEqual(checker.own_slot(grant,'EG',allow_arrival=True),0)
+
+    def test_exported_roles_need_observed_activation_and_promotion(self):
+        checker=self.fixture()
+        def event(kind,t,role,slot=0):
+            return {'event':kind,'vehicle_id':'BF01','time_s':t,'level':'EG','slot':slot,'role':role}
+        events=[event('waiting_granted',0,'lookahead_destination'),
+                event('waiting_role_activated',1,'destination'),
+                event('waiting_promoted',2,'start'),event('waiting_released',3,'start')]
+        for t in(0,.5,1,1.5):self.assertIsNone(checker.exported_slot(events,'BF01',t,'EG'))
+        self.assertIsNone(checker.exported_slot(events,'BF01',.5,'EG',allow_arrival=True))
+        self.assertEqual(checker.exported_slot(events,'BF01',1,'EG',allow_arrival=True),0)
+        self.assertEqual(checker.exported_slot(events,'BF01',2,'EG'),0)
+        self.assertIsNone(checker.exported_slot(events,'BF01',3,'EG'))
+        self.assertIsNone(checker.exported_slot(events,'BF02',2,'EG'))
+        with self.assertRaisesRegex(ValueError,'actual arrival'):
+            checker.exported_slot([events[0],events[2]],'BF01',2,'EG')
+        with self.assertRaisesRegex(ValueError,'successor'):
+            checker.exported_slot([events[1]],'BF01',2,'EG')
 
     def test_cabin_attachment_rejects_motion_even_between_fixed_endpoints(self):
         checker=self.fixture()

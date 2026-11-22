@@ -45,18 +45,53 @@ class GeometryChecks:
         cert=copy.copy(self.variants[key]);cert.lift_context=context
         return cert
 
-    def own_slot(self, grants, level):
+    def own_slot(self, grants, level, *, allow_arrival=False):
         grant=grants.get('waiting_place',{})if isinstance(grants,dict)else{}
         if grant.get('status')!='granted'or grant.get('level')!=level:return None
+        if grant.get('role')not in('start','destination'):
+            raise ValueError('A conditional or unknown waiting role grants no physical bay access')
+        if grant['role']=='destination'and not allow_arrival:
+            raise ValueError('An arrival bay is accessible only during its allocated alighting curve')
         slot=grant.get('slot')
         if type(slot)is not int or not 0<=slot<len(self.nav.waits[level]):raise ValueError('Own source waiting slot required')
         if grant.get('pose_mm')!=self.nav.waits[level][slot]:raise ValueError('Own waiting grant differs from source pose')
         return slot
 
+    def exported_slot(self, events, identity, when, level, *, allow_arrival=False):
+        """Replay physical permission separately from conditional capacity fences.
+
+        The independent lifecycle audit binds these events to original issued
+        missions and actual body clearance. This geometric boundary still
+        refuses to turn a conditional successor reservation into free space.
+        """
+        roles={}
+        for event in events:
+            if event['vehicle_id']!=identity or event['time_s']>when+1e-8:continue
+            key=event['level'],event['slot'];kind=event['event']
+            if kind=='waiting_granted':
+                role=event['role']
+                if role not in('start','destination','lookahead_destination'):
+                    raise ValueError('Unknown waiting reservation role')
+                if key in roles:raise ValueError('A waiting bay cannot be granted twice')
+                roles[key]=role
+            elif kind=='waiting_released':
+                if roles.pop(key,None)!='start':raise ValueError('Only a current source bay can be released')
+            elif kind=='waiting_promoted':
+                if roles.get(key)!='destination':raise ValueError('Observed promotion needs the actual arrival bay')
+                roles[key]='start'
+            elif kind=='waiting_role_activated':
+                if event['role']!='destination'or roles.get(key)!='lookahead_destination':
+                    raise ValueError('Only a conditional successor can activate as the next arrival bay')
+                roles[key]='destination'
+        slots={slot for (lev,slot),role in roles.items()if lev==level and
+               (role=='start'or allow_arrival and role=='destination')}
+        if len(slots)>1:raise ValueError('Multiple physical own waiting bays on one floor')
+        return next(iter(slots),None)
+
     def __call__(self, action, curve, observed):
         identity=observed['vehicle_id'];level=action['level']
         grants=observed.get('own_grants_at_start')or observed['own_grants']
-        slot=self.own_slot(grants,level);context=None
+        slot=self.own_slot(grants,level,allow_arrival=(action.get('lift_phase')or{}).get('kind')=='alighting');context=None
         if action.get('lift_phase'):
             grant=grants.get('lift',{});stage=action['lift_phase']
             port=stage['start_port'if stage['kind']=='boarding'else'destination_port']
@@ -107,15 +142,10 @@ class GeometryChecks:
                         context=PortSupportContext(self.nav.mesh,source,episode['port_id'],lift,vehicle_id=trajectory.identity)
                     # Replay own timestamped reservation events. Events are
                     # independently checked against real occupancy/resources.
-                    own=set()
-                    for event in program.get('waiting_events',[]):
-                        if event['vehicle_id']!=trajectory.identity or event['time_s']>episode['start_s']+1e-8:continue
-                        key=(event['level'],event['slot'])
-                        if event['event']=='waiting_granted':own.add(key)
-                        elif event['event']=='waiting_released':own.discard(key)
-                    slots={slot for level,slot in own if level==episode['level_id']}
-                    if len(slots)>1:raise ValueError('Multiple own waiting bays on one floor')
-                    proof=self.certificate(episode['level_id'],next(iter(slots),None),context).check(episode['curve'])
+                    slot=self.exported_slot(program.get('waiting_events',[]),trajectory.identity,
+                        episode['start_s'],episode['level_id'],
+                        allow_arrival=episode.get('lift_phase')=='alighting')
+                    proof=self.certificate(episode['level_id'],slot,context).check(episode['curve'])
                 rows.append({'vehicle_id':trajectory.identity,'time_s':[episode['start_s'],episode['end_s']],
                              'mode':episode['mode'],'proof':proof})
                 covered.append({'vehicle_id':trajectory.identity,'episode':index})

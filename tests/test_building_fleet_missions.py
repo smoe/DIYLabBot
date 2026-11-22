@@ -95,12 +95,18 @@ class MissionTests(unittest.TestCase):
         invalid = own(nav); invalid['pose_mm_rad'][0] = float('nan')
         with self.assertRaises(ValueError): planner.next_action(invalid, 0, {})
 
-    def test_inspection_prefetch_waits_at_home_not_at_inspection_endpoint(self):
+    def test_unfenced_successor_ends_continuous_inspection_at_provisional_home(self):
         planner, nav, _ = fixture(); planner.receive_assignment('BF01', mission('m1'))
-        action = planner.next_action(own(nav), 0, {})
-        self.assertEqual(action['kind'], 'request_mission')
-        self.assertIsNone(planner.states['BF01']['active'])
-        self.assertEqual(planner.next_action(own(nav, mission_pending=True), .1, {})['kind'], 'hold')
+        request=planner.next_action(own(nav),0,{})
+        self.assertEqual(request['kind'],'request_mission')
+        planner.on_action_result('BF01',request,{'status':'pending_admission'},0)
+        action = planner.next_action(own(nav), .05, {})
+        self.assertEqual(action['kind'], 'drive')
+        self.assertEqual(action['terminal']['kind'],'capacity_home')
+        self.assertEqual(action['points_mm'][-1],nav.homes['BF01']['pose_mm_rad'][:2])
+        self.assertEqual([m['event']for m in action['markers']],['inspection_completed'])
+        self.assertLess(action['markers'][0]['progress_mm'],_path(action['points_mm'],250).length)
+        self.assertFalse(planner.states['BF01']['done'])
 
     def test_wait_grant_precedes_private_bay_approach_and_chain_is_one_drive(self):
         planner, nav, _ = fixture()
@@ -118,6 +124,51 @@ class MissionTests(unittest.TestCase):
         self.assertLess(action['markers'][0]['progress_mm'], _path(action['points_mm'], 250).length)
         self.assertEqual(action['prefetch_level'], 'OG3')
         with self.assertRaises(ValueError): planner.next_action(own(nav), .2, grants)
+
+    def test_available_successor_is_requested_before_committing_a_capacity_home_leg(self):
+        planner,nav,_=fixture();planner.receive_assignment('BF01',mission('m1'))
+        request=planner.next_action(own(nav),0,{})
+        self.assertEqual(request['kind'],'request_mission')
+        self.assertIsNone(planner.states['BF01']['active'])
+        planner.on_action_result('BF01',request,{'status':'pending'},0)
+        self.assertEqual(planner.next_action(own(nav,mission_pending=True),.05,{})['kind'],'hold')
+        planner.receive_assignment('BF01',{**mission('m2','OG3','lab'),'source_level':'EG','booking_id':'booking-1'})
+        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':nav.waits['EG'][0],'role':'start'}}
+        action=planner.next_action(own(nav),.1,grant)
+        self.assertEqual(action['terminal']['kind'],'lift_wait')
+        self.assertEqual(action['points_mm'][-1],nav.waits['EG'][0][:2])
+
+    def test_capacity_wait_retains_owned_bay_and_retries_without_final_completion(self):
+        planner,nav,_=fixture()
+        planner.receive_assignment('BF01',mission('m1'))
+        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':nav.waits['EG'][0],'role':'start'}}
+        request=planner.next_action(own(nav),0,grant)
+        planner.on_action_result('BF01',request,{'status':'pending_admission'},0)
+        action=planner.next_action(own(nav),.05,grant)
+        self.assertEqual(action['terminal'],{'kind':'capacity_wait','level':'EG','slot':0})
+        details=action['markers'][0]['details']
+        planner.on_event('BF01','inspection_completed',details,1)
+        planner.on_action_result('BF01',action,{'status':'arrived'},2)
+        observed=own(nav,pose_mm_rad=nav.waits['EG'][0][:],home=False,phase='capacity_wait')
+        request=planner.next_action(observed,2,grant)
+        self.assertEqual(request['kind'],'request_mission')
+        planner.on_action_result('BF01',request,{'status':'pending_admission'},2)
+        self.assertFalse(planner.states['BF01']['requested']);self.assertFalse(planner.states['BF01']['done'])
+        self.assertEqual(planner.next_action(observed,3,grant)['kind'],'request_mission')
+
+    def test_fenced_foreign_successor_calls_from_capacity_wait_without_redundant_loop(self):
+        planner,nav,_=fixture();planner.states['BF01']['terminal']={'kind':'capacity_wait','level':'EG','slot':0}
+        item={**mission('m1','OG3','lab'),'source_level':'EG','booking_id':'booking-1'}
+        planner.receive_assignment('BF01',item)
+        observed=own(nav,pose_mm_rad=nav.waits['EG'][0][:],home=False,phase='capacity_wait')
+        grant={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':nav.waits['EG'][0],'role':'start'}}
+        action=planner.next_action(observed,0,grant)
+        self.assertEqual(action,{'kind':'call_lift','from_level':'EG','to_level':'OG3','mission_id':'m1','booking_id':'booking-1'})
+
+    def test_foreign_production_assignment_requires_fenced_booking(self):
+        planner,_,_=fixture()
+        item={**mission('m1','OG3','lab'),'source_level':'EG','booking_id':None}
+        with self.assertRaises(ValueError):planner.receive_assignment('BF01',item)
 
     def test_only_active_drive_marker_can_complete_own_inspection(self):
         planner, nav, _ = fixture(); planner.receive_assignment('BF01', mission('m1'))

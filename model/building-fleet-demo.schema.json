@@ -218,6 +218,16 @@
     "missions": {
       "type": "object",
       "properties": {
+        "admission_policy": {
+          "const": {
+            "foreign_assignment": "fenced_source_and_destination_before_issue",
+            "lookahead_source": "incoming_destination_after_body_clear",
+            "maximum_foreign_boundaries": 1,
+            "capacity_terminal": "owned_waiting_bay_or_own_home",
+            "waiting_corridor_token": "release_only_at_confirmed_owned_bay_rest",
+            "booking_binding": "immutable_mission_id"
+          }
+        },
         "seed": {
           "type": "integer",
           "minimum": 0,
@@ -317,6 +327,7 @@
         }
       },
       "required": [
+        "admission_policy",
         "seed",
         "targets",
         "deferred_targets",

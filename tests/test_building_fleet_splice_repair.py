@@ -125,15 +125,17 @@ class SpliceRepairReview(unittest.TestCase):
         graph=prepared(nav);planner=object.__new__(MissionPlanner)
         planner.nav=nav;planner.graph=graph;planner.source={'geometry':{'localization_tolerance_mm':1}}
         planner.trim_mm=1.;planner.variants={};planner.wait_approaches={('EG',0):[[nav.B[0],nav.waits['EG'][0][:2]]]}
-        planner.states={'BF01':{'queue':[{'mission_id':'M','goal':{'level':'OG3','kind':'inspection_pass'}}],
+        planner.states={'BF01':{'queue':[{'mission_id':'M','booking_id':'B','source_level':'EG','goal':{'level':'OG3','kind':'inspection_pass'}}],
                                'completed':set(),'active':None}}
         own={'vehicle_id':'BF01','level':'EG','pose_mm_rad':start,'home':True}
-        grants={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':nav.waits['EG'][0]}}
+        grants={'waiting_place':{'status':'granted','level':'EG','slot':0,'pose_mm':nav.waits['EG'][0],
+                                'role':'start','booking_id':'B','mission_id':'M'}}
         action=planner._floor_leg(own,grants)
         self.assertEqual(action['kind'],'drive')
         self.assertEqual(action['points_mm'][:2],[start[:2],nav.A[0]])
         self.assertEqual(action['points_mm'][-2:],[nav.B[0],nav.waits['EG'][0][:2]])
-        self.assertEqual(action['terminal'],{'kind':'lift_wait','level':'EG','slot':0,'to_level':'OG3'})
+        self.assertEqual(action['terminal'],{'kind':'lift_wait','level':'EG','slot':0,'to_level':'OG3',
+                                            'mission_id':'M','booking_id':'B'})
         self.assertNotIn([35,-20],action['points_mm'])
 
 

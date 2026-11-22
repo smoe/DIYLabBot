@@ -23,21 +23,27 @@ class Dispatcher:
         self.returning = False
         self.counter = 0
 
-    def assign(self, vehicle_id, own_level, now, lift_wait_available=True):
+    def ready_to_return(self,now):
+        return self.returning or(now>=self.source['missions']['minimum_duration_s']and
+            all(self.visits[k]>=r['minimum_visits']for k,r in self.targets.items()))
+
+    def assign(self, vehicle_id, own_level, now, lift_wait_available=True,*,admissible_levels=None,book_goal=None):
         if vehicle_id not in self.homes:
             raise ValueError('Unknown own home')
         if now > self.source['missions']['maximum_duration_s']:
             raise RuntimeError('BF01 maximum duration exceeded; seed retained')
-        coverage = all(self.visits[k] >= r['minimum_visits'] for k, r in self.targets.items())
-        if coverage and now >= self.source['missions']['minimum_duration_s']:
+        if self.ready_to_return(now):
             self.returning = True
-        self.counter += 1
-        identifier = 'mission-'+str(self.counter)
+        allowed=set(admissible_levels)if admissible_levels is not None else None
+        identifier = 'mission-'+str(self.counter+1);key=None
         if self.returning:
             goal = {'kind': 'home', **copy.deepcopy(self.homes[vehicle_id])}
+            if allowed is not None and goal['level']not in allowed:return None
         else:
-            candidates = [k for k in self.targets if lift_wait_available or k[0] == own_level]
+            candidates = [k for k in self.targets if (allowed is None and(lift_wait_available or k[0]==own_level))
+                          or(allowed is not None and k[0]in allowed)]
             if not candidates:
+                if allowed is not None:return None
                 raise RuntimeError('No permitted same-level successor while lift waiting area is full')
             # Prefer missing coverage, then those not already assigned. No seed
             # switching and no random calls in vehicle/sensor/service modules.
@@ -45,9 +51,15 @@ class Dispatcher:
             candidates = sorted(k for k in candidates if (self.visits[k] > 0, self.planned[k]) == priority)
             weights = [self.targets[k]['weight'] for k in candidates]
             key = self.random.choices(candidates, weights=weights, k=1)[0]
-            self.planned[key] += 1
             goal = copy.deepcopy(self.targets[key])
+        booking=None
+        if book_goal is not None and goal['level']!=own_level:
+            booking=book_goal(identifier,copy.deepcopy(goal))
+            if booking is None:raise RuntimeError('Foreign mission lost its endpoint fence before issuance')
+        self.counter+=1
+        if key is not None:self.planned[key]+=1
         message = {'mission_id': identifier, 'vehicle_id': vehicle_id, 'assigned_s': now, 'goal': goal}
+        if book_goal is not None:message.update(booking_id=booking['booking_id']if booking is not None else None,source_level=own_level)
         self.missions[identifier] = message
         return copy.deepcopy(message)
 

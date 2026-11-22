@@ -130,7 +130,8 @@ def checked_export_report(path,program_path):
            'building_fleet_services.py','building_fleet_sim.py','building_fleet_lift_checks.py',
            'building_fleet_lift_geometry.py','building_fleet_floor.py','building_fleet_runner.py',
            'building_fleet_missions.py','building_fleet_resources.py','building_fleet_comm.py',
-           'building_fleet_dispatch.py','building_fleet_geometry_checks.py','building_fleet_depot.py','building_fleet_zones.py')
+           'building_fleet_dispatch.py','building_fleet_geometry_checks.py','building_fleet_depot.py','building_fleet_zones.py',
+           'building_fleet_assignment_checks.py')
     expected.update({'scripts/'+name:model.digest(ROOT/'scripts'/name)for name in names})
     if any(pins.get(name)!=digest for name,digest in expected.items()):
         raise ValueError('Export check omits a current checker/support/primitive source pin')
