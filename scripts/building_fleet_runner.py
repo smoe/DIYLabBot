@@ -23,7 +23,7 @@ import building_fleet_comm as communication
 import walkthrough_world
 from building_fleet_dispatch import Dispatcher
 from building_fleet_motion import Path,compile_motion
-from building_fleet_control import Controller
+from building_fleet_control import Controller,source_perception_limit
 from building_fleet_depot import FixedHomeMap,check_invariant,exact_home_rest,fixed_home_curve_proof
 import tr01_floor_motion as floor
 
@@ -665,8 +665,9 @@ class WorldRunner:
         source_zones=progress_windows(path,self.zone_regions[row['level']],
             self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm,self.source['motion']['zone_velocity_mm_s'])
         caps=zone_caps(self.source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],source_zones)
-        key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse']],sort_keys=True)
-        if key not in self._motion_cache:self._motion_cache[key]=compile_motion(path,self.source,reverse=action['reverse'],zone_caps=caps)
+        velocity_cap=source_perception_limit(self.source,self.nav.radius)['applied_velocity_mm_s']
+        key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse'],velocity_cap],sort_keys=True)
+        if key not in self._motion_cache:self._motion_cache[key]=compile_motion(path,self.source,velocity_cap,reverse=action['reverse'],zone_caps=caps)
         driver=Controller(path,self.source,caps,own_start_s=self.now,radius_mm=self.nav.radius,
             static_return=self.static_return(row['level'],action.get('lift_phase'),identity),motion_program=self._motion_cache[key])
         driver.align_initial_heading(row['pose_mm_rad'][2])

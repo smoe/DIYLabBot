@@ -1,4 +1,4 @@
-// Usage: node tests/check_building_walkthrough.cjs <index.html> [playwright-module] [chrome-executable]
+// Usage: node tests/check_building_walkthrough.cjs <index.html> [playwright-module] [chrome-executable] [https-url]
 // SOLIDCRAFTBOT_WALKTHROUGH_GPU=metal selects the native macOS GPU for local QA.
 // Exercise the derived native scene through the same controls exposed to visitors.
 const fs = require('node:fs');
@@ -12,7 +12,12 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
 (async () => {
   assert(process.argv[2], 'A generated walk-through HTML file is required.');
   const target = path.resolve(process.argv[2]);
-  const html = fs.readFileSync(target, 'utf8');
+  const htmlBytes = fs.readFileSync(target), html = htmlBytes.toString('utf8');
+  const htmlHash = crypto.createHash('sha256').update(htmlBytes).digest('hex');
+  const liveURL = process.argv[5] ? new URL(process.argv[5]) : null;
+  if (liveURL) assert.equal(liveURL.protocol, 'https:', 'A live deployment must use HTTPS.');
+  const faviconURL = liveURL ? new URL('/favicon.ico', liveURL).href : null;
+  const live = liveURL ? {url: liveURL.href, navigations: [], ignored_favicon: []} : null;
   const inline = html.match(/<script id="walkthrough-data" type="application\/json">([\s\S]*?)<\/script>/);
   assert(inline, 'A standalone inline scene is required.');
   const model = JSON.parse(inline[1]);
@@ -163,9 +168,68 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     const filmUrl = seminar.film?.video_url;
     if (filmUrl) await page.route(url => url.href === filmUrl, route => route.fulfill({status: 204}));
     page.on('pageerror', error => errors.push(error.message));
-    page.on('console', message => {if (message.type() === 'error') errors.push(message.text());});
-    page.on('request', request => {if (/^https?:/.test(request.url())) network.push(request.url());});
-    await page.goto(pathToFileURL(target).href, {waitUntil: 'load', timeout: 120000});
+    page.on('console', message => {
+      if (message.type() !== 'error') return;
+      if (live && message.location().url === faviconURL)
+        live.ignored_favicon.push({event: 'console', url: faviconURL, message: message.text()});
+      else errors.push(message.text());
+    });
+    page.on('request', request => {
+      if (!/^https?:/.test(request.url())) return;
+      if (live && request.url() === liveURL.href && request.isNavigationRequest()
+          && request.frame() === page.mainFrame() && request.method() === 'GET') return;
+      if (live && request.url() === faviconURL && request.method() === 'GET')
+        live.ignored_favicon.push({event: 'request', url: request.url(), resource_type: request.resourceType()});
+      else network.push(request.url());
+    });
+    async function navigateChecked(surface, label) {
+      if (!liveURL) return surface.goto(pathToFileURL(target).href, {waitUntil: 'load', timeout: 120000});
+      const receipt = {label, url: liveURL.href, passed: false, main_requests: []};
+      live.navigations.push(receipt);
+      const session = await surface.context().newCDPSession(surface), documents = [];
+      const resourceBuffer = htmlBytes.length * 2 + 1024 * 1024;
+      receipt.inspector_buffer_bytes = {resource: resourceBuffer, total: resourceBuffer * 2};
+      const captureRequest = request => {
+        if (request.url() === liveURL.href && request.isNavigationRequest()
+            && request.frame() === surface.mainFrame() && request.method() === 'GET')
+          receipt.main_requests.push({url: request.url(), method: request.method(), resource_type: request.resourceType()});
+      };
+      surface.on('request', captureRequest);
+      session.on('Network.responseReceived', event => {
+        if (event.type === 'Document' && event.response.url === liveURL.href)
+          documents.push({request_id: event.requestId, url: event.response.url, status: event.response.status});
+      });
+      try {
+        // Buffer the actual HTTPS main response, which exceeds Chrome's
+        // default inspector cache. Each browser context needs its own receipt.
+        await session.send('Network.enable', {maxResourceBufferSize: resourceBuffer, maxTotalBufferSize: resourceBuffer * 2});
+        const response = await surface.goto(liveURL.href, {waitUntil: 'load', timeout: 120000});
+        assert(response, label+': deployed document must have an HTTP response');
+        assert.equal(documents.length, 1, label+': exactly one deployed main response is buffered');
+        const document = documents[0];
+        assert.equal(document.status, response.status(), label+': both sessions observe the same status');
+        const captured = await session.send('Network.getResponseBody', {requestId: document.request_id});
+        const body = Buffer.from(captured.body, captured.base64Encoded ? 'base64' : 'utf8');
+        Object.assign(receipt, {response_url: response.url(), status: response.status(),
+          body_sha256: crypto.createHash('sha256').update(body).digest('hex'), body_bytes: body.length,
+          body_source: 'Network.getResponseBody from this buffered actual HTTPS document session'});
+        assert.equal(response.url(), liveURL.href, label+': exact requested deployment URL');
+        assert.equal(response.status(), 200, label+': deployed document returns HTTP 200');
+        assert.equal(body.length, htmlBytes.length, label+': deployed bytes match checked local length');
+        assert.equal(receipt.body_sha256, htmlHash, label+': deployed bytes match checked local SHA-256');
+        assert.equal(receipt.main_requests.length, 1, label+': exactly one expected main GET');
+        receipt.passed = true;
+        progress(label+': deployed HTTPS response matches checked local HTML bytes');
+        return response;
+      } catch (error) {
+        receipt.error = String(error);
+        throw error;
+      } finally {
+        surface.off('request', captureRequest);
+        await session.detach();
+      }
+    }
+    await navigateChecked(page, 'main');
     await page.waitForFunction(() => document.querySelector('#building-walkthrough').dataset.ready === 'true'
       || Boolean(document.querySelector('#building-walkthrough').dataset.error), null, {timeout: 120000});
     assert.equal(await page.locator('#building-walkthrough').getAttribute('data-error'), null,
@@ -178,8 +242,9 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     const waitForStop = async id => page.waitForFunction(value => document.querySelector('#building-walkthrough').dataset.stop === value,
       id, {timeout: 120000});
     const cameraDistance = (a, b) => Math.hypot(...a.map((value, i) => value - b[i]));
-    const report = {target, html_sha256: crypto.createHash('sha256').update(html).digest('hex'),
+    const report = {target, html_sha256: htmlHash,
       browser: {engine: 'chromium', version: browser.version(),launch_profile:gpuProfile}, viewpoints: [], detail_views: [], interactions: []};
+    if (live) report.live = live;
     report.social_source_coverage={furnishings_sha256:model.source_files_sha256[socialSourceName],
       catalog_sha256:socialSource.catalog.source_sha256,office_computers:officeComputerCoverage,articulated_instances:socialObjectCoverage};
     report.microscopy={id:microscopy.id,room:microscopy.area,level:microscopy.level_id,
@@ -540,7 +605,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     // A second context exercises actual animation, independently of reduced motion.
     const animatedContext=await browser.newContext({viewport:{width:1280,height:950},reducedMotion:'no-preference'});
     try{
-      const animated=await animatedContext.newPage();await animated.goto(pathToFileURL(target).href,{waitUntil:'load',timeout:120000});
+      const animated=await animatedContext.newPage();await navigateChecked(animated, 'animated_articulation');
       await animated.waitForFunction(()=>window.__buildingWalkthrough?.ready,null,{timeout:120000});
       await animated.evaluate(id=>window.__buildingWalkthrough.viewObject(id),object.id);
       await animated.evaluate(id=>{
@@ -866,7 +931,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     const liftContext=await browser.newContext({viewport:{width:1280,height:950},reducedMotion:'no-preference'});
     try{
       const riding=await liftContext.newPage();riding.on('pageerror',error=>errors.push(error.message));
-      await riding.goto(pathToFileURL(target).href,{waitUntil:'load',timeout:120000});
+      await navigateChecked(riding, 'animated_lift');
       await riding.waitForFunction(()=>window.__buildingWalkthrough?.ready,null,{timeout:120000});
       const driver=publicControls(riding);await approachLift(riding,driver,true);
       assert.equal((await liftState(riding)).boarded,false);
@@ -953,6 +1018,10 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     await page.waitForSelector('#walkthrough-error:not([hidden])');
     assert.match(await page.locator('#walkthrough-error').textContent(), /could not be displayed/);
     report.interactions.push('visible malformed-scene error');
+    if (live) {
+      assert.deepEqual(live.navigations.map(receipt => receipt.label), ['main', 'animated_articulation', 'animated_lift']);
+      assert(live.navigations.every(receipt => receipt.passed), 'All three actual HTTPS contexts use the exact checked HTML');
+    }
     report.passed = true;
     fs.writeFileSync(path.join(output, 'browser-check.json'), JSON.stringify(report, null, 2) + '\n');
     console.log(JSON.stringify(report, null, 2));
@@ -970,7 +1039,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
         failures.push({screenshot,state});
       }catch(captureError){failures.push({screenshot,capture_error:String(captureError)});}
     }
-    fs.writeFileSync(path.join(output,'browser-failure.json'),JSON.stringify({passed:false,error:String(error),failures},null,2)+'\n');
+    fs.writeFileSync(path.join(output,'browser-failure.json'),JSON.stringify({passed:false,error:String(error),failures,...(live?{live}:{})},null,2)+'\n');
     throw error;
   } finally {await browser.close();}
 })().catch(error => {console.error(error); process.exitCode = 1;});

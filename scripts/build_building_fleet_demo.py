@@ -154,7 +154,7 @@ def world_presentation(world_path):
     if world_path.name!=walkthrough_world.REPORT:
         raise ValueError('A separate physical world report is required for BF01 presentation')
     report,manifest,bundle=walkthrough_world.read(world_path.parent,ROOT)
-    paths=(Path(builder.__file__),builder.TEMPLATE,builder.INTERACTION_SCRIPT,
+    paths=(Path(builder.__file__),builder.TEMPLATE,builder.INTERACTION_SCRIPT,builder.SEMINAR_SCRIPT,
            ROOT/'scripts/templates/quintic_motion.js',ROOT/'scripts/walkthrough_robots.js',
            ROOT/'scripts/camera_monitor_wall.js',ROOT/'scripts/monitor_frustum.js',world_path,
            *(native.project_path(path)for path in report['files'].values()))
@@ -190,6 +190,7 @@ def opt_in_html(normal,payload=None):
     if normal.count(ANCHOR)!=1:raise ValueError('Current normal viewer bridge anchor changed')
     text=normal.replace(ANCHOR,BRIDGE+ANCHOR)
     replacements={
+      '<a class="quiet-button" id="walkthrough-fleet-link" href="bf01/">20-Transporter-Demo · BF01</a>':'<a class="quiet-button" id="walkthrough-fleet-link" href="../">Gebäuderundgang</a>',
       '    function command(id,name){':'    function command(id,name){\n      if(fleetActive&&(id===elevatorConfig?.object_id||objectStates.get(id)?.config.mechanism===\'lift_door\'))return fleetBusy();',
       '    function robotCommand(id,name){':'    function robotCommand(id,name){\n      if(fleetActive)return fleetBusy();',
       '    function move(seconds){':'    function move(seconds){\n      if(fleetHooks?.following)return;',

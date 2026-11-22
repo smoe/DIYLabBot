@@ -89,17 +89,63 @@ assert(adapted.includes('elevator[key]=()=>fleetBusy()'),'Physical floor/call co
 assert(view.mount.toString().includes('createFramebuffer'),'Camera inset renders the native scene into a framebuffer');assert(fs.readFileSync(path.join(root,'scripts/building_fleet_view.js'),'utf8').includes('drawElementsInstanced'));
 console.log('Passed shared quintic/lift replay, Python-equivalent received-only reducer, capture ownership/pose, source labels, current manual-control guards, generated syntax, lossless playback projection/target reporting and normal-byte-preservation checks. Actual full-program WebGL verification remains separate.');
 
-// Optional actual WebGL branch: <index.html> [playwright-module] [chrome].
+// Optional actual WebGL branch: <index.html> [playwright-module] [chrome] [https-url].
 // No dependency is installed and absence is an error, never a skipped pass.
 if(process.argv[2]) (async()=>{
  const zlib=require('node:zlib'),crypto=require('node:crypto'),{pathToFileURL}=require('node:url'),{chromium}=require(process.argv[3]||'playwright');
+ const liveURL=process.argv[5]?new URL(process.argv[5]):null;
+ if(liveURL)assert.equal(liveURL.protocol,'https:','A live deployment must use HTTPS.');
  const target=path.resolve(process.argv[2]),bytes=fs.readFileSync(target),html=bytes.toString(),payload=JSON.parse(html.match(/<script id="building-fleet-data" type="application\/json">([\s\S]*?)<\/script>/)[1]),program=JSON.parse(zlib.gunzipSync(Buffer.from(payload.program_gzip_base64,'base64'))),normal=JSON.parse(html.match(/<script id="walkthrough-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
  const gpu=process.env.SOLIDCRAFTBOT_WALKTHROUGH_GPU||'software';assert(['metal','software'].includes(gpu));
  const browser=await chromium.launch({headless:true,...(process.argv[4]?{executablePath:process.argv[4]}:{}),args:gpu==='metal'?['--enable-gpu','--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=metal']:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1400,height:1000},reducedMotion:'no-preference'}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  const report={passed:false,html_sha256:crypto.createHash('sha256').update(bytes).digest('hex'),browser:{engine:'chromium',version:browser.version(),gpu_profile:gpu},scope:'Actual opt-in WebGL instancing, compiled timeline, received-message projection, camera framebuffer, follow and command/freeze checks. Controlled seek/clock verifies semantics, not real-time performance.'};
  try{
-  await page.goto(pathToFileURL(target).href,{timeout:120000});await page.waitForFunction(()=>window.__buildingFleet?.ready,null,{timeout:120000});
+  async function navigateCheckedFleet(){
+   if(!liveURL)return page.goto(pathToFileURL(target).href,{timeout:120000});
+   const receipt=report.live={url:liveURL.href,passed:false,main_requests:[]};
+   const session=await page.context().newCDPSession(page),documents=[];
+   const resourceBuffer=bytes.length*2+1024*1024;
+   receipt.inspector_buffer_bytes={resource:resourceBuffer,total:resourceBuffer*2};
+   const captureRequest=request=>{
+    if(request.url()===liveURL.href&&request.isNavigationRequest()
+       &&request.frame()===page.mainFrame()&&request.method()==='GET')
+     receipt.main_requests.push({url:request.url(),method:request.method(),resource_type:request.resourceType()});
+   };
+   page.on('request',captureRequest);
+   session.on('Network.responseReceived',event=>{
+    if(event.type==='Document'&&event.response.url===liveURL.href)
+     documents.push({request_id:event.requestId,url:event.response.url,status:event.response.status});
+   });
+   try{
+    // Bind the real HTTPS response before executing fleet checks. Its large
+    // inline program needs an explicit Chrome inspector response buffer.
+    await session.send('Network.enable',{maxResourceBufferSize:resourceBuffer,maxTotalBufferSize:resourceBuffer*2});
+    const response=await page.goto(liveURL.href,{waitUntil:'load',timeout:120000});
+    assert(response,'Deployed BF01 document must have an HTTP response');
+    assert.equal(documents.length,1,'Exactly one deployed BF01 main response is buffered');
+    const document=documents[0];
+    assert.equal(document.status,response.status(),'Both sessions observe the same BF01 response status');
+    const captured=await session.send('Network.getResponseBody',{requestId:document.request_id});
+    const body=Buffer.from(captured.body,captured.base64Encoded?'base64':'utf8');
+    Object.assign(receipt,{response_url:response.url(),status:response.status(),
+     body_sha256:crypto.createHash('sha256').update(body).digest('hex'),body_bytes:body.length,
+     body_source:'Network.getResponseBody from this buffered actual HTTPS document session'});
+    assert.equal(response.url(),liveURL.href,'Exact requested BF01 deployment URL');
+    assert.equal(response.status(),200,'Deployed BF01 document returns HTTP 200');
+    assert.equal(body.length,bytes.length,'Deployed BF01 bytes match checked local length');
+    assert.equal(receipt.body_sha256,report.html_sha256,'Deployed BF01 bytes match checked local SHA-256');
+    assert.equal(receipt.main_requests.length,1,'Exactly one expected BF01 main GET');
+    receipt.passed=true;
+    return response;
+   }catch(error){
+    receipt.error=String(error);throw error;
+   }finally{
+    page.off('request',captureRequest);await session.detach();
+   }
+  }
+  await navigateCheckedFleet();await page.waitForFunction(()=>window.__buildingFleet?.ready,null,{timeout:120000});
+  const back=page.locator('#walkthrough-fleet-link');assert(await back.isVisible());assert.equal(await back.getAttribute('href'),'../');report.walkthrough_return_link=true;
   assert.equal(await page.evaluate(()=>window.__buildingFleet.instance_count),20);await page.waitForFunction(()=>window.__buildingFleet.draw_calls>0);const gpuInstances=await page.evaluate(()=>window.__buildingFleet.renderer_stats);assert.equal(gpuInstances.last_instance_count,20);assert(gpuInstances.native_mesh_groups>=34);report.native_instances=gpuInstances;
   const models=view.trajectories(program),duration=program.duration_s||Math.max(...program.trajectories.flatMap(t=>t.episodes.map(e=>e.end_s))),times=[0,duration,...program.lift_schedule.flatMap(r=>[r.start_s,(r.start_s+r.end_s)/2,r.end_s])];
   for(const t of [...new Set(times)].sort((a,b)=>a-b)){

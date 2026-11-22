@@ -14,6 +14,7 @@ import tempfile
 from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
+from urllib.parse import urljoin
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import build_building_fleet_demo as browser
@@ -50,7 +51,8 @@ class WorldAdapterTests(unittest.TestCase):
             self.assertFalse(world.OVERLAY_SOURCES&set(manifest['source_files_sha256']))
             for name in ('scripts/build_building_walkthrough.py','scripts/building_walkthrough_viewer.html',
                          'scripts/walkthrough_interaction.js','scripts/templates/quintic_motion.js',
-                         'scripts/walkthrough_robots.js','scripts/camera_monitor_wall.js','scripts/monitor_frustum.js'):
+                         'scripts/walkthrough_robots.js','scripts/camera_monitor_wall.js','scripts/monitor_frustum.js',
+                         'scripts/seminar_projection.js'):
                 self.assertEqual(pins[name],native.digest(browser.ROOT/name))
             self.assertEqual(pins[str(report.relative_to(browser.ROOT))],native.digest(report))
             self.assertTrue(all(path.read_bytes()==raw for path,raw in original.items()))
@@ -65,16 +67,34 @@ class WorldAdapterTests(unittest.TestCase):
                 browser.world_presentation(report)
 
     def test_renderer_source_change_during_embedding_fails_closed(self):
-        with tempfile.TemporaryDirectory(dir=browser.ROOT/'exports')as directory:
-            report,_,_=self.world_fixture(directory)
-            template=Path(directory)/'temporary-renderer.html'
-            template.write_text('__WALKTHROUGH_DATA__')
-            def changed(template_text,payload):
-                template.write_text('changed after source fence')
-                return '{}'
-            with patch.object(viewer,'TEMPLATE',template),patch.object(viewer,'embed_html',side_effect=changed):
-                with self.assertRaisesRegex(ValueError,'Changed or missing checked input'):
-                    browser.world_presentation(report)
+        for attribute in ('TEMPLATE','SEMINAR_SCRIPT'):
+            with self.subTest(source=attribute),tempfile.TemporaryDirectory(dir=browser.ROOT/'exports')as directory:
+                report,_,_=self.world_fixture(directory)
+                source=Path(directory)/'temporary-renderer-source'
+                source.write_text('__WALKTHROUGH_DATA__')
+                def changed(template_text,payload):
+                    source.write_text('changed after source fence')
+                    return '{}'
+                with patch.object(viewer,attribute,source),patch.object(viewer,'embed_html',side_effect=changed):
+                    with self.assertRaisesRegex(ValueError,'Changed or missing checked input'):
+                        browser.world_presentation(report)
+
+    def test_pages_entry_and_return_preserve_separate_modes(self):
+        normal=viewer.TEMPLATE.read_text(encoding='utf-8')
+        self.assertEqual(browser.opt_in_html(normal),normal)
+        self.assertNotIn('<script id="building-fleet-data"',normal)
+        adapted=browser.opt_in_html(normal,{'format':'unqualified-adapter-fixture'})
+        pattern=r'<a\b[^>]*\bid="walkthrough-fleet-link"[^>]*\bhref="([^"]+)"[^>]*>([^<]+)</a>'
+        entry=re.findall(pattern,normal);back=re.findall(pattern,adapted)
+        self.assertEqual(len(entry),1);self.assertEqual(len(back),1)
+        root='https://smoe.github.io/DIYLabBot/'
+        self.assertEqual(urljoin(root,entry[0][0]),root+'bf01/')
+        self.assertEqual(urljoin(root+'bf01/',back[0][0]),root)
+        self.assertIn('BF01',entry[0][1]);self.assertEqual(back[0][1],'Gebäuderundgang')
+        self.assertIn('<script id="building-fleet-data"',adapted)
+        changed=normal.replace('href="bf01/"','href="unexpected/"')
+        with self.assertRaisesRegex(ValueError,'adapter hook changed'):
+            browser.opt_in_html(changed,{'format':'unqualified-adapter-fixture'})
 
     def test_compile_binds_world_for_runtime_and_written_program(self):
         with tempfile.TemporaryDirectory(dir=browser.ROOT/'exports/building-fleet')as directory:

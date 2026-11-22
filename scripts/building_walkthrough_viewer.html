@@ -7,7 +7,7 @@
   <title>Building walk-through · SolidCraftBot</title>
   <style>
     :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#203331;background:#f0f1ed;font-synthesis:none}
-    *{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}button:focus-visible,select:focus-visible,canvas:focus-visible{outline:3px solid #be713e;outline-offset:3px}
+    *{box-sizing:border-box}body{margin:0}button,select{font:inherit}button{cursor:pointer}a:focus-visible,button:focus-visible,select:focus-visible,canvas:focus-visible{outline:3px solid #be713e;outline-offset:3px}
     main{max-width:1500px;margin:auto;padding:24px 28px 18px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}.eyebrow{color:#6a7771;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0 0 5px}h1{font-size:clamp(22px,3vw,32px);font-weight:500;letter-spacing:-.035em;margin:0}.identity{display:flex;align-items:center;gap:12px}.identity svg{width:39px;height:39px;color:#57766b}.model-label{font-size:12px;color:#69766f;text-align:right;line-height:1.6}
     .places{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.place{border:1px solid #d2d9d0;background:#fffef9;color:#4b5b53;border-radius:9px;padding:10px 16px;min-height:44px;font-size:13px;transition:background .15s,color .15s}.place:hover{background:#e5ebe3}.place[aria-pressed=true]{background:#2e5146;border-color:#2e5146;color:#fff}.place .ordinal{opacity:.62;margin-right:8px;font-variant-numeric:tabular-nums}
     .stage{position:relative;background:#cfdad7;border-radius:14px;overflow:hidden;height:clamp(430px,72vh,850px);box-shadow:0 16px 45px #24372e12}.stage:fullscreen{height:100%;width:100%;border-radius:0}.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.stage canvas:active{cursor:grabbing}.caption{position:absolute;left:20px;top:19px;pointer-events:none;max-width:calc(100% - 100px);color:#23362f;background:#fffef8ed;padding:12px 16px;border-radius:10px;box-shadow:0 3px 12px #172c2510}.caption strong{display:block;font-size:16px;font-weight:500;letter-spacing:-.015em}.caption span{display:block;font-size:11px;color:#6b776e;line-height:1.6;margin-top:2px}.fullscreen{position:absolute;right:17px;top:18px;width:40px;height:40px;border:1px solid #dbe0d5;background:#fffef6f0;border-radius:9px;color:#3a5148;font-size:18px}.fullscreen[hidden]{display:none}.crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #ffffffb8;border-radius:50%;box-shadow:0 0 2px #0a1c2080;pointer-events:none;transform:translate(-50%,-50%)}
@@ -73,6 +73,7 @@
       <button class="quiet-button" id="walkthrough-next" type="button">Next stop →</button>
       <button class="quiet-button" id="walkthrough-return" type="button">Return to viewpoint</button>
       <button class="quiet-button isolation-button" id="walkthrough-isolate" type="button" aria-pressed="false" hidden>Isolate lab 3.003</button>
+      <a class="quiet-button" id="walkthrough-fleet-link" href="bf01/">20-Transporter-Demo · BF01</a>
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>

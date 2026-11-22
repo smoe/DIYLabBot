@@ -141,6 +141,65 @@ bleiben gesperrt; der Schacht wird ausschließlich über den Aufzugablauf genutz
 
 ## Arbeitsstand und Nachweisgrenzen
 
+### Ruckkorrektur auf dem Stand `01c7cff`
+
+Die konkrete nächste BF04-Kurve des früheren Abbruchs bei 616 s wurde aus
+den damaligen Quellen rekonstruiert. Ihr vollständiger 36-Punkte-Vorschlag
+reproduziert die Ruckobergrenze von 1433,6473387483768 mm/s³.
+Zwei Ereignisse einer konstanten Fahrt liegen dabei nur 0,389 ms auseinander;
+die frühere Rundung passte ein einziges Exportpolynom über beide Ruckwechsel.
+
+Der Compiler fasst jetzt ausschließlich belegte konstante Fahrabschnitte
+mit zusammen weniger als 1 ms zu einem C2-Transitknoten zusammen.
+Geschwindigkeit, Beschleunigung und Weg-/Zeitbeziehung werden dafür geprüft.
+Beim Übertragen der Ereignisse auf das Millisekundenraster wird ihre eigene
+PVA mitgeführt. Der danach neu gefittete skalare Clock ist dieselbe Quelle
+für räumliche FK-Ausgabe und Fahrzeugregler. Funktionale Endorte und
+Ruhezustände bleiben erhalten. Der vollständige skalare und räumliche
+Verlauf wird einschließlich der tatsächlichen 50-ms-Reglerknoten und der
+benachbarten Grenzereignisse auf PVA-, Zonen-, Monotonie- und Kein-Halt-
+Verletzungen geprüft; notwendige Nachskalierung bleibt örtlich begrenzt.
+
+Runner und Regler verwenden außerdem denselben bereits vorhandenen,
+an der quantisierten Bremsfamilie geprüften Wahrnehmungscap. Es wurden
+keine Quellgrenzen angehoben. Die konkrete Regression dauert nun
+418,824 s bei einer räumlichen Ruckobergrenze von 995,227948 mm/s³
+und einer skalaren von 995,227185 mm/s³. Der echte Regler übernimmt
+die Kurve mit Dilatationsfaktor 1 und unverändertem Endhalt. Die
+Quantisierung ergänzt bei dieser Kurve 0,828 ms zum qualifizierten
+Vorschlag; eine allgemeine Obergrenze von 1 ms wird nicht behauptet.
+Globale Zeitoptimalität und ein gemessener menschlicher Vergleich bleiben offen.
+16 Bewegungstests und der unabhängige mathematische Review bestehen.
+Der reproduzierbare Teilbericht steht unter
+`exports/building-fleet/jerk-01c7cff/diagnosis-final-r2/report.json`.
+
+Die aktuelle physische Welt wurde mit 5788 Körpern und 163 physischen
+Quellenpins frisch abgeleitet. Navigation und Routenkatalog stammen
+aus diesem Stand. Der unveränderte Nav-R1-Cache bleibt die Eingabe
+für Katalog und anschließenden Vollversuch. Alle 22 nativen Hüllentests
+bestehen. Der normale Browserrundgang, seine Büro–Labor–Aufzug-Route
+und das gehende Ein-/Aussteigen an allen fünf Geschossen sind geprüft.
+Der Aufzug-Gehprüfer pausiert seinen kontrollierten Testtakt jetzt
+ausdrücklich, damit zwischen Browserabfragen keine unbeabsichtigte
+zusätzliche Modellzeit verstreicht; die Produktionskollision bleibt
+unverändert. Der erste entsprechende Fehlbericht bleibt erhalten.
+
+Der neue Katalog umfasst 3314 Routen, 2895 Splice-Reparaturen und
+35 Ressourcen; seine Ableitung benötigte 816,916 s. Alle 38 erfassten
+Eingabepins und die Nav-R1-Bytes blieben unverändert. Ein älterer
+Controller-Regressionsfall wird am kurzen Restweg statt an seiner
+früheren absoluten Fahrzeit positioniert; alle 24 Controllertests bestehen.
+
+Die gesamte BF01-Suite besteht mit 383 von 384 Tests in 503,177 s;
+die optionale native Prüfung ist in den 22 separat ausgeführten
+FreeCAD-Hüllentests enthalten. Der erneute Vollversuch mit Seed `20261120`
+wird mit denselben eingefrorenen Quellen geprüft. Dieser Stand ist noch kein
+vollständiger Flotten-, Native-, Export- oder Browsernachweis. Für die
+angeforderte Veröffentlichung ist eine separate Opt-in-Seite `bf01/`
+mit Rücklink zum normalen Rundgang vorbereitet. Der normale Rundgang
+aktiviert weiterhin keine Flotte. Der Präsentationsadapter pinnt auch
+das seit dem aktuellen Master konsumierte Seminar-Projektionsskript.
+
 ### Folgeschrittnachweis auf dem Stand `f1eb858`
 
 Die Weiterfahrfreigabe bindet den nächsten Integrationsschritt von höchstens

@@ -16,7 +16,7 @@ const {chromium}=require(process.argv[3]||'playwright');
     await page.goto(pathToFileURL(file).href,{waitUntil:'load',timeout:120000});
     await page.waitForFunction(()=>window.__buildingWalkthrough?.ready||document.querySelector('#building-walkthrough').dataset.error,null,{timeout:120000});
     assert.equal(await page.locator('#building-walkthrough').getAttribute('data-error'),null,await page.locator('#walkthrough-error').textContent());
-    await page.clock.install();
+    const epoch=new Date('2026-11-22T12:00:00Z');await page.clock.install({time:epoch});await page.clock.pauseAt(new Date(+epoch+1000));
     const read=()=>page.evaluate(()=>({camera:window.__buildingWalkthrough.camera,lift:window.__buildingWalkthrough.elevator}));
     async function settle(){for(let n=0;n<40;n++){await page.clock.fastForward(3000);const s=await read();if(s.lift.state!=='moving'&&s.lift.door_phase==='idle')return s;}throw Error('Lift did not settle');}
     async function lookAt(point){

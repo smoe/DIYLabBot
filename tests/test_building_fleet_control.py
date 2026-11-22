@@ -269,16 +269,29 @@ class ControllerTests(unittest.TestCase):
             [9281.219033984651,16190.370669571663],[8611.321545995319,16190.370669571663],
             [8271.30401003135,15925.],[8225.,15925.]]
         c=self.controller(motion.Path(points),zone_caps=[(0,300)])
-        c.set_plan(c.nominal_clock,.6,'driving','goal');c.now=58.
-        jet=c.plan.evaluate(57.4);c.y,c.v,c.a=[jet[field][0]for field in F[:3]]
-        c.recorded=[{'time_s':58.,'pose_mm_rad':c.path.evaluate(c.y)[0]}];c.record_times=[58.]
-        self.assertAlmostEqual(c.goal-c.y,15.403095133384435)
+        c.set_plan(c.nominal_clock,.6,'driving','goal')
+        # Retain the historical short remaining distance, rather than its old
+        # elapsed-time offset: a faster valid plan reaches this state earlier.
+        short_remaining_mm=15.403095133384435;target=c.goal-short_remaining_mm
+        lo,hi=0.,c.plan.times[-1]
+        for _ in range(60):
+            middle=(lo+hi)/2
+            if c.plan.evaluate(middle)[F[0]][0]<target:lo=middle
+            else:hi=middle
+        elapsed=math.ceil(hi*1000)/1000
+        c.now=round(c.plan_start+elapsed,3)
+        jet=c.plan.evaluate(elapsed);c.y,c.v,c.a=[jet[field][0]for field in F[:3]]
+        c.recorded=[];c.record_times=[];c._record(c.now)
+        self.assertGreater(c.goal-c.y,0)
+        self.assertLessEqual(c.goal-c.y,short_remaining_mm)
+        self.assertLessEqual(c.plan.evaluate(elapsed-.001)[F[0]][0],target)
+        self.assertGreater(c.v,0)
         self.assertIsNone(c._final_deceleration())
         clock=c._checked_brake(strict=True)
         self.assertIs(clock._bf01_continuation,c.plan)
         self.assertAlmostEqual(clock.points[-1][F[0]][0],c.goal-c.y)
-        self.assertGreaterEqual(c._stop_observation_margin(clock),0)
         self.assertTrue(c._admissible(clock,c.y)[0])
+        self.assertGreaterEqual(c._stop_observation_margin(clock),0)
         self.assertTrue(any(row['kind']=='validated_goal_suffix_stop'for row in c.profile_checks))
 
     def test_unwrapped_initial_heading_is_equivalent_and_requires_rest(self):
