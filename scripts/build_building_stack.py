@@ -152,7 +152,7 @@ def z_checks(geometry, contract):
                        'scope': ('Referenced basic laboratory furniture and native appliances' if laboratory.get('native_equipment_included')
                                  else 'Referenced laboratory furniture and illustrative support; native equipment excluded')})
         expected.update(names)
-    for station in [contract[key] for key in ('microscopy','kitchenette','monitor_wall') if contract.get(key)]:
+    for station in [contract[key] for key in ('microscopy','kitchenette','monitor_wall','seminar_room') if contract.get(key)]:
         names=station['body_ids'];level=level_by_id[station['level_id']]
         if not names or len(names)!=len(set(names)) or set(names)&expected or not set(names)<=set(bodies):
             raise ValueError('Bound room equipment needs disjoint, complete native body coverage')
@@ -796,7 +796,7 @@ def build(args):
             'atrium_access_floor_probes':contract.get('atrium_access_floor_probes',[]),
             'backends':args.backend,'cross_cad_checked':args.backend=='both','closed_body_count':len(expanded['bodies']),
             'structural_display_body_count':len(expanded['bodies'])-len(contract['marker_body_ids'])-len(contract.get('furnishings', {}).get('body_ids', [])),'marker_body_ids':contract['marker_body_ids'],
-            'furnishings':contract.get('furnishings'), 'microscopy':contract.get('microscopy'), 'kitchenette':contract.get('kitchenette'), 'monitor_wall':contract.get('monitor_wall'),
+            'furnishings':contract.get('furnishings'), 'microscopy':contract.get('microscopy'), 'kitchenette':contract.get('kitchenette'), 'monitor_wall':contract.get('monitor_wall'), 'seminar_room':contract.get('seminar_room'),
             'coordinate_meaning':NOTICE,'metric_scale_known':False,'assumed_dimensions':contract['assumed_dimensions'],
             'solidcraft_checks':sc_checks,'freecad_checks_passed':None if fc_checks is None else fc_checks['passed'],'body_comparisons':cross,
             'native_corridor_roof_checks_passed':{'solidcraft':None if sc_checks is None else sc_checks.get('native_corridor_roof_checks_passed'),

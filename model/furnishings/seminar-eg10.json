@@ -1,0 +1,85 @@
+{
+  "format": "solidcraftbot.seminar-room/1",
+  "id": "SeminarEG10",
+  "level": "EG",
+  "area": "R0_010",
+  "units": {"length": "mm"},
+  "catalog": {
+    "source": "model/furniture/social.catalog.json",
+    "source_sha256": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440"
+  },
+  "anchor": {"wall": "EW092", "fraction": 0.5},
+  "window_front": {
+    "id": "SeminarEG10Windows",
+    "area": "R0_010",
+    "wall_ids": [
+      "EW093",
+      "EW094",
+      "EW095",
+      "EW096"
+    ],
+    "sill_mm": 1000,
+    "head_mm": 3200,
+    "jamb_mm": 60,
+    "mullion_mm": 70,
+    "max_sash_width_mm": 900,
+    "frame_mm": 35,
+    "sash_depth_mm": 60,
+    "glass_mm": 6,
+    "open_angle_deg": 70,
+    "basis": "The owner confirms the continuous rear window frontage and individually opening windows. The EG room boundary identifies the west facade opposite the corridor entrance. Dimensions, subdivisions and outward handing are unmeasured presentation assumptions."
+  },
+  "screen": {
+    "width_mm": 2400,
+    "height_mm": 1350,
+    "bottom_mm": 1200,
+    "back_gap_mm": 40,
+    "frame_mm": 20,
+    "case_depth_mm": 20,
+    "surface_depth_mm": 2,
+    "mount_width_mm": 60,
+    "mount_height_mm": 100
+  },
+  "seating": {
+    "desk_type": "desk",
+    "chair_type": "dining_chair",
+    "rows": 3,
+    "chairs_per_table": 2,
+    "desk_overrides_mm": {"length": 1400, "depth": 700, "height": 745},
+    "desk_length_min_mm": 1200,
+    "desk_length_max_mm": 1800,
+    "table_gap_mm": 20,
+    "window_margin_mm": 100,
+    "door_side_clearance_mm": 1500,
+    "door_opening_id": "D0_010",
+    "door_sweep_margin_mm": 50,
+    "front_row_depth_mm": 900,
+    "row_pitch_mm": 1400,
+    "chair_setback_mm": 650,
+    "chair_spacing_mm": 700
+  },
+  "projector": {
+    "depth_mm": 2700,
+    "drop_mm": 650,
+    "width_mm": 320,
+    "case_depth_mm": 240,
+    "height_mm": 110,
+    "lens_radius_mm": 32,
+    "lens_length_mm": 45,
+    "lens_glass_depth_mm": 3,
+    "mount_radius_mm": 18,
+    "ceiling_plate_width_mm": 180,
+    "ceiling_plate_depth_mm": 140,
+    "ceiling_plate_thickness_mm": 20
+  },
+  "viewpoint": {
+    "depth_mm": 4600,
+    "lateral_mm": -2800,
+    "eye_height_mm": 1100,
+    "target_depth_mm": 2800,
+    "target_lateral_mm": -800,
+    "target_height_mm": 1350,
+    "clearance_mm": 160
+  },
+  "basis": "Room 10 Seminarraum and its EG doorway come from the relative ground-floor plan. Owner correction: three rows fill from the exterior window side to an approximately 1500 mm door-side strip. Each adjoining catalog desk has two chairs; supported desk lengths are resolved per row without scaling other dimensions. Screen, projector, mounting, seated/oblique viewpoint and all dimensions remain unmeasured presentation assumptions. No ergonomic, egress, structural, optical or hardware qualification."
+}

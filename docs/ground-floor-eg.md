@@ -42,6 +42,23 @@ die äußere Darstellungsgeometrie an die Obergeschosse an. Aufzug und innere
 Treppe bleiben im gemeinsamen Bezug fest; die hier beschriebene Originalquelle
 und ihre relative Nachzeichnung bleiben unverändert.
 
+## Seminarraum 10
+
+Die [Möblierung](../model/furnishings/seminar-eg10.json) bindet den Projektor
+und die Projektionsfläche an die geschlossene Stirnwand von `R0_010`. Die
+gesamte westliche Außenwand gegenüber der Flurtür erhält eine Fensterfront.
+Ihre Öffnungen folgen den registrierten Wandabschnitten. Jeder Flügel hat
+einen eigenen Rahmen mit Glas und Griff und öffnet im Rundgang nach außen.
+
+Drei Tischreihen aus dem Möbelkatalog reichen von der Fensterseite bis etwa
+1,5 m vor den türseitigen Rand. Jeder Tisch hat zwei Stühle. Die Aufhängung
+des Projektors leitet sich aus der Deckenhöhe ab. Fensteraufteilung,
+Flügelanschläge und Maße bleiben Modellannahmen.
+
+Im [Rundgang](building-walkthrough.md#bedienung) erhält die Projektionsfläche
+eine Filmtextur. Die native CAD-Geometrie enthält die Leinwand samt Rahmen und
+den Deckenprojektor.
+
 ## Bilder und Prüfung
 
 Die native [EG-Ansicht](media/building-stack-ground.png) wird aus derselben Quelle

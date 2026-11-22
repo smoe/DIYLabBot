@@ -106,7 +106,7 @@ def validate(spec):
     exact(leading, 'format id sources calibration parameters presentation_reference levels atrium concept_exchange circulation roof qualification limitations', 'building stack')
     require(spec['format'] == FORMAT and spec['calibration'] is None, 'Uncalibrated building concept required')
     require(isinstance(spec['id'], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', spec['id']), 'Stable stack ID required')
-    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories', 'microscopy', 'kitchenette', 'monitor_wall'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
+    exact({k: v for k, v in spec['sources'].items() if k not in {'furnishings', 'laboratories', 'microscopy', 'kitchenette', 'monitor_wall', 'seminar_room'}}, 'floorplan room_geometry ground_floor basement', 'stack sources')
     ref = spec['presentation_reference']
     exact(ref, 'width_parameter wall_thickness_parameter door_height_parameter floorplan_area extent_axis basis', 'presentation reference')
     require(ref['extent_axis'] == 'x' and ref['basis'] == 'unmeasured_concept_proportion', 'Presentation proportion is not metric calibration')
@@ -471,6 +471,17 @@ def interfaces(spec, p):
         import foyer_monitor_wall
         data['monitor_wall'] = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
             {name: value[0] for name, value in bases.items()}, p, levels)['interface']
+    if 'seminar_room' in spec['sources']:
+        import building_seminar
+        seminar = building_seminar.compile(spec['sources']['seminar_room'], bases['EG'][0], p, levels,
+                                           door_geometry=extension if 'exterior' in spec else None)
+        data['seminar_room'] = seminar['interface']
+        window_probes = seminar.get('window_probes', [])
+        existing_windows = {group['target_body'] for group in data.get('exterior', {}).get('side_window_groups', [])}
+        ground_walls = set(next(level['wall_bodies'] for level in levels if level['id'] == 'EG'))
+        require(all(probe['target_body'] in ground_walls-existing_windows for probe in window_probes),
+                'Seminar window apertures need uncovered EG wall bodies')
+        data['opening_probes'].extend(window_probes)
     if 'room_signs' in spec:
         import building_room_signs
         omitted = set(data.get('furnishings', {}).get('omitted_walls', [])) | set(data.get('exterior', {}).get('omitted_body_ids', []))
@@ -544,6 +555,11 @@ def expanded(spec, p):
         displays = foyer_monitor_wall.compile(spec['sources']['monitor_wall'],
             {name: value[0] for name, value in bases.items()}, p, data['levels'])
         for key in ('components', 'bodies', 'operations'): result[key].extend(displays[key])
+    if 'seminar_room' in spec['sources']:
+        import building_seminar
+        seminar = building_seminar.compile(spec['sources']['seminar_room'], bases['EG'][0], p, data['levels'],
+                                           door_geometry=extension if 'exterior' in spec else None)
+        for key in ('components', 'bodies', 'operations'): result[key].extend(seminar[key])
     if 'room_signs' in spec:
         import building_room_signs
         omitted = set(data.get('furnishings', {}).get('omitted_walls', [])) | set(data.get('exterior', {}).get('omitted_body_ids', []))
@@ -605,6 +621,9 @@ def source_dependencies(spec):
     if 'monitor_wall' in spec['sources']:
         import foyer_monitor_wall
         paths.extend(foyer_monitor_wall.dependencies(spec['sources']['monitor_wall']))
+    if 'seminar_room' in spec['sources']:
+        import building_seminar
+        paths.extend(building_seminar.dependencies(spec['sources']['seminar_room']))
     if 'alignment' in spec: paths.extend([ROOT/'scripts/building_alignment.py', ROOT/'model/building-alignment.schema.json'])
     if 'exterior' in spec: paths.extend([ROOT/'scripts/building_exterior.py', ROOT/'model/building-exterior.schema.json'])
     if 'doors' in spec.get('exterior',{}): paths.extend(exterior.doors.dependencies(spec['exterior']['doors']))

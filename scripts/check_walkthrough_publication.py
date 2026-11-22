@@ -56,12 +56,15 @@ def check(html, manifest, program=None, body_ids=None):
             require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
     require(payload.get('camera_wall') == program.get('camera_wall'), 'Stale published walkthrough: camera_wall')
     require(payload.get('room_signs') == program.get('room_signs'), 'Stale published walkthrough: room_signs')
+    require(payload.get('seminar_room') == program.get('seminar_room'), 'Stale published walkthrough: seminar_room')
     expected = dict(program['source_files_sha256'])
     renderer_sources = ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
                         'scripts/walkthrough_world.py', 'scripts/building_walkthrough_viewer.html',
                         'scripts/walkthrough_interaction.js')
     if program.get('camera_wall') is not None:
         renderer_sources += MONITOR_RENDERER_SOURCES
+    if program.get('seminar_room', {}).get('film') is not None:
+        renderer_sources += ('scripts/seminar_projection.js',)
     for name in renderer_sources:
         expected[name] = hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
     for name, digest in expected.items():

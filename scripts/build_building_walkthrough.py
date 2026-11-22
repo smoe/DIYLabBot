@@ -16,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FORMAT = 'solidcraftbot.building-walkthrough-build/1'
 TEMPLATE = ROOT/'scripts/building_walkthrough_viewer.html'
 INTERACTION_SCRIPT = ROOT/'scripts/walkthrough_interaction.js'
+SEMINAR_SCRIPT = ROOT/'scripts/seminar_projection.js'
 
 
 def merge_pins(*collections):
@@ -37,6 +38,8 @@ def embed_html(template, payload):
     if template.count('__WALKTHROUGH_INTERACTION__') > 1:
         raise ValueError('Only one interaction-script placeholder is allowed')
     template = template.replace('__WALKTHROUGH_INTERACTION__', INTERACTION_SCRIPT.read_text(encoding='utf-8'))
+    if '__WALKTHROUGH_SEMINAR__' in template:
+        template = template.replace('__WALKTHROUGH_SEMINAR__', SEMINAR_SCRIPT.read_text(encoding='utf-8'))
     template = template.replace('__WALKTHROUGH_ROBOTS__', (ROOT/'scripts/templates/quintic_motion.js').read_text()+'\n'+(ROOT/'scripts/walkthrough_robots.js').read_text())
     template = template.replace('__WALKTHROUGH_MONITORS__', (ROOT/'scripts/monitor_frustum.js').read_text()+'\n'+(ROOT/'scripts/camera_monitor_wall.js').read_text())
     return template.replace('__WALKTHROUGH_DATA__', data)
@@ -140,7 +143,7 @@ def build(args):
          for path in (Path(__file__), Path(walkthrough_world.__file__), Path(mesh_export.__file__), *reports.values())})
     browser_inputs = merge_pins(world_inputs, overlay['source_files_sha256'] if overlay else {},
         {str(path.relative_to(ROOT)): mesh_export.digest(path)
-         for path in (TEMPLATE, INTERACTION_SCRIPT,
+         for path in (TEMPLATE, INTERACTION_SCRIPT, SEMINAR_SCRIPT,
                       ROOT/'scripts/camera_monitor_wall.js', ROOT/'scripts/monitor_frustum.js')})
     key = hashlib.sha256(json.dumps(browser_inputs, sort_keys=True).encode()).hexdigest()
     stem = 'building-walkthrough-'+key[:12]
