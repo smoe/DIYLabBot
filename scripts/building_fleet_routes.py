@@ -213,7 +213,7 @@ class Navigation:
         (directory/'navigation.json.gz').write_bytes(data)
         if pins!=self._cache_pins():raise ValueError('Navigation sources changed during cache export')
         report={'format':'solidcraftbot.building-fleet-navigation-cache/1','source_files_sha256':pins,
-                'walkthrough_build_report_sha256':model.digest(self.mesh.export/'build-report.json'),
+                'walkthrough_build_report_sha256':model.digest(self.mesh.world_report_path),
                 'config_sha256':hashlib.sha256(json.dumps(self.config,sort_keys=True,allow_nan=False).encode()).hexdigest(),
                 'file':'navigation.json.gz','artifact_sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data),
                 'qualification':{'curve_qualified':False,'fleet_compiled':False,'navigation_qualified':False},
@@ -231,7 +231,7 @@ class Navigation:
             raise ValueError('A static cache cannot assert completed motion qualification')
         n=cls.__new__(cls);n.config=model.validate(copy.deepcopy(config));n.mesh=nav.NativeMesh(export_dir)
         if report['source_files_sha256']!=n._cache_pins():raise ValueError('Navigation cache source or generator pins are stale')
-        if report['walkthrough_build_report_sha256']!=model.digest(n.mesh.export/'build-report.json'):raise ValueError('Navigation cache refers to another walkthrough export')
+        if report['walkthrough_build_report_sha256']!=model.digest(n.mesh.world_report_path):raise ValueError('Navigation cache refers to another walkthrough world export')
         expected=hashlib.sha256(json.dumps(config,sort_keys=True,allow_nan=False).encode()).hexdigest()
         if report['config_sha256']!=expected:raise ValueError('Navigation cache configuration changed')
         data=(directory/report['file']).read_bytes()

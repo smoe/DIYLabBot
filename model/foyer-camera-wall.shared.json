@@ -17,6 +17,7 @@
       180
     ],
     "mosaic_rate_hz": 1,
+    "mosaic_max_view_distance_mm": 15000,
     "selected_rate_hz": 5,
     "virtual_fov_y_deg": 60,
     "near_mm": 0.5,

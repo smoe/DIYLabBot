@@ -23,6 +23,7 @@
   function digest(bytes){let h=2166136261;for(const b of bytes)h=Math.imul(h^b,16777619);return (h>>>0).toString(16).padStart(8,'0');}
   function imageSize(value){if(!Array.isArray(value)||value.length!==2||value.some(v=>!Number.isInteger(v)||v<16||v>1920))throw Error('Invalid monitor image size');return value.slice();}
   const unavailable={no_camera:'Keine Kamera modelliert',not_connected:'Flotte nicht angebunden',missing_viewpoint:'Kein Blickpunkt vorhanden'};
+  const groupLabels={transporter:'Transporter',robot:'Roboterkameras',device:'Geräte'};
   function create({config,wall,gl,host,capture,visible,requestRender,focusMain}){
     const rows=wall?.grid_rows,columns=wall?.grid_columns;
     if(!Number.isInteger(rows)||rows<1||!Number.isInteger(columns)||columns<1||
@@ -49,9 +50,12 @@
       const option=document.createElement('option');option.value='';option.textContent='Keine Bildquelle';option.disabled=true;select.append(option);
     }
     for(const c of cameras.values()){
-      const group=c.availability==='not_connected'?'BF01 · nicht angebunden':c.availability==='available'?'Verfügbare Ansichten':'Ohne Bildquelle';
-      if(!options.has(group)){const node=document.createElement('optgroup');node.label=group;options.set(group,node);select.append(node);}
-      const option=document.createElement('option');option.value=c.id;option.textContent=c.label+' · '+(c.location||c.level_id||'Nicht angebunden')+' · '+c.id;options.get(group).append(option);
+      const group=c.category;
+      if(!options.has(group)){const node=document.createElement('optgroup');node.label=groupLabels[group];options.set(group,node);select.append(node);}
+      const option=document.createElement('option');option.value=c.id;
+      const status=c.availability==='available'?'Ansicht verfügbar':unavailable[c.availability],location=c.location||c.level_id;
+      option.textContent=[c.label,location===status?null:location,c.id,status].filter(Boolean).join(' · ');
+      options.get(group).append(option);
     }
     panel.append(close,title,label,select,image,details,notice);host.append(panel);
     const large=image.getContext('2d'),scratch=document.createElement('canvas');scratch.width=width;scratch.height=height;

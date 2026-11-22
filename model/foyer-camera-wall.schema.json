@@ -14,10 +14,11 @@
     },
     "settings": {
       "type": "object", "additionalProperties": false,
-      "required": ["resolution_px", "mosaic_rate_hz", "selected_rate_hz", "virtual_fov_y_deg", "near_mm", "modeled_far_mm", "virtual_near_mm", "far_mm", "stale_after_s", "history_enabled"],
+      "required": ["resolution_px", "mosaic_rate_hz", "mosaic_max_view_distance_mm", "selected_rate_hz", "virtual_fov_y_deg", "near_mm", "modeled_far_mm", "virtual_near_mm", "far_mm", "stale_after_s", "history_enabled"],
       "properties": {
         "resolution_px": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "integer", "minimum": 16, "maximum": 1920}},
         "mosaic_rate_hz": {"type": "number", "minimum": 0.1, "maximum": 30},
+        "mosaic_max_view_distance_mm": {"type": "number", "minimum": 1000, "maximum": 30000, "description": "Presentation assumption in model millimetres for the main eye to a screen centre; applies to automatic mosaic refresh."},
         "selected_rate_hz": {"type": "number", "minimum": 0.1, "maximum": 30},
         "virtual_fov_y_deg": {"type": "number", "minimum": 1, "maximum": 150},
         "near_mm": {"type": "number", "minimum": 0.01, "maximum": 100, "description": "Modeled-camera near clipping plane in mm; presentation assumption, not a sensor limit."},

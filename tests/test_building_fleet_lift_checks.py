@@ -93,16 +93,12 @@ class PinTests(unittest.TestCase):
         export = root / 'exports' / 'walkthrough'
         export.mkdir(parents=True)
         (root / 'source.json').write_text('{}')
-        files = {'html': 'index.html', 'native_mesh': 'native-mesh.json',
-                 'manifest': 'manifest.json'}
-        for name in files.values():
-            (export / name).write_text('{}')
-        report = {'format': 'solidcraftbot.building-walkthrough-build/1',
-                  'passed': True, 'files': files,
-                  'source_files_sha256': {'source.json': checks.model.digest(root / 'source.json')},
-                  'artifact_sha256': {key: checks.model.digest(export / name)
-                                      for key, name in files.items()}}
-        (export / 'build-report.json').write_text(json.dumps(report))
+        pins = {'source.json': checks.model.digest(root / 'source.json')}
+        (export / 'native-mesh.json').write_text(json.dumps({
+            'format': 'solidcraftbot.building-walkthrough-mesh/1',
+            'source_files_sha256': pins, 'scenes': {'building': {}}}))
+        checks.walkthrough_world.write(export, {
+            'format': 'solidcraftbot.building-walkthrough/1', 'source_files_sha256': pins}, {}, root)
         mesh = object.__new__(navigation.NativeMesh)
         mesh.export = export
         return mesh
@@ -114,7 +110,7 @@ class PinTests(unittest.TestCase):
             with patch.object(checks, 'ROOT', root):
                 checks._verify_export(mesh)
                 (mesh.export / 'native-mesh.json').write_text('{"changed":true}')
-                with self.assertRaisesRegex(ValueError, 'consumed walkthrough artifact'):
+                with self.assertRaisesRegex(ValueError, 'Changed walkthrough artifact'):
                     checks._verify_export(mesh)
 
     def test_changed_source_rejects_before_support_claim(self):

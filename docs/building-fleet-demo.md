@@ -67,6 +67,20 @@ unqualifiziert; der Vergleich mit manueller Durchführung bleibt offen.
 Neue Laufzeitdaten und Geometrienachweise entstehen ausschließlich unter den
 ignorierten lokalen Ausgabeordnern. Historische Medien bleiben unverändert.
 
+### Welteingabe aus dem Rundgang
+
+`NativeMesh` erwartet im Exportordner `world-build-report.json`. Es prüft
+alle dort gebundenen Quellen sowie `world-manifest.json` und
+`native-mesh.json` auf Bytegleichheit. Die Welt enthält native Gebäude-
+und L01-Körper einschließlich der Monitore, Objektbindungen und
+Navigationsdaten. Sie hängt von der physischen Monitorquelle ab. Änderungen
+an der BF01-Quelle oder am Kameraregister haben nur Auswirkungen auf das
+separat geprüfte Browser-Overlay.
+
+Frühere Navigationscaches sind durch den neuen Welteingabevertrag und die
+geänderten Generatorpins veraltet. Der neue Weltexport und sein Lader
+qualifizieren keine Flottenfahrt. Der BF01-Status bleibt **unproven**.
+
 ## Erreichte Phase 1
 
 Die separate [Flottenquelle](../model/building-fleet-demo.shared.json) und ihr
@@ -247,21 +261,22 @@ Bodensteg unabhängig von Raster, Route und Dreieckstessellierung. Die Zahl
 2758 betrifft diese fokussierte Gebäudeprüfung; der L01-Kurvennachweis
 verwendet separat die gesamte gebundene Welt mit 3441 Körpern.
 
-Aktuelle lokale Nachweise sind
+Die lokalen Nachweise für diesen historischen Befund sind
 `exports/building-fleet/lift-preflight/inner-port-support-barrier.json` sowie
 `exports/building-fleet/lift-threshold/native-eg-threshold-strip.json` mit
-Reproduzierer `check_native_threshold_strip.py`. Der dauerhafte negative
-Preflight ist unabhängig aufrufbar (Exitcode 2 ist hier die beabsichtigte
-Sperre, keine bestandene Fahrt):
+Reproduzierer `check_native_threshold_strip.py`. Der Preflight kann separat
+mit einem neuen Weltexport ausgeführt werden. Exitcode 2 meldet einen
+ausstehenden Nachweis beziehungsweise eine festgestellte Sperre.
 
 ```sh
+python3 scripts/build_building_walkthrough.py --no-rebuild
 python3 scripts/building_fleet_lift_checks.py \
-  --walkthrough exports/building-walkthrough/pages-master-80abbc7 \
+  --walkthrough 'exports/building-walkthrough/<Revision>' \
   --output exports/building-fleet/lift-preflight/current-support-barrier.json
 ```
 
-Dieser Einstieg beweist nur die Sperre; das Ausbleiben dieses speziellen
-Zeugen würde noch keine vollständige Aufzugfreigabe beweisen. Eine reale
+Dieser Einstieg prüft den konkreten Zeugen für eine Stützungslücke.
+Eine vollständige Aufzugfreigabe erfordert weitere Nachweise. Eine reale
 Radüberbrückung oder zulässige Spaltbreite ist nicht qualifiziert und ersetzt
 den geforderten geometrischen Bodenstützungsnachweis nicht. Quellen, native CAD-Ausgaben
 und Prüfberichte sind über SHA256 gebunden. Es wurden keine historischen

@@ -58,7 +58,8 @@ def check(html, manifest, program=None, body_ids=None):
     require(payload.get('room_signs') == program.get('room_signs'), 'Stale published walkthrough: room_signs')
     expected = dict(program['source_files_sha256'])
     renderer_sources = ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
-                        'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js')
+                        'scripts/walkthrough_world.py', 'scripts/building_walkthrough_viewer.html',
+                        'scripts/walkthrough_interaction.js')
     if program.get('camera_wall') is not None:
         renderer_sources += MONITOR_RENDERER_SOURCES
     for name in renderer_sources:

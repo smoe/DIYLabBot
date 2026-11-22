@@ -14,6 +14,7 @@ import building_fleet_clearance as clearance
 import building_fleet_model as model
 import building_fleet_navigation as navigation
 import building_stack as stack
+import walkthrough_world
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -41,24 +42,7 @@ def _verify_export(mesh):
     """Recheck the bytes actually consumed by the supplied checked mesh."""
     if not isinstance(mesh, navigation.NativeMesh):
         raise ValueError('Current source-pinned NativeMesh required')
-    export = Path(mesh.export).resolve()
-    if not export.is_relative_to(ROOT):
-        raise ValueError('Project-local checked walkthrough required')
-    report = model.read_json(export / 'build-report.json')
-    if (report.get('format') != 'solidcraftbot.building-walkthrough-build/1'
-            or report.get('passed') is not True
-            or not report.get('source_files_sha256')
-            or set(report.get('files', {})) != {'html', 'native_mesh', 'manifest'}):
-        raise ValueError('Successful checked walkthrough report required')
-    for name, digest in report['source_files_sha256'].items():
-        path = (ROOT / name).resolve()
-        if not path.is_relative_to(ROOT) or not path.is_file() or model.digest(path) != digest:
-            raise ValueError('Stale walkthrough source: ' + name)
-    for key, name in report['files'].items():
-        path = (export / Path(name).name).resolve()
-        if (not path.is_relative_to(export) or not path.is_file()
-                or model.digest(path) != report['artifact_sha256'][key]):
-            raise ValueError('Changed consumed walkthrough artifact: ' + name)
+    report, _, _ = walkthrough_world.read(mesh.export, ROOT)
     return report
 
 
@@ -149,7 +133,7 @@ def support_barrier(mesh, port_id):
                             source['geometry']['floor_band_start_mm'])
     result.update({
         'source_opening_id': opening,
-        'walkthrough_report': str((Path(mesh.export) / 'build-report.json').relative_to(ROOT)),
+        'walkthrough_report': str(mesh.world_report_path.relative_to(ROOT)),
         'source_files_sha256': {**report['source_files_sha256'], **model.source_pins(source),
                                 **{str((ROOT / 'scripts' / name).relative_to(ROOT)):
                                    model.digest(ROOT / 'scripts' / name)

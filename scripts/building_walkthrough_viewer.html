@@ -98,7 +98,7 @@ __WALKTHROUGH_MONITORS__</script>
     if(!data.scenes||!Array.isArray(data.stops)||!data.stops.length)throw Error('Scene geometry and viewpoints are required.');
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
     if(typeof opacityByRole!=='object'||Array.isArray(opacityByRole)||Object.values(opacityByRole).some(v=>!Number.isFinite(v)||v<0||v>1))throw Error('Invalid source rendering policy.');
-    const hiddenIds=data.hidden_body_ids||{},sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
+    const hiddenIds=data.hidden_body_ids||{},meshCache=new Map(),sceneCache=new Map(),keys=new Set(),keyboardKeys=new Set();
     const monitorConfig=data.camera_wall||null,monitorFrames=new Map((monitorConfig?.monitors||[]).map(m=>[m.screen_body_id,m.screen_frame]));
     const monitorTriggers=new Map((monitorConfig?.monitors||[]).flatMap((m,i)=>m.body_ids.map(id=>[id,i])));
     let monitorWall=null;
@@ -363,18 +363,38 @@ __WALKTHROUGH_MONITORS__</script>
       for(let i=0;i<count;i++)result[i]=kind==='float'?view.getFloat32(i*4,true):view.getUint32(i*4,true);
       return result;
     }
-    function prepareScene(id,complete=false){
-      const key=complete?id+':monitor-complete':sceneKey(id);if(sceneCache.has(key))return sceneCache.get(key);
+    function uploadBuffer(target,values){
+      const buffer=gl.createBuffer();
+      gl.bindBuffer(target,buffer);
+      gl.bufferData(target,values,gl.STATIC_DRAW);
+      return buffer;
+    }
+    function prepareMesh(id){
+      if(meshCache.has(id))return meshCache.get(id);
       const source=data.scenes[id];
       if(!Number.isSafeInteger(source.vertex_count)||source.vertex_count<3||!Number.isSafeInteger(source.index_count)||source.index_count<3||!Array.isArray(source.groups))throw Error('A complete native mesh scene is required.');
       const positions=decode(source.positions_base64,'float',source.vertex_count*3,'positions'),normals=decode(source.normals_base64,'float',source.vertex_count*3,'normals'),indices=decode(source.indices_base64,'uint',source.index_count,'indices');
       for(let i=0;i<positions.length;i++){if(!Number.isFinite(positions[i])||!Number.isFinite(normals[i]))throw Error('Nonfinite native mesh value.');positions[i]/=1000;}
       for(const index of indices)if(index>=source.vertex_count)throw Error('Native mesh index is outside its vertex array.');
-      const pickGroups=[];
-      const omitted=new Set(hiddenIds[id]||[]),opaque=new Map(),movingOpaque=[],transparent=[],coverage=source.groups.slice().sort((a,b)=>a.index_start-b.index_start);let opacityOverrides=0;
+      const coverage=source.groups.slice().sort((a,b)=>a.index_start-b.index_start);
       let expected=0;
       for(const group of coverage){if(group.index_start!==expected||!Number.isSafeInteger(group.index_count)||group.index_count<0||group.index_count%3)throw Error('Native mesh groups must partition all triangles.');expected+=group.index_count;}
       if(expected!==source.index_count)throw Error('The native mesh group manifest omits triangles.');
+      const mesh={
+        positions,indices,
+        positionBuffer:uploadBuffer(gl.ARRAY_BUFFER,positions),
+        normalBuffer:uploadBuffer(gl.ARRAY_BUFFER,normals),
+      };
+      meshCache.set(id,mesh);
+      return mesh;
+    }
+    function prepareScene(id,complete=false){
+      const key=complete?id+':monitor-complete':sceneKey(id);if(sceneCache.has(key))return sceneCache.get(key);
+      const started=complete?performance.now():null;
+      const source=data.scenes[id],mesh=prepareMesh(id);
+      const {positions,indices}=mesh;
+      const pickGroups=[];
+      const omitted=new Set(hiddenIds[id]||[]),opaque=new Map(),movingOpaque=[],transparent=[];let opacityOverrides=0;
       for(const group of source.groups){
         if(omitted.has(group.id)||(isolated&&!complete&&!isolationIds.has(group.id))||(complete&&group.role==='viewing_cone'))continue;
         if(!finite3(group.color)||group.color.some(v=>v<0||v>1)||!Number.isFinite(group.opacity)||group.opacity<0||group.opacity>1)throw Error('Native material metadata is invalid.');
@@ -394,15 +414,23 @@ __WALKTHROUGH_MONITORS__</script>
       }
       const batches=[...opaque.values(),...movingOpaque,...transparent],length=batches.reduce((sum,g)=>sum+g.count,0),combined=new Uint32Array(length);let offset=0;
       for(const batch of batches){batch.offset=offset*4;for(const part of batch.parts){combined.set(part,offset);offset+=part.length;}delete batch.parts;}
+      // Drawing variants share the native vertex arrays and buffers. Their element
+      // buffers retain the draw order and group boundaries specific to each pass.
       const vao=gl.createVertexArray();gl.bindVertexArray(vao);
-      function attribute(location,array){const buffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buffer);gl.bufferData(gl.ARRAY_BUFFER,array,gl.STATIC_DRAW);gl.enableVertexAttribArray(location);gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);}
-      attribute(attributes.position,positions);attribute(attributes.normal,normals);
-      const element=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,element);gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,combined,gl.STATIC_DRAW);
+      for(const [location,buffer] of [[attributes.position,mesh.positionBuffer],[attributes.normal,mesh.normalBuffer]]){
+        gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
+        gl.enableVertexAttribArray(location);
+        gl.vertexAttribPointer(location,3,gl.FLOAT,false,0,0);
+      }
+      uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);
       const nav=data.navigation;if(!nav)throw Error('Source-bound camera collision profile required.');
       const collider=complete?null:WalkthroughInteraction.createCameraCollider({positions,indices,
         groups:source.groups.filter(g=>!omitted.has(g.id)&&g.index_count),radius:nav.camera_radius_mm/1000,
         margin:nav.contact_margin_mm/1000,iterations:nav.max_contact_iterations,slides:nav.max_slides});
-      const result={collider,picker:complete?null:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};sceneCache.set(key,result);return result;
+      const result={collider,picker:complete?null:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};
+      sceneCache.set(key,result);
+      if(complete)performance.measure('walkthrough-monitor-scene-preparation',{start:started,end:performance.now()});
+      return result;
     }
     function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function drawScene(scene,viewProjection,viewEye,feed=false){
@@ -448,11 +476,15 @@ __WALKTHROUGH_MONITORS__</script>
     if(monitorConfig){
       const sourceIds=new Set(data.scenes.building.groups.map(g=>g.id));
       for(const id of monitorTriggers.keys())if(!sourceIds.has(id))throw Error('Missing native monitor body: '+id);
+      const [levelFloor,levelCeiling]=(monitorConfig.mosaic_eye_z_bounds_mm||[]).map(v=>v/1000);
+      const maxViewDistance=monitorConfig.settings.mosaic_max_view_distance_mm/1000;
+      if(!Number.isFinite(levelFloor)||!Number.isFinite(levelCeiling)||levelCeiling<=levelFloor||
+         !Number.isFinite(maxViewDistance)||maxViewDistance<=0)throw Error('Invalid camera wall visibility bounds.');
       objectSceneIds.add('building');
       monitorWall=CameraMonitorWall.create({config:monitorConfig,wall:monitorConfig,gl,host:stageNode,capture:captureMonitor,
-        visible:()=>!isolated&&sceneId==='building'&&monitorConfig.monitors.some(m=>{
+        visible:()=>!isolated&&sceneId==='building'&&eye[2]>=levelFloor&&eye[2]<levelCeiling&&monitorConfig.monitors.some(m=>{
           const f=m.screen_frame,side=eye.map((v,i)=>v-f.origin_mm[i]/1000);
-          return dot(side,f.normal)>0&&projectPoint(f.origin_mm).visible;
+          return dot(side,f.normal)>0&&Math.hypot(...side)<=maxViewDistance&&projectPoint(f.origin_mm).visible;
         }),requestRender,focusMain:()=>canvas.focus()});
     }
     function clearKeyboardKeys(){keyboardKeys.clear();keyboardModifiers.alt=false;keyboardModifiers.shift=false;}
