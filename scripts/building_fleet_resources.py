@@ -212,7 +212,8 @@ class ResourceCatalog:
     def _cache_pins(self):
         if not callable(getattr(self.nav,'_cache_pins',None)):
             raise ValueError('Source-bound navigation required for resource caching')
-        names=('building_fleet_resources.py','building_fleet_missions.py','building_fleet_motion.py')
+        names=('building_fleet_resources.py','building_fleet_missions.py','building_fleet_motion.py',
+               'building_fleet_port_paths.py')
         return {**self.nav._cache_pins(),**{'scripts/'+name:model.digest(model.ROOT/'scripts'/name)for name in names}}
 
     @staticmethod
@@ -287,7 +288,10 @@ class ResourceCatalog:
         points=route['points_mm'];level=route['level']
         if len(points)<2:return
         # Reverse cusps are a geometry error, never a reason to spin in place.
-        self.paths.append((level,Path(points,route.get('corner_trim_mm',250))))
+        if 'corner_trim_caps'in route and type(route['corner_trim_caps'])is not list:
+            raise ValueError('Explicit corner trim caps must be a JSON list')
+        options={'corner_trim_caps':route['corner_trim_caps']}if 'corner_trim_caps'in route else{}
+        self.paths.append((level,Path(points,route.get('corner_trim_mm',250),**options)))
         for row in route.get('resources',[]):
             alias=row['id'];kind=row.get('kind','passage');areas=row.get('areas',portals.get(alias,(level,[]))[1])
             rooms=[self.room_alias[(level,a)]for a in areas if(level,a)in self.room_alias]
@@ -391,7 +395,12 @@ class ResourceCatalog:
         return spans
 
     def normalize(self,route):
-        result=copy.deepcopy(route);path=Path(result['points_mm'],result.get('corner_trim_mm',250))
+        result=copy.deepcopy(route)
+        if 'corner_trim_caps'in result and type(result['corner_trim_caps'])is not list:
+            raise ValueError('Explicit corner trim caps must be a JSON list')
+        options={'corner_trim_caps':result['corner_trim_caps']}if 'corner_trim_caps'in result else{}
+        path=Path(result['points_mm'],result.get('corner_trim_mm',250),**options)
+        if 'corner_trim_caps'in result:result['corner_trim_caps']=copy.deepcopy(path.corner_trim_caps)
         result['resource_spans']=self.spans(result['level'],path)
         return result
 

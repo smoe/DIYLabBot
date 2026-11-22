@@ -345,14 +345,14 @@ class Controller(local.LocalController):
                     if geometry['linear'][0]*local_bound>local_cap*(1+1e-6):return False
         return True
 
-    def _final_deceleration(self):
+    def _final_deceleration(self,require_monotone=True):
         # This suffix was already checked as part of the active own clock.
         # Its monotonic final-deceleration boundary is compiled once per plan;
         # scanning/refitting the entire future trajectory every tick is both
         # unnecessary and numerically weaker than preserving that exact clock.
         if self.plan is None or self.plan_kind!='goal':return None
         elapsed=self.now-self.plan_start
-        if elapsed<getattr(self,'_final_tail_time',math.inf)-1e-9:return None
+        if require_monotone and elapsed<getattr(self,'_final_tail_time',math.inf)-1e-9:return None
         duration=self.plan.times[-1]-elapsed
         distance=self.plan_origin+self.plan.points[-1][F[0]][0]-self.y
         closing=max(self._zone_cap_at(self.y),self.settings['maximum_obstacle_closing_speed_mm_s'])
@@ -367,13 +367,25 @@ class Controller(local.LocalController):
         suffix=floor.motion.Curve(points);suffix._bf01_continuation=self.plan
         return suffix
 
+    def _stop_observation_margin(self,clock):
+        """Use the same actual observation budget for every stop family."""
+        closing=max(self._zone_cap_at(self.y),self.settings['maximum_obstacle_closing_speed_mm_s'])
+        reaction=self.settings['period_s']+self.settings['latency_s']+self.settings['stale_after_s']
+        inflation=self.settings['range_error_mm']+self.settings['range_mm']*math.sin(math.radians(self.settings['angular_step_deg']))+self.source['geometry']['localization_tolerance_mm']
+        required=(self.settings['clearance_mm']+clock.points[-1][F[0]][0]
+            +(self._zone_cap_at(self.y)+closing)*reaction+closing*clock.times[-1])
+        return self.settings['range_mm']-self.radius-inflation-required
+
     def _checked_brake(self,strict=False):
         if self.v<1e-8 and abs(self.a)<1e-8:return None
         if self.mode=='braking'and self.plan is not None and self.plan_kind=='protective_stop':
             elapsed=self.now-self.plan_start;points=[local.point(0,0,self.v,self.a)]
             for node in self.plan.points:
                 if node['time_s']>elapsed+1e-8:points.append(local.point(node['time_s']-elapsed,self.plan_origin+node[F[0]][0]-self.y,node[F[1]][0],node[F[2]][0]))
-            return floor.motion.Curve(points)if len(points)>1 else None
+            result=floor.motion.Curve(points)if len(points)>1 else None
+            if result is not None and self._stop_observation_margin(result)<0:
+                raise RuntimeError('Actual protective-stop continuation exceeds the unchanged observation budget')
+            return result
         key=(self.y,self.v,self.a)
         if self._brake_cache is not None and self._brake_cache[0]==key:clock=self._brake_cache[1]
         else:
@@ -386,6 +398,7 @@ class Controller(local.LocalController):
                     if self.y+row['distance_mm']>self.goal+1e-5:continue
                     points=copy.deepcopy(row['clock']);points[0][F[1]]=[self.v];points[0][F[2]]=[self.a]
                     candidate=floor.motion.Curve(points)
+                    if self._stop_observation_margin(candidate)<0:continue
                     if row['interval_bounds']is None:row['interval_bounds']=[floor.motion.bounds([a,b])for a,b in zip(row['clock'],row['clock'][1:])]
                     bounds=list(row['interval_bounds']);bounds[0]=floor.motion.bounds(points[:2])
                     if self._analytic_stop_ok(candidate,bounds):clock=candidate;clock._bf01_origin=self.y;break
@@ -398,7 +411,7 @@ class Controller(local.LocalController):
                     # and the no-stop rule still apply without wider padding.
                     for candidate in rejected:
                         valid,actual=self._admissible(candidate,self.y)
-                        if valid:
+                        if valid and self._stop_observation_margin(candidate)>=0:
                             clock=candidate;clock._bf01_origin=self.y
                             self.profile_checks.append({'kind':'exact_stop_fallback','progress_mm':self.y,
                                 'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
@@ -428,13 +441,26 @@ class Controller(local.LocalController):
                         if (scalar[F[1]]['min'][0]>=-1e-8 and all(scalar[field]['max_abs'][0]<=self.limits[name]*(1+1e-6)
                                 for field,name in zip(F[1:],('velocity','acceleration','jerk')))):
                             valid,actual=self._admissible(candidate,self.y)
-                            if valid:
+                            if valid and self._stop_observation_margin(candidate)>=0:
                                 clock=candidate;clock._bf01_origin=self.y
                                 self.profile_checks.append({'kind':'exact_stop_extension','progress_mm':self.y,
                                     'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
                                 break
                         duration*=1.1
+            if clock is None:
+                # Last resort: the already bound, validated own goal clock
+                # may have a short correlated suffix before its monotone
+                # deceleration boundary. It is an actual stop only if its
+                # remaining exported PVA and observation budget both pass.
+                suffix=self._final_deceleration(require_monotone=False)
+                if suffix is not None and floor.motion.bounds(suffix)[F[1]]['min'][0]>=-1e-8:
+                    valid,actual=self._admissible(suffix,self.y)
+                    if valid and self._stop_observation_margin(suffix)>=0:
+                        clock=suffix
+                        self.profile_checks.append({'kind':'validated_goal_suffix_stop','progress_mm':self.y,
+                            'velocity_mm_s':self.v,'acceleration_mm_s2':self.a,'dynamics':actual})
             if clock is None:raise RuntimeError('No bounded own protective-stop enclosure; replan before execution')
+            if self._stop_observation_margin(clock)<0:raise RuntimeError('Selected stop exceeds the unchanged observation budget')
             self._brake_cache=(key,clock)
         if strict and not getattr(clock,'_bf01_continuation',None):
             valid,bounds=self._admissible(clock,self.y)
@@ -502,6 +528,63 @@ class Controller(local.LocalController):
             if distance<best[0]:best=distance,left+u*(right-left)
         return best if maximum_lateral_mm is None or best[0]<=maximum_lateral_mm else(math.inf,self.y)
 
+    def _future_rectangle_excludes(self,point,padding,lookahead_mm):
+        """One-sided proof that an anonymous point misses the whole own sweep.
+
+        Failure or finite-work exhaustion preserves the original hazard. The
+        padding retains the complete source clearance and sensing uncertainty.
+        No peer identity, pose, reservation or static-map assumption is used.
+        """
+        if (len(point)!=2 or any(type(v)not in(int,float)or not math.isfinite(v)for v in point)or
+                type(padding)not in(int,float)or not math.isfinite(padding)or padding<0 or
+                type(lookahead_mm)not in(int,float)or not math.isfinite(lookahead_mm)or lookahead_mm<0):return False
+        end=min(self.goal,self.y+lookahead_mm);before=0.;evaluations=0
+        def distance(pose,L):
+            dx,dy=point[0]-pose[0],point[1]-pose[1];c,s=math.cos(pose[2]),math.sin(pose[2])
+            return math.hypot(max(0.,abs(c*dx+s*dy)-L),max(0.,abs(-s*dx+c*dy)-self.half_width))
+        pose=self.path.evaluate(self.y)[0]
+        error=128*math.ulp(max(1.,*[abs(v)for v in point+pose[:2]],padding,self.radius))
+        if end<self.y or math.nextafter(distance(pose,self.half_length)-error,-math.inf)<=padding:return False
+        for piece,finish in zip(self.path.pieces,self.path.ends):
+            left,right=max(before,self.y),min(finish,end);before=finish
+            if right<=left:continue
+            if len(piece['controls'])==2:
+                a,b=self.path.evaluate(left)[0],self.path.evaluate(right)[0]
+                pose=[(a[0]+b[0])/2,(a[1]+b[1])/2,a[2]]
+                error=128*math.ulp(max(1.,*[abs(v)for v in point+a[:2]+b[:2]],padding,self.radius))
+                # A constant-yaw translating rectangle sweeps exactly one
+                # longer rectangle. This bound covers the complete segment.
+                travel=math.nextafter(math.hypot(b[0]-a[0],b[1]-a[1]),math.inf)
+                half_travel=math.nextafter(travel/2,math.inf)
+                swept_length=math.nextafter(self.half_length+half_travel,math.inf)
+                gap=distance(pose,swept_length)
+                if math.nextafter(gap-error,-math.inf)<=padding:return False
+                continue
+            # Full-piece derivative hulls cover even a sub-ULP endpoint
+            # remainder; the stopping helper's tolerant piece skips cannot
+            # supply a strict sweep enclosure here.
+            try:bounds=spatial_bounds(piece,subdivisions=8)
+            except ValueError:return False
+            if bounds['linear'][0]<=0 or not all(math.isfinite(v)for v in(bounds['linear'][0],bounds['angular'][0])):return False
+            pending=[(left,right,0)]
+            while pending:
+                if evaluations>=1024:return False
+                a,b,depth=pending.pop();mid=(a+b)/2;pose=self.path.evaluate(mid)[0]
+                error=128*math.ulp(max(1.,*[abs(v)for v in point+pose[:2]],padding,self.radius))
+                gap=distance(pose,self.half_length)
+                if math.nextafter(gap-error,-math.inf)<=padding:return False
+                # The rounded midpoint can equal an endpoint. Bound both
+                # distances separately instead of assuming an exact half.
+                half_span=max(math.nextafter(mid-a,math.inf),math.nextafter(b-mid,math.inf))
+                rotation=math.nextafter(self.radius*bounds['angular'][0],math.inf)
+                rate=math.nextafter(bounds['linear'][0]+rotation,math.inf)
+                movement=math.nextafter(rate*half_span,math.inf)
+                evaluations+=1
+                if math.nextafter(gap-error-movement,-math.inf)>padding:continue
+                if depth>=24 or evaluations>=1024:return False
+                pending.extend([(a,mid,depth+1),(mid,b,depth+1)])
+        return True
+
     def _observed_gap(self,scan,now):
         if scan is None:return 0.,'scan_missing_or_stale'
         if type(scan)is not dict or set(scan)!={'captured_s','returns_local_mm'}:raise ValueError('Only anonymous timestamped local scans are accepted')
@@ -527,15 +610,26 @@ class Controller(local.LocalController):
             half_width=self.half_width if straight else self.radius
             half_length=self.half_length if straight else self.radius
             if along>self.y and lateral<=half_width+self.settings['clearance_mm']+inflation:
-                gap=min(gap,along-self.y-half_length-inflation)
+                candidate=along-self.y-half_length-inflation
+                if (candidate<gap and not straight and self._future_rectangle_excludes(point,
+                        self.settings['clearance_mm']+inflation,self.settings['range_mm']+self.radius)):
+                    continue
+                gap=min(gap,candidate)
             relative=[point[k]-own[k]for k in range(2)];ahead=relative[0]*tc+relative[1]*ts
             sideways=abs(-relative[0]*ts+relative[1]*tc)
             # Immediate body protection must not extrapolate the current
             # tangent indefinitely beyond a bend in the own future curve.
             # The future-path projection above retains every forward hazard
             # on that curve. This second test covers its current body only.
-            if (0<=ahead<=self.half_length+self.settings['clearance_mm']+inflation
-                    and sideways<=self.half_width+self.settings['clearance_mm']+inflation):
+            body_distance=math.hypot(max(0.,ahead-self.half_length),max(0.,sideways-self.half_width))
+            # The source uncertainty is a displacement radius, hence the
+            # inflated rectangle has round corners. Axis-wise padding adds
+            # false square corners. Keep boundary hazards conservatively;
+            # the allowance covers world-coordinate cancellation and the
+            # local rotations, including large translated source fixtures.
+            roundoff=64*math.ulp(max(1.,*[abs(v)for v in point+own[:2]],self.half_length,self.half_width,inflation))
+            if (ahead>=-roundoff and math.nextafter(body_distance,-math.inf)<=
+                    self.settings['clearance_mm']+inflation+roundoff):
                 gap=min(gap,ahead-self.half_length-inflation)
         return gap,'perception_range_budget'if gap==visible_gap else'local_obstacle'
 

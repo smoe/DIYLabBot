@@ -117,6 +117,14 @@ class ResourceOptimizationReview(unittest.TestCase):
         unique={(row['level'],row['alias'],tuple(tuple(p)for p in row['polygon']))for row in reference.regions}
         self.assertEqual(len(cached.regions),len(unique))
 
+    def test_capped_complete_paths_keep_uncached_alias_windows_and_queries(self):
+        row=route([[-500,0],[0,0],[0,500],[700,500]],'EG.capped')
+        row.update(corner_trim_mm=250,corner_trim_caps=[{'point_index':2,'maximum_trim_mm':20},
+                                                      {'point_index':1,'maximum_trim_mm':35}])
+        reference,cached=self.assert_equivalent(navigation(),[row],[('EG',row['points_mm'])])
+        path=MotionPath(row['points_mm'],250,corner_trim_caps=row['corner_trim_caps'])
+        self.assertEqual(observed_spans(cached,'EG',path),observed_spans(reference,'EG',path))
+
     def test_whole_route_visited_room_semantics_are_retained(self):
         room=[[-1000,480],[-5,480],[-5,0],[5,0],[5,500],[-1000,500]]
         nav=navigation(room)

@@ -23,6 +23,19 @@ import building_stack as stack
 from building_fleet_geometry import vehicle_envelope
 
 
+def swept_rectangle_bay_clearance(a,b,yaw,length_mm,width_mm,polygon):
+    """Conservative Euclidean gap for the whole fixed-heading body sweep."""
+    from building_fleet_l01 import _rectangle_distance
+    centre=[(x+y)/2 for x,y in zip(a,b)]
+    travel=math.nextafter(math.dist(a,b),math.inf)
+    half_travel=math.nextafter(travel/2,math.inf)
+    half_length=math.nextafter(length_mm/2+half_travel,math.inf)
+    half_width=math.nextafter(width_mm/2,math.inf)
+    distance=_rectangle_distance(polygon,centre,yaw,half_length,half_width)
+    error=128*math.ulp(max(1.,*[abs(v)for p in[a,b,*polygon]for v in p],length_mm,width_mm))
+    return math.nextafter(distance-error,-math.inf)
+
+
 def area_polygons(topological):
     return {level:{area['id']:[[v*data['display_scale'] for v in xy] for xy in nav.floor.area_points(data['plan'],area)]
                    for area in data['plan']['areas']} for level,data in topological.items()}
@@ -513,7 +526,14 @@ class Navigation:
             if nav.polygon_touches_box(poly,lo,-half_width,hi,half_width):hits.append('ReservedDepotBay.'+ident)
         for slot,physical in enumerate(getattr(self,'waiting_bay_polygons',{}).get(level,[])):
             poly=[[(p[0]-a[0])*c+(p[1]-a[1])*s,-(p[0]-a[0])*s+(p[1]-a[1])*c]for p in physical]
-            if nav.polygon_touches_box(poly,lo,-half_width,hi,half_width):hits.append('ReservedLiftWaitingBay.'+level+'.'+str(slot))
+            if nav.polygon_touches_box(poly,lo,-half_width,hi,half_width):
+                # Axis-wise reserve inflation has false square corners.
+                # Refine only that preflag with the complete physical sweep;
+                # no bay ownership or dynamic occupancy is inferred here.
+                mesh_error=self.mesh.scene['linear_tessellation_deflection_mm']+math.sqrt(3)*self.mesh.scene['maximum_float32_error_mm']
+                required=math.nextafter(self.reserve+mesh_error+getattr(self,'navigation_margin_mm',0),math.inf)
+                lower=swept_rectangle_bay_clearance(a,b,yaw,self.envelope['length_mm'],self.envelope['width_mm'],physical)
+                if lower<=required:hits.append('ReservedLiftWaitingBay.'+level+'.'+str(slot))
         hits.extend(nav.native_rectangle_collisions(self.mesh,level,a,b,yaw,self.envelope['length_mm']/2,
             self.envelope['width_mm']/2,self.height,self.reserve))
         if not hits:
