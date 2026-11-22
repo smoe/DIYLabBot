@@ -124,6 +124,12 @@ def resolved_sensor(source):
     return sensor
 
 
+def admission_settings(source):
+    """Resolve the source-owned mission and conditional bay lifecycle policy."""
+    validate(source)
+    return copy.deepcopy(source['missions']['admission_policy'])
+
+
 def source_pins(source):
     return {**{ref['path']: ref['sha256'] for ref in source['sources'].values()},
             str(SOURCE.relative_to(ROOT)): digest(SOURCE),

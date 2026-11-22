@@ -36,6 +36,7 @@ class ReceivedProjection{
 }
 function controlRoom(messages,t){return new ReceivedProjection(messages).at(t);}
 function targetLabel(target){return target.basis==='template_area_use_unconfirmed'?`${target.level} · Vorlagefläche ${target.area} (Nutzung unbestätigt)`:`${target.level} · ${target.area}`;}
+function stateLabel(mode){return({capacity_wait:'wartet auf zulässigen Folgeauftrag',capacity_home:'vorläufig am eigenen Stellplatz'})[mode]||mode;}
 function receivedLift(events){const vehicles={};let last=null;for(const message of events){if(message.payload.event.startsWith('lift_')){vehicles[message.vehicle_id]={event:message.payload.event,details:message.payload.details,received_s:message.received_s};last=message;}}return{queue:Object.entries(vehicles).filter(([,v])=>['lift_call','lift_slot_assigned'].includes(v.event)).map(([id,v])=>({vehicle_id:id,...v})),last};}
 function validateProgram(program){
  require(program.format==='solidcraftbot.building-fleet-program/1'&&program.complete===true,'Complete compiled fleet program required');
@@ -85,7 +86,7 @@ async function mount(bridge,payload){
   const tableKey=projection.cursor+':'+Math.floor(time*10);
   if(tableKey!==lastTableKey){lastTableKey=tableKey;
    q('rows').replaceChildren(...models.map(m=>{const r=received.vehicles[m.id],row=document.createElement('tr'),mission=r?.mission,goal=mission?.goal||mission;
-    const values=[m.id,r?.heartbeat?`${r.heartbeat.level} · ${r.heartbeat.area} · ${r.heartbeat.mode}`:'noch keine Meldung',r?.last_sent_s==null?'unbekannt':r.message_age_s.toFixed(1)+' s',r?.connected===false?'Funkloch':r?.connected===true?'verbunden':'unbekannt',goal?.level&&goal?.area?targetLabel(goal):mission?.mission_id||'unbekannt'];
+    const values=[m.id,r?.heartbeat?`${r.heartbeat.level} · ${r.heartbeat.area} · ${stateLabel(r.heartbeat.mode)}`:'noch keine Meldung',r?.last_sent_s==null?'unbekannt':r.message_age_s.toFixed(1)+' s',r?.connected===false?'Funkloch':r?.connected===true?'verbunden':'unbekannt',goal?.level&&goal?.area?targetLabel(goal):mission?.mission_id||'unbekannt'];
     for(const value of values){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}return row;}));
   }
   const filter=q('filter').value.toLowerCase(),eventKey=received.events.length+':'+filter;
@@ -120,5 +121,5 @@ async function mount(bridge,payload){
  function frame(now){try{frozen=blocked().length>0;if(last!==null&&playing&&!frozen&&!document.hidden)time=Math.min(duration,time+(now-last)/1000*factor);last=now;if(time===duration){playing=false;q('play').textContent='Abspielen';}ui();requestAnimationFrame(frame);}catch(error){playing=false;q('status').textContent='BF01-Fehler: '+error.message;panel.dataset.error=error.message;console.error(error);}}
  window.__buildingFleet=Object.freeze({seek:t=>{require(finite(t)&&t>=0&&t<=duration,'Time outside program');require(!blocked().length,'Open route doors before seeking');time=t;return ui();},play:()=>{playing=true;last=null;q('play').textContent='Pause';},pause:()=>{playing=false;q('play').textContent='Abspielen';},follow:id=>{require(models.some(m=>m.id===id),'Unknown vehicle');if(!follow)bridge.beginFollow();selected=id;select.value=id;follow=true;q('follow').textContent='Folgemodus beenden';return ui();},stopFollowing:()=>{follow=false;bridge.endFollow();q('follow').textContent='Fahrzeug folgen';return ui();},get time_s(){return time;},get states(){const lift=liftAt(program,time);return models.map(m=>m.at(time,lift));},get control_room(){return controlRoom(program.received_messages,time);},get frozen(){return frozen;},get instance_count(){return models.length;},get draw_calls(){return renderer.draws;},get renderer_stats(){return renderer.stats;},get ready(){return !panel.dataset.error;},get model_duration_s(){return duration;},get playback_factor(){return factor;}});ui();requestAnimationFrame(frame);return hooks;
 }
-return{compileCurve,liftAt,trajectories,controlRoom,ReceivedProjection,targetLabel,receivedLift,validateProgram,mount};
+return{compileCurve,liftAt,trajectories,controlRoom,ReceivedProjection,targetLabel,stateLabel,receivedLift,validateProgram,mount};
 });
