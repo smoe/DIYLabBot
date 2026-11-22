@@ -53,6 +53,7 @@ def navigation(source,args):
 
 def generator_pins():
     names=('building_fleet_checks.py','building_fleet_assignment_checks.py','building_fleet_geometry_checks.py','building_fleet_depot.py','building_fleet_zones.py',
+           'building_fleet_port_paths.py',
            'building_fleet_runner.py','building_fleet_missions.py','building_fleet_resources.py',
            'building_fleet_motion.py','building_fleet_control.py','building_fleet_services.py',
            'building_fleet_dispatch.py','building_fleet_comm.py','building_fleet_sim.py',
@@ -128,7 +129,13 @@ def compile_fleet(args):
         if not python:raise ValueError('Installed FreeCAD Python required for the complete native audit; use --freecad-python')
         proof=out/'native-check.json'
         native_started=time.monotonic()
-        subprocess.run([str(python),str(model.ROOT/'scripts/check_building_fleet_freecad.py'),str(path),'--out',str(proof)],
+        # Audit precision is separate from the unchanged 50 ms simulation and
+        # 1 ms exported PVA clocks. The native audit still enforces its bounds.
+        native_code=('import sys;sys.path.insert(0,sys.argv[1]);'
+            'import check_building_fleet_freecad as checker;'
+            'checker.audit(sys.argv[2],sys.argv[3],minimum_step_s=float(sys.argv[4]),maximum_depth=int(sys.argv[5]))')
+        subprocess.run([str(python),'-c',native_code,str(model.ROOT/'scripts'),str(path),str(proof),
+                        str(args.native_minimum_step_s),str(args.native_maximum_depth)],
             cwd=model.ROOT,env=freecad_environment(python),check=True)
         native_elapsed=time.monotonic()-native_started;export_started=time.monotonic()
         checked=independent_check(path,source,nav,prepared[1],proof,out/'export-check.json')
@@ -145,6 +152,10 @@ def compile_fleet(args):
             'program_bytes':path.stat().st_size,'statistics':program['statistics'],
             'runtime_records':records,
             'qualification':source['qualification'],'native_full_program_checked':True,'browser_checked':False,
+            'native_audit_resolution':{'minimum_step_s':args.native_minimum_step_s,
+                                       'maximum_depth':args.native_maximum_depth,
+                                       'minimum_clearance_mm':nav.reserve,
+                                       'simulation_step_s':.05,'export_time_quantum_s':.001},
             'limitations':source['limitations']}
         write(out/'fleet-report.json',report)
         if not checked['passed']:raise RuntimeError('Independent programme check failed; see export-check.json')
@@ -177,6 +188,9 @@ def parser():
         item.add_argument('--resource-cache',help='Optional source/route-bound static alias cache; stale data fails closed')
     compile_=sub.add_parser('compile');nav_options(compile_)
     compile_.add_argument('--camera-report',required=True);compile_.add_argument('--output-dir',required=True)
+    compile_.add_argument('--native-minimum-step-s',type=float,default=.000125,
+        help='Native interval refinement only; leaves motion, export clocks and clearances unchanged')
+    compile_.add_argument('--native-maximum-depth',type=int,default=21)
     tool_paths.add_tool_arguments(compile_,solidcraft=False)
     check=sub.add_parser('check');nav_options(check);check.add_argument('program')
     check.add_argument('--native-proof',required=True);check.add_argument('--out',required=True)

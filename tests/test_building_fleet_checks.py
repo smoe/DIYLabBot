@@ -226,14 +226,22 @@ class ExportChecks(unittest.TestCase):
             self.assertNotIn('compile_checks',result)
 
     def test_raw_own_inputs_recompute_actual_stops_and_reject_forged_gap(self):
+        self.assert_raw_own_input_replay()
+
+    def test_capped_raw_own_inputs_recompute_actual_stops_and_reject_forged_gap(self):
+        self.assert_raw_own_input_replay([{'point_index':1,'maximum_trim_mm':100}])
+
+    def assert_raw_own_input_replay(self,corner_trim_caps=None):
         from building_fleet_control import Controller
         from building_fleet_runner import EvidenceWriter
         from building_fleet_geometry import vehicle_envelope
         envelope=vehicle_envelope();source=self.source
         with tempfile.TemporaryDirectory(dir=model.ROOT/'exports')as directory:
             writer=EvidenceWriter(Path(directory)/'own.jsonl.gz')
-            car=Controller(motion.Path([[0,0],[3000,0]]),source,zone_caps=[(0,300)])
-            path_id=writer.route({'points_mm':[[0,0],[3000,0]],'corner_trim_mm':250,'reverse':False},[(0,300)])
+            points=[[0,0],[1500,0],[1500,1500]]if corner_trim_caps is not None else[[0,0],[3000,0]]
+            options={'corner_trim_caps':corner_trim_caps}if corner_trim_caps is not None else{}
+            car=Controller(motion.Path(points,250,**options),source,zone_caps=[(0,300)])
+            path_id=writer.route({'points_mm':points,'corner_trim_mm':250,'reverse':False,**options},[(0,300)])
             scans=[];latest=None
             for step in range(24):
                 at=round(step*.05,3)
@@ -269,6 +277,28 @@ class ExportChecks(unittest.TestCase):
             with patch('building_fleet_runner.native_scan_geometry',return_value=({'EG':[]},{},{})):
                 with self.assertRaisesRegex(ValueError,'independent anonymous-input replay'):
                     checks.check_perception(program,[car_trajectory],source,nav,catalog,{})
+
+    def test_own_path_corner_caps_are_reconstructed_and_bound_to_original_bytes(self):
+        import hashlib
+        data={'points_mm':[[0,0],[1000,0],[1000,1000]],'corner_trim_mm':250,
+              'zone_caps':[[0,300]],'reverse':False}
+        def record(payload):
+            return {'kind':'own_path','id':hashlib.sha256(json.dumps(payload,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest(),**payload}
+        legacy=record(data);_,old=checks._own_path_bank_row(legacy,{'velocity':1000})
+        self.assertEqual(old['path'].pieces,motion.Path(data['points_mm'],250).pieces)
+        capped=record({**data,'corner_trim_caps':[{'point_index':1,'maximum_trim_mm':30}]})
+        _,new=checks._own_path_bank_row(capped,{'velocity':1000})
+        self.assertNotEqual(capped['id'],legacy['id'])
+        self.assertEqual(new['path'].pieces,motion.Path(data['points_mm'],250,corner_trim_caps=capped['corner_trim_caps']).pieces)
+        self.assertNotEqual(new['path'].pieces,old['path'].pieces)
+        changed=copy.deepcopy(capped);changed['corner_trim_caps'][0]['maximum_trim_mm']=31
+        with self.assertRaisesRegex(ValueError,'identity'):checks._own_path_bank_row(changed,{'velocity':1000})
+        for caps in (None,{},[{'point_index':0,'maximum_trim_mm':30}],
+                     [{'point_index':1,'maximum_trim_mm':251}],
+                     [{'point_index':1,'maximum_trim_mm':30,'peer_position':[0,0]}]):
+            with self.assertRaises(ValueError):checks._own_path_bank_row(record({**data,'corner_trim_caps':caps}),{'velocity':1000})
+        with self.assertRaisesRegex(ValueError,'unexpected controller knowledge'):
+            checks._own_path_bank_row(record({**data,'peer_positions':[]}),{'velocity':1000})
 
 
 if __name__=='__main__':unittest.main()
