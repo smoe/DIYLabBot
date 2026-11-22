@@ -20,6 +20,7 @@ import building_fleet_navigation as navigation_model
 import building_fleet_sim as world_model
 import building_fleet_services as service_model
 import building_fleet_comm as communication
+import walkthrough_world
 from building_fleet_dispatch import Dispatcher
 from building_fleet_motion import Path,compile_motion
 from building_fleet_control import Controller
@@ -242,10 +243,10 @@ class EvidenceWriter:
         return key
     def close(self):
         if not self.closed:self.stream.close();self.raw.close();self.closed=True
-        return {'format':'solidcraftbot.building-fleet-own-input-evidence/1',
+        return {'format':'solidcraftbot.building-fleet-own-input-evidence/2',
                 'path':str(self.path.resolve().relative_to(model.ROOT)),
                 'sha256':model.digest(self.path),'counts':copy.deepcopy(self.counts),
-                'scope':'Actual own anonymous scans, captured own localization, selected scalar stop clocks and own decision states; no peer pose or ID in controller inputs'}
+                'scope':'Actual own anonymous scans, captured own localization, selected stops and complete next-step continuation/stop clocks; no peer pose or ID in controller inputs'}
 
 
 def point_progress(path,points,trim):
@@ -985,7 +986,8 @@ class WorldRunner:
                     values=self.lift_values();timeline=SimpleNamespace(values=lambda at:values)
                     gate_at(self.nav.mesh,action['port_id'],timeline,start)
             own_state={'progress_mm':driver.y,'velocity_mm_s':driver.v,'acceleration_mm_s2':driver.a}
-            self.decision[identity]=driver.decide(start,self.latest_scans.get(identity),grant_permits=bool(permit))
+            self.decision[identity]=driver.decide(start,self.latest_scans.get(identity),
+                grant_permits=bool(permit),step_end_s=end)
             margin=driver.perception_audit['minimum_range_margin_mm']
             if margin is None or not math.isfinite(margin)or margin<0:
                 raise RuntimeError('Actual own stopping proof exceeds its source observation budget: '+str((identity,start,margin)))
@@ -995,6 +997,8 @@ class WorldRunner:
                     **own_state,zone_cap_mm_s=driver._zone_cap_at(driver.y),
                     captured_s=scan['captured_s']if scan is not None else None,
                     own_grant_permits=bool(permit),selected_stop_clock=self.evidence.clock(stop),
+                    step_end_s=driver.step_end_s,
+                    continuation_stop_clock=self.evidence.clock(driver.continuation_stop_clock),
                     own_conditional_home_map_grant=copy.deepcopy(own_resource),
                     decision=copy.deepcopy(self.decision[identity]),mode=driver.mode,
                     observation_range_margin_mm=driver.perception_audit['minimum_range_margin_mm'])
@@ -1134,8 +1138,10 @@ def compile_program(source,navigation,output_dir,*,progress=None,geometry_checke
             if kind=='camera_report':
                 from export_building_fleet_vehicle_freecad import checked_camera_report
                 report=checked_camera_report(path)
-            elif path.resolve()!=(navigation.mesh.export/'build-report.json').resolve():
-                raise ValueError('Walkthrough report must be the navigation native export')
+            else:
+                if path.resolve()!=navigation.mesh.world_report_path.resolve():
+                    raise ValueError('Walkthrough report must be the separate navigation world export')
+                report,_,_=walkthrough_world.read(path.parent,model.ROOT)
             artifact_pins.update(report['source_files_sha256'])
             for name,digest in report.get('artifact_sha256',{}).items():
                 artifact_pins[report['files'][name]]=digest

@@ -156,9 +156,27 @@ class RuntimeBoundaryTests(unittest.TestCase):
             identity=writer.clock(clock);self.assertEqual(identity,writer.clock(clock))
             writer.write('scan',vehicle_id='BF01',captured_s=.1,pose_mm_rad=[1,2,0],level='EG',z_mm=0,returns_local_mm=[[0,500]])
             proof=writer.close();self.assertEqual(proof['counts'],{'stop_clock':1,'scan':1})
+            self.assertEqual(proof['format'],'solidcraftbot.building-fleet-own-input-evidence/2')
             self.assertEqual(proof['sha256'],runner.model.digest(Path(folder)/'own-controller-observations.jsonl.gz'))
             rows=[json.loads(line)for line in gzip.decompress((Path(folder)/'own-controller-observations.jsonl.gz').read_bytes()).decode().splitlines()]
             self.assertEqual(rows[0]['points'],clock.points);self.assertEqual(rows[1]['captured_s'],.1)
+
+    def test_runtime_rejects_presentation_report_as_physical_world(self):
+        source=runner.model.load()
+        with tempfile.TemporaryDirectory(dir=runner.model.ROOT/'exports')as folder:
+            directory=Path(folder)
+            legacy=directory/'build-report.json';legacy.write_text(json.dumps({'source_files_sha256':{}}))
+            camera=directory/'camera.json';camera.write_text('{}')
+            nav=SimpleNamespace(homes={'BF%02d'%i:{}for i in range(1,21)},config=source,
+                mesh=SimpleNamespace(world_report_path=directory/'world-build-report.json'))
+            artifacts={key:{'path':str(path.relative_to(runner.model.ROOT)),
+                'sha256':runner.model.digest(path)}for key,path in(
+                    ('walkthrough_report',legacy),('camera_report',camera))}
+            with patch.object(runner,'WorldRunner')as world:
+                with self.assertRaisesRegex(ValueError,'separate navigation world'):
+                    compile_program(source,nav,directory,prepared=(object(),object(),object()),
+                        geometry_checker=lambda *a:{'passed':True},artifacts=artifacts)
+                world.assert_not_called()
 
     def test_keyboard_interruption_closes_raw_evidence_and_preserves_original_pins(self):
         source=runner.model.load();nav=SimpleNamespace(homes={'BF%02d'%i:{}for i in range(1,21)},config=source)

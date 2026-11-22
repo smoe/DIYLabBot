@@ -231,7 +231,10 @@ class ExportChecks(unittest.TestCase):
     def test_capped_raw_own_inputs_recompute_actual_stops_and_reject_forged_gap(self):
         self.assert_raw_own_input_replay([{'point_index':1,'maximum_trim_mm':100}])
 
-    def assert_raw_own_input_replay(self,corner_trim_caps=None):
+    def test_raw_own_inputs_replay_braking_fallback_and_fresh_clear_restart(self):
+        self.assert_raw_own_input_replay(obstruction=True)
+
+    def assert_raw_own_input_replay(self,corner_trim_caps=None,obstruction=False):
         from building_fleet_control import Controller
         from building_fleet_runner import EvidenceWriter
         from building_fleet_geometry import vehicle_envelope
@@ -243,21 +246,25 @@ class ExportChecks(unittest.TestCase):
             car=Controller(motion.Path(points,250,**options),source,zone_caps=[(0,300)])
             path_id=writer.route({'points_mm':points,'corner_trim_mm':250,'reverse':False,**options},[(0,300)])
             scans=[];latest=None
-            for step in range(24):
+            steps=120 if obstruction else 24
+            for step in range(steps):
                 at=round(step*.05,3)
                 if step%2==0:
-                    scans.append({'captured_s':at,'returns_local_mm':[]})
-                    writer.write('scan',vehicle_id='BF01',captured_s=at,pose_mm_rad=car.pose(),level='EG',z_mm=0,returns_local_mm=[])
+                    returns=[[0.,1500.-car.pose()[0]]]if obstruction and at<3.5 else[]
+                    scans.append({'captured_s':at,'returns_local_mm':returns})
+                    writer.write('scan',vehicle_id='BF01',captured_s=at,pose_mm_rad=car.pose(),level='EG',z_mm=0,returns_local_mm=returns)
                 available=[row for row in scans if row['captured_s']+.1<=at+1e-8]
                 latest=available[-1]if available else None
                 own={'progress_mm':car.y,'velocity_mm_s':car.v,'acceleration_mm_s2':car.a}
-                decision=car.decide(at,latest)
+                end=round(at+.05,3)
+                decision=car.decide(at,latest,step_end_s=end)
                 writer.write('decision',vehicle_id='BF01',time_s=at,path_id=path_id,**own,
                     zone_cap_mm_s=car._zone_cap_at(car.y),captured_s=latest['captured_s']if latest else None,
                     own_grant_permits=True,selected_stop_clock=writer.clock(car._checked_brake()),
+                    step_end_s=car.step_end_s,continuation_stop_clock=writer.clock(car.continuation_stop_clock),
                     own_conditional_home_map_grant={'status':'none'},decision=decision,mode=car.mode,
                     observation_range_margin_mm=car.perception_audit['minimum_range_margin_mm'])
-                car.advance(at,round(at+.05,3))
+                car.advance(at,end)
             evidence=writer.close();car_trajectory=trajectory('BF01',car.recorded,leg_id='pure-trace-test')
             nav=NS(config=source,radius=envelope['radius_mm'],envelope=envelope,
                    homes={'BF01':{'level':'EG','area':'R0_004','pose_mm_rad':[0,0,0]}},
@@ -267,9 +274,21 @@ class ExportChecks(unittest.TestCase):
             with patch('building_fleet_runner.native_scan_geometry',return_value=({'EG':[]},{},{})):
                 proof=checks.check_perception(program,[car_trajectory],source,nav,catalog,{})
             self.assertTrue(proof['passed']);self.assertGreater(proof['checked_selected_stops'],0)
-            self.assertEqual(proof['driving_decision_coverage'],24)
+            self.assertGreater(proof['checked_continuations'],0)
+            self.assertEqual(proof['driving_decision_coverage'],steps)
+            if obstruction:
+                self.assertTrue(any(p['mode']=='braking'for p in car.recorded))
+                self.assertGreaterEqual(sum(e['event']=='resumed'for e in car.events),2)
             trace_path=model.ROOT/evidence['path']
             rows=[json.loads(line)for line in gzip.decompress(trace_path.read_bytes()).decode().splitlines()]
+            moving=next(row for row in reversed(rows)if row['kind']=='decision'and row['velocity_mm_s']>0)
+            original_continuation=moving.pop('continuation_stop_clock')
+            trace_path.write_bytes(gzip.compress(('\n'.join(json.dumps(row,separators=(',',':'))for row in rows)+'\n').encode(),mtime=0))
+            evidence['sha256']=model.digest(trace_path)
+            with patch('building_fleet_runner.native_scan_geometry',return_value=({'EG':[]},{},{})):
+                with self.assertRaisesRegex(ValueError,'declared own state'):
+                    checks.check_perception(program,[car_trajectory],source,nav,catalog,{})
+            moving['continuation_stop_clock']=original_continuation
             decision=next(row for row in reversed(rows)if row['kind']=='decision')
             decision['decision']['observed_gap_mm']-=1
             trace_path.write_bytes(gzip.compress(('\n'.join(json.dumps(row,separators=(',',':'))for row in rows)+'\n').encode(),mtime=0))

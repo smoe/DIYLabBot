@@ -146,6 +146,25 @@ def html_budget(additional_bytes):
             'policy':'Presentation target; exceedance is reported without dropping PVA, received telemetry or captures'}
 
 
+def world_presentation(world_path):
+    """Render the checked physical world with the current shared viewer adapter."""
+    import build_building_walkthrough as builder
+    import walkthrough_world
+    world_path=native.project_path(world_path)
+    if world_path.name!=walkthrough_world.REPORT:
+        raise ValueError('A separate physical world report is required for BF01 presentation')
+    report,manifest,bundle=walkthrough_world.read(world_path.parent,ROOT)
+    paths=(Path(builder.__file__),builder.TEMPLATE,builder.INTERACTION_SCRIPT,
+           ROOT/'scripts/templates/quintic_motion.js',ROOT/'scripts/walkthrough_robots.js',
+           ROOT/'scripts/camera_monitor_wall.js',ROOT/'scripts/monitor_frustum.js',world_path,
+           *(native.project_path(path)for path in report['files'].values()))
+    pins={str(path.relative_to(ROOT)):native.digest(path)for path in paths}
+    normal=builder.embed_html(builder.TEMPLATE.read_text(encoding='utf-8'),
+                              {**manifest,'scenes':bundle['scenes']})
+    native.verify_pins(pins)
+    return normal,pins
+
+
 def view_program(program,manifest):
     """Project every playback datum and add source-derived numeric lift endpoints."""
     # Keep every playback datum verbatim. Audit-only curves, scan/brake
@@ -177,7 +196,7 @@ def opt_in_html(normal,payload=None):
       '    function viewObject(id){':'    function viewObject(id){\n      if(fleetHooks?.following)return {status:\'rejected_following\',id};',
       '    function setStop(id){':'    function setStop(id){\n      if(fleetHooks?.following)return {status:\'rejected_following\',id};',
       'const animating=advanceObjects(now),liftActive=liftDoors?.advance();':'const animating=advanceObjects(now),liftActive=fleetActive?false:liftDoors?.advance();',
-      'gl.depthMask(true);gl.disable(gl.BLEND);updateInteractionHint();':'gl.depthMask(true);gl.disable(gl.BLEND);if(fleetHooks){fleetHooks.draw(cameraMatrix(width/height));gl.useProgram(program);gl.bindVertexArray(scene.vao);}updateInteractionHint();',
+      'gl.viewport(0,0,width,height);drawScene(prepareScene(sceneId),cameraMatrix(width/height),eye);':'gl.viewport(0,0,width,height);const scene=prepareScene(sceneId);drawScene(scene,cameraMatrix(width/height),eye);if(fleetHooks){fleetHooks.draw(cameraMatrix(width/height));gl.useProgram(program);gl.bindVertexArray(scene.vao);}',
       '    liftDoors?.initialize();setStop(':'    if(!fleetActive)liftDoors?.initialize();setStop(',
       "    canvas.addEventListener('pointermove',event=>{":"    canvas.addEventListener('pointermove',event=>{\n      if(fleetHooks?.following)return;",
     }
@@ -206,7 +225,7 @@ def build(program_path,native_proof_path,vehicle_mesh_path,output,*,export_check
     if proof.get('passed')is not True or proof.get('audit_scope')!='full_fleet_program'or proof['program']['sha256']!=native.digest(program_path):raise ValueError('Successful exact native full-fleet proof required; a connector proof is insufficient')
     native.verify_pins(proof['source_files_sha256'])
     from check_building_fleet_freecad import checked_walkthrough
-    walk_path=pinned(program['artifacts']['walkthrough_report']);report,_,manifest,_=checked_walkthrough(walk_path);camera_path=pinned(program['artifacts']['camera_report']);checked_camera_report(camera_path)
+    walk_path=pinned(program['artifacts']['walkthrough_report']);_,_,manifest,_=checked_walkthrough(walk_path);camera_path=pinned(program['artifacts']['camera_report']);checked_camera_report(camera_path)
     vehicle=model.read_json(mesh_path);native.verify_pins(vehicle['source_files_sha256'])
     if vehicle.get('format')!='solidcraftbot.building-fleet-vehicle-mesh/1'or vehicle['camera_report']['sha256']!=native.digest(camera_path):raise ValueError('Current checked native vehicle mesh required')
     import tr01_camera_model as kit
@@ -214,7 +233,7 @@ def build(program_path,native_proof_path,vehicle_mesh_path,output,*,export_check
     if {g['id']for g in vehicle['scene']['groups']}!=expected:raise ValueError('Incomplete physical vehicle mesh')
     normalized=view_program(program,manifest);compressed=gzip.compress(json.dumps(normalized,separators=(',',':'),allow_nan=False).encode(),mtime=0)
     payload={'program_gzip_base64':base64.b64encode(compressed).decode(),'vehicle_mesh':vehicle,'camera_presentation':source['camera_presentation'],'program_source_sha256':native.digest(program_path)}
-    normal=native.project_path(report['files']['html']).read_text();html=opt_in_html(normal,payload);extra=len(html.encode())-len(normal.encode())
+    normal,presentation_pins=world_presentation(walk_path);html=opt_in_html(normal,payload);extra=len(html.encode())-len(normal.encode())
     budget=html_budget(extra)
     limitations=copy.deepcopy(source['limitations'])
     if not budget['budget_met']:
@@ -222,9 +241,15 @@ def build(program_path,native_proof_path,vehicle_mesh_path,output,*,export_check
     output=native.project_path(output)
     if output.exists():raise FileExistsError(output)
     output.mkdir(parents=True);(output/'index.html').write_text(html)
-    pins={**program['source_files_sha256'],str(program_path.relative_to(ROOT)):native.digest(program_path),str(proof_path.relative_to(ROOT)):native.digest(proof_path),str(export_path.relative_to(ROOT)):native.digest(export_path),str(mesh_path.relative_to(ROOT)):native.digest(mesh_path),str(VIEW.relative_to(ROOT)):native.digest(VIEW),str(Path(__file__).relative_to(ROOT)):native.digest(__file__)}
+    for name,digest in presentation_pins.items():
+        if name in program['source_files_sha256']and program['source_files_sha256'][name]!=digest:
+            raise ValueError('Presentation conflicts with the compiled world source: '+name)
+    pins={**program['source_files_sha256'],**presentation_pins,str(program_path.relative_to(ROOT)):native.digest(program_path),str(proof_path.relative_to(ROOT)):native.digest(proof_path),str(export_path.relative_to(ROOT)):native.digest(export_path),str(mesh_path.relative_to(ROOT)):native.digest(mesh_path),str(VIEW.relative_to(ROOT)):native.digest(VIEW),str(Path(__file__).relative_to(ROOT)):native.digest(__file__)}
     native.verify_pins(pins)
     result={'format':'solidcraftbot.building-fleet-browser-build/1','passed':True,'browser_checked':False,'source_files_sha256':pins,'html_sha256':native.digest(output/'index.html'),'normal_html_sha256':hashlib.sha256(normal.encode()).hexdigest(),'additional_html_bytes':extra,'html_budget':budget,'gzip_program_bytes':len(compressed),
+            'presentation':{'world_report':program['artifacts']['walkthrough_report'],
+                'source_files_sha256':presentation_pins,
+                'scope':'Current shared renderer applied to the exact checked physical world; no camera-wall overlay is a physical input'},
             'playback_projection':{'included_fields':list(PLAYBACK_FIELDS),'omitted_audit_only_fields':sorted(set(program)-set(PLAYBACK_FIELDS)),
                 'full_program':{'path':str(program_path.relative_to(ROOT)),'sha256':native.digest(program_path)},
                 'trajectory_pva_unchanged':normalized['trajectories']==program['trajectories'],

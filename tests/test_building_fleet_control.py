@@ -44,14 +44,16 @@ class ControllerTests(unittest.TestCase):
         c=self.controller();c.y=100.;c.v=300.;c.a=0
         # End at 23 ms inside a 50 ms integration tick, then keep cruising.
         curve=control.floor.motion.Curve([control.local.point(0,0,300,0),control.local.point(.023,6.9,300,0)])
-        c.set_plan(curve,0,'driving','speed_change');c.advance(0,.05)
+        c._record(0.)
+        c.set_plan(curve,0,'driving','speed_change')
+        c.decide(0.,{'captured_s':0.,'returns_local_mm':[]});c.advance(0,.05)
         self.assertAlmostEqual(c.y,115.,places=8)
         self.assertAlmostEqual(c.v,300.,places=8)
         self.assertEqual(c.mode,'driving')
         self.assertIsNone(c.plan)
         records=c.recorded[1:]
         self.assertTrue(all(b['pose_mm_rad'][0]>a['pose_mm_rad'][0]for a,b in zip(records,records[1:])))
-        c.advance(.05,.1)
+        c.decide(.05,{'captured_s':.05,'returns_local_mm':[]});c.advance(.05,.1)
         self.assertAlmostEqual(c.y,130.,places=8)
 
     def test_missing_scan_and_stale_scan_do_not_launch(self):
