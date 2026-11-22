@@ -83,7 +83,7 @@ def check_assignments(program,trajectories,navigation,source):
     duration=_time(program['duration_s'],source['missions']['maximum_duration_s'])
     if _tick(duration)!=duration:raise ValueError('Complete world time must use the task integration clock')
     by_vehicle={t.identity:t for t in trajectories};targets={(r['level'],r['area']):r for r in source['missions']['targets']}
-    assignments={};previous=-math.inf
+    assignments={};foreign_by_booking={};previous=-math.inf
     for row in program['mission_assignments']:
         _fields(row,{'mission_id','vehicle_id','assigned_s','goal','source_level','booking_id'},'issued mission')
         mid=row['mission_id'];vehicle=row['vehicle_id'];t=_time(row['assigned_s'],duration)
@@ -101,6 +101,10 @@ def check_assignments(program,trajectories,navigation,source):
         if foreign!=(isinstance(row['booking_id'],str)and bool(row['booking_id'])):
             raise ValueError('Only a foreign issued mission has a named endpoint booking')
         if not foreign and row['booking_id']is not None:raise ValueError('Local mission must not claim a foreign booking')
+        if foreign:
+            if row['booking_id']in foreign_by_booking:
+                raise ValueError('Each foreign booking must bind exactly one issued mission')
+            foreign_by_booking[row['booking_id']]=mid
         assignments[mid]=copy.deepcopy(row)
     if not assignments:raise ValueError('An actual fleet needs issued missions')
     receipts=_records(program['mission_receipts'],assignments,duration,'assignment receipt')
@@ -219,10 +223,16 @@ def check_assignments(program,trajectories,navigation,source):
     final={r['booking_id']:r for r in program['mission_bookings']}
     if len(final)!=len(program['mission_bookings'])or final!=states or active or conditional or any(r['state']!='arrived'for r in states.values()):
         raise ValueError('Complete program retains a changed or unfinished mission booking')
-    if set(final)!={m['booking_id']for m in assignments.values()if m['booking_id']is not None}:
+    if set(final)!=set(foreign_by_booking):
         raise ValueError('Every foreign issued mission needs exactly its own fenced booking')
     for mission in assignments.values():
-        if mission['booking_id']is not None:continue
+        if mission['booking_id']is not None:
+            booking=final[mission['booking_id']]
+            if (booking['mission_id']!=mission['mission_id']or booking['vehicle_id']!=mission['vehicle_id']
+                    or booking['from_level']!=mission['source_level']or booking['to_level']!=mission['goal']['level']
+                    or _time(booking['created_s'],duration)>mission['assigned_s']):
+                raise ValueError('A foreign mission needs its exact booking fenced before issuance')
+            continue
         vehicle=mission['vehicle_id'];t=mission['assigned_s'];episode=by_vehicle[vehicle].episode(t)
         actual=episode['level_id']==mission['source_level']and not episode['attached_cabin']
         history={}
