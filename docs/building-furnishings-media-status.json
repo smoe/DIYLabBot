@@ -142,7 +142,7 @@
     "model/tip-collector-t01.shared.json": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
     "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
-    "scripts/build_building_stack.py": "cf1cadee7e3a1e4c7b7718738a91e778405561df8d4427d9475edc7e99cf49f0",
+    "scripts/build_building_stack.py": "5a5a0a89d605a8b1779ee0795b8e1f124de2182c075097cc169e2e4252a20903",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
     "scripts/build_building_walkthrough.py": "e6df6c1a96e051dbdbec95f7f6b9d6601b74f0bdd24751dd828158b4768e0d6c",
     "scripts/build_centrifuge_freecad.py": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec",
