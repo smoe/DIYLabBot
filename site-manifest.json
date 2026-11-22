@@ -2,14 +2,14 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "7537f9e4a1f3adecb6217faa64aabcbdc231f68a",
-  "integrated_commit": "7537f9e4a1f3adecb6217faa64aabcbdc231f68a",
-  "export_revision": "browser",
+  "source_commit": "ee9620d4feae0e0b63f3a4478f2177f571323d5b",
+  "integrated_commit": "ee9620d4feae0e0b63f3a4478f2177f571323d5b",
+  "export_revision": "cold-storage",
   "html": {
-    "sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6",
-    "bytes": 51911770
+    "sha256": "3c9abf43c8ce88da2f7bb439cea809178283d8945c40b326309bbd3b272f8978",
+    "bytes": 51913514
   },
-  "source_manifest_sha256": "d19584f48b3273050684c2aa9840667d987680f675d9b47fe7687500d575c4df",
+  "source_manifest_sha256": "1bb4ea8a04fa27d4e9655a9008f775e320d636e3fb61e12b252956ee7f2c5f20",
   "native_builds": {
     "building": {
       "report": "cad/building-stack/shared-build-report.json",
@@ -38,13 +38,13 @@
     "scripts/furniture_articulation.py": "73e8497c5d527c42efa87dadff412ff05fe989ec0b5bcfceda7da8c4065c775f",
     "model/furniture/social.catalog.json": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440",
     "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
-    "scripts/walkthrough_mechanisms.py": "b8c23f3d64bf2234856facaa06e97f05b645df27833bef027cad46b8c6cd4145",
+    "scripts/walkthrough_mechanisms.py": "ddf5fdd8dd45dd3d33c5722989b919829ed9e522a196e1e52aa6e8dcf942e54e",
     "scripts/lab_equipment.py": "fe868847435e6ca67bc41636a58732a82fc9cf6309b49c360237e95cc35fe868",
     "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
     "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
     "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
-    "model/building-walkthrough.shared.json": "9346c61abeddb153c703c076ef12f5dbcb8a266a9b6b53c4440fb6a6e0ad14c4",
-    "model/building-walkthrough.schema.json": "34c53ec336a350d95209f8fe8cb3a78b3092f3004fc8172f3e0980338aa31d03",
+    "model/building-walkthrough.shared.json": "5d4a808828e9acd750ffcd7db9192f701ea39b76f449c221c6759ac5809ef2a2",
+    "model/building-walkthrough.schema.json": "0f1003f9a5d95e7c3795911f8a84c63fa74199d614ce57f1da2357f6e6769b24",
     "scripts/building_walkthrough.py": "b85eff3ea686af25e16ca45d7b39de50cc07d0f1d6f48e6f30ef52f306ca5323",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
     "model/building-stack.shared.json": "f9af02de40c9e33d3d55ec7c09fd342de3bfefe6e30aebfeb6873e324cd498e4",
@@ -182,19 +182,24 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
     "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4",
-    "model/foyer-camera-wall.shared.json": "71d9aff55bdbf15ec2c6c6c8dc8056c547b1055d7f2d845d543ec2b6018e2296",
+    "model/foyer-camera-wall.shared.json": "bc03073253122b5588410f45a080ebed935e0f4e4063e503ca345a7872911930",
     "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
     "scripts/monitor_camera_registry.py": "aefee896a12abc0ee2bb555ffb969356f22afb47e944d75b8f5f868f98d4006f",
-    "model/building-fleet-demo.shared.json": "24d6e2e904c9423d6bd6ac39063ae486bc03f9d0b0ac14c61566da82d3f8f954",
-    "scripts/building_walkthrough_viewer.html": "5395eebf9ca6a66f1198cd15093f3e58de3f26dbfb68b9db76e7ecdbfa98730c",
+    "model/building-fleet-demo.shared.json": "fc4d8630831b1c0087750db4b158b5addac6c19fe434fc89fe19c63877887159",
+    "scripts/building_walkthrough_viewer.html": "6a2fd2a13aaa5f06584bafb58989b0f7565b79fffc703b220a0970dca692fb15",
     "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
     "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
     "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1"
   },
+  "native_mesh_reuse": {
+    "sha256": "3988f83f75053eca669f8d682203b3470904e814e253e672b9d4f969be27d463",
+    "source_build_report_sha256": "2b95be2c3f2be623ab42cbcb4d57807f0dd3a575e04b06aa5dad4bc2dda0ac96"
+  },
   "qualification": {
     "metric_scale_known": false,
     "lab_to_building_registered": false,
-    "collision_checked": false
+    "collision_checked": false,
+    "signage_qualified": false
   },
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
@@ -212,21 +217,26 @@
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
   "local_browser_evidence": {
-    "camera-wall-browser-report-metal.json": {
-      "sha256": "8055c0ac43c944cbd98ae290ec4d07c524a76834d1a451256b1b4eb76d2ecc08",
+    "browser-check.json": {
+      "sha256": "8015b8229ef63eeb5f40f3b9f2dc6da61959b52f3cfd02f09ae7d692065a3a06",
       "passed": true,
-      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
+      "html_sha256": "3c9abf43c8ce88da2f7bb439cea809178283d8945c40b326309bbd3b272f8978"
     },
-    "camera-wall-browser-report-swiftshader.json": {
-      "sha256": "6bb092e8e60f1340e55dc1fdc7a41b8b0338b520985cd5c323cdc9f1ea581180",
+    "complete-route-check.json": {
+      "sha256": "9d2743b85e0aa3bef20b41b526092bf0d860385fa64cf69f057f318c18682f39",
       "passed": true,
-      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
+      "html_sha256": "3c9abf43c8ce88da2f7bb439cea809178283d8945c40b326309bbd3b272f8978"
     },
-    "robot-commands-browser-report.json": {
-      "sha256": "4d96945ddaafc8f3b56d7e31df8a5f8600a2f02f5c0b55a447529977ac2f6e8c",
+    "camera-native-contacts.json": {
+      "sha256": "857a64c465d8217deeb30a32a21c83f59ff3deaad49c937e76d329ec86c80c6e",
       "passed": true,
-      "html_sha256": "4458e5851f75077d2e5731e4b28b476db2f1f3e8d768713304d91128cbcf38c6"
+      "html_sha256": "3c9abf43c8ce88da2f7bb439cea809178283d8945c40b326309bbd3b272f8978"
+    },
+    "cold-storage-browser-report.json": {
+      "sha256": "7a8af25441298abe1707f7f505c1f56a37a8d8579e982677483f9981268e2ac1",
+      "passed": true,
+      "html_sha256": "3c9abf43c8ce88da2f7bb439cea809178283d8945c40b326309bbd3b272f8978"
     }
   },
-  "update": "Verified 5 by 4 foyer wall with shared GPU geometry, ground-floor viewing limits and transporter-first camera selection. Camera images are synthetic. The BF01 world is independent of the browser overlay."
+  "update": "Walking guidance from doctoral room 3.002 through the nearer lab door 3.003B. Verified browser walking and the office-to-lift detour around the open leaf. All four cooling cabinets start closed and support opening and closing."
 }
