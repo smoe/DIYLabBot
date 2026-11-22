@@ -9,8 +9,10 @@ from urllib.request import urlopen
 import building_walkthrough as walkthrough
 import building_stack as stack
 import export_building_walkthrough_freecad as native_mesh
+from build_building_walkthrough import add_monitor_wall
 
 ROOT = Path(__file__).resolve().parents[1]
+MONITOR_RENDERER_SOURCES = ('scripts/camera_monitor_wall.js', 'scripts/monitor_frustum.js')
 
 
 def required_body_ids(program, building_ids):
@@ -45,16 +47,20 @@ def check(html, manifest, program=None, body_ids=None):
     match = re.search(rb'<script id="walkthrough-data" type="application/json">(.*?)</script>', html, re.S)
     require(match is not None, 'Missing inline walkthrough data')
     payload = json.loads(match[1])
-    program = walkthrough.compile() if program is None else program
+    program = add_monitor_wall(walkthrough.compile()) if program is None else program
     require(payload.get('navigation') == program.get('navigation'), 'Stale published navigation policy')
     for key in ('objects', 'interaction', 'stops', 'levels', 'settings', 'rendering', 'hidden_body_ids'):
         require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
     for key in ('robots', 'laboratories', 'equipment_source', 'elevator', 'places', 'topology'):
         if key in program:
             require(payload.get(key) == program[key], 'Stale published walkthrough: '+key)
+    require(payload.get('camera_wall') == program.get('camera_wall'), 'Stale published walkthrough: camera_wall')
     expected = dict(program['source_files_sha256'])
-    for name in ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
-                 'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js'):
+    renderer_sources = ('scripts/build_building_walkthrough.py', 'scripts/export_building_walkthrough_freecad.py',
+                        'scripts/building_walkthrough_viewer.html', 'scripts/walkthrough_interaction.js')
+    if program.get('camera_wall') is not None:
+        renderer_sources += MONITOR_RENDERER_SOURCES
+    for name in renderer_sources:
         expected[name] = hashlib.sha256((ROOT/name).read_bytes()).hexdigest()
     for name, digest in expected.items():
         require(payload.get('source_files_sha256', {}).get(name) == digest,

@@ -64,6 +64,31 @@ class PublicationTests(unittest.TestCase):
                 self.verify(payload)
             self.program.pop(key)
 
+    def test_camera_wall_and_renderer_pins_are_required(self):
+        self.program['camera_wall'] = {'monitors': [{'id': 'FoyerMonitor1'}]}
+        payload = copy.deepcopy(self.payload)
+        payload['camera_wall'] = copy.deepcopy(self.program['camera_wall'])
+        for name in ('scripts/camera_monitor_wall.js', 'scripts/monitor_frustum.js'):
+            payload['source_files_sha256'][name] = hashlib.sha256((publication.ROOT/name).read_bytes()).hexdigest()
+        self.assertTrue(self.verify(payload)['passed'])
+
+        for replacement in (None, {'monitors': []}):
+            stale = copy.deepcopy(payload)
+            if replacement is None:
+                stale.pop('camera_wall')
+            else:
+                stale['camera_wall'] = replacement
+            with self.subTest(camera_wall=replacement), self.assertRaisesRegex(ValueError, 'camera_wall'):
+                self.verify(stale)
+
+        for name in ('scripts/camera_monitor_wall.js', 'scripts/monitor_frustum.js'):
+            stale = copy.deepcopy(payload)
+            stale['source_files_sha256'].pop(name)
+            with self.subTest(source=name), self.assertRaisesRegex(ValueError, 'Stale published source'):
+                self.verify(stale)
+            with self.subTest(manifest=name), self.assertRaisesRegex(ValueError, 'Stale publication manifest'):
+                self.verify(payload, lambda manifest: manifest['source_files_sha256'].pop(name))
+
     def test_checked_browser_equipment_and_functional_supports_extend_native_coverage(self):
         from unittest.mock import patch
         program = {'laboratories': [{'id': 'Lab'}],
