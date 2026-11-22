@@ -2,21 +2,21 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "2c9b0172fa10c87c62096f34d0eb420ef78efecc",
-  "integrated_commit": "f8ed614acb2abc8990d3930f168d7df5526f2ed2",
-  "export_revision": "ice-maker-lab-3016",
+  "source_commit": "01c7cff3ca9565dfef09434c41c25f01a7817215",
+  "integrated_commit": "01c7cff3ca9565dfef09434c41c25f01a7817215",
+  "export_revision": "browser",
   "html": {
-    "sha256": "a6338dcaa89b450bb7d311420771fe1e9349e4eea3eae33da143991990e39ecf",
-    "bytes": 52142471
+    "sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c",
+    "bytes": 52585068
   },
-  "source_manifest_sha256": "0954444a1e2c2006611b1d3f1df17607869fdbbde5879a9bc52d8e4e7b01798c",
+  "source_manifest_sha256": "8db1640838206514ed4220d9864025de29afb2f1400c6a14362c2053d2a5cb52",
   "native_builds": {
     "building": {
-      "report": "exports/generated/building-stack-d785eed13068-r2/build-report.json",
-      "report_sha256": "200123d4b76c34aed55d0e7272192dcc52ca544f8dc8deea3419cf5e6b4a532e",
-      "revision": "building-stack-d785eed13068-r2",
-      "source_sha256": "d785eed130686222cdb24b7dbd05909a958bf5bc6fa5feb6c3db4f1eef8fda36",
-      "native_sha256": "ca8936a40feaa5dd0fa6491b4f606185c2b0ba917db100bc30c38e87e4ad4791"
+      "report": "cad/building-stack/shared-build-report.json",
+      "report_sha256": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
+      "revision": "building-stack-268bd52d21e1",
+      "source_sha256": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a",
+      "native_sha256": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777"
     },
     "lab": {
       "report": "cad/lab-layout-l01/shared-build-report.json",
@@ -35,21 +35,21 @@
     "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226",
     "model/furniture/social.articulations.json": "ece5818078ba3c4228aee91a56919b4ced7bddd25fdf58ea336868f0b993da46",
     "model/furniture-articulations.schema.json": "05e373c4d1a1996fddc6659e0fac81ec75009c22576ae742e3a7e01ea7824d8d",
-    "scripts/furniture_articulation.py": "73e8497c5d527c42efa87dadff412ff05fe989ec0b5bcfceda7da8c4065c775f",
+    "scripts/furniture_articulation.py": "b43b7b09a6d1f71eef62e65082bf9d8994bfc69c844770e7c7acdfb967694604",
     "model/furniture/social.catalog.json": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440",
     "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
-    "scripts/walkthrough_mechanisms.py": "ddf5fdd8dd45dd3d33c5722989b919829ed9e522a196e1e52aa6e8dcf942e54e",
+    "scripts/walkthrough_mechanisms.py": "05f2ca117b7e4651b72a4387cc9c2c8a4e7fd5991dc2c7c4f2bee52f801da703",
     "scripts/lab_equipment.py": "fe868847435e6ca67bc41636a58732a82fc9cf6309b49c360237e95cc35fe868",
     "scripts/instrument_concept.py": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143",
     "scripts/tube_cam_model.py": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71",
     "scripts/robot_spec.py": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0",
-    "model/building-walkthrough.shared.json": "0c59f82f9e61dca60a191df93c095e9ac797a9b4eca2c60683d9e94d449bf9ca",
-    "model/building-walkthrough.schema.json": "0f1003f9a5d95e7c3795911f8a84c63fa74199d614ce57f1da2357f6e6769b24",
-    "scripts/building_walkthrough.py": "b85eff3ea686af25e16ca45d7b39de50cc07d0f1d6f48e6f30ef52f306ca5323",
+    "model/building-walkthrough.shared.json": "7601a1b1a6266dc71bc60d4cce644abb1c284f4716beee82c48294222fa9cde7",
+    "model/building-walkthrough.schema.json": "413825e4623787bfe71f3ed6d7a18d215d950248e8d0899a73e409057c63c31d",
+    "scripts/building_walkthrough.py": "b9fda546ed2c31c39bee3e19efbc69a54bc5fc11f57978bc31ad0cb10e62fdd7",
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
-    "model/building-stack.shared.json": "d785eed130686222cdb24b7dbd05909a958bf5bc6fa5feb6c3db4f1eef8fda36",
-    "model/building-stack.schema.json": "8f5e4d734a0f043575c6a1fc704e719c2bb4ca6041864d10d8b05636d6d1b5c5",
-    "scripts/building_stack.py": "a12595dd75a62eece1acf4bd7c6516320048cbd30e47c74b961c466e16740924",
+    "model/building-stack.shared.json": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a",
+    "model/building-stack.schema.json": "c7028202edd2589fd0011b147d211254798beae6d5e5d78dea82e69e49cad08c",
+    "scripts/building_stack.py": "95a9fb51f335097d902225fe561902eba709bd84b8c68aaff2e15aed1e0aacb6",
     "scripts/building_circulation.py": "818ecc95503b30342eefa9e7f430d04bd96ff05840c6ba650f2297899fe5dd66",
     "scripts/building_roof.py": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306",
     "scripts/building_guards.py": "297b418ad939086e9130aaa0604a4153e41adb5e79e04f3efbc53812200f3d28",
@@ -74,7 +74,7 @@
     "scripts/wall_worktops.py": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1",
     "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
     "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
-    "model/furnishings/building-laboratories.json": "2788da7c3cc5b1aa4dda5e7f3d6b56879d748735ea6b759962cae7c4b8f8ccfd",
+    "model/furnishings/building-laboratories.json": "315735d8c867f193da63ca6011b24c69cd05e95bb03efd9f67dc4cfeda6f44d6",
     "model/building-laboratories.schema.json": "5b2dde953592edad71c1103d847cb0094d56641c0ab63da411391933609ebe20",
     "scripts/building_laboratories.py": "21f4bae8fe8f13086356a5e01dfc74a8a066a4aedebf4c3134043a7edeaf00e9",
     "scripts/lab_room_model.py": "a8aa368a14ed149caf91256564087cf2487a32496419d76684e9b08fa05cac1e",
@@ -99,10 +99,10 @@
     "model/furnishings/basic-laboratory.shared.json": "fa5fa071721229ff88de7ca1b1bf68395ed1bd77ab4943412f54894278181796",
     "model/basic-laboratory-furnishings.schema.json": "53ceb1b080578437a0ce336069b6c419b7e40c31472f2c38e059c4e0935fccda",
     "scripts/basic_laboratories.py": "630cde4e9e210e2c2e821c345e9fe51275c08611f188f3d989bcdc50f901b6b1",
-    "model/ice-maker-im01.shared.json": "e9d9826f966dfb47256a045143db5fae21b208559007273b18fa0f80d23b5f97",
-    "model/ice-maker-im01.schema.json": "db0fd1319cc00c6c1d62215785d03f8fb2b092de9c6c1513e1307dc1494125e0",
-    "scripts/building_ice_maker.py": "7a7bda8b72d2fadfe72304377342e7a6a777a05ac3a02e479cd59543002c0d0e",
-    "scripts/ice_maker_model.py": "1692dd073b20ca34641cb7763a5e94a06db19944fae86b7cf210d6fb50299b8e",
+    "model/ice-maker-im01.shared.json": "e2b6bbbef43439449d971f643ac189ff26fd98954bc6f0c6b40e5f21ad2f6f99",
+    "model/ice-maker-im01.schema.json": "1d59a0455d1e1a80d131d34cf8473c38aa0bb60040b57f2bb58219cc9277fd63",
+    "scripts/building_ice_maker.py": "e3558c309b898ad96eb43e83951e45c0f66d332a93abaadf650e0dc48a90ed67",
+    "scripts/ice_maker_model.py": "dac5ee90bc9c73c03310b23331a77693d445248f211c3738b1ad38935313aa95",
     "scripts/microscope_model.py": "1fd57c12c5254bf5609ad204d88f7ccc308267da09fea54a681e9ddd95be6f05",
     "model/equipment/microscopy-3007.json": "59e0f172e09c7b4452be4827cb60d96fb33d5b186acf25268389e050c5e98bb2",
     "model/furnishings/microscopy-3007.json": "372396c92e02ac226cf6822dfceed46c0801d4d33c622c99c6d4806d63f39026",
@@ -119,25 +119,29 @@
     "model/equipment/foyer-monitor-wall.json": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31",
     "model/foyer-monitor-wall.schema.json": "3b7a25c8a667d92236facd17fe3142b141ec164b60b2206bddea028b8f303d61",
     "scripts/foyer_monitor_wall.py": "ad6638d326eda0505f1296fcf67dbb5af3b7d9073d0549b7596acfdc791560c9",
+    "model/furnishings/seminar-eg10.json": "91f84368bf9fba27aaf1eca1f31d4502fc98dd5690674607af9e1c2fb9b3823f",
+    "model/seminar-room.schema.json": "a7f885404c6fa8d6362a1fa5455bb8bc4db31d7f3d74db7d56cc1dd1756485d5",
+    "scripts/building_seminar.py": "45f58e306e04066845535ce5b3a0fbe3f919d29e71f0e61bfb8ac22e6fc49112",
+    "scripts/building_room_signs.py": "f2e0f45e8165ee02c0485aefda5bf1efb6d0d7c7f878524b4681496547223c10",
+    "scripts/building_seminar_windows.py": "b967068bfdaab6a20be5649dfb474e8ef8d7fac3b00510c9b0dbc6372b74d9e3",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
     "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
     "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
-    "model/building-doors.shared.json": "d9144cb30e82ccbf469f8fcf4b0f777f70d074241137a21dd0e4e7068b7144ab",
+    "model/building-doors.shared.json": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391",
     "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
     "scripts/building_doors.py": "9c10dee44d5104cd74fb87abf32659a1bc9691b01b4aa73a9535172e989608bd",
     "model/building-doors.schema.json": "9d21e2eb2f87ea1e16105756c1a56b33bdac147357a36131beb82a4714b36196",
     "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
-    "scripts/building_room_signs.py": "f2e0f45e8165ee02c0485aefda5bf1efb6d0d7c7f878524b4681496547223c10",
     "scripts/marker_label.py": "a4df191542b968cf01370fbbadf8b0ed417914f9811ee7720840d64f712e46fd",
     "scripts/building_room_labels.py": "a0ddfb72c9f203e8b85f0af5588ec38c586ef8754dd210f64a12caa3a79e88ed",
     "scripts/walkthrough_elevator.py": "d92b22b1e9c1ee97116bf936d3057eb7ebf644e29e7adaee0cff246fc6bab21f",
-    "scripts/build_building_walkthrough.py": "e6df6c1a96e051dbdbec95f7f6b9d6601b74f0bdd24751dd828158b4768e0d6c",
+    "scripts/build_building_walkthrough.py": "734d3e113b22f0e73643910817a08ed5f453311720951a228f8438c3b20f6f88",
     "scripts/walkthrough_world.py": "e49ae5853a9ae0b83137cf4a350038674607834552b091cd6f448fb2ecbf66dd",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
-    "exports/generated/building-stack-d785eed13068-r2/build-report.json": "200123d4b76c34aed55d0e7272192dcc52ca544f8dc8deea3419cf5e6b4a532e",
+    "cad/building-stack/shared-build-report.json": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
     "cad/lab-layout-l01/shared-build-report.json": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6",
-    "scripts/build_building_stack.py": "5a5a0a89d605a8b1779ee0795b8e1f124de2182c075097cc169e2e4252a20903",
+    "scripts/build_building_stack.py": "c298ddd6b3e624b4c80277b879004ee0ecb82395075877f4e74ffe373b1e954a",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
     "scripts/build_relative_floorplan.py": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57",
     "scripts/build_extraction_kit_station.py": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88",
@@ -149,9 +153,9 @@
     "scripts/freecad/persist_station_view.py": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60",
     "scripts/freecad/persist_view.py": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571",
     "scripts/tool_paths.py": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952",
-    "cad/generated/building-stack-d785eed13068-r2/overview.FCStd": "ca8936a40feaa5dd0fa6491b4f606185c2b0ba917db100bc30c38e87e4ad4791",
-    "exports/generated/building-stack-d785eed13068-r2/overview.case.json": "e32d8ac697faaf232d1d43c955a1ded1e2549aa455e2a267acf4af75cfdb0b43",
-    "exports/generated/building-stack-d785eed13068-r2/overview.freecad.json": "28c7896be6830a3035317a5d640f7d79e42fbb097be1f10909db0731e84029e5",
+    "cad/generated/building-stack-268bd52d21e1/overview.FCStd": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
+    "exports/generated/building-stack-268bd52d21e1/overview.case.json": "946a342182084faf0d1d2ced592b07f1844f027d3985df93808e243f551a3fb7",
+    "exports/generated/building-stack-268bd52d21e1/overview.freecad.json": "fa8445a1ecfda05180dbe11030f701d03bc4fcd1ff8c50dce31992486578e567",
     "scripts/build_lab_layout.py": "643e7d3ecd969c89ae6e010e49b650a17a36175a414a1e4fe38584b788bb1197",
     "scripts/build_lab_layout_freecad.py": "a1e6aa9137f54572605c2cb3fd4e75d1b824b325d2af70c3f4e4c9e91e76ef22",
     "scripts/build_lab_room_freecad.py": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849",
@@ -186,20 +190,20 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
     "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4",
-    "model/foyer-camera-wall.shared.json": "c98689fc25032d8e26409a63da9092a05aa6cf9bc2ad2712b61c425b2de9d3eb",
+    "model/foyer-camera-wall.shared.json": "516255171225d157c773f9413b9b11b21e879b59db654c17e26dcd2f2d532b41",
     "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
     "scripts/monitor_camera_registry.py": "aefee896a12abc0ee2bb555ffb969356f22afb47e944d75b8f5f868f98d4006f",
-    "model/building-fleet-demo.shared.json": "d40bb08fd6801d100435b44d1c2bdad78ddd99d8ab8980b2241502c7028393da",
-    "scripts/building_walkthrough_viewer.html": "6a2fd2a13aaa5f06584bafb58989b0f7565b79fffc703b220a0970dca692fb15",
+    "model/building-fleet-demo.shared.json": "80155e3df17280a228c8c740f63039fad1fe285950b18ce653013a57a4526033",
+    "scripts/building_walkthrough_viewer.html": "6361b6e5e1bf205b082cd7bce92fe9a448f7d6c5b1eaa97cb49d0997fce3c380",
     "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
+    "scripts/seminar_projection.js": "87e3d728858b95cc9709f3f71e5c49a1676630883d0cf174e5b5809359a1900d",
     "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
     "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1"
   },
   "qualification": {
     "metric_scale_known": false,
     "lab_to_building_registered": false,
-    "collision_checked": false,
-    "signage_qualified": false
+    "collision_checked": false
   },
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
@@ -217,21 +221,21 @@
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
   "local_browser_evidence": {
-    "complete-route-check.json": {
-      "sha256": "e781865dc497896482785c1ee83903b60cfef630650955783cf2b4a1efe8c669",
+    "browser-check.json": {
+      "sha256": "5d62063061b0211a086844b6d3b6f9ebc282f4c4d8a116bba4c7be01349292c9",
       "passed": true,
-      "html_sha256": "a6338dcaa89b450bb7d311420771fe1e9349e4eea3eae33da143991990e39ecf"
+      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
     },
-    "camera-native-contacts.json": {
-      "sha256": "3a7cee69da937805f9a35a2db823b042713413df7b5a3fab0e51367d118e8ce3",
+    "seminar-window-browser.json": {
+      "sha256": "b32a72256812f40f1bb0c8c2f9d01f5e22d4915795094d9427c27d88c4b19a0e",
       "passed": true,
-      "html_sha256": "a6338dcaa89b450bb7d311420771fe1e9349e4eea3eae33da143991990e39ecf"
+      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
     },
-    "software-smoke.json": {
-      "sha256": "68d20d2460f51e91cc9df197125688ca362d7f556224aa113940628a6ed63aa4",
+    "ice-maker-flap-browser-report.json": {
+      "sha256": "c43ee4c62b9d1fe28eb4abbd439b2d4ec4d4b306177475fabee8f119e715434b",
       "passed": true,
-      "html_sha256": "a6338dcaa89b450bb7d311420771fe1e9349e4eea3eae33da143991990e39ecf"
+      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
     }
   },
-  "update": "Places the IM01 countertop ice maker on the existing drying tray next to the sink in laboratory 3.016 on the third floor."
+  "update": "Publishes the ground-floor seminar room with table rows, seven operable window sashes and Steamboat Willie on the projection screen. The same snapshot includes the operable ice-maker flap in laboratory 3.016."
 }
