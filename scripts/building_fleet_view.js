@@ -85,8 +85,8 @@ async function mount(bridge,payload){
  const q=name=>panel.querySelector('[data-bf="'+name+'"]'),select=q('vehicle');for(const m of models){const option=document.createElement('option');option.value=option.textContent=m.id;select.append(option);}
  const mosaic=models.map(m=>{const box=document.createElement('figure'),canvas=document.createElement('canvas'),label=document.createElement('figcaption');label.textContent=m.id;box.append(canvas,label);q('mosaic').append(box);return{canvas,box,id:m.id};});const [cameraWidth,cameraHeight]=payload.camera_presentation.resolution_px;q('camera').width=cameraWidth;q('camera').height=cameraHeight;for(const m of mosaic){m.canvas.width=160;m.canvas.height=90;}
  const captureReceivedAt=new Map();for(const m of program.received_messages)if(m.kind==='perception'){const previous=captureReceivedAt.get(m.payload.camera_ref);if(previous===undefined||m.received_s<previous)captureReceivedAt.set(m.payload.camera_ref,m.received_s);}
- const framebuffer=bridge.gl.createFramebuffer(),texture=bridge.gl.createTexture(),depth=bridge.gl.createRenderbuffer();let framebufferSize='';
- function cameraImage(canvas,capture){const gl=bridge.gl,width=canvas.width,height=canvas.height,key=width+'x'+height;
+ const framebuffer=bridge.gl.createFramebuffer(),texture=bridge.gl.createTexture(),depth=bridge.gl.createRenderbuffer(),cameraCache=new Map();let framebufferSize='';
+ function renderCameraImage(canvas,capture){const gl=bridge.gl,width=canvas.width,height=canvas.height,key=width+'x'+height;
   const activeTexture=gl.getParameter(gl.ACTIVE_TEXTURE),previousFramebuffer=gl.getParameter(gl.FRAMEBUFFER_BINDING);gl.activeTexture(gl.TEXTURE0);const previousTexture=gl.getParameter(gl.TEXTURE_BINDING_2D);
   try{gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);if(framebufferSize!==key){gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,width,height,0,gl.RGBA,gl.UNSIGNED_BYTE,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);gl.bindRenderbuffer(gl.RENDERBUFFER,depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,width,height);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,depth);framebufferSize=key;require(gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE,'Camera framebuffer incomplete');}
    // The building shader has an active sampler on unit zero even when its
@@ -95,10 +95,19 @@ async function mount(bridge,payload){
    const captureTime=capture.captured_s,lift=liftAt(program,captureTime),states=models.map(m=>m.at(captureTime,lift));bridge.applyLift(lift);bridge.capture(capture,width,height,()=>renderer.draw(bridge.cameraMatrix(width/height),states),payload.vehicle_mesh.scene.camera_frame,payload.camera_presentation.fov_deg);const pixels=new Uint8Array(width*height*4);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);const flipped=new Uint8ClampedArray(pixels.length);for(let y=0;y<height;y++)flipped.set(pixels.subarray(y*width*4,(y+1)*width*4),(height-y-1)*width*4);canvas.getContext('2d').putImageData(new ImageData(flipped,width,height),0,0);canvas.dataset.captureRef=capture.camera_ref||'';canvas.title='synthetische Aufnahme '+capture.captured_s.toFixed(3)+' s · '+(capture.camera_ref||'');
   }finally{gl.bindFramebuffer(gl.FRAMEBUFFER,previousFramebuffer);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,previousTexture);gl.activeTexture(activeTexture);apply(time);}}
 
+ function cameraCanvas(capture,width,height){
+  const key=capture.vehicle_id+':'+width+'x'+height,cached=cameraCache.get(key);
+  if(cached?.ref===capture.camera_ref)return cached.canvas;
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;renderCameraImage(canvas,capture);
+  cameraCache.set(key,{ref:capture.camera_ref,canvas});return canvas;
+ }
+ function cameraImage(canvas,capture){const image=cameraCanvas(capture,canvas.width,canvas.height);canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);canvas.getContext('2d').drawImage(image,0,0);canvas.dataset.captureRef=image.dataset.captureRef;canvas.title=image.title;}
+
  function apply(t){const lift=liftAt(program,t);bridge.applyLift(lift);return models.map(m=>m.at(t,lift));}
  function blocked(){return program.room_route_object_ids.filter(id=>!bridge.doorOpen(id));}
  function ui(){
-  const received=projection.at(time,false),states=apply(time),blocks=blocked();frozen=blocks.length>0;
+  const received=projection.at(time,false),states=apply(time),blocks=blocked();frozen=blocks.length>0;if(payload.presentation?.atrium_monitors)bridge.syncMonitorFeeds();
+  labels.hidden=Boolean(payload.presentation?.atrium_monitors&&!follow&&bridge.atMonitorWall());
   q('status').textContent=frozen?'Flottenvorschau gesperrt: Fahrwegtür öffnen · '+blocks.join(', '):'Modellzeit '+time.toFixed(3)+' s · Aufzug im Flottenbetrieb · '+(preview&&time===duration?'Ende der Aufzeichnung · Gesamtlauf unbestätigt':playing?'läuft':'pausiert');
   q('clock').textContent=time.toFixed(3)+' / '+duration.toFixed(3)+' s';q('time').value=time;q('time').disabled=frozen;
   q('coverage').textContent='Empfangene Zielabdeckung: '+received.coverage.length+' / '+program.targets.length;
@@ -125,11 +134,11 @@ async function mount(bridge,payload){
   for(const canvas of [q('camera'),...mosaic.map(m=>m.canvas)]){const ref=canvas.dataset.captureRef;if(ref&&!(captureReceivedAt.get(ref)<=time)){canvas.getContext('2d').clearRect(0,0,canvas.width,canvas.height);canvas.dataset.captureRef='';if(canvas===q('camera'))cameraTick=-Infinity;}}
   const wallNow=performance.now()/1000;
   if(wallNow-cameraTick>=1/payload.camera_presentation.selected_rate_hz){cameraTick=wallNow;const own=received.vehicles[selected]?.perception;
-   if(own){const capture=program.camera_captures[own.camera_ref];q('camera-meta').textContent=selected+' · Aufnahme '+capture.captured_s.toFixed(3)+' s · empfangene synthetische Darstellung';if(q('camera').dataset.captureRef!==own.camera_ref)cameraImage(q('camera'),{...capture,camera_ref:own.camera_ref});}
+   if(own){const capture=program.camera_captures[own.camera_ref];q('camera-meta').textContent=selected+' · Aufnahme '+capture.captured_s.toFixed(3)+' s · empfangene synthetische Darstellung';if(q('camera').dataset.captureRef!==own.camera_ref)cameraImage(q('camera'),{...capture,camera_ref:own.camera_ref,vehicle_id:selected});}
    else{q('camera-meta').textContent='Noch keine empfangene Aufnahme für '+selected;q('camera').getContext('2d').clearRect(0,0,cameraWidth,cameraHeight);q('camera').dataset.captureRef='';}
   }
   if(wallNow-mosaicTick>=1/payload.camera_presentation.mosaic_rate_hz){mosaicTick=wallNow;let next;do{next=mosaic[mosaicIndex++%mosaic.length];}while(next.id===selected);const perception=received.vehicles[next.id]?.perception;
-   if(perception){const capture=program.camera_captures[perception.camera_ref];if(next.canvas.dataset.captureRef!==perception.camera_ref)cameraImage(next.canvas,{...capture,camera_ref:perception.camera_ref});}
+   if(perception){const capture=program.camera_captures[perception.camera_ref];if(next.canvas.dataset.captureRef!==perception.camera_ref)cameraImage(next.canvas,{...capture,camera_ref:perception.camera_ref,vehicle_id:next.id});}
    else{next.canvas.getContext('2d').clearRect(0,0,next.canvas.width,next.canvas.height);next.canvas.dataset.captureRef='';}
   }
   bridge.requestRender();return{received,states,blocked_doors:blocks};
@@ -139,7 +148,18 @@ async function mount(bridge,payload){
  document.addEventListener('visibilitychange',()=>{last=null;});
  function frame(now){try{frozen=blocked().length>0;if(last!==null&&playing&&!frozen&&!document.hidden)time=Math.min(duration,time+(now-last)/1000*factor);last=now;if(time===duration){playing=false;q('play').textContent='Abspielen';}ui();requestAnimationFrame(frame);}catch(error){playing=false;q('status').textContent='BF01-Fehler: '+error.message;panel.dataset.error=error.message;console.error(error);}}
  window.__buildingFleet=Object.freeze({seek:t=>{require(finite(t)&&t>=0&&t<=duration,'Time outside program');require(!blocked().length,'Open route doors before seeking');time=t;return ui();},play:()=>{playing=true;last=null;q('play').textContent='Pause';},pause:()=>{playing=false;q('play').textContent='Abspielen';},follow:id=>{require(models.some(m=>m.id===id),'Unknown vehicle');if(!follow)bridge.beginFollow();selected=id;select.value=id;follow=true;q('follow').textContent='Folgemodus beenden';return ui();},stopFollowing:()=>{follow=false;bridge.endFollow();q('follow').textContent='Fahrzeug folgen';return ui();},get time_s(){return time;},get states(){const lift=liftAt(program,time);return models.map(m=>m.at(time,lift));},get control_room(){return controlRoom(program.received_messages,time);},get frozen(){return frozen;},get instance_count(){return models.length;},get draw_calls(){return renderer.draws;},get renderer_stats(){return renderer.stats;},get ready(){return !panel.dataset.error;},get model_duration_s(){return duration;},get playback_factor(){return factor;},get experimental_preview(){return preview?JSON.parse(JSON.stringify({...preview,at_recorded_end:time===duration})):null;}});
- if(preview){window.__buildingFleet.follow('BF04');window.__buildingFleet.play();}
+ if(payload.presentation?.atrium_monitors){
+  const ids=models.map(m=>'BF01.'+m.id+'.Overview'),owners=new Map(ids.map((id,i)=>[id,models[i].id]));
+  bridge.connectMonitorFeeds({camera_ids:ids,clock:()=>time,frameAt:(id,width,height)=>{
+   const vehicle=owners.get(id),perception=projection.at(time,false).vehicles[vehicle]?.perception;if(!perception)return null;
+   const ref=perception.camera_ref,capture=program.camera_captures[ref],received_s=captureReceivedAt.get(ref);
+   require(capture&&finite(received_s)&&received_s<=time&&capture.captured_s<=time,'Only received historical captures may feed physical monitors');
+   return{canvas:cameraCanvas({...capture,camera_ref:ref,vehicle_id:vehicle},width,height),vehicle_id:vehicle,camera_ref:ref,captured_s:capture.captured_s,received_s,program_time_s:time,level_id:capture.level_id};
+  }});
+  if(payload.presentation.start_stop)bridge.startAt(payload.presentation.start_stop);
+  if(payload.presentation.follow===true)window.__buildingFleet.follow('BF04');
+  if(payload.presentation.autoplay===true)window.__buildingFleet.play();
+ }else if(preview){window.__buildingFleet.follow('BF04');window.__buildingFleet.play();}
  ui();requestAnimationFrame(frame);return hooks;
 }
 return{compileCurve,liftAt,trajectories,controlRoom,ReceivedProjection,targetLabel,stateLabel,receivedLift,validateProgram,validatePreview,mount};

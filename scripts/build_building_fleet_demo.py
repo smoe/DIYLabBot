@@ -39,6 +39,10 @@ BRIDGE=r"""
       return multiply(projection,view);
     }
     const fleetBridge={gl,canvas,stage:stageNode,requestRender,
+      startAt:id=>setStop(id),
+      atMonitorWall:()=>stopId==='camera-wall',
+      connectMonitorFeeds:source=>{if(!monitorWall)throw Error('Source-bound physical monitor wall unavailable');return monitorWall.connectReceivedSource(source);},
+      syncMonitorFeeds:()=>monitorWall?.synchronizeReceivedSource(),
       projectPoint:point=>{const p=projectPoint(point);return{...p,x:p.x/canvas.width,y:p.y/canvas.height};},
       cameraMatrix:fleetCaptureMatrix,clearMovement:clearInputKeys,
       beginFollow:()=>{if(!fleetSavedCamera)fleetSavedCamera={eye:[...eye],yaw,pitch,sceneId,selectedLevel,isolated,location:locationLabel.textContent,context:contextLabel.textContent};clearInputKeys();},
@@ -65,7 +69,7 @@ BRIDGE=r"""
           poses.push([object,object.value,object.state,object.targetState,object.transition]);const initial=object.config.initial_state||object.config.reference_state;
           object.value=object.config.states[initial];object.state=object.targetState=initial;object.transition=null;}
         try{
-          gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);const scene=prepareScene('building');gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,fleetCaptureMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);gl.disable(gl.BLEND);gl.depthMask(true);
+          gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);gl.uniform1i(uniforms.screenEnabled,0);const scene=prepareScene('building');gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,fleetCaptureMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);gl.disable(gl.BLEND);gl.depthMask(true);
           for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id),on=levelsOn?.includes(elevator.displayLevel());gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
           gl.uniform1i(uniforms.emissive,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
           const transparent=scene.transparent.map(group=>{const m=group.object?objectMatrix(group.object):null,p=group.centre,centre=m?[0,1,2].map(i=>m[i]*p[0]+m[i+4]*p[1]+m[i+8]*p[2]+m[i+12]):p;return{group,distance:dot(centre.map((v,i)=>v-eye[i]),centre.map((v,i)=>v-eye[i]))};}).sort((a,b)=>b.distance-a.distance);
@@ -146,7 +150,7 @@ def html_budget(additional_bytes):
             'policy':'Presentation target; exceedance is reported without dropping PVA, received telemetry or captures'}
 
 
-def world_presentation(world_path):
+def world_presentation(world_path,*,include_monitor_overlay=False):
     """Render the checked physical world with the current shared viewer adapter."""
     import build_building_walkthrough as builder
     import walkthrough_world
@@ -159,8 +163,13 @@ def world_presentation(world_path):
            ROOT/'scripts/camera_monitor_wall.js',ROOT/'scripts/monitor_frustum.js',world_path,
            *(native.project_path(path)for path in report['files'].values()))
     pins={str(path.relative_to(ROOT)):native.digest(path)for path in paths}
-    normal=builder.embed_html(builder.TEMPLATE.read_text(encoding='utf-8'),
-                              {**manifest,'scenes':bundle['scenes']})
+    payload={**manifest,'scenes':bundle['scenes']}
+    if include_monitor_overlay:
+        overlay=builder.compile_monitor_overlay(manifest)
+        if overlay is None:raise ValueError('Source-bound physical monitor wall required')
+        payload=builder.attach_monitor_overlay(payload,overlay)
+        pins=builder.merge_pins(pins,overlay['source_files_sha256'])
+    normal=builder.embed_html(builder.TEMPLATE.read_text(encoding='utf-8'),payload)
     native.verify_pins(pins)
     return normal,pins
 

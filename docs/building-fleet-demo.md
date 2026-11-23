@@ -10,9 +10,11 @@ Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte
 
 Der separate Einstieg `bf01/` zeigt eine ausdrücklich **experimentelle
 Teilvorschau** der aufgezeichneten Fahrt von 0 bis 1188,1 s mit allen
-20 Fahrzeugen. Er berechnet keine neue Fahrt im Browser. Die Aufzeichnung
-endet mit unvollständiger Zielabdeckung; ein sichtbarer Hinweis und der
-Endzustand kennzeichnen diese Grenze. Zwei Stationsbesuche sind protokolliert.
+20 Fahrzeugen. Fahren, Warten und Parken folgen der Aufzeichnung; die
+Fahrzeuge sind nicht ständig gleichzeitig in Bewegung. Der Browser berechnet
+keine neue Fahrt. Die Aufzeichnung endet mit unvollständiger Zielabdeckung;
+ein sichtbarer Hinweis und der Endzustand kennzeichnen diese Grenze.
+Zwei Stationsbesuche sind protokolliert.
 Die spätere BF09-Fahrt ist darin noch nicht enthalten; deren Ruckkorrektur
 ist durch die separate vollständige Kurvenregression geprüft.
 
@@ -21,12 +23,28 @@ die Entwicklungsansicht mit begrenzter Funktionsprüfung bereitzustellen.
 Alle 20 aufgezeichneten Trajektorien reichen gemeinsam bis 1188,1 s.
 Originaldaten, Laufzeitquellen und Unterbrechung bleiben unverändert;
 der Darstellungsadapter bindet seine eigenen Quellen separat. Er übernimmt
-die vorhandenen PVA-Knoten, empfangenen Meldungen und Kameraaufnahmen.
+die vorhandenen PVA-Knoten, empfangenen Meldungen und Kamerareferenzen mit
+ihren synthetischen Aufnahmeposen.
 Der normale Rundgang und der strenge Vollprogramm-Builder bleiben erhalten.
 
-Die gesamte BF01-Suite besteht mit 385 erfolgreichen Tests und einem
-separat ausgeführten nativen Fall; alle 22 FreeCAD-Hüllentests bestehen.
-Die Teilvorschau erhält zusätzlich eine begrenzte Browser-Funktionsprüfung.
+Dieselbe BF01-Seite verbindet die bewegten Fahrzeugmodelle mit den 20
+physischen Bildschirmen der [Foyer-Kamerawand](foyer-camera-wall.md#flottenansichten-in-der-experimentellen-bf01-vorschau).
+Die Startbelegung ordnet M01 bis M20 jeweils BF01 bis BF20 zu; die vorhandenen
+Monitor- und Kamera-IDs werden wiederverwendet. Die Bilder entstehen aus den
+gespeicherten Aufnahmeposen der bis dahin empfangenen Kamerareferenzen. Sie
+sind historische synthetische Modellansichten, keine realen Videos. Ohne
+empfangene Referenz bleibt ein Platzhalter. Aufnahmezeit, Empfangszeit und
+Alter in der Wiedergabemodellzeit werden von der Zeit seit der letzten
+Browserbildberechnung unterschieden. Die manuell bedienbare Normalansicht
+bleibt ohne Flottenbindung und behält ihre bisherige Monitorbelegung.
+
+Für den bisherigen Vorschau-Stand bestehen 385 BF01-Tests und ein separat
+ausgeführter nativer Fall sowie alle 22 FreeCAD-Hüllentests. Die neue
+Monitoranbindung ist zusätzlich begrenzt im Browser geprüft: 20 native
+Bildschirmflächen mit zugeordneten Texturen, empfangene Aufnahmen derselben
+Modellzeit, Fahrzeugbewegung, Pause, Rückwärtssuche, Quellenwechsel,
+Fahrwegtürsperre und Aufzeichnungsende. Die Kamerapässe erzeugen weder
+rekursive Monitorbilder noch WebGL-Texturfeedback.
 Dies ist **kein vollständiger Flotten-, Zielabdeckungs-, nativer Bewegungs-
 oder unabhängiger Exportnachweis**. Diese Nachweise bleiben offen; ein
 Entwicklungsfehler in der Vorschau wird nicht als bestandener Lauf behandelt.
@@ -34,13 +52,15 @@ Die lokalen Originale und die Unterbrechungsquittung liegen unter
 `exports/building-fleet/jerk-01c7cff/full-seed-r3/` beziehungsweise
 `full-seed-r3-interruption-r1/` im selben Ausgabeordner.
 
-Die [Foyer-Kamerawand](foyer-camera-wall.md) ergänzt neue Gebäudekörper.
-Die aktiven Gebäude-, Rundgang- und Konnektorpins sind nachgeführt; ältere
-Navigationscaches, Freiraum-, Boden- und Fahrtnachweise qualifizieren diese
-Revision nicht. Der aktuelle Flottennachweis bleibt **unproven**.
-Die separaten BF01-Kameraeinträge enthalten keine Bilder oder Fahrzeugposen.
-Die Eismaschine im Labor 3.016 ist Teil der aktuellen Gebäudegeometrie.
-Für diesen Stand wurde kein neuer Flottennachweis erzeugt.
+Die 60 Körper der Foyer-Kamerawand sind bereits Bestandteil der geprüften
+Welteingabe mit 5788 Körpern. Die Monitoranbindung ergänzt nur die Darstellung;
+Gebäude, Kamera- und Fahrzeugmesh sowie die 216 Laufzeitpins des R3-Standes
+werden unverändert wiederverwendet. Die getrennten Darstellungsquellen werden
+neu gebunden. Historische Berichte bleiben bytegleich erhalten; ältere
+Freiraum-, Boden- und Fahrtnachweise gelten weiterhin nur für ihren jeweiligen
+Quellstand. Der vollständige Flottennachweis bleibt **unproven**.
+Die Eismaschine im Labor 3.016 gehört ebenfalls zur Welteingabe. Die gemeinsame
+Anzeige erzeugt keinen neuen Flotten- oder nativen Gesamtbewegungsnachweis.
 
 Die separate L01-Verbindung wurde am früheren Gebäudestand geprüft. Mit der
 Labormöblierung und den nach außen öffnenden Labortüren sind die Gebäude- und

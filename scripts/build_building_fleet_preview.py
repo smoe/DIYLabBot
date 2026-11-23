@@ -75,7 +75,7 @@ def partial_prefix(program):
 
 
 def build(program_path, failure_path, runtime_start_path, world_path, camera_path,
-          vehicle_mesh_path, output):
+          vehicle_mesh_path, output, *, atrium_monitors=False):
     started = time.monotonic()
     paths = [native.project_path(p) for p in (program_path, failure_path, runtime_start_path,
         world_path, camera_path, vehicle_mesh_path)]
@@ -128,7 +128,12 @@ def build(program_path, failure_path, runtime_start_path, world_path, camera_pat
     payload = {'program_gzip_base64': base64.b64encode(compressed).decode(),
         'vehicle_mesh': vehicle, 'camera_presentation': source['camera_presentation'],
         'program_source_sha256': refs['partial_program']['sha256'], 'experimental_preview': preview}
-    normal, presentation_pins = browser.world_presentation(world_path)
+    presentation = {'atrium_monitors': True, 'start_stop': 'camera-wall',
+        'autoplay': True, 'follow': False} if atrium_monitors else None
+    if presentation is not None:
+        payload['presentation'] = presentation
+    normal, presentation_pins = browser.world_presentation(world_path,
+        include_monitor_overlay=atrium_monitors)
     html = browser.opt_in_html(normal, payload)
     extra = len(html.encode()) - len(normal.encode())
     pins = {**runtime_pins, **presentation_pins, **vehicle['source_files_sha256'],
@@ -148,6 +153,7 @@ def build(program_path, failure_path, runtime_start_path, world_path, camera_pat
     report = {'format': 'solidcraftbot.building-fleet-experimental-preview-build/1',
         'passed': True, 'complete': False, 'browser_checked': False, **QUALIFICATION,
         **refs, 'source_files_sha256': pins, 'experimental_preview': preview,
+        'presentation': presentation,
         'html_sha256': native.digest(output / 'index.html'),
         'normal_html_sha256': hashlib.sha256(normal.encode()).hexdigest(),
         'additional_html_bytes': extra, 'html_budget': browser.html_budget(extra),
@@ -169,9 +175,12 @@ def main():
     parser.add_argument('program')
     for name in ('runtime-failure', 'runtime-source-start', 'world-report', 'camera-report', 'vehicle-mesh', 'output-dir'):
         parser.add_argument('--' + name, required=True)
+    parser.add_argument('--atrium-monitors', action='store_true',
+        help='Show recorded fleet camera views on the existing twenty atrium monitors')
     args = parser.parse_args()
     result = build(args.program, args.runtime_failure, args.runtime_source_start,
-        args.world_report, args.camera_report, args.vehicle_mesh, args.output_dir)
+        args.world_report, args.camera_report, args.vehicle_mesh, args.output_dir,
+        atrium_monitors=args.atrium_monitors)
     print(json.dumps({'format': result['format'], 'recorded_end_s': result['experimental_preview']['recorded_end_s'],
         'html_sha256': result['html_sha256']}), flush=True)
 

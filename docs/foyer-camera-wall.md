@@ -9,7 +9,7 @@ oder Escape kehrt zum Rundgang zurück. Die Belegung gilt für diese Sitzung.
 ## Bilder und fehlende Quellen
 
 Alle Bilder entstehen lokal aus dem Gebäudemodell. Es gibt keine realen
-Videostreams, Aufzeichnungen oder Gerätebedienung. **Modellkamera /
+Videostreams, Videoaufzeichnungen oder Gerätebedienung. **Modellkamera /
 synthetisches Livebild** bezeichnet die vorhandenen Arm-Kameramodelle.
 **Virtuelle Übersicht – keine physische Kamera** bezeichnet einen vorhandenen
 quellgebundenen Geräteblickpunkt. Nur Arm A besitzt die vorhandene
@@ -20,8 +20,9 @@ einschließlich Basislabor-Abzügen und Mikroskop. Racks, Möbel, Büro und Küc
 sind ausgenommen. Eine Gerätequelle allein ist keine aufgestellte Instanz.
 Unklassifizierte Gerätetypen und fehlende Blickpunkte erscheinen als Lücken.
 
-Aktuell sind **25 Ansichten verfügbar**: sechs Armkameras und 19 virtuelle
-Geräteübersichten. Beim Start zeigen die 20 Monitore unterschiedliche Ansichten.
+Im normalen Rundgang sind **25 Ansichten verfügbar**: sechs Armkameras und
+19 virtuelle Geräteübersichten. Beim Start zeigen die 20 Monitore
+unterschiedliche Ansichten.
 Über die Auswahl auf jedem Monitor sind alle 25 erreichbar.
 Für CF01, Spitzensammelstation T01, Waage, Kühlschrank,
 Wasserbad und TapeStation fehlen quellgebundene Blickpunkte. Diese sechs
@@ -37,6 +38,40 @@ Vorhandene Arm-Modellzeit wird separat angezeigt. Veraltete Bilder,
 pausierte Anzeige, fehlende Quellen und Darstellungsfehler unterscheiden
 sich von Gerätestörungen. **Keine Meldungsquelle angebunden** bedeutet
 nicht „keine Störung“.
+
+## Flottenansichten in der experimentellen BF01-Vorschau
+
+Der ausdrücklich gewählte Einstieg `bf01/` verbindet die
+[BF01-Teilvorschau](building-fleet-demo.md#experimentelle-teilvorschau) mit
+denselben 20 physischen Monitoren. Beim Start gehört M01 zu BF01, M02 zu
+BF02 und entsprechend M20 zu BF20. Die vorhandenen Kamera-IDs
+`BF01.BF01.Overview` bis `BF01.BF20.Overview` bleiben erhalten. Der normale
+Rundgang behält seine bisherige Belegung und die Kennzeichnung
+**Flotte nicht angebunden**; er aktiviert keine Fahrzeugfahrt.
+
+Die BF01-Seite spielt die gespeicherten Fahrzeugbahnen gemeinsam mit den
+Monitoransichten bis 1188,1 s ab. Einzelne Fahrzeuge fahren, warten oder
+parken entsprechend der Aufzeichnung; alle 20 müssen nicht gleichzeitig
+in Bewegung sein. Ein Monitor verwendet nur eine bis zur aktuellen
+Wiedergabemodellzeit empfangene Kamerareferenz. Ohne passende Meldung zeigt
+er einen Platzhalter. Beim Zurücksetzen der Zeit verschwinden Referenzen,
+deren Aufnahme oder Empfang noch in der Zukunft liegt.
+
+Das Bild wird aus der gespeicherten synthetischen Aufnahmepose gerendert.
+Es ist keine Videoaufzeichnung und zeigt nicht automatisch die aktuelle
+Fahrzeugpose in der Hauptansicht. `captured_s` bezeichnet die Modellzeit
+der Aufnahme, `received_s` deren erste gespeicherte Zustellung. Das
+Modellbildalter ist die aktuelle Wiedergabemodellzeit abzüglich
+`captured_s`; die Zeit seit Zustellung bezieht sich auf `received_s`.
+Das Meldungsalter im Leitstand verwendet weiterhin den Senderzeitstempel. Eine neue
+Bildberechnung im Browser verjüngt diese Aufnahme nicht. Die Browserzeit
+seit der letzten Bildberechnung bleibt eine getrennte Darstellungsangabe.
+
+Originalbahnen, Meldungen, Aufnahmeposen und das sichtbare Aufzeichnungsende
+bleiben erhalten. Der neue Darstellungsbericht bindet seine Quellen separat;
+die historischen Welt- und Laufberichte werden nicht umgepinnt. Vollständige
+Zielabdeckung, native Gesamtbewegungsprüfung, unabhängige Exportprüfung und
+reale Sicherheitsqualifikation bleiben offen.
 
 ## Quellen und Geometrie
 
@@ -70,8 +105,10 @@ BF01 prüft `world-build-report.json`, `world-manifest.json` und
 die Flottenquelle noch die Kamerawand-Komposition. Die physischen
 Monitorkörper bleiben Teil der Welt. Beim Browserexport werden Rundgang-
 und Flottenpin des Overlays separat geprüft. Ein veralteter Pin bricht den
-Export mit Angabe des betroffenen Bezugs ab. BF01-Einträge im Register
-enthalten ausschließlich abgeleitete Metadaten ohne Fahrzeugpose oder Bild.
+Export mit Angabe des betroffenen Bezugs ab. BF01-Einträge im normalen
+Register enthalten ausschließlich abgeleitete Metadaten ohne Fahrzeugpose
+oder Bild. Erst die ausdrücklich gebundene Teilvorschau ergänzt die
+empfangenen Kamerareferenzen aus dem unveränderten R3-Lauf.
 
 ## Darstellung und Prüfung
 
