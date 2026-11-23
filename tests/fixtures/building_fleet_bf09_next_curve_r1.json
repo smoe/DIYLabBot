@@ -1,0 +1,274 @@
+{
+  "format": "solidcraftbot.building-fleet-motion-regression-input/1",
+  "provenance": {
+    "source_commit": "8492e32",
+    "seed": 20261120,
+    "vehicle": "BF09",
+    "mission_id": "mission-23",
+    "model_time_s": 1466.35,
+    "historical_failure_scalar_jerk_bound_mm_s3": 1103.6884113872482,
+    "historical_failure_cartesian_jerk_bound_mm_s3": 1103.6884112289151,
+    "source_runtime_failure": {
+      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r1/runtime-failure.json",
+      "sha256": "e5d892d9175f139f4b1ff8882e7ada81b517b082c858700054ba42f71f3a167b",
+      "bytes": 25739
+    },
+    "source_partial_program": {
+      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r1/partial-program.json",
+      "sha256": "d409871d238f3cb175cbe2a7fd1f9fc4fe3f23c269c03e54e34b75edc0dec041",
+      "bytes": 200913933
+    },
+    "source_log": {
+      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r1.log",
+      "sha256": "bad23a7ac9f8c6fa99c692b123ab4f1818ffc713a98e4bbb8a7f076094756a07",
+      "bytes": 39223
+    },
+    "reconstruction": "Captured exact own terminal pose and mission-23, source-pinned NavR1, unchanged planner with own admission_deferred state; only required EG endpoints are derived in sorted order and source splice repairs are sealed. Logged count/length/turn match; separate frozen-compiler baseline reproduction remains required.",
+    "qualification": "Reconstructed compiler input only; the rejected new route was never registered or executed. No full-program, native, browser or safety qualification.",
+    "source_capture_fixture_sha256": "82fbbceb70a4b87ffe2bd3bddd86153b688fb6254af668487159c1c23edf5757",
+    "historical_motion_source_sha256": "9092122efbdff2ea1b850f5c18b00a0f5a617183b3096380a1bd97516093c724",
+    "baseline_reproduced_report_sha256": "abadb688464f450b9e0bd94c4f86b3efdda79b8ab4d38fef7fe197ddcf73babf"
+  },
+  "points_mm": [
+    [
+      14700.0,
+      21799.999999999967
+    ],
+    [
+      14700.0,
+      22870.772793294684
+    ],
+    [
+      11275.0,
+      22475.0
+    ],
+    [
+      10975.0,
+      22025.0
+    ],
+    [
+      11133.844908047173,
+      20118.86110343392
+    ],
+    [
+      11225.0,
+      19025.0
+    ],
+    [
+      13896.875,
+      17600.0
+    ],
+    [
+      14225.0,
+      17425.0
+    ],
+    [
+      14475.0,
+      16825.0
+    ],
+    [
+      14375.0,
+      16325.0
+    ],
+    [
+      14075.0,
+      16025.0
+    ],
+    [
+      13925.0,
+      15975.0
+    ],
+    [
+      14375.0,
+      15425.0
+    ],
+    [
+      14109.45945945946,
+      14805.405405405405
+    ],
+    [
+      12725.0,
+      11575.0
+    ],
+    [
+      12709.07797395982,
+      10157.939682423996
+    ],
+    [
+      12678.476075269282,
+      7434.370698966148
+    ],
+    [
+      12675.0,
+      7125.0
+    ],
+    [
+      13225.0,
+      6575.0
+    ],
+    [
+      13475.0,
+      6325.0
+    ],
+    [
+      13625.0,
+      3225.0
+    ],
+    [
+      13125.0,
+      1317.4529520168148
+    ],
+    [
+      13532.547047983186,
+      1317.4529520168148
+    ],
+    [
+      13532.547047983186,
+      2132.547047983185
+    ],
+    [
+      12717.452952016814,
+      2132.547047983185
+    ],
+    [
+      12717.452952016814,
+      1317.4529520168148
+    ],
+    [
+      13125.0,
+      1317.4529520168148
+    ],
+    [
+      13625.0,
+      3225.0
+    ],
+    [
+      13475.0,
+      6325.0
+    ],
+    [
+      13225.0,
+      6575.0
+    ],
+    [
+      12675.0,
+      7125.0
+    ],
+    [
+      12678.476075269282,
+      7434.370698966149
+    ],
+    [
+      12709.07797395982,
+      10157.939682423996
+    ],
+    [
+      12725.0,
+      11575.0
+    ],
+    [
+      14109.45945945946,
+      14805.405405405405
+    ],
+    [
+      14375.0,
+      15425.0
+    ],
+    [
+      13925.0,
+      15975.0
+    ],
+    [
+      14075.0,
+      16025.0
+    ],
+    [
+      14425.0,
+      16375.0
+    ],
+    [
+      14475.0,
+      16925.0
+    ],
+    [
+      14175.0,
+      17475.0
+    ],
+    [
+      13929.310344827587,
+      17600.0
+    ],
+    [
+      11325.0,
+      18925.0
+    ],
+    [
+      11025.0,
+      20125.0
+    ],
+    [
+      11025.570633209069,
+      20125.855949813602
+    ],
+    [
+      11325.0,
+      20575.0
+    ],
+    [
+      14700.0,
+      20729.227206705316
+    ],
+    [
+      14700.0,
+      21800.0
+    ]
+  ],
+  "corner_trim_mm": 250,
+  "reverse": false,
+  "zone_caps": [
+    [
+      0.0,
+      300
+    ],
+    [
+      7572.245888098856,
+      1000
+    ],
+    [
+      14589.338203719393,
+      300
+    ],
+    [
+      20492.084651968642,
+      1000
+    ],
+    [
+      22366.145258012133,
+      300
+    ],
+    [
+      40043.391792106886,
+      1000
+    ],
+    [
+      41917.45239815038,
+      300
+    ],
+    [
+      47820.19884639963,
+      1000
+    ],
+    [
+      54847.57654408284,
+      300
+    ],
+    [
+      60410.36748069986,
+      1000
+    ]
+  ],
+  "shape": {
+    "polyline_length_mm": 58842.170925576516,
+    "maximum_turn_deg": 110.85445803957835
+  }
+}

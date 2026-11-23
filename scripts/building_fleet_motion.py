@@ -300,6 +300,59 @@ def episode_dynamics(curve,radius):
     return result
 
 
+def _merged_motion_clock(points,coasts):
+    """Remove a sub-tick coast's two unnecessary interior jerk switches.
+
+    A sub-tick constant-speed coast has two identical velocity/acceleration
+    states. Retain its midpoint as one C2 transit state instead of fitting
+    across both jerk switches inside a single export interval. Distances and
+    the functional endpoint states are retained. The final polynomials still
+    need their complete monotonicity and dynamics checks.
+    """
+    nodes=[];merges=[];index=0
+    while index<len(points):
+        end=index
+        while 0<index and end<len(points)-2 and end in coasts:
+            left,right=points[end:end+2]
+            if (coasts[end]>=.001 or right['time_s']-points[index]['time_s']>=.001 or left[F[1]]!=right[F[1]]
+                    or left[F[1]][0]<=0 or left[F[2]]!=right[F[2]]or left[F[2]]!=[0.]):break
+            dt=right['time_s']-left['time_s'];ds=right[F[0]][0]-left[F[0]][0]
+            expected=left[F[1]][0]*dt
+            # The original coast is explicit, but equal endpoint jets alone
+            # do not prove it. Enclose binary64 accumulated-time/distance
+            # subtraction and the velocity product before merging its knots.
+            tolerance=8*(math.ulp(left[F[0]][0])+math.ulp(right[F[0]][0])+
+                abs(left[F[1]][0])*(math.ulp(left['time_s'])+math.ulp(right['time_s']))+
+                math.ulp(expected)+math.ulp(ds))
+            if dt<=0 or ds<=0 or abs(ds-expected)>tolerance:
+                raise ValueError('Declared constant coast does not match its distance/time jets')
+            end+=1
+        if end>index:
+            left,right=points[index],points[end]
+            merged=local.point((left['time_s']+right['time_s'])/2,
+                (left[F[0]][0]+right[F[0]][0])/2,left[F[1]][0],0.)
+            nodes.append(merged)
+            merges.append({'start_s':left['time_s'],'end_s':right['time_s'],
+                'start_progress_mm':left[F[0]][0],'end_progress_mm':right[F[0]][0],
+                'velocity_mm_s':left[F[1]][0],'time_s':merged['time_s'],
+                'progress_mm':merged[F[0]][0],'coast_intervals':end-index})
+        else:nodes.append(copy.deepcopy(points[index]))
+        index=end+1
+    result=floor.motion.Curve(nodes);result._bf01_coast_merges=merges;return result
+
+
+def _grid_motion_clock(proposal):
+    """Transport each scalar jet with its event before the common C2 refit."""
+    points=[];previous=-1
+    for index,node in enumerate(proposal.points):
+        tick=(math.ceil(node['time_s']*1000)if index==len(proposal.points)-1
+              else math.floor(node['time_s']*1000+.5))
+        tick=max(previous+1,tick);previous=tick;t=tick/1000;dt=t-node['time_s']
+        s,v,a=[node[f][0]for f in F[:3]]
+        points.append(local.point(t,s+v*dt+.5*a*dt*dt,v+a*dt,a))
+    return floor.motion.Curve(points)
+
+
 def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=(), *, _piece_factors=None, _attempt=0):
     """Fast straights and bounded corners on one uninterrupted C2 route.
 
@@ -343,7 +396,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                     weight=right-left;d=[(y[k]-x[k])/weight for k in range(3)]
                     pieces.append({'controls':[x,y],'weight':weight,'derivatives':[[d],[[0.,0.,0.]],[[0.,0.,0.]],[[0.,0.,0.]]]})
             offset=finish
-    piece_caps=[]; proofs=[];progress=0.
+    piece_caps=[];piece_limits=[];proofs=[];progress=0.
 
     for piece in pieces:
         proof=spatial_bounds(piece);proofs.append(proof);limit=zone_at(progress)
@@ -354,7 +407,15 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             for kind,limits in (('linear',linear),('angular',angular)):
                 bound=proof[kind][order-1]
                 if bound>1e-12:limit=min(limit,(limits[key]/bound)**(1/order))
-        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*(_piece_factors or {}).get(len(piece_caps),1.))
+        factor=(_piece_factors or {}).get(len(piece_caps),1.)
+        if type(factor)not in(int,float)or not math.isfinite(factor)or not 0<factor<=1:
+            raise ValueError('Local timing refinement factors must be finite in (0, 1]')
+        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*factor)
+        # A local time dilation must reduce all derivative orders coherently.
+        # Reducing only the peak speed would still regenerate ramps at full
+        # acceleration/jerk and can preserve the rejected quantization spike.
+        piece_limits.append({key:linear[key]*factor**order
+            for order,key in enumerate(('velocity','acceleration','jerk'),1)})
     # Constant corner progress speeds match both neighbouring line endpoints.
     # A short line must be able to connect those speeds; reduce adjacent corner
     # speeds when needed, never insert a waypoint halt.
@@ -371,7 +432,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
         nodes=node_speeds();changed=False
         for i,piece in enumerate(pieces):
             if len(piece['controls'])>2:continue
-            ramp=transition(nodes[i],0,nodes[i+1],linear)if abs(nodes[i]-nodes[i+1])>1e-8 else None
+            ramp=transition(nodes[i],0,nodes[i+1],piece_limits[i])if abs(nodes[i]-nodes[i+1])>1e-8 else None
             distance=ramp.points[-1][F[0]][0]if ramp else 0.
             if distance>piece['weight']:
                 for j in (i-1,i,i+1):
@@ -379,7 +440,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                 changed=True
         if not changed:break
     else:raise RuntimeError('No continuous speed connection on short geometric line')
-    clock_points=[local.point(0,0,0,0)]; time=distance=0.; intervals=[]
+    clock_points=[local.point(0,0,0,0)]; time=distance=0.; intervals=[];coasts={}
     def append_curve(curve):
         nonlocal time,distance
         if curve is None:return
@@ -395,6 +456,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
         # Length stays exact. Quantizing the duration changes the constant
         # speed; adjacent ramp endpoints must therefore use the same speed.
         duration=length/speed
+        coasts[len(clock_points)-1]=duration
         append_curve(floor.motion.Curve([local.point(0,0,speed,0),local.point(duration,length,speed,0)]))
     # Construct the analytic clock first; quantization applies to the final
     # Cartesian evaluation at those rounded times, preserving the jets.
@@ -405,8 +467,8 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             coast(length,v0)
         else:
             def ramps(peak):
-                up=transition(v0,0,peak,linear)if abs(peak-v0)>1e-8 else None
-                down=transition(peak,0,v1,linear)if abs(peak-v1)>1e-8 else None
+                up=transition(v0,0,peak,piece_limits[i])if abs(peak-v0)>1e-8 else None
+                down=transition(peak,0,v1,piece_limits[i])if abs(peak-v1)>1e-8 else None
                 used=sum(c.points[-1][F[0]][0]for c in (up,down)if c)
                 return used,up,down
             lo,hi=max(v0,v1),piece_caps[i]
@@ -417,9 +479,12 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                 else:hi=mid
             used,up,down=ramps(lo);append_curve(up);coast(max(0,length-used),lo);append_curve(down)
         if abs(distance-before-length)>1e-5:raise RuntimeError('Clock geometry length mismatch')
-    clock=floor.motion.Curve(clock_points)
+    proposal=_merged_motion_clock(clock_points,coasts)
+    merges=proposal._bf01_coast_merges;analytical_end=proposal.times[-1]
+    proposal=_grid_motion_clock(proposal);clock=proposal
     # Retain every clock event and sample only the curved geometry additionally.
     times={0.,clock.times[-1],*clock.times}
+    times.update(k*.05 for k in range(1,math.ceil(clock.times[-1]/.05)))
     offset=0.
     for piece in pieces:
         if len(piece['controls'])>2:
@@ -432,13 +497,41 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                     else:hi=mid
                 times.add((lo+hi)/2)
         offset+=piece['weight']
-    # Match the reference clock's endpoint before evaluating jets on a 1ms
-    # grid; the last tiny extension is handled by endpoint evaluation.
+    # Refit the actual scalar clock on the export grid first. Its functional
+    # end is part of that refit, rather than a Cartesian extension of an older
+    # clock. Cartesian jets and the follower then share these exact nodes.
     ordered=sorted({round(t*1000)/1000 for t in times})
-    ordered[0]=0.;ordered[-1]=math.ceil(clock.times[-1]*1000)/1000
-    points=[];last_yaw=None
+    ordered[0]=0.;ordered[-1]=math.ceil(proposal.times[-1]*1000)/1000
+    scalar_points=[]
     for t in ordered:
-        scalar=clock.evaluate(min(t,clock.times[-1]));pose,v,a=path.pva(*[scalar[f][0]for f in F[:3]])
+        jet=proposal.points[-1]if t==ordered[-1]else proposal.evaluate(t)
+        scalar_points.append(local.point(t,*[jet[f][0]for f in F[:3]]))
+    clock=floor.motion.Curve(scalar_points)
+    # The follower observes source geometry/zone crossings on this same grid.
+    # Include both neighbouring ticks so its later rounded crossing cannot
+    # create an unverified extra Cartesian interpolation interval.
+    events={*path.ends,*[at for at,_ in zone_caps]};event_times=set(clock.times)
+    for goal in events:
+        if not 0<goal<path.length:continue
+        lo,hi=0.,clock.times[-1]
+        for _ in range(50):
+            middle=(lo+hi)/2
+            if clock.evaluate(middle)[F[0]][0]<goal:lo=middle
+            else:hi=middle
+        crossing=(lo+hi)/2
+        event_times.update(t/1000 for t in(math.floor(crossing*1000),math.ceil(crossing*1000)))
+    scalar_points=[]
+    for t in sorted(event_times):
+        jet=clock.points[-1]if t==clock.times[-1]else clock.evaluate(t)
+        scalar_points.append(local.point(t,*[jet[f][0]for f in F[:3]]))
+    clock=floor.motion.Curve(scalar_points)
+    scalar_bounds=floor.motion.bounds(clock)
+    scalar_no_stop=floor.no_stop(floor.motion.Curve([
+        {'time_s':p['time_s'],**{field:[p[field][0],0.,0.]for field in F[:3]}}for p in clock.points]))
+    points=[];scalar_points=clock.points;last_yaw=None
+    for scalar in clock.points:
+        t=scalar['time_s']
+        pose,v,a=path.pva(*[scalar[f][0]for f in F[:3]])
         if reverse:pose[2]+=math.pi
         if last_yaw is not None:pose[2]=last_yaw+(pose[2]-last_yaw+math.pi)%(2*math.pi)-math.pi
         last_yaw=pose[2]
@@ -446,6 +539,11 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
     curve=floor.motion.Curve(floor.canonical(points));bounds=episode_dynamics(curve,radius)
     no_stop=floor.no_stop(curve)
     violations={}
+    for key,field in zip(('velocity','acceleration','jerk'),F[1:]):
+        value=scalar_bounds[field]['max_abs'][0]
+        if value>declared[key]*(1+1e-6):violations['scalar.'+key]={'value':value,'limit':declared[key]}
+    if scalar_bounds[F[1]]['min'][0]<-1e-8:
+        violations['scalar.monotonicity']={'value':scalar_bounds[F[1]]['min'][0],'limit':0}
     for kind,limit in (('linear',declared),('angular',angular)):
         for key,value in bounds[kind].items():
             cap=min(declared['velocity'],zone_velocity_mm_s or declared['velocity']) if kind=='linear'and key=='velocity'else limit[key]
@@ -474,7 +572,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                 speed=math.hypot(*(max(abs(raw['min'][k]),abs(raw['max'][k]))for k in range(2)))
                 if speed>cap*(1+1e-6):violations['zone@'+str(begin)]={'value':speed,'limit':cap}
                 zone_proofs.append({'start_s':begin,'end_s':end,'cap_mm_s':cap,'speed_upper_mm_s':speed})
-    if violations and no_stop['passed'] and _attempt<8:
+    if violations and no_stop['passed'] and scalar_no_stop['passed'] and _attempt<8:
         # The fitted quantized polynomials are the authority. Tight turns can
         # need lower local speeds than the analytic spatial proposal. Refine
         # only the offending pieces (and adjoining corners), preserving fast
@@ -487,6 +585,11 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             for kind,limits in (('linear',declared),('angular',angular)):
                 for key,cap in limits.items():
                     if bound[kind][key]>cap*(1+1e-6):scale=min(scale,.98*(cap/bound[kind][key])**(1/orders[key]))
+            if any(key.startswith('scalar.')for key in violations):
+                for key in ('velocity','acceleration','jerk'):
+                    local_bound=interval_extrema(clock,a['time_s']-start_s,b['time_s']-start_s,orders[key])
+                    value=max(abs(local_bound['min'][0]),abs(local_bound['max'][0]))
+                    if value>declared[key]*(1+1e-6):scale=min(scale,.98*(declared[key]/value)**(1/orders[key]))
             if scale>=1:continue
             middle=(a['time_s']+b['time_s'])/2-start_s
             progress=clock.evaluate(min(middle,clock.times[-1]))[F[0]][0]
@@ -499,11 +602,18 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                                   _piece_factors=factors,_attempt=_attempt+1)
             report['timing'].setdefault('quantization_refinements',{str(i):v for i,v in factors.items()})
             return report
-    if violations or not no_stop['passed']:
-        raise RuntimeError('Final quantized motion rejected: '+str({'limits':violations,'no_stop':no_stop}))
-    result={'points':points,'scalar_clock':clock.points,'duration_s':points[-1]['time_s']-start_s,'dynamics':bounds,'no_stop':no_stop,
+    if violations or not no_stop['passed']or not scalar_no_stop['passed']:
+        raise RuntimeError('Final quantized motion rejected: '+str({'limits':violations,'no_stop':no_stop,'scalar_no_stop':scalar_no_stop}))
+    result={'points':points,'scalar_clock':scalar_points,'duration_s':points[-1]['time_s']-start_s,'dynamics':bounds,'no_stop':no_stop,
             'perception_limit':perception,'piece_caps_mm_s':piece_caps,'spatial_interval_bounds':proofs,
-            'timing':{'family':'constant corner speed; fastest admissible straight cubic-velocity ramps in the selected family',
-                      'global_time_optimality_proved':False,'time_quantum_s':.001,'playback_factor':1}}
+            'timing':{'family':'constant corner/cubic-velocity straight proposal; jointly checked quantized C2 scalar and Cartesian refit',
+                      'global_time_optimality_proved':False,'time_quantum_s':.001,'playback_factor':1,
+                      'analytical_proposal_duration_s':analytical_end,
+                      'subtick_coast_merges':merges,'scalar_no_stop':scalar_no_stop,
+                      'scalar_velocity_min_mm_s':scalar_bounds[F[1]]['min'][0],
+                      'local_refinement_rule':'piece speed f, ramp acceleration f^2 and jerk f^3; all final source limits unchanged',
+                      'refined_piece_limits':{str(i):{'factor':factor,'scalar_limits':piece_limits[i]}
+                          for i,factor in (_piece_factors or {}).items()},
+                      'scalar_dynamics':{key:scalar_bounds[field]['max_abs'][0]for key,field in zip(('velocity','acceleration','jerk'),F[1:])}}}
     if zone_caps:result['zone_bounds']=zone_proofs
     return result

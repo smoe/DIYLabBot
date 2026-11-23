@@ -105,6 +105,15 @@ def qualified_perception_limit(sensor_values,limit_values,radius,localization):
            'global_maximum_proved':False,'hardware_qualified':False}
 
 
+def source_perception_limit(source,radius):
+    """Share one quantized-stop perception cap with the own motion compiler."""
+    linear=source['motion']['empty_linear_limits']
+    limits=dict(zip(('velocity','acceleration','jerk'),
+        (linear['velocity_mm_s'],linear['acceleration_mm_s2'],linear['jerk_mm_s3'])))
+    return copy.deepcopy(qualified_perception_limit(tuple(sorted(resolved_sensor(source).items())),
+        tuple(sorted(limits.items())),radius,source['geometry']['localization_tolerance_mm']))
+
+
 
 
 class Controller(local.LocalController):
@@ -129,7 +138,7 @@ class Controller(local.LocalController):
         limits = dict(zip(('velocity','acceleration','jerk'),
                           (linear['velocity_mm_s'],linear['acceleration_mm_s2'],linear['jerk_mm_s3'])))
         cfg = resolved_sensor(source)
-        self.perception_limit=copy.deepcopy(qualified_perception_limit(tuple(sorted(cfg.items())),tuple(sorted(limits.items())),self.radius,source['geometry']['localization_tolerance_mm']))
+        self.perception_limit=source_perception_limit(source,self.radius)
         cfg['desired_speed_mm_s']=self.perception_limit['applied_velocity_mm_s']
         self.zone_caps = sorted(zone_caps)
         self.angular = reference(source,'angular_profile')['limits']['angular']
@@ -144,7 +153,7 @@ class Controller(local.LocalController):
         zone_values=[min(cfg['desired_speed_mm_s'],cap)for _,cap in self.zone_caps]
         if not self.zone_caps or self.zone_caps[0][0]>0:zone_values.append(cfg['desired_speed_mm_s'])
         self.zone_velocity_cap=max(zone_values)
-        program=compile_motion(path,source,zone_caps=self.zone_caps)if motion_program is None else copy.deepcopy(motion_program)
+        program=compile_motion(path,source,cfg['desired_speed_mm_s'],zone_caps=self.zone_caps)if motion_program is None else copy.deepcopy(motion_program)
         allowed={'points','scalar_clock','duration_s','dynamics','no_stop','perception_limit','piece_caps_mm_s','spatial_interval_bounds','timing','zone_bounds'}
         if type(program)is not dict or not {'points','scalar_clock'}<=set(program)or set(program)-allowed:raise ValueError('Only an own compiled motion program is accepted')
         self.nominal_clock=floor.motion.Curve(program['scalar_clock'])

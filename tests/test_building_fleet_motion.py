@@ -81,7 +81,8 @@ class MotionTests(unittest.TestCase):
         self.assertLessEqual(result['dynamics']['linear']['jerk'],1000.001)
         self.assertGreater(result['dynamics']['linear']['velocity'],295)
         self.assertTrue(result['no_stop']['passed'])
-        self.assertTrue(result['timing']['quantization_refinements'])
+        self.assertTrue(all(abs(p['time_s']*1000-round(p['time_s']*1000))<1e-7
+                            for p in result['scalar_clock']))
 
     def test_windowed_extrema_preserve_all_orders_and_both_knot_sides(self):
         rng=random.Random(20261121);F=motion.F
