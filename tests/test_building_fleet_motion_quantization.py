@@ -103,5 +103,44 @@ class QuantizedMotionTests(unittest.TestCase):
             self.assertAlmostEqual(bounds[F[2]]['min'][0],acceleration,places=6)
             self.assertAlmostEqual(bounds[F[2]]['max'][0],acceleration,places=6)
 
+    def test_bf09_successor_refines_all_derivative_orders_and_follower_needs_no_dilation(self):
+        fixture=json.loads((Path(__file__).parent/'fixtures/building_fleet_bf09_next_curve_r1.json').read_text())
+        path=motion.Path(fixture['points_mm'],fixture['corner_trim_mm']);F=motion.F
+        result=motion.compile_motion(path,self.source,self.cap,zone_caps=fixture['zone_caps'],reverse=fixture['reverse'])
+        scalar=motion.floor.motion.Curve(result['scalar_clock']);scalar_bounds=motion.floor.motion.bounds(scalar)
+        curve=motion.floor.motion.Curve(motion.floor.canonical(result['points']))
+        actual=motion.episode_dynamics(curve,vehicle_envelope()['radius_mm'])
+        source_limits=self.source['motion']['empty_linear_limits']
+        linear=dict(zip(('velocity','acceleration','jerk'),
+            (source_limits['velocity_mm_s'],source_limits['acceleration_mm_s2'],source_limits['jerk_mm_s3'])))
+        angular=model.reference(self.source,'angular_profile')['limits']['angular']
+        for kind,caps in(('linear',linear),('angular',angular)):
+            for name,value in actual[kind].items():self.assertLessEqual(value,caps[name]*(1+1e-6))
+        for name,field in zip(linear,F[1:]):self.assertLessEqual(scalar_bounds[field]['max_abs'][0],linear[name]*(1+1e-6))
+        self.assertGreaterEqual(scalar_bounds[F[1]]['min'][0],-1e-8)
+        padded=motion.floor.motion.Curve([{'time_s':p['time_s'],
+            **{field:[p[field][0],0.,0.]for field in F[:3]}}for p in scalar.points])
+        self.assertTrue(motion.floor.no_stop(curve)['passed'])
+        self.assertTrue(motion.floor.no_stop(padded)['passed'])
+        self.assertGreater(actual['linear']['velocity'],self.cap*.95)
+        self.assertAlmostEqual(scalar.points[-1][F[0]][0],path.length,places=7)
+        for p in(scalar.points[0],scalar.points[-1]):self.assertEqual([p[f]for f in F[1:3]],[[0.],[0.]])
+        utilization=model.reference(self.source,'sensor')['controller']['motion_limit_utilization']
+        refined=result['timing']['refined_piece_limits'];self.assertTrue(refined)
+        for record in refined.values():
+            factor=record['factor'];self.assertGreater(factor,0);self.assertLessEqual(factor,1)
+            for order,name in enumerate(('velocity','acceleration','jerk'),1):
+                self.assertEqual(record['scalar_limits'][name],linear[name]*utilization*factor**order)
+        driver=Controller(path,self.source,fixture['zone_caps'],motion_program=result)
+        self.assertEqual(driver.nominal_clock_proof['dilation'],1.)
+        self.assertEqual(driver.nominal_clock.times[-1],result['duration_s'])
+        self.assertAlmostEqual(driver.nominal_clock.points[-1][F[0]][0],path.length,places=7)
+
+    def test_local_refinement_cannot_raise_the_planning_limits(self):
+        for factor in(True,0.,-1.,1.01,float('inf'),float('nan')):
+            with self.subTest(factor=factor):
+                with self.assertRaises(ValueError):
+                    motion.compile_motion(motion.Path([[0,0],[1000,0]]),self.source,_piece_factors={0:factor})
+
 
 if __name__=='__main__':unittest.main()

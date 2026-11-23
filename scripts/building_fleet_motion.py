@@ -396,7 +396,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                     weight=right-left;d=[(y[k]-x[k])/weight for k in range(3)]
                     pieces.append({'controls':[x,y],'weight':weight,'derivatives':[[d],[[0.,0.,0.]],[[0.,0.,0.]],[[0.,0.,0.]]]})
             offset=finish
-    piece_caps=[]; proofs=[];progress=0.
+    piece_caps=[];piece_limits=[];proofs=[];progress=0.
 
     for piece in pieces:
         proof=spatial_bounds(piece);proofs.append(proof);limit=zone_at(progress)
@@ -407,7 +407,15 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             for kind,limits in (('linear',linear),('angular',angular)):
                 bound=proof[kind][order-1]
                 if bound>1e-12:limit=min(limit,(limits[key]/bound)**(1/order))
-        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*(_piece_factors or {}).get(len(piece_caps),1.))
+        factor=(_piece_factors or {}).get(len(piece_caps),1.)
+        if type(factor)not in(int,float)or not math.isfinite(factor)or not 0<factor<=1:
+            raise ValueError('Local timing refinement factors must be finite in (0, 1]')
+        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*factor)
+        # A local time dilation must reduce all derivative orders coherently.
+        # Reducing only the peak speed would still regenerate ramps at full
+        # acceleration/jerk and can preserve the rejected quantization spike.
+        piece_limits.append({key:linear[key]*factor**order
+            for order,key in enumerate(('velocity','acceleration','jerk'),1)})
     # Constant corner progress speeds match both neighbouring line endpoints.
     # A short line must be able to connect those speeds; reduce adjacent corner
     # speeds when needed, never insert a waypoint halt.
@@ -424,7 +432,7 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
         nodes=node_speeds();changed=False
         for i,piece in enumerate(pieces):
             if len(piece['controls'])>2:continue
-            ramp=transition(nodes[i],0,nodes[i+1],linear)if abs(nodes[i]-nodes[i+1])>1e-8 else None
+            ramp=transition(nodes[i],0,nodes[i+1],piece_limits[i])if abs(nodes[i]-nodes[i+1])>1e-8 else None
             distance=ramp.points[-1][F[0]][0]if ramp else 0.
             if distance>piece['weight']:
                 for j in (i-1,i,i+1):
@@ -459,8 +467,8 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             coast(length,v0)
         else:
             def ramps(peak):
-                up=transition(v0,0,peak,linear)if abs(peak-v0)>1e-8 else None
-                down=transition(peak,0,v1,linear)if abs(peak-v1)>1e-8 else None
+                up=transition(v0,0,peak,piece_limits[i])if abs(peak-v0)>1e-8 else None
+                down=transition(peak,0,v1,piece_limits[i])if abs(peak-v1)>1e-8 else None
                 used=sum(c.points[-1][F[0]][0]for c in (up,down)if c)
                 return used,up,down
             lo,hi=max(v0,v1),piece_caps[i]
@@ -603,6 +611,9 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                       'analytical_proposal_duration_s':analytical_end,
                       'subtick_coast_merges':merges,'scalar_no_stop':scalar_no_stop,
                       'scalar_velocity_min_mm_s':scalar_bounds[F[1]]['min'][0],
+                      'local_refinement_rule':'piece speed f, ramp acceleration f^2 and jerk f^3; all final source limits unchanged',
+                      'refined_piece_limits':{str(i):{'factor':factor,'scalar_limits':piece_limits[i]}
+                          for i,factor in (_piece_factors or {}).items()},
                       'scalar_dynamics':{key:scalar_bounds[field]['max_abs'][0]for key,field in zip(('velocity','acceleration','jerk'),F[1:])}}}
     if zone_caps:result['zone_bounds']=zone_proofs
     return result

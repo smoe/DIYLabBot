@@ -179,6 +179,10 @@ aus diesem Stand. Der unveränderte Nav-R1-Cache bleibt die Eingabe
 für Katalog und anschließenden Vollversuch. Alle 22 nativen Hüllentests
 bestehen. Der normale Browserrundgang, seine Büro–Labor–Aufzug-Route
 und das gehende Ein-/Aussteigen an allen fünf Geschossen sind geprüft.
+Der Fünf-Geschoss-Gehversuch schließt vorher ausdrücklich die große
+Kellertür `KG.DK015.Door`, deren offenes Blatt in die Kabine reicht;
+er belegt diese Testaufstellung. Die Büro–Labor–EG-Route benötigt
+diese Keller-Vorbereitung nicht.
 Der Aufzug-Gehprüfer pausiert seinen kontrollierten Testtakt jetzt
 ausdrücklich, damit zwischen Browserabfragen keine unbeabsichtigte
 zusätzliche Modellzeit verstreicht; die Produktionskollision bleibt
@@ -199,6 +203,58 @@ angeforderte Veröffentlichung ist eine separate Opt-in-Seite `bf01/`
 mit Rücklink zum normalen Rundgang vorbereitet. Der normale Rundgang
 aktiviert weiterhin keine Flotte. Der Präsentationsadapter pinnt auch
 das seit dem aktuellen Master konsumierte Seminar-Projektionsskript.
+
+#### Vollversuch nach der BF04-Korrektur
+
+Der auf `8492e32` eingefrorene Versuch
+`exports/building-fleet/jerk-01c7cff/full-seed-r1/` verwendet Seed
+`20261120` und unveränderte Grenzwerte. Alle 20 ersten nominalen
+Fahrkurven wurden akzeptiert. Die zuvor fehlerhafte nächste BF04-Kurve
+startete bei 563,55 s; auch die anschließende BF06-Kurve startete.
+
+Bei 1466,35 s wurde die nächste BF09-Kurve vor Registrierung und
+Ausführung verworfen. Nach acht lokalen Nachskalierungen beträgt ihre
+skalare Ruckobergrenze 1103,6884113872482 mm/s³ und die räumliche
+1103,6884112289151 mm/s³, jeweils bei erlaubten 1000 mm/s³.
+Beide Kein-Halt-Prüfungen bestehen. Die eigenständige Rekonstruktion
+aus dem tatsächlichen BF09-Endhalt, Mission 23 und den unveränderten
+Quellen ergibt die protokollierten 48 Punkte, 58842,170925576516 mm
+und 110,85445803957835° größten Richtungswechsel.
+
+Der Versuch endete regulär nach 9000,767 s CLI-Zeit, davon 8877,876 s
+Laufzeitphase. Drei Pflichtziele sind besucht; die endgültige Heimkehr
+ist noch nicht erreicht. Der geschlossene `/2`-Trace enthält 293280
+Scans, 586445 Entscheidungen, 55534 Stoppkurven und 22 eigene Pfade.
+Eine getrennte Prüfung bestätigt Gzip-CRC, Abschluss und Originalzähler;
+sie ist keine vollständige Entscheidungsnachprüfung. Alle 218 beim
+Fehlerabgleich erfassten Pins und die Fehlerartefakte sind unverändert.
+Die lokalen Berichte liegen unter `bf09-full-seed-r1-capture-r1/` und
+`bf09-full-seed-r1-analysis-r1/` im selben Ausgabeordner. Dieser Versuch
+liefert keinen vollständigen Native-, Export- oder Browsernachweis.
+
+#### Örtliche Nachkorrektur der BF09-Kurve
+
+Der unveränderte Compiler reproduziert beide BF09-Ruckwerte bitgleich.
+Im betroffenen geraden Stück senkte die bisherige Nachkorrektur nur
+die Geschwindigkeitskappe. Die Übergänge wurden weiterhin mit den vollen
+Planungsgrenzen von 490 mm/s² und 980 mm/s³ erzeugt, auch nach acht
+Nachkorrekturen. Ihre Ruckspitze blieb dadurch erhalten.
+
+Ein örtlicher Faktor `f` begrenzt jetzt die Geschwindigkeit mit `f`,
+die geplante Rampenbeschleunigung mit `f²` und den Rampenruck mit `f³`.
+Dies gilt sowohl für die Machbarkeitsprüfung kurzer Geraden als auch
+für ihre tatsächlichen Beschleunigungs- und Bremsrampen. Die endgültige
+Millisekundenkurve wird weiterhin vollständig geprüft; weder die
+deklarierten Grenzwerte noch die acht erlaubten Nachkorrekturen ändern sich.
+Die Metadaten benennen die örtlichen Planungsgrenzen. Eine exakte
+nachträgliche Zeitumparametrisierung wird damit nicht behauptet.
+
+Die konkrete BF09-Regression besteht mit 607,898 s Dauer, einer skalaren
+Ruckobergrenze von 987,239892713 mm/s³ und einer räumlichen von
+987,239894654 mm/s³. Ihre Spitzengeschwindigkeit bleibt bei
+511,235286 mm/s; der echte Fahrzeugregler benötigt keine zusätzliche
+Zeitstreckung. Alle 18 Bewegungstests einschließlich BF04 und BF09
+bestehen. Der vollständige Seed-Lauf bleibt separat erforderlich.
 
 ### Folgeschrittnachweis auf dem Stand `f1eb858`
 
