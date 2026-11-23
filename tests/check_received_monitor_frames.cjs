@@ -29,6 +29,7 @@ let now=10,delivered=true,future=false;
 const image=new Element('canvas');image.getContext('2d').fillRect();
 value.connectReceivedSource({camera_ids:ids,clock:()=>now,frameAt:id=>!delivered?null:{canvas:image,
  camera_ref:'capture-'+id,captured_s:future?11:8,received_s:future?12:9,program_time_s:now,vehicle_id:id,level_id:'EG'}});
+assert.equal(value.snapshot.source_kind,'received_fleet_recording');
 assert.deepEqual(value.snapshot.slots.map(s=>s.camera_id),ids);
 assert(cameras.slice(0,20).every(c=>c.availability==='not_connected'),'Source registry records remain unchanged');
 for(let i=0;i<20;i++)assert.equal(value.captureSlot(i).status,'captured');
@@ -41,5 +42,9 @@ now=10;delivered=true;future=true;assert.equal(value.captureSlot(0).status,'erro
 value.assign(0,'arm');assert.equal(value.captureSlot(0).status,'captured');assert.equal(staticCaptures,1);
 future=false;value.assign(0,ids[0]);assert.equal(value.captureSlot(0).status,'captured');
 assert.equal(value.snapshot.slots[0].frame.camera_ref,'capture-'+ids[0]);
+value.connectReceivedSource({kind:'received_fleet_live',camera_ids:ids,clock:()=>now,frameAt:()=>null});
+assert.equal(value.snapshot.source_kind,'received_fleet_live');
+assert(value.snapshot.slots.every(s=>s.frame===null),'Changing received source resets historical screen images');
+assert.throws(()=>value.connectReceivedSource({kind:'unqualified_source',camera_ids:ids,clock:()=>now,frameAt:()=>null}));
 assert(uploads>20);value.dispose();global.setTimeout=schedule;
 console.log('Passed 20 received-monitor assignments, immutable source metadata, clock age, immediate no-future seek, missing/future frames and arm/source switching.');

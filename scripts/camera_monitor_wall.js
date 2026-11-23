@@ -1,4 +1,4 @@
-/* Local synthetic views and optional received-recording images; no equipment commands. */
+/* Local synthetic views and optional received model images; no equipment commands. */
 (function(scope){
   'use strict';
   const finite3=v=>Array.isArray(v)&&v.length===3&&v.every(Number.isFinite);
@@ -109,9 +109,11 @@
     }
     function connectReceivedSource(source){
       if(!source||!Array.isArray(source.camera_ids)||source.camera_ids.length!==slots.length||new Set(source.camera_ids).size!==slots.length||source.camera_ids.some(id=>!cameras.has(id)||cameras.get(id).category!=='transporter')||typeof source.frameAt!=='function'||typeof source.clock!=='function')throw Error('Known complete received-camera source required');
-      receivedSource={...source,ids:new Set(source.camera_ids)};
-      for(const id of source.camera_ids){const camera=cameras.get(id);camera.availability='available';camera.location='BF01-Aufzeichnung';camera.origin_label='Empfangene Modellpose · synthetische Teilaufzeichnung';cameraOptions.get(id).textContent=camera.label+' · '+id+' · empfangene Modellansicht';}
-      notice.textContent='Experimentelle BF01-Teilaufzeichnung · empfangene Modellposen · synthetische Ansichten, keine realen Kamerabilder';
+      const kind=source.kind??'received_fleet_recording';if(!['received_fleet_recording','received_fleet_live'].includes(kind))throw Error('Unknown received-camera source kind');
+      receivedSource={...source,kind,ids:new Set(source.camera_ids)};
+      const live=kind==='received_fleet_live';
+      for(const id of source.camera_ids){const camera=cameras.get(id);camera.availability='available';camera.location=live?'BF01-Patrouille':'BF01-Aufzeichnung';camera.origin_label=live?'Empfangene Modellpose · aktive synthetische Simulation':'Empfangene Modellpose · synthetische Teilaufzeichnung';cameraOptions.get(id).textContent=camera.label+' · '+id+' · empfangene Modellansicht';}
+      notice.textContent=live?'Experimentelle BF01-Patrouille · empfangene Modellposen · synthetische Ansichten, keine realen Kamerabilder':'Experimentelle BF01-Teilaufzeichnung · empfangene Modellposen · synthetische Ansichten, keine realen Kamerabilder';
       source.camera_ids.forEach((id,index)=>assign(index,id));synchronizeReceivedSource();return{status:'accepted',camera_count:source.camera_ids.length};
     }
     function captureReceivedSlot(slot){
@@ -178,7 +180,7 @@
     window.addEventListener('pageshow',()=>{if(!disposed&&timer===null)tick();});
     gl.canvas.addEventListener('webglcontextlost',dispose,{once:true});
     return {open,assign,captureSlot,connectReceivedSource,synchronizeReceivedSource,dispose,get selected(){return selected;},get textures(){return disposed?new Map():new Map(slots.map(s=>[s.monitor.screen_body_id,s.texture]));},
-      get snapshot(){const now=performance.now();return {selected,source_connected:Boolean(receivedSource),source_kind:receivedSource?'received_fleet_recording':null,model_time_s:receivedSource?receivedSource.clock():null,texture_count:disposed?0:slots.length+1,framebuffer_count:disposed?0:1,renderbuffer_count:disposed?0:1,resolution_px:[width,height],slots:slots.map(s=>({id:s.monitor.id,screen_body_id:s.monitor.screen_body_id,camera_id:s.camera_id,pixel_alpha_min:s.pixel_alpha_min,status:state(s),error:s.error,frames:s.frames,image_hash:s.hash,frame:s.frame,captured_browser_ms:s.last_capture,age_s:s.last_capture===null?null:(now-s.last_capture)/1000,render_duration_ms:s.duration_ms,measured_rate_hz:s.frames<2?null:(s.frames-1)*1000/(s.last_capture-s.first_capture)}))};}};
+      get snapshot(){const now=performance.now();return {selected,source_connected:Boolean(receivedSource),source_kind:receivedSource?.kind??null,model_time_s:receivedSource?receivedSource.clock():null,texture_count:disposed?0:slots.length+1,framebuffer_count:disposed?0:1,renderbuffer_count:disposed?0:1,resolution_px:[width,height],slots:slots.map(s=>({id:s.monitor.id,screen_body_id:s.monitor.screen_body_id,camera_id:s.camera_id,pixel_alpha_min:s.pixel_alpha_min,status:state(s),error:s.error,frames:s.frames,image_hash:s.hash,frame:s.frame,captured_browser_ms:s.last_capture,age_s:s.last_capture===null?null:(now-s.last_capture)/1000,render_duration_ms:s.duration_ms,measured_rate_hz:s.frames<2?null:(s.frames-1)*1000/(s.last_capture-s.first_capture)}))};}};
   }
   const api={pose,projection,digest,imageSize,create};if(typeof module!=='undefined'&&module.exports)module.exports=api;scope.CameraMonitorWall=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

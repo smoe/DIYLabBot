@@ -1,0 +1,123 @@
+/* Active local BF01 presentation. Routing and movement stay in the Python runner. */
+(function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./building_fleet_view.js'):root.BuildingFleetView);if(typeof module==='object'&&module.exports)module.exports=api;else root.BuildingFleetLiveView=api;})(typeof globalThis!=='undefined'?globalThis:this,function(view){
+'use strict';
+const IDS=Array.from({length:20},(_,i)=>'BF'+String(i+1).padStart(2,'0'));
+const finite=n=>typeof n==='number'&&Number.isFinite(n);
+const vector=v=>Array.isArray(v)&&v.length===3&&v.every(finite);
+const target=t=>t&&typeof t.level==='string'&&typeof t.area==='string';
+function require(ok,message){if(!ok)throw Error(message);}
+function validateStates(states){
+ require(Array.isArray(states)&&states.length===IDS.length,'Twenty observed vehicle states required');
+ const ids=new Set();for(const state of states){require(IDS.includes(state.id)&&!ids.has(state.id)&&vector(state.pose_xyz_mm)&&finite(state.yaw_rad)&&typeof state.level_id==='string'&&typeof state.mode==='string'&&typeof state.attached_cabin==='boolean','Invalid observed vehicle state');ids.add(state.id);}return states;
+}
+function validateLift(lift){require(lift&&finite(lift.z_mm)&&lift.door_values&&typeof lift.door_values==='object'&&!Array.isArray(lift.door_values)&&Object.values(lift.door_values).every(finite),'Numeric source-bound lift state required');return lift;}
+function validateSnapshot(snapshot){
+ require(snapshot?.format==='solidcraftbot.building-fleet-live-snapshot/1'&&typeof snapshot.session_id==='string'&&snapshot.session_id.length>0,'Named active fleet snapshot required');
+ require(finite(snapshot.model_time_s)&&snapshot.model_time_s>=0&&typeof snapshot.paused==='boolean','Finite executed model clock required');
+ validateStates(snapshot.states);validateLift(snapshot.lift);
+ require(Array.isArray(snapshot.targets)&&snapshot.targets.every(target)&&Array.isArray(snapshot.jobs)&&Array.isArray(snapshot.coverage)&&Array.isArray(snapshot.camera_frames),'Bounded jobs, coverage and received frames required');
+ require(snapshot.jobs.every(j=>j&&typeof j.request_id==='string'&&typeof j.status==='string'&&target(j.pickup)&&target(j.delivery)&&(j.vehicle_id==null||IDS.includes(j.vehicle_id))&&(j.eta_s==null||finite(j.eta_s)&&j.eta_s>=0)),'Identified test-job endpoints and assignment required');
+ require(snapshot.coverage.every(t=>target(t)&&Number.isInteger(t.visits)&&t.visits>=0&&(t.last_visit_s===null||finite(t.last_visit_s)&&t.last_visit_s>=0&&t.last_visit_s<=snapshot.model_time_s)),'Observed coverage time must not be in the future');
+ require(snapshot.camera_frames.length<=IDS.length,'At most one latest received camera frame per vehicle required');
+ const seen=new Set();for(const frame of snapshot.camera_frames){
+  require(IDS.includes(frame.vehicle_id)&&!seen.has(frame.vehicle_id)&&typeof frame.camera_ref==='string'&&frame.camera_ref.length>0&&[frame.captured_s,frame.received_s].every(finite)&&frame.captured_s>=0&&frame.captured_s<=frame.received_s&&frame.received_s<=snapshot.model_time_s&&vector(frame.pose_xyz_mm)&&finite(frame.yaw_rad)&&typeof frame.level_id==='string','Only already received, identified camera poses may be displayed');
+  validateStates(frame.states);validateLift(frame.lift);seen.add(frame.vehicle_id);
+  const own=frame.states.find(s=>s.id===frame.vehicle_id);require(own.level_id===frame.level_id&&Math.abs(own.yaw_rad-frame.yaw_rad)<1e-7&&own.pose_xyz_mm.every((v,i)=>Math.abs(v-frame.pose_xyz_mm[i])<1e-7),'Camera pose differs from its historical own state');
+ }
+ return snapshot;
+}
+function endpoint(path,base){const url=new URL(path,base);require(url.origin===new URL(base).origin&&['http:','https:'].includes(url.protocol),'Same-origin local fleet endpoint required');return url.href;}
+function targetKey(target){return target.level+'/'+target.area;}
+function compileWindow(window,observedEnd){
+ if(window==null)return null;
+ require(finite(window.start_s)&&finite(window.end_s)&&window.start_s>=0&&window.start_s<window.end_s&&window.end_s<=observedEnd,'Executed interpolation window must end at an observed time');
+ validateLift(window.lift_initial_state);require(Array.isArray(window.lift_schedule)&&Array.isArray(window.trajectories)&&window.trajectories.length===20,'Executed source curves and lift schedule required');
+ const levels=Array.isArray(window.levels)?Object.fromEntries(window.levels.map(l=>[l.id,l])):window.levels;require(levels&&Object.values(levels).every(l=>finite(l.z_mm)),'Executed source floor heights required');
+ const ids=new Set();for(const row of window.trajectories){
+  require(IDS.includes(row.vehicle_id)&&!ids.has(row.vehicle_id)&&Array.isArray(row.episodes)&&row.episodes.length>0,'Unique executed vehicle curves required');ids.add(row.vehicle_id);
+  require(row.episodes[0].start_s<=window.start_s&&row.episodes.at(-1).end_s>=window.end_s,'Executed curves must cover the display window');
+  let previous=null;for(const episode of row.episodes){require(levels[episode.level_id]&&typeof episode.mode==='string'&&typeof episode.attached_cabin==='boolean'&&finite(episode.start_s)&&finite(episode.end_s)&&episode.start_s<episode.end_s&&(previous===null||episode.start_s===previous)&&episode.points[0].time_s===episode.start_s&&episode.points.at(-1).time_s===episode.end_s&&episode.end_s<=observedEnd,'No future or discontinuous executed PVA may be displayed');previous=episode.end_s;}
+ }
+ for(const row of window.lift_schedule){require(['travel','doors'].includes(row.kind)&&finite(row.start_s)&&finite(row.end_s)&&row.start_s<row.end_s,'Original lift interval required');if(row.kind==='travel')require(finite(row.from_z_mm)&&finite(row.to_z_mm),'Numeric source lift endpoints required');else require(row.from_values&&row.target_values&&Object.entries(row.target_values).every(([id,v])=>finite(v)&&finite(row.from_values[id])),'Door intervals require their original start values');}
+ const models=view.trajectories(window);
+ return{start_s:window.start_s,end_s:window.end_s,at(t){require(finite(t)&&t>=window.start_s&&t<=window.end_s,'Display cannot extrapolate beyond executed PVA');const lift={z_mm:window.lift_initial_state.z_mm,door_values:{...window.lift_initial_state.door_values}};for(const row of window.lift_schedule){if(t<row.start_s)continue;const u=view.blend(Math.max(0,Math.min(1,(t-row.start_s)/(row.end_s-row.start_s))));if(row.kind==='travel')lift.z_mm=row.from_z_mm+(row.to_z_mm-row.from_z_mm)*u;else for(const [id,value]of Object.entries(row.target_values))lift.door_values[id]=row.from_values[id]+(value-row.from_values[id])*u;}return{lift,states:models.map(m=>m.at(t,lift))};}};
+}
+function makeCameraRenderer(bridge,renderer,payload){
+ const gl=bridge.gl,framebuffer=gl.createFramebuffer(),texture=gl.createTexture(),depth=gl.createRenderbuffer(),cache=new Map();let size='';
+ return function image(frame,width,height,restoreLift,session){
+  const key=session+':'+frame.vehicle_id+':'+frame.camera_ref+':'+width+'x'+height;
+  if(cache.has(key))return cache.get(key);
+  const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+  const active=gl.getParameter(gl.ACTIVE_TEXTURE),previousFramebuffer=gl.getParameter(gl.FRAMEBUFFER_BINDING);gl.activeTexture(gl.TEXTURE0);const previousTexture=gl.getParameter(gl.TEXTURE_BINDING_2D);
+  try{
+   gl.bindFramebuffer(gl.FRAMEBUFFER,framebuffer);
+   if(size!==width+'x'+height){gl.bindTexture(gl.TEXTURE_2D,texture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,width,height,0,gl.RGBA,gl.UNSIGNED_BYTE,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,texture,0);gl.bindRenderbuffer(gl.RENDERBUFFER,depth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,width,height);gl.framebufferRenderbuffer(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.RENDERBUFFER,depth);size=width+'x'+height;require(gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE,'Active camera framebuffer incomplete');}
+   gl.bindTexture(gl.TEXTURE_2D,previousTexture===texture?null:previousTexture);bridge.applyLift(frame.lift);
+   bridge.capture(frame,width,height,()=>renderer.draw(bridge.cameraMatrix(width/height),frame.states),payload.vehicle_mesh.scene.camera_frame,payload.camera_presentation.fov_deg);
+   const pixels=new Uint8Array(width*height*4),flipped=new Uint8ClampedArray(pixels.length);gl.readPixels(0,0,width,height,gl.RGBA,gl.UNSIGNED_BYTE,pixels);
+   for(let y=0;y<height;y++)flipped.set(pixels.subarray(y*width*4,(y+1)*width*4),(height-y-1)*width*4);
+   canvas.getContext('2d').putImageData(new ImageData(flipped,width,height),0,0);
+  }finally{bridge.applyLift(restoreLift);gl.bindFramebuffer(gl.FRAMEBUFFER,previousFramebuffer);gl.bindTexture(gl.TEXTURE_2D,previousTexture);gl.activeTexture(active);}
+  cache.set(key,canvas);while(cache.size>60)cache.delete(cache.keys().next().value);return canvas;
+ };
+}
+async function mount(bridge,payload){
+ const config=payload.live;require(config&&typeof config==='object','Local active-fleet endpoint configuration required');
+ const base=location.href,urls={state:endpoint(config.state_url??'/api/state',base),jobs:endpoint(config.jobs_url??'/api/jobs',base),control:endpoint(config.control_url??'/api/control',base)};
+ const panel=document.getElementById('building-fleet-panel');require(panel,'Fleet panel missing');panel.hidden=false;panel.dataset.live='true';
+ panel.innerHTML='<h2>BF01 · aktive Patrouille</h2><p>20 leere Transporter · fortlaufende Erkundung mit priorisierten Testaufträgen. Kamerabilder sind lokale synthetische Ansichten empfangener Modellposen; kein Video-Netzwerklasttest. Testabholung und Testabgabe sind Raumankünfte ohne Probe oder Roboterübergabe.</p><div class="bf-controls"><button data-bf="play" disabled>Pause</button><output data-bf="clock">Initialisierung</output><select data-bf="vehicle" aria-label="Fahrzeug"></select><button data-bf="follow">Fahrzeug folgen</button></div><p data-bf="status" role="status">Patrouille wird vorbereitet …</p><form data-bf="request"><label>Testabholung <select data-bf="pickup" aria-label="Testabholung" required></select></label> <label>Testabgabe <select data-bf="delivery" aria-label="Testabgabe" required></select></label> <button data-bf="submit" type="submit" disabled>Transport anfordern</button></form><p data-bf="request-status" role="status"></p><p data-bf="coverage"></p><ul data-bf="targets"></ul><h3>Testaufträge</h3><ol data-bf="jobs"></ol><div class="bf-table"><table><thead><tr><th>Fahrzeug</th><th>Beobachteter Zustand</th><th>Auftrag</th></tr></thead><tbody data-bf="rows"></tbody></table></div><p data-bf="camera-note">Noch keine empfangenen Kameraaufnahmen.</p>';
+ const q=name=>panel.querySelector('[data-bf="'+name+'"]');for(const id of IDS){const option=document.createElement('option');option.value=option.textContent=id;q('vehicle').append(option);}
+ const renderer=view.makeRenderer(bridge,payload.vehicle_mesh),cameraImage=makeCameraRenderer(bridge,renderer,payload),labels=document.createElement('div');labels.className='bf-labels';bridge.stage.append(labels);
+ const labelNodes=new Map(IDS.map(id=>{const node=document.createElement('span');node.textContent=id;labels.append(node);return[id,node];}));
+ let snapshot=null,selected='BF01',follow=false,stopped=false,connected=false,lastResponse=0,pendingRequest=null,requestCount=0,targetsKey='',polling=false,manualPause=false,doorPause=false,controlPending=false,runtimeError=null,queuedControl=null,lastCommandError='',motion=null,displayTime=null;
+ const copy=value=>JSON.parse(JSON.stringify(value));
+ const requestId=()=>globalThis.crypto?.randomUUID?.()??('browser-'+Date.now()+'-'+(++requestCount));
+ const blockers=()=>snapshot?.room_route_object_ids?.filter(id=>!bridge.doorOpen(id))??[];
+ function display(){return motion?motion.at(displayTime):snapshot?{lift:snapshot.lift,states:snapshot.states}:null;}
+ function positionLabels(observed){labels.hidden=Boolean(payload.presentation?.atrium_monitors&&!follow&&bridge.atMonitorWall());for(const state of observed.states){const node=labelNodes.get(state.id),point=bridge.projectPoint(state.pose_xyz_mm.map((v,i)=>v+(i===2?payload.vehicle_mesh.scene.bounds_mm.max[2]:0)));node.hidden=!point?.visible;if(point){node.style.left=point.x*100+'%';node.style.top=point.y*100+'%';}}if(follow)bridge.follow(observed.states.find(state=>state.id===selected));}
+ function setTargets(targets){const key=targets.map(targetKey).join('|');if(key===targetsKey)return;targetsKey=key;for(const field of ['pickup','delivery']){q(field).replaceChildren(...targets.map(target=>{const option=document.createElement('option');option.value=targetKey(target);option.textContent=view.targetLabel(target);return option;}));}if(targets.length>1)q('delivery').selectedIndex=1;}
+ setTargets(config.targets??[]);
+ function connectWall(){if(!payload.presentation?.atrium_monitors)return;bridge.connectMonitorFeeds({kind:'received_fleet_live',camera_ids:IDS.map(id=>'BF01.'+id+'.Overview'),clock:()=>snapshot?.model_time_s??0,frameAt:(id,width,height)=>{
+  if(!snapshot)return null;const vehicle=id.slice('BF01.'.length,-'.Overview'.length),frame=snapshot.camera_frames.find(f=>f.vehicle_id===vehicle);if(!frame)return null;
+  return{canvas:cameraImage(frame,width,height,display().lift,snapshot.session_id),vehicle_id:vehicle,camera_ref:frame.camera_ref,captured_s:frame.captured_s,received_s:frame.received_s,program_time_s:snapshot.model_time_s,level_id:frame.level_id};
+ }});}
+ function paint(){
+  const age=lastResponse?(performance.now()-lastResponse)/1000:0;
+  if(!snapshot)return;
+  const observed=display();bridge.applyLift(observed.lift);const blocks=blockers();
+  q('clock').textContent=snapshot.model_time_s.toFixed(3)+' s Modellzeit'+(motion?' · Anzeige '+displayTime.toFixed(3)+' s':'');
+  q('status').textContent=runtimeError?'Patrouille angehalten · '+runtimeError:!connected?'Verbindung unterbrochen · letzte ausgeführte Positionen bleiben stehen':blocks.length?'Fahrwegtür gesperrt · Patrouille wird angehalten':snapshot.paused?'Patrouille pausiert':snapshot.phase==='own_drive_prepare'?'Fahrbahn für '+snapshot.vehicle_id+' wird vorbereitet · letzte ausgeführte Positionen bleiben sichtbar':'Patrouille aktiv · '+age.toFixed(1)+' s seit letzter Zustandsmeldung';
+  q('play').disabled=controlPending||!connected||Boolean(blocks.length);q('play').textContent=snapshot.paused?'Fortsetzen':'Pause';q('submit').disabled=!connected||!snapshot.targets.length;
+  q('coverage').textContent='Gemeldete Zielbesuche: '+snapshot.coverage.filter(t=>t.visits>0).length+' / '+snapshot.targets.length;
+  q('targets').replaceChildren(...snapshot.coverage.map(target=>{const li=document.createElement('li');li.textContent=view.targetLabel(target)+' · '+(target.last_visit_s==null?'noch nicht besucht':Math.max(0,snapshot.model_time_s-target.last_visit_s).toFixed(1)+' s seit letztem Besuch')+' · '+target.visits+' Besuche';return li;}));
+  q('jobs').replaceChildren(...snapshot.jobs.slice(-30).map(job=>{const li=document.createElement('li'),winner=job.vehicle_id??job.winner?.vehicle_id,eta=job.eta_s??job.winner?.eta_s;li.textContent=job.request_id+' · '+view.targetLabel(job.pickup)+' → '+view.targetLabel(job.delivery)+' · '+job.status+(winner?' · '+winner:' · wartet auf verfügbares Fahrzeug')+(finite(eta)?' · geschätzte Abholankunft '+eta.toFixed(1)+' s':'');return li;}));
+  q('rows').replaceChildren(...snapshot.states.map(state=>{const row=document.createElement('tr');for(const value of [state.id,state.level_id+' · '+view.stateLabel(state.mode),state.job_id??state.mission_id??'Patrouille']){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}return row;}));
+  q('camera-note').textContent=snapshot.camera_frames.length+' / 20 empfangene synthetische Kameraansichten · gemeinsame Modellzeit';
+  const commandError=snapshot.command_errors?.at(-1);if(commandError){const key=commandError.request_id+':'+commandError.error;if(key!==lastCommandError){lastCommandError=key;q('request-status').textContent='Testauftrag abgelehnt · '+commandError.request_id+' · '+commandError.error;}}
+  positionLabels(observed);bridge.syncMonitorFeeds?.();bridge.requestRender();
+ }
+ function receive(value){
+  if(value.status==='starting'){if(!snapshot)q('status').textContent='Patrouille wird vorbereitet · '+(value.phase??'Initialisierung');return;}
+  if(value.status==='error'){connected=false;runtimeError=value.error??'Laufzeitfehler';if(snapshot)paint();else q('status').textContent='Patrouille angehalten · '+runtimeError;return;}
+  validateSnapshot(value);
+  if(snapshot&&snapshot.session_id===value.session_id&&value.model_time_s<snapshot.model_time_s)return;
+  const changed=!snapshot||snapshot.session_id!==value.session_id,nextMotion=compileWindow(value.executed_window,value.model_time_s);snapshot=value;motion=nextMotion;
+  if(motion)displayTime=changed||displayTime===null?Math.max(motion.start_s,motion.end_s-.2):Math.max(motion.start_s,Math.min(motion.end_s,displayTime));else displayTime=snapshot.model_time_s;
+  connected=true;runtimeError=null;lastResponse=performance.now();setTargets(snapshot.targets);if(changed)connectWall();paint();
+ }
+ async function request(url,body){const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),5000);try{const response=await fetch(url,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',credentials:'same-origin',signal:controller.signal});const value=await response.json();if(!response.ok)throw Error(value.error??('HTTP '+response.status));return value;}finally{clearTimeout(timeout);}}
+ async function control(action){if(action==='resume'&&blockers().length){q('status').textContent='Fortsetzen gesperrt · zuerst alle Fahrwegtüren öffnen';return;}if(controlPending){queuedControl=action;return;}controlPending=true;paint();try{const value=await request(urls.control,{action});if(value.format==='solidcraftbot.building-fleet-live-snapshot/1')receive(value);else await poll();}catch(error){connected=false;q('status').textContent='Steuerung nicht bestätigt · '+error.message;}finally{controlPending=false;paint();if(queuedControl){const next=queuedControl;queuedControl=null;await control(next);}}}
+ function userControl(action){if(action==='resume'&&blockers().length)return control(action);manualPause=action==='pause';if(action==='resume')doorPause=false;return control(action);}
+ async function poll(){if(polling||stopped)return;polling=true;try{receive(await request(urls.state));}catch(error){connected=false;q('status').textContent='Verbindung unterbrochen · '+error.message+' · keine Bewegungsvorhersage';}finally{polling=false;}}
+ async function cycle(){if(stopped)return;await poll();const blocks=blockers();if(snapshot&&connected&&!controlPending){if(blocks.length&&!snapshot.paused){doorPause=true;await control('pause');}else if(!blocks.length&&doorPause&&!manualPause){doorPause=false;await control('resume');}}setTimeout(cycle,Math.max(50,Math.min(2000,config.poll_interval_ms??200)));}
+ q('play').onclick=()=>{if(snapshot)return userControl(snapshot.paused?'resume':'pause');};
+ q('vehicle').onchange=()=>{selected=q('vehicle').value;paint();};
+ q('follow').onclick=()=>{follow=!follow;if(follow)bridge.beginFollow();else bridge.endFollow();q('follow').textContent=follow?'Folgemodus beenden':'Fahrzeug folgen';bridge.clearMovement();paint();};
+ q('request').onsubmit=async event=>{event.preventDefault();if(!snapshot)return;const pickup=snapshot.targets.find(t=>targetKey(t)===q('pickup').value),delivery=snapshot.targets.find(t=>targetKey(t)===q('delivery').value);if(!pickup||!delivery)return;const signature=targetKey(pickup)+'→'+targetKey(delivery);if(!pendingRequest||pendingRequest.signature!==signature)pendingRequest={signature,body:{request_id:requestId(),pickup:{level:pickup.level,area:pickup.area},delivery:{level:delivery.level,area:delivery.area}}};q('submit').disabled=true;try{const value=await request(urls.jobs,pendingRequest.body);q('request-status').textContent='Testauftrag bestätigt · '+pendingRequest.body.request_id;pendingRequest=null;if(value.format==='solidcraftbot.building-fleet-live-snapshot/1')receive(value);else await poll();}catch(error){q('request-status').textContent='Bestätigung fehlt · erneuter Klick wiederholt dieselbe Auftragskennung · '+error.message;}finally{q('submit').disabled=!connected;}};
+ const hooks={get following(){return follow;},draw:matrix=>{const observed=display();if(observed){bridge.applyLift(observed.lift);renderer.draw(matrix,observed.states);}}};bridge.activate(hooks);if(payload.presentation?.start_stop)bridge.startAt(payload.presentation.start_stop);
+ window.__buildingFleet=Object.freeze({get ready(){return Boolean(snapshot)&&!panel.dataset.error;},get live(){return true;},get time_s(){return snapshot?.model_time_s??0;},get display_time_s(){return displayTime;},get states(){return snapshot?copy(display().states):[];},get snapshot(){return snapshot?copy(snapshot):null;},get connected(){return connected;},get frozen(){return !connected||Boolean(snapshot?.paused)||Boolean(blockers().length);},get instance_count(){return snapshot?.states.length??0;},get renderer_stats(){return renderer.stats;},pause:()=>userControl('pause'),play:()=>userControl('resume'),poll,follow:id=>{require(IDS.includes(id),'Unknown vehicle');if(!follow)bridge.beginFollow();follow=true;selected=id;q('vehicle').value=id;q('follow').textContent='Folgemodus beenden';paint();},stopFollowing:()=>{follow=false;bridge.endFollow();q('follow').textContent='Fahrzeug folgen';paint();},dispose:()=>{stopped=true;}});
+ function animate(now){if(stopped)return;if(snapshot&&motion&&connected&&!blockers().length){displayTime=Math.min(motion.end_s,Math.max(displayTime,motion.end_s-.2+(now-lastResponse)/1000));const observed=display();bridge.applyLift(observed.lift);positionLabels(observed);q('clock').textContent=snapshot.model_time_s.toFixed(3)+' s Modellzeit · Anzeige '+displayTime.toFixed(3)+' s';bridge.requestRender();}requestAnimationFrame(animate);}
+ cycle();requestAnimationFrame(animate);return hooks;
+}
+return{IDS,validateStates,validateLift,validateSnapshot,compileWindow,endpoint,targetKey,mount};
+});

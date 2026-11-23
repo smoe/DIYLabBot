@@ -77,6 +77,114 @@ aktiven Ports. Die neue Stützregel und ihre Grenzen stehen im folgenden
 Abschnitt; eine bestandene Portprüfung qualifiziert keinen vollständigen
 Flottenlauf.
 
+## Aktive lokale Patrouille und Transporterrekrutierung
+
+`model/building-fleet-patrol.shared.json` ergänzt einen ausdrücklich gewählten
+aktiven Testmodus. Der veröffentlichte Einstieg `bf01/` bleibt die oben
+beschriebene Aufzeichnung. Die aktive Fassung benötigt einen lokalen
+Python-Dienst; sie ist keine neue statische Pages-Aufzeichnung. Ihre 20 leeren
+Fahrzeuge verwenden dieselben Modellquellen, Fahrgrenzen, anonymen Scans,
+50-ms-Weiterfahr-/Bremsnachweise, Bodenprüfungen und Aufzugdienste.
+Die bestehenden BF01-, TR01- und L01-Quellen werden nicht überschrieben.
+
+Die Patrouille endet nicht nach der ersten Zielabdeckung. Erlaubte Ziele
+werden nach einer einmaligen Beobachtungsfreigabe vergeben: Die ersten
+synthetischen Kameraaufnahmen aller 20 Fahrzeuge müssen tatsächlich empfangen
+sein. Währenddessen bleiben die Fahrzeuge an ihren eigenen Stellplätzen;
+die Freigabe ist ein Kommunikationstest. Danach werden die Ziele nach dem
+ältesten **empfangenen** Besuch ausgewählt; bei gleicher
+Besuchszeit zählen ausstehende Aufträge und die bestehende Seed-Auswahl.
+Geplante Ankünfte setzen das Besuchsalter nicht zurück. Das sind die 19
+vorhandenen BF01-Ziele und ihre Verbindungswege, keine Behauptung einer
+lückenlosen Sichtabdeckung aller Gebäudeflächen. K0_013, Treppenkern,
+Bench-Schutzbereiche und andere ausgeschlossene Zugänge bleiben gesperrt.
+
+„Transport anfordern“ erzeugt einen priorisierten **leeren Testauftrag** aus
+Testabholung und Testabgabe an zwei vorhandenen Raumzielen. Geeignete
+Fahrzeuge geben eigene skalare Ankunftszeitschätzungen ab. Die Auswahl
+verwendet die vorhandene Routenlänge, Quellgrenzen und aggregierte
+Aufzugzeiten statt des direkten räumlichen Abstands. Die Schätzung ist
+keine Ankunftszusage. Fahrzeuge kennen weiterhin keine fremden Positionen.
+
+Ein Fahrzeug wird nur an einer beobachteten stationären eigenen Grenze
+rekrutiert: ohne laufende Fahrt, Kabinenbelegung, unbestätigten Auftrag oder
+offene fremdgeschossige Buchung. Bereits verpflichtete Fahrten werden zu Ende
+geführt; bei fehlendem Kandidaten bleibt der Testauftrag sichtbar vorgemerkt.
+Ein ausstehender Testauftrag verhindert neue nachrangige Patrouillenzusagen,
+bis ein Kandidat verfügbar wird. Auftragskennung und Fahrzeugzuordnung
+bleiben erhalten; ein wiederholter Request erzeugt keinen zweiten Auftrag.
+Bereits empfangene, noch nicht gestartete lokale Patrouillen werden mit ihrer
+ursprünglichen Kennung und Quittung zurückgestellt. Nach dem Testauftrag
+werden sie fortgesetzt. Liegt die Testabgabe auf einem anderen Geschoss,
+führt zuerst eine neue regulär gebuchte Rückkehrinspektion zum ursprünglichen
+Geschoss; die alte lokale Zusage wird nicht in einen fremdgeschossigen
+Auftrag umgedeutet.
+Geschosswechsel benötigen unverändert ihre eigenen atomaren Buchtenzusagen.
+Erst empfangene Missionsquittungen und Besuchsabschlüsse führen die beiden
+Teststufen weiter; danach wird das Fahrzeug wieder für Patrouillen verfügbar.
+Die Ankunft ist eine Durchfahrtbeobachtung, kein Halt zum Be- oder Entladen.
+
+Die aktiven Atriumbilder verwenden die tatsächlich empfangenen Kameraposen
+mit der damaligen gemeinsamen Fahrzeug- und Aufzugstellung. Ein
+Verbindungsfehler lässt die zuletzt ausgeführten Stellungen stehen. Der
+Browser extrapoliert keine ungeprüfte Fahrt. Eine geschlossene Fahrwegtür
+fordert eine Pause des ganzen lokalen Motors an; ein manuell gesetzter
+Pausenzustand bleibt beim Wiederöffnen erhalten. Diese Browserbedienung ist
+keine qualifizierte Schutzfunktion. Modellzeit und tatsächliche Laufzeit
+bleiben getrennt; rechenintensive Prüfungen können langsamer als Echtzeit sein.
+
+Ein lokaler Einstieg mit bereits erzeugten, quellgebundenen Artefakten ist:
+
+```bash
+python3 scripts/run_building_fleet_patrol.py \
+  --walkthrough-export exports/building-fleet/jerk-01c7cff/walkthrough-r1 \
+  --camera-report exports/generated/tr01-awareness-ccd729bbb881-r2/build-report.json \
+  --vehicle-mesh exports/building-fleet/support-680652f/native-vehicle-mesh.json \
+  --navigation-cache exports/building-fleet/jerk-01c7cff/navigation-r1 \
+  --resource-cache exports/building-fleet/jerk-01c7cff/resource-catalog-r2 \
+  --output-dir exports/building-fleet/patrol-local-new
+```
+
+Der Dienst bindet ausschließlich `127.0.0.1` und meldet seine lokale URL.
+Ausgabeverzeichnisse müssen neu sein. Vorhandene Caches werden nur bei
+unveränderten Quellen verwendet; sie sind keine neuen Bewegungsnachweise.
+Ein optionaler `--graph-cache-report` beschleunigt den erneuten Start anhand
+eines separat quellgebundenen statischen Vorbereitungsberichts. Alte Berichte
+werden nicht umgepinnt. Der Aufbaubericht, die empfangenen Request-Kennungen
+und die eigenen Controllerbelege bleiben im ignorierten Ausgabeordner.
+Mit `--initial-request <Datei.json>` lässt sich ein ausdrücklich benannter
+leerer Testauftrag vor Beginn der Patrouille über denselben Eingang vormerken.
+Die Datei wird dabei als Laufzeiteingabe gebunden. Eine Abfahrt vom eigenen
+Heimplatz bereitet ihre Kurve erst nach Zusage des schon vorhandenen
+Depot-Durchgangstokens vor; wartende Fahrzeuge benötigen diese teure
+Vorbereitung noch nicht. Die Tokenreihenfolge wird nicht umgeschrieben.
+
+Für diese Ergänzung bestehen 36 gezielte Python-Tests und die gemeinsamen
+JavaScript-Grenz-/Darstellungsprüfungen. Eine getrennte Browserprüfung mit
+kontrollierten Aufzeichnungen prüft unter anderem das originale PVA,
+Request-Wiederholung, Türpause und Verbindungsausfall. Der kurze tatsächliche
+lokale Lauf `patrol-5f4da9d/live-r5` beobachtete BF04-Bewegung von Modellzeit
+0,9 bis 1,9 s, 20 empfangene Kameraansichten und die Rekrutierung von BF03
+aus 20 eigenen Ankunftszeitangeboten. Die Testabholung wurde quittiert;
+eine abgeschlossene Testabgabe wird damit nicht behauptet. Die zusätzliche
+echte Browserbeobachtung desselben Dienstes bestätigt 20 native Fahrzeuge,
+20 physische Bildschirmtexturen und Bewegung ohne WebGL-Fehler. Die getrennten
+Berichte heißen `short-real-run-check.json` und
+`active-patrol-browser-observation.json` im genannten lokalen Ausgabeordner.
+
+Dieser Entwicklungsmodus führt keine Last, Probe, Armübergabe, Materialbilanz
+oder biologische Prozessbindung aus. Die Kameraansichten entstehen lokal;
+ein Video-Netzwerklasttest und dessen Durchsatzmessung sind nicht implementiert.
+Der HTTP-Eingang begrenzt die Sitzung auf 100 unterschiedliche Testaufträge.
+Der Motor stoppt mit sichtbarem Fehler beim Erreichen der getrennten Speichergrenzen
+von 1000 Aufträgen, 100000 empfangenen Meldungen oder 1000000 aufbewahrten
+PVA-Punkten überschritten werden; Controllerbelege werden nicht zur
+Fortsetzung gelöscht. Diese Grenzen sind Implementierungsgrenzen des Tests,
+keine Fahrzeug- oder Netzwerkgrenzen. Ein vollständiger aktiver Flottenlauf,
+alle Zielbesuche, neue native Gesamtbewegungen, unabhängiger Gesamtexport und
+reale Sicherheit bleiben unbestätigt. Die offenen E4-Entscheidungen bleiben
+unverändert.
+
 ## Eigentümerregel für Bodenstützung und Aufzug
 
 `support_rule` in der BF01-Quelle führt die Entscheidung vom **20. November

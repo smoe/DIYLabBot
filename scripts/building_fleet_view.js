@@ -162,5 +162,5 @@ async function mount(bridge,payload){
  }else if(preview){window.__buildingFleet.follow('BF04');window.__buildingFleet.play();}
  ui();requestAnimationFrame(frame);return hooks;
 }
-return{compileCurve,liftAt,trajectories,controlRoom,ReceivedProjection,targetLabel,stateLabel,receivedLift,validateProgram,validatePreview,mount};
+return{blend,compileCurve,liftAt,trajectories,controlRoom,ReceivedProjection,targetLabel,stateLabel,receivedLift,validateProgram,validatePreview,makeRenderer,mount};
 });

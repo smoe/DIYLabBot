@@ -1,0 +1,33 @@
+{
+  "format": "solidcraftbot.building-fleet-patrol/1",
+  "id": "BF01-Patrol",
+  "sources": {
+    "fleet": {
+      "path": "model/building-fleet-demo.shared.json",
+      "sha256": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99"
+    }
+  },
+  "patrol": {
+    "termination": "explicit_stop",
+    "startup": "first_received_camera_frames",
+    "targets": "/missions/targets",
+    "selection": "oldest_received_visit"
+  },
+  "recruitment": {
+    "selection": "lowest_feasible_route_eta",
+    "diversion": "observed_stationary_boundary",
+    "pickup_delivery": "empty_inspection_visits",
+    "acknowledgement": "received_mission_and_completion"
+  },
+  "qualification": {
+    "simulation_only": true,
+    "empty_vehicles": true,
+    "loads_implemented": false,
+    "workflow_binding_implemented": false,
+    "network_video_implemented": false,
+    "full_mission_coverage_verified": false,
+    "native_full_program_verified": false,
+    "independent_export_verified": false,
+    "hardware_or_real_safety_qualified": false
+  }
+}
