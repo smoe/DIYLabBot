@@ -95,6 +95,8 @@ def floor_support(mesh,level,config):
     # A compile keeps the checked source and mesh immutable. New source bytes
     # or support policy create a different bank; source pins are rechecked at
     # public compile/check boundaries rather than rehashing every raster edge.
+    loader=getattr(mesh,'_runtime_floor_loader',None)
+    if loader is not None:loader(level)
     key=(id(mesh),level,model.digest(model.SOURCE),model.digest(model.SCHEMA))
     if key not in _CACHE:_CACHE[key]=FloorSupport(mesh,level,config)
     return _CACHE[key]

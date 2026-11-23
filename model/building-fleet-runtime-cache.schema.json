@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Derived BF01 plain static runtime cache, not recorded execution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "runtime_source_files_sha256", "operation_sha256", "files", "source_config_sha256", "derivation_inputs", "geometry_selection", "qualification"],
+  "properties": {
+    "format": {"enum": ["solidcraftbot.building-fleet-runtime-static-cache/1", "solidcraftbot.building-fleet-runtime-static-cache/2"]},
+    "runtime_source_files_sha256": {"type": "object", "description": "Exact small source files consumed at runtime; original CAD is checked at build and is not replaced by fake files."},
+    "operation_sha256": {"type": "object", "description": "SHA256 of exact allowlisted static operation source blocks, independent of Python AST serialization versions."},
+    "files": {"type": "object", "description": "Real state and lossless little-endian binary artifacts, each with project-relative path, byte count and SHA256."},
+    "source_config_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "derivation_inputs": {"type": "object", "description": "Original complete native/CAD, navigation and closure evidence verified at build; not runtime file placeholders."},
+    "geometry_selection": {"type": "object", "description": "Every omitted nonmoving whole body and its bounds; all moving bodies and ordinary floors remain, with global frames unchanged."},
+    "qualification": {
+      "type": "object", "additionalProperties": false,
+      "required": ["static_geometry_only", "motion_recorded", "full_fleet_qualified", "hardware_qualified"],
+      "properties": {
+        "static_geometry_only": {"const": true}, "motion_recorded": {"const": false},
+        "full_fleet_qualified": {"const": false}, "hardware_qualified": {"const": false}
+      }
+    }
+  }
+}

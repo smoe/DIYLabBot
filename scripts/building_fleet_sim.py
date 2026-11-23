@@ -58,9 +58,41 @@ def polygon_segment_distance(polygon, a, b):
                 *[point_segment_distance(p,ea,eb) for p in (a,b) for ea,eb in edges]])
 
 
-def polygon_distance(first, second):
+def _polygon_distance_uncached(first, second):
     return min(min(polygon_segment_distance(first,a,b) for a,b in zip(second,second[1:]+second[:1])),
                min(polygon_segment_distance(second,a,b) for a,b in zip(first,first[1:]+first[:1])))
+
+
+_POLYGON_DISTANCE_CACHE=collections.OrderedDict()
+_POLYGON_DISTANCE_FUNCTIONS=None
+
+
+def polygon_distance(first,second):
+    """Cache exact ordered vertices only; callers retain all live conditions."""
+    global _POLYGON_DISTANCE_FUNCTIONS
+    functions=(_polygon_distance_uncached,polygon_segment_distance,point_segment_distance,ray_segment)
+    previous=_POLYGON_DISTANCE_FUNCTIONS
+    if previous is None or any(a is not b for a,b in zip(previous,functions)):
+        _POLYGON_DISTANCE_FUNCTIONS=functions;_POLYGON_DISTANCE_CACHE.clear()
+    polygons=[]
+    for polygon in(first,second):
+        if type(polygon)not in(list,tuple)or len(polygon)<3:return _polygon_distance_uncached(first,second)
+        points=[]
+        for point in polygon:
+            if type(point)not in(list,tuple)or len(point)!=2:return _polygon_distance_uncached(first,second)
+            values=[]
+            for value in point:
+                if type(value)is float and math.isfinite(value):values.append(('float',value.hex()))
+                elif type(value)is int:values.append(('int',value))
+                else:return _polygon_distance_uncached(first,second)
+            points.append(tuple(values))
+        polygons.append(tuple(points))
+    key=tuple(polygons);cache=_POLYGON_DISTANCE_CACHE
+    if key in cache:
+        cache.move_to_end(key);return cache[key]
+    result=_polygon_distance_uncached(first,second);cache[key]=result
+    if len(cache)>2048:cache.popitem(last=False)
+    return result
 
 
 class SegmentIndex:
@@ -121,15 +153,25 @@ class SensorWorld:
     disc-only fixture fallback. Floors, error bounds and stale delivery remain
     separate contracts; this ideal generator adds no random noise.
     """
-    def __init__(self, settings, static_segments_by_level, cell_mm=500, cabin_segments_by_sides=None, landing_segments_by_level_sides=None):
+    def __init__(self, settings, static_segments_by_level, cell_mm=500, cabin_segments_by_sides=None, landing_segments_by_level_sides=None,
+                 prepared_indices=None):
         self.settings = dict(settings)
         step = settings['angular_step_deg']
         if type(step) is not int or step <= 0 or 360 % step or settings['range_mm'] <= 0:
             raise ValueError('A full-circle integer beam grid and positive range required')
-        self.static = {level:SegmentIndex(segments,cell_mm) for level,segments in static_segments_by_level.items()}
-        self.cabin={tuple(sides):SegmentIndex(segments,cell_mm)for sides,segments in(cabin_segments_by_sides or{}).items()}
-        self.landings={(level,tuple(sides)):SegmentIndex(segments,cell_mm)
-                       for(level,sides),segments in(landing_segments_by_level_sides or{}).items()}
+        if prepared_indices is None:
+            self.static = {level:SegmentIndex(segments,cell_mm) for level,segments in static_segments_by_level.items()}
+            self.cabin={tuple(sides):SegmentIndex(segments,cell_mm)for sides,segments in(cabin_segments_by_sides or{}).items()}
+            self.landings={(level,tuple(sides)):SegmentIndex(segments,cell_mm)
+                           for(level,sides),segments in(landing_segments_by_level_sides or{}).items()}
+        else:
+            if set(prepared_indices) != {'static','cabin','landings'}:
+                raise ValueError('All three checked source ray-index mappings are required')
+            self.static,self.cabin,self.landings=(prepared_indices[name]for name in('static','cabin','landings'))
+            if (set(self.static)!=set(static_segments_by_level)or
+                    set(self.cabin)!=set(cabin_segments_by_sides or{})or
+                    set(self.landings)!=set(landing_segments_by_level_sides or{})):
+                raise ValueError('Prepared indices must cover the same complete source geometry')
         self.scans = 0; self.rays = 0;self.rectangle_rays=0;self.disc_rays=0
         self._beam_angles=tuple((math.radians(degrees),math.sin(math.radians(degrees)),
                                 math.cos(math.radians(degrees)))for degrees in range(0,360,step))
@@ -289,11 +331,14 @@ class IntervalAuditor:
     bounds rotational surface motion by circumscribed radius * angular speed.
     Actual native BRep checks remain separate.
     """
-    def __init__(self, clearance_mm, static_by_level):
+    def __init__(self, clearance_mm, static_by_level, *, prepared_indices=None):
         if not math.isfinite(clearance_mm) or clearance_mm < 0:
             raise ValueError('Nonnegative declared reserve required')
         self.clearance = clearance_mm
-        self.static = {level:SegmentIndex(segments) for level,segments in static_by_level.items()}
+        self.static = ({level:SegmentIndex(segments) for level,segments in static_by_level.items()}
+                       if prepared_indices is None else prepared_indices)
+        if set(self.static)!=set(static_by_level):
+            raise ValueError('Prepared audit indices must cover the complete source geometry')
         self.minima = {'vehicle_vehicle':math.inf, 'vehicle_static':math.inf}
         self.checks = 0; self.oriented_fallbacks = 0;self.refined_intervals=0
 
@@ -373,9 +418,113 @@ class IntervalAuditor:
     def static_rectangle_bound(self, index, a,b, linear,angular,dt):
         bound = self.shape_bound(a,b,linear,angular)
         if bound is None: return -math.inf
-        polygons = [footprint(row) for row in (a,b)]
-        endpoint = min((polygon_segment_distance(poly,*segment) for poly in polygons for segment in index.segments), default=math.inf)
+        endpoint = min(self._static_endpoint_distance(index, row) for row in (a,b))
         return endpoint-bound*dt/2
+
+    def _pair_endpoint_distance(self,first,second):
+        """Reuse exact planar geometry, never a motion or interval certificate."""
+        functions=(footprint,polygon_distance,polygon_segment_distance,point_segment_distance,ray_segment)
+        previous=getattr(self,'_pair_endpoint_functions',None)
+        if previous is None or any(a is not b for a,b in zip(previous,functions)):
+            self._pair_endpoint_functions=functions
+            self._pair_endpoint_distances=collections.OrderedDict()
+            self._endpoint_footprints=collections.OrderedDict()
+        def key(row):
+            result=[]
+            for field in('pose_mm','footprint_mm'):
+                values=[]
+                for value in row[field]:
+                    if type(value)is float and math.isfinite(value):values.append(('float',value.hex()))
+                    elif type(value)is int:values.append(('int',value))
+                    else:return None
+                result.append(tuple(values))
+            return tuple(result)
+        a,b=key(first),key(second)
+        if a is None or b is None:return polygon_distance(footprint(first),footprint(second))
+        pair=(a,b);distances=self._pair_endpoint_distances
+        if pair in distances:
+            distances.move_to_end(pair);return distances[pair]
+        polygons=[];corners=self._endpoint_footprints
+        for row,identity in((first,a),(second,b)):
+            if identity not in corners:
+                corners[identity]=tuple(tuple(point)for point in footprint(row))
+                if len(corners)>2048:corners.popitem(last=False)
+            else:corners.move_to_end(identity)
+            # Keep the same list-of-tuples primitive input without exposing
+            # mutable cache storage to a geometric caller.
+            polygons.append(list(corners[identity]))
+        result=polygon_distance(*polygons);distances[pair]=result
+        if len(distances)>2048:distances.popitem(last=False)
+        return result
+
+    @staticmethod
+    def _static_endpoint_distance(index, row):
+        polygon = footprint(row)
+        if not hasattr(index, '_endpoint_source'):
+            from types import MappingProxyType
+            # Freeze the exact source at first use, allowing other floors to
+            # restore their checked source indices only when first requested.
+            index.segments = tuple(index.segments)
+            index._endpoint_source = index.segments
+            index.cells = MappingProxyType({cell:tuple(members)for cell,members in index.cells.items()})
+            index._endpoint_cells = index.cells
+            index._endpoint_cell = (type(index.cell),float(index.cell).hex())
+            index._endpoint_scale = max((abs(value)for segment in index.segments for point in segment for value in point),default=1.)
+            index._endpoint_segment_length = max((math.dist(*segment)for segment in index.segments),default=0.)
+            index._endpoint_distances = collections.OrderedDict()
+        if (getattr(index, '_endpoint_source', None) is not index.segments or
+                index._endpoint_cells is not index.cells or
+                index._endpoint_cell != (type(index.cell),float(index.cell).hex())):
+            return min((polygon_segment_distance(polygon, *segment)
+                        for segment in index.segments), default=math.inf)
+        key = tuple(tuple(float(value).hex() for value in point) for point in polygon)
+        cache = index._endpoint_distances
+        if key not in cache:
+            # A segment omitted by this padded cell query is farther than the
+            # expansion margin from the polygon AABB. Once an actual original
+            # distance is within that margin, no omitted segment can improve
+            # it. Padding only widens candidate selection; it never changes a
+            # measured distance, contact predicate or declared reserve.
+            edges=[math.dist(a,b)for a,b in zip(polygon,polygon[1:]+polygon[:1])]
+            scale=max(index._endpoint_scale,1.,*[abs(v)for p in polygon for v in p],*edges)
+            fallback=(not index.segments or not all(math.isfinite(v)and v>0 for v in edges)or
+                not math.isfinite(scale)or scale>math.sqrt(float.fromhex('0x1.fffffffffffffp+1023'))/16)
+            # Degenerate rounded rectangles cannot supply the separating-box
+            # argument used below. Preserve the original complete scan there.
+            turns=[abs((b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0]))
+                   for a,b,c in zip(polygon,polygon[1:]+polygon[:1],polygon[2:]+polygon[:2])]
+            if any(turn<.5*edges[i]*edges[(i+1)%4]for i,turn in enumerate(turns)):fallback=True
+            gap=math.inf;best_index=len(index.segments);seen=set();margin=index.cell
+            # Cover the unchanged primitives' closed-contact arithmetic as
+            # well as outward rounding of very large translated coordinates.
+            padding=(1024*math.ulp(scale)+4e-9/min(edges)+
+                     4e-9*max(index._endpoint_segment_length,*edges))if not fallback else 0.
+            bounds=[min(p[k]for p in polygon)for k in range(2)]+[max(p[k]for p in polygon)for k in range(2)]
+            while not fallback:
+                limits=[math.floor((bounds[k]-margin-padding)/index.cell)-1 for k in range(2)]+[
+                    math.floor((bounds[k+2]+margin+padding)/index.cell)+1 for k in range(2)]
+                count=(limits[2]-limits[0]+1)*(limits[3]-limits[1]+1)
+                if count>max(4096,4*len(index.cells)):
+                    fallback=True;break
+                candidates=set()
+                for x in range(limits[0],limits[2]+1):
+                    for y in range(limits[1],limits[3]+1):candidates.update(index.cells.get((x,y),()))
+                for i in sorted(candidates-seen):
+                    if type(i)is not int or not 0<=i<len(index.segments):fallback=True;break
+                    actual=polygon_segment_distance(polygon,*index.segments[i])
+                    if math.isnan(actual):fallback=True;break
+                    if actual<gap or actual==gap and i<best_index:gap,best_index=actual,i
+                if fallback:break
+                seen.update(candidates)
+                if gap<=margin or len(seen)==len(index.segments):break
+                margin*=2
+            cache[key] = (min((polygon_segment_distance(polygon,*segment)for segment in index.segments),default=math.inf)
+                          if fallback else gap)
+            if len(cache) > 128:
+                cache.popitem(last=False)
+        else:
+            cache.move_to_end(key)
+        return cache[key]
 
     def audit(self, previous, current, dt, speed_bounds, *,curves=None,start_s=None,end_s=None):
         if not math.isfinite(dt) or dt <= 0 or set(previous) != set(current) or set(current) != set(speed_bounds):
@@ -421,7 +570,7 @@ class IntervalAuditor:
                 if gap < self.clearance-1e-6:
                     b1,b2 = self.shape_bound(a,b,v1,w1),self.shape_bound(c,d,v2,w2)
                     if b1 is not None and b2 is not None:
-                        oriented = min(polygon_distance(footprint(a),footprint(c)),polygon_distance(footprint(b),footprint(d)))-(b1+b2)*dt/2
+                        oriented = min(self._pair_endpoint_distance(a,c),self._pair_endpoint_distance(b,d))-(b1+b2)*dt/2
                         if oriented >= self.clearance-1e-6:
                             gap = oriented; self.oriented_fallbacks += 1
                 if gap<self.clearance-1e-6 and curves is not None:

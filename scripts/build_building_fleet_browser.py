@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Package the unchanged BF01 engine and checked static inputs for a browser worker.
+"""Package the live BF01 engine and checked static inputs for browser workers.
 
-This is a portable source/data bundle, never an action recording. It retains
-the original bytes required by the existing source, mesh and cache checks.
+This is a portable source/data bundle, never an action recording. A compact
+bundle carries explicitly attested lossless static derivations; original CAD
+bytes remain build inputs rather than browser download dependencies.
 """
 import argparse
 import copy
@@ -12,6 +13,7 @@ import json
 from pathlib import Path, PurePosixPath
 import re
 import shutil
+import subprocess
 import sys
 from types import SimpleNamespace
 import zipfile
@@ -107,7 +109,8 @@ def load_browser_source(path=BROWSER_SOURCE):
     value = model.read_json(path)
     if (type(value) is not dict or set(value) !=
             {'format', 'id', 'sources', 'runtime', 'session', 'qualification'}
-            or value['format'] != 'solidcraftbot.building-fleet-browser/1'
+            or value['format'] not in ('solidcraftbot.building-fleet-browser/1',
+                                     'solidcraftbot.building-fleet-browser/2')
             or value['id'] != 'BF01-Browser'
             or set(value['sources']) not in ({'patrol'}, {'patrol', 'python_core'})):
         raise ValueError('Explicit browser fleet source required')
@@ -115,6 +118,11 @@ def load_browser_source(path=BROWSER_SOURCE):
         raise ValueError('Browser source must pin the current patrol profile')
     runtime = value['runtime']
     fields = {'engine', 'version', 'loader_module_url', 'execution', 'pacing', 'static_route_witnesses'}
+    if value['format'].endswith('/2'):
+        fields.update(('static_geometry', 'route_preparation'))
+        if (runtime.get('static_geometry') != 'source_bound_lossless_runtime_cache' or
+                runtime.get('route_preparation') != 'background_worker_with_checked_rolling_prefix'):
+            raise ValueError('Source-bound geometry and checked background preparation required')
     if 'python_core' in value['sources']:
         fields.add('delivery')
         if runtime.get('delivery') != 'same_origin_pinned_core':
@@ -156,6 +164,8 @@ def collect(inputs, *, root=ROOT):
     source = model.load()
     profile = local.load_profile(ROOT / inputs['profile'])
     browser_source = load_browser_source(ROOT / inputs['browser_source'])
+    if browser_source['format'].endswith('/2'):
+        raise ValueError('The current browser contract requires --static-runtime-cache')
     files.add(inputs['profile'])
     files.add(inputs['browser_source'])
     if 'python_core' in browser_source['sources']:
@@ -272,7 +282,83 @@ def collect_python_core(browser_source, directory):
         'originals': originals, 'input_directory': directory}
 
 
-def pack(files, browser_source, inputs, output, *, python_core=None):
+def collect_compact(inputs):
+    """Package verified static derivations, without shipping build-only CAD files."""
+    import building_fleet_runtime_cache as runtime_cache
+    source = model.load()
+    profile = local.load_profile(ROOT / inputs['profile'])
+    browser_source = load_browser_source(ROOT / inputs['browser_source'])
+    if browser_source['format'] != 'solidcraftbot.building-fleet-browser/2':
+        raise ValueError('The compact live runtime needs its explicit source contract')
+    files = FileSet()
+    report_path = ROOT / inputs['static_runtime_cache']
+    report = model.read_json(report_path)
+    for name, row in runtime_cache.bundle_files(report_path).items():
+        files.add(name, row['sha256'])
+    files.pins(report['runtime_source_files_sha256'])
+    files.pins(model.source_pins(source))
+    files.pins(model.protected_pins())
+    for name in ('profile', 'browser_source'):
+        files.add(inputs[name])
+    core_ref = browser_source['sources']['python_core']
+    files.add(core_ref['path'], core_ref['sha256'])
+    for name in ('building_fleet_browser_runtime', 'building_fleet_patrol',
+                 'building_fleet_browser_navigation',
+                 'building_fleet_runtime_cache', 'building_fleet_geometry_checks',
+                 'building_fleet_background', 'building_fleet_starter',
+                 'building_fleet_port_paths', 'building_fleet_zones', 'building_fleet_floor'):
+        importlib.import_module(name)
+    for module in tuple(sys.modules.values()):
+        path = getattr(module, '__file__', None)
+        if path and Path(path).is_file() and Path(path).resolve().is_relative_to(ROOT.resolve()):
+            relative = Path(path).resolve().relative_to(ROOT.resolve())
+            if relative.parts[0] in ('scripts', 'ros2_ws') and relative.suffix == '.py':
+                files.add(Path(path).resolve())
+    for name in (BOOTSTRAP, WORKER, TRANSPORT, 'scripts/build_building_fleet_browser.py'):
+        files.add(name)
+    files.verify()
+    return files, browser_source, profile
+
+
+def prepare_bytecode(files, output, compiler):
+    """Derive checked-hash import caches; original source remains in the bundle."""
+    prefix = Path(output).with_name(Path(output).name + '-python-cache')
+    if prefix.exists():
+        raise FileExistsError('Preserve the previous generated import cache')
+    prefix.mkdir(parents=True)
+    names = [name for name in files.files if name.startswith('scripts/') and name.endswith('.py')
+             and (Path(name).name.startswith('building_fleet_') or
+                  Path(name).name in model.PROTECTED or Path(name).name in
+                  ('walkthrough_world.py', 'building_stack.py', 'relative_floorplan.py', 'tr01_camera_model.py'))]
+    script = '''import importlib.util,json,pathlib,py_compile,sys
+rows,prefix=json.loads(sys.stdin.read());sys.pycache_prefix=prefix
+if sys.implementation.cache_tag!='cpython-314' or sys.flags.optimize!=0:raise ValueError('An unoptimized CPython 3.14 compiler is required')
+outputs=[]
+for source,virtual in rows:
+    target=importlib.util.cache_from_source(virtual)
+    pathlib.Path(target).parent.mkdir(parents=True,exist_ok=True)
+    py_compile.compile(source,cfile=target,dfile=virtual,doraise=True,invalidation_mode=py_compile.PycInvalidationMode.CHECKED_HASH)
+    outputs.append(target)
+print(json.dumps({'cache_tag':sys.implementation.cache_tag,'magic_number_hex':importlib.util.MAGIC_NUMBER.hex(),'compiler_version':sys.version,'outputs':outputs}))
+'''
+    result = subprocess.run([compiler, '-I', '-c', script],
+        input=json.dumps([[[str(ROOT/name), '/project/'+name] for name in names], str(prefix)]),
+        text=True, capture_output=True, check=True)
+    metadata = json.loads(result.stdout)
+    outputs = metadata.pop('outputs')
+    if len(outputs) != len(names):
+        raise ValueError('Every selected source needs one checked import artifact')
+    metadata.update(format='solidcraftbot.building-fleet-import-cache/1',
+        prefix=prefix.relative_to(ROOT).as_posix(), sources={})
+    for name, target in zip(names, outputs):
+        generated = files.add(target)
+        metadata['sources'][name] = {'source_sha256': files.files[name]['sha256'],
+            'artifact': generated, **files.files[generated]}
+    files.verify()
+    return metadata
+
+
+def pack(files, browser_source, inputs, output, *, python_core=None, bytecode=None):
     """Write an immutable deterministic archive and independently hashed manifest."""
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -285,7 +371,8 @@ def pack(files, browser_source, inputs, output, *, python_core=None):
             info.compress_type = zipfile.ZIP_DEFLATED
             zipped.writestr(info, (files.root / name).read_bytes(), compresslevel=6)
     files.verify()
-    manifest = {'format': FORMAT, 'root_dir': '/project',
+    manifest = {'format': ('solidcraftbot.building-fleet-browser-bundle/2'
+                          if 'static_runtime_cache' in inputs else FORMAT), 'root_dir': '/project',
         'bootstrap_path': BOOTSTRAP, 'inputs': copy.deepcopy(inputs),
         'runtime': copy.deepcopy(browser_source['runtime']),
         'session': copy.deepcopy(browser_source['session']),
@@ -295,7 +382,13 @@ def pack(files, browser_source, inputs, output, *, python_core=None):
         'archive': {'path': archive.name, 'sha256': model.digest(archive),
                     'bytes': archive.stat().st_size},
         'qualification': copy.deepcopy(browser_source['qualification']),
-        'scope': 'Original engine sources and checked static geometry/cache inputs only; a new independent live world starts per page, without prior mission, snapshot, action journal or recording fallback.'}
+        'scope': 'Original engine sources and source-bound static geometry/cache inputs only; a new independent live world starts per page, without prior mission, snapshot, action journal or recording fallback. Compact derivations retain their build-only native provenance separately.'}
+    if 'static_runtime_cache' in inputs:
+        from building_fleet_runtime_cache import verification_receipt
+        manifest['static_cache_verification'] = verification_receipt(ROOT / inputs['static_runtime_cache'])
+        files.verify()
+    if bytecode is not None:
+        manifest['python_bytecode'] = copy.deepcopy(bytecode)
     if python_core is not None:
         manifest['python_core'] = {key: copy.deepcopy(python_core[key])
                                    for key in ('source', 'files', 'directory')}
@@ -308,9 +401,10 @@ def pack(files, browser_source, inputs, output, *, python_core=None):
     return manifest
 
 
-def build(inputs, output, *, bundle_only=False, python_core_dir=None):
+def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_bytecode_compiler=None):
     output = local.project_path(output, output=True)
-    files, browser_source, profile = collect(inputs)
+    compact = 'static_runtime_cache' in inputs
+    files, browser_source, profile = collect_compact(inputs) if compact else collect(inputs)
     python_core = None
     if 'python_core' in browser_source['sources']:
         if python_core_dir is None:
@@ -318,7 +412,12 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None):
         python_core = collect_python_core(browser_source, python_core_dir)
     elif python_core_dir is not None:
         raise ValueError('Python runtime delivery must be declared in the leading browser source')
-    manifest = pack(files, browser_source, inputs, output, python_core=python_core)
+    runtime_inputs = ({key: inputs[key] for key in ('profile', 'browser_source', 'static_runtime_cache')}
+                      if compact else inputs)
+    if python_bytecode_compiler and not browser_source['runtime']['version'].startswith('314.'):
+        raise ValueError('The optional import cache currently targets only the pinned Python 3.14 runtime')
+    bytecode = prepare_bytecode(files, output, python_bytecode_compiler) if python_bytecode_compiler else None
+    manifest = pack(files, browser_source, runtime_inputs, output, python_core=python_core, bytecode=bytecode)
     manifest_ref = local.artifact(output / 'runtime-manifest.json')
     worker = {'module_url': 'building_fleet_browser_worker.mjs?sha256=' + files.files[WORKER]['sha256'],
         'manifest': {'url': 'runtime-manifest.json?sha256=' + manifest_ref['sha256'],
@@ -332,7 +431,8 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None):
     if not bundle_only:
         source = model.load()
         args = SimpleNamespace(**inputs)
-        local_report = local.build_page(source, profile, args, output)
+        local_report = local.build_page(source, profile, args, output,
+                                       **({'progressive_output': output} if compact else {}))
         presentation_pins = local_report['source_files_sha256']
         page = (output / 'index.html').read_text()
         pattern = r'(<script id="building-fleet-data" type="application/json">)([^<]*)(</script>)'
@@ -348,7 +448,13 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None):
         encoded = json.dumps(payload, separators=(',', ':'), allow_nan=False).replace('<', '\\u003c')
         page = page[:match.start(2)] + encoded + page[match.end(2):]
         script_url = 'building_fleet_browser_transport.js?sha256=' + files.files[TRANSPORT]['sha256']
-        page = page.replace('</head>', '<script src="' + script_url + '"></script></head>')
+        script = '<script src="' + script_url + '"></script>'
+        if compact:
+            config_json = json.dumps(worker, separators=(',', ':')).replace('<', '\\u003c')
+            script += ('<script>globalThis.__bf01EarlyTransport={manifest_sha256:' +
+                json.dumps(worker['manifest']['sha256']) +
+                ',transport:BuildingFleetBrowserTransport.create(' + config_json + ')};</script>')
+        page = page.replace('</head>', script + '</head>')
         (output / 'index.html').write_text(page)
         # The final browser document has a separate exact build receipt.
         # Do not retain a local-HTTP HTML hash under the public build name.
@@ -379,13 +485,17 @@ def main(argv=None):
     parser.add_argument('--browser-source', default='model/building-fleet-browser.shared.json')
     parser.add_argument('--bundle-only', action='store_true')
     parser.add_argument('--python-core-dir', help='Original official core files declared by the browser source')
+    parser.add_argument('--static-runtime-cache', help='Source-bound lossless static derivation report')
+    parser.add_argument('--python-bytecode-compiler', help='Optional compatible CPython 3.14 interpreter for checked-hash source import caches')
     args = parser.parse_args(argv)
     inputs = {name: (ROOT / getattr(args, name)).resolve().relative_to(ROOT.resolve()).as_posix()
               for name in ('walkthrough_export', 'camera_report', 'vehicle_mesh',
                            'navigation_cache', 'resource_cache', 'graph_cache_report',
                            'profile', 'browser_source')}
+    if args.static_runtime_cache:
+        inputs['static_runtime_cache'] = local.project_path(args.static_runtime_cache).relative_to(ROOT).as_posix()
     result = build(inputs, args.output_dir, bundle_only=args.bundle_only,
-                   python_core_dir=args.python_core_dir)
+                   python_core_dir=args.python_core_dir, python_bytecode_compiler=args.python_bytecode_compiler)
     print(json.dumps({'passed': result['passed'], 'files': len(result['source_files_sha256']),
         'runtime_archive_bytes': result['files']['runtime.zip']['bytes'],
         'uncompressed_runtime_bytes': result['uncompressed_runtime_bytes']}), flush=True)

@@ -45,7 +45,7 @@ function compileWindow(window,observedEnd){
 function makeCameraRenderer(bridge,renderer,payload){
  const gl=bridge.gl,framebuffer=gl.createFramebuffer(),texture=gl.createTexture(),depth=gl.createRenderbuffer(),cache=new Map();let size='';
  return function image(frame,width,height,restoreLift,session){
-  const key=session+':'+frame.vehicle_id+':'+frame.camera_ref+':'+width+'x'+height;
+  const key=session+':'+frame.vehicle_id+':'+frame.camera_ref+':'+width+'x'+height+':geometry'+(bridge.geometryRevision??0);
   if(cache.has(key))return cache.get(key);
   const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
   const active=gl.getParameter(gl.ACTIVE_TEXTURE),previousFramebuffer=gl.getParameter(gl.FRAMEBUFFER_BINDING);gl.activeTexture(gl.TEXTURE0);const previousTexture=gl.getParameter(gl.TEXTURE_BINDING_2D);
@@ -64,7 +64,7 @@ function makeCameraRenderer(bridge,renderer,payload){
 async function mount(bridge,payload){
  const config=payload.live;require(config&&typeof config==='object','Local active-fleet endpoint configuration required');
  const base=location.href,urls={state:endpoint(config.state_url??'/api/state',base),jobs:endpoint(config.jobs_url??'/api/jobs',base),control:endpoint(config.control_url??'/api/control',base)};
- let transport=config.transport??null;
+ let transport=config.transport??(config.worker&&globalThis.__bf01EarlyTransport?.manifest_sha256===config.worker.manifest.sha256?globalThis.__bf01EarlyTransport.transport:null);
  if(config.worker&&!transport){require(globalThis.BuildingFleetBrowserTransport?.create,'Live browser engine transport is unavailable');transport=globalThis.BuildingFleetBrowserTransport.create(config.worker);}
  const panel=document.getElementById('building-fleet-panel');require(panel,'Fleet panel missing');panel.hidden=false;panel.dataset.live='true';
  const notice=document.createElement('p');notice.setAttribute('role','status');notice.className='bf-live-status';notice.textContent='Experimentelle Live-Patrouille wird gestartet …';notice.style.cssText='position:absolute;top:76px;left:12px;right:12px;margin:0;padding:8px 12px;background:#f5f7f4ee;color:#173d37;border:1px solid #aebdb6;border-radius:8px;z-index:12;pointer-events:none;font:14px sans-serif';bridge.stage.append(notice);
@@ -82,7 +82,7 @@ async function mount(bridge,payload){
  function setTargets(targets){const key=targets.map(targetKey).join('|');if(key===targetsKey)return;targetsKey=key;for(const field of ['pickup','delivery']){q(field).replaceChildren(...targets.map(target=>{const option=document.createElement('option');option.value=targetKey(target);option.textContent=view.targetLabel(target);return option;}));}if(targets.length>1)q('delivery').selectedIndex=1;}
  setTargets(config.targets??[]);
  function connectWall(){if(!payload.presentation?.atrium_monitors)return;bridge.connectMonitorFeeds({kind:'received_fleet_live',camera_ids:IDS.map(id=>'BF01.'+id+'.Overview'),clock:()=>snapshot?.model_time_s??0,frameAt:(id,width,height)=>{
-  if(!snapshot)return null;const vehicle=id.slice('BF01.'.length,-'.Overview'.length),frame=snapshot.camera_frames.find(f=>f.vehicle_id===vehicle);if(!frame)return null;
+  if(!snapshot)return null;const vehicle=id.slice('BF01.'.length,-'.Overview'.length),frame=snapshot.camera_frames.find(f=>f.vehicle_id===vehicle);if(!frame||bridge.visualLevelReady?.(frame.level_id)===false)return null;
   return{canvas:cameraImage(frame,width,height,display().lift,snapshot.session_id),vehicle_id:vehicle,camera_ref:frame.camera_ref,captured_s:frame.captured_s,received_s:frame.received_s,program_time_s:snapshot.model_time_s,level_id:frame.level_id};
  }});}
  function paint(){
@@ -104,7 +104,7 @@ async function mount(bridge,payload){
  function receive(value){
   if(value.status==='starting'){if(!snapshot){const labels={checking_browser_bundle:'Gebäudemodell wird geladen',loading_python_runtime:'Simulation wird gestartet',checking_simulation_sources:'Modell wird geprüft',verifying_browser_bundle:'Modell wird geprüft',checking_navigation:'Fahrwege werden vorbereitet',static_graph_cache_restore:'Fahrwege werden vorbereitet',static_route_witnesses_bound:'Fahrwege werden geprüft',static_graph_cache_ready:'Fahrwege sind vorbereitet',native_scan_surfaces:'Hindernisse werden vorbereitet',native_scan_surfaces_ready:'Hindernisse sind vorbereitet'};q('status').textContent=labels[value.phase]??'Live-Patrouille wird vorbereitet';notice.textContent=q('status').textContent;}return;}
   if(value.status==='error'){connected=false;runtimeError=value.error??'Laufzeitfehler';if(snapshot)paint();else{q('status').textContent='Patrouille angehalten · '+runtimeError;notice.textContent=q('status').textContent;}return;}
-  validateSnapshot(value);
+  validateSnapshot(value);bridge.observeVisualGeometry?.(value);
   if(snapshot&&snapshot.session_id===value.session_id&&value.model_time_s<snapshot.model_time_s)return;
   const changed=!snapshot||snapshot.session_id!==value.session_id,nextMotion=compileWindow(value.executed_window,value.model_time_s);snapshot=value;motion=nextMotion;
   if(motion)displayTime=changed||displayTime===null?Math.max(motion.start_s,motion.end_s-.2):Math.max(motion.start_s,Math.min(motion.end_s,displayTime));else displayTime=snapshot.model_time_s;

@@ -121,6 +121,33 @@ class BrowserLifecycleTests(unittest.TestCase):
         self.assertEqual(json.loads(runtime.snapshot())['status'], 'error')
         self.assertIsNone(runtime.engine)
 
+    def test_background_json_is_opaque_and_preserves_typed_signed_zero(self):
+        runtime, engine = self.ready()
+        request = {'kind': 'full_route', 'action': {'values': [0, 0.0, -0.0, 1.0]}}
+        engine.drain_preparation_requests = lambda: [request]
+        envelopes = json.loads(runtime.pending_jobs())
+        # Only the envelope is decoded by JS; its nested JSON remains a string.
+        wire = json.loads(json.dumps(envelopes))[0]
+        self.assertIn('[0,0.0,-0.0,1.0]', wire['request_json'])
+        self.assertEqual(wire['kind'], 'full_route')
+        received = json.loads(wire['request_json'])
+        self.assertIs(type(received['action']['values'][0]), int)
+        self.assertIs(type(received['action']['values'][1]), float)
+        self.assertEqual(adapter._json(received), adapter._json(request))
+
+    def test_every_control_step_runs_without_rebuilding_a_presentation_snapshot(self):
+        runtime, engine = self.ready()
+        with patch.object(engine, 'snapshot', wraps=engine.snapshot) as snapshots:
+            for _ in range(4):
+                step = json.loads(runtime.tick(False))
+                self.assertEqual(step['format'], 'solidcraftbot.building-fleet-live-step/1')
+            self.assertEqual(engine.now, .2)
+            self.assertEqual(engine.calls, [('step',)]*4)
+            self.assertEqual(snapshots.call_count, 0)
+            self.assertEqual(json.loads(runtime.snapshot())['model_time_s'], 0)
+            self.assertEqual(json.loads(runtime.tick())['model_time_s'], .25)
+            self.assertEqual(snapshots.call_count, 1)
+
 
 class BrowserConfigurationTests(unittest.TestCase):
     def test_project_escape_and_unpinned_new_adapter_are_rejected(self):
@@ -192,6 +219,29 @@ class BrowserConfigurationTests(unittest.TestCase):
             config['source_files_sha256'][path.relative_to(root).as_posix()] = hashlib.sha256(path.read_bytes()).hexdigest()
             with patch.object(adapter.model, 'ROOT', root):
                 with self.assertRaisesRegex(ValueError, 'without recording'):
+                    adapter._configuration(config)
+
+    def test_compact_contract_pins_cache_and_requires_background_policy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            old, browser = self.fixture(root)
+            browser['format'] = 'solidcraftbot.building-fleet-browser/2'
+            browser['runtime'].update(static_geometry='source_bound_lossless_runtime_cache',
+                route_preparation='background_worker_with_checked_rolling_prefix')
+            path = root/'model/building-fleet-browser.shared.json'
+            path.write_text(json.dumps(browser))
+            cache = root/'exports/cache-report.json'
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            cache.write_text('{"fixture":"static geometry only"}')
+            pins = {p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+                    for p in root.rglob('*') if p.is_file()}
+            config = {name: old[name] for name in ('root', 'profile')}
+            config.update(static_runtime_cache='exports/cache-report.json', source_files_sha256=pins)
+            with patch.object(adapter.model, 'ROOT', root), patch.object(adapter.model, 'load', return_value={}):
+                paths, _, _, _ = adapter._configuration(config)
+                self.assertEqual(paths['static_runtime_cache'], cache)
+                cache.write_text('{"fixture":"changed"}')
+                with self.assertRaisesRegex(ValueError, 'Changed'):
                     adapter._configuration(config)
 
 

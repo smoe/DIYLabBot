@@ -28,6 +28,25 @@ from building_fleet_depot import FixedHomeMap,check_invariant,exact_home_rest,fi
 import tr01_floor_motion as floor
 
 
+def world_velocity_bound(curve):
+    """Bound the derivative actually consumed by the independent world audit.
+
+    Zero higher-order coefficients prove a constant coordinate on every
+    actual Hermite interval. Other coordinates use the unchanged protected
+    closed-interval velocity extrema; unconsumed position/acceleration/jerk
+    root solves are not repeated here. Driver limit proofs remain separate.
+    """
+    constant=[all(all(value==0 for value in segment[axis][1:])
+                  for segment in curve.segments)for axis in range(3)]
+    if all(constant):
+        maxima=[0.,0.,0.]
+    else:
+        bounds=floor.extrema(curve,order=1)
+        maxima=[0. if constant[axis] else max(abs(bounds['min'][axis]),abs(bounds['max'][axis]))
+                for axis in range(3)]
+    return {'linear_mm_s':math.hypot(*maxima[:2]),'yaw_rad_s':maxima[2]}
+
+
 def _projection(point,a,b):
     delta=[b[k]-a[k]for k in range(2)];length=sum(v*v for v in delta)
     u=sum((point[k]-a[k])*delta[k]for k in range(2))/length if length else 0
@@ -334,9 +353,14 @@ def native_scan_geometry(navigation):
 
 class ResourceGate:
     """Own progress requests, bounded stopping before an ungranted region."""
-    def __init__(self,engine,vehicle,controller,level):
+    def __init__(self,engine,vehicle,controller,level,*,prepared_spans=None):
         self.engine=engine;self.vehicle=vehicle;self.driver=controller
-        self.spans=engine.catalog.spans(level,controller.path);self.index=0
+        self.spans=engine.catalog.spans(level,controller.path)if prepared_spans is None else copy.deepcopy(prepared_spans)
+        if any(set(s)!={'resource','start_progress_mm','end_progress_mm'}or
+               s['resource']not in engine.catalog.resources or
+               not 0<=s['start_progress_mm']<=s['end_progress_mm']<=controller.path.length+1e-5 for s in self.spans):
+            raise ValueError('Exact source resource spans on the unchanged own path required')
+        self.index=0
         self.lookahead=controller.settings['range_mm']
 
     def permit(self,now):
@@ -366,18 +390,23 @@ class ResourceGate:
 
 class WorldRunner:
     """One deterministic simultaneous world; vehicle inputs stay own-only."""
-    def __init__(self,source,navigation,graph,catalog,planner,*,progress=None,geometry_checker=None,output_dir=None):
+    def __init__(self,source,navigation,graph,catalog,planner,*,progress=None,geometry_checker=None,output_dir=None,
+                 scan_geometry=None,zone_regions=None,scan_indices=None):
         self.source=source;self.nav=navigation;self.graph=graph;self.catalog=catalog;self.planner=planner;self.progress=progress
         if not callable(geometry_checker):raise ValueError('Canonical source-gated floor/clearance checker required')
         self.geometry_checker=geometry_checker;self.evidence=EvidenceWriter(output_dir)if output_dir is not None else None
         self.dt=.05;self.now=0.;self.wall_start=time.monotonic();self.sensor=model.resolved_sensor(source)
         from building_fleet_zones import source_regions
-        self.zone_regions={level:source_regions(navigation,level)for level in navigation.level_z}
+        self.zone_regions=({level:source_regions(navigation,level)for level in navigation.level_z}
+                           if zone_regions is None else zone_regions)
+        if set(self.zone_regions)!=set(navigation.level_z):raise ValueError('Prepared source zones must cover every source level')
         if self.progress is not None:self.progress({'phase':'native_scan_surfaces','model_time_s':self.now})
-        static,cabins,landings=native_scan_geometry(navigation)
+        static,cabins,landings=native_scan_geometry(navigation)if scan_geometry is None else scan_geometry
         if self.progress is not None:self.progress({'phase':'native_scan_surfaces_ready','model_time_s':self.now})
-        self.world=world_model.SensorWorld(self.sensor,static,cabin_segments_by_sides=cabins,landing_segments_by_level_sides=landings)
-        self.auditor=world_model.IntervalAuditor(navigation.reserve,static)
+        self.world=world_model.SensorWorld(self.sensor,static,cabin_segments_by_sides=cabins,
+            landing_segments_by_level_sides=landings,prepared_indices=scan_indices)
+        self.auditor=world_model.IntervalAuditor(navigation.reserve,static,
+            prepared_indices=None if scan_indices is None else scan_indices['static'])
         self.resources=service_model.ResourceServices(catalog.resources,navigation.waits)
         self.admission_policy=model.admission_settings(source)
         depot_level=source['depot']['level']
@@ -422,6 +451,20 @@ class WorldRunner:
         self.cabin_capacity_report={'geometric_maximum':len(service_model.cabin_lanes(interior,[length,width],navigation.reserve,source['lift']['maximum_capacity'])),
             'operating_capacity':len(lanes),'required_passing_gap_mm':gap,'basis':'source native interior, full physical envelope, perception and static reserves'}
         if hasattr(planner,'set_cabin_lanes'):planner.set_cabin_lanes(copy.deepcopy(lanes))
+        self._background_preparation=None
+
+    def configure_background_preparation(self,source_binding):
+        """Opt in to source-bound own-route work in a separate planning worker."""
+        if self._background_preparation is not None:raise RuntimeError('Route worker binding is immutable for this world')
+        from building_fleet_background import BackgroundPreparation
+        self._background_preparation=BackgroundPreparation(self,source_binding)
+
+    def drain_preparation_requests(self):
+        return self._background_preparation.drain()if self._background_preparation is not None else []
+
+    def accept_prepared_route(self,result):
+        if self._background_preparation is None:raise RuntimeError('Background route preparation is not enabled')
+        return self._background_preparation.accept(result)
 
     def own(self,identity):
         row=self.vehicles[identity]
@@ -432,6 +475,18 @@ class WorldRunner:
             abs(math.remainder(row['pose_mm_rad'][2]-expected[2],2*math.pi))<1e-6 and
             (driver is None or(abs(driver.v)<1e-8 and abs(driver.a)<1e-8)))
         return own
+
+    def prior_localization(self,identity):
+        """Bind only this vehicle's exact resting capture at its new leg pose."""
+        row=self.vehicles[identity]
+        start={key:copy.deepcopy(row[key])for key in('pose_mm_rad','level','z_mm','aboard')}
+        own_history=self.capture_history[identity]
+        def at(captured_s):
+            observed=own_history.get(captured_s)
+            if (observed is None or observed.get('own_rest')is not True or
+                    any(observed.get(key)!=value for key,value in start.items())):return None
+            return observed['pose_mm_rad'][:]
+        return at
 
     def event(self,identity,event,details,now):
         self.uplink.emit(identity,'event',{'event':event,'details':copy.deepcopy(details)},now)
@@ -654,6 +709,7 @@ class WorldRunner:
         return sorted(markers,key=lambda m:m['progress_mm'])
 
     def start_drive(self,identity,action):
+        if getattr(self,'_background_preparation',None)is not None:return self._background_preparation.start_drive(identity,action)
         row=self.vehicles[identity]
         if action['level']!=row['level']or row['driver']is not None:raise RuntimeError('Own drive must begin on its observed level at rest')
         shape=route_shape(action['points_mm'])
@@ -669,7 +725,8 @@ class WorldRunner:
         key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse'],velocity_cap],sort_keys=True)
         if key not in self._motion_cache:self._motion_cache[key]=compile_motion(path,self.source,velocity_cap,reverse=action['reverse'],zone_caps=caps)
         driver=Controller(path,self.source,caps,own_start_s=self.now,radius_mm=self.nav.radius,
-            static_return=self.static_return(row['level'],action.get('lift_phase'),identity),motion_program=self._motion_cache[key])
+            static_return=self.static_return(row['level'],action.get('lift_phase'),identity),motion_program=self._motion_cache[key],
+            prior_localization=self.prior_localization(identity))
         driver.align_initial_heading(row['pose_mm_rad'][2])
         markers=copy.deepcopy(action['markers'])+self.door_markers(row['level'],path)
         markers.sort(key=lambda m:m['progress_mm'])
@@ -730,6 +787,7 @@ class WorldRunner:
         if held:self.release_resource(identity,held,self.now)
 
     def idle_action(self,identity):
+        if getattr(self,'_background_preparation',None)is not None and self._background_preparation.pending(identity):return
         row=self.vehicles[identity]
         if row['done']or row['driver']is not None:return
         for _ in range(12):
@@ -873,7 +931,9 @@ class WorldRunner:
     def observe(self,step):
         truth=self.truth();snapshot=self.lift_snapshot()
         for identity,row in self.vehicles.items():
-            self.capture_history[identity][self.now]={'pose_mm_rad':row['pose_mm_rad'][:],'level':row['level'],'z_mm':row['z_mm']}
+            driver=row['driver']
+            self.capture_history[identity][self.now]={'pose_mm_rad':row['pose_mm_rad'][:],'level':row['level'],'z_mm':row['z_mm'],
+                'aboard':row['aboard'],'own_rest':driver is None or driver.v==0 and driver.a==0}
         if step%self.scan_step==0:
             for identity in self.vehicles:
                 scan=self.world.scan(identity,truth,self.now,snapshot);self.scan_serial+=1
@@ -889,7 +949,8 @@ class WorldRunner:
                 self.uplink.emit(identity,'heartbeat',{'pose_mm':row['pose_mm_rad'][:],'level':row['level'],
                     'area':self.area(identity),'mode':row['phase'],'speed_mm_s':speed},self.now)
             scan=self.latest_scans.get(identity)
-            if step%self.perception_step==0 and scan is not None:
+            first_received_scan=(getattr(self,'_first_perception_on_scan',False)and row['capture_seq']==0)
+            if scan is not None and(step%self.perception_step==0 or first_received_scan):
                 captured=self.capture_history[identity].get(scan['captured_s'])
                 if captured is None:raise RuntimeError('Original own capture localization missing')
                 points=scan['returns_local_mm'];nearest=min(points,key=lambda p:math.hypot(*p),default=None)
@@ -968,6 +1029,7 @@ class WorldRunner:
         else:episodes.append({**metadata,'start_s':start,'end_s':end,'points':points})
 
     def advance_world(self,end):
+        if getattr(self,'_background_preparation',None)is not None:self._background_preparation.before_tick()
         start=self.now;previous=self.truth();drivers={i:r['driver']for i,r in self.vehicles.items()};lift_before=self.lift_snapshot()
         self.check_depot_invariant()
         for identity,driver in drivers.items():
@@ -1017,8 +1079,8 @@ class WorldRunner:
         curves={};speed_bounds={};all_points={}
         for identity,driver in drivers.items():
             points=self.interval_points(identity,start,end,driver);all_points[identity]=points
-            curve=floor.motion.Curve(floor.canonical(points));curves[identity]=curve;bounds=floor.motion.bounds(curve)
-            speed_bounds[identity]={'linear_mm_s':math.hypot(*bounds[floor.F[1]]['max_abs'][:2]),'yaw_rad_s':bounds[floor.F[1]]['max_abs'][2]}
+            curve=floor.motion.Curve(floor.canonical(points));curves[identity]=curve
+            speed_bounds[identity]=world_velocity_bound(curve)
         self.auditor.audit(previous,self.truth(),end-start,speed_bounds,curves=curves,start_s=start,end_s=end)
         for identity,driver in drivers.items():self.append_episode(identity,start,end,all_points[identity],driver,lift_before)
         for identity,row in self.vehicles.items():

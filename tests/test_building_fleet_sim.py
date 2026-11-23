@@ -6,6 +6,7 @@ from pathlib import Path
 import sys
 import random
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_fleet_sim as sim
@@ -308,6 +309,251 @@ class AuditorTests(unittest.TestCase):
         current['BF01']['pose_mm'][2] = .1
         with self.assertRaisesRegex(ValueError,'angular bound'):
             auditor.audit(previous,current,.05,{'BF01':{'linear_mm_s':0,'yaw_rad_s':0}})
+
+    def test_endpoint_cache_reuses_only_exact_geometry_and_keeps_interval_bound(self):
+        row = dict(own(), footprint_mm=[512,412])
+        auditor = sim.IntervalAuditor(75, {'EG': [((-1000,300),(1000,300))]})
+        index = auditor.static['EG']
+        with patch.object(sim, 'polygon_segment_distance', wraps=sim.polygon_segment_distance) as measure:
+            self.assertEqual(auditor.static_rectangle_bound(index,row,row,0,0,.05),94)
+            self.assertEqual(auditor.static_rectangle_bound(index,row,row,10,0,.05),93.75)
+            self.assertEqual(measure.call_count,1)
+            moved = copy.deepcopy(row)
+            moved['pose_mm'][1] = 1e-8
+            self.assertLess(auditor.static_rectangle_bound(index,moved,moved,0,0,.05),94)
+            self.assertEqual(measure.call_count,2)
+            index.segments = (((-1000,200),(1000,200)),)
+            self.assertEqual(auditor.static_rectangle_bound(index,row,row,0,0,.05),0)
+            self.assertGreater(measure.call_count,2)
+
+
+
+class ExactStaticEndpointTests(unittest.TestCase):
+    def original(self,index,row):
+        polygon=sim.footprint(row)
+        return min((sim.polygon_segment_distance(polygon,*segment)for segment in index.segments),default=math.inf)
+
+    def assert_exact(self,index,row):
+        expected=self.original(index,row)
+        actual=sim.IntervalAuditor._static_endpoint_distance(index,row)
+        self.assertEqual(actual.hex(),expected.hex())
+
+    def test_random_rotated_rectangles_match_every_original_segment_distance(self):
+        rng=random.Random(811240)
+        for cell in(47.,500.,2300.):
+            segments=[((rng.uniform(-12000,12000),rng.uniform(-12000,12000)),
+                       (rng.uniform(-12000,12000),rng.uniform(-12000,12000)))for _ in range(55)]
+            index=sim.SegmentIndex(segments,cell)
+            for _ in range(24):
+                row=dict(own(rng.uniform(-15000,15000),rng.uniform(-15000,15000)),
+                    footprint_mm=[rng.uniform(1,1800),rng.uniform(1,1200)])
+                row['pose_mm'][2]=rng.uniform(-12*math.pi,12*math.pi)
+                self.assert_exact(index,row)
+
+    def test_closed_grid_edges_contacts_long_segments_and_large_translations(self):
+        for offset in(0.,1e9,-1e9):
+            for yaw in(0.,math.pi/2,math.pi/4,-.000000001):
+                row=dict(own(offset,offset),footprint_mm=[512.,412.]);row['pose_mm'][2]=yaw
+                corners=sim.footprint(row)
+                segments=[((offset-20000,offset+700),(offset+20000,offset+700)),
+                    (corners[0],corners[1]),((offset+5000,offset-5000),(offset+5000,offset+5000))]
+                for shift in(-1e-8,0.,1e-8):
+                    moved=[((a[0],a[1]+shift),(b[0],b[1]+shift))for a,b in segments]
+                    self.assert_exact(sim.SegmentIndex(moved),row)
+
+    def test_local_query_omits_far_work_and_retains_exact_cached_value(self):
+        row=dict(own(),footprint_mm=[512,412])
+        segments=[((-1000,300),(1000,300))]+[
+            ((50000+100*i,50000),(50000+100*i,50200))for i in range(400)]
+        index=sim.SegmentIndex(segments)
+        expected=self.original(index,row)
+        with patch.object(sim,'polygon_segment_distance',wraps=sim.polygon_segment_distance)as measure:
+            self.assertEqual(sim.IntervalAuditor._static_endpoint_distance(index,row),expected)
+            self.assertLess(measure.call_count,10)
+            count=measure.call_count
+            self.assertEqual(sim.IntervalAuditor._static_endpoint_distance(index,row),expected)
+            self.assertEqual(measure.call_count,count)
+        # Original ray/match consumers keep their exact read-only interface.
+        self.assertEqual(index.ray((0,0),(0,1),1000),300.)
+        self.assertTrue(index.matches((0,300),.001))
+
+    def test_empty_and_distant_geometry_expand_or_use_complete_fallback(self):
+        row=dict(own(),footprint_mm=[512,412])
+        for segments in([], [((1e7,1e7),(1e7+1000,1e7))],
+                         [((5000,-5000),(5000,5000)),((-5000,-5000),(-5000,5000))]):
+            self.assert_exact(sim.SegmentIndex(segments),row)
+
+    def test_frozen_membership_and_replaced_sources_cannot_reuse_a_stale_gap(self):
+        row=dict(own(),footprint_mm=[512,412]);index=sim.SegmentIndex([((-1000,300),(1000,300))])
+        self.assertEqual(sim.IntervalAuditor._static_endpoint_distance(index,row),94.)
+        with self.assertRaises(TypeError):index.cells[0,0]=()
+        cell=next(iter(index.cells))
+        with self.assertRaises(TypeError):index.cells[cell][0]=9
+        index.cells={};self.assert_exact(index,row)
+        index.segments=(((-1000,200),(1000,200)),);self.assert_exact(index,row)
+        self.assertEqual(sim.IntervalAuditor._static_endpoint_distance(index,row),0.)
+        index.cell=0.;self.assert_exact(index,row)
+
+    def test_rounded_degenerate_polygon_keeps_original_primitive_semantics(self):
+        row=dict(own(1e30,1e30),footprint_mm=[512,412])
+        self.assert_exact(sim.SegmentIndex([((0.,0.),(1.,1.))]),row)
+
+
+class ExactPairEndpointTests(unittest.TestCase):
+    def row(self,x=0.,y=0.,yaw=0.,length=512,width=412):
+        result=dict(own(x,y,radius=math.hypot(length,width)/2),footprint_mm=[length,width])
+        result['pose_mm'][2]=yaw
+        return result
+
+    def test_random_orientations_and_large_translations_keep_exact_original_hex(self):
+        rng=random.Random(138005)
+        auditor=sim.IntervalAuditor(85,{'EG':[]})
+        for _ in range(120):
+            origin=rng.choice([0.,1e9,-1e9])
+            rows=[self.row(origin+rng.uniform(-3000,3000),origin+rng.uniform(-3000,3000),
+                rng.uniform(-40*math.pi,40*math.pi),rng.uniform(10,2000),rng.uniform(10,1500))for _ in range(2)]
+            expected=sim.polygon_distance(*[sim.footprint(row)for row in rows])
+            self.assertEqual(auditor._pair_endpoint_distance(*rows).hex(),expected.hex())
+            self.assertEqual(auditor._pair_endpoint_distance(*rows).hex(),expected.hex())
+            reverse=sim.polygon_distance(*[sim.footprint(row)for row in reversed(rows)])
+            self.assertEqual(auditor._pair_endpoint_distance(*reversed(rows)).hex(),reverse.hex())
+
+    def test_repeated_pairs_reuse_geometry_and_shared_endpoints_reuse_corners(self):
+        auditor=sim.IntervalAuditor(85,{'EG':[]});a,b,c=self.row(),self.row(1000),self.row(2000)
+        with patch.object(sim,'polygon_distance',wraps=sim.polygon_distance)as distance:
+            with patch.object(sim,'footprint',wraps=sim.footprint)as shape:
+                auditor._pair_endpoint_distance(a,b);auditor._pair_endpoint_distance(a,b)
+                self.assertEqual(distance.call_count,1);self.assertEqual(shape.call_count,2)
+                auditor._pair_endpoint_distance(a,c);auditor._pair_endpoint_distance(b,c)
+                self.assertEqual(distance.call_count,3);self.assertEqual(shape.call_count,3)
+
+    def test_typed_signed_zero_tiny_pose_and_changed_shape_do_not_alias(self):
+        auditor=sim.IntervalAuditor(85,{'EG':[]});a,b=self.row(),self.row(1000.)
+        with patch.object(sim,'polygon_distance',wraps=sim.polygon_distance)as distance:
+            auditor._pair_endpoint_distance(a,b)
+            a['pose_mm'][0]=-0.;auditor._pair_endpoint_distance(a,b)
+            a['pose_mm'][0]=0;auditor._pair_endpoint_distance(a,b)
+            a['pose_mm'][0]=math.nextafter(0.,math.inf);auditor._pair_endpoint_distance(a,b)
+            b['footprint_mm'][0]=512.;auditor._pair_endpoint_distance(a,b)
+            b['footprint_mm'][0]=math.nextafter(512.,math.inf);auditor._pair_endpoint_distance(a,b)
+            self.assertEqual(distance.call_count,6)
+        b['footprint_mm'][0]=-512
+        with self.assertRaises(ValueError):auditor._pair_endpoint_distance(a,b)
+
+    def test_geometry_definition_changes_invalidate_both_pure_caches(self):
+        auditor=sim.IntervalAuditor(85,{'EG':[]});a,b=self.row(),self.row(1000.)
+        original=auditor._pair_endpoint_distance(a,b)
+        with patch.object(sim,'polygon_distance',return_value=original+1)as changed:
+            self.assertEqual(auditor._pair_endpoint_distance(a,b),original+1)
+            changed.assert_called_once()
+        self.assertEqual(auditor._pair_endpoint_distance(a,b),original)
+
+    def test_pair_and_corner_storage_is_bounded_and_eviction_recomputes(self):
+        auditor=sim.IntervalAuditor(85,{'EG':[]});a=self.row()
+        with patch.object(sim,'polygon_distance',wraps=sim.polygon_distance)as distance:
+            for i in range(2055):auditor._pair_endpoint_distance(a,self.row(1000.+i))
+            self.assertEqual(len(auditor._pair_endpoint_distances),2048)
+            self.assertLessEqual(len(auditor._endpoint_footprints),2048)
+            distance.reset_mock()
+            auditor._pair_endpoint_distance(a,self.row(3054.));self.assertEqual(distance.call_count,0)
+            auditor._pair_endpoint_distance(a,self.row(1000.));self.assertEqual(distance.call_count,1)
+
+    def test_current_angular_bound_and_actual_moving_contact_still_fail(self):
+        a,b=self.row(),self.row(y=487.)
+        previous={'BF01':a,'BF02':b};current=copy.deepcopy(previous)
+        zero={identity:{'linear_mm_s':0.,'yaw_rad_s':0.}for identity in previous}
+        auditor=sim.IntervalAuditor(75,{'EG':[]})
+        auditor.audit(previous,current,.05,zero)
+        self.assertEqual(auditor.minima['vehicle_vehicle'],75.)
+        angular=copy.deepcopy(zero);angular['BF01']['yaw_rad_s']=1.
+        with self.assertRaisesRegex(RuntimeError,'pair interval'):auditor.audit(previous,current,.05,angular)
+        current['BF02']['pose_mm'][1]=420.
+        moving=copy.deepcopy(zero);moving['BF02']['linear_mm_s']=1340.
+        with self.assertRaisesRegex(RuntimeError,'pair interval'):auditor.audit(previous,current,.05,moving)
+        # Floor and height gates remain current even for geometrically cached
+        # endpoints; they are deliberately absent from this pure planar key.
+        current=copy.deepcopy(previous);previous['BF02']['z_mm']=current['BF02']['z_mm']=4250.
+        auditor.audit(previous,current,.05,zero)
+
+
+class ExactPolygonDistanceTests(unittest.TestCase):
+    def polygon(self,x=0.,y=0.,yaw=0.,length=512.,width=412.):
+        return sim.footprint(dict(own(x,y),pose_mm=[x,y,yaw],footprint_mm=[length,width]))
+
+    def test_random_ordered_vertices_equal_uncached_hex_and_mutation_is_observed(self):
+        rng=random.Random(761004)
+        for _ in range(100):
+            offset=rng.choice([0.,1e9,-1e9])
+            polygons=[self.polygon(offset+rng.uniform(-3000,3000),offset+rng.uniform(-3000,3000),
+                rng.uniform(-20*math.pi,20*math.pi),rng.uniform(10,3000),rng.uniform(10,2000))for _ in range(2)]
+            expected=sim._polygon_distance_uncached(*polygons)
+            self.assertEqual(sim.polygon_distance(*polygons).hex(),expected.hex())
+            self.assertEqual(sim.polygon_distance(*polygons).hex(),expected.hex())
+            reverse=sim._polygon_distance_uncached(*reversed(polygons))
+            self.assertEqual(sim.polygon_distance(*reversed(polygons)).hex(),reverse.hex())
+        a,b=self.polygon(),self.polygon(1000.)
+        original=sim.polygon_distance(a,b)
+        b[0]=(b[0][0]+.01,b[0][1])
+        self.assertEqual(sim.polygon_distance(a,b).hex(),sim._polygon_distance_uncached(a,b).hex())
+        self.assertGreaterEqual(sim.polygon_distance(a,b),original)
+
+    def test_signed_zero_numeric_type_order_and_one_ulp_inputs_have_separate_entries(self):
+        a=[[0.,0.],[1.,0.],[1.,1.],[0.,1.]];b=[[4.,0.],[5.,0.],[5.,1.],[4.,1.]]
+        with patch.object(sim,'_polygon_distance_uncached',wraps=sim._polygon_distance_uncached)as original:
+            sim.polygon_distance(a,b);sim.polygon_distance(a,b);self.assertEqual(original.call_count,1)
+            a[0][0]=-0.;sim.polygon_distance(a,b)
+            a[0][0]=0;sim.polygon_distance(a,b)
+            a[0][0]=math.nextafter(0.,math.inf);sim.polygon_distance(a,b)
+            sim.polygon_distance(b,a)
+            self.assertEqual(original.call_count,5)
+
+    def test_primitive_replacement_cannot_reuse_old_distance(self):
+        a,b=self.polygon(),self.polygon(1000.)
+        original=sim.polygon_distance(a,b)
+        with patch.object(sim,'polygon_segment_distance',return_value=3.):
+            self.assertEqual(sim.polygon_distance(a,b),3.)
+        self.assertEqual(sim.polygon_distance(a,b),original)
+
+    def test_unusual_numeric_types_and_nonfinite_vertices_use_original_each_time(self):
+        from fractions import Fraction
+        a=[[Fraction(0),Fraction(0)],[Fraction(1),Fraction(0)],[Fraction(0),Fraction(1)]]
+        b=self.polygon(1000.)
+        for polygon in(a,[[0.,0.],[math.nan,0.],[0.,1.]],[[0.,0.],[math.inf,0.],[0.,1.]]):
+            expected=sim._polygon_distance_uncached(polygon,b)
+            with patch.object(sim,'_polygon_distance_uncached',wraps=sim._polygon_distance_uncached)as original:
+                self.assertEqual(sim.polygon_distance(polygon,b).hex(),expected.hex())
+                self.assertEqual(sim.polygon_distance(polygon,b).hex(),expected.hex())
+                self.assertEqual(original.call_count,2)
+
+    def test_bounded_lru_and_unchanged_polygon_skip_original_computation(self):
+        room=[[-10000.,-10000.],[10000.,-10000.],[10000.,10000.],[-10000.,10000.]]
+        with patch.object(sim,'_polygon_distance_uncached',wraps=sim._polygon_distance_uncached)as original:
+            for i in range(2055):sim.polygon_distance(self.polygon(float(i)),room)
+            self.assertEqual(len(sim._POLYGON_DISTANCE_CACHE),2048)
+            original.reset_mock()
+            sim.polygon_distance(self.polygon(2054.),room);self.assertEqual(original.call_count,0)
+            sim.polygon_distance(self.polygon(0.),room);self.assertEqual(original.call_count,1)
+
+    def test_depot_owner_rest_and_velocity_checks_still_run_on_cached_geometry(self):
+        import building_fleet_depot as depot
+        room={('EG','garage'):[[-2000.,-2000.],[2000.,-2000.],[2000.,2000.],[-2000.,2000.]]}
+        aliases={('EG','garage'):'own-resource'}
+        homes={'BF01':{'level':'EG','pose_mm_rad':[0.,0.,0.]},'BF02':{'level':'EG','pose_mm_rad':[1000.,0.,0.]}}
+        states={identity:{**dict(own(*home['pose_mm_rad'][:2]),footprint_mm=[512,412]),
+            'velocity_mm_rad_s':[0.,0.,0.],'acceleration_mm_rad_s2':[0.,0.,0.]}for identity,home in homes.items()}
+        states['BF01']['pose_mm'][0]=100.;states['BF01']['velocity_mm_rad_s'][0]=10.
+        with patch.object(sim,'_polygon_distance_uncached',wraps=sim._polygon_distance_uncached)as original:
+            self.assertEqual(depot.check_invariant(states,homes,room,aliases,{'own-resource':'BF01'},85),2)
+            self.assertEqual(original.call_count,2);original.reset_mock()
+            self.assertEqual(depot.check_invariant(states,homes,room,aliases,{'own-resource':'BF01'},85),2)
+            self.assertEqual(original.call_count,0)
+            with self.assertRaisesRegex(RuntimeError,'depot map invariant'):
+                depot.check_invariant(states,homes,room,aliases,{'own-resource':'BF02'},85)
+            self.assertEqual(original.call_count,0)
+            states['BF02']['velocity_mm_rad_s'][0]=1.
+            with self.assertRaisesRegex(RuntimeError,'depot map invariant'):
+                depot.check_invariant(states,homes,room,aliases,{'own-resource':'BF01'},85)
+            self.assertEqual(original.call_count,0)
 
 
 if __name__ == '__main__': unittest.main()

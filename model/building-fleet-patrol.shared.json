@@ -9,7 +9,7 @@
   },
   "patrol": {
     "termination": "explicit_stop",
-    "startup": "first_received_camera_frames",
+    "startup": "own_received_camera_frame",
     "targets": "/missions/targets",
     "selection": "oldest_received_visit"
   },

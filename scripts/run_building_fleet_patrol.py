@@ -27,10 +27,13 @@ LIVE_VIEW = model.ROOT / 'scripts/building_fleet_live_view.js'
 def load_profile(path=PROFILE):
     """Reject unsupported policies instead of silently using a different one."""
     value = model.read_json(project_path(path))
+    startup=value.get('patrol',{}).get('startup')
+    if startup not in ('first_received_camera_frames','own_received_camera_frame'):
+        raise ValueError('Explicit supported received-camera startup policy required')
     expected = {
         'format': 'solidcraftbot.building-fleet-patrol/1', 'id': 'BF01-Patrol',
         'sources': {'fleet': artifact(model.ROOT / 'model/building-fleet-demo.shared.json')},
-        'patrol': {'termination': 'explicit_stop', 'startup': 'first_received_camera_frames',
+        'patrol': {'termination': 'explicit_stop', 'startup': startup,
                    'targets': '/missions/targets',
                    'selection': 'oldest_received_visit'},
         'recruitment': {'selection': 'lowest_feasible_route_eta',
@@ -48,7 +51,7 @@ def load_profile(path=PROFILE):
     return value
 
 
-def build_page(source, profile, args, output):
+def build_page(source, profile, args, output, *, progressive_output=None):
     """Reuse the checked native world and the existing physical monitor wall."""
     from export_building_fleet_vehicle_freecad import checked_camera_report
     camera = project_path(args.camera_report)
@@ -64,7 +67,8 @@ def build_page(source, profile, args, output):
     if {g['id'] for g in vehicle['scene']['groups']} != expected:
         raise ValueError('Complete physical vehicle mesh required')
     world = project_path(args.walkthrough_export) / 'world-build-report.json'
-    normal, pins = browser.world_presentation(world, include_monitor_overlay=True)
+    normal, pins = browser.world_presentation(world, include_monitor_overlay=True,
+                                               progressive_output=progressive_output)
     payload = {'vehicle_mesh': vehicle, 'camera_presentation': source['camera_presentation'],
         'live': {'state_url': '/api/state', 'jobs_url': '/api/jobs',
             'control_url': '/api/control', 'poll_interval_ms':

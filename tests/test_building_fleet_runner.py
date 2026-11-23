@@ -199,4 +199,57 @@ class RuntimeBoundaryTests(unittest.TestCase):
             self.assertEqual(len(rows),1);self.assertFalse((path/'program.json').exists())
 
 
+class FirstReceivedScanTests(unittest.TestCase):
+    def world(self,immediate):
+        import building_fleet_comm as comm
+        import building_fleet_sim as sim
+        world=object.__new__(WorldRunner)
+        world.vehicles={'BF01':{'pose_mm_rad':[0.,0.,0.],'level':'EG','z_mm':0.,
+            'driver':None,'phase':'home','capture_seq':0,'aboard':False}}
+        world.sensor={'angular_step_deg':90,'range_mm':1000,'period_s':.2,'latency_s':.1,'stale_after_s':.4}
+        world.world=sim.SensorWorld(world.sensor,{'EG':[((500.,-1000.),(500.,1000.))]})
+        world.truth=lambda:{'BF01':{'pose_mm':world.vehicles['BF01']['pose_mm_rad'][:],
+            'level':'EG','z_mm':0.,'radius_mm':1.}}
+        world.lift_snapshot=lambda:{'doors_open':False,'level':'EG','z_mm':1000.}
+        world.capture_history={'BF01':{}};world.camera_captures={};world.latest_scans={}
+        world.scan_queue=[];world.scan_serial=0;world.evidence=None
+        world.scan_step=4;world.perception_step=10;world.heartbeat_step=20
+        world.area=lambda identity:'fixture';world.uplink=comm.Channel([.1,.1],20261120,.1)
+        world._first_perception_on_scan=immediate;world.now=0.
+        return world
+
+    def test_first_real_delayed_scan_emits_without_period_wait_and_keeps_radio_delay(self):
+        world=self.world(True);received=[]
+        for step in range(13):
+            world.now=round(step*.05,3);world.observe(step)
+            received.extend(m for m in world.uplink.deliver(world.now)if m['kind']=='perception')
+            if step<2:self.assertEqual(world.vehicles['BF01']['capture_seq'],0)
+            if step==2:
+                self.assertEqual(world.vehicles['BF01']['capture_seq'],1)
+                self.assertEqual(received,[])
+                self.assertEqual(world.camera_captures['BF01-camera-1']['captured_s'],0.)
+        self.assertEqual([m['sent_s']for m in received],[.1,.5])
+        self.assertEqual([m['received_s']for m in received],[.2,.6])
+        self.assertEqual([m['payload']['captured_s']for m in received],[0.,.4])
+        self.assertGreater(received[0]['payload']['scan']['return_count'],0)
+
+    def test_legacy_observer_keeps_original_period_and_original_capture(self):
+        world=self.world(False);received=[]
+        for step in range(13):
+            world.now=round(step*.05,3);world.observe(step)
+            received.extend(m for m in world.uplink.deliver(world.now)if m['kind']=='perception')
+        self.assertEqual(len(received),1)
+        self.assertEqual(received[0]['sent_s'],.5);self.assertEqual(received[0]['received_s'],.6)
+        self.assertEqual(received[0]['payload']['captured_s'],.4)
+
+    def test_capture_rest_flag_requires_observed_exact_zero_velocity_and_acceleration(self):
+        world=self.world(True);driver=SimpleNamespace(v=1e-12,a=0.)
+        world.vehicles['BF01']['driver']=driver
+        world.observe(0);self.assertFalse(world.capture_history['BF01'][0.]['own_rest'])
+        world.now=.05;driver.v=0.;driver.a=1e-12
+        world.observe(1);self.assertFalse(world.capture_history['BF01'][.05]['own_rest'])
+        world.now=.1;driver.a=0.
+        world.observe(2);self.assertTrue(world.capture_history['BF01'][.1]['own_rest'])
+
+
 if __name__=='__main__':unittest.main()

@@ -201,6 +201,7 @@ class PatrolWorldRunner(WorldRunner):
         if (profile.get('format') != 'solidcraftbot.building-fleet-patrol/1' or
                 profile.get('patrol', {}).get('termination') != 'explicit_stop' or
                 profile.get('patrol', {}).get('selection') != 'oldest_received_visit' or
+                profile.get('patrol', {}).get('startup') not in ('first_received_camera_frames','own_received_camera_frame') or
                 profile.get('recruitment', {}).get('pickup_delivery') != 'empty_inspection_visits'):
             raise ValueError('Explicit continuous empty-patrol profile required')
         self.profile = copy.deepcopy(profile)
@@ -216,6 +217,20 @@ class PatrolWorldRunner(WorldRunner):
         self._lift_discontinuity_s = -math.inf
         self._deferred_patrol = {}
         self._startup_ready = False
+        self._startup_seen_frames = set()
+        self._first_perception_on_scan = self._startup_policy() == 'own_received_camera_frame'
+
+    def _startup_policy(self):
+        return getattr(self,'profile',{}).get('patrol',{}).get('startup','first_received_camera_frames')
+
+    def _own_startup_ready(self,identity):
+        if self._startup_policy()=='first_received_camera_frames':return self._startup_ready
+        return identity in getattr(self,'_startup_seen_frames',set())or identity in self._camera_frames
+
+    def request_mission(self,identity,level,now):
+        if self._startup_policy()=='own_received_camera_frame'and not self._own_startup_ready(identity):
+            return {'status':'pending_own_camera'}
+        return super().request_mission(identity,level,now)
 
     def set_paused(self, paused):
         if type(paused) is not bool:
@@ -227,6 +242,7 @@ class PatrolWorldRunner(WorldRunner):
 
     def eligible(self, identity):
         """Only observed stationary boundaries without unfinished commitments."""
+        if not self._own_startup_ready(identity):return False
         row = self.vehicles[identity]
         state = self.planner.states[identity]
         if (identity in self.dispatcher.vehicle_jobs or row['driver'] is not None or
@@ -368,6 +384,10 @@ class PatrolWorldRunner(WorldRunner):
         Vehicles denied that token remain at their exact own home/rest pose.
         """
         row = self.vehicles[identity]
+        if self._startup_policy()=='own_received_camera_frame'and not self._own_startup_ready(identity):
+            row['hold_reason']='await_own_received_camera_frame'
+            row['hold_condition']='first_actual_own_perception_delivery'
+            return
         state = self.planner.states[identity]
         queued = any(mission['mission_id'] not in state['completed'] for mission in state['queue'])
         if (not row.get('done', False) and row['driver'] is None and not row['aboard'] and
@@ -386,7 +406,9 @@ class PatrolWorldRunner(WorldRunner):
         return [{'id': identity, 'pose_xyz_mm': [*row['pose_mm_rad'][:2], row['z_mm']],
                  'yaw_rad': row['pose_mm_rad'][2], 'level_id': row['level'],
                  'mode': row['phase'], 'attached_cabin': row['aboard'],
-                 'job_id': self.dispatcher.vehicle_jobs.get(identity)}
+                 'job_id': self.dispatcher.vehicle_jobs.get(identity),
+                 'own_route_horizon_mm': getattr(row['driver'],'certified_horizon_mm',None),
+                 'awaiting_checked_continuation':getattr(row['driver'],'awaiting_continuation',False)}
                 for identity, row in sorted(self.vehicles.items())]
 
     def _lift_state(self):
@@ -516,9 +538,11 @@ class PatrolWorldRunner(WorldRunner):
             raise PatrolStorageLimit('Live session storage limit reached; retained evidence remains intact. '
                                      'Start a new session to continue the development exercise.')
         self.deliver_messages(self.now)
+        if not hasattr(self,'_startup_seen_frames'):self._startup_seen_frames=set()
+        self._startup_seen_frames.update(self._camera_frames)
         if not self._startup_ready:
-            self._startup_ready = set(self._camera_frames) == set(self.vehicles)
-            if not self._startup_ready:
+            self._startup_ready = set(self.vehicles) <= self._startup_seen_frames
+            if not self._startup_ready and self._startup_policy()=='first_received_camera_frames':
                 # Once-only readiness is an observed communication condition,
                 # not a demonstration pause or fabricated camera receipt.
                 self.observe(self.step_index)
@@ -526,6 +550,7 @@ class PatrolWorldRunner(WorldRunner):
         self.recruit_pending()
         for identity in sorted(self.vehicles,
                                key=lambda identity: (identity not in self.dispatcher.vehicle_jobs, identity)):
+            if not self._own_startup_ready(identity):continue
             if self.vehicles[identity]['aboard'] and not self.vehicles[identity]['mission_pending']:
                 self.request_mission(identity, self.vehicles[identity]['level'], self.now)
             self.idle_action(identity)
@@ -552,7 +577,10 @@ class PatrolWorldRunner(WorldRunner):
         return {'format': SNAPSHOT_FORMAT, 'session_id': self.session_id,
                 'model_time_s': self.now, 'paused': self.paused,
                 'startup_ready': self._startup_ready,
-                'startup_phase': 'active' if self._startup_ready else 'awaiting_first_received_camera_frames',
+                'startup_phase': ('active' if self._startup_ready else 'independent_vehicle_startup'
+                    if self._startup_policy()=='own_received_camera_frame'else 'awaiting_first_received_camera_frames'),
+                'background_preparation': (self._background_preparation.snapshot()
+                    if getattr(self,'_background_preparation',None)is not None else None),
                 'states': self._states(), 'lift': self._lift_state(),
                 'executed_window': self.executed_window(),
                 'room_route_object_ids': sorted(self.route_door_ids),

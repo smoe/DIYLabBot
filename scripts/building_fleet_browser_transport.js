@@ -17,9 +17,11 @@ function create(config,options={}){
  const resolved=resolveConfig(config,base);
  const factory=options.workerFactory??((url)=>new Worker(url,{type:'module',name:'BF01 live patrol'}));
  const worker=factory(resolved.module_url);
+ let resolveReady;const ready=new Promise(resolve=>{resolveReady=resolve;});
+ const settleReady=()=>{if(resolveReady){resolveReady({status:state.status});resolveReady=null;}};
  let state={format:'solidcraftbot.building-fleet-live-state/1',status:'starting',phase:'loading_browser_engine',paused:false},disposed=false,commandCount=0;
  const requests=new Map();
- const fatal=error=>{state={...state,status:'error',error:String(error||'Browser simulation stopped')};};
+ const fatal=error=>{state={...state,status:'error',error:String(error||'Browser simulation stopped')};settleReady();};
  const send=command=>{require(!disposed,'This browser simulation has been closed');require(state.status!=='error','The browser simulation stopped; reload to start a new session');worker.postMessage({type:'command',id:++commandCount,command});return commandCount;};
  worker.onmessage=event=>{
   const message=event.data;
@@ -29,6 +31,7 @@ function create(config,options={}){
    if(next?.format!==SNAPSHOT||typeof next.session_id!=='string'||!Number.isFinite(next.model_time_s)){fatal('Invalid executed simulation state');return;}
    if(state.format===SNAPSHOT&&state.session_id===next.session_id&&next.model_time_s<state.model_time_s){fatal('Simulation clock moved backwards');return;}
    state={...clone(next),status:'ready',command_errors:state.command_errors??[]};
+   settleReady();
   }else if(message.type==='progress'){
    const p=message.progress??{},progress={};
    for(const key of ['phase','vehicle_id','done','total','routes'])if(p[key]!==undefined)progress[key]=p[key];
@@ -42,6 +45,7 @@ function create(config,options={}){
  worker.onmessageerror=()=>fatal('The browser simulation returned unreadable data');
  worker.postMessage({type:'boot',config:resolved});
  return Object.freeze({
+  ready,
   async request(url,body){
    require(!disposed,'This browser simulation has been closed');
    const address=new URL(url,base);require(address.origin===new URL(base).origin,'Simulation commands must use the page origin');const path=address.pathname;

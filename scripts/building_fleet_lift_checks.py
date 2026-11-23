@@ -96,6 +96,12 @@ def _verify_export(mesh):
     """Recheck the bytes actually consumed by the supplied checked mesh."""
     if not isinstance(mesh, navigation.NativeMesh):
         raise ValueError('Current source-pinned NativeMesh required')
+    if hasattr(mesh, '_runtime_static_cache_token'):
+        from building_fleet_runtime_cache import cached_world_report
+        cached = cached_world_report(mesh)
+        if cached is None:
+            raise ValueError('Unverified compact native geometry provenance')
+        return cached
     report, _, _ = walkthrough_world.read(mesh.export, ROOT)
     return report
 
@@ -254,6 +260,10 @@ def _source_surface_contract(building_sha256, fittings_sha256):
 
 def source_surface_contract():
     """Return the current source-derived R2 body identities and top offset."""
+    from building_fleet_runtime_cache import cached_surface_contract
+    cached = cached_surface_contract()
+    if cached is not None:
+        return cached
     return copy.deepcopy(_source_surface_contract(
         model.digest(ROOT / 'model/building-stack.shared.json'),
         model.digest(ROOT / 'scripts/lift_fittings.py')))

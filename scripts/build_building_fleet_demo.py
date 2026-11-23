@@ -22,6 +22,7 @@ ADDITIONAL_HTML_TARGET_BYTES=10*1024*1024
 ANCHOR='    window.__buildingWalkthrough=Object.freeze({'
 BRIDGE=r"""
     let fleetHooks=null;const fleetActive=true;let fleetSavedCamera=null;
+    const fleetVisualGeometry=window.__walkthroughProgressiveGeometry??null;
     const fleetPayload=JSON.parse(document.getElementById('building-fleet-data').textContent);
     const fleetBusy=()=>({status:'rejected_busy',reason:'Aufzug im Flottenbetrieb; Fahrzeug folgen zum Mitfahren'});
     // The opt-in page owns the compiled cabin. Neither overlay buttons,
@@ -39,6 +40,9 @@ BRIDGE=r"""
       return multiply(projection,view);
     }
     const fleetBridge={gl,canvas,stage:stageNode,requestRender,
+      get geometryRevision(){return fleetVisualGeometry?.revision??0;},
+      visualLevelReady:level=>fleetVisualGeometry?.levelReady(level)??true,
+      observeVisualGeometry:snapshot=>fleetVisualGeometry?.observe(snapshot),
       startAt:id=>setStop(id),
       atMonitorWall:()=>stopId==='camera-wall',
       connectMonitorFeeds:source=>{if(!monitorWall)throw Error('Source-bound physical monitor wall unavailable');return monitorWall.connectReceivedSource(source);},
@@ -49,7 +53,7 @@ BRIDGE=r"""
       endFollow:()=>{if(fleetSavedCamera){eye=fleetSavedCamera.eye;yaw=fleetSavedCamera.yaw;pitch=fleetSavedCamera.pitch;sceneId=fleetSavedCamera.sceneId;selectedLevel=fleetSavedCamera.selectedLevel;isolated=fleetSavedCamera.isolated;levelSelect.value=selectedLevel;isolationButton.setAttribute('aria-pressed',String(isolated));locationLabel.textContent=fleetSavedCamera.location;contextLabel.textContent=fleetSavedCamera.context;fleetSavedCamera=null;}root.dataset.freeCamera='true';clearInputKeys();requestRender();},
       doorOpen:id=>{const o=objectStates.get(id);return Boolean(o&&o.state==='open'&&!o.transition);},
       activate:hooks=>{fleetHooks=hooks;clearInputKeys();},
-      follow:state=>{clearInputKeys();sceneId='building';isolated=false;selectedLevel=state.level_id;levelSelect.value=selectedLevel;
+      follow:state=>{if(fleetVisualGeometry&&!fleetVisualGeometry.levelReady(state.level_id)){fleetVisualGeometry.requestView(state.level_id,()=>fleetBridge.follow(state));return;}clearInputKeys();sceneId='building';isolated=false;selectedLevel=state.level_id;levelSelect.value=selectedLevel;
         eye=state.pose_xyz_mm.map((v,i)=>v/1000+(i===2?eyeHeight:0));eye[0]-=Math.cos(state.yaw_rad)*eyeHeight;eye[1]-=Math.sin(state.yaw_rad)*eyeHeight;
         yaw=state.yaw_rad;pitch=-Math.atan2(eyeHeight/2,eyeHeight);root.dataset.freeCamera='false';locationLabel.textContent=state.id+' folgen';contextLabel.textContent='Synthetische BF01-Fahrt · '+selectedLevel;},
       applyLift:state=>{const cabin=objectStates.get(elevatorConfig.object_id);cabin.value=state.z_mm;cabin.transition=null;
@@ -69,12 +73,8 @@ BRIDGE=r"""
           poses.push([object,object.value,object.state,object.targetState,object.transition]);const initial=object.config.initial_state||object.config.reference_state;
           object.value=object.config.states[initial];object.state=object.targetState=initial;object.transition=null;}
         try{
-          gl.viewport(0,0,width,height);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);gl.uniform1i(uniforms.screenEnabled,0);const scene=prepareScene('building');gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,fleetCaptureMatrix(width/height));gl.uniform3fv(uniforms.eye,eye);gl.disable(gl.BLEND);gl.depthMask(true);
-          for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id),on=levelsOn?.includes(elevator.displayLevel());gl.uniform1i(uniforms.emissive,Boolean(on));gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,levelsOn?ledColor(on?liftControls.led_color:liftControls.inactive_color):group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-          gl.uniform1i(uniforms.emissive,0);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);
-          const transparent=scene.transparent.map(group=>{const m=group.object?objectMatrix(group.object):null,p=group.centre,centre=m?[0,1,2].map(i=>m[i]*p[0]+m[i+4]*p[1]+m[i+8]*p[2]+m[i+12]):p;return{group,distance:dot(centre.map((v,i)=>v-eye[i]),centre.map((v,i)=>v-eye[i]))};}).sort((a,b)=>b.distance-a.distance);
-          for(const {group}of transparent){gl.uniformMatrix4fv(uniforms.modelMatrix,false,group.object?objectMatrix(group.object):identity());gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);}
-          gl.depthMask(true);gl.disable(gl.BLEND);drawFleet();
+          gl.viewport(0,0,width,height);
+          drawScene(prepareScene('building',true),fleetCaptureMatrix(width/height),eye,true);drawFleet();
         }finally{
           for(const [object,value,state,target,transition]of poses){object.value=value;object.state=state;object.targetState=target;object.transition=transition;}
           eye=saved.eye;yaw=saved.yaw;pitch=saved.pitch;sceneId=saved.sceneId;selectedLevel=saved.selectedLevel;isolated=saved.isolated;fleetCaptureFrame=null;gl.depthMask(true);gl.disable(gl.BLEND);gl.useProgram(program);
@@ -150,7 +150,7 @@ def html_budget(additional_bytes):
             'policy':'Presentation target; exceedance is reported without dropping PVA, received telemetry or captures'}
 
 
-def world_presentation(world_path,*,include_monitor_overlay=False):
+def world_presentation(world_path,*,include_monitor_overlay=False,progressive_output=None):
     """Render the checked physical world with the current shared viewer adapter."""
     import build_building_walkthrough as builder
     import walkthrough_world
@@ -169,7 +169,14 @@ def world_presentation(world_path,*,include_monitor_overlay=False):
         if overlay is None:raise ValueError('Source-bound physical monitor wall required')
         payload=builder.attach_monitor_overlay(payload,overlay)
         pins=builder.merge_pins(pins,overlay['source_files_sha256'])
+    if progressive_output is not None:
+        import building_fleet_progressive_presentation as progressive
+        payload=progressive.derive(payload,progressive_output,world_report_sha256=native.digest(world_path))
+        for path in (Path(progressive.__file__),progressive.SCRIPT,progressive.WORKER):
+            pins[str(path.relative_to(ROOT))]=native.digest(path)
     normal=builder.embed_html(builder.TEMPLATE.read_text(encoding='utf-8'),payload)
+    if progressive_output is not None:
+        normal=progressive.attach(normal)
     native.verify_pins(pins)
     return normal,pins
 

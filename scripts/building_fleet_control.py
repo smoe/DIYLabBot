@@ -2,12 +2,37 @@
 import bisect
 import copy
 import math
+import hashlib
+import json
+from collections import OrderedDict
 from functools import lru_cache
 import l01_local_traffic as local
 import tr01_floor_motion as floor
 from building_fleet_model import reference, resolved_sensor
 from building_fleet_motion import Path, transition, perception_speed_limit, compile_motion, episode_dynamics, spatial_bounds, interval_extrema
 F = floor.F
+
+
+def preparation_digest(value):
+    """Bind worker receipts to exact JSON values, including numeric types/sign."""
+    return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+
+
+class PreparedNominal:
+    """An explicit source-bound receipt from the same isolated planning code.
+
+    This is an execution optimization inside the synthetic browser runtime,
+    not a signature, hardware attestation or replacement for per-step scans.
+    """
+    def __init__(self,source,path,zone_caps,program,proof,endpoint_mm):
+        if not isinstance(proof,dict)or proof.get('time_quantum_s')!=.001:raise ValueError('Actual quantized nominal proof required')
+        self.binding=preparation_digest([source,path.pieces,path.ends,zone_caps,program,endpoint_mm])
+        self.proof=copy.deepcopy(proof)
+
+    def verify(self,source,path,zone_caps,program,endpoint_mm):
+        if self.binding!=preparation_digest([source,path.pieces,path.ends,zone_caps,program,endpoint_mm]):
+            raise ValueError('Prepared nominal no longer matches its exact source/path/program')
+        return copy.deepcopy(self.proof)
 
 
 def _quantized_scalar_clock(curve,origin=0.,progress_events=(),*,periodic_fit=True):
@@ -79,7 +104,40 @@ def _scalar_stop_catalogue(velocity,acceleration,A,J,closing):
 
 
 
+_PREPARED_SCALAR_STOPS={}
+
+
+def scalar_stop_cache_input_sha256(velocity,acceleration,A,J,closing):
+    values=[velocity,acceleration,A,J,closing]
+    if (any(type(v)not in(int,float)or not math.isfinite(v)for v in values)or
+            velocity<0 or A<=0 or J<=0 or closing<0):raise ValueError('Finite source scalar stopping inputs required')
+    return preparation_digest(values)
+
+
+def bind_prepared_scalar_stops(rows):
+    """Restore source-pinned pure launch calculations, never dynamic brakes."""
+    if type(rows)is not list or len(rows)>16:raise ValueError('Bounded source scalar-stop receipts required')
+    prepared={}
+    for row in rows:
+        if type(row)is not dict or set(row)!={'inputs','input_sha256','result'}or type(row['inputs'])is not list or len(row['inputs'])!=5:
+            raise ValueError('Closed exact-input scalar-stop receipt required')
+        key=scalar_stop_cache_input_sha256(*row['inputs'])
+        if row['input_sha256']!=key or key in prepared:raise ValueError('Exact unique source stopping inputs required')
+        result=row['result'];A,J=row['inputs'][2:4]
+        if type(result)is not dict or set(result)!={'distance_mm','duration_s','dynamics'}:raise ValueError('Actual scalar-stop derivation required')
+        if (any(type(result[k])not in(int,float)or not math.isfinite(result[k])or result[k]<=0 for k in('distance_mm','duration_s'))or
+                type(result['dynamics'])is not dict or set(result['dynamics'])!={'velocity','acceleration','jerk'}or
+                any(type(v)not in(int,float)or not math.isfinite(v)or v<0 for v in result['dynamics'].values())or
+                result['dynamics']['acceleration']>A*.98 or result['dynamics']['jerk']>J*.98):
+            raise ValueError('Prepared scalar stop contradicts unchanged source bounds')
+        prepared[key]=copy.deepcopy(result)
+    if len(_PREPARED_SCALAR_STOPS)+len(prepared)>32:_PREPARED_SCALAR_STOPS.clear()
+    _PREPARED_SCALAR_STOPS.update(prepared)
+
+
 def _qualified_scalar_stop(velocity,acceleration,A,J,closing):
+    prepared=_PREPARED_SCALAR_STOPS.get(scalar_stop_cache_input_sha256(velocity,acceleration,A,J,closing))
+    if prepared is not None:return copy.deepcopy(prepared)
     row=next(_scalar_stop_catalogue(velocity,acceleration,A,J,closing),None)
     return {k:v for k,v in row.items()if k not in('clock','interval_bounds')}if row else None
 
@@ -107,8 +165,44 @@ def qualified_perception_limit(sensor_values,limit_values,radius,localization):
            'global_maximum_proved':False,'hardware_qualified':False}
 
 
+_PREPARED_PERCEPTION={}
+
+
+def perception_cache_input_sha256(source,radius):
+    return preparation_digest([resolved_sensor(source),source['motion']['empty_linear_limits'],
+        radius,source['geometry']['localization_tolerance_mm']])
+
+
+def bind_prepared_perception_limit(source,radius,receipt):
+    """Restore pure math only after the caller verifies its static cache pins.
+
+    The cache derivation binds the original complete stopping-family proof
+    operations. This is not a sensor observation or a per-step stop approval.
+    """
+    key=perception_cache_input_sha256(source,radius)
+    if type(receipt)is not dict or set(receipt)!={'input_sha256','result'}or receipt['input_sha256']!=key:
+        raise ValueError('Prepared perception proof belongs to different exact source inputs')
+    result=receipt['result'];sensor=resolved_sensor(source);maximum=source['motion']['empty_linear_limits']['velocity_mm_s']
+    required={'velocity_mm_s','applied_velocity_mm_s','required_range_mm','reaction_s','stop',
+        'localization_allowance_mm','basis','global_maximum_proved','hardware_qualified'}
+    if type(result)is not dict or set(result)!=required:raise ValueError('Closed prepared perception receipt required')
+    for field in('velocity_mm_s','applied_velocity_mm_s','required_range_mm','reaction_s','localization_allowance_mm'):
+        if type(result[field])not in(int,float)or not math.isfinite(result[field]):raise ValueError('Finite prepared perception values required')
+    if not(0<result['applied_velocity_mm_s']<=result['velocity_mm_s']<=maximum and
+           0<result['required_range_mm']<=sensor['range_mm']and
+           result['reaction_s']==sensor['period_s']+sensor['latency_s']+sensor['stale_after_s']and
+           result['localization_allowance_mm']==source['geometry']['localization_tolerance_mm']and
+           result['global_maximum_proved']is False and result['hardware_qualified']is False and
+           isinstance(result['stop'],dict)):
+        raise ValueError('Prepared perception receipt contradicts the unchanged source contract')
+    if len(_PREPARED_PERCEPTION)>=8:_PREPARED_PERCEPTION.pop(next(iter(_PREPARED_PERCEPTION)))
+    _PREPARED_PERCEPTION[key]=copy.deepcopy(result)
+
+
 def source_perception_limit(source,radius):
     """Share one quantized-stop perception cap with the own motion compiler."""
+    prepared=_PREPARED_PERCEPTION.get(perception_cache_input_sha256(source,radius))
+    if prepared is not None:return copy.deepcopy(prepared)
     linear=source['motion']['empty_linear_limits']
     limits=dict(zip(('velocity','acceleration','jerk'),
         (linear['velocity_mm_s'],linear['acceleration_mm_s2'],linear['jerk_mm_s3'])))
@@ -126,8 +220,11 @@ class Controller(local.LocalController):
     and recovery clocks are independently bounded before execution. A failed
     export/clearance check rejects the build instead of relaxing a limit.
     """
+    _supports_partial_horizon=False
+
     def __init__(self, path, source, zone_caps=(), own_start_s=0, radius_mm=None,
-                 static_return=None, motion_program=None):
+                 static_return=None, motion_program=None, prepared_nominal=None,
+                 certified_horizon_mm=None,prior_localization=None):
         from building_fleet_routes import vehicle_envelope
         self.path=path;self.source=source
         envelope=vehicle_envelope()
@@ -145,6 +242,8 @@ class Controller(local.LocalController):
         self.zone_caps = sorted(zone_caps)
         self.angular = reference(source,'angular_profile')['limits']['angular']
         self.static_return = static_return
+        if prior_localization is not None and not callable(prior_localization):raise ValueError('Optional own historical localization must be callable')
+        self.prior_localization=prior_localization
         super().__init__(0,path.length,cfg,limits,self.radius)
         self.mode = 'waiting'; self.history = []; self.recorded = []; self.record_times = []
         self.heading_offset=0.
@@ -162,19 +261,28 @@ class Controller(local.LocalController):
         nodes=self.nominal_clock.points
         if self.nominal_clock.times[0]!=0 or any(len(p[field])!=1 for p in nodes for field in F[:3]):raise ValueError('Own scalar clock requires time zero and one-dimensional complete PVA')
         if abs(nodes[0][F[0]][0])>1e-9 or any(abs(p[f][0])>1e-8 for p in(nodes[0],nodes[-1])for f in F[1:3]):raise ValueError('Own scalar clock must start at zero and rest at both functional endpoints')
-        if any(p[F[0]][0]<-1e-8 or p[F[0]][0]>path.length+1e-5 for p in nodes)or floor.motion.bounds(self.nominal_clock)[F[1]]['min'][0]<-1e-8:raise ValueError('Own scalar clock must remain monotone on its route')
+        endpoint=path.length if certified_horizon_mm is None else certified_horizon_mm
+        if type(endpoint)not in(int,float)or not math.isfinite(endpoint)or not 0<endpoint<=path.length:raise ValueError('Certified own nominal horizon must lie inside the unchanged full path')
+        if endpoint<path.length and not self._supports_partial_horizon:raise ValueError('A partial horizon requires the explicit rolling continuation controller')
+        prepared_proof=None
+        if prepared_nominal is not None:
+            if type(prepared_nominal)is not PreparedNominal:raise ValueError('Explicit prepared own nominal receipt required')
+            prepared_proof=prepared_nominal.verify(source,path,zone_caps,program,endpoint)
+        if any(p[F[0]][0]<-1e-8 or p[F[0]][0]>endpoint+1e-5 for p in nodes)or(prepared_proof is None and floor.motion.bounds(self.nominal_clock)[F[1]]['min'][0]<-1e-8):raise ValueError('Own scalar clock must remain monotone on its route')
         initial_heading=program['points'][0]['pose_mm_rad'][2]
         raw_heading=path.evaluate(0)[0][2]
         self.heading_offset=(initial_heading-raw_heading+math.pi)%(2*math.pi)-math.pi
         if min(abs(self.heading_offset),abs(abs(self.heading_offset)-math.pi))>1e-6:raise ValueError('Own vehicle heading must follow or reverse its path')
         self._record(own_start_s)
-        if abs(self.nominal_clock.points[-1][F[0]][0]-path.length)>1e-5:raise ValueError('Own compiled clock must cover this path exactly')
+        if abs(self.nominal_clock.points[-1][F[0]][0]-endpoint)>1e-5:raise ValueError('Own compiled clock must cover its certified horizon exactly')
+        self.certified_horizon_mm=endpoint
         self._brake_cache=None;self.profile_checks=[];self._geometry_cache={}
         self.perception_audit={'checks':0,'minimum_range_margin_mm':None,'maximum_required_gap_mm':0.,'scope':'actual checked stop at each own decision state; discrete 0.05 s synthetic controller clock'}
         # Nominal geometry/ramp events already provide a fully bounded fit.
         # Protective stops and recovery retain their existing periodic nodes;
         # actual decision/advance prefixes remain independently capped at 50 ms.
-        self.nominal_clock,self.nominal_clock_proof=self._bounded_start_clock(self.nominal_clock,0.,periodic_fit=False)
+        if prepared_proof is None:self.nominal_clock,self.nominal_clock_proof=self._bounded_start_clock(self.nominal_clock,0.,periodic_fit=False)
+        else:self.nominal_clock_proof=prepared_proof
         self.profile_checks.append({'kind':'nominal_clock','proof':self.nominal_clock_proof})
         self.continuation_stop_clock=None;self.step_end_s=None
         self._step_certificate=None;self._fallback=None
@@ -505,14 +613,30 @@ class Controller(local.LocalController):
     def own_pose_at(self, captured_s):
         if captured_s < 0:
             raise ValueError('Negative capture time')
+        if captured_s>self.now+1e-8:raise ValueError('No own localization at the scan capture time')
         times = self.record_times
         i = bisect.bisect_right(times, captured_s)-1
+        if i<0:
+            prior=self._prior_own_rest_pose(captured_s)
+            if prior is not None:return prior
         if i < 0 or captured_s > self.now+1e-8:
             raise ValueError('No own localization at the scan capture time')
         if i == len(times)-1 or times[i] == captured_s:
             return self.recorded[i]['pose_mm_rad'][:]
         curve = floor.motion.Curve(floor.canonical(self.recorded[i:i+2]))
         return curve.evaluate(captured_s)[F[0]]
+
+    def _prior_own_rest_pose(self,captured_s):
+        """Use an exact own observation without extending this leg's export."""
+        callback=getattr(self,'prior_localization',None)
+        if callback is None:return None
+        pose=callback(captured_s)
+        if pose is None:return None
+        if (type(pose)not in(list,tuple)or len(pose)!=3 or
+                any(type(v)not in(int,float)or not math.isfinite(v)for v in pose)):
+            raise ValueError('Finite exact own historical pose required')
+        if list(pose)!=self.recorded[0]['pose_mm_rad']:return None
+        return list(pose)
 
     def _projection_window(self,lookahead_mm):
         """Cache only this vehicle's immutable future centreline samples."""
@@ -548,6 +672,30 @@ class Controller(local.LocalController):
         """
         if maximum_lateral_mm is not None and(type(maximum_lateral_mm)not in(int,float)or not math.isfinite(maximum_lateral_mm)or maximum_lateral_mm<0):
             raise ValueError('Finite nonnegative projection lateral bound required')
+        def exact(value):
+            if value is None:return ('none',)
+            if type(value)is float and math.isfinite(value):return ('float',value.hex())
+            if type(value)is int:return ('int',value)
+            return None
+        values=([exact(v)for v in(self.y,self.goal,self.path.length,point[0],point[1],lookahead_mm,maximum_lateral_mm)]
+                if type(self.path)is Path else [])
+        memo_key=None;memo=None
+        if values and all(v is not None for v in values):
+            # Own source paths remain immutable during an action. Retain
+            # strong references, so recycled object IDs cannot match an old
+            # geometry. Replacing any geometry view or evaluator also resets
+            # the existing clipped-window cache before another exact query.
+            geometry=(self.path,self.path.samples,self.path.pieces,self.path.ends,
+                self.path.__dict__.get('evaluate'),type(self.path).evaluate)
+            previous=getattr(self,'_projection_memo_geometry',None)
+            parameters=(values[1],values[2])
+            if (previous is None or any(a is not b for a,b in zip(previous,geometry))or
+                    getattr(self,'_projection_memo_parameters',None)!=parameters):
+                self._projection_memo_geometry=geometry;self._projection_memo_parameters=parameters
+                self._projection_memo=OrderedDict();self._projection_window_key=None;self._projection_path=None
+            memo=self._projection_memo;memo_key=tuple(values)
+            if memo_key in memo:
+                memo.move_to_end(memo_key);return memo[memo_key]
         best=(math.inf,self.y);query_roundoff=32*math.ulp(max(1.,abs(point[0]),abs(point[1])))
         for left,right,p,delta,norm,bounds,roundoff in self._projection_window(lookahead_mm):
             threshold=best[0]if maximum_lateral_mm is None else min(best[0],maximum_lateral_mm)
@@ -561,7 +709,11 @@ class Controller(local.LocalController):
             u=max(0.,min(1.,sum((point[k]-p[k])*delta[k]for k in range(2))/norm))if norm else 0.
             distance=math.hypot(*(point[k]-p[k]-u*delta[k]for k in range(2)))
             if distance<best[0]:best=distance,left+u*(right-left)
-        return best if maximum_lateral_mm is None or best[0]<=maximum_lateral_mm else(math.inf,self.y)
+        result=best if maximum_lateral_mm is None or best[0]<=maximum_lateral_mm else(math.inf,self.y)
+        if memo is not None:
+            memo[memo_key]=result
+            if len(memo)>512:memo.popitem(last=False)
+        return result
 
     def _future_rectangle_excludes(self,point,padding,lookahead_mm):
         """One-sided proof that an anonymous point misses the whole own sweep.
@@ -630,8 +782,11 @@ class Controller(local.LocalController):
             if math.hypot(*ray)>self.settings['range_mm']+self.settings['range_error_mm']:raise ValueError('Return exceeds the referenced sensor range')
         if scan['captured_s']>now+1e-9:raise ValueError('Future scan')
         if now-scan['captured_s']>self.settings['stale_after_s']:return 0.,'scan_missing_or_stale'
-        if scan['captured_s']<self.record_times[0]-1e-9:return 0.,'scan_capture_localization_unavailable'
-        pose=self.own_pose_at(scan['captured_s']);c,s=math.cos(pose[2]),math.sin(pose[2])
+        if scan['captured_s']<self.record_times[0]-1e-9:
+            pose=self._prior_own_rest_pose(scan['captured_s'])
+            if pose is None:return 0.,'scan_capture_localization_unavailable'
+        else:pose=self.own_pose_at(scan['captured_s'])
+        c,s=math.cos(pose[2]),math.sin(pose[2])
         inflation=self.settings['range_error_mm']+self.settings['range_mm']*math.sin(math.radians(self.settings['angular_step_deg']))+self.source['geometry']['localization_tolerance_mm']
         visible_gap=self.settings['range_mm']-self.radius-inflation
         gap=visible_gap;own=self.pose();travel=self.path.evaluate(self.y)[0][2];tc,ts=math.cos(travel),math.sin(travel)

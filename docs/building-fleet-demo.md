@@ -28,9 +28,11 @@ Bench-Regeln kommen aus denselben Python-Modulen wie beim lokalen Dienst.
 Modellzeit wird nicht vorgezogen, um langsame Berechnungen aufzuholen.
 
 `scripts/build_building_fleet_browser.py` erzeugt HTML, Workerdateien und ein
-deterministisches ZIP mit den originalen Modul-, Modell-, CAD-, Welt- und
-Cachebytes. Die CAD-Dateien werden zur unveränderten Prüfsummenprüfung
-mitgeführt; der Browser startet kein natives CAD. Das Laufzeitmanifest bindet
+deterministisches ZIP. Der Browservertrag `/2` enthält originale Module und
+Modellquellen sowie ausdrücklich abgeleitete, quellgebundene statische Daten.
+Die originalen CAD- und vollständigen Weltdateien werden beim Cacheaufbau
+geprüft und als Ableitungsnachweis gebunden; sie sind keine notwendigen
+Browserdownloads mehr. Der Browser startet kein natives CAD. Das Laufzeitmanifest bindet
 jede Datei mit Größe und SHA256. Aufgezeichnete Programme, Laufjournale,
 Controller-Beobachtungen und alte Sitzungssnapshots gehören nicht in dieses
 Paket. Die statischen Daten beschreiben Wege und Körper, keine ausgeführte
@@ -75,6 +77,67 @@ dieser eng begrenzten Metadatenbindung separat fest. Die Quellenregel
 Punkte, PVA, Stützung, Abstände und Grenzwerte werden dadurch nicht geändert.
 
 ### Start und laufende Bahnvorbereitung
+
+Der Browser startet den einzigen Sitzungsmotor bereits beim Laden des
+Seitenkopfs. Derselbe Motor wird anschließend mit der Darstellung verbunden.
+Die erste Ansicht enthält die vollständige native Geometrie des EG und die
+gemeinsamen Gebäudekörper. Die übrigen Geschosse werden nach tatsächlichem
+Fahrtbeginn im Hintergrund geladen; die Vereinigung enthält dieselben
+Körper und Dreiecke wie die vollständige Welt. Ein Wechsel oder freier
+Kameragang in ein noch nicht geladenes Geschoss wartet auf dessen geprüfte
+Geometrie. Die Physik verwendet ihren eigenen vollständigen, quellgebundenen
+Geometrievertrag.
+
+`building_fleet_runtime_cache.py` stellt die bisherigen Geometrieklassen aus
+offenen JSON- und Zahlenfeldern wieder her. Ganze native Körper bleiben
+erhalten; nur unbewegte Körper außerhalb sämtlicher erreichbarer
+Fahrzeughöhenbänder dürfen entfallen. Bewegte Körper, Bodenflächen,
+Rasterbezug, native Hindernisflächen und exakte Strahlindizes bleiben gebunden.
+Geschossdaten werden vor ihrer ersten Verwendung geprüft und materialisiert.
+Die statische Wahrnehmungsgrenze darf mit ihren unveränderten mathematischen
+Operationen wiederverwendet werden; sie ist kein Scan und keine Fahrfreigabe.
+Ein aufgezeichneter Fahrzeugzustand, Auftrag oder Transfer gehört nicht in
+diesen Cache.
+
+Die längere Bahnvorbereitung läuft in einem zweiten Worker ohne eigene
+Weltzustandsmaschine. Er erhält ausschließlich den eigenen, bereits
+zugesagten Auftrag mit Quell-, Aktions- und Freigabebindung. Der Sitzungsmotor
+läuft währenddessen weiter. Eine erste gerade Teilstrecke darf nur innerhalb
+der bereits eigenen Ressource beginnen und benötigt ihre eigenen Grenz-,
+Boden- und nativen Abstandsprüfungen. Sie behält die vollständige ursprüngliche
+Fahrt und deren Ziel; ihr Planungshorizont ist kein Missionsabschluss.
+Alle ausgeführten Schritte benötigen weiterhin den vollständigen nächsten
+höchstens 50-ms-Abschnitt samt anschließender Bremskurve gegen denselben Scan.
+Auch die gesamte Rückfallbremsung muss innerhalb des geprüften Horizonts liegen.
+
+Eine Fortsetzung während der Fahrt benötigt einen geprüften C2-Anschluss am
+tatsächlich beobachteten PVA-Zeitpunkt. Ein verspätetes oder inzwischen
+unpassendes Ergebnis ersetzt die bestehende Bremsfreigabe nicht. Ohne
+rechtzeitige Fortsetzung bremst das Fahrzeug innerhalb des Horizonts und
+wartet; ein erneuter Anschluss aus bestätigtem Stillstand kann danach
+geprüft werden. Aufträge, Buchten, Aufzugbeobachtungen, Türfreigaben und
+Bench-Sperren bleiben beim Sitzungsmotor. Die Worker übertragen die inneren
+JSON-Nachrichten unverändert als Text, damit Zahlenarten und vorzeichenbehaftete
+Nullen in den exakten Prüfbindungen erhalten bleiben.
+
+Die Darstellungsnachrichten folgen der gewählten Bildrate; die internen
+50-ms-Schritte laufen auch ohne neue vollständige Darstellungsnachricht.
+Unveränderte geometrische Abstände werden nur mit exakten Eingaben
+wiederverwendet. Besitz, Stillstand, aktuelle Bewegungshüllen und die
+Weiterfahr-/Bremsprüfung werden weiterhin bei jedem Schritt ausgewertet.
+Optional erzeugt `--python-bytecode-compiler` aus den mitgelieferten Originalen
+quellhashgeprüfte Python-Importdateien. Größe, Prüfsumme, Quellhash,
+Bytecodeversion und Laufzeitkompatibilität werden vor dem Import geprüft.
+
+Die neue vollständige lokale Browserprüfung beobachtete die erste Bewegung
+nach **7,56 s** und ihre erste native Bildschirmdarstellung nach **7,80 s**
+ab Seitenaufruf. Alle 20 Kamerazuordnungen und physischen Monitorflächen,
+das Laden aller Geschosse, Pause/Fortsetzung, Testrekrutierung und ein
+tatsächlich übernommener C2-Anschluss aus der Hintergrundberechnung bestehen.
+Die zusätzlich gesetzte 5-Sekunden-Marke wurde verfehlt und bleibt offen;
+dies ist kein vollständiger Missions- oder Hardware-Nachweis. Originalbericht
+und unveränderte Messwerte liegen unter
+`exports/building-fleet/background-startup-0b10fe1/full-r7/`.
 
 Die Browserquelle bindet zusätzlich
 `model/building-fleet-browser-python.shared.json`. Dessen fünf unveränderte
@@ -126,7 +189,7 @@ Koeffizienteneingaben in begrenzten Prüf-Caches wiederverwendet. Andere
 Eingaben erhalten die ursprüngliche gemeinsame Mathematik; deren Quellen
 und die Bewegungsgrenzen werden nicht geändert.
 
-Eine tatsächliche Browsermessung mit frischer Standardpatrouille beobachtete
+Die frühere Browsermessung vor dieser Hintergrundvorbereitung beobachtete
 die erste Ausführungsnachricht nach 31,9 statt 193,5 s, die erste Bewegung
 von mindestens 1 mm nach 71,2 statt 475,7 s und die Vorbereitung der ersten
 nominalen Kurve in 34,9 statt 278,3 s. Die geplante Modellzeit dieser ersten
@@ -225,11 +288,16 @@ Fahrzeuge verwenden dieselben Modellquellen, Fahrgrenzen, anonymen Scans,
 Die bestehenden BF01-, TR01- und L01-Quellen werden nicht überschrieben.
 
 Die Patrouille endet nicht nach der ersten Zielabdeckung. Erlaubte Ziele
-werden nach einer einmaligen Beobachtungsfreigabe vergeben: Die ersten
-synthetischen Kameraaufnahmen aller 20 Fahrzeuge müssen tatsächlich empfangen
-sein. Währenddessen bleiben die Fahrzeuge an ihren eigenen Stellplätzen;
-die Freigabe ist ein Kommunikationstest. Danach werden die Ziele nach dem
-ältesten **empfangenen** Besuch ausgewählt; bei gleicher
+werden pro Fahrzeug erst vergeben, nachdem dessen erste synthetische
+Kameraaufnahme tatsächlich empfangen wurde. Andere Fahrzeuge müssen dafür
+noch keine Aufnahme geliefert haben; der Gesamtstatus meldet weiterhin,
+ob alle 20 Erstaufnahmen eingegangen sind. Die erste Wahrnehmungsmeldung
+entsteht unmittelbar nach dem tatsächlichen Empfang des ersten verzögerten
+Scans; danach bleibt der bestehende Meldetakt erhalten. Sensor- und
+Funklatenzen, frische Scans und Weiterfahr-/Bremsnachweise bleiben verbindlich.
+Das ältere Profil `first_received_camera_frames` behält seine gemeinsame
+Startfreigabe nach allen 20 empfangenen Erstaufnahmen. Danach werden die Ziele
+nach dem ältesten **empfangenen** Besuch ausgewählt; bei gleicher
 Besuchszeit zählen ausstehende Aufträge und die bestehende Seed-Auswahl.
 Geplante Ankünfte setzen das Besuchsalter nicht zurück. Das sind die 19
 vorhandenen BF01-Ziele und ihre Verbindungswege, keine Behauptung einer

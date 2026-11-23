@@ -228,6 +228,32 @@ class LiveAdapterTests(unittest.TestCase):
         r.step()
         self.assertEqual(calls, ['recruit', *r.vehicles, 'observe'])
 
+    def test_independent_startup_releases_only_own_received_vehicle(self):
+        r=self.runner();r.profile={'patrol':{'startup':'own_received_camera_frame'}}
+        r._startup_ready=False;r._startup_seen_frames=set();r._camera_frames={'BF02':{}}
+        r.deliver_messages=lambda now:None
+        calls=[];r.recruit_pending=lambda:calls.append('recruit')
+        r.idle_action=lambda identity:calls.append(identity)
+        r.observe=lambda step:calls.append('observe');r.advance_world=lambda end:setattr(r,'now',end)
+        self.assertFalse(r.eligible('BF01'));self.assertTrue(r.eligible('BF02'))
+        r.step();self.assertEqual(calls,['recruit','BF02','observe']);self.assertFalse(r._startup_ready)
+        r._camera_frames['BF01']={};calls.clear();r.step()
+        self.assertTrue(r._startup_ready);self.assertEqual(calls,['recruit','BF01','BF02','observe'])
+        # Later radio blackout does not restart the once-only readiness gate.
+        r._camera_frames.clear();calls.clear();r.step()
+        self.assertEqual(calls,['recruit','BF01','BF02','observe'])
+
+    def test_unreceived_vehicle_cannot_request_a_mission_or_enter_idle_planning(self):
+        r=self.runner();r.profile={'patrol':{'startup':'own_received_camera_frame'}}
+        with patch('building_fleet_patrol.WorldRunner.request_mission',return_value={'status':'pending'})as mission:
+            with patch('building_fleet_patrol.WorldRunner.idle_action')as idle:
+                self.assertEqual(r.request_mission('BF01','EG',0.)['status'],'pending_own_camera')
+                r.idle_action('BF01');mission.assert_not_called();idle.assert_not_called()
+                self.assertEqual(r.vehicles['BF01']['hold_condition'],'first_actual_own_perception_delivery')
+                r._camera_frames['BF01']={}
+                r.request_mission('BF01','EG',0.);r.idle_action('BF01')
+                mission.assert_called_once_with('BF01','EG',0.);idle.assert_called_once_with('BF01')
+
     def test_cross_floor_process_returns_with_new_fence_before_restoring_local_intent(self):
         r = self.runner()
         original = r.dispatcher.assign('BF01', 'EG', 0., admissible_levels={'EG'},
