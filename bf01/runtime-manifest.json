@@ -1,0 +1,997 @@
+{
+  "archive": {
+    "bytes": 54303483,
+    "path": "runtime.zip",
+    "sha256": "3b53b4ead6a1cf61b03e66d1ed466b17400b8063fdc5c0a4ade064b86958f6c0"
+  },
+  "bootstrap_path": "scripts/building_fleet_browser_runtime.py",
+  "browser_config": {
+    "path": "model/building-fleet-browser.shared.json",
+    "sha256": "8e624ebdd6a870b862f97bb3398ae3da0fdcf79bf213963deea08c0d3bd9a72d"
+  },
+  "files": {
+    "cad/generated/building-stack-268bd52d21e1/overview.FCStd": {
+      "bytes": 37070908,
+      "sha256": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777"
+    },
+    "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": {
+      "bytes": 9833474,
+      "sha256": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5"
+    },
+    "cad/generated/tr01-awareness-ccd729bbb881-r2/TR01_Awareness.FCStd": {
+      "bytes": 317673,
+      "sha256": "5dcbc76cd0d555dc3f82d8bfac9e7d8b39f9fd160f4ead007145ced104ecebd8"
+    },
+    "cad/generated/tr01-awareness-ccd729bbb881-r2/TR01_Awareness.sc": {
+      "bytes": 765370,
+      "sha256": "a3ec8dbd2928f2b0cf463920fd5eb337528d2fee92e1207851d9eef664a46783"
+    },
+    "cad/lab-layout-l01/shared-build-report.json": {
+      "bytes": 422876,
+      "sha256": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6"
+    },
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": {
+      "bytes": 435774,
+      "sha256": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875"
+    },
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/interface-check-fit-v1.json": {
+      "bytes": 7308,
+      "sha256": "ef1791a5fa2f3fbcf528d4999a86dcc1fff78b4dae98f130bfd5976c1e987da9"
+    },
+    "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/output.step": {
+      "bytes": 74421,
+      "sha256": "646750d7ad56022c0f5a4302f1e47d2490769e20d71d015cb4d6891e999aad0e"
+    },
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/housing.step": {
+      "bytes": 1551367,
+      "sha256": "ad027f57a786f3fe02a6434d4143ceda4e9d0614e2a7e3d4955d3a411542c874"
+    },
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/interface-check-fit-v1.json": {
+      "bytes": 7561,
+      "sha256": "824b875f1462a6aa93bc5e9ce9afc366e95318c222ef15fdd94bd1aa3b7bb28c"
+    },
+    "cad/vendor/myactuator/RMD-X4-P36-36-E-L/261019/derived/registered-v1/output.step": {
+      "bytes": 123662,
+      "sha256": "384dffdf06a9eba535709ffcdfb32d2e58ae514d585929647012d19d6c20bd5f"
+    },
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/housing.step": {
+      "bytes": 1426711,
+      "sha256": "e89f69f3687852d05a600b3827916aa577233dff95b01574633819322f27f3ef"
+    },
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": {
+      "bytes": 5652,
+      "sha256": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67"
+    },
+    "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": {
+      "bytes": 276729,
+      "sha256": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11"
+    },
+    "cad/vendor/myactuator/component-library.json": {
+      "bytes": 52572,
+      "sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa"
+    },
+    "exports/building-fleet/jerk-01c7cff/navigation-r1/cache-report.json": {
+      "bytes": 4258,
+      "sha256": "dc40cc6c76a166339c0259b09d126c4b855782c68f5f3af4ec1ebff7c080bf78"
+    },
+    "exports/building-fleet/jerk-01c7cff/resource-catalog-r2/cache-report.json": {
+      "bytes": 4460,
+      "sha256": "c3ae82d0441a8fb5e4ac7b7d9ac5a828f001ca45c958e414cecfd7fe592d1ec4"
+    },
+    "exports/building-fleet/jerk-01c7cff/resource-catalog-r2/closure.json": {
+      "bytes": 22639,
+      "sha256": "06a6e35217ff3171d0183cdeedaa8ab774813ed5e3bae7d901b43b00b7becc77"
+    },
+    "exports/building-fleet/jerk-01c7cff/walkthrough-r1/native-mesh.json": {
+      "bytes": 50784717,
+      "sha256": "999de6aaab73c8c42972cb418d5518664b612c8829a042b51fa101017facfc45"
+    },
+    "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json": {
+      "bytes": 19677,
+      "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5"
+    },
+    "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-manifest.json": {
+      "bytes": 2870240,
+      "sha256": "a891d57c267e8eb2a6b1cf635f6f3693fac2f14d0693dd898fe85ab6257736ad"
+    },
+    "exports/building-fleet/patrol-5f4da9d/preparation-r1/navigation-after-graph/cache-report.json": {
+      "bytes": 4258,
+      "sha256": "4e2cbb07a6c2bd11c245044dba9fdb6908860127d7df8843c298b25959f4964f"
+    },
+    "exports/building-fleet/patrol-5f4da9d/preparation-r1/navigation-after-graph/navigation.json.gz": {
+      "bytes": 600000,
+      "sha256": "7a8b882d3114dcf8b1953117ba87836ce03b65bf4795a67bee64ff2d2990706e"
+    },
+    "exports/building-fleet/patrol-5f4da9d/preparation-r1/report.json": {
+      "bytes": 10076,
+      "sha256": "2e8b71345490ae1e6d944902efa202e94f6156ef6981e9d311dc5afb04811b11"
+    },
+    "exports/building-fleet/patrol-5f4da9d/preparation-r1/route-graph.json": {
+      "bytes": 29436363,
+      "sha256": "12b621df4317b89011ed1f1c0d0ddb5fa1f786345346d500b424490d7e48b1c5"
+    },
+    "exports/building-fleet/support-680652f/native-vehicle-mesh.json": {
+      "bytes": 497190,
+      "sha256": "5e4d1cdd69a1da3a91c4f3e7a6e5e9ea7c52c13cc003d8cd89d44fe6a04d6a10"
+    },
+    "exports/generated/building-stack-268bd52d21e1/build-report.json": {
+      "bytes": 536253,
+      "sha256": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862"
+    },
+    "exports/generated/building-stack-268bd52d21e1/overview.case.json": {
+      "bytes": 11595,
+      "sha256": "946a342182084faf0d1d2ced592b07f1844f027d3985df93808e243f551a3fb7"
+    },
+    "exports/generated/building-stack-268bd52d21e1/overview.freecad.json": {
+      "bytes": 5513990,
+      "sha256": "fa8445a1ecfda05180dbe11030f701d03bc4fcd1ff8c50dce31992486578e567"
+    },
+    "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": {
+      "bytes": 369804,
+      "sha256": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4"
+    },
+    "exports/generated/tr01-awareness-ccd729bbb881-r2/build-report.json": {
+      "bytes": 47061,
+      "sha256": "c176d4d0a9913a7a8f348d26aef83e0642a28ba58fba3a66aa0996800fb0ff51"
+    },
+    "exports/generated/tr01-awareness-ccd729bbb881-r2/commands.json": {
+      "bytes": 41311,
+      "sha256": "8720ca8b9507f8318474294f149e5a8392b5eac8773c78b4f787cc6927833f13"
+    },
+    "exports/generated/tr01-awareness-ccd729bbb881-r2/freecad.json": {
+      "bytes": 32462,
+      "sha256": "40ca3753d84df7d60abad016fc8189109ca6a50e42373337fe24aaabc19d951f"
+    },
+    "exports/generated/tr01-awareness-ccd729bbb881-r2/solidcraft.json": {
+      "bytes": 28548,
+      "sha256": "6ed2eecc1a9e84b9a69c3edd4344712e35914da259448c8c6254a08bd50cb803"
+    },
+    "model/assembly-reference.schema.json": {
+      "bytes": 2277,
+      "sha256": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3"
+    },
+    "model/atrium-seating.schema.json": {
+      "bytes": 2883,
+      "sha256": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810"
+    },
+    "model/basement-kg.shared.json": {
+      "bytes": 35824,
+      "sha256": "90ffead72e02600b083cba0fbbc1fa5951691e133158ae0c4cc0123d7321d0c4"
+    },
+    "model/basic-laboratory-furnishings.schema.json": {
+      "bytes": 4282,
+      "sha256": "53ceb1b080578437a0ce336069b6c419b7e40c31472f2c38e059c4e0935fccda"
+    },
+    "model/building-alignment.schema.json": {
+      "bytes": 1743,
+      "sha256": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e"
+    },
+    "model/building-doors.schema.json": {
+      "bytes": 7856,
+      "sha256": "9d21e2eb2f87ea1e16105756c1a56b33bdac147357a36131beb82a4714b36196"
+    },
+    "model/building-doors.shared.json": {
+      "bytes": 4376,
+      "sha256": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391"
+    },
+    "model/building-exterior.schema.json": {
+      "bytes": 7119,
+      "sha256": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18"
+    },
+    "model/building-fleet-browser.shared.json": {
+      "bytes": 1034,
+      "sha256": "8e624ebdd6a870b862f97bb3398ae3da0fdcf79bf213963deea08c0d3bd9a72d"
+    },
+    "model/building-fleet-demo.schema.json": {
+      "bytes": 21613,
+      "sha256": "bc7d23b945738f9fa4002d19a977d872dabc41b0d0371ca1a0482682d9fe08c6"
+    },
+    "model/building-fleet-demo.shared.json": {
+      "bytes": 11291,
+      "sha256": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99"
+    },
+    "model/building-fleet-l01-route.schema.json": {
+      "bytes": 6516,
+      "sha256": "57b247cfd4e95ab089f9b2a757f0886fadc8b2fbc15e5df86e8cf6f68f836b17"
+    },
+    "model/building-fleet-l01-route.shared.json": {
+      "bytes": 1930,
+      "sha256": "33d1a942076bfaa1d03a7e73af48b119688f10a0490de880e487a8d779a63adf"
+    },
+    "model/building-fleet-patrol.shared.json": {
+      "bytes": 1038,
+      "sha256": "faa50900f9f58895c7d35fafbdfd9d9f28f9036e6ebaa7276c3ccbb5184cc1b4"
+    },
+    "model/building-furnishings.schema.json": {
+      "bytes": 10522,
+      "sha256": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775"
+    },
+    "model/building-laboratories.schema.json": {
+      "bytes": 5048,
+      "sha256": "5b2dde953592edad71c1103d847cb0094d56641c0ab63da411391933609ebe20"
+    },
+    "model/building-microscopy.schema.json": {
+      "bytes": 4749,
+      "sha256": "e8ed15fb14e7412d68f9993f5fde91abcf7be510abe040f952761d8bb5f3dea9"
+    },
+    "model/building-stack.schema.json": {
+      "bytes": 41626,
+      "sha256": "c7028202edd2589fd0011b147d211254798beae6d5e5d78dea82e69e49cad08c"
+    },
+    "model/building-stack.shared.json": {
+      "bytes": 20117,
+      "sha256": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a"
+    },
+    "model/building-walkthrough.schema.json": {
+      "bytes": 25191,
+      "sha256": "413825e4623787bfe71f3ed6d7a18d215d950248e8d0899a73e409057c63c31d"
+    },
+    "model/building-walkthrough.shared.json": {
+      "bytes": 12424,
+      "sha256": "7601a1b1a6266dc71bc60d4cce644abb1c284f4716beee82c48294222fa9cde7"
+    },
+    "model/camera.schema.json": {
+      "bytes": 3028,
+      "sha256": "06d24aaa7e32249e8c8a127a461e5b4ada0ee14ec3541ece67066634228b7eda"
+    },
+    "model/centrifuge-cf01.shared.json": {
+      "bytes": 17390,
+      "sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+    },
+    "model/doors/room-doors.catalog.json": {
+      "bytes": 953,
+      "sha256": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b"
+    },
+    "model/environments/l01.geometry.json": {
+      "bytes": 4946,
+      "sha256": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608"
+    },
+    "model/equipment/foyer-monitor-wall.json": {
+      "bytes": 1191,
+      "sha256": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31"
+    },
+    "model/equipment/kitchen-3008.json": {
+      "bytes": 845,
+      "sha256": "33d8cf485422c9e855ee5c8d47a445efcf37d531b04e902f5ab390fb685fe113"
+    },
+    "model/equipment/microscopy-3007.json": {
+      "bytes": 755,
+      "sha256": "59e0f172e09c7b4452be4827cb60d96fb33d5b186acf25268389e050c5e98bb2"
+    },
+    "model/floor-f03.shared.json": {
+      "bytes": 45160,
+      "sha256": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2"
+    },
+    "model/foyer-monitor-wall.schema.json": {
+      "bytes": 4517,
+      "sha256": "3b7a25c8a667d92236facd17fe3142b141ec164b60b2206bddea028b8f303d61"
+    },
+    "model/furnishings.schema.json": {
+      "bytes": 3792,
+      "sha256": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376"
+    },
+    "model/furnishings/basic-laboratory.shared.json": {
+      "bytes": 3268,
+      "sha256": "fa5fa071721229ff88de7ca1b1bf68395ed1bd77ab4943412f54894278181796"
+    },
+    "model/furnishings/building-laboratories.json": {
+      "bytes": 6157,
+      "sha256": "315735d8c867f193da63ca6011b24c69cd05e95bb03efd9f67dc4cfeda6f44d6"
+    },
+    "model/furnishings/building-social.json": {
+      "bytes": 20105,
+      "sha256": "53b2d85d46da4b8c50ebfe1d6ce1f2b7bc235b1201c428d042fb30714ae25ec1"
+    },
+    "model/furnishings/kitchen-3008.json": {
+      "bytes": 536,
+      "sha256": "c3294f590196b4820f4bd3d5a0a695b5dc2f9bd8de0bf9b1d8cda7e3f7dbadb2"
+    },
+    "model/furnishings/l01.furnishings.json": {
+      "bytes": 25003,
+      "sha256": "955ecac17cbbdeef3b40abf65a8f33b3c46985589ed9425710e1ccd439f0d4ed"
+    },
+    "model/furnishings/microscopy-3007.json": {
+      "bytes": 637,
+      "sha256": "372396c92e02ac226cf6822dfceed46c0801d4d33c622c99c6d4806d63f39026"
+    },
+    "model/furnishings/seminar-eg10.json": {
+      "bytes": 2812,
+      "sha256": "91f84368bf9fba27aaf1eca1f31d4502fc98dd5690674607af9e1c2fb9b3823f"
+    },
+    "model/furniture-articulations.schema.json": {
+      "bytes": 9330,
+      "sha256": "05e373c4d1a1996fddc6659e0fac81ec75009c22576ae742e3a7e01ea7824d8d"
+    },
+    "model/furniture-catalog.schema.json": {
+      "bytes": 3923,
+      "sha256": "fd63aa8e6c6318f780a6e5dac87c1b6418a2e982b4f5b1e6f4f067b1ff0327ed"
+    },
+    "model/furniture/kitchenette.catalog.json": {
+      "bytes": 1111,
+      "sha256": "984da3f305f3d21c67839634271f0a1166b7545763181d19eacf90cb6de5c7d7"
+    },
+    "model/furniture/laboratory.catalog.json": {
+      "bytes": 9836,
+      "sha256": "17734a5b9579040ca49b908a61b268bb03af6b48702a8f4408fa460bbf324e9e"
+    },
+    "model/furniture/social.articulations.json": {
+      "bytes": 8074,
+      "sha256": "ece5818078ba3c4228aee91a56919b4ced7bddd25fdf58ea336868f0b993da46"
+    },
+    "model/furniture/social.catalog.json": {
+      "bytes": 58377,
+      "sha256": "1acd1184d238d1011a8bccd948811cc0706c42915907b07aed187553cc7b1440"
+    },
+    "model/ground-floor-eg.shared.json": {
+      "bytes": 54852,
+      "sha256": "9342bc0e1cfa6a556e71bf6af924f71c28d992334d9c875106a4b46339c9ff12"
+    },
+    "model/ground-floor.schema.json": {
+      "bytes": 3110,
+      "sha256": "a2db54854d57039805f595dd43c760175040af5396949d05504366e47ad12124"
+    },
+    "model/ice-maker-im01.schema.json": {
+      "bytes": 4338,
+      "sha256": "1d59a0455d1e1a80d131d34cf8473c38aa0bb60040b57f2bb58219cc9277fd63"
+    },
+    "model/ice-maker-im01.shared.json": {
+      "bytes": 4421,
+      "sha256": "e2b6bbbef43439449d971f643ac189ff26fd98954bc6f0c6b40e5f21ad2f6f99"
+    },
+    "model/kitchenette.schema.json": {
+      "bytes": 13166,
+      "sha256": "7cc0e99113241351096349042c8bd3991ca38085881cf5c7794dacf024af1abb"
+    },
+    "model/l01-local-traffic.demo.json": {
+      "bytes": 1951,
+      "sha256": "fa6aa501fd0857fcf5ecca250cc565ade752af71a042e940db0fc4295e4fe111"
+    },
+    "model/lab-equipment.schema.json": {
+      "bytes": 4889,
+      "sha256": "f76c820e1dad5f11aae62c7ed3e390e1a009cecc15506cab7fe24d084bc668c8"
+    },
+    "model/lab-equipment.shared.json": {
+      "bytes": 19260,
+      "sha256": "e4797cf7c34c28053d39264c2312d343722b55a8bf664552da68c3f1b120a728"
+    },
+    "model/lab-layout-l01.shared.json": {
+      "bytes": 13721,
+      "sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+    },
+    "model/lab-layout.schema.json": {
+      "bytes": 816,
+      "sha256": "6adecc29e87690f9a01b152002920e0d0530174cc9e7df93d25af66f7b38f002"
+    },
+    "model/lab-room-l01.shared.json": {
+      "bytes": 3486,
+      "sha256": "8827f0e318a49c68cbcde3ae06a2b7f799ec8e008994b9d09245e8207b974cea"
+    },
+    "model/microscope-mi01.schema.json": {
+      "bytes": 5685,
+      "sha256": "048c83064a28d33677a71417d53f5a55ca5c79d2fdf143efab5fe05be602de6c"
+    },
+    "model/microscope-mi01.shared.json": {
+      "bytes": 2588,
+      "sha256": "304adecf33ce234f657e4c37ee5373f90ac4aa8e233bb92c628e6fc77617b6fc"
+    },
+    "model/nanodrop-concept.shared.json": {
+      "bytes": 2817,
+      "sha256": "4919cfacf4cd1fb365a7017b98ad914f448b39b3806d73342acc809b2dfb7c02"
+    },
+    "model/qubit-4-concept.shared.json": {
+      "bytes": 2768,
+      "sha256": "f41063a1a0998b46cbea55cf683cd2af7bf931323d0dc0a606bf8c68059f5e71"
+    },
+    "model/relative-floorplan.schema.json": {
+      "bytes": 5160,
+      "sha256": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf"
+    },
+    "model/robot.json": {
+      "bytes": 75815,
+      "sha256": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd"
+    },
+    "model/room-composition.schema.json": {
+      "bytes": 2517,
+      "sha256": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d"
+    },
+    "model/room-door-catalog.schema.json": {
+      "bytes": 4429,
+      "sha256": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d"
+    },
+    "model/room-geometry.schema.json": {
+      "bytes": 2777,
+      "sha256": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4"
+    },
+    "model/sample-transport-tr01.shared.json": {
+      "bytes": 8560,
+      "sha256": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a"
+    },
+    "model/seminar-room.schema.json": {
+      "bytes": 7711,
+      "sha256": "a7f885404c6fa8d6362a1fa5455bb8bc4db31d7f3d74db7d56cc1dd1756485d5"
+    },
+    "model/social-furniture-catalog.schema.json": {
+      "bytes": 22000,
+      "sha256": "27b3e71962d0c8dbb87742ccefd258cb7c577caecbb86c882a3e8983f117ab6f"
+    },
+    "model/tapestation.shared.json": {
+      "bytes": 3395,
+      "sha256": "50c933005136799da51735620445babfae4e2d24f51f163c9982bda6ae0b3bf6"
+    },
+    "model/tip-collector-t01.shared.json": {
+      "bytes": 27917,
+      "sha256": "feb168b81fd8da2c5b593db081047534a56ecacdc55f432372453eca703e373a"
+    },
+    "model/tr01-awareness-camera.schema.json": {
+      "bytes": 11138,
+      "sha256": "a90a329ff4e71b5fe6c1b79433b145a8066ff3eb8ff015f82be25a8783257100"
+    },
+    "model/tr01-awareness-camera.shared.json": {
+      "bytes": 4711,
+      "sha256": "ccd729bbb881de0b2d626ec0e76cf7a91516b8fc6d16d38a69ba5b1f2e835a45"
+    },
+    "model/tr01-l01-workcell.protocol.json": {
+      "bytes": 6914,
+      "sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+    },
+    "model/tr01-l01.motion.json": {
+      "bytes": 4004,
+      "sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+    },
+    "model/walkthrough-robot-commands.json": {
+      "bytes": 490,
+      "sha256": "284be8867ecc24ef395c0150f4ec2a0f645dc151ffe22613f447ae1f400f60d2"
+    },
+    "model/x2-mounting-interface.json": {
+      "bytes": 10311,
+      "sha256": "54b48a8e8efd3787cb1e6a8a0ff08f1a5bc82bb8f3c863e576187d1e93e9513b"
+    },
+    "model/x4-mounting-interface.json": {
+      "bytes": 10349,
+      "sha256": "d9e1b6d9e5fe080cf011549f6c1bbd8cbe587943d90ce07e1a1ccc7fce451b6c"
+    },
+    "model/x6-mounting-interface.json": {
+      "bytes": 7070,
+      "sha256": "3dc0e27922ddf841e8c0ca3e91c27494d721c6231e9e68500409bfa0f70aecc0"
+    },
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/__init__.py": {
+      "bytes": 69,
+      "sha256": "b6dd8e2ffe4d74f70ec1dce3cc11cad501fa2ace55fdc74a303cd98f198a6db2"
+    },
+    "ros2_ws/src/solidcraftbot_ros/solidcraftbot_ros/motion.py": {
+      "bytes": 15748,
+      "sha256": "06dfe55366b49dceead90b44e961125ed41fb07850fc59303e6259878400b226"
+    },
+    "scripts/assembly_model.py": {
+      "bytes": 6037,
+      "sha256": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930"
+    },
+    "scripts/atrium_seating.py": {
+      "bytes": 21033,
+      "sha256": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0"
+    },
+    "scripts/basic_laboratories.py": {
+      "bytes": 29466,
+      "sha256": "630cde4e9e210e2c2e821c345e9fe51275c08611f188f3d989bcdc50f901b6b1"
+    },
+    "scripts/build_building_fleet_browser.py": {
+      "bytes": 18281,
+      "sha256": "2dfb7ccc1b594f337d89fd925c9e174f5010a4da469842f46beec5a3dec37347"
+    },
+    "scripts/build_building_fleet_demo.py": {
+      "bytes": 26411,
+      "sha256": "2c5b8e2410f7471b64d3cbdca08830ad4e4bdbaadd1c1f9642392c7d7225e5f3"
+    },
+    "scripts/build_building_stack.py": {
+      "bytes": 63319,
+      "sha256": "c298ddd6b3e624b4c80277b879004ee0ecb82395075877f4e74ffe373b1e954a"
+    },
+    "scripts/build_building_stack_freecad.py": {
+      "bytes": 13352,
+      "sha256": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e"
+    },
+    "scripts/build_building_walkthrough.py": {
+      "bytes": 13874,
+      "sha256": "734d3e113b22f0e73643910817a08ed5f453311720951a228f8438c3b20f6f88"
+    },
+    "scripts/build_centrifuge_freecad.py": {
+      "bytes": 11451,
+      "sha256": "6bf43b55a61e0335a40bf801f4fec0a78cb6d363ee2a87d7322f7ac02c8a88ec"
+    },
+    "scripts/build_extraction_kit_station.py": {
+      "bytes": 20543,
+      "sha256": "9f47b1d904189b0dd83b4d3f20799b408cec449fb632a7318d18ba81cb004c88"
+    },
+    "scripts/build_instrument_concepts.py": {
+      "bytes": 8973,
+      "sha256": "46e3ef6684dd50fcd8fd6616f5533f79b97a8680cf7c7f0967dca5f45ee2d407"
+    },
+    "scripts/build_lab_equipment_freecad.py": {
+      "bytes": 8268,
+      "sha256": "6288919f44a95ec41cfa90e84cfc602d58044e58305834e0431c16c7179aa10c"
+    },
+    "scripts/build_lab_layout.py": {
+      "bytes": 21971,
+      "sha256": "643e7d3ecd969c89ae6e010e49b650a17a36175a414a1e4fe38584b788bb1197"
+    },
+    "scripts/build_lab_layout_freecad.py": {
+      "bytes": 23028,
+      "sha256": "a1e6aa9137f54572605c2cb3fd4e75d1b824b325d2af70c3f4e4c9e91e76ef22"
+    },
+    "scripts/build_lab_room_freecad.py": {
+      "bytes": 17964,
+      "sha256": "54f2b42692375f511bf82e638f6c3d2c6e080db60a5ae313256ed1422ff67849"
+    },
+    "scripts/build_neutral_freecad.py": {
+      "bytes": 25492,
+      "sha256": "bfdba375dc4374c9cbcfaae9cc121250ad08c18dace4a82d640d4f39f1a1851f"
+    },
+    "scripts/build_relative_floorplan.py": {
+      "bytes": 15587,
+      "sha256": "cce0ac02a9fa1606f8cc040b8fecb93085a4b2609b0632791058fbd02ef36c57"
+    },
+    "scripts/build_sample_transport_freecad.py": {
+      "bytes": 5903,
+      "sha256": "b3d6e8099b0c6b7d94765f1b1f41819238fa9c54e662d070a71df039aa67586d"
+    },
+    "scripts/build_tip_collector_freecad.py": {
+      "bytes": 11919,
+      "sha256": "f3d3191604ab175406a0799fbd17a92406176c2aee8e7d55a23826552f15f7a1"
+    },
+    "scripts/build_tr01_awareness.py": {
+      "bytes": 3594,
+      "sha256": "23c090d15fa2c5177dff54eb6fa616e6d4419b1cffb0f5ada7ebd35cf901dcbf"
+    },
+    "scripts/build_tr01_awareness_freecad.py": {
+      "bytes": 4641,
+      "sha256": "5b45b47fb17080a06ac740beb6a2ab047bc3d2bd654c8e29faa256cf5c18b3c3"
+    },
+    "scripts/build_tube_carrier.py": {
+      "bytes": 9706,
+      "sha256": "20f8bc8a22f361e6280fe9f15c2a393d6d2dc52bde9382994334671b0c9a9b8a"
+    },
+    "scripts/build_tube_carrier_freecad.py": {
+      "bytes": 20155,
+      "sha256": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20"
+    },
+    "scripts/building_alignment.py": {
+      "bytes": 10975,
+      "sha256": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f"
+    },
+    "scripts/building_circulation.py": {
+      "bytes": 44639,
+      "sha256": "818ecc95503b30342eefa9e7f430d04bd96ff05840c6ba650f2297899fe5dd66"
+    },
+    "scripts/building_doors.py": {
+      "bytes": 18058,
+      "sha256": "9c10dee44d5104cd74fb87abf32659a1bc9691b01b4aa73a9535172e989608bd"
+    },
+    "scripts/building_exterior.py": {
+      "bytes": 22143,
+      "sha256": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5"
+    },
+    "scripts/building_fleet_browser_navigation.py": {
+      "bytes": 8901,
+      "sha256": "d0b3e42a70b799239e603d693fc925d2f7ca218f6d563e64b4ebf1926fad3531"
+    },
+    "scripts/building_fleet_browser_runtime.py": {
+      "bytes": 10909,
+      "sha256": "c54c9795bb45cc8412af0c4f0bc78046a5d58c4f15160ad5e5539755b3cb4433"
+    },
+    "scripts/building_fleet_browser_transport.js": {
+      "bytes": 5504,
+      "sha256": "d5bfd5dc8bbbc2c0001c6694d3f1b8f18688d11b5807175f2042c0b7558dc3f5"
+    },
+    "scripts/building_fleet_browser_worker.mjs": {
+      "bytes": 9529,
+      "sha256": "1acd733164b590905a5aaf188e8922546433582cc6451cc3646ccf91cce1ef4b"
+    },
+    "scripts/building_fleet_clearance.py": {
+      "bytes": 17174,
+      "sha256": "434cac5da2eb2dba136d3720299ad44489e60f236cbc5ffb4537e8e6b4c669cc"
+    },
+    "scripts/building_fleet_comm.py": {
+      "bytes": 11983,
+      "sha256": "05c4a46c0072e5aa26b0643c67b55870a0a6e36c95239aba8f6ac3fc6d2a8809"
+    },
+    "scripts/building_fleet_control.py": {
+      "bytes": 63563,
+      "sha256": "b230a330363b8f20aa9457bedea58c8289bd1867d1fc5c935926d18a43ec3059"
+    },
+    "scripts/building_fleet_depot.py": {
+      "bytes": 5807,
+      "sha256": "f44722f14e771cac91c4aada0e1354dc395e11d8b3e76196a71680d225c5187f"
+    },
+    "scripts/building_fleet_dispatch.py": {
+      "bytes": 4510,
+      "sha256": "6e28bef2a95d766315b1595cc7b37d763f8857a06b1a89437f6d2dcd6623c4a4"
+    },
+    "scripts/building_fleet_floor.py": {
+      "bytes": 5547,
+      "sha256": "f9fc09e97587e337c5f2e8e643f90042410c21a18f577a1606c2a8fb4862a91a"
+    },
+    "scripts/building_fleet_geometry.py": {
+      "bytes": 1639,
+      "sha256": "b479436d4e4ecda1d2957e6d59528c6d21d7a2f86e6d53edb9c2850261f36c38"
+    },
+    "scripts/building_fleet_geometry_checks.py": {
+      "bytes": 13217,
+      "sha256": "025be9d2d59852185e7750e3071f0d8118430ea5111095588b2357527451e2fc"
+    },
+    "scripts/building_fleet_l01.py": {
+      "bytes": 15349,
+      "sha256": "fda852e8b03cb60164e401bb6a0948734df022ab2cecbaedbc7c42cb2a72613f"
+    },
+    "scripts/building_fleet_lift_checks.py": {
+      "bytes": 20690,
+      "sha256": "d80c69f3dfc4f971f93e987b518853a2d404a1c69b6ad19dc93011c69ff5ef13"
+    },
+    "scripts/building_fleet_lift_geometry.py": {
+      "bytes": 7698,
+      "sha256": "8f8479eb7a5b52bf9925d580ee1642f39ea5b6a582918419967a556bcd90de3f"
+    },
+    "scripts/building_fleet_missions.py": {
+      "bytes": 36765,
+      "sha256": "262cd952dfe6adb38b6d4bf271b5a8de0049e22814395bde2e4d76410540cdac"
+    },
+    "scripts/building_fleet_model.py": {
+      "bytes": 6615,
+      "sha256": "f52eb351a4a8d7ff44e06d4b2e7f436f145d3de4716a6b1a964f69e0cb1fa8f4"
+    },
+    "scripts/building_fleet_motion.py": {
+      "bytes": 33861,
+      "sha256": "14f9f9be2a669bd51cab0094e31b14c089a9ba34a45e1a7b17fe061af9e1a86d"
+    },
+    "scripts/building_fleet_navigation.py": {
+      "bytes": 31238,
+      "sha256": "cf0e1ab5fc2554a7e9db755ea283e44ef7d6ec8f117208a7ab1c209a5dfef9fd"
+    },
+    "scripts/building_fleet_patrol.py": {
+      "bytes": 30301,
+      "sha256": "00add5d36785a41752618628f1567231ac629d30dfadc8521e791b1bed546762"
+    },
+    "scripts/building_fleet_patrol_cache.py": {
+      "bytes": 9346,
+      "sha256": "62bbca5ea60b25c3b2aaf2fd070ef90bad073118d04bfe48b323c609b4499970"
+    },
+    "scripts/building_fleet_port_paths.py": {
+      "bytes": 14007,
+      "sha256": "15dfbdfcdf1c47f0e8a2931c94db777f5edd193635aa96c9e0ae141c0e113337"
+    },
+    "scripts/building_fleet_resources.py": {
+      "bytes": 24257,
+      "sha256": "9b046703e7002b68afc59659ee5d482f804c5112b897015d0326d75d149f8d4a"
+    },
+    "scripts/building_fleet_routes.py": {
+      "bytes": 53340,
+      "sha256": "8ab775d3e293020e8919bae81e8c66b0865bb0d955d00165a0548b4e1a29287d"
+    },
+    "scripts/building_fleet_runner.py": {
+      "bytes": 84544,
+      "sha256": "088b590a97013bf93cb7cb93d2c3aaaf218b2a0ccd5c8452739ddb250aef6cab"
+    },
+    "scripts/building_fleet_services.py": {
+      "bytes": 31276,
+      "sha256": "c70fd1905ab92f4fa5d62cc8d92510acbe2035df44697fcb635053f210691c1f"
+    },
+    "scripts/building_fleet_sim.py": {
+      "bytes": 26755,
+      "sha256": "5edb7e9f806b9a424328294f7a3c2fa388ea97286e740d06aeb89b6b4339145f"
+    },
+    "scripts/building_fleet_support.py": {
+      "bytes": 22001,
+      "sha256": "0baebbff7f5b2f407bfd0a3e0dcf38ffea2dd0e6a53ba849393aeafa13b2614b"
+    },
+    "scripts/building_fleet_zones.py": {
+      "bytes": 2843,
+      "sha256": "6f3cf3a078c5ce701ea9e8aad32c5cb02d4a3b011b53053cbbabc26d0b1cd8e9"
+    },
+    "scripts/building_furnishings.py": {
+      "bytes": 21890,
+      "sha256": "edc841bc2c1910f212109f3f4ff7e7ce8e03d8ee221be8c959471d5e086c88ed"
+    },
+    "scripts/building_guards.py": {
+      "bytes": 10151,
+      "sha256": "297b418ad939086e9130aaa0604a4153e41adb5e79e04f3efbc53812200f3d28"
+    },
+    "scripts/building_ice_maker.py": {
+      "bytes": 6994,
+      "sha256": "e3558c309b898ad96eb43e83951e45c0f66d332a93abaadf650e0dc48a90ed67"
+    },
+    "scripts/building_kitchenette.py": {
+      "bytes": 8046,
+      "sha256": "8b289280ac599f3ec90047a4484cab24b346cee7aaf4b297c6c3128679ca39b0"
+    },
+    "scripts/building_laboratories.py": {
+      "bytes": 24204,
+      "sha256": "21f4bae8fe8f13086356a5e01dfc74a8a066a4aedebf4c3134043a7edeaf00e9"
+    },
+    "scripts/building_microscopy.py": {
+      "bytes": 8618,
+      "sha256": "d6ee3f5f872983e7037783fa78447b80265a58af661a537dd47e7bae37567258"
+    },
+    "scripts/building_roof.py": {
+      "bytes": 25414,
+      "sha256": "bc49ed115de7aab0fd6720eb3e4ef5f48a1279639407a0f106056104aac17306"
+    },
+    "scripts/building_room_labels.py": {
+      "bytes": 6582,
+      "sha256": "a0ddfb72c9f203e8b85f0af5588ec38c586ef8754dd210f64a12caa3a79e88ed"
+    },
+    "scripts/building_room_signs.py": {
+      "bytes": 35092,
+      "sha256": "f2e0f45e8165ee02c0485aefda5bf1efb6d0d7c7f878524b4681496547223c10"
+    },
+    "scripts/building_seminar.py": {
+      "bytes": 25151,
+      "sha256": "45f58e306e04066845535ce5b3a0fbe3f919d29e71f0e61bfb8ac22e6fc49112"
+    },
+    "scripts/building_seminar_windows.py": {
+      "bytes": 14864,
+      "sha256": "b967068bfdaab6a20be5649dfb474e8ef8d7fac3b00510c9b0dbc6372b74d9e3"
+    },
+    "scripts/building_stack.py": {
+      "bytes": 44933,
+      "sha256": "95a9fb51f335097d902225fe561902eba709bd84b8c68aaff2e15aed1e0aacb6"
+    },
+    "scripts/building_walkthrough.py": {
+      "bytes": 24690,
+      "sha256": "b9fda546ed2c31c39bee3e19efbc69a54bc5fc11f57978bc31ad0cb10e62fdd7"
+    },
+    "scripts/centrifuge_mechanisms.py": {
+      "bytes": 7719,
+      "sha256": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b"
+    },
+    "scripts/centrifuge_model.py": {
+      "bytes": 23688,
+      "sha256": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f"
+    },
+    "scripts/cf01_unload_path.py": {
+      "bytes": 6857,
+      "sha256": "9ea588a5fc65a931a5397bcb83691854a463619ac51e4b8a1d4ea268ef64d9cb"
+    },
+    "scripts/check_building_fleet_freecad.py": {
+      "bytes": 37811,
+      "sha256": "0cc64d21b7f77341344b8e398862b39680ff55160c72c4e9f75a55e083901358"
+    },
+    "scripts/export_building_fleet_vehicle_freecad.py": {
+      "bytes": 5287,
+      "sha256": "add637a0f11016af9420d47bd488114a0c87020b5cdb2efee1e048ff9aa21436"
+    },
+    "scripts/export_building_walkthrough_freecad.py": {
+      "bytes": 29944,
+      "sha256": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563"
+    },
+    "scripts/extraction_kit_station.py": {
+      "bytes": 28834,
+      "sha256": "fe9f36de4792972e65679b9127c29f2c3b0961ea14d32c4807f985fa97d0e203"
+    },
+    "scripts/foyer_monitor_wall.py": {
+      "bytes": 12536,
+      "sha256": "ad6638d326eda0505f1296fcf67dbb5af3b7d9073d0549b7596acfdc791560c9"
+    },
+    "scripts/freecad/persist_station_view.py": {
+      "bytes": 4258,
+      "sha256": "cc4ea66cc5c6b9603981138690b8bc2ce01dfee7485466528d2f6f6000380b60"
+    },
+    "scripts/freecad/persist_view.py": {
+      "bytes": 6625,
+      "sha256": "12bc790781a3d8fc2c305bf248eed9d8052a2eb64df2a5ea16325ed67c3bd571"
+    },
+    "scripts/freecad/solidcraftbot_freecad.py": {
+      "bytes": 25990,
+      "sha256": "d728cf2e9759e36d3052cf846c55131d20f8cb205cc2ab0bb499855200c2ea84"
+    },
+    "scripts/furniture_articulation.py": {
+      "bytes": 18912,
+      "sha256": "b43b7b09a6d1f71eef62e65082bf9d8994bfc69c844770e7c7acdfb967694604"
+    },
+    "scripts/furniture_model.py": {
+      "bytes": 22968,
+      "sha256": "ba37509ed2030c4c3c479eba85fe019230d269b2978a8fee45a86c880fb6b76a"
+    },
+    "scripts/ground_floor_model.py": {
+      "bytes": 3665,
+      "sha256": "eeed1e78565cddb7fd5b840121340d81298b1cdfc6260eaabae09c73a6ee7e8a"
+    },
+    "scripts/ice_maker_model.py": {
+      "bytes": 8840,
+      "sha256": "dac5ee90bc9c73c03310b23331a77693d445248f211c3738b1ad38935313aa95"
+    },
+    "scripts/instrument_concept.py": {
+      "bytes": 13581,
+      "sha256": "8c8f0f30a164473334f7dd1e13bb1d164d9d31da26931b1b60a14bc1d5d91143"
+    },
+    "scripts/kitchenette_model.py": {
+      "bytes": 8579,
+      "sha256": "ab265df45feef8e8541dd343894337e37285635c858c9a5a0dcc2d794183ede6"
+    },
+    "scripts/l01_independent_fleet.py": {
+      "bytes": 21615,
+      "sha256": "506c879f99348e1f47413cf3c5eb432eca089bb011725407896b7e730989f743"
+    },
+    "scripts/l01_local_traffic.py": {
+      "bytes": 14044,
+      "sha256": "6a230145175b6f82cf2b0230bdeab74af5eb998c33b4af713223c83f2987f6bc"
+    },
+    "scripts/l01_opposing_traffic.py": {
+      "bytes": 18782,
+      "sha256": "8fe27b56a6b50a9300565e47b23f1d7ca9dcbc1422831a3ad3e2d6db04baf85a"
+    },
+    "scripts/lab_equipment.py": {
+      "bytes": 28585,
+      "sha256": "fe868847435e6ca67bc41636a58732a82fc9cf6309b49c360237e95cc35fe868"
+    },
+    "scripts/lab_layout_model.py": {
+      "bytes": 12414,
+      "sha256": "2a7260ef4884955e6c2a7451a5655d36ad1d32d43f6ea48c9362be6b6e8aae75"
+    },
+    "scripts/lab_room_model.py": {
+      "bytes": 12252,
+      "sha256": "a8aa368a14ed149caf91256564087cf2487a32496419d76684e9b08fa05cac1e"
+    },
+    "scripts/lift_fittings.py": {
+      "bytes": 18471,
+      "sha256": "e41caa897213c4eadf6d7cad5a31e9dbce1b52fbd9a8289a92decaac445136d8"
+    },
+    "scripts/marker_label.py": {
+      "bytes": 8427,
+      "sha256": "a4df191542b968cf01370fbbadf8b0ed417914f9811ee7720840d64f712e46fd"
+    },
+    "scripts/microscope_model.py": {
+      "bytes": 12214,
+      "sha256": "1fd57c12c5254bf5609ad204d88f7ccc308267da09fea54a681e9ddd95be6f05"
+    },
+    "scripts/relative_floorplan.py": {
+      "bytes": 24099,
+      "sha256": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b"
+    },
+    "scripts/robot_cameras.py": {
+      "bytes": 7587,
+      "sha256": "803236969593a6b59f56cd5dfb5e8ec535715f71f843feaa1ef454a469f846bd"
+    },
+    "scripts/robot_components.py": {
+      "bytes": 13494,
+      "sha256": "f6bebcb97b3246ebc15658f9aa6b4dbab074de5f84e4b6f13c75b125611b1afe"
+    },
+    "scripts/robot_services.py": {
+      "bytes": 9386,
+      "sha256": "62efbf2f4c59676167968fc5efc9ad4b065a85debcbf943f714d38f9f72117e8"
+    },
+    "scripts/robot_spec.py": {
+      "bytes": 16636,
+      "sha256": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0"
+    },
+    "scripts/room_geometry_model.py": {
+      "bytes": 5565,
+      "sha256": "e15bd341defd60198e9a3fa55ea74f0f0a995ca47e9e7bd37fc988c32b9ce711"
+    },
+    "scripts/run_building_fleet.py": {
+      "bytes": 13103,
+      "sha256": "69c740286157721a82000850956e1809f174a23d6012719029af16ccfd39161d"
+    },
+    "scripts/run_building_fleet_patrol.py": {
+      "bytes": 17444,
+      "sha256": "fe3b3bb9933ccd6ccfa9002b8136c2ecef005196b3c150372b6f710b5fe0c603"
+    },
+    "scripts/sample_motion.py": {
+      "bytes": 18519,
+      "sha256": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673"
+    },
+    "scripts/sample_transport_model.py": {
+      "bytes": 9760,
+      "sha256": "21cf3a2d4a3c7cf0c4544447b68acea9ce3f433a127b09579f2dff053bd7686c"
+    },
+    "scripts/servo_mounting_design.py": {
+      "bytes": 6540,
+      "sha256": "73f8079989cadd02aad98b9f94553cabab073575a00ff3914e94dbb1205bef2d"
+    },
+    "scripts/tapestation_model.py": {
+      "bytes": 4361,
+      "sha256": "56de677f2c5fcd8ac787769fc7850fc7f1b30e9c4fa360af9fc8d58406bd32c3"
+    },
+    "scripts/templates/quintic_motion.js": {
+      "bytes": 3419,
+      "sha256": "eb75082765ecb815d1dbd181a4826bad11cda7f197a10407c7ce31965ebaaf30"
+    },
+    "scripts/tip_collector_model.py": {
+      "bytes": 12091,
+      "sha256": "ad71d7eef5f437d4c7c3b2146529e3f7e035a4b18509e32776e3397e2fc09cca"
+    },
+    "scripts/tool_paths.py": {
+      "bytes": 5771,
+      "sha256": "3a0d43190e48a544cc7cff70cbeb35d17ff808fa1d76fe6c0c2116bfa49c0952"
+    },
+    "scripts/tr01_camera_model.py": {
+      "bytes": 9483,
+      "sha256": "81d3e490a0e566380da823cd2d98b3ed29db80b96405976b5daeb2114cf781b3"
+    },
+    "scripts/tr01_floor_motion.py": {
+      "bytes": 13262,
+      "sha256": "282fe65f4a8d4c27a5845021c65b1c68a7c6422ee5cd982218e0ae316c621304"
+    },
+    "scripts/tr01_workcell.py": {
+      "bytes": 14391,
+      "sha256": "96aaddc54185fed89cc9edea8690d49d18aa63bfb0f0bf0fc1571fc338f37c89"
+    },
+    "scripts/tube_cam_model.py": {
+      "bytes": 27072,
+      "sha256": "14473f88b72a50a460647a241edc1b536d5043b07bf9250c63fef68bb416fc71"
+    },
+    "scripts/tube_carrier_model.py": {
+      "bytes": 17251,
+      "sha256": "9c4ba07cc57238aa5cdc01d9a7ea5f32b6d75ac3d17d6e1427c53c3aeb1d3b69"
+    },
+    "scripts/tube_frame_model.py": {
+      "bytes": 13006,
+      "sha256": "8484c39fdeb5a84963fe0ddaefe49ef357fa8c700adbf1208dadec66d96f12b7"
+    },
+    "scripts/walkthrough_elevator.py": {
+      "bytes": 6941,
+      "sha256": "d92b22b1e9c1ee97116bf936d3057eb7ebf644e29e7adaee0cff246fc6bab21f"
+    },
+    "scripts/walkthrough_mechanisms.py": {
+      "bytes": 12251,
+      "sha256": "05f2ca117b7e4651b72a4387cc9c2c8a4e7fd5991dc2c7c4f2bee52f801da703"
+    },
+    "scripts/walkthrough_robots.js": {
+      "bytes": 2955,
+      "sha256": "60d0b66b0b776014f80e6803f4246847eef820fdc418e55a8a760178a976b630"
+    },
+    "scripts/walkthrough_robots.py": {
+      "bytes": 6229,
+      "sha256": "87afb5be2db91cc038d60356101859adbfad637fa3dd666c5fa509c7af0341e4"
+    },
+    "scripts/walkthrough_world.py": {
+      "bytes": 4248,
+      "sha256": "e49ae5853a9ae0b83137cf4a350038674607834552b091cd6f448fb2ecbf66dd"
+    },
+    "scripts/wall_worktops.py": {
+      "bytes": 9678,
+      "sha256": "be21a91fa1be18b8f46756d07625cfb122ce51f66cb08f0c818cf92436a092e1"
+    },
+    "scripts/worktop_equipment.py": {
+      "bytes": 2323,
+      "sha256": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a"
+    },
+    "scripts/x6_mounting_design.py": {
+      "bytes": 4016,
+      "sha256": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
+    }
+  },
+  "format": "solidcraftbot.building-fleet-browser-bundle/1",
+  "inputs": {
+    "browser_source": "model/building-fleet-browser.shared.json",
+    "camera_report": "exports/generated/tr01-awareness-ccd729bbb881-r2/build-report.json",
+    "graph_cache_report": "exports/building-fleet/patrol-5f4da9d/preparation-r1/report.json",
+    "navigation_cache": "exports/building-fleet/patrol-5f4da9d/preparation-r1/navigation-after-graph",
+    "profile": "model/building-fleet-patrol.shared.json",
+    "resource_cache": "exports/building-fleet/jerk-01c7cff/resource-catalog-r2",
+    "vehicle_mesh": "exports/building-fleet/support-680652f/native-vehicle-mesh.json",
+    "walkthrough_export": "exports/building-fleet/jerk-01c7cff/walkthrough-r1"
+  },
+  "qualification": {
+    "empty_vehicles": true,
+    "full_mission_coverage_verified": false,
+    "hardware_or_real_safety_qualified": false,
+    "independent_export_verified": false,
+    "native_full_program_verified": false,
+    "network_video_implemented": false,
+    "simulation_only": true
+  },
+  "root_dir": "/project",
+  "runtime": {
+    "engine": "pyodide",
+    "execution": "module_web_worker",
+    "loader_module_url": "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs",
+    "pacing": "source_step_without_wall_clock_catchup",
+    "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry",
+    "version": "314.0.8"
+  },
+  "scope": "Original engine sources and checked static geometry/cache inputs only; a new independent live world starts per page, without prior mission, snapshot, action journal or recording fallback.",
+  "session": {
+    "recording_fallback": false,
+    "scope": "independent_live_session_per_page",
+    "start": "new_patrol_world"
+  }
+}
