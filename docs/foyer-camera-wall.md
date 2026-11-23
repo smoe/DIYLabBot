@@ -39,10 +39,43 @@ pausierte Anzeige, fehlende Quellen und Darstellungsfehler unterscheiden
 sich von Gerätestörungen. **Keine Meldungsquelle angebunden** bedeutet
 nicht „keine Störung“.
 
+## Flottenansichten in der aktiven Browserfassung
+
+Die ausdrücklich gewählte [aktive BF01-Browserfassung](building-fleet-demo.md#aktive-browserfassung)
+startet pro geöffneter Seite eine neue, unabhängige Patrouille mit denselben
+20 physischen Monitoren. Die Sitzung berechnet Fahrzeugbewegungen und neue
+leere Testaufträge aus den vorhandenen Quellen und statischen Geometriedaten;
+sie spielt keine gespeicherte Fahrt ab. Ein lokal gestarteter Python-Dienst
+ist dafür nicht erforderlich. Der normale manuelle Rundgang bleibt ohne
+Flottenbindung und aktiviert durch den Blick auf die Kamerawand keine Fahrt.
+
+Beim Start gehört M01 zu BF01, M02 zu BF02 und entsprechend M20 zu BF20.
+Die Kamera-IDs `BF01.BF01.Overview` bis `BF01.BF20.Overview` bleiben erhalten.
+Ein Monitor verwendet ausschließlich eine bereits im synthetischen Funkmodell
+empfangene Kamerareferenz seines Fahrzeugs. Vor der ersten Zustellung bleibt
+ein Platzhalter. Die einmalige Startfreigabe der Patrouille wartet auf die
+tatsächlich empfangenen ersten Ansichten aller 20 Fahrzeuge.
+
+Das Bild entsteht aus der ursprünglichen Aufnahmepose und der damaligen
+gemeinsamen Fahrzeug- und Aufzugstellung. Aufnahmezeit, Empfangszeit und
+Bildalter in Modellzeit bleiben von der Zeit seit der letzten Bildberechnung
+im Browser getrennt. Eine neue Bildberechnung verjüngt die Aufnahme nicht.
+Die Bilder sind synthetische Modellansichten und kein realer Videostream
+oder Video-Netzwerklasttest. Bei einer Pause oder einem Fehler bleiben die
+letzten ausgeführten Stellungen sichtbar; die Anzeige sagt keine zukünftige
+Fahrt voraus. Das Schließen und erneute Öffnen der Seite beginnt eine neue
+Sitzung statt der Fortsetzung eines früheren Laufs.
+
+Die gesonderten Paket-, Worker- und Browserberichte binden die jeweils
+geprüften Quellen und Ausgabebytes. Ein bestandener Paketaufbau ist keine
+Bestätigung einer öffentlichen Veröffentlichung, vollständiger Gebäudebesuche
+oder realer Schutzfunktionen. Die frühere Teilvorschau und ihre Nachweise
+bleiben als historische Prüfstände erhalten.
+
 ## Flottenansichten in der experimentellen BF01-Vorschau
 
-Der ausdrücklich gewählte Einstieg `bf01/` verbindet die
-[BF01-Teilvorschau](building-fleet-demo.md#experimentelle-teilvorschau) mit
+**Historischer Prüfstand:** Die frühere
+[BF01-Teilvorschau](building-fleet-demo.md#experimentelle-teilvorschau) verbindet die Aufzeichnung mit
 denselben 20 physischen Monitoren. Beim Start gehört M01 zu BF01, M02 zu
 BF02 und entsprechend M20 zu BF20. Die vorhandenen Kamera-IDs
 `BF01.BF01.Overview` bis `BF01.BF20.Overview` bleiben erhalten. Der normale
@@ -107,8 +140,9 @@ Monitorkörper bleiben Teil der Welt. Beim Browserexport werden Rundgang-
 und Flottenpin des Overlays separat geprüft. Ein veralteter Pin bricht den
 Export mit Angabe des betroffenen Bezugs ab. BF01-Einträge im normalen
 Register enthalten ausschließlich abgeleitete Metadaten ohne Fahrzeugpose
-oder Bild. Erst die ausdrücklich gebundene Teilvorschau ergänzt die
-empfangenen Kamerareferenzen aus dem unveränderten R3-Lauf.
+oder Bild. Die aktive Browserfassung ergänzt empfangene Kamerareferenzen
+ihrer eigenen Sitzung. Die historische Teilvorschau bindet weiterhin die
+unveränderten Referenzen des R3-Laufs; diese Quellen werden nicht umgepinnt.
 
 ## Darstellung und Prüfung
 

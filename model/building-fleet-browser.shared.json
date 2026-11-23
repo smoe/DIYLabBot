@@ -1,0 +1,32 @@
+{
+  "format": "solidcraftbot.building-fleet-browser/1",
+  "id": "BF01-Browser",
+  "sources": {
+    "patrol": {
+      "path": "model/building-fleet-patrol.shared.json",
+      "sha256": "faa50900f9f58895c7d35fafbdfd9d9f28f9036e6ebaa7276c3ccbb5184cc1b4"
+    }
+  },
+  "runtime": {
+    "engine": "pyodide",
+    "version": "314.0.8",
+    "loader_module_url": "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs",
+    "execution": "module_web_worker",
+    "pacing": "source_step_without_wall_clock_catchup",
+    "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry"
+  },
+  "session": {
+    "scope": "independent_live_session_per_page",
+    "start": "new_patrol_world",
+    "recording_fallback": false
+  },
+  "qualification": {
+    "simulation_only": true,
+    "empty_vehicles": true,
+    "network_video_implemented": false,
+    "full_mission_coverage_verified": false,
+    "native_full_program_verified": false,
+    "independent_export_verified": false,
+    "hardware_or_real_safety_qualified": false
+  }
+}

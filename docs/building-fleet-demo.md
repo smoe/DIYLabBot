@@ -4,12 +4,80 @@ BF01 ist eine ausdrücklich gewählte, separate Simulation für 20 leere
 TR01-Instanzen `BF01` bis `BF20`. Die bestehende L01-Aufstellung einschließlich
 ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
-Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
+Gerätenetzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
+Die aktive Browserfassung und der lokale Dienst verwenden denselben Motor;
+die frühere zeitlich begrenzte Teilvorschau bleibt ein historischer Prüfstand.
+
+## Aktive Browserfassung
+
+`model/building-fleet-browser.shared.json` beschreibt den zusätzlichen
+Browseradapter. Jede geöffnete Seite startet eine **neue, unabhängige aktive
+Sitzung** mit 20 leeren Fahrzeugen. Es wird keine frühere Fahrt abgespielt;
+ein Rückfall auf die alte Aufzeichnung ist ausgeschlossen. Die laufende
+Patrouille und neue Testaufträge werden in dieser Sitzung berechnet. Das
+Schließen der Seite beendet sie; eine neue Seite übernimmt weder Aufträge
+noch Fahrzeugzustände einer früheren Sitzung.
+
+Der Browser benötigt dafür keinen lokal gestarteten Simulationsdienst und
+keinen gemeinsam betriebenen Simulationsserver. Er lädt den in der Quelle
+festgelegten Python-Laufzeitkern sowie das quellgebundene Laufzeitpaket und
+führt den vorhandenen `PatrolWorldRunner` in einem eigenen Worker aus. Die
+übrige Seite bleibt während längerer Berechnungen bedienbar. Physik, anonyme
+Scans, 50-ms-Schritte und Bremsnachweise, Rekrutierung, Buchten-, Aufzug- und
+Bench-Regeln kommen aus denselben Python-Modulen wie beim lokalen Dienst.
+Modellzeit wird nicht vorgezogen, um langsame Berechnungen aufzuholen.
+
+`scripts/build_building_fleet_browser.py` erzeugt HTML, Workerdateien und ein
+deterministisches ZIP mit den originalen Modul-, Modell-, CAD-, Welt- und
+Cachebytes. Die CAD-Dateien werden zur unveränderten Prüfsummenprüfung
+mitgeführt; der Browser startet kein natives CAD. Das Laufzeitmanifest bindet
+jede Datei mit Größe und SHA256. Aufgezeichnete Programme, Laufjournale,
+Controller-Beobachtungen und alte Sitzungssnapshots gehören nicht in dieses
+Paket. Die statischen Daten beschreiben Wege und Körper, keine ausgeführte
+Mission. Download-, Quellen- oder Rechenfehler bleiben sichtbar, statt eine
+gespeicherte Fahrt als aktive Simulation auszugeben.
+
+Die 20 vorhandenen Atrium-Monitore erhalten jeweils die tatsächlich im
+synthetischen Funkmodell empfangene Kamerareferenz ihres Fahrzeugs samt
+ursprünglicher Aufnahmezeit, Aufnahmepose und damaliger gemeinsamer Szene.
+Es handelt sich um lokal gerenderte Modellansichten. Die Hauptansicht zeigt
+ausschließlich bereits ausgeführtes PVA, mit begrenztem Darstellungsverzug
+und ohne Vorhersage über das berechnete Ende hinaus. Ein Testauftrag und die
+auftragsbezogene Bestätigung gehören ausschließlich zu dieser Browsersitzung.
+Reale Lasten, Geräteübergaben und Video-Netzwerklastmessungen bleiben offen.
+
+Der Browseraufbau ist eine zusätzlich implementierte Zielunterstützung. Ein
+erfolgreicher Paketaufbau ist noch keine Prüfung des öffentlichen Deployments,
+der vollständigen Zielabdeckung oder einer realen Schutzfunktion. Die
+separaten Browser- und Veröffentlichungsberichte binden jeweils die konkret
+geprüften Bytes. Der normale manuelle Rundgang bleibt ohne aktive Flotte.
+
+### Statische Prüfmetadaten zwischen Python-Laufzeiten
+
+Bei der ersten WebAssembly-Rekonstruktion der 3314 festen Routen unterschieden
+sich 269 Felder ausschließlich in `portal_certificates[].yaw_rad`, jeweils
+um höchstens eine binary64-ULP. Alle übrigen Routenfelder, Punkte, Ressourcen,
+Typen und Vorzeichen von Null waren identisch. Diese Winkel sind
+Prüfmetadaten; sie sind keine neue Fahrkurve. Die ursprünglichen Bytes und
+der Hash der vollständigen Routenbank bleiben maßgeblich.
+
+`building_fleet_browser_navigation.py` verwendet deshalb einen ausdrücklich
+gebundenen Browseradapter. Zuerst führt er die unveränderte geometrische
+Ableitung und deren frische Prüfungen aus. Er übernimmt anschließend nur
+die ursprünglichen, gepinnten Winkelzeugnisse eines ansonsten bis auf diese
+Felder bitidentischen statischen Routenobjekts. Jeder andere Unterschied
+oder ein unbekanntes Objekt sperrt die Wiederverwendung. Der gewöhnliche
+vollständige Routenbank-Hash und der bestehende Ressourcencache-Vertrag
+werden danach unverändert geprüft. Alte Berichte werden nicht umgepinnt;
+der Browserbericht hält die ursprünglichen und neu berechneten Hexwerte
+dieser eng begrenzten Metadatenbindung separat fest. Die Quellenregel
+`static_route_witnesses` benennt diese Ausnahme ausdrücklich. Fahrzeugmaße,
+Punkte, PVA, Stützung, Abstände und Grenzwerte werden dadurch nicht geändert.
 
 ## Experimentelle Teilvorschau
 
-Der separate Einstieg `bf01/` zeigt eine ausdrücklich **experimentelle
-Teilvorschau** der aufgezeichneten Fahrt von 0 bis 1188,1 s mit allen
+**Historischer Prüfstand:** Die frühere BF01-Seite zeigte eine ausdrücklich
+**experimentelle Teilvorschau** der aufgezeichneten Fahrt von 0 bis 1188,1 s mit allen
 20 Fahrzeugen. Fahren, Warten und Parken folgen der Aufzeichnung; die
 Fahrzeuge sind nicht ständig gleichzeitig in Bewegung. Der Browser berechnet
 keine neue Fahrt. Die Aufzeichnung endet mit unvollständiger Zielabdeckung;
@@ -27,7 +95,7 @@ die vorhandenen PVA-Knoten, empfangenen Meldungen und Kamerareferenzen mit
 ihren synthetischen Aufnahmeposen.
 Der normale Rundgang und der strenge Vollprogramm-Builder bleiben erhalten.
 
-Dieselbe BF01-Seite verbindet die bewegten Fahrzeugmodelle mit den 20
+Diese historische BF01-Seite verbindet die bewegten Fahrzeugmodelle mit den 20
 physischen Bildschirmen der [Foyer-Kamerawand](foyer-camera-wall.md#flottenansichten-in-der-experimentellen-bf01-vorschau).
 Die Startbelegung ordnet M01 bis M20 jeweils BF01 bis BF20 zu; die vorhandenen
 Monitor- und Kamera-IDs werden wiederverwendet. Die Bilder entstehen aus den
@@ -77,12 +145,13 @@ aktiven Ports. Die neue Stützregel und ihre Grenzen stehen im folgenden
 Abschnitt; eine bestandene Portprüfung qualifiziert keinen vollständigen
 Flottenlauf.
 
-## Aktive lokale Patrouille und Transporterrekrutierung
+<a id="aktive-lokale-patrouille-und-transporterrekrutierung"></a>
+
+## Aktive Patrouille und Transporterrekrutierung
 
 `model/building-fleet-patrol.shared.json` ergänzt einen ausdrücklich gewählten
-aktiven Testmodus. Der veröffentlichte Einstieg `bf01/` bleibt die oben
-beschriebene Aufzeichnung. Die aktive Fassung benötigt einen lokalen
-Python-Dienst; sie ist keine neue statische Pages-Aufzeichnung. Ihre 20 leeren
+aktiven Testmodus. Die Browserfassung und der optionale lokale Python-Dienst
+sind getrennte Laufzeitadapter für denselben Motor. Ihre 20 leeren
 Fahrzeuge verwenden dieselben Modellquellen, Fahrgrenzen, anonymen Scans,
 50-ms-Weiterfahr-/Bremsnachweise, Bodenprüfungen und Aufzugdienste.
 Die bestehenden BF01-, TR01- und L01-Quellen werden nicht überschrieben.
@@ -128,7 +197,7 @@ Die aktiven Atriumbilder verwenden die tatsächlich empfangenen Kameraposen
 mit der damaligen gemeinsamen Fahrzeug- und Aufzugstellung. Ein
 Verbindungsfehler lässt die zuletzt ausgeführten Stellungen stehen. Der
 Browser extrapoliert keine ungeprüfte Fahrt. Eine geschlossene Fahrwegtür
-fordert eine Pause des ganzen lokalen Motors an; ein manuell gesetzter
+fordert eine Pause des ganzen Sitzungsmotors an; ein manuell gesetzter
 Pausenzustand bleibt beim Wiederöffnen erhalten. Diese Browserbedienung ist
 keine qualifizierte Schutzfunktion. Modellzeit und tatsächliche Laufzeit
 bleiben getrennt; rechenintensive Prüfungen können langsamer als Echtzeit sein.
@@ -178,7 +247,7 @@ ein Video-Netzwerklasttest und dessen Durchsatzmessung sind nicht implementiert.
 Der HTTP-Eingang begrenzt die Sitzung auf 100 unterschiedliche Testaufträge.
 Der Motor stoppt mit sichtbarem Fehler beim Erreichen der getrennten Speichergrenzen
 von 1000 Aufträgen, 100000 empfangenen Meldungen oder 1000000 aufbewahrten
-PVA-Punkten überschritten werden; Controllerbelege werden nicht zur
+PVA-Punkten; Controllerbelege werden nicht zur
 Fortsetzung gelöscht. Diese Grenzen sind Implementierungsgrenzen des Tests,
 keine Fahrzeug- oder Netzwerkgrenzen. Ein vollständiger aktiver Flottenlauf,
 alle Zielbesuche, neue native Gesamtbewegungen, unabhängiger Gesamtexport und
