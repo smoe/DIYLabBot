@@ -2,17 +2,15 @@
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "url": "https://smoe.github.io/DIYLabBot/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "01c7cff3ca9565dfef09434c41c25f01a7817215",
-  "integrated_commit": "01c7cff3ca9565dfef09434c41c25f01a7817215",
-  "export_revision": "browser",
+  "export_revision": "walkthrough-r1",
   "html": {
-    "sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c",
-    "bytes": 52585068
+    "sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1",
+    "bytes": 52585227
   },
-  "source_manifest_sha256": "8db1640838206514ed4220d9864025de29afb2f1400c6a14362c2053d2a5cb52",
+  "source_manifest_sha256": "c3f734ca27b258baec39ec3a6955b4525eacb91d399933d9dae8fdfc067745f1",
   "native_builds": {
     "building": {
-      "report": "cad/building-stack/shared-build-report.json",
+      "report": "exports/generated/building-stack-268bd52d21e1/build-report.json",
       "report_sha256": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
       "revision": "building-stack-268bd52d21e1",
       "source_sha256": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a",
@@ -139,7 +137,7 @@
     "scripts/build_building_walkthrough.py": "734d3e113b22f0e73643910817a08ed5f453311720951a228f8438c3b20f6f88",
     "scripts/walkthrough_world.py": "e49ae5853a9ae0b83137cf4a350038674607834552b091cd6f448fb2ecbf66dd",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
-    "cad/building-stack/shared-build-report.json": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
+    "exports/generated/building-stack-268bd52d21e1/build-report.json": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
     "cad/lab-layout-l01/shared-build-report.json": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6",
     "scripts/build_building_stack.py": "c298ddd6b3e624b4c80277b879004ee0ecb82395075877f4e74ffe373b1e954a",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
@@ -190,11 +188,11 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
     "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4",
-    "model/foyer-camera-wall.shared.json": "516255171225d157c773f9413b9b11b21e879b59db654c17e26dcd2f2d532b41",
+    "model/foyer-camera-wall.shared.json": "00da315f32f96608b0914b3bab512a2493d96810c5a88f8814dd0b1e533af00b",
     "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
     "scripts/monitor_camera_registry.py": "aefee896a12abc0ee2bb555ffb969356f22afb47e944d75b8f5f868f98d4006f",
-    "model/building-fleet-demo.shared.json": "80155e3df17280a228c8c740f63039fad1fe285950b18ce653013a57a4526033",
-    "scripts/building_walkthrough_viewer.html": "6361b6e5e1bf205b082cd7bce92fe9a448f7d6c5b1eaa97cb49d0997fce3c380",
+    "model/building-fleet-demo.shared.json": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99",
+    "scripts/building_walkthrough_viewer.html": "a0a4efa71e2c4d02a0faea077b95cadff6f727a4e8c970355fdefa25e0001962",
     "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
     "scripts/seminar_projection.js": "87e3d728858b95cc9709f3f71e5c49a1676630883d0cf174e5b5809359a1900d",
     "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
@@ -221,21 +219,110 @@
     "The native building CAD contains laboratory furniture; equipment instancing is implemented in this browser exporter only."
   ],
   "local_browser_evidence": {
-    "browser-check.json": {
-      "sha256": "5d62063061b0211a086844b6d3b6f9ebc282f4c4d8a116bba4c7be01349292c9",
+    "main": {
+      "path": "exports/building-fleet/jerk-01c7cff/normal-browser-r2/browser-check.json",
+      "sha256": "e730b849cd4db985204e5535b0141556cc957df53a8d29388521adc389d3ec5a",
+      "bytes": 36129,
       "passed": true,
-      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
+      "html_sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1"
     },
-    "seminar-window-browser.json": {
-      "sha256": "b32a72256812f40f1bb0c8c2f9d01f5e22d4915795094d9427c27d88c4b19a0e",
+    "lift_walking": {
+      "path": "exports/building-fleet/jerk-01c7cff/normal-lift-walking-r2/lift-walking-browser-report.json",
+      "sha256": "5788ac903d6a21b75d27682e1804b39543ba94c3aca3a5648497f824836d3819",
+      "bytes": 138840,
       "passed": true,
-      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
-    },
-    "ice-maker-flap-browser-report.json": {
-      "sha256": "c43ee4c62b9d1fe28eb4abbd439b2d4ec4d4b306177475fabee8f119e715434b",
-      "passed": true,
-      "html_sha256": "129c998fd3e34bb33a60a11a4248f9e01d6f585be94de663467eb81992cde60c"
+      "html_sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1"
     }
   },
-  "update": "Publishes the ground-floor seminar room with table rows, seven operable window sashes and Steamboat Willie on the projection screen. The same snapshot includes the operable ice-maker flap in laboratory 3.016."
+  "local_native_checks": {
+    "complete_route": {
+      "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/complete-route-check.json",
+      "sha256": "f70635b20f8847584c11c7074bc1cb4e7932a5bd50726150b62c783fd693be3f",
+      "bytes": 661200
+    },
+    "camera_receipt": {
+      "path": "exports/building-fleet/jerk-01c7cff/publication/normal-camera-recheck-r1/receipt.json",
+      "sha256": "dffe14ad66ef21838a86e1822f66ddfed2e05e05f4629c5f2359f74d567599fa",
+      "bytes": 1533
+    }
+  },
+  "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
+  "integrated_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
+  "source_tree": "b75c41c8276056ce6d0c4746206f6028b5beb7f3",
+  "related_pages": {
+    "bf01": {
+      "url": "https://smoe.github.io/DIYLabBot/bf01/",
+      "status": "experimental_preview",
+      "complete": false,
+      "recorded_end_s": 1188.1,
+      "html_sha256": "c358db088aa4601e34777c46376c00833f2c04e4bab8b4791a43d18039ec9f40",
+      "qualification": {
+        "full_mission_coverage_verified": false,
+        "native_full_program_verified": false,
+        "independent_export_verified": false,
+        "hardware_or_real_safety_qualified": false
+      },
+      "publication_manifest": {
+        "url": "https://smoe.github.io/DIYLabBot/bf01/site-manifest.json",
+        "sha256": "8f6b5fe416cdbdeff77da8e65596c76ff795958a9bb0f4008c044ac0460edbe8"
+      },
+      "provenance": {
+        "partial_program": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/partial-program.json",
+          "sha256": "b76ef65cae9f12f60c38b5a9cebaaddc27ee2c17491910ebbf06572380cd2158",
+          "bytes": 170534749
+        },
+        "runtime_failure": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/runtime-failure.json",
+          "sha256": "d33c70beaf912585161545ca3fd11cca4d138f4c23259a2f976852827237bac9",
+          "bytes": 25282
+        },
+        "runtime_source_start": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/runtime-source-start.json",
+          "sha256": "7a88e32549cbe015c4c5422d767afe619ccb3dc05ba66191809126c52ae7f4e9",
+          "bytes": 23979
+        },
+        "interruption_receipt": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3-interruption-r1/report.json",
+          "sha256": "de5e79222f56addeb67afe096346d9930b6d4a1f6bd93ff42309ad5bf59421b7",
+          "bytes": 63639
+        },
+        "raw_trace": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/own-controller-observations.jsonl.gz",
+          "sha256": "905149447c61cca6d4dafc2fbbf3d44c91b00fc3a2e41e4e9b0dd3fc2df765a6",
+          "bytes": 316241451
+        },
+        "world_report": {
+          "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json",
+          "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5",
+          "bytes": 19677
+        },
+        "camera_report": {
+          "path": "exports/generated/tr01-awareness-ccd729bbb881-r2/build-report.json",
+          "sha256": "c176d4d0a9913a7a8f348d26aef83e0642a28ba58fba3a66aa0996800fb0ff51",
+          "bytes": 47061
+        },
+        "vehicle_mesh": {
+          "path": "exports/building-fleet/support-680652f/native-vehicle-mesh.json",
+          "sha256": "5e4d1cdd69a1da3a91c4f3e7a6e5e9ea7c52c13cc003d8cd89d44fe6a04d6a10",
+          "bytes": 497190
+        },
+        "preview_build": {
+          "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/build-report.json",
+          "sha256": "9b0416ba8fa84f6a3768bb185973cef0c487bd1836bb0e548d8bc162e865054e",
+          "bytes": 30023
+        },
+        "bounded_preview_browser": {
+          "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/preview-browser-check.json",
+          "sha256": "79ede598e48df0b3ac23ac888db1382b16747efafec8ce95acf2ac477364ab72",
+          "bytes": 3881
+        }
+      }
+    }
+  },
+  "packager": {
+    "path": "exports/building-fleet/jerk-01c7cff/publication/package_preview_pages.py",
+    "sha256": "f83350fdccebf206e971ca940739a41b2d94fab65c10b8cebef1013266c87b6d",
+    "bytes": 24070
+  }
 }
