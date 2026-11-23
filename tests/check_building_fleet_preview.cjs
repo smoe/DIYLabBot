@@ -18,6 +18,7 @@ const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
  const browser=await chromium.launch({headless:true,...(process.argv[4]?{executablePath:process.argv[4]}:{}),args:gpu==='metal'?['--enable-gpu','--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=metal']:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
  const page=await browser.newPage({viewport:{width:1400,height:1000}}),errors=[];
  page.on('pageerror',e=>errors.push(e.message));
+ page.on('console',m=>{if(/GL_INVALID_OPERATION|WebGL drawing error/.test(m.text()))errors.push(m.text());});
  const report={format:'solidcraftbot.building-fleet-preview-browser-check/1',passed:false,
   scope:'Bounded WebGL smoke check of the recorded experimental prefix; no full native, export, mission-coverage or performance qualification.',
   html_sha256:digest(bytes),model_end_s:program.duration_s,recorded_end_s:program.duration_s,
@@ -41,6 +42,7 @@ const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
    await cdp.detach();
   }else await page.goto(pathToFileURL(target).href,{timeout:120000});
   await page.waitForFunction(()=>window.__buildingFleet?.ready,null,{timeout:120000});
+  assert(await page.locator('#walkthrough-error').isHidden());
   await page.evaluate(()=>window.__buildingFleet.pause());
   const banner=page.locator('#building-fleet-preview-notice');assert(await banner.isVisible());
   const notice=await banner.innerText();assert(/experimentell/i.test(notice));assert(/unvollständig|nicht.*geprüft|ungeprüft|unbestätigt/i.test(notice));
@@ -93,6 +95,7 @@ const digest=b=>crypto.createHash('sha256').update(b).digest('hex');
   await page.setViewportSize({width:390,height:844});assert(await page.locator('[data-bf=play]').isVisible());
   assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2));
   await page.screenshot({path:path.join(path.dirname(target),'preview-mobile.png'),fullPage:true});
+  assert(await page.locator('#walkthrough-error').isHidden());report.main_scene_error_hidden=true;
   assert.deepEqual(errors,[]);report.errors=errors;report.passed=true;
  }finally{fs.writeFileSync(path.join(path.dirname(target),'preview-browser-check.json'),JSON.stringify(report,null,2)+'\n');await browser.close();}
  console.log('Experimental preview smoke check passed. Full fleet qualification remains open.');
