@@ -38,6 +38,8 @@ RECORDING_NAMES = frozenset({'program.json', 'partial-program.json', 'commands.j
     'runtime-source-start.json', 'runtime-failure.json', 'browser-observed-state.json',
     'own-controller-observations.jsonl.gz'})
 HEX = re.compile(r'[0-9a-f]{64}\Z')
+PYTHON_CORE_FILES = frozenset({'pyodide.mjs', 'pyodide.asm.mjs', 'pyodide.asm.wasm',
+                              'python_stdlib.zip', 'pyodide-lock.json'})
 
 
 def json_bytes(value):
@@ -107,13 +109,17 @@ def load_browser_source(path=BROWSER_SOURCE):
             {'format', 'id', 'sources', 'runtime', 'session', 'qualification'}
             or value['format'] != 'solidcraftbot.building-fleet-browser/1'
             or value['id'] != 'BF01-Browser'
-            or set(value['sources']) != {'patrol'}):
+            or set(value['sources']) not in ({'patrol'}, {'patrol', 'python_core'})):
         raise ValueError('Explicit browser fleet source required')
     if value['sources']['patrol'] != local.artifact(local.PROFILE):
         raise ValueError('Browser source must pin the current patrol profile')
     runtime = value['runtime']
-    if (set(runtime) != {'engine', 'version', 'loader_module_url', 'execution', 'pacing',
-                         'static_route_witnesses'}
+    fields = {'engine', 'version', 'loader_module_url', 'execution', 'pacing', 'static_route_witnesses'}
+    if 'python_core' in value['sources']:
+        fields.add('delivery')
+        if runtime.get('delivery') != 'same_origin_pinned_core':
+            raise ValueError('Explicit unchanged same-origin Python core delivery required')
+    if (set(runtime) != fields
             or runtime['engine'] != 'pyodide' or runtime['execution'] != 'module_web_worker'
             or runtime['pacing'] != 'source_step_without_wall_clock_catchup'
             or runtime['static_route_witnesses'] !=
@@ -152,6 +158,9 @@ def collect(inputs, *, root=ROOT):
     browser_source = load_browser_source(ROOT / inputs['browser_source'])
     files.add(inputs['profile'])
     files.add(inputs['browser_source'])
+    if 'python_core' in browser_source['sources']:
+        ref = browser_source['sources']['python_core']
+        files.add(ref['path'], ref['sha256'])
     files.pins(model.source_pins(source))
     files.pins(model.protected_pins())
     world_path = ROOT / inputs['walkthrough_export'] / 'world-build-report.json'
@@ -183,12 +192,21 @@ def collect(inputs, *, root=ROOT):
     resource_report = files.read(ROOT / inputs['resource_cache'] / 'cache-report.json')
     resource_probe = ResourceCatalog.__new__(ResourceCatalog)
     resource_probe.nav = probe
-    if (resource_report.get('format') != 'solidcraftbot.building-fleet-resource-cache/1'
+    if (resource_report.get('format') not in ('solidcraftbot.building-fleet-resource-cache/1',
+                                             'solidcraftbot.building-fleet-resource-cache/2')
+            or (resource_report['format'].endswith('/2') and
+                resource_report.get('path_validation') != 'complete_original_path_construction')
             or resource_report.get('source_files_sha256') != resource_probe._cache_pins()):
         raise ValueError('Current static resource cache required')
     files.pins(resource_report['source_files_sha256'])
     files.add(ROOT / inputs['resource_cache'] / resource_report['file'], resource_report['artifact_sha256'])
     graph_report = files.read(inputs['graph_cache_report'])
+    if 'data_equivalence' in graph_report:
+        ref = graph_report['data_equivalence']
+        files.add(ref['path'], ref['sha256'])
+        equivalence = files.read(ref['path'])
+        checker = equivalence['checker']
+        files.add(checker['path'], checker['sha256'])
     required = static_cache._mandatory_pins(probe)
     pins = graph_report.get('source_files_sha256_start')
     if (graph_report.get('format') != 'solidcraftbot.building-fleet-static-preparation/1'
@@ -231,7 +249,30 @@ def collect(inputs, *, root=ROOT):
     return files, browser_source, profile
 
 
-def pack(files, browser_source, inputs, output):
+def collect_python_core(browser_source, directory):
+    """Keep unchanged official runtime bytes outside the simulation ZIP."""
+    ref = browser_source['sources']['python_core']
+    descriptor = model.read_json(model.resolve_pin(ref))
+    if (descriptor.get('format') != 'solidcraftbot.building-fleet-python-core/1' or
+            descriptor.get('version') != browser_source['runtime']['version'] or
+            not PYTHON_CORE_FILES <= set(descriptor.get('files', {}))):
+        raise ValueError('Version-matched pinned original Python runtime files required')
+    if 'project_notice' in descriptor and hashlib.sha256(descriptor['project_notice'].encode()).hexdigest() != descriptor['files'].get('NOTICE', {}).get('sha256'):
+        raise ValueError('The project source-availability notice differs from its leading text')
+    originals = FileSet()
+    directory = local.project_path(directory)
+    for name, row in descriptor['files'].items():
+        archive_name(name)
+        path = directory / name
+        originals.add(path, row['sha256'])
+        if path.stat().st_size != row['bytes']:
+            raise ValueError('Original Python runtime file size changed: ' + name)
+    return {'source': copy.deepcopy(ref), 'files': copy.deepcopy(descriptor['files']),
+        'directory': 'python/' + descriptor['version'] + '-' + ref['sha256'][:16],
+        'originals': originals, 'input_directory': directory}
+
+
+def pack(files, browser_source, inputs, output, *, python_core=None):
     """Write an immutable deterministic archive and independently hashed manifest."""
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -255,14 +296,29 @@ def pack(files, browser_source, inputs, output):
                     'bytes': archive.stat().st_size},
         'qualification': copy.deepcopy(browser_source['qualification']),
         'scope': 'Original engine sources and checked static geometry/cache inputs only; a new independent live world starts per page, without prior mission, snapshot, action journal or recording fallback.'}
+    if python_core is not None:
+        manifest['python_core'] = {key: copy.deepcopy(python_core[key])
+                                   for key in ('source', 'files', 'directory')}
+        for name in python_core['files']:
+            target = output / python_core['directory'] / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(python_core['input_directory'] / name, target)
+        python_core['originals'].verify()
     (output / 'runtime-manifest.json').write_bytes(json_bytes(manifest))
     return manifest
 
 
-def build(inputs, output, *, bundle_only=False):
+def build(inputs, output, *, bundle_only=False, python_core_dir=None):
     output = local.project_path(output, output=True)
     files, browser_source, profile = collect(inputs)
-    manifest = pack(files, browser_source, inputs, output)
+    python_core = None
+    if 'python_core' in browser_source['sources']:
+        if python_core_dir is None:
+            raise ValueError('Supply the pinned official Python core directory')
+        python_core = collect_python_core(browser_source, python_core_dir)
+    elif python_core_dir is not None:
+        raise ValueError('Python runtime delivery must be declared in the leading browser source')
+    manifest = pack(files, browser_source, inputs, output, python_core=python_core)
     manifest_ref = local.artifact(output / 'runtime-manifest.json')
     worker = {'module_url': 'building_fleet_browser_worker.mjs?sha256=' + files.files[WORKER]['sha256'],
         'manifest': {'url': 'runtime-manifest.json?sha256=' + manifest_ref['sha256'],
@@ -297,8 +353,8 @@ def build(inputs, output, *, bundle_only=False):
         # The final browser document has a separate exact build receipt.
         # Do not retain a local-HTTP HTML hash under the public build name.
         (output / 'build-report.json').unlink()
-    artifacts = {p.name: {'sha256': model.digest(p), 'bytes': p.stat().st_size}
-                 for p in output.iterdir() if p.is_file()}
+    artifacts = {p.relative_to(output).as_posix(): {'sha256': model.digest(p), 'bytes': p.stat().st_size}
+                 for p in output.rglob('*') if p.is_file()}
     report = {'format': 'solidcraftbot.building-fleet-browser-build/1', 'passed': True,
         'source_files_sha256': {**{name: row['sha256'] for name, row in files.files.items()},
                                **presentation_pins},
@@ -307,6 +363,9 @@ def build(inputs, output, *, bundle_only=False):
         'qualification': copy.deepcopy(manifest['qualification']), 'bundle_only': bundle_only,
         'files': artifacts, 'uncompressed_runtime_bytes': sum(row['bytes'] for row in files.files.values()),
         'browser_checked': False, 'scope': manifest['scope']}
+    if python_core is not None:
+        report['source_files_sha256'].update({name: row['sha256']
+            for name, row in python_core['originals'].files.items()})
     (output / 'browser-build-report.json').write_bytes(json_bytes(report))
     return report
 
@@ -319,12 +378,14 @@ def main(argv=None):
     parser.add_argument('--profile', default='model/building-fleet-patrol.shared.json')
     parser.add_argument('--browser-source', default='model/building-fleet-browser.shared.json')
     parser.add_argument('--bundle-only', action='store_true')
+    parser.add_argument('--python-core-dir', help='Original official core files declared by the browser source')
     args = parser.parse_args(argv)
     inputs = {name: (ROOT / getattr(args, name)).resolve().relative_to(ROOT.resolve()).as_posix()
               for name in ('walkthrough_export', 'camera_report', 'vehicle_mesh',
                            'navigation_cache', 'resource_cache', 'graph_cache_report',
                            'profile', 'browser_source')}
-    result = build(inputs, args.output_dir, bundle_only=args.bundle_only)
+    result = build(inputs, args.output_dir, bundle_only=args.bundle_only,
+                   python_core_dir=args.python_core_dir)
     print(json.dumps({'passed': result['passed'], 'files': len(result['source_files_sha256']),
         'runtime_archive_bytes': result['files']['runtime.zip']['bytes'],
         'uncompressed_runtime_bytes': result['uncompressed_runtime_bytes']}), flush=True)

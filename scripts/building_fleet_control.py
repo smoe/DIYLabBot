@@ -10,10 +10,12 @@ from building_fleet_motion import Path, transition, perception_speed_limit, comp
 F = floor.F
 
 
-def _quantized_scalar_clock(curve,origin=0.,progress_events=()):
+def _quantized_scalar_clock(curve,origin=0.,progress_events=(),*,periodic_fit=True):
+    if type(periodic_fit)is not bool:raise ValueError('Explicit periodic fit choice required')
     end=max(.001,round(curve.times[-1]*1000)/1000)
     times={0.,end,*[round(t*1000)/1000 for t in curve.times]}
-    times.update(round(k*.05,3)for k in range(1,math.ceil(end/.05))if k*.05<end)
+    if periodic_fit:
+        times.update(round(k*.05,3)for k in range(1,math.ceil(end/.05))if k*.05<end)
     # Include source geometry boundaries before evaluating the PVA on the
     # quantized clock; waypoint events still do not introduce a stop.
     first,last=curve.points[0][F[0]][0],curve.points[-1][F[0]][0]
@@ -169,7 +171,10 @@ class Controller(local.LocalController):
         if abs(self.nominal_clock.points[-1][F[0]][0]-path.length)>1e-5:raise ValueError('Own compiled clock must cover this path exactly')
         self._brake_cache=None;self.profile_checks=[];self._geometry_cache={}
         self.perception_audit={'checks':0,'minimum_range_margin_mm':None,'maximum_required_gap_mm':0.,'scope':'actual checked stop at each own decision state; discrete 0.05 s synthetic controller clock'}
-        self.nominal_clock,self.nominal_clock_proof=self._bounded_start_clock(self.nominal_clock,0.)
+        # Nominal geometry/ramp events already provide a fully bounded fit.
+        # Protective stops and recovery retain their existing periodic nodes;
+        # actual decision/advance prefixes remain independently capped at 50 ms.
+        self.nominal_clock,self.nominal_clock_proof=self._bounded_start_clock(self.nominal_clock,0.,periodic_fit=False)
         self.profile_checks.append({'kind':'nominal_clock','proof':self.nominal_clock_proof})
         self.continuation_stop_clock=None;self.step_end_s=None
         self._step_certificate=None;self._fallback=None
@@ -212,22 +217,22 @@ class Controller(local.LocalController):
         else:
             self.recorded.append(item); self.record_times.append(now)
 
-    def _bounded_start_clock(self,raw,origin):
+    def _bounded_start_clock(self,raw,origin,*,periodic_fit=True):
         if abs(raw.points[0][F[1]][0])>1e-8 or abs(raw.points[0][F[2]][0])>1e-8:raise ValueError('Retiming requires a confirmed resting episode start')
         base=raw;scales=[1.,1.005,1.01,1.02,1.04,1.08]
         for iteration in range(40):
             dilation=scales[iteration]
             raw=floor.motion.Curve([local.point(p['time_s']*dilation,p[F[0]][0],p[F[1]][0]/dilation,p[F[2]][0]/dilation**2)for p in base.points])
-            quantized=self._quantized_clock(raw,origin);valid,bounds=self._admissible(quantized,origin)
+            quantized=self._quantized_clock(raw,origin,periodic_fit=periodic_fit);valid,bounds=self._admissible(quantized,origin)
             if valid:return quantized,{'dilation':dilation,'dynamics':bounds,'time_quantum_s':.001,'playback_factor':1,'selection':'first verified factor in an increasing finite search family; global optimum unproved'}
             limits={'linear':{**self.limits,'velocity':self.zone_velocity_cap},'angular':self.angular}
             ratio=max([1.001,*[(value/limits[kind][key])**(1/order)for kind in('linear','angular')for order,key in enumerate(('velocity','acceleration','jerk'),1)for value in[bounds[kind][key]]]])*1.001
             proposed=max(scales[-1]*1.001,dilation*ratio)
             scales.append(proposed)
-        raise RuntimeError('Dense quantized own nominal motion cannot satisfy source bounds')
+        raise RuntimeError('Quantized own motion cannot satisfy source bounds')
 
-    def _quantized_clock(self,curve,origin):
-        return _quantized_scalar_clock(curve,origin,[*self.path.ends,*[at for at,_ in self.zone_caps]])
+    def _quantized_clock(self,curve,origin,*,periodic_fit=True):
+        return _quantized_scalar_clock(curve,origin,[*self.path.ends,*[at for at,_ in self.zone_caps]],periodic_fit=periodic_fit)
 
     def _cartesian_curve(self,clock,origin):
         points=[];yaw=None

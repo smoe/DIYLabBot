@@ -74,6 +74,74 @@ dieser eng begrenzten Metadatenbindung separat fest. Die Quellenregel
 `static_route_witnesses` benennt diese Ausnahme ausdrücklich. Fahrzeugmaße,
 Punkte, PVA, Stützung, Abstände und Grenzwerte werden dadurch nicht geändert.
 
+### Start und laufende Bahnvorbereitung
+
+Die Browserquelle bindet zusätzlich
+`model/building-fleet-browser-python.shared.json`. Dessen fünf unveränderte
+Pyodide-Kerndateien werden mit ihren Originalprüfsummen von derselben Website
+geladen; Herstellerlizenzen und der in dieser Quelle geführte Hinweis auf den
+verfügbaren Quelltext werden mit veröffentlicht. Python und Modellpaket laden
+parallel. Inhaltlich adressierte Dateien dürfen den HTTP-Cache nutzen;
+Größe und SHA256 werden auch bei einem Cachetreffer geprüft. Das ist weiterhin
+eine neue lokale Browsersitzung, kein gehosteter Simulationsdienst.
+
+Der optionale Ressourcencache `/2` bindet die vollständige ursprüngliche
+Konstruktion aller statischen `Path`-Objekte mit typ- und bitgenauen
+Eingangsprüfsummen. Seine Wiederherstellung rekonstruiert die tatsächlichen
+Konfliktflächen und prüft Quellen, Routenbank und Abschlussbedingungen;
+ungenutzte Abtasttabellen dieser bereits geprüften statischen Wege werden
+nicht nochmals aufgebaut. Der alte Cache `/1` behält seine vollständige
+Konstruktion. Neue Kompatibilitätsberichte belegen die Gleichheit der
+statischen Daten separat, einschließlich aller 3314 Wege und 2117104
+Abtastintervalle. Historische Berichte bleiben unverändert. Ein solches
+Ergebnis ist kein neuer vollständiger Flotten- oder Bewegungsnachweis.
+
+Aufzugöffnung, Topologie und Startbelegungsraster werden aus der bereits
+quellen- und artefaktgeprüften Welt übernommen. Welt, Fahrzeughöhe,
+Bodenbank und Auflösung müssen exakt passen. Die unabhängige
+Geometrieprüfung ohne diese Navigation behält ihren eigenen Aufbau.
+Tatsächliche native Hindernisflächen, die Prüfung der Anfangsbelegung sowie
+die Abstands- und Bodenprüfung jeder neu geplanten Kurve bleiben erhalten.
+
+Die nominale Kurvenanpassung verwendet ihre funktionalen Rampen-,
+Geometrie-, Zonen- und Endereignisse sowie die zusätzlichen Knoten in
+gekrümmten Abschnitten. Ein regelmäßiger 50-ms-Knoten wird nicht zusätzlich
+allein zur Anpassung einer nominalen Kurve eingefügt. Zeitquantisierung,
+vollständige Polynomgrenzen und Kein-Halt-Prüfung bleiben verbindlich;
+die so neu angepassten Kurven benötigen ihre eigenen Geometrieprüfungen.
+Schutzbremsung und Wiederanlauf behalten ihre bisherigen regelmäßigen
+Anpassungsknoten. Der Regler beobachtet und prüft weiterhin jeden nächsten
+höchstens 50-ms-Schritt samt vollständiger Anschlussbremskurve gegen
+denselben vorhandenen Scan. Modellzeit wird nicht beschleunigt.
+
+Die native Intervallprüfung beginnt mit Gruppen von höchstens 32 bestehenden
+Kurvenabschnitten. Eine Freigabe benötigt weiterhin die vollständigen
+Polynomgrenzen aller enthaltenen Abschnitte, native Abstände und die
+vollständige aufgeweitete Bodenstützung. Ein nicht bewiesener Gruppenbereich
+wird zunächst an den ursprünglichen Knoten geteilt; anschließend gilt die
+bisherige Unterteilungstiefe je ursprünglichem Abschnitt. Das verändert
+keine Abstandsschwelle, Bodenregel, Türfreigabe oder Bench-Sperre.
+Zusätzlich werden ausschließlich identische, unveränderliche PVA- und
+Koeffizienteneingaben in begrenzten Prüf-Caches wiederverwendet. Andere
+Eingaben erhalten die ursprüngliche gemeinsame Mathematik; deren Quellen
+und die Bewegungsgrenzen werden nicht geändert.
+
+Eine tatsächliche Browsermessung mit frischer Standardpatrouille beobachtete
+die erste Ausführungsnachricht nach 31,9 statt 193,5 s, die erste Bewegung
+von mindestens 1 mm nach 71,2 statt 475,7 s und die Vorbereitung der ersten
+nominalen Kurve in 34,9 statt 278,3 s. Die geplante Modellzeit dieser ersten
+Fahrt blieb bei 530,384 s. Das sind einzelne Messungen der minimalen
+Worker-Testseite; das Modellpaket kam lokal, die frühere Python-Laufzeit vom
+CDN und die neue vom selben Ursprung. Download der vollständigen
+Gebäudeansicht, parallele Rechnerlast und öffentliche Auslieferung sind
+gesondert zu betrachten. Die Rohdaten und der Vergleich liegen lokal unter
+`exports/building-fleet/startup-performance-586ff76/` in
+`before/measurement.json`, `after-final/measurement.json` und
+`comparison-final.json`. Auch die neue Fassung hat noch eine sichtbare
+Vorbereitungsphase; eine sofortige Fahrt oder Echtzeit des Gesamtlaufs ist
+damit nicht nachgewiesen. Die öffentliche Fassung wird separat auf
+tatsächliche Bewegung und alle 20 physischen Monitorflächen geprüft.
+
 ## Experimentelle Teilvorschau
 
 **Historischer Prüfstand:** Die frühere BF01-Seite zeigte eine ausdrücklich

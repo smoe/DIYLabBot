@@ -9,7 +9,7 @@ import sys
 import unittest
 from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
-from building_fleet_resources import ResourceCatalog,_positive_overlap
+from building_fleet_resources import ResourceCatalog,_positive_overlap,_path_input_hash
 import building_fleet_model as model
 from building_fleet_motion import Path as MotionPath
 
@@ -76,6 +76,19 @@ class StaticResourcesTests(unittest.TestCase):
 
 
 class ResourceCacheTests(unittest.TestCase):
+    def test_path_receipts_preserve_all_numeric_types_signed_zero_and_input_order(self):
+        row={'points_mm':[[0.,-0.],[1000.,0.],[1000.,1000.],[2000.,1000.]],
+             'corner_trim_mm':250,'corner_trim_caps':[
+                 {'point_index':1,'maximum_trim_mm':25},
+                 {'point_index':2,'maximum_trim_mm':20}]}
+        original=_path_input_hash(row)
+        for change in (lambda r:r.update(corner_trim_mm=250.),
+                       lambda r:r['points_mm'][0].__setitem__(1,0.),
+                       lambda r:r['points_mm'].__setitem__(0,tuple(r['points_mm'][0])),
+                       lambda r:r['corner_trim_caps'].reverse()):
+            changed=copy.deepcopy(row);change(changed)
+            self.assertNotEqual(_path_input_hash(changed),original)
+
     def setup_cache(self,folder):
         nav=navigation();nav._cache_pins=lambda:{'tests/test_building_fleet_resources.py':model.digest(Path(__file__))}
         routes=[route('EG.merge.A',1000),route('EG.merge.B',1050),route('EG.other',4000)]
@@ -139,6 +152,69 @@ class ResourceCacheTests(unittest.TestCase):
             with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
                 nav,routes,_=self.setup_cache(folder);self.mutate(folder,change)
                 with self.assertRaises(ValueError):ResourceCatalog.from_cache(nav,routes,folder)
+
+    def setup_validated_cache(self,folder):
+        nav=navigation();nav._cache_pins=lambda:{}
+        rows=[route('EG.A',1000),{'level':'EG','points_mm':[[3000.,-0.],[4000.,-0.],[4000.,1000.]],
+            'corner_trim_mm':250,'corner_trim_caps':[{'point_index':1,'maximum_trim_mm':25}],
+            'resources':[{'id':'EG.turn','kind':'passage','start_index':0,'end_index':2}]}]
+        fresh=ResourceCatalog(nav,rows);fresh.write_cache(folder,rows,validated_paths=True)
+        return nav,rows,fresh
+
+    def test_validated_cache_reuses_only_static_validation_and_rebuilds_identical_regions(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,rows,fresh=self.setup_validated_cache(folder)
+            with patch('building_fleet_resources.Path',side_effect=AssertionError('Static samples rebuilt')):
+                cached=ResourceCatalog.from_cache(nav,rows,folder)
+            self.assertEqual(cached.report(),fresh.report());self.assertEqual(cached.paths,[])
+            for row in rows:self.assertEqual(cached.normalize(row),fresh.normalize(row))
+            payload=json.loads((Path(folder)/'closure.json').read_text())
+            self.assertEqual(set(payload),{'canonical','path_validation'})
+            self.assertEqual(payload['path_validation']['validated_path_count'],len(rows))
+            self.assertNotIn('samples',json.dumps(payload));self.assertNotIn('action',json.dumps(payload))
+            with self.assertRaisesRegex(ValueError,'complete original path construction'):
+                cached.write_cache(Path(folder)/'not-original',rows,validated_paths=True)
+
+    def test_changed_exact_path_input_including_caps_type_order_and_signed_zero_rejects(self):
+        changes=[lambda r:r[1]['corner_trim_caps'][0].update(maximum_trim_mm=30),
+                 lambda r:r[1].update(corner_trim_mm=250.),
+                 lambda r:r[1]['points_mm'][0].__setitem__(1,0.),
+                 lambda r:r[1].update(corner_trim_caps=None)]
+        for change in changes:
+            with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+                nav,rows,_=self.setup_validated_cache(folder);changed=copy.deepcopy(rows);change(changed)
+                report=Path(folder)/'cache-report.json';data=json.loads(report.read_text())
+                data['route_bank_sha256']=ResourceCatalog.route_bank_hash(changed)
+                report.write_text(json.dumps(data))
+                with self.assertRaises((ValueError,TypeError)):
+                    ResourceCatalog.from_cache(nav,changed,folder)
+
+    def test_rehashed_missing_or_malformed_path_receipt_and_unknown_version_fail_closed(self):
+        changes=[lambda d:d.pop('path_validation'),
+                 lambda d:d['path_validation'].update(validated_path_count=True),
+                 lambda d:d['path_validation']['ordered_input_sha256'].reverse(),
+                 lambda d:d['path_validation'].update(format='unknown'),
+                 lambda d:d['path_validation'].update(recorded_actions=[])]
+        for change in changes:
+            with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+                nav,rows,_=self.setup_validated_cache(folder);self.mutate(folder,change)
+                with self.assertRaises(ValueError):ResourceCatalog.from_cache(nav,rows,folder)
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav,rows,_=self.setup_validated_cache(folder);report=Path(folder)/'cache-report.json'
+            data=json.loads(report.read_text());data['format']='solidcraftbot.building-fleet-resource-cache/3'
+            report.write_text(json.dumps(data))
+            with self.assertRaises(ValueError):ResourceCatalog.from_cache(nav,rows,folder)
+
+    def test_validated_cache_still_rejects_current_native_guard_overlap_split(self):
+        with tempfile.TemporaryDirectory(dir=model.ROOT/'exports/building-fleet')as folder:
+            nav=navigation();nav._cache_pins=lambda:{}
+            rows=[route('EG.merge.A',1000),route('EG.merge.B',1050)]
+            ResourceCatalog(nav,rows).write_cache(folder,rows,validated_paths=True)
+            def split(data):
+                for alias in ('EG.merge.A','EG.merge.B'):
+                    data['canonical'][alias]='EG.resource.'+hashlib.sha256(alias.encode()).hexdigest()[:16]
+            self.mutate(folder,split)
+            with self.assertRaisesRegex(ValueError,'splits'):ResourceCatalog.from_cache(nav,rows,folder)
 
 
 if __name__=='__main__':unittest.main()

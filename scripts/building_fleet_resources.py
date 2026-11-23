@@ -19,6 +19,31 @@ from building_fleet_motion import Path
 from building_fleet_navigation import point_in_polygon
 
 
+PATH_VALIDATION_FORMAT = 'solidcraftbot.building-fleet-static-path-validation/1'
+
+
+def _path_input_hash(route):
+    """Fingerprint every original constructor input, without numeric rounding."""
+    def typed(value):
+        kind=type(value)
+        if kind is float:
+            if not math.isfinite(value):raise ValueError('Finite original path input required')
+            return ['float',value.hex()]
+        if kind is int:return ['int',str(value)]
+        if kind is bool:return ['bool',value]
+        if value is None:return ['null']
+        if kind is str:return ['str',value]
+        if kind in(list,tuple):return ['list'if kind is list else'tuple',[typed(v)for v in value]]
+        if kind is dict and all(type(k)is str for k in value):
+            return ['dict',[[key,typed(value[key])]for key in sorted(value)]]
+        raise ValueError('Closed typed original path input required')
+    value = {'points_mm': route['points_mm'],
+             'corner_trim_mm': route.get('corner_trim_mm', 250),
+             'corner_trim_caps': route.get('corner_trim_caps', [])}
+    raw = json.dumps(typed(value), separators=(',', ':'), allow_nan=False)
+    return hashlib.sha256(raw.encode()).hexdigest()
+
+
 def _bounds(poly):
     return ([min(p[k]for p in poly)for k in range(2)],[max(p[k]for p in poly)for k in range(2)])
 
@@ -85,8 +110,10 @@ def _guards(points,radius):
 
 
 class ResourceCatalog:
-    def __init__(self,navigation,routes,*,_cached_canonical=None):
+    def __init__(self,navigation,routes,*,_cached_canonical=None,_validated_paths=None):
         self.nav=navigation;self.guard=navigation.radius+navigation.reserve+4
+        self._path_validation_source_pins=(self._cache_pins()
+            if callable(getattr(navigation,'_cache_pins',None))else None)
         self.parent={};self.kind={};self.regions=[];self.room_alias={};self.room_polygons=[];self._region_keys=set()
         self.paths=[];self._frozen=False
         active={(r['level'],r['area'])for r in navigation.config['missions']['targets']}
@@ -114,8 +141,20 @@ class ResourceCatalog:
         for level,entry in navigation.topological.items():
             for edge in entry['connections']:
                 portals[level+'.'+edge.get('opening',edge['wall'])]=(level,edge['areas'])
+        inputs=[_path_input_hash(route)for route in routes]
+        path_count=sum(len(route['points_mm'])>=2 for route in routes)
+        expected_validation={'format':PATH_VALIDATION_FORMAT,'ordered_input_sha256':inputs,
+                             'validated_path_count':path_count}
+        if _validated_paths is not None:
+            if (_cached_canonical is None or type(_validated_paths)is not dict
+                    or set(_validated_paths)!=set(expected_validation)
+                    or type(_validated_paths.get('validated_path_count'))is not int
+                    or _validated_paths!=expected_validation):
+                raise ValueError('Complete exact static path validation receipts required')
         for route in routes:
-            self._route(route,portals)
+            self._route(route,portals,construct_path=_validated_paths is None)
+        self._path_validation=expected_validation
+        self._validated_route_bank=self.route_bank_hash(routes)
         # Exact immutable geometry only. Bounded point-query memoization never
         # rounds coordinates and cannot retain an unbounded runtime path bank.
         self._polygon_refs={id(p):p for _,_,p in self.room_polygons}
@@ -213,7 +252,7 @@ class ResourceCatalog:
         if not callable(getattr(self.nav,'_cache_pins',None)):
             raise ValueError('Source-bound navigation required for resource caching')
         names=('building_fleet_resources.py','building_fleet_missions.py','building_fleet_motion.py',
-               'building_fleet_port_paths.py')
+               'building_fleet_port_paths.py','building_fleet_lift_checks.py')
         return {**self.nav._cache_pins(),**{'scripts/'+name:model.digest(model.ROOT/'scripts'/name)for name in names}}
 
     @staticmethod
@@ -227,17 +266,28 @@ class ResourceCatalog:
             raise ValueError('Resource cache must remain in ignored BF01 exports')
         return path
 
-    def write_cache(self,directory,routes):
+    def write_cache(self,directory,routes,*,validated_paths=False):
         """Persist only static closure data with exact source and route pins."""
         if not self._frozen:raise ValueError('Close all source resources before caching')
         directory=self._cache_directory(directory);pins=self._cache_pins();bank=self.route_bank_hash(routes)
         if (directory/'cache-report.json').exists():raise FileExistsError(directory)
         directory.mkdir(parents=True,exist_ok=True)
-        raw=(json.dumps({'canonical':self.canonical},sort_keys=True,separators=(',',':'))+'\n').encode()
-        report={'format':'solidcraftbot.building-fleet-resource-cache/1','source_files_sha256':pins,
+        if type(validated_paths)is not bool:raise ValueError('Explicit static path validation cache choice required')
+        payload={'canonical':self.canonical}
+        if validated_paths:
+            if (bank!=self._validated_route_bank or self._path_validation['ordered_input_sha256']!=[_path_input_hash(r)for r in routes]
+                    or len(self.paths)!=self._path_validation['validated_path_count']
+                    or self._path_validation_source_pins!=pins):
+                raise ValueError('Only a complete original path construction can create validation receipts')
+            payload['path_validation']=self._path_validation
+        raw=(json.dumps(payload,sort_keys=True,separators=(',',':'))+'\n').encode()
+        report={'format':'solidcraftbot.building-fleet-resource-cache/'+('2'if validated_paths else'1'),'source_files_sha256':pins,
                 'route_bank_sha256':bank,'route_count':len(routes),'file':'closure.json',
                 'bytes':len(raw),'artifact_sha256':hashlib.sha256(raw).hexdigest(),
                 'scope':'Immutable source-route conflict closure only; no runtime state, motion qualification or executable pickle'}
+        if validated_paths:
+            report['path_validation']='complete_original_path_construction'
+            report['scope']='Immutable conflict closure and source-bound original static path-construction receipts; no runtime state, actions, motion qualification or executable pickle'
         (directory/'closure.json').write_bytes(raw)
         if pins!=self._cache_pins():raise ValueError('Resource cache sources changed during export')
         (directory/'cache-report.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -248,7 +298,10 @@ class ResourceCatalog:
         directory=cls._cache_directory(directory);report=model.read_json(directory/'cache-report.json')
         probe=object.__new__(cls);probe.nav=navigation;pins=probe._cache_pins()
         fields={'format','source_files_sha256','route_bank_sha256','route_count','file','bytes','artifact_sha256','scope'}
-        if (set(report)!=fields or report.get('format')!='solidcraftbot.building-fleet-resource-cache/1'
+        validated_paths=report.get('format')=='solidcraftbot.building-fleet-resource-cache/2'
+        if validated_paths:fields.add('path_validation')
+        if (set(report)!=fields or report.get('format')not in('solidcraftbot.building-fleet-resource-cache/1','solidcraftbot.building-fleet-resource-cache/2')
+                or validated_paths and report.get('path_validation')!='complete_original_path_construction'
                 or report.get('file')!='closure.json' or report.get('source_files_sha256')!=pins
                 or report.get('route_bank_sha256')!=cls.route_bank_hash(routes)
                 or report.get('route_count')!=len(routes)):
@@ -260,8 +313,10 @@ class ResourceCatalog:
         if len(raw)>4*1024*1024 or len(raw)!=report.get('bytes')or hashlib.sha256(raw).hexdigest()!=report.get('artifact_sha256'):
             raise ValueError('Resource closure cache bytes changed')
         data=json.loads(raw,parse_constant=lambda value:(_ for _ in()).throw(ValueError('Nonfinite cache data')))
-        if type(data)is not dict or set(data)!={'canonical'}:raise ValueError('Only immutable canonical closure data is accepted')
-        result=cls(navigation,routes,_cached_canonical=data['canonical'])
+        expected={'canonical','path_validation'}if validated_paths else{'canonical'}
+        if type(data)is not dict or set(data)!=expected:raise ValueError('Only declared immutable resource geometry receipts are accepted')
+        result=cls(navigation,routes,_cached_canonical=data['canonical'],
+                   _validated_paths=data['path_validation']if validated_paths else None)
         if pins!=result._cache_pins():raise ValueError('Resource cache sources changed during reconstruction')
         return result
 
@@ -284,14 +339,14 @@ class ResourceCatalog:
         for x in range(math.floor((lo[0]-padding)/1000),math.floor((hi[0]+padding)/1000)+1):
             for y in range(math.floor((lo[1]-padding)/1000),math.floor((hi[1]+padding)/1000)+1):yield level,x,y
 
-    def _route(self,route,portals):
+    def _route(self,route,portals,*,construct_path=True):
         points=route['points_mm'];level=route['level']
         if len(points)<2:return
         # Reverse cusps are a geometry error, never a reason to spin in place.
         if 'corner_trim_caps'in route and type(route['corner_trim_caps'])is not list:
             raise ValueError('Explicit corner trim caps must be a JSON list')
         options={'corner_trim_caps':route['corner_trim_caps']}if 'corner_trim_caps'in route else{}
-        self.paths.append((level,Path(points,route.get('corner_trim_mm',250),**options)))
+        if construct_path:self.paths.append((level,Path(points,route.get('corner_trim_mm',250),**options)))
         for row in route.get('resources',[]):
             alias=row['id'];kind=row.get('kind','passage');areas=row.get('areas',portals.get(alias,(level,[]))[1])
             rooms=[self.room_alias[(level,a)]for a in areas if(level,a)in self.room_alias]

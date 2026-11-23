@@ -29,7 +29,8 @@ class GeometryChecks:
         if context is not None and(not isinstance(context,PortSupportContext)or context.level!=level or context.source!=self.source):
             raise ValueError('Only a source-matched typed port context may remove the semantic shaft mask')
         if level not in self.base:
-            self.base[level]=clearance.ClearanceCertificate(self.nav.mesh,level,self.source)
+            self.base[level]=clearance.ClearanceCertificate(self.nav.mesh,level,self.source,
+                checked_navigation=self.nav)
         key=(level,own_waiting_slot,context is not None)
         if key not in self.variants:
             cert=copy.copy(self.base[level]);cert.obstacles=[];cert.obstacle_names=[]

@@ -1,0 +1,200 @@
+{
+  "delivery": {
+    "recording_inputs": false,
+    "runtime_files_unmodified": true,
+    "scope": "five_observed_browser_core_files_plus_original_licenses_and_source_availability_notice"
+  },
+  "files": {
+    "BZIP2-LICENSE": {
+      "bytes": 1901,
+      "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204"
+    },
+    "COMPILER-RT-LICENSE": {
+      "bytes": 16708,
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+    },
+    "CPYTHON-LICENSE": {
+      "bytes": 13804,
+      "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231"
+    },
+    "EMSCRIPTEN-LICENSE": {
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    "HIWIRE-LICENSE": {
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "LIBCXX-LICENSE": {
+      "bytes": 16703,
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    "LIBCXXABI-LICENSE": {
+      "bytes": 16706,
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    "LIBFFI-LICENSE": {
+      "bytes": 1132,
+      "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388"
+    },
+    "LIBLZMA-NOTICE": {
+      "bytes": 2774,
+      "sha256": "c4f8e14fafe458d84808a4cd8b69f94673ebe2bf8fc992291629a69ac12218f8"
+    },
+    "LZ4-NOTICE": {
+      "bytes": 10269,
+      "sha256": "ac1eaa04b68d792d962d5946504ee5141ef58a9df86a0dfcf0ffa63d08634e46"
+    },
+    "MUSL-COPYRIGHT": {
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    },
+    "NOTICE": {
+      "bytes": 2081,
+      "sha256": "0aa9e602a8ebde7d3f032accf2e7c308cde2972058d753c70561b2b16a53de8b"
+    },
+    "PYODIDE-LICENSE": {
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "ZLIB-LICENSE": {
+      "bytes": 1002,
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    },
+    "ZSTD-LICENSE": {
+      "bytes": 1549,
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+    },
+    "pyodide-lock.json": {
+      "bytes": 119077,
+      "sha256": "5dc2fc119108bc148c7457dc86e7675b5c87e1cafd420b9c34c1eaef7b36c010"
+    },
+    "pyodide.asm.mjs": {
+      "bytes": 1250259,
+      "sha256": "22514b8be6980e28a02c8b1d6387ce8dfe666fc4edf8d547cff5dce29ff4d972"
+    },
+    "pyodide.asm.wasm": {
+      "bytes": 9597892,
+      "sha256": "e14d49ceca9b4a0e274ea918f3a898de2d3880b6e5573a6cfe1a2267ecc70329"
+    },
+    "pyodide.mjs": {
+      "bytes": 17758,
+      "sha256": "1bb8cc14f9405aaa7cd4e00c12edd0a8539de9cc026618d6ee5a9663f367dc70"
+    },
+    "python_stdlib.zip": {
+      "bytes": 2545550,
+      "sha256": "2bd3394a145bfbbe5bbc9d9d6ab9136abbb986c6fef6c142b3a2962227aa5c28"
+    }
+  },
+  "format": "solidcraftbot.building-fleet-python-core/1",
+  "project_notice": "Unveränderte Pyodide-Laufzeit 314.0.8 für den synthetischen BF01-Browserlauf\n\nDie fünf Laufzeitdateien pyodide.mjs, pyodide.asm.mjs,\npyodide.asm.wasm, python_stdlib.zip und pyodide-lock.json wurden bytegenau\nübernommen aus dem offiziellen Pyodide-Kernarchiv:\nhttps://github.com/pyodide/pyodide/releases/download/314.0.8/pyodide-core-314.0.8.tar.bz2\nSHA-256: ff3e5f9d9bc8e98ff30b99515535fc24d375994f47a978c61975d653e162ca37\n\nDie Projektänderung betrifft nur die Bereitstellung dieser Dateien vom\nSeitenursprung. Es wurden keine Änderungen an der Pyodide-Laufzeit vorgenommen.\nDas Kernarchiv enthält selbst keine separaten Lizenzdateien. Die beigefügten\nLizenz- und Copyrighttexte wurden unverändert aus den unten benannten\nQuellständen übernommen; die maschinenlesbare Begleitquelle benennt jede URL,\nDateigröße und Prüfsumme einzeln.\n\nPyodide-Quelltext und Buildquellen sind öffentlich unter MPL-2.0 verfügbar:\nhttps://github.com/pyodide/pyodide/tree/f37a18559ae11c5f371beb1c9462a13a663fc461\nhttps://github.com/pyodide/pyodide/archive/refs/tags/314.0.8.tar.gz\nPYODIDE-LICENSE enthält den unveränderten Lizenztext.\n\nDie Laufzeit enthält CPython 3.14.2 und Emscripten 5.0.3.\nCPYTHON-LICENSE und EMSCRIPTEN-LICENSE enthalten deren Originaltexte.\nQuellen: https://github.com/python/cpython/tree/v3.14.2\nhttps://github.com/emscripten-core/emscripten/tree/5.0.3\n\nWeitere mitgelieferte Originaltexte benennen musl, libc++, libc++abi,\ncompiler-rt, libffi, hiwire, liblzma, zstd, zlib, bzip2 und MiniLZ4. Deren genaue\nQuellstände folgen den Pyodide-Buildquellen beziehungsweise den bezeichneten\nEmscripten- und CPython-Ständen und stehen in der maschinenlesbaren\nBegleitquelle. SQLite 3.39.0 wird von Pyodide eingebunden und ist laut\nHersteller gemeinfrei: https://www.sqlite.org/copyright.html\nQuellarchiv: https://www.sqlite.org/2022/sqlite-autoconf-3390000.tar.gz\n\nDie Lizenztexte gelten ausschließlich für die jeweiligen Drittbestandteile.\nDie BF01-Anwendung und ihre Modellquellen haben dadurch keine neue\nGeräte-, Sicherheits- oder Laufqualifikation erhalten.\n",
+  "runtime_files": [
+    "pyodide.mjs",
+    "pyodide.asm.mjs",
+    "pyodide.asm.wasm",
+    "python_stdlib.zip",
+    "pyodide-lock.json"
+  ],
+  "upstream": {
+    "archive": {
+      "bytes": 6759200,
+      "sha256": "ff3e5f9d9bc8e98ff30b99515535fc24d375994f47a978c61975d653e162ca37",
+      "url": "https://github.com/pyodide/pyodide/releases/download/314.0.8/pyodide-core-314.0.8.tar.bz2"
+    },
+    "archive_members": {
+      "pyodide-lock.json": "pyodide/pyodide-lock.json",
+      "pyodide.asm.mjs": "pyodide/pyodide.asm.mjs",
+      "pyodide.asm.wasm": "pyodide/pyodide.asm.wasm",
+      "pyodide.mjs": "pyodide/pyodide.mjs",
+      "python_stdlib.zip": "pyodide/python_stdlib.zip"
+    },
+    "build_metadata_sources": [
+      "https://github.com/pyodide/pyodide/blob/f37a18559ae11c5f371beb1c9462a13a663fc461/Makefile.envs",
+      "https://github.com/pyodide/pyodide/blob/f37a18559ae11c5f371beb1c9462a13a663fc461/cpython/Makefile",
+      "https://github.com/emscripten-core/emscripten/blob/5.0.3/tools/ports/zlib.py",
+      "https://github.com/emscripten-core/emscripten/blob/5.0.3/tools/ports/bzip2.py"
+    ],
+    "cpython_version": "3.14.2",
+    "emscripten_version": "5.0.3",
+    "license_sources": {
+      "BZIP2-LICENSE": {
+        "bytes": 1901,
+        "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204",
+        "url": "https://raw.githubusercontent.com/emscripten-ports/bzip2/1.0.6/LICENSE"
+      },
+      "COMPILER-RT-LICENSE": {
+        "bytes": 16708,
+        "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/compiler-rt/LICENSE.TXT"
+      },
+      "CPYTHON-LICENSE": {
+        "bytes": 13804,
+        "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+        "url": "https://raw.githubusercontent.com/python/cpython/v3.14.2/LICENSE"
+      },
+      "EMSCRIPTEN-LICENSE": {
+        "bytes": 5093,
+        "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/LICENSE"
+      },
+      "HIWIRE-LICENSE": {
+        "bytes": 16725,
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "url": "https://raw.githubusercontent.com/pyodide/hiwire/6a1e67280a15d929ebeceee54a6358c9c8d5f697/LICENSE"
+      },
+      "LIBCXX-LICENSE": {
+        "bytes": 16703,
+        "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libcxx/LICENSE.TXT"
+      },
+      "LIBCXXABI-LICENSE": {
+        "bytes": 16706,
+        "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libcxxabi/LICENSE.TXT"
+      },
+      "LIBFFI-LICENSE": {
+        "bytes": 1132,
+        "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388",
+        "url": "https://raw.githubusercontent.com/libffi/libffi/f08493d249d2067c8b3207ba46693dd858f95db3/LICENSE"
+      },
+      "LIBLZMA-NOTICE": {
+        "bytes": 2774,
+        "sha256": "c4f8e14fafe458d84808a4cd8b69f94673ebe2bf8fc992291629a69ac12218f8",
+        "url": "https://raw.githubusercontent.com/xz-mirror/xz/v5.2.2/COPYING"
+      },
+      "LZ4-NOTICE": {
+        "bytes": 10269,
+        "content": "Unmodified upstream source containing the original license notice; not executed by the application.",
+        "sha256": "ac1eaa04b68d792d962d5946504ee5141ef58a9df86a0dfcf0ffa63d08634e46",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/third_party/mini-lz4.js"
+      },
+      "MUSL-COPYRIGHT": {
+        "bytes": 6204,
+        "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+        "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libc/musl/COPYRIGHT"
+      },
+      "NOTICE": {
+        "origin": "Project source-availability notice; upstream runtime files remain unchanged."
+      },
+      "PYODIDE-LICENSE": {
+        "bytes": 16725,
+        "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+        "url": "https://raw.githubusercontent.com/pyodide/pyodide/f37a18559ae11c5f371beb1c9462a13a663fc461/LICENSE"
+      },
+      "ZLIB-LICENSE": {
+        "bytes": 1002,
+        "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+        "url": "https://raw.githubusercontent.com/madler/zlib/v1.3.1/LICENSE"
+      },
+      "ZSTD-LICENSE": {
+        "bytes": 1549,
+        "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+        "url": "https://raw.githubusercontent.com/python/cpython-source-deps/zstd-1.5.7/LICENSE"
+      }
+    },
+    "release_url": "https://github.com/pyodide/pyodide/releases/tag/314.0.8",
+    "source_archive_url": "https://github.com/pyodide/pyodide/archive/refs/tags/314.0.8.tar.gz",
+    "source_commit": "f37a18559ae11c5f371beb1c9462a13a663fc461"
+  },
+  "version": "314.0.8"
+}

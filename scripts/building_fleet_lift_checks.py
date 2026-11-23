@@ -22,10 +22,31 @@ import walkthrough_world
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def _source_aperture():
-    """Use precisely the canonical opening and scale used by circulation."""
+def _source_aperture(*, checked_navigation=None):
+    """Use the canonical opening, reusing a checked world's validation only.
+
+    A native source-bound world already required complete building validation.
+    Its reverified geometry permits reading the same aperture without compiling
+    unrelated laboratory furnishings again. Standalone callers still perform
+    the original complete source validation.
+    """
     source = model.load()
-    building = stack.load(model.resolve_pin(source['sources']['building']))
+    if checked_navigation is None:
+        building = stack.load(model.resolve_pin(source['sources']['building']))
+        native_lift = None
+    else:
+        if checked_navigation.config != source or not isinstance(checked_navigation.mesh, navigation.NativeMesh):
+            raise ValueError('Current source-matched native navigation required')
+        report, manifest, _ = walkthrough_world.read(checked_navigation.mesh.export, ROOT)
+        reference = source['sources']['building']
+        if (report['source_files_sha256'].get(reference['path']) != reference['sha256']
+                or manifest['elevator'] != checked_navigation.mesh.manifest['elevator']):
+            raise ValueError('Native lift must retain the exact current building source and geometry')
+        building = model.reference(source, 'building')
+        if building.get('format') != stack.FORMAT or building.get('calibration') is not None:
+            raise ValueError('Source-bound uncalibrated building stack required')
+        stack.circulation.validate_source(building['circulation'])
+        native_lift = manifest['elevator']
     parameters = stack.parameters(building)
     plan, _ = stack.templates(building)
     declaration = building['circulation']['elevator']
@@ -37,7 +58,38 @@ def _source_aperture():
         raise ValueError('Source lift opening must have the circulation X plane')
     interval = sorted((a[1] + t * (b[1] - a[1])) * parameters['display_scale']
                       for t in opening['interval'])
+    if native_lift is not None:
+        _check_native_aperture(building, plan, parameters, interval, native_lift)
     return source, interval, declaration['reference_opening']
+
+
+def _check_native_aperture(building, plan, parameters, interval, native_lift):
+    """Bind all source port frames to the already validated native geometry."""
+    declaration = building['circulation']['elevator']
+    opening = next(row for row in plan['openings'] if row['id'] == declaration['reference_opening'])
+    if (opening['wall'] != declaration['sides']['outward']['wall']
+            or not all(math.isfinite(v) for v in interval) or interval[0] >= interval[1]
+            or native_lift['reference_level'] != declaration['cabin_level']):
+        raise ValueError('Native lift disagrees with its source aperture and reference side')
+    expected = {(level['id'], side) for level in building['levels'] for side in declaration['sides']}
+    ports = native_lift['ports']
+    if len(ports) != len(expected) or {(p['level_id'], p['side']) for p in ports} != expected:
+        raise ValueError('Every source lift side and level must retain its native port')
+    walls = {row['id']: row for row in plan['walls']}
+    for port in ports:
+        wall_id = declaration['sides'][port['side']]['wall']
+        wall = walls[wall_id]
+        a, b = [plan['vertices'][wall[key]] for key in ('start', 'end')]
+        scale = parameters['display_scale']
+        level_index = next(i for i, row in enumerate(building['levels']) if row['id'] == port['level_id'])
+        if (wall['kind'] != 'wall' or abs(a[0] - b[0]) > 1e-7
+                or not min(a[1], b[1])*scale <= interval[0] < interval[1] <= max(a[1], b[1])*scale
+                or port['wall'] != wall_id or port['plane_x_mm'] != a[0]*scale
+                or port['height_mm'] != parameters['door_height_mm']
+                or port['wall_thickness_mm'] != parameters['display_thickness']
+                or port['z_mm'] != (level_index-1)*parameters['floor_pitch_mm']
+                or port['cabin_entry_mm'][1] != sum(interval)/2):
+            raise ValueError('Native port frame differs from its validated canonical source aperture')
 
 
 def _verify_export(mesh):

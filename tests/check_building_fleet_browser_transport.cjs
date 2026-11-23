@@ -38,6 +38,14 @@ const flush=()=>new Promise(resolve=>setImmediate(resolve));
  assert.throws(()=>worker.validateManifest({...manifest,runtime:{...manifest.runtime,loader_module_url:'https://other.test/python.mjs'}},config),/Official/);
  assert.throws(()=>worker.validateManifest({...manifest,archive:{...manifest.archive,sha256:'b'.repeat(64)}},config),/page pin/);
  assert.throws(()=>worker.validateManifest({...manifest,files:{...manifest.files,'../escape':{sha256:hash,bytes:1}}},config),/Unsafe/);
+ const coreFiles=Object.fromEntries(['pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json'].map(name=>[name,{sha256:hash,bytes:12}]));
+ const hosted={...manifest,runtime:{...manifest.runtime,delivery:'same_origin_pinned_core'},
+  files:{...manifest.files,'model/python-core.json':{sha256:hash,bytes:30}},
+  python_core:{source:{path:'model/python-core.json',sha256:hash},directory:'python/314.0.8-pinned',files:coreFiles}};
+ assert.equal(worker.validateManifest(hosted,config),hosted);
+ assert.throws(()=>worker.validateManifest({...hosted,python_core:{...hosted.python_core,directory:'../external'}},config),/Unsafe/);
+ assert.throws(()=>worker.validateManifest({...hosted,python_core:{...hosted.python_core,files:{}}},config),/Complete original/);
+ assert.throws(()=>worker.validateManifest({...manifest,python_core:hosted.python_core},config),/declared/);
 
  let clock=0,time=0,paused=false;const timers=[],messages=[],effects=[];
  const runtime={initial:state(),command(command){effects.push(command.action);if(command.action==='request_job')throw Error('unknown target');paused=command.action==='pause';return state(time,paused);},tick(){effects.push('tick');time=Math.round((time+.05)*100)/100;clock+=80;return state(time,paused);}};

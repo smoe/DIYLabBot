@@ -73,6 +73,17 @@ def _configuration(config):
         _path(path)
         model.resolve_pin({'path': path, 'sha256': digest})
     browser = model.read_json(paths['browser_source'])
+    if 'python_core' in browser.get('sources', {}):
+        ref = browser['sources']['python_core']
+        if pins.get(ref['path']) != ref['sha256']:
+            raise ValueError('The original Python runtime descriptor must be in the verified closure')
+        core = model.read_json(model.resolve_pin(ref))
+        if (browser.get('runtime', {}).get('delivery') != 'same_origin_pinned_core' or
+                core.get('format') != 'solidcraftbot.building-fleet-python-core/1' or
+                core.get('version') != browser['runtime'].get('version')):
+            raise ValueError('Source-bound original same-origin Python runtime required')
+    elif browser.get('runtime', {}).get('delivery') is not None:
+        raise ValueError('Python runtime delivery must have a pinned original descriptor')
     if (browser.get('format') != 'solidcraftbot.building-fleet-browser/1' or
             browser.get('session') != {'scope': 'independent_live_session_per_page',
                 'start': 'new_patrol_world', 'recording_fallback': False} or

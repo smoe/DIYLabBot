@@ -128,7 +128,7 @@ _TOPOLOGY_CACHE={}
 
 
 class ClearanceCertificate:
-    def __init__(self,mesh,level,config,extra_exclusions=(),benchareas_ifL01=True,lift_context=None):
+    def __init__(self,mesh,level,config,extra_exclusions=(),benchareas_ifL01=True,lift_context=None,*,checked_navigation=None):
         model.validate(config);self.mesh=mesh;self.level=level;self.config=config
         self.lift_context=lift_context
         if lift_context is not None:
@@ -157,9 +157,27 @@ class ClearanceCertificate:
             for triangle in mesh.triangles(group):
                 poly=nav.clip_height(triangle,low,high)
                 if poly:self.obstacles.append(poly);self.obstacle_names.append(group['id'])
-        topo_key=json.dumps([config['sources']['building'],config['sources']['walkthrough'],config['exclusions']['KG_technical_areas']],sort_keys=True)
-        if topo_key not in _TOPOLOGY_CACHE:_TOPOLOGY_CACHE[topo_key]=nav.topology(excluded_by_level={'KG':config['exclusions']['KG_technical_areas']})
-        topo=_TOPOLOGY_CACHE[topo_key]
+        if checked_navigation is not None:
+            from building_fleet_routes import Navigation
+            # The runner already owns a source/artifact-checked static map.
+            # Reuse only that exact world's topology, never another mesh or
+            # source. Native surfaces and every curve's interval clearance/
+            # floor proof are still computed below. Its checked start raster
+            # was derived with the identical height, floor bank and exclusions.
+            if not isinstance(checked_navigation,Navigation):
+                raise ValueError('Exact source/world-matched checked navigation required')
+            grid=checked_navigation.grids.get(level)
+            if (checked_navigation.mesh is not mesh or checked_navigation.config!=config or
+                    checked_navigation.height!=vehicle['height_mm']+config['geometry']['height_reserve_mm'] or
+                    level not in checked_navigation.topological or grid is None or
+                    grid.resolution_mm!=config['geometry']['grid_step_mm'] or
+                    grid.floor_support is not self.floor_bank):
+                raise ValueError('Exact source/world-matched checked navigation required')
+            topo=checked_navigation.topological
+        else:
+            topo_key=json.dumps([config['sources']['building'],config['sources']['walkthrough'],config['exclusions']['KG_technical_areas']],sort_keys=True)
+            if topo_key not in _TOPOLOGY_CACHE:_TOPOLOGY_CACHE[topo_key]=nav.topology(excluded_by_level={'KG':config['exclusions']['KG_technical_areas']})
+            topo=_TOPOLOGY_CACHE[topo_key]
         entry=topo[level];plan=entry['plan'];scale=entry['display_scale']
         for area in plan['areas']:
             if area['id']in entry['excluded_areas']:
@@ -177,7 +195,8 @@ class ClearanceCertificate:
         self.obstacle_ids={id(poly):i for i,poly in enumerate(self.obstacles)}
         # Membership alone is used to exclude an initial enclosed solid. Never
         # apply this grid's circumscribed-disc clearance to a narrow doorway.
-        self.start_grid=nav.build_grid(mesh,level,vehicle['height_mm']+config['geometry']['height_reserve_mm'],config['geometry']['grid_step_mm'],topological=topo)
+        self.start_grid=(checked_navigation.grids[level] if checked_navigation is not None else
+            nav.build_grid(mesh,level,vehicle['height_mm']+config['geometry']['height_reserve_mm'],config['geometry']['grid_step_mm'],topological=topo,support_config=config))
 
     def distance(self,xy,yaw):
         best=500.;name='distance_cap_lower_bound';extent=self.radius+best+self.mesh_error;lo=[v-extent for v in xy];hi=[v+extent for v in xy]
@@ -218,13 +237,22 @@ class ClearanceCertificate:
                 if membership['inside']or membership['boundary']:
                     return {'passed':False,'reason':'initial_pose_inside_or_on_closed_native_solid',
                             'body_id':group['id'],'membership':membership}
-        accepted=[];evaluations=0;applications=[];queue=[(a,b,0)for a,b in zip(curve.times,curve.times[1:])]
+        accepted=[];evaluations=0;applications=[];queue=[];knot_splits=0;coarse_accepted=0
+        # This is a computation partition, not a physical tolerance. The same
+        # complete polynomial enclosure must prove every point of a block.
+        # Unproved blocks split at existing knots before the original single-
+        # interval midpoint algorithm and its full depth budget are used.
+        for first_index in range(0,len(curve.times)-1,32):
+            last_index=min(len(curve.times)-1,first_index+32)
+            queue.append((curve.times[first_index],curve.times[last_index],0,first_index,last_index))
         while queue:
-            start,end,depth=queue.pop();mid=(start+end)/2;pose=curve.evaluate(mid)[floor.F[0]];bounds=_extrema(curve,start,end)
+            start,end,depth,first_index,last_index=queue.pop()
+            coarse=first_index is not None and last_index-first_index>1
+            mid=(start+end)/2;pose=curve.evaluate(mid)[floor.F[0]];bounds=_extrema(curve,start,end)
             translation=math.hypot(*[max(abs(bounds[k][i]-pose[i])for k in ('min','max'))for i in range(2)]);turn=max(abs(bounds[k][2]-pose[2])for k in ('min','max'));movement=math.nextafter(translation+self.radius*turn,math.inf)
             distance,body=self.distance(pose[:2],pose[2]);lower=math.nextafter(distance-movement,-math.inf);evaluations+=1
-            if distance<self.reserve:return {'passed':False,'reason':'midpoint_mesh_or_exclusion_clearance','time_s':[start,end],'midpoint_pose_mm_rad':pose,'midpoint_clearance_mm':distance,'limiting_body':body,'evaluations':evaluations}
-            # An impossible static midpoint cannot be repaired by splitting;
+            if not coarse and distance<self.reserve:return {'passed':False,'reason':'midpoint_mesh_or_exclusion_clearance','time_s':[start,end],'midpoint_pose_mm_rad':pose,'midpoint_clearance_mm':distance,'limiting_body':body,'evaluations':evaluations}
+            # On an original interval an impossible midpoint cannot be repaired;
             # a larger interval-support failure may be a conservative envelope.
             def floor_at(inflation,left,right):
                 try:return self.support(pose[:2],pose[2],inflation,start_s=left,end_s=right,
@@ -233,11 +261,20 @@ class ClearanceCertificate:
             support=floor_at(movement,start,end)if lower>=self.reserve else None
             if lower>=self.reserve and support['passed']:
                 applications.extend(support.get('applications',[]))
+                if coarse:coarse_accepted+=1
                 accepted.append({'time_s':[start,end],'clearance_lower_mm':lower,'limiting_body':body,'floor_support':True,'support_rule_applied':support.get('rule_applied',False),'height_exception_applied':support.get('lift_height_exception_applied',False),'depth':depth});continue
+            if coarse:
+                # A blocked coarse midpoint or inflated floor rectangle is
+                # inconclusive at this partition. Refine to original knots;
+                # never substitute a new coarse rejection for the old check.
+                middle_index=(first_index+last_index)//2;split=curve.times[middle_index];knot_splits+=1
+                queue.extend([(start,split,0,first_index,middle_index),
+                              (split,end,0,middle_index,last_index)])
+                continue
             if depth>=max_depth:return {'passed':False,'reason':'interval_clearance_or_exact_floor_union_unresolved','time_s':[start,end],'midpoint_pose_mm_rad':pose,'interval_clearance_lower_mm':lower,'floor_union':support,'limiting_body':body,'evaluations':evaluations}
             if support is not None and not floor_at(0,mid,mid)['passed']:return {'passed':False,'reason':'midpoint_expanded_oriented_rectangle_lacks_floor_union','time_s':[start,end],'midpoint_pose_mm_rad':pose,'floor_union':floor_at(0,mid,mid),'evaluations':evaluations}
-            queue.extend([(start,mid,depth+1),(mid,end,depth+1)])
-        return {'passed':True,'minimum_interval_clearance_lower_mm':min(v['clearance_lower_mm']for v in accepted),'intervals':accepted,'evaluations':evaluations,'minimum_clearance_mm':self.reserve,'mesh_reserve_mm':self.mesh_error,'support_applications':applications,'lift_support':self.lift_context.report()if self.lift_context else None,'floor_support_method':'canonical exact native union plus conservative owner disk closing; full expanded oriented rectangle and source-gated lift-only raised surfaces','qualification':{'native_BRep_curve_checked':False,'dynamic_lift_checked':False,'bench_zones_changed':False},'scope':'Continuous actual PVA x/y/yaw projected-surface and excluded-area clearance plus whole-rectangle floor-union coverage; static enclosed-body start membership checked. Independent native BRep and lift-stage proofs remain required.'}
+            queue.extend([(start,mid,depth+1,None,None),(mid,end,depth+1,None,None)])
+        return {'passed':True,'minimum_interval_clearance_lower_mm':min(v['clearance_lower_mm']for v in accepted),'intervals':accepted,'evaluations':evaluations,'minimum_clearance_mm':self.reserve,'mesh_reserve_mm':self.mesh_error,'support_applications':applications,'lift_support':self.lift_context.report()if self.lift_context else None,'floor_support_method':'canonical exact native union plus conservative owner disk closing; full expanded oriented rectangle and source-gated lift-only raised surfaces','interval_partition':{'maximum_initial_original_segments':32,'original_knot_splits':knot_splits,'coarse_intervals_proved':coarse_accepted,'single_interval_midpoint_depth_limit':max_depth},'qualification':{'native_BRep_curve_checked':False,'dynamic_lift_checked':False,'bench_zones_changed':False},'scope':'Continuous actual PVA x/y/yaw projected-surface and excluded-area clearance plus whole-rectangle floor-union coverage; static enclosed-body start membership checked. Independent native BRep and lift-stage proofs remain required.'}
 
 
 _CACHE={}

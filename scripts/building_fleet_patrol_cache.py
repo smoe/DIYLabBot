@@ -11,7 +11,8 @@ from building_fleet_runner import RouteGraph
 
 GENERATORS = ('building_fleet_runner.py', 'building_fleet_missions.py',
               'building_fleet_motion.py', 'building_fleet_resources.py',
-              'building_fleet_port_paths.py', 'building_fleet_geometry_checks.py')
+              'building_fleet_port_paths.py', 'building_fleet_lift_checks.py',
+              'building_fleet_geometry_checks.py')
 GRAPH_FIELDS = frozenset({'format', 'source_files_sha256', 'world_report',
     'navigation_input', 'resource_input', 'sealed', 'hubs', 'endpoints',
     'centreline', 'repairs', 'routes', 'route_bank_sha256', 'qualification', 'scope'})

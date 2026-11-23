@@ -6,6 +6,7 @@ this module. Scans carry only delayed anonymous local first returns.
 import bisect
 import copy
 import math
+import struct
 from types import SimpleNamespace
 from functools import lru_cache
 
@@ -266,6 +267,36 @@ def _cached_spatial_bounds(derivative_controls, subdivisions):
 
 
 
+def _numeric_key(values):
+    """Keep binary64 sign bits and unusual numeric types in a compact key."""
+    values=tuple(values)
+    if all(type(value)is float for value in values):
+        return struct.pack('!'+str(len(values))+'d',*values)
+    result=[]
+    for value in values:
+        if type(value)is float:result.append(('float',value.hex()))
+        elif type(value)is int:result.append(('int',value))
+        elif type(value)is bool:result.append(('bool',value))
+        else:raise TypeError('Polynomial proof inputs must be numeric')
+    return tuple(result)
+
+
+def _numeric_values(key):
+    if isinstance(key,bytes):return struct.unpack('!'+str(len(key)//8)+'d',key)
+    return tuple(float.fromhex(value)if kind=='float'else value for kind,value in key)
+
+
+@lru_cache(maxsize=16384)
+def _cached_extrema_window(checker,times_key,shape,coefficients_key,interval_key,order_key):
+    """Invoke the protected primitive once per exact small coefficient view."""
+    coefficients=iter(_numeric_values(coefficients_key))
+    segments=[[[next(coefficients)for _ in range(size)]for size in segment]for segment in shape]
+    start,end=_numeric_values(interval_key)
+    result=checker(SimpleNamespace(times=_numeric_values(times_key),segments=segments),
+                   start,end,_numeric_values(order_key)[0])
+    return tuple(result['min']),tuple(result['max'])
+
+
 def interval_extrema(curve,start=None,end=None,order=0):
     """Preserve the shared closed-interval extrema, including BOTH knot sides.
 
@@ -278,7 +309,25 @@ def interval_extrema(curve,start=None,end=None,order=0):
     first=max(0,bisect.bisect_left(curve.times,start)-1)
     stop=min(len(curve.segments),bisect.bisect_right(curve.times,end))
     window=SimpleNamespace(times=curve.times[first:stop+1],segments=curve.segments[first:stop])
-    return floor.extrema(window,start,end,order)
+    if len(window.segments)>4:return floor.extrema(window,start,end,order)
+    shape=tuple(tuple(len(coefficients)for coefficients in segment)for segment in window.segments)
+    result=_cached_extrema_window(floor.extrema,_numeric_key(window.times),shape,
+        _numeric_key(value for segment in window.segments for coefficients in segment for value in coefficients),
+        _numeric_key((start,end)),_numeric_key((order,)))
+    return {'min':list(result[0]),'max':list(result[1])}
+
+
+@lru_cache(maxsize=16384)
+def _cached_interval_dynamics(checker,shape,points_key,radius_key):
+    """Reuse only a protected proof of the identical two-node PVA interval."""
+    values=iter(_numeric_values(points_key));points=[]
+    for sizes in shape:
+        point={'time_s':next(values)}
+        for field,size in zip(F[:3],sizes):point[field]=[next(values)for _ in range(size)]
+        points.append(point)
+    result=checker(points,_numeric_values(radius_key)[0])
+    return tuple(result[kind][key]for kind in('linear','angular','carried_points')
+                 for key in('velocity','acceleration','jerk'))
 
 
 def episode_dynamics(curve,radius):
@@ -292,9 +341,15 @@ def episode_dynamics(curve,radius):
     result={kind:dict.fromkeys(('velocity','acceleration','jerk'),0.)
             for kind in('linear','angular','carried_points')}
     for a,b in zip(curve.points,curve.points[1:]):
-        local_bounds=floor.dynamics([a,b],radius)
+        shape=tuple(tuple(len(point[field])for field in F[:3])for point in(a,b))
+        values=[]
+        for point in(a,b):
+            values.append(point['time_s'])
+            values.extend(value for field in F[:3]for value in point[field])
+        local_bounds=iter(_cached_interval_dynamics(floor.dynamics,shape,
+            _numeric_key(values),_numeric_key((radius,))))
         for kind in result:
-            for key,value in local_bounds[kind].items():result[kind][key]=max(result[kind][key],value)
+            for key in result[kind]:result[kind][key]=max(result[kind][key],next(local_bounds))
     result.update(radius_mm=radius,
         method='shared polynomial extrema once per actual interval; unchanged linear/angular maxima; carried-point bound is the union of per-interval shared rigid-yaw enclosures')
     return result
@@ -482,9 +537,10 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
     proposal=_merged_motion_clock(clock_points,coasts)
     merges=proposal._bf01_coast_merges;analytical_end=proposal.times[-1]
     proposal=_grid_motion_clock(proposal);clock=proposal
-    # Retain every clock event and sample only the curved geometry additionally.
+    # Retain every functional clock event and curved-geometry fit node.
+    # The independent controller still proves and executes steps of at most
+    # 50 ms; its observation period is not an interpolation-fit requirement.
     times={0.,clock.times[-1],*clock.times}
-    times.update(k*.05 for k in range(1,math.ceil(clock.times[-1]/.05)))
     offset=0.
     for piece in pieces:
         if len(piece['controls'])>2:

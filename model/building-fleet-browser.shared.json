@@ -5,6 +5,10 @@
     "patrol": {
       "path": "model/building-fleet-patrol.shared.json",
       "sha256": "faa50900f9f58895c7d35fafbdfd9d9f28f9036e6ebaa7276c3ccbb5184cc1b4"
+    },
+    "python_core": {
+      "path": "model/building-fleet-browser-python.shared.json",
+      "sha256": "8669e653e69e0356d03f15b67ecb8cf1815757588a98303d77079b2169a4bc3d"
     }
   },
   "runtime": {
@@ -13,7 +17,8 @@
     "loader_module_url": "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs",
     "execution": "module_web_worker",
     "pacing": "source_step_without_wall_clock_catchup",
-    "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry"
+    "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry",
+    "delivery": "same_origin_pinned_core"
   },
   "session": {
     "scope": "independent_live_session_per_page",
