@@ -1,0 +1,36 @@
+Unveränderte Pyodide-Laufzeit 314.0.8 für den synthetischen BF01-Browserlauf
+
+Die fünf Laufzeitdateien pyodide.mjs, pyodide.asm.mjs,
+pyodide.asm.wasm, python_stdlib.zip und pyodide-lock.json wurden bytegenau
+übernommen aus dem offiziellen Pyodide-Kernarchiv:
+https://github.com/pyodide/pyodide/releases/download/314.0.8/pyodide-core-314.0.8.tar.bz2
+SHA-256: ff3e5f9d9bc8e98ff30b99515535fc24d375994f47a978c61975d653e162ca37
+
+Die Projektänderung betrifft nur die Bereitstellung dieser Dateien vom
+Seitenursprung. Es wurden keine Änderungen an der Pyodide-Laufzeit vorgenommen.
+Das Kernarchiv enthält selbst keine separaten Lizenzdateien. Die beigefügten
+Lizenz- und Copyrighttexte wurden unverändert aus den unten benannten
+Quellständen übernommen; die maschinenlesbare Begleitquelle benennt jede URL,
+Dateigröße und Prüfsumme einzeln.
+
+Pyodide-Quelltext und Buildquellen sind öffentlich unter MPL-2.0 verfügbar:
+https://github.com/pyodide/pyodide/tree/f37a18559ae11c5f371beb1c9462a13a663fc461
+https://github.com/pyodide/pyodide/archive/refs/tags/314.0.8.tar.gz
+PYODIDE-LICENSE enthält den unveränderten Lizenztext.
+
+Die Laufzeit enthält CPython 3.14.2 und Emscripten 5.0.3.
+CPYTHON-LICENSE und EMSCRIPTEN-LICENSE enthalten deren Originaltexte.
+Quellen: https://github.com/python/cpython/tree/v3.14.2
+https://github.com/emscripten-core/emscripten/tree/5.0.3
+
+Weitere mitgelieferte Originaltexte benennen musl, libc++, libc++abi,
+compiler-rt, libffi, hiwire, liblzma, zstd, zlib, bzip2 und MiniLZ4. Deren genaue
+Quellstände folgen den Pyodide-Buildquellen beziehungsweise den bezeichneten
+Emscripten- und CPython-Ständen und stehen in der maschinenlesbaren
+Begleitquelle. SQLite 3.39.0 wird von Pyodide eingebunden und ist laut
+Hersteller gemeinfrei: https://www.sqlite.org/copyright.html
+Quellarchiv: https://www.sqlite.org/2022/sqlite-autoconf-3390000.tar.gz
+
+Die Lizenztexte gelten ausschließlich für die jeweiligen Drittbestandteile.
+Die BF01-Anwendung und ihre Modellquellen haben dadurch keine neue
+Geräte-, Sicherheits- oder Laufqualifikation erhalten.

@@ -1,6 +1,7 @@
 /* Live BF01 Python engine inside one visitor's module Worker; no recording. */
 const SNAPSHOT='solidcraftbot.building-fleet-live-snapshot/1';
 const HASH=/^[a-f0-9]{64}$/;
+const CORE_FILES=['pyodide.mjs','pyodide.asm.mjs','pyodide.asm.wasm','python_stdlib.zip','pyodide-lock.json'];
 function require(ok,message){if(!ok)throw Error(message);}
 export function checkedPath(value){
  require(typeof value==='string'&&value.length>0&&!value.startsWith('/')&&!value.includes('\\')&&!value.includes('\0')&&value.split('/').every(part=>part&&part!=='.'&&part!=='..'),'Unsafe browser bundle path');return value;
@@ -17,12 +18,20 @@ export function validateManifest(manifest,config){
  require(session?.scope==='independent_live_session_per_page'&&session.start==='new_patrol_world'&&session.recording_fallback===false,'Every visitor must start an independent live world');
  const browser=manifest.browser_config;require(browser&&manifest.files[checkedPath(browser.path)]?.sha256===browser.sha256,'Leading browser configuration must be pinned in the bundle');
  require(manifest.inputs&&typeof manifest.inputs==='object'&&manifest.inputs.browser_source===browser.path,'Source-matched bootstrap inputs required');
+ if(runtime.delivery!==undefined){
+  require(runtime.delivery==='same_origin_pinned_core','Unknown browser Python delivery policy');
+  const core=manifest.python_core;require(core&&manifest.files[checkedPath(core.source?.path)]?.sha256===core.source.sha256,'Pinned original Python core descriptor required');
+  checkedPath(core.directory);require(CORE_FILES.every(name=>core.files?.[name]&&HASH.test(core.files[name].sha256)&&Number.isSafeInteger(core.files[name].bytes)&&core.files[name].bytes>0),'Complete original Python core files required');
+  for(const name of Object.keys(core.files))checkedPath(name);
+ }else require(manifest.python_core===undefined,'Python delivery must be declared by the leading source');
  return manifest;
 }
 async function digest(bytes){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');}
-async function download(url,expectedHash,expectedBytes=null){
+export async function download(url,expectedHash,expectedBytes=null){
  require(HASH.test(expectedHash),'Pinned simulation download required');
- const response=await fetch(url,{cache:'no-store',credentials:'same-origin'});require(response.ok,'Simulation asset download failed: HTTP '+response.status);
+ // Fingerprinted assets may use the HTTP cache; every returned byte is still
+ // checked against the page/manifest hash before it enters the simulation.
+ const response=await fetch(url,{cache:'force-cache',credentials:'same-origin'});require(response.ok,'Simulation asset download failed: HTTP '+response.status);
  const limit=expectedBytes??1024*1024;
  let bytes;
  if(response.body?.getReader){const reader=response.body.getReader(),chunks=[];let count=0;for(;;){const result=await reader.read();if(result.done)break;count+=result.value.byteLength;if(count>limit){await reader.cancel();throw Error('Simulation asset exceeds its declared size');}chunks.push(result.value);}bytes=new Uint8Array(count);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}}
@@ -61,17 +70,41 @@ with open('/project/' + _manifest['browser_config']['path'], encoding='utf-8') a
 if (_browser_source['runtime'] != _manifest['runtime']
         or _browser_source['session'] != _manifest['session']):
     raise ValueError('Derived browser runtime differs from its leading source')
+if _manifest['runtime'].get('delivery') == 'same_origin_pinned_core':
+    _core_ref = _browser_source['sources']['python_core']
+    if _core_ref != _manifest['python_core']['source']:
+        raise ValueError('Python core differs from its pinned leading source')
+    with open('/project/' + _core_ref['path'], encoding='utf-8') as _input:
+        _core_source = json.load(_input)
+    if (_core_source['version'] != _manifest['runtime']['version']
+            or _core_source['files'] != _manifest['python_core']['files']):
+        raise ValueError('Python core delivery differs from its original byte manifest')
 import sys
 sys.path.insert(0, '/project/scripts')
 `;
 function parseState(raw){const state=typeof raw==='string'?JSON.parse(raw):raw;require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&state.integration_step_s<=.05,'Executed Python simulation snapshot and source control step required');return state;}
+export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(url),fetchArchive=download,fetchCore=download}={}){
+ // Start the actual Python/Wasm initialization alongside the archive download,
+ // rather than waiting for the entire model before starting the runtime.
+ const python=(async()=>{
+  let loader=manifest.runtime.loader_module_url,indexURL=new URL('.',loader).href;
+  if(manifest.python_core){
+   const core=manifest.python_core,base=new URL(core.directory+'/',config.manifest.url);
+   require(base.origin===new URL(config.manifest.url).origin,'Python core must use the page origin');
+   await Promise.all(CORE_FILES.map(name=>fetchCore(new URL(name,base).href,core.files[name].sha256,core.files[name].bytes)));
+   loader=new URL('pyodide.mjs',base).href;indexURL=base.href;
+  }
+  const {loadPyodide}=await loadModule(loader);
+  return loadPyodide({indexURL});
+ })();
+ const archive=fetchArchive(config.bundle.url,config.bundle.sha256,manifest.archive.bytes);
+ return Promise.all([python,archive]);
+}
 export async function loadPythonRuntime(config,progress){
  progress({phase:'checking_browser_bundle'});
  const raw=await download(config.manifest.url,config.manifest.sha256),text=new TextDecoder().decode(raw),manifest=validateManifest(JSON.parse(text),config);
  progress({phase:'loading_python_runtime'});
- const [{loadPyodide},archive]=await Promise.all([
-  import(manifest.runtime.loader_module_url),download(config.bundle.url,config.bundle.sha256,manifest.archive.bytes)]);
- const pyodide=await loadPyodide({indexURL:new URL('.',manifest.runtime.loader_module_url).href});
+ const [pyodide,archive]=await loadRuntimeAssets(manifest,config);
  progress({phase:'checking_simulation_sources'});
  pyodide.FS.writeFile('/tmp/bf01-runtime.zip',archive);pyodide.globals.set('_bf_manifest_json',text);
  await pyodide.runPythonAsync(EXTRACT);pyodide.FS.unlink('/tmp/bf01-runtime.zip');

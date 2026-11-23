@@ -1,15 +1,29 @@
 {
   "bounded_browser_evidence": {
-    "actual_checks": {
-      "independent_world": true,
+    "actual_runtime_checks": {
+      "complete_source_closure_verified": true,
+      "fresh_browser_wasm_world": true,
+      "independent_session": true,
       "live_motion": true,
-      "request_recruits_vehicle": true,
-      "twenty_native_instances": true,
-      "twenty_received_monitor_sources": true
+      "no_recording_inputs": true,
+      "same_origin_pinned_runtime": true,
+      "twenty_received_camera_frames": true,
+      "twenty_vehicle_states": true
     },
+    "current_full_GL_executed": false,
+    "current_request_recruitment_tested": false,
+    "evidence_model": "actual_new_runtime_and_exact_presentation_equivalence",
     "execution_host": "browser_wasm_worker",
     "fixtures": false,
-    "passed": true
+    "passed": true,
+    "presentation_checks": {
+      "all_other_HTML_bytes_identical": true,
+      "prior_actual_UI_pause_request_resume": true,
+      "prior_actual_twenty_native_instances": true,
+      "prior_actual_twenty_physical_monitor_textures": true,
+      "transport_bytes_identical": true
+    },
+    "public_full_GL_recheck_required": true
   },
   "files": {
     "building_fleet_browser_transport.js": {
@@ -17,55 +31,142 @@
       "sha256": "d5bfd5dc8bbbc2c0001c6694d3f1b8f18688d11b5807175f2042c0b7558dc3f5"
     },
     "building_fleet_browser_worker.mjs": {
-      "bytes": 9529,
-      "sha256": "1acd733164b590905a5aaf188e8922546433582cc6451cc3646ccf91cce1ef4b"
+      "bytes": 11960,
+      "sha256": "dbd5307ac60247d6c01b0e983870ed960a26a4d58c70bb8fd196870659daf370"
     },
     "index.html": {
       "bytes": 53153870,
-      "sha256": "67c4f0d4520b9fed379b4ba26551c9f96c3b5eb726c2ccf8aa183bcb3259967e"
+      "sha256": "30911231dc7844f4871a4fb556b4e07547e0cd54742241b1a2c04d1610097ed1"
+    },
+    "python/314.0.8-8669e653e69e0356/BZIP2-LICENSE": {
+      "bytes": 1901,
+      "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204"
+    },
+    "python/314.0.8-8669e653e69e0356/COMPILER-RT-LICENSE": {
+      "bytes": 16708,
+      "sha256": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d"
+    },
+    "python/314.0.8-8669e653e69e0356/CPYTHON-LICENSE": {
+      "bytes": 13804,
+      "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231"
+    },
+    "python/314.0.8-8669e653e69e0356/EMSCRIPTEN-LICENSE": {
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    "python/314.0.8-8669e653e69e0356/HIWIRE-LICENSE": {
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "python/314.0.8-8669e653e69e0356/LIBCXX-LICENSE": {
+      "bytes": 16703,
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    "python/314.0.8-8669e653e69e0356/LIBCXXABI-LICENSE": {
+      "bytes": 16706,
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    "python/314.0.8-8669e653e69e0356/LIBFFI-LICENSE": {
+      "bytes": 1132,
+      "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388"
+    },
+    "python/314.0.8-8669e653e69e0356/LIBLZMA-NOTICE": {
+      "bytes": 2774,
+      "sha256": "c4f8e14fafe458d84808a4cd8b69f94673ebe2bf8fc992291629a69ac12218f8"
+    },
+    "python/314.0.8-8669e653e69e0356/LZ4-NOTICE": {
+      "bytes": 10269,
+      "sha256": "ac1eaa04b68d792d962d5946504ee5141ef58a9df86a0dfcf0ffa63d08634e46"
+    },
+    "python/314.0.8-8669e653e69e0356/MUSL-COPYRIGHT": {
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    },
+    "python/314.0.8-8669e653e69e0356/NOTICE": {
+      "bytes": 2081,
+      "sha256": "0aa9e602a8ebde7d3f032accf2e7c308cde2972058d753c70561b2b16a53de8b"
+    },
+    "python/314.0.8-8669e653e69e0356/PYODIDE-LICENSE": {
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    "python/314.0.8-8669e653e69e0356/ZLIB-LICENSE": {
+      "bytes": 1002,
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    },
+    "python/314.0.8-8669e653e69e0356/ZSTD-LICENSE": {
+      "bytes": 1549,
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+    },
+    "python/314.0.8-8669e653e69e0356/pyodide-lock.json": {
+      "bytes": 119077,
+      "sha256": "5dc2fc119108bc148c7457dc86e7675b5c87e1cafd420b9c34c1eaef7b36c010"
+    },
+    "python/314.0.8-8669e653e69e0356/pyodide.asm.mjs": {
+      "bytes": 1250259,
+      "sha256": "22514b8be6980e28a02c8b1d6387ce8dfe666fc4edf8d547cff5dce29ff4d972"
+    },
+    "python/314.0.8-8669e653e69e0356/pyodide.asm.wasm": {
+      "bytes": 9597892,
+      "sha256": "e14d49ceca9b4a0e274ea918f3a898de2d3880b6e5573a6cfe1a2267ecc70329"
+    },
+    "python/314.0.8-8669e653e69e0356/pyodide.mjs": {
+      "bytes": 17758,
+      "sha256": "1bb8cc14f9405aaa7cd4e00c12edd0a8539de9cc026618d6ee5a9663f367dc70"
+    },
+    "python/314.0.8-8669e653e69e0356/python_stdlib.zip": {
+      "bytes": 2545550,
+      "sha256": "2bd3394a145bfbbe5bbc9d9d6ab9136abbb986c6fef6c142b3a2962227aa5c28"
     },
     "runtime-manifest.json": {
-      "bytes": 40069,
-      "sha256": "46f6796d2e33cca188d797ee9ddfc445f2daf280923c126eb78d3c5df9f5f5e8"
+      "bytes": 43559,
+      "sha256": "e08d89d60f5c9551271c4af074a6e99060abd75745ed85f9e9d585f869a3b72c"
     },
     "runtime.zip": {
-      "bytes": 54303483,
-      "sha256": "3b53b4ead6a1cf61b03e66d1ed466b17400b8063fdc5c0a4ade064b86958f6c0"
+      "bytes": 54440315,
+      "sha256": "f2c4d9ea45aa3cc954a7763d35be06bf229648f3c96cddd6d5a2890240571bff"
     }
   },
   "format": "solidcraftbot.building-fleet-browser-pages/1",
   "html": {
     "bytes": 53153870,
-    "sha256": "67c4f0d4520b9fed379b4ba26551c9f96c3b5eb726c2ccf8aa183bcb3259967e"
+    "sha256": "30911231dc7844f4871a4fb556b4e07547e0cd54742241b1a2c04d1610097ed1"
   },
   "packager": {
-    "bytes": 13526,
-    "path": "exports/building-fleet/browser-live-2f7f741/publication/package_pages.py",
-    "sha256": "69fd83ecc25f93aabc3d60ad76c956520515bc7ef1d07e4780c223937fbd6c4e"
+    "bytes": 18621,
+    "path": "exports/building-fleet/startup-performance-586ff76/publication/package_pages.py",
+    "sha256": "25e9339f6b93fe75cc27c39745e957a4d75558a64d7cc7b2152a148be3432139"
   },
   "provenance": {
-    "actual_html_report": {
+    "actual_publication_check": {
+      "bytes": 3967,
+      "path": "exports/building-fleet/startup-performance-586ff76/publication/publication-check-final-r1.json",
+      "sha256": "db64c6e4d4bf199a53728468a29f4cef7a862c45afef3618a3309e5d601aeeaf"
+    },
+    "actual_worker_report": {
+      "bytes": 786874,
+      "path": "exports/building-fleet/startup-performance-586ff76/after-final/measurement.json",
+      "sha256": "9b1f813d09a2d52974e8b8d59788bf47f6b8acfdc2ebb75a02a364d615a165a9"
+    },
+    "live_build": {
+      "bytes": 37686,
+      "path": "exports/building-fleet/startup-performance-586ff76/browser-r2/browser-build-report.json",
+      "sha256": "5f464baf05d188e705c664f39ac1b1a1844cc81c3efb1e105608f6e196a9d7c7"
+    },
+    "presentation_equivalence": {
+      "bytes": 4446,
+      "path": "exports/building-fleet/startup-performance-586ff76/publication/presentation-equivalence-r2.json",
+      "sha256": "86ff4df201727ab098c7ba9d4efb44ecd2e573974215e87e58210eabda18bf5f"
+    },
+    "prior_actual_html_report": {
+      "bytes": 310821,
       "path": "exports/building-fleet/browser-live-2f7f741/full-page-r2/full-page-browser-check.json",
       "sha256": "7416aac89d1fe1401f5987f3bc5a1f8d8e94232fedbea672ba738c3f89f69696"
     },
-    "actual_publication_check": {
-      "bytes": 3403,
-      "path": "exports/building-fleet/browser-live-2f7f741/publication/publication-check-r1.json",
-      "sha256": "873229c2190c580e9a4d92e7ee9b7e261b0254301bea22c2659365ad00c45913"
-    },
-    "actual_worker_report": {
-      "path": "exports/building-fleet/browser-live-2f7f741/worker-live-smoke-r2/worker-smoke-report.json",
-      "sha256": "ef5627abdfa8dc591350851c1d2a9fcc640b05e0d1201aae56661441469cc62b"
-    },
-    "live_build": {
-      "bytes": 31006,
-      "path": "exports/building-fleet/browser-live-2f7f741/browser-r2/browser-build-report.json",
-      "sha256": "23752179e39c014a67dba2671221a86b50f5b2921cc60b79fc5fd0d5809c7808"
-    },
     "runtime_manifest": {
-      "bytes": 40069,
-      "path": "exports/building-fleet/browser-live-2f7f741/browser-r2/runtime-manifest.json",
-      "sha256": "46f6796d2e33cca188d797ee9ddfc445f2daf280923c126eb78d3c5df9f5f5e8"
+      "bytes": 43559,
+      "path": "exports/building-fleet/startup-performance-586ff76/browser-r2/runtime-manifest.json",
+      "sha256": "e08d89d60f5c9551271c4af074a6e99060abd75745ed85f9e9d585f869a3b72c"
     }
   },
   "qualification": {
@@ -94,6 +195,7 @@
     "url": "https://smoe.github.io/DIYLabBot/"
   },
   "runtime": {
+    "delivery": "same_origin_pinned_core",
     "engine": "pyodide",
     "execution": "module_web_worker",
     "loader_module_url": "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs",
@@ -107,7 +209,7 @@
     "scope": "independent_live_session_per_page",
     "start": "new_patrol_world"
   },
-  "source_commit": "586ff76a2d138e39d88463bb5d4d74457d8f6714",
+  "source_commit": "0b10fe19b857112a3d506e82bc434437c55e0741",
   "source_files_sha256": {
     "cad/generated/building-stack-268bd52d21e1/overview.FCStd": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
@@ -124,16 +226,37 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
-    "exports/building-fleet/jerk-01c7cff/navigation-r1/cache-report.json": "dc40cc6c76a166339c0259b09d126c4b855782c68f5f3af4ec1ebff7c080bf78",
-    "exports/building-fleet/jerk-01c7cff/resource-catalog-r2/cache-report.json": "c3ae82d0441a8fb5e4ac7b7d9ac5a828f001ca45c958e414cecfd7fe592d1ec4",
-    "exports/building-fleet/jerk-01c7cff/resource-catalog-r2/closure.json": "06a6e35217ff3171d0183cdeedaa8ab774813ed5e3bae7d901b43b00b7becc77",
     "exports/building-fleet/jerk-01c7cff/walkthrough-r1/native-mesh.json": "999de6aaab73c8c42972cb418d5518664b612c8829a042b51fa101017facfc45",
     "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5",
     "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-manifest.json": "a891d57c267e8eb2a6b1cf635f6f3693fac2f14d0693dd898fe85ab6257736ad",
-    "exports/building-fleet/patrol-5f4da9d/preparation-r1/navigation-after-graph/cache-report.json": "4e2cbb07a6c2bd11c245044dba9fdb6908860127d7df8843c298b25959f4964f",
-    "exports/building-fleet/patrol-5f4da9d/preparation-r1/navigation-after-graph/navigation.json.gz": "7a8b882d3114dcf8b1953117ba87836ce03b65bf4795a67bee64ff2d2990706e",
-    "exports/building-fleet/patrol-5f4da9d/preparation-r1/report.json": "2e8b71345490ae1e6d944902efa202e94f6156ef6981e9d311dc5afb04811b11",
-    "exports/building-fleet/patrol-5f4da9d/preparation-r1/route-graph.json": "12b621df4317b89011ed1f1c0d0ddb5fa1f786345346d500b424490d7e48b1c5",
+    "exports/building-fleet/startup-586ff76/static-r2/derive.py": "305716e9cf1610826723889cbbcc68750d42145594945e1804e673bff199f749",
+    "exports/building-fleet/startup-586ff76/static-r2/equivalence.json": "05eec6d994004ce28bd769fe8db7729cc53b8c1142292a158200d12ff0726900",
+    "exports/building-fleet/startup-586ff76/static-r2/navigation/cache-report.json": "316bb9fc60fb4ddf41841f183a3607368b1da4fa98801aac95d187f85a8679f1",
+    "exports/building-fleet/startup-586ff76/static-r2/navigation/navigation.json.gz": "7a8b882d3114dcf8b1953117ba87836ce03b65bf4795a67bee64ff2d2990706e",
+    "exports/building-fleet/startup-586ff76/static-r2/report.json": "9745a05073876d04aeabde74c0825738fd58d20e21436f9b971140568175fbbe",
+    "exports/building-fleet/startup-586ff76/static-r2/resources/cache-report.json": "588b63469f93af08a8aef97df8d1d1134beebc5c1c309856624b3a8bb28f1bc7",
+    "exports/building-fleet/startup-586ff76/static-r2/resources/closure.json": "83348361acd3d9cc6f4b69dcaefc10f6a2ad2c00af870217542aa995f08e6d44",
+    "exports/building-fleet/startup-586ff76/static-r2/route-graph.json": "3ca9ed4a4e8689678ab5b2e396bfca82bd5890105517422a95776c4a09b18933",
+    "exports/building-fleet/startup-performance-586ff76/python-core/BZIP2-LICENSE": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204",
+    "exports/building-fleet/startup-performance-586ff76/python-core/COMPILER-RT-LICENSE": "1a8f1058753f1ba890de984e48f0242a3a5c29a6a8f2ed9fd813f36985387e8d",
+    "exports/building-fleet/startup-performance-586ff76/python-core/CPYTHON-LICENSE": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231",
+    "exports/building-fleet/startup-performance-586ff76/python-core/EMSCRIPTEN-LICENSE": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86",
+    "exports/building-fleet/startup-performance-586ff76/python-core/HIWIRE-LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+    "exports/building-fleet/startup-performance-586ff76/python-core/LIBCXX-LICENSE": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b",
+    "exports/building-fleet/startup-performance-586ff76/python-core/LIBCXXABI-LICENSE": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c",
+    "exports/building-fleet/startup-performance-586ff76/python-core/LIBFFI-LICENSE": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388",
+    "exports/building-fleet/startup-performance-586ff76/python-core/LIBLZMA-NOTICE": "c4f8e14fafe458d84808a4cd8b69f94673ebe2bf8fc992291629a69ac12218f8",
+    "exports/building-fleet/startup-performance-586ff76/python-core/LZ4-NOTICE": "ac1eaa04b68d792d962d5946504ee5141ef58a9df86a0dfcf0ffa63d08634e46",
+    "exports/building-fleet/startup-performance-586ff76/python-core/MUSL-COPYRIGHT": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+    "exports/building-fleet/startup-performance-586ff76/python-core/NOTICE": "0aa9e602a8ebde7d3f032accf2e7c308cde2972058d753c70561b2b16a53de8b",
+    "exports/building-fleet/startup-performance-586ff76/python-core/PYODIDE-LICENSE": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5",
+    "exports/building-fleet/startup-performance-586ff76/python-core/ZLIB-LICENSE": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243",
+    "exports/building-fleet/startup-performance-586ff76/python-core/ZSTD-LICENSE": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8",
+    "exports/building-fleet/startup-performance-586ff76/python-core/pyodide-lock.json": "5dc2fc119108bc148c7457dc86e7675b5c87e1cafd420b9c34c1eaef7b36c010",
+    "exports/building-fleet/startup-performance-586ff76/python-core/pyodide.asm.mjs": "22514b8be6980e28a02c8b1d6387ce8dfe666fc4edf8d547cff5dce29ff4d972",
+    "exports/building-fleet/startup-performance-586ff76/python-core/pyodide.asm.wasm": "e14d49ceca9b4a0e274ea918f3a898de2d3880b6e5573a6cfe1a2267ecc70329",
+    "exports/building-fleet/startup-performance-586ff76/python-core/pyodide.mjs": "1bb8cc14f9405aaa7cd4e00c12edd0a8539de9cc026618d6ee5a9663f367dc70",
+    "exports/building-fleet/startup-performance-586ff76/python-core/python_stdlib.zip": "2bd3394a145bfbbe5bbc9d9d6ab9136abbb986c6fef6c142b3a2962227aa5c28",
     "exports/building-fleet/support-680652f/native-vehicle-mesh.json": "5e4d1cdd69a1da3a91c4f3e7a6e5e9ea7c52c13cc003d8cd89d44fe6a04d6a10",
     "exports/generated/building-stack-268bd52d21e1/build-report.json": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
     "exports/generated/building-stack-268bd52d21e1/overview.case.json": "946a342182084faf0d1d2ced592b07f1844f027d3985df93808e243f551a3fb7",
@@ -151,7 +274,8 @@
     "model/building-doors.schema.json": "9d21e2eb2f87ea1e16105756c1a56b33bdac147357a36131beb82a4714b36196",
     "model/building-doors.shared.json": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391",
     "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
-    "model/building-fleet-browser.shared.json": "8e624ebdd6a870b862f97bb3398ae3da0fdcf79bf213963deea08c0d3bd9a72d",
+    "model/building-fleet-browser-python.shared.json": "8669e653e69e0356d03f15b67ecb8cf1815757588a98303d77079b2169a4bc3d",
+    "model/building-fleet-browser.shared.json": "8d4048ad33a4ea5b28c6bae2eca9ba5c1f67d904fecf367aaf44e78e5226f201",
     "model/building-fleet-demo.schema.json": "bc7d23b945738f9fa4002d19a977d872dabc41b0d0371ca1a0482682d9fe08c6",
     "model/building-fleet-demo.shared.json": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99",
     "model/building-fleet-l01-route.schema.json": "57b247cfd4e95ab089f9b2a757f0886fadc8b2fbc15e5df86e8cf6f68f836b17",
@@ -227,7 +351,7 @@
     "scripts/assembly_model.py": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930",
     "scripts/atrium_seating.py": "9e3345dcd6b560498099105449a4a443584b876514e1cae8ff4d1c986b0372b0",
     "scripts/basic_laboratories.py": "630cde4e9e210e2c2e821c345e9fe51275c08611f188f3d989bcdc50f901b6b1",
-    "scripts/build_building_fleet_browser.py": "2dfb7ccc1b594f337d89fd925c9e174f5010a4da469842f46beec5a3dec37347",
+    "scripts/build_building_fleet_browser.py": "b0615b29c2bc809a3e26daa4442c037f912908b77a23d92b0a0acf489e962731",
     "scripts/build_building_fleet_demo.py": "2c5b8e2410f7471b64d3cbdca08830ad4e4bdbaadd1c1f9642392c7d7225e5f3",
     "scripts/build_building_stack.py": "c298ddd6b3e624b4c80277b879004ee0ecb82395075877f4e74ffe373b1e954a",
     "scripts/build_building_stack_freecad.py": "892d4a0552b48eb41b6b058d7d47a7cc73525a9a185070cabb3b9ec2b7aa339e",
@@ -252,29 +376,29 @@
     "scripts/building_doors.py": "9c10dee44d5104cd74fb87abf32659a1bc9691b01b4aa73a9535172e989608bd",
     "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
     "scripts/building_fleet_browser_navigation.py": "d0b3e42a70b799239e603d693fc925d2f7ca218f6d563e64b4ebf1926fad3531",
-    "scripts/building_fleet_browser_runtime.py": "c54c9795bb45cc8412af0c4f0bc78046a5d58c4f15160ad5e5539755b3cb4433",
+    "scripts/building_fleet_browser_runtime.py": "c2f2dbc78a38cc5a3626d5f1be1a813ee85aaaa559c0e31c41237b90d26eb670",
     "scripts/building_fleet_browser_transport.js": "d5bfd5dc8bbbc2c0001c6694d3f1b8f18688d11b5807175f2042c0b7558dc3f5",
-    "scripts/building_fleet_browser_worker.mjs": "1acd733164b590905a5aaf188e8922546433582cc6451cc3646ccf91cce1ef4b",
-    "scripts/building_fleet_clearance.py": "434cac5da2eb2dba136d3720299ad44489e60f236cbc5ffb4537e8e6b4c669cc",
+    "scripts/building_fleet_browser_worker.mjs": "dbd5307ac60247d6c01b0e983870ed960a26a4d58c70bb8fd196870659daf370",
+    "scripts/building_fleet_clearance.py": "cdaaf1128514b2ff4fb9461119ad359d0316710936a72bb0972f15ab97530ef3",
     "scripts/building_fleet_comm.py": "05c4a46c0072e5aa26b0643c67b55870a0a6e36c95239aba8f6ac3fc6d2a8809",
-    "scripts/building_fleet_control.py": "b230a330363b8f20aa9457bedea58c8289bd1867d1fc5c935926d18a43ec3059",
+    "scripts/building_fleet_control.py": "32b74c08ed64342f7faa3c6fbf63738da7ed688c8976075d344127b3df6e164a",
     "scripts/building_fleet_depot.py": "f44722f14e771cac91c4aada0e1354dc395e11d8b3e76196a71680d225c5187f",
     "scripts/building_fleet_dispatch.py": "6e28bef2a95d766315b1595cc7b37d763f8857a06b1a89437f6d2dcd6623c4a4",
     "scripts/building_fleet_floor.py": "f9fc09e97587e337c5f2e8e643f90042410c21a18f577a1606c2a8fb4862a91a",
     "scripts/building_fleet_geometry.py": "b479436d4e4ecda1d2957e6d59528c6d21d7a2f86e6d53edb9c2850261f36c38",
-    "scripts/building_fleet_geometry_checks.py": "025be9d2d59852185e7750e3071f0d8118430ea5111095588b2357527451e2fc",
+    "scripts/building_fleet_geometry_checks.py": "70fcbb0b225307f30b1944fe1dc2927f5310ec906b7fb974cdb87af162be2f98",
     "scripts/building_fleet_l01.py": "fda852e8b03cb60164e401bb6a0948734df022ab2cecbaedbc7c42cb2a72613f",
-    "scripts/building_fleet_lift_checks.py": "d80c69f3dfc4f971f93e987b518853a2d404a1c69b6ad19dc93011c69ff5ef13",
+    "scripts/building_fleet_lift_checks.py": "57ef7d4b23824f19a4b299fedc3b50d3ab17e95c70b9737bb6bfd088896457d2",
     "scripts/building_fleet_lift_geometry.py": "8f8479eb7a5b52bf9925d580ee1642f39ea5b6a582918419967a556bcd90de3f",
     "scripts/building_fleet_live_view.js": "1cf3dfab2b55744f2817917bf00cba11dee0caee11ece5355bcced73a9abe885",
     "scripts/building_fleet_missions.py": "262cd952dfe6adb38b6d4bf271b5a8de0049e22814395bde2e4d76410540cdac",
     "scripts/building_fleet_model.py": "f52eb351a4a8d7ff44e06d4b2e7f436f145d3de4716a6b1a964f69e0cb1fa8f4",
-    "scripts/building_fleet_motion.py": "14f9f9be2a669bd51cab0094e31b14c089a9ba34a45e1a7b17fe061af9e1a86d",
+    "scripts/building_fleet_motion.py": "7175770ee9aaab3017c109276258784e869ba2138fac4a90ad27b89b3337eb59",
     "scripts/building_fleet_navigation.py": "cf0e1ab5fc2554a7e9db755ea283e44ef7d6ec8f117208a7ab1c209a5dfef9fd",
     "scripts/building_fleet_patrol.py": "00add5d36785a41752618628f1567231ac629d30dfadc8521e791b1bed546762",
-    "scripts/building_fleet_patrol_cache.py": "62bbca5ea60b25c3b2aaf2fd070ef90bad073118d04bfe48b323c609b4499970",
-    "scripts/building_fleet_port_paths.py": "15dfbdfcdf1c47f0e8a2931c94db777f5edd193635aa96c9e0ae141c0e113337",
-    "scripts/building_fleet_resources.py": "9b046703e7002b68afc59659ee5d482f804c5112b897015d0326d75d149f8d4a",
+    "scripts/building_fleet_patrol_cache.py": "48d573b38b6ae1cc4f4fd1dee42fb933e39d8d8710613792cfba380e16f6e112",
+    "scripts/building_fleet_port_paths.py": "e08efd5b50e433be3cebbf10e28afed30e024bce579739a5784bf989b955a89e",
+    "scripts/building_fleet_resources.py": "1b65fae1631c6393801780b167e01b9468a784e08f21f977247862649a3be788",
     "scripts/building_fleet_routes.py": "8ab775d3e293020e8919bae81e8c66b0865bb0d955d00165a0548b4e1a29287d",
     "scripts/building_fleet_runner.py": "088b590a97013bf93cb7cb93d2c3aaaf218b2a0ccd5c8452739ddb250aef6cab",
     "scripts/building_fleet_services.py": "c70fd1905ab92f4fa5d62cc8d92510acbe2035df44697fcb635053f210691c1f",
@@ -358,7 +482,7 @@
     "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
   },
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_tree": "c36f3398965d86f34e6b4b2ea93dab275086b7cf",
+  "source_tree": "82f76f9c01044952750c413007825ef0bfd289ed",
   "status": "experimental_live_browser_patrol",
   "url": "https://smoe.github.io/DIYLabBot/bf01/"
 }
