@@ -252,19 +252,28 @@
   "related_pages": {
     "bf01": {
       "url": "https://smoe.github.io/DIYLabBot/bf01/",
-      "status": "experimental_preview",
+      "status": "experimental_recorded_atrium_preview",
       "complete": false,
       "recorded_end_s": 1188.1,
-      "html_sha256": "c358db088aa4601e34777c46376c00833f2c04e4bab8b4791a43d18039ec9f40",
+      "source_commit": "5f4da9d89ca4c561e898e89f374d220439865dae",
+      "source_tree": "0705db8a34d1eac4b752ca79e7a6f29f0187b20d",
+      "html_sha256": "6e3ccd1365f622d4807e6b987126280febad9b3a14ef52891e3ea0a4b27e90e1",
+      "presentation": {
+        "atrium_monitors": true,
+        "start_stop": "camera-wall",
+        "autoplay": true,
+        "follow": false
+      },
       "qualification": {
         "full_mission_coverage_verified": false,
         "native_full_program_verified": false,
         "independent_export_verified": false,
         "hardware_or_real_safety_qualified": false
       },
+      "camera_quality_qualified": false,
       "publication_manifest": {
         "url": "https://smoe.github.io/DIYLabBot/bf01/site-manifest.json",
-        "sha256": "8f6b5fe416cdbdeff77da8e65596c76ff795958a9bb0f4008c044ac0460edbe8"
+        "sha256": "d2eac77c73e82a76b4fd778b86ee5c3ec49c0e2f71745cc0fb1bbbf07f412a49"
       },
       "provenance": {
         "partial_program": {
@@ -282,16 +291,6 @@
           "sha256": "7a88e32549cbe015c4c5422d767afe619ccb3dc05ba66191809126c52ae7f4e9",
           "bytes": 23979
         },
-        "interruption_receipt": {
-          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3-interruption-r1/report.json",
-          "sha256": "de5e79222f56addeb67afe096346d9930b6d4a1f6bd93ff42309ad5bf59421b7",
-          "bytes": 63639
-        },
-        "raw_trace": {
-          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/own-controller-observations.jsonl.gz",
-          "sha256": "905149447c61cca6d4dafc2fbbf3d44c91b00fc3a2e41e4e9b0dd3fc2df765a6",
-          "bytes": 316241451
-        },
         "world_report": {
           "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json",
           "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5",
@@ -308,15 +307,35 @@
           "bytes": 497190
         },
         "preview_build": {
-          "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/build-report.json",
-          "sha256": "9b0416ba8fa84f6a3768bb185973cef0c487bd1836bb0e548d8bc162e865054e",
-          "bytes": 30023
+          "path": "exports/building-fleet/atrium-8806231/preview-r2/build-report.json",
+          "sha256": "8699a9872592b8b32ea41e56c09edc89a239da7fddeed4c5b7873ac6e5b0ec0d",
+          "bytes": 30484
         },
-        "bounded_preview_browser": {
-          "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/preview-browser-check.json",
-          "sha256": "79ede598e48df0b3ac23ac888db1382b16747efafec8ce95acf2ac477364ab72",
-          "bytes": 3881
+        "bounded_atrium_browser": {
+          "path": "exports/building-fleet/atrium-8806231/preview-r2/atrium-fleet-monitors-browser-check.json",
+          "sha256": "1bbf8baa65577eb48f290c68d9251d6113ab926acdc909c1af23373c11059af4",
+          "bytes": 20044
+        },
+        "browser_execution_receipt": {
+          "path": "exports/building-fleet/atrium-8806231/preview-r2/atrium-browser-execution-receipt.json",
+          "sha256": "f822a4d83d511925ef263c5ee09a59a32ffe6a1c4b85f904850f26a727f5545c",
+          "bytes": 1551
+        },
+        "interruption_receipt": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3-interruption-r1/report.json",
+          "sha256": "de5e79222f56addeb67afe096346d9930b6d4a1f6bd93ff42309ad5bf59421b7",
+          "bytes": 63639
+        },
+        "raw_trace": {
+          "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/own-controller-observations.jsonl.gz",
+          "sha256": "905149447c61cca6d4dafc2fbbf3d44c91b00fc3a2e41e4e9b0dd3fc2df765a6",
+          "bytes": 316241451
         }
+      },
+      "composite_packager": {
+        "path": "exports/building-fleet/atrium-8806231/publication/package_composite_pages.py",
+        "sha256": "a8fcf4dd67a04c0b0ad247dfc90a69188fffbdf1baf044468ecf8291a522021a",
+        "bytes": 25088
       }
     }
   },

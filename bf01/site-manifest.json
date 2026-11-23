@@ -1,17 +1,22 @@
 {
-  "format": "solidcraftbot.building-fleet-experimental-preview-pages/1",
-  "status": "experimental_preview",
+  "format": "solidcraftbot.building-fleet-experimental-atrium-pages/1",
+  "status": "experimental_recorded_atrium_preview",
   "url": "https://smoe.github.io/DIYLabBot/bf01/",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
-  "source_tree": "b75c41c8276056ce6d0c4746206f6028b5beb7f3",
-  "complete": false,
-  "recorded_end_s": 1188.1,
-  "source_recorded_duration_s": 1188.1,
-  "seed": 20261120,
+  "source_commit": "5f4da9d89ca4c561e898e89f374d220439865dae",
+  "source_tree": "0705db8a34d1eac4b752ca79e7a6f29f0187b20d",
   "html": {
-    "sha256": "c358db088aa4601e34777c46376c00833f2c04e4bab8b4791a43d18039ec9f40",
-    "bytes": 59779634
+    "sha256": "6e3ccd1365f622d4807e6b987126280febad9b3a14ef52891e3ea0a4b27e90e1",
+    "bytes": 59831402
+  },
+  "complete": false,
+  "seed": 20261120,
+  "recorded_end_s": 1188.1,
+  "presentation": {
+    "atrium_monitors": true,
+    "start_stop": "camera-wall",
+    "autoplay": true,
+    "follow": false
   },
   "source_files_sha256": {
     "model/building-stack.shared.json": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a",
@@ -233,16 +238,19 @@
     "scripts/building_walkthrough_viewer.html": "a0a4efa71e2c4d02a0faea077b95cadff6f727a4e8c970355fdefa25e0001962",
     "scripts/walkthrough_interaction.js": "98b8b7f6033752c69a9159692b731998892cfb1928a998f2ace2c80968d96e13",
     "scripts/seminar_projection.js": "87e3d728858b95cc9709f3f71e5c49a1676630883d0cf174e5b5809359a1900d",
-    "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
+    "scripts/camera_monitor_wall.js": "3bd6c419d87156b4c2eb6eeb5056b5e04b7dddb3aed1d1b97fbfa20f495432a2",
     "scripts/monitor_frustum.js": "b0291f4e32cc6792660cf321238d431601b4d9d5c3f3f816906c2810068aa1f1",
+    "model/foyer-camera-wall.shared.json": "00da315f32f96608b0914b3bab512a2493d96810c5a88f8814dd0b1e533af00b",
+    "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
+    "scripts/monitor_camera_registry.py": "aefee896a12abc0ee2bb555ffb969356f22afb47e944d75b8f5f868f98d4006f",
     "scripts/export_building_fleet_vehicle_freecad.py": "add637a0f11016af9420d47bd488114a0c87020b5cdb2efee1e048ff9aa21436",
     "exports/building-fleet/jerk-01c7cff/full-seed-r3/partial-program.json": "b76ef65cae9f12f60c38b5a9cebaaddc27ee2c17491910ebbf06572380cd2158",
     "exports/building-fleet/jerk-01c7cff/full-seed-r3/runtime-failure.json": "d33c70beaf912585161545ca3fd11cca4d138f4c23259a2f976852827237bac9",
     "exports/building-fleet/jerk-01c7cff/full-seed-r3/runtime-source-start.json": "7a88e32549cbe015c4c5422d767afe619ccb3dc05ba66191809126c52ae7f4e9",
     "exports/building-fleet/support-680652f/native-vehicle-mesh.json": "5e4d1cdd69a1da3a91c4f3e7a6e5e9ea7c52c13cc003d8cd89d44fe6a04d6a10",
-    "scripts/building_fleet_view.js": "b07081ee127b37e1242be42e437c52ee5a581bcda72057c9420c8b3aa926275f",
-    "scripts/build_building_fleet_demo.py": "778f9799872056922c7d8744ba5aa6fbdedce1f4db391a8f6b20ca42cb18249c",
-    "scripts/build_building_fleet_preview.py": "150be8d24f34732119eeb65ab7aae4a152245b86bcb31269125f08f99c7d53ff"
+    "scripts/building_fleet_view.js": "dc5a41b8bc7d124e1356391625a345c38b86fd9c3786cc8068bf6fe4ea4ac188",
+    "scripts/build_building_fleet_demo.py": "2c5b8e2410f7471b64d3cbdca08830ad4e4bdbaadd1c1f9642392c7d7225e5f3",
+    "scripts/build_building_fleet_preview.py": "8c0917d2bce20f77edb64771af81a10fd030c6f19cdaa773b413f9f699c52eb8"
   },
   "qualification": {
     "full_mission_coverage_verified": false,
@@ -250,6 +258,7 @@
     "independent_export_verified": false,
     "hardware_or_real_safety_qualified": false
   },
+  "camera_quality_qualified": false,
   "experimental_notice": "Experimentelle Teilvorschau · Aufzeichnung bis 1188.100 s. Vollständiger Missionslauf, native Gesamtprüfung und unabhängige Exportprüfung unbestätigt.",
   "provenance": {
     "partial_program": {
@@ -267,16 +276,6 @@
       "sha256": "7a88e32549cbe015c4c5422d767afe619ccb3dc05ba66191809126c52ae7f4e9",
       "bytes": 23979
     },
-    "interruption_receipt": {
-      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3-interruption-r1/report.json",
-      "sha256": "de5e79222f56addeb67afe096346d9930b6d4a1f6bd93ff42309ad5bf59421b7",
-      "bytes": 63639
-    },
-    "raw_trace": {
-      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/own-controller-observations.jsonl.gz",
-      "sha256": "905149447c61cca6d4dafc2fbbf3d44c91b00fc3a2e41e4e9b0dd3fc2df765a6",
-      "bytes": 316241451
-    },
     "world_report": {
       "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json",
       "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5",
@@ -293,36 +292,51 @@
       "bytes": 497190
     },
     "preview_build": {
-      "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/build-report.json",
-      "sha256": "9b0416ba8fa84f6a3768bb185973cef0c487bd1836bb0e548d8bc162e865054e",
-      "bytes": 30023
+      "path": "exports/building-fleet/atrium-8806231/preview-r2/build-report.json",
+      "sha256": "8699a9872592b8b32ea41e56c09edc89a239da7fddeed4c5b7873ac6e5b0ec0d",
+      "bytes": 30484
     },
-    "bounded_preview_browser": {
-      "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/preview-browser-check.json",
-      "sha256": "79ede598e48df0b3ac23ac888db1382b16747efafec8ce95acf2ac477364ab72",
-      "bytes": 3881
+    "bounded_atrium_browser": {
+      "path": "exports/building-fleet/atrium-8806231/preview-r2/atrium-fleet-monitors-browser-check.json",
+      "sha256": "1bbf8baa65577eb48f290c68d9251d6113ab926acdc909c1af23373c11059af4",
+      "bytes": 20044
+    },
+    "browser_execution_receipt": {
+      "path": "exports/building-fleet/atrium-8806231/preview-r2/atrium-browser-execution-receipt.json",
+      "sha256": "f822a4d83d511925ef263c5ee09a59a32ffe6a1c4b85f904850f26a727f5545c",
+      "bytes": 1551
+    },
+    "interruption_receipt": {
+      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3-interruption-r1/report.json",
+      "sha256": "de5e79222f56addeb67afe096346d9930b6d4a1f6bd93ff42309ad5bf59421b7",
+      "bytes": 63639
+    },
+    "raw_trace": {
+      "path": "exports/building-fleet/jerk-01c7cff/full-seed-r3/own-controller-observations.jsonl.gz",
+      "sha256": "905149447c61cca6d4dafc2fbbf3d44c91b00fc3a2e41e4e9b0dd3fc2df765a6",
+      "bytes": 316241451
     }
   },
   "bounded_browser_evidence": {
     "report": {
-      "path": "exports/building-fleet/jerk-01c7cff/browser-preview-r3/preview-browser-check.json",
-      "sha256": "79ede598e48df0b3ac23ac888db1382b16747efafec8ce95acf2ac477364ab72",
-      "bytes": 3881
+      "path": "exports/building-fleet/atrium-8806231/preview-r2/atrium-fleet-monitors-browser-check.json",
+      "sha256": "1bbf8baa65577eb48f290c68d9251d6113ab926acdc909c1af23373c11059af4",
+      "bytes": 20044
     },
     "passed": true,
-    "scope": "Bounded WebGL smoke check of the recorded experimental prefix; no full native, export, mission-coverage or performance qualification.",
+    "scope": "Bounded same-document fleet/physical-monitor presentation check of an interrupted recording; no full mission, native-motion, export, camera-quality, performance or real-safety qualification.",
+    "physical_screens": 20,
     "sampled_timeline": [
       0,
       60,
-      1188.1
+      120
     ],
-    "camera_quality_qualified": false
+    "observed_moving_vehicle_ids": [
+      "BF04"
+    ]
   },
-  "original_interruption": {
-    "exception": "KeyboardInterrupt",
-    "model_time_s": 1188.1,
-    "elapsed_s": 9143.553917832964
-  },
+  "full_program_native_report": null,
+  "full_program_independent_export_report": null,
   "recorded_coverage_progress_unverified": [
     {
       "level": "EG",
@@ -439,17 +453,25 @@
       "basis": "owner_description"
     }
   ],
-  "full_program_native_report": null,
-  "full_program_independent_export_report": null,
-  "raw_trace_validation_scope": "Original artifact hash and interruption receipt only; no independent decision replay or complete-program proof claimed",
   "root_walkthrough": {
     "url": "https://smoe.github.io/DIYLabBot/",
-    "html_sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1"
+    "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
+    "source_tree": "b75c41c8276056ce6d0c4746206f6028b5beb7f3",
+    "html": {
+      "sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1",
+      "bytes": 52585227
+    },
+    "original_manifest": {
+      "path": "exports/building-fleet/jerk-01c7cff/publication/experimental-candidate-r1/site-manifest.json",
+      "sha256": "1ae115cc1982191ce4aa3998143cfad9276e0046119dbea05364a81dde2b5ba2",
+      "bytes": 27365
+    },
+    "original_pages_commit": "4a480cce13d891fab5ff6c29f74963d91bfcca25"
   },
-  "scope": "Explicitly experimental interrupted-recording prefix. Build/browser pass values describe bounded presentation checks only; mission coverage, full native/export verification, hardware and real safety remain unqualified.",
+  "scope": "Composite publication: unchanged previously checked manual root at its original source; separate experimental same-document fleet/physical-monitor recording. No complete mission, native motion, independent export, hardware or real-safety qualification.",
   "packager": {
-    "path": "exports/building-fleet/jerk-01c7cff/publication/package_preview_pages.py",
-    "sha256": "f83350fdccebf206e971ca940739a41b2d94fab65c10b8cebef1013266c87b6d",
-    "bytes": 24070
+    "path": "exports/building-fleet/atrium-8806231/publication/package_composite_pages.py",
+    "sha256": "a8fcf4dd67a04c0b0ad247dfc90a69188fffbdf1baf044468ecf8291a522021a",
+    "bytes": 25088
   }
 }
