@@ -6,6 +6,34 @@ ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
 Netzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
 
+## Experimentelle Teilvorschau
+
+Der separate Einstieg `bf01/` zeigt eine ausdrücklich **experimentelle
+Teilvorschau** der aufgezeichneten Fahrt von 0 bis 1188,1 s mit allen
+20 Fahrzeugen. Er berechnet keine neue Fahrt im Browser. Die Aufzeichnung
+endet mit unvollständiger Zielabdeckung; ein sichtbarer Hinweis und der
+Endzustand kennzeichnen diese Grenze. Zwei Stationsbesuche sind protokolliert.
+Die spätere BF09-Fahrt ist darin noch nicht enthalten; deren Ruckkorrektur
+ist durch die separate vollständige Kurvenregression geprüft.
+
+Der erneute Seed-Lauf auf `596d801` wurde kontrolliert unterbrochen, um
+die Entwicklungsansicht mit begrenzter Funktionsprüfung bereitzustellen.
+Alle 20 aufgezeichneten Trajektorien reichen gemeinsam bis 1188,1 s.
+Originaldaten, Laufzeitquellen und Unterbrechung bleiben unverändert;
+der Darstellungsadapter bindet seine eigenen Quellen separat. Er übernimmt
+die vorhandenen PVA-Knoten, empfangenen Meldungen und Kameraaufnahmen.
+Der normale Rundgang und der strenge Vollprogramm-Builder bleiben erhalten.
+
+Die gesamte BF01-Suite besteht mit 385 erfolgreichen Tests und einem
+separat ausgeführten nativen Fall; alle 22 FreeCAD-Hüllentests bestehen.
+Die Teilvorschau erhält zusätzlich eine begrenzte Browser-Funktionsprüfung.
+Dies ist **kein vollständiger Flotten-, Zielabdeckungs-, nativer Bewegungs-
+oder unabhängiger Exportnachweis**. Diese Nachweise bleiben offen; ein
+Entwicklungsfehler in der Vorschau wird nicht als bestandener Lauf behandelt.
+Die lokalen Originale und die Unterbrechungsquittung liegen unter
+`exports/building-fleet/jerk-01c7cff/full-seed-r3/` beziehungsweise
+`full-seed-r3-interruption-r1/` im selben Ausgabeordner.
+
 Die [Foyer-Kamerawand](foyer-camera-wall.md) ergänzt neue Gebäudekörper.
 Die aktiven Gebäude-, Rundgang- und Konnektorpins sind nachgeführt; ältere
 Navigationscaches, Freiraum-, Boden- und Fahrtnachweise qualifizieren diese
