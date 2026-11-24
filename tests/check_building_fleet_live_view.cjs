@@ -106,6 +106,21 @@ assert.equal(playback.time,0,'The next session starts its own observed history')
 assert.equal(playback.rate,null);
 playback.advance(burstWall+604,true);
 assert.equal(playback.time,0);
+// Launch can suddenly make each fixed simulation step much more expensive.
+// After sampling the slower cadence, the buffer must recover while motion continues.
+const launch=new live.ExecutedPlayback();
+launch.observe('launch',0,null,0,true);
+let launchWall=0,launchModel=0;
+const arrivals=[1,1,1,1,1,1,.1,.1,.1,.1,.1,.1];
+for(const [i,rate] of arrivals.entries()){
+ const nextWall=launchWall+.2/rate;
+ for(let frame=1;frame<=Math.round((nextWall-launchWall)*60);frame++){
+  launch.advance(launchWall+frame/60,true);
+  if(i>=9)assert.equal(launch.underrun,false,'Playback adapts after the simulation slows at launch');
+ }
+ launchWall=nextWall;launchModel+=.2;
+ launch.observe('launch',launchModel,executed(launchModel),launchWall,true);
+}
 const slowFrames=new live.ExecutedPlayback();
 slowFrames.observe('visible',0,null,0,true);
 for(let frame=1;frame<300;frame++){

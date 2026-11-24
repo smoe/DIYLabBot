@@ -288,7 +288,8 @@ class BrowserRuntime:
         # Keep the inner JSON opaque in JavaScript: JSON.parse/stringify would
         # turn 0.0/-0.0 into integer 0 and invalidate exact typed PVA fences.
         return _json([{'kind': row['kind'], 'request_id': row['request_id'],
-                       'vehicle_id': row['vehicle_id'], 'request_json': _json(row)}
+                       'vehicle_id': row['vehicle_id'], 'request_json': _json(row),
+                       **({'brake_headroom_mm': row['brake_headroom_mm']} if row['kind']=='route_interval' else {})}
                       for row in self.engine.drain_preparation_requests()])
 
     def complete_job(self, result_json):

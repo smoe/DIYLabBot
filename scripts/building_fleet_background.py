@@ -27,20 +27,30 @@ def _caps(source,nav,path,action,regions):
     return zone_caps(source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],windows)
 
 
-def _geometry(context,request,driver,clock,origin,phase,mark=None):
+def _absolute_curve(driver,clock,origin,time_s):
+    curve=driver._cartesian_curve(clock,origin)
+    return floor.motion.Curve([{**p,'time_s':round(p['time_s']+time_s,3)}for p in curve.points])
+
+
+def _check_absolute(context,request,absolute,phase,mark):
     source,nav=context['source'],context['nav']
     observed=copy.deepcopy(request['observed']);observed['phase']=phase
-    absolute=driver._cartesian_curve(clock,origin)
-    absolute=floor.motion.Curve([{**p,'time_s':round(p['time_s']+observed['time_s'],3)}for p in absolute.points])
-    if mark:mark('cartesian_curve')
     home=None
     if request['action']['level']==source['depot']['level']:
         home=fixed_home_curve_proof(absolute,request['vehicle_id'],nav.homes,nav.envelope,nav.reserve,request['action']['level'])
         if mark:mark('fixed_home')
     proof=context['geometry_checks'](copy.deepcopy(request['action']),absolute,observed)
     if mark:mark('native_geometry')
-    if not isinstance(proof,dict)or proof.get('passed')is not True:raise RuntimeError('Background native curve support/clearance rejected')
+    if not isinstance(proof,dict)or proof.get('passed')is not True:
+        reason=proof.get('reason','missing proof') if isinstance(proof,dict) else 'missing proof'
+        raise RuntimeError('Background native curve support/clearance rejected: '+str(reason))
     return {'geometry':proof,'fixed_home':home}
+
+
+def _geometry(context,request,driver,clock,origin,phase,mark=None):
+    absolute=_absolute_curve(driver,clock,origin,request['observed']['time_s'])
+    if mark:mark('cartesian_curve')
+    return _check_absolute(context,request,absolute,phase,mark)
 
 
 def _checked_result(request,**values):
@@ -48,6 +58,61 @@ def _checked_result(request,**values):
         'source_binding':request['source_binding'],'fence':copy.deepcopy(request['fence']),**values}
     result['result_sha256']=preparation_digest(result)
     return result
+
+
+def _passed_receipt(receipt,field):
+    proof=receipt.get(field) if isinstance(receipt,dict) else None
+    return isinstance(proof,dict) and proof.get('passed') is True
+
+
+def _interval_binding(request,interval=None):
+    # Static geometry uses this action's original waiting-bay/lift context.
+    # Current passage ownership is checked independently on every live step.
+    fence=request['fence'];level=request['action']['level']
+    if fence.get('level')!=level or type(fence.get('generation')) is not int:
+        raise ValueError('Missing interval action level or generation')
+    grants=request['observed'].get('own_grants_at_start')
+    if not isinstance(grants,dict):raise ValueError('Missing original action grants')
+    fields=[request['source_binding'],request['vehicle_id'],fence['action_sha256'],
+        fence['generation'],level,grants]
+    if interval is not None:fields.append(interval)
+    return preparation_digest(fields)
+
+
+def _prove_interval(context,request,asset,start,end,mark):
+    # Slice the single world-coordinate curve at its original PVA knots, with
+    # the original absolute clock and unwrapped yaw at both shared endpoints.
+    curve=floor.motion.Curve(asset['points'][start:end+1])
+    receipt=_check_absolute(context,asset['request'],curve,'background_nominal_interval',mark)
+    if (request['action']['level']==context['source']['depot']['level']
+            and (receipt.get('fixed_home') or {}).get('passed') is not True):
+        raise ValueError('Original fixed-home proof missing for depot interval')
+    interval={'start_knot':start,'end_knot':end,'start_mm':asset['positions'][start],
+        'end_mm':asset['positions'][end],'program_sha256':asset['program_sha256']}
+    receipt['interval_sha256']=_interval_binding(request,interval)
+    asset['end_knot']=end
+    return {'interval':interval,'receipt':receipt}
+
+
+def _next_interval(request,context,mark):
+    asset=context.get('rolling_nominals',{}).get(request['vehicle_id'])
+    start=request.get('start_knot')
+    try:
+        if (asset is None or asset['binding']!=_interval_binding(request)
+                or request.get('program_sha256')!=asset['program_sha256'] or request['action'].get('lift_phase')
+                or type(start)is not int or start!=asset['end_knot'] or start>=len(asset['points'])-1):
+            raise ValueError('Interval does not continue its exact source-bound program')
+        if asset.get('rejected'):raise ValueError(asset['rejected'])
+        end=min(start+32,len(asset['points'])-1)
+        mark('restore_interval')
+        try:
+            values=_prove_interval(context,request,asset,start,end,mark)
+        except (RuntimeError,ValueError) as error:
+            asset['rejected']=str(error)
+            raise
+        return _checked_result(request,**values)
+    except (RuntimeError,ValueError) as error:
+        return _checked_result(request,status='interval_rejected',reason=str(error))
 
 
 def prepare_route(request,context,*,phase_complete=None):
@@ -65,15 +130,28 @@ def prepare_route(request,context,*,phase_complete=None):
             previous=perf_counter()
 
     if (type(request)is not dict or request.get('format')!=FORMAT or
-            request.get('kind')not in('full_route','continuation')or
+            request.get('kind')not in('full_route','continuation','route_interval')or
             request.get('source_binding')!=context.get('source_binding')):
         raise ValueError('The planning worker needs its exact boot source binding')
     if request['fence']['action_sha256']!=preparation_digest(request['action']):raise ValueError('Immutable own action differs from its request fence')
     source,nav=context['source'],context['nav'];action=request['action']
+    if request['kind']=='route_interval':return _next_interval(request,context,mark)
     path=Path(action['points_mm'],action['corner_trim_mm'],corner_trim_caps=action.get('corner_trim_caps'))
     caps=copy.deepcopy(request['zone_caps'])
     mark('path_setup')
     if request['kind']=='full_route':
+        partial='rolling_horizon_mm' in request
+        if partial:
+            horizon=request['rolling_horizon_mm']
+            if (action.get('lift_phase') or request['vehicle_id'] not in nav.homes or
+                    type(horizon) not in(int,float) or not 0<horizon<=path.length):
+                return _checked_result(request,status='interval_rejected',reason='Invalid initial rolling horizon')
+            try:binding=_interval_binding(request)
+            except ValueError as error:return _checked_result(request,status='interval_rejected',reason=str(error))
+            assets=context.setdefault('rolling_nominals',{})
+            previous_asset=assets.get(request['vehicle_id'])
+            if previous_asset and previous_asset['request']['fence']['generation']>=request['fence']['generation']:
+                return _checked_result(request,status='interval_rejected',reason='Existing or newer prepared generation')
         velocity=source_perception_limit(source,nav.radius)['applied_velocity_mm_s']
         mark('perception_limit')
         program=compile_motion(path,source,velocity,reverse=action['reverse'],zone_caps=caps)
@@ -81,29 +159,62 @@ def prepare_route(request,context,*,phase_complete=None):
         driver=Controller(path,source,caps,own_start_s=request['observed']['time_s'],radius_mm=nav.radius,motion_program=program)
         driver.align_initial_heading(request['own_pose_mm_rad'][2])
         mark('nominal_retiming')
-        receipt=_geometry(context,request,driver,driver.nominal_clock,0.,'background_nominal',mark)
         # Preserve the actual checked quantized clock, rather than asking the
         # simulation worker to repeat its full nominal retiming/proof search.
         program['scalar_clock']=copy.deepcopy(driver.nominal_clock.points)
+        program_sha=preparation_digest(program)
+        if partial:
+            points=driver.nominal_clock.points
+            absolute=_absolute_curve(driver,driver.nominal_clock,0.,request['observed']['time_s'])
+            mark('cartesian_curve')
+            asset={'request':copy.deepcopy(request),'binding':binding,'program_sha256':program_sha,
+                'points':absolute.points,'positions':tuple(p[F[0]][0] for p in points),'end_knot':0}
+            assets[request['vehicle_id']]=asset
+            # Cover a moving rejoin beyond the starter when available. Later
+            # quanta contain at most 32 original intervals.
+            first_join=next((i for i,p in enumerate(points) if p[F[0]][0]>horizon+5
+                and p[F[1]][0]>1e-6 and abs(p[F[2]][0])<1e-8),None)
+            first_past=next((i for i,p in enumerate(points) if p[F[0]][0]>=horizon),len(points)-1)
+            end=min(len(points)-1,max(32,first_past,(first_join+1) if first_join is not None else first_past))
+            try:values=_prove_interval(context,request,asset,0,end,mark)
+            except (RuntimeError,ValueError) as error:
+                asset['rejected']=str(error)
+                return _checked_result(request,status='interval_rejected',reason=str(error))
+        else:
+            values={'receipt':_geometry(context,request,driver,driver.nominal_clock,0.,'background_nominal',mark)}
         from building_fleet_runner import WorldRunner
         door_context=SimpleNamespace(nav=nav,route_door_ids=set())
         doors=WorldRunner.door_markers(door_context,action['level'],path)
         spans=context['catalog'].spans(action['level'],path)
         mark('spans_and_door_markers')
         return _checked_result(request,program=program,nominal_proof=driver.nominal_clock_proof,
-            receipt=receipt,program_sha256=preparation_digest(program),resource_spans=spans,
+            **values,program_sha256=program_sha,resource_spans=spans,
             door_markers=doors,room_route_object_ids=sorted(door_context.route_door_ids))
     program=request['program']
     if request.get('program_sha256')!=preparation_digest(program):raise ValueError('Continuation nominal program changed')
+    initial_yaw=request['own_pose_mm_rad'][2]
+    horizon=request.get('horizon_mm',path.length)
+    if type(horizon) not in (int,float) or not 0<horizon<=path.length:
+        return _checked_result(request,status='no_checked_connector',anchor=request['anchor'])
+    if 'horizon_mm' in request:
+        asset=context.get('rolling_nominals',{}).get(request['vehicle_id'])
+        if (action.get('lift_phase') or asset is None or asset['binding']!=_interval_binding(request)
+                or asset['program_sha256']!=request['program_sha256']
+                or horizon>asset['positions'][asset['end_knot']]+1e-8):
+            return _checked_result(request,status='no_checked_connector',anchor=request['anchor'],
+                reason='Requested join exceeds the source-bound checked nominal')
+        # A later horizon can be reached around a corner. Calibrate the
+        # path's heading offset using the actual pose at its original start.
+        initial_yaw=asset['request']['own_pose_mm_rad'][2]
     prepared=PreparedNominal(source,path,caps,program,request['nominal_proof'],path.length)
     driver=Controller(path,source,caps,radius_mm=nav.radius,motion_program=program,prepared_nominal=prepared)
-    driver.align_initial_heading(request['own_pose_mm_rad'][2])
+    driver.align_initial_heading(initial_yaw)
     mark('restore_nominal')
     anchor=request['anchor'];origin=anchor['progress_mm'];v=anchor['velocity_mm_s'];a=anchor['acceleration_mm_s2']
     driver.y=origin;driver.v=v;driver.a=a;driver.now=anchor['time_s']
-    candidates=[p for p in driver.nominal_clock.points if p[F[0]][0]>origin+5 and p[F[1]][0]>1e-6 and abs(p[F[2]][0])<1e-8]
+    candidates=[p for p in driver.nominal_clock.points if origin+5<p[F[0]][0]<=horizon and p[F[1]][0]>1e-6 and abs(p[F[2]][0])<1e-8]
     # A terminal rest anchor is also valid when no moving nominal node remains.
-    candidates.append(driver.nominal_clock.points[-1])
+    if horizon==path.length:candidates.append(driver.nominal_clock.points[-1])
     for target in candidates:
         distance=target[F[0]][0]-origin
         if distance<=0:continue
@@ -115,9 +226,15 @@ def prepare_route(request,context,*,phase_complete=None):
             if scalar[F[1]]['min'][0]>=-1e-8 and all(scalar[f]['max_abs'][0]<=driver.limits[k]*(1+1e-6)for f,k in zip(F[1:],('velocity','acceleration','jerk'))):
                 connector=driver._quantized_clock(raw,origin)
                 valid,bounds=driver._admissible(connector,origin)
+                if 'horizon_mm' in request:
+                    extent=floor.motion.bounds(connector)[F[0]]
+                    valid=valid and origin+extent['min'][0]>=-1e-8 and origin+extent['max'][0]<=horizon+1e-8
                 if valid:
                     mark('connector_search')
-                    receipt=_geometry(context,request,driver,connector,origin,'background_C2_connector',mark)
+                    try:receipt=_geometry(context,request,driver,connector,origin,'background_C2_connector',mark)
+                    except (ValueError,RuntimeError) as error:
+                        if 'horizon_mm' not in request:raise
+                        return _checked_result(request,status='no_checked_connector',anchor=anchor,reason=str(error))
                     points=copy.deepcopy(connector.points);join=points[-1]['time_s']
                     for node in driver.nominal_clock.points:
                         if node['time_s']>target['time_s']+1e-9:
@@ -140,6 +257,7 @@ class BackgroundPreparation:
         if type(source_binding)is not str or not re.fullmatch('[0-9a-f]{64}',source_binding):raise ValueError('Complete SHA-256 worker source binding required')
         self.engine=engine;self.binding=source_binding;self.serial=0;self.queue=[];self.jobs={};self.pending_by_vehicle={}
         self.full={};self.continuations={};self.attempted_anchors={};self.statistics={'submitted':0,'accepted':0,'stale':0,'starters':0,'continuations':0,'rejected':0}
+        self.intervals={};self.failures={}
 
     def pending(self,identity):
         row=self.engine.vehicles[identity]
@@ -150,7 +268,9 @@ class BackgroundPreparation:
         result=self.queue;self.queue=[];return copy.deepcopy(result)
 
     def snapshot(self):
-        return {**self.statistics,'pending':len(self.jobs),'requests':[{'request_id':r['request_id'],'kind':r['kind'],'vehicle_id':r['vehicle_id']}for r in self.jobs.values()]}
+        return {**self.statistics,'pending':len(self.jobs),'failures':dict(self.failures),
+            'checked_intervals':copy.deepcopy(self.intervals),
+            'requests':[{'request_id':r['request_id'],'kind':r['kind'],'vehicle_id':r['vehicle_id']}for r in self.jobs.values()]}
 
     def _fence(self,identity,action):
         e=self.engine
@@ -175,12 +295,17 @@ class BackgroundPreparation:
         if math.dist(path.evaluate(0)[0][:2],row['pose_mm_rad'][:2])>1e-6:raise RuntimeError('Own route does not begin at observed localization')
         caps=_caps(e.source,e.nav,path,action,e.zone_regions)
         row['preparation_generation']=row.get('preparation_generation',0)+1
+        self.failures.pop(identity,None)
+        self.intervals.pop(identity,None)
+        self.attempted_anchors.pop(identity,None)
         row['action_context']=copy.deepcopy(e.own_grants(identity));row['action']=copy.deepcopy(action)
         request=self._request(identity,action,caps,'full_route');self.pending_by_vehicle[identity]=request['request_id']
         row['phase']='preparing';row['hold_reason']='await_checked_route';row['hold_condition']='same_source_action_and_own_grants'
         if e.progress is not None:e.progress({'phase':'background_route_submitted','vehicle_id':identity,'request_id':request['request_id'],'model_time_s':e.now})
         began=perf_counter()
         self._starter(identity,action,path,caps,request)
+        if isinstance(row['driver'],RollingController):
+            request['rolling_horizon_mm']=row['driver'].certified_horizon_mm
         if e.progress is not None:
             e.progress({'phase':'starter_timing','request_id':request['request_id'],'vehicle_id':identity,
                 'model_time_s':e.now,'wall_s':perf_counter()-began,'installed':row['driver'] is not None})
@@ -235,11 +360,59 @@ class BackgroundPreparation:
         e=self.engine;identity=request['vehicle_id'];row=e.vehicles[identity]
         # The action and existing booking are immutable. A source-bound starter
         # may have moved; no peer position is part of this admission fence.
-        return(row['action']is not None and preparation_digest(row['action'])==request['fence']['action_sha256']and
+        same_action=(row['action']is not None and preparation_digest(row['action'])==request['fence']['action_sha256']and
             row.get('preparation_generation',0)==request['fence']['generation']and
             row['level']==request['fence']['level']and not row['done']and
-            e.own_grants(identity)==request['fence']['own_grants']and
-            e.resources.own_grants(identity)==request['fence']['own_narrow_grant'])
+            e.own_grants(identity)==request['fence']['own_grants'])
+        if 'rolling_horizon_mm' in request:
+            # Native geometry uses the action's original waiting bay and lift context.
+            # The independent ResourceGate observes the actual passage grant on each step.
+            return same_action and not row['action'].get('lift_phase') and (
+                row['action_context']==request['observed']['own_grants_at_start'])
+        return same_action and e.resources.own_grants(identity)==request['fence']['own_narrow_grant']
+
+    def _reject(self,request,reason):
+        identity=request['vehicle_id']
+        self.jobs.pop(request['request_id'],None)
+        self.statistics['rejected']+=1
+        if ('rolling_horizon_mm' in request and
+                self.engine.vehicles[identity].get('preparation_generation')==request['fence']['generation']):
+            self.failures[identity]=reason
+            self.continuations.pop(identity,None)
+        return {'accepted':False,'status':reason,'request_id':request['request_id']}
+
+    def _accept_interval(self,request,result,nominal):
+        identity=request['vehicle_id']
+        driver=self.engine.vehicles[identity]['driver']
+        interval=result.get('interval');receipt=result.get('receipt')
+        if not isinstance(driver,RollingController) or not isinstance(interval,dict) or not isinstance(receipt,dict):
+            return False
+        first,last=interval.get('start_knot'),interval.get('end_knot')
+        nodes=nominal['program']['scalar_clock']
+        previous=self.intervals.get(identity)
+        expected=previous['end_knot'] if previous else 0
+        if (type(first)is not int or type(last)is not int or first!=expected or not first<last<len(nodes)
+                or first!=request.get('start_knot',0)
+                or interval.get('program_sha256')!=nominal['program_sha256']
+                or interval.get('start_mm')!=nodes[first][F[0]][0]
+                or interval.get('end_mm')!=nodes[last][F[0]][0]
+                or not 0<=interval['start_mm']<interval['end_mm']<=driver.goal+1e-5
+                or (last==len(nodes)-1 and abs(interval['end_mm']-driver.goal)>1e-5)
+                or receipt.get('interval_sha256')!=_interval_binding(request,interval)
+                or not _passed_receipt(receipt,'geometry')
+                or (request['action']['level']==self.engine.source['depot']['level']
+                    and not _passed_receipt(receipt,'fixed_home'))):
+            return False
+        horizon=driver.goal if last==len(nodes)-1 else interval['end_mm']
+        if driver.joined_nominal and not driver.extend_horizon(horizon):
+            return False
+        self.intervals[identity]={'end_knot':last,'horizon_mm':horizon}
+        leg=self.engine.vehicles[identity]['leg_id']
+        for field,log in [('geometry',self.engine.geometry_checks),('fixed_home',self.engine.depot_checks)]:
+            if receipt.get(field) is not None:
+                log.append({'vehicle_id':identity,'leg_id':leg,'phase':'nominal_interval',
+                    'interval':dict(interval),'proof':copy.deepcopy(receipt[field])})
+        return True
 
     def accept(self,result):
         if type(result)is not dict:raise ValueError('Own route worker result required')
@@ -248,23 +421,40 @@ class BackgroundPreparation:
         if (request is None or result.get('format')!=RESULT or result.get('source_binding')!=self.binding or
                 result.get('kind')!=request['kind']or result.get('fence')!=request['fence']or
                 result.get('result_sha256')!=preparation_digest(unsigned)):
+            if request is not None and 'rolling_horizon_mm' in request:
+                return self._reject(request,'invalid_receipt')
             self.statistics['rejected']+=1;return {'accepted':False,'status':'invalid_receipt','request_id':result.get('request_id')}
         del self.jobs[request['request_id']]
         identity=request['vehicle_id'];row=self.engine.vehicles[identity]
+        if 'rolling_horizon_mm' in request and identity in self.failures:
+            return self._reject(request,self.failures[identity])
         if not self._current(request):
             self.statistics['stale']+=1
+            if 'rolling_horizon_mm' in request:
+                return self._reject(request,'stale_geometry_context')
             if request['kind']=='continuation':self.continuations.pop(identity,None)
             elif (row.get('action')==request['action']and
                   row.get('preparation_generation',0)==request['fence']['generation']):
                 renewed=self._request(identity,request['action'],request['zone_caps'],'full_route')
                 self.pending_by_vehicle[identity]=renewed['request_id']
             return {'accepted':False,'status':'stale_own_fence','request_id':request['request_id']}
-        if request['kind']=='full_route':
-            if (result.get('program_sha256')!=preparation_digest(result.get('program'))or
-                    result.get('receipt',{}).get('geometry',{}).get('passed')is not True or
+        if result.get('status')=='interval_rejected':
+            return self._reject(request,str(result.get('reason') or 'interval_rejected'))
+        if request['kind']=='route_interval':
+            active=self.full.get(identity)
+            if active is None or not self._accept_interval(request,result,active[1]):
+                return self._reject(request,'invalid_interval_proof')
+            self.statistics['accepted']+=1
+        elif request['kind']=='full_route':
+            if (not isinstance(result.get('program'),dict) or not result['program'].get('scalar_clock') or
+                    not isinstance(result.get('nominal_proof'),dict) or result['nominal_proof'].get('time_quantum_s')!=.001 or
+                    result.get('program_sha256')!=preparation_digest(result['program'])or
+                    not _passed_receipt(result.get('receipt'),'geometry') or
                     type(result.get('resource_spans'))is not list or type(result.get('door_markers'))is not list or
                     type(result.get('room_route_object_ids'))is not list):
-                self.statistics['rejected']+=1;return {'accepted':False,'status':'invalid_proof','request_id':request['request_id']}
+                return self._reject(request,'invalid_proof')
+            if 'rolling_horizon_mm' in request and not self._accept_interval(request,result,result):
+                return self._reject(request,'invalid_interval_proof')
             self.full[identity]=(request,copy.deepcopy(result));self.statistics['accepted']+=1
             if row['driver']is None:
                 if row['pose_mm_rad']!=request['own_pose_mm_rad']:return {'accepted':False,'status':'stale_localization','request_id':request['request_id']}
@@ -288,10 +478,19 @@ class BackgroundPreparation:
         else:
             self.continuations.pop(identity,None)
             if result.get('status')=='no_checked_connector':
-                self.statistics['rejected']+=1;return {'accepted':False,'status':'no_checked_connector','request_id':request['request_id']}
+                # More certified knots or a newly observed anchor can admit another join.
+                if result.get('reason'):
+                    return self._reject(request,result['reason'])
+                self.statistics['rejected']+=1
+                return {'accepted':False,'status':'no_checked_connector','request_id':request['request_id']}
             anchor=result.get('anchor')
-            if anchor!=request['anchor']or result.get('proof',{}).get('passed')is not True:
-                self.statistics['rejected']+=1;return {'accepted':False,'status':'invalid_connector','request_id':request['request_id']}
+            proof=result.get('proof',{})
+            if (anchor!=request['anchor'] or not isinstance(proof,dict) or proof.get('passed')is not True
+                    or proof.get('suffix_program_sha256')!=request['program_sha256']
+                    or proof.get('anchor')!=anchor or not _passed_receipt(proof.get('receipt'),'geometry')
+                    or ('rolling_horizon_mm' in request and request['action']['level']==self.engine.source['depot']['level']
+                        and not _passed_receipt(proof.get('receipt'),'fixed_home'))):
+                return self._reject(request,'invalid_connector')
             self.continuations[identity]=copy.deepcopy(result)
         return {'accepted':True,'status':'ready','request_id':request['request_id']}
 
@@ -300,7 +499,11 @@ class BackgroundPreparation:
         for identity,(original,result)in list(self.full.items()):
             row=e.vehicles[identity];driver=row['driver']
             if not isinstance(driver,RollingController)or not driver.awaiting_continuation:
-                self.full.pop(identity,None);continue
+                self.full.pop(identity,None);self.pending_by_vehicle.pop(identity,None);continue
+            if identity in self.failures:continue
+            rolling='rolling_horizon_mm' in original
+            interval=self.intervals.get(identity)
+            horizon=interval['horizon_mm'] if interval else driver.goal
             pending=self.continuations.get(identity)
             if pending is not None:
                 if pending.get('request_id')in self.jobs:continue
@@ -308,17 +511,37 @@ class BackgroundPreparation:
                 if e.now<anchor['time_s']-1e-8:continue
                 current_request={**original,'fence':pending['fence']}
                 if self._current(current_request)and driver.commit_continuation(pending['clock'],result['program']['scalar_clock'],anchor,pending['proof'],
+                        horizon_mm=horizon if rolling else None,
                         allow_static_rest_rebase=not bool(original['action'].get('lift_phase'))):
-                    self.statistics['continuations']+=1;self.full.pop(identity,None);self.pending_by_vehicle.pop(identity,None)
-                    self.continuations.pop(identity,None);continue
-                self.statistics['stale']+=1;self.continuations.pop(identity,None)
-            if identity in self.continuations:continue
+                    self.statistics['continuations']+=1
+                else:self.statistics['stale']+=1
+                self.continuations.pop(identity,None)
+                if not driver.awaiting_continuation:
+                    self.full.pop(identity,None);self.pending_by_vehicle.pop(identity,None);continue
+            if any(job['vehicle_id']==identity for job in self.jobs.values()):continue
             anchor=driver.continuation_anchor()
-            if anchor is None:continue
-            signature=tuple(anchor[k]for k in('progress_mm','velocity_mm_s','acceleration_mm_s2'))
-            if self.attempted_anchors.get(identity)==signature:continue
-            self.attempted_anchors[identity]=signature
-            request=self._request(identity,original['action'],original['zone_caps'],'continuation',anchor=anchor,
-                program=result['program'],program_sha256=result['program_sha256'],nominal_proof=result['nominal_proof'])
-            request['observed']['time_s']=anchor['time_s']
-            self.continuations[identity]={'request_id':request['request_id']}
+            if anchor is not None and horizon>=driver.certified_horizon_mm and anchor['progress_mm']<horizon-1e-5:
+                signature=(horizon,anchor['progress_mm'],anchor['velocity_mm_s'],anchor['acceleration_mm_s2'])
+                if self.attempted_anchors.get(identity)!=signature:
+                    self.attempted_anchors[identity]=signature
+                    values={'anchor':anchor,'program':result['program'],'program_sha256':result['program_sha256'],
+                            'nominal_proof':result['nominal_proof']}
+                    if rolling:values['horizon_mm']=horizon
+                    request=self._followup(original,'continuation',**values)
+                    request['observed']['time_s']=anchor['time_s']
+                    self.continuations[identity]={'request_id':request['request_id']}
+                    continue
+            if interval and interval['end_knot']<len(result['program']['scalar_clock'])-1:
+                # Only a scheduling priority. The vehicle's actual step and stop are proved separately.
+                fallback=driver._fallback
+                stopping_end=driver.y if fallback is None else fallback['origin_mm']+fallback['clock'].points[-1][F[0]][0]
+                self._followup(original,'route_interval',start_knot=interval['end_knot'],
+                    program_sha256=result['program_sha256'],brake_headroom_mm=max(0.,horizon-stopping_end))
+
+    def _followup(self,original,kind,**values):
+        request=self._request(original['vehicle_id'],original['action'],original['zone_caps'],kind,**values)
+        if 'rolling_horizon_mm' in original:
+            request['rolling_horizon_mm']=original['rolling_horizon_mm']
+            for key in ('fence','observed','own_pose_mm_rad'):
+                request[key]=copy.deepcopy(original[key])
+        return request

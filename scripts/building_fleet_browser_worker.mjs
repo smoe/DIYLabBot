@@ -148,12 +148,15 @@ export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(
  const archive=fetchArchive(config.bundle.url,config.bundle.sha256,manifest.archive.bytes);
  return Promise.all([python,archive]);
 }
-async function loadPythonBridge(config,progress,onCompactManifest){
+async function loadPythonBridge(config,progress,onCompactAssetsReady){
  progress({phase:'checking_browser_bundle'});
  const raw=await download(config.manifest.url,config.manifest.sha256),text=new TextDecoder().decode(raw),manifest=validateManifest(JSON.parse(text),config);
- if(manifest.format.endsWith('/2'))onCompactManifest?.();
  progress({phase:'loading_python_runtime'});
  const [pyodide,archive]=await loadRuntimeAssets(manifest,config);
+ // Warm the planner before restoring either world. The simulator's verified
+ // large downloads must finish first: concurrent cold Chromium cache writers
+ // can abort the same WASM and model responses.
+ if(manifest.format.endsWith('/2'))onCompactAssetsReady?.();
  progress({phase:'checking_simulation_sources'});
  pyodide.globals.set('_bf_manifest_json',text);
  if(typeof DecompressionStream==='function'){
@@ -173,8 +176,8 @@ async function loadPythonBridge(config,progress,onCompactManifest){
  const inputs={...manifest.inputs,root:'/project',source_files_sha256:Object.fromEntries(Object.entries(manifest.files).map(([name,ref])=>[name,ref.sha256])),browser_config_sha256:config.manifest.sha256};
  return{runtime,inputs,manifest};
 }
-export async function loadPythonRuntime(config,progress,onCompactManifest){
- const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactManifest);
+export async function loadPythonRuntime(config,progress,onCompactAssetsReady){
+ const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactAssetsReady);
  const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))));
  let hasMotion=Boolean(state.has_motion);
  return{initial:state,background:manifest.format.endsWith('/2'),
@@ -207,16 +210,24 @@ export function createBackgroundPlanner(config,progress,workerFactory=url=>new W
   dispose(){disposed=true;rejectAll(Error('Preparation worker closed'));worker.terminate();}};
 }
 export function createPreparationController({post,loadPlanner=loadPythonPlanner,now=()=>performance.now(),nextTask=()=>new Promise(resolve=>setTimeout(resolve,0))}){
- let planner=null,booted=false,failed=false,busy=false;const jobs=[];
+ let planner=null,booted=false,failed=false,busy=false,active=null;
+ const jobs=[],intervalVehicles=new Set();
+ // Connectors unblock a checked join. Among interval receipts, serve the
+ // smallest requested braking headroom first. All ties keep arrival order.
+ const priority=job=>job.kind==='continuation'?-Infinity:
+  job.kind==='route_interval'?job.brake_headroom_mm:Infinity;
  const fail=error=>{failed=true;post({type:'planner_error',error:String(error?.message??error)});};
  const progress=value=>post({type:'planner_progress',progress:value});
  async function pump(){if(busy||failed||!planner)return;busy=true;
-  try{while(jobs.length){
-    const item=jobs.shift(),{kind,request_id,vehicle_id}=item.job,began=now();
+  try{while(jobs.length&&!failed){
+    active=jobs.shift();
+    const {kind,request_id,vehicle_id}=active.job,began=now();
     progress({phase:'planner_job_start',kind,request_id,vehicle_id});
-    const result=await planner.prepare(item.job);
+    const result=await planner.prepare(active.job);
+    if(failed)return;
     progress({phase:'planner_job_end',kind,request_id,vehicle_id,total_wall_s:(now()-began)/1000});
-    post({type:'prepared_route',id:item.id,result});
+    if(kind==='route_interval')intervalVehicles.delete(vehicle_id);
+    post({type:'prepared_route',id:active.id,result});active=null;
     // A synchronous Python job only yields a microtask through await. Give
     // incoming continuation messages an actual task turn before the next job.
     if(jobs.length)await nextTask();}}
@@ -231,8 +242,16 @@ export function createPreparationController({post,loadPlanner=loadPythonPlanner,
     void pump();
    }).catch(fail);
   }else if(message?.type==='prepare_route'){
-   if(!booted||jobs.length>=32){fail(Error('Bounded preparation requests after boot required'));return;}
-   if(message.job?.kind==='continuation')jobs.unshift(message);else jobs.push(message);void pump();
+   if(!booted||jobs.length+Number(active!==null)>=32){fail(Error('Bounded preparation requests after boot required'));return;}
+   const job=message.job;
+   if(job.kind==='route_interval'){
+    if(!job.vehicle_id||!Number.isFinite(job.brake_headroom_mm)||intervalVehicles.has(job.vehicle_id)){
+     fail(Error('One interval per vehicle with finite braking headroom required'));return;
+    }
+    intervalVehicles.add(job.vehicle_id);
+   }
+   const rank=priority(job),before=jobs.findIndex(item=>priority(item.job)>rank);
+   jobs.splice(before===-1?jobs.length:before,0,message);void pump();
   }
  }};
 }

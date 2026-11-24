@@ -40,11 +40,46 @@ const state=t=>({format:'solidcraftbot.building-fleet-live-snapshot/1',session_i
  priority.handle({type:'prepare_route',id:3,job:{kind:'continuation'}});releaseTask();await flush();
  assert.deepEqual(order,[1,3],'Incoming continuations enter at the actual task boundary before queued full routes');
  releaseTask();await flush();assert.deepEqual(order,[1,3,2]);
+ const fleet=Array.from({length:20},(_,i)=>'BF'+String(i+1).padStart(2,'0'));
+ const completed=[],failures=[],received=new Set();let boot,finishActive,maxOutstanding=0;
+ const intervals=api.createPreparationController({
+  post(value){
+   if(value.type==='planner_error')failures.push(value.error);
+   if(value.type==='prepared_route'){completed.push(value.id);received.delete(value.id);}
+  },
+  loadPlanner:()=>new Promise(resolve=>{boot=()=>resolve({
+   prepare:()=>new Promise(done=>{finishActive=()=>done({});})});}),
+  nextTask:flush
+ });
+ intervals.handle({type:'planner_boot',config:{}});await flush();
+ function offer(id,job){
+  received.add(id);maxOutstanding=Math.max(maxOutstanding,received.size);
+  intervals.handle({type:'prepare_route',id,job});
+ }
+ // Equal-headroom ties keep FIFO even across different vehicles. Both complete
+ // waves reuse the same vehicles without overlapping interval ownership.
+ offer('full',{kind:'full_route'});
+ for(const [i,vehicle_id] of fleet.entries())offer('first'+i,{
+  kind:'route_interval',vehicle_id,brake_headroom_mm:Math.floor((19-i)/2)});
+ offer('join1',{kind:'continuation'});offer('join2',{kind:'continuation'});
+ boot();await flush();
+ for(let count=0;count<23;count++){finishActive();await flush();await flush();}
+ const firstOrder=fleet.map((_,i)=>i).sort((a,b)=>Math.floor((19-a)/2)-Math.floor((19-b)/2));
+ assert.deepEqual(completed,['join1','join2',...firstOrder.map(i=>'first'+i),'full']);
+ for(const [i,vehicle_id] of fleet.entries())offer('second'+i,{
+  kind:'route_interval',vehicle_id,brake_headroom_mm:i});
+ for(let count=0;count<20;count++){finishActive();await flush();await flush();}
+ assert.deepEqual(completed.slice(23),fleet.map((_,i)=>'second'+i));
+ assert.equal(maxOutstanding,23);assert.equal(received.size,0);assert.deepEqual(failures,[]);
+ const repeated={kind:'route_interval',vehicle_id:'BF01',brake_headroom_mm:12};
+ offer('first-active',repeated);offer('duplicate-active',repeated);
+ assert.match(failures.at(-1),/One interval per vehicle/);
+ finishActive();await flush();assert(!completed.includes('first-active'),'Fail closed on overlapping requests');
  const cadence=[],quietTimers=[],quietPosts=[],staged=[{kind:'full_route',request_id:'1',vehicle_id:'BF06'}];
  let plannerStarts=0,preparedCount=0,modelTime=0,wall=0,plannerEvent,runtimeEvent;
  const quiet=api.createController({post:v=>quietPosts.push(v),now:()=>wall,
-  loadRuntime:async(_,progress,compactManifest)=>{
-   runtimeEvent=progress;compactManifest();assert.equal(plannerStarts,1,'Prewarm before simulator boot finishes');
+  loadRuntime:async(_,progress,compactAssetsReady)=>{
+   runtimeEvent=progress;compactAssetsReady();assert.equal(plannerStarts,1,'Prewarm before simulator boot finishes');
    return{initial:state(0),background:true,snapshotIntervalSteps:4,
     tick(capture){cadence.push(capture);modelTime+=.05;wall+=80;return capture?state(modelTime):null;},pendingJobs:()=>staged.splice(0)};
   },

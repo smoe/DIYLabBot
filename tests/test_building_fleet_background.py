@@ -126,6 +126,18 @@ class BackgroundTests(unittest.TestCase):
         self.assertTrue(moved);self.assertEqual(car.mode,'waiting');self.assertEqual(car.reason,'await_checked_continuation')
         self.assertEqual(car.y,1000.);self.assertEqual(car.goal,6000.)
 
+    def test_wait_before_starter_horizon_preserves_actual_reason(self):
+        car=self.rolling()
+        for start,end,permitted,reason in (
+                (0.,.05,True,'fresh_clear_observation'),
+                (.05,.1,False,'resource_wait')):
+            scan={'captured_s':start,'returns_local_mm':[]}
+            decision=car.decide(start,scan,grant_permits=permitted,step_end_s=end)
+            self.assertEqual(decision['reason'],reason)
+            car.advance(start,end)
+            self.assertEqual((car.y,car.mode,car.reason),(0.,'waiting',reason))
+            self.assertEqual(car.recorded[-1]['hold_reason'],reason)
+
     def test_starter_rejects_stop_outside_certified_horizon(self):
         car=self.rolling();car.y=999.;car.v=100.;car.a=0.
         clock=floor.motion.Curve([background.local.point(0,0,100,0),background.local.point(1,50,0,0)])
@@ -205,6 +217,67 @@ class FenceTests(unittest.TestCase):
         preserved=json.loads(json.dumps(value))
         self.assertEqual(preparation_digest(value),preparation_digest(preserved))
         self.assertNotEqual(preparation_digest(value),preparation_digest({'zero':0,'negative_zero':0,'integer':0}))
+
+    def interval_case(self):
+        e=self.engine()
+        row=e.vehicles['BF01']
+        grants={'waiting_place':{'status':'none'},'lift':{'status':'none'}}
+        row.update(action={'level':'EG'},action_context=copy.deepcopy(grants),leg_id=4)
+        e.own_grants=lambda identity:copy.deepcopy(grants)
+        e.geometry_context=lambda identity,phase:{'vehicle_id':identity,'phase':phase,'time_s':0.,
+                                                   'own_grants_at_start':copy.deepcopy(row['action_context'])}
+        e.source={'depot':{'level':'EG'}}
+        e.geometry_checks=[];e.depot_checks=[]
+        driver=object.__new__(RollingController)
+        driver.goal=300.;driver.certified_horizon_mm=100.;driver.joined_nominal=True
+        driver.awaiting_continuation=True;driver.mode='waiting';row['driver']=driver
+        manager=background.BackgroundPreparation(e,'a'*64)
+        full=manager._request('BF01',row['action'],[],'full_route',rolling_horizon_mm=50.)
+        manager.drain();manager.jobs.clear()
+        program={'scalar_clock':[{F[0]:[s]} for s in (0.,100.,200.,300.)]}
+        nominal={'program':program,'program_sha256':preparation_digest(program)}
+        manager.full['BF01']=(full,nominal)
+        manager.intervals['BF01']={'end_knot':1,'horizon_mm':100.}
+        request=manager._followup(full,'route_interval',start_knot=1,
+                                  program_sha256=nominal['program_sha256'],brake_headroom_mm=50.)
+        manager.drain()
+        interval={'start_knot':1,'end_knot':2,'start_mm':100.,'end_mm':200.,
+                  'program_sha256':nominal['program_sha256']}
+        receipt={'interval_sha256':background._interval_binding(request,interval),
+                 'geometry':{'passed':True},'fixed_home':{'passed':True}}
+        return manager,request,interval,receipt,driver
+
+    def test_passage_grant_change_accepts_current_section_only_once(self):
+        manager,request,interval,receipt,driver=self.interval_case()
+        manager.engine.resources.own_grants=lambda identity:{'status':'waiting','resource':'another'}
+        result=background._checked_result(request,interval=interval,receipt=receipt)
+        self.assertTrue(manager.accept(result)['accepted'])
+        self.assertEqual(driver.certified_horizon_mm,200.)
+        self.assertEqual(len(manager.engine.geometry_checks),1)
+        self.assertFalse(manager.accept(result)['accepted'])
+
+    def test_rewrapped_proofs_and_changed_action_grants_cannot_expand_horizon(self):
+        for change in ('gap','rollback','foreign_proof','geometry','fixed_home','null_geometry',
+                       'missing_fixed_home','bad_hash','lift','waiting_place','bench'):
+            with self.subTest(change=change):
+                manager,request,interval,receipt,driver=self.interval_case()
+                if change=='gap':interval.update(start_knot=2,start_mm=200.)
+                elif change=='rollback':interval.update(start_knot=0,start_mm=0.)
+                elif change=='foreign_proof':interval.update(end_knot=3,end_mm=300.)
+                elif change in ('geometry','fixed_home'):receipt[change]['passed']=False
+                elif change=='null_geometry':receipt['geometry']=None
+                elif change=='missing_fixed_home':del receipt['fixed_home']
+                elif change in ('lift','waiting_place','bench'):
+                    manager.engine.vehicles['BF01']['action_context'][change]={'slot':1}
+                result=background._checked_result(request,interval=interval,receipt=receipt)
+                if change=='bad_hash':result['result_sha256']='invalid'
+                self.assertFalse(manager.accept(result)['accepted'])
+                self.assertNotIn(request['request_id'],manager.jobs)
+                self.assertIn('BF01',manager.snapshot()['failures'])
+                self.assertEqual(driver.certified_horizon_mm,100.)
+                self.assertEqual(manager.intervals['BF01']['end_knot'],1)
+                manager.before_tick()
+                self.assertEqual(manager.drain(),[])
 
 
 if __name__=='__main__':unittest.main()

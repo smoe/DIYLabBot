@@ -93,7 +93,10 @@ class ExecutedPlayback {
   else if(!this.sample)this.sample={modelTime,wall};
   else if(modelTime>this.sample.modelTime&&wall>this.sample.wall){
    const measured=Math.min(1,(modelTime-this.sample.modelTime)/(wall-this.sample.wall));
-   this.rate=this.rate===null?measured:this.rate+.35*(measured-this.rate);
+   // A slower producer threatens the available buffer immediately. Rebuild
+   // confidence in a faster cadence over several genuinely new arrivals.
+   const weight = measured < this.rate ? 0.85 : 0.2;
+   this.rate=this.rate===null?measured:this.rate+weight*(measured-this.rate);
    this.sample={modelTime,wall};
   }
   if(!motion){
@@ -255,7 +258,17 @@ async function mount(bridge,payload){
   q('coverage').textContent='Gemeldete Zielbesuche: '+snapshot.coverage.filter(t=>t.visits>0).length+' / '+snapshot.targets.length;
   q('targets').replaceChildren(...snapshot.coverage.map(target=>{const li=document.createElement('li');li.textContent=view.targetLabel(target)+' · '+(target.last_visit_s==null?'noch nicht besucht':Math.max(0,snapshot.model_time_s-target.last_visit_s).toFixed(1)+' s seit letztem Besuch')+' · '+target.visits+' Besuche';return li;}));
   q('jobs').replaceChildren(...snapshot.jobs.slice(-30).map(job=>{const li=document.createElement('li'),winner=job.vehicle_id??job.winner?.vehicle_id,eta=job.eta_s??job.winner?.eta_s;li.textContent=job.request_id+' · '+view.targetLabel(job.pickup)+' → '+view.targetLabel(job.delivery)+' · '+job.status+(winner?' · '+winner:' · wartet auf verfügbares Fahrzeug')+(finite(eta)?' · geschätzte Abholankunft '+eta.toFixed(1)+' s':'');return li;}));
-  q('rows').replaceChildren(...snapshot.states.map(state=>{const row=document.createElement('tr');for(const value of [state.id,locations.get(state.id)+' · '+view.stateLabel(state.mode),state.job_id??state.mission_id??'Patrouille']){const cell=document.createElement('td');cell.textContent=value;row.append(cell);}return row;}));
+  q('rows').replaceChildren(...snapshot.states.map(state=>{
+   const row=document.createElement('tr'),failure=snapshot.background_preparation?.failures?.[state.id];
+   let status=view.stateLabel(state.controller_mode??state.mode);
+   if(failure)status+=' · Abschnittsprüfung abgelehnt · '+failure;
+   else if(state.queue_position)status='Warteschlange · Platz '+state.queue_position+(state.resource_holder?' · belegt durch '+state.resource_holder:'');
+   else if(state.hold_reason==='await_checked_continuation')status='Wartet auf geprüfte Weiterfahrt';
+   for(const value of [state.id,locations.get(state.id)+' · '+status,state.job_id??state.mission_id??'Patrouille']){
+    const cell=document.createElement('td');cell.textContent=value;row.append(cell);
+   }
+   return row;
+  }));
   q('camera-note').textContent=snapshot.camera_frames.length+' / 20 empfangene synthetische Kameraansichten · gemeinsame Modellzeit';
   const commandError=snapshot.command_errors?.at(-1);if(commandError){const key=commandError.request_id+':'+commandError.error;if(key!==lastCommandError){lastCommandError=key;q('request-status').textContent='Testauftrag abgelehnt · '+commandError.request_id+' · '+commandError.error;}}
   positionLabels(observed);bridge.syncMonitorFeeds?.();bridge.requestRender();
