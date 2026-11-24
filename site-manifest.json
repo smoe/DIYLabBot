@@ -79,11 +79,11 @@
     "bf01": {
       "html": {
         "bytes": 9172353,
-        "sha256": "a8518dca423fad5e8f0422125484123576888a52e7540226af2f25a9e8b63b03"
+        "sha256": "f7851a5f669628ba4045c99e66289c4d8df07463223f8d8fcf08b960a38ce2a5"
       },
-      "manifest_sha256": "de552171a7619253a1bfdb48e726b4c1612a58a2463e7615fd360806729a1648",
-      "source_commit": "d38f09063bf26163caa8e0f7e2964688e8d2ab5d",
-      "source_tree": "8907e85afa6d9e9cdb74af7ed6e406ddd86f512a",
+      "manifest_sha256": "48c5480678a73d8eacfff9e1f85b5a6847cd3081b4d1e60e9084bc01b3623693",
+      "source_commit": "b2e8a65040a846bf9ff8ac42c728e3dae1edca62",
+      "source_tree": "df70be878481bcd86ec3aba920339b1e2ac46503",
       "status": "experimental_live_browser_patrol",
       "url": "https://smoe.github.io/DIYLabBot/bf01/"
     }
