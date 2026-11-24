@@ -39,4 +39,95 @@ const curve=live.compileWindow(window,10);assert.equal(curve.at(9.5).states[0].p
 assert.throws(()=>curve.at(10.001));assert.throws(()=>curve.at(8.999));
 assert.throws(()=>live.compileWindow({...window,end_s:10.001},10));
 const discontinuous=structuredClone(window);discontinuous.trajectories[0].episodes[0].points.at(-1).time_s=10.01;assert.throws(()=>live.compileWindow(discontinuous,10));
+// Deterministic arrival and animation clocks, including multiple polls of one snapshot.
+const playback=new live.ExecutedPlayback();
+const executed=end_s=>({start_s:Math.max(0,end_s-1),end_s});
+const observe=(time,wall,running=true)=>playback.observe('slow',time,executed(time),wall,running);
+playback.observe('slow',0,null,0,true);
+let previous=0;
+for(let batch=1;batch<=8;batch++){
+ const end=batch*.2,wall=batch*4/3;
+ observe(end,wall);
+ for(let frame=0;frame<80;frame++){
+  const now=wall+frame/60;
+  if(frame%10===0)observe(end,now);
+  playback.advance(now,true);
+  assert(playback.time>=previous&&playback.time<=end);
+  if(batch>1||frame>0)assert(playback.time>previous,'Slow steady arrivals still advance on every frame');
+  assert(playback.factor>0&&playback.factor<=1);
+  assert(playback.time>=playback.motion.start_s&&playback.time<=playback.motion.end_s);
+  previous=playback.time;
+ }
+}
+assert(Math.abs(playback.rate-.15)<1e-10,'Repeated polls do not re-date an executed sample');
+const lastArrival=8*4/3,latest=8*.2;
+for(let frame=80;frame<=180;frame++)playback.advance(lastArrival+frame/60,true);
+assert.equal(playback.time,latest,'Three seconds without new PVA reach the executed end');
+assert.equal(playback.underrun,true);
+assert.equal(playback.factor,0);
+playback.advance(lastArrival+20,true);
+assert.equal(playback.time,latest);
+previous=playback.time;
+const burstWall=lastArrival+20.01;
+for(let i=1;i<=8;i++){
+ const wall=burstWall+.01*i;
+ observe(latest+i*.2,wall);
+ playback.advance(wall,true);
+ assert(playback.time-previous<=(i===1?.02:.01)+1e-8,'Overlapping windows cannot jump through a burst');
+ assert(playback.time>=playback.motion.start_s&&playback.time<=playback.motion.end_s);
+ assert(playback.factor<=1&&!playback.underrun);
+ previous=playback.time;
+}
+for(let frame=1;frame<=20;frame++){
+ const wall=burstWall+.08+frame/60;
+ playback.advance(wall,true);
+ assert(playback.time>previous&&playback.time-previous<=1/60+1e-10);
+ assert(playback.time<=playback.motion.end_s,'Burst playback remains inside its original PVA');
+ previous=playback.time;
+}
+// Manual pause, a route-door block and a lost connection use the same suspension path.
+for(const condition of ['pause','route door','connection loss','hidden tab']){
+ const before=playback.time;
+ playback.advance(burstWall+2,false);
+ assert.equal(playback.factor,0,condition);
+ assert.equal(playback.underrun,false,condition);
+ playback.advance(burstWall+300,true);
+ assert.equal(playback.time,before,'Resume has no accumulated wall time after '+condition);
+}
+playback.advance(burstWall+600,true);
+assert(playback.time-previous<=.25000001,'Throttled animation cannot catch up in one frame');
+playback.observe('slow',latest+2,null,burstWall+601,true);
+assert.equal(playback.motion,null);
+assert.equal(playback.time,latest+2,'Null window uses the snapshot');
+assert.equal(playback.factor,0);
+assert.equal(playback.underrun,false);
+playback.observe('restart',.2,executed(.2),burstWall+602,true);
+assert.equal(playback.time,0,'The next session starts its own observed history');
+assert.equal(playback.rate,null);
+playback.advance(burstWall+604,true);
+assert.equal(playback.time,0);
+const slowFrames=new live.ExecutedPlayback();
+slowFrames.observe('visible',0,null,0,true);
+for(let frame=1;frame<300;frame++){
+ const time=frame/5;
+ slowFrames.observe('visible',time,executed(time),time,true);
+ slowFrames.advance(time,true);
+ assert(slowFrames.windows.length<=4);
+ assert(slowFrames.time<=time&&slowFrames.time>=time-1);
+}
+assert.equal(slowFrames.resyncCount,0,'Steady 5-fps foreground playback remains continuous');
+const held=slowFrames.time;
+for(let i=1;i<200;i++){
+ const end=60+i*.2;
+ slowFrames.observe('visible',end,executed(end),60+i*.001,true);
+ assert.equal(slowFrames.time,held,'Even an oversized arrival burst cannot seek during receive');
+ assert(slowFrames.windows.length<=4,'Render stalls retain bounded executed history');
+}
+for(let frame=1;frame<1200&&!slowFrames.resyncCount;frame++){
+ const wall=61+frame/60,before=slowFrames.time;
+ slowFrames.advance(wall,true);
+ if(!slowFrames.resyncCount)assert(slowFrames.time-before<=.25+1e-8);
+}
+assert.equal(slowFrames.resyncCount,1,'An expired interval is an explicit reacquisition');
+assert.equal(slowFrames.factor,0);
 console.log('Active BF01 received-state/camera boundary checks passed.');
