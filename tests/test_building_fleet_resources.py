@@ -76,6 +76,10 @@ class StaticResourcesTests(unittest.TestCase):
 
 
 class ResourceCacheTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        (model.ROOT/'exports/building-fleet').mkdir(parents=True, exist_ok=True)
+
     def test_path_receipts_preserve_all_numeric_types_signed_zero_and_input_order(self):
         row={'points_mm':[[0.,-0.],[1000.,0.],[1000.,1000.],[2000.,1000.]],
              'corner_trim_mm':250,'corner_trim_caps':[
