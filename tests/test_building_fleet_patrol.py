@@ -157,6 +157,28 @@ class LiveAdapterTests(unittest.TestCase):
         r.recruit_pending()
         self.assertEqual(r.dispatcher.jobs['process']['vehicle_id'], 'BF02')
 
+    def test_snapshot_distinguishes_planning_horizon_from_depot_queue(self):
+        from building_fleet_services import ResourceServices
+        r = self.runner()
+        r.resources = ResourceServices({'depot': 'room'})
+        r.resources.request('BF02', 'depot', 0.)
+        r.resources.request('BF01', 'depot', .05)
+        r.vehicles['BF01'].update(hold_reason='resource_wait', hold_condition='own_depot_departure_grant')
+        driver = SimpleNamespace(mode='waiting', reason='await_checked_continuation', y=800., goal=1500.,
+                                 certified_horizon_mm=800., awaiting_continuation=True)
+        r.vehicles['BF02'].update(driver=driver, phase='driving')
+        waiting, stopped = r._states()
+        self.assertEqual((waiting['requested_resource'], waiting['queue_position'], waiting['resource_holder']),
+                         ('depot', 1, 'BF02'))
+        self.assertEqual(waiting['hold_condition'], 'own_depot_departure_grant')
+        self.assertEqual((stopped['mode'], stopped['controller_mode'], stopped['hold_reason']),
+                         ('driving', 'waiting', 'await_checked_continuation'))
+        self.assertEqual((stopped['progress_mm'], stopped['own_route_horizon_mm'], stopped['goal_mm']),
+                         (800., 800., 1500.))
+        driver.mode = 'driving'
+        self.assertIsNone(r._states()[1]['hold_reason'])
+        self.assertNotIn('resource_holder', r._states(diagnostics=False)[0])
+
     def test_driving_aboard_pending_and_foreign_booked_vehicles_are_ineligible(self):
         r = self.runner()
         self.assertTrue(r.eligible('BF01'))

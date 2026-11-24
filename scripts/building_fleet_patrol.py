@@ -402,14 +402,38 @@ class PatrolWorldRunner(WorldRunner):
                 return
         return super().idle_action(identity)
 
-    def _states(self):
-        return [{'id': identity, 'pose_xyz_mm': [*row['pose_mm_rad'][:2], row['z_mm']],
+    def _states(self, *, diagnostics=True):
+        states = []
+        for identity, row in sorted(self.vehicles.items()):
+            driver = row['driver']
+            state = {'id': identity, 'pose_xyz_mm': [*row['pose_mm_rad'][:2], row['z_mm']],
                  'yaw_rad': row['pose_mm_rad'][2], 'level_id': row['level'],
                  'mode': row['phase'], 'attached_cabin': row['aboard'],
                  'job_id': self.dispatcher.vehicle_jobs.get(identity),
-                 'own_route_horizon_mm': getattr(row['driver'],'certified_horizon_mm',None),
-                 'awaiting_checked_continuation':getattr(row['driver'],'awaiting_continuation',False)}
-                for identity, row in sorted(self.vehicles.items())]
+                 'own_route_horizon_mm': getattr(driver, 'certified_horizon_mm', None),
+                 'awaiting_checked_continuation': getattr(driver, 'awaiting_continuation', False)}
+            if diagnostics:
+                # Resource ownership is presentation-only and never enters a vehicle observation.
+                request = self.resources.requests.get(identity)
+                requested = request[0] if request else None
+                held = self.resources.holds.get(identity)
+                reason = getattr(driver, 'reason', None)
+                hold_reason, condition = None, None
+                if driver is None:
+                    hold_reason, condition = row['hold_reason'], row['hold_condition']
+                elif driver.mode == 'waiting':
+                    hold_reason = reason
+                    condition = {'await_checked_continuation': 'checked_continuation_at_observed_pva',
+                                 'resource_wait': 'own_exclusive_resource_grant',
+                                 'next_step_stop_unproven': 'checked_next_step_and_stop'}.get(
+                                     reason, 'fresh_clear_anonymous_scan')
+                state.update(controller_mode=getattr(driver, 'mode', None), controller_reason=reason,
+                             progress_mm=getattr(driver, 'y', None), goal_mm=getattr(driver, 'goal', None),
+                             hold_reason=hold_reason, hold_condition=condition, held_resource=held,
+                             requested_resource=requested, resource_holder=self.resources.owners.get(requested or held),
+                             queue_position=self.resources.queues[requested].index(identity)+1 if request else None)
+            states.append(state)
+        return states
 
     def _lift_state(self):
         values = self.lift_values()
@@ -483,7 +507,7 @@ class PatrolWorldRunner(WorldRunner):
                 key=lambda row: row['start_s']))}
 
     def observe(self, step):
-        self._scene_history[self.now] = {'states': self._states(), 'lift': self._lift_state()}
+        self._scene_history[self.now] = {'states': self._states(diagnostics=False), 'lift': self._lift_state()}
         sequences = {identity: row['capture_seq'] for identity, row in self.vehicles.items()}
         result = super().observe(step)
         for identity, row in self.vehicles.items():
