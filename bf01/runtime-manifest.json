@@ -1,8 +1,8 @@
 {
   "archive": {
-    "bytes": 9338972,
+    "bytes": 9338596,
     "path": "runtime.zip",
-    "sha256": "b084aac3792dfbb5cb8d2405b8c1665c86f9098293ab293542e97f74d29410e1"
+    "sha256": "75fe93d65a0b4facce2388874eb1a8cd3ce1f13b45cd615b3fffdfb2850771da"
   },
   "bootstrap_path": "scripts/building_fleet_browser_runtime.py",
   "browser_config": {
@@ -29,182 +29,6 @@
     "cad/vendor/myactuator/component-library.json": {
       "bytes": 52572,
       "sha256": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/assembly_model.cpython-314.pyc": {
-      "bytes": 11001,
-      "sha256": "d1d0e99ab15d7a0772ae11aff008eecfcb9536a59d8678e4c592c1d81de1c4ee"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_background.cpython-314.pyc": {
-      "bytes": 36753,
-      "sha256": "3d9b2c598e0bf3cee7eecd4abfd6923d1597a29a121e0ffeea18ac6a6366bcdb"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_browser_navigation.cpython-314.pyc": {
-      "bytes": 13942,
-      "sha256": "4748395c44caad16e1d6136ded7f1f09a399760fea30a5ff0ab88c4d129111a4"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_browser_runtime.cpython-314.pyc": {
-      "bytes": 29009,
-      "sha256": "7aadf8e31791e6fbcf2dc54fd4349968c9b12ff9b76d661a5755e1fff1d3c4bb"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_clearance.cpython-314.pyc": {
-      "bytes": 37094,
-      "sha256": "ef6fe3171d93396ff7e927550a275bb2ac437bd0cc99d92f9abf1b3fc8d3583f"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_comm.cpython-314.pyc": {
-      "bytes": 20104,
-      "sha256": "f869efeb83bd31eed1e72d8dc543992c9a25438b2ec51f2eaeda4439c841dcf8"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_control.cpython-314.pyc": {
-      "bytes": 134671,
-      "sha256": "2d6b8df3120362057c47fb67382a0b1f23b06720bce4be6ca2c12274f2d32898"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_depot.cpython-314.pyc": {
-      "bytes": 11265,
-      "sha256": "b7ce106d57fc3c94a05266e5c83152df6ffc569487dbcc59a51e5f1ecbfd1b64"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_dispatch.cpython-314.pyc": {
-      "bytes": 8158,
-      "sha256": "8b8a4495a02aa3e2d6a176535f876b7018ae73440b9a0db9b168d0e06f48c477"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_floor.cpython-314.pyc": {
-      "bytes": 12789,
-      "sha256": "ec9e7c204f9612e7942a618d3cbbd5f9047a16019b83c1a2f0ec995660e7135a"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_geometry.cpython-314.pyc": {
-      "bytes": 3989,
-      "sha256": "b6aa33f8f94e59969f334d903b351254a9419a20681cba427e34ec235fd4e7cc"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_geometry_checks.cpython-314.pyc": {
-      "bytes": 22304,
-      "sha256": "67dd1e316c9e5b65cb1e01d287a81bd2ed2b63c72b950a390e4b51c234fdcaf3"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_l01.cpython-314.pyc": {
-      "bytes": 31783,
-      "sha256": "baf639ce17ffe5ccdc9ee8cd4b741f92907ac742e3bc3237f3ff5cae1bd9d954"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_lift_checks.cpython-314.pyc": {
-      "bytes": 36959,
-      "sha256": "fbdb464d36a632f48ea160a0b2923c8c67a87a308b8f58bf46aee6cea5685580"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_lift_geometry.cpython-314.pyc": {
-      "bytes": 10894,
-      "sha256": "1fc041f0f6f2fdae7f365e1360898f722f0912fe746c89487e8ce3a2e2e8cfd2"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_missions.cpython-314.pyc": {
-      "bytes": 57484,
-      "sha256": "7a9e0592148d6aa46a958b08ba33259bf7b4164eb23af2ad11a554fbed016b3c"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_model.cpython-314.pyc": {
-      "bytes": 12558,
-      "sha256": "2f4ef2c88870dcf17666c1042e2230316b070c330cfc65227a949fa6d491f755"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_motion.cpython-314.pyc": {
-      "bytes": 71489,
-      "sha256": "ff0254c2b30e04199cc1b681f09b72912d717097506ccccdbcbbca85097f0d33"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_navigation.cpython-314.pyc": {
-      "bytes": 64055,
-      "sha256": "36b24fe5a8367c21b4339890dabc340b7b22be9ed1450b257018a849038cb177"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_patrol.cpython-314.pyc": {
-      "bytes": 52125,
-      "sha256": "cc4d5d44f6e9c79199ee788e43e4daa5e25ee8bf5f73d361a1ade950325712fb"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_patrol_cache.cpython-314.pyc": {
-      "bytes": 14869,
-      "sha256": "6dbf2560f1fed7ff2f8ca5bc2f4538f9218a6fc02c530ab1b9fad01d4fe02f2c"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_port_paths.cpython-314.pyc": {
-      "bytes": 26562,
-      "sha256": "5249303137bf81d468e5ebc37d6592091cdd368ec1789c15f218d7e189cebf5f"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_resources.cpython-314.pyc": {
-      "bytes": 52002,
-      "sha256": "a93055e67984b688b40002c0831be8815343749cc7b7cc82a6130dc30f82466a"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_routes.cpython-314.pyc": {
-      "bytes": 102422,
-      "sha256": "e45a9a5798cadc8501b740da4933229ffc7b5299eacadf4e78ca9b8158d9f695"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_runner.cpython-314.pyc": {
-      "bytes": 159404,
-      "sha256": "f0c0087c4d661055c0d45e55d7448df15fc14c1742ac298af74b9b0414b0fa38"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_runtime_cache.cpython-314.pyc": {
-      "bytes": 90281,
-      "sha256": "3344d6cea03eb89542951b52421fb491b8c44a900144d8ca65a6c0b3d43fc72b"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_services.cpython-314.pyc": {
-      "bytes": 52867,
-      "sha256": "82fda0ff03021b799c9e30db7750301736efc58e032c721b36a7ccc905dabb8f"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_sim.cpython-314.pyc": {
-      "bytes": 67081,
-      "sha256": "aebbbcfbd27976d85388e13a6b0e493bff2310ef0788da5f77a59a011a3d4cb0"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_starter.cpython-314.pyc": {
-      "bytes": 11091,
-      "sha256": "d913639e8b6b199adb94447f0e6ecdf2769b9032a8f6ad86f67ea73fd649953b"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_support.cpython-314.pyc": {
-      "bytes": 45631,
-      "sha256": "d4c7b0cdcff5c869877287b671aa62d099f99f8497659cdcdf89ffdd75930a1f"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_zones.cpython-314.pyc": {
-      "bytes": 5703,
-      "sha256": "1953ce8a8ab6294918e917cab62928bbf231a5fc719db6bb7644665acb8f404b"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_stack.cpython-314.pyc": {
-      "bytes": 80029,
-      "sha256": "512f8b2119b5dc87d1b793c9c433c54c020064d95a8796817c78d6799cb23dfb"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/cf01_unload_path.cpython-314.pyc": {
-      "bytes": 15578,
-      "sha256": "b5b6025b7e329e9e2a475221a4b25b5b7c6589741794781abe30d03ce81e819e"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_independent_fleet.cpython-314.pyc": {
-      "bytes": 50953,
-      "sha256": "c056bd8b169c063c50fe7efdb3073692f981a6004fdd5dd2b200264816392c94"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_local_traffic.cpython-314.pyc": {
-      "bytes": 32800,
-      "sha256": "baaa8559924044866ca75b42814a7d73aa7d899406ebfce61ff6e2f184fba1d0"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_opposing_traffic.cpython-314.pyc": {
-      "bytes": 48558,
-      "sha256": "d701c48b78a39458303f686affdb45411ab6596b148b98c4fadc1b124147e32d"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/relative_floorplan.cpython-314.pyc": {
-      "bytes": 50847,
-      "sha256": "fe8f45b204eee3fbfa1776f17aa94579910958f53bade8d3274110371d29ea2d"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/robot_spec.cpython-314.pyc": {
-      "bytes": 31849,
-      "sha256": "3f3669cd98d50ac5eaa22c4da07f72e13195c8b4efc122351c56932354192afd"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/sample_motion.cpython-314.pyc": {
-      "bytes": 42738,
-      "sha256": "74fe76c16bf483f5c9eb702c31eab28ebfffc4e0efbd2afe556f63f769db5a76"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/sample_transport_model.cpython-314.pyc": {
-      "bytes": 17722,
-      "sha256": "7a8ef34ffccc487577dcdc52ba9cfefd9ecd87b88081398f8500f11ac24dbe33"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_camera_model.cpython-314.pyc": {
-      "bytes": 19202,
-      "sha256": "460cd75488694c100a376c0f299a7e4db27f0c4d3234b08ec51f415b3ac9a6ec"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_floor_motion.cpython-314.pyc": {
-      "bytes": 27744,
-      "sha256": "6ce1bbf11415e0d998c25451eb53d50a8c033f417f096adb7ac9f8cbbb4aff21"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_workcell.cpython-314.pyc": {
-      "bytes": 33354,
-      "sha256": "2b1af04e6ccd14a8b4ad7c0780157d71189d0bbd45f1da574e9e51fed9ddb7d9"
-    },
-    "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/walkthrough_world.cpython-314.pyc": {
-      "bytes": 7929,
-      "sha256": "8fc482bfa5a624031eb1f2e96416200531bcf3b4b6589512b04b951a44cf929c"
     },
     "exports/building-fleet/background-startup-0b10fe1/static-cache-r6/cache-report.json": {
       "bytes": 445659,
@@ -305,6 +129,182 @@
     "exports/building-fleet/background-startup-0b10fe1/static-cache-r6/static-returns.json": {
       "bytes": 261510,
       "sha256": "91e6f7ffd7fe61cd56ac1235f193bf38fc7737a872692272cbef85c00673de46"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/assembly_model.cpython-314.pyc": {
+      "bytes": 11001,
+      "sha256": "d1d0e99ab15d7a0772ae11aff008eecfcb9536a59d8678e4c592c1d81de1c4ee"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_background.cpython-314.pyc": {
+      "bytes": 36753,
+      "sha256": "3d9b2c598e0bf3cee7eecd4abfd6923d1597a29a121e0ffeea18ac6a6366bcdb"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_browser_navigation.cpython-314.pyc": {
+      "bytes": 13942,
+      "sha256": "4748395c44caad16e1d6136ded7f1f09a399760fea30a5ff0ab88c4d129111a4"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_browser_runtime.cpython-314.pyc": {
+      "bytes": 29009,
+      "sha256": "7aadf8e31791e6fbcf2dc54fd4349968c9b12ff9b76d661a5755e1fff1d3c4bb"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_clearance.cpython-314.pyc": {
+      "bytes": 37094,
+      "sha256": "ef6fe3171d93396ff7e927550a275bb2ac437bd0cc99d92f9abf1b3fc8d3583f"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_comm.cpython-314.pyc": {
+      "bytes": 20104,
+      "sha256": "f869efeb83bd31eed1e72d8dc543992c9a25438b2ec51f2eaeda4439c841dcf8"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_control.cpython-314.pyc": {
+      "bytes": 134671,
+      "sha256": "2d6b8df3120362057c47fb67382a0b1f23b06720bce4be6ca2c12274f2d32898"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_depot.cpython-314.pyc": {
+      "bytes": 11265,
+      "sha256": "b7ce106d57fc3c94a05266e5c83152df6ffc569487dbcc59a51e5f1ecbfd1b64"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_dispatch.cpython-314.pyc": {
+      "bytes": 8158,
+      "sha256": "8b8a4495a02aa3e2d6a176535f876b7018ae73440b9a0db9b168d0e06f48c477"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_floor.cpython-314.pyc": {
+      "bytes": 12789,
+      "sha256": "ec9e7c204f9612e7942a618d3cbbd5f9047a16019b83c1a2f0ec995660e7135a"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_geometry.cpython-314.pyc": {
+      "bytes": 3989,
+      "sha256": "b6aa33f8f94e59969f334d903b351254a9419a20681cba427e34ec235fd4e7cc"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_geometry_checks.cpython-314.pyc": {
+      "bytes": 22304,
+      "sha256": "67dd1e316c9e5b65cb1e01d287a81bd2ed2b63c72b950a390e4b51c234fdcaf3"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_l01.cpython-314.pyc": {
+      "bytes": 31783,
+      "sha256": "baf639ce17ffe5ccdc9ee8cd4b741f92907ac742e3bc3237f3ff5cae1bd9d954"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_lift_checks.cpython-314.pyc": {
+      "bytes": 36959,
+      "sha256": "fbdb464d36a632f48ea160a0b2923c8c67a87a308b8f58bf46aee6cea5685580"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_lift_geometry.cpython-314.pyc": {
+      "bytes": 10894,
+      "sha256": "1fc041f0f6f2fdae7f365e1360898f722f0912fe746c89487e8ce3a2e2e8cfd2"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_missions.cpython-314.pyc": {
+      "bytes": 57484,
+      "sha256": "7a9e0592148d6aa46a958b08ba33259bf7b4164eb23af2ad11a554fbed016b3c"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_model.cpython-314.pyc": {
+      "bytes": 12558,
+      "sha256": "2f4ef2c88870dcf17666c1042e2230316b070c330cfc65227a949fa6d491f755"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_motion.cpython-314.pyc": {
+      "bytes": 71489,
+      "sha256": "ff0254c2b30e04199cc1b681f09b72912d717097506ccccdbcbbca85097f0d33"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_navigation.cpython-314.pyc": {
+      "bytes": 64055,
+      "sha256": "36b24fe5a8367c21b4339890dabc340b7b22be9ed1450b257018a849038cb177"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_patrol.cpython-314.pyc": {
+      "bytes": 52125,
+      "sha256": "cc4d5d44f6e9c79199ee788e43e4daa5e25ee8bf5f73d361a1ade950325712fb"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_patrol_cache.cpython-314.pyc": {
+      "bytes": 14869,
+      "sha256": "6dbf2560f1fed7ff2f8ca5bc2f4538f9218a6fc02c530ab1b9fad01d4fe02f2c"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_port_paths.cpython-314.pyc": {
+      "bytes": 26562,
+      "sha256": "5249303137bf81d468e5ebc37d6592091cdd368ec1789c15f218d7e189cebf5f"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_resources.cpython-314.pyc": {
+      "bytes": 52002,
+      "sha256": "a93055e67984b688b40002c0831be8815343749cc7b7cc82a6130dc30f82466a"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_routes.cpython-314.pyc": {
+      "bytes": 102422,
+      "sha256": "e45a9a5798cadc8501b740da4933229ffc7b5299eacadf4e78ca9b8158d9f695"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_runner.cpython-314.pyc": {
+      "bytes": 159404,
+      "sha256": "f0c0087c4d661055c0d45e55d7448df15fc14c1742ac298af74b9b0414b0fa38"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_runtime_cache.cpython-314.pyc": {
+      "bytes": 90281,
+      "sha256": "3344d6cea03eb89542951b52421fb491b8c44a900144d8ca65a6c0b3d43fc72b"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_services.cpython-314.pyc": {
+      "bytes": 52867,
+      "sha256": "82fda0ff03021b799c9e30db7750301736efc58e032c721b36a7ccc905dabb8f"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_sim.cpython-314.pyc": {
+      "bytes": 67081,
+      "sha256": "aebbbcfbd27976d85388e13a6b0e493bff2310ef0788da5f77a59a011a3d4cb0"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_starter.cpython-314.pyc": {
+      "bytes": 11091,
+      "sha256": "d913639e8b6b199adb94447f0e6ecdf2769b9032a8f6ad86f67ea73fd649953b"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_support.cpython-314.pyc": {
+      "bytes": 45631,
+      "sha256": "d4c7b0cdcff5c869877287b671aa62d099f99f8497659cdcdf89ffdd75930a1f"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_zones.cpython-314.pyc": {
+      "bytes": 5703,
+      "sha256": "1953ce8a8ab6294918e917cab62928bbf231a5fc719db6bb7644665acb8f404b"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_stack.cpython-314.pyc": {
+      "bytes": 80029,
+      "sha256": "512f8b2119b5dc87d1b793c9c433c54c020064d95a8796817c78d6799cb23dfb"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/cf01_unload_path.cpython-314.pyc": {
+      "bytes": 15578,
+      "sha256": "b5b6025b7e329e9e2a475221a4b25b5b7c6589741794781abe30d03ce81e819e"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_independent_fleet.cpython-314.pyc": {
+      "bytes": 50953,
+      "sha256": "c056bd8b169c063c50fe7efdb3073692f981a6004fdd5dd2b200264816392c94"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_local_traffic.cpython-314.pyc": {
+      "bytes": 32800,
+      "sha256": "baaa8559924044866ca75b42814a7d73aa7d899406ebfce61ff6e2f184fba1d0"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_opposing_traffic.cpython-314.pyc": {
+      "bytes": 48558,
+      "sha256": "d701c48b78a39458303f686affdb45411ab6596b148b98c4fadc1b124147e32d"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/relative_floorplan.cpython-314.pyc": {
+      "bytes": 50847,
+      "sha256": "fe8f45b204eee3fbfa1776f17aa94579910958f53bade8d3274110371d29ea2d"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/robot_spec.cpython-314.pyc": {
+      "bytes": 31849,
+      "sha256": "3f3669cd98d50ac5eaa22c4da07f72e13195c8b4efc122351c56932354192afd"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/sample_motion.cpython-314.pyc": {
+      "bytes": 42738,
+      "sha256": "74fe76c16bf483f5c9eb702c31eab28ebfffc4e0efbd2afe556f63f769db5a76"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/sample_transport_model.cpython-314.pyc": {
+      "bytes": 17722,
+      "sha256": "7a8ef34ffccc487577dcdc52ba9cfefd9ecd87b88081398f8500f11ac24dbe33"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_camera_model.cpython-314.pyc": {
+      "bytes": 19202,
+      "sha256": "460cd75488694c100a376c0f299a7e4db27f0c4d3234b08ec51f415b3ac9a6ec"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_floor_motion.cpython-314.pyc": {
+      "bytes": 27744,
+      "sha256": "6ce1bbf11415e0d998c25451eb53d50a8c033f417f096adb7ac9f8cbbb4aff21"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_workcell.cpython-314.pyc": {
+      "bytes": 33354,
+      "sha256": "2b1af04e6ccd14a8b4ad7c0780157d71189d0bbd45f1da574e9e51fed9ddb7d9"
+    },
+    "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/walkthrough_world.cpython-314.pyc": {
+      "bytes": 7929,
+      "sha256": "8fc482bfa5a624031eb1f2e96416200531bcf3b4b6589512b04b951a44cf929c"
     },
     "model/assembly-reference.schema.json": {
       "bytes": 2277,
@@ -643,8 +643,8 @@
       "sha256": "630cde4e9e210e2c2e821c345e9fe51275c08611f188f3d989bcdc50f901b6b1"
     },
     "scripts/build_building_fleet_browser.py": {
-      "bytes": 29196,
-      "sha256": "79b6361bc1185b69c710fa24fdf881e82105af97e0241cc9290bfb19fdb6d4a7"
+      "bytes": 30989,
+      "sha256": "fc16e1f35d1e1d9abe8960aab544e1d29c7e38dddcbfe71c7f2fc4b5d691a8f2"
     },
     "scripts/build_building_fleet_demo.py": {
       "bytes": 25872,
@@ -1142,268 +1142,268 @@
     "compiler_version": "3.14.8 (main, Sep 30 2026, 17:55:09) [Clang 21.0.0 (clang-2100.3.34.2)]",
     "format": "solidcraftbot.building-fleet-import-cache/1",
     "magic_number_hex": "2b0e0d0a",
-    "prefix": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache",
+    "prefix": "exports/building-fleet/camera-locations/browser-r2-python-cache",
     "sources": {
       "scripts/assembly_model.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/assembly_model.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/assembly_model.cpython-314.pyc",
         "bytes": 11001,
         "sha256": "d1d0e99ab15d7a0772ae11aff008eecfcb9536a59d8678e4c592c1d81de1c4ee",
         "source_sha256": "feddc36cb9469e391bf76bcf2edd707c7d345001ecce2fe95cf81c39f41e5930"
       },
       "scripts/building_fleet_background.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_background.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_background.cpython-314.pyc",
         "bytes": 36753,
         "sha256": "3d9b2c598e0bf3cee7eecd4abfd6923d1597a29a121e0ffeea18ac6a6366bcdb",
         "source_sha256": "e83d5cad43bd4d82f334d0eb01aa6b00094a0cc147c291dfc04f45724d1a4a0c"
       },
       "scripts/building_fleet_browser_navigation.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_browser_navigation.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_browser_navigation.cpython-314.pyc",
         "bytes": 13942,
         "sha256": "4748395c44caad16e1d6136ded7f1f09a399760fea30a5ff0ab88c4d129111a4",
         "source_sha256": "d0b3e42a70b799239e603d693fc925d2f7ca218f6d563e64b4ebf1926fad3531"
       },
       "scripts/building_fleet_browser_runtime.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_browser_runtime.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_browser_runtime.cpython-314.pyc",
         "bytes": 29009,
         "sha256": "7aadf8e31791e6fbcf2dc54fd4349968c9b12ff9b76d661a5755e1fff1d3c4bb",
         "source_sha256": "b83f71cc49c34cc9f06ad3f0d17aa853851f2ea6546b38c81dece19767b6f1df"
       },
       "scripts/building_fleet_clearance.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_clearance.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_clearance.cpython-314.pyc",
         "bytes": 37094,
         "sha256": "ef6fe3171d93396ff7e927550a275bb2ac437bd0cc99d92f9abf1b3fc8d3583f",
         "source_sha256": "cdaaf1128514b2ff4fb9461119ad359d0316710936a72bb0972f15ab97530ef3"
       },
       "scripts/building_fleet_comm.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_comm.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_comm.cpython-314.pyc",
         "bytes": 20104,
         "sha256": "f869efeb83bd31eed1e72d8dc543992c9a25438b2ec51f2eaeda4439c841dcf8",
         "source_sha256": "05c4a46c0072e5aa26b0643c67b55870a0a6e36c95239aba8f6ac3fc6d2a8809"
       },
       "scripts/building_fleet_control.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_control.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_control.cpython-314.pyc",
         "bytes": 134671,
         "sha256": "2d6b8df3120362057c47fb67382a0b1f23b06720bce4be6ca2c12274f2d32898",
         "source_sha256": "8c27212fb52024a19e9096bf90a28bafb2cba707fba489af34b4022a98e06e4e"
       },
       "scripts/building_fleet_depot.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_depot.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_depot.cpython-314.pyc",
         "bytes": 11265,
         "sha256": "b7ce106d57fc3c94a05266e5c83152df6ffc569487dbcc59a51e5f1ecbfd1b64",
         "source_sha256": "f44722f14e771cac91c4aada0e1354dc395e11d8b3e76196a71680d225c5187f"
       },
       "scripts/building_fleet_dispatch.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_dispatch.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_dispatch.cpython-314.pyc",
         "bytes": 8158,
         "sha256": "8b8a4495a02aa3e2d6a176535f876b7018ae73440b9a0db9b168d0e06f48c477",
         "source_sha256": "6e28bef2a95d766315b1595cc7b37d763f8857a06b1a89437f6d2dcd6623c4a4"
       },
       "scripts/building_fleet_floor.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_floor.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_floor.cpython-314.pyc",
         "bytes": 12789,
         "sha256": "ec9e7c204f9612e7942a618d3cbbd5f9047a16019b83c1a2f0ec995660e7135a",
         "source_sha256": "11ee922ca321d8263c933860962e10d600c3d28efad55ee8596f20cff07f40bd"
       },
       "scripts/building_fleet_geometry.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_geometry.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_geometry.cpython-314.pyc",
         "bytes": 3989,
         "sha256": "b6aa33f8f94e59969f334d903b351254a9419a20681cba427e34ec235fd4e7cc",
         "source_sha256": "b479436d4e4ecda1d2957e6d59528c6d21d7a2f86e6d53edb9c2850261f36c38"
       },
       "scripts/building_fleet_geometry_checks.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_geometry_checks.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_geometry_checks.cpython-314.pyc",
         "bytes": 22304,
         "sha256": "67dd1e316c9e5b65cb1e01d287a81bd2ed2b63c72b950a390e4b51c234fdcaf3",
         "source_sha256": "70fcbb0b225307f30b1944fe1dc2927f5310ec906b7fb974cdb87af162be2f98"
       },
       "scripts/building_fleet_l01.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_l01.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_l01.cpython-314.pyc",
         "bytes": 31783,
         "sha256": "baf639ce17ffe5ccdc9ee8cd4b741f92907ac742e3bc3237f3ff5cae1bd9d954",
         "source_sha256": "fda852e8b03cb60164e401bb6a0948734df022ab2cecbaedbc7c42cb2a72613f"
       },
       "scripts/building_fleet_lift_checks.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_lift_checks.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_lift_checks.cpython-314.pyc",
         "bytes": 36959,
         "sha256": "fbdb464d36a632f48ea160a0b2923c8c67a87a308b8f58bf46aee6cea5685580",
         "source_sha256": "15a110900dea156bbd4ccda9aa4bef10b92f8e09a30494fca393c2a699ddcc18"
       },
       "scripts/building_fleet_lift_geometry.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_lift_geometry.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_lift_geometry.cpython-314.pyc",
         "bytes": 10894,
         "sha256": "1fc041f0f6f2fdae7f365e1360898f722f0912fe746c89487e8ce3a2e2e8cfd2",
         "source_sha256": "8f8479eb7a5b52bf9925d580ee1642f39ea5b6a582918419967a556bcd90de3f"
       },
       "scripts/building_fleet_missions.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_missions.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_missions.cpython-314.pyc",
         "bytes": 57484,
         "sha256": "7a9e0592148d6aa46a958b08ba33259bf7b4164eb23af2ad11a554fbed016b3c",
         "source_sha256": "262cd952dfe6adb38b6d4bf271b5a8de0049e22814395bde2e4d76410540cdac"
       },
       "scripts/building_fleet_model.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_model.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_model.cpython-314.pyc",
         "bytes": 12558,
         "sha256": "2f4ef2c88870dcf17666c1042e2230316b070c330cfc65227a949fa6d491f755",
         "source_sha256": "f52eb351a4a8d7ff44e06d4b2e7f436f145d3de4716a6b1a964f69e0cb1fa8f4"
       },
       "scripts/building_fleet_motion.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_motion.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_motion.cpython-314.pyc",
         "bytes": 71489,
         "sha256": "ff0254c2b30e04199cc1b681f09b72912d717097506ccccdbcbbca85097f0d33",
         "source_sha256": "7175770ee9aaab3017c109276258784e869ba2138fac4a90ad27b89b3337eb59"
       },
       "scripts/building_fleet_navigation.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_navigation.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_navigation.cpython-314.pyc",
         "bytes": 64055,
         "sha256": "36b24fe5a8367c21b4339890dabc340b7b22be9ed1450b257018a849038cb177",
         "source_sha256": "cf0e1ab5fc2554a7e9db755ea283e44ef7d6ec8f117208a7ab1c209a5dfef9fd"
       },
       "scripts/building_fleet_patrol.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_patrol.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_patrol.cpython-314.pyc",
         "bytes": 52125,
         "sha256": "cc4d5d44f6e9c79199ee788e43e4daa5e25ee8bf5f73d361a1ade950325712fb",
         "source_sha256": "d1332c21f3520a293a03fd831b06491ee3b642211ff426c071c9047d7a1aaea6"
       },
       "scripts/building_fleet_patrol_cache.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_patrol_cache.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_patrol_cache.cpython-314.pyc",
         "bytes": 14869,
         "sha256": "6dbf2560f1fed7ff2f8ca5bc2f4538f9218a6fc02c530ab1b9fad01d4fe02f2c",
         "source_sha256": "48d573b38b6ae1cc4f4fd1dee42fb933e39d8d8710613792cfba380e16f6e112"
       },
       "scripts/building_fleet_port_paths.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_port_paths.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_port_paths.cpython-314.pyc",
         "bytes": 26562,
         "sha256": "5249303137bf81d468e5ebc37d6592091cdd368ec1789c15f218d7e189cebf5f",
         "source_sha256": "e08efd5b50e433be3cebbf10e28afed30e024bce579739a5784bf989b955a89e"
       },
       "scripts/building_fleet_resources.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_resources.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_resources.cpython-314.pyc",
         "bytes": 52002,
         "sha256": "a93055e67984b688b40002c0831be8815343749cc7b7cc82a6130dc30f82466a",
         "source_sha256": "1b65fae1631c6393801780b167e01b9468a784e08f21f977247862649a3be788"
       },
       "scripts/building_fleet_routes.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_routes.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_routes.cpython-314.pyc",
         "bytes": 102422,
         "sha256": "e45a9a5798cadc8501b740da4933229ffc7b5299eacadf4e78ca9b8158d9f695",
         "source_sha256": "8ab775d3e293020e8919bae81e8c66b0865bb0d955d00165a0548b4e1a29287d"
       },
       "scripts/building_fleet_runner.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_runner.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_runner.cpython-314.pyc",
         "bytes": 159404,
         "sha256": "f0c0087c4d661055c0d45e55d7448df15fc14c1742ac298af74b9b0414b0fa38",
         "source_sha256": "21068f93b546e57979e598bad5cbb2dbe885ecf8c90883d0dece4411517121f9"
       },
       "scripts/building_fleet_runtime_cache.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_runtime_cache.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_runtime_cache.cpython-314.pyc",
         "bytes": 90281,
         "sha256": "3344d6cea03eb89542951b52421fb491b8c44a900144d8ca65a6c0b3d43fc72b",
         "source_sha256": "133b12c25e2ebaf69c86e02dd02d4fe2b75f18db0e864e77a14e3197332a016a"
       },
       "scripts/building_fleet_services.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_services.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_services.cpython-314.pyc",
         "bytes": 52867,
         "sha256": "82fda0ff03021b799c9e30db7750301736efc58e032c721b36a7ccc905dabb8f",
         "source_sha256": "c70fd1905ab92f4fa5d62cc8d92510acbe2035df44697fcb635053f210691c1f"
       },
       "scripts/building_fleet_sim.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_sim.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_sim.cpython-314.pyc",
         "bytes": 67081,
         "sha256": "aebbbcfbd27976d85388e13a6b0e493bff2310ef0788da5f77a59a011a3d4cb0",
         "source_sha256": "86cdafdcebd71fcaf596c737f348d92ab20941e400aa8f127bdcd301d8e09e5b"
       },
       "scripts/building_fleet_starter.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_starter.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_starter.cpython-314.pyc",
         "bytes": 11091,
         "sha256": "d913639e8b6b199adb94447f0e6ecdf2769b9032a8f6ad86f67ea73fd649953b",
         "source_sha256": "84a4e9083f7bce18d63b05e8df836e32157994e36f1ef9db12c4f4f813ab4a24"
       },
       "scripts/building_fleet_support.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_support.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_support.cpython-314.pyc",
         "bytes": 45631,
         "sha256": "d4c7b0cdcff5c869877287b671aa62d099f99f8497659cdcdf89ffdd75930a1f",
         "source_sha256": "0baebbff7f5b2f407bfd0a3e0dcf38ffea2dd0e6a53ba849393aeafa13b2614b"
       },
       "scripts/building_fleet_zones.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_fleet_zones.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_fleet_zones.cpython-314.pyc",
         "bytes": 5703,
         "sha256": "1953ce8a8ab6294918e917cab62928bbf231a5fc719db6bb7644665acb8f404b",
         "source_sha256": "6f3cf3a078c5ce701ea9e8aad32c5cb02d4a3b011b53053cbbabc26d0b1cd8e9"
       },
       "scripts/building_stack.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/building_stack.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/building_stack.cpython-314.pyc",
         "bytes": 80029,
         "sha256": "512f8b2119b5dc87d1b793c9c433c54c020064d95a8796817c78d6799cb23dfb",
         "source_sha256": "95a9fb51f335097d902225fe561902eba709bd84b8c68aaff2e15aed1e0aacb6"
       },
       "scripts/cf01_unload_path.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/cf01_unload_path.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/cf01_unload_path.cpython-314.pyc",
         "bytes": 15578,
         "sha256": "b5b6025b7e329e9e2a475221a4b25b5b7c6589741794781abe30d03ce81e819e",
         "source_sha256": "9ea588a5fc65a931a5397bcb83691854a463619ac51e4b8a1d4ea268ef64d9cb"
       },
       "scripts/l01_independent_fleet.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_independent_fleet.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_independent_fleet.cpython-314.pyc",
         "bytes": 50953,
         "sha256": "c056bd8b169c063c50fe7efdb3073692f981a6004fdd5dd2b200264816392c94",
         "source_sha256": "506c879f99348e1f47413cf3c5eb432eca089bb011725407896b7e730989f743"
       },
       "scripts/l01_local_traffic.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_local_traffic.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_local_traffic.cpython-314.pyc",
         "bytes": 32800,
         "sha256": "baaa8559924044866ca75b42814a7d73aa7d899406ebfce61ff6e2f184fba1d0",
         "source_sha256": "6a230145175b6f82cf2b0230bdeab74af5eb998c33b4af713223c83f2987f6bc"
       },
       "scripts/l01_opposing_traffic.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/l01_opposing_traffic.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/l01_opposing_traffic.cpython-314.pyc",
         "bytes": 48558,
         "sha256": "d701c48b78a39458303f686affdb45411ab6596b148b98c4fadc1b124147e32d",
         "source_sha256": "8fe27b56a6b50a9300565e47b23f1d7ca9dcbc1422831a3ad3e2d6db04baf85a"
       },
       "scripts/relative_floorplan.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/relative_floorplan.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/relative_floorplan.cpython-314.pyc",
         "bytes": 50847,
         "sha256": "fe8f45b204eee3fbfa1776f17aa94579910958f53bade8d3274110371d29ea2d",
         "source_sha256": "169b646c800e47d3723a28ef9c517fbe082fead7df495e0d326f55ceda2d521b"
       },
       "scripts/robot_spec.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/robot_spec.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/robot_spec.cpython-314.pyc",
         "bytes": 31849,
         "sha256": "3f3669cd98d50ac5eaa22c4da07f72e13195c8b4efc122351c56932354192afd",
         "source_sha256": "e5cf4bbb44a3739c07280d4658ab8234edc0753ca6d41b2db4a580ca45f9b9b0"
       },
       "scripts/sample_motion.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/sample_motion.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/sample_motion.cpython-314.pyc",
         "bytes": 42738,
         "sha256": "74fe76c16bf483f5c9eb702c31eab28ebfffc4e0efbd2afe556f63f769db5a76",
         "source_sha256": "c73cae1df6d21db1d59be177ef4c3db3d3e9790eb45cef66dea114f911fa2673"
       },
       "scripts/sample_transport_model.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/sample_transport_model.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/sample_transport_model.cpython-314.pyc",
         "bytes": 17722,
         "sha256": "7a8ef34ffccc487577dcdc52ba9cfefd9ecd87b88081398f8500f11ac24dbe33",
         "source_sha256": "21cf3a2d4a3c7cf0c4544447b68acea9ce3f433a127b09579f2dff053bd7686c"
       },
       "scripts/tr01_camera_model.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_camera_model.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_camera_model.cpython-314.pyc",
         "bytes": 19202,
         "sha256": "460cd75488694c100a376c0f299a7e4db27f0c4d3234b08ec51f415b3ac9a6ec",
         "source_sha256": "81d3e490a0e566380da823cd2d98b3ed29db80b96405976b5daeb2114cf781b3"
       },
       "scripts/tr01_floor_motion.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_floor_motion.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_floor_motion.cpython-314.pyc",
         "bytes": 27744,
         "sha256": "6ce1bbf11415e0d998c25451eb53d50a8c033f417f096adb7ac9f8cbbb4aff21",
         "source_sha256": "282fe65f4a8d4c27a5845021c65b1c68a7c6422ee5cd982218e0ae316c621304"
       },
       "scripts/tr01_workcell.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/tr01_workcell.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/tr01_workcell.cpython-314.pyc",
         "bytes": 33354,
         "sha256": "2b1af04e6ccd14a8b4ad7c0780157d71189d0bbd45f1da574e9e51fed9ddb7d9",
         "source_sha256": "96aaddc54185fed89cc9edea8690d49d18aa63bfb0f0bf0fc1571fc338f37c89"
       },
       "scripts/walkthrough_world.py": {
-        "artifact": "exports/building-fleet/background-startup-0b10fe1/browser-r7-python-cache/project/scripts/walkthrough_world.cpython-314.pyc",
+        "artifact": "exports/building-fleet/camera-locations/browser-r2-python-cache/project/scripts/walkthrough_world.cpython-314.pyc",
         "bytes": 7929,
         "sha256": "8fc482bfa5a624031eb1f2e96416200531bcf3b4b6589512b04b951a44cf929c",
         "source_sha256": "e49ae5853a9ae0b83137cf4a350038674607834552b091cd6f448fb2ecbf66dd"
