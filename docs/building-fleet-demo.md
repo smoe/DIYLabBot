@@ -114,7 +114,11 @@ diesen Cache.
 Die längere Bahnvorbereitung läuft in einem zweiten Worker ohne eigene
 Weltzustandsmaschine. Er erhält ausschließlich den eigenen, bereits
 zugesagten Auftrag mit Quell-, Aktions- und Freigabebindung. Der Sitzungsmotor
-läuft währenddessen weiter. Eine erste gerade Teilstrecke darf nur innerhalb
+läuft währenddessen weiter. Sobald der Sitzungsmotor die gemeinsamen
+Laufzeit- und Paketdateien geladen und geprüft hat, beginnt der Planer
+parallel zum Aufbau der Simulationswelt mit dem Depotgeschoss.
+Die weiteren Geschosse werden bei ihrem ersten Zugriff geprüft.
+Eine erste gerade Teilstrecke darf nur innerhalb
 der bereits eigenen Ressource beginnen und benötigt ihre eigenen Grenz-,
 Boden- und nativen Abstandsprüfungen. Sie behält die vollständige ursprüngliche
 Fahrt und deren Ziel; ihr Planungshorizont ist kein Missionsabschluss.
@@ -132,8 +136,39 @@ Bench-Sperren bleiben beim Sitzungsmotor. Die Worker übertragen die inneren
 JSON-Nachrichten unverändert als Text, damit Zahlenarten und vorzeichenbehaftete
 Nullen in den exakten Prüfbindungen erhalten bleiben.
 
+Für eine Fahrt mit geprüfter Startgerade berechnet der Planer die gesamte
+Nominalkurve einmal. Seine erste Antwort enthält den Fahrverlauf und die
+Tür- und Ressourcenbezüge bis zum Ziel sowie den Geometrienachweis für den
+ersten Abschnitt. Jeder weitere Nachweis beginnt genau am zuletzt bestätigten
+Knoten und umfasst höchstens 32 ursprüngliche Kurvenintervalle. Die native
+Abstands- und Bodenprüfung gilt für jeden Abschnitt. Im Depotgeschoss prüft
+der Planer außerdem die Abstände zu den festen Heimplätzen. Die Freigabe
+wächst erst, wenn Quellstand, Fahrzeug, Aktion, Generation, Geschoss,
+Programmprüfsumme, Knotenbereich und ursprüngliche eigene Zusagen stimmen.
+Die Geometrieprüfung verwendet die Wartebucht und die Aufzugstufe vom
+Aktionsbeginn. Wechselnde Durchfahrtszusagen prüft `ResourceGate` bei jedem
+Fahrschritt anhand des aktuellen Zustands.
+
+Je Fahrzeug ist höchstens ein Prüfauftrag gleichzeitig ausstehend. Anschlüsse
+an den beobachteten Fahrzustand haben Vorrang. Unter den weiteren Abschnitten
+wird zuerst das Fahrzeug mit dem bei Anforderung kleinsten Abstand zwischen
+Bremsende und geprüftem Horizont bedient. Ein abgelehnter Abschnitt erscheint
+mit Grund in der Fahrzeugtabelle. Der letzte gültige Horizont begrenzt
+weiterhin die Fahrt und die gesamte Rückfallbremsung. Ein Wiederanlauf aus
+Ruhe erfordert einen geprüften Anschluss, eine freie Ressource und einen
+frischen freien Scan. Aufzugaktionen benötigen vor Fahrtbeginn den bisherigen
+vollständigen Einzelnachweis.
+
 Die Darstellungsnachrichten folgen der gewählten Bildrate; die internen
 50-ms-Schritte laufen auch ohne neue vollständige Darstellungsnachricht.
+Die Anzeige schätzt aus neu eingetroffenen Modellzeiten und ihrer tatsächlichen
+Ankunftszeit, wie schnell sie die ausgeführte Bewegung abspielen kann.
+Der Regler der Anzeige strebt 0,3 Modellsekunden Puffer an. Er spielt mit
+höchstens einfacher Echtzeit und nur bis zum Ende der empfangenen Kurve.
+„Simulation rechnet“ kennzeichnet einen aufgebrauchten Puffer. Modellzeit,
+Anzeigezeit, vergangene Wandzeit und Wiedergabefaktor sind getrennt ablesbar.
+Der Diagnosezustand enthält zusätzlich die gemessenen Rechenzeiten des
+Sitzungsmotors und der einzelnen Planerphasen.
 Unveränderte geometrische Abstände werden nur mit exakten Eingaben
 wiederverwendet. Besitz, Stillstand, aktuelle Bewegungshüllen und die
 Weiterfahr-/Bremsprüfung werden weiterhin bei jedem Schritt ausgewertet.
@@ -141,7 +176,7 @@ Optional erzeugt `--python-bytecode-compiler` aus den mitgelieferten Originalen
 quellhashgeprüfte Python-Importdateien. Größe, Prüfsumme, Quellhash,
 Bytecodeversion und Laufzeitkompatibilität werden vor dem Import geprüft.
 
-Die neue vollständige lokale Browserprüfung beobachtete die erste Bewegung
+Die frühere vollständige lokale Browserprüfung beobachtete die erste Bewegung
 nach **7,56 s** und ihre erste native Bildschirmdarstellung nach **7,80 s**
 ab Seitenaufruf. Alle 20 Kamerazuordnungen und physischen Monitorflächen,
 das Laden aller Geschosse, Pause/Fortsetzung, Testrekrutierung und ein
@@ -150,6 +185,70 @@ Die zusätzlich gesetzte 5-Sekunden-Marke wurde verfehlt und bleibt offen;
 dies ist kein vollständiger Missions- oder Hardware-Nachweis. Originalbericht
 und unveränderte Messwerte liegen unter
 `exports/building-fleet/background-startup-0b10fe1/full-r7/`.
+
+**Lokaler Kontinuitätstest mit Seed 20261120.** Ein neuer Chromium-Prozess
+öffnete je Fassung den vollständigen Rundgang mit leerem Browsercache.
+Ein Beobachter erfasste die Workerzustände und die dargestellte Modellzeit
+pro Browserbild. Als erste Bewegung zählt eine Ortsänderung von mindestens
+1 mm. Ein Anzeigestillstand bei vorhandener Bewegung im Puffer
+(`display_freeze`), ein aufgebrauchter Puffer (`buffer_underrun`) und ein
+im Modell tatsächlich ruhendes Fahrzeug (`real_stop`) sind getrennt messbar.
+Die alte Fassung meldete weder den Haltegrund noch die Warteschlangenposition.
+
+In der Zwischenfassung mit früherem Planerstart stand BF06 nach der Abfahrt
+bei 0,821 m. Der vollständige Prüfauftrag war noch offen. Von 66,14 s
+Wandzeit entfielen 30,61 s auf die native Geometrie, 3,50 s auf die Heimplätze,
+17,57 s auf die Kurvenberechnung, 2,38 s auf deren zeitliche Anpassung und
+11,38 s auf Ressourcen- und Türbezüge. Diese Messung begründet die
+abschnittsweise Geometrieprüfung. Die synchrone Prüfung der Startgeraden
+benötigte 1,02 s im Kontrolllauf und 0,94 s in der Zwischenfassung. Dort
+war der Planer erst 1,64 s nach Beginn der Starterarbeit bereit. Daher
+verbleibt die Prüfung der Startgeraden beim Sitzungsmotor.
+
+Der Sitzungsmotor benötigte in der Zwischenfassung während aktiver Planung
+durchschnittlich 0,165 s Rechenzeit je 50-ms-Schritt (395 Schritte), bei
+bereitem, untätigem Planer 0,461 s (20 Schritte). Die Phasen enthalten
+unterschiedliche Fahr- und Startzustände. Ein isolierter Einfluss der
+Planerlast auf die Schrittzeit lässt sich daraus nicht bestimmen.
+
+Die folgende Tabelle vergleicht die ersten 55 s Wandzeit. Modell- und
+Anzeigezeit stammen aus der letzten verfügbaren Beobachtung im Fenster.
+Die beiden Faktoren geben den mittleren Zeitfortschritt während der
+laufenden Simulation bzw. Darstellung an.
+
+| Messgröße | Ausgangsstand mit Zeitmessung | Früher Planer und gepufferte Anzeige | Zusätzlich abschnittsweise Freigabe |
+|---|---:|---:|---:|
+| Erste Bewegung ab Seitenaufruf (Wandzeit) | 14,37 s | 16,18 s | 13,17 s |
+| Erreichte Modellzeit / Anzeigezeit | 9,20 / 8,99 s | 8,80 / 8,12 s | 6,80 / 6,33 s |
+| Modellsekunden / Wandsekunde | 0,189 | 0,193 | 0,142 |
+| Angezeigte Modellsekunden / Wandsekunde | 0,187 | 0,179 | 0,133 |
+| Anzeigestillstand bei gepufferter Bewegung (Episoden / Wandzeit) | 31 / 4,28 s | 2 / 0,03 s | 4 / 0,17 s |
+| Aufgebrauchter Puffer (Episoden / Wandzeit) | 28 / 27,10 s | 3 / 3,48 s | 4 / 2,27 s |
+
+BF06 wartete in der Endfassung zunächst auf einen freien Scan. Ein zweiter,
+kurzer Halt blieb an der Grenze der Startgeraden. Vom beobachteten Stillstand
+bis zur nächsten beobachteten Bewegung vergingen 1,12 s Wandzeit (5,0 bis
+5,2 s Modellzeit). Mit dem früheren vollständigen Prüfauftrag lagen zwischen
+diesen beiden Beobachtungen 35,99 s Wandzeit (5,0 bis 20,6 s Modellzeit).
+Die übrigen 19 Fahrzeuge warteten auf die von BF06 gehaltene Depotressource.
+
+Die erste Teilfreigabe beanspruchte 30,33 s Planerzeit, ihr C2-Anschluss
+weitere 0,56 s. Nach 86,98 s Wandzeit war die gesamte erste Route bis
+59,195 m geprüft. Der bestätigte Horizont wuchs von 1,240 m bis zum Ziel
+mit durchschnittlich 1,29 m je Wandsekunde. Diese Messung liegt unter der
+freien Profilgrenze von 1,45 m/s. Im letzten beobachteten Fahrzeugzustand
+nach 90,75 s Wandzeit hatte BF06 1,010 m zurückgelegt. Die Modellzeit betrug
+12,20 s, die Anzeigezeit 11,72 s. Der momentane Wiedergabefaktor reichte
+von 0 bis 0,897. Es gab keinen Sprung zu einer späteren Anzeigezeit.
+
+Der Kaltstart der Endfassung lag 1,20 s unter dem Kontrolllauf und 5,61 s
+über der historischen Messung von 7,56 s. Auslieferung und Rechnerlast
+unterscheiden sich zwischen den Einzelmessungen. Der menschliche
+Geschwindigkeitsvergleich, die tatsächliche Ankunft am Ziel sowie
+Hardware- und Sicherheitsqualifikation bleiben offen. Der lokale Vergleich
+und die Zeitreihen liegen unter `exports/building-fleet/bf01-live-continuity/`
+in `browser-comparison.json`, `final-live.json` und der zugehörigen
+`.trace.json.gz`. Das dabei geprüfte Browserpaket liegt in `final-browser/`.
 
 Die Browserquelle bindet zusätzlich
 `model/building-fleet-browser-python.shared.json`. Dessen fünf unveränderte
@@ -315,6 +414,20 @@ Geplante Ankünfte setzen das Besuchsalter nicht zurück. Das sind die 19
 vorhandenen BF01-Ziele und ihre Verbindungswege, keine Behauptung einer
 lückenlosen Sichtabdeckung aller Gebäudeflächen. K0_013, Treppenkern,
 Bench-Schutzbereiche und andere ausgeschlossene Zugänge bleiben gesperrt.
+
+Die Ausfahrt aus den beiden EG-Depots erfolgt seriell. Die Räume R0_004
+und R0_013 gehören zur selben exklusiven Ressource
+`EG.resource.0e0d9d15541065e1`. Ein nachvollzogener Abschluss ihrer
+199 Aliase umfasst zehn Verbindungen aus Raum- und Türnachbarschaft, 187
+positive Überlappungen von Schutzflächen und eine weitere Verbindung über
+überlappende Fortschrittsintervalle. Die beiden Depots sind bereits über
+ihre Türen und die Schutzflächen der Flure miteinander verbunden.
+Bei Seed 20261120 belegt BF06 diese Ressource auf seiner gesamten ersten
+Route von 59,195 m. Der Endpunkt seiner ersten geprüften Geraden liegt
+bereits bei 0,821 m. Im Live-Zustand lässt sich ablesen, welches Fahrzeug
+die Ressource hält, welches anfragt und an welcher Stelle der Warteschlange
+es steht. Die vollständigen Alias- und Geometriebezüge stehen im lokalen
+Prüfbericht `exports/building-fleet/bf01-live-continuity/depot-closure.json`.
 
 „Transport anfordern“ erzeugt einen priorisierten **leeren Testauftrag** aus
 Testabholung und Testabgabe an zwei vorhandenen Raumzielen. Geeignete
