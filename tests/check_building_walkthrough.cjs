@@ -234,6 +234,9 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
       || Boolean(document.querySelector('#building-walkthrough').dataset.error), null, {timeout: 120000});
     assert.equal(await page.locator('#building-walkthrough').getAttribute('data-error'), null,
       await page.locator('#walkthrough-error').textContent());
+    assert(await page.locator('#walkthrough-loading').isHidden(), 'First render dismisses the loading overlay');
+    const loadingBar = page.locator('#walkthrough-loading-progress');
+    assert(await loadingBar.evaluate(bar => bar.value === bar.max), 'All preparation steps completed');
     const read = () => page.evaluate(() => {
       const viewer = window.__buildingWalkthrough;
       return {ready: viewer.ready, scene: viewer.sceneId, stop: viewer.stopId, camera: viewer.camera,
@@ -1017,6 +1020,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
       {waitUntil: 'load', timeout: 120000});
     await page.waitForSelector('#walkthrough-error:not([hidden])');
     assert.match(await page.locator('#walkthrough-error').textContent(), /could not be displayed/);
+    assert(await page.locator('#walkthrough-loading').isHidden(), 'Startup errors dismiss the loading overlay');
     report.interactions.push('visible malformed-scene error');
     if (live) {
       assert.deepEqual(live.navigations.map(receipt => receipt.label), ['main', 'animated_articulation', 'animated_lift']);

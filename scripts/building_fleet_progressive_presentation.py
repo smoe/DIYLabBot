@@ -148,24 +148,18 @@ def derive(payload, output, *, world_report_sha256):
 
 def attach(html):
     """Opt-in hooks leave the ordinary standalone viewer unchanged."""
-    viewer_start = "(() => {\n  'use strict';\n  const root=document.getElementById('building-walkthrough')"
-    if html.count(viewer_start) != 1:
-        raise ValueError('Progressive native viewer initialization anchor changed')
-    html = html.replace(viewer_start, viewer_start.replace('(() => {', '(async () => {'))
-    gate_anchor = "  try {\n    const data=JSON.parse(document.getElementById('walkthrough-data').textContent);"
-    gate = r'''  try {
-    const early=globalThis.__bf01EarlyTransport;
+    gate_anchor = "    await loadingStep(0, 'Reading the building data…');"
+    gate = r'''    const early=globalThis.__bf01EarlyTransport;
     if(early){
       if(!early.transport?.ready||typeof early.transport.ready.then!=='function')throw Error('Live simulation readiness is unavailable');
-      loading.textContent='Live-Patrouille wird gestartet …';root.dataset.initialization='waiting_for_live_engine';
+      setLoadingStep(null, 'Live-Patrouille wird gestartet …');root.dataset.initialization='waiting_for_live_engine';
       const first=await early.transport.ready;
       if(first?.status!=='ready')throw Error('Die Live-Patrouille konnte nicht gestartet werden.');
       root.dataset.initialization='preparing_native_view';
-    }
-    const data=JSON.parse(document.getElementById('walkthrough-data').textContent);'''
+    }'''
     if html.count(gate_anchor) != 1:
         raise ValueError('Progressive source decode initialization anchor changed')
-    html = html.replace(gate_anchor, gate)
+    html = html.replace(gate_anchor, gate + '\n' + gate_anchor)
     replacements = {
         '  let gl=null,frameRequest=null;': '  let gl=null,frameRequest=null,progressiveGeometry=null;',
         "      uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);": "      const elementBuffer=uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);",

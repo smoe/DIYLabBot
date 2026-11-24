@@ -11,7 +11,11 @@
     main{max-width:1500px;margin:auto;padding:24px 28px 18px}.top{display:flex;justify-content:space-between;gap:20px;align-items:center;margin-bottom:22px}.eyebrow{color:#6a7771;font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;margin:0 0 5px}h1{font-size:clamp(22px,3vw,32px);font-weight:500;letter-spacing:-.035em;margin:0}.identity{display:flex;align-items:center;gap:12px}.identity svg{width:39px;height:39px;color:#57766b}.model-label{font-size:12px;color:#69766f;text-align:right;line-height:1.6}
     .places{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.place{border:1px solid #d2d9d0;background:#fffef9;color:#4b5b53;border-radius:9px;padding:10px 16px;min-height:44px;font-size:13px;transition:background .15s,color .15s}.place:hover{background:#e5ebe3}.place[aria-pressed=true]{background:#2e5146;border-color:#2e5146;color:#fff}.place .ordinal{opacity:.62;margin-right:8px;font-variant-numeric:tabular-nums}
     .stage{position:relative;background:#cfdad7;border-radius:14px;overflow:hidden;height:clamp(430px,72vh,850px);box-shadow:0 16px 45px #24372e12}.stage:fullscreen{height:100%;width:100%;border-radius:0}.stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.stage canvas:active{cursor:grabbing}.caption{position:absolute;left:20px;top:19px;pointer-events:none;max-width:calc(100% - 100px);color:#23362f;background:#fffef8ed;padding:12px 16px;border-radius:10px;box-shadow:0 3px 12px #172c2510}.caption strong{display:block;font-size:16px;font-weight:500;letter-spacing:-.015em}.caption span{display:block;font-size:11px;color:#6b776e;line-height:1.6;margin-top:2px}.fullscreen{position:absolute;right:17px;top:18px;width:40px;height:40px;border:1px solid #dbe0d5;background:#fffef6f0;border-radius:9px;color:#3a5148;font-size:18px}.fullscreen[hidden]{display:none}.crosshair{position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #ffffffb8;border-radius:50%;box-shadow:0 0 2px #0a1c2080;pointer-events:none;transform:translate(-50%,-50%)}
-    .move-controls{position:absolute;bottom:18px;left:18px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px;gap:5px}.move-controls button,.height-controls button{border:1px solid #dbe0d5;background:#fffef6ed;color:#355346;border-radius:8px;min-width:42px;min-height:42px;font-size:17px;touch-action:none;user-select:none;-webkit-user-select:none}.move-controls button:active,.height-controls button:active{background:#b9d1bc}.move-controls [data-move=forward]{grid-column:2}.move-controls [data-move=left]{grid-column:1;grid-row:2}.move-controls [data-move=back]{grid-column:2;grid-row:2}.move-controls [data-move=right]{grid-column:3;grid-row:2}.height-controls{position:absolute;right:18px;bottom:18px;display:grid;gap:5px}.height-controls button{font-size:14px}.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e1e8e1;color:#40584b;font-size:14px}.loading[hidden],.error[hidden]{display:none}.error{position:absolute;inset:16px;z-index:5;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;background:#fffaf1f5;border-radius:10px;color:#70432e;line-height:1.6}
+    .move-controls{position:absolute;bottom:18px;left:18px;display:grid;grid-template-columns:42px 42px 42px;grid-template-rows:42px 42px;gap:5px}.move-controls button,.height-controls button{border:1px solid #dbe0d5;background:#fffef6ed;color:#355346;border-radius:8px;min-width:42px;min-height:42px;font-size:17px;touch-action:none;user-select:none;-webkit-user-select:none}.move-controls button:active,.height-controls button:active{background:#b9d1bc}.move-controls [data-move=forward]{grid-column:2}.move-controls [data-move=left]{grid-column:1;grid-row:2}.move-controls [data-move=back]{grid-column:2;grid-row:2}.move-controls [data-move=right]{grid-column:3;grid-row:2}.height-controls{position:absolute;right:18px;bottom:18px;display:grid;gap:5px}.height-controls button{font-size:14px}.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#e1e8e1;color:#40584b;font-size:14px}.loading[hidden],.error[hidden]{display:none}
+    .loading-content{width:min(360px,calc(100% - 48px));text-align:center}
+    .loading-title{display:block;color:#203331;font-size:16px;font-weight:600;margin-bottom:12px}
+    .loading progress{display:block;width:100%;height:10px;accent-color:#2e5146}
+    .loading-detail{margin:10px 0 0;color:#40584b;font-size:13px;line-height:1.5}.error{position:absolute;inset:16px;z-index:5;display:flex;align-items:center;justify-content:center;text-align:center;padding:25px;background:#fffaf1f5;border-radius:10px;color:#70432e;line-height:1.6}
     .bottom{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:15px 0 7px}.navigation{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.quiet-button,.level-select{color:#395447;border:1px solid #ced8cc;background:#fafbf6;border-radius:7px;font-size:12px;padding:8px 12px;min-height:38px}.quiet-button:hover{background:#e4ebe0}.level-select:disabled{opacity:.55}.help{font-size:11px;color:#758078;line-height:1.7}.notice{font-size:11px;line-height:1.6;color:#7b847c;margin:6px 0 0}.free-tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#536e5f;margin-left:8px}.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
     .interaction-hint{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);max-width:calc(100% - 190px);margin:0;padding:9px 12px;border-radius:8px;background:#fffef6ed;color:#294d3f;font-size:12px;text-align:center;pointer-events:none}.interaction-hint[hidden]{display:none}.crosshair.is-interactive{border-color:#e3c276;background:#e3c27655;box-shadow:0 0 5px #172b21}
     @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
@@ -64,7 +68,13 @@
       <button type="button" data-move="up" aria-label="Move camera up" title="Up · E">＋</button>
       <button type="button" data-move="down" aria-label="Move camera down" title="Down · Q">−</button>
     </div>
-    <div class="loading" id="walkthrough-loading" role="status">Preparing the model…</div>
+    <div class="loading" id="walkthrough-loading">
+      <div class="loading-content">
+        <strong class="loading-title" id="walkthrough-loading-title">Preparing the model…</strong>
+        <progress id="walkthrough-loading-progress" max="4" aria-labelledby="walkthrough-loading-title"></progress>
+        <p class="loading-detail" id="walkthrough-loading-detail" role="status">Loading the building data…</p>
+      </div>
+    </div>
     <div class="error" id="walkthrough-error" role="alert" hidden></div>
   </section>
   <div class="bottom">
@@ -89,17 +99,35 @@ __WALKTHROUGH_ROBOTS__
 __WALKTHROUGH_MONITORS__
 __WALKTHROUGH_SEMINAR__</script>
 <script>
-(() => {
+(async () => {
   'use strict';
   const root=document.getElementById('building-walkthrough'),canvas=document.getElementById('walkthrough-canvas');
   const loading=document.getElementById('walkthrough-loading'),errorPanel=document.getElementById('walkthrough-error');
+  const loadingProgress=document.getElementById('walkthrough-loading-progress');
+  const loadingDetail=document.getElementById('walkthrough-loading-detail');
   const locationLabel=document.getElementById('walkthrough-location'),contextLabel=document.getElementById('walkthrough-context');
   const labRouteHint=document.getElementById('walkthrough-lab-route');
   const stopsNode=document.getElementById('walkthrough-stops'),levelSelect=document.getElementById('walkthrough-level');
   const announcement=document.getElementById('walkthrough-announcement'),stageNode=document.getElementById('walkthrough-stage');
   let gl=null,frameRequest=null;
   const fail=error=>{loading.hidden=true;errorPanel.hidden=false;errorPanel.textContent='The model could not be displayed. '+(error.message||String(error));root.dataset.ready='false';root.dataset.error=error.message||String(error);console.error(error);};
+  function setLoadingStep(completed, detail){
+    if(completed===null)loadingProgress.removeAttribute('value');
+    else loadingProgress.value=completed;
+    loadingDetail.textContent=detail;
+  }
+  function loadingStep(completed, detail){
+    setLoadingStep(completed, detail);
+    if(document.hidden)return;
+    // Let the new status paint before synchronous work. A timer also covers
+    // tabs that become hidden or browsers that defer animation frames.
+    return new Promise(resolve=>{
+      const deadline=setTimeout(()=>{cancelAnimationFrame(frame);resolve();},80);
+      const frame=requestAnimationFrame(()=>{clearTimeout(deadline);setTimeout(resolve,0);});
+    });
+  }
   try {
+    await loadingStep(0, 'Reading the building data…');
     const data=JSON.parse(document.getElementById('walkthrough-data').textContent);
     if(!data.scenes||!Array.isArray(data.stops)||!data.stops.length)throw Error('Scene geometry and viewpoints are required.');
     const settings=data.settings||{},stops=data.stops,levels=data.levels||[],opacityByRole=data.rendering?.opacity_by_role||{};
@@ -122,6 +150,7 @@ __WALKTHROUGH_SEMINAR__</script>
     const near=(settings.near_mm||25)/1000,far=(settings.far_mm||180000)/1000,fov=(settings.fov_deg||70)*Math.PI/180;
     const sensitivity=settings.look_sensitivity||.0025,eyeHeight=(settings.eye_height_mm||1600)/1000;
     if(!(walkSpeed>0&&verticalSpeed>0&&near>0&&far>near&&fov>0&&fov<Math.PI))throw Error('Invalid camera settings.');
+    await loadingStep(1, 'Setting up the 3D graphics…');
     gl=canvas.getContext('webgl2',{alpha:false,antialias:true,preserveDrawingBuffer:true,powerPreference:'high-performance'});
     if(!gl)throw Error('This viewer needs a browser with WebGL 2 enabled.');
     const vertexSource=`#version 300 es
@@ -441,7 +470,7 @@ __WALKTHROUGH_SEMINAR__</script>
       if(complete)performance.measure('walkthrough-monitor-scene-preparation',{start:started,end:performance.now()});
       return result;
     }
-    function requestRender(){dirty=true;if(frameRequest===null)frameRequest=requestAnimationFrame(tick);}
+    function requestRender(){dirty=true;if(root.dataset.ready==='true'&&frameRequest===null)frameRequest=requestAnimationFrame(tick);}
     function drawScene(scene,viewProjection,viewEye,feed=false){
       gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
       gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,viewProjection);gl.uniform3fv(uniforms.eye,viewEye);
@@ -591,6 +620,12 @@ __WALKTHROUGH_SEMINAR__</script>
       levelSelect.disabled=sceneId!=='building';if(selectedLevel!==null)levelSelect.value=selectedLevel;
       root.dataset.freeCamera='false';announcement.textContent=stop.label+'. '+contextLabel.textContent;for(const object of objectStates.values())updateObjectUI(object);requestRender();
     }
+    const defaultStop=data.default_stop_id||data.default_stop||stops[0].id;
+    const initialView=stops.find(stop=>stop.id===defaultStop);
+    if(!initialView)throw Error('Unknown viewpoint.');
+    await loadingStep(2, 'Preparing the geometry and navigation…');
+    prepareScene(initialView.scene);
+    await loadingStep(3, 'Drawing the first view…');
     stops.forEach((stop,index)=>{const button=document.createElement('button');button.type='button';button.className='place';button.dataset.stop=stop.id;button.setAttribute('aria-pressed','false');const number=document.createElement('span');number.className='ordinal';number.textContent=String(index+1).padStart(2,'0');button.append(number,document.createTextNode(stop.label));button.addEventListener('click',()=>setStop(stop.id));stopsNode.append(button);});
     isolationButton.addEventListener('click',()=>{if(elevator?.boarded)return recordLift({status:'rejected_aboard'});const next=!isolated;if(next)setStop('lab');isolated=next;isolationButton.setAttribute('aria-pressed',String(isolated));requestRender();});
     for(const level of levels){const option=document.createElement('option');option.value=level.id;option.textContent=level.label||level.id;levelSelect.append(option);}
@@ -656,7 +691,8 @@ __WALKTHROUGH_SEMINAR__</script>
       get frames(){return frames;},get renderer(){return 'webgl2';},
       get sceneStats(){const scene=sceneCache.get(sceneKey(sceneId));return scene?{triangles:scene.triangles,native_groups:scene.nativeGroups,opaque_batches:scene.opaque.length,transparent_groups:scene.transparent.length,display_opacity_overrides:scene.opacityOverrides}:null;}
     });
-    liftDoors?.initialize();setStop(data.default_stop_id||data.default_stop||stops[0].id);prepareScene(sceneId);render();dirty=false;loading.hidden=true;root.dataset.ready='true';
+    liftDoors?.initialize();setStop(defaultStop);render();dirty=false;
+    loadingProgress.value=loadingProgress.max;loading.hidden=true;root.dataset.ready='true';
   }catch(error){fail(error);}
 })();
 </script>
