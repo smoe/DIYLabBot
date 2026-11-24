@@ -266,6 +266,17 @@ Beispiel mit vorgegebenem Geometrieprüfergebnis. Die Messungen stehen in
 `exports/building-fleet/bf01-live-followup/merged-180s.json` und
 `concurrency-r2.json` im selben Verzeichnis.
 
+Ein separater Lauf desselben Browserpakets in CPython folgte Seed
+20261120 bis zur ersten tatsächlichen Flurübergabe. Bei 535,05 s
+Modellzeit erreichte BF06 seinen Heimplatz in R0_013 und BF01 erhielt
+die Flurfreigabe. Bei 535,30 s fuhr BF01 mit seiner ursprünglichen
+`mission-1` und `booking-1` über die bisherige Grenze hinaus. Sein
+eigener Scan von 535,10 s deckte den Schritt und die Bremsung bis
+829,37 mm bei einem geprüften Horizont von 13,765 m ab. Alle 41
+Planergebnisse wurden angenommen. Der Lauf dauerte 895,14 s Wandzeit
+und endete beim beobachteten Wiederanfahren. Der Prüfbericht liegt unter
+`exports/building-fleet/bf01-live-followup/live-r2-native-handover-through.json`.
+
 Die Browserquelle bindet zusätzlich
 `model/building-fleet-browser-python.shared.json`. Dessen fünf unveränderte
 Pyodide-Kerndateien werden mit ihren Originalprüfsummen von derselben Website
