@@ -250,6 +250,22 @@ und die Zeitreihen liegen unter `exports/building-fleet/bf01-live-continuity/`
 in `browser-comparison.json`, `final-live.json` und der zugehörigen
 `.trace.json.gz`. Das dabei geprüfte Browserpaket liegt in `final-browser/`.
 
+Der spätere Vergleich der Depotausfahrten verwendete Seed 20261120 und
+frische Chromium-Sitzungen. Im seriellen Kontrolllauf fuhr BF06 in
+62,40 s Modellzeit 6,867 m (179,60 s Wandzeit). Im Lauf mit zwei
+Ausfahrten bewegte sich BF06 nach 5,28 s Wandzeit. Nach 16,13 s
+Wandzeit fuhren BF06 in R0_013 und BF01 in R0_004 im selben
+Modellschritt von 4,15 bis 4,20 s. Beide Regler bestätigten anhand
+ihres eigenen Scans von 4,00 s Modellzeit den folgenden Bremsweg.
+BF01 wartete ab der Beobachtung bei 8,20 s Modellzeit an der
+0,821-m-Grenze auf BF06. Weitere 18 Fahrzeuge standen am Heimplatz.
+Alle 20 Kameras lieferten Bilder. Der Browserlauf endete bei 15,40 s
+Modellzeit nach 60,96 s Wandzeit. Der Integrationstest prüft die spätere
+Übergabe und das Wiederanfahren derselben Mission an einem kürzeren
+Beispiel mit vorgegebenem Geometrieprüfergebnis. Die Messungen stehen in
+`exports/building-fleet/bf01-live-followup/merged-180s.json` und
+`concurrency-r2.json` im selben Verzeichnis.
+
 Die Browserquelle bindet zusätzlich
 `model/building-fleet-browser-python.shared.json`. Dessen fünf unveränderte
 Pyodide-Kerndateien werden mit ihren Originalprüfsummen von derselben Website
@@ -415,7 +431,7 @@ vorhandenen BF01-Ziele und ihre Verbindungswege, keine Behauptung einer
 lückenlosen Sichtabdeckung aller Gebäudeflächen. K0_013, Treppenkern,
 Bench-Schutzbereiche und andere ausgeschlossene Zugänge bleiben gesperrt.
 
-Die Ausfahrt aus den beiden EG-Depots erfolgt seriell. Die Räume R0_004
+Die beiden EG-Depots teilen sich eine Flurfreigabe. Die Räume R0_004
 und R0_013 gehören zur selben exklusiven Ressource
 `EG.resource.0e0d9d15541065e1`. Ein nachvollzogener Abschluss ihrer
 199 Aliase umfasst zehn Verbindungen aus Raum- und Türnachbarschaft, 187
@@ -428,6 +444,23 @@ bereits bei 0,821 m. Im Live-Zustand lässt sich ablesen, welches Fahrzeug
 die Ressource hält, welches anfragt und an welcher Stelle der Warteschlange
 es steht. Die vollständigen Alias- und Geometriebezüge stehen im lokalen
 Prüfbericht `exports/building-fleet/bf01-live-continuity/depot-closure.json`.
+
+Im Live-Rundgang darf ein zweiter Transporter während dieser Fahrt seine
+eigene Mission beginnen. Dafür muss seine erste Gerade einschließlich
+Fahrzeughülle und Reserve im anderen Depot liegen. Der Abstand wird gegen
+die gesamte Bahn des ersten Transporters einschließlich Rückweg und gegen
+die zwischen den 50-ms-Schritten ausgewerteten Kurven geprüft. Beide
+Fahrzeuge benötigen für jeden Schritt einen eigenen Scan, der auch den
+anschließenden Bremsweg abdeckt. Potenziell verlassene Heimplätze bleiben
+bei der Auswertung verzögerter Scans als feste Oberflächen ausgeschlossen.
+
+Der zweite Transporter erhält den nächsten Flurzugang erst bei beobachteter
+Ankunft des ersten an dessen Heimplatz oder gebuchter Wartebucht. Erreicht
+er vorher das Ende seiner Geraden, bremst er dort bis zum Stillstand. Die
+Fahrzeugansicht zeigt den Grund „Wartet im eigenen Depot auf die Flurfreigabe“.
+Danach setzt er dieselbe Mission aus seinem tatsächlichen Bewegungszustand
+fort. Nach einer vorgezogenen Vergabe kommt wieder das erste Fahrzeug der
+regulären Warteschlange zum Zug.
 
 „Transport anfordern“ erzeugt einen priorisierten **leeren Testauftrag** aus
 Testabholung und Testabgabe an zwei vorhandenen Raumzielen. Geeignete

@@ -262,6 +262,7 @@ async function mount(bridge,payload){
    const row=document.createElement('tr'),failure=snapshot.background_preparation?.failures?.[state.id];
    let status=view.stateLabel(state.controller_mode??state.mode);
    if(failure)status+=' · Abschnittsprüfung abgelehnt · '+failure;
+   else if(finite(state.private_departure_horizon_mm))status=state.hold_condition==='observed_corridor_handover'?'Wartet im eigenen Depot auf die Flurfreigabe':'Geprüfte Parallelausfahrt im eigenen Depot';
    else if(state.queue_position)status='Warteschlange · Platz '+state.queue_position+(state.resource_holder?' · belegt durch '+state.resource_holder:'');
    else if(state.hold_reason==='await_checked_continuation')status='Wartet auf geprüfte Weiterfahrt';
    for(const value of [state.id,locations.get(state.id)+' · '+status,state.job_id??state.mission_id??'Patrouille']){

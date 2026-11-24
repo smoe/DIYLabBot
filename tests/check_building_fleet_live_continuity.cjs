@@ -1,5 +1,5 @@
 // Measure a fresh live browser session. Serve the exact bundle with an untouched worker.
-// Usage: node check_building_fleet_live_continuity.cjs <build-dir> <new-report.json> <playwright> <chrome> [wall-seconds] [first-continuation|verified-extensions|verified-goal]
+// Usage: node check_building_fleet_live_continuity.cjs <build-dir> <new-report.json> <playwright> <chrome> [wall-seconds] [first-continuation|verified-extensions|verified-goal|concurrent-departures]
 'use strict';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -9,11 +9,11 @@ const zlib = require('node:zlib');
 const {createHash} = require('node:crypto');
 const digest = value => createHash('sha256').update(value).digest('hex');
 
-function observe() {
+function observe(checkConcurrency) {
     const audit = window.__continuity = {snapshots: [], frames: [], progress: [], errors: []};
     const bounded = vector => vector.every(component => Math.abs(component) <= 1e-6);
     function motionRecord(trajectory, start, end) {
-        const moving = [];
+        const moving = [], translating = [];
         let tail;
         for (const episode of trajectory.episodes) {
             const points = episode.points;
@@ -28,9 +28,13 @@ function observe() {
                 const from = Math.max(start, a.time_s), to = Math.min(end, b.time_s);
                 if (moving.length && moving.at(-1)[1] === from) moving.at(-1)[1] = to;
                 else moving.push([from, to]);
+                if (checkConcurrency && (a.pose_mm_rad.slice(0,2).some((x,j) => Math.abs(x-b.pose_mm_rad[j])>1e-8)
+                        || [a,b].some(p => !bounded(p.velocity_mm_rad_s.slice(0,2))
+                        || !bounded(p.acceleration_mm_rad_s2.slice(0,2))))) translating.push([from,to]);
             }
         }
-        return {moving, v_end: tail?.velocity_mm_rad_s, a_end: tail?.acceleration_mm_rad_s2};
+        return {moving, ...(checkConcurrency ? {translating} : {}),
+            v_end: tail?.velocity_mm_rad_s, a_end: tail?.acceleration_mm_rad_s2};
     }
     const Original = window.Worker;
     window.Worker = class extends Original {
@@ -59,6 +63,63 @@ function observe() {
         requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+}
+
+function concurrentDeparture(snapshot, home) {
+    if (!snapshot.window || snapshot.step !== .05 || snapshot.window[1] !== snapshot.model) return null;
+    const start = +(snapshot.model-snapshot.step).toFixed(3), end = snapshot.model;
+    if (start < snapshot.window[0]-1e-9) return null;
+    const candidates = [];
+    for (const v of snapshot.vehicles) {
+        const initial = home.get(v.id);
+        if (!initial || !v.pva?.translating?.length) continue;
+        const distance = Math.hypot(v.pose_xyz_mm[0]-initial[0],v.pose_xyz_mm[1]-initial[1]);
+        if (distance < 1) continue;
+        const intervals = v.pva.translating.filter(([a,b]) => a<end && b>start);
+        if (intervals.length) candidates.push({v,distance,intervals});
+    }
+    for (let i=0; i<candidates.length; i++) for (const b of candidates.slice(i+1)) {
+        const a = candidates[i];
+        for (const [t0,t1] of a.intervals) for (const [u0,u1] of b.intervals) {
+            const overlap = [Math.max(t0,u0,start),Math.min(t1,u1,end)];
+            if (overlap[1]-overlap[0] <= 1e-8) continue;
+            const vehicles = [a,b].map(({v,distance}) => ({
+                id:v.id, level:v.level_id, home_xy_mm:home.get(v.id).slice(0,2), xy_mm:v.pose_xyz_mm.slice(0,2),
+                displacement_mm:distance, progress_mm:v.progress_mm, horizon_mm:v.own_route_horizon_mm,
+                controller:v.controller_mode, reason:v.controller_reason, held_resource:v.held_resource,
+                requested_resource:v.requested_resource, resource_holder:v.resource_holder,
+                queue_position:v.queue_position, hold_condition:v.hold_condition,
+                private_departure_horizon_mm:v.private_departure_horizon_mm ?? null,
+                executed_step_stop:v.executed_step_stop
+            }));
+            return {wall_s:snapshot.wall, step_model_s:[start,end], xy_motion_overlap_s:overlap, vehicles};
+        }
+    }
+    return null;
+}
+
+function verifyConcurrentDeparture(witness) {
+    assert(witness,'Need two vehicles with overlapping executed XY motion within one completed step');
+    const [start,end] = witness.step_model_s, [leader,staged] = [...witness.vehicles]
+        .sort((a,b) => Number(a.private_departure_horizon_mm!==null)-Number(b.private_departure_horizon_mm!==null));
+    assert.notEqual(leader.id,staged.id);
+    assert.equal(leader.private_departure_horizon_mm,null);
+    assert(Number.isFinite(staged.private_departure_horizon_mm));
+    assert.equal(staged.horizon_mm,staged.private_departure_horizon_mm);
+    assert.equal(staged.level,leader.level);
+    assert.equal(staged.held_resource,null);
+    assert(leader.held_resource && staged.requested_resource === leader.held_resource);
+    assert.equal(leader.resource_holder,leader.id);
+    assert.equal(staged.resource_holder,leader.id);
+    for (const v of witness.vehicles) {
+        const stop = v.executed_step_stop;
+        assert(stop && stop.start_s === start && stop.end_s === end,'Need both executed same-step stop receipts');
+        assert(Number.isFinite(stop.captured_s) && stop.captured_s>=0 && stop.captured_s<=start+1e-9,
+            'Stop receipt must name its own observed scan');
+        assert(Number.isFinite(v.progress_mm) && Number.isFinite(v.horizon_mm) && stop.horizon_mm === v.horizon_mm);
+        assert(Number.isFinite(stop.stop_progress_mm) && stop.stop_progress_mm>=v.progress_mm-1e-5 &&
+            stop.stop_progress_mm<=v.horizon_mm+1e-5, 'Entire recorded stop must fit the checked horizon');
+    }
 }
 
 function horizonChanges(snapshots) {
@@ -179,6 +240,7 @@ async function run() {
     const root = path.resolve(directory), output = path.resolve(reportPath), seconds = Number(duration);
     assert(seconds > 0 && Number.isFinite(seconds));
     const checkIntervals = finish === 'verified-extensions' || finish === 'verified-goal';
+    const checkConcurrency = finish === 'concurrent-departures';
     const tracePath = output+'.trace.json.gz';
     assert(!fs.existsSync(output) && !fs.existsSync(tracePath), 'Supply new evidence paths');
     const build = JSON.parse(fs.readFileSync(path.join(root,'browser-build-report.json')));
@@ -220,10 +282,11 @@ async function run() {
             if (/^https?:/.test(req.url()) && new URL(req.url()).origin !== origin) receipt.errors.push('external '+req.url());
         });
         page.on('requestfailed', req => receipt.errors.push(req.url()+' '+req.failure()?.errorText));
-        await page.addInitScript(observe);
+        await page.addInitScript(observe,checkConcurrency);
         const response = await page.goto(origin);
         assert.equal(digest(await response.body()),receipt.html_sha256);
         const started = Date.now();
+        let sampled = 0, home, overlap;
         for (;;) {
             const status = await page.evaluate(() => {
                 const states = window.__continuity.snapshots, s = states.at(-1);
@@ -240,13 +303,22 @@ async function run() {
                     planner_ready:s?.worker_timing?.planner_ready_wall_ms, errors:window.__continuity.errors};
             });
             if (status.errors.length) break;
+            if (checkConcurrency && !overlap) {
+                const recent = await page.evaluate(from => window.__continuity.snapshots.slice(from),sampled);
+                sampled += recent.length;
+                for (const s of recent) {
+                    home ??= new Map(s.vehicles.map(v => [v.id,v.pose_xyz_mm]));
+                    overlap = concurrentDeparture(s,home);
+                    if (overlap) break;
+                }
+            }
             console.log(JSON.stringify(status));
             const joined = status.preparation?.continuations > 0;
-            const completed = (finish === 'first-continuation' && joined) ||
+            const completed = overlap || (finish === 'first-continuation' && joined) ||
                 (checkIntervals && joined && status.past_first_horizon && status.observed_extensions >= 3 &&
                     (finish !== 'verified-goal' || status.full_horizon));
             if (status.wall >= seconds || (completed && status.wall >= 55)) break;
-            if (checkIntervals && Object.keys(status.preparation?.failures ?? {}).length) break;
+            if ((checkIntervals || checkConcurrency) && Object.keys(status.preparation?.failures ?? {}).length) break;
             assert(Date.now()-started < (seconds+30)*1000, 'Real browser deadline exceeded');
             await page.waitForTimeout(Math.min(10000, (seconds-status.wall)*1000));
         }
@@ -272,6 +344,18 @@ async function run() {
                 frames, snapshots: audit.snapshots.slice(0,received)});
 
             assert(receipt.summary.first_motion && receipt.summary.classified_frame_intervals);
+            if (checkConcurrency) {
+                assert(audit.snapshots[0].model===0, 'Need observed initial home positions');
+                assert.equal(home?.size,20);
+                const witness = audit.snapshots.map(s => concurrentDeparture(s,home)).find(Boolean);
+                receipt.concurrent_departures = witness;
+                verifyConcurrentDeparture(witness);
+                for (const s of audit.snapshots) if (s.preparation) {
+                    assert.equal(s.preparation.stale,0,'Unexpected stale route receipt');
+                    assert.equal(s.preparation.rejected,0,'Unexpected rejected route receipt');
+                    assert.deepEqual(s.preparation.failures,{});
+                }
+            }
             if (checkIntervals) {
                 const latest = audit.snapshots.at(-1), first = receipt.summary.horizon_changes[0];
                 assert.deepEqual(latest.preparation.failures, {});
@@ -298,5 +382,5 @@ async function run() {
     }
     console.log(JSON.stringify(receipt.summary));
 }
-module.exports = {summarize};
+module.exports = {summarize, concurrentDeparture, verifyConcurrentDeparture};
 if (require.main === module) run().catch(err => { console.error(err); process.exitCode=1; });

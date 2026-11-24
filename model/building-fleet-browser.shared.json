@@ -20,7 +20,8 @@
     "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry",
     "delivery": "same_origin_pinned_core",
     "static_geometry": "source_bound_lossless_runtime_cache",
-    "route_preparation": "background_worker_with_checked_rolling_prefix"
+    "route_preparation": "background_worker_with_checked_rolling_prefix",
+    "depot_departures": "checked_private_starter_with_reserved_successor"
   },
   "session": {
     "scope": "independent_live_session_per_page",

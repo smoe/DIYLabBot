@@ -365,6 +365,9 @@ class ResourceGate:
 
     def permit(self,now):
         e=self.engine;driver=self.driver;identity=self.vehicle
+        departures=getattr(e,'departures',None)
+        if departures is not None and departures.staged(identity):
+            return departures.permits(identity,driver)
         while self.index<len(self.spans):
             span=self.spans[self.index];held=e.resources.holds.get(identity)
             if driver.y>span['end_progress_mm']+1e-7:
@@ -690,18 +693,18 @@ class WorldRunner:
             if door is None:raise ValueError('Source path portal lacks a room-door binding')
             if door.get('initial_state',door['reference_state'])!='open':continue
             centre,normal,tangent=portal['centre_mm'],portal['normal'],portal['tangent']
-            def signed(progress):
-                p=path.evaluate(progress)[0];return sum((p[k]-centre[k])*normal[k]for k in range(2))
+            def signed(p):
+                return sum((p[k]-centre[k])*normal[k]for k in range(2))
             found=[]
-            for a,b,_,_ in path.samples:
-                da,db=signed(a),signed(b)
+            for a,b,first,last in path.samples:
+                da,db=signed(first),signed(last)
                 if da*db>0 or abs(da-db)<1e-10:continue
                 lo,hi=a,b
                 for _ in range(35):
                     mid=(lo+hi)/2
-                    if signed(mid)*da>0:lo=mid
+                    if signed(path.position(mid))*da>0:lo=mid
                     else:hi=mid
-                progress=(lo+hi)/2;p=path.evaluate(progress)[0]
+                progress=(lo+hi)/2;p=path.position(progress)
                 if abs(sum((p[k]-centre[k])*tangent[k]for k in range(2)))>portal['opening_width_mm']/2:continue
                 if any(abs(progress-old)<1e-5 for old in found):continue
                 found.append(progress);self.route_door_ids.add(door['id'])

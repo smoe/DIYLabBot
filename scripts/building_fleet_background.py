@@ -265,7 +265,15 @@ class BackgroundPreparation:
         return identity in self.pending_by_vehicle and row['driver']is None
 
     def drain(self):
-        result=self.queue;self.queue=[];return copy.deepcopy(result)
+        result=[];waiting=[]
+        departures=getattr(self.engine,'departures',None)
+        for job in self.queue:
+            if departures is not None and departures.staged(job['vehicle_id']):
+                waiting.append(job)
+            else:
+                result.append(job)
+        self.queue=waiting
+        return copy.deepcopy(result)
 
     def snapshot(self):
         return {**self.statistics,'pending':len(self.jobs),'failures':dict(self.failures),
@@ -306,6 +314,8 @@ class BackgroundPreparation:
         self._starter(identity,action,path,caps,request)
         if isinstance(row['driver'],RollingController):
             request['rolling_horizon_mm']=row['driver'].certified_horizon_mm
+        elif getattr(e,'departures',None) is not None and e.departures.staged(identity):
+            raise RuntimeError('Private departure needs its own checked rolling starter')
         if e.progress is not None:
             e.progress({'phase':'starter_timing','request_id':request['request_id'],'vehicle_id':identity,
                 'model_time_s':e.now,'wall_s':perf_counter()-began,'installed':row['driver'] is not None})
@@ -315,13 +325,22 @@ class BackgroundPreparation:
         if action.get('lift_phase')or not path.pieces or len(path.pieces[0]['controls'])!=2:return
         held=e.resources.holds.get(identity)
         horizon=path.ends[0];start=path.evaluate(0)[0];end=path.evaluate(horizon)[0]
+        departures=getattr(e,'departures',None)
+        if departures is not None and departures.staged(identity):
+            ticket=departures.ticket
+            if preparation_digest(action)!=ticket['action_sha256']:
+                raise RuntimeError('Private departure action changed before its starter proof')
+            held=ticket['resource']
+            horizon=min(horizon,ticket['horizon_mm'])
+            end=path.evaluate(horizon)[0]
+        proposed_horizon=horizon
         short=Path([start[:2],end[:2]],action['corner_trim_mm'])
         spans=e.catalog.spans(row['level'],short)
         own=[s for s in spans if s['resource']==held and s['start_progress_mm']<=1e-6 and s['end_progress_mm']>0]
         if not own:return
         horizon=min(horizon,own[0]['end_progress_mm'])
         if horizon<=1e-5:return
-        if horizon!=path.ends[0]:
+        if horizon!=proposed_horizon:
             start=path.evaluate(0)[0];end=path.evaluate(horizon)[0]
             short=Path([start[:2],end[:2]],action['corner_trim_mm'])
             spans=e.catalog.spans(row['level'],short)
@@ -417,6 +436,9 @@ class BackgroundPreparation:
     def accept(self,result):
         if type(result)is not dict:raise ValueError('Own route worker result required')
         request=self.jobs.get(result.get('request_id'))
+        departures=getattr(self.engine,'departures',None)
+        if request is not None and departures is not None and departures.staged(request['vehicle_id']):
+            return {'accepted':False,'status':'await_corridor_handover','request_id':request['request_id']}
         unsigned={k:v for k,v in result.items()if k!='result_sha256'}
         if (request is None or result.get('format')!=RESULT or result.get('source_binding')!=self.binding or
                 result.get('kind')!=request['kind']or result.get('fence')!=request['fence']or

@@ -120,6 +120,10 @@ def load_browser_source(path=BROWSER_SOURCE):
     fields = {'engine', 'version', 'loader_module_url', 'execution', 'pacing', 'static_route_witnesses'}
     if value['format'].endswith('/2'):
         fields.update(('static_geometry', 'route_preparation'))
+        if 'depot_departures' in runtime:
+            fields.add('depot_departures')
+            if runtime['depot_departures'] != 'checked_private_starter_with_reserved_successor':
+                raise ValueError('Unknown live depot departure policy')
         if (runtime.get('static_geometry') != 'source_bound_lossless_runtime_cache' or
                 runtime.get('route_preparation') != 'background_worker_with_checked_rolling_prefix'):
             raise ValueError('Source-bound geometry and checked background preparation required')
@@ -305,7 +309,7 @@ def collect_compact(inputs):
     for name in ('building_fleet_browser_runtime', 'building_fleet_patrol',
                  'building_fleet_browser_navigation',
                  'building_fleet_runtime_cache', 'building_fleet_geometry_checks',
-                 'building_fleet_background', 'building_fleet_starter',
+                 'building_fleet_background', 'building_fleet_starter', 'building_fleet_patrol_departure',
                  'building_fleet_port_paths', 'building_fleet_zones', 'building_fleet_floor'):
         importlib.import_module(name)
     for module in tuple(sys.modules.values()):

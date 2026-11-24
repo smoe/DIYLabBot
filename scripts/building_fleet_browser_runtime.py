@@ -118,6 +118,9 @@ def _configuration(config):
     if compact and (browser['runtime'].get('static_geometry') != 'source_bound_lossless_runtime_cache' or
             browser['runtime'].get('route_preparation') != 'background_worker_with_checked_rolling_prefix'):
         raise ValueError('The compact runtime requires checked geometry and background preparation')
+    if 'depot_departures' in browser['runtime'] and (not compact or
+            browser['runtime']['depot_departures'] != 'checked_private_starter_with_reserved_successor'):
+        raise ValueError('Unsupported live depot departure policy')
     if model.resolve_pin(browser['sources']['patrol']) != paths['profile']:
         raise ValueError('Browser profile differs from its leading pinned source')
     profile = model.read_json(paths['profile'])
@@ -236,6 +239,8 @@ class BrowserRuntime:
             self.engine = _make_engine(paths, source, profile, self._progress)
             if 'static_runtime_cache' in paths:
                 self.engine.configure_background_preparation(self.config_hash)
+                if model.read_json(paths['browser_source'])['runtime'].get('depot_departures'):
+                    self.engine.enable_private_departures()
             return self._capture()
         except Exception as exc:
             self.failed = True

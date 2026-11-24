@@ -12,6 +12,7 @@ import re
 import uuid
 
 from building_fleet_dispatch import Dispatcher
+from building_fleet_control import F
 from building_fleet_motion import Path
 from building_fleet_runner import WorldRunner
 
@@ -197,6 +198,36 @@ class PatrolDispatcher(Dispatcher):
 
 class PatrolWorldRunner(WorldRunner):
     """The existing BF01 world, stepped live with a separate patrol policy."""
+    departures = None
+
+    def enable_private_departures(self):
+        from building_fleet_patrol_departure import PatrolDepartures
+        if self.departures is not None:
+            raise RuntimeError('Private departure service already initialized')
+        self.departures = PatrolDepartures(self)
+
+    def check_depot_invariant(self):
+        if self.departures is None:
+            return super().check_depot_invariant()
+        self.depot_invariant_checks += self.departures.audit()
+
+    def release_resource(self, identity, resource, now):
+        if self.departures is not None:
+            self.departures.check_release(identity, resource)
+        super().release_resource(identity, resource, now)
+        if self.departures is not None:
+            self.departures.released(identity, resource)
+
+    def finish_drive(self, identity):
+        super().finish_drive(identity)
+        ticket = self.departures.ticket if self.departures is not None else None
+        row = self.vehicles[identity]
+        # A patrol can receive another job at home. Complete the already
+        # reserved handover before the old owner can acquire its next leg.
+        if (ticket and ticket['leader'] == identity and row['driver'] is None
+                and row['phase'] == 'home' and row['last_terminal']['kind'] == 'home'):
+            self.release_resource(identity, ticket['resource'], self.now)
+
     def __init__(self, source, nav, graph, catalog, planner, profile, **kwargs):
         if (profile.get('format') != 'solidcraftbot.building-fleet-patrol/1' or
                 profile.get('patrol', {}).get('termination') != 'explicit_stop' or
@@ -379,9 +410,8 @@ class PatrolWorldRunner(WorldRunner):
     def idle_action(self, identity):
         """Admit a home departure before preparing its expensive nominal curve.
 
-        This requests the existing source depot token. Its ordinary FIFO,
-        source-clear release and later ResourceGate checks remain unchanged.
-        Vehicles denied that token remain at their exact own home/rest pose.
+        The live policy can reserve one queued successor's private starter.
+        Other vehicles wait at their own home until the corridor is granted.
         """
         row = self.vehicles[identity]
         if self._startup_policy()=='own_received_camera_frame'and not self._own_startup_ready(identity):
@@ -397,6 +427,8 @@ class PatrolWorldRunner(WorldRunner):
             grant = self.resources.request(identity, resource, self.now)
             self.drain_resource_events()
             if grant['status'] != 'granted':
+                if self.departures is not None and self.departures.try_depart(identity,resource):
+                    return
                 row['hold_reason'] = 'resource_wait'
                 row['hold_condition'] = 'own_depot_departure_grant'
                 return
@@ -432,6 +464,19 @@ class PatrolWorldRunner(WorldRunner):
                              hold_reason=hold_reason, hold_condition=condition, held_resource=held,
                              requested_resource=requested, resource_holder=self.resources.owners.get(requested or held),
                              queue_position=self.resources.queues[requested].index(identity)+1 if request else None)
+                if self.departures is not None and driver is not None:
+                    # Retained only when the last executed step consumed this exact stop witness.
+                    fallback=getattr(driver,'_fallback',None)
+                    if fallback and round(fallback['start_s']+self.dt,3)==driver.now:
+                        clock=fallback['clock']
+                        state['executed_step_stop']={'start_s':fallback['start_s'],'end_s':driver.now,
+                            'captured_s':fallback['anchor']['captured_s'],
+                            'stop_progress_mm':fallback['origin_mm']+clock.points[-1][F[0]][0],
+                            'horizon_mm':driver.certified_horizon_mm}
+                if self.departures is not None and self.departures.staged(identity):
+                    state['private_departure_horizon_mm'] = driver.certified_horizon_mm
+                    if driver.mode == 'waiting' and abs(driver.y-driver.certified_horizon_mm)<1e-5:
+                        state.update(hold_reason='resource_wait',hold_condition='observed_corridor_handover')
             states.append(state)
         return states
 
