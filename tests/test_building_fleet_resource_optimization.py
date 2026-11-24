@@ -27,9 +27,9 @@ class NoDedup:
 
 class FullRouteReference(ResourceCatalog):
     """Former exact full-path behavior, deliberately without performance caches."""
-    def _route(self,route,portals):
+    def _route(self,route,portals,*,construct_path=True):
         self._region_keys=NoDedup()
-        return super()._route(route,portals)
+        return super()._route(route,portals,construct_path=construct_path)
 
     def _spans(self,level,path,canonical=True):
         marked=collections.defaultdict(list);visited=[]

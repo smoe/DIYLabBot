@@ -194,7 +194,9 @@ class ParkedBayTests(unittest.TestCase):
         self.assertNotIn('BF01',world.resources.holds)
         self.assertEqual(before,world.resources.wait_owners)
         self.assertEqual(world.bay_parking_events[0]['released_resource'],'landing')
-        world.catalog=SimpleNamespace(spans=lambda level,path:[{'resource':'landing','start_progress_mm':0.,'end_progress_mm':1000.}])
+        driver.path.length=1000.
+        world.catalog=SimpleNamespace(resources={'landing':'passage'},
+                                      spans=lambda level,path:[{'resource':'landing','start_progress_mm':0.,'end_progress_mm':driver.path.length}])
         driver.settings={'range_mm':2200}
         gate=ResourceGate(world,'BF01',driver,'EG')
         self.assertTrue(gate.permit(2))
