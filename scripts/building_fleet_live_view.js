@@ -28,6 +28,21 @@ function validateSnapshot(snapshot){
 }
 function endpoint(path,base){const url=new URL(path,base);require(url.origin===new URL(base).origin&&['http:','https:'].includes(url.protocol),'Same-origin local fleet endpoint required');return url.href;}
 function targetKey(target){return target.level+'/'+target.area;}
+function translated(before,after){
+ const previous=new Map(before.map(state=>[state.id,state]));
+ return after.some(state=>{
+  const start=previous.get(state.id);
+  return start&&start.level_id===state.level_id&&!start.attached_cabin&&!state.attached_cabin&&
+   Math.hypot(state.pose_xyz_mm[0]-start.pose_xyz_mm[0],state.pose_xyz_mm[1]-start.pose_xyz_mm[1])>1e-6;
+ });
+}
+function observedDeparture(previous,current,motion,blocked){
+ if(blocked||current.paused)return false;
+ if(previous?.session_id===current.session_id&&current.model_time_s>previous.model_time_s&&
+    translated(previous.states,current.states))return true;
+ // A page may join a running session after the first vehicle has left.
+ return Boolean(motion&&translated(motion.at(motion.start_s).states,motion.at(motion.end_s).states));
+}
 function vehicleLocation(state, locations){
  const floor=locations?.[state.level_id];
  const level=floor?.label??state.level_id;
@@ -188,13 +203,26 @@ async function mount(bridge,payload){
  let transport=config.transport??(config.worker&&globalThis.__bf01EarlyTransport?.manifest_sha256===config.worker.manifest.sha256?globalThis.__bf01EarlyTransport.transport:null);
  if(config.worker&&!transport){require(globalThis.BuildingFleetBrowserTransport?.create,'Live browser engine transport is unavailable');transport=globalThis.BuildingFleetBrowserTransport.create(config.worker);}
  const panel=document.getElementById('building-fleet-panel');require(panel,'Fleet panel missing');panel.hidden=false;panel.dataset.live='true';
- const notice=document.createElement('p');notice.setAttribute('role','status');notice.className='bf-live-status';notice.textContent='Experimentelle Live-Patrouille wird gestartet …';notice.style.cssText='position:absolute;top:76px;left:12px;right:12px;margin:0;padding:8px 12px;background:#f5f7f4ee;color:#173d37;border:1px solid #aebdb6;border-radius:8px;z-index:3;pointer-events:none;font:14px sans-serif';bridge.stage.append(notice);
+ const notice=document.createElement('div');notice.className='bf-live-status';notice.style.cssText='position:absolute;top:76px;left:12px;right:12px;margin:0;padding:8px 12px;background:#f5f7f4ee;color:#173d37;border:1px solid #aebdb6;border-radius:8px;z-index:3;pointer-events:none;font:14px sans-serif';
+ const noticeText=document.createElement('div'),progress=document.createElement('progress');
+ progress.id='bf01-startup-progress';progress.setAttribute('aria-label','Start der Patrouille');
+ progress.style.cssText='width:min(100%,32rem);height:10px;accent-color:#2e5146';
+ notice.append(noticeText,progress);bridge.stage.append(notice);
  panel.innerHTML='<h2>BF01 · aktive Patrouille</h2><p>20 leere Transporter · fortlaufende Erkundung mit priorisierten Testaufträgen. Kamerabilder sind lokale synthetische Ansichten empfangener Modellposen; kein Video-Netzwerklasttest. Testabholung und Testabgabe sind Raumankünfte ohne Probe oder Roboterübergabe.</p><div class="bf-controls"><button data-bf="play" disabled>Pause</button><output data-bf="clock">Initialisierung</output><select data-bf="vehicle" aria-label="Fahrzeug"></select><button data-bf="follow">Fahrzeug folgen</button></div><p data-bf="status" role="status">Patrouille wird vorbereitet …</p><form data-bf="request"><label>Testabholung <select data-bf="pickup" aria-label="Testabholung" required></select></label> <label>Testabgabe <select data-bf="delivery" aria-label="Testabgabe" required></select></label> <button data-bf="submit" type="submit" disabled>Transport anfordern</button></form><p data-bf="request-status" role="status"></p><p data-bf="coverage"></p><ul data-bf="targets"></ul><h3>Testaufträge</h3><ol data-bf="jobs"></ol><div class="bf-table"><table><thead><tr><th>Fahrzeug</th><th>Beobachteter Zustand</th><th>Auftrag</th></tr></thead><tbody data-bf="rows"></tbody></table></div><p data-bf="camera-note">Noch keine empfangenen Kameraaufnahmen.</p>';
  const q=name=>panel.querySelector('[data-bf="'+name+'"]');for(const id of IDS){const option=document.createElement('option');option.value=option.textContent=id;q('vehicle').append(option);}
+ function startupNotice({detail,value,max}){
+  if(q('status').textContent!==detail)q('status').textContent=detail;
+  noticeText.textContent=detail;progress.hidden=false;
+  if(finite(value)&&finite(max)&&max>0){progress.max=max;progress.value=value;}
+  else progress.removeAttribute('value');
+  progress.setAttribute('aria-valuetext',detail);
+ }
+ startupNotice({detail:'Gebäude bereit · Live-Patrouille wird vorbereitet …'});
  if(config.worker){const note=document.createElement('p');note.textContent='Eigene Live-Simulation in diesem Browser. Beim Schließen endet diese Sitzung; beim nächsten Öffnen startet eine neue Patrouille.';panel.querySelector('p').after(note);}
  const renderer=view.makeRenderer(bridge,payload.vehicle_mesh),cameraImage=makeCameraRenderer(bridge,renderer,payload),labels=document.createElement('div');labels.className='bf-labels';bridge.stage.append(labels);
  const labelNodes=new Map(IDS.map(id=>{const node=document.createElement('span');node.textContent=id;labels.append(node);return[id,node];}));
  let snapshot=null,selected='BF01',follow=false,stopped=false,connected=false,lastResponse=0,pendingRequest=null,requestCount=0,targetsKey='',polling=false,manualPause=false,doorPause=false,controlPending=false,runtimeError=null,queuedControl=null,lastCommandError='';
+ let departed=false;
  const playback=new ExecutedPlayback();
  let locations=new Map();
  const copy=value=>JSON.parse(JSON.stringify(value));
@@ -247,8 +275,14 @@ async function mount(bridge,payload){
  function statusLabel(blocks){
   const age=(performance.now()-lastResponse)/1000;
   const reacquired=playback.resyncWall!==null&&performance.now()/1000-playback.resyncWall<1;
-  q('status').textContent=runtimeError?'Patrouille angehalten · '+runtimeError:!connected?'Verbindung unterbrochen · letzte ausgeführte Positionen bleiben stehen':blocks.length?'Fahrwegtür gesperrt · Patrouille wird angehalten':snapshot.paused?'Patrouille pausiert':reacquired?'Anzeige nach einer Lücke im empfangenen Zeitfenster neu synchronisiert':playback.underrun?'Simulation rechnet · wartet auf den nächsten ausgeführten Schritt':snapshot.phase==='own_drive_prepare'?'Fahrbahn für '+snapshot.vehicle_id+' wird vorbereitet · letzte ausgeführte Positionen bleiben sichtbar':'Patrouille aktiv · '+age.toFixed(1)+' s seit letzter Zustandsmeldung';
-  notice.textContent='Live · '+snapshot.model_time_s.toFixed(2)+' s · '+q('status').textContent;
+  const hold=runtimeError?'Patrouille angehalten · '+runtimeError:!connected?'Verbindung unterbrochen · letzte ausgeführte Positionen bleiben stehen':blocks.length?'Fahrwegtür gesperrt · Patrouille wird angehalten':snapshot.paused?'Patrouille pausiert':null;
+  if(!departed){
+   startupNotice({detail:hold??(snapshot.phase==='own_drive_prepare'&&snapshot.vehicle_id?'Erste Fahrbahn für '+snapshot.vehicle_id+' wird geprüft …':'Flotte bereit · wartet auf die erste Patrouillenfahrt …')});
+   return;
+  }
+  progress.hidden=true;
+  q('status').textContent=hold??(reacquired?'Anzeige nach einer Lücke im empfangenen Zeitfenster neu synchronisiert':playback.underrun?'Simulation rechnet · wartet auf den nächsten ausgeführten Schritt':snapshot.phase==='own_drive_prepare'?'Fahrbahn für '+snapshot.vehicle_id+' wird vorbereitet · letzte ausgeführte Positionen bleiben sichtbar':'Patrouille aktiv · '+age.toFixed(1)+' s seit letzter Zustandsmeldung');
+  noticeText.textContent='Live · '+snapshot.model_time_s.toFixed(2)+' s · '+q('status').textContent;
  }
  function paint(){
   if(!snapshot)return;
@@ -275,11 +309,16 @@ async function mount(bridge,payload){
   positionLabels(observed);bridge.syncMonitorFeeds?.();bridge.requestRender();
  }
  function receive(value){
-  if(value.status==='starting'){if(!snapshot){const labels={checking_browser_bundle:'Gebäudemodell wird geladen',loading_python_runtime:'Simulation wird gestartet',checking_simulation_sources:'Modell wird geprüft',verifying_browser_bundle:'Modell wird geprüft',checking_navigation:'Fahrwege werden vorbereitet',static_graph_cache_restore:'Fahrwege werden vorbereitet',static_route_witnesses_bound:'Fahrwege werden geprüft',static_graph_cache_ready:'Fahrwege sind vorbereitet',native_scan_surfaces:'Hindernisse werden vorbereitet',native_scan_surfaces_ready:'Hindernisse sind vorbereitet'};q('status').textContent=labels[value.phase]??'Live-Patrouille wird vorbereitet';notice.textContent=q('status').textContent;}return;}
-  if(value.status==='error'){connected=false;playback.resetTiming();runtimeError=value.error??'Laufzeitfehler';if(snapshot)paint();else{q('status').textContent='Patrouille angehalten · '+runtimeError;notice.textContent=q('status').textContent;}return;}
+  if(value.status==='starting'){
+   if(!snapshot)startupNotice(globalThis.BuildingFleetBrowserTransport?.startupDisplay(value)??{detail:'Live-Patrouille wird vorbereitet …'});
+   return;
+  }
+  if(value.status==='error'){connected=false;playback.resetTiming();runtimeError=value.error??'Laufzeitfehler';if(snapshot)paint();else startupNotice({detail:'Patrouille angehalten · '+runtimeError});return;}
   validateSnapshot(value);bridge.observeVisualGeometry?.(value);
   if(snapshot&&snapshot.session_id===value.session_id&&value.model_time_s<snapshot.model_time_s)return;
-  const changed=!snapshot||snapshot.session_id!==value.session_id,nextMotion=compileWindow(value.executed_window,value.model_time_s);snapshot=value;
+  const previous=snapshot,changed=!previous||previous.session_id!==value.session_id,nextMotion=compileWindow(value.executed_window,value.model_time_s);snapshot=value;
+  if(changed)departed=false;
+  if(!departed)departed=observedDeparture(connected?previous:null,value,nextMotion,Boolean(blockers().length)||manualPause);
   locations=new Map(value.states.map(state=>[state.id,vehicleLocation(state,payload.locations)]));
   connected=true;runtimeError=null;lastResponse=performance.now();
   playback.observe(value.session_id,value.model_time_s,nextMotion,lastResponse/1000,!snapshot.paused&&!blockers().length,document.hidden);
@@ -288,7 +327,7 @@ async function mount(bridge,payload){
  async function request(url,body){if(transport)return transport.request(url,body);const controller=new AbortController(),timeout=setTimeout(()=>controller.abort(),5000);try{const response=await fetch(url,{method:body===undefined?'GET':'POST',headers:body===undefined?{}:{'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body),cache:'no-store',credentials:'same-origin',signal:controller.signal});const value=await response.json();if(!response.ok)throw Error(value.error??('HTTP '+response.status));return value;}finally{clearTimeout(timeout);}}
  async function control(action){if(action==='resume'&&blockers().length){q('status').textContent='Fortsetzen gesperrt · zuerst alle Fahrwegtüren öffnen';return;}if(controlPending){queuedControl=action;return;}controlPending=true;paint();try{const value=await request(urls.control,{action});if(value.format==='solidcraftbot.building-fleet-live-snapshot/1')receive(value);else await poll();}catch(error){connected=false;playback.resetTiming();q('status').textContent='Steuerung nicht bestätigt · '+error.message;}finally{controlPending=false;paint();if(queuedControl){const next=queuedControl;queuedControl=null;await control(next);}}}
  function userControl(action){if(action==='resume'&&blockers().length)return control(action);manualPause=action==='pause';if(action==='resume')doorPause=false;return control(action);}
- async function poll(){if(polling||stopped)return;polling=true;try{receive(await request(urls.state));}catch(error){connected=false;playback.resetTiming();q('status').textContent='Verbindung unterbrochen · '+error.message+' · keine Bewegungsvorhersage';notice.textContent=q('status').textContent;}finally{polling=false;}}
+ async function poll(){if(polling||stopped)return;polling=true;try{receive(await request(urls.state));}catch(error){connected=false;playback.resetTiming();const detail='Verbindung unterbrochen · '+error.message+' · keine Bewegungsvorhersage';if(departed){q('status').textContent=detail;noticeText.textContent=detail;}else startupNotice({detail});}finally{polling=false;}}
  async function cycle(){if(stopped)return;await poll();const blocks=blockers();if(snapshot&&connected&&!controlPending){if(blocks.length&&!snapshot.paused){doorPause=true;await control('pause');}else if(!blocks.length&&doorPause&&!manualPause){doorPause=false;await control('resume');}}setTimeout(cycle,Math.max(50,Math.min(2000,config.poll_interval_ms??200)));}
  q('play').onclick=()=>{if(snapshot)return userControl(snapshot.paused?'resume':'pause');};
  q('vehicle').onchange=()=>{selected=q('vehicle').value;paint();};

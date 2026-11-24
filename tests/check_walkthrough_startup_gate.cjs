@@ -40,7 +40,10 @@ async function run(kind, schedule = 'hidden') {
     setTimeout: callback => enqueue(timers, callback),
     clearTimeout: id => timers.delete(id),
   };
-  if (kind !== 'legacy') context.__bf01EarlyTransport = {transport: {ready: new Promise(r => resolve = r)}};
+  if (kind !== 'legacy') context.__bf01EarlyTransport = {transport: {
+    state: kind === 'error' ? {error: 'Asset verification failed'} : {},
+    ready: new Promise(r => resolve = r),
+  }};
   const completed = vm.runInNewContext(prefix, context);
   const root = nodes.get('building-walkthrough');
   const progress = nodes.get('walkthrough-loading-progress');
@@ -49,7 +52,6 @@ async function run(kind, schedule = 'hidden') {
   if (kind !== 'legacy') {
     assert.equal(root.dataset.initialization, 'waiting_for_live_engine');
     assert.equal(progress.value, undefined);
-    assert.match(detail.textContent, /Live-Patrouille/);
     assert.equal(timers.size, 0);
     resolve({status: kind});
   }
@@ -59,11 +61,13 @@ async function run(kind, schedule = 'hidden') {
     assert.equal(parses, 0);
     assert(nodes.get('walkthrough-loading').hidden);
     assert.equal(nodes.get('walkthrough-error').hidden, false);
+    assert.match(nodes.get('walkthrough-error').textContent, /Asset verification failed/);
     assert.equal(root.dataset.ready, 'false');
     assert.equal(errors.length, 1);
     return;
   }
   assert.equal(progress.value, 0);
+  if (kind === 'ready') assert.equal(progress.max, 4, 'Restore the scene milestones after byte progress');
   assert.equal(detail.textContent, 'Reading the building data…');
   if (schedule !== 'hidden') {
     assert.equal(parses, 0, 'The reading status has a chance to paint before decoding');

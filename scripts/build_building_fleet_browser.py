@@ -492,10 +492,16 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         script = '<script src="' + script_url + '"></script>'
         if compact:
             config_json = json.dumps(worker, separators=(',', ':')).replace('<', '\\u003c')
-            script += ('<script>globalThis.__bf01EarlyTransport={manifest_sha256:' +
-                json.dumps(worker['manifest']['sha256']) +
-                ',transport:BuildingFleetBrowserTransport.create(' + config_json + ')};</script>')
-        page = page.replace('</head>', script + '</head>')
+            script += ('<script>try{globalThis.__bf01EarlyTransport={manifest_sha256:' +
+                json.dumps(worker['manifest']['sha256']) + ',transport:BuildingFleetBrowserTransport.create(' +
+                config_json + ')};}catch(error){globalThis.__bf01EarlyTransport={error:String(error.message||error)};}</script>')
+            # Put the loading panel on screen before the first external script
+            # can block parsing. The worker still starts before the scene data.
+            if page.count('</main>') != 1:
+                raise ValueError('Expected the initial walkthrough loading panel before fleet startup')
+            page = page.replace('</main>', '</main>' + script)
+        else:
+            page = page.replace('</head>', script + '</head>')
         (output / 'index.html').write_text(page)
         # The final browser document has a separate exact build receipt.
         # Do not retain a local-HTTP HTML hash under the public build name.

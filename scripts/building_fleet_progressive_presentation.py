@@ -151,15 +151,45 @@ def attach(html):
     gate_anchor = "    await loadingStep(0, 'Reading the building data…');"
     gate = r'''    const early=globalThis.__bf01EarlyTransport;
     if(early){
+      if(early.error)throw Error(early.error);
       if(!early.transport?.ready||typeof early.transport.ready.then!=='function')throw Error('Live simulation readiness is unavailable');
-      setLoadingStep(null, 'Live-Patrouille wird gestartet …');root.dataset.initialization='waiting_for_live_engine';
+      root.dataset.initialization='waiting_for_live_engine';
       const first=await early.transport.ready;
-      if(first?.status!=='ready')throw Error('Die Live-Patrouille konnte nicht gestartet werden.');
+      if(first?.status!=='ready')throw Error(early.transport.state.error||'Die Live-Patrouille konnte nicht gestartet werden.');
+      loadingProgress.max=4;
+      document.getElementById('walkthrough-loading-title').textContent='Preparing the model…';
       root.dataset.initialization='preparing_native_view';
     }'''
     if html.count(gate_anchor) != 1:
         raise ValueError('Progressive source decode initialization anchor changed')
     html = html.replace(gate_anchor, gate + '\n' + gate_anchor)
+    # Receive real worker progress as soon as the panel exists, even while
+    # the HTML parser is still receiving the embedded ground-floor model.
+    early_display = r'''<script id="bf01-startup-display">
+(() => {
+  const early = globalThis.__bf01EarlyTransport;
+  if (!early) return;
+  const title = document.getElementById('walkthrough-loading-title');
+  const detail = document.getElementById('walkthrough-loading-detail');
+  const bar = document.getElementById('walkthrough-loading-progress');
+  title.textContent = 'Live-Patrouille wird vorbereitet';
+  if (early.error) { detail.textContent = early.error; return; }
+  early.transport.subscribeStartup(state => {
+    if (state.status === 'starting') {
+      const stage = BuildingFleetBrowserTransport.startupDisplay(state);
+      if (stage.value === null) bar.removeAttribute('value');
+      else { bar.max = stage.max; bar.value = stage.value; }
+      detail.textContent = stage.detail;
+    } else {
+      bar.removeAttribute('value');
+      detail.textContent = state.status === 'error' ? state.error : 'Laufzeit bereit. Gebäudedaten werden geladen …';
+    }
+  });
+})();
+</script>'''
+    if html.count('</main>') != 1:
+        raise ValueError('Expected one walkthrough loading panel before the scene payload')
+    html = html.replace('</main>', '</main>' + early_display)
     replacements = {
         '  let gl=null,frameRequest=null;': '  let gl=null,frameRequest=null,progressiveGeometry=null;',
         "      uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);": "      const elementBuffer=uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);",

@@ -90,8 +90,13 @@ Punkte, PVA, Stützung, Abstände und Grenzwerte werden dadurch nicht geändert.
 
 ### Start und laufende Bahnvorbereitung
 
-Der Browser startet den einzigen Sitzungsmotor bereits beim Laden des
-Seitenkopfs. Derselbe Motor wird anschließend mit der Darstellung verbunden.
+Der Browser zeigt den Ladebalken vor den eingebetteten Gebäudedaten und
+startet dort den einzigen Sitzungsmotor. Beim Laden der Laufzeit zeigt der
+Balken die empfangenen Bytes und die Zahl der geprüften Dateien. Beim Aufbau
+der ersten 3D-Ansicht zeigt er die abgeschlossenen Arbeitsschritte. Danach
+bleibt der Startstatus in der Szene sichtbar, bis sich der erste Transporter
+nachweislich von seinem Startort bewegt. Bei Arbeitsschritten ohne bekannte
+Gesamtmenge zeigt die Anzeige die laufende Tätigkeit.
 Die erste Ansicht enthält die vollständige native Geometrie des EG und die
 gemeinsamen Gebäudekörper. Die übrigen Geschosse werden nach tatsächlichem
 Fahrtbeginn im Hintergrund geladen; die Vereinigung enthält dieselben

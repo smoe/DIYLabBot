@@ -22,13 +22,20 @@ const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
  function executedWindow(end){const start=Math.max(0,end-1);return{start_s:start,end_s:end,levels:program.levels,lift_initial_state:view.liftAt(program,start),lift_schedule:program.lift_schedule.filter(r=>r.start_s<end&&r.end_s>start).map(r=>({...r,...(r.kind==='doors'?{from_values:view.liftAt(program,r.start_s).door_values}:{})})),trajectories:program.trajectories.map(row=>({vehicle_id:row.vehicle_id,episodes:row.episodes.filter(e=>e.start_s<end&&e.end_s>start).map(e=>{const left=Math.max(start,e.start_s),right=Math.min(end,e.end_s),points=[pva(e,left),...e.points.filter(p=>p.time_s>left&&p.time_s<right),pva(e,right)];return{...e,start_s:left,end_s:right,points};})}))};}
  const cameraFrames=captures.map(p=>{const c=program.camera_captures[p.camera_ref],m=program.received_messages.find(m=>m.kind==='perception'&&m.payload.camera_ref===p.camera_ref);return{...c,vehicle_id:m.vehicle_id,camera_ref:p.camera_ref,received_s:m.received_s,...at(c.captured_s)};});
  assert.equal(cameraFrames.length,20);
- let time=60,paused=false,online=true,startup=2,failFirstJob=true;const jobs=new Map(),requests=[],controls=[];
+ let time=60,paused=false,online=true,initializing=true,awaitingDeparture=true,startupError=false,failFirstJob=true;const jobs=new Map(),requests=[],controls=[];
  function state(){if(!paused)time=Math.round((time+.05)*1000)/1000;return{format:'solidcraftbot.building-fleet-live-snapshot/1',session_id:'controlled-browser-fixture',model_time_s:time,paused,...at(time),executed_window:executedWindow(time),targets:program.targets,jobs:[...jobs.values()],coverage:program.targets.map(t=>({...t,visits:0,last_visit_s:null})),camera_frames:cameraFrames,room_route_object_ids:program.room_route_object_ids,command_errors:[]};}
  const server=http.createServer(async(req,res)=>{
   if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html'});res.end(html);return;}
   let body='';for await(const chunk of req)body+=chunk;
   res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');
-  if(req.url==='/api/state'){if(!online){res.writeHead(503);res.end(JSON.stringify({error:'controlled disconnect'}));return;}if(startup-->0){res.end(JSON.stringify({status:'starting',phase:'controlled initialization'}));return;}res.end(JSON.stringify(state()));return;}
+  if(req.url==='/api/state'){
+   if(!online){res.writeHead(503);res.end(JSON.stringify({error:'controlled disconnect'}));return;}
+   if(startupError){res.end(JSON.stringify({status:'error',error:'controlled startup error'}));return;}
+   if(initializing){res.end(JSON.stringify({status:'starting',phase:'native_scan_surfaces'}));return;}
+   const observed=state();
+   if(awaitingDeparture)Object.assign(observed,at(60),{startup_ready:true,has_motion:true,executed_window:null});
+   res.end(JSON.stringify(observed));return;
+  }
   if(req.url==='/api/control'){const command=JSON.parse(body);controls.push(command.action);paused=command.action==='pause';res.end(JSON.stringify({status:'accepted'}));return;}
   if(req.url==='/api/jobs'){const job=JSON.parse(body);requests.push(job);jobs.set(job.request_id,{...job,status:'assigned',vehicle_id:'BF04',eta_s:2});if(failFirstJob){failFirstJob=false;res.writeHead(503);res.end(JSON.stringify({error:'controlled lost acknowledgement'}));return;}res.end(JSON.stringify({status:'accepted'}));return;}
   res.writeHead(404);res.end('{}');
@@ -39,8 +46,27 @@ const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
  const sources=['scripts/building_fleet_view.js','scripts/building_fleet_live_view.js','scripts/camera_monitor_wall.js','scripts/templates/quintic_motion.js','tests/check_building_fleet_live_browser.cjs'];
  const report={format:'solidcraftbot.building-fleet-live-fixture-browser-check/1',passed:false,fixture_only:true,input_html_sha256:sha(fs.readFileSync(target)),served_html_sha256:sha(html),recorded_fixture_html_sha256:sha(fs.readFileSync(process.argv[3])),source_files_sha256:Object.fromEntries(sources.map(name=>[name,sha(fs.readFileSync(path.resolve(__dirname,'..',name)))])),browser:{engine:'chromium',version:browser.version(),gpu_profile:'metal'},live_runner_motion_verified:false,native_motion_verified:false,scope:'Actual local HTML/WebGL controls and received camera presentation with a controlled recorded-state HTTP fixture. Current viewer modules are injected into the input HTML before serving; no active fleet geometry, route or native-motion qualification.'};
  try{
-  await page.goto(url,{timeout:120000});await page.waitForFunction(()=>window.__buildingFleet?.ready||!document.querySelector('#walkthrough-error')?.hidden||/Verbindung unterbrochen/.test(document.querySelector('[data-bf=status]')?.textContent??''),null,{timeout:45000});
+  await page.goto(url,{timeout:120000});
+  const progress=page.getByRole('progressbar',{name:'Start der Patrouille'});
+  await progress.waitFor();
+  startupError=true;
+  await page.waitForFunction(()=>document.querySelector('[data-bf=status]').textContent.includes('controlled startup error'));
+  assert(await progress.isVisible());
+  startupError=false;initializing=false;
+  await page.waitForFunction(()=>window.__buildingFleet?.ready,null,{timeout:45000});
   assert.equal(await page.evaluate(()=>window.__buildingFleet?.ready),true,await page.locator('body').innerText());
+  await page.waitForFunction(()=>window.__buildingFleet.time_s>=60.15);
+  assert(await progress.isVisible(),'Camera, planner flags and advancing time cannot complete startup for parked vehicles');
+  assert.match(await page.locator('.bf-live-status').innerText(),/erste Patrouillenfahrt/);
+  online=false;
+  await page.waitForFunction(()=>!window.__buildingFleet.connected);
+  assert(await progress.isVisible());
+  online=true;paused=true;
+  await page.waitForFunction(()=>window.__buildingFleet.snapshot.paused);
+  assert(await progress.isVisible());
+  paused=false;awaitingDeparture=false;
+  await progress.waitFor({state:'hidden'});
+  report.startup_bar_until_observed_departure=true;
   assert(await page.locator('#walkthrough-error').isHidden());assert.equal(await page.evaluate(()=>window.__buildingFleet.live),true);assert.equal(await page.evaluate(()=>window.__buildingFleet.instance_count),20);
   const interpolated=await page.evaluate(()=>({time:window.__buildingFleet.display_time_s,states:window.__buildingFleet.states,window:window.__buildingFleet.snapshot.executed_window}));assert(interpolated.time>=interpolated.window.start_s&&interpolated.time<=interpolated.window.end_s);const expected=at(interpolated.time).states;interpolated.states.forEach((s,i)=>s.pose_xyz_mm.forEach((v,k)=>assert(Math.abs(v-expected[i].pose_xyz_mm[k])<1e-6)));report.executed_pva_interpolation_matches_recorded_source=true;
   assert.equal(await page.evaluate(()=>window.__buildingWalkthrough.monitorWall.source_kind),'received_fleet_live');
