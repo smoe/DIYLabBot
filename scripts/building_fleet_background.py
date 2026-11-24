@@ -6,6 +6,7 @@ allocate missions/resources, advance the world, or contain another car's pose.
 import copy
 import math
 import re
+from time import perf_counter
 from types import SimpleNamespace
 from building_fleet_control import Controller,PreparedNominal,preparation_digest,source_perception_limit,F
 from building_fleet_motion import Path,compile_motion
@@ -26,15 +27,18 @@ def _caps(source,nav,path,action,regions):
     return zone_caps(source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],windows)
 
 
-def _geometry(context,request,driver,clock,origin,phase):
+def _geometry(context,request,driver,clock,origin,phase,mark=None):
     source,nav=context['source'],context['nav']
     observed=copy.deepcopy(request['observed']);observed['phase']=phase
     absolute=driver._cartesian_curve(clock,origin)
     absolute=floor.motion.Curve([{**p,'time_s':round(p['time_s']+observed['time_s'],3)}for p in absolute.points])
+    if mark:mark('cartesian_curve')
     home=None
     if request['action']['level']==source['depot']['level']:
         home=fixed_home_curve_proof(absolute,request['vehicle_id'],nav.homes,nav.envelope,nav.reserve,request['action']['level'])
+        if mark:mark('fixed_home')
     proof=context['geometry_checks'](copy.deepcopy(request['action']),absolute,observed)
+    if mark:mark('native_geometry')
     if not isinstance(proof,dict)or proof.get('passed')is not True:raise RuntimeError('Background native curve support/clearance rejected')
     return {'geometry':proof,'fixed_home':home}
 
@@ -46,13 +50,20 @@ def _checked_result(request,**values):
     return result
 
 
-def prepare_route(request,context):
+def prepare_route(request,context,*,phase_complete=None):
     """Compute a full route or short C2 connector, without constructing a world.
 
     The caller must supply its independently restored source binding. Native
     geometry and fixed-home proofs run here; actual scan/brake decisions remain
     in the simulation worker after the observed-state commit fence.
     """
+    previous=perf_counter()
+    def mark(name):
+        nonlocal previous
+        if phase_complete is not None:
+            phase_complete(name,perf_counter()-previous)
+            previous=perf_counter()
+
     if (type(request)is not dict or request.get('format')!=FORMAT or
             request.get('kind')not in('full_route','continuation')or
             request.get('source_binding')!=context.get('source_binding')):
@@ -61,12 +72,16 @@ def prepare_route(request,context):
     source,nav=context['source'],context['nav'];action=request['action']
     path=Path(action['points_mm'],action['corner_trim_mm'],corner_trim_caps=action.get('corner_trim_caps'))
     caps=copy.deepcopy(request['zone_caps'])
+    mark('path_setup')
     if request['kind']=='full_route':
         velocity=source_perception_limit(source,nav.radius)['applied_velocity_mm_s']
+        mark('perception_limit')
         program=compile_motion(path,source,velocity,reverse=action['reverse'],zone_caps=caps)
+        mark('compile_motion')
         driver=Controller(path,source,caps,own_start_s=request['observed']['time_s'],radius_mm=nav.radius,motion_program=program)
         driver.align_initial_heading(request['own_pose_mm_rad'][2])
-        receipt=_geometry(context,request,driver,driver.nominal_clock,0.,'background_nominal')
+        mark('nominal_retiming')
+        receipt=_geometry(context,request,driver,driver.nominal_clock,0.,'background_nominal',mark)
         # Preserve the actual checked quantized clock, rather than asking the
         # simulation worker to repeat its full nominal retiming/proof search.
         program['scalar_clock']=copy.deepcopy(driver.nominal_clock.points)
@@ -74,6 +89,7 @@ def prepare_route(request,context):
         door_context=SimpleNamespace(nav=nav,route_door_ids=set())
         doors=WorldRunner.door_markers(door_context,action['level'],path)
         spans=context['catalog'].spans(action['level'],path)
+        mark('spans_and_door_markers')
         return _checked_result(request,program=program,nominal_proof=driver.nominal_clock_proof,
             receipt=receipt,program_sha256=preparation_digest(program),resource_spans=spans,
             door_markers=doors,room_route_object_ids=sorted(door_context.route_door_ids))
@@ -82,6 +98,7 @@ def prepare_route(request,context):
     prepared=PreparedNominal(source,path,caps,program,request['nominal_proof'],path.length)
     driver=Controller(path,source,caps,radius_mm=nav.radius,motion_program=program,prepared_nominal=prepared)
     driver.align_initial_heading(request['own_pose_mm_rad'][2])
+    mark('restore_nominal')
     anchor=request['anchor'];origin=anchor['progress_mm'];v=anchor['velocity_mm_s'];a=anchor['acceleration_mm_s2']
     driver.y=origin;driver.v=v;driver.a=a;driver.now=anchor['time_s']
     candidates=[p for p in driver.nominal_clock.points if p[F[0]][0]>origin+5 and p[F[1]][0]>1e-6 and abs(p[F[2]][0])<1e-8]
@@ -99,7 +116,8 @@ def prepare_route(request,context):
                 connector=driver._quantized_clock(raw,origin)
                 valid,bounds=driver._admissible(connector,origin)
                 if valid:
-                    receipt=_geometry(context,request,driver,connector,origin,'background_C2_connector')
+                    mark('connector_search')
+                    receipt=_geometry(context,request,driver,connector,origin,'background_C2_connector',mark)
                     points=copy.deepcopy(connector.points);join=points[-1]['time_s']
                     for node in driver.nominal_clock.points:
                         if node['time_s']>target['time_s']+1e-9:
@@ -109,8 +127,10 @@ def prepare_route(request,context):
                     proof={'passed':True,'connector_dynamics':bounds,'join_progress_mm':target[F[0]][0],
                         'suffix_program_sha256':request['program_sha256'],'receipt':receipt,
                         'anchor':copy.deepcopy(anchor),'time_quantum_s':.001,'PVA_continuity':'C2'}
+                    mark('join_suffix')
                     return _checked_result(request,clock=points,anchor=anchor,proof=proof)
             duration*=1.2
+    mark('connector_search')
     return _checked_result(request,status='no_checked_connector',anchor=anchor)
 
 
@@ -159,7 +179,11 @@ class BackgroundPreparation:
         request=self._request(identity,action,caps,'full_route');self.pending_by_vehicle[identity]=request['request_id']
         row['phase']='preparing';row['hold_reason']='await_checked_route';row['hold_condition']='same_source_action_and_own_grants'
         if e.progress is not None:e.progress({'phase':'background_route_submitted','vehicle_id':identity,'request_id':request['request_id'],'model_time_s':e.now})
+        began=perf_counter()
         self._starter(identity,action,path,caps,request)
+        if e.progress is not None:
+            e.progress({'phase':'starter_timing','request_id':request['request_id'],'vehicle_id':identity,
+                'model_time_s':e.now,'wall_s':perf_counter()-began,'installed':row['driver'] is not None})
 
     def _starter(self,identity,action,path,caps,request):
         e=self.engine;row=e.vehicles[identity]

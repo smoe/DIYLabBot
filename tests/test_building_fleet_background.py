@@ -66,6 +66,16 @@ class BackgroundTests(unittest.TestCase):
         with self.assertRaises(ValueError):background.prepare_route(request,context)
         self.assertFalse(checked)
 
+    def test_phase_wall_times_do_not_change_route_or_admission_receipt(self):
+        context,_=self.source_context();request=self.request()
+        original=background.prepare_route(request,context)
+        timings={}
+        measured=background.prepare_route(request,context,phase_complete=timings.__setitem__)
+        self.assertEqual(measured,original)
+        self.assertEqual(set(timings),{'path_setup','perception_limit','compile_motion',
+            'nominal_retiming','cartesian_curve','native_geometry','spans_and_door_markers'})
+        self.assertTrue(all(value>=0 for value in timings.values()))
+
     def test_prepared_factory_skips_duplicate_proof_but_rejects_changed_values(self):
         token=PreparedNominal(self.source,self.path,[(0,300)],self.program,self.car.nominal_clock_proof,self.path.length)
         with patch.object(Controller,'_bounded_start_clock',side_effect=AssertionError('duplicate whole proof')):

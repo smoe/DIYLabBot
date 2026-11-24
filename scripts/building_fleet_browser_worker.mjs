@@ -148,9 +148,10 @@ export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(
  const archive=fetchArchive(config.bundle.url,config.bundle.sha256,manifest.archive.bytes);
  return Promise.all([python,archive]);
 }
-async function loadPythonBridge(config,progress){
+async function loadPythonBridge(config,progress,onCompactManifest){
  progress({phase:'checking_browser_bundle'});
  const raw=await download(config.manifest.url,config.manifest.sha256),text=new TextDecoder().decode(raw),manifest=validateManifest(JSON.parse(text),config);
+ if(manifest.format.endsWith('/2'))onCompactManifest?.();
  progress({phase:'loading_python_runtime'});
  const [pyodide,archive]=await loadRuntimeAssets(manifest,config);
  progress({phase:'checking_simulation_sources'});
@@ -172,8 +173,8 @@ async function loadPythonBridge(config,progress){
  const inputs={...manifest.inputs,root:'/project',source_files_sha256:Object.fromEntries(Object.entries(manifest.files).map(([name,ref])=>[name,ref.sha256])),browser_config_sha256:config.manifest.sha256};
  return{runtime,inputs,manifest};
 }
-export async function loadPythonRuntime(config,progress){
- const {runtime,inputs,manifest}=await loadPythonBridge(config,progress);
+export async function loadPythonRuntime(config,progress,onCompactManifest){
+ const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactManifest);
  const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))));
  let hasMotion=Boolean(state.has_motion);
  return{initial:state,background:manifest.format.endsWith('/2'),
@@ -188,7 +189,7 @@ export async function loadPythonRuntime(config,progress){
 export async function loadPythonPlanner(config,progress){
  const {runtime,inputs}=await loadPythonBridge(config,progress);
  runtime.boot_planner(JSON.stringify(inputs),value=>progress(JSON.parse(value)));
- return{prepare:job=>({result_json:runtime.prepare_job(job.request_json)}),dispose:()=>runtime.destroy?.()};
+ return{prepare:job=>({result_json:runtime.prepare_job(job.request_json,value=>progress(JSON.parse(value)))}),dispose:()=>runtime.destroy?.()};
 }
 export function createBackgroundPlanner(config,progress,workerFactory=url=>new Worker(url,{type:'module',name:'BF01 checked route preparation'})){
  const worker=workerFactory(import.meta.url);let sequence=0,disposed=false,failure=null;const pending=new Map();
@@ -205,11 +206,17 @@ export function createBackgroundPlanner(config,progress,workerFactory=url=>new W
   return new Promise((resolve,reject)=>{pending.set(id,{resolve,reject});worker.postMessage({type:'prepare_route',id,job});});},
   dispose(){disposed=true;rejectAll(Error('Preparation worker closed'));worker.terminate();}};
 }
-export function createPreparationController({post,loadPlanner=loadPythonPlanner,nextTask=()=>new Promise(resolve=>setTimeout(resolve,0))}){
+export function createPreparationController({post,loadPlanner=loadPythonPlanner,now=()=>performance.now(),nextTask=()=>new Promise(resolve=>setTimeout(resolve,0))}){
  let planner=null,booted=false,failed=false,busy=false;const jobs=[];
  const fail=error=>{failed=true;post({type:'planner_error',error:String(error?.message??error)});};
+ const progress=value=>post({type:'planner_progress',progress:value});
  async function pump(){if(busy||failed||!planner)return;busy=true;
-  try{while(jobs.length){const item=jobs.shift();post({type:'prepared_route',id:item.id,result:await planner.prepare(item.job)});
+  try{while(jobs.length){
+    const item=jobs.shift(),{kind,request_id,vehicle_id}=item.job,began=now();
+    progress({phase:'planner_job_start',kind,request_id,vehicle_id});
+    const result=await planner.prepare(item.job);
+    progress({phase:'planner_job_end',kind,request_id,vehicle_id,total_wall_s:(now()-began)/1000});
+    post({type:'prepared_route',id:item.id,result});
     // A synchronous Python job only yields a microtask through await. Give
     // incoming continuation messages an actual task turn before the next job.
     if(jobs.length)await nextTask();}}
@@ -217,7 +224,12 @@ export function createPreparationController({post,loadPlanner=loadPythonPlanner,
  return{handle(message){if(failed)return;
   if(message?.type==='planner_boot'){
    if(booted){fail(Error('One immutable preparation context per Worker required'));return;}booted=true;
-   Promise.resolve().then(()=>loadPlanner(message.config,value=>post({type:'planner_progress',progress:value}))).then(value=>{planner=value;void pump();}).catch(fail);
+   const began=now();
+   Promise.resolve().then(()=>loadPlanner(message.config,progress)).then(value=>{
+    planner=value;const ready=now();
+    progress({phase:'planner_ready',planner_boot_wall_s:(ready-began)/1000,planner_ready_wall_ms:performance.timeOrigin+ready});
+    void pump();
+   }).catch(fail);
   }else if(message?.type==='prepare_route'){
    if(!booted||jobs.length>=32){fail(Error('Bounded preparation requests after boot required'));return;}
    if(message.job?.kind==='continuation')jobs.unshift(message);else jobs.push(message);void pump();
@@ -225,26 +237,58 @@ export function createPreparationController({post,loadPlanner=loadPythonPlanner,
  }};
 }
 export function createController({post,loadRuntime=loadPythonRuntime,makePlanner=createBackgroundPlanner,now=()=>performance.now(),setTimer=setTimeout,clearTimer=clearTimeout}){
- let runtime=null,state=null,busy=false,booted=false,disposed=false,timer=null,planner=null,config=null,steps=0,seenMotion=false,queuedAt=null;const commands=[],prepared=[],waitingJobs=[];
- const emitState=value=>{state=parseState(value);post({type:'state',state});};
+ let runtime=null,state=null,busy=false,booted=false,disposed=false,timer=null,planner=null,config=null,steps=0;
+ const commands=[],prepared=[];
+ let plannerState='idle',lastCycleEnd=null;
+ const cycles=()=>({count:0,compute_wall_s:0,elapsed_wall_s:0,model_s:0});
+ const timing={planner_boot_wall_s:null,planner_ready_wall_ms:null,last_starter:null,planner_jobs:{},
+  cycles_by_planner:{booting:cycles(),active:cycles(),idle:cycles()},last_cycle:null};
+ const emitState=value=>{state={...parseState(value),worker_timing:structuredClone(timing)};post({type:'state',state});};
+ function startPlanner(){
+  if(disposed||planner)return;
+  plannerState='booting';
+  planner=makePlanner(config,event=>{
+   const {phase,kind,request_id,vehicle_id}=event;
+   if(phase==='planner_ready'){
+    plannerState='idle';
+    timing.planner_boot_wall_s=event.planner_boot_wall_s;
+    timing.planner_ready_wall_ms=event.planner_ready_wall_ms;
+   }else if(phase==='planner_job_start'){
+    plannerState='active';
+    timing.planner_jobs[kind]={request_id,vehicle_id,status:'active',phase_wall_s:{}};
+   }else if(phase==='planner_job_phase'){
+    timing.planner_jobs[kind].phase_wall_s[event.name]=event.wall_s;
+   }else if(phase==='planner_job_end'){
+    plannerState='idle';
+    Object.assign(timing.planner_jobs[kind],{status:'complete',total_wall_s:event.total_wall_s});
+   }
+  });
+ }
+ function runtimeProgress(event){
+  if(event.phase==='starter_timing'){
+   timing.last_starter={...event,start_wall_ms:performance.timeOrigin+now()-1000*event.wall_s};
+  }else post({type:'progress',progress:event});
+ }
  const fail=error=>{disposed=true;if(timer!==null)clearTimer(timer);planner?.dispose();post({type:'error',error:String(error?.message??error)});};
  const schedule=delay=>{if(disposed||timer!==null||!runtime)return;timer=setTimer(()=>{timer=null;void cycle();},delay);};
  async function cycle(){
-  if(disposed||busy||!runtime)return;busy=true;const began=now();
+  if(disposed||busy||!runtime)return;busy=true;const began=now(),cyclePlanner=plannerState;
   try{
    while(prepared.length)runtime.completeJob(prepared.shift());
-   while(commands.length){const row=commands.shift();try{emitState(await runtime.command(row.command));}catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
-   if(!state.paused){const next=await runtime.tick(++steps%(runtime.snapshotIntervalSteps??1)===0);if(next!==null)emitState(next);seenMotion ||= Boolean(runtime.hasMotion);}
-   if(runtime.background){waitingJobs.push(...runtime.pendingJobs());
-    if(waitingJobs.length&&queuedAt===null)queuedAt=now();
-    // Give the first checked starter's actual movement priority over another
-    // Python startup. This is a bounded CPU scheduling choice, never a grant,
-    // simulated time advance or permission to move without the normal proofs.
-    const ready=seenMotion||!waitingJobs.some(job=>job.starter_installed)||now()-queuedAt>=1000;
-    if(waitingJobs.length&&ready){
-     if(!planner)planner=makePlanner(config,progress=>post({type:'progress',progress:{...progress,phase:'background_route_preparation'}}));
-     for(const job of waitingJobs.splice(0))planner.prepare(job).then(result=>{if(!disposed){prepared.push(result);schedule(0);}}).catch(fail);
+   while(commands.length){const row=commands.shift();try{emitState(await runtime.command(row.command));if(state.paused)lastCycleEnd=null;}catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
+   if(!state.paused){
+    const next=await runtime.tick(++steps%(runtime.snapshotIntervalSteps??1)===0);
+    if(runtime.background){
+     for(const job of runtime.pendingJobs())planner.prepare(job).then(result=>{if(!disposed){prepared.push(result);schedule(0);}}).catch(fail);
     }
+    // Wall time is observational only. One call still advances exactly one source step.
+    const end=now(),compute=(end-began)/1000,elapsed=(end-(lastCycleEnd??began))/1000,dt=state.integration_step_s;
+    lastCycleEnd=end;
+    timing.last_cycle={planner_state:cyclePlanner,compute_wall_s:compute,elapsed_wall_s:elapsed,model_s:dt,
+     realtime_factor:elapsed>0?dt/elapsed:null};
+    const group=timing.cycles_by_planner[cyclePlanner];
+    group.count++;group.compute_wall_s+=compute;group.elapsed_wall_s+=elapsed;group.model_s+=dt;
+    if(next!==null)emitState(next);
    }
   }catch(error){fail(error);}finally{busy=false;if(!disposed&&(!state?.paused||commands.length))schedule(Math.max(0,state.integration_step_s*1000-(now()-began)));}
  }
@@ -252,7 +296,10 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
   if(disposed)return;
   if(message?.type==='boot'){
    if(booted){fail(Error('A browser Worker may boot only one live world'));return;}booted=true;busy=true;config=message.config;
-   Promise.resolve().then(()=>loadRuntime(message.config,progress=>post({type:'progress',progress}))).then(value=>{if(disposed){value.dispose?.();return;}runtime=value;emitState(value.initial);busy=false;schedule(0);}).catch(fail);
+   Promise.resolve().then(()=>loadRuntime(message.config,runtimeProgress,startPlanner)).then(value=>{
+    if(disposed){value.dispose?.();return;}
+    runtime=value;if(runtime.background)startPlanner();emitState(value.initial);busy=false;schedule(0);
+   }).catch(fail);
   }else if(message?.type==='command'){
    const action=message.command?.action;
    if(!['pause','resume','request_job'].includes(action)){post({type:'command_error',id:message.id,error:'Unknown simulation command'});return;}

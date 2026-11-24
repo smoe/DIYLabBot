@@ -123,7 +123,8 @@ class BrowserLifecycleTests(unittest.TestCase):
 
     def test_background_json_is_opaque_and_preserves_typed_signed_zero(self):
         runtime, engine = self.ready()
-        request = {'kind': 'full_route', 'action': {'values': [0, 0.0, -0.0, 1.0]}}
+        request = {'kind': 'full_route', 'request_id': '1', 'vehicle_id': 'BF06',
+                   'action': {'values': [0, 0.0, -0.0, 1.0]}}
         engine.drain_preparation_requests = lambda: [request]
         envelopes = json.loads(runtime.pending_jobs())
         # Only the envelope is decoded by JS; its nested JSON remains a string.

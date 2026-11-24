@@ -287,8 +287,8 @@ class BrowserRuntime:
         self._ready()
         # Keep the inner JSON opaque in JavaScript: JSON.parse/stringify would
         # turn 0.0/-0.0 into integer 0 and invalidate exact typed PVA fences.
-        return _json([{'kind': row['kind'], 'request_json': _json(row),
-                       'starter_installed': getattr(self.engine, 'vehicles', {}).get(row.get('vehicle_id'), {}).get('driver') is not None}
+        return _json([{'kind': row['kind'], 'request_id': row['request_id'],
+                       'vehicle_id': row['vehicle_id'], 'request_json': _json(row)}
                       for row in self.engine.drain_preparation_requests()])
 
     def complete_job(self, result_json):
@@ -369,18 +369,23 @@ def boot_planner(config_json, progress_callback=None):
     def progress(row):
         if progress_callback is not None:
             progress_callback(_json(row))
-    prepared = restore(paths['static_runtime_cache'], source, progress=progress, initial_level=None,
+    prepared = restore(paths['static_runtime_cache'], source, progress=progress, initial_level=source['depot']['level'],
                        **_static_verification())
     _planner_context = {**prepared, 'source': source,
         'source_binding': hashlib.sha256(_json(config).encode()).hexdigest()}
     return _json({'status': 'ready'})
 
 
-def prepare_job(request_json):
+def prepare_job(request_json, progress_callback=None):
     if _planner_context is None:
         raise RuntimeError('Background geometry is not initialized')
     request = _decode(request_json)
     if request.get('source_binding') != _planner_context['source_binding']:
         raise ValueError('Preparation request belongs to different runtime sources')
     from building_fleet_background import prepare_route
-    return _json(prepare_route(request, _planner_context))
+    def phase_complete(name, wall_s):
+        progress_callback(_json({'phase': 'planner_job_phase', 'kind': request['kind'],
+            'request_id': request['request_id'], 'vehicle_id': request['vehicle_id'],
+            'name': name, 'wall_s': wall_s}))
+    return _json(prepare_route(request, _planner_context,
+        phase_complete=phase_complete if progress_callback is not None else None))
