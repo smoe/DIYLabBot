@@ -3,6 +3,7 @@ import copy
 import json
 import math
 from pathlib import Path
+import re
 import sys
 import unittest
 
@@ -182,6 +183,37 @@ class WalkthroughTests(unittest.TestCase):
             with self.subTest(value=value), self.assertRaises(ValueError): walkthrough.validate(changed)
         changed=copy.deepcopy(self.source);changed['interaction']['reach']['unit']='m'
         with self.assertRaises(ValueError): walkthrough.validate(changed)
+
+    def test_interface_palette_meets_wcag_contrast_baseline(self):
+        template = (walkthrough.ROOT/'scripts/building_walkthrough_viewer.html').read_text()
+        colors = dict(re.findall(r'(--[\w-]+):(#(?:[0-9a-fA-F]{6}))', template))
+
+        def rgb(value):
+            return tuple(int(value[index:index+2], 16)/255 for index in (1, 3, 5))
+
+        def luminance(value):
+            channels = [channel/12.92 if channel <= .04045
+                        else ((channel+.055)/1.055)**2.4 for channel in rgb(value)]
+            return sum(weight*channel for weight, channel in zip((.2126, .7152, .0722), channels))
+
+        def contrast(foreground, background):
+            lighter, darker = sorted((luminance(foreground), luminance(background)), reverse=True)
+            return (lighter+.05)/(darker+.05)
+
+        def composite(foreground, background, opacity):
+            return '#'+''.join(f'{round((front*opacity+back*(1-opacity))*255):02x}'
+                               for front, back in zip(rgb(foreground), rgb(background)))
+
+        page = colors['--color-page']
+        surface = colors['--color-surface']
+        for name in ('--color-text', '--color-text-secondary', '--color-text-muted'):
+            with self.subTest(color=name):
+                self.assertGreaterEqual(contrast(colors[name], page), 4.5)
+        self.assertGreaterEqual(contrast(colors['--color-focus'], page), 3)
+        self.assertGreaterEqual(contrast(colors['--color-focus'], surface), 3)
+        ordinal_opacity = float(re.search(r'\.place \.ordinal\{opacity:([.\d]+)', template).group(1))
+        ordinal = composite(colors['--color-place-text'], surface, ordinal_opacity)
+        self.assertGreaterEqual(contrast(ordinal, surface), 4.5)
 
     def test_source_matches_schema(self):
         try:

@@ -97,6 +97,13 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 - Die Geschossauswahl ändert die Kamerahöhe im Gebäude. „Return to viewpoint“
   setzt den aktuellen Blickpunkt zurück; Vollbild vergrößert die Ansicht.
 
+Die semantischen Oberflächenfarben der Bedienoberfläche sind von den Farben der
+3D-Materialien getrennt. Kleine sichtbare Beschriftungen erreichen auf ihren
+Standardhintergründen mindestens 4,5:1 Kontrast; der Fokusrahmen erreicht
+mindestens 3:1. Ein Quelltest berechnet diese Verhältnisse direkt aus den
+Farbvariablen des HTML-Templates. Die Modellmaterialien und ihre dokumentierten
+Darstellungsgrenzen werden dadurch nicht verändert.
+
 Der Weghinweis am Blickpunkt **Doktorandenraum 3.002** führt rückwärts in
 den Flur und nach rechts zur ersten Tür mit dem Schild **3.003 Labor**. Dort
 führt `D3_003B` direkt ins ausgestattete Labor. Wer im Flur weiter zur zweiten
