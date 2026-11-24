@@ -401,6 +401,37 @@ def pack(files, browser_source, inputs, output, *, python_core=None, bytecode=No
     return manifest
 
 
+def presentation_locations(source, levels):
+    """Derive room names and polygons in the BF01 presentation frame."""
+    from building_fleet_routes import area_polygons
+    import building_room_labels
+    import building_stack
+
+    building = model.reference(source, 'building')
+    scale = building_stack.parameters(building)['display_scale']
+    plans = {level['id']: building_stack.level_plan(building, level['id']) for level in levels}
+    polygons = area_polygons({key: {'plan': plan, 'display_scale': scale}
+                              for key, plan in plans.items()})
+    labels = building_room_labels.labels(building, plans)
+    locations = {}
+    for level in levels:
+        identity = level['id']
+        locations[identity] = {
+            'label': level['label'],
+            'z_mm': level['z_mm'],
+            'areas': [
+                {'label': labels.get((identity, area['id']), {}).get(
+                    'text', 'Flur' if area['kind'] == 'corridor' else 'Bereich ' + area['id']),
+                 'polygon_mm': polygons[identity][area['id']]}
+                for area in plans[identity]['areas'] if area['kind'] != 'void'
+            ],
+        }
+    paths = [*building_room_labels.dependencies(building),
+             model.ROOT / 'scripts/building_fleet_routes.py']
+    pins = {path.relative_to(model.ROOT).as_posix(): model.digest(path) for path in paths}
+    return locations, pins
+
+
 def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_bytecode_compiler=None):
     output = local.project_path(output, output=True)
     compact = 'static_runtime_cache' in inputs
@@ -434,6 +465,11 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         local_report = local.build_page(source, profile, args, output,
                                        **({'progressive_output': output} if compact else {}))
         presentation_pins = local_report['source_files_sha256']
+        from walkthrough_world import FILES
+        # build_page checked the native world manifest against its report.
+        levels = model.read_json(ROOT / inputs['walkthrough_export'] / FILES['manifest'])['levels']
+        locations, location_pins = presentation_locations(source, levels)
+        presentation_pins.update(location_pins)
         page = (output / 'index.html').read_text()
         pattern = r'(<script id="building-fleet-data" type="application/json">)([^<]*)(</script>)'
         match = re.search(pattern, page)
@@ -442,6 +478,7 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         payload = json.loads(match.group(2))
         if any(name in payload for name in ('program_gzip_base64', 'experimental_preview')):
             raise ValueError('Live browser publication cannot contain a recorded program')
+        payload['locations'] = locations
         payload['live'] = {'worker': worker,
             'poll_interval_ms': payload['live']['poll_interval_ms'],
             'targets': payload['live']['targets']}

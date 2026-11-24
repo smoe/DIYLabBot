@@ -53,13 +53,21 @@ Beim Start gehört M01 zu BF01, M02 zu BF02 und entsprechend M20 zu BF20.
 Die Kamera-IDs `BF01.BF01.Overview` bis `BF01.BF20.Overview` bleiben erhalten.
 Ein Monitor verwendet ausschließlich eine bereits im synthetischen Funkmodell
 empfangene Kamerareferenz seines Fahrzeugs. Vor der ersten Zustellung bleibt
-ein Platzhalter. Die einmalige Startfreigabe der Patrouille wartet auf die
-tatsächlich empfangenen ersten Ansichten aller 20 Fahrzeuge.
+ein Platzhalter. Jedes Fahrzeug wartet auf seine eigene erste empfangene
+Kameraansicht, bevor es einen Patrouillenauftrag erhalten kann.
+
+Zu Beginn stehen BF01 und BF02 im EG in **4 Anlieferung**. BF03 bis BF20
+stehen im EG in **13 Logistik (Post / Abfall)**. Die Monitorbeschriftung
+zeigt Geschoss und, soweit zugeordnet, den Raum der Aufnahme. Die
+Monitor-Großansicht zeigt außerdem den zuletzt beobachteten Standort des
+Fahrzeugs. **Fahrzeug folgen** wechselt von dort direkt in die Folgeansicht.
 
 Das Bild entsteht aus der ursprünglichen Aufnahmepose und der damaligen
 gemeinsamen Fahrzeug- und Aufzugstellung. Aufnahmezeit, Empfangszeit und
 Bildalter in Modellzeit bleiben von der Zeit seit der letzten Bildberechnung
-im Browser getrennt. Eine neue Bildberechnung verjüngt die Aufnahme nicht.
+im Browser getrennt. Die Großansicht zeigt zusätzlich, wie viel Browserzeit
+seit der letzten neu angezeigten Aufnahme vergangen ist. Wenn ein Fahrzeug
+wartet, können aufeinanderfolgende Aufnahmen nahezu gleich aussehen.
 Die Bilder sind synthetische Modellansichten und kein realer Videostream
 oder Video-Netzwerklasttest. Bei einer Pause oder einem Fehler bleiben die
 letzten ausgeführten Stellungen sichtbar; die Anzeige sagt keine zukünftige

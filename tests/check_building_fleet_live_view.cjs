@@ -23,6 +23,17 @@ assert.equal(live.endpoint('/api/state','http://127.0.0.1:8080/bf01/'),'http://1
 assert.throws(()=>live.endpoint('https://example.com/api/state','http://127.0.0.1:8080/'));
 assert.throws(()=>live.endpoint('file:///api/state','file:///index.html'));
 assert.equal(live.targetKey({level:'OG3',area:'R3_003'}),'OG3/R3_003');
+const locations={
+ EG:{label:'EG',z_mm:0,areas:[{label:'Anlieferung',polygon_mm:[[-1,0],[50,0],[50,2000],[-1,2000]]}]},
+ OG3:{label:'3. OG',z_mm:9000,areas:[{label:'Labor 3.003',polygon_mm:[[-1,0],[50,0],[50,2000],[-1,2000]]}]},
+};
+const views=snapshot();
+Object.assign(views.states[0],{level_id:'OG3',pose_xyz_mm:[0,1000,9000]});
+assert.equal(live.vehicleLocation(views.camera_frames[0].states[0],locations),'EG · Anlieferung');
+assert.equal(live.vehicleLocation(views.states[0],locations),'3. OG · Labor 3.003');
+assert.equal(live.vehicleLocation({...views.states[0],attached_cabin:true},locations),'Aufzug · 3. OG');
+assert.equal(live.vehicleLocation({...views.states[0],attached_cabin:true,pose_xyz_mm:[0,1000,4500]},locations),'Aufzug · zwischen den Geschossen');
+assert.equal(live.vehicleLocation(views.states[1],locations),'EG');
 const window={start_s:9,end_s:10,levels:{EG:{z_mm:0}},lift_initial_state:{z_mm:0,door_values:{door:0}},lift_schedule:[{kind:'doors',start_s:8,end_s:12,from_values:{door:0},target_values:{door:1}}],trajectories:live.IDS.map(vehicle_id=>({vehicle_id,episodes:[{start_s:9,end_s:10,level_id:'EG',mode:'patrol',attached_cabin:false,points:[9,10].map(time_s=>({time_s,pose_mm_rad:[(time_s-9)*1000,0,0],velocity_mm_rad_s:[1000,0,0],acceleration_mm_rad_s2:[0,0,0]}))}]}))};
 const curve=live.compileWindow(window,10);assert.equal(curve.at(9.5).states[0].pose_xyz_mm[0],500);assert.equal(curve.at(9.5).lift.door_values.door,.27520751953125);
 assert.throws(()=>curve.at(10.001));assert.throws(()=>curve.at(8.999));
