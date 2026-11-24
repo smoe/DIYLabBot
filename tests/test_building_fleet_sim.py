@@ -24,8 +24,9 @@ def original_scan(world,vehicle_id,truth,now,lift):
     row=truth[vehicle_id];x,y,yaw=row['pose_mm'];cap=world.settings['range_mm']
     others=[p for key,p in truth.items()if key!=vehicle_id and world.visible(row,p,lift)]
     returns=[]
-    for degrees in range(0,360,world.settings['angular_step_deg']):
-        angle=math.radians(degrees);heading=yaw+angle;dx,dy=math.cos(heading),math.sin(heading)
+    step=world.settings['angular_step_deg']
+    for index in range(round(360/step)):
+        angle=math.radians(index*step);heading=yaw+angle;dx,dy=math.cos(heading),math.sin(heading)
         on_floor=abs(row.get('floor_z_mm',row['z_mm'])-row['z_mm'])<1e-6
         distance=world.static[row['level']].ray((x,y),(dx,dy),cap)if on_floor else cap
         sides=tuple(sorted(lift.get('open_sides',())))if lift['doors_open']else()
@@ -86,6 +87,38 @@ class ExactScanTests(unittest.TestCase):
         truth={'BF01':own(),'BF02':own(4000)};truth['BF02']['footprint_mm']=[9000,10000]
         self.assertTrue(self.assert_scan(world,truth,0,lift)['returns_local_mm'])
         self.assertGreater(world.range_pruned_peers,0)
+
+    def test_dense_beams_preserve_first_returns_after_rectangle_angle_pruning(self):
+        rng = random.Random(74786)
+        world = sim.SensorWorld({**SETTINGS, 'angular_step_deg': .36, 'range_mm': 12000},
+                                {'EG': [((1800, -2500), (1800, 2500))]})
+        lift = {'doors_open': False, 'level': 'EG', 'z_mm': 1000}
+        for frame in range(24):
+            x, y = rng.uniform(-10000, 10000), rng.uniform(-10000, 10000)
+            truth = {'BF01': own(x, y)}
+            truth['BF01']['pose_mm'][2] = rng.uniform(-20 * math.pi, 20 * math.pi)
+            for index in range(12):
+                peer = own(x + rng.uniform(-11000, 11000), y + rng.uniform(-11000, 11000))
+                peer['pose_mm'][2] = rng.uniform(-20 * math.pi, 20 * math.pi)
+                peer['footprint_mm'] = [rng.uniform(150, 1100), rng.uniform(150, 900)]
+                truth[str(index)] = peer
+            self.assert_scan(world, truth, frame * .1, lift)
+        self.assertLess(world.rectangle_rays, 24 * 12 * 1000 // 4)
+
+        for origin in (0., 1e9, -1e9):
+            for yaw in (0., math.nextafter(math.tau, 0.), -10 * math.tau, 1e8):
+                truth = {'BF01': own(origin, origin), 'enclosing': own(origin + 1, origin + 1)}
+                truth['BF01']['pose_mm'][2] = yaw
+                truth['enclosing']['footprint_mm'] = [2, 2]
+                self.assert_scan(world, truth, 3., lift)
+                del truth['enclosing']
+                for index, offset in enumerate((math.nextafter(206., 0.), 206.,
+                                                math.nextafter(206., math.inf), -206.)):
+                    peer = own(origin + 11744, origin + offset)
+                    peer['pose_mm'][2] = 1e-13 * index
+                    peer['footprint_mm'] = [512, 412]
+                    truth['boundary'] = peer
+                    self.assert_scan(world, truth, 3.1, lift)
 
     def test_cache_refreshes_for_nearby_motion_height_doors_and_cabin(self):
         world=sim.SensorWorld(SETTINGS,{'EG':[]},cabin_segments_by_sides={():[((1200,-500),(1200,500))],('inward',):[]},

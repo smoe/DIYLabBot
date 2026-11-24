@@ -12,7 +12,7 @@ import building_fleet_motion as motion
 
 class MotionTests(unittest.TestCase):
     def test_perception_cap_accounts_for_opposing_motion_and_stale_scan(self):
-        source=model.load();sensor=model.resolved_sensor(source)
+        source=model.load();sensor=model.resolved_sensor(source, for_layout=True)
         limits={'velocity':1000,'acceleration':500,'jerk':1000}
         proof=motion.perception_speed_limit(sensor,limits,329,1000)
         self.assertLess(proof['velocity_mm_s'],1000)
@@ -59,17 +59,18 @@ class MotionTests(unittest.TestCase):
         self.assertEqual(report['points'][-1]['velocity_mm_rad_s'],[0.,0.,0.])
 
     def test_zone_limit_brakes_in_advance_and_recovers_without_waypoint_stop(self):
-        report=motion.compile_motion(motion.Path([[0,0],[10000,0]]),model.load(),
+        source=model.load();maximum=source['motion']['empty_linear_limits']['velocity_mm_s']
+        report=motion.compile_motion(motion.Path([[0,0],[10000,0]]),source,
                                      zone_caps=[(0,1000),(4000,300),(7000,1000)])
         self.assertGreater(report['dynamics']['linear']['velocity'],500)
         self.assertTrue(report['no_stop']['passed'])
         slow=[row for row in report['zone_bounds'] if row['cap_mm_s']<301]
         self.assertTrue(slow)
         self.assertTrue(all(row['speed_upper_mm_s']<=300.0001 for row in slow))
-        for cap in [True,float('nan'),1001,-1]:
+        for cap in [True,float('nan'),maximum+1,-1]:
             with self.subTest(cap=cap):
                 with self.assertRaises(ValueError):
-                    motion.compile_motion(motion.Path([[0,0],[1000,0]]),model.load(),zone_caps=[(0,cap)])
+                    motion.compile_motion(motion.Path([[0,0],[1000,0]]),source,zone_caps=[(0,cap)])
 
     def test_tight_actual_route_refines_only_export_violations(self):
         # Source-derived EG R0_014A proposal: its short linked turns used to

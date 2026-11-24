@@ -8,7 +8,7 @@
     },
     "fleet": {
       "source": "model/building-fleet-demo.shared.json",
-      "source_sha256": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99"
+      "source_sha256": "b5db27834c2f373a1b5f5871a2b78067176e157e32eb33baf539a978fd38e4cb"
     }
   },
   "settings": {

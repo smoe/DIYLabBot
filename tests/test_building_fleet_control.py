@@ -12,6 +12,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_fleet_control as control
 import building_fleet_model as model
 import building_fleet_motion as motion
+from test_building_fleet_checks import legacy_scan_source
 F=control.F
 
 
@@ -130,7 +131,7 @@ class ControllerTests(unittest.TestCase):
 
     def test_obstacle_bounded_braking_fresh_free_and_resume(self):
         c=self.controller(zone_caps=[(0,300)])
-        self.run_controller(c,lambda time:[2500,0]if time<8 else None)
+        self.run_controller(c,lambda time:[4000,0]if time<8 else None)
         self.assert_bounded_recording(c)
         stops=[e for e in c.events if e['event']=='protective_stop']
         resumed=[e for e in c.events if e['event']=='resumed']
@@ -139,7 +140,7 @@ class ControllerTests(unittest.TestCase):
         self.assertTrue(all(e['clear_observation_s']>=c.settings['clear_observation_s']-1e-8 for e in resumed))
         stopped=[p for p in c.recorded if p.get('hold_reason')=='local_obstacle'and math.hypot(*p['velocity_mm_rad_s'][:2])<1e-8]
         self.assertTrue(stopped)
-        self.assertLess(stopped[0]['pose_mm_rad'][0]+c.radius+c.settings['clearance_mm'],2500)
+        self.assertLess(stopped[0]['pose_mm_rad'][0]+c.radius+c.settings['clearance_mm'],4000)
 
     def test_future_projection_does_not_choose_a_nearer_past_loop_branch(self):
         path=motion.Path([[0,0],[3000,0],[3000,1000],[0,1000]],trim_mm=10)
@@ -255,7 +256,7 @@ class ControllerTests(unittest.TestCase):
         points=[[8725.,16475.],[9281.219033984651,16475.],
             [9281.219033984651,16328.23312254141],[9521.589703556314,16112.137952915458],
             [10639.689802960147,15907.813256329951],[11356.756756756757,15907.813256329951]]
-        c=self.controller(motion.Path(points),zone_caps=[(0,300)])
+        c=control.Controller(motion.Path(points),legacy_scan_source(self.source),zone_caps=[(0,300)])
         c.y=2274.2061753266926;c.v=157.60920044906106;c.a=1.535680909329833e-13
         c.mode='driving';c.plan=None
         clock=c._checked_brake(strict=True)
@@ -383,7 +384,8 @@ class ControllerTests(unittest.TestCase):
     def test_sensor_range_negative_time_and_reduced_radius_rejected(self):
         c=self.controller()
         with self.assertRaises(ValueError):c._observed_gap({'captured_s':-1.,'returns_local_mm':[]},0.)
-        with self.assertRaises(ValueError):c._observed_gap({'captured_s':0.,'returns_local_mm':[[0.,3000.]]},0.)
+        outside=c.settings['range_mm']+c.settings['range_error_mm']+1
+        with self.assertRaises(ValueError):c._observed_gap({'captured_s':0.,'returns_local_mm':[[0.,outside]]},0.)
         with self.assertRaises(ValueError):self.controller(radius_mm=1.)
 
 

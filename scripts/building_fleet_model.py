@@ -82,6 +82,15 @@ def resolve_pin(ref):
     return path
 
 
+def scan_beam_count(step_deg):
+    if type(step_deg) not in (int, float) or not math.isfinite(step_deg) or not .36 <= step_deg <= 360:
+        raise ValueError('A bounded full-circle beam step is required')
+    count = round(360 / step_deg)
+    if not math.isclose(count * step_deg, 360., rel_tol=0, abs_tol=1e-12):
+        raise ValueError('The BF01 synthetic scan must cover the full circle')
+    return count
+
+
 def validate(source, verify_pins=True):
     validate_shape(source, read_json(SCHEMA))
     if verify_pins:
@@ -106,6 +115,19 @@ def validate(source, verify_pins=True):
     latency = source['communication']['latency_s']
     if latency[0] > latency[1]:
         raise ValueError('Latency interval inverted')
+    policy = source['sensor']
+    extension = policy.get('synthetic_scan')
+    if (policy['basis'] == 'bf01_synthetic_long_range') != (extension is not None):
+        raise ValueError('Declare the BF01-only scan model and its basis together')
+    if extension is not None:
+        scan_beam_count(extension['angular_step_deg'])
+        if extension['maximum_obstacle_closing_speed_mm_s'] < source['motion']['empty_linear_limits']['velocity_mm_s']:
+            raise ValueError('The BF01 scan must cover a vehicle approaching from a faster zone')
+        layout_sensor = resolved_sensor(source, for_layout=True)
+        if scan_angular_allowance(extension) > scan_angular_allowance(layout_sensor):
+            raise ValueError('The BF01 scan uncertainty exceeds the layout passing allowance')
+    elif source['motion']['empty_linear_limits']['velocity_mm_s'] > 1000:
+        raise ValueError('The legacy scan cannot accompany an extended BF01 speed ceiling')
     return source
 
 
@@ -117,9 +139,16 @@ def reference(source, key):
     return read_json(resolve_pin(source['sources'][key]))
 
 
-def resolved_sensor(source):
+def scan_angular_allowance(sensor):
+    return sensor['range_mm'] * math.sin(math.radians(sensor['angular_step_deg']))
+
+
+def resolved_sensor(source, *, for_layout=False):
+    """Keep the original E5 spacing assumptions for static path construction."""
     ref = reference(source, 'sensor')
     sensor = copy.deepcopy(ref['sensor'])
+    if not for_layout:
+        sensor.update(source['sensor'].get('synthetic_scan', {}))
     sensor['clearance_mm'] = ref['controller']['clearance_mm']
     return sensor
 

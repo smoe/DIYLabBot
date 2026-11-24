@@ -24,7 +24,7 @@ class PortPaths:
         _,self.aperture,_=_source_aperture(checked_navigation=navigation);self.open_leaves={};self.departures={}
         scene=navigation.mesh.scene
         self.mesh_error=scene['linear_tessellation_deflection_mm']+math.sqrt(3)*scene['maximum_float32_error_mm']
-        sensor=model.resolved_sensor(source);self.sensor=copy.deepcopy(sensor)
+        sensor=model.resolved_sensor(source, for_layout=True);self.sensor=copy.deepcopy(sensor)
         self.passing=max(navigation.reserve,sensor['clearance_mm']+sensor['range_error_mm']+
             sensor['range_mm']*math.sin(math.radians(sensor['angular_step_deg']))+
             source['geometry']['localization_tolerance_mm'])+navigation.navigation_margin_mm

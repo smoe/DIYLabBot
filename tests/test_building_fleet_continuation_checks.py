@@ -9,7 +9,7 @@ import building_fleet_checks as checks
 import building_fleet_control as control
 import building_fleet_model as model
 import building_fleet_motion as motion
-from test_building_fleet_checks import trajectory
+from test_building_fleet_checks import legacy_scan_source, trajectory
 
 F=motion.F
 
@@ -50,7 +50,7 @@ def decision(at=.1,mode='driving'):
 
 class ContinuationChecks(unittest.TestCase):
     @classmethod
-    def setUpClass(cls):cls.source=model.load()
+    def setUpClass(cls):cls.source=legacy_scan_source(model.load())
 
     def test_actual_whole_prefix_and_bounded_stop_are_accepted(self):
         car=own_car(self.source);clock=motion.floor.motion.Curve([scalar(0,0,100,0),scalar(1,50,0,0)])

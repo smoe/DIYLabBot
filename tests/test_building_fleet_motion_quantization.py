@@ -11,13 +11,14 @@ import building_fleet_model as model
 import building_fleet_motion as motion
 from building_fleet_control import Controller,source_perception_limit
 from building_fleet_geometry import vehicle_envelope
+from test_building_fleet_checks import legacy_scan_source
 
 
 class QuantizedMotionTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.fixture=json.loads((Path(__file__).parent/'fixtures/building_fleet_bf04_next_curve_r3.json').read_text())
-        cls.source=model.load();cls.path=motion.Path(cls.fixture['points_mm'],cls.fixture['corner_trim_mm'])
+        cls.source=legacy_scan_source(model.load());cls.path=motion.Path(cls.fixture['points_mm'],cls.fixture['corner_trim_mm'])
         cls.cap=source_perception_limit(cls.source,vehicle_envelope()['radius_mm'])['applied_velocity_mm_s']
         cls.report=motion.compile_motion(cls.path,cls.source,cls.cap,zone_caps=cls.fixture['zone_caps'],reverse=cls.fixture['reverse'])
 

@@ -27,6 +27,18 @@ Scans, 50-ms-Schritte und Bremsnachweise, Rekrutierung, Buchten-, Aufzug- und
 Bench-Regeln kommen aus denselben Python-Modulen wie beim lokalen Dienst.
 Modellzeit wird nicht vorgezogen, um langsame Berechnungen aufzuholen.
 
+Auf ausreichend langen, freien Geraden ist die leere Flotte auf Schritttempo
+ausgelegt. Das BF01-Profil begrenzt die Geschwindigkeit dort auf 1,45 m/s und
+verwendet einen synthetischen Rundumscan mit 12 m Reichweite und 1.000 Strahlen.
+Die Bremsrechnung berücksichtigt ein entgegenkommendes Fahrzeug mit bis zu
+1,45 m/s. Die baulichen Abstände für Begegnungen und Aufzugbuchten basieren
+weiter auf der etwas größeren Winkelunsicherheit des E5-Rundumscans. Die
+bestehende Begrenzung auf 0,30 m/s in geschützten Bereichen wie
+Räumen, Durchgängen und der Aufzugkabine sowie die Beschleunigungs- und
+Ruckgrenzen gelten weiter. Kurven und der jeweils verfügbare Bremsweg können
+das Tempo zusätzlich begrenzen. Die Scan- und Fahrwerte gelten für die
+Simulation. Eine Fahrwerks- oder Sensorqualifikation für TR01 steht aus.
+
 `scripts/build_building_fleet_browser.py` erzeugt HTML, Workerdateien und ein
 deterministisches ZIP. Der Browservertrag `/2` enthält originale Module und
 Modellquellen sowie ausdrücklich abgeleitete, quellgebundene statische Daten.

@@ -179,7 +179,7 @@ class Navigation:
         excluded={'KG':config['exclusions']['KG_technical_areas']}
         self.topological = nav.topology(building,walkthrough['navigation'],excluded)
         self.polygons = area_polygons(self.topological)
-        self.envelope = vehicle_envelope(); self.sensor = model.resolved_sensor(config)
+        self.envelope = vehicle_envelope(); self.sensor = model.resolved_sensor(config, for_layout=True)
         self.reserve = self.sensor['clearance_mm']+config['geometry']['localization_tolerance_mm']
         self.radius = self.envelope['radius_mm']; self.height = self.envelope['height_mm']+config['geometry']['height_reserve_mm']
         self.navigation_margin_mm=walkthrough['navigation']['contact_margin_mm']
@@ -268,7 +268,7 @@ class Navigation:
             if any(v not in(0,1)for v in grid.blocked+grid.supported)or any(math.isnan(v)or v<0 for v in grid.distance_squared):raise ValueError('Invalid cached map values')
             return grid
         n.topological=payload['topological'];n.polygons=payload['polygons'];n.envelope=vehicle_envelope()
-        n.sensor=model.resolved_sensor(config);n.reserve=n.sensor['clearance_mm']+config['geometry']['localization_tolerance_mm']
+        n.sensor=model.resolved_sensor(config, for_layout=True);n.reserve=n.sensor['clearance_mm']+config['geometry']['localization_tolerance_mm']
         n.radius=n.envelope['radius_mm'];n.height=n.envelope['height_mm']+config['geometry']['height_reserve_mm']
         n.navigation_margin_mm=model.reference(config,'walkthrough')['navigation']['contact_margin_mm']
         if payload['envelope']!=n.envelope or payload['reserve_mm']!=n.reserve or payload['height_mm']!=n.height:raise ValueError('Cached vehicle envelope or reserve differs')

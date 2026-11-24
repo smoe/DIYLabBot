@@ -34,6 +34,15 @@ def trajectory(identity,points,mode='driving',**fields):
     return Trajectory({'vehicle_id':identity,'episodes':[e]},{'EG':{'z_mm':0}},lift)
 
 
+def legacy_scan_source(source):
+    """Keep recorded short-range stopping cases tied to their original assumptions."""
+    source = copy.deepcopy(source)
+    source['sensor'].pop('synthetic_scan', None)
+    source['sensor']['basis'] = 'referenced_E5_no_override'
+    source['motion']['empty_linear_limits']['velocity_mm_s'] = 1000
+    return model.validate(source)
+
+
 class ExportChecks(unittest.TestCase):
     @classmethod
     def setUpClass(cls):cls.source=model.load()
@@ -162,7 +171,7 @@ class ExportChecks(unittest.TestCase):
         nav=NS(reserve=85,navigation_margin_mm=1,cabin_interior_mm={'min':[0,0,0],'max':[2000,1600,2500]},
                envelope={'length_mm':512,'width_mm':412})
         lanes,gap=checks.operating_cabin_lanes(nav,self.source)
-        sensor=model.resolved_sensor(self.source)
+        sensor=model.resolved_sensor(self.source, for_layout=True)
         expected=max(nav.reserve,sensor['clearance_mm']+sensor['range_error_mm']+
             sensor['range_mm']*math.sin(math.radians(sensor['angular_step_deg']))+
             self.source['geometry']['localization_tolerance_mm'])+nav.navigation_margin_mm
@@ -238,7 +247,7 @@ class ExportChecks(unittest.TestCase):
         from building_fleet_control import Controller
         from building_fleet_runner import EvidenceWriter
         from building_fleet_geometry import vehicle_envelope
-        envelope=vehicle_envelope();source=self.source
+        envelope=vehicle_envelope();source=legacy_scan_source(self.source) if obstruction else self.source
         with tempfile.TemporaryDirectory(dir=model.ROOT/'exports')as directory:
             writer=EvidenceWriter(Path(directory)/'own.jsonl.gz')
             points=[[0,0],[1500,0],[1500,1500]]if corner_trim_caps is not None else[[0,0],[3000,0]]

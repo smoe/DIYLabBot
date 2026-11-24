@@ -33,11 +33,30 @@ class FleetContractTests(unittest.TestCase):
         self.reject(lambda s: s['fleet'].update(payload_kg=1))
 
     def test_units_ranges_and_unconfirmed_area_labels(self):
-        self.reject(lambda s: s['motion']['empty_linear_limits'].update(velocity_mm_s=1001))
+        self.reject(lambda s: s['motion']['empty_linear_limits'].update(velocity_mm_s=1451))
         self.reject(lambda s: s['motion']['empty_linear_limits'].update(acceleration_mm_s2=float('nan')))
         self.reject(lambda s: s['missions'].update(seed=1.5))
         self.reject(lambda s: s['communication'].update(latency_s=[1, .5]))
         self.reject(lambda s: s['missions']['targets'][8].update(basis='owner_description'))
+
+    def test_long_range_fleet_scan_preserves_legacy_sensor_safety_settings(self):
+        effective = model.resolved_sensor(self.source)
+        original = model.reference(self.source, 'sensor')['sensor']
+        self.assertEqual(effective['range_mm'], 12000)
+        self.assertEqual(effective['angular_step_deg'], .36)
+        self.assertEqual(model.scan_beam_count(effective['angular_step_deg']), 1000)
+        self.assertEqual(effective['maximum_obstacle_closing_speed_mm_s'], 1450)
+        for field in ('latency_s', 'period_s', 'stale_after_s', 'range_error_mm', 'clear_observation_s'):
+            self.assertEqual(effective[field], original[field])
+        self.assertEqual(effective['clearance_mm'], 75)
+        self.assertLess(model.scan_angular_allowance(effective),
+                        model.scan_angular_allowance(model.resolved_sensor(self.source, for_layout=True)))
+        self.reject(lambda s: s['sensor']['synthetic_scan'].update(maximum_obstacle_closing_speed_mm_s=500))
+        self.reject(lambda s: s['sensor']['synthetic_scan'].update(angular_step_deg=.37))
+        self.reject(lambda s: s['sensor']['synthetic_scan'].update(angular_step_deg=1))
+        self.reject(lambda s: s['sensor']['synthetic_scan'].update(stale_after_s=1))
+        self.reject(lambda s: s['sensor'].update(basis='referenced_E5_no_override'))
+        self.reject(lambda s: s['sensor'].pop('synthetic_scan'))
 
     def test_support_rule_is_explicit_and_cannot_be_widened(self):
         rule=model.support_settings(self.source)

@@ -440,7 +440,7 @@ def check_telemetry(program,trajectories,source,navigation):
 def operating_cabin_lanes(navigation,source):
     """Re-derive the source operating lanes without reading runtime reports."""
     from building_fleet_services import cabin_lanes
-    sensor=model.resolved_sensor(source)
+    sensor=model.resolved_sensor(source, for_layout=True)
     perception_gap=(sensor['clearance_mm']+sensor['range_error_mm']+
         sensor['range_mm']*math.sin(math.radians(sensor['angular_step_deg']))+
         source['geometry']['localization_tolerance_mm'])
@@ -708,7 +708,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
                 if identity in scan_previous and at-scan_previous[identity]>cfg['period_s']+1e-7:raise ValueError('Original scan stream has a missing capture')
                 scan_previous[identity]=at;trajectory=by_id[identity];pose=trajectory.pose(at);e=trajectory.episode(at)
                 if not _same_pose(row['pose_mm_rad'],[pose[0],pose[1],pose[3]])or abs(finite(row['z_mm'])-pose[2])>1e-6 or row['level']!=e['level_id']:raise ValueError('Scan input contains a non-own capture localization')
-                if not isinstance(row['returns_local_mm'],list)or len(row['returns_local_mm'])>360//cfg['angular_step_deg']:raise ValueError('Original full-circle anonymous scan vectors required')
+                if not isinstance(row['returns_local_mm'],list)or len(row['returns_local_mm'])>model.scan_beam_count(cfg['angular_step_deg']):raise ValueError('Original full-circle anonymous scan vectors required')
                 for vector in row['returns_local_mm']:
                     if len(vector)!=2 or math.hypot(*[finite(v)for v in vector])>cfg['range_mm']+cfg['range_error_mm']:raise ValueError('Anonymous scan exceeds the source beam/range envelope')
                 vectors=row['returns_local_mm'];near=min(vectors,key=lambda p:math.hypot(*p),default=None)

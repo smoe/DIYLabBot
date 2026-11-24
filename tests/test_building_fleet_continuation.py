@@ -12,6 +12,7 @@ import building_fleet_control as control
 import building_fleet_model as model
 import building_fleet_motion as motion
 from building_fleet_geometry import vehicle_envelope
+from test_building_fleet_checks import legacy_scan_source
 F=control.F
 FIXTURE=Path(__file__).parent/'fixtures/building_fleet_bf04_reserve_r4.json'
 
@@ -20,25 +21,26 @@ class ContinuationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):cls.source=model.load();cls.r4=json.loads(FIXTURE.read_text())
 
-    def car(self,path=None):
-        return control.Controller(path or motion.Path([[0,0],[6000,0]]),self.source,zone_caps=[(0.,300.)])
+    def car(self,path=None,*,source=None):
+        return control.Controller(path or motion.Path([[0,0],[6000,0]]),source or self.source,zone_caps=[(0.,300.)])
 
     def clear_scan(self,car,now):
         return {'captured_s':now,'returns_local_mm':[]}
 
     def r4_car(self):
         raw=self.r4['own_path'];path=motion.Path(raw['points_mm'],raw['corner_trim_mm'])
-        c=control.Controller.__new__(control.Controller);c.path=path;c.source=self.source
+        source=legacy_scan_source(self.source)
+        c=control.Controller.__new__(control.Controller);c.path=path;c.source=source
         envelope=vehicle_envelope();c.radius=envelope['radius_mm']
         c.half_length=max(abs(envelope['min'][0]),abs(envelope['max'][0]));c.half_width=max(abs(envelope['min'][1]),abs(envelope['max'][1]))
-        linear=self.source['motion']['empty_linear_limits'];limits=dict(zip(('velocity','acceleration','jerk'),
+        linear=source['motion']['empty_linear_limits'];limits=dict(zip(('velocity','acceleration','jerk'),
             (linear['velocity_mm_s'],linear['acceleration_mm_s2'],linear['jerk_mm_s3'])))
-        cfg=model.resolved_sensor(self.source)
-        qualified=control.qualified_perception_limit(tuple(sorted(cfg.items())),tuple(sorted(limits.items())),c.radius,self.source['geometry']['localization_tolerance_mm'])
+        cfg=model.resolved_sensor(source)
+        qualified=control.qualified_perception_limit(tuple(sorted(cfg.items())),tuple(sorted(limits.items())),c.radius,source['geometry']['localization_tolerance_mm'])
         cfg['desired_speed_mm_s']=qualified['applied_velocity_mm_s']
         control.local.LocalController.__init__(c,0.,path.length,cfg,limits,c.radius)
         c.zone_caps=raw['zone_caps'];c.zone_velocity_cap=max(min(cfg['desired_speed_mm_s'],v)for _,v in c.zone_caps)
-        c.angular=model.reference(self.source,'angular_profile')['limits']['angular'];c.static_return=None;c.heading_offset=0.
+        c.angular=model.reference(source,'angular_profile')['limits']['angular'];c.static_return=None;c.heading_offset=0.
         c.recorded=[];c.record_times=[];c.events=[];c.plan_kind=None;c._brake_cache=None;c._geometry_cache={};c.profile_checks=[]
         c.continuation_stop_clock=None;c.step_end_s=None;c._step_certificate=None;c._fallback=None
         c.perception_audit={'checks':0,'minimum_range_margin_mm':None,'maximum_required_gap_mm':0.}
@@ -135,7 +137,7 @@ class ContinuationTests(unittest.TestCase):
         self.assertEqual(c.stops,1);self.assertFalse(any(r['event']=='resumed'for r in c.events))
 
     def test_future_candidate_selection_uses_the_real_gap_not_only_sensor_range(self):
-        c=self.car();c.y=c.goal-200.;c.v=200.;c.a=0.;c._record(0.)
+        c=self.car(source=legacy_scan_source(self.source));c.y=c.goal-200.;c.v=200.;c.a=0.;c._record(0.)
         gentle=control.floor.motion.Curve([control.local.point(0,0,200,0),control.local.point(2.,200,0,0)])
         c.set_plan(gentle,0.,'driving','goal');scan=self.clear_scan(c,0.)
         roomy=c._preview_stop(.05,c._visible_gap(),scan)

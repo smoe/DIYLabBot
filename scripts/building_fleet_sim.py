@@ -8,6 +8,7 @@ a completed fleet mission or a native BRep proof.
 import collections
 import math
 
+from building_fleet_model import scan_beam_count
 from l01_local_traffic import ray_disc,ray_box
 import tr01_floor_motion as floor
 
@@ -157,8 +158,9 @@ class SensorWorld:
                  prepared_indices=None):
         self.settings = dict(settings)
         step = settings['angular_step_deg']
-        if type(step) is not int or step <= 0 or 360 % step or settings['range_mm'] <= 0:
-            raise ValueError('A full-circle integer beam grid and positive range required')
+        count = scan_beam_count(step)
+        if settings['range_mm'] <= 0:
+            raise ValueError('A positive scan range is required')
         if prepared_indices is None:
             self.static = {level:SegmentIndex(segments,cell_mm) for level,segments in static_segments_by_level.items()}
             self.cabin={tuple(sides):SegmentIndex(segments,cell_mm)for sides,segments in(cabin_segments_by_sides or{}).items()}
@@ -173,8 +175,8 @@ class SensorWorld:
                     set(self.landings)!=set(landing_segments_by_level_sides or{})):
                 raise ValueError('Prepared indices must cover the same complete source geometry')
         self.scans = 0; self.rays = 0;self.rectangle_rays=0;self.disc_rays=0
-        self._beam_angles=tuple((math.radians(degrees),math.sin(math.radians(degrees)),
-                                math.cos(math.radians(degrees)))for degrees in range(0,360,step))
+        self._beam_angles = tuple((angle, math.sin(angle), math.cos(angle))
+                                  for angle in (math.radians(index * step) for index in range(count)))
         self.peer_candidates=0;self.range_pruned_peers=0
         self._raw_cache=collections.OrderedDict();self._raw_cache_limit=128
         self.raw_cache_hits=0;self.raw_cache_misses=0;self.raw_rays=0
@@ -219,9 +221,39 @@ class SensorWorld:
         if isinstance(value,(list,tuple)):return tuple(SensorWorld._exact_key(v)for v in value)
         return (type(value).__name__,value)
 
+    def _rectangle_beams(self, yaw, c, s, ox, oy, box, sensor_range):
+        """Broad phase for a rectangle's angular extent, with exact ray tests after it."""
+        count = len(self._beam_angles)
+        all_beams = range(count)
+        if (not abs(yaw) <= 1e6 or not 0 < sensor_range <= 1e12 or
+                not all(math.isfinite(v) and abs(v) <= 1e12 for v in (ox, oy, *box)) or
+                box[:2] != (-box[2], -box[3]) or min(box[2:]) <= 0):
+            return all_beams
+        if not math.isclose(math.hypot(c, s), 1., rel_tol=0, abs_tol=1e-14):
+            return all_beams
+
+        # A reported hit before the range cap can miss the true slab by at
+        # most range * 1e-12 on each ray_box near-parallel axis. Include both
+        # axes, plus arithmetic roundoff, in the enclosing disc.
+        scale = max(sensor_range, abs(ox), abs(oy), box[2], box[3])
+        radius = math.hypot(box[2], box[3]) + 2e-12 * sensor_range + 64 * math.ulp(scale)
+        distance = math.hypot(ox, oy)
+        if distance <= radius:
+            return all_beams
+        half_angle = math.asin(radius / distance)
+        centre = (math.atan2(-oy, -ox) + math.atan2(s, c) - yaw) % math.tau
+        step = math.radians(self.settings['angular_step_deg'])
+        # Retain one complete beam outside each rounded angular endpoint.
+        # Also covers cancellation in subtracting yaw before wrapping.
+        start = math.floor((centre - half_angle) / step) - 1
+        stop = math.ceil((centre + half_angle) / step) + 2
+        if stop - start >= count:
+            return all_beams
+        return (index % count for index in range(start, stop))
+
     def _first_returns(self,x,y,yaw,static,landing,cabin,peers):
         """Raw ideal distances only; no timestamps, output lists or noise."""
-        sensor_range=self.settings['range_mm'];distances=[]
+        sensor_range=self.settings['range_mm']
         directions=tuple((math.cos(yaw+angle),math.sin(yaw+angle))for angle,_,_ in self._beam_angles)
         key=(self._exact_key((x,y,yaw,sensor_range)),static,landing,cabin)
         static_distances=self._static_cache.get(key)
@@ -238,19 +270,24 @@ class SensorWorld:
                 if len(self._static_cache)>self._static_cache_limit:self._static_cache.popitem(last=False)
         else:
             self.static_cache_hits+=1;self._static_cache.move_to_end(key)
-        # The original source-min order is unchanged; every peer minimum is
-        # evaluated against current geometry even if the static part is reused.
-        for (dx,dy),distance in zip(directions,static_distances):
-            for peer in peers:
-                if peer[0]=='rectangle':
-                    _,c,s,ox,oy,box=peer
+        # Each beam still sees the static minimum followed by peers in their
+        # original order, including signed-zero ties.
+        distances = list(static_distances)
+        for peer in peers:
+            if peer[0] == 'rectangle':
+                _,c,s,ox,oy,box=peer
+                count = 0
+                for index in self._rectangle_beams(yaw, c, s, ox, oy, box, sensor_range):
+                    dx,dy=directions[index]
                     rx,ry=dx*c+dy*s,-dx*s+dy*c
-                    measured=ray_box(ox,oy,rx,ry,box);self.rectangle_rays+=1
-                else:
-                    _,cx,cy,radius=peer
-                    measured=ray_disc(x,y,dx,dy,cx,cy,radius);self.disc_rays+=1
-                distance=min(distance,measured)
-            distances.append(distance)
+                    distances[index]=min(distances[index],ray_box(ox,oy,rx,ry,box))
+                    count += 1
+                self.rectangle_rays += count
+            else:
+                _,cx,cy,radius=peer
+                for index,(dx,dy) in enumerate(directions):
+                    distances[index]=min(distances[index],ray_disc(x,y,dx,dy,cx,cy,radius))
+                self.disc_rays += len(directions)
         self.raw_rays+=len(self._beam_angles)
         return tuple(distances)
 
@@ -297,7 +334,7 @@ class SensorWorld:
         for (_,local_side,local_forward),distance in zip(self._beam_angles,distances):
             if distance < sensor_range:
                 returns.append([local_side*distance,local_forward*distance])
-        self.scans += 1; self.rays += 360//self.settings['angular_step_deg']
+        self.scans += 1; self.rays += len(self._beam_angles)
         return {'captured_s':now, 'returns_local_mm':returns}
 
     def statistics(self):

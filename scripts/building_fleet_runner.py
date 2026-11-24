@@ -436,8 +436,9 @@ class WorldRunner:
         lift_config=navigation.mesh.manifest['elevator'];walk=model.reference(source,'walkthrough')['elevator']
         # Sensor uncertainty can require more lateral spacing than the geometric
         # minimum. Capacity remains a derived upper bound, never a claimed run.
-        gap=max(navigation.reserve,self.sensor['clearance_mm']+self.sensor['range_error_mm']+
-            self.sensor['range_mm']*math.sin(math.radians(self.sensor['angular_step_deg']))+source['geometry']['localization_tolerance_mm']+getattr(navigation,'navigation_margin_mm',0))
+        layout_sensor=model.resolved_sensor(source, for_layout=True)
+        gap=max(navigation.reserve,layout_sensor['clearance_mm']+layout_sensor['range_error_mm']+
+            model.scan_angular_allowance(layout_sensor)+source['geometry']['localization_tolerance_mm']+getattr(navigation,'navigation_margin_mm',0))
         width=navigation.envelope['width_mm'];length=navigation.envelope['length_mm'];interior=navigation.cabin_interior_mm
         lanes=copy.deepcopy(planner.cabin_lanes_override)
         if not lanes or len(lanes)>source['lift']['maximum_capacity']:raise ValueError('Planner must supply proven source cabin lanes')

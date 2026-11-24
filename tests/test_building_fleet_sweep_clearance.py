@@ -33,6 +33,7 @@ class SweepTests(unittest.TestCase):
         points=[[8875.,15475.],[9281.219033984651,15475.],[9281.219033984651,15759.629330428337],
             [8708.24552897667,15759.629330428337],[8257.50541137794,15925.],[8225.,15925.]]
         c=self.car(points,385.4361417333006);ray=[837.5947586366375,-408.52225979904523]
+        c.settings=model.resolved_sensor(self.source, for_layout=True)
         pose=c.pose();side,forward=ray
         point=[pose[0]+math.cos(pose[2])*forward-math.sin(pose[2])*side,
                pose[1]+math.sin(pose[2])*forward+math.cos(pose[2])*side]

@@ -51,7 +51,8 @@ class NominalFitTests(unittest.TestCase):
             for a,b in zip(nodes,nodes[1:]):
                 if a[F[0]][0]<boundary<b[F[0]][0]:
                     self.assertLessEqual(b['time_s']-a['time_s'],.001000001)
-        for cap in(None,True,float('nan'),-1,1001):
+        maximum=self.source['motion']['empty_linear_limits']['velocity_mm_s']
+        for cap in(None,True,float('nan'),-1,maximum+1):
             with self.subTest(cap=cap),self.assertRaises((TypeError,ValueError)):
                 motion.compile_motion(path,self.source,300,zone_caps=[(0,cap)])
 
