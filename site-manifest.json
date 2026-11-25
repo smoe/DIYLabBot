@@ -5,7 +5,7 @@
     "bytes": 52594869,
     "sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337"
   },
-  "integrated_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
+  "integrated_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
@@ -91,16 +91,16 @@
     "bf01": {
       "html": {
         "bytes": 9182729,
-        "sha256": "a201161d98302a8565cd659eb348973233ddcde95b1ce249ae483b053f45bd08"
+        "sha256": "8c7bf8655696d0ac13d907d27cff43f5f74f00c506b8d170ca479b164026db70"
       },
-      "manifest_sha256": "365d370b23be140e7ab092ab4054805f2d05f5ef6a3415f0d3b79c2a3bbf1b49",
-      "source_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
-      "source_tree": "e12ab7f62d04a03edd1351d52f64160fa5130b3c",
+      "manifest_sha256": "18efe042cebb447e95cd5c9c2ed0a8280f284a66d19d178b315d55306ab872ab",
+      "source_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
+      "source_tree": "3a5f6765e27e6d6e6816d31fd04badc9769bae1d",
       "status": "experimental_live_browser_patrol",
       "url": "https://smoe.github.io/DIYLabBot/bf01/"
     }
   },
-  "source_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
+  "source_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
   "source_files_sha256": {
     "cad/generated/building-stack-268bd52d21e1/overview.FCStd": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
@@ -277,7 +277,7 @@
   },
   "source_manifest_sha256": "d92d2414df0a421d00e39917e66cf27ffd54587c9c3053a2baae174dd39453e8",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_tree": "e12ab7f62d04a03edd1351d52f64160fa5130b3c",
+  "source_tree": "3a5f6765e27e6d6e6816d31fd04badc9769bae1d",
   "url": "https://smoe.github.io/DIYLabBot/",
   "world_presentation_build": {
     "bytes": 9151,
