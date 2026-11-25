@@ -1,11 +1,11 @@
 {
-  "export_revision": "walkthrough-r1",
+  "export_revision": "release-r1",
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "html": {
-    "bytes": 52585227,
-    "sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1"
+    "bytes": 52594869,
+    "sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337"
   },
-  "integrated_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
+  "integrated_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
@@ -24,17 +24,24 @@
   "local_browser_evidence": {
     "lift_walking": {
       "bytes": 138840,
-      "html_sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1",
+      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
       "passed": true,
-      "path": "exports/building-fleet/jerk-01c7cff/normal-lift-walking-r2/lift-walking-browser-report.json",
-      "sha256": "5788ac903d6a21b75d27682e1804b39543ba94c3aca3a5648497f824836d3819"
+      "path": "exports/building-fleet/startup-progress/release-r1/checks/lift/lift-walking-browser-report.json",
+      "sha256": "5951bb74c876d7b7ed7d3c103d6307dcfc185cd26ea693329bcbec2646d26f3f"
     },
     "main": {
-      "bytes": 36129,
-      "html_sha256": "7806930ee70c4cb8558970accaa09381b3853ccf1068b8e7f80b76af4c4dd3f1",
+      "bytes": 39615,
+      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
       "passed": true,
-      "path": "exports/building-fleet/jerk-01c7cff/normal-browser-r2/browser-check.json",
-      "sha256": "e730b849cd4db985204e5535b0141556cc957df53a8d29388521adc389d3ec5a"
+      "path": "exports/building-fleet/startup-progress/release-r1/checks/main/browser-check.json",
+      "sha256": "01e7da0cfab48c788d39b9e071ad3577b735b8fb5810932931b103e812d85120"
+    },
+    "startup_progress": {
+      "bytes": 670,
+      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
+      "passed": true,
+      "path": "exports/building-fleet/startup-progress/release-r1/checks/slow-start/loading-progress-check.json",
+      "sha256": "6efe497ce5dcc5dc1a60ad1a2033ff908c187205ccf30808124774e30559bfe1"
     }
   },
   "local_native_checks": {
@@ -65,10 +72,15 @@
       "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
     }
   },
+  "native_evidence_origin": {
+    "current_world_native_builds_identical": true,
+    "pages_commit": "1b924f61576164ed9ce2d39f5ee230b4026774b2",
+    "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe"
+  },
   "packager": {
-    "bytes": 24070,
-    "path": "exports/building-fleet/jerk-01c7cff/publication/package_preview_pages.py",
-    "sha256": "f83350fdccebf206e971ca940739a41b2d94fab65c10b8cebef1013266c87b6d"
+    "bytes": 8867,
+    "path": "exports/building-fleet/startup-progress/package.py",
+    "sha256": "f16b9cba415d7152e260a81485ca6cebf80ae415a4f19b04cecaab37aae01bc1"
   },
   "qualification": {
     "collision_checked": false,
@@ -78,17 +90,17 @@
   "related_pages": {
     "bf01": {
       "html": {
-        "bytes": 9177807,
-        "sha256": "13508737a39fcca936f151c240dac90bc8d02e658e2d148767d60fb98c04931c"
+        "bytes": 9182729,
+        "sha256": "a201161d98302a8565cd659eb348973233ddcde95b1ce249ae483b053f45bd08"
       },
-      "manifest_sha256": "1498ce2cb30fee1e5ef1016813557dd5a9d3307158422804024a15add646aa70",
-      "source_commit": "ac277280cb27d385aea1a3926001fe19af748686",
-      "source_tree": "31521bfb1e04c8a0235e4d6739e7030ecc53bd1b",
+      "manifest_sha256": "365d370b23be140e7ab092ab4054805f2d05f5ef6a3415f0d3b79c2a3bbf1b49",
+      "source_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
+      "source_tree": "e12ab7f62d04a03edd1351d52f64160fa5130b3c",
       "status": "experimental_live_browser_patrol",
       "url": "https://smoe.github.io/DIYLabBot/bf01/"
     }
   },
-  "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe",
+  "source_commit": "369eef1b22134c51ba0dfcd9a81332b1f5ec0172",
   "source_files_sha256": {
     "cad/generated/building-stack-268bd52d21e1/overview.FCStd": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
@@ -115,7 +127,7 @@
     "model/building-doors.schema.json": "9d21e2eb2f87ea1e16105756c1a56b33bdac147357a36131beb82a4714b36196",
     "model/building-doors.shared.json": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391",
     "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
-    "model/building-fleet-demo.shared.json": "85441dceb245700cf5da2a45d5ba3776cb9deccaba073c0019b61de46ba3ec99",
+    "model/building-fleet-demo.shared.json": "b5db27834c2f373a1b5f5871a2b78067176e157e32eb33baf539a978fd38e4cb",
     "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
     "model/building-laboratories.schema.json": "5b2dde953592edad71c1103d847cb0094d56641c0ab63da411391933609ebe20",
     "model/building-microscopy.schema.json": "e8ed15fb14e7412d68f9993f5fde91abcf7be510abe040f952761d8bb5f3dea9",
@@ -131,7 +143,7 @@
     "model/equipment/microscopy-3007.json": "59e0f172e09c7b4452be4827cb60d96fb33d5b186acf25268389e050c5e98bb2",
     "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
     "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
-    "model/foyer-camera-wall.shared.json": "00da315f32f96608b0914b3bab512a2493d96810c5a88f8814dd0b1e533af00b",
+    "model/foyer-camera-wall.shared.json": "e85fc255b31eaf17e50e9ffb421f55a7fa20a2c622bbd07a0f6c652b2dfb63aa",
     "model/foyer-monitor-wall.schema.json": "3b7a25c8a667d92236facd17fe3142b141ec164b60b2206bddea028b8f303d61",
     "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
     "model/furnishings/basic-laboratory.shared.json": "fa5fa071721229ff88de7ca1b1bf68395ed1bd77ab4943412f54894278181796",
@@ -212,8 +224,8 @@
     "scripts/building_seminar_windows.py": "b967068bfdaab6a20be5649dfb474e8ef8d7fac3b00510c9b0dbc6372b74d9e3",
     "scripts/building_stack.py": "95a9fb51f335097d902225fe561902eba709bd84b8c68aaff2e15aed1e0aacb6",
     "scripts/building_walkthrough.py": "b9fda546ed2c31c39bee3e19efbc69a54bc5fc11f57978bc31ad0cb10e62fdd7",
-    "scripts/building_walkthrough_viewer.html": "a0a4efa71e2c4d02a0faea077b95cadff6f727a4e8c970355fdefa25e0001962",
-    "scripts/camera_monitor_wall.js": "f4a384ab13aa31fbf9c02061b970663f9e8ee10a2aa4aa0110e021b5e824181c",
+    "scripts/building_walkthrough_viewer.html": "f7805078b6bf2b4b1b2698e676f8dd76db4e91b747276ff85a74a6c8932d8170",
+    "scripts/camera_monitor_wall.js": "2885c152547dcc8656df23662755ec74cecfe11a991ef53a38d3c38425c42450",
     "scripts/centrifuge_mechanisms.py": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b",
     "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
@@ -263,8 +275,18 @@
     "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
     "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
   },
-  "source_manifest_sha256": "c3f734ca27b258baec39ec3a6955b4525eacb91d399933d9dae8fdfc067745f1",
+  "source_manifest_sha256": "d92d2414df0a421d00e39917e66cf27ffd54587c9c3053a2baae174dd39453e8",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_tree": "b75c41c8276056ce6d0c4746206f6028b5beb7f3",
-  "url": "https://smoe.github.io/DIYLabBot/"
+  "source_tree": "e12ab7f62d04a03edd1351d52f64160fa5130b3c",
+  "url": "https://smoe.github.io/DIYLabBot/",
+  "world_presentation_build": {
+    "bytes": 9151,
+    "path": "exports/building-fleet/startup-progress/build.py",
+    "sha256": "6a3b8f5e00ff5c67a3c1baf2a07c42fb6b24cdf22f16006eda0202d26f6eb2e1"
+  },
+  "world_report": {
+    "bytes": 19677,
+    "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json",
+    "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5"
+  }
 }

@@ -40,15 +40,25 @@ export function validateManifest(manifest,config){
  return manifest;
 }
 async function digest(bytes){return [...new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))].map(v=>v.toString(16).padStart(2,'0')).join('');}
-export async function download(url,expectedHash,expectedBytes=null){
+export async function download(url,expectedHash,expectedBytes=null,onBytes){
  require(HASH.test(expectedHash),'Pinned simulation download required');
  // Fingerprinted assets may use the HTTP cache; every returned byte is still
  // checked against the page/manifest hash before it enters the simulation.
  const response=await fetch(url,{cache:'force-cache',credentials:'same-origin'});require(response.ok,'Simulation asset download failed: HTTP '+response.status);
  const limit=expectedBytes??1024*1024;
  let bytes;
- if(response.body?.getReader){const reader=response.body.getReader(),chunks=[];let count=0;for(;;){const result=await reader.read();if(result.done)break;count+=result.value.byteLength;if(count>limit){await reader.cancel();throw Error('Simulation asset exceeds its declared size');}chunks.push(result.value);}bytes=new Uint8Array(count);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}}
- else{bytes=new Uint8Array(await response.arrayBuffer());require(bytes.byteLength<=limit,'Simulation asset exceeds its declared size');}
+ if(response.body?.getReader){
+  const reader=response.body.getReader(),chunks=[];let count=0;
+  for(;;){
+   const result=await reader.read();if(result.done)break;count+=result.value.byteLength;
+   if(count>limit){await reader.cancel();throw Error('Simulation asset exceeds its declared size');}
+   chunks.push(result.value);onBytes?.(count);
+  }
+  bytes=new Uint8Array(count);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.byteLength;}
+ }else{
+  bytes=new Uint8Array(await response.arrayBuffer());require(bytes.byteLength<=limit,'Simulation asset exceeds its declared size');
+  onBytes?.(bytes.byteLength);
+ }
  require(expectedBytes===null||bytes.byteLength===expectedBytes,'Simulation asset size differs from its manifest');
  require(await digest(bytes)===expectedHash,'Simulation asset hash differs from its page pin');return bytes;
 }
@@ -131,28 +141,53 @@ export async function extractArchive(pyodide,archive,manifest){
  }
 }
 function parseState(raw){const state=typeof raw==='string'?JSON.parse(raw):raw;require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&state.integration_step_s<=.05,'Executed Python simulation snapshot and source control step required');return state;}
-export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(url),fetchArchive=download,fetchCore=download}={}){
+export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(url),fetchArchive=download,fetchCore=download,progress}={}){
+ const core=manifest.python_core;
+ const totalFiles=1+(core?CORE_FILES.length:0);
+ const totalBytes=manifest.archive.bytes+(core?CORE_FILES.reduce((sum,name)=>sum+core.files[name].bytes,0):0);
+ let receivedBytes=0,verifiedFiles=0,lastPercent=-1,pythonReady=false,failed=false;
+ function report(force=false){
+  if(!progress||failed)return;
+  const percent=Math.floor(100*receivedBytes/totalBytes);
+  if(!force&&percent===lastPercent)return;
+  lastPercent=percent;
+  progress({phase:'loading_runtime_assets',received_bytes:receivedBytes,total_bytes:totalBytes,
+   verified_files:verifiedFiles,total_files:totalFiles});
+ }
+ async function loadFile(fetchFile,url,hash,size){
+  if(!progress)return fetchFile(url,hash,size);
+  let received=0;
+  const bytes=await fetchFile(url,hash,size,count=>{
+   receivedBytes+=count-received;received=count;report();
+  });
+  // A file resolves only after the pinned size and digest have both matched.
+  receivedBytes+=bytes.byteLength-received;
+  verifiedFiles++;report(true);
+  if(verifiedFiles===totalFiles&&!pythonReady&&!failed)progress({phase:'initializing_python_runtime'});
+  return bytes;
+ }
+ report();
  // Start the actual Python/Wasm initialization alongside the archive download,
  // rather than waiting for the entire model before starting the runtime.
  const python=(async()=>{
   let loader=manifest.runtime.loader_module_url,indexURL=new URL('.',loader).href;
-  if(manifest.python_core){
-   const core=manifest.python_core,base=new URL(core.directory+'/',config.manifest.url);
+  if(core){
+   const base=new URL(core.directory+'/',config.manifest.url);
    require(base.origin===new URL(config.manifest.url).origin,'Python core must use the page origin');
-   await Promise.all(CORE_FILES.map(name=>fetchCore(new URL(name,base).href,core.files[name].sha256,core.files[name].bytes)));
+   await Promise.all(CORE_FILES.map(name=>loadFile(fetchCore,new URL(name,base).href,core.files[name].sha256,core.files[name].bytes)));
    loader=new URL('pyodide.mjs',base).href;indexURL=base.href;
   }
   const {loadPyodide}=await loadModule(loader);
-  return loadPyodide({indexURL});
+  const runtime=await loadPyodide({indexURL});pythonReady=true;return runtime;
  })();
- const archive=fetchArchive(config.bundle.url,config.bundle.sha256,manifest.archive.bytes);
- return Promise.all([python,archive]);
+ const archive=loadFile(fetchArchive,config.bundle.url,config.bundle.sha256,manifest.archive.bytes);
+ try{return await Promise.all([python,archive]);}catch(error){failed=true;throw error;}
 }
-async function loadPythonBridge(config,progress,onCompactAssetsReady){
+async function loadPythonBridge(config,progress,onCompactAssetsReady,assetProgress){
  progress({phase:'checking_browser_bundle'});
  const raw=await download(config.manifest.url,config.manifest.sha256),text=new TextDecoder().decode(raw),manifest=validateManifest(JSON.parse(text),config);
  progress({phase:'loading_python_runtime'});
- const [pyodide,archive]=await loadRuntimeAssets(manifest,config);
+ const [pyodide,archive]=await loadRuntimeAssets(manifest,config,{progress:assetProgress});
  // Warm the planner before restoring either world. The simulator's verified
  // large downloads must finish first: concurrent cold Chromium cache writers
  // can abort the same WASM and model responses.
@@ -177,7 +212,7 @@ async function loadPythonBridge(config,progress,onCompactAssetsReady){
  return{runtime,inputs,manifest};
 }
 export async function loadPythonRuntime(config,progress,onCompactAssetsReady){
- const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactAssetsReady);
+ const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactAssetsReady,progress);
  const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))));
  let hasMotion=Boolean(state.has_motion);
  return{initial:state,background:manifest.format.endsWith('/2'),
@@ -284,6 +319,7 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
   });
  }
  function runtimeProgress(event){
+  if(disposed)return;
   if(event.phase==='starter_timing'){
    timing.last_starter={...event,start_wall_ms:performance.timeOrigin+now()-1000*event.wall_s};
   }else post({type:'progress',progress:event});
