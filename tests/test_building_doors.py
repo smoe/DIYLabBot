@@ -76,7 +76,7 @@ class DoorTests(unittest.TestCase):
         original=copy.deepcopy(self.catalog)
         result=doors.geometry(self.catalog,selection,'WindowDoor',hinge,u,normal,900,2150,4250,self.spec['exterior'])
         self.assertEqual(self.catalog,original)
-        self.assertEqual(len(result['bodies']),4)
+        self.assertEqual(len(result['bodies']),6)
         opening=next(o for o in result['operations'] if o['id'].endswith('_ViewingOpening'))
         self.assertEqual(opening['action'],'cut');self.assertEqual(opening['body'],'WindowDoor')
         self.assertEqual(opening['shape']['axis'],u+[0])
@@ -87,8 +87,36 @@ class DoorTests(unittest.TestCase):
 
     def test_plain_door_has_no_window_bodies_or_cut(self):
         result=doors.geometry(self.catalog,{'type':'plain','material':'steel'},'SteelDoor',[0,0],[1,0],[0,1],900,2150,0,self.spec['exterior'])
-        self.assertEqual(len(result['bodies']),1);self.assertEqual(len(result['operations']),1)
-        self.assertEqual(result['bodies'][0]['role'],'concept_open_steel_room_door')
+        self.assertEqual([b['role'] for b in result['bodies']],
+                         ['concept_open_steel_room_door', 'concept_room_door_handle', 'concept_room_door_handle'])
+        self.assertTrue(all(op['action']=='create' for op in result['operations']))
+
+    def test_handles_are_on_the_latch_edge_of_both_faces_in_mirrored_frames(self):
+        u=[math.cos(.37),math.sin(.37)]
+        hinge=[1410,733]
+        width,height,base=900,2150,4250
+        handle=self.catalog['handle']
+        for sign in (-1,1):
+            normal=[-sign*u[1],sign*u[0]]
+            for material in ('wood','steel','glass'):
+                with self.subTest(sign=sign,material=material):
+                    selection={'type':'plain','material':material}
+                    result=doors.geometry(self.catalog,selection,'Door',hinge,u,normal,width,height,base,self.spec['exterior'])
+                    shapes={op['body']:op['shape'] for op in result['operations']}
+                    self.assertEqual(selection['detail_body_ids'],['Door_HandleFront','Door_HandleBack'])
+                    thickness=selection['leaf_thickness_mm']
+                    projection=handle['projection_mm']
+                    for suffix,expected in [('Front',(0,projection)),('Back',(-thickness-projection,-thickness))]:
+                        shape=shapes['Door_Handle'+suffix]
+                        relative=[[point[i]-hinge[i] for i in (0,1)] for point in shape['points']]
+                        along=[sum(x*y for x,y in zip(point,u)) for point in relative]
+                        across=[sum(x*y for x,y in zip(point,normal)) for point in relative]
+                        self.assertAlmostEqual(min(along),expected[0])
+                        self.assertAlmostEqual(max(along),expected[1])
+                        mount=width-handle['latch_inset_mm']
+                        self.assertAlmostEqual(max(across),mount+handle['section_mm']/2)
+                        self.assertAlmostEqual(min(across),mount-handle['lever_length_mm'])
+                        self.assertAlmostEqual(shape['offset']+shape['depth']/2,base+handle['center_height_mm'])
 
     def test_invalid_dimensions_and_unsupported_variants_fail_closed(self):
         for key,value in [('diameter_mm',-1),('glass_opacity',True),('center_height_mm',float('nan'))]:
@@ -163,8 +191,8 @@ class GlassOverrideTests(unittest.TestCase):
     def test_full_glass_leaf_has_transparent_material_and_no_round_cut(self):
         chosen=doors.select(self.policy,self.plan,self.plan,'OG3',self.door)
         result=doors.geometry(self.catalog,chosen,'GlassDoor',[100,200],[1,0],[0,1],1010,2150,12750,self.legacy)
-        self.assertEqual(len(result['bodies']),1)
-        self.assertEqual(len(result['operations']),1)
+        self.assertEqual(len(result['bodies']),3)
+        self.assertEqual(len(result['operations']),3)
         body=result['bodies'][0]
         self.assertEqual(body['role'],'concept_open_glass_room_door')
         self.assertEqual(body['appearance'],{'color':self.catalog['materials']['glass']['color'],
@@ -172,7 +200,7 @@ class GlassOverrideTests(unittest.TestCase):
         self.assertEqual(chosen['leaf_thickness_mm'],12)
         self.assertTrue(chosen['full_leaf_glazing'])
         self.assertFalse(chosen['dimensions_measured'])
-        self.assertEqual(chosen['detail_body_ids'],[])
+        self.assertEqual(chosen['detail_body_ids'],['GlassDoor_HandleFront','GlassDoor_HandleBack'])
         self.assertTrue(all(operation['action']=='create' for operation in result['operations']))
 
     def test_legacy_profiles_and_untargeted_levels_generate_identical_geometry(self):

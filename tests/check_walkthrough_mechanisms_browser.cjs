@@ -45,13 +45,19 @@ const {chromium}=require(process.argv[3]||'playwright');
         report.basic_laboratory_controls.push(control.id);
       }
     }
-    // Every native room door completes a close/open cycle; all window details
-    // share the same rigid transform. This includes every steel basement leaf.
+    // Every native room door completes a close/open cycle. Glazing and
+    // handles share the rigid transform, including on steel basement leaves.
     for(const room of rooms){
       const initial=room.initial_state||room.reference_state;
       assert.equal((await state(room.id)).state,initial,'Source-defined initial pose');
       assert.equal((await command(room.id,'close')).status,initial==='closed'?'already_in_state':'accepted');await settled(room.id,'closed');
       const closed=await state(room.id);assert.equal(closed.angle_deg,0);
+      const leaf=room.moving_body_ids[0];
+      for(const side of ['Front','Back']){
+        const handle=leaf+'_Handle'+side;
+        assert.equal(native.get(handle)?.role,'concept_room_door_handle');
+        assert.equal(closed.body_angles_deg[handle],0);
+      }
       assert(Object.values(closed.body_angles_deg).every(v=>v===0));
       assert.equal((await command(room.id,'open')).status,'accepted');await settled(room.id,'open');
       assert.deepEqual((await state(room.id)).model_matrix,[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
@@ -71,7 +77,7 @@ const {chromium}=require(process.argv[3]||'playwright');
       assert.deepEqual((await command(outer,'close')).blockers,[id]);
       assert.equal((await command(id,'close')).status,'accepted');
     }
-    // Mouse events use the actual moved handle surfaces, without bypassing the
+    // Mouse events use the actual moved door and handle surfaces, without bypassing the
     // triangle picker, reach limit or occlusion test. viewObject only positions
     // the QA camera; it does not perform the interaction.
     async function lookAt(point){
@@ -94,8 +100,9 @@ const {chromium}=require(process.argv[3]||'playwright');
       // sits behind this small room's parked-open entrance leaf.
       if(id.startsWith('Kitchen3008.'))await page.locator('#walkthrough-stops button[data-stop="kitchen3008"]').click();
       else await page.evaluate(id=>window.__buildingWalkthrough.viewObject(id),id);
-      const preferred=config.moving_body_ids.map(id=>native.get(id)).filter(g=>/handle|grip/i.test(g.role+' '+g.id));
-      const candidates=preferred.length?preferred:[native.get(config.moving_body_ids[0])];
+      const candidates=config.moving_body_ids.map(id=>native.get(id)).filter(g=>/handle|grip/i.test(g.role+' '+g.id));
+      // A room-door lever can be occluded when its leaf parks beside a wall.
+      if(config.mechanism==='room_door'||!candidates.length)candidates.push(native.get(config.moving_body_ids[0]));
       let success=false;
       for(const group of candidates){
         const point=group.bounds_mm.min.map((v,i)=>(v+group.bounds_mm.max[i])/2);

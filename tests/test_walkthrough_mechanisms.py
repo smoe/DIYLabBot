@@ -20,7 +20,7 @@ class MechanismTests(unittest.TestCase):
         cls.program = walkthrough.compile()
         cls.objects = {obj['id']: obj for obj in cls.program['objects']}
 
-    def test_every_native_room_leaf_and_its_glazing_move_once(self):
+    def test_every_native_room_leaf_and_its_hardware_move_once(self):
         rooms = [o for o in self.objects.values() if o.get('mechanism') == 'room_door']
         self.assertEqual(len(rooms), 138)
         self.assertNotIn('OG3.D3_009.Door',self.objects)
@@ -34,8 +34,11 @@ class MechanismTests(unittest.TestCase):
             self.assertEqual(room['reference_state'], 'open')
             self.assertEqual(room['states'], {'closed': 0, 'open': 90})
             self.assertEqual(abs(room['joint']['axis'][2]), 1)
+            leaf=room['moving_body_ids'][0]
+            self.assertEqual([body for body in room['moving_body_ids'] if '_Handle' in body],
+                             [leaf+'_HandleFront',leaf+'_HandleBack'])
         window = self.objects['OG3.D3_002N.Door']
-        self.assertEqual(len(window['moving_body_ids']), 4, 'Leaf, pane and both rims share their hinge')
+        self.assertEqual(len(window['moving_body_ids']), 6, 'Leaf, pane, rims and handles share their hinge')
 
     def test_freezer_guard_covers_every_drawer_and_both_command_directions(self):
         prefix = 'Lab3003.Freezer01.'

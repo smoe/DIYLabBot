@@ -18,6 +18,14 @@
     "glass_opacity": 0.3,
     "rim_color": "#69737C"
   },
+  "handle": {
+    "latch_inset_mm": 75,
+    "center_height_mm": 1050,
+    "lever_length_mm": 110,
+    "section_mm": 20,
+    "projection_mm": 55,
+    "color": "#A7B3BA"
+  },
   "materials": {
     "wood": {"thickness_source": "exterior.door_leaf_mm", "color_source": "exterior.door_color", "mass_kg": null},
     "steel": {"thickness_mm": 60, "color": "#69737C", "mass_kg": null},

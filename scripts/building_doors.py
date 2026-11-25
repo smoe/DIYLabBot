@@ -34,7 +34,7 @@ def dependencies(ref):
 
 def validate(policy,catalog):
     require(set(policy)-{'opening_overrides','laboratory_corridor_rule'}=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
-    require(set(catalog)=={'format','units','status','types','window','materials'},'Explicit door-catalog fields required')
+    require(set(catalog)-{'handle'}=={'format','units','status','types','window','materials'},'Explicit door-catalog fields required')
     require(policy['format']=='solidcraftbot.building-doors/1','Unsupported building-door policy')
     require(catalog['format']=='solidcraftbot.room-door-catalog/1' and catalog['units']=={'length':'mm','angle':'deg'},'Typed room-door catalog required')
     require(catalog['types']=={'plain':{'round_window':False},'round_window':{'round_window':True}},'Exactly two supported door types required')
@@ -55,6 +55,16 @@ def validate(policy,catalog):
         if name.endswith('_mm'):require(type(value) in (int,float) and math.isfinite(value) and value>0,'Positive finite window dimension: '+name)
     require(w['radial_glass_clearance_mm']<w['diameter_mm']/2,'Glass clearance removes the pane')
     require(type(w['glass_opacity']) in (int,float) and 0<w['glass_opacity']<1,'Transparent viewing pane required')
+    if 'handle' in catalog:
+        handle=catalog['handle']
+        dimensions=('latch_inset_mm','center_height_mm','lever_length_mm','section_mm','projection_mm')
+        require(isinstance(handle,dict) and set(handle)=={*dimensions,'color'},'Explicit door-handle dimensions and finish required')
+        require(all(type(handle[k]) in (int,float) and math.isfinite(handle[k]) and 0<handle[k]<=3000 for k in dimensions),
+                'Positive finite door-handle dimensions required')
+        require(isinstance(handle['color'],str) and re.fullmatch('#[0-9a-fA-F]{6}',handle['color']),'RGB door-handle colour required')
+        section=handle['section_mm']
+        require(section<min(handle['projection_mm'],handle['lever_length_mm']) and section/2<handle['latch_inset_mm'],
+                'A door lever needs clearance from the leaf face and latch edge')
     require(catalog['materials']['wood']=={'thickness_source':'exterior.door_leaf_mm','color_source':'exterior.door_color','mass_kg':None},'Wood reuses the existing shared finish and thickness')
     require(set(policy['level_materials'])<={'KG','EG','OG1','OG2','OG3'},'Unknown material floor')
     steel=catalog['materials']['steel'];require(set(steel)=={'thickness_mm','color','mass_kg'} and re.fullmatch('#[0-9a-fA-F]{6}',steel['color']),'Explicit steel profile required')
@@ -210,11 +220,34 @@ def geometry(catalog,selection,name,hinge,u,normal,width,height,z,legacy,compone
         op(id,target,{'kind':'cylinder','origin':[center[0]+along*u[0],center[1]+along*u[1],z+w['center_height_mm']],
             'radius':radius,'height':depth,'axis':[u[0],u[1],0]},action)
     body(name,'concept_open_'+material+'_room_door',color,profile.get('opacity',1))
-    points=[[hinge[j]+along*u[j]+across*normal[j] for j in (0,1)] for along,across in [(-thickness,0),(0,0),(0,width),(-thickness,width)]]
-    if floor.signed_area(points)<0:points.reverse()
-    op(name+'_Leaf',name,{'kind':'polygon_prism','plane':'XY','points':points,'offset':z,'depth':height,'fixed':True})
+    def prism(id,target,outline,offset,depth):
+        points=[[hinge[j]+along*u[j]+across*normal[j] for j in (0,1)] for along,across in outline]
+        if floor.signed_area(points)<0:points.reverse()
+        op(id,target,{'kind':'polygon_prism','plane':'XY','points':points,'offset':offset,'depth':depth,'fixed':True})
+    prism(name+'_Leaf',name,[(-thickness,0),(0,0),(0,width),(-thickness,width)],z,height)
     selection.update(leaf_body_id=name,leaf_thickness_mm=thickness,width_mm=width,height_mm=height,detail_body_ids=[],dimensions_measured=False)
     if material=='glass':selection['full_leaf_glazing']=True
+    if 'handle' in catalog:
+        handle=catalog['handle'];section=handle['section_mm'];half=section/2
+        mounting_axis=width-handle['latch_inset_mm']
+        lever_end=mounting_axis-handle['lever_length_mm']
+        bottom=handle['center_height_mm']-half;projection=handle['projection_mm']
+        require(0<lever_end<mounting_axis+half<width and 0<bottom<bottom+section<height,
+                'Door handle must fit at the latch edge: '+name)
+        if selection['type']=='round_window':
+            window=catalog['window']
+            across_gap=max(lever_end-width/2, width/2-(mounting_axis+half), 0)
+            height_gap=max(bottom-window['center_height_mm'], window['center_height_mm']-(bottom+section), 0)
+            require(math.hypot(across_gap,height_gap)>window['diameter_mm']/2+window['rim_width_mm'],
+                    'Door handle must clear the viewing window: '+name)
+        # Each grip sits on the latch edge and points back toward the hinge.
+        outline=[(0,mounting_axis-half),(0,mounting_axis+half),(projection,mounting_axis+half),
+                 (projection,lever_end),(projection-section,lever_end),(projection-section,mounting_axis-half)]
+        for suffix,face,direction in [('Front',0,1),('Back',-thickness,-1)]:
+            grip=name+'_Handle'+suffix
+            body(grip,'concept_room_door_handle',handle['color'])
+            prism(grip,grip,[(face+direction*along,across) for along,across in outline],z+bottom,section)
+            selection['detail_body_ids'].append(grip)
     if selection['type']=='plain':return result
     w=catalog['window'];radius=w['diameter_mm']/2;rim_radius=radius+w['rim_width_mm']
     require(2*(rim_radius+w['edge_margin_mm'])<width and rim_radius+w['edge_margin_mm']<w['center_height_mm']<height-rim_radius-w['edge_margin_mm'],'Viewing window does not fit its door leaf: '+name)

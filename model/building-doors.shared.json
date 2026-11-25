@@ -2,7 +2,7 @@
   "format": "solidcraftbot.building-doors/1",
   "catalog": {
     "source": "model/doors/room-doors.catalog.json",
-    "source_sha256": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b"
+    "source_sha256": "f912c7ff4fb2936009a83854f12ddabec79c2eb0d46c7ea09de8be015d7378ec"
   },
   "default_type": "plain",
   "default_material": "wood",

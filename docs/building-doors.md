@@ -99,6 +99,11 @@ CADs. Die Fensteröffnung wird durch das gesamte Türblatt geschnitten. Scheibe
 und die beiden äußeren Ringe sind eigene geschlossene Körper; ihr Rahmen wird
 aus derselben Fenstergröße abgeleitet. Die Fensterachse folgt der tatsächlichen
 Türblattausrichtung, auch an schrägen Wänden. Bestehende Blatt-IDs bleiben erhalten.
+Das Katalogprofil für die Drücker gilt für Holz-, Stahl- und Glasblätter.
+Der Generator setzt je einen Drücker auf beide Blattseiten, 75 mm von der
+Schließkante gegenüber dem Anschlag und 1050 mm über der Blattunterkante.
+Die Griffe bewegen sich im Rundgang mit dem zugehörigen Blatt. Maße und
+Ausführung der Griffe sind Darstellungsannahmen.
 Ein Glasblatt verwendet dieselbe portable Profiloperation wie ein fensterloses
 Blatt und trägt die im Katalog deklarierte Transparenz. Es bekommt weder einen
 zusätzlichen runden Ausschnitt noch eine zweite Scheibe. Unbekannte Geschosse,

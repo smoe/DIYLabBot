@@ -378,7 +378,7 @@
     "door_leaf_mm": 40,
     "doors": {
       "source": "model/building-doors.shared.json",
-      "source_sha256": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391"
+      "source_sha256": "aa4e83e1e19e2de6e0a3736e5fb276573ed9e9765f4d195a4b18384190f54c18"
     },
     "guard_boundaries": [
       "W068",
