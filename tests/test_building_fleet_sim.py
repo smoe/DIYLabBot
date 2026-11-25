@@ -181,6 +181,40 @@ class ExactScanTests(unittest.TestCase):
 
 
 class SensorTests(unittest.TestCase):
+    def test_ray_bounds_preserve_closed_edges_corner_tangencies_and_range_types(self):
+        segments = [((0, 0), (0, 1)), ((0, 1), (1, 1)), ((-4, 0), (-4, -2)),
+                    ((-1, -1), (0, 0)), ((3, 2), (3, 2))]
+        diagonal = math.sqrt(.5)
+        directions = [(1., 0.), (-1., 0.), (0., 1.), (-0., -1.), (0., 0.),
+                      (1., 1e-15), (diagonal, diagonal), (-diagonal, diagonal),
+                      (diagonal, -diagonal), (-diagonal, -diagonal)]
+        for geometry in (segments, [segments[-1]], []):
+            index = sim.SegmentIndex(geometry, 1.)
+            unpruned = sim.SegmentIndex(geometry, 1.)
+            unpruned._ray_bounds = (-math.inf, -math.inf, math.inf, math.inf)
+            for x in (-7., -4., -1e-10, 0., 1., math.nextafter(1., math.inf), 8.):
+                for y in (-5., -2., 0., 1., 4.):
+                    for direction in directions:
+                        for cap in (0, -0., 1e-12, 1., math.sqrt(2), 4., 12.):
+                            expected = unpruned.ray((x, y), direction, cap)
+                            result = index.ray((x, y), direction, cap)
+                            self.assertEqual((type(result), float(result).hex()),
+                                             (type(expected), float(expected).hex()))
+
+    def test_far_ray_skips_indexed_cells_but_an_incoming_ray_hits(self):
+        class CountingCells(dict):
+            visits = 0
+            def get(self, *args):
+                self.visits += 1
+                return super().get(*args)
+
+        index = sim.SegmentIndex([((0., 0.), (0., 1.))], 1.)
+        index.cells = CountingCells(index.cells)
+        self.assertEqual(index.ray((-100., .5), (1., 0.), 5.), 5.)
+        self.assertEqual(index.cells.visits, 0)
+        self.assertEqual(index.ray((-100., .5), (1., 0.), 101.), 100.)
+        self.assertGreater(index.cells.visits, 0)
+
     def test_first_return_is_anonymous_and_static_wall_occludes_vehicle(self):
         world = sim.SensorWorld(SETTINGS, {'EG':[((500,-500),(500,500))]})
         truth = {'BF01':own(), 'BF02':own(1000)}

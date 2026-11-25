@@ -7,6 +7,7 @@ a completed fleet mission or a native BRep proof.
 """
 import collections
 import math
+from functools import cached_property
 
 from building_fleet_model import scan_beam_count
 from l01_local_traffic import ray_disc,ray_box
@@ -107,8 +108,30 @@ class SegmentIndex:
                 for y in range(math.floor(min(a[1],b[1])/cell_mm), math.floor(max(a[1],b[1])/cell_mm)+1):
                     self.cells.setdefault((x,y), []).append(index)
 
+    @cached_property
+    def _ray_bounds(self):
+        # Derived from the occupied cells for both native and restored indexes.
+        # A one-cell margin includes every side cell visited at a grid corner.
+        if not self.cells:
+            return None
+        xs, ys = zip(*self.cells)
+        return ((min(xs)-1)*self.cell, (min(ys)-1)*self.cell,
+                (max(xs)+2)*self.cell, (max(ys)+2)*self.cell)
+
     def ray(self, origin, direction, distance):
         ox,oy=origin;dx,dy=direction;ix,iy=math.floor(ox/self.cell),math.floor(oy/self.cell)
+        bounds = self._ray_bounds
+        if bounds is None:
+            return distance
+        xmin, ymin, xmax, ymax = bounds
+        if (ox < xmin and ox + dx*distance < xmin or ox > xmax and ox + dx*distance > xmax or
+                oy < ymin and oy + dy*distance < ymin or oy > ymax and oy + dy*distance > ymax):
+            # On a unit beam of at most 2^16 cells, accumulated binary64
+            # traversal error is below the margin. Keep the original traversal
+            # for extreme coordinates, ranges or non-unit fixture directions.
+            if (0 <= distance <= 65536*self.cell and abs(dx) <= 1 and abs(dy) <= 1 and
+                    abs(ix) < 2**40 and abs(iy) < 2**40):
+                return distance
         sx,sy=(1 if dx>=0 else-1),(1 if dy>=0 else-1)
         tx=((ix+(1 if sx>0 else 0))*self.cell-ox)/dx if dx else math.inf
         ty=((iy+(1 if sy>0 else 0))*self.cell-oy)/dy if dy else math.inf
