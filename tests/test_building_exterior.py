@@ -1,5 +1,6 @@
 """Photo-informed facade, wood doors, open guards and grade remain one source."""
 import copy
+import math
 from pathlib import Path
 import sys
 import unittest
@@ -37,6 +38,56 @@ class ExteriorTests(unittest.TestCase):
         self.assertTrue(any(o['body']==ext['frame_body_id'] and o['action']=='join' for o in self.e['operations']))
         self.assertGreater(len(ext['frame_body_ids']),10)
         self.assertTrue(all(o['action']=='create' for o in self.e['operations'] if o['body'] in {n for n in ext['frame_body_ids'] if n.startswith('Foyer')}-{ext['frame_body_id']}))
+
+    def test_external_stair_glazing_spans_the_aligned_front_to_the_roof(self):
+        exposed = self.s['exterior']['fire_stair_glazing']
+        canonical = model.level_plan(self.s, 'OG3')
+        wall = next(wall for wall in canonical['walls'] if wall['id'] == exposed['upper_wall'])
+        start, end = sorted(canonical['vertices'][wall[key]] for key in ('start', 'end'))
+        length = math.dist(start, end)
+        scale = self.p['display_scale']
+        direction = [(b-a)/length for a,b in zip(start,end)]
+        bodies = {body['id']: body for body in self.e['bodies']}
+        ext = self.d['exterior']
+        glass = {name for name in ext['glass_body_ids'] if '__FireStairFacade_' in name}
+        frame = {name for name in ext['frame_body_ids'] if '__FireStairFacade_' in name}
+        self.assertEqual(len(glass), 4*exposed['bay_count'])
+        for name in glass:
+            self.assertEqual(bodies[name]['role'], 'concept_fire_stair_glass')
+            self.assertEqual(bodies[name]['appearance']['opacity'], self.s['exterior']['glass_opacity'])
+        previous_top = ext['grade_z_mm']
+        for level in self.d['levels']:
+            prefix = level['id'] + '__FireStairFacade_'
+            shapes = {op['body'].removeprefix(prefix): op['shape'] for op in self.e['operations']
+                      if op['body'].startswith(prefix) and op['body'] in glass | frame}
+            if level['id'] == 'KG':
+                self.assertFalse(shapes)
+                continue
+            sill, head = shapes.pop('Sill'), shapes.pop('Head')
+            self.assertAlmostEqual(sill['offset'], previous_top)
+            previous_top = head['offset'] + head['depth']
+            intervals = []
+            for shape in shapes.values():
+                self.assertAlmostEqual(shape['offset'], sill['offset'] + sill['depth'])
+                self.assertAlmostEqual(shape['offset'] + shape['depth'], head['offset'])
+                along = [sum((coord-origin*scale)*axis for coord,origin,axis in zip(point,start,direction))
+                         for point in shape['points']]
+                intervals.append((min(along), max(along)))
+            edge = 0
+            for lo, hi in sorted(intervals):
+                self.assertAlmostEqual(lo, edge)
+                edge = hi
+            self.assertAlmostEqual(edge, length*scale)
+            self.assertNotIn(level['id']+'__Wall_'+wall['id'], bodies)
+        self.assertAlmostEqual(previous_top, ext['facade_top_mm'])
+        self.assertEqual(self.d['circulation']['external_stairs'][0]['ground_exit']['neighbor_area'], 'R0_022')
+        self.assertIn('EG__D0_022', ext['door_leaves'])
+
+    def test_stair_glazing_rejects_a_boundary_shared_with_the_building(self):
+        selected = copy.deepcopy(self.s)
+        selected['exterior']['fire_stair_glazing']['ground_wall'] = 'EW092'
+        with self.assertRaisesRegex(ValueError, 'outer stair edge'):
+            model.interfaces(selected, self.p)
 
     def test_door_materials_and_native_aperture_witnesses(self):
         ext=self.d['exterior'];doors=[b for b in self.e['bodies'] if b['id'] in ext['door_leaves'].values()]

@@ -4,7 +4,7 @@
   "sources": {
     "patrol": {
       "path": "model/building-fleet-patrol.shared.json",
-      "sha256": "279b08d738dea254aba0fb44c9e9339f8897f675c34e07dd82fc34c7e5007414"
+      "sha256": "b43514a0da1c343fdb7bfb8d7a1b1cd07cc45040dfe217d99608c25b7f4d495d"
     },
     "python_core": {
       "path": "model/building-fleet-browser-python.shared.json",

@@ -374,6 +374,11 @@
     "glass_opacity": 0.2,
     "frame_color": "#424A50",
     "glass_color": "#A7CDD8",
+    "fire_stair_glazing": {
+      "upper_wall": "W010",
+      "ground_wall": "AlignmentStairOuter",
+      "bay_count": 3
+    },
     "door_color": "#C99448",
     "door_leaf_mm": 40,
     "doors": {

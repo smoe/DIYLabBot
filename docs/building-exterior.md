@@ -13,6 +13,12 @@ portablen Quader- und Profiloperationen für FreeCAD und SolidCraft:
 - Eine mehrgeschossige transparente Glasfront mit dunklen Pfosten und Riegeln
   ersetzt die Fassaden-Platzhalterwand `W108` in der Gebäudekomposition.
   Die EG-Eingangsöffnung bleibt über `EW074` / `D0_018` referenziert.
+- Die gesamte nach außen gerichtete Front der Notfalltreppe ist vom EG bis
+  zur Dachkante verglast. Die Gebäudekomposition leitet die Länge aus der
+  Kante `W010` der oberen Treppenfläche und ihrer registrierten Fortsetzung
+  `AlignmentStairOuter` im EG ab. Die drei Glasfelder je Geschoss sind eine
+  Darstellungsannahme und verwenden dasselbe Glas- und Rahmenprofil wie das
+  Foyer. Der Ausgang neben Raum 22 bleibt frei.
 - Der vorläufige Holzfarbton `#C99448` gilt für die oberirdischen Raumtürblätter.
   Die [Türtypenquelle](building-doors.md) ergänzt die runden Guckfenster und
   das schwere Stahlprofil für den Keller. Sie stehen illustrativ offen. Die sichtbare Glasfront ist

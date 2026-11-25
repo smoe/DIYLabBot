@@ -12,9 +12,16 @@ def require(ok, message):
 
 
 def validate(s):
-    require(set(s)-{'doors','side_window_walls_by_level'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening','left_hardstanding_end_fraction'},'Explicit exterior recipe required')
+    require(set(s)-{'doors','side_window_walls_by_level','fire_stair_glazing'}=={'status','front_wall','ground_front_wall','entry_opening','bay_count','frame_mm','glass_mm','glass_opacity','frame_color','glass_color','door_color','door_leaf_mm','guard_boundaries','guard_height_mm','guard_post_mm','guard_bar_mm','guard_bar_fractions','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','terrain_color','landscape_layer_mm','concrete_color','side_cladding_color','side_window_walls','side_window_interval','side_window_height_fractions','sidewalk_width_mm','road_width_mm','sidewalk_color','road_color','entrance_flank_color','entrance_flank_walls','left_sidewalk_walls','left_sidewalk_entry_opening','left_hardstanding_end_fraction'},'Explicit exterior recipe required')
     require(s['status']=='photo_informed_unmeasured_concept','Declare photo-informed, unmeasured exterior')
     require(type(s['bay_count']) is int and 2<=s['bay_count']<=12,'Bounded illustrative facade bays required')
+    if 'fire_stair_glazing' in s:
+        glazing = s['fire_stair_glazing']
+        require(isinstance(glazing, dict) and set(glazing) == {'upper_wall', 'ground_wall', 'bay_count'}
+                and all(isinstance(glazing[key], str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', glazing[key])
+                        for key in ('upper_wall','ground_wall'))
+                and type(glazing['bay_count']) is int and 1 <= glazing['bay_count'] <= 12,
+                'Explicit fire stair facade references and bounded bay count required')
     for k in ['frame_mm','glass_mm','door_leaf_mm','guard_height_mm','guard_post_mm','guard_bar_mm','guard_max_post_spacing_mm','terrain_margin_mm','terrain_clearance_mm','landscape_layer_mm','sidewalk_width_mm','road_width_mm']:
         require(type(s[k]) in (int,float) and math.isfinite(s[k]) and 0<s[k]<10000,'Positive bounded presentation mm required: '+k)
     require(type(s['glass_opacity']) in (int,float) and 0<s['glass_opacity']<1,'Transparent glass required')
@@ -136,6 +143,45 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     def strip(wa,wb,lo,hi,half):
         length=math.dist(wa,wb);normal=[-(wb[1]-wa[1])/length,(wb[0]-wa[0])/length]
         return [[wa[j]+fraction*(wb[j]-wa[j])+side*normal[j] for j in (0,1)] for fraction,side in [(lo,-half),(hi,-half),(hi,half),(lo,half)]]
+    if 'fire_stair_glazing' in s:
+        glazing = s['fire_stair_glazing']
+        bays = glazing['bay_count']
+        reference = walls.get(glazing['upper_wall'])
+        require(reference is not None, 'Existing upper fire stair facade edge required')
+        wa, wb = sorted(ends(canonical, reference))
+        pitch = 1 / bays
+        half_post = frame / (2 * math.dist(wa, wb))
+        height = p['floor_pitch_mm']
+        require(pitch > 4 * half_post and height > frame and glass <= frame, 'Fire stair glazing must fit its frame')
+        # Each storey adds half of the horizontal frame at either seam. The
+        # panels span the floor pitch, including the slab height at the edge.
+        for level in above:
+            level_id = level['id']
+            plan = plans[level_id]
+            wall_id = glazing['ground_wall' if level_id == 'EG' else 'upper_wall']
+            wall = next((w for w in plan['walls'] if w['id'] == wall_id), None)
+            owners = [area for area in plan['areas'] if any(edge['wall'] == wall_id for edge in area['boundary'])]
+            require(wall is not None and len(owners) == 1 and owners[0]['kind'] == 'stairwell'
+                    and not any(o['wall'] == wall_id for o in plan['openings']),
+                    'Fire stair glazing must be on the outer stair edge, clear of existing openings')
+            require(sorted(ends(plan, wall)) == [wa, wb],
+                    'Fire stair facade edges must align across storeys')
+            z = level['z_mm']
+            name = level_id + '__FireStairFacade'
+            for label, bottom in [('Sill', z), ('Head', z + height - frame/2)]:
+                target = body(name+'_'+label, 'concept_dark_facade_frame', s['frame_color'])
+                frame_ids.append(target)
+                prism(target+'_Profile', target, strip(wa, wb, 0, 1, frame/2), bottom, frame/2)
+            for index in range(bays + 1):
+                lo = max(0, index*pitch - half_post)
+                hi = min(1, index*pitch + half_post)
+                post = body(name+'_Post'+str(index), 'concept_dark_facade_frame', s['frame_color'])
+                frame_ids.append(post)
+                prism(post+'_Profile', post, strip(wa, wb, lo, hi, frame/2), z+frame/2, height-frame)
+                if index < bays:
+                    pane = body(name+'_Glass'+str(index), 'concept_fire_stair_glass', s['glass_color'], s['glass_opacity'])
+                    glass_ids.append(pane)
+                    prism(pane+'_Pane', pane, strip(wa, wb, hi, (index+1)*pitch-half_post, glass/2), z+frame/2, height-frame)
     for level in levels:
         plan=plans[level['id']];wallmap={w['id']:w for w in plan['walls']}
         level_segments=side_segments+[(canonical['vertices'][walls[n]['start']],canonical['vertices'][walls[n]['end']])
