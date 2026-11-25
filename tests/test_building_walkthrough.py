@@ -152,7 +152,8 @@ class WalkthroughTests(unittest.TestCase):
         devices = [device for laboratory, device in bindings if not device.get('supporting_device_id')]
         supports = [device for laboratory, device in bindings if device.get('supporting_device_id')]
         self.assertEqual(len(devices), 17)
-        self.assertEqual({device['supporting_device_id'] for device in supports}, {'ArmA', 'ArmB', 'ArmC'})
+        self.assertEqual({device['supporting_device_id'] for device in supports}, {'ArmA', 'ArmB'})
+        self.assertTrue(next(device for device in devices if device['id'] == 'ArmC')['direct_mount'])
         for support in supports:
             owner = next(device for device in devices if device['id'] == support['supporting_device_id'])
             self.assertEqual(support['transform'], owner['transform'])

@@ -9,11 +9,11 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "579aa4e0639084065796df8c69a5411c050f3ee09d16a3936b605217a79ff7d1"
+      "sha256": "05a73fc7c7c055d77b3522951165e4aa27fa789cb4deed0afb81fb2aadc684ec"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "2aeb85158850bc39967df38f158f99fc31f7f78c5b7a76552c930df88d51abd5"
+      "sha256": "8eb729efd501b615597f0a5bd0b7d61edcd406f39ea827954b22414e0bba3941"
     },
     "vehicle": {
       "path": "model/sample-transport-tr01.shared.json",
@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "c3af1399ba83838af43b9b7a8aa65d403dee51b61885df178664defb4989becb"
+      "sha256": "e3f4a4648005d7b870e850d34ddb96e5ecde13b186ba8dd96dbb29e0bb6198f2"
     },
     "lift_geometry": {
       "path": "scripts/lift_fittings.py",

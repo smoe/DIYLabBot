@@ -202,6 +202,7 @@ class NativeWorldSnapshotTests(unittest.TestCase):
         class Shape:
             BoundBox=SimpleNamespace(XMin=0,YMin=0,ZMin=0,XMax=1,YMax=2,ZMax=3)
             Solids=[True]
+            Placement=None
             def copy(self):return Shape()
             def isNull(self):return False
             def isValid(self):return True
@@ -243,6 +244,38 @@ class NativeWorldSnapshotTests(unittest.TestCase):
         self.world();self.assertEqual(len(self.opens),3)
         with self.assertRaises(ValueError):self.world(expected={'Missing'})
         self.assertEqual(len(self.opens),4)
+
+    def test_parked_arm_bodies_match_walkthrough_and_pose_changes_invalidate_cache(self):
+        self.reports['lab'] = self.reports.pop('building')
+        laboratory = {'id': 'Lab3003'}
+        def translated(x):
+            return [[1, 0, 0, x], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+
+        arm = {'id': 'ArmC', 'body_prefix': 'Lab3003_ArmC_', 'transform': translated(100),
+               'park_joints_deg': [125, 0, 0, 0, 0, 0]}
+        instrument = {'id': 'CF01', 'body_prefix': 'Lab3003_CF01_', 'transform': translated(250)}
+        self.bindings = [(laboratory, arm), (laboratory, instrument)]
+        self.geo.features = lambda doc: [SimpleNamespace(SourceBody=name)
+                                         for name in ('ArmC__Jaw__Solid2', 'CF01__Lid')]
+        self.app.Matrix = lambda *elements: elements
+        self.app.Placement = lambda matrix: SimpleNamespace(multiply=lambda previous: matrix)
+        arm_body = 'Lab3003_ArmC_Jaw__Solid2'
+        lid_body = 'Lab3003_CF01_Lid'
+        expected = {arm_body, lid_body}
+
+        def parked_placement(lab, device):
+            return {'Jaw': translated(device['park_joints_deg'][0])}
+
+        with patch.object(self.checker.native, 'equipment_link_placements', side_effect=parked_placement) as parked:
+            first = self.world(expected=expected)
+            self.assertEqual(first[arm_body]['shape'].Placement[3], 125)
+            self.assertEqual(first[lid_body]['shape'].Placement[3], 250)
+            self.world(expected=expected)
+            parked.assert_called_once_with(laboratory, arm)
+            arm['park_joints_deg'][0] = 140
+            updated = self.world(expected=expected)
+            self.assertEqual(updated[arm_body]['shape'].Placement[3], 140)
+            self.assertEqual(len(self.opens), 2)
 
     def test_changed_input_during_restore_is_not_cached(self):
         original=self.geo.features

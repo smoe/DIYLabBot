@@ -45,10 +45,11 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
   assert.equal(nativeScene.equipment_placement_checks.length, 17);
   assert(nativeScene.equipment_placement_checks.every(check => check.passed && check.host_anchor_checked));
   const auxiliary=nativeScene.auxiliary_instances;
-  assert.deepEqual(auxiliary.map(item=>item.id).sort(),['Lab3003.MountArmA','Lab3003.MountArmB','Lab3003.MountArmC']);
+  const raisedArms = laboratory.device_instances.filter(device => device.asset === 'arm' && !device.direct_mount).map(device => device.id).sort();
+  assert.deepEqual(auxiliary.map(item=>item.id).sort(),raisedArms.map(id=>laboratory.id+'.Mount'+id));
   const supportGroups=nativeScene.groups.filter(group=>group.supporting_device_id);
-  assert.equal(supportGroups.length,3,'The three functional native arm risers remain in the building');
-  assert.deepEqual(supportGroups.map(group=>group.supporting_device_id).sort(),['ArmA','ArmB','ArmC']);
+  assert.equal(supportGroups.length,raisedArms.length,'Every raised arm has its native support');
+  assert.deepEqual(supportGroups.map(group=>group.supporting_device_id).sort(),raisedArms);
   for(const support of auxiliary){
     const groups=supportGroups.filter(group=>laboratory.id+'.'+group.instance_id===support.id);
     assert.equal(groups.length,support.body_count);

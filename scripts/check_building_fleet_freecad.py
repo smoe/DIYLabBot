@@ -267,6 +267,8 @@ def native_world(reports,manifest,expected,App,geo):
     bindings=native.native_equipment_bindings(manifest.get('laboratories',[]))
     key=_world_input_key(reports,manifest,expected,bindings,App,geo)
     if key in _NATIVE_WORLD_CACHE:return _world_rows(_NATIVE_WORLD_CACHE[key])
+    parked_links = {(lab['id'], device['id']): native.equipment_link_placements(lab, device)
+                    for lab, device in bindings if 'park_joints_deg' in device}
     world={}
     for kind,report in reports.items():
         doc=App.openDocument(str(native.project_path(report['files']['freecad'])))
@@ -278,8 +280,15 @@ def native_world(reports,manifest,expected,App,geo):
                 for match in matches:
                     identity=name
                     if match:
-                        lab,device=match;matrix=device['transform'];native.validate_rigid(matrix);m=App.Matrix(*[v for row in matrix for v in row]);shape=shape.copy();shape.Placement=App.Placement(m).multiply(shape.Placement)
-                        identity=device['body_prefix']+name[len(device['id']+'__'):]
+                        lab, device = match
+                        body = name[len(device['id']+'__'):]
+                        park = parked_links.get((lab['id'], device['id']))
+                        matrix = park[body.split('__Solid', 1)[0]] if park else device['transform']
+                        native.validate_rigid(matrix)
+                        placement = App.Placement(App.Matrix(*[v for row in matrix for v in row]))
+                        shape = shape.copy()
+                        shape.Placement = placement.multiply(shape.Placement)
+                        identity = device['body_prefix']+body
                     if identity in world:raise ValueError('Duplicate native audit body')
                     if shape.isNull()or not shape.isValid()or not shape.Solids:raise ValueError('Invalid native audit body: '+identity)
                     world[identity]={'shape':shape,'bounds':shape_bounds(shape),'role':str(getattr(obj,'ModelRole','native_geometry'))}

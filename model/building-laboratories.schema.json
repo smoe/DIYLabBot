@@ -86,6 +86,47 @@
           },
           "basis": {
             "const": "unmeasured_room_binding"
+          },
+          "transporter_dock": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["instance", "xy_mm", "yaw_deg"],
+            "properties": {
+              "instance": {"type": "string", "minLength": 1},
+              "xy_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+              "yaw_deg": {"type": "number"}
+            }
+          },
+          "bench_layout": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["workspace", "anchor", "yaw_deg", "devices"],
+            "properties": {
+              "workspace": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["source", "source_sha256"],
+                "properties": {
+                  "source": {"type": "string", "pattern": "^model/.*\\.json$"},
+                  "source_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+                }
+              },
+              "anchor": {"type": "string", "minLength": 1},
+              "yaw_deg": {"type": "number"},
+              "devices": {
+                "type": "object",
+                "minProperties": 1,
+                "propertyNames": {"minLength": 1},
+                "additionalProperties": {"type": "string", "minLength": 1}
+              },
+              "park_joints_deg": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "array", "minItems": 6, "maxItems": 6,
+                  "items": {"type": "number"}
+                }
+              }
+            }
           }
         }
       }
