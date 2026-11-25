@@ -27,15 +27,10 @@ LIVE_VIEW = model.ROOT / 'scripts/building_fleet_live_view.js'
 def load_profile(path=PROFILE):
     """Reject unsupported policies instead of silently using a different one."""
     value = model.read_json(project_path(path))
-    startup=value.get('patrol',{}).get('startup')
-    if startup not in ('first_received_camera_frames','own_received_camera_frame'):
-        raise ValueError('Explicit supported received-camera startup policy required')
     expected = {
         'format': 'solidcraftbot.building-fleet-patrol/1', 'id': 'BF01-Patrol',
         'sources': {'fleet': artifact(model.ROOT / 'model/building-fleet-demo.shared.json')},
-        'patrol': {'termination': 'explicit_stop', 'startup': startup,
-                   'targets': '/missions/targets',
-                   'selection': 'oldest_received_visit'},
+        'patrol': model.patrol_policy(value),
         'recruitment': {'selection': 'lowest_feasible_route_eta',
             'diversion': 'observed_stationary_boundary',
             'pickup_delivery': 'empty_inspection_visits',

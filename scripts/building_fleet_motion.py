@@ -408,12 +408,67 @@ def _grid_motion_clock(proposal):
     return floor.motion.Curve(points)
 
 
-def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=(), *, _piece_factors=None, _attempt=0):
+def _corner_clock(path, offset, length, constant_speed, zone_cap, linear, angular):
+    """Propose a clock whose elapsed time follows both progress and heading.
+
+    For a monotone-heading blend use t(s) = s/v + signed_delta_yaw(s)/omega.
+    Its inverse gives positive scalar speed, with zero scalar acceleration
+    at the straight joins. Sampled jets select a proposal only. The full
+    quantized scalar and Cartesian polynomials must still pass compile_motion.
+    """
+    count = max(32, math.ceil(length / 15))
+    samples = [path.evaluate(offset + length*i/count) for i in range(count+1)]
+    yaw0 = samples[0][0][2]
+    delta = math.remainder(samples[-1][0][2] - yaw0, math.tau)
+    if abs(delta) < 1e-8:
+        return None
+    omega = math.copysign(angular['velocity'], delta)
+    yaw_time = delta / omega
+    best_time = length / constant_speed
+    best = None
+    # Compare distance- and heading-dominated clocks on this actual blend.
+    # Uniform time scaling reduces the nth time derivative by scale**n.
+    for speed in sorted({min(zone_cap, ratio*length/yaw_time) for ratio in (.5, 1, 2, 4)}):
+        duration = length/speed + yaw_time
+        if duration >= best_time:
+            continue
+        scale = 1.
+        points = []
+        for i, (pose, d1, d2, d3) in enumerate(samples):
+            s = length*i/count
+            dt_ds = 1/speed + d1[2]/omega
+            if d1[2]/omega < -1e-8 or dt_ds <= 0:
+                return None
+            v = 1/dt_ds
+            a = -(d2[2]/omega)*v**3
+            j = 3*(d2[2]/omega)**2*v**5 - (d3[2]/omega)*v**4
+            t = s/speed + math.remainder(pose[2] - yaw0, math.tau)/omega
+            points.append(local.point(t, s, v, a))
+            rates = ([x*v for x in d1],
+                     [y*v*v+x*a for x,y in zip(d1,d2)],
+                     [z*v**3+3*y*v*a+x*j for x,y,z in zip(d1,d2,d3)])
+            for n,(key,rate,scalar) in enumerate(zip(('velocity','acceleration','jerk'),rates,(v,a,j)),1):
+                ratio = max(math.hypot(*rate[:2])/linear[key], abs(scalar)/linear[key],
+                            abs(rate[2])/angular[key])
+                scale = max(scale, ratio**(1/n))
+        # Keep half the nominal acceleration demand available for changing
+        # to a protective stop on the same bend. Uniform sqrt(2) dilation
+        # halves acceleration and cuts jerk by 2**1.5. This design reserve
+        # only selects a nominal; the live prefix plus complete brake must
+        # still pass its own exact PVA, scan, and observation-budget checks.
+        scale *= math.sqrt(2.)
+        if duration*scale < best_time:
+            best_time = duration*scale
+            best = (speed/scale, points, scale)
+    return best
+
+
+def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=False, zone_caps=(), *, variable_corner_speed=False, _piece_factors=None, _attempt=0):
     """Fast straights and bounded corners on one uninterrupted C2 route.
 
-    Each corner has constant positive geometric-progress speed. Acceleration
-    and deceleration occur on the straight portions with exact cubic velocity
-    ramps, so a slow corner never dilates the entire route. All final fitted
+    Empty patrol curves can opt into a variable positive geometric-progress
+    speed on bends. The reference profile retains constant corner speed.
+    Straight portions use exact cubic velocity ramps. All final fitted
     Cartesian polynomials are checked after 1 ms quantization.
     """
     from building_fleet_geometry import vehicle_envelope
@@ -451,13 +506,13 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                     weight=right-left;d=[(y[k]-x[k])/weight for k in range(3)]
                     pieces.append({'controls':[x,y],'weight':weight,'derivatives':[[d],[[0.,0.,0.]],[[0.,0.,0.]],[[0.,0.,0.]]]})
             offset=finish
-    piece_caps=[];piece_limits=[];proofs=[];progress=0.
+    piece_caps=[];piece_limits=[];proofs=[];progress=0.;corner_clocks={}
 
     for piece in pieces:
         proof=spatial_bounds(piece);proofs.append(proof);limit=zone_at(progress)
         for at,cap in zone_caps:
             if progress<at<progress+piece['weight']:limit=min(limit,cap*.995)
-        progress+=piece['weight']
+        zone_limit=limit
         for order,key in enumerate(('velocity','acceleration','jerk'),1):
             for kind,limits in (('linear',linear),('angular',angular)):
                 bound=proof[kind][order-1]
@@ -465,7 +520,15 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
         factor=(_piece_factors or {}).get(len(piece_caps),1.)
         if type(factor)not in(int,float)or not math.isfinite(factor)or not 0<factor<=1:
             raise ValueError('Local timing refinement factors must be finite in (0, 1]')
-        piece_caps.append((limit*.995 if len(piece['controls'])>2 else limit)*factor)
+        if len(piece['controls'])>2:
+            limit *= .995
+            if variable_corner_speed:
+                clock = _corner_clock(path, progress, piece['weight'], limit, zone_limit, linear, angular)
+                if clock:
+                    corner_clocks[len(piece_caps)] = clock
+                    limit = clock[0]
+        piece_caps.append(limit*factor)
+        progress+=piece['weight']
         # A local time dilation must reduce all derivative orders coherently.
         # Reducing only the peak speed would still regenerate ramps at full
         # acceleration/jerk and can preserve the rejected quantization spike.
@@ -483,6 +546,12 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             if len(piece['controls'])>2:
                 v=min(nodes[i],nodes[i+1]);nodes[i]=nodes[i+1]=v
         return nodes
+
+    def reference_clock(reason):
+        result = compile_motion(path, source, zone_velocity_mm_s, start_s, reverse, zone_caps)
+        result['timing']['corner_clock_fallback'] = reason
+        return result
+
     for _ in range(30):
         nodes=node_speeds();changed=False
         for i,piece in enumerate(pieces):
@@ -494,7 +563,10 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                     if 0<=j<len(piece_caps):piece_caps[j]*=.9
                 changed=True
         if not changed:break
-    else:raise RuntimeError('No continuous speed connection on short geometric line')
+    else:
+        if corner_clocks:
+            return reference_clock('Variable corner speeds could not join across a short straight')
+        raise RuntimeError('No continuous speed connection on short geometric line')
     clock_points=[local.point(0,0,0,0)]; time=distance=0.; intervals=[];coasts={}
     def append_curve(curve):
         nonlocal time,distance
@@ -519,7 +591,16 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
         v0,v1=nodes[i:i+2]; length=piece['weight']; before=distance
         if len(piece['controls'])>2:
             if abs(v0-v1)>1e-8 or v0<=0:raise ValueError('A corner needs one positive transit speed')
-            coast(length,v0)
+            if i in corner_clocks:
+                entry, points, scale = corner_clocks[i]
+                scale *= entry/v0
+                nodes_local = [local.point(p['time_s']*scale, p[F[0]][0],
+                                           p[F[1]][0]/scale, p[F[2]][0]/scale**2) for p in points]
+                nodes_local[0] = local.point(0.,0.,v0,0.)
+                nodes_local[-1] = local.point(nodes_local[-1]['time_s'],length,v1,0.)
+                append_curve(floor.motion.Curve(nodes_local))
+            else:
+                coast(length,v0)
         else:
             def ramps(peak):
                 up=transition(v0,0,peak,piece_limits[i])if abs(peak-v0)>1e-8 else None
@@ -542,8 +623,8 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
     # 50 ms; its observation period is not an interpolation-fit requirement.
     times={0.,clock.times[-1],*clock.times}
     offset=0.
-    for piece in pieces:
-        if len(piece['controls'])>2:
+    for i,piece in enumerate(pieces):
+        if len(piece['controls'])>2 and i not in corner_clocks:
             count=max(32,math.ceil(piece['weight']/15))
             for k in range(count+1):
                 goal=offset+piece['weight']*k/count;lo,hi=0.,clock.times[-1]
@@ -654,11 +735,13 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
             for i in selected:affected[i]=min(affected.get(i,1.),scale)
         if affected:
             for i,scale in affected.items():factors[i]=factors.get(i,1.)*scale
-            report=compile_motion(path,source,zone_velocity_mm_s,start_s,reverse,zone_caps,
+            report=compile_motion(path,source,zone_velocity_mm_s,start_s,reverse,zone_caps,variable_corner_speed=variable_corner_speed,
                                   _piece_factors=factors,_attempt=_attempt+1)
             report['timing'].setdefault('quantization_refinements',{str(i):v for i,v in factors.items()})
             return report
     if violations or not no_stop['passed']or not scalar_no_stop['passed']:
+        if corner_clocks:
+            return reference_clock('Variable corner clock failed final quantized checks')
         raise RuntimeError('Final quantized motion rejected: '+str({'limits':violations,'no_stop':no_stop,'scalar_no_stop':scalar_no_stop}))
     result={'points':points,'scalar_clock':scalar_points,'duration_s':points[-1]['time_s']-start_s,'dynamics':bounds,'no_stop':no_stop,
             'perception_limit':perception,'piece_caps_mm_s':piece_caps,'spatial_interval_bounds':proofs,
@@ -671,5 +754,8 @@ def compile_motion(path, source, zone_velocity_mm_s=None, start_s=0, reverse=Fal
                       'refined_piece_limits':{str(i):{'factor':factor,'scalar_limits':piece_limits[i]}
                           for i,factor in (_piece_factors or {}).items()},
                       'scalar_dynamics':{key:scalar_bounds[field]['max_abs'][0]for key,field in zip(('velocity','acceleration','jerk'),F[1:])}}}
+    if corner_clocks:
+        result['timing']['family']='heading-weighted corner clocks and cubic-velocity straight ramps; jointly checked quantized C2 scalar and Cartesian refit'
+        result['timing']['variable_corner_pieces']=sorted(corner_clocks)
     if zone_caps:result['zone_bounds']=zone_proofs
     return result

@@ -72,6 +72,59 @@ class MotionTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     motion.compile_motion(motion.Path([[0,0],[1000,0]]),source,zone_caps=[(0,cap)])
 
+    def test_patrol_turns_vary_speed_and_still_pass_quantized_follower_checks(self):
+        from building_fleet_control import Controller
+        source = model.load()
+        angular = model.reference(source, 'angular_profile')['limits']['angular']
+        # The initial heading near pi crosses the yaw wrap on one traversal.
+        for side, reverse in ((1, False), (-1, True)):
+            path = motion.Path([[2000, -1], [0, 0], [1000, side*360]], 120)
+            begin, end = path.ends[:2]
+            zones = [(0, 300), ((begin+end)/2, 200)]
+            baseline = motion.compile_motion(path, source, 300, reverse=reverse, zone_caps=zones)
+            result = motion.compile_motion(path, source, 300, reverse=reverse, zone_caps=zones,
+                                           variable_corner_speed=True)
+            self.assertEqual(result['timing']['variable_corner_pieces'], [1])
+            self.assertLess(result['duration_s'], baseline['duration_s']/2)
+            driver = Controller(path, source, zones, motion_program=result)
+            curve = driver.nominal_clock
+            inner = [p[motion.F[1]][0] for p in curve.points if begin < p[motion.F[0]][0] < end]
+            self.assertGreater(min(inner), 0)
+            self.assertGreater(max(inner), 2*min(inner))
+            self.assertTrue(result['no_stop']['passed'])
+            self.assertTrue(result['timing']['scalar_no_stop']['passed'])
+            for key, cap in angular.items():
+                self.assertLessEqual(driver.nominal_clock_proof['dynamics']['angular'][key], cap*(1+1e-6))
+            for zone in result['zone_bounds']:
+                self.assertLessEqual(zone['speed_upper_mm_s'], zone['cap_mm_s']*(1+1e-6))
+
+    def test_first_seed_bend_has_a_complete_stop_before_committing_next_step(self):
+        from building_fleet_control import Controller
+        # The unreserved BF06 clock lost the stop witness on this first bend
+        # even with a clear scan. Use the actual first three seed waypoints.
+        path = motion.Path([[13200, 21800], [13200, 22870.772793294684], [11225, 22425]], 250)
+        source = model.load()
+        zones = [(0, 300)]
+        program = motion.compile_motion(path, source, 300, zone_caps=zones, variable_corner_speed=True)
+        driver = Controller(path, source, zones, motion_program=program)
+        driver.set_plan(driver.nominal_clock, 0., 'driving', 'goal')
+        # Select the physical controller tick closest to the original failed
+        # progress, independent of the speed or duration of the approach.
+        clock = driver.nominal_clock
+        ticks = (round(step*.05, 3) for step in range(math.ceil(clock.times[-1]/.05)))
+        t = min(ticks, key=lambda tick: abs(clock.evaluate(tick)[motion.F[0]][0]-834.268))
+        driver.now = t
+        jet = clock.evaluate(t)
+        driver.y, driver.v, driver.a = (jet[f][0] for f in motion.F[:3])
+        end = round(t+.05, 3)
+        scan = {'captured_s': t-.1}
+        preview = driver._preview_stop(end, driver._visible_gap(), scan)
+        self.assertIsNotNone(preview)
+        self.assertTrue(driver._approve_step(preview, end, driver._visible_gap(), scan))
+        self.assertGreater(preview.times[-1], .05)
+        self.assertEqual(preview.points[-1][motion.F[1]], [0.])
+        self.assertEqual(preview.points[-1][motion.F[2]], [0.])
+
     def test_tight_actual_route_refines_only_export_violations(self):
         # Source-derived EG R0_014A proposal: its short linked turns used to
         # produce1256mm/s³ after quantization despite the analytic proposal.

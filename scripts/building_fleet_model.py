@@ -139,6 +139,19 @@ def reference(source, key):
     return read_json(resolve_pin(source['sources'][key]))
 
 
+def patrol_policy(profile):
+    """Validate the active patrol policy, including profiles preceding variable corner timing."""
+    policy = profile.get('patrol', {})
+    startup = policy.get('startup')
+    expected = {'termination': 'explicit_stop', 'startup': startup, 'targets': '/missions/targets',
+                'selection': 'oldest_received_visit'}
+    if 'corner_timing' in policy:
+        expected['corner_timing'] = 'variable_progress'
+    if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
+        raise ValueError('Unsupported continuous empty-patrol policy')
+    return policy
+
+
 def scan_angular_allowance(sensor):
     return sensor['range_mm'] * math.sin(math.radians(sensor['angular_step_deg']))
 

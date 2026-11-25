@@ -11,7 +11,8 @@
     "termination": "explicit_stop",
     "startup": "own_received_camera_frame",
     "targets": "/missions/targets",
-    "selection": "oldest_received_visit"
+    "selection": "oldest_received_visit",
+    "corner_timing": "variable_progress"
   },
   "recruitment": {
     "selection": "lowest_feasible_route_eta",

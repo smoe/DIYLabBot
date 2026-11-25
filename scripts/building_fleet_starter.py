@@ -68,7 +68,8 @@ class RollingController(Controller):
         if not self.awaiting_continuation:return super()._goal_plan(now)
         if abs(self.v)>1e-7 or abs(self.a)>1e-7:raise RuntimeError('Rolling restart requires an observed stop')
         remaining=self.certified_horizon_mm-self.y
-        if self.joined_nominal or remaining<1e-5:
+        if (self.joined_nominal or remaining<1e-5 or
+                (self.y>1e-8 and self.certified_horizon_mm>self.path.ends[0])):
             # A new curved recovery needs a separately checked connector.
             self.plan=None;self.mode='waiting';self.reason='await_checked_continuation';return
         if self.y<1e-8:clock=self.nominal_clock
@@ -97,18 +98,41 @@ class RollingController(Controller):
     def continuation_anchor(self):
         """Use an existing own checked plan at a future control boundary."""
         if self._rest_connector is not None:return None
+        curved_launch=not self.joined_nominal and self.certified_horizon_mm>self.path.ends[0]
         if abs(self.v)<1e-8 and abs(self.a)<1e-8 and self.mode=='waiting':
+            # A fast background response at the home pose must not replace
+            # the brakeable launch clock before it traverses its first bend.
+            if curved_launch and self.y==0:return None
             return {'time_s':self.now,'progress_mm':self.y,'velocity_mm_s':self.v,'acceleration_mm_s2':self.a}
         if self.plan is None or self.plan_kind!='rolling_prefix':return None
-        # A cruise boundary offers a C2 rejoin without first undoing a hard
-        # deceleration. If it has passed, try the remaining moving boundaries.
+        # A splice at the last cruise endpoint can leave only the starter's
+        # shortest braking distance to the next corner. Prefer the middle of
+        # the remaining cruise so there is distance for a checked C2 join as
+        # well as model time for its receipt to arrive. The committed state
+        # is still evaluated from the actual own plan on a control boundary.
+        cruises=[]
+        for left,right in zip(self.plan.points,self.plan.points[1:]):
+            speed=left[F[1]][0]
+            if (speed<=1e-6 or abs(speed-right[F[1]][0])>1e-7 or
+                    max(abs(left[F[2]][0]),abs(right[F[2]][0]))>1e-7):
+                continue
+            if cruises and cruises[-1][1]==left['time_s']:
+                cruises[-1]=(cruises[-1][0],right['time_s'])
+            else:
+                cruises.append((left['time_s'],right['time_s']))
+        # A fixed boundary also prevents repeated requests for a drifting
+        # anchor when the worker first needs another checked interval.
+        future=[self.plan_start+(start+end)/2 for start,end in reversed(cruises)]
+        # When there is no usable cruise left, try the moving knot boundaries.
         candidates=sorted((p for p in self.plan.points if p[F[1]][0]>1e-6),
                           key=lambda p:(abs(p[F[2]][0])<1e-8,p['time_s']),reverse=True)
-        for node in candidates:
-            at=math.floor((self.plan_start+node['time_s'])*20+1e-9)/20
+        future.extend(self.plan_start+p['time_s'] for p in candidates)
+        for when in future:
+            at=math.floor(when*20+1e-9)/20
             if at<=self.now+.05:continue
             jet=self.plan.evaluate(round(at-self.plan_start,3))
             if jet[F[1]][0]<=1e-6:continue
+            if curved_launch and self.plan_origin+jet[F[0]][0]<self.path.ends[1]:continue
             return {'time_s':round(at,3),'progress_mm':self.plan_origin+jet[F[0]][0],
                     'velocity_mm_s':jet[F[1]][0],'acceleration_mm_s2':jet[F[2]][0]}
         return None

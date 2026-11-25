@@ -29,15 +29,22 @@ class PatrolServiceTests(unittest.TestCase):
         self.assertFalse(value['qualification']['loads_implemented'])
         self.assertFalse(value['qualification']['native_full_program_verified'])
         self.assertEqual(value['patrol']['termination'], 'explicit_stop')
+        self.assertEqual(value['patrol']['corner_timing'], 'variable_progress')
+        legacy = copy.deepcopy(value)
+        del legacy['patrol']['corner_timing']
+        with patch.object(live.model, 'read_json', return_value=legacy):
+            self.assertEqual(live.load_profile(), legacy)
 
     def test_profile_rejects_stale_pin_or_unsupported_policy(self):
         value = live.load_profile()
-        for mutation in ('source', 'policy'):
+        for mutation in ('source', 'policy', 'corner_timing'):
             changed = copy.deepcopy(value)
             if mutation == 'source':
                 changed['sources']['fleet']['sha256'] = '0' * 64
-            else:
+            elif mutation == 'policy':
                 changed['recruitment']['diversion'] = 'teleport'
+            else:
+                changed['patrol']['corner_timing'] = 'unknown'
             with patch.object(live.model, 'read_json', return_value=changed):
                 with self.assertRaises(ValueError):
                     live.load_profile()

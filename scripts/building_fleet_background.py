@@ -53,6 +53,25 @@ def _geometry(context,request,driver,clock,origin,phase,mark=None):
     return _check_absolute(context,request,absolute,phase,mark)
 
 
+def _owned_departure_bend(path,catalog,level,held):
+    """Take one existing bend and its braking straight inside the owned resource."""
+    if (held is None or len(path.pieces)<=3 or len(path.pieces[0]['controls'])!=2
+            or len(path.pieces[1]['controls'])==2 or len(path.pieces[2]['controls'])!=2):
+        return None
+    # Cutting the shared Bezier pieces at their boundary keeps the same trim,
+    # progress coordinate, sample cells and heading throughout the prefix.
+    short=copy.copy(path)
+    short.pieces=path.pieces[:3]
+    short.ends=path.ends[:3]
+    short.length=short.ends[-1]
+    short.samples=[sample for sample in path.samples if sample[0]<short.length]
+    spans=catalog.spans(level,short)
+    if (len(spans)!=1 or spans[0]['resource']!=held or spans[0]['start_progress_mm']!=0
+            or spans[0]['end_progress_mm']<short.length):
+        return None
+    return short,spans
+
+
 def _checked_result(request,**values):
     result={'format':RESULT,'request_id':request['request_id'],'kind':request['kind'],
         'source_binding':request['source_binding'],'fence':copy.deepcopy(request['fence']),**values}
@@ -154,7 +173,8 @@ def prepare_route(request,context,*,phase_complete=None):
                 return _checked_result(request,status='interval_rejected',reason='Existing or newer prepared generation')
         velocity=source_perception_limit(source,nav.radius)['applied_velocity_mm_s']
         mark('perception_limit')
-        program=compile_motion(path,source,velocity,reverse=action['reverse'],zone_caps=caps)
+        program=compile_motion(path,source,velocity,reverse=action['reverse'],zone_caps=caps,
+            variable_corner_speed=context.get('variable_corner_speed', False) and not action.get('lift_phase'))
         mark('compile_motion')
         driver=Controller(path,source,caps,own_start_s=request['observed']['time_s'],radius_mm=nav.radius,motion_program=program)
         driver.align_initial_heading(request['own_pose_mm_rad'][2])
@@ -344,16 +364,27 @@ class BackgroundPreparation:
             start=path.evaluate(0)[0];end=path.evaluate(horizon)[0]
             short=Path([start[:2],end[:2]],action['corner_trim_mm'])
             spans=e.catalog.spans(row['level'],short)
+        phase='rolling_straight_starter'
+        home=e.nav.homes.get(identity)
+        if (home and home['level']==row['level'] and not action['reverse']
+                and path.position(0)[:2]==home['pose_mm_rad'][:2]
+                and not (departures and departures.staged(identity))):
+            extension=_owned_departure_bend(path,e.catalog,row['level'],held)
+            if extension is not None:
+                short,spans=extension
+                horizon=short.length
+                phase='rolling_depot_bend_starter'
         cap=source_perception_limit(e.source,e.nav.radius)['applied_velocity_mm_s']
         short_caps=[(at,value)for at,value in caps if at<short.length]
-        program=compile_motion(short,e.source,cap,reverse=action['reverse'],zone_caps=short_caps)
+        program=compile_motion(short,e.source,cap,reverse=action['reverse'],zone_caps=short_caps,
+            variable_corner_speed=phase=='rolling_depot_bend_starter' and e.variable_corner_speed)
         driver=RollingController(path,e.source,caps,own_start_s=e.now,radius_mm=e.nav.radius,
             static_return=e.static_return(row['level'],None,identity),motion_program=program,certified_horizon_mm=horizon,
             prior_localization=e.prior_localization(identity))
         driver.align_initial_heading(row['pose_mm_rad'][2])
         context={'source':e.source,'nav':e.nav,'geometry_checks':e.geometry_checker}
-        receipt=_geometry(context,request,driver,driver.nominal_clock,0.,'rolling_straight_starter')
-        self._install(identity,action,driver,caps,receipt,'rolling_straight_starter',prepared_spans=spans,
+        receipt=_geometry(context,request,driver,driver.nominal_clock,0.,phase)
+        self._install(identity,action,driver,caps,receipt,phase,prepared_spans=spans,
             door_markers=e.door_markers(row['level'],short))
         self.statistics['starters']+=1
 

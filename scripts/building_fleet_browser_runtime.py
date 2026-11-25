@@ -125,12 +125,8 @@ def _configuration(config):
         raise ValueError('Browser profile differs from its leading pinned source')
     profile = model.read_json(paths['profile'])
     source = model.load(model.resolve_pin(profile['sources']['fleet']))
-    patrol_policy = profile.get('patrol', {})
+    model.patrol_policy(profile)
     if (profile.get('format') != 'solidcraftbot.building-fleet-patrol/1' or
-            patrol_policy.get('startup') not in ('first_received_camera_frames', 'own_received_camera_frame') or
-            patrol_policy != {'termination': 'explicit_stop',
-                'startup': patrol_policy.get('startup'), 'targets': '/missions/targets',
-                'selection': 'oldest_received_visit'} or
             profile.get('recruitment') != {'selection': 'lowest_feasible_route_eta',
                 'diversion': 'observed_stationary_boundary',
                 'pickup_delivery': 'empty_inspection_visits',
@@ -368,7 +364,7 @@ def boot_planner(config_json, progress_callback=None):
     if _planner_context is not None:
         raise RuntimeError('A preparation worker may initialize only once')
     config = _decode(config_json)
-    paths, source, _profile, _pins = _configuration(config)
+    paths, source, profile, _pins = _configuration(config)
     if 'static_runtime_cache' not in paths:
         raise ValueError('A background planner requires the checked compact runtime')
     from building_fleet_runtime_cache import restore
@@ -378,6 +374,7 @@ def boot_planner(config_json, progress_callback=None):
     prepared = restore(paths['static_runtime_cache'], source, progress=progress, initial_level=source['depot']['level'],
                        **_static_verification())
     _planner_context = {**prepared, 'source': source,
+        'variable_corner_speed': 'corner_timing' in profile['patrol'],
         'source_binding': hashlib.sha256(_json(config).encode()).hexdigest()}
     return _json({'status': 'ready'})
 

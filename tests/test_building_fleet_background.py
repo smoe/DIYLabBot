@@ -126,6 +126,56 @@ class BackgroundTests(unittest.TestCase):
         self.assertTrue(moved);self.assertEqual(car.mode,'waiting');self.assertEqual(car.reason,'await_checked_continuation')
         self.assertEqual(car.y,1000.);self.assertEqual(car.goal,6000.)
 
+    def test_depot_prefix_keeps_original_bend_and_requires_full_resource_coverage(self):
+        path=Path([[0,0],[1000,0],[1000,1400],[1500,1400]],200,
+                  corner_trim_caps=[{'point_index':1,'maximum_trim_mm':90}])
+        def spans(level,prefix):
+            return [{'resource':'owned','start_progress_mm':0.,'end_progress_mm':prefix.length}]
+        catalog=SimpleNamespace(spans=spans)
+        short,_=background._owned_departure_bend(path,catalog,'EG','owned')
+        self.assertEqual(short.ends,path.ends[:3])
+        self.assertEqual(short.samples,[s for s in path.samples if s[0]<short.length])
+        for at in (0,path.ends[0],(path.ends[0]+path.ends[1])/2,path.ends[1],short.length-1):
+            self.assertEqual(short.evaluate(at)[:3],path.evaluate(at)[:3])
+        self.assertEqual(short.pva(short.length,0,0),path.pva(short.length,0,0))
+        self.assertIsNone(background._owned_departure_bend(path,catalog,'EG','another'))
+        catalog.spans=lambda level,prefix:[{**spans(level,prefix)[0],'end_progress_mm':prefix.length-1}]
+        self.assertIsNone(background._owned_departure_bend(path,catalog,'EG','owned'))
+
+    def test_curved_prefix_requires_checked_rejoin_after_an_intermediate_stop(self):
+        car=self.rolling()
+        car.path=Path([[0,0],[400,0],[400,800],[0,800]],100)
+        car.certified_horizon_mm=car.path.ends[2]
+        car.y=(car.path.ends[0]+car.path.ends[1])/2
+        with patch.object(car,'_bounded_start_clock',side_effect=AssertionError('unproved curved restart')):
+            car._goal_plan(5.)
+        self.assertIsNone(car.plan)
+        self.assertEqual((car.mode,car.reason),('waiting','await_checked_continuation'))
+
+    def test_moving_anchor_leaves_room_to_decelerate_after_a_subdivided_cruise(self):
+        car=self.rolling()
+        car.mode='driving';car.plan_kind='rolling_prefix';car.v=120.
+        car.plan_origin=0.;car.plan_start=1.
+        car.plan=floor.motion.Curve([background.local.point(t,120*t,120.,0.) for t in (0.,3.,7.,8.)])
+        car.now=2.
+        anchor=car.continuation_anchor()
+        self.assertEqual(anchor,{'time_s':5.,'progress_mm':480.,'velocity_mm_s':120.,'acceleration_mm_s2':0.})
+        car.now=3.
+        self.assertEqual(car.continuation_anchor(),anchor)
+
+    def test_early_nominal_cannot_replace_the_brakeable_depot_bend(self):
+        car=self.rolling()
+        car.path=Path([[0,0],[300,0],[300,600],[0,600]],100)
+        car.certified_horizon_mm=car.path.ends[2]
+        self.assertIsNone(car.continuation_anchor())
+        car.mode='driving';car.plan_kind='rolling_prefix';car.v=100.;car.now=.1
+        car.plan_origin=0.;car.plan_start=0.
+        car.plan=floor.motion.Curve([background.local.point(t,100*t,100.,0.) for t in (0.,4.,8.)])
+        anchor=car.continuation_anchor()
+        self.assertGreaterEqual(anchor['progress_mm'],car.path.ends[1])
+        car.mode='waiting';car.v=0.;car.y=300.;car.plan=None
+        self.assertEqual(car.continuation_anchor()['progress_mm'],car.y)
+
     def test_wait_before_starter_horizon_preserves_actual_reason(self):
         car=self.rolling()
         for start,end,permitted,reason in (

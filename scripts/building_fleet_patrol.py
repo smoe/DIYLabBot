@@ -236,6 +236,7 @@ class PatrolWorldRunner(WorldRunner):
                 profile.get('recruitment', {}).get('pickup_delivery') != 'empty_inspection_visits'):
             raise ValueError('Explicit continuous empty-patrol profile required')
         self.profile = copy.deepcopy(profile)
+        self.variable_corner_speed = profile['patrol'].get('corner_timing') == 'variable_progress'
         super().__init__(source, nav, graph, catalog, planner, **kwargs)
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex

@@ -393,6 +393,8 @@ class ResourceGate:
 
 class WorldRunner:
     """One deterministic simultaneous world; vehicle inputs stay own-only."""
+    variable_corner_speed = False
+
     def __init__(self,source,navigation,graph,catalog,planner,*,progress=None,geometry_checker=None,output_dir=None,
                  scan_geometry=None,zone_regions=None,scan_indices=None):
         self.source=source;self.nav=navigation;self.graph=graph;self.catalog=catalog;self.planner=planner;self.progress=progress
@@ -726,8 +728,11 @@ class WorldRunner:
             self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm,self.source['motion']['zone_velocity_mm_s'])
         caps=zone_caps(self.source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],source_zones)
         velocity_cap=source_perception_limit(self.source,self.nav.radius)['applied_velocity_mm_s']
-        key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse'],velocity_cap],sort_keys=True)
-        if key not in self._motion_cache:self._motion_cache[key]=compile_motion(path,self.source,velocity_cap,reverse=action['reverse'],zone_caps=caps)
+        variable = self.variable_corner_speed and not action.get('lift_phase')
+        key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse'],velocity_cap,variable],sort_keys=True)
+        if key not in self._motion_cache:
+            self._motion_cache[key]=compile_motion(path,self.source,velocity_cap,reverse=action['reverse'],
+                zone_caps=caps,variable_corner_speed=variable)
         driver=Controller(path,self.source,caps,own_start_s=self.now,radius_mm=self.nav.radius,
             static_return=self.static_return(row['level'],action.get('lift_phase'),identity),motion_program=self._motion_cache[key],
             prior_localization=self.prior_localization(identity))
