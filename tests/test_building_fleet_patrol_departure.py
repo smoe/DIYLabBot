@@ -1,5 +1,6 @@
 """Private starter, ordinary resource handover and retained scan integration."""
 import copy
+import math
 from pathlib import Path
 import sys
 from types import SimpleNamespace
@@ -8,28 +9,47 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import building_fleet_background as background
 import building_fleet_model as model
-from building_fleet_control import preparation_digest
+from building_fleet_control import Controller, F, preparation_digest
 from building_fleet_geometry import vehicle_envelope
 from building_fleet_motion import Path as Route
 from building_fleet_patrol import PatrolWorldRunner
+from building_fleet_runner import ResourceGate
 
 
 class PatrolDepartureIntegrationTests(unittest.TestCase):
     def setUp(self):
         # Two distinct depot rooms, one canonical corridor, one ordinary FIFO waiter.
-        w = self.world = object.__new__(PatrolWorldRunner)
-        w.source = model.load()
-        w.sensor = model.resolved_sensor(w.source)
         homes = {identity: {'level':'EG', 'area':area, 'pose_mm_rad':[x,y,0.]}
                  for identity, area, x, y in [('leader','A',0.,0.), ('fifo','A',0.,1000.),
                                                 ('successor','B',4000.,0.)]}
+        rooms = {('EG','A'):[[-1000.,-900.],[1400.,-900.],[1400.,1700.],[-1000.,1700.]],
+                 ('EG','B'):[[3000.,-900.],[5100.,-900.],[5100.,900.],[3000.,900.]]}
+        w = self.world = self.make_world(homes, rooms)
+        for identity in ('leader','fifo','successor'):
+            w.resources.request(identity, 'corridor', 0.)
+        lead = w.vehicles['leader']
+        path = Route([[0.,0.],[1000.,0.],[1000.,400.],[-1000.,400.],[-1000.,0.],[0.,0.]])
+        lead.update(action={'level':'EG', 'terminal':{'kind':'capacity_home'}}, leg_id=1,
+                    driver=SimpleNamespace(path=path, mode='driving', goal=path.length, y=0., v=0., a=0.),
+                    gate=SimpleNamespace(spans=w.catalog.spans('EG',path)))
+        self.action = {'kind':'drive', 'level':'EG', 'points_mm':[[4000.,0.],[6400.,0.]],
+                       'corner_trim_mm':100., 'reverse':False, 'prefetch_level':'EG', 'markers':[],
+                       'zone_segments':[{'start_index':0,'end_index':1,'velocity_mm_s':300.}],
+                       'terminal':{'kind':'lift_wait','mission_id':'mission-successor'}}
+        w.planner = SimpleNamespace(states={'successor':{'queue':[{'mission_id':'mission-successor'}],
+                    'admission_deferred':False, 'requested':False}},
+                    next_action=lambda own, now, grants:copy.deepcopy(self.action))
+
+    def make_world(self, homes, rooms, waits=None):
+        w = object.__new__(PatrolWorldRunner)
+        w.source = model.load()
+        w.sensor = model.resolved_sensor(w.source)
         w.vehicles = {k: {'driver':None, 'action':None, 'done':False, 'drives':0,
                            'vehicle_id':k, 'home':home, 'level':'EG', 'z_mm':0., 'phase':'home',
                            'pose_mm_rad':home['pose_mm_rad'][:], 'mission_pending':True, 'aboard':False}
                       for k,home in homes.items()}
-        w.depot_aliases = {('EG','A'):'corridor', ('EG','B'):'corridor'}
-        w.depot_polygons = {('EG','A'):[[-1000.,-900.],[1400.,-900.],[1400.,1700.],[-1000.,1700.]],
-                            ('EG','B'):[[3000.,-900.],[5100.,-900.],[5100.,900.],[3000.,900.]]}
+        w.depot_aliases = {room:'corridor' for room in rooms}
+        w.depot_polygons = rooms
         w.depot_invariant_checks = 0
         w.dt, w.now = .05, 0.
         w.progress = w.evidence = None
@@ -38,7 +58,7 @@ class PatrolDepartureIntegrationTests(unittest.TestCase):
         w.route_door_ids = set()
         w.zone_regions = {'EG':[]}
         envelope = vehicle_envelope()
-        w.nav = SimpleNamespace(homes=homes, waits={}, envelope=envelope, radius=envelope['radius_mm'],
+        w.nav = SimpleNamespace(homes=homes, waits=waits or {}, envelope=envelope, radius=envelope['radius_mm'],
                                 level_z={'EG':0.}, reserve=85., navigation_margin_mm=0., portals={'EG':[]},
                                 mesh=SimpleNamespace(manifest={'objects':[]}))
         def spans(level, path):
@@ -55,20 +75,7 @@ class PatrolDepartureIntegrationTests(unittest.TestCase):
         w._background_preparation = None
         w.configure_background_preparation('c'*64)
         w.enable_private_departures()
-        for identity in ('leader','fifo','successor'):
-            w.resources.request(identity, 'corridor', 0.)
-        lead = w.vehicles['leader']
-        path = Route([[0.,0.],[1000.,0.],[1000.,400.],[-1000.,400.],[-1000.,0.],[0.,0.]])
-        lead.update(action={'level':'EG', 'terminal':{'kind':'capacity_home'}}, leg_id=1,
-                    driver=SimpleNamespace(path=path, mode='driving', goal=path.length, y=0., v=0., a=0.),
-                    gate=SimpleNamespace(spans=spans('EG',path)))
-        self.action = {'kind':'drive', 'level':'EG', 'points_mm':[[4000.,0.],[6400.,0.]],
-                       'corner_trim_mm':100., 'reverse':False, 'prefetch_level':'EG', 'markers':[],
-                       'zone_segments':[{'start_index':0,'end_index':1,'velocity_mm_s':300.}],
-                       'terminal':{'kind':'lift_wait','mission_id':'mission-successor'}}
-        w.planner = SimpleNamespace(states={'successor':{'queue':[{'mission_id':'mission-successor'}],
-                    'admission_deferred':False, 'requested':False}},
-                    next_action=lambda own, now, grants:copy.deepcopy(self.action))
+        return w
 
     def stage(self):
         w = self.world
@@ -176,6 +183,26 @@ class PatrolDepartureIntegrationTests(unittest.TestCase):
             row['gate'].permit(w.now)
         self.assertEqual(w.drain_preparation_requests(),[])
 
+    def test_batch_uses_full_owner_spans_and_checks_recorded_speed(self):
+        w = self.world
+        original_spans = w.catalog.spans
+        owner_path = w.vehicles['leader']['driver'].path
+        w.catalog.spans = lambda level,path: [
+            *original_spans(level,path),
+            {'resource':'foreign', 'start_progress_mm':path.length/2, 'end_progress_mm':path.length}
+        ] if path is owner_path else original_spans(level,path)
+        self.assertFalse(w.departures.try_depart('successor','corridor'))
+        self.assertEqual(w.resources.departure_successors,{})
+        w.catalog.spans = original_spans
+        w.vehicles['leader']['leg_id'] += 1
+        self.stage()
+        limit = w.source['motion']['empty_linear_limits']['velocity_mm_s']
+        speeds = {identity:{'linear_mm_s':limit} for identity in ('leader','successor')}
+        w.departures.check_step_speeds(speeds)
+        speeds['leader']['linear_mm_s'] = limit+1.
+        with self.assertRaisesRegex(RuntimeError,'sweep speed'):
+            w.departures.check_step_speeds(speeds)
+
     def test_finishing_home_promotes_before_the_leader_action_is_replaced(self):
         w = self.world
         lead = w.vehicles['leader']
@@ -225,3 +252,118 @@ class PatrolDepartureIntegrationTests(unittest.TestCase):
         w.now += 2*w.dt
         w.check_depot_invariant()
         self.assertTrue(other_map.matches(observer,leader_home_return))
+
+    def test_three_vehicles_share_steps_without_sharing_the_corridor_token(self):
+        homes = {identity:{'level':'EG', 'area':area, 'pose_mm_rad':[x,y,yaw]}
+                 for identity,area,x,y,yaw in [('leader','A',0.,0.,0.), ('fifo','A',0.,1500.,0.),
+                    ('first','B',4000.,0.,0.), ('second','B',4000.,1700.,0.),
+                    ('conflict','C',6100.,548.,-math.pi/2), ('parked','A',0.,2450.,0.)]}
+        rooms = {('EG','A'):[[-1000.,-900.],[1400.,-900.],[1400.,2950.],[-1000.,2950.]],
+                 ('EG','B'):[[3000.,-900.],[5100.,-900.],[5100.,2600.],[3000.,2600.]],
+                 ('EG','C'):[[5550.,0.],[6800.,0.],[6800.,1450.],[5550.,1450.]]}
+        waits = {'EG':[[2500.,0.,0.],[7400.,0.,0.],[7400.,1700.,0.]]}
+        w = self.make_world(homes, rooms, waits)
+        for identity in ('leader','fifo','first','second','conflict'):
+            w.resources.request(identity,'corridor',0.)
+        for identity in ('leader','first','second'):
+            w.resources.request_waiting_place(identity,'EG')
+        actions = {}
+        for identity,end,slot in [('leader',[2500.,0.],0), ('first',[7400.,0.],1),
+                                  ('second',[7400.,1700.],2), ('conflict',[6100.,-1352.],0)]:
+            actions[identity] = {'kind':'drive', 'level':'EG', 'points_mm':[homes[identity]['pose_mm_rad'][:2],end],
+                'corner_trim_mm':100., 'reverse':False, 'prefetch_level':'EG', 'markers':[],
+                'zone_segments':[{'start_index':0,'end_index':1,'velocity_mm_s':300.}],
+                'terminal':{'kind':'lift_wait','mission_id':'mission-'+identity,'slot':slot}}
+        w.planner = SimpleNamespace(states={identity:{'queue':[{'mission_id':'mission-'+identity}],
+             'admission_deferred':False,'requested':False} for identity in actions},
+             next_action=lambda own,now,grants:copy.deepcopy(actions[own['vehicle_id']]))
+        owner_path = Route(actions['leader']['points_mm'],100.)
+        owner = Controller(owner_path,w.source,[(0.,300.)],radius_mm=w.nav.radius)
+        w.leg_counter = 1
+        w.vehicles['leader'].update(action=actions['leader'],driver=owner,leg_id=1,
+                                    gate=ResourceGate(w,'leader',owner,'EG'))
+        crossing = Route(actions['conflict']['points_mm'],100.)
+        self.assertGreater(w.departures._prefix([owner_path],crossing,rooms['EG','C']),1.)
+        self.assertTrue(w.departures.try_depart('first','corridor'))
+        self.assertTrue(w.departures.try_depart('second','corridor'))
+        # This candidate is clear of the current owner and near homes, but the
+        # earlier starter's full future lane crosses its standby envelope.
+        self.assertFalse(w.departures.try_depart('conflict','corridor'))
+        self.assertEqual(w.resources.departure_successors['corridor'],('first','second'))
+        self.assertEqual(w.resources.owners,{'corridor':'leader'})
+        self.assertEqual(w.drain_preparation_requests(),[])
+        stage_rows = {identity:w.vehicles[identity] for identity in ('first','second')}
+        active_rows = {'leader':w.vehicles['leader'],**stage_rows}
+        for _ in range(20):
+            start, end = w.now, round(w.now+w.dt,3)
+            before = {identity:row['driver'].y for identity,row in active_rows.items()}
+            w.check_depot_invariant()
+            for row in active_rows.values():
+                row['driver'].decide(start,{'captured_s':start,'returns_local_mm':[]},
+                    grant_permits=row['gate'].permit(start),step_end_s=end)
+            for row in active_rows.values():
+                row['pose_mm_rad'] = row['driver'].advance(start,end)['pose_mm_rad']
+            w.now = end
+            w.check_depot_invariant()
+            if all(row['driver'].y > before[identity]+1e-5 for identity,row in active_rows.items()):
+                break
+        else:
+            self.fail('The owner and two independent starters must move in one common tick')
+        for row in active_rows.values():
+            driver = row['driver']
+            witness = driver._fallback
+            self.assertEqual((witness['start_s'],witness['anchor']['captured_s'],driver.now),(start,start,end))
+            self.assertLessEqual(witness['origin_mm']+witness['clock'].points[-1][F[0]][0],
+                                 driver.certified_horizon_mm+1e-5)
+        self.assertEqual(w.resources.holds,{'leader':'corridor'})
+
+        def hand_over(identity, observe_arrival=True):
+            row = w.vehicles[identity]
+            if observe_arrival:
+                driver = row['driver']
+                driver.mode,driver.y,driver.v,driver.a = 'arrived',driver.goal,0.,0.
+                row['pose_mm_rad'] = driver.pose()
+            w.release_resource(identity,'corridor',w.now)
+
+        with self.assertRaisesRegex(RuntimeError,'original terminal'):
+            hand_over('leader',observe_arrival=False)
+        hand_over('leader')
+        w.vehicles['leader']['driver'] = None
+        manager = w._background_preparation
+        job, = w.drain_preparation_requests()
+        self.assertEqual(job['vehicle_id'],'first')
+        self.assertEqual(w.resources.owners,{'corridor':'first'})
+        self.assertEqual(w.resources.departure_successors['corridor'],('second',))
+        self.assertEqual(w.departures.ticket_for('second')['leader_leg'],stage_rows['first']['leg_id'])
+        self.assertTrue(stage_rows['second']['gate'].permit(w.now))
+        # A geometric span may end before the planned terminal. The current
+        # owner's gate must keep this batch's token through the clear gap.
+        gap_probe = copy.copy(stage_rows['first']['driver'])
+        gap_probe.y = 700.
+        gate = ResourceGate(w,'first',gap_probe,'EG',prepared_spans=[
+            {'resource':'corridor','start_progress_mm':0.,'end_progress_mm':300.},
+            {'resource':'corridor','start_progress_mm':450.,'end_progress_mm':600.}])
+        self.assertTrue(gate.permit(w.now))
+        self.assertEqual(w.resources.owners,{'corridor':'first'})
+        ctx = {'source':w.source,'nav':w.nav,'catalog':w.catalog,
+               'geometry_checks':w.geometry_checker,'source_binding':manager.binding}
+        second_request = manager.jobs[manager.pending_by_vehicle['second']]
+        response = background.prepare_route(second_request,ctx)
+        self.assertEqual(manager.accept(response)['status'],'await_corridor_handover')
+        self.assertNotIn('second',manager.full)
+        with self.assertRaisesRegex(RuntimeError,'original terminal'):
+            hand_over('first',observe_arrival=False)
+        second = stage_rows['second']
+        driver = second['driver']
+        exact_jet = (driver,driver.y,driver.v,driver.a,second['pose_mm_rad'][:])
+        hand_over('first')
+        stage_rows['first']['driver'] = None
+        self.assertEqual((second['driver'],driver.y,driver.v,driver.a,second['pose_mm_rad']),exact_jet)
+        self.assertEqual(w.resources.owners,{'corridor':'second'})
+        self.assertEqual(w.departures.handovers,2)
+        self.assertFalse(w.departures.staged('second'))
+        admitted, = w.drain_preparation_requests()
+        self.assertEqual(admitted,second_request)
+        self.assertTrue(manager.accept(response)['accepted'])
+        hand_over('second')
+        self.assertEqual(w.resources.owners,{'corridor':'fifo'})

@@ -561,22 +561,32 @@ die Ressource hält, welches anfragt und an welcher Stelle der Warteschlange
 es steht. Die vollständigen Alias- und Geometriebezüge stehen im lokalen
 Prüfbericht `exports/building-fleet/bf01-live-continuity/depot-closure.json`.
 
-Im Live-Rundgang darf ein zweiter Transporter während dieser Fahrt seine
-eigene Mission beginnen. Dafür muss seine erste Gerade einschließlich
-Fahrzeughülle und Reserve im anderen Depot liegen. Der Abstand wird gegen
-die gesamte Bahn des ersten Transporters einschließlich Rückweg und gegen
-die zwischen den 50-ms-Schritten ausgewerteten Kurven geprüft. Beide
-Fahrzeuge benötigen für jeden Schritt einen eigenen Scan, der auch den
-anschließenden Bremsweg abdeckt. Potenziell verlassene Heimplätze bleiben
-bei der Auswertung verzögerter Scans als feste Oberflächen ausgeschlossen.
+Mehrere Transporter können gleichzeitig auf ihrer ersten Geraden im eigenen
+Depot vorfahren. Jede Gerade einschließlich Fahrzeughülle und Bremsreserve
+muss innerhalb des Depots liegen. Ihr Abstand berücksichtigt die gesamte
+Bahn des Flurinhabers und aller vor ihm vorgemerkten Transporter, einschließlich
+Rückwegen. Dabei gilt auch die aus der Quelle abgeleitete Sensorreserve.
+Auf Geraden lassen sich die rechteckigen Fahrzeughüllen prüfen. An Kurven
+und Übergängen umfasst die Hülle den vollen Fahrzeugradius und den aus dem
+Geschwindigkeitslimit abgeleiteten Weg zum nächsten Stützpunkt. Der Motor
+prüft dieses Limit an den tatsächlich aufgezeichneten 50-ms-Kurven. Weiterhin
+braucht jeder ausgeführte Schritt einen eigenen Scan, der den anschließenden
+Bremsweg abdeckt. Potenziell verlassene Heimplätze sind bei der Auswertung
+verzögerter Scans als feste Oberflächen ausgeschlossen.
 
-Der zweite Transporter erhält den nächsten Flurzugang erst bei beobachteter
-Ankunft des ersten an dessen Heimplatz oder gebuchter Wartebucht. Erreicht
-er vorher das Ende seiner Geraden, bremst er dort bis zum Stillstand. Die
-Fahrzeugansicht zeigt den Grund „Wartet im eigenen Depot auf die Flurfreigabe“.
-Danach setzt er dieselbe Mission aus seinem tatsächlichen Bewegungszustand
-fort. Nach einer vorgezogenen Vergabe kommt wieder das erste Fahrzeug der
-regulären Warteschlange zum Zug.
+Die Flurfreigabe bleibt exklusiv. Wenn ein Transporter vorgerückt ist,
+behält der Inhaber die Freigabe bis zur beobachteten Ankunft am Heimplatz
+oder an der gebuchten Wartebucht, auch zwischen Abschnitten derselben Ressource.
+Der nächste vorgemerkte Transporter setzt dann dieselbe Mission aus seinem
+tatsächlichen Bewegungszustand fort. Am Ende einer privaten Geraden wartet
+er bei Bedarf im Stillstand. Ab der ersten Übergabe ist die Gruppe geschlossen.
+Danach erhält der Kopf der regulären Warteschlange die Flurfreigabe.
+
+Im lokalen Startlauf mit sechs Fahrzeugen und Seed `20261120` fuhren BF01,
+BF04 und BF06 in 34 aufeinanderfolgenden 50-ms-Schritten gleichzeitig.
+Die unabhängige Intervallprüfung ergab mindestens 85,046 mm Fahrzeugabstand.
+BF04 hielt nach 115,321 mm innerhalb seiner geprüften Geraden an. Dieser Lauf
+erfasste die Abfahrt bis zum ersten Wartepunkt von BF04.
 
 „Transport anfordern“ erzeugt einen priorisierten **leeren Testauftrag** aus
 Testabholung und Testabgabe an zwei vorhandenen Raumzielen. Geeignete

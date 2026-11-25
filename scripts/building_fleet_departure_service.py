@@ -1,11 +1,11 @@
-"""One bounded successor reservation for source-authorized live depot departures."""
+"""Ordered successor reservations for source-authorized live depot departures."""
 from types import MappingProxyType
 
 from building_fleet_services import ResourceServices, finite
 
 
 class DepartureResourceServices(ResourceServices):
-    """Keep the existing exclusive token and favor at most one proved successor."""
+    """Keep the exclusive token while a checked batch takes its queued turns."""
 
     def __init__(self, resources, waiting_places=None, maximum_queue=20):
         super().__init__(resources, waiting_places, maximum_queue)
@@ -15,7 +15,7 @@ class DepartureResourceServices(ResourceServices):
 
     @property
     def departure_successors(self):
-        """Dispatcher-only nominations. These confer no passage ownership."""
+        """Dispatcher-only tuples in promotion order, without passage ownership."""
         return MappingProxyType(self._departure_successors)
 
     def enable_depot_departures(self, resource_ids):
@@ -27,10 +27,10 @@ class DepartureResourceServices(ResourceServices):
         self._departure_resources=resources
 
     def reserve_departure_successor(self, vehicle, resource, leader, now):
-        """Nominate one queued vehicle for a caller-checked depot departure.
+        """Append a queued vehicle for a caller-checked depot departure.
 
-        The existing owner keeps its token. At its actual release the nominee
-        goes next, then the ordinary FIFO head must receive an unpromoted turn.
+        The existing owner keeps its token. Its release closes the batch.
+        After all nominees take their turns, the ordinary FIFO head goes next.
         """
         finite(now)
         if (not all(isinstance(name,str) and name for name in (vehicle,resource,leader))
@@ -43,15 +43,24 @@ class DepartureResourceServices(ResourceServices):
             return False
         if vehicle not in self.queues[resource]:
             return False
-        return self._departure_successors.setdefault(resource,vehicle)==vehicle
+        batch = self._departure_successors.get(resource, ())
+        if vehicle not in batch:
+            self._departure_successors[resource] = (*batch, vehicle)
+        return True
 
     def _grant(self, resource, now):
         if resource not in self.owners:
-            self._promoted_resources.discard(resource)
-            nominee = self._departure_successors.pop(resource, None)
-            if nominee is not None:
+            batch = self._departure_successors.get(resource)
+            if batch:
+                nominee, *remaining = batch
                 queue = self.queues[resource]
                 queue.remove(nominee)
                 queue.insert(0, nominee)
                 self._promoted_resources.add(resource)
+                if remaining:
+                    self._departure_successors[resource] = tuple(remaining)
+                else:
+                    del self._departure_successors[resource]
+            else:
+                self._promoted_resources.discard(resource)
         super()._grant(resource, now)

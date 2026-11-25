@@ -371,7 +371,8 @@ class ResourceGate:
         while self.index<len(self.spans):
             span=self.spans[self.index];held=e.resources.holds.get(identity)
             if driver.y>span['end_progress_mm']+1e-7:
-                if held==span['resource']:e.release_resource(identity,held,now)
+                if held==span['resource'] and not (departures and departures.keeps_corridor(identity,held)):
+                    e.release_resource(identity,held,now)
                 self.index+=1;continue
             if held is not None and held!=span['resource']:
                 # A preceding episode can retain a lease while resting. If this
@@ -387,7 +388,8 @@ class ResourceGate:
             if driver.y+distance>span['start_progress_mm']+1e-6:raise RuntimeError('Own resource request came too late for its checked stopping envelope')
             return False
         held=e.resources.holds.get(identity)
-        if held:e.release_resource(identity,held,now)
+        if held and not (departures and departures.keeps_corridor(identity,held)):
+            e.release_resource(identity,held,now)
         return True
 
 
@@ -1093,6 +1095,8 @@ class WorldRunner:
             points=self.interval_points(identity,start,end,driver);all_points[identity]=points
             curve=floor.motion.Curve(floor.canonical(points));curves[identity]=curve
             speed_bounds[identity]=world_velocity_bound(curve)
+        departures=getattr(self,'departures',None)
+        if departures is not None:departures.check_step_speeds(speed_bounds)
         self.auditor.audit(previous,self.truth(),end-start,speed_bounds,curves=curves,start_s=start,end_s=end)
         for identity,driver in drivers.items():self.append_episode(identity,start,end,all_points[identity],driver,lift_before)
         for identity,row in self.vehicles.items():

@@ -51,7 +51,8 @@ class DepartureGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):m.set_own_grant({'status':'granted','resource':'R','peers':[]})
 
     def check(self,ticket,owner='C'):
-        return check_departure_invariant(self.states,self.homes,self.rooms,self.aliases,{'R':owner},85,ticket)
+        return check_departure_invariant(self.states,self.homes,self.rooms,self.aliases,{'R':owner},85,
+                                         [] if ticket is None else [ticket])
 
     def test_only_the_designated_successor_can_move_on_its_straight(self):
         self.assertEqual(self.check(self.ticket),4)

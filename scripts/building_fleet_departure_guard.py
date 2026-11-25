@@ -1,4 +1,4 @@
-"""Source-home scan surfaces and truth checks for one private depot starter."""
+"""Source-home scan surfaces and truth checks for private depot starters."""
 import math
 
 from building_fleet_depot import FixedHomeMap, check_invariant
@@ -50,10 +50,7 @@ class GuardedHomeMap(FixedHomeMap):
             self.grant = grant['resource']
 
 
-def check_departure_invariant(states, homes, room_polygons, aliases, owners, reserve_mm, ticket):
-    """Keep every unticketed occupant under the original home/owner invariant."""
-    if ticket is None:
-        return check_invariant(states, homes, room_polygons, aliases, owners, reserve_mm)
+def _check_private_starter(states, homes, room_polygons, aliases, owners, reserve_mm, ticket):
     vehicle, leader = ticket['vehicle'], ticket['leader']
     room = (ticket['level'], ticket['area'])
     resource = ticket['resource']
@@ -92,5 +89,15 @@ def check_departure_invariant(states, homes, room_polygons, aliases, owners, res
             or any(key != room and key[0] == room[0] and polygon_distance(body,polygon) <= reserve_mm+1e-7
                    for key,polygon in room_polygons.items())):
         raise RuntimeError('Private starter footprint or its clearance reached a room boundary')
-    ordinary = {key:row for key,row in states.items() if key != vehicle}
-    return 1 + check_invariant(ordinary, homes, room_polygons, aliases, owners, reserve_mm)
+
+
+def check_departure_invariant(states, homes, room_polygons, aliases, owners, reserve_mm, tickets):
+    """Keep every unticketed occupant under the original home/owner invariant."""
+    staged = set()
+    for ticket in tickets:
+        if ticket['vehicle'] in staged:
+            raise RuntimeError('A private starter may have only one live ticket')
+        _check_private_starter(states, homes, room_polygons, aliases, owners, reserve_mm, ticket)
+        staged.add(ticket['vehicle'])
+    ordinary = {key:row for key,row in states.items() if key not in staged}
+    return len(staged) + check_invariant(ordinary, homes, room_polygons, aliases, owners, reserve_mm)
