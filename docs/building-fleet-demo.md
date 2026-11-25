@@ -66,6 +66,78 @@ der vollständigen Zielabdeckung oder einer realen Schutzfunktion. Die
 separaten Browser- und Veröffentlichungsberichte binden jeweils die konkret
 geprüften Bytes. Der normale manuelle Rundgang bleibt ohne aktive Flotte.
 
+### Fahrtempo in Kurven
+
+Bei der ersten Patrouille von BF06 ab R0_013 (Seed `20261120`) begrenzte die
+engste Stelle eines Bogens bisher das Tempo im gesamten Bogen. Für die leere
+Patrouille kann der Planer jetzt am Ein- und Ausgang schneller fahren und am
+Scheitel langsamer lenken. Dazu berechnet er auf derselben Mittellinie die Zeit
+aus zurückgelegtem Weg und Richtungsänderung. Unter den zulässigen Vorschlägen
+verwendet er eine schnellere Kurvenuhr nur dort, wo sich Zeit gewinnen lässt.
+Die 1-ms-Ausgabe wird auf Geschwindigkeit, Beschleunigung und Ruck geprüft.
+Der Regler prüft anschließend für jeden gefahrenen Schritt den aktuellen Scan
+und eine vollständige Bremsung. Die Anzeige spielt weiterhin höchstens mit 1×.
+
+| Abschnitt auf BF06s erster Route | Bisherige Modellzeit | Neue geplante Modellzeit |
+| --- | ---: | ---: |
+| Erster Bogen, 103° | 21,29 s | 10,87 s |
+| Darauffolgende Gerade | 6,60 s | 6,08 s |
+| Kehre, 160° | 101,35 s | 14,12 s |
+| Vollständige nominale Route | 533,37 s | 385,53 s |
+
+Ein früherer Entwurf plante die Kehre in 9,98 s. Im ersten Bogen erreichte BF06
+aber einen Zustand, aus dem der Regler trotz 11,57 m freier Sicht keine
+zulässige Bremsung nach dem nächsten Schritt fand. Die gewählte Kurvenuhr
+lässt deshalb Reserve für die Beschleunigungs- und Ruckanteile beim Bremsen
+in der Kurve. In Räumen und Türen gilt weiterhin die Zonengrenze von 0,30 m/s.
+Eine separate Prüfung beider Bögen einschließlich Ein- und Ausfahrt fand bei
+allen 540 Kontrollzeitpunkten eine zulässige Anschlussbremsung mit einem
+frischen, freien Scan. Die größte dafür erforderliche Sichtweite betrug 5,31 m.
+Der vollständige Nominalverlauf bestand aus 1.084 Knoten. Die 33 Prüfintervalle
+erfüllten die native projizierte Abstands-, Boden- und Heimplatzprüfung mit
+1 mm zusätzlicher Reserve. Die berechnete Abweichung der Fahrzeughülle zwischen
+Mittellinie und kartesischem Export blieb unter 0,992 mm. Bei der 160°-Kehre
+folgt der Fahrzeugmittelpunkt einer sehr engen Kurve. Man sieht dort vor allem
+die Drehung. Der lokale Regler durchfuhr sie mit freien synthetischen Scans in
+306 aufeinanderfolgenden Schritten ohne Schutzstopp.
+
+Die Tabelle umfasst auch die späteren geplanten Bögen. Die Dauer einer
+tatsächlich abgefahrenen Mission hängt von Scans, Ressourcen und Freigaben ab.
+
+BF06 kann jetzt als Inhaber der gemeinsamen Depotressource auf den ersten
+3,039 m der ursprünglichen Route losfahren. Dieser vorab geprüfte Abschnitt
+enthält den Bogen und die anschließende Bremsgerade. Die Übernahme der
+vollständigen Route erfolgt auf der Geraden bei übereinstimmender Position,
+Geschwindigkeit und Beschleunigung. BF01 darf gleichzeitig innerhalb seines
+eigenen Depots bis 0,821 m vorfahren. Erst die spätere Ressourcenzusage erlaubt
+ihm die Fahrt in den gemeinsamen Bereich. In der lokalen Ausführung mit dem
+veröffentlichten Laufzeitpaket übernahm BF06 den Anschluss bei 2,236 m mit
+0,299 m/s und erreichte den Beginn des nominalen Folgeabschnitts nach 20,70 s
+Modellzeit. Die zweite private Depotabfahrt war im selben Lauf sichtbar.
+
+Bei der Scanberechnung überspringt ein Strahl den Zellindex eines Körpers,
+wenn sein gesamtes Reichweitensegment außerhalb des erweiterten umschließenden
+Rechtecks auf derselben Seite liegt. In vier abwechselnd ausgeführten Läufen
+mit je 70 Schritten sank die mediane CPU-Zeit von 12,40 auf 8,15 s. Alle
+700 Scans je Lauf, Fahrzeugzustände, Planungsaufträge und Quittungen stimmten
+im Vergleich überein. Diese Messung erfasst den nativen Simulationsmotor.
+Die Browser-Wandzeit ist zusätzlich vom WebAssembly-Worker und der Darstellung
+abhängig.
+
+Im lokalen Chromium-Test des Veröffentlichungspakets bewegte sich BF06 nach
+13,59 s Wandzeit (vorher 14,53 s). Bei 4,60 s Modellzeit fuhr es an der
+früheren Haltestelle vorbei. Bei 4,80 s fuhr es mit 154 mm/s, der bisherige
+Stand lag zu diesem Zeitpunkt bei 0,5 mm/s. BF01 und BF06 hatten bereits im selben
+50-ms-Intervall getrennte Weiterfahrfreigaben. Alle 20 Fahrzeuge und
+Kamerazuordnungen waren vorhanden. In den ersten 55 s erreichte die Fassung
+4,60 s Modellzeit und zeigte 4,29 s an. Der frühere Stand erreichte 5,20 s
+und zeigte 5,01 s an. Die Browsermessungen liefen auf einem auch für native
+Prüfungen genutzten Rechner. Ein höherer Browserdurchsatz oder Echtzeitbetrieb
+ist damit weiterhin offen.
+
+Der [Prüfauftrag für Claude](building-fleet-speed-review.md) benennt den
+Ausgangsstand, die Gegenbeispiele und die zu prüfenden Stellen.
+
 ### Statische Prüfmetadaten zwischen Python-Laufzeiten
 
 Bei der ersten WebAssembly-Rekonstruktion der 3314 festen Routen unterschieden
