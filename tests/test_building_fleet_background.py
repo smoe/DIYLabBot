@@ -13,6 +13,8 @@ from building_fleet_control import (Controller,PreparedNominal,preparation_diges
     bind_prepared_perception_limit,perception_cache_input_sha256,source_perception_limit,
     bind_prepared_scalar_stops,scalar_stop_cache_input_sha256,_qualified_scalar_stop)
 from building_fleet_motion import Path,compile_motion
+from building_fleet_runner import WorldRunner
+from building_fleet_services import ResourceServices
 from building_fleet_starter import RollingController
 import tr01_floor_motion as floor
 
@@ -29,7 +31,9 @@ class BackgroundTests(unittest.TestCase):
         source=copy.deepcopy(self.source);source['depot']['level']='not-test-level'
         checked=[]
         def geometry(action,curve,observed):
-            checked.append((action,curve,observed));return {'passed':True,'native_checks':1}
+            checked.append((action,curve,observed))
+            grants = observed.get('own_grants_at_start') or observed['own_grants']
+            return {'passed': True, 'native_checks': 1, 'own_waiting_slot': grants.get('waiting_place', {}).get('slot')}
         return {'source':source,'nav':SimpleNamespace(radius=self.car.radius,
                 portals={'EG':[]},mesh=SimpleNamespace(manifest={'objects':[]})),
                 'catalog':SimpleNamespace(spans=lambda level,path:[]),
@@ -65,6 +69,48 @@ class BackgroundTests(unittest.TestCase):
         request=self.request();request['action']['points_mm'][1][0]+=1
         with self.assertRaises(ValueError):background.prepare_route(request,context)
         self.assertFalse(checked)
+
+    def test_worker_checks_post_release_sections_without_access_to_the_old_bay(self):
+        context, checked = self.source_context()
+        context['nav'].homes = {'BF01': {}}
+        full = self.request()
+        full['action']['points_mm'] = [[0, 0], [1000, 0], [1000, 1000], [2000, 1000],
+                                       [2000, 2000], [3000, 2000], [3000, 3000], [4000, 3000]]
+        full['action'].update(terminal={'kind': 'home'}, markers=[{
+            'event': 'waiting_place_released', 'details': {'level': 'EG', 'slot': 0}, 'progress_mm': 75.,
+        }])
+        original = {'waiting_place': {'status': 'granted', 'level': 'EG', 'slot': 0, 'role': 'start'},
+                    'lift': {'status': 'none'}}
+        full['fence'].update(action_sha256=preparation_digest(full['action']), level='EG', generation=1,
+                             own_grants=original)
+        full['observed'].update(own_grants=original, own_grants_at_start=original)
+        full['rolling_horizon_mm'] = 100.
+        first = background.prepare_route(full, context)
+        self.assertNotIn('status', first)
+        self.assertGreater(first['interval']['end_mm'], 75.)
+        effective = {'waiting_place': {'status': 'none'}, 'lift': {'status': 'none'}}
+        tail = first['receipt']['released_bay_tail']
+        self.assertTrue(tail['geometry']['passed'])
+        self.assertIsNone(tail['geometry']['own_waiting_slot'])
+        self.assertEqual(tail['own_grants'], effective)
+        self.assertEqual([call[2]['own_grants_at_start'] for call in checked], [original, effective])
+        self.assertAlmostEqual(checked[1][1].points[0][F[0]][0], 75., places=5)
+        scope = {'leg_id': 1, 'marker_mm': 75., 'own_grants': effective}
+        section = {**full, 'kind': 'route_interval', 'request_id': '2',
+                   'start_knot': first['interval']['end_knot'], 'program_sha256': first['program_sha256'],
+                   'post_release': scope}
+        checked.clear()
+        result = background.prepare_route(section, context)
+        self.assertNotIn('status', result)
+        self.assertEqual(result['receipt']['post_release'], scope)
+        self.assertIsNone(result['receipt']['geometry']['own_waiting_slot'])
+        self.assertEqual(len(checked), 1)
+        self.assertEqual(checked[0][2]['own_grants_at_start'], effective)
+        self.assertEqual(full['observed']['own_grants_at_start'], original)
+        interval = result['interval']
+        unscoped = {key: value for key, value in section.items() if key != 'post_release'}
+        self.assertEqual(result['receipt']['interval_sha256'], background._interval_binding(section, interval))
+        self.assertNotEqual(result['receipt']['interval_sha256'], background._interval_binding(unscoped, interval))
 
     def test_phase_wall_times_do_not_change_route_or_admission_receipt(self):
         context,_=self.source_context();request=self.request()
@@ -301,6 +347,20 @@ class FenceTests(unittest.TestCase):
                   'program_sha256':request['program_sha256']}
         receipt={'interval_sha256':background._interval_binding(request,interval),
                  'geometry':{'passed':True},'fixed_home':{'passed':True}}
+        if 'post_release' in request:
+            receipt['post_release'] = copy.deepcopy(request['post_release'])
+            receipt['geometry']['own_waiting_slot'] = None
+        else:
+            for mark in request['action'].get('markers', []):
+                if (mark['event'] == 'waiting_place_released'
+                        and interval['start_mm'] < mark['progress_mm'] <= interval['end_mm']):
+                    original = request['observed']['own_grants_at_start']
+                    receipt['geometry']['own_waiting_slot'] = original['waiting_place']['slot']
+                    receipt['released_bay_tail'] = {
+                        'geometry': {'passed': True, 'own_waiting_slot': None},
+                        'fixed_home': {'passed': True},
+                        'own_grants': {**original, 'waiting_place': {'status': 'none'}},
+                    }
         return interval,receipt
 
     def interval_case(self):
@@ -310,6 +370,189 @@ class FenceTests(unittest.TestCase):
                                   program_sha256=nominal['program_sha256'],brake_headroom_mm=50.)
         manager.drain()
         return manager,request,*self.interval_receipt(request),manager.engine.vehicles['BF01']['driver']
+
+    def return_bay_manager(self, marker_mm=75.):
+        manager = self.interval_manager(count=6)
+        engine = manager.engine
+        engine.resources = ResourceServices({}, {'EG': [[0., 0., 0.], [0., 40., 0.]]})
+        engine.resources.request_waiting_place('BF01', 'EG')
+        for identity, row in engine.vehicles.items():
+            row['aboard'] = False
+            if identity != 'BF01':
+                row['driver'] = None
+                manager.full.pop(identity)
+                manager.intervals.pop(identity)
+        engine.lift = SimpleNamespace(own_grant=lambda identity: {'status': 'none'})
+        engine.own_grants = lambda identity: WorldRunner.own_grants(engine, identity)
+        engine.geometry_context = lambda identity, phase: {
+            'vehicle_id': identity, 'phase': phase, 'time_s': engine.now,
+            'own_grants': engine.own_grants(identity),
+            'own_grants_at_start': copy.deepcopy(engine.vehicles[identity]['action_context']),
+        }
+        engine.nav = SimpleNamespace(reserve=5., waiting_bay_polygons={'EG': [
+            [[-15., -15.], [15., -15.], [15., 15.], [-15., 15.]],
+            [[-15., 25.], [15., 25.], [15., 55.], [-15., 55.]],
+        ]})
+        engine.truth = lambda: {
+            identity: {'pose_mm': row['pose_mm_rad'], 'footprint_mm': [20., 20.]}
+            for identity, row in engine.vehicles.items()
+        }
+        engine.planner = SimpleNamespace(on_event=lambda *args: None)
+        engine.event = lambda *args: None
+        row = engine.vehicles['BF01']
+        marker = {'event': 'waiting_place_released', 'details': {'level': 'EG', 'slot': 0},
+                  'progress_mm': marker_mm}
+        row.update(action_context=engine.own_grants('BF01'), markers=[copy.deepcopy(marker)],
+                   action={'kind': 'drive', 'level': 'EG', 'terminal': {'kind': 'home'}, 'markers': [marker]},
+                   pose_mm_rad=[0., 0., 0.])
+        row['driver'].y = 0.
+        _, nominal = manager.full['BF01']
+        full = manager._request('BF01', row['action'], [], 'full_route', rolling_horizon_mm=100.)
+        manager.jobs.pop(full['request_id'])
+        manager.full['BF01'] = (full, nominal)
+        manager.drain()
+        return manager
+
+    def observed_return_bay_release(self, manager, position_mm=80., progress_mm=80., time_s=1.):
+        engine = manager.engine
+        row = engine.vehicles['BF01']
+        engine.now = time_s
+        row['driver'].y = progress_mm
+        row['pose_mm_rad'][0] = position_mm
+        WorldRunner.process_markers(engine, 'BF01')
+
+    def return_bay_interval(self, manager):
+        full, nominal = manager.full['BF01']
+        request = manager._followup(full, 'route_interval', start_knot=1,
+                                    program_sha256=nominal['program_sha256'], brake_headroom_mm=50.)
+        self.assertEqual(manager.drain(), [request])
+        interval, receipt = self.interval_receipt(request)
+        return request, background._checked_result(request, interval=interval, receipt=receipt)
+
+    def test_waiting_bay_release_requires_observed_footprint_clearance(self):
+        manager = self.return_bay_manager()
+        with self.assertRaisesRegex(RuntimeError, 'physical footprint has not cleared'):
+            self.observed_return_bay_release(manager, position_mm=0.)
+        self.assertEqual(manager.engine.own_grants('BF01')['waiting_place']['status'], 'granted')
+        self.assertEqual(manager.engine.resources.waiting_events, [])
+
+    def test_unobserved_booking_release_still_rejects_prepared_route_interval(self):
+        manager = self.return_bay_manager()
+        request, result = self.return_bay_interval(manager)
+        manager.engine.resources.release_waiting_place('BF01', 1.)
+        self.assertEqual(manager.accept(result)['status'], 'stale_geometry_context')
+        self.assertNotIn(request['request_id'], manager.jobs)
+        self.assertEqual(manager.snapshot()['failures'], {'BF01': 'stale_geometry_context'})
+        self.assertEqual(manager.intervals['BF01']['horizon_mm'], 100.)
+
+    def test_waiting_bay_release_does_not_relax_full_route_fence(self):
+        manager = self.return_bay_manager()
+        original, _ = manager.full['BF01']
+        manager.jobs[original['request_id']] = original
+        self.observed_return_bay_release(manager)
+        result = background._checked_result(original)
+        self.assertEqual(manager.accept(result)['status'], 'stale_geometry_context')
+        self.assertEqual(manager.intervals['BF01']['horizon_mm'], 100.)
+
+    def test_post_release_intervals_accept_before_and_after_submission(self):
+        for release_before_submission in (False, True):
+            with self.subTest(release_before_submission=release_before_submission):
+                manager = self.return_bay_manager()
+                original, _ = manager.full['BF01']
+                row = manager.engine.vehicles['BF01']
+                if release_before_submission:
+                    self.observed_return_bay_release(manager)
+                request, result = self.return_bay_interval(manager)
+                self.assertEqual(request['fence'], original['fence'])
+                self.assertEqual(request['observed']['own_grants_at_start'], original['fence']['own_grants'])
+                self.assertEqual(result['receipt']['post_release'], {
+                    'leg_id': row['leg_id'], 'marker_mm': 75.,
+                    'own_grants': {'waiting_place': {'status': 'none'}, 'lift': {'status': 'none'}},
+                })
+                if not release_before_submission:
+                    self.observed_return_bay_release(manager)
+                self.assertEqual(row['waiting_bay_release'], {
+                    'leg_id': row['leg_id'], 'generation': row['preparation_generation'], 'marker_mm': 75.,
+                    'grant': original['fence']['own_grants']['waiting_place'], 'time_s': 1., 'progress_mm': 80.,
+                })
+                self.assertTrue(manager.accept(result)['accepted'])
+                self.assertEqual(row['driver'].certified_horizon_mm, 200.)
+                self.assertEqual(manager.snapshot()['failures'], {})
+                self.assertEqual(manager.snapshot()['stale'], 0)
+                self.assertFalse(manager.accept(result)['accepted'])
+
+    def test_release_does_not_allow_scope_to_reach_behind_the_marker(self):
+        manager = self.return_bay_manager(marker_mm=125.)
+        driver = manager.engine.vehicles['BF01']['driver']
+        driver.joined_nominal = False
+        driver.certified_horizon_mm = 150.
+        request, result = self.return_bay_interval(manager)
+        self.assertNotIn('post_release', request)
+        self.observed_return_bay_release(manager, position_mm=130., progress_mm=130.)
+        self.assertEqual(manager.accept(result)['status'], 'stale_geometry_context')
+        self.assertEqual(manager.intervals['BF01']['horizon_mm'], 100.)
+
+    def test_post_release_proof_rejects_unrelated_grant_and_leg_changes(self):
+        for change in ('lift', 'new_bay', 'same_bay', 'different_leg', 'old_generation', 'wrong_event_grant'):
+            with self.subTest(change=change):
+                manager = self.return_bay_manager()
+                request, result = self.return_bay_interval(manager)
+                self.assertIn('post_release', request)
+                self.observed_return_bay_release(manager)
+                engine = manager.engine
+                row = engine.vehicles['BF01']
+                if change == 'lift':
+                    engine.lift.own_grant = lambda identity: {'status': 'assigned', 'slot': 0}
+                elif change in ('new_bay', 'same_bay'):
+                    if change == 'new_bay':
+                        engine.resources.request_waiting_place('BF02', 'EG')
+                    engine.resources.request_waiting_place('BF01', 'EG')
+                elif change == 'different_leg':
+                    row['leg_id'] += 1
+                elif change == 'old_generation':
+                    row['waiting_bay_release']['generation'] -= 1
+                else:
+                    row['waiting_bay_release']['grant']['slot'] += 1
+                self.assertEqual(manager.accept(result)['status'], 'stale_geometry_context')
+                self.assertEqual(manager.snapshot()['failures'], {'BF01': 'stale_geometry_context'})
+                self.assertEqual(row['driver'].certified_horizon_mm, 100.)
+
+    def test_post_release_interval_needs_effective_grants_in_the_proof(self):
+        for change in ('missing', 'old_grant', 'old_geometry_slot', 'missing_geometry_slot'):
+            with self.subTest(change=change):
+                manager = self.return_bay_manager()
+                request, valid = self.return_bay_interval(manager)
+                self.observed_return_bay_release(manager)
+                receipt = copy.deepcopy(valid['receipt'])
+                if change == 'missing':
+                    receipt.pop('post_release')
+                elif change == 'old_grant':
+                    receipt['post_release']['own_grants'] = request['fence']['own_grants']
+                elif change == 'old_geometry_slot':
+                    receipt['geometry']['own_waiting_slot'] = 0
+                else:
+                    receipt['geometry'].pop('own_waiting_slot')
+                result = background._checked_result(request, interval=valid['interval'], receipt=receipt)
+                self.assertEqual(manager.accept(result)['status'], 'invalid_interval_proof')
+                self.assertEqual(manager.intervals['BF01']['horizon_mm'], 100.)
+
+    def test_crossing_interval_requires_released_bay_tail(self):
+        for change in (None, 'missing', 'old_geometry_slot', 'old_grant'):
+            with self.subTest(change=change):
+                manager = self.return_bay_manager(marker_mm=125.)
+                request, valid = self.return_bay_interval(manager)
+                self.assertNotIn('post_release', request)
+                receipt = copy.deepcopy(valid['receipt'])
+                if change == 'missing':
+                    receipt.pop('released_bay_tail')
+                elif change == 'old_geometry_slot':
+                    receipt['released_bay_tail']['geometry']['own_waiting_slot'] = 0
+                elif change == 'old_grant':
+                    receipt['released_bay_tail']['own_grants'] = request['fence']['own_grants']
+                result = background._checked_result(request, interval=valid['interval'], receipt=receipt)
+                answer = manager.accept(result)
+                self.assertEqual(answer['status'], 'ready' if change is None else 'invalid_interval_proof')
+                self.assertEqual(manager.intervals['BF01']['horizon_mm'], 200. if change is None else 100.)
 
     def connector_receipt(self, manager, vehicle):
         driver=manager.engine.vehicles[vehicle]['driver']
@@ -323,10 +566,34 @@ class FenceTests(unittest.TestCase):
         manager.continuations[vehicle]={'request_id':request['request_id']}
         proof={'passed':True,'anchor':anchor,'join_progress_mm':100.,'suffix_program_sha256':request['program_sha256'],
                'receipt':{'geometry':{'passed':True},'fixed_home':{'passed':True}}}
+        if 'post_release' in request:
+            proof['receipt']['post_release'] = copy.deepcopy(request['post_release'])
+            proof['receipt']['geometry']['own_waiting_slot'] = None
         clock=[background.local.point(0.,0.,100.,0.)]
         clock.extend(background.local.point(p['time_s']-.5,p[F[0]][0]-50.,p[F[1]][0],p[F[2]][0])
                      for p in nominal['program']['scalar_clock'][1:])
         return background._checked_result(request,anchor=anchor,clock=clock,proof=proof)
+
+    def test_post_release_connector_stays_valid_when_grant_changes_before_commit(self):
+        for release_before_accept in (False, True):
+            with self.subTest(release_before_accept=release_before_accept):
+                manager = self.return_bay_manager(marker_mm=40.)
+                driver = manager.engine.vehicles['BF01']['driver']
+                result = self.connector_receipt(manager, 'BF01')
+                manager.drain()
+                self.assertEqual(result['proof']['receipt']['post_release']['marker_mm'], 40.)
+                if release_before_accept:
+                    self.observed_return_bay_release(manager, position_mm=45., progress_mm=45., time_s=.5)
+                self.assertTrue(manager.accept(result)['accepted'])
+                if not release_before_accept:
+                    self.observed_return_bay_release(manager, position_mm=45., progress_mm=45., time_s=.5)
+                manager.engine.now = driver.now = 1.
+                driver.y, driver.v, driver.a = 50., 100., 0.
+                manager.before_tick()
+                self.assertTrue(driver.joined_nominal)
+                self.assertEqual(driver.certified_horizon_mm, 100.)
+                self.assertEqual(manager.statistics['continuations'], 1)
+                self.assertEqual(manager.statistics['stale'], 0)
 
     def test_intervals_extend_before_anchor_and_commit_uses_latest_contiguous_horizon(self):
         manager=self.interval_manager()

@@ -6,6 +6,7 @@ allocate missions/resources, advance the world, or contain another car's pose.
 import copy
 import math
 import re
+from bisect import bisect_right
 from time import perf_counter
 from types import SimpleNamespace
 from building_fleet_control import Controller,PreparedNominal,preparation_digest,source_perception_limit,F
@@ -32,9 +33,11 @@ def _absolute_curve(driver,clock,origin,time_s):
     return floor.motion.Curve([{**p,'time_s':round(p['time_s']+time_s,3)}for p in curve.points])
 
 
-def _check_absolute(context,request,absolute,phase,mark):
+def _check_absolute(context,request,absolute,phase,mark,*,grants=None):
     source,nav=context['source'],context['nav']
     observed=copy.deepcopy(request['observed']);observed['phase']=phase
+    if grants is not None:
+        observed['own_grants_at_start']=observed['own_grants']=copy.deepcopy(grants)
     home=None
     if request['action']['level']==source['depot']['level']:
         home=fixed_home_curve_proof(absolute,request['vehicle_id'],nav.homes,nav.envelope,nav.reserve,request['action']['level'])
@@ -50,6 +53,8 @@ def _check_absolute(context,request,absolute,phase,mark):
 def _geometry(context,request,driver,clock,origin,phase,mark=None):
     absolute=_absolute_curve(driver,clock,origin,request['observed']['time_s'])
     if mark:mark('cartesian_curve')
+    if request['kind']=='full_route' or 'rolling_horizon_mm' in request:
+        return _check_route_geometry(context,request,absolute,clock.points,origin,phase,mark)
     return _check_absolute(context,request,absolute,phase,mark)
 
 
@@ -84,6 +89,90 @@ def _passed_receipt(receipt,field):
     return isinstance(proof,dict) and proof.get('passed') is True
 
 
+def _return_release(action, grants):
+    """Derive the sole allowed grant change from this source-bound return action."""
+    if action.get('lift_phase') or not isinstance(grants,dict):
+        return None
+    grant=grants.get('waiting_place',{})
+    if grant.get('status')!='granted' or grant.get('role')!='start' or grant.get('level')!=action['level']:
+        return None
+    markers=[m for m in action.get('markers',()) if m['event']=='waiting_place_released']
+    if len(markers)!=1:
+        return None
+    marker=markers[0]
+    if (marker['details']!={'level':grant['level'],'slot':grant['slot']}
+            or not math.isfinite(marker['progress_mm']) or marker['progress_mm']<=0):
+        return None
+    return {'marker_mm':marker['progress_mm'],'own_grants':{**grants,'waiting_place':{'status':'none'}}}
+
+
+def _post_release_scope(request, start_mm, leg_id):
+    if request['kind'] not in ('route_interval','continuation'):
+        return None
+    release=_return_release(request['action'],request['observed'].get('own_grants_at_start'))
+    if release is None or start_mm<release['marker_mm']-1e-7:
+        return None
+    if type(leg_id) is not int or leg_id<=0:
+        raise ValueError('Post-release geometry requires the installed own leg')
+    return {**release,'leg_id':leg_id}
+
+
+def _check_route_geometry(context,request,absolute,scalar_points,origin,phase,mark):
+    """Check the released bay as an obstacle for every post-marker curve portion."""
+    release=_return_release(request['action'],request['observed'].get('own_grants_at_start'))
+    scope=request.get('post_release')
+    if scope is not None and not isinstance(scope,dict):
+        raise ValueError('Post-release geometry requires a bound own scope')
+    start=origin+scalar_points[0][F[0]][0]
+    expected=_post_release_scope(request,start,(scope or {}).get('leg_id'))
+    if scope!=expected:
+        raise ValueError('Route geometry has the wrong post-release scope')
+    if scope is not None:
+        return {**_check_absolute(context,request,absolute,phase,mark,grants=scope['own_grants']),
+                'post_release':copy.deepcopy(scope)}
+    receipt=_check_absolute(context,request,absolute,phase,mark)
+    if release is None or origin+scalar_points[-1][F[0]][0]<=release['marker_mm']-1e-7:
+        return receipt
+    # The retained scalar clock and Cartesian curve share their PVA knot times.
+    # Include the runner's release tolerance at the start of the restricted tail.
+    scalar=floor.motion.Curve([{**p,'time_s':t} for p,t in zip(scalar_points,absolute.times)])
+    lo,hi=absolute.times[0],absolute.times[-1]
+    for _ in range(48):
+        at=(lo+hi)/2
+        if origin+scalar.evaluate(at)[F[0]][0]<release['marker_mm']-1e-7:
+            lo=at
+        else:
+            hi=at
+    index=bisect_right(absolute.times,lo)
+    if absolute.times[index]-lo<1e-6:
+        # Keep the complete original interval when the remainder would be too short
+        # to reconstruct from floating-point PVA without numerical cancellation.
+        points=absolute.points[index-1:]
+    else:
+        cut=absolute.evaluate(lo)
+        points=[{'time_s':lo,**{key:cut[key] for key in F[:3]}},*absolute.points[index:]]
+    tail=floor.motion.Curve(points)
+    receipt['released_bay_tail']={
+        **_check_absolute(context,request,tail,phase,mark,grants=release['own_grants']),
+        'own_grants':copy.deepcopy(release['own_grants'])}
+    return receipt
+
+
+def _release_receipt_matches(request,receipt,start_mm,end_mm):
+    scope=request.get('post_release')
+    if receipt.get('post_release')!=scope:
+        return False
+    if scope is not None:
+        return receipt['geometry'].get('own_waiting_slot',False) is None
+    release=_return_release(request['action'],request['observed'].get('own_grants_at_start'))
+    if release is None or end_mm<=release['marker_mm']-1e-7:
+        return True
+    tail=receipt.get('released_bay_tail')
+    return (start_mm<release['marker_mm']-1e-7 and _passed_receipt(tail,'geometry')
+            and tail['geometry'].get('own_waiting_slot',False) is None
+            and tail.get('own_grants')==release['own_grants'])
+
+
 def _interval_binding(request,interval=None):
     # Static geometry uses this action's original waiting-bay/lift context.
     # Current passage ownership is checked independently on every live step.
@@ -94,7 +183,9 @@ def _interval_binding(request,interval=None):
     if not isinstance(grants,dict):raise ValueError('Missing original action grants')
     fields=[request['source_binding'],request['vehicle_id'],fence['action_sha256'],
         fence['generation'],level,grants]
-    if interval is not None:fields.append(interval)
+    if interval is not None:
+        fields.append(interval)
+        if 'post_release' in request:fields.append(request['post_release'])
     return preparation_digest(fields)
 
 
@@ -102,7 +193,8 @@ def _prove_interval(context,request,asset,start,end,mark):
     # Slice the single world-coordinate curve at its original PVA knots, with
     # the original absolute clock and unwrapped yaw at both shared endpoints.
     curve=floor.motion.Curve(asset['points'][start:end+1])
-    receipt=_check_absolute(context,asset['request'],curve,'background_nominal_interval',mark)
+    receipt=_check_route_geometry(context,request,curve,asset['scalar_points'][start:end+1],
+                                  0.,'background_nominal_interval',mark)
     if (request['action']['level']==context['source']['depot']['level']
             and (receipt.get('fixed_home') or {}).get('passed') is not True):
         raise ValueError('Original fixed-home proof missing for depot interval')
@@ -188,7 +280,8 @@ def prepare_route(request,context,*,phase_complete=None):
             absolute=_absolute_curve(driver,driver.nominal_clock,0.,request['observed']['time_s'])
             mark('cartesian_curve')
             asset={'request':copy.deepcopy(request),'binding':binding,'program_sha256':program_sha,
-                'points':absolute.points,'positions':tuple(p[F[0]][0] for p in points),'end_knot':0}
+                'points':absolute.points,'scalar_points':points,
+                'positions':tuple(p[F[0]][0] for p in points),'end_knot':0}
             assets[request['vehicle_id']]=asset
             # Cover a moving rejoin beyond the starter when available. Later
             # quanta contain at most 32 original intervals.
@@ -323,6 +416,7 @@ class BackgroundPreparation:
         if math.dist(path.evaluate(0)[0][:2],row['pose_mm_rad'][:2])>1e-6:raise RuntimeError('Own route does not begin at observed localization')
         caps=_caps(e.source,e.nav,path,action,e.zone_regions)
         row['preparation_generation']=row.get('preparation_generation',0)+1
+        row.pop('waiting_bay_release',None)
         self.failures.pop(identity,None)
         self.intervals.pop(identity,None)
         self.attempted_anchors.pop(identity,None)
@@ -345,6 +439,7 @@ class BackgroundPreparation:
         if action.get('lift_phase')or not path.pieces or len(path.pieces[0]['controls'])!=2:return
         held=e.resources.holds.get(identity)
         horizon=path.ends[0];start=path.evaluate(0)[0];end=path.evaluate(horizon)[0]
+        release=_return_release(action,request['observed'].get('own_grants_at_start'))
         departures=getattr(e,'departures',None)
         if departures is not None and departures.staged(identity):
             ticket=departures.ticket
@@ -352,6 +447,12 @@ class BackgroundPreparation:
                 raise RuntimeError('Private departure action changed before its starter proof')
             held=ticket['resource']
             horizon=min(horizon,ticket['horizon_mm'])
+            end=path.evaluate(horizon)[0]
+        if release is not None and horizon>=release['marker_mm']-1e-7:
+            # The initial full-route result still requires the original grant.
+            # No private starter may reach the physical release before it arrives.
+            horizon=release['marker_mm']-1e-4
+            if horizon<=1e-5:return
             end=path.evaluate(horizon)[0]
         proposed_horizon=horizon
         short=Path([start[:2],end[:2]],action['corner_trim_mm'])
@@ -366,7 +467,7 @@ class BackgroundPreparation:
             spans=e.catalog.spans(row['level'],short)
         phase='rolling_straight_starter'
         home=e.nav.homes.get(identity)
-        if (home and home['level']==row['level'] and not action['reverse']
+        if (release is None and home and home['level']==row['level'] and not action['reverse']
                 and path.position(0)[:2]==home['pose_mm_rad'][:2]
                 and not (departures and departures.staged(identity))):
             extension=_owned_departure_bend(path,e.catalog,row['level'],held)
@@ -410,16 +511,32 @@ class BackgroundPreparation:
         e=self.engine;identity=request['vehicle_id'];row=e.vehicles[identity]
         # The action and existing booking are immutable. A source-bound starter
         # may have moved; no peer position is part of this admission fence.
-        same_action=(row['action']is not None and preparation_digest(row['action'])==request['fence']['action_sha256']and
+        fence=request['fence']
+        same_action=(row['action']is not None and preparation_digest(row['action'])==fence['action_sha256']and
             row.get('preparation_generation',0)==request['fence']['generation']and
-            row['level']==request['fence']['level']and not row['done']and
-            e.own_grants(identity)==request['fence']['own_grants'])
+            row['level']==fence['level']and not row['done'])
+        if not same_action:return False
+        grants=e.own_grants(identity)
         if 'rolling_horizon_mm' in request:
-            # Native geometry uses the action's original waiting bay and lift context.
-            # The independent ResourceGate observes the actual passage grant on each step.
-            return same_action and not row['action'].get('lift_phase') and (
-                row['action_context']==request['observed']['own_grants_at_start'])
-        return same_action and e.resources.own_grants(identity)==request['fence']['own_narrow_grant']
+            if (row['action'].get('lift_phase') or row['action_context']!=request['observed']['own_grants_at_start']
+                    or row['action_context']!=fence['own_grants']):
+                return False
+            scope=request.get('post_release')
+            if scope is not None and scope['leg_id']!=row['leg_id']:
+                return False
+            release=row.get('waiting_bay_release')
+            if (release is not None and release['leg_id']==row['leg_id']
+                    and release['generation']==fence['generation']):
+                expected=_return_release(row['action'],row['action_context'])
+                return (request['kind'] in ('route_interval','continuation')
+                        and expected is not None and scope=={**expected,'leg_id':row['leg_id']}
+                        and release['grant']==fence['own_grants']['waiting_place']
+                        and release['marker_mm']==scope['marker_mm']
+                        and release['progress_mm']>=scope['marker_mm']-1e-7
+                        and release['time_s']<=e.now and grants==scope['own_grants'])
+            # Passage ownership is checked separately by ResourceGate on each step.
+            return grants==fence['own_grants']
+        return grants==fence['own_grants'] and e.resources.own_grants(identity)==fence['own_narrow_grant']
 
     def _reject(self,request,reason):
         identity=request['vehicle_id']
@@ -450,6 +567,7 @@ class BackgroundPreparation:
                 or (last==len(nodes)-1 and abs(interval['end_mm']-driver.goal)>1e-5)
                 or receipt.get('interval_sha256')!=_interval_binding(request,interval)
                 or not _passed_receipt(receipt,'geometry')
+                or not _release_receipt_matches(request,receipt,interval['start_mm'],interval['end_mm'])
                 or (request['action']['level']==self.engine.source['depot']['level']
                     and not _passed_receipt(receipt,'fixed_home'))):
             return False
@@ -508,6 +626,9 @@ class BackgroundPreparation:
                 return self._reject(request,'invalid_proof')
             if 'rolling_horizon_mm' in request and not self._accept_interval(request,result,result):
                 return self._reject(request,'invalid_interval_proof')
+            if 'rolling_horizon_mm' not in request and not _release_receipt_matches(request,result['receipt'],
+                    0.,result['program']['scalar_clock'][-1][F[0]][0]):
+                return self._reject(request,'invalid_proof')
             self.full[identity]=(request,copy.deepcopy(result));self.statistics['accepted']+=1
             if row['driver']is None:
                 if row['pose_mm_rad']!=request['own_pose_mm_rad']:return {'accepted':False,'status':'stale_localization','request_id':request['request_id']}
@@ -543,6 +664,8 @@ class BackgroundPreparation:
                         or not anchor['progress_mm']<proof['join_progress_mm']<=request['horizon_mm']+1e-5))
                     or proof.get('suffix_program_sha256')!=request['program_sha256']
                     or proof.get('anchor')!=anchor or not _passed_receipt(proof.get('receipt'),'geometry')
+                    or ('rolling_horizon_mm' in request and not _release_receipt_matches(request,
+                        proof['receipt'],anchor['progress_mm'],proof['join_progress_mm']))
                     or ('rolling_horizon_mm' in request and request['action']['level']==self.engine.source['depot']['level']
                         and not _passed_receipt(proof.get('receipt'),'fixed_home'))):
                 return self._reject(request,'invalid_connector')
@@ -565,7 +688,8 @@ class BackgroundPreparation:
                 anchor=pending['anchor']
                 # The connector was checked inside its requested horizon. Only
                 # adjoining intervals on that same nominal enlarge the usable suffix.
-                current_request={**original,'fence':pending['fence']}
+                current_request={**original,'fence':pending['fence'],'kind':'continuation',
+                    'post_release':pending['proof']['receipt'].get('post_release')}
                 if self._current(current_request)and driver.commit_continuation(pending['clock'],result['program']['scalar_clock'],anchor,pending['proof'],
                         horizon_mm=horizon if rolling else None,
                         allow_static_rest_rebase=not bool(original['action'].get('lift_phase'))):
@@ -600,4 +724,12 @@ class BackgroundPreparation:
             request['rolling_horizon_mm']=original['rolling_horizon_mm']
             for key in ('fence','observed','own_pose_mm_rad'):
                 request[key]=copy.deepcopy(original[key])
+            row=self.engine.vehicles[original['vehicle_id']]
+            if kind=='route_interval':
+                nominal=self.full[original['vehicle_id']][1]
+                start=nominal['program']['scalar_clock'][values['start_knot']][F[0]][0]
+            else:
+                start=values['anchor']['progress_mm']
+            scope=_post_release_scope(request,start,row.get('leg_id'))
+            if scope is not None:request['post_release']=scope
         return request

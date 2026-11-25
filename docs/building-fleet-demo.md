@@ -240,9 +240,16 @@ Abstands- und Bodenprüfung gilt für jeden Abschnitt. Im Depotgeschoss prüft
 der Planer außerdem die Abstände zu den festen Heimplätzen. Die Freigabe
 wächst erst, wenn Quellstand, Fahrzeug, Aktion, Generation, Geschoss,
 Programmprüfsumme, Knotenbereich und ursprüngliche eigene Zusagen stimmen.
-Die Geometrieprüfung verwendet die Wartebucht und die Aufzugstufe vom
-Aktionsbeginn. Wechselnde Durchfahrtszusagen prüft `ResourceGate` bei jedem
-Fahrschritt anhand des aktuellen Zustands.
+Bis zur Freigabemarke verwendet die Geometrieprüfung die Wartebucht und die
+Aufzugstufe vom Aktionsbeginn. Hinter der Marke prüft sie die freigegebene
+Bucht als Hindernis, auch wenn der Planer den Abschnitt vor der Freigabe
+berechnet. Der Sitzungsmotor akzeptiert die geänderte Zusage erst, nachdem
+der Fahrzeugkörper nachweislich aus seiner Bucht ausgefahren ist. Der Nachweis
+bindet dieselbe Fahrt, Aktionsgeneration und Freigabemarke sowie den vollständigen
+Wechsel dieser einen Buchtenzusage. Der vollständige Erstbescheid und
+Aufzugaktionen benötigen weiterhin ihre ursprünglichen Zusagen.
+Wechselnde Durchfahrtszusagen prüft `ResourceGate` bei jedem Fahrschritt
+anhand des aktuellen Zustands.
 
 Je Fahrzeug ist höchstens ein Prüfauftrag gleichzeitig ausstehend. Anschlüsse
 an den beobachteten Fahrzustand haben Vorrang. Unter den weiteren Abschnitten

@@ -886,6 +886,9 @@ class WorldRunner:
                 poly=self.nav.waiting_bay_polygons[details['level']][details['slot']]
                 if world_model.polygon_distance(world_model.footprint(self.truth()[identity]),poly)<self.nav.reserve-1e-6:raise RuntimeError('Own physical footprint has not cleared its reserved waiting bay')
                 self.resources.release_waiting_place(identity,self.now)
+                row['waiting_bay_release']={'leg_id':row['leg_id'],
+                    'generation':row.get('preparation_generation',0),'marker_mm':mark['progress_mm'],
+                    'grant':copy.deepcopy(grant),'time_s':self.now,'progress_mm':driver.y}
             else:
                 if event not in communication.EVENTS:raise ValueError('Unknown executed mission marker '+str(event))
                 self.event(identity,event,details,self.now)
