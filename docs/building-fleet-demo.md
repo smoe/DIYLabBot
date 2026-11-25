@@ -90,9 +90,10 @@ aber einen Zustand, aus dem der Regler trotz 11,57 m freier Sicht keine
 zulässige Bremsung nach dem nächsten Schritt fand. Die gewählte Kurvenuhr
 lässt deshalb Reserve für die Beschleunigungs- und Ruckanteile beim Bremsen
 in der Kurve. In Räumen und Türen gilt weiterhin die Zonengrenze von 0,30 m/s.
-Eine separate Prüfung beider Bögen einschließlich Ein- und Ausfahrt fand bei
-allen 540 Kontrollzeitpunkten eine zulässige Anschlussbremsung mit einem
-frischen, freien Scan. Die größte dafür erforderliche Sichtweite betrug 5,31 m.
+Eine separate Prüfung umfasste alle 28 Bögen und jeweils 80 mm vor und nach
+jedem Bogen. An allen 4.637 Kontrollzeitpunkten im 50-ms-Raster fand der
+Regler eine zulässige Anschlussbremsung mit einem frischen, freien Scan.
+Die größte dafür erforderliche Sichtweite betrug 9,31 m.
 Der vollständige Nominalverlauf bestand aus 1.084 Knoten. Die 33 Prüfintervalle
 erfüllten die native projizierte Abstands-, Boden- und Heimplatzprüfung mit
 1 mm zusätzlicher Reserve. Die berechnete Abweichung der Fahrzeughülle zwischen
@@ -113,7 +114,9 @@ eigenen Depots bis 0,821 m vorfahren. Erst die spätere Ressourcenzusage erlaubt
 ihm die Fahrt in den gemeinsamen Bereich. In der lokalen Ausführung mit dem
 veröffentlichten Laufzeitpaket übernahm BF06 den Anschluss bei 2,236 m mit
 0,299 m/s und erreichte den Beginn des nominalen Folgeabschnitts nach 20,70 s
-Modellzeit. Die zweite private Depotabfahrt war im selben Lauf sichtbar.
+Modellzeit. Nach 35,65 Modellsekunden hatte BF06 die ersten vier Meter ohne
+Zwischenhalt zurückgelegt. BF01 und BF06 fuhren in 80 geprüften Schritten
+gleichzeitig. Der beobachtete Lauf endet bei vier Metern.
 
 Bei der Scanberechnung überspringt ein Strahl den Zellindex eines Körpers,
 wenn sein gesamtes Reichweitensegment außerhalb des erweiterten umschließenden
