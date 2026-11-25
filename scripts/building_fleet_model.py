@@ -141,6 +141,10 @@ def reference(source, key):
 
 def patrol_policy(profile):
     """Validate the active patrol policy, including profiles preceding variable corner timing."""
+    if 'vehicle_count' in profile:
+        count = profile['vehicle_count']
+        if type(count) is not int or count not in (6, 20):
+            raise ValueError('The patrol vehicle_count must be exactly six or twenty')
     policy = profile.get('patrol', {})
     startup = policy.get('startup')
     expected = {'termination': 'explicit_stop', 'startup': startup, 'targets': '/missions/targets',
@@ -150,6 +154,22 @@ def patrol_policy(profile):
     if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
         raise ValueError('Unsupported continuous empty-patrol policy')
     return policy
+
+
+def active_vehicle_ids(source, profile=None):
+    """Select live occupants without changing the twenty-place reference source.
+
+    Profiles preceding the explicit selection retain the complete reference
+    fleet. The profile selects existing identities, never new home geometry.
+    """
+    maximum = source['fleet']['count']
+    count = maximum
+    if profile is not None:
+        patrol_policy(profile)
+        count = profile.get('vehicle_count', maximum)
+    if type(maximum) is not int or maximum != 20 or type(count) is not int or count not in (6, maximum):
+        raise ValueError('A six- or twenty-vehicle patrol needs the twenty-place reference fleet')
+    return tuple('BF%02d' % i for i in range(1, count + 1))
 
 
 def scan_angular_allowance(sensor):

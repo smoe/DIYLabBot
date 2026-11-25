@@ -1,27 +1,30 @@
 /* Active local BF01 presentation. Routing and movement stay in the Python runner. */
 (function(root,factory){const api=factory(typeof module==='object'&&module.exports?require('./building_fleet_view.js'):root.BuildingFleetView);if(typeof module==='object'&&module.exports)module.exports=api;else root.BuildingFleetLiveView=api;})(typeof globalThis!=='undefined'?globalThis:this,function(view){
 'use strict';
-const IDS=Array.from({length:20},(_,i)=>'BF'+String(i+1).padStart(2,'0'));
+const IDS=Object.freeze(Array.from({length:20},(_,i)=>'BF'+String(i+1).padStart(2,'0')));
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const vector=v=>Array.isArray(v)&&v.length===3&&v.every(finite);
 const target=t=>t&&typeof t.level==='string'&&typeof t.area==='string';
 function require(ok,message){if(!ok)throw Error(message);}
-function validateStates(states){
- require(Array.isArray(states)&&states.length===IDS.length,'Twenty observed vehicle states required');
- const ids=new Set();for(const state of states){require(IDS.includes(state.id)&&!ids.has(state.id)&&vector(state.pose_xyz_mm)&&finite(state.yaw_rad)&&typeof state.level_id==='string'&&typeof state.mode==='string'&&typeof state.attached_cabin==='boolean','Invalid observed vehicle state');ids.add(state.id);}return states;
+function validateStates(states,expectedIds=IDS){
+ require(Array.isArray(states)&&states.length===expectedIds.length,'Complete observed fleet states required');
+ const ids=new Set();for(const state of states){require(expectedIds.includes(state?.id)&&!ids.has(state.id)&&vector(state.pose_xyz_mm)&&finite(state.yaw_rad)&&typeof state.level_id==='string'&&typeof state.mode==='string'&&typeof state.attached_cabin==='boolean','Invalid observed vehicle state');ids.add(state.id);}return states;
 }
 function validateLift(lift){require(lift&&finite(lift.z_mm)&&lift.door_values&&typeof lift.door_values==='object'&&!Array.isArray(lift.door_values)&&Object.values(lift.door_values).every(finite),'Numeric source-bound lift state required');return lift;}
-function validateSnapshot(snapshot){
+function validateSnapshot(snapshot,expectedCount){
  require(snapshot?.format==='solidcraftbot.building-fleet-live-snapshot/1'&&typeof snapshot.session_id==='string'&&snapshot.session_id.length>0,'Named active fleet snapshot required');
  require(finite(snapshot.model_time_s)&&snapshot.model_time_s>=0&&typeof snapshot.paused==='boolean','Finite executed model clock required');
- validateStates(snapshot.states);validateLift(snapshot.lift);
+ const count=snapshot.vehicle_count===undefined?IDS.length:snapshot.vehicle_count;
+ require((count===6||count===IDS.length)&&(expectedCount===undefined||count===expectedCount),'Active fleet count differs from its source');
+ const ids=IDS.slice(0,count);
+ validateStates(snapshot.states,ids);validateLift(snapshot.lift);
  require(Array.isArray(snapshot.targets)&&snapshot.targets.every(target)&&Array.isArray(snapshot.jobs)&&Array.isArray(snapshot.coverage)&&Array.isArray(snapshot.camera_frames),'Bounded jobs, coverage and received frames required');
- require(snapshot.jobs.every(j=>j&&typeof j.request_id==='string'&&typeof j.status==='string'&&target(j.pickup)&&target(j.delivery)&&(j.vehicle_id==null||IDS.includes(j.vehicle_id))&&(j.eta_s==null||finite(j.eta_s)&&j.eta_s>=0)),'Identified test-job endpoints and assignment required');
+ require(snapshot.jobs.every(j=>j&&typeof j.request_id==='string'&&typeof j.status==='string'&&target(j.pickup)&&target(j.delivery)&&(j.vehicle_id==null||ids.includes(j.vehicle_id))&&(j.eta_s==null||finite(j.eta_s)&&j.eta_s>=0)),'Identified test-job endpoints and assignment required');
  require(snapshot.coverage.every(t=>target(t)&&Number.isInteger(t.visits)&&t.visits>=0&&(t.last_visit_s===null||finite(t.last_visit_s)&&t.last_visit_s>=0&&t.last_visit_s<=snapshot.model_time_s)),'Observed coverage time must not be in the future');
- require(snapshot.camera_frames.length<=IDS.length,'At most one latest received camera frame per vehicle required');
+ require(snapshot.camera_frames.length<=count,'At most one latest received camera frame per vehicle required');
  const seen=new Set();for(const frame of snapshot.camera_frames){
-  require(IDS.includes(frame.vehicle_id)&&!seen.has(frame.vehicle_id)&&typeof frame.camera_ref==='string'&&frame.camera_ref.length>0&&[frame.captured_s,frame.received_s].every(finite)&&frame.captured_s>=0&&frame.captured_s<=frame.received_s&&frame.received_s<=snapshot.model_time_s&&vector(frame.pose_xyz_mm)&&finite(frame.yaw_rad)&&typeof frame.level_id==='string','Only already received, identified camera poses may be displayed');
-  validateStates(frame.states);validateLift(frame.lift);seen.add(frame.vehicle_id);
+  require(ids.includes(frame.vehicle_id)&&!seen.has(frame.vehicle_id)&&typeof frame.camera_ref==='string'&&frame.camera_ref.length>0&&[frame.captured_s,frame.received_s].every(finite)&&frame.captured_s>=0&&frame.captured_s<=frame.received_s&&frame.received_s<=snapshot.model_time_s&&vector(frame.pose_xyz_mm)&&finite(frame.yaw_rad)&&typeof frame.level_id==='string','Only already received, identified camera poses may be displayed');
+  validateStates(frame.states,ids);validateLift(frame.lift);seen.add(frame.vehicle_id);
   const own=frame.states.find(s=>s.id===frame.vehicle_id);require(own.level_id===frame.level_id&&Math.abs(own.yaw_rad-frame.yaw_rad)<1e-7&&own.pose_xyz_mm.every((v,i)=>Math.abs(v-frame.pose_xyz_mm[i])<1e-7),'Camera pose differs from its historical own state');
  }
  return snapshot;
@@ -62,13 +65,13 @@ function vehicleLocation(state, locations){
  });
  return area?level+' · '+area.label:level;
 }
-function compileWindow(window,observedEnd){
+function compileWindow(window,observedEnd,expectedIds=IDS){
  if(window==null)return null;
  require(finite(window.start_s)&&finite(window.end_s)&&window.start_s>=0&&window.start_s<window.end_s&&window.end_s<=observedEnd,'Executed interpolation window must end at an observed time');
- validateLift(window.lift_initial_state);require(Array.isArray(window.lift_schedule)&&Array.isArray(window.trajectories)&&window.trajectories.length===20,'Executed source curves and lift schedule required');
+ validateLift(window.lift_initial_state);require(Array.isArray(window.lift_schedule)&&Array.isArray(window.trajectories)&&window.trajectories.length===expectedIds.length,'Executed source curves and lift schedule required');
  const levels=Array.isArray(window.levels)?Object.fromEntries(window.levels.map(l=>[l.id,l])):window.levels;require(levels&&Object.values(levels).every(l=>finite(l.z_mm)),'Executed source floor heights required');
  const ids=new Set();for(const row of window.trajectories){
-  require(IDS.includes(row.vehicle_id)&&!ids.has(row.vehicle_id)&&Array.isArray(row.episodes)&&row.episodes.length>0,'Unique executed vehicle curves required');ids.add(row.vehicle_id);
+  require(expectedIds.includes(row.vehicle_id)&&!ids.has(row.vehicle_id)&&Array.isArray(row.episodes)&&row.episodes.length>0,'Unique executed vehicle curves required');ids.add(row.vehicle_id);
   require(row.episodes[0].start_s<=window.start_s&&row.episodes.at(-1).end_s>=window.end_s,'Executed curves must cover the display window');
   let previous=null;for(const episode of row.episodes){require(levels[episode.level_id]&&typeof episode.mode==='string'&&typeof episode.attached_cabin==='boolean'&&finite(episode.start_s)&&finite(episode.end_s)&&episode.start_s<episode.end_s&&(previous===null||episode.start_s===previous)&&episode.points[0].time_s===episode.start_s&&episode.points.at(-1).time_s===episode.end_s&&episode.end_s<=observedEnd,'No future or discontinuous executed PVA may be displayed');previous=episode.end_s;}
  }
@@ -208,8 +211,8 @@ async function mount(bridge,payload){
  progress.id='bf01-startup-progress';progress.setAttribute('aria-label','Start der Patrouille');
  progress.style.cssText='width:min(100%,32rem);height:10px;accent-color:#2e5146';
  notice.append(noticeText,progress);bridge.stage.append(notice);
- panel.innerHTML='<h2>BF01 · aktive Patrouille</h2><p>20 leere Transporter · fortlaufende Erkundung mit priorisierten Testaufträgen. Kamerabilder sind lokale synthetische Ansichten empfangener Modellposen; kein Video-Netzwerklasttest. Testabholung und Testabgabe sind Raumankünfte ohne Probe oder Roboterübergabe.</p><div class="bf-controls"><button data-bf="play" disabled>Pause</button><output data-bf="clock">Initialisierung</output><select data-bf="vehicle" aria-label="Fahrzeug"></select><button data-bf="follow">Fahrzeug folgen</button></div><p data-bf="status" role="status">Patrouille wird vorbereitet …</p><form data-bf="request"><label>Testabholung <select data-bf="pickup" aria-label="Testabholung" required></select></label> <label>Testabgabe <select data-bf="delivery" aria-label="Testabgabe" required></select></label> <button data-bf="submit" type="submit" disabled>Transport anfordern</button></form><p data-bf="request-status" role="status"></p><p data-bf="coverage"></p><ul data-bf="targets"></ul><h3>Testaufträge</h3><ol data-bf="jobs"></ol><div class="bf-table"><table><thead><tr><th>Fahrzeug</th><th>Beobachteter Zustand</th><th>Auftrag</th></tr></thead><tbody data-bf="rows"></tbody></table></div><p data-bf="camera-note">Noch keine empfangenen Kameraaufnahmen.</p>';
- const q=name=>panel.querySelector('[data-bf="'+name+'"]');for(const id of IDS){const option=document.createElement('option');option.value=option.textContent=id;q('vehicle').append(option);}
+ panel.innerHTML='<h2>BF01 · aktive Patrouille</h2><p><span data-bf="fleet-size"></span>Fortlaufende Erkundung mit priorisierten Testaufträgen. Kamerabilder sind lokale synthetische Ansichten empfangener Modellposen; kein Video-Netzwerklasttest. Testabholung und Testabgabe sind Raumankünfte ohne Probe oder Roboterübergabe.</p><div class="bf-controls"><button data-bf="play" disabled>Pause</button><output data-bf="clock">Initialisierung</output><select data-bf="vehicle" aria-label="Fahrzeug"></select><button data-bf="follow">Fahrzeug folgen</button></div><p data-bf="status" role="status">Patrouille wird vorbereitet …</p><form data-bf="request"><label>Testabholung <select data-bf="pickup" aria-label="Testabholung" required></select></label> <label>Testabgabe <select data-bf="delivery" aria-label="Testabgabe" required></select></label> <button data-bf="submit" type="submit" disabled>Transport anfordern</button></form><p data-bf="request-status" role="status"></p><p data-bf="coverage"></p><ul data-bf="targets"></ul><h3>Testaufträge</h3><ol data-bf="jobs"></ol><div class="bf-table"><table><thead><tr><th>Fahrzeug</th><th>Beobachteter Zustand</th><th>Auftrag</th></tr></thead><tbody data-bf="rows"></tbody></table></div><p data-bf="camera-note">Noch keine empfangenen Kameraaufnahmen.</p>';
+ const q=name=>panel.querySelector('[data-bf="'+name+'"]');
  function startupNotice({detail,value,max}){
   if(q('status').textContent!==detail)q('status').textContent=detail;
   noticeText.textContent=detail;progress.hidden=false;
@@ -220,7 +223,8 @@ async function mount(bridge,payload){
  startupNotice({detail:'Gebäude bereit · Live-Patrouille wird vorbereitet …'});
  if(config.worker){const note=document.createElement('p');note.textContent='Eigene Live-Simulation in diesem Browser. Beim Schließen endet diese Sitzung; beim nächsten Öffnen startet eine neue Patrouille.';panel.querySelector('p').after(note);}
  const renderer=view.makeRenderer(bridge,payload.vehicle_mesh),cameraImage=makeCameraRenderer(bridge,renderer,payload),labels=document.createElement('div');labels.className='bf-labels';bridge.stage.append(labels);
- const labelNodes=new Map(IDS.map(id=>{const node=document.createElement('span');node.textContent=id;labels.append(node);return[id,node];}));
+ const labelNodes=new Map();
+ let vehicleIds=[];
  let snapshot=null,selected='BF01',follow=false,stopped=false,connected=false,lastResponse=0,pendingRequest=null,requestCount=0,targetsKey='',polling=false,manualPause=false,doorPause=false,controlPending=false,runtimeError=null,queuedControl=null,lastCommandError='';
  let departed=false;
  const playback=new ExecutedPlayback();
@@ -231,10 +235,23 @@ async function mount(bridge,payload){
  function display(){return playback.motion?playback.motion.at(playback.time):snapshot?{lift:snapshot.lift,states:snapshot.states}:null;}
  function positionLabels(observed){labels.hidden=Boolean(payload.presentation?.atrium_monitors&&!follow&&bridge.atMonitorWall());for(const state of observed.states){const node=labelNodes.get(state.id),point=bridge.projectPoint(state.pose_xyz_mm.map((v,i)=>v+(i===2?payload.vehicle_mesh.scene.bounds_mm.max[2]:0)));node.hidden=!point?.visible;if(point){node.style.left=point.x*100+'%';node.style.top=point.y*100+'%';}}if(follow)bridge.follow(observed.states.find(state=>state.id===selected));}
  function setTargets(targets){const key=targets.map(targetKey).join('|');if(key===targetsKey)return;targetsKey=key;for(const field of ['pickup','delivery']){q(field).replaceChildren(...targets.map(target=>{const option=document.createElement('option');option.value=targetKey(target);option.textContent=view.targetLabel(target);return option;}));}if(targets.length>1)q('delivery').selectedIndex=1;}
+ function setFleet(ids){
+  vehicleIds=ids;
+  if(!ids.includes(selected)){if(follow)stopFollowing();selected=ids[0];}
+  q('fleet-size').textContent=ids.length+' leere Transporter · ';
+  const options=[],nodes=[];
+  labelNodes.clear();
+  for(const id of ids){
+   const option=document.createElement('option');option.value=option.textContent=id;options.push(option);
+   const label=document.createElement('span');label.textContent=id;labelNodes.set(id,label);nodes.push(label);
+  }
+  q('vehicle').replaceChildren(...options);q('vehicle').value=selected;
+  labels.replaceChildren(...nodes);
+ }
  setTargets(config.targets??[]);
  const vehicleIdFromCamera=id=>id.slice('BF01.'.length,-'.Overview'.length);
  function followVehicle(id){
-  require(IDS.includes(id),'Unknown vehicle');
+  require(vehicleIds.includes(id),'Unknown vehicle');
   if(!follow)bridge.beginFollow();
   follow=true;
   selected=id;
@@ -252,7 +269,7 @@ async function mount(bridge,payload){
   if(!payload.presentation?.atrium_monitors)return;
   bridge.connectMonitorFeeds({
    kind:'received_fleet_live',
-   camera_ids:IDS.map(id=>'BF01.'+id+'.Overview'),
+   camera_ids:vehicleIds.map(id=>'BF01.'+id+'.Overview'),
    clock:()=>snapshot?.model_time_s??0,
    locationAt:id=>locations.get(vehicleIdFromCamera(id))??null,
    followVehicle:id=>followVehicle(vehicleIdFromCamera(id)),
@@ -304,7 +321,7 @@ async function mount(bridge,payload){
    }
    return row;
   }));
-  q('camera-note').textContent=snapshot.camera_frames.length+' / 20 empfangene synthetische Kameraansichten · gemeinsame Modellzeit';
+  q('camera-note').textContent=snapshot.camera_frames.length+' / '+vehicleIds.length+' empfangene synthetische Kameraansichten · gemeinsame Modellzeit';
   const commandError=snapshot.command_errors?.at(-1);if(commandError){const key=commandError.request_id+':'+commandError.error;if(key!==lastCommandError){lastCommandError=key;q('request-status').textContent='Testauftrag abgelehnt · '+commandError.request_id+' · '+commandError.error;}}
   positionLabels(observed);bridge.syncMonitorFeeds?.();bridge.requestRender();
  }
@@ -314,9 +331,15 @@ async function mount(bridge,payload){
    return;
   }
   if(value.status==='error'){connected=false;playback.resetTiming();runtimeError=value.error??'Laufzeitfehler';if(snapshot)paint();else startupNotice({detail:'Patrouille angehalten · '+runtimeError});return;}
-  validateSnapshot(value);bridge.observeVisualGeometry?.(value);
+  validateSnapshot(value,config.vehicle_count);
   if(snapshot&&snapshot.session_id===value.session_id&&value.model_time_s<snapshot.model_time_s)return;
-  const previous=snapshot,changed=!previous||previous.session_id!==value.session_id,nextMotion=compileWindow(value.executed_window,value.model_time_s);snapshot=value;
+  const previous=snapshot,changed=!previous||previous.session_id!==value.session_id;
+  require(changed||vehicleIds.length===value.states.length,'An active session cannot change its fleet');
+  const ids=IDS.slice(0,value.states.length);
+  const nextMotion=compileWindow(value.executed_window,value.model_time_s,ids);
+  bridge.observeVisualGeometry?.(value);
+  if(vehicleIds.length!==ids.length)setFleet(ids);
+  snapshot=value;
   if(changed)departed=false;
   if(!departed)departed=observedDeparture(connected?previous:null,value,nextMotion,Boolean(blockers().length)||manualPause);
   locations=new Map(value.states.map(state=>[state.id,vehicleLocation(state,payload.locations)]));

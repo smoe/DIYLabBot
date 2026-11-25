@@ -362,8 +362,10 @@ print(json.dumps({'cache_tag':sys.implementation.cache_tag,'magic_number_hex':im
     return metadata
 
 
-def pack(files, browser_source, inputs, output, *, python_core=None, bytecode=None):
+def pack(files, browser_source, inputs, output, *, python_core=None, bytecode=None, vehicle_count=None):
     """Write an immutable deterministic archive and independently hashed manifest."""
+    if vehicle_count is not None and (type(vehicle_count) is not int or vehicle_count not in (6, 20)):
+        raise ValueError('A source-bound six- or twenty-vehicle bundle is required')
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     archive = output / 'runtime.zip'
@@ -387,6 +389,8 @@ def pack(files, browser_source, inputs, output, *, python_core=None, bytecode=No
                     'bytes': archive.stat().st_size},
         'qualification': copy.deepcopy(browser_source['qualification']),
         'scope': 'Original engine sources and source-bound static geometry/cache inputs only; a new independent live world starts per page, without prior mission, snapshot, action journal or recording fallback. Compact derivations retain their build-only native provenance separately.'}
+    if vehicle_count is not None:
+        manifest['vehicle_count'] = vehicle_count
     if 'static_runtime_cache' in inputs:
         from building_fleet_runtime_cache import verification_receipt
         manifest['static_cache_verification'] = verification_receipt(ROOT / inputs['static_runtime_cache'])
@@ -440,6 +444,8 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
     output = local.project_path(output, output=True)
     compact = 'static_runtime_cache' in inputs
     files, browser_source, profile = collect_compact(inputs) if compact else collect(inputs)
+    source = model.load()
+    vehicle_count = len(model.active_vehicle_ids(source, profile))
     python_core = None
     if 'python_core' in browser_source['sources']:
         if python_core_dir is None:
@@ -452,7 +458,8 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
     if python_bytecode_compiler and not browser_source['runtime']['version'].startswith('314.'):
         raise ValueError('The optional import cache currently targets only the pinned Python 3.14 runtime')
     bytecode = prepare_bytecode(files, output, python_bytecode_compiler) if python_bytecode_compiler else None
-    manifest = pack(files, browser_source, runtime_inputs, output, python_core=python_core, bytecode=bytecode)
+    manifest = pack(files, browser_source, runtime_inputs, output, python_core=python_core,
+                    bytecode=bytecode, vehicle_count=vehicle_count)
     manifest_ref = local.artifact(output / 'runtime-manifest.json')
     worker = {'module_url': 'building_fleet_browser_worker.mjs?sha256=' + files.files[WORKER]['sha256'],
         'manifest': {'url': 'runtime-manifest.json?sha256=' + manifest_ref['sha256'],
@@ -460,11 +467,10 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         'bundle': {'url': 'runtime.zip?sha256=' + manifest['archive']['sha256'],
                    'sha256': manifest['archive']['sha256']}}
     presentation_pins = {}
-    for source, name in ((WORKER, 'building_fleet_browser_worker.mjs'),
-                         (TRANSPORT, 'building_fleet_browser_transport.js')):
-        shutil.copyfile(ROOT / source, output / name)
+    for source_path, name in ((WORKER, 'building_fleet_browser_worker.mjs'),
+                              (TRANSPORT, 'building_fleet_browser_transport.js')):
+        shutil.copyfile(ROOT / source_path, output / name)
     if not bundle_only:
-        source = model.load()
         args = SimpleNamespace(**inputs)
         local_report = local.build_page(source, profile, args, output,
                                        **({'progressive_output': output} if compact else {}))
@@ -484,6 +490,7 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
             raise ValueError('Live browser publication cannot contain a recorded program')
         payload['locations'] = locations
         payload['live'] = {'worker': worker,
+            'vehicle_count': vehicle_count,
             'poll_interval_ms': payload['live']['poll_interval_ms'],
             'targets': payload['live']['targets']}
         encoded = json.dumps(payload, separators=(',', ':'), allow_nan=False).replace('<', '\\u003c')
@@ -509,6 +516,7 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
     artifacts = {p.relative_to(output).as_posix(): {'sha256': model.digest(p), 'bytes': p.stat().st_size}
                  for p in output.rglob('*') if p.is_file()}
     report = {'format': 'solidcraftbot.building-fleet-browser-build/1', 'passed': True,
+        'vehicle_count': vehicle_count,
         'source_files_sha256': {**{name: row['sha256'] for name, row in files.files.items()},
                                **presentation_pins},
         'inputs': copy.deepcopy(inputs), 'runtime_manifest': manifest_ref,

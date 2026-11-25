@@ -19,6 +19,18 @@ rejected(s=>s.camera_frames[0].level_id='OG3');
 rejected(s=>s.camera_frames.push(structuredClone(s.camera_frames[0])));
 rejected(s=>s.jobs.push({request_id:'j',status:'queued',pickup:null,delivery:{level:'EG',area:'R0_001'}}));
 rejected(s=>s.coverage.push({level:'EG',area:'R0_001',visits:1,last_visit_s:11}));
+const six=snapshot();
+six.vehicle_count=6;
+six.states=six.states.slice(0,6);
+six.camera_frames[0].states=six.camera_frames[0].states.slice(0,6);
+assert.equal(live.validateSnapshot(six,6).states.length,6);
+assert.throws(()=>live.validateSnapshot(six,20),/fleet count/);
+assert.throws(()=>live.validateSnapshot({...six,vehicle_count:undefined}),/fleet states/);
+assert.throws(()=>live.validateSnapshot({...six,states:[...six.states.slice(0,5),states()[6]]}),/vehicle state/);
+assert.throws(()=>live.validateSnapshot({...six,camera_frames:snapshot().camera_frames}),/fleet states/);
+const goal={level:'EG',area:'R0_001'};
+assert.throws(()=>live.validateSnapshot({...six,jobs:[
+ {request_id:'j',status:'assigned',pickup:goal,delivery:goal,vehicle_id:'BF07'}]}),/assignment/);
 assert.equal(live.endpoint('/api/state','http://127.0.0.1:8080/bf01/'),'http://127.0.0.1:8080/api/state');
 assert.throws(()=>live.endpoint('https://example.com/api/state','http://127.0.0.1:8080/'));
 assert.throws(()=>live.endpoint('file:///api/state','file:///index.html'));
@@ -36,6 +48,11 @@ assert.equal(live.vehicleLocation({...views.states[0],attached_cabin:true,pose_x
 assert.equal(live.vehicleLocation(views.states[1],locations),'EG');
 const window={start_s:9,end_s:10,levels:{EG:{z_mm:0}},lift_initial_state:{z_mm:0,door_values:{door:0}},lift_schedule:[{kind:'doors',start_s:8,end_s:12,from_values:{door:0},target_values:{door:1}}],trajectories:live.IDS.map(vehicle_id=>({vehicle_id,episodes:[{start_s:9,end_s:10,level_id:'EG',mode:'patrol',attached_cabin:false,points:[9,10].map(time_s=>({time_s,pose_mm_rad:[(time_s-9)*1000,0,0],velocity_mm_rad_s:[1000,0,0],acceleration_mm_rad_s2:[0,0,0]}))}]}))};
 const curve=live.compileWindow(window,10);assert.equal(curve.at(9.5).states[0].pose_xyz_mm[0],500);assert.equal(curve.at(9.5).lift.door_values.door,.27520751953125);
+const sixIds=live.IDS.slice(0,6),sixWindow={...window,trajectories:window.trajectories.slice(0,6)};
+assert.deepEqual(live.compileWindow(sixWindow,10,sixIds).at(9.5).states.map(state=>state.id),sixIds);
+assert.throws(()=>live.compileWindow(window,10,sixIds),/Executed source curves/);
+assert.throws(()=>live.compileWindow({...sixWindow,
+ trajectories:[...sixWindow.trajectories.slice(0,5),window.trajectories[6]]},10,sixIds),/Unique executed vehicle curves/);
 assert.throws(()=>curve.at(10.001));assert.throws(()=>curve.at(8.999));
 assert.throws(()=>live.compileWindow({...window,end_s:10.001},10));
 const discontinuous=structuredClone(window);discontinuous.trajectories[0].episodes[0].points.at(-1).time_s=10.01;assert.throws(()=>live.compileWindow(discontinuous,10));

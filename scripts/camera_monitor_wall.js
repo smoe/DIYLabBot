@@ -50,15 +50,18 @@
     const details=document.createElement('p'),notice=document.createElement('p');details.setAttribute('role','status');notice.className='notice';
     notice.textContent='Modellansichten · keine Aufzeichnung · keine Meldungsquelle angebunden';
     const options=new Map(),cameraOptions=new Map();
-    if(defaults.includes(null)){
-      const option=document.createElement('option');option.value='';option.textContent='Keine Bildquelle';option.disabled=true;select.append(option);
+    const unassigned=document.createElement('option');unassigned.value='';unassigned.textContent='Keine Bildquelle';
+    unassigned.disabled=true;unassigned.hidden=!defaults.includes(null);select.append(unassigned);
+    function cameraCaption(camera){
+      const status=camera.availability==='available'?'Ansicht verfügbar':unavailable[camera.availability];
+      const location=camera.location||camera.level_id;
+      return [camera.label,location===status?null:location,camera.id,status].filter(Boolean).join(' · ');
     }
     for(const c of cameras.values()){
       const group=c.category;
       if(!options.has(group)){const node=document.createElement('optgroup');node.label=groupLabels[group];options.set(group,node);select.append(node);}
       const option=document.createElement('option');option.value=c.id;
-      const status=c.availability==='available'?'Ansicht verfügbar':unavailable[c.availability],location=c.location||c.level_id;
-      option.textContent=[c.label,location===status?null:location,c.id,status].filter(Boolean).join(' · ');
+      option.textContent=cameraCaption(c);
       options.get(group).append(option);cameraOptions.set(c.id,option);
     }
     panel.append(close,title,label,select,liveInfo,image,details,notice);host.append(panel);
@@ -129,7 +132,8 @@
     function clearFrame(slot){
       slot.hash=null;slot.frame=null;slot.pixel_alpha_min=null;slot.last_capture=null;slot.last_received_capture=null;
     }
-    function assign(index,id){const slot=slots[index];if(!slot||!cameras.has(id))return {status:'unknown_target'};slot.camera_id=id;slot.error=null;slot.frames=0;clearFrame(slot);slot.first_capture=null;slot.next_due=0;placeholder(slot);refreshUI();requestRender();return {status:'accepted'};}
+    function setCamera(slot,id){slot.camera_id=id;slot.error=null;slot.frames=0;clearFrame(slot);slot.first_capture=null;slot.next_due=0;placeholder(slot);}
+    function assign(index,id){const slot=slots[index];if(!slot||!cameras.has(id))return {status:'unknown_target'};setCamera(slot,id);refreshUI();requestRender();return {status:'accepted'};}
     function open(index){if(!slots[index])return {status:'unknown_target'};selected=index;panel.hidden=false;refreshUI();select.focus();slots[index].next_due=0;return {status:'accepted',id:slots[index].monitor.id};}
     function shut(){panel.hidden=true;selected=null;focusMain();requestRender();}
     close.addEventListener('click',shut);panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.stopPropagation();shut();}});
@@ -149,13 +153,29 @@
       refreshUI(redactSelected);
     }
     function connectReceivedSource(source){
-      if(!source||!Array.isArray(source.camera_ids)||source.camera_ids.length!==slots.length||new Set(source.camera_ids).size!==slots.length||source.camera_ids.some(id=>!cameras.has(id)||cameras.get(id).category!=='transporter')||typeof source.frameAt!=='function'||typeof source.clock!=='function')throw Error('Known complete received-camera source required');
-      const kind=source.kind??'received_fleet_recording';if(!['received_fleet_recording','received_fleet_live'].includes(kind))throw Error('Unknown received-camera source kind');
-      receivedSource={...source,kind,ids:new Set(source.camera_ids)};
-      const live=kind==='received_fleet_live';
-      for(const id of source.camera_ids){const camera=cameras.get(id);camera.availability='available';camera.location=live?'BF01-Patrouille':'BF01-Aufzeichnung';camera.origin_label=live?'Empfangene Modellpose · aktive synthetische Simulation':'Empfangene Modellpose · synthetische Teilaufzeichnung';cameraOptions.get(id).textContent=camera.label+' · '+id+' · empfangene Modellansicht';}
+      const kind=source?.kind??'received_fleet_recording',live=kind==='received_fleet_live';
+      if(!live&&kind!=='received_fleet_recording')throw Error('Unknown received-camera source kind');
+      const ids=source?.camera_ids;
+      if(!Array.isArray(ids)||!ids.length||ids.length>slots.length||(!live&&ids.length!==slots.length)||
+          new Set(ids).size!==ids.length||ids.some(id=>cameras.get(id)?.category!=='transporter')||
+          typeof source.frameAt!=='function'||typeof source.clock!=='function')throw Error('Known complete received-camera source required');
+      receivedSource={...source,kind,ids:new Set(ids)};
+      unassigned.hidden=!defaults.includes(null)&&ids.length===slots.length;
+      for(const original of config.cameras){
+        if(original.category!=='transporter')continue;
+        const camera={...original},option=cameraOptions.get(original.id);
+        cameras.set(original.id,camera);
+        if(receivedSource.ids.has(original.id)){
+          camera.availability='available';camera.location=live?'BF01-Patrouille':'BF01-Aufzeichnung';
+          camera.origin_label=live?'Empfangene Modellpose · aktive synthetische Simulation':'Empfangene Modellpose · synthetische Teilaufzeichnung';
+          option.textContent=camera.label+' · '+camera.id+' · empfangene Modellansicht';
+        }else option.textContent=cameraCaption(camera);
+        option.hidden=live&&camera.availability==='not_connected';
+      }
       notice.textContent=live?'Experimentelle BF01-Patrouille · empfangene Modellposen · synthetische Ansichten, keine realen Kamerabilder':'Experimentelle BF01-Teilaufzeichnung · empfangene Modellposen · synthetische Ansichten, keine realen Kamerabilder';
-      source.camera_ids.forEach((id,index)=>assign(index,id));synchronizeReceivedSource();return{status:'accepted',camera_count:source.camera_ids.length};
+      slots.forEach((slot,index)=>setCamera(slot,ids[index]??null));
+      synchronizeReceivedSource();refreshUI();requestRender();
+      return{status:'accepted',camera_count:ids.length};
     }
     function captureReceivedSlot(slot){
       synchronizeReceivedSource();const now=receivedSource.clock(),frame=receivedSource.frameAt(slot.camera_id,width,height);

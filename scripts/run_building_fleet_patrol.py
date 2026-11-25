@@ -40,6 +40,8 @@ def load_profile(path=PROFILE):
             'network_video_implemented': False, 'full_mission_coverage_verified': False,
             'native_full_program_verified': False, 'independent_export_verified': False,
             'hardware_or_real_safety_qualified': False}}
+    if 'vehicle_count' in value:
+        expected['vehicle_count'] = value['vehicle_count']
     if value != expected:
         raise ValueError('Unsupported or stale patrol source; review its explicit policy and fleet pin')
     model.resolve_pin(value['sources']['fleet'])
@@ -68,6 +70,7 @@ def build_page(source, profile, args, output, *, progressive_output=None):
         'live': {'state_url': '/api/state', 'jobs_url': '/api/jobs',
             'control_url': '/api/control', 'poll_interval_ms':
                 round(1000 / source['camera_presentation']['selected_rate_hz']),
+            'vehicle_count': len(model.active_vehicle_ids(source, profile)),
             'targets': source['missions']['targets']},
         'presentation': {'atrium_monitors': True, 'start_stop': 'camera-wall',
                          'autoplay': True, 'follow': False},
@@ -86,6 +89,7 @@ def build_page(source, profile, args, output, *, progressive_output=None):
     native.verify_pins(pins)
     result = {'format': 'solidcraftbot.building-fleet-patrol-build/1',
         'passed': True, 'source_files_sha256': pins,
+        'vehicle_count': len(model.active_vehicle_ids(source, profile)),
         'html_sha256': model.digest(output / 'index.html'),
         'qualification': profile['qualification'],
         'scope': 'Active local empty-vehicle experiment; no completed fleet or load qualification'}
@@ -311,7 +315,8 @@ def main(argv=None):
         'building_fleet_runner.py', 'building_fleet_missions.py',
         'building_fleet_resources.py', 'building_fleet_geometry_checks.py',
         'building_fleet_control.py', 'building_fleet_motion.py',
-        'building_fleet_comm.py', 'building_fleet_sim.py', 'building_fleet_services.py')
+        'building_fleet_comm.py', 'building_fleet_sim.py', 'building_fleet_services.py',
+        'building_fleet_runtime_cache.py')
     pins = {**model.source_pins(source), **model.protected_pins(),
         str(PROFILE.relative_to(model.ROOT)): model.digest(PROFILE),
         **{'scripts/' + name: model.digest(model.ROOT / 'scripts' / name)

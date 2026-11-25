@@ -237,6 +237,14 @@ class PatrolWorldRunner(WorldRunner):
             raise ValueError('Explicit continuous empty-patrol profile required')
         self.profile = copy.deepcopy(profile)
         self.variable_corner_speed = profile['patrol'].get('corner_timing') == 'variable_progress'
+        from building_fleet_runtime_cache import bind_active_fleet
+        prepared = {'nav': nav, 'graph': graph, 'catalog': catalog, 'planner': planner}
+        if 'geometry_checker' in kwargs:
+            prepared['geometry_checks'] = kwargs['geometry_checker']
+        active = bind_active_fleet(prepared, source, profile)
+        if 'geometry_checks' in active:
+            kwargs['geometry_checker'] = active['geometry_checks']
+        nav, graph, catalog, planner = (active[key] for key in ('nav', 'graph', 'catalog', 'planner'))
         super().__init__(source, nav, graph, catalog, planner, **kwargs)
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex
@@ -645,6 +653,7 @@ class PatrolWorldRunner(WorldRunner):
     def snapshot(self):
         """Bounded presentation state; no prediction or full-run qualification."""
         return {'format': SNAPSHOT_FORMAT, 'session_id': self.session_id,
+                'vehicle_count': len(self.vehicles),
                 'model_time_s': self.now, 'paused': self.paused,
                 'startup_ready': self._startup_ready,
                 'startup_phase': ('active' if self._startup_ready else 'independent_vehicle_startup'

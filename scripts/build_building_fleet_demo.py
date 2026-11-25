@@ -206,7 +206,7 @@ def opt_in_html(normal,payload=None):
     if normal.count(ANCHOR)!=1:raise ValueError('Current normal viewer bridge anchor changed')
     text=normal.replace(ANCHOR,BRIDGE+ANCHOR)
     replacements={
-      '<a class="quiet-button" id="walkthrough-fleet-link" href="bf01/">20-Transporter-Demo · BF01</a>':'<a class="quiet-button" id="walkthrough-fleet-link" href="../">Gebäuderundgang</a>',
+      '<a class="quiet-button" id="walkthrough-fleet-link" href="bf01/">Transporter-Demo · BF01</a>':'<a class="quiet-button" id="walkthrough-fleet-link" href="../">Gebäuderundgang</a>',
       '    function command(id,name){':'    function command(id,name){\n      if(fleetActive&&(id===elevatorConfig?.object_id||objectStates.get(id)?.config.mechanism===\'lift_door\'))return fleetBusy();',
       '    function robotCommand(id,name){':'    function robotCommand(id,name){\n      if(fleetActive)return fleetBusy();',
       '    function move(seconds){':'    function move(seconds){\n      if(fleetHooks?.following)return;',

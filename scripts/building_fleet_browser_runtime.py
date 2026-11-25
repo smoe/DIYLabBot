@@ -373,10 +373,12 @@ def boot_planner(config_json, progress_callback=None):
             progress_callback(_json(row))
     prepared = restore(paths['static_runtime_cache'], source, progress=progress, initial_level=source['depot']['level'],
                        **_static_verification())
+    from building_fleet_runtime_cache import bind_active_fleet
+    prepared = bind_active_fleet(prepared, source, profile)
     _planner_context = {**prepared, 'source': source,
         'variable_corner_speed': 'corner_timing' in profile['patrol'],
         'source_binding': hashlib.sha256(_json(config).encode()).hexdigest()}
-    return _json({'status': 'ready'})
+    return _json({'status': 'ready', 'vehicle_count': len(prepared['nav'].homes)})
 
 
 def prepare_job(request_json, progress_callback=None):
@@ -385,6 +387,8 @@ def prepare_job(request_json, progress_callback=None):
     request = _decode(request_json)
     if request.get('source_binding') != _planner_context['source_binding']:
         raise ValueError('Preparation request belongs to different runtime sources')
+    if request.get('vehicle_id') not in _planner_context['nav'].homes:
+        raise ValueError('Preparation request belongs to an inactive vehicle')
     from building_fleet_background import prepare_route
     def phase_complete(name, wall_s):
         progress_callback(_json({'phase': 'planner_job_phase', 'kind': request['kind'],

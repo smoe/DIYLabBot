@@ -1,5 +1,5 @@
 // Measure a fresh live browser session. Serve the exact bundle with an untouched worker.
-// Usage: node check_building_fleet_live_continuity.cjs <build-dir> <new-report.json> <playwright> <chrome> [wall-seconds] [first-continuation|verified-extensions|verified-goal|concurrent-departures]
+// Usage: node check_building_fleet_live_continuity.cjs <build-dir> <new-report.json> <playwright> <chrome> [wall-seconds] [first-continuation|verified-extensions|verified-goal|concurrent-departures] [expected-vehicle-count]
 'use strict';
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -236,7 +236,7 @@ function summarize(audit) {
 }
 
 async function run() {
-    const [directory, reportPath, playwright, chrome, duration = '50', finish] = process.argv.slice(2);
+    const [directory, reportPath, playwright, chrome, duration = '50', finish, requestedCount] = process.argv.slice(2);
     const root = path.resolve(directory), output = path.resolve(reportPath), seconds = Number(duration);
     assert(seconds > 0 && Number.isFinite(seconds));
     const checkIntervals = finish === 'verified-extensions' || finish === 'verified-goal';
@@ -252,6 +252,10 @@ async function run() {
     const manifest = JSON.parse(fs.readFileSync(path.join(root,'runtime-manifest.json')));
     assert.equal(digest(fs.readFileSync(path.join(root,'runtime-manifest.json'))),build.runtime_manifest.sha256);
     assert.equal(manifest.archive.sha256,build.files['runtime.zip'].sha256);
+    const expectedCount = manifest.vehicle_count ?? 20;
+    assert([6,20].includes(expectedCount));
+    if(requestedCount!==undefined)assert.equal(expectedCount,Number(requestedCount));
+    const expectedIds = Array.from({length:expectedCount},(_,i)=>'BF'+String(i+1).padStart(2,'0'));
     const mime = {'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.json':'application/json',
         '.wasm':'application/wasm','.zip':'application/zip','.gz':'application/gzip'};
     const server = http.createServer((req, res) => {
@@ -330,12 +334,19 @@ async function run() {
                 const f = window.__buildingFleet, s = f.snapshot;
                 return {host:s.execution_host, fallback:s.recording_fallback, vehicles:f.instance_count,
                     cameras:s.camera_frames.length, rendered:f.renderer_stats.last_instance_count, session:s.session_id,
+                    declared_count:s.vehicle_count ?? 20, vehicle_ids:s.states.map(row=>row.id).sort(),
+                    camera_ids:s.camera_frames.map(row=>row.vehicle_id).sort(),
+                    monitor_camera_ids:window.__buildingWalkthrough.monitorWall.slots.map(slot=>slot.camera_id),
                     sources_match: Object.keys(s.source_files_sha256).length === Object.keys(pins).length &&
                         Object.entries(pins).every(([name,ref]) => s.source_files_sha256[name] === ref.sha256)};
             },manifest.files);
             assert.equal(receipt.latest.sources_match,true);
             assert.equal(receipt.latest.host,'browser_wasm_worker'); assert.equal(receipt.latest.fallback,false);
-            assert.equal(receipt.latest.vehicles,20); assert.equal(receipt.latest.rendered,20); assert.equal(receipt.latest.cameras,20);
+            assert.equal(receipt.latest.vehicles,expectedCount); assert.equal(receipt.latest.rendered,expectedCount);
+            assert.equal(receipt.latest.cameras,expectedCount); assert.equal(receipt.latest.declared_count,expectedCount);
+            assert.deepEqual(receipt.latest.vehicle_ids,expectedIds); assert.deepEqual(receipt.latest.camera_ids,expectedIds);
+            assert.deepEqual(receipt.latest.monitor_camera_ids,[
+                ...expectedIds.map(id=>'BF01.'+id+'.Overview'),...Array(20-expectedCount).fill(null)]);
             receipt.summary = summarize(audit);
             // Cut all comparison runs at identical wall time; the long gate run may continue independently.
             const frames = audit.frames.filter(frame => frame.wall <= 55);
@@ -346,7 +357,7 @@ async function run() {
             assert(receipt.summary.first_motion && receipt.summary.classified_frame_intervals);
             if (checkConcurrency) {
                 assert(audit.snapshots[0].model===0, 'Need observed initial home positions');
-                assert.equal(home?.size,20);
+                assert.equal(home?.size,expectedCount);
                 const witness = audit.snapshots.map(s => concurrentDeparture(s,home)).find(Boolean);
                 receipt.concurrent_departures = witness;
                 verifyConcurrentDeparture(witness);

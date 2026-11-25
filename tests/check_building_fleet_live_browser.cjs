@@ -7,23 +7,28 @@ const extract=(html,id)=>JSON.parse(html.match(new RegExp('<script id="'+id+'" t
 const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
 (async()=>{
  const target=path.resolve(process.argv[2]),recorded=extract(fs.readFileSync(process.argv[3],'utf8'),'building-fleet-data');
- const program=JSON.parse(zlib.gunzipSync(Buffer.from(recorded.program_gzip_base64,'base64'))),models=view.trajectories(program);
+ const program=JSON.parse(zlib.gunzipSync(Buffer.from(recorded.program_gzip_base64,'base64')));
  let html=fs.readFileSync(target,'utf8');
  for(const [prefix,file]of [['/* BF01 compiled-program playback.','building_fleet_view.js'],['/* Active local BF01 presentation.','building_fleet_live_view.js'],['/* Local synthetic views and optional received','camera_monitor_wall.js']]){
   const start=html.indexOf(prefix),tail="})(typeof globalThis!=='undefined'?globalThis:this);",end=file==='camera_monitor_wall.js'?html.indexOf(tail,start)+tail.length:html.indexOf('</script>',start);assert(start>0&&end>start);html=html.slice(0,start)+fs.readFileSync(path.resolve(__dirname,'../scripts',file),'utf8').replaceAll('</script','<\\/script')+html.slice(end);
  }
  const payload=extract(html,'building-fleet-data'),normal=extract(html,'walkthrough-data');
  assert(payload.live&&payload.presentation.atrium_monitors);
- const captures=Object.values(view.controlRoom(program.received_messages,60).vehicles).filter(v=>v.perception).map(row=>row.perception);
+ const count=payload.live.vehicle_count??20;
+ assert([6,20].includes(count));
+ const ids=new Set(Array.from({length:count},(_,i)=>'BF'+String(i+1).padStart(2,'0')));
+ const trajectories=program.trajectories.filter(row=>ids.has(row.vehicle_id));
+ const models=view.trajectories({...program,trajectories});
+ const captures=Object.entries(view.controlRoom(program.received_messages,60).vehicles).filter(([id,v])=>ids.has(id)&&v.perception).map(([,v])=>v.perception);
  const at=t=>{const lift=view.liftAt(program,t);return{lift,states:models.map(model=>model.at(t,lift))};};
  const curves=new WeakMap();function pva(episode,time_s){if(!curves.has(episode))curves.set(episode,new Curve(episode.points,['pose_mm_rad','velocity_mm_rad_s','acceleration_mm_rad_s2']));const v=curves.get(episode).at(time_s);return{time_s,pose_mm_rad:v.p,velocity_mm_rad_s:v.v,acceleration_mm_rad_s2:v.a};}
  // The fixture restricts already recorded quintics using exact boundary PVA;
  // intermediate original knots stay present. Production supplies executed knots.
- function executedWindow(end){const start=Math.max(0,end-1);return{start_s:start,end_s:end,levels:program.levels,lift_initial_state:view.liftAt(program,start),lift_schedule:program.lift_schedule.filter(r=>r.start_s<end&&r.end_s>start).map(r=>({...r,...(r.kind==='doors'?{from_values:view.liftAt(program,r.start_s).door_values}:{})})),trajectories:program.trajectories.map(row=>({vehicle_id:row.vehicle_id,episodes:row.episodes.filter(e=>e.start_s<end&&e.end_s>start).map(e=>{const left=Math.max(start,e.start_s),right=Math.min(end,e.end_s),points=[pva(e,left),...e.points.filter(p=>p.time_s>left&&p.time_s<right),pva(e,right)];return{...e,start_s:left,end_s:right,points};})}))};}
+ function executedWindow(end){const start=Math.max(0,end-1);return{start_s:start,end_s:end,levels:program.levels,lift_initial_state:view.liftAt(program,start),lift_schedule:program.lift_schedule.filter(r=>r.start_s<end&&r.end_s>start).map(r=>({...r,...(r.kind==='doors'?{from_values:view.liftAt(program,r.start_s).door_values}:{})})),trajectories:trajectories.map(row=>({vehicle_id:row.vehicle_id,episodes:row.episodes.filter(e=>e.start_s<end&&e.end_s>start).map(e=>{const left=Math.max(start,e.start_s),right=Math.min(end,e.end_s),points=[pva(e,left),...e.points.filter(p=>p.time_s>left&&p.time_s<right),pva(e,right)];return{...e,start_s:left,end_s:right,points};})}))};}
  const cameraFrames=captures.map(p=>{const c=program.camera_captures[p.camera_ref],m=program.received_messages.find(m=>m.kind==='perception'&&m.payload.camera_ref===p.camera_ref);return{...c,vehicle_id:m.vehicle_id,camera_ref:p.camera_ref,received_s:m.received_s,...at(c.captured_s)};});
- assert.equal(cameraFrames.length,20);
+ assert.equal(cameraFrames.length,count);
  let time=60,paused=false,online=true,initializing=true,awaitingDeparture=true,startupError=false,failFirstJob=true;const jobs=new Map(),requests=[],controls=[];
- function state(){if(!paused)time=Math.round((time+.05)*1000)/1000;return{format:'solidcraftbot.building-fleet-live-snapshot/1',session_id:'controlled-browser-fixture',model_time_s:time,paused,...at(time),executed_window:executedWindow(time),targets:program.targets,jobs:[...jobs.values()],coverage:program.targets.map(t=>({...t,visits:0,last_visit_s:null})),camera_frames:cameraFrames,room_route_object_ids:program.room_route_object_ids,command_errors:[]};}
+ function state(){if(!paused)time=Math.round((time+.05)*1000)/1000;return{format:'solidcraftbot.building-fleet-live-snapshot/1',session_id:'controlled-browser-fixture',model_time_s:time,paused,vehicle_count:count,...at(time),executed_window:executedWindow(time),targets:program.targets,jobs:[...jobs.values()],coverage:program.targets.map(t=>({...t,visits:0,last_visit_s:null})),camera_frames:cameraFrames,room_route_object_ids:program.room_route_object_ids,command_errors:[]};}
  const server=http.createServer(async(req,res)=>{
   if(req.url==='/'){res.writeHead(200,{'Content-Type':'text/html'});res.end(html);return;}
   let body='';for await(const chunk of req)body+=chunk;
@@ -67,13 +72,19 @@ const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
   paused=false;awaitingDeparture=false;
   await progress.waitFor({state:'hidden'});
   report.startup_bar_until_observed_departure=true;
-  assert(await page.locator('#walkthrough-error').isHidden());assert.equal(await page.evaluate(()=>window.__buildingFleet.live),true);assert.equal(await page.evaluate(()=>window.__buildingFleet.instance_count),20);
+  assert(await page.locator('#walkthrough-error').isHidden());assert.equal(await page.evaluate(()=>window.__buildingFleet.live),true);assert.equal(await page.evaluate(()=>window.__buildingFleet.instance_count),count);
   const interpolated=await page.evaluate(()=>({time:window.__buildingFleet.display_time_s,states:window.__buildingFleet.states,window:window.__buildingFleet.snapshot.executed_window}));assert(interpolated.time>=interpolated.window.start_s&&interpolated.time<=interpolated.window.end_s);const expected=at(interpolated.time).states;interpolated.states.forEach((s,i)=>s.pose_xyz_mm.forEach((v,k)=>assert(Math.abs(v-expected[i].pose_xyz_mm[k])<1e-6)));report.executed_pva_interpolation_matches_recorded_source=true;
   assert.equal(await page.evaluate(()=>window.__buildingWalkthrough.monitorWall.source_kind),'received_fleet_live');
   await page.evaluate(()=>window.__buildingFleet.pause());await page.waitForFunction(()=>window.__buildingFleet.snapshot.paused);
   const observed=await page.evaluate(()=>window.__buildingFleet.time_s);await page.waitForTimeout(350);assert.equal(await page.evaluate(()=>window.__buildingFleet.time_s),observed);assert(controls.includes('pause'));report.pause_observed_without_extrapolation=true;
-  const captureResults=await page.evaluate(()=>Array.from({length:20},(_,i)=>window.__buildingWalkthrough.captureMonitor(i)));assert(captureResults.every(r=>r.status==='captured'));
-  const wall=await page.evaluate(()=>window.__buildingWalkthrough.monitorWall);assert(wall.slots.every(s=>s.frame&&s.frame.received_s<=wall.model_time_s&&s.pixel_alpha_min===255));assert.equal(new Set(wall.slots.map(s=>s.frame.vehicle_id)).size,20);report.twenty_received_camera_sources=true;
+  const captureResults=await page.evaluate(n=>Array.from({length:n},(_,i)=>window.__buildingWalkthrough.captureMonitor(i)),count);assert(captureResults.every(r=>r.status==='captured'));
+  const wall=await page.evaluate(()=>window.__buildingWalkthrough.monitorWall);
+  assert.equal(wall.slots.length,20);
+  const attached=wall.slots.slice(0,count);
+  assert(attached.every(s=>s.frame&&s.frame.received_s<=wall.model_time_s&&s.pixel_alpha_min===255));
+  assert.deepEqual(new Set(attached.map(s=>s.frame.vehicle_id)),ids);
+  assert(wall.slots.slice(count).every(s=>s.camera_id===null&&s.frame===null));
+  report.received_camera_sources=count;
   await page.locator('[data-bf=submit]').click();await page.waitForFunction(()=>/Bestätigung fehlt/.test(document.querySelector('[data-bf=request-status]').textContent));
   await page.locator('[data-bf=submit]').click();await page.waitForFunction(()=>/bestätigt/.test(document.querySelector('[data-bf=request-status]').textContent));
   assert.equal(requests.length,2);assert.equal(requests[0].request_id,requests[1].request_id);assert.equal(jobs.size,1);assert(/BF04/.test(await page.locator('[data-bf=jobs]').innerText()));report.idempotent_request_retry=true;report.assignment_visible=true;
@@ -86,7 +97,7 @@ const sha=value=>crypto.createHash('sha256').update(value).digest('hex');
   await page.waitForFunction(id=>window.__buildingWalkthrough.objects.find(o=>o.id===id)?.state==='open',door,{timeout:30000});await page.waitForTimeout(450);assert.equal(paused,true,'Manual pause survives opening a route door');report.route_door_controls_engine_and_respects_manual_pause=true;
   online=false;await page.waitForFunction(()=>!window.__buildingFleet.connected);const held=await page.evaluate(()=>window.__buildingFleet.time_s);await page.waitForTimeout(350);assert.equal(await page.evaluate(()=>window.__buildingFleet.time_s),held);report.disconnect_freezes_last_observation=true;
   online=true;await page.waitForFunction(()=>window.__buildingFleet.connected);assert(await page.locator('#walkthrough-error').isHidden());assert.deepEqual(errors,[]);
-  report.renderer_stats=await page.evaluate(()=>window.__buildingFleet.renderer_stats);assert.equal(report.renderer_stats.last_instance_count,20);
+  report.renderer_stats=await page.evaluate(()=>window.__buildingFleet.renderer_stats);assert.equal(report.renderer_stats.last_instance_count,count);
   await page.locator('button[data-stop="camera-wall"]').click();await page.screenshot({path:path.join(path.dirname(target),'live-view-fixture-desktop.png'),fullPage:true});report.errors=errors;report.passed=true;
  }catch(error){report.failure={name:error.name,message:error.message};report.errors=errors;report.page_text=await page.locator('body').innerText().catch(()=>null);await page.screenshot({path:path.join(path.dirname(target),'live-view-fixture-failure.png'),fullPage:true}).catch(()=>{});throw error;}
  finally{fs.writeFileSync(path.join(path.dirname(target),'live-view-fixture-browser-check.json'),JSON.stringify(report,null,2)+'\n');await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}

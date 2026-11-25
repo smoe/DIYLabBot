@@ -367,6 +367,46 @@ def _restore_catalog(data,nav):
     return c
 
 
+def bind_active_fleet(prepared, source, profile):
+    """Bind fresh live state to a subset of the unchanged static home map.
+
+    The cache still describes every reference route and all twenty available
+    home placements. Only selected homes count as occupied in the world,
+    conditional home maps and isolated own-route preparation proofs.
+    """
+    identities = model.active_vehicle_ids(source, profile)
+    nav, planner = prepared['nav'], prepared['planner']
+    expected = set(model.active_vehicle_ids(source))
+    _require(nav.config == source and set(nav.homes) == expected,
+             'The active fleet needs the complete source-matched reference home map')
+    if len(identities) == len(expected):
+        return prepared
+    _require(set(planner.states) == expected and all(
+        not state['queue'] and not state['seen'] and not state['completed']
+        and state['active'] is None and state['terminal'] is None and not state['done']
+        and not state['requested'] and not state['admission_deferred']
+        and state['home_confirmation'] is None for state in planner.states.values()),
+        'Select live occupants before any assignment, observation or execution')
+    active_nav = copy.copy(nav)
+    active_nav.homes = {identity: copy.deepcopy(nav.homes[identity]) for identity in identities}
+    graph = copy.copy(prepared['graph'])
+    graph.navigation = active_nav
+    catalog = copy.copy(prepared['catalog'])
+    catalog.nav = active_nav
+    active_planner = copy.copy(planner)
+    active_planner.nav, active_planner.graph = active_nav, graph
+    active_planner.states = {identity: copy.deepcopy(planner.states[identity]) for identity in identities}
+    if planner.port_paths is not None:
+        active_planner.port_paths = copy.copy(planner.port_paths)
+        active_planner.port_paths.nav = active_nav
+    result = {**prepared, 'nav': active_nav, 'graph': graph,
+              'catalog': catalog, 'planner': active_planner}
+    if 'geometry_checks' in prepared and getattr(prepared['geometry_checks'], 'nav', None) is nav:
+        result['geometry_checks'] = copy.copy(prepared['geometry_checks'])
+        result['geometry_checks'].nav = active_nav
+    return result
+
+
 def restore(report_path,source,*,progress=None,verified_operations=None,initial_level=None,
             verified_files=None,verification_receipt=None):
     """Restore original static classes; initialize no robot, mission or scan."""

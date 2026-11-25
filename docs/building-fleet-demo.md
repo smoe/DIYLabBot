@@ -1,7 +1,7 @@
 # BF01 · synthetische Gebäudeflotte
 
-BF01 ist eine ausdrücklich gewählte, separate Simulation für 20 leere
-TR01-Instanzen `BF01` bis `BF20`. Die bestehende L01-Aufstellung einschließlich
+Die aktive BF01-Simulation verwendet sechs leere TR01-Instanzen `BF01` bis
+`BF06`. Die bestehende L01-Aufstellung einschließlich
 ihres statischen TR01 und ihrer Bewegungsnachweise bleibt unverändert.
 Es gibt keine Probenübergabe, Materialbuchung, T1/T2/T3-Bindung, ROS-,
 Gerätenetzwerk- oder Hardwareausführung. Ein normaler Rundgang aktiviert keine Flotte.
@@ -12,7 +12,7 @@ die frühere zeitlich begrenzte Teilvorschau bleibt ein historischer Prüfstand.
 
 `model/building-fleet-browser.shared.json` beschreibt den zusätzlichen
 Browseradapter. Jede geöffnete Seite startet eine **neue, unabhängige aktive
-Sitzung** mit 20 leeren Fahrzeugen. Es wird keine frühere Fahrt abgespielt;
+Sitzung** mit sechs leeren Fahrzeugen. Es wird keine frühere Fahrt abgespielt;
 ein Rückfall auf die alte Aufzeichnung ist ausgeschlossen. Die laufende
 Patrouille und neue Testaufträge werden in dieser Sitzung berechnet. Das
 Schließen der Seite beendet sie; eine neue Seite übernimmt weder Aufträge
@@ -51,9 +51,10 @@ Paket. Die statischen Daten beschreiben Wege und Körper, keine ausgeführte
 Mission. Download-, Quellen- oder Rechenfehler bleiben sichtbar, statt eine
 gespeicherte Fahrt als aktive Simulation auszugeben.
 
-Die 20 vorhandenen Atrium-Monitore erhalten jeweils die tatsächlich im
-synthetischen Funkmodell empfangene Kamerareferenz ihres Fahrzeugs samt
-ursprünglicher Aufnahmezeit, Aufnahmepose und damaliger gemeinsamer Szene.
+Die sechs aktiven Transporter belegen standardmäßig die Atrium-Monitore
+M01 bis M06. Die übrigen 14 Monitore bleiben als Anzeigeflächen verfügbar.
+Jeder Fahrzeugfeed zeigt die tatsächlich im synthetischen Funkmodell empfangene
+Kamerareferenz samt Aufnahmezeit, Aufnahmepose und damaliger gemeinsamer Szene.
 Es handelt sich um lokal gerenderte Modellansichten. Die Hauptansicht zeigt
 ausschließlich bereits ausgeführtes PVA, mit begrenztem Darstellungsverzug
 und ohne Vorhersage über das berechnete Ende hinaus. Ein Testauftrag und die
@@ -65,6 +66,20 @@ erfolgreicher Paketaufbau ist noch keine Prüfung des öffentlichen Deployments,
 der vollständigen Zielabdeckung oder einer realen Schutzfunktion. Die
 separaten Browser- und Veröffentlichungsberichte binden jeweils die konkret
 geprüften Bytes. Der normale manuelle Rundgang bleibt ohne aktive Flotte.
+
+### Rechenlast mit sechs Fahrzeugen
+
+Ein lokaler Vergleich mit Seed `20261120` verwendete identische statische
+Geometrie und dieselbe Laufzeit für beide Flottengrößen. Über 8,4 s Modellzeit
+sank die Zahl der Fahrzeugscans von 1.680 auf 504. Die Scan-CPU-Zeit sank von
+10,06 auf 4,77 s und die CPU-Zeit der gesamten Simulationsschritte von 33,90
+auf 28,39 s. Die getrennt gemessene CPU-Zeit der Routenplanung sank von
+13,02 auf 10,63 s. In je einem frischen Chrome-Lauf erreichte die Simulation
+nach 55 s Wandzeit 3,6 Modellsekunden mit 20 und 4,8 Modellsekunden mit sechs
+Fahrzeugen. Die erste sichtbare Fahrt begann nach 19,3 beziehungsweise 14,4 s.
+Der Browserlauf mit sechs Fahrzeugen bestätigte zwei gleichzeitige Abfahrten
+mit getrennten Bremsnachweisen und genau sechs Fahrzeugfeeds. Die Messungen
+beschreiben die Startphase dieser lokalen Läufe.
 
 ### Fahrtempo in Kurven
 
@@ -500,21 +515,24 @@ Flottenlauf.
 
 `model/building-fleet-patrol.shared.json` ergänzt einen ausdrücklich gewählten
 aktiven Testmodus. Die Browserfassung und der optionale lokale Python-Dienst
-sind getrennte Laufzeitadapter für denselben Motor. Ihre 20 leeren
-Fahrzeuge verwenden dieselben Modellquellen, Fahrgrenzen, anonymen Scans,
+sind getrennte Laufzeitadapter für denselben Motor. Das Patrouillenprofil
+setzt `vehicle_count` auf sechs. Beide Adapter verwenden dieselben
+Modellquellen, Fahrgrenzen, anonymen Scans,
 50-ms-Weiterfahr-/Bremsnachweise, Bodenprüfungen und Aufzugdienste.
-Die bestehenden BF01-, TR01- und L01-Quellen werden nicht überschrieben.
+Die sechs Fahrzeugkennungen nutzen die vorhandenen geprüften Heimplätze.
+Die übrigen Plätze sind frei von simulierten Fahrzeugen. Ältere aktive Profile
+ohne `vehicle_count` starten die gesamte ursprüngliche Flotte.
 
 Die Patrouille endet nicht nach der ersten Zielabdeckung. Erlaubte Ziele
 werden pro Fahrzeug erst vergeben, nachdem dessen erste synthetische
 Kameraaufnahme tatsächlich empfangen wurde. Andere Fahrzeuge müssen dafür
 noch keine Aufnahme geliefert haben; der Gesamtstatus meldet weiterhin,
-ob alle 20 Erstaufnahmen eingegangen sind. Die erste Wahrnehmungsmeldung
+ob die Erstaufnahmen aller aktiven Fahrzeuge eingegangen sind. Die erste Wahrnehmungsmeldung
 entsteht unmittelbar nach dem tatsächlichen Empfang des ersten verzögerten
 Scans; danach bleibt der bestehende Meldetakt erhalten. Sensor- und
 Funklatenzen, frische Scans und Weiterfahr-/Bremsnachweise bleiben verbindlich.
 Das ältere Profil `first_received_camera_frames` behält seine gemeinsame
-Startfreigabe nach allen 20 empfangenen Erstaufnahmen. Danach werden die Ziele
+Startfreigabe nach allen empfangenen Erstaufnahmen der aktiven Flotte. Danach werden die Ziele
 nach dem ältesten **empfangenen** Besuch ausgewählt; bei gleicher
 Besuchszeit zählen ausstehende Aufträge und die bestehende Seed-Auswahl.
 Geplante Ankünfte setzen das Besuchsalter nicht zurück. Das sind die 19
