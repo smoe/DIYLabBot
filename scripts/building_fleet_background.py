@@ -539,6 +539,8 @@ class BackgroundPreparation:
             anchor=result.get('anchor')
             proof=result.get('proof',{})
             if (anchor!=request['anchor'] or not isinstance(proof,dict) or proof.get('passed')is not True
+                    or ('horizon_mm' in request and (type(proof.get('join_progress_mm')) not in (int,float)
+                        or not anchor['progress_mm']<proof['join_progress_mm']<=request['horizon_mm']+1e-5))
                     or proof.get('suffix_program_sha256')!=request['program_sha256']
                     or proof.get('anchor')!=anchor or not _passed_receipt(proof.get('receipt'),'geometry')
                     or ('rolling_horizon_mm' in request and request['action']['level']==self.engine.source['depot']['level']
@@ -558,10 +560,11 @@ class BackgroundPreparation:
             interval=self.intervals.get(identity)
             horizon=interval['horizon_mm'] if interval else driver.goal
             pending=self.continuations.get(identity)
-            if pending is not None:
-                if pending.get('request_id')in self.jobs:continue
+            if pending is not None and pending['request_id'] in self.jobs:continue
+            if pending is not None and e.now>=pending['anchor']['time_s']-1e-8:
                 anchor=pending['anchor']
-                if e.now<anchor['time_s']-1e-8:continue
+                # The connector was checked inside its requested horizon. Only
+                # adjoining intervals on that same nominal enlarge the usable suffix.
                 current_request={**original,'fence':pending['fence']}
                 if self._current(current_request)and driver.commit_continuation(pending['clock'],result['program']['scalar_clock'],anchor,pending['proof'],
                         horizon_mm=horizon if rolling else None,
@@ -572,7 +575,7 @@ class BackgroundPreparation:
                 if not driver.awaiting_continuation:
                     self.full.pop(identity,None);self.pending_by_vehicle.pop(identity,None);continue
             if any(job['vehicle_id']==identity for job in self.jobs.values()):continue
-            anchor=driver.continuation_anchor()
+            anchor=None if identity in self.continuations else driver.continuation_anchor()
             if anchor is not None and horizon>=driver.certified_horizon_mm and anchor['progress_mm']<horizon-1e-5:
                 signature=(horizon,anchor['progress_mm'],anchor['velocity_mm_s'],anchor['acceleration_mm_s2'])
                 if self.attempted_anchors.get(identity)!=signature:

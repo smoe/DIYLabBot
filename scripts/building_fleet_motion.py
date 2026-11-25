@@ -412,8 +412,8 @@ def _corner_clock(path, offset, length, constant_speed, zone_cap, linear, angula
     """Propose a clock whose elapsed time follows both progress and heading.
 
     For a monotone-heading blend use t(s) = s/v + signed_delta_yaw(s)/omega.
-    Its inverse gives positive scalar speed, with zero scalar acceleration
-    at the straight joins. Sampled jets select a proposal only. The full
+    Its inverse gives positive scalar speed. The fit sets scalar acceleration
+    to zero at both straight joins. Sampled jets select a proposal only. The full
     quantized scalar and Cartesian polynomials must still pass compile_motion.
     """
     count = max(32, math.ceil(length / 15))

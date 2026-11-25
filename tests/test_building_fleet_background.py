@@ -268,34 +268,153 @@ class FenceTests(unittest.TestCase):
         self.assertEqual(preparation_digest(value),preparation_digest(preserved))
         self.assertNotEqual(preparation_digest(value),preparation_digest({'zero':0,'negative_zero':0,'integer':0}))
 
-    def interval_case(self):
+    def interval_manager(self, count=1):
         e=self.engine()
-        row=e.vehicles['BF01']
+        template=e.vehicles['BF01']
         grants={'waiting_place':{'status':'none'},'lift':{'status':'none'}}
-        row.update(action={'level':'EG'},action_context=copy.deepcopy(grants),leg_id=4)
         e.own_grants=lambda identity:copy.deepcopy(grants)
-        e.geometry_context=lambda identity,phase:{'vehicle_id':identity,'phase':phase,'time_s':0.,
-                                                   'own_grants_at_start':copy.deepcopy(row['action_context'])}
+        e.geometry_context=lambda identity,phase:{'vehicle_id':identity,'phase':phase,'time_s':e.now,
+                                                   'own_grants_at_start':copy.deepcopy(grants)}
         e.source={'depot':{'level':'EG'}}
         e.geometry_checks=[];e.depot_checks=[]
-        driver=object.__new__(RollingController)
-        driver.goal=300.;driver.certified_horizon_mm=100.;driver.joined_nominal=True
-        driver.awaiting_continuation=True;driver.mode='waiting';row['driver']=driver
         manager=background.BackgroundPreparation(e,'a'*64)
-        full=manager._request('BF01',row['action'],[],'full_route',rolling_horizon_mm=50.)
-        manager.drain();manager.jobs.clear()
-        program={'scalar_clock':[{F[0]:[s]} for s in (0.,100.,200.,300.)]}
+        program={'scalar_clock':[background.local.point(t,100.*t,100. if t<3 else 0.,0.) for t in range(4)]}
         nominal={'program':program,'program_sha256':preparation_digest(program)}
-        manager.full['BF01']=(full,nominal)
-        manager.intervals['BF01']={'end_knot':1,'horizon_mm':100.}
+        for index in range(1,count+1):
+            vehicle=f'BF{index:02d}'
+            row=copy.deepcopy(template)
+            row.update(action={'level':'EG'},action_context=copy.deepcopy(grants),leg_id=index)
+            e.vehicles[vehicle]=row
+            driver=object.__new__(RollingController)
+            driver.goal=300.;driver.certified_horizon_mm=100.;driver.joined_nominal=True
+            driver.awaiting_continuation=True;driver.mode='waiting';row['driver']=driver
+            full=manager._request(vehicle,row['action'],[],'full_route',rolling_horizon_mm=50.)
+            manager.jobs.pop(full['request_id'])
+            manager.full[vehicle]=(full,nominal)
+            manager.intervals[vehicle]={'end_knot':1,'horizon_mm':100.}
+        manager.drain()
+        return manager
+
+    def interval_receipt(self, request):
+        first=request['start_knot']
+        interval={'start_knot':first,'end_knot':first+1,'start_mm':100.*first,'end_mm':100.*(first+1),
+                  'program_sha256':request['program_sha256']}
+        receipt={'interval_sha256':background._interval_binding(request,interval),
+                 'geometry':{'passed':True},'fixed_home':{'passed':True}}
+        return interval,receipt
+
+    def interval_case(self):
+        manager=self.interval_manager()
+        full,nominal=manager.full['BF01']
         request=manager._followup(full,'route_interval',start_knot=1,
                                   program_sha256=nominal['program_sha256'],brake_headroom_mm=50.)
         manager.drain()
-        interval={'start_knot':1,'end_knot':2,'start_mm':100.,'end_mm':200.,
-                  'program_sha256':nominal['program_sha256']}
-        receipt={'interval_sha256':background._interval_binding(request,interval),
-                 'geometry':{'passed':True},'fixed_home':{'passed':True}}
-        return manager,request,interval,receipt,driver
+        return manager,request,*self.interval_receipt(request),manager.engine.vehicles['BF01']['driver']
+
+    def connector_receipt(self, manager, vehicle):
+        driver=manager.engine.vehicles[vehicle]['driver']
+        driver.joined_nominal=False;driver.certified_horizon_mm=50.
+        driver.mode='driving';driver.y=0.;driver._fallback=None
+        driver._rest_connector=None;driver.plan=None;driver.profile_checks=[]
+        anchor={'time_s':1.,'progress_mm':50.,'velocity_mm_s':100.,'acceleration_mm_s2':0.}
+        full,nominal=manager.full[vehicle]
+        request=manager._followup(full,'continuation',anchor=anchor,horizon_mm=100.,
+                                  program_sha256=nominal['program_sha256'])
+        manager.continuations[vehicle]={'request_id':request['request_id']}
+        proof={'passed':True,'anchor':anchor,'join_progress_mm':100.,'suffix_program_sha256':request['program_sha256'],
+               'receipt':{'geometry':{'passed':True},'fixed_home':{'passed':True}}}
+        clock=[background.local.point(0.,0.,100.,0.)]
+        clock.extend(background.local.point(p['time_s']-.5,p[F[0]][0]-50.,p[F[1]][0],p[F[2]][0])
+                     for p in nominal['program']['scalar_clock'][1:])
+        return background._checked_result(request,anchor=anchor,clock=clock,proof=proof)
+
+    def test_intervals_extend_before_anchor_and_commit_uses_latest_contiguous_horizon(self):
+        manager=self.interval_manager()
+        driver=manager.engine.vehicles['BF01']['driver']
+        result=self.connector_receipt(manager,'BF01')
+        manager.drain()
+        manager.engine.now=.1
+        self.assertTrue(manager.accept(result)['accepted'])
+        for at,expected_end in ((.25,200.),(.5,300.)):
+            manager.engine.now=at;manager.before_tick()
+            request,=manager.drain()
+            self.assertEqual(request['kind'],'route_interval')
+            self.assertEqual(manager.continuations['BF01'],result)
+            interval,receipt=self.interval_receipt(request)
+            section=background._checked_result(request,interval=interval,receipt=receipt)
+            self.assertTrue(manager.accept(section)['accepted'])
+            self.assertEqual(manager.intervals['BF01']['horizon_mm'],expected_end)
+            self.assertEqual(driver.certified_horizon_mm,50.)
+        manager.engine.now=driver.now=1.
+        driver.y,driver.v,driver.a=50.,100.,0.
+        manager.before_tick()
+        self.assertTrue(driver.joined_nominal)
+        self.assertEqual(driver.certified_horizon_mm,300.)
+        self.assertEqual(manager.statistics['continuations'],1)
+        self.assertFalse(manager.accept(section)['accepted'])
+        self.assertEqual(len(manager.engine.geometry_checks),2)
+
+    def test_connector_cannot_claim_a_join_beyond_its_original_request(self):
+        manager=self.interval_manager()
+        result=self.connector_receipt(manager,'BF01')
+        manager.drain()
+        request=manager.jobs[result['request_id']]
+        proof=dict(result['proof'],join_progress_mm=200.)
+        wrong=background._checked_result(request,anchor=result['anchor'],clock=result['clock'],proof=proof)
+        self.assertEqual(manager.accept(wrong)['status'],'invalid_connector')
+        self.assertNotIn('BF01',manager.continuations)
+        self.assertEqual(manager.engine.vehicles['BF01']['driver'].certified_horizon_mm,50.)
+
+    def test_waiting_connector_never_uses_rejected_foreign_or_gapped_interval(self):
+        for change in ('rejected','foreign','gap','new_generation'):
+            with self.subTest(change=change):
+                manager=self.interval_manager()
+                result=self.connector_receipt(manager,'BF01')
+                manager.drain();manager.engine.now=.1
+                self.assertTrue(manager.accept(result)['accepted'])
+                manager.before_tick()
+                request,=manager.drain()
+                interval,receipt=self.interval_receipt(request)
+                valid=background._checked_result(request,interval=interval,receipt=receipt)
+                manager.engine.now=.5
+                if change=='rejected':
+                    wrong=background._checked_result(request,status='interval_rejected',reason='native_obstruction')
+                elif change=='foreign':
+                    wrong={**valid,'source_binding':'b'*64}
+                elif change=='gap':
+                    interval['start_knot']+=1
+                    receipt['interval_sha256']=background._interval_binding(request,interval)
+                    wrong=background._checked_result(request,interval=interval,receipt=receipt)
+                else:
+                    manager.engine.vehicles['BF01']['preparation_generation']+=1
+                    wrong=valid
+                self.assertFalse(manager.accept(wrong)['accepted'])
+                self.assertFalse(manager.accept(valid)['accepted'])
+                if change!='new_generation':
+                    self.assertNotIn('BF01',manager.continuations)
+                    self.assertIn('BF01',manager.snapshot()['failures'])
+                    if change=='rejected':self.assertEqual(manager.failures['BF01'],'native_obstruction')
+                    manager.engine.now=1.;manager.before_tick()
+                    self.assertEqual(manager.drain(),[])
+                self.assertEqual(manager.intervals['BF01']['end_knot'],1)
+                self.assertEqual(manager.engine.vehicles['BF01']['driver'].certified_horizon_mm,50.)
+
+    def test_twenty_waiting_anchors_have_at_most_one_outstanding_job_each(self):
+        manager=self.interval_manager(count=20)
+        responses=[self.connector_receipt(manager,vid) for vid in manager.engine.vehicles]
+        self.assertEqual(len(manager.drain()),20)
+        manager.engine.now=.05;manager.before_tick()
+        self.assertEqual(manager.drain(),[])
+        manager.engine.now=.1
+        for response in responses:self.assertTrue(manager.accept(response)['accepted'])
+        manager.engine.now=.2;manager.before_tick()
+        jobs=manager.drain()
+        self.assertEqual({j['kind'] for j in jobs},{'route_interval'})
+        self.assertEqual({j['vehicle_id'] for j in jobs},set(manager.engine.vehicles))
+        self.assertEqual(len(jobs),20)
+        manager.engine.now=.3;manager.before_tick()
+        self.assertEqual(manager.drain(),[])
+        self.assertEqual(len(manager.jobs),20)
 
     def test_passage_grant_change_accepts_current_section_only_once(self):
         manager,request,interval,receipt,driver=self.interval_case()
