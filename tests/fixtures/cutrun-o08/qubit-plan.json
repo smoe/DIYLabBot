@@ -1,0 +1,43 @@
+{
+  "format": "solidcraftbot.cutrun-o08-synthetic-plan/1",
+  "source_kind": "test_fixture",
+  "run_id": "Test.CutRun.O08",
+  "attempt_id": "Test.CutRun.O08.A01",
+  "plan_id": "Fixture.O08.qubit",
+  "revision": "fixture/1",
+  "method": "fluorometry",
+  "qc_bindings": {
+    "h3k4me3": {
+      "assay_id": "Fixture.QC.h3k4me3",
+      "criteria_ref": "Fixture.Criteria.h3k4me3"
+    },
+    "igg": {
+      "assay_id": "Fixture.QC.igg",
+      "criteria_ref": "Fixture.Criteria.igg"
+    },
+    "input": {
+      "assay_id": "Fixture.QC.input",
+      "criteria_ref": "Fixture.Criteria.input"
+    }
+  },
+  "acquisition": {
+    "instrument_id": "Fixture.qubit",
+    "instrument_run_id": "Fixture.Acquisition.qubit",
+    "container_id": "Fixture.TubeBatch",
+    "software_version": "fixture/1",
+    "assay_id": "Fixture.Assay.qubit",
+    "assay_revision": "Fixture.qubit.1",
+    "calibration_ref": "Fixture.Calibration",
+    "kit_lot": "Fixture.KitLot",
+    "standard_lot": "Fixture.StandardLot",
+    "standard_ids": [
+      "Fixture.Standard.A",
+      "Fixture.Standard.B"
+    ]
+  },
+  "positions": [
+    {"id": "Fixture.Reading.h3k4me3", "role": "h3k4me3", "replicate": 1, "reaction_id": "Fixture.Reaction.h3k4me3", "material_id": "Fixture.Product.h3k4me3", "vessel_id": "Fixture.EluateTube.h3k4me3", "withdrawal_intent_id": "Fixture.Withdrawal.h3k4me3.qubit", "preparation_id": "Fixture.Preparation.h3k4me3.qubit", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1, "assay_ul": 200}},
+    {"id": "Fixture.Reading.igg", "role": "igg", "replicate": 1, "reaction_id": "Fixture.Reaction.igg", "material_id": "Fixture.Product.igg", "vessel_id": "Fixture.EluateTube.igg", "withdrawal_intent_id": "Fixture.Withdrawal.igg.qubit", "preparation_id": "Fixture.Preparation.igg.qubit", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1, "assay_ul": 200}},
+    {"id": "Fixture.Reading.input", "role": "input", "replicate": 1, "reaction_id": "Fixture.Reaction.input", "material_id": "Fixture.Product.input", "vessel_id": "Fixture.EluateTube.input", "withdrawal_intent_id": "Fixture.Withdrawal.input.qubit", "preparation_id": "Fixture.Preparation.input.qubit", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1, "assay_ul": 200}}
+  ]
+}

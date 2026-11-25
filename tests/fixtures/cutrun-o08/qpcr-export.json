@@ -1,0 +1,34 @@
+{
+  "format": "solidcraftbot.cutrun-synthetic-qpcr-export/1",
+  "source_kind": "test_fixture",
+  "plan_sha256": "e351aedf96a3ea63f4d3480dcfe3170d354355c3a10ac1dfd6f26b0427e9aa65",
+  "acquisition": {
+    "instrument_id": "Fixture.qpcr",
+    "instrument_run_id": "Fixture.Acquisition.qpcr",
+    "container_id": "Fixture.Plate",
+    "software_version": "fixture/1",
+    "assay_id": "Fixture.Assay.qpcr",
+    "assay_revision": "Fixture.qpcr.1",
+    "calibration_ref": null,
+    "primer_id": "Fixture.RPL30",
+    "master_mix_lot": "Fixture.MasterMixLot"
+  },
+  "analysis_revision": "fixture/1",
+  "supersedes_sha256": null,
+  "baseline": "fixture automatic",
+  "threshold": 0.5,
+  "rows": [
+    {"id": "D03", "preparation_id": null, "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "Undetermined", "cq_status": "undetermined", "result_status": "not_detected", "melt_status": "not_observed", "amplification_curve": null, "melt_curve": null},
+    {"id": "D02", "preparation_id": null, "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "Undetermined", "cq_status": "undetermined", "result_status": "not_detected", "melt_status": "not_observed", "amplification_curve": null, "melt_curve": null},
+    {"id": "D01", "preparation_id": null, "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "Undetermined", "cq_status": "undetermined", "result_status": "not_detected", "melt_status": "not_observed", "amplification_curve": null, "melt_curve": null},
+    {"id": "C03", "preparation_id": "Fixture.Preparation.input.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "24.3", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "C02", "preparation_id": "Fixture.Preparation.input.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "24.2", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "C01", "preparation_id": "Fixture.Preparation.input.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "24.1", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "B03", "preparation_id": "Fixture.Preparation.igg.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "Undetermined", "cq_status": "undetermined", "result_status": "not_detected", "melt_status": "not_observed", "amplification_curve": null, "melt_curve": null},
+    {"id": "B02", "preparation_id": "Fixture.Preparation.igg.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "Undetermined", "cq_status": "undetermined", "result_status": "not_detected", "melt_status": "not_observed", "amplification_curve": null, "melt_curve": null},
+    {"id": "B01", "preparation_id": "Fixture.Preparation.igg.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "37.1", "cq_status": "determined", "result_status": "below_loq", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "A03", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "20.3", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "A02", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "20.2", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]},
+    {"id": "A01", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "raw_cq": "20.1", "cq_status": "determined", "result_status": "quantified", "melt_status": "target", "amplification_curve": [[1, 0.01], [40, 2.0]], "melt_curve": [[78.5, 1.0], [79, 0.3]]}
+  ]
+}

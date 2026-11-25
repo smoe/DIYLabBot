@@ -1,0 +1,52 @@
+{
+  "format": "solidcraftbot.cutrun-o08-synthetic-plan/1",
+  "source_kind": "test_fixture",
+  "run_id": "Test.CutRun.O08",
+  "attempt_id": "Test.CutRun.O08.A01",
+  "plan_id": "Fixture.O08.qpcr",
+  "revision": "fixture/1",
+  "method": "qpcr",
+  "qc_bindings": {
+    "h3k4me3": {
+      "assay_id": "Fixture.QC.h3k4me3",
+      "criteria_ref": "Fixture.Criteria.h3k4me3"
+    },
+    "igg": {
+      "assay_id": "Fixture.QC.igg",
+      "criteria_ref": "Fixture.Criteria.igg"
+    },
+    "input": {
+      "assay_id": "Fixture.QC.input",
+      "criteria_ref": "Fixture.Criteria.input"
+    },
+    "ntc": {
+      "assay_id": "Fixture.QC.ntc",
+      "criteria_ref": "Fixture.Criteria.ntc"
+    }
+  },
+  "acquisition": {
+    "instrument_id": "Fixture.qpcr",
+    "instrument_run_id": "Fixture.Acquisition.qpcr",
+    "container_id": "Fixture.Plate",
+    "software_version": "fixture/1",
+    "assay_id": "Fixture.Assay.qpcr",
+    "assay_revision": "Fixture.qpcr.1",
+    "calibration_ref": null,
+    "primer_id": "Fixture.RPL30",
+    "master_mix_lot": "Fixture.MasterMixLot"
+  },
+  "positions": [
+    {"id": "A01", "role": "h3k4me3", "replicate": 1, "reaction_id": "Fixture.Reaction.h3k4me3", "material_id": "Fixture.Product.h3k4me3", "vessel_id": "Fixture.EluateTube.h3k4me3", "withdrawal_intent_id": "Fixture.Withdrawal.h3k4me3.qpcr", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "A02", "role": "h3k4me3", "replicate": 2, "reaction_id": "Fixture.Reaction.h3k4me3", "material_id": "Fixture.Product.h3k4me3", "vessel_id": "Fixture.EluateTube.h3k4me3", "withdrawal_intent_id": "Fixture.Withdrawal.h3k4me3.qpcr", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "A03", "role": "h3k4me3", "replicate": 3, "reaction_id": "Fixture.Reaction.h3k4me3", "material_id": "Fixture.Product.h3k4me3", "vessel_id": "Fixture.EluateTube.h3k4me3", "withdrawal_intent_id": "Fixture.Withdrawal.h3k4me3.qpcr", "preparation_id": "Fixture.Preparation.h3k4me3.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "B01", "role": "igg", "replicate": 1, "reaction_id": "Fixture.Reaction.igg", "material_id": "Fixture.Product.igg", "vessel_id": "Fixture.EluateTube.igg", "withdrawal_intent_id": "Fixture.Withdrawal.igg.qpcr", "preparation_id": "Fixture.Preparation.igg.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "B02", "role": "igg", "replicate": 2, "reaction_id": "Fixture.Reaction.igg", "material_id": "Fixture.Product.igg", "vessel_id": "Fixture.EluateTube.igg", "withdrawal_intent_id": "Fixture.Withdrawal.igg.qpcr", "preparation_id": "Fixture.Preparation.igg.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "B03", "role": "igg", "replicate": 3, "reaction_id": "Fixture.Reaction.igg", "material_id": "Fixture.Product.igg", "vessel_id": "Fixture.EluateTube.igg", "withdrawal_intent_id": "Fixture.Withdrawal.igg.qpcr", "preparation_id": "Fixture.Preparation.igg.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "C01", "role": "input", "replicate": 1, "reaction_id": "Fixture.Reaction.input", "material_id": "Fixture.Product.input", "vessel_id": "Fixture.EluateTube.input", "withdrawal_intent_id": "Fixture.Withdrawal.input.qpcr", "preparation_id": "Fixture.Preparation.input.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "C02", "role": "input", "replicate": 2, "reaction_id": "Fixture.Reaction.input", "material_id": "Fixture.Product.input", "vessel_id": "Fixture.EluateTube.input", "withdrawal_intent_id": "Fixture.Withdrawal.input.qpcr", "preparation_id": "Fixture.Preparation.input.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "C03", "role": "input", "replicate": 3, "reaction_id": "Fixture.Reaction.input", "material_id": "Fixture.Product.input", "vessel_id": "Fixture.EluateTube.input", "withdrawal_intent_id": "Fixture.Withdrawal.input.qpcr", "preparation_id": "Fixture.Preparation.input.qpcr", "volumes": {"eluate_ul": 2, "prepared_ul": 4, "used_ul": 1}},
+    {"id": "D01", "role": "ntc", "replicate": 1, "reaction_id": null, "material_id": null, "vessel_id": null, "withdrawal_intent_id": null, "preparation_id": null, "volumes": null},
+    {"id": "D02", "role": "ntc", "replicate": 2, "reaction_id": null, "material_id": null, "vessel_id": null, "withdrawal_intent_id": null, "preparation_id": null, "volumes": null},
+    {"id": "D03", "role": "ntc", "replicate": 3, "reaction_id": null, "material_id": null, "vessel_id": null, "withdrawal_intent_id": null, "preparation_id": null, "volumes": null}
+  ]
+}

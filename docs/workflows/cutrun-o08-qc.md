@@ -9,6 +9,60 @@ werden für S11 gesondert festgelegt.
 [Lokaler SOP-Entwurf](../cutrun-manual-sop-draft.md#7-produkt-qc-und-abschlusskriterien),
 [Möller et al., Methoden 2.4](https://pmc.ncbi.nlm.nih.gov/articles/PMC12839168/)
 
+## Synthetische Umsetzung
+
+Der qPCR-Vertrag `/1` und der Qubit-Vertrag `solidcraftbot.cutrun-qubit-results/1`
+lassen sich mit ausdrücklich als `test_fixture` markierten JSON-Exporten
+prüfen. Die Beispiele enthalten erfundene Messwerte und Einstellungen.
+
+```sh
+python3 scripts/run_cutrun_o08.py inspect \
+  --plan tests/fixtures/cutrun-o08/qpcr-plan.json \
+  --export tests/fixtures/cutrun-o08/qpcr-export.json
+python3 scripts/run_cutrun_o08.py inspect \
+  --plan tests/fixtures/cutrun-o08/qubit-plan.json \
+  --export tests/fixtures/cutrun-o08/qubit-export.json
+```
+
+`inspect` liest und normalisiert die Dateien ohne Journal. Für die Erfassung
+im bestehenden E4-Testlauf des Rezeptvertrags `/2` stehen `bind`, `import`
+und `report` zur Verfügung. Dazu in S11 mit `begin_qc_withdrawal` und
+`confirm_material_action` die simulierten Entnahmen erfassen. Im Plan die
+tatsächlichen IDs des Testlaufs und die bestätigten Entnahmen referenzieren.
+Der Export muss die SHA-256 der gebundenen Plandatei und ihre Geräte- und
+Assaykennungen führen. Der qPCR-Plattenbezug und der Qubit-Messserienbezug
+stehen in `acquisition.container_id`. `qc_bindings` referenziert je Rolle den
+E4-Assaybezug und den Kriterienbeleg. Die Kennung des Messassays bleibt in
+`acquisition.assay_id` erhalten.
+
+- `bind RUN --session SESSION --actor ACTOR --observation OBS.json --plan PLAN.json`
+  archiviert den Plan und bindet seine Positionen, Präparationen und
+  tatsächlichen Entnahmen. Mehrere Wells dürfen eine Präparation teilen. Das
+  insgesamt verwendete Eluat wird gegen die bestätigte Entnahme geprüft.
+- `import RUN --session SESSION --actor ACTOR --observation OBS.json --plan-id ID --export EXPORT.json`
+  archiviert Originalbytes und Zeilenfundstellen im selben Journal. Fehlende
+  Positionen, unklare Kontrollen und Ergebnisse außerhalb des Bereichs bleiben
+  als Befunde sichtbar und erzeugen keine E4-Zuordnung aus diesem Export.
+  Identitätskonflikte gehen in die bestehende QC-Quarantäne. Ein verwendbarer
+  Export erzeugt atomare `map_qc`-Zuordnungen. Die technische Prüfung und
+  fachliche Bewertung bleiben eigene Handlungen im bestehenden E4-Runner.
+- `report RUN` zeigt den gebundenen Plan, Originalprüfsummen, aktuelle und
+  frühere Auswertungen sowie die zugehörigen Mapping-IDs. Ein bytegleicher
+  Wiederimport ist idempotent. Eine Neuauswertung braucht eine eigene
+  `analysis_revision` und den SHA-256 des abgelösten aktiven Exports in
+  `supersedes_sha256`. Frühere Zuordnungen und technische Prüfungen verlieren
+  dabei ihre Gültigkeit. Das Materialjournal wird durch Importe und
+  Neuauswertungen nicht erneut belastet.
+
+Für ein außerhalb des Bereichs liegendes Qubit-Ergebnis ist eine neue
+Messserie mit eigenem Plan und bestätigter Entnahme möglich. Die drei
+Konzentrationsbezüge `assay_solution`, `prepared_sample` und `original_eluate`
+bestimmen, welche Volumenfaktoren einmalig angewandt werden. Der Bericht
+enthält den Gerätewert, den Bezugswert in `ng/uL` und die verwendeten Faktoren.
+
+Die Erweiterung akzeptiert ausschließlich E4-Testläufe. Reale Exportformate,
+Gerätebindungen, Grenzwerte und übrige Laborparameter bleiben offen.
+
 ## qPCR-Vorschlag
 
 Für den ersten Referenzlauf genügt als vorgeschlagener Umfang ein Positivlocus,
@@ -25,9 +79,9 @@ unabhängiger CUT&RUN-Ansätze wird in O02 festgelegt.
 
 ### Ergebnisvertrag `solidcraftbot.cutrun-qpcr-results/1`
 
-Vorgeschlagener normalisierter Beleg mit einem Datensatz pro geplantem Well.
-Der Plattenplan wird mit Revision und Prüfsumme vor der Messung gebunden.
-Die konkreten Exportspalten werden anhand eines Geräteoriginals festgelegt.
+Der normalisierte Beleg enthält einen Datensatz pro geplantem Well. Der
+Plattenplan wird mit Revision und Prüfsumme vor der Auswertung gebunden.
+Die Spalten realer Exporte werden anhand eines Geräteoriginals festgelegt.
 
 | Bereich | Pflichtangaben und Zuordnung |
 | --- | --- |

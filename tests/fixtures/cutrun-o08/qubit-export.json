@@ -1,0 +1,37 @@
+{
+  "format": "solidcraftbot.cutrun-synthetic-qubit-export/1",
+  "source_kind": "test_fixture",
+  "plan_sha256": "4d622c7def19fb17179c51cbe8eadd6496f4e33f4131a0cc0ea2fb1ec45ebb15",
+  "acquisition": {
+    "instrument_id": "Fixture.qubit",
+    "instrument_run_id": "Fixture.Acquisition.qubit",
+    "container_id": "Fixture.TubeBatch",
+    "software_version": "fixture/1",
+    "assay_id": "Fixture.Assay.qubit",
+    "assay_revision": "Fixture.qubit.1",
+    "calibration_ref": "Fixture.Calibration",
+    "kit_lot": "Fixture.KitLot",
+    "standard_lot": "Fixture.StandardLot",
+    "standard_ids": [
+      "Fixture.Standard.A",
+      "Fixture.Standard.B"
+    ]
+  },
+  "analysis_revision": "fixture/1",
+  "supersedes_sha256": null,
+  "standards": {
+    "Fixture.Standard.A": {
+      "rfu": 1,
+      "observed": true
+    },
+    "Fixture.Standard.B": {
+      "rfu": 1000,
+      "observed": true
+    }
+  },
+  "rows": [
+    {"id": "Fixture.Reading.input", "preparation_id": "Fixture.Preparation.input.qubit", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "result_status": "quantified", "concentration": 4, "concentration_unit": "ng/uL", "concentration_basis": "original_eluate", "rfu": 120.1},
+    {"id": "Fixture.Reading.igg", "preparation_id": "Fixture.Preparation.igg.qubit", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "result_status": "below_loq", "concentration": null, "concentration_unit": null, "concentration_basis": "assay_solution", "rfu": 1.3},
+    {"id": "Fixture.Reading.h3k4me3", "preparation_id": "Fixture.Preparation.h3k4me3.qubit", "flags": [], "reason": "Explicit synthetic assessment, no laboratory threshold", "result_status": "quantified", "concentration": 5, "concentration_unit": "ng/mL", "concentration_basis": "assay_solution", "rfu": 120.1}
+  ]
+}
