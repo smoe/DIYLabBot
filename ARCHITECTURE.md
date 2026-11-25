@@ -1109,8 +1109,12 @@ Rezeptur-/Konzentrationsbestätigung, Temperatur-/Zeitqualifikation und
 E4-Abnahme fehlen weiterhin. Ein geschlossener
 Aufzeichnungskopf behauptet keinen Referenzerfolg; `execution_ready` bleibt falsch.
 Die separate S09-Fixture fordert einen identifizierten Fragmentgrößenbefund.
-Für den manuellen Rezeptweg fehlen diese Verknüpfung und getrennte Zeit- und
-Temperaturbelege für Lyse, Sonikation und Klärung.
+Der [manuelle Rezeptvertrag /2](docs/cutrun-manual-runtime.md#konsolidierter-inputzweig-in-rezeptvertrag-2)
+verwendet dieselbe Sonikationslogik im Rezeptlauf. S09 fordert getrennte Zeit-
+und Temperaturbelege für Lyse, Sonikation und Klärung, dazu den Größenbefund
+mit eigener QC-Entnahme und Originaldatei. Der Realmodus fordert reale
+Beobachtungen. Seine ausdrücklich gewählte Fixture-Variante verwendet eine
+Testuhr. Der Nachweis der realen Laborbedingungen und die E4-Abnahme stehen aus.
 
 ### Quellenbindung und Varianten
 

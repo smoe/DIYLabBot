@@ -1,0 +1,52 @@
+{
+  "format": "solidcraftbot.cutrun-manual-sop-profile/2",
+  "id": "CutRunSkMel29H3K4me3InputConsolidation",
+  "mode": "manual_observation",
+  "protocol": {
+    "source": "model/cutrun-manual-sop-v2.protocol.json",
+    "source_sha256": "75354de9bc87684e9fd1911c6c797f0b503e0d27589ceb61a4e7862a9adfad69"
+  },
+  "phase_requirements": {
+    "S09.extraction_lysis": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S09.input_preparation": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    },
+    "S09.supernatant_clarification": {
+      "duration_min_s": null,
+      "duration_max_s": null,
+      "temperature_min_deg_c": null,
+      "temperature_max_deg_c": null,
+      "time_qualification_ref": null,
+      "temperature_qualification_ref": null,
+      "evidence_ref": null
+    }
+  },
+  "input_sonication": {
+    "input_reaction_id": null,
+    "device_instance_id": null,
+    "sonicator_place_id": null,
+    "cycles": null,
+    "pulse_on_s": null,
+    "between_pulses_s": null,
+    "amplitude_percent": null,
+    "fill_volume_ul": null,
+    "plan_evidence_ref": null,
+    "size_minimum_bp": null,
+    "size_maximum_bp": null,
+    "size_criteria_evidence_ref": null
+  }
+}
