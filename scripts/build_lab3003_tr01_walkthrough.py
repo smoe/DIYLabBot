@@ -11,6 +11,7 @@ import build_building_walkthrough as browser
 import building_stack
 import building_walkthrough
 import export_building_walkthrough_freecad as mesh
+import lab3003_tr01_camera
 import lab_layout_model as layout
 import robot_spec as robot
 
@@ -61,7 +62,7 @@ def unpack(value, kind):
     return result
 
 
-def replacement_mesh(path, old_scene, lab, visual_changes):
+def replacement_mesh(path, old_scene, lab, proof, stock):
     import FreeCAD as App
     import MeshPart
     sys.path.insert(0, str(ROOT/'scripts/freecad'))
@@ -83,7 +84,7 @@ def replacement_mesh(path, old_scene, lab, visual_changes):
     output = mesh.MeshBuilder()
     try:
         physical = {obj.Label: obj for obj in doc.Objects if obj.TypeId == 'Part::Feature'}
-        replacements = {name: physical[name] for name in visual_changes}
+        replacements = {name: physical[name] for name in proof['geometry_changes']['body_ids']}
         vehicles = {tr['body_prefix']+name.removeprefix('TR01_'): obj
                     for name, obj in physical.items() if name.startswith('TR01_')}
         cover_id = tr['body_prefix']+'TransportCover'
@@ -92,17 +93,22 @@ def replacement_mesh(path, old_scene, lab, visual_changes):
         expected = set(vehicles)-{cover_id}
         if expected != {k for k in old_groups if k.startswith(tr['body_prefix'])}:
             raise ValueError('Incomplete stock TR01 scene mapping')
-        for name, obj in {**replacements, **vehicles}.items():
-            shape = world_shape(obj)
+        camera, frame, camera_report = lab3003_tr01_camera.native_camera(lab, tr, physical, vehicles, proof, stock)
+        shapes = {name: (world_shape(obj), old_groups.get(name) or {**cover_style, 'role': cover['role'], 'instance_id': 'TR01'})
+                  for name, obj in {**replacements, **vehicles}.items()}
+        for name, (shape, body) in camera.items():
+            style = body['appearance']
+            shapes[name] = (shape, {'color': [v/255 for v in style['color']], 'opacity': style['opacity'],
+                                    'role': body['role'], 'instance_id': 'TR01'})
+        for name, (shape, group) in shapes.items():
             if shape.isNull() or not shape.isValid() or not shape.Solids:
                 raise ValueError('Invalid checked native shape: '+name)
             points, triangles, normals = mesh.native_face_mesh(shape, 1., .35, MeshPart)
-            group = old_groups.get(name) or {**cover_style, 'role': cover['role'], 'instance_id': 'TR01'}
             output.add(name, [mesh.rigid_point(trans, p) for p in points], triangles, group,
                        level_id=lab['level_id'], role=group['role'], instance_id=group['instance_id'],
                        normals=[mesh.rigid_point(trans, n, vector=True) for n in normals])
             output.groups[-1].update(laboratory_id=lab['id'])
-        return output.result(), sorted(vehicles), cover_id
+        return output.result(), sorted(vehicles.keys() | camera.keys()), cover_id, frame, camera_report
     finally:
         App.closeDocument(doc.Name)
 
@@ -216,17 +222,19 @@ def build(baseline_dir, cert, output, *, program=None):
     if not equivalent([d for d in lab['device_instances'] if d['id'] != 'TR01'],
                       [d for d in previous_lab['device_instances'] if d['id'] != 'TR01']):
         raise ValueError('Unverified changes in the stock device placement')
-    tr = next(v for v in lab['device_instances'] if v['id'] == 'TR01')['bound_pose']
+    device = next(v for v in lab['device_instances'] if v['id'] == 'TR01')
+    tr = device['bound_pose']
     dock = [tr[0][3], tr[1][3], math.degrees(math.atan2(tr[1][0], tr[0][0]))%360]
     if not all(abs(v-w) < 1e-8 for v,w in zip(dock, proof['dock']['arrival_mm_deg'])):
         raise ValueError('Dock pose differs from the certificate')
     source = read(baseline_dir/'native-mesh.json')['scenes']['building']
     print('Tessellating certified covered TR01 against the original room geometry', flush=True)
-    replacements, ids, cover_id = replacement_mesh(native_path, source, lab, proof['geometry_changes']['body_ids'])
+    replacements, ids, cover_id, frame, camera_report = replacement_mesh(native_path, source, lab, proof, stock)
     scene = replace_mesh(source, replacements)
     isolated = {group['id'] for group in scene['groups'] if group.get('laboratory_id') == lab['id']}
     program['isolation']['body_ids'] = sorted(set(program['isolation']['body_ids']) | isolated)
     configuration(program, lab, proof, route, ids, cover_id)
+    camera_report.update(lab3003_tr01_camera.assign_monitor(program['camera_wall'], lab, device, frame))
     payload = {**program, 'scenes': {'building': scene}}
     output.mkdir(parents=True)
     index = output/'index.html'
@@ -237,8 +245,10 @@ def build(baseline_dir, cert, output, *, program=None):
               'local_view': program['default_stop'], 'time_s': route['duration_s'],
               'default_playback_rate': program['tr01_lap']['default_playback_rate'],
               'autoplay': program['tr01_lap']['autoplay'],
+              'onboard_camera': camera_report,
               'viewer_source_sha256': {str(path.relative_to(ROOT)): mesh.digest(path) for path in
-                   (Path(__file__), browser.TEMPLATE, browser.SEMINAR_SCRIPT, ROOT/'scripts/walkthrough_tr01_lap.js')},
+                   (Path(__file__), Path(lab3003_tr01_camera.__file__), browser.TEMPLATE, browser.SEMINAR_SCRIPT,
+                    ROOT/'scripts/walkthrough_tr01_lap.js', ROOT/'scripts/camera_monitor_wall.js')},
               'reversal': route['reversal'],
               'scope': 'Local covered-TR01 preview with the original worktop and the checked forward and reverse PVA knots.'}
     (output/'tr01-preview-report.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')

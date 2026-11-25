@@ -669,7 +669,8 @@ __WALKTHROUGH_SEMINAR__</script>
       const frame=CameraMonitorWall.pose(camera,owner?objectMatrix(owner):null);
       const metrics=drawScene(prepareScene('building',true),CameraMonitorWall.projection(camera,frame,width/height),frame.eye_mm.map(v=>v/1000),true);
       const robot=owner&&robots.get(owner.config.robot_id);
-      return {...frame,...metrics,model_time_s:robot?.snapshot.time_s??null,source_kind:camera.kind};
+      const time=owner?.config.mechanism==='tr01_lap'?lap.snapshot.time_s:robot?.snapshot.time_s;
+      return {...frame,...metrics,model_time_s:time??null,source_kind:camera.kind};
     }
     if(monitorConfig){
       const sourceIds=new Set(data.scenes.building.groups.map(g=>g.id));

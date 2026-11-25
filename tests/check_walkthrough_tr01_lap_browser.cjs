@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const {pathToFileURL} = require('node:url');
 const {chromium} = require(process.argv[3] || 'playwright');
+const {pose} = require('../scripts/camera_monitor_wall.js');
 
 (async () => {
   const file = path.resolve(process.argv[2]);
@@ -18,8 +19,16 @@ const {chromium} = require(process.argv[3] || 'playwright');
   const dock = lap.points[0].pose_mm_rad;
   const dockMatrix = [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
   const groups = model.scenes.building.groups.filter(group => lap.body_ids.includes(group.id));
-  assert.equal(groups.length, 57);
+  const cameraBodies = groups.filter(group => ['camera_envelope', 'camera_mount'].includes(group.role));
+  assert.equal(groups.length - cameraBodies.length, 57);
+  assert.equal(cameraBodies.length, 3);
   assert(groups.some(group => group.id === lap.cover_body_id && group.index_count > 0));
+  const wall = model.camera_wall;
+  const camera = wall.cameras.find(entry => entry.device_id === 'Lab3003.TR01');
+  assert.equal(wall.default_assignments[0], camera.id);
+  assert.equal(camera.kind, 'modeled_camera');
+  assert.equal(camera.availability, 'available');
+  assert(cameraBodies.some(group => group.id === camera.mount_body_id && group.index_count > 0));
   const browser = await chromium.launch({headless:true, executablePath:process.argv[4],
     args:['--enable-webgl','--ignore-gpu-blocklist','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
   const page = await browser.newPage({viewport:{width:1440,height:1000}});
@@ -147,8 +156,41 @@ const {chromium} = require(process.argv[3] || 'playwright');
     await page.clock.fastForward(Math.ceil((lap.duration_s-backing.time_s)*1000 + 250));
     await page.clock.fastForward(1000);
     assert.equal((await snapshot()).state, 'docked');
+
+    await page.locator('#walkthrough-lap-rate').selectOption('8');
+    await play.click({force:true});
+    await page.locator('[data-stop="camera-wall"]').click({force:true});
+    await page.clock.fastForward(500);
+    const mosaic = await page.evaluate(() => window.__buildingWalkthrough.monitorWall.slots[0]);
+    assert(mosaic.frames > 0, 'Monitor M01 should render its default camera without selection');
+    const capture = () => page.evaluate(() => {
+      const walkthrough = window.__buildingWalkthrough;
+      const result = walkthrough.captureMonitor(0);
+      return {result, slot: walkthrough.monitorWall.slots[0], vehicle: walkthrough.tr01Lap};
+    });
+    const atFoyer = await capture();
+    assert.equal(atFoyer.result.status, 'captured', atFoyer.slot.error);
+    assert.equal(atFoyer.slot.camera_id, camera.id);
+    assert.equal(atFoyer.slot.frame.drawn_native_groups > 0, true);
+    await page.clock.fastForward(12000);
+    const later = await capture();
+    assert.equal(later.result.status, 'captured', later.slot.error);
+    assert.equal(later.slot.frame.model_time_s, later.vehicle.time_s);
+    assert(later.slot.frame.model_time_s > atFoyer.slot.frame.model_time_s + 90);
+    assert.notEqual(later.slot.image_hash, atFoyer.slot.image_hash);
+    assert.notDeepEqual(later.slot.frame.eye_mm, atFoyer.slot.frame.eye_mm);
+    const expected = pose(camera, later.vehicle.matrix);
+    for (const key of ['eye_mm', 'target_mm', 'up']) {
+      assert.deepEqual(later.slot.frame[key], expected[key]);
+    }
+    await page.evaluate(() => window.__buildingWalkthrough.selectMonitor(0));
+    await page.clock.fastForward(200);
+    const monitor = page.getByRole('region', {name:'Kameraansicht'});
+    assert.match(await monitor.innerText(), /Bordkamera.*TR01-Modellzeit/s);
+    await page.screenshot({path:path.join(path.dirname(file),'tr01-foyer-camera.png')});
+
     assert.deepEqual(errors, []);
-    console.log('Eye-level startup, physical exit into the corridor, automatic repeat during navigation, fixture interlock and exact redocking passed.');
+    console.log('Eye-level lab navigation, automatic TR01 lap and the moving onboard image on Foyer monitor M01 passed.');
   } finally {
     await browser.close();
   }
