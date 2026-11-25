@@ -1039,10 +1039,13 @@ wird der Export gesperrt, statt die Überlagerung ungefiltert auszugeben.
 
 ## CUT&RUN: geplanter Ablaufvertrag
 
-**Stand 12. November 2026: E1-Preflight, gemeinsamer E2-Materialvertrag,
-synthetischer E3-Lauf und erster manueller E4-Aufzeichnungskern implementiert;
-keine reale CUT&RUN-Ausführung oder
-biologische Qualifikation.** Die erste Ausbaustufe
+**Stand 25. November 2026: E1-Preflight, gemeinsamer E2-Materialvertrag,
+synthetischer E3-Lauf und manueller E4-Stufen- und Rezeptvertrag implementiert.**
+Hinzu kommen die wirkungsfreie [Sonikationsvorbereitung](docs/dna-sonication.md),
+die [S09-Laufzeit mit Testuhr und Fixture-Beobachtungen](docs/dna-sonication.md#merged-cutrun-input-sonication-runtime)
+und ihr [SiLA-Adapter für den Loopback-Simulator](docs/sonication-sila2-network.md).
+Ein qualifizierter Sonikator, eine tatsächliche CUT&RUN-Durchführung und die
+biologische Abnahme stehen aus. Die erste Ausbaustufe
 führt eine ausgewählte Zell-/Kernpräparation bis zu identifizierter, gereinigter
 CUT&RUN-DNA und ihrer dokumentierten Übergabe. Ausgangsmaterial ist intaktes
 zelluläres beziehungsweise nukleäres Material; ein RNA-/DNA-Extrakt aus K01
@@ -1059,7 +1062,10 @@ und das synthetische SK-Mel-29/H3K4me3-Profil in
 Parameterherkunft, Fraktionen, Stoppanforderungen, Providergrenzen und Produkt-QC,
 ohne Journal-, Bestands-, Reservierungs- oder Gerätewirkung. Vollständige
 synthetische Angaben ergeben weiterhin `execution_ready: false`; die offene
-historische SOP-Bindung und die biochemische Laufzeitbindung bleiben getrennte Sperren.
+fachliche Bestätigung des lokalen SOP-Entwurfs (O11) und die biochemische
+Laufzeitbindung bleiben getrennte Sperren. Die bisherigen E1-Quellen referenzieren
+noch eine historische SOP-Revision. Die geplante neue Revision bindet den
+lokalen Entwurf und seinen CST-Quellenstand.
 
 Der [gemeinsame E2-Materialvertrag](docs/material-lifecycle.md) verwendet eine
 Opt-in-Variante der vorhandenen manuellen Ablaufhülle und dasselbe Journal.
@@ -1102,6 +1108,9 @@ Lokale Mengen und Wiederholungsentscheidungen bleiben offen. Reale
 Rezeptur-/Konzentrationsbestätigung, Temperatur-/Zeitqualifikation und
 E4-Abnahme fehlen weiterhin. Ein geschlossener
 Aufzeichnungskopf behauptet keinen Referenzerfolg; `execution_ready` bleibt falsch.
+Die separate S09-Fixture fordert einen identifizierten Fragmentgrößenbefund.
+Für den manuellen Rezeptweg fehlen diese Verknüpfung und getrennte Zeit- und
+Temperaturbelege für Lyse, Sonikation und Klärung.
 
 ### Quellenbindung und Varianten
 
@@ -1111,7 +1120,7 @@ Ein Literaturverweis ist noch keine ausführbare, bytegebundene Arbeitsanweisung
 | Kennung | Referenz und Lesestand | Verwendung |
 |---|---|---|
 | CR1 | [Janssens/Henikoff, protocols.io v3](https://www.protocols.io/view/cut-amp-run-targeted-in-situ-genome-wide-profiling-14egnr4ql5dy/v3), [PDF-Export](https://www.protocols.io/view/cut-amp-run-targeted-in-situ-genome-wide-profiling-14egnr4ql5dy/v3.pdf), [DOI 10.17504/protocols.io.zcpf2vn](https://doi.org/10.17504/protocols.io.zcpf2vn). Version 3 vom 09.05.2019; PDF mit 42 Seiten/114 Schritten konsultiert am 11.11.2026; CC-BY laut PDF. | Versionierte Referenz mit mehreren Verfahrenszweigen; keine Übernahme als bereits freigegebene Labor-SOP. |
-| CR2 | [CST CUT&RUN Kit Protocol](https://www.cellsignal.com/learn-and-support/protocols/cut-and-run-protocol), Abschnitte I–IX und Anhänge konsultiert am 11.11.2026. Keine eindeutige Protokollrevision auf der Webseite erkannt; keine offene Lizenz festgestellt. | Herstellerverfahren; vor Ausführung konkretes Kit, Variante und eingefrorenen Quellenstand binden. |
+| CR2 | [CST CUT&RUN Assay Kit #86652, Original-PDF](https://media.cellsignal.com/pdf/86652.pdf), Datenblatt Revision 9 und Protokoll „1884_CUT & RUN“ Revision 09/2026. Lokale Originalkopie mit SHA-256 laut [SOP-Entwurf 0.1](docs/cutrun-manual-sop-draft.md#2-quellen-und-verbindlicher-rezeptbezug). | Aktuelle Herstellerreferenz für den lokalen Entwurf. Die im Paper verwendete historische Revision ist unbelegt. |
 | CR3 | [EpiCypher, Complete Step-by-Step Guide](https://www.epicypher.com/resources/blog/complete-step-by-step-guide-to-cutrun/), Blog vom 11.07.2022, konsultiert am 11.11.2026; keine offene Lizenz festgestellt. | Hintergrund und QC-Abgrenzung. Die verlinkten Kit-/DIY-Anleitungen sind damit nicht als operative SOP ausgewählt oder geprüft. |
 
 Ein Profil bindet **Quelle + Revision/Quellprüfsumme + Verfahrenszweig** sowie
@@ -1170,6 +1179,10 @@ ihre bisherigen Abschluss- und Wiederaufnahmeregeln.
 - IgG-/Positivkontrollen als eigene Reaktionen, einen gewählten Input als
   eigenen Prozesszweig führen. Zugesetzte Spike-ins mit Charge, Menge und
   Zeitpunkt buchen; chargenbedingter E.-coli-Übertrag ist keine erfundene Zugabe.
+- Im gewählten CST-Inputzweig führt die Bilanz vom Inputlysat über das
+  sonifizierte Material und den geklärten Überstand zur Säule. Der
+  Fragmentgrößenbefund benötigt eine eigene bestätigte QC-Entnahme aus
+  dem sonifizierten Inputprodukt und einen zugeordneten Originalbeleg.
 - Aufbewahrte Produkte, verbrauchte Materialien, Quarantäne und bestätigte
   Entsorgung als unterschiedliche Enddispositionen erlauben. QC-Aliquots aus
   Produktgefäßen benötigen eigene Entnahmeabsichten und Buchungen gegen dieses
@@ -1239,7 +1252,7 @@ Abweichungsbewertung. Pausenorte und Lagerfristen dürfen nur aus diesem Profil 
 | Temperieren/inkubieren | Probentemperatur direkt oder über einen qualifizierten Geräte-/Probenzusammenhang mit Unsicherheit nachweisen; ein CAD-Kühlplatz liefert diesen Nachweis nicht. Exposition, Mischmodus und tatsächlicher Beginn/Abschluss gehören zusammen. |
 | Zentrifugieren | RCF, Temperatur, Zeit, Rotor und konkreten Gefäßartikel gemeinsam binden. CF01 hat ein ungeprüftes Ziel von 16.000 × g und offene Temperaturführung; keine vollständige CUT&RUN-Eignung ist belegt. CR2 benötigt teilweise 18.500 × g. Einzelne Teilschritte bleiben erst nach Qualifikation Kandidaten; Grenzen nicht passend hochsetzen. |
 | Reinigen/weiterverarbeiten | Profilgerechte Erhaltung kleiner DNA-Fragmente, Gefäßwechsel und gegebenenfalls organische Phasentrennung separat qualifizieren. Organische Schritte bleiben zunächst manuell mit freigegebenem Arbeitsplatz; die modellierte Abzughülle ist keine Absaugungsfreigabe. |
-| Messen und übergeben | Fluorometrie, gegebenenfalls qPCR/Fragmentanalyse und externe QC-Artefakte mit eindeutigen Reaktions-/Produktbezügen. Thermocycler, Sonifikation und Library-Handhabung nur für ausdrücklich gewählte spätere Zweige binden. |
+| Messen und übergeben | Sonikation und Fragmentgrößenbefund gehören zum Inputzweig des gewählten CST-Profils (Abschnitt VI und Anhang B). Zur gewählten Roh-DNA-QC gehören Fluorometrie und qPCR mit eindeutigen Reaktions-/Produktbezügen und Originalartefakten. Assays und Kriterien sind unter O08 zu binden. Library-Präparation und Direktligation sind spätere Zweige. |
 
 Gemeinsame Quellen für Station, Gefäßhalter, Werkzeug und Fähigkeit verwenden;
 neue Geometrie später unabhängig in beiden CADs ableiten. Ein Stationstypname
