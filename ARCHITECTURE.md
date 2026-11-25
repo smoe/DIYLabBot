@@ -1063,9 +1063,9 @@ Parameterherkunft, Fraktionen, Stoppanforderungen, Providergrenzen und Produkt-Q
 ohne Journal-, Bestands-, Reservierungs- oder Gerätewirkung. Vollständige
 synthetische Angaben ergeben weiterhin `execution_ready: false`; die offene
 fachliche Bestätigung des lokalen SOP-Entwurfs (O11) und die biochemische
-Laufzeitbindung bleiben getrennte Sperren. Die bisherigen E1-Quellen referenzieren
-noch eine historische SOP-Revision. Die geplante neue Revision bindet den
-lokalen Entwurf und seinen CST-Quellenstand.
+Laufzeitbindung bleiben getrennte Sperren. Die [E1-Revision /3](docs/cutrun-reference-profile.md#e1-revision-3-mit-lokalem-sop-entwurf)
+bindet den lokalen Entwurf und seinen CST-Quellenstand. Die bisherigen
+E1-Quellen führen weiterhin den historischen Recherchebezug.
 
 Der [gemeinsame E2-Materialvertrag](docs/material-lifecycle.md) verwendet eine
 Opt-in-Variante der vorhandenen manuellen Ablaufhülle und dasselbe Journal.

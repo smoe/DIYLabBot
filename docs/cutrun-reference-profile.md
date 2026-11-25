@@ -199,6 +199,23 @@ DIYLabBot-Referenzlauf nach E4 und kein E1-Profil gilt als ausführungsbereit.
 
 ## Wirkungsfreier CUT&RUN-Preflight
 
+### E1-Revision /3 mit lokalem SOP-Entwurf
+
+`model/cutrun-automation-v3.preparation.json` bindet den maschinenlesbaren
+SOP-Entwurf `SOP-CR-SKM29-H3K4me3`, Fassung 0.1, und die CST-Originalfassung
+#86652 mit Protokollrevision 09/2026 über ihre Prüfsummen. O11 bleibt offen.
+Die Planung verwendet den gepinnten E1-Graphen aus /2. Die bestehenden
+/1- und /2-Quellen sowie die Bindung des synthetischen E3-Laufs gelten
+weiterhin für diese Laufstände.
+
+```sh
+python3 scripts/prepare_cutrun_automation_v3.py --original-pdf exports/cutrun-e4-sop-sources/cst-86652-2026-11-12.pdf
+```
+
+Die optionale Originaldatei wird lokal gegen den SHA-256 geprüft. Der Bericht
+führt die Originalprüfung, die weiterhin offene fachliche Bestätigung und
+`execution_ready: false` als eigene Felder. Die PDF bleibt lokal.
+
 **Stand 12. November 2026: E1 für das synthetische SK-Mel-29/H3K4me3-Profil
 implementiert.** Der Preflight prüft und beschreibt eine Planung. Er führt keine
 Laborhandlung aus, öffnet kein Journal und reserviert oder bucht nichts.

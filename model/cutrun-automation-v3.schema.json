@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cutrun-automation-v3.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format", "id", "base_preflight", "source_binding"],
+  "properties": {
+    "format": {"const": "solidcraftbot.cutrun-preparation/3"},
+    "id": {"type": "string", "minLength": 1},
+    "base_preflight": {"$ref": "assembly-reference.schema.json#/$defs/reference"},
+    "source_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["sop_draft", "manual_reference", "manufacturer", "confirmation"],
+      "properties": {
+        "sop_draft": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "source_sha256", "id", "revision"],
+          "properties": {
+            "source": {"type": "string", "minLength": 1},
+            "source_sha256": {"$ref": "#/$defs/sha256"},
+            "id": {"const": "SOP-CR-SKM29-H3K4me3"},
+            "revision": {"const": "0.1"}
+          }
+        },
+        "manual_reference": {"$ref": "assembly-reference.schema.json#/$defs/reference"},
+        "manufacturer": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kit", "url", "source_sha256", "datasheet_revision", "protocol_revision"],
+          "properties": {
+            "kit": {"const": "CST #86652"},
+            "url": {"const": "https://media.cellsignal.com/pdf/86652.pdf"},
+            "source_sha256": {"$ref": "#/$defs/sha256"},
+            "datasheet_revision": {"const": "9"},
+            "protocol_revision": {"const": "09/2026"}
+          }
+        },
+        "confirmation": {"const": {"decision_id": "O11", "status": "open", "evidence_ref": null}}
+      }
+    }
+  },
+  "$defs": {"sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}}
+}
