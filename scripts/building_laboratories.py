@@ -14,6 +14,7 @@ import lab_layout_model as layout
 import lab_room_model as room
 import relative_floorplan as floor
 import robot_spec as robot
+import synthetic_workspace as workspace
 
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMA = ROOT/'model/building-laboratories.schema.json'
@@ -45,8 +46,9 @@ def validate(source):
         require(key not in excluded, 'Duplicate room-use exclusion')
         excluded.add(key)
     for item in source['laboratories']:
-        require(set(item) == {'id', 'room', 'level', 'area', 'entrance_wall', 'room_source', 'layout_source', 'basis'},
-                'Only room binding and pinned sources belong to a laboratory instance')
+        require(set(item) - {'bench_layout'} == {'id', 'room', 'level', 'area', 'entrance_wall',
+                                               'room_source', 'layout_source', 'basis'},
+                'Laboratory instance requires a room binding and pinned sources')
         require(item['id'] not in identities and item['id'].isidentifier(), 'Unique laboratory identity required')
         identities.add(item['id'])
         key = (item['level'], item['area'])
@@ -58,6 +60,24 @@ def validate(source):
         for key in ('room_source', 'layout_source'):
             require(set(item[key]) == {'source', 'source_sha256'}, 'Pinned primary laboratory source required')
             assembly.validate_reference(item[key], root=ROOT)
+        if 'bench_layout' in item:
+            bench = item['bench_layout']
+            require(isinstance(bench, dict) and set(bench) - {'park_joints_deg'} == {'workspace', 'anchor', 'yaw_deg', 'devices'}
+                    and type(bench['yaw_deg']) in (int, float) and math.isfinite(bench['yaw_deg'])
+                    and isinstance(bench['devices'], dict) and isinstance(bench['anchor'], str)
+                    and bench['anchor'] in bench['devices']
+                    and all(isinstance(name, str) and name and isinstance(ref, str) and ref
+                            for name, ref in bench['devices'].items())
+                    and len(set(bench['devices'].values())) == len(bench['devices']),
+                    'Bench layout needs a rigid anchor and distinct device references')
+            require(isinstance(bench['workspace'], dict) and set(bench['workspace']) == {'source', 'source_sha256'},
+                    'Pinned workspace required')
+            assembly.validate_reference(bench['workspace'], root=ROOT)
+            parking = bench.get('park_joints_deg', {})
+            require(isinstance(parking, dict) and parking.keys() <= bench['devices'].keys()
+                    and all(isinstance(q, list) and len(q) == 6
+                            and all(type(v) in (int, float) and math.isfinite(v) for v in q) for q in parking.values()),
+                    'Parked bench arm poses require six finite joint angles')
     if 'basic_profile' in source:
         import basic_laboratories
         basic_laboratories.load(source['basic_profile'])
@@ -264,23 +284,40 @@ def compile_instance(item, plan, p, z):
             'Laboratory room and layout room sources must agree')
     standalone = layout.parameters(equipment)
     context = layout.parameters(equipment, room_overrides=binding['bound_parameters_mm'])
+    bench = item.get('bench_layout')
+    moved = bench_poses(bench, equipment['instances'], context) if bench else {}
+    parked = bench.get('park_joints_deg', {}) if bench else {}
     devices = []
     for device in equipment['instances']:
-        point = layout.xyz(device['xyz'], context)
+        bound = moved.get(device['id'])
+        if bound is None:
+            bound = layout.matrix(device, context)
+        point = [row[3] for row in bound[:3]]
         require(floor.point_membership(point[:2], binding['local_interior_polygon_mm']) >= 0,
                 'Laboratory device leaves its destination room: '+device['id'])
         host = device['host']
+        direct_mount = device['id'] in moved and device['asset'] == 'arm'
         if host == 'Floor':
             require(abs(point[2]) < 1e-7, 'Floor device must stay on its declared host: '+device['id'])
         else:
             require(host in surfaces and floor.point_membership(point[:2], surfaces[host][0]) >= 0,
                     'Laboratory device loses its declared host: '+device['id'])
-            expected_z = surfaces[host][1]+(robot.evaluate(device.get('riser_height', 'arm_riser_h'), context) if device['asset'] == 'arm' else 0)
+            riser = robot.evaluate(device.get('riser_height', 'arm_riser_h'), context) if device['asset'] == 'arm' and not direct_mount else 0
+            expected_z = surfaces[host][1] + riser
             require(abs(point[2]-expected_z) < 1e-7, 'Laboratory device is not on its host plane: '+device['id'])
+        original = layout.matrix(device, standalone)
+        world = robot.multiply(transform, bound)
+        park = parked.get(device['id'])
+        if park is not None:
+            require(device['asset'] == 'arm', 'Only a bench arm can specify parked joints')
+            arm = layout.instance_source(equipment, device)
+            require(all(joint['limits_deg'][0] <= v <= joint['limits_deg'][1] for joint, v in zip(arm['joints'], park)),
+                    'Bench arm park pose exceeds joint limits: '+device['id'])
         devices.append({'id': device['id'], 'asset': device['asset'], 'host': host,
-                        'standalone_pose': layout.matrix(device, standalone), 'bound_pose': layout.matrix(device, context),
-                        'world_pose': robot.multiply(transform, layout.matrix(device, context)),
-                        'transform': robot.multiply(robot.multiply(transform, layout.matrix(device, context)), robot.inverse(layout.matrix(device, standalone))),
+                        'standalone_pose': original, 'bound_pose': bound,
+                        'world_pose': world, 'transform': robot.multiply(world, robot.inverse(original)),
+                        **({'direct_mount': True} if direct_mount else {}),
+                        **({'park_joints_deg': park} if park is not None else {}),
                         'body_prefix': prefix+device['id']+'_',
                         'anchor_in_room': True, 'host_anchor_checked': True,
                         'geometry_extent_checked': False})
@@ -355,6 +392,29 @@ def compile(ref, plans, p, levels):
     return result
 
 
+def bench_poses(definition, layout_instances, context):
+    """Place the referenced bench arrangement rigidly about its existing anchor."""
+    reference = workspace.load(assembly.validate_reference(definition['workspace'], root=ROOT))
+    devices = {device['id']: device for device in layout_instances}
+    mapping = definition['devices']
+    require(set(mapping) <= devices.keys() and set(mapping.values()) <= reference['devices'].keys(),
+            'Bench layout refers to an unknown device')
+    anchor = devices[definition['anchor']]
+    anchor_reference = reference['devices'][mapping[anchor['id']]]
+    index = robot.inverse(anchor_reference['matrix'])
+    xy = layout.xyz(anchor['xyz'], context)
+    pose = workspace.pose(xy, definition['yaw_deg'])
+    placements = {}
+    for name, source_name in mapping.items():
+        device = devices[name]
+        original = reference['devices'][source_name]
+        asset = 'rack' if device['asset'] == 'tube_rack' else device['asset']
+        require(asset == original['asset'] and device['host'] == anchor['host'] != 'Floor'
+                and original['host'] == anchor_reference['host'], 'Bench layout device type or support differs')
+        placements[name] = robot.multiply(pose, robot.multiply(index, original['matrix']))
+    return placements
+
+
 def social_places(ref, placed):
     """Name existing placed desktop surfaces without copying their dimensions."""
     source = furnishings.read(ref); catalog = furnishings.read(source['catalog'])
@@ -383,6 +443,10 @@ def dependencies(ref):
         paths.extend(room.source_dependencies(spec))
         equipment = read(item['layout_source'])
         paths.extend(ROOT/v['source'] for v in equipment['assets'].values())
+        if 'bench_layout' in item:
+            ref = item['bench_layout']['workspace']
+            path = assembly.validate_reference(ref, root=ROOT)
+            paths.extend([path, Path(workspace.__file__), *workspace.source_dependencies(workspace.load(path))])
     if 'basic_profile' in source:
         import basic_laboratories
         paths.extend(basic_laboratories.dependencies(source['basic_profile']))

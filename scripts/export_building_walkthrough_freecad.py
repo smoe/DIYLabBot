@@ -358,8 +358,35 @@ def native_equipment_bindings(laboratories):
                       and all(abs(device['standalone_pose'][axis][3]-prop['xyz'][axis]) < 1e-7 for axis in (0, 1))]
             if len(owners) != 1:
                 raise ValueError('A functional layout support needs one source arm owner: '+prop['id'])
+            if owners[0].get('direct_mount'):
+                continue
             result.append((laboratory, {**owners[0], 'id': prop['id'],
                 'body_prefix': laboratory['id']+'_'+prop['id']+'_', 'supporting_device_id': owners[0]['id']}))
+    return result
+
+
+def equipment_link_placements(laboratory, device):
+    """Place the checked native arm bodies in a binding's parked configuration."""
+    import lab_layout_model as layout
+    import robot_spec as robot
+
+    if 'park_joints_deg' not in device:
+        return {}
+    source = json.loads(project_path(laboratory['layout_source']['source']).read_text())
+    item = next(item for item in source['instances'] if item['id'] == device['id'])
+    arm = layout.instance_source(source, item)
+    before = robot.forward(arm, item['joints_deg'])
+    after = robot.forward(arm, device['park_joints_deg'])
+    local_from_standalone = robot.inverse(device['standalone_pose'])
+    result = {}
+    for link in robot.expanded(arm)['links']:
+        name = link['id']
+        matrix = robot.multiply(robot.multiply(device['world_pose'], after[name]),
+                                robot.multiply(robot.inverse(before[name]), local_from_standalone))
+        validate_rigid(matrix)
+        for operation in link['recipe']:
+            if operation['action'] == 'create':
+                result[operation['body']] = matrix
     return result
 
 
@@ -383,6 +410,8 @@ def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflectio
         devices = native_equipment_bindings(laboratories or [])
         for laboratory, device in devices:
             validate_rigid(device['transform'])
+        parked_links = {(laboratory['id'], device['id']): equipment_link_placements(laboratory, device)
+                        for laboratory, device in devices if 'park_joints_deg' in device}
         coverage = {laboratory['id']+'.'+device['id']: 0 for laboratory, device in devices}
         for obj in sorted(objects, key=lambda entry: entry.SourceBody):
             name = obj.SourceBody
@@ -403,11 +432,15 @@ def export_scene(scene, report, path, deflection_mm, App, geo, angular_deflectio
             instance_id = str(getattr(obj, 'LayoutInstance', getattr(obj, 'RigidLink', '')))
             if match:
                 laboratory, device = match[0]
+                body = name[len(device['id']+'__'):]
                 transform = device['transform']
+                park = parked_links.get((laboratory['id'], device['id']))
+                if park:
+                    transform = park[body.split('__Solid', 1)[0]]
                 points = [rigid_point(transform, point) for point in points]
                 normals = [rigid_point(transform, normal, vector=True) for normal in normals]
                 bounds = rigid_bounds(transform, bounds)
-                identity = device['body_prefix']+name[len(device['id']+'__'):]
+                identity = device['body_prefix']+body
                 level, instance_id = laboratory['level_id'], device['id']
                 coverage[laboratory['id']+'.'+instance_id] += 1
             mesh.add(identity, points, triangles, styles[name], normals=normals,

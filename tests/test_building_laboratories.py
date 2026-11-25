@@ -27,11 +27,41 @@ class BuildingLaboratoryTests(unittest.TestCase):
 
     def test_sources_contain_references_not_copied_dimensions(self):
         self.assertEqual(set(self.instance), {'id', 'room', 'level', 'area', 'entrance_wall',
-                                             'room_source', 'layout_source', 'basis'})
+                                             'room_source', 'layout_source', 'basis', 'bench_layout'})
         self.assertEqual(self.lab['area'], 'R3_003')
         self.assertEqual(self.lab['level_id'], 'OG3')
         self.assertFalse(self.lab['placement_qualified'])
         self.assertFalse(self.lab['metric_registration_qualified'])
+
+    def test_cf01_bench_uses_the_video_arrangement_about_the_existing_anchor(self):
+        import synthetic_workspace
+        from export_building_walkthrough_freecad import equipment_link_placements, native_equipment_bindings
+
+        setup = self.instance['bench_layout']
+        source = synthetic_workspace.load(ROOT / setup['workspace']['source'])['devices']
+        devices = {item['id']: item for item in self.lab['device_instances']}
+        anchor = devices[setup['anchor']]
+        source_anchor = source[setup['devices'][setup['anchor']]]
+        anchor_inverse = robot.inverse(anchor['bound_pose'])
+        expected_inverse = robot.inverse(source_anchor['matrix'])
+        for name, original in setup['devices'].items():
+            with self.subTest(device=name):
+                relative = robot.multiply(anchor_inverse, devices[name]['bound_pose'])
+                expected = robot.multiply(expected_inverse, source[original]['matrix'])
+                self.assertLess(max(abs(a-b) for row, ref in zip(relative, expected)
+                                    for a, b in zip(row, ref)), 1e-7)
+        self.assertTrue(devices['ArmC']['direct_mount'])
+        self.assertEqual(anchor['bound_pose'][2][3], devices['ArmC']['bound_pose'][2][3])
+        self.assertEqual(devices['TR01']['bound_pose'], devices['TR01']['standalone_pose'])
+        self.assertEqual(devices['ArmC']['park_joints_deg'], setup['park_joints_deg']['ArmC'])
+        placements = equipment_link_placements(self.lab, devices['ArmC'])
+        for actual, expected in zip(placements['Base_plate'], devices['ArmC']['transform']):
+            for a, b in zip(actual, expected):
+                self.assertAlmostEqual(a, b)
+        self.assertNotEqual(placements['C_tip_lens_ENVELOPE'], placements['Base_plate'])
+        supports = {device['supporting_device_id'] for _, device in native_equipment_bindings([self.lab])
+                    if 'supporting_device_id' in device}
+        self.assertEqual(supports, {'ArmA', 'ArmB'})
 
     def test_binding_follows_boundary_translation_and_wall_thickness(self):
         shifted = copy.deepcopy(self.plan)

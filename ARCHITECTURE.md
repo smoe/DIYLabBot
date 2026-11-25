@@ -220,7 +220,9 @@ und keine Platzierungsqualifikation.
 Die native Gebäudefassung enthält die 183 gebundenen Möbel-/Strukturkörper.
 Der Browser ergänzt genau einmal die 17 nativen Gerätegruppen des geprüften
 Standalone-L01-Layouts über `Gebäude · gebundene Pose · Standalone-Pose⁻¹`.
-Die drei funktionalen Arm-Unterbauten stammen ebenfalls aus dieser Layoutquelle.
+Die Unterbauten von ArmA und ArmB stammen ebenfalls aus dieser Layoutquelle.
+Die CF01-Aufstellung in 3.003 übernimmt die relativen Gerätepositionen aus
+der Vorlage des Arbeitsplatzvideos. ArmC steht dort direkt auf der Bank.
 Native Gerätekörper im Gebäude-CAD bleiben fehlende Zielunterstützung.
 Der Rundgang besitzt eine Gebäudeszene; Laborisolation ist ein Filter in
 diesem Weltbezug. Der eigenständig erzeugbare L01-Aufbau bleibt für Ablauftests
