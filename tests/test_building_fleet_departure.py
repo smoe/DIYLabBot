@@ -5,7 +5,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from building_fleet_departure import _clear, _fit_margin, _limits, independent_starter_end, inside_departure_room
+from building_fleet_departure import (_clear, _fit_margin, _limits, independent_starter_end,
+                                      inside_departure_room, rectangular_starter_end)
 from building_fleet_motion import Path as Route
 
 
@@ -68,3 +69,45 @@ class DepartureGeometryTests(unittest.TestCase):
         for step, speed, acceleration in ((.051, 100., 50.), (.05, math.nan, 50.), (.05, 10., 0.)):
             with self.assertRaises(ValueError):
                 _limits(step, speed, acceleration)
+
+    def test_rectangular_parallel_straights_preserve_the_exact_lateral_reserve(self):
+        follower = Route([[500.,0.],[500.,800.]])
+        forward = Route([[0.,0.],[0.,1200.]])
+        reverse = Route([[0.,1200.],[0.,0.]])
+        envelope = {'length_mm':512., 'width_mm':412.}
+        for path in (forward,reverse):
+            with self.subTest(path=path.pieces):
+                # The source body gap is 500 - 412 = 88 mm, above the 85 mm reserve.
+                self.assertEqual(rectangular_starter_end(path,follower,envelope,85.),800.)
+                self.assertEqual(rectangular_starter_end(path,follower,envelope,88.),0.)
+                self.assertEqual(independent_starter_end(path,follower,math.hypot(256,206),85.),0.)
+
+    def test_rectangular_crossing_reserves_body_lengths_and_limits_the_prefix(self):
+        follower = Route([[0.,0.],[1400.,0.]])
+        protected = Route([[1000.,-500.],[1000.,500.]])
+        envelope = {'length_mm':512., 'width_mm':412.}
+        prefix = rectangular_starter_end(protected,follower,envelope,85.,**self.limits)
+        physical_bound = 1000. - (512. + 412.)/2 - 85.
+        fit = self.limits['velocity_mm_s']*self.limits['max_step_s']/2
+        self.assertLess(prefix,physical_bound-fit)
+        self.assertAlmostEqual(prefix,physical_bound-fit,delta=.02)
+
+    def test_rectangular_joint_bands_block_a_cross_piece_interval(self):
+        follower = Route([[500.,0.],[500.,450.]])
+        parallel = Route([[0.,0.],[0.,900.]])
+        away_at_end = Route([[0.,0.],[0.,900.],[-600.,900.]],trim_mm=15.)
+        envelope = {'length_mm':512., 'width_mm':412.}
+        self.assertEqual(rectangular_starter_end(parallel,follower,envelope,85.),450.)
+        # The turn is aimed away. The test still accounts for the fit and full
+        # vehicle yaw of any interval with one endpoint on that turn.
+        prefix = rectangular_starter_end(away_at_end,follower,envelope,85.)
+        self.assertGreater(prefix,40.)
+        self.assertLess(prefix,450.)
+
+    def test_rectangular_prefix_keeps_horizon_tolerance_on_first_straight(self):
+        follower = Route([[500.,0.],[500.,900.],[1500.,900.]])
+        protected = Route([[0.,0.],[0.,1500.]])
+        envelope = {'length_mm':512., 'width_mm':412.}
+        prefix = rectangular_starter_end(protected,follower,envelope,85.)
+        self.assertAlmostEqual(prefix,follower.ends[0],delta=3e-5)
+        self.assertLess(prefix+1e-5,follower.ends[0])

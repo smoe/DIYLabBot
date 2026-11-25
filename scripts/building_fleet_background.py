@@ -442,7 +442,7 @@ class BackgroundPreparation:
         release=_return_release(action,request['observed'].get('own_grants_at_start'))
         departures=getattr(e,'departures',None)
         if departures is not None and departures.staged(identity):
-            ticket=departures.ticket
+            ticket=departures.ticket_for(identity)
             if preparation_digest(action)!=ticket['action_sha256']:
                 raise RuntimeError('Private departure action changed before its starter proof')
             held=ticket['resource']

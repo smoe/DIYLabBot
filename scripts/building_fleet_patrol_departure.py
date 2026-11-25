@@ -1,11 +1,13 @@
-"""Admission of one independently checked depot starter alongside a patrol leg."""
+"""Admission and ordered handover of independently checked depot starters."""
 import copy
+import math
 
 from building_fleet_control import preparation_digest
-from building_fleet_departure import independent_starter_end, inside_departure_room
+from building_fleet_departure import independent_starter_end, inside_departure_room, rectangular_starter_end
 from building_fleet_departure_guard import GuardedHomeMap, check_departure_invariant
 from building_fleet_departure_service import DepartureResourceServices
 from building_fleet_depot import exact_home_rest
+from building_fleet_model import scan_angular_allowance
 from building_fleet_motion import Path
 
 
@@ -14,9 +16,10 @@ class PatrolDepartures:
         if world.now != 0 or world._background_preparation is None:
             raise ValueError('Enable private departures only at checked live session startup')
         self.world = world
-        self.ticket = None
-        self.leader_action = self.follower_action = None
-        self.leader_driver = self.follower_driver = None
+        self.tickets = {}
+        self._private_drives = {}
+        self._batch_promoted = False
+        self.leader_action = self.leader_driver = None
         self.attempted = {}
         self.last_unavailable = {}
         self.handovers = 0
@@ -28,16 +31,37 @@ class PatrolDepartures:
                                                    world.depot_aliases, tolerance)
                             for identity in world.vehicles}
 
-    def staged(self, identity):
-        return self.ticket is not None and self.ticket['vehicle'] == identity
+    @property
+    def ticket(self):
+        """Next staged successor, whose handover also protects the remaining batch."""
+        return next(iter(self.tickets.values()), None)
 
-    def _prefix(self, leader_driver, follower_path, polygon):
+    def ticket_for(self, identity):
+        return self.tickets.get(identity)
+
+    def staged(self, identity):
+        return identity in self.tickets
+
+    def _prefix(self, protected_paths, follower_path, polygon):
         world = self.world
         limits = world.source['motion']['empty_linear_limits']
         bounds = dict(max_step_s=world.dt, velocity_mm_s=limits['velocity_mm_s'],
                       acceleration_mm_s2=limits['acceleration_mm_s2'])
-        horizon = independent_starter_end(leader_driver.path, follower_path,
-                                          world.nav.radius, world.nav.reserve, **bounds)
+        # A geometrically clear pair can still block each other's anonymous
+        # scan when both leave their static homes. Include the controller's
+        # full source sensing allowance in the branch admission, not its scans.
+        sensor = world.sensor
+        separation = max(world.nav.reserve, sensor['clearance_mm'] + sensor['range_error_mm']
+                         + scan_angular_allowance(sensor) + world.source['geometry']['localization_tolerance_mm'])
+        horizon = follower_path.ends[0]
+        for path in protected_paths:
+            n = independent_starter_end(path, follower_path, world.nav.radius, separation, **bounds)
+            if n < horizon:
+                n = max(n, rectangular_starter_end(path, follower_path, world.nav.envelope,
+                                                   separation, **bounds))
+            horizon = min(horizon, n)
+            if horizon <= 1e-5:
+                return 0.
         margin = world.nav.radius + world.nav.reserve
         if horizon > 0 and inside_departure_room(follower_path, horizon, polygon, margin, **bounds):
             return horizon
@@ -51,25 +75,40 @@ class PatrolDepartures:
                 upper = middle
         return lower
 
+    @staticmethod
+    def _can_keep_corridor(action, resource, spans):
+        return (not action.get('lift_phase')
+                and action['terminal']['kind'] in ('capacity_home','home','lift_wait','capacity_wait')
+                and bool(spans) and all(span['resource'] == resource for span in spans))
+
+    def keeps_corridor(self, identity, resource):
+        """Keep the same exclusive token through gaps until the verified handover."""
+        ticket = self.ticket
+        return ticket is not None and (identity,resource)==(ticket['leader'],ticket['resource'])
+
+    def check_step_speeds(self, speed_bounds):
+        """Enforce the fit assumption on the exact recorded world PVA."""
+        batch = self.ticket
+        if batch is None:
+            return
+        cap = self.world.source['motion']['empty_linear_limits']['velocity_mm_s']*(1+1e-6)
+        for identity in (batch['leader'], *self.tickets):
+            actual = speed_bounds[identity]['linear_mm_s']
+            if not math.isfinite(actual) or not 0<=actual<=cap:
+                raise RuntimeError('Actual depot step exceeds its guaranteed sweep speed: '+identity)
+
     def try_depart(self, identity, resource):
         world = self.world
-        if self.ticket is not None:
+        batch = self.ticket
+        if self._batch_promoted or identity in self.tickets or (batch and batch['resource'] != resource):
             return False
         leader = world.resources.owners.get(resource)
         home = world.nav.homes[identity]
-        if leader is None or home['area'] == world.nav.homes[leader]['area']:
+        if leader is None:
             return False
         first = world.vehicles[leader]
         action = first['action']
-        if (first['driver'] is None or not action or action.get('lift_phase')
-                or action['level'] != home['level']
-                or action['terminal']['kind'] not in ('capacity_home','home','lift_wait','capacity_wait')):
-            return False
-        # Only a lease covering the leader's whole remaining leg may nominate.
-        # An intermediate release would expose its later return to a new owner.
-        spans = first['gate'].spans
-        if (len(spans) != 1 or spans[0]['resource'] != resource or spans[0]['start_progress_mm'] != 0
-                or abs(spans[0]['end_progress_mm']-first['driver'].goal) > 1e-6):
+        if first['driver'] is None or not action or action['level'] != home['level']:
             return False
         state = world.planner.states[identity]
         signature = (first['leg_id'], tuple(m['mission_id'] for m in state['queue']),
@@ -77,6 +116,19 @@ class PatrolDepartures:
         if self.attempted.get(identity) == signature:
             return False
         self.attempted[identity] = signature
+        # An intermediate release would expose a later part of this path to a
+        # new owner. Check the full path, even if only its starter is installed.
+        if not self._can_keep_corridor(action, resource,
+                                       world.catalog.spans(action['level'], first['driver'].path)):
+            return False
+        # Each earlier staged vehicle may inherit the corridor while this new
+        # starter is still on its private straight. Bind to their full paths.
+        protected_paths = [first['driver'].path]
+        for staged_action, driver in self._private_drives.values():
+            if not self._can_keep_corridor(staged_action, resource,
+                                           world.catalog.spans(home['level'], driver.path)):
+                return False
+            protected_paths.append(driver.path)
         own, grants = world.own(identity), world.own_grants(identity)
         preview = copy.copy(world.planner)
         preview.states = {identity: copy.deepcopy(state)}
@@ -90,7 +142,7 @@ class PatrolDepartures:
                 or proposal['level'] != home['level']):
             return False
         path = Path(proposal['points_mm'], proposal['corner_trim_mm'], proposal.get('corner_trim_caps'))
-        horizon = self._prefix(first['driver'], path, world.depot_polygons[home['level'],home['area']])
+        horizon = self._prefix(protected_paths, path, world.depot_polygons[home['level'],home['area']])
         if horizon <= 1e-5 or horizon >= path.length-1e-5:
             return False
         if not world.resources.reserve_departure_successor(identity, resource, leader, world.now):
@@ -99,25 +151,25 @@ class PatrolDepartures:
         digest = preparation_digest(proposal)
         if preparation_digest(actual) != digest:
             raise RuntimeError('Nominated starter differs from the actual immutable mission action')
-        self.ticket = dict(vehicle=identity, leader=leader, resource=resource, level=home['level'],
-                           area=home['area'], start_xy=path.position(0), end_xy=path.position(horizon),
-                           start_yaw=own['pose_mm_rad'][2], horizon_mm=horizon, action_sha256=digest,
-                           leader_leg=first['leg_id'], granted_s=world.now)
+        self.tickets[identity] = dict(vehicle=identity, leader=leader, resource=resource,
+            level=home['level'], area=home['area'], start_xy=path.position(0), end_xy=path.position(horizon),
+            start_yaw=own['pose_mm_rad'][2], horizon_mm=horizon, action_sha256=digest,
+            leader_leg=first['leg_id'], granted_s=world.now)
         world.start_drive(identity, actual)
         self.leader_action, self.leader_driver = action, first['driver']
         row = world.vehicles[identity]
-        self.follower_action, self.follower_driver = row['action'], row['driver']
+        self._private_drives[identity] = row['action'], row['driver']
         return True
 
     def permits(self, identity, driver):
-        t, world = self.ticket, self.world
-        if (not self.staged(identity) or world.resources.departure_successors.get(t['resource']) != identity
+        t, world = self.ticket_for(identity), self.world
+        if (t is None or identity not in world.resources.departure_successors.get(t['resource'], ())
                 or world.resources.owners.get(t['resource']) != t['leader']
                 or world.vehicles[t['leader']]['leg_id'] != t['leader_leg']
                 or world.vehicles[t['leader']]['action'] is not self.leader_action
                 or world.vehicles[t['leader']]['driver'] is not self.leader_driver
-                or world.vehicles[identity]['action'] is not self.follower_action
-                or driver is not self.follower_driver
+                or world.vehicles[identity]['action'] is not self._private_drives[identity][0]
+                or driver is not self._private_drives[identity][1]
                 or driver is not world.vehicles[identity]['driver'] or driver.joined_nominal
                 or not driver.awaiting_continuation or driver.certified_horizon_mm > t['horizon_mm']+1e-5):
             raise RuntimeError('Private departure lost its bounded action or resource')
@@ -129,7 +181,7 @@ class PatrolDepartures:
             return
         row = world.vehicles[leader]
         if (row['leg_id'] != t['leader_leg'] or world.resources.owners.get(resource) != leader
-                or world.resources.departure_successors.get(resource) != t['vehicle']):
+                or world.resources.departure_successors.get(resource, ()) != tuple(self.tickets)):
             raise RuntimeError('Private departure has lost its reserved handover')
         driver = row['driver']
         terminal = self.leader_action['terminal']
@@ -148,13 +200,20 @@ class PatrolDepartures:
             raise RuntimeError('Private departure handover requires exact home rest')
 
     def released(self, leader, resource):
-        if self.ticket and self.ticket['leader'] == leader and self.ticket['resource'] == resource:
-            if self.world.resources.owners.get(resource) != self.ticket['vehicle']:
-                raise RuntimeError('A staged departure lost its reserved corridor succession')
-            self.ticket = None
-            self.leader_action = self.follower_action = None
-            self.leader_driver = self.follower_driver = None
-            self.handovers += 1
+        ticket = self.ticket
+        if not ticket or (ticket['leader'], ticket['resource']) != (leader,resource):
+            return
+        world = self.world
+        successor = ticket['vehicle']
+        if world.resources.owners.get(resource) != successor:
+            raise RuntimeError('A staged departure lost its reserved corridor succession')
+        action, driver = self._private_drives.pop(successor)
+        del self.tickets[successor]
+        self.handovers += 1
+        self._batch_promoted = bool(self.tickets)
+        self.leader_action, self.leader_driver = (action, driver) if self.tickets else (None,None)
+        for pending in self.tickets.values():
+            pending.update(leader=successor, leader_leg=world.vehicles[successor]['leg_id'])
 
     def audit(self):
         world = self.world
@@ -166,7 +225,8 @@ class PatrolDepartures:
         excluded = {identity for identity, last in self.last_unavailable.items() if last >= expiry}
         for identity, row in world.vehicles.items():
             if row['driver'] is not None:
-                room = self.ticket['area'] if self.staged(identity) else None
+                ticket = self.ticket_for(identity)
+                room = ticket['area'] if ticket is not None else None
                 world.depot_maps[identity].select_occupied_homes(excluded, private_room=room)
         return check_departure_invariant(states, world.nav.homes, world.depot_polygons, world.depot_aliases,
-                                         world.resources.owners, world.nav.reserve, self.ticket)
+                                         world.resources.owners, world.nav.reserve, self.tickets.values())

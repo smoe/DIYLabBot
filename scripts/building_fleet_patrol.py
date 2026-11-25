@@ -419,8 +419,8 @@ class PatrolWorldRunner(WorldRunner):
     def idle_action(self, identity):
         """Admit a home departure before preparing its expensive nominal curve.
 
-        The live policy can reserve one queued successor's private starter.
-        Other vehicles wait at their own home until the corridor is granted.
+        Queued vehicles can stage on privately checked straights with an
+        ordered handover. Entry to the shared corridor still needs its token.
         """
         row = self.vehicles[identity]
         if self._startup_policy()=='own_received_camera_frame'and not self._own_startup_ready(identity):

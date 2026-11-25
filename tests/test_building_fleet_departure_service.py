@@ -22,8 +22,9 @@ class DepartureServiceTests(unittest.TestCase):
             self.assertFalse(service.reserve_departure_successor(vehicle,resource,leader,now))
         self.assertTrue(service.reserve_departure_successor('C','room','A',2))
         self.assertTrue(service.reserve_departure_successor('C','room','A',3))
-        self.assertFalse(service.reserve_departure_successor('B','room','A',3))
-        self.assertEqual(dict(service.departure_successors),{'room':'C'})
+        self.assertTrue(service.reserve_departure_successor('B','room','A',3))
+        self.assertTrue(service.reserve_departure_successor('C','room','A',3))
+        self.assertEqual(dict(service.departure_successors),{'room':('C','B')})
         with self.assertRaises(TypeError):service.departure_successors['room']='B'
         self.assertEqual(service.request('C','room',3),{'status':'waiting','resource':'room'})
         self.assertEqual(service.queues['room'],['B','C'])
@@ -54,6 +55,38 @@ class DepartureServiceTests(unittest.TestCase):
         self.assertEqual([e['vehicle_id'] for e in service.events],list('ADBEC'))
         self.assertEqual([e['wait_s'] for e in service.events],[0,2,6,5,8])
         self.assertEqual(service.own_waiting_grants('D'),booking)
+
+    def test_reserved_batch_drains_with_exact_ownership_then_an_ordinary_turn(self):
+        service = DepartureResourceServices({'room':'room'})
+        service.enable_depot_departures(['room'])
+        for now, vehicle in enumerate('ABCDEFG'):
+            service.request(vehicle, 'room', now)
+        self.assertTrue(service.reserve_departure_successor('F','room','A',6))
+        self.assertTrue(service.reserve_departure_successor('D','room','A',6))
+        self.assertTrue(service.reserve_departure_successor('F','room','A',6))
+        self.assertEqual(service.departure_successors['room'], ('F','D'))
+
+        service.release('A', 'room', 7)
+        self.assertEqual(service.owners, {'room':'F'})
+        self.assertEqual(service.holds, {'F':'room'})
+        self.assertEqual(service.departure_successors['room'], ('D',))
+        self.assertEqual(service.own_grants('D'), {'status':'waiting','resource':'room'})
+        self.assertFalse(service.reserve_departure_successor('G','room','A',7))
+        self.assertFalse(service.reserve_departure_successor('G','room','F',7))
+        self.assertEqual(service.queues['room'], list('BCDEG'))
+
+        service.release('F', 'room', 8)
+        self.assertEqual(service.owners, {'room':'D'})
+        self.assertEqual(service.holds, {'D':'room'})
+        self.assertEqual(service.departure_successors, {})
+        self.assertFalse(service.reserve_departure_successor('G','room','D',8))
+        self.assertEqual(service.queues['room'], list('BCEG'))
+
+        service.release('D', 'room', 9)
+        self.assertEqual(service.owners, {'room':'B'})
+        self.assertEqual(service.queues['room'], list('CEG'))
+        self.assertTrue(service.reserve_departure_successor('G','room','B',9))
+        self.assertEqual([event['vehicle_id'] for event in service.events], list('AFDB'))
 
 
 if __name__ == "__main__":
