@@ -1,11 +1,11 @@
 {
-  "export_revision": "release-r1",
+  "export_revision": "bf01-six-patrol",
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "html": {
-    "bytes": 52594869,
-    "sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337"
+    "bytes": 53159530,
+    "sha256": "7f0a32d7865f8928b3c09f013c7ffd3fec1fa22d1341a80e077c87e12088f8fe"
   },
-  "integrated_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
+  "integrated_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
@@ -24,45 +24,26 @@
   "local_browser_evidence": {
     "lift_walking": {
       "bytes": 138840,
-      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
+      "html_sha256": "7f0a32d7865f8928b3c09f013c7ffd3fec1fa22d1341a80e077c87e12088f8fe",
       "passed": true,
-      "path": "exports/building-fleet/startup-progress/release-r1/checks/lift/lift-walking-browser-report.json",
-      "sha256": "5951bb74c876d7b7ed7d3c103d6307dcfc185cd26ea693329bcbec2646d26f3f"
+      "path": "exports/building-fleet/patrol-six/publication/checks/lift/lift-walking-browser-report.json",
+      "sha256": "cc474666665fcf5078abccb4bb5924dce896298a371fda769a68a8168c354db7"
     },
     "main": {
-      "bytes": 39615,
-      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
+      "bytes": 35875,
+      "html_sha256": "7f0a32d7865f8928b3c09f013c7ffd3fec1fa22d1341a80e077c87e12088f8fe",
       "passed": true,
-      "path": "exports/building-fleet/startup-progress/release-r1/checks/main/browser-check.json",
-      "sha256": "01e7da0cfab48c788d39b9e071ad3577b735b8fb5810932931b103e812d85120"
-    },
-    "startup_progress": {
-      "bytes": 670,
-      "html_sha256": "0b837381c3b67b673664552b4bb1ecc381422999bc8ed38451e87ad63e5bf337",
-      "passed": true,
-      "path": "exports/building-fleet/startup-progress/release-r1/checks/slow-start/loading-progress-check.json",
-      "sha256": "6efe497ce5dcc5dc1a60ad1a2033ff908c187205ccf30808124774e30559bfe1"
-    }
-  },
-  "local_native_checks": {
-    "camera_receipt": {
-      "bytes": 1533,
-      "path": "exports/building-fleet/jerk-01c7cff/publication/normal-camera-recheck-r1/receipt.json",
-      "sha256": "dffe14ad66ef21838a86e1822f66ddfed2e05e05f4629c5f2359f74d567599fa"
-    },
-    "complete_route": {
-      "bytes": 661200,
-      "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/complete-route-check.json",
-      "sha256": "f70635b20f8847584c11c7074bc1cb4e7932a5bd50726150b62c783fd693be3f"
+      "path": "exports/building-fleet/patrol-six/publication/checks/main/browser-check.json",
+      "sha256": "18b50cc2e72274790901e2f823ff5c57dfe4445f875714202c3c6e1bfb8bd17f"
     }
   },
   "native_builds": {
     "building": {
-      "native_sha256": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
-      "report": "exports/generated/building-stack-268bd52d21e1/build-report.json",
-      "report_sha256": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
-      "revision": "building-stack-268bd52d21e1",
-      "source_sha256": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a"
+      "native_sha256": "97780c346cfb3ceae2f0b6f5e9de56eb5ad7353c8129ed287d1de9504690102a",
+      "report": "exports/generated/building-stack-579aa4e06390-r2/build-report.json",
+      "report_sha256": "260b855722660bf385abccf62eaa74bb5d7aa7030fe7ae4ff4744d06c1092d11",
+      "revision": "building-stack-579aa4e06390-r2",
+      "source_sha256": "579aa4e0639084065796df8c69a5411c050f3ee09d16a3936b605217a79ff7d1"
     },
     "lab": {
       "native_sha256": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
@@ -72,16 +53,12 @@
       "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
     }
   },
-  "native_evidence_origin": {
-    "current_world_native_builds_identical": true,
-    "pages_commit": "1b924f61576164ed9ce2d39f5ee230b4026774b2",
-    "source_commit": "8806231ff6f226b63e5b585d7b283c9de4e35bfe"
-  },
   "packager": {
-    "bytes": 8867,
-    "path": "exports/building-fleet/startup-progress/package.py",
-    "sha256": "f16b9cba415d7152e260a81485ca6cebf80ae415a4f19b04cecaab37aae01bc1"
+    "bytes": 8729,
+    "path": "exports/building-fleet/patrol-six/publication/stage-release.py",
+    "sha256": "1fb25e4c51a7ac53b21534a3b649848a13eb1c67840f4830543bfff818e4b9e9"
   },
+  "previous_pages_commit": "388c15c1b6c03a7e78c4ef661b76efa168ea6386",
   "qualification": {
     "collision_checked": false,
     "lab_to_building_registered": false,
@@ -90,19 +67,20 @@
   "related_pages": {
     "bf01": {
       "html": {
-        "bytes": 9182729,
-        "sha256": "8c7bf8655696d0ac13d907d27cff43f5f74f00c506b8d170ca479b164026db70"
+        "bytes": 9390436,
+        "sha256": "5c88e472d7ce5771fadbb8099d4590baafa78a798c3b9416de65ed2621b93e59"
       },
-      "manifest_sha256": "18efe042cebb447e95cd5c9c2ed0a8280f284a66d19d178b315d55306ab872ab",
-      "source_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
-      "source_tree": "3a5f6765e27e6d6e6816d31fd04badc9769bae1d",
+      "manifest_sha256": "210dba212646e6b36573137c9be61c89d39bbd74d1db58b7b6522c5b8ae3dee0",
+      "source_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
+      "source_tree": "b79ec9f90c856d5b291e767161011376b95cac43",
       "status": "experimental_live_browser_patrol",
-      "url": "https://smoe.github.io/DIYLabBot/bf01/"
+      "url": "https://smoe.github.io/DIYLabBot/bf01/",
+      "vehicle_count": 6
     }
   },
-  "source_commit": "e513e5249f082b430b34c30629902a8b0ceb45a3",
+  "source_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
   "source_files_sha256": {
-    "cad/generated/building-stack-268bd52d21e1/overview.FCStd": "71f56324cfdab5cbf18366fb44199b8267d4a8565c0aae6a26d4f0a21ee1d777",
+    "cad/generated/building-stack-579aa4e06390-r2/overview.FCStd": "97780c346cfb3ceae2f0b6f5e9de56eb5ad7353c8129ed287d1de9504690102a",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
     "cad/lab-layout-l01/shared-build-report.json": "ce049adb793a7bb7e981f66856211286956cb1760b5fc47dc4f4f0fe507568f6",
     "cad/vendor/myactuator/RMD-X2-P28-7-E/260920/derived/registered-v1/housing.step": "c4647277cb390352caaa65af7ae58e8514a5b019e28c1328cea91d52ca240875",
@@ -115,9 +93,9 @@
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/interface-check-fit-v1.json": "564bcc859e8df9b2c6a33dd399007c9d5701ee78109a3afb34c9ef393ce31c67",
     "cad/vendor/myactuator/RMD-X6-P20-60-E/260920/derived/registered-v2/output.step": "0cfb142e92638955ffb11cc617e4393840a291bb8875eee16f01a77ea9936c11",
     "cad/vendor/myactuator/component-library.json": "d5768ba366a09d8aaa2ca487a069eb4206cba13492bd3787867cfcc50bb82efa",
-    "exports/generated/building-stack-268bd52d21e1/build-report.json": "231b8eb845e18e9e747e377753fc99b5324398b8f29d3030fb0a6695a838a862",
-    "exports/generated/building-stack-268bd52d21e1/overview.case.json": "946a342182084faf0d1d2ced592b07f1844f027d3985df93808e243f551a3fb7",
-    "exports/generated/building-stack-268bd52d21e1/overview.freecad.json": "fa8445a1ecfda05180dbe11030f701d03bc4fcd1ff8c50dce31992486578e567",
+    "exports/generated/building-stack-579aa4e06390-r2/build-report.json": "260b855722660bf385abccf62eaa74bb5d7aa7030fe7ae4ff4744d06c1092d11",
+    "exports/generated/building-stack-579aa4e06390-r2/overview.case.json": "0da772cffdb0e2cb2f64aa0cedf4ecfdbbdf9de6e5c80ab0e0acc4e8d53957a9",
+    "exports/generated/building-stack-579aa4e06390-r2/overview.freecad.json": "08043bcc394ab2ff08f0b9fe2fff232b784ffe2baaa93a34b33bbdd3257e6e16",
     "exports/generated/lab-layout-l01-953a32f28782/layout-validation.json": "cc8ed002b3ebb9b37ae5ac92bf4315897453e546caae412a23adb14c4a84a0a4",
     "model/assembly-reference.schema.json": "aa87f3af2dabbaf2b22de6e0774df2dc7fb2988358c536b60975990c73a9ccb3",
     "model/atrium-seating.schema.json": "56fc758e9f2faf2c3a590793b5c4bd961fc21fc5617856d41841b083781c0810",
@@ -125,25 +103,25 @@
     "model/basic-laboratory-furnishings.schema.json": "53ceb1b080578437a0ce336069b6c419b7e40c31472f2c38e059c4e0935fccda",
     "model/building-alignment.schema.json": "d2e9bcd2496cff0dc81e7385c343c24fb7ffd6a883ea838ad671c635eb1c985e",
     "model/building-doors.schema.json": "9d21e2eb2f87ea1e16105756c1a56b33bdac147357a36131beb82a4714b36196",
-    "model/building-doors.shared.json": "1da43253f83dcdbc5279d945dbc22c7d58691d00f0b9ff4507b1ac6405fb0391",
-    "model/building-exterior.schema.json": "2196c3d97b3b353859dbb8e96daff731f365d3b903da0f50abe7dad9ef1bed18",
-    "model/building-fleet-demo.shared.json": "b5db27834c2f373a1b5f5871a2b78067176e157e32eb33baf539a978fd38e4cb",
+    "model/building-doors.shared.json": "aa4e83e1e19e2de6e0a3736e5fb276573ed9e9765f4d195a4b18384190f54c18",
+    "model/building-exterior.schema.json": "7c1aa6c0f1ebc87574c0330687bdad7711a1d9d98ccdbaa3c13c87740adda804",
+    "model/building-fleet-demo.shared.json": "639b84d8eebbb53635d8e1339c861c053691ddcb7ab6f006228b2bf8762125a4",
     "model/building-furnishings.schema.json": "89ad72ee8f733a0dfa4316428eade6237f07d941fbd1895f90feedd8e2d0f775",
     "model/building-laboratories.schema.json": "5b2dde953592edad71c1103d847cb0094d56641c0ab63da411391933609ebe20",
     "model/building-microscopy.schema.json": "e8ed15fb14e7412d68f9993f5fde91abcf7be510abe040f952761d8bb5f3dea9",
     "model/building-stack.schema.json": "c7028202edd2589fd0011b147d211254798beae6d5e5d78dea82e69e49cad08c",
-    "model/building-stack.shared.json": "268bd52d21e1339c17c167dd979de28cb42c384f11b5cf857ab2cdae10282c6a",
+    "model/building-stack.shared.json": "579aa4e0639084065796df8c69a5411c050f3ee09d16a3936b605217a79ff7d1",
     "model/building-walkthrough.schema.json": "413825e4623787bfe71f3ed6d7a18d215d950248e8d0899a73e409057c63c31d",
-    "model/building-walkthrough.shared.json": "7601a1b1a6266dc71bc60d4cce644abb1c284f4716beee82c48294222fa9cde7",
+    "model/building-walkthrough.shared.json": "2aeb85158850bc39967df38f158f99fc31f7f78c5b7a76552c930df88d51abd5",
     "model/centrifuge-cf01.shared.json": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
-    "model/doors/room-doors.catalog.json": "ca1ca64116573e7d34ca370bb954412cb4cbab0472cc3d59dbfe93d893aedd2b",
+    "model/doors/room-doors.catalog.json": "f912c7ff4fb2936009a83854f12ddabec79c2eb0d46c7ea09de8be015d7378ec",
     "model/environments/l01.geometry.json": "d0c89afd843f352570cac4cb88cadb0eb41bba4048bfd95435139e2284bdf608",
     "model/equipment/foyer-monitor-wall.json": "6bb93e0469d4d69b4ff3968f694e04b23e6935c4d2055416ea0b5a674c57dc31",
     "model/equipment/kitchen-3008.json": "33d8cf485422c9e855ee5c8d47a445efcf37d531b04e902f5ab390fb685fe113",
     "model/equipment/microscopy-3007.json": "59e0f172e09c7b4452be4827cb60d96fb33d5b186acf25268389e050c5e98bb2",
     "model/floor-f03.shared.json": "a430fc8e917f0ee98f30f8a6fa8f8ff0f7f49868d915e771620c6c91d7a877c2",
     "model/foyer-camera-wall.schema.json": "b5c391bc2f1014974f7bd5e7fef2ef111f317933d74e4a5f01a75bd087bd4d38",
-    "model/foyer-camera-wall.shared.json": "e85fc255b31eaf17e50e9ffb421f55a7fa20a2c622bbd07a0f6c652b2dfb63aa",
+    "model/foyer-camera-wall.shared.json": "6bf3c0dbf98084a0b83e39bd22ed36ac1152b0746ca368fa41b257e1262b31c2",
     "model/foyer-monitor-wall.schema.json": "3b7a25c8a667d92236facd17fe3142b141ec164b60b2206bddea028b8f303d61",
     "model/furnishings.schema.json": "9778d5fffc38c81b5aec191cbf5a9260c6e200751f686ea0d8bc060569a31376",
     "model/furnishings/basic-laboratory.shared.json": "fa5fa071721229ff88de7ca1b1bf68395ed1bd77ab4943412f54894278181796",
@@ -176,7 +154,7 @@
     "model/relative-floorplan.schema.json": "f591e71ccf8e06e5a297c37986a20b63a14f9ec76aa046f839129e9cf6d1c9cf",
     "model/robot.json": "978fa3557abcfe549f5c2bd572c761d387310c2983f1d4e60cfd903df621bfdd",
     "model/room-composition.schema.json": "67753cb2a3eb4ca1de6fc6171f7137293c1a36fabfdef00724e65c4624f20f2d",
-    "model/room-door-catalog.schema.json": "814090d3b1463b346bb4a2774ece5fb40881c80f5a1822d417fe1e41aad8e14d",
+    "model/room-door-catalog.schema.json": "9a6a69c7ab0109305c3b5ef316033df3a6b6a4433db74397a09ed02dee11da77",
     "model/room-geometry.schema.json": "085e6cea72e8c0f4080cac279eff01544a1479c642d9a80051ab38197a5520f4",
     "model/sample-transport-tr01.shared.json": "4785a40b8bad5aece8ea7c9e99042e3f6d0e5403cc42facad95aa8665a0ecb5a",
     "model/seminar-room.schema.json": "a7f885404c6fa8d6362a1fa5455bb8bc4db31d7f3d74db7d56cc1dd1756485d5",
@@ -209,8 +187,8 @@
     "scripts/build_tube_carrier_freecad.py": "fffd4f03542716c7bb269a79a8b5b8b11aef41e2274c504606f39c1dbcf25f20",
     "scripts/building_alignment.py": "1b6a776639b1f14c6c9df31258a426010f3bc1b12cbb9ed77a9d32154edf358f",
     "scripts/building_circulation.py": "818ecc95503b30342eefa9e7f430d04bd96ff05840c6ba650f2297899fe5dd66",
-    "scripts/building_doors.py": "9c10dee44d5104cd74fb87abf32659a1bc9691b01b4aa73a9535172e989608bd",
-    "scripts/building_exterior.py": "1f240113c839000af0b8626a472ef19ea21d4769b888a66a4fd3df46138128d5",
+    "scripts/building_doors.py": "b02c472c15d1e0ecfe0c295c9f7670e1f507e44812d8eca990849b73a0e2c296",
+    "scripts/building_exterior.py": "dcaca502478490cccf3f10fa9d19e637b2101ed768ce8baed52f6089b50cfc41",
     "scripts/building_furnishings.py": "edc841bc2c1910f212109f3f4ff7e7ce8e03d8ee221be8c959471d5e086c88ed",
     "scripts/building_guards.py": "297b418ad939086e9130aaa0604a4153e41adb5e79e04f3efbc53812200f3d28",
     "scripts/building_ice_maker.py": "e3558c309b898ad96eb43e83951e45c0f66d332a93abaadf650e0dc48a90ed67",
@@ -224,8 +202,8 @@
     "scripts/building_seminar_windows.py": "b967068bfdaab6a20be5649dfb474e8ef8d7fac3b00510c9b0dbc6372b74d9e3",
     "scripts/building_stack.py": "95a9fb51f335097d902225fe561902eba709bd84b8c68aaff2e15aed1e0aacb6",
     "scripts/building_walkthrough.py": "b9fda546ed2c31c39bee3e19efbc69a54bc5fc11f57978bc31ad0cb10e62fdd7",
-    "scripts/building_walkthrough_viewer.html": "f7805078b6bf2b4b1b2698e676f8dd76db4e91b747276ff85a74a6c8932d8170",
-    "scripts/camera_monitor_wall.js": "2885c152547dcc8656df23662755ec74cecfe11a991ef53a38d3c38425c42450",
+    "scripts/building_walkthrough_viewer.html": "de7baabd340b0de7d480bc2519f03d0cece63d1d47c0836f6c3ee6896d3e982f",
+    "scripts/camera_monitor_wall.js": "1c3c1dd1e5fbfae59baa06cb2cfd7c5b0131116aa46d243da8c767a17543d420",
     "scripts/centrifuge_mechanisms.py": "bdd93bb406cc21af6e300d5fae52a458ab7ed512a07e471e7cb2c34334f7b34b",
     "scripts/centrifuge_model.py": "f0859ec069340898f16c7670ed461be80a2488a4ad1ea08e4eeb8a54938a2d8f",
     "scripts/export_building_walkthrough_freecad.py": "dbf08c1db9620517689694ccbbe3f77b0309e75fce803067404d24c60fc92563",
@@ -275,18 +253,18 @@
     "scripts/worktop_equipment.py": "8d0171ac81accbe87f6cceabdc427d6c790a629e1d44b5a9ed59c1a98784dc0a",
     "scripts/x6_mounting_design.py": "79c62c0a7ac4ba743512ba431a52c92e1ae31c2a88d24a369eb62228faa80927"
   },
-  "source_manifest_sha256": "d92d2414df0a421d00e39917e66cf27ffd54587c9c3053a2baae174dd39453e8",
+  "source_manifest_sha256": "47c31d7fe2336617220a03f4320c7283036ef5b9431cd7db69b40f62544aa9e6",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_tree": "3a5f6765e27e6d6e6816d31fd04badc9769bae1d",
+  "source_tree": "b79ec9f90c856d5b291e767161011376b95cac43",
   "url": "https://smoe.github.io/DIYLabBot/",
   "world_presentation_build": {
-    "bytes": 9151,
-    "path": "exports/building-fleet/startup-progress/build.py",
-    "sha256": "6a3b8f5e00ff5c67a3c1baf2a07c42fb6b24cdf22f16006eda0202d26f6eb2e1"
+    "bytes": 22607,
+    "path": "exports/building-fleet/patrol-six/publication/root-build.json",
+    "sha256": "bd4cb1f8f6e4d3d4319832564ca967b8e7d7e8779112977839d6f37c2b1ceafa"
   },
   "world_report": {
-    "bytes": 19677,
-    "path": "exports/building-fleet/jerk-01c7cff/walkthrough-r1/world-build-report.json",
-    "sha256": "66ea844c187ccd22e96fa144debfeff9c5d8b369a2201615b6ef2fafb168dad5"
+    "bytes": 19659,
+    "path": "exports/fire-stair-glass/browser/world-build-report.json",
+    "sha256": "f9a87f76e27bc1e69f0ed07ec30803a5f1a2a557d13d16984afa027f3e956d56"
   }
 }

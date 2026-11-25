@@ -16,6 +16,7 @@ export function validateManifest(manifest,config){
  require(runtime?.engine==='pyodide'&&runtime.execution==='module_web_worker'&&runtime.pacing==='source_step_without_wall_clock_catchup'&&typeof runtime.version==='string','Declared browser Python runtime required');
  require(runtime.loader_module_url==='https://cdn.jsdelivr.net/pyodide/v'+runtime.version+'/full/pyodide.mjs','Official version-matched Pyodide loader required');
  require(session?.scope==='independent_live_session_per_page'&&session.start==='new_patrol_world'&&session.recording_fallback===false,'Every visitor must start an independent live world');
+ require(manifest.vehicle_count===undefined||manifest.vehicle_count===6||manifest.vehicle_count===20,'Supported active fleet count required');
  const browser=manifest.browser_config;require(browser&&manifest.files[checkedPath(browser.path)]?.sha256===browser.sha256,'Leading browser configuration must be pinned in the bundle');
  require(manifest.inputs&&typeof manifest.inputs==='object'&&manifest.inputs.browser_source===browser.path,'Source-matched bootstrap inputs required');
  if(manifest.format.endsWith('/2')){
@@ -140,7 +141,15 @@ export async function extractArchive(pyodide,archive,manifest){
   pyodide.FS.writeFile('/project/'+row.name,raw);
  }
 }
-function parseState(raw){const state=typeof raw==='string'?JSON.parse(raw):raw;require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&state.integration_step_s<=.05,'Executed Python simulation snapshot and source control step required');return state;}
+function parseState(raw,expectedCount){
+ const state=typeof raw==='string'?JSON.parse(raw):raw;
+ require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&state.integration_step_s<=.05,'Executed Python simulation snapshot and source control step required');
+ if(expectedCount!==undefined){
+  const count=state.vehicle_count===undefined?20:state.vehicle_count;
+  require(count===expectedCount&&Array.isArray(state.states)&&state.states.length===expectedCount,'Executed Python fleet differs from the bundled count');
+ }
+ return state;
+}
 export async function loadRuntimeAssets(manifest,config,{loadModule=url=>import(url),fetchArchive=download,fetchCore=download,progress}={}){
  const core=manifest.python_core;
  const totalFiles=1+(core?CORE_FILES.length:0);
@@ -213,20 +222,23 @@ async function loadPythonBridge(config,progress,onCompactAssetsReady,assetProgre
 }
 export async function loadPythonRuntime(config,progress,onCompactAssetsReady){
  const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactAssetsReady,progress);
- const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))));
+ const count=manifest.vehicle_count??20;
+ const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))),count);
  let hasMotion=Boolean(state.has_motion);
  return{initial:state,background:manifest.format.endsWith('/2'),
   snapshotIntervalSteps:state.snapshot_interval_steps??1,get hasMotion(){return hasMotion;},
   tick:(capture=true)=>{const value=JSON.parse(runtime.tick(capture));hasMotion=Boolean(value.has_motion);
-   if(capture)return parseState(value);
+   if(capture)return parseState(value,count);
    require(value.format==='solidcraftbot.building-fleet-live-step/1'&&Number.isFinite(value.model_time_s)&&typeof value.paused==='boolean'&&value.integration_step_s===state.integration_step_s,'Executed source step receipt required');return null;},
-  command:command=>parseState(runtime.command(JSON.stringify(command))),
+  command:command=>parseState(runtime.command(JSON.stringify(command)),count),
   pendingJobs:()=>JSON.parse(runtime.pending_jobs()),completeJob:value=>runtime.complete_job(value.result_json),
   dispose:()=>runtime.destroy?.()};
 }
 export async function loadPythonPlanner(config,progress){
- const {runtime,inputs}=await loadPythonBridge(config,progress);
- runtime.boot_planner(JSON.stringify(inputs),value=>progress(JSON.parse(value)));
+ const {runtime,inputs,manifest}=await loadPythonBridge(config,progress);
+ const ready=JSON.parse(runtime.boot_planner(JSON.stringify(inputs),value=>progress(JSON.parse(value))));
+ const count=ready.vehicle_count===undefined?20:ready.vehicle_count;
+ require(ready.status==='ready'&&count===(manifest.vehicle_count??20),'Background planner fleet differs from the bundled count');
  return{prepare:job=>({result_json:runtime.prepare_job(job.request_json,value=>progress(JSON.parse(value)))}),dispose:()=>runtime.destroy?.()};
 }
 export function createBackgroundPlanner(config,progress,workerFactory=url=>new Worker(url,{type:'module',name:'BF01 checked route preparation'})){
