@@ -1,11 +1,11 @@
 {
-  "export_revision": "bf01-six-patrol",
+  "export_revision": "bf01-return-bay",
   "format": "solidcraftbot.building-walkthrough-pages/1",
   "html": {
     "bytes": 53159530,
     "sha256": "7f0a32d7865f8928b3c09f013c7ffd3fec1fa22d1341a80e077c87e12088f8fe"
   },
-  "integrated_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
+  "integrated_commit": "ce81db3d2a4d8e204aa50a04d7a2c10f9dae5ffc",
   "limitations": [
     "Building XY dimensions are presentation-scaled and storey heights are assumptions, not a survey.",
     "The L01 definition is evaluated as a presentation variant inside OG3/R3_003; this is not a surveyed building registration.",
@@ -54,11 +54,11 @@
     }
   },
   "packager": {
-    "bytes": 8729,
-    "path": "exports/building-fleet/patrol-six/publication/stage-release.py",
-    "sha256": "1fb25e4c51a7ac53b21534a3b649848a13eb1c67840f4830543bfff818e4b9e9"
+    "bytes": 9335,
+    "path": "exports/building-fleet/return-bay-six/publication/stage-pages.py",
+    "sha256": "92bf00ab21f991141d68cbb949550535b42e8da6cd3d5fb19eb6039be7c8b405"
   },
-  "previous_pages_commit": "388c15c1b6c03a7e78c4ef661b76efa168ea6386",
+  "previous_pages_commit": "dbfefec504d6ea713b137f0c322d3f2c2b318d3d",
   "qualification": {
     "collision_checked": false,
     "lab_to_building_registered": false,
@@ -68,17 +68,26 @@
     "bf01": {
       "html": {
         "bytes": 9390436,
-        "sha256": "5c88e472d7ce5771fadbb8099d4590baafa78a798c3b9416de65ed2621b93e59"
+        "sha256": "683e4fa1c8b0553d52a4f09c9b7c5a072777acc0cd3c8fd8d3b084dc27948e06"
       },
-      "manifest_sha256": "210dba212646e6b36573137c9be61c89d39bbd74d1db58b7b6522c5b8ae3dee0",
-      "source_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
-      "source_tree": "b79ec9f90c856d5b291e767161011376b95cac43",
+      "manifest_sha256": "cdc0a0bd2386a042e82697aebe86cbb04f3ddf6038409400f645d4bfa95d0139",
+      "source_commit": "ce81db3d2a4d8e204aa50a04d7a2c10f9dae5ffc",
+      "source_tree": "414464d26207478852428e83c4fd2878027966cb",
       "status": "experimental_live_browser_patrol",
       "url": "https://smoe.github.io/DIYLabBot/bf01/",
       "vehicle_count": 6
     }
   },
-  "source_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
+  "root_render_reuse": {
+    "html": {
+      "bytes": 53159530,
+      "sha256": "7f0a32d7865f8928b3c09f013c7ffd3fec1fa22d1341a80e077c87e12088f8fe"
+    },
+    "pages_commit": "dbfefec504d6ea713b137f0c322d3f2c2b318d3d",
+    "source_commit": "b2a1f33ff8621d56acc8a231e4ecaf9c6c63278e",
+    "verified_source_pin_count": 172
+  },
+  "source_commit": "ce81db3d2a4d8e204aa50a04d7a2c10f9dae5ffc",
   "source_files_sha256": {
     "cad/generated/building-stack-579aa4e06390-r2/overview.FCStd": "97780c346cfb3ceae2f0b6f5e9de56eb5ad7353c8129ed287d1de9504690102a",
     "cad/generated/lab-layout-l01-953a32f28782/LabLayout_L01.FCStd": "e6f195665bf41c37023c8e982a7c2e40bc8900e6bc131d2dca1bddcd7f72fcc5",
@@ -255,7 +264,7 @@
   },
   "source_manifest_sha256": "47c31d7fe2336617220a03f4320c7283036ef5b9431cd7db69b40f62544aa9e6",
   "source_repository": "https://github.com/smoe/DIYLabBot",
-  "source_tree": "b79ec9f90c856d5b291e767161011376b95cac43",
+  "source_tree": "414464d26207478852428e83c4fd2878027966cb",
   "url": "https://smoe.github.io/DIYLabBot/",
   "world_presentation_build": {
     "bytes": 22607,
