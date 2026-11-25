@@ -1,0 +1,32 @@
+{
+  "format": "solidcraftbot.cutrun-preparation/3",
+  "id": "CutRunSKMel29H3K4me3Draft",
+  "base_preflight": {
+    "source": "model/cutrun-automation.preparation.json",
+    "source_sha256": "fa465b701475c6030418f6433e48df2e2c59f3ac3107d355cf52d3b7d373180d"
+  },
+  "source_binding": {
+    "sop_draft": {
+      "source": "model/cutrun-manual-sop.protocol.json",
+      "source_sha256": "7c1b5791e8eacfff64a7f9a0b07c1b8cba2ffa394f35f6a258a9ec4d07503480",
+      "id": "SOP-CR-SKM29-H3K4me3",
+      "revision": "0.1"
+    },
+    "manual_reference": {
+      "source": "model/cutrun-manual-runtime.profile.json",
+      "source_sha256": "65cb211f2949fc3293f40996520755ce210a5f2b568168bfaa74ff372b031fa5"
+    },
+    "manufacturer": {
+      "kit": "CST #86652",
+      "url": "https://media.cellsignal.com/pdf/86652.pdf",
+      "source_sha256": "4569c1793c112e94cd8b0e5ca11ac7a82c53b2ce5dd46ce30831f653c830a34f",
+      "datasheet_revision": "9",
+      "protocol_revision": "09/2026"
+    },
+    "confirmation": {
+      "decision_id": "O11",
+      "status": "open",
+      "evidence_ref": null
+    }
+  }
+}

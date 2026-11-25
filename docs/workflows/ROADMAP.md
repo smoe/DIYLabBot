@@ -1,11 +1,11 @@
 # Roadmap: Laborabläufe und CUT&RUN
 
-**Stand 12. November 2026. E0 ist begonnen; die SOP-Bindung bleibt offen.
+**Stand 25. November 2026. E0 ist begonnen und die operative SOP-Bindung ist offen.
 E1 ist für den synthetischen Referenzfall implementiert und geprüft;
 E2 ist als gemeinsamer synthetischer Materialvertrag implementiert;
 E3 ist als synthetischer Prozessvertrag implementiert;
-E4 ist mit Vorbereitungspaket, lokalem SOP-Entwurf 0.1 und manuellem
-Stufenvertrag mit Zeit-/Temperaturbelegen begonnen;
+E4 ist mit Vorbereitungspaket, lokalem SOP-Entwurf 0.1, manuellem
+Stufen- und Rezeptvertrag, S09-Fixture und konsolidiertem Inputzweig begonnen;
 E5–E7 sind geplant.** Diese Datei führt Reihenfolge,
 Abhängigkeiten und Übergaben. Die verbindlichen Architekturgrenzen stehen im
 [CUT&RUN-Ablaufvertrag](../../ARCHITECTURE.md#cutrun). Sie ist keine zusätzliche
@@ -23,6 +23,8 @@ Arbeits-SOP, Gerätefreigabe oder vollständige mechanische Entwicklungsplanung.
 | [Wasch- und Reagenzvertrag](../cutrun-manual-runtime.md#merged-cutrun-manual-recipe) | Ausgewählte Waschgruppen, Arbeitsmischungen, Istverbräuche und Fraktionen auf demselben Ledger; offene lokale Parameter |
 | [Manueller Laufzeitvertrag](../cutrun-manual-runtime.md) | Getrennte /3-Engines für Aufzeichnung und vollständige lokale SOP-Stufenfolge, phasenbezogene Zeit-/Temperaturbelege, Materialbuchungen und manuelle QC; keine Geräteausführung |
 | [Lokaler SOP-Entwurf 0.1](../cutrun-manual-sop-draft.md) | Manuelle Arbeitsfolge, gebundene aktuelle CST-Quelle, offene Parameter und ausdrücklich gekennzeichnete Paper-Abweichungen |
+| [DNA-Sonikationsvorbereitung und S09](../dna-sonication.md) | Wirkungsfreie Planung für den separaten Input und S09-Laufzeit mit Testuhr, Fixture und eigenem Größenbefund im gemeinsamen Ledger |
+| [S09-SiLA-Adapter](../sonication-sila2-network.md) | Gepinnter Loopback-Vertrag für die S09-Fixture mit Quittungen und Abgleich im selben Journal |
 | [Stock-Plan](../stock-continuation.md) | Dauerhafte Bestandsköpfe, atomare Buchungen und Schutz vor veralteten Schreibern; Reagenzvorräte bisher ausgeschlossen |
 | [Storage-Plan](../automated-storage-plan.md) | K01-Bereitstellung, Regal-/Übergabekonzept und spätere Transportqualifikation; S01 bleibt ein synthetischer Fixture-Nachweis |
 
@@ -40,6 +42,11 @@ flowchart LR
     E1 --> E2["E2 · Gemeinsamer Materiallebenszyklus"]
     E2 --> E3["E3 · Synthetischer Lauf und Wiederanlauf"]
     E3 --> E4["E4 · Integrierter manueller Referenzlauf"]
+    E1 --> E1R["Neue E1-Revision · SOP-Entwurf und CST-Original binden"]
+    E1R --> E4R["Neue manuelle E4-Engine · SOP, Rezept und Input"]
+    E4R --> E4
+    E0 --> O08["O08 · QC-Assays und Ergebnisverträge festlegen"]
+    O08 --> E4
     E0 --> E5["E5 · Einzelne Fähigkeiten qualifizieren"]
     E4 --> E6["E6 · Ein automatisierter Ablauf"]
     E5 --> E6
@@ -61,12 +68,12 @@ Bestände und Transporte; unabhängige Stock-/S01-Entwicklung kann parallel fort
 | Etappe | Zu lieferndes Ergebnis | Abnahme vor der nächsten Freigabe | Status |
 |---|---|---|---|
 | **E0 · Profil/Umfang** | Genau ein erstes Referenzprofil mit Quelle, Revision, Verfahrenszweig, lokal geprüftem Quellenbeleg, Probenart, Kontrollen und Zuständigkeit auswählen. Erste Ausbaustufe endet bei gereinigter CUT&RUN-DNA; spätere Erweiterungen separat beschließen. | SOP fachlich freigegeben; Reagenz-/Kitidentitäten, Eingangsmenge, Reinigung, Gerätebedarf, Pausen und zulässige Abweichungen eindeutig. Quellenwidersprüche und fehlende Parameter aufgelöst, keine Misch-SOP. | Begonnen: [publikationsbezogener Melanom-/H3K4me3-Entwurf](../cutrun-reference-profile.md); konkrete SOP-Bindung offen |
-| **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Implementiert und synthetisch geprüft](../cutrun-reference-profile.md#merged-cutrun-preflight); E0-/SOP-Bindung offen |
+| **E1 · Preflight** | CUT&RUN nach dem Extraktionsmuster als gebundene operative Planung vorbereiten: Rollen, Fraktionen, Mengenarten, Kontrollzweige, Parameter und benötigte Fähigkeiten. Noch keine Wirkungen oder Bilanzbuchungen. | Unvollständige oder widersprüchliche Profile, fehlende Stoppwege, falsche Gefäß-/Fähigkeitsbindungen und unpassende QC werden erkannt. Ein formal vollständiger Plan bleibt ohne implementierte Laufzeit ausdrücklich nicht ausführungsbereit. | [Revision /3](../cutrun-reference-profile.md#e1-revision-3-mit-lokalem-sop-entwurf) bindet den SOP-Entwurf und das CST-Original. O11 und die operative SOP-Bindung sind offen. |
 | **E2 · Gemeinsamer Lebenszyklus** | Eine versionierte Erweiterung für Extraktion **und** CUT&RUN: Umwandlungen, 1:n-Abstammung, behaltene Produkte/Nebenfraktionen, Enddispositionen, typisierte Mengen, Produktaliquots sowie laufexklusive Reagenzzuteilung und Istverbrauch. | Keine erzwungene Originalrückgabe oder Produktentsorgung; keine doppelte Belastung durch Produkt-QC oder doppelte Aliquotzuteilung. Ereignis und Projektion atomar, Wiederholungen idempotent, Unbekanntes nicht Null. Historische Läufe bleiben unverändert lesbar. | [Gemeinsamer synthetischer Materialvertrag implementiert und geprüft](../material-lifecycle.md); keine biochemische Ausführung |
 | **E3 · Synthetischer Lauf** | Gemeinsame Ablaufhülle und Journal mit ausdrücklich synthetischen Personen-/Gerätebeobachtungen erweitern. Profilabhängige Stufenfolge, Aktivierungs-/Stoppzustand und Wiederaufnahme abbilden. | Negative Fälle unten bestehen. Wiederaufnahme kann Zustand und Inventar klären, wiederholt aber keine unklare Aktivierung oder Entnahme. Synthetische Prozesszeit wird als solche ausgewiesen. | [Implementiert und synthetisch geprüft](../cutrun-synthetic-workflow.md); reale SOP-/Stoppqualifikation bleibt E0/E4–E6 |
-| **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus; tatsächliche Handlungen, Zeiten und Originalartefakte werden dem integrierten Lauf zugeordnet. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind vollständig nachvollziehbar. Biologische Bewertung durch zuständige Person nach vorher festgelegten Kriterien; synthetische Bestätigung zählt nicht als reale Durchführung. | [Vorbereitung begonnen](../cutrun-manual-reference.md); [manueller Stufenvertrag mit Zeit-/Temperaturbelegen](../cutrun-manual-runtime.md) implementiert. Operative SOP-Bindung, vollständiger O12-/E4-Nachweis und realer Referenzlauf offen |
+| **E4 · Manueller Referenzlauf** | Menschen führen die freigegebene SOP mit vorhandenen qualifizierten Geräten aus. Der Lauf bindet tatsächliche Handlungen, Zeiten und Originalartefakte. E4 erfasst reale Handhabungsintervalle als menschlichen Vergleichswert für E6. | Herkunft, Fraktionsübergaben, Stoppevidenz, Reagenzverbrauch, QC-Entnahmen und Produktübergabe sind nachvollziehbar. Die zuständige Person bewertet den Lauf nach den vorher festgelegten biologischen Kriterien. | [Rezeptvertrag /2](../cutrun-manual-runtime.md#konsolidierter-inputzweig-in-rezeptvertrag-2) führt getrennte S09-Phasen und den Größenbefund im selben Root. O08-QC-Verträge, operative SOP-Bindung, lokale Qualifikation und O12-/E4-Abnahme sind offen. |
 | **E5 · Einzelne Fähigkeiten** | Pipettieren, Magnettrennung, Resuspension/Mischung, Probentemperierung und gegebenenfalls Zentrifugation/Analytik am konkreten Gefäß und Medium qualifizieren; Personenaufgaben weiter zulassen. | Vorab festgelegte Fehler-, Verlust-, Verschleppungs-, Temperatur- und Zeitgrenzen experimentell erfüllt. Stoppweg einschließlich Ausfallverhalten erprobt. Native Geometrie- und Bewegungsnachweise ergänzen die Messungen. | Offen, noch nicht geprüft |
-| **E6 · Ein automatisierter Ablauf** | Einen seriellen Ablauf desselben Profils mit eindeutig gebundenen Fähigkeiten gegen E4 vergleichen. Automatisierte und verbleibende Personenaufgaben ausweisen; noch keine frei optimierte Mehrarm-/Mehrchargenplanung. | Vorab definierte technische und biologische Vergleichskriterien erfüllt; Fristen und Probentemperatur nachgewiesen. Vollautomation nur beanspruchen, wenn alle betreffenden Schritte qualifiziert sind. | Offen, noch nicht geprüft |
+| **E6 · Ein automatisierter Ablauf** | Einen seriellen Ablauf desselben Profils mit eindeutig gebundenen Fähigkeiten gegen E4 vergleichen. Automatisierte und verbleibende Personenaufgaben ausweisen. | Technische und biologische Vergleichskriterien, Fristen und Probentemperatur sind nachgewiesen. Die Robotik führt die vergleichbare Handhabung schneller aus als ein typischer Biologe in E4. Fehlt der manuelle Vergleichswert, bleibt das Geschwindigkeitsziel offen. Vollautomation setzt qualifizierte Schritte voraus. | Offen, noch nicht geprüft |
 | **E7 · Bestände und Ausbau** | Laufübergreifenden Stock um die benötigten Reagenz-/Produktrollen erweitern; anschließend Storage- und Mehrarmplanung aus den verlinkten Plänen integrieren. Library-Präparation und Direktligation bleiben eigene Erweiterungsaufträge. | Bestandskopf/Lease/Fencing und Eltern-Kind-Reservierungen verhindern Doppelbelegung und Doppelverbrauch. Danach Chargen-/Armtakt, Rückhaltung, Lagerbedingungen und Wiederanlauf über alle beteiligten Ressourcen nachgewiesen. | Offen, noch nicht geprüft |
 
 E2 arbeitet zunächst mit nachweislich für einen Lauf ausgegebenen Reagenzaliquots.
@@ -75,6 +82,12 @@ Es entsteht keine zweite globale Vorratsliste. Erst E7 darf gemeinsame Vorräte
 Reagenzien im Stock-Vertrag ausdrücklich erweitert werden. Ein Neustart, neues
 Profil oder Rückstellen ins Regal darf keine Mengen beziehungsweise Haltbarkeit
 zurücksetzen. Reservierungen und Abgleich gelten weiterhin innerhalb eines Laufs.
+
+Für den Geschwindigkeitsvergleich legt der Eigentümer fest, welche Handgriffe
+vergleichbar sind. Diese Entscheidung ist offen. Die Vergleichsgrundlage sind
+die beobachteten Handhabungsintervalle aus E4. Inkubations- und Reaktionszeiten
+werden dafür ausgenommen. Modellzeit und Wiedergabefaktor werden für E6 getrennt
+ausgewiesen.
 
 ## Erforderliche negative Nachweise für E3
 

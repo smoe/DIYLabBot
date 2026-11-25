@@ -1,5 +1,9 @@
 # Manueller CUT&RUN-Aufzeichnungskern
 
+Der [Rezeptvertrag /2](#konsolidierter-inputzweig-in-rezeptvertrag-2) führt
+SOP-Stufen, Reagenzbuchungen und den Inputzweig im selben Lauf. Die bisherigen
+Verträge bleiben für bereits angelegte Läufe maßgeblich.
+
 Stand 12. November 2026: Der manuelle Aufzeichnungskern für
 SK-Mel-29/H3K4me3 ist um einen eigenen SOP-Stufenvertrag erweitert. Er bindet den
 [SOP-Entwurf 0.1](cutrun-manual-sop-draft.md), bewahrt Beobachtungen und
@@ -578,3 +582,60 @@ Der Bericht unterscheidet deshalb `selected_wash_and_reagent_contract_checked`
 von `vendor_recipe_completeness_checked`: Der ausgewählte manuelle Vertrag
 wird geprüft; die unabhängige Vollständigkeit aller Herstelleranweisungen
 wird weiterhin nicht behauptet.
+
+## Konsolidierter Inputzweig in Rezeptvertrag /2
+
+`cutrun_manual_recipe/2` verwendet die vorhandenen Rezept- und
+Sonikationshandler, das Materialformat `/3`, das gemeinsame Journal und
+dieselben Freigabe- und Wiederanlaufregeln. Der eingefrorene Laufkopf trägt
+`runtime_engine: cutrun_manual_recipe/2`. Der Ledger verwendet weiterhin
+den Typ `cutrun_manual_recipe/1` für seine vorhandenen Reagenz- und
+Schutzstoppregeln. Die Kennungen in Laufkopf und Zustand verhindern eine
+Wiederaufnahme unter einer anderen Engine.
+
+`model/cutrun-manual-sop-v2.protocol.json` bindet den SOP-Entwurf 0.1, den
+unveränderten Rezeptgraphen und [E1 /3](cutrun-reference-profile.md#e1-revision-3-mit-lokalem-sop-entwurf).
+`model/cutrun-manual-sop-v2.profile.json` ergänzt die S09-Grenzen und den
+lokalen Sonikationsplan. Die Vorlage führt die zusätzlichen Grenzen,
+Geräte-/Reaktionskennungen und Belegreferenzen als `null`. Qualifikationen
+und weitere Entscheidungen stammen aus dem ausdrücklich gebundenen
+manuellen Profil und den lokalen Originalbelegen.
+
+| Reihenfolge im Inputzweig | Beleg im gemeinsamen Lauf |
+|---|---|
+| S02 · Input bereitstellen | Identifizierter vorbereiteter Eingang. |
+| S09 · Lyse (`S09.extraction_lysis`) | Tatsächliche Extraktionspufferbuchung und Mischbeobachtung, Zeit und Probentemperatur für das identifizierte Gemisch mit der Materialrolle `input_lysis_mixture`. |
+| S09 · Sonikation (`S09.input_preparation`) | Dauer und Probentemperatur für die Sonikation, ursprüngliche Gefäßidentität, persistierte Absicht mit lokalem Pulsplan und eigene Wirkungsquittung. Der Phasenname übernimmt den Bezeichner der vorhandenen Sonikationsprüfung. Das sonifizierte Inputprodukt erhält eine eigene bestätigte QC-Entnahme sowie den zugeordneten Originalbefund. |
+| S09 · Klärung (`S09.supernatant_clarification`) | Tatsächliche Trennbeobachtung, eigene Zeit- und Temperaturbelege und ein identifizierter Überstand im vorgesehenen Gefäß. |
+| S10 · Säule | Das Rezept übernimmt den gebuchten geklärten Überstand. |
+
+Bei Neustart bleibt die unquittierte Sonikationsabsicht bestehen. Der Bericht
+weist die Wirkung als ungeklärt aus. Die Bedienperson klärt sie über
+`resolve_sonication`. Ein bestätigtes `unknown` hält Material-, Gefäß- und
+Geräteressourcen im selben Journal. Die bestätigte Rückgabe des
+Sonikationsgefäßes an seinen Ursprungsplatz gehört zum S09-Abschluss.
+
+Der Einstieg ergänzt den bestehenden CLI-Vertrag über eine eigene Datei.
+`scripts/run_cutrun_manual.py` gehört zu den historischen Laufzeitpins.
+Die Bedienung von `prepare`, `create`, `status`, `report`, `resume` und
+`act` folgt dem bestehenden Muster. `--input-profile` wählt bei Bedarf eine
+lokale /2-Profilvariante. Ausgaben liegen unter `exports/`.
+
+```sh
+python3 scripts/run_cutrun_manual_v2.py prepare --original-pdf exports/cutrun-e4-sop-sources/cst-86652-2026-11-12.pdf
+```
+
+Im Realmodus stammen UTC und Monotoniebeobachtungen von einer realen
+Uhrquelle. Die Standarduhr ist unqualifiziert. Phasenbelege brauchen
+qualifizierte Zeit- und Probentemperaturquellen mit vollständiger
+Intervallabdeckung. Der Fixture-Modus derselben Engine verlangt das
+ausdrückliche Profil `test_fixture` und eine Testuhr. Seine Beobachtungen
+bleiben als `test_fixture` gekennzeichnet. Die älteren Formate behalten ihren
+Einstieg und ihre Quellenpins.
+
+Der Größenbefund verwendet ein generisches Original und die bestätigte
+Entnahmekennung. Die Auswahl eines passenden Assays, etwa für eine spätere
+TapeStation-Anbindung, bleibt offen. Der S09-SiLA-Adapter führt weiterhin
+seinen bisherigen Fixture-Vertrag. Seine Anbindung an /2 wäre ein eigener
+Schritt. O08, die operative SOP-Freigabe, lokale Zeit- und
+Temperaturqualifikation sowie die integrierte E4-Abnahme sind offen.

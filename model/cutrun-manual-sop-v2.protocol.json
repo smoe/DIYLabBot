@@ -1,0 +1,24 @@
+{
+  "format": "solidcraftbot.cutrun-manual-sop-protocol/2",
+  "sop": {
+    "id": "SOP-CR-SKM29-H3K4me3",
+    "revision": "0.1"
+  },
+  "base_protocol": {
+    "source": "model/cutrun-manual-sop.protocol.json",
+    "source_sha256": "7c1b5791e8eacfff64a7f9a0b07c1b8cba2ffa394f35f6a258a9ec4d07503480"
+  },
+  "preflight": {
+    "source": "model/cutrun-automation-v3.preparation.json",
+    "source_sha256": "3413c7fcdb24416e017335aa925ed80a2fb963fb8ce3d4bedfe72a7ca06ba8cd"
+  },
+  "recipe_protocol": {
+    "source": "model/cutrun-manual-recipe.protocol.json",
+    "source_sha256": "02f1797b969b1fc3c671078f9060f5682bfb49e6cbe5d110012a758639e92e28"
+  },
+  "s09_phases": [
+    "S09.extraction_lysis",
+    "S09.input_preparation",
+    "S09.supernatant_clarification"
+  ]
+}
