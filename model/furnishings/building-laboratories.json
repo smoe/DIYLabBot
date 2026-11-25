@@ -16,6 +16,11 @@
         "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
       },
       "basis": "unmeasured_room_binding",
+      "transporter_dock": {
+        "instance": "TR01",
+        "xy_mm": [930, 5615],
+        "yaw_deg": 270
+      },
       "bench_layout": {
         "workspace": {
           "source": "model/synthetic-cf01-workspace.shared.json",

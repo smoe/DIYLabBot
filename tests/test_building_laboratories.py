@@ -27,7 +27,7 @@ class BuildingLaboratoryTests(unittest.TestCase):
 
     def test_sources_contain_references_not_copied_dimensions(self):
         self.assertEqual(set(self.instance), {'id', 'room', 'level', 'area', 'entrance_wall',
-                                             'room_source', 'layout_source', 'basis', 'bench_layout'})
+                                             'room_source', 'layout_source', 'basis', 'bench_layout', 'transporter_dock'})
         self.assertEqual(self.lab['area'], 'R3_003')
         self.assertEqual(self.lab['level_id'], 'OG3')
         self.assertFalse(self.lab['placement_qualified'])
@@ -52,7 +52,6 @@ class BuildingLaboratoryTests(unittest.TestCase):
                                     for a, b in zip(row, ref)), 1e-7)
         self.assertTrue(devices['ArmC']['direct_mount'])
         self.assertEqual(anchor['bound_pose'][2][3], devices['ArmC']['bound_pose'][2][3])
-        self.assertEqual(devices['TR01']['bound_pose'], devices['TR01']['standalone_pose'])
         self.assertEqual(devices['ArmC']['park_joints_deg'], setup['park_joints_deg']['ArmC'])
         placements = equipment_link_placements(self.lab, devices['ArmC'])
         for actual, expected in zip(placements['Base_plate'], devices['ArmC']['transform']):
@@ -62,6 +61,33 @@ class BuildingLaboratoryTests(unittest.TestCase):
         supports = {device['supporting_device_id'] for _, device in native_equipment_bindings([self.lab])
                     if 'supporting_device_id' in device}
         self.assertEqual(supports, {'ArmA', 'ArmB'})
+
+    def test_tr01_dock_changes_only_the_building_pose(self):
+        from centrifuge_robot_pickup import load as tool_source
+        from lab_transfer_model import oriented_solutions
+        from tr01_workcell import SOURCE as WORKCELL_SOURCE, tube_geometry
+
+        setup = self.instance['transporter_dock']
+        tr01 = next(device for device in self.lab['device_instances'] if device['id'] == setup['instance'])
+        self.assertEqual(tr01['host'], 'Floor')
+        self.assertEqual([row[3] for row in tr01['bound_pose'][:3]], [*setup['xy_mm'], 0])
+        self.assertAlmostEqual(tr01['bound_pose'][0][1], 1.0)
+        self.assertAlmostEqual(tr01['standalone_pose'][0][1], -1.0)
+        self.assertNotEqual(tr01['bound_pose'], tr01['standalone_pose'])
+
+        layout = laboratories.layout
+        source = laboratories.read(self.instance['layout_source'])
+        items = {item['id']: item for item in source['instances']}
+        provider = layout.provider('transporter')
+        vehicle = layout.instance_source(source, items['TR01'])
+        equipment = provider.expanded(vehicle, provider.parameters(vehicle), layout.instance_variant(vehicle, items['TR01']))
+        offset = json.loads(WORKCELL_SOURCE.read_text())['cargo_grip_offset_from_top_mm']
+        grip = robot.transform(tr01['bound_pose'], tube_geometry(equipment, 'B2_Tube01', offset)['grip_mm'])
+        arm = layout.instance_source(source, items['ArmC'])
+        base = next(device['bound_pose'] for device in self.lab['device_instances'] if device['id'] == 'ArmC')
+        tool = {'tool': {'flange_standoff_mm': tool_source()['gripper']['flange_to_grip_mm']},
+                'checks': {'tcp_error_mm': 0.001, 'axis_error_deg': 0.001}}
+        self.assertTrue(oriented_solutions({'arm': arm, 'ap': robot.parameters(arm), 'base': base}, tool, grip, [0, 0, 1]))
 
     def test_binding_follows_boundary_translation_and_wall_thickness(self):
         shifted = copy.deepcopy(self.plan)

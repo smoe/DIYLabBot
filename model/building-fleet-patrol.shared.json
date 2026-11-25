@@ -5,7 +5,7 @@
   "sources": {
     "fleet": {
       "path": "model/building-fleet-demo.shared.json",
-      "sha256": "6d4d9cc0c09a89f65cbb94a55995845e6c69f798705ba45bd08303b08c9d19c5"
+      "sha256": "5664927b9562fb2f4e06a93c75212ea2235914ac12b234ce4882889810db9398"
     }
   },
   "patrol": {

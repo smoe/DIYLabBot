@@ -87,6 +87,16 @@
           "basis": {
             "const": "unmeasured_room_binding"
           },
+          "transporter_dock": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["instance", "xy_mm", "yaw_deg"],
+            "properties": {
+              "instance": {"type": "string", "minLength": 1},
+              "xy_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+              "yaw_deg": {"type": "number"}
+            }
+          },
           "bench_layout": {
             "type": "object",
             "additionalProperties": false,

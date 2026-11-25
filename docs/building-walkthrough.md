@@ -170,6 +170,13 @@ und zeigt die für diese Anordnung gewählte aufrechte Parkpose.
 ArmA und ArmB behalten ihre Unterbauten aus der L01-Layoutquelle. Die
 Gerätegeometrie stammt aus der L01-Aufstellung. Die neue Aufstellung ist
 eine statische Referenz für die erneute Bahnprüfung des Probenzyklus.
+TR01 steht beim CF01-Arbeitsplatz im Laborbezug bei X = 930 mm, Y = 5615 mm
+und ist auf 270° ausgerichtet. Dadurch liegt der Kassetten-Eckplatz
+`B2_Tube01` zur Arbeitsplatte hin. Die Gebäudebindung führt die Dockpose
+für die dargestellte TR01-Instanz. Eine diskrete FreeCAD-Prüfung umfasst
+115 Prüfstellungen für die seitliche Greiferanfahrt, den Backenschluss und
+das Freiheben des Gefäßes um 35 mm. Die Prüfung erfasst beide Endstellungen
+des CF01-Deckels. Die Fahrbahn von TR01 bleibt gesondert zu prüfen.
 Studienkörper `People_*` und Fahrzeugrouten entfallen.
 Native Geräte im Gebäude-CAD sind weiterhin fehlende Zielunterstützung.
 

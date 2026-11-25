@@ -46,7 +46,7 @@ def validate(source):
         require(key not in excluded, 'Duplicate room-use exclusion')
         excluded.add(key)
     for item in source['laboratories']:
-        require(set(item) - {'bench_layout'} == {'id', 'room', 'level', 'area', 'entrance_wall',
+        require(set(item) - {'bench_layout', 'transporter_dock'} == {'id', 'room', 'level', 'area', 'entrance_wall',
                                                'room_source', 'layout_source', 'basis'},
                 'Laboratory instance requires a room binding and pinned sources')
         require(item['id'] not in identities and item['id'].isidentifier(), 'Unique laboratory identity required')
@@ -78,6 +78,13 @@ def validate(source):
                     and all(isinstance(q, list) and len(q) == 6
                             and all(type(v) in (int, float) and math.isfinite(v) for v in q) for q in parking.values()),
                     'Parked bench arm poses require six finite joint angles')
+        if 'transporter_dock' in item:
+            dock = item['transporter_dock']
+            require(isinstance(dock, dict) and set(dock) == {'instance', 'xy_mm', 'yaw_deg'}
+                    and isinstance(dock['instance'], str) and bool(dock['instance'])
+                    and isinstance(dock['xy_mm'], list) and len(dock['xy_mm']) == 2
+                    and all(type(v) in (float, int) and math.isfinite(v) for v in [*dock['xy_mm'], dock['yaw_deg']]),
+                    'A floor transporter dock needs a finite room-local pose')
     if 'basic_profile' in source:
         import basic_laboratories
         basic_laboratories.load(source['basic_profile'])
@@ -287,6 +294,12 @@ def compile_instance(item, plan, p, z):
     bench = item.get('bench_layout')
     moved = bench_poses(bench, equipment['instances'], context) if bench else {}
     parked = bench.get('park_joints_deg', {}) if bench else {}
+    dock = item.get('transporter_dock')
+    if dock:
+        transporters = {device['id'] for device in equipment['instances']
+                        if device['asset'] == 'transporter' and device['host'] == 'Floor'}
+        require(dock['instance'] in transporters, 'Dock must refer to a floor-mounted transporter')
+        moved[dock['instance']] = workspace.pose([*dock['xy_mm'], 0.0], dock['yaw_deg'])
     devices = []
     for device in equipment['instances']:
         bound = moved.get(device['id'])
