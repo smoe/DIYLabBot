@@ -942,29 +942,34 @@ class WorldRunner:
             'pose_mm_rad':row['pose_mm_rad'][:],'level':row['level']},self.now)
         row['last_terminal']=copy.deepcopy(terminal);row['driver']=None;row['gate']=None;row['action']=None
 
-    def observe(self,step):
+    def capture_scans(self, truth, at, lift):
+        for identity, row in truth.items():
+            scan=self.world.scan(identity,truth,at,lift);self.scan_serial+=1
+            if self.evidence is not None:self.evidence.write('scan',vehicle_id=identity,
+                captured_s=at,pose_mm_rad=row['pose_mm'][:],level=row['level'],z_mm=row['z_mm'],
+                returns_local_mm=scan['returns_local_mm'])
+            heapq.heappush(self.scan_queue,(round(at+self.sensor['latency_s'],9),self.scan_serial,identity,scan))
+
+    def observe(self,step,*,capture_due=None,heartbeat_due=None,perception_due=None):
+        if capture_due is None:capture_due=step%self.scan_step==0
+        if heartbeat_due is None:heartbeat_due=step%self.heartbeat_step==0
+        if perception_due is None:perception_due=step%self.perception_step==0
         truth=self.truth();snapshot=self.lift_snapshot()
         for identity,row in self.vehicles.items():
             driver=row['driver']
             self.capture_history[identity][self.now]={'pose_mm_rad':row['pose_mm_rad'][:],'level':row['level'],'z_mm':row['z_mm'],
                 'aboard':row['aboard'],'own_rest':driver is None or driver.v==0 and driver.a==0}
-        if step%self.scan_step==0:
-            for identity in self.vehicles:
-                scan=self.world.scan(identity,truth,self.now,snapshot);self.scan_serial+=1
-                if self.evidence is not None:self.evidence.write('scan',vehicle_id=identity,
-                    captured_s=self.now,pose_mm_rad=self.vehicles[identity]['pose_mm_rad'][:],
-                    level=self.vehicles[identity]['level'],z_mm=self.vehicles[identity]['z_mm'],returns_local_mm=scan['returns_local_mm'])
-                heapq.heappush(self.scan_queue,(round(self.now+self.sensor['latency_s'],9),self.scan_serial,identity,scan))
+        if capture_due:self.capture_scans(truth,self.now,snapshot)
         while self.scan_queue and self.scan_queue[0][0]<=self.now+1e-9:
             _,_,identity,scan=heapq.heappop(self.scan_queue);self.latest_scans[identity]=scan
         for identity,row in self.vehicles.items():
-            if step%self.heartbeat_step==0:
+            if heartbeat_due:
                 speed=abs(row['driver'].v)if row['driver']is not None else 0.
                 self.uplink.emit(identity,'heartbeat',{'pose_mm':row['pose_mm_rad'][:],'level':row['level'],
                     'area':self.area(identity),'mode':row['phase'],'speed_mm_s':speed},self.now)
             scan=self.latest_scans.get(identity)
             first_received_scan=(getattr(self,'_first_perception_on_scan',False)and row['capture_seq']==0)
-            if scan is not None and(step%self.perception_step==0 or first_received_scan):
+            if scan is not None and(perception_due or first_received_scan):
                 captured=self.capture_history[identity].get(scan['captured_s'])
                 if captured is None:raise RuntimeError('Original own capture localization missing')
                 points=scan['returns_local_mm'];nearest=min(points,key=lambda p:math.hypot(*p),default=None)
@@ -1098,6 +1103,8 @@ class WorldRunner:
         departures=getattr(self,'departures',None)
         if departures is not None:departures.check_step_speeds(speed_bounds)
         self.auditor.audit(previous,self.truth(),end-start,speed_bounds,curves=curves,start_s=start,end_s=end)
+        if end-start>.05+1e-9:
+            self.capture_interval(start,end,curves,previous,lift_before)
         for identity,driver in drivers.items():self.append_episode(identity,start,end,all_points[identity],driver,lift_before)
         for identity,row in self.vehicles.items():
             area=self.area(identity)

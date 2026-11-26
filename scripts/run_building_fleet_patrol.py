@@ -42,6 +42,8 @@ def load_profile(path=PROFILE):
             'hardware_or_real_safety_qualified': False}}
     if 'vehicle_count' in value:
         expected['vehicle_count'] = value['vehicle_count']
+    if 'timing' in value:
+        expected['timing'] = model.patrol_timing(value)
     if value != expected:
         raise ValueError('Unsupported or stale patrol source; review its explicit policy and fleet pin')
     model.resolve_pin(value['sources']['fleet'])

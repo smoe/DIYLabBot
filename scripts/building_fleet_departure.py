@@ -15,8 +15,8 @@ def _limits(step, velocity, acceleration):
         if acceleration is None:
             acceleration = limits['acceleration_mm_s2']
     if not all(type(n) in (float, int) and math.isfinite(n) and n > 0
-               for n in (step, velocity, acceleration)) or step > .05:
-        raise ValueError('Positive BF01 scalar limits and a step of at most 50 ms required')
+               for n in (step, velocity, acceleration)) or step > .4:
+        raise ValueError('Positive BF01 scalar limits and a step of at most 400 ms required')
     # Controller._valid_stop_clock allows this relative tolerance on scalar extrema.
     return step, velocity * (1 + 1e-6), acceleration * (1 + 1e-6)
 

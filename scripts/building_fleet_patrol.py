@@ -15,6 +15,7 @@ from building_fleet_dispatch import Dispatcher
 from building_fleet_control import F
 from building_fleet_motion import Path
 from building_fleet_runner import WorldRunner
+from building_fleet_model import control_step_s, patrol_source
 
 
 SNAPSHOT_FORMAT = 'solidcraftbot.building-fleet-live-snapshot/1'
@@ -245,7 +246,11 @@ class PatrolWorldRunner(WorldRunner):
         if 'geometry_checks' in active:
             kwargs['geometry_checker'] = active['geometry_checks']
         nav, graph, catalog, planner = (active[key] for key in ('nav', 'graph', 'catalog', 'planner'))
-        super().__init__(source, nav, graph, catalog, planner, **kwargs)
+        # The archival /2 audit contract still has the 50 ms clock.
+        runtime_source = patrol_source(source, profile) if kwargs.get('output_dir') is None else source
+        super().__init__(runtime_source, nav, graph, catalog, planner, **kwargs)
+        self.dt = control_step_s(runtime_source)
+        self._last_control_start_s = -.05
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex
         self.paused = False
@@ -476,7 +481,7 @@ class PatrolWorldRunner(WorldRunner):
                 if self.departures is not None and driver is not None:
                     # Retained only when the last executed step consumed this exact stop witness.
                     fallback=getattr(driver,'_fallback',None)
-                    if fallback and round(fallback['start_s']+self.dt,3)==driver.now:
+                    if fallback and fallback['start_s']==self._last_control_start_s and driver.now==self.now:
                         clock=fallback['clock']
                         state['executed_step_stop']={'start_s':fallback['start_s'],'end_s':driver.now,
                             'captured_s':fallback['anchor']['captured_s'],
@@ -529,9 +534,10 @@ class PatrolWorldRunner(WorldRunner):
         curtain resets may create a source-state discontinuity, so that short
         interval falls back to observed snapshots instead of interpolation.
         """
-        if self.now <= 0 or self.now-self._lift_discontinuity_s < 1.:
+        history_s = 2. if self.dt>.05 else 1.
+        if self.now <= 0 or self.now-self._lift_discontinuity_s < history_s:
             return None
-        start = max(0., round(self.now-1., 3))
+        start = max(0., round(self.now-history_s, 3))
         initial = self._scene_history.get(start)
         if initial is None:
             return None
@@ -563,7 +569,14 @@ class PatrolWorldRunner(WorldRunner):
     def observe(self, step):
         self._scene_history[self.now] = {'states': self._states(diagnostics=False), 'lift': self._lift_state()}
         sequences = {identity: row['capture_seq'] for identity, row in self.vehicles.items()}
-        result = super().observe(step)
+        if self.dt>.05:
+            now_ms=round(self.now*1000)
+            previous_ms=round(self._last_control_start_s*1000)
+            result=super().observe(step,capture_due=now_ms%100==50,
+                heartbeat_due=now_ms//1000!=previous_ms//1000,
+                perception_due=now_ms//500!=previous_ms//500)
+        else:
+            result=super().observe(step)
         for identity, row in self.vehicles.items():
             if row['capture_seq'] == sequences[identity]:
                 continue
@@ -573,7 +586,7 @@ class PatrolWorldRunner(WorldRunner):
             if scene is None:
                 raise RuntimeError('Camera capture lacks its original simultaneous scene')
             self._capture_scenes[reference] = scene
-        horizon = max(1., 2*self.sensor['stale_after_s'])+self.sensor['latency_s']+self.dt
+        horizon = max(2. if self.dt>.05 else 1., 2*self.sensor['stale_after_s'])+self.sensor['latency_s']+self.dt
         self._scene_history = {at: scene for at, scene in self._scene_history.items()
                                if at >= self.now-horizon}
         return result
@@ -604,10 +617,45 @@ class PatrolWorldRunner(WorldRunner):
         self._capture_scenes = {ref: scene for ref, scene in self._capture_scenes.items() if ref in retained}
         self.camera_captures = {ref: capture for ref, capture in self.camera_captures.items() if ref in retained}
 
+    def _can_use_long_step(self):
+        return (self.lift.phase=='idle' and not self.lift.requests
+                and all(not row['aboard'] and row['level']==self.source['depot']['level']
+                        and not (row['action'] or {}).get('lift_phase')
+                        for row in self.vehicles.values()))
+
+    def capture_interval(self,start,end,curves,previous,lift):
+        # Evaluate anonymous lidar against simultaneous executed poses.
+        # A long interval is admitted only with stationary lift geometry.
+        final_lift=self.lift_snapshot()
+        if any(final_lift[key]!=value for key,value in lift.items() if key!='time_s'):
+            raise RuntimeError('Long-step scan requires stationary lift state')
+        for stamp in range(round(start*1000)+50,round(end*1000),100):
+            at=stamp/1000
+            truth={}
+            for identity,row in previous.items():
+                jet=curves[identity].evaluate(at)
+                truth[identity]={**row,'pose_mm':list(jet[F[0]])}
+                self.capture_history[identity][at]={
+                    'pose_mm_rad':truth[identity]['pose_mm'][:], 'level':row['level'],
+                    'z_mm':row['z_mm'], 'aboard':False,
+                    'own_rest':not any(jet[F[1]]) and not any(jet[F[2]])}
+            states=self._states(diagnostics=False)
+            for state in states:
+                row=truth[state['id']]
+                state.update(pose_xyz_mm=[*row['pose_mm'][:2],row['z_mm']],yaw_rad=row['pose_mm'][2])
+            self._scene_history[at]={'states':states,'lift':self._lift_state()}
+            self.capture_scans(truth,at,lift)
+
     def step(self):
-        """Execute the original simultaneous loop once, never beyond 50 ms."""
+        """Advance one presentation tick through fully checked control intervals."""
         if self.paused:
             return self.now
+        end=round(self.now+self.dt,3)
+        while self.now<end:
+            self._step_once(end)
+        return self.now
+
+    def _step_once(self,end):
         points = sum(len(episode['points']) for row in self.vehicles.values()
                      for episode in row['episodes'])
         points += sum(len(row['driver'].recorded) for row in self.vehicles.values()
@@ -624,7 +672,7 @@ class PatrolWorldRunner(WorldRunner):
                 # Once-only readiness is an observed communication condition,
                 # not a demonstration pause or fabricated camera receipt.
                 self.observe(self.step_index)
-                return self._advance_tick()
+                return self._advance_tick(end)
         self.recruit_pending()
         for identity in sorted(self.vehicles,
                                key=lambda identity: (identity not in self.dispatcher.vehicle_jobs, identity)):
@@ -633,10 +681,12 @@ class PatrolWorldRunner(WorldRunner):
                 self.request_mission(identity, self.vehicles[identity]['level'], self.now)
             self.idle_action(identity)
         self.observe(self.step_index)
-        return self._advance_tick()
+        return self._advance_tick(end)
 
-    def _advance_tick(self):
-        end = round((self.step_index+1)*self.dt, 3)
+    def _advance_tick(self,target):
+        end=target if (self.dt>.05 and self._can_use_long_step()
+                       and round(self.now*1000)%400==0) else round(self.now+.05,3)
+        self._last_control_start_s=self.now
         phase = getattr(self.lift, 'phase', None)
         before = (phase, getattr(self.lift, 'phase_started', None))
         if phase is not None:

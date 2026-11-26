@@ -13,7 +13,7 @@ export function validateManifest(manifest,config){
  checkedPath(manifest.bootstrap_path);require(manifest.files[manifest.bootstrap_path],'Pinned Python bootstrap required');
  require(manifest.archive&&manifest.archive.sha256===config.bundle.sha256&&Number.isSafeInteger(manifest.archive.bytes)&&manifest.archive.bytes>0,'Archive must match its page pin');
  const runtime=manifest.runtime,session=manifest.session;
- require(runtime?.engine==='pyodide'&&runtime.execution==='module_web_worker'&&runtime.pacing==='source_step_without_wall_clock_catchup'&&typeof runtime.version==='string','Declared browser Python runtime required');
+ require(runtime?.engine==='pyodide'&&runtime.execution==='module_web_worker'&&['source_step_without_wall_clock_catchup','source_step_with_bounded_deadline_recovery'].includes(runtime.pacing)&&typeof runtime.version==='string','Declared browser Python runtime required');
  require(runtime.loader_module_url==='https://cdn.jsdelivr.net/pyodide/v'+runtime.version+'/full/pyodide.mjs','Official version-matched Pyodide loader required');
  require(session?.scope==='independent_live_session_per_page'&&session.start==='new_patrol_world'&&session.recording_fallback===false,'Every visitor must start an independent live world');
  require(manifest.vehicle_count===undefined||manifest.vehicle_count===6||manifest.vehicle_count===20,'Supported active fleet count required');
@@ -143,7 +143,7 @@ export async function extractArchive(pyodide,archive,manifest){
 }
 function parseState(raw,expectedCount){
  const state=typeof raw==='string'?JSON.parse(raw):raw;
- require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&state.integration_step_s<=.05,'Executed Python simulation snapshot and source control step required');
+ require(state?.format===SNAPSHOT&&typeof state.session_id==='string'&&Number.isFinite(state.model_time_s)&&typeof state.paused==='boolean'&&Number.isFinite(state.integration_step_s)&&state.integration_step_s>0&&(state.integration_step_s<=.05||(state.integration_step_s===.4&&state.vehicle_count===6)),'Executed Python simulation snapshot and source control step required');
  if(expectedCount!==undefined){
   const count=state.vehicle_count===undefined?20:state.vehicle_count;
   require(count===expectedCount&&Array.isArray(state.states)&&state.states.length===expectedCount,'Executed Python fleet differs from the bundled count');
@@ -305,7 +305,7 @@ export function createPreparationController({post,loadPlanner=loadPythonPlanner,
 export function createController({post,loadRuntime=loadPythonRuntime,makePlanner=createBackgroundPlanner,now=()=>performance.now(),setTimer=setTimeout,clearTimer=clearTimeout}){
  let runtime=null,state=null,busy=false,booted=false,disposed=false,timer=null,planner=null,config=null,steps=0;
  const commands=[],prepared=[];
- let plannerState='idle',lastCycleEnd=null;
+ let plannerState='idle',lastCycleEnd=null,nextTickDeadline=null;
  const cycles=()=>({count:0,compute_wall_s:0,elapsed_wall_s:0,model_s:0});
  const timing={planner_boot_wall_s:null,planner_ready_wall_ms:null,last_starter:null,planner_jobs:{},
   cycles_by_planner:{booting:cycles(),active:cycles(),idle:cycles()},last_cycle:null};
@@ -342,14 +342,19 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
   if(disposed||busy||!runtime)return;busy=true;const began=now(),cyclePlanner=plannerState;
   try{
    while(prepared.length)runtime.completeJob(prepared.shift());
-   while(commands.length){const row=commands.shift();try{emitState(await runtime.command(row.command));if(state.paused)lastCycleEnd=null;}catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
+   while(commands.length){const row=commands.shift();try{emitState(await runtime.command(row.command));if(state.paused){lastCycleEnd=null;nextTickDeadline=null;}}catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
    if(!state.paused){
+    if(state.integration_step_s===.4)nextTickDeadline??=began;
     const next=await runtime.tick(++steps%(runtime.snapshotIntervalSteps??1)===0);
     if(runtime.background){
      for(const job of runtime.pendingJobs())planner.prepare(job).then(result=>{if(!disposed){prepared.push(result);schedule(0);}}).catch(fail);
     }
     // Wall time is observational only. One call still advances exactly one source step.
     const end=now(),compute=(end-began)/1000,elapsed=(end-(lastCycleEnd??began))/1000,dt=state.integration_step_s;
+    if(nextTickDeadline!==null){
+     const intervalMs=dt*1000;
+     nextTickDeadline=Math.max(nextTickDeadline+intervalMs,end-4*intervalMs);
+    }
     lastCycleEnd=end;
     timing.last_cycle={planner_state:cyclePlanner,compute_wall_s:compute,elapsed_wall_s:elapsed,model_s:dt,
      realtime_factor:elapsed>0?dt/elapsed:null};
@@ -357,7 +362,7 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
     group.count++;group.compute_wall_s+=compute;group.elapsed_wall_s+=elapsed;group.model_s+=dt;
     if(next!==null)emitState(next);
    }
-  }catch(error){fail(error);}finally{busy=false;if(!disposed&&(!state?.paused||commands.length))schedule(Math.max(0,state.integration_step_s*1000-(now()-began)));}
+  }catch(error){fail(error);}finally{busy=false;if(!disposed&&(!state?.paused||commands.length))schedule(Math.max(0,(nextTickDeadline??began+state.integration_step_s*1000)-now()));}
  }
  return{handle(message){
   if(disposed)return;

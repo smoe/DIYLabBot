@@ -92,7 +92,7 @@ def scan_beam_count(step_deg):
 
 
 def validate(source, verify_pins=True):
-    validate_shape(source, read_json(SCHEMA))
+    validate_shape(dict(source) if isinstance(source, _PatrolSource) else source, read_json(SCHEMA))
     if verify_pins:
         for ref in source['sources'].values():
             resolve_pin(ref)
@@ -145,6 +145,7 @@ def patrol_policy(profile):
         count = profile['vehicle_count']
         if type(count) is not int or count not in (6, 20):
             raise ValueError('The patrol vehicle_count must be exactly six or twenty')
+    patrol_timing(profile)
     policy = profile.get('patrol', {})
     startup = policy.get('startup')
     expected = {'termination': 'explicit_stop', 'startup': startup, 'targets': '/missions/targets',
@@ -172,6 +173,33 @@ def active_vehicle_ids(source, profile=None):
     return tuple('BF%02d' % i for i in range(1, count + 1))
 
 
+def patrol_timing(profile):
+    timing = profile.get('timing')
+    if 'timing' in profile and (profile.get('vehicle_count') != 6 or timing != {
+            'ground_step_ms': 400, 'scan_latency_ms': 50, 'maximum_scan_age_ms': 450}):
+        raise ValueError('The tested live timing requires the six-vehicle patrol')
+    return timing
+
+
+class _PatrolSource(dict):
+    # Keep runtime timing separate from serialized native geometry and source pins.
+    pass
+
+
+def patrol_source(source, profile):
+    timing = patrol_timing(profile)
+    if timing is None:
+        return source
+    scoped = _PatrolSource(source)
+    scoped.timing = timing.copy()
+    return scoped
+
+
+def control_step_s(source):
+    timing = getattr(source, 'timing', None)
+    return timing['ground_step_ms']/1000 if timing else .05
+
+
 def scan_angular_allowance(sensor):
     return sensor['range_mm'] * math.sin(math.radians(sensor['angular_step_deg']))
 
@@ -182,6 +210,10 @@ def resolved_sensor(source, *, for_layout=False):
     sensor = copy.deepcopy(ref['sensor'])
     if not for_layout:
         sensor.update(source['sensor'].get('synthetic_scan', {}))
+        timing = getattr(source, 'timing', None)
+        if timing is not None:
+            sensor.update(latency_s=timing['scan_latency_ms']/1000,
+                          stale_after_s=timing['maximum_scan_age_ms']/1000)
     sensor['clearance_mm'] = ref['controller']['clearance_mm']
     return sensor
 

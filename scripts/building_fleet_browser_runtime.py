@@ -113,7 +113,8 @@ def _configuration(config):
             browser.get('runtime', {}).get('execution') != 'module_web_worker' or
             browser.get('runtime', {}).get('static_route_witnesses') !=
                 'original_pinned_metadata_for_bit_identical_geometry' or
-            browser.get('runtime', {}).get('pacing') != 'source_step_without_wall_clock_catchup'):
+            browser.get('runtime', {}).get('pacing') not in (
+                'source_step_without_wall_clock_catchup', 'source_step_with_bounded_deadline_recovery')):
         raise ValueError('A fresh independent browser-worker world without recording fallback is required')
     if compact and (browser['runtime'].get('static_geometry') != 'source_bound_lossless_runtime_cache' or
             browser['runtime'].get('route_preparation') != 'background_worker_with_checked_rolling_prefix'):
@@ -155,7 +156,8 @@ def _make_engine(paths, source, profile, progress):
             geometry_checker=prepared['geometry_checks'], output_dir=None,
             scan_geometry=prepared['scan_geometry'], zone_regions=prepared['zone_regions'],
             scan_indices=prepared.get('scan_indices'))
-        if prepared.get('static_ray_cache') is not None:
+        # Reference ray capsules are bound to the original sensor settings.
+        if prepared.get('static_ray_cache') is not None and engine.dt <= .05:
             from building_fleet_runtime_cache import seed_static_rays
             engine.static_ray_cache = seed_static_rays(engine.world, prepared['static_ray_cache'])
         return engine
@@ -375,7 +377,7 @@ def boot_planner(config_json, progress_callback=None):
                        **_static_verification())
     from building_fleet_runtime_cache import bind_active_fleet
     prepared = bind_active_fleet(prepared, source, profile)
-    _planner_context = {**prepared, 'source': source,
+    _planner_context = {**prepared, 'source': model.patrol_source(source, profile),
         'variable_corner_speed': 'corner_timing' in profile['patrol'],
         'source_binding': hashlib.sha256(_json(config).encode()).hexdigest()}
     return _json({'status': 'ready', 'vehicle_count': len(prepared['nav'].homes)})

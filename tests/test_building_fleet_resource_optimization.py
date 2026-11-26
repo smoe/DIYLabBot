@@ -163,6 +163,19 @@ class ResourceOptimizationReview(unittest.TestCase):
         self.assertEqual(cached._distance.cache_info().maxsize,32768)
         self.assertEqual(set(cached._static_paths),{(level,id(path))for level,path in cached.paths})
 
+    def test_recreated_runtime_paths_share_exact_windows(self):
+        points = [[-500, 0], [500, 0], [500, 400]]
+        catalog = ResourceCatalog(navigation(), [route(points, 'EG.A')])
+        first = MotionPath(points, 20)
+        same = MotionPath(copy.deepcopy(points), 20)
+        other = MotionPath(points, 21)
+        with patch.object(catalog, '_raw_windows', wraps=catalog._raw_windows) as compute:
+            expected = catalog.spans('EG', first)
+            self.assertEqual(catalog.spans('EG', same), expected)
+            self.assertEqual(compute.call_count, 1)
+            catalog.spans('EG', other)
+            self.assertEqual(compute.call_count, 2)
+
     def test_distance_cache_has_no_coordinate_rounding(self):
         nav=navigation([[0,0],[1,0],[1,1],[0,1]])
         cached=ResourceCatalog(nav,[route([[-10,-10],[-9,-9]])])

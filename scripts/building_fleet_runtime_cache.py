@@ -353,16 +353,7 @@ def _array(code,raw):
 def _restore_catalog(data,nav):
     import building_fleet_resources as resources
     c=resources.ResourceCatalog.__new__(resources.ResourceCatalog);c.__dict__.update(data);c.nav=nav;c.paths=[];c._frozen=True
-    c._polygon_refs={id(p):p for _,_,p in c.room_polygons};c._polygon_refs.update({id(r['polygon']):r['polygon']for r in c.regions})
-    c._polygon_bounds={i:resources._bounds(p)for i,p in c._polygon_refs.items()}
-    c._polygon_numeric_safe={i:resources._broad_phase_finite(v for p in poly for v in p)for i,poly in c._polygon_refs.items()}
-    geometries={};c._polygon_canonical={}
-    for ident,polygon in c._polygon_refs.items():
-        key=tuple(tuple(p)for p in polygon);c._polygon_canonical[ident]=geometries.setdefault(key,ident)
-    c._distance=lru_cache(maxsize=32768)(lambda point,ident:resources._point_distance(point,c._polygon_refs[ident]))
-    c._within=lru_cache(maxsize=65536)(lambda point,ident,threshold:
-        (not c._polygon_numeric_safe[ident]or resources._bounds_may_reach(point,c._polygon_bounds[ident],threshold))
-        and c._distance(point,c._polygon_canonical[ident])<=threshold)
+    c._bind_polygon_queries()
     c._candidates=lru_cache(maxsize=32768)(c._candidate_indices);c._static_paths={};c._raw_alias_windows={}
     return c
 

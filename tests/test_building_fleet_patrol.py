@@ -142,6 +142,36 @@ class LiveAdapterTests(unittest.TestCase):
         r._camera_frames = {}
         return r
 
+    def test_six_vehicle_timing_uses_short_steps_for_lift_activity(self):
+        r = self.runner()
+        r.source = {'depot': {'level': 'EG'}}
+        r.dt = .4
+        r.lift.phase = 'idle'
+        r.lift.requests = {}
+        for row in r.vehicles.values():
+            row['action'] = None
+        r._remember_lift_phase = lambda: None
+        intervals = []
+
+        def advance(end):
+            intervals.append(round(end-r.now,3))
+            r.now = end
+
+        r.advance_world = advance
+        r._step_once = r._advance_tick
+        self.assertEqual(r.step(), .4)
+        self.assertEqual(intervals, [.4])
+        r.lift.requests['BF01'] = {}
+        self.assertEqual(r.step(), .8)
+        self.assertEqual(intervals[1:], [.05]*8)
+        r.lift.requests.clear()
+        r.vehicles['BF01']['level'] = 'OG1'
+        self.assertEqual(r.step(), 1.2)
+        self.assertEqual(intervals[9:], [.05]*8)
+        r.vehicles['BF01']['level'] = 'EG'
+        self.assertEqual(r.step(), 1.6)
+        self.assertEqual(intervals[-1], .4)
+
     def test_bid_uses_actual_map_route_instead_of_euclidean_distance(self):
         r = self.runner()
         def route(level, start, end):
