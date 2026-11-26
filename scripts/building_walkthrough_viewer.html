@@ -21,6 +21,7 @@
     @media(max-width:650px){main{padding:15px 12px}.top{align-items:flex-start;margin-bottom:17px}.model-label{max-width:125px;font-size:10px}.identity{gap:8px}.identity svg{width:29px;height:29px}.eyebrow{font-size:9px;letter-spacing:.1em}h1{font-size:23px}.places{display:grid;grid-template-columns:1fr 1fr;gap:6px}.place{padding:10px 9px;text-align:left;font-size:11px}.place .ordinal{margin-right:5px}.stage{height:65vh;min-height:420px;border-radius:10px}.caption{left:12px;top:12px;padding:9px 11px;max-width:calc(100% - 75px)}.caption strong{font-size:13px}.caption span{font-size:10px}.fullscreen{top:12px;right:12px;width:35px;height:35px}.bottom{gap:9px}.navigation{gap:6px}.quiet-button,.level-select{padding:8px 9px;font-size:11px}.help{font-size:10px}.notice{font-size:10px}.move-controls{left:12px;bottom:12px}.height-controls{right:12px;bottom:12px}}
     @media(max-width:650px){.interaction-hint{bottom:110px;max-width:calc(100% - 24px);width:max-content;font-size:11px}}
     .lift-panel{position:absolute;right:18px;top:72px;z-index:2;max-width:calc(100% - 36px);width:260px;max-height:calc(100% - 90px);overflow:auto;overscroll-behavior:contain;padding:12px;background:#fffef6f5;border:1px solid #ced8cc;border-radius:10px;color:#294d3f;font-size:12px}.lift-panel[hidden]{display:none}.lift-panel p{margin:0 0 9px;line-height:1.5}.lift-actions,.lift-floors{display:flex;gap:6px;flex-wrap:wrap}.lift-floors{margin-bottom:8px}.lift-panel button{min-height:38px}.lift-panel button:disabled,.quiet-button:disabled,.place:disabled{opacity:.55;cursor:default}.lift-status{font-size:11px;color:#64766a}.isolation-button[aria-pressed=true]{background:#d7e6d7}
+    .lap-panel{width:284px}.lap-panel .lap-progress{display:block;width:100%;margin:10px 0 2px;accent-color:#2e5146}.lap-panel .lap-row{display:flex;justify-content:space-between;align-items:center;gap:6px}.lap-panel .lap-rate{display:flex;align-items:center;gap:6px}.lap-panel .lap-time{font-variant-numeric:tabular-nums;white-space:nowrap}.lap-panel .lap-primary{background:#2e5146;color:#fff;border-color:#2e5146}.lap-panel .lap-primary:hover{background:#41695a}.lap-panel label{font-size:11px}
     .lift-readout{display:inline-block;background:#18171c;color:#ff3156;font:700 32px monospace;min-width:48px;text-align:center;padding:4px 10px;border-radius:5px;margin:0 0 10px}.lift-floors button{border-radius:50%;min-width:40px;padding:8px;font-weight:700}.lift-floors button[aria-pressed=true]{border-color:#f54e71;box-shadow:0 0 0 2px #f54e7155}
     @media(max-width:650px){.lift-panel{right:12px;top:65px;width:230px;padding:9px;font-size:11px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -56,6 +57,21 @@
       <p><strong id="walkthrough-robot-label"></strong><br><span id="walkthrough-robot-status" role="status"></span></p>
       <div class="lift-actions" id="walkthrough-robot-actions"></div>
       <p class="notice">Simulation · Leerbewegung</p>
+    </section>
+    <section class="lift-panel lap-panel" id="walkthrough-lap" aria-label="TR01-Laborrunde" hidden>
+      <p><strong>TR01 · Laborrunde</strong><br><span id="walkthrough-lap-distance"></span></p>
+      <div class="lift-actions">
+        <button type="button" class="quiet-button lap-primary" id="walkthrough-lap-play">Runde starten</button>
+        <button type="button" class="quiet-button" id="walkthrough-lap-reset">Zurücksetzen</button>
+        <button type="button" class="quiet-button" id="walkthrough-lap-reverse" hidden>Rückwärtsanfahrt ansehen</button>
+      </div>
+      <input class="lap-progress" id="walkthrough-lap-time" type="range" min="0" step="any" aria-label="Position auf der Modellzeitachse">
+      <div class="lap-row">
+        <output class="lap-time" id="walkthrough-lap-clock"></output>
+        <label class="lap-rate">Wiedergabe <select class="level-select" id="walkthrough-lap-rate" aria-label="Wiedergabefaktor"></select></label>
+      </div>
+      <label><input type="checkbox" id="walkthrough-lap-follow"> TR01 im Blick behalten</label>
+      <p class="notice" id="walkthrough-lap-status" role="status"></p>
     </section>
     <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
@@ -96,6 +112,7 @@
 <script id="walkthrough-data" type="application/json">__WALKTHROUGH_DATA__</script>
 <script>__WALKTHROUGH_INTERACTION__
 __WALKTHROUGH_ROBOTS__
+__WALKTHROUGH_TR01_LAP__
 __WALKTHROUGH_MONITORS__
 __WALKTHROUGH_SEMINAR__</script>
 <script>
@@ -218,6 +235,22 @@ __WALKTHROUGH_SEMINAR__</script>
         const other=objectStates.get(rule.object_id);if(!other||!Number.isFinite(other.config.states[rule.state]))throw Error('Unknown articulation guard.');
       }
     }
+    const lapConfig=data.tr01_lap;
+    const lap=lapConfig?WalkthroughTR01Lap.create(lapConfig,CF01Motion.Curve):null;
+    if(lap){
+      const visible=new Set(data.scenes[lapConfig.scene].groups.map(group=>group.id));
+      if(new Set(lapConfig.body_ids).size!==lapConfig.body_ids.length||!lapConfig.body_ids.includes(lapConfig.cover_body_id))
+        throw Error('The TR01 playback requires the complete covered vehicle.');
+      const owner={config:{id:lapConfig.stop_id,mechanism:'tr01_lap'},matrix:()=>lap.matrix};
+      for(const id of lapConfig.body_ids){
+        const key=lapConfig.scene+':'+id;
+        if(!visible.has(id)||bodyOwners.has(key))throw Error('Missing or multiply bound TR01 body.');
+        bodyOwners.set(key,owner);
+      }
+      for(const [id,state] of Object.entries(lapConfig.fixture_states)){
+        if(!Number.isFinite(objectStates.get(id)?.config.states[state]))throw Error('Unknown TR01 fixture state.');
+      }
+    }
     const robots=new Map((data.robots||[]).map(c=>[c.id,WalkthroughRobots.create(c,objectStates,CF01Motion.Curve)]));
     const robotTriggers=new Map();
     for(const robot of robots.values())for(const id of robot.config.trigger_body_ids){
@@ -246,6 +279,7 @@ __WALKTHROUGH_SEMINAR__</script>
     }
     function robotCommand(id,name){
       const robot=robots.get(id);if(!robot)return {status:'unknown_target',id};
+      if(lap?.locked&&lapConfig.parked_robots.includes(id))return {status:'rejected_lap_active',id};
       const result=robot.command(name,performance.now());dirty=true;updateRobotUI();requestRender();return result;
     }
     const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
@@ -264,6 +298,7 @@ __WALKTHROUGH_SEMINAR__</script>
     let liftUIKey=null,lastLiftCommand=null;
     function updateObjectUI(){dirty=true;}
     function objectMatrix(object,closed=false){
+      if(object.matrix)return object.matrix();
       const value=closed&&Number.isFinite(object.config.states.closed)?object.config.states.closed:object.value;
       const local=WalkthroughInteraction.jointMatrix(object.config.joint,value,object.config.states[object.config.reference_state]);
       const parent=object.config.parent_object_id?objectStates.get(object.config.parent_object_id):null;
@@ -332,6 +367,7 @@ __WALKTHROUGH_SEMINAR__</script>
     function driveObject(id,name){
       advanceObjects(performance.now());const object=objectStates.get(id),target=object?.config.commands[name]?.target_state;
       if(!object||!target||!Number.isFinite(object.config.states[target]))return {status:'unknown_target',id};
+      if(lap?.locked&&Object.hasOwn(lapConfig.fixture_states,id))return {status:'rejected_lap_active',id};
       if(object.transition)return {status:'rejected_busy',id,state:object.state};
       if(object.state===target)return {status:'already_in_state',id,state:object.state};
       const blockers=WalkthroughInteraction.commandBlockers(objectStates,id,name);
@@ -369,7 +405,7 @@ __WALKTHROUGH_SEMINAR__</script>
       const direction=normalize(forward.map((v,i)=>v+right[i]*x*spread*aspect+up[i]*y*spread));
       const scene=prepareScene(sceneId);
       return scene.picker.pick(eye,direction,{reach,includeReference,minDistance:near,
-        targetForBody:id=>monitorTriggers.has(id)?'monitor:'+monitorTriggers.get(id):controlBodies.get(id)||robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(bodyOwners.get(sceneId+':'+id)?.config.id===elevatorConfig?.object_id?null:bodyOwners.get(sceneId+':'+id)?.config.id)||null,
+        targetForBody:id=>monitorTriggers.has(id)?'monitor:'+monitorTriggers.get(id):controlBodies.get(id)||robotTriggers.get(id)?.config.id||triggerPorts.get(id)?.id||(objectStates.has(bodyOwners.get(sceneId+':'+id)?.config.id)&&bodyOwners.get(sceneId+':'+id)?.config.id!==elevatorConfig?.object_id?bodyOwners.get(sceneId+':'+id).config.id:null)||null,
         transformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner):null;},
         referenceTransformForBody:id=>{const owner=bodyOwners.get(sceneId+':'+id);return owner?objectMatrix(owner,true):null;}});
     }
@@ -498,7 +534,127 @@ __WALKTHROUGH_SEMINAR__</script>
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
       return {drawn_native_groups:drawnGroups,drawn_triangles:drawnTriangles};
     }
+    const lapPanel=document.getElementById('walkthrough-lap'),lapPlay=document.getElementById('walkthrough-lap-play');
+    const lapReset=document.getElementById('walkthrough-lap-reset'),lapTimeline=document.getElementById('walkthrough-lap-time');
+    const lapReverse=document.getElementById('walkthrough-lap-reverse');
+    const lapRate=document.getElementById('walkthrough-lap-rate'),lapFollow=document.getElementById('walkthrough-lap-follow');
+    const lapStatus=document.getElementById('walkthrough-lap-status'),lapClock=document.getElementById('walkthrough-lap-clock');
+    const lapRoom=data.laboratories?.find(room=>room.id===lapConfig?.laboratory_id);
+    let lapMessage='',lapAutoplay=lapConfig?.autoplay===true;
+    function lapViewActive(){
+      if(!lap||sceneId!==lapConfig.scene||selectedLevel!==lapConfig.level_id||elevator?.boarded)return false;
+      if(!lapRoom)return stopId===lapConfig.stop_id;
+      return SeminarProjection.insidePolygon(lapRoom.interior_polygon_mm,eye.map(value=>value*1000));
+    }
+    function blockedLapFixture(){
+      for(const [id,expected] of Object.entries(lapConfig.fixture_states)){
+        const object=objectStates.get(id);
+        if(object.transition||Math.abs(object.value-object.config.states[expected])>1e-7)return object.config.label;
+      }
+      for(const id of lapConfig.parked_robots){
+        const robot=robots.get(id);
+        if(!robot||robot.snapshot.busy||robot.snapshot.joints_deg.some((q,i)=>Math.abs(q-robot.config.reference_deg[i])>1e-7))
+          return robot?.config.label||id;
+      }
+      return '';
+    }
+    function checkLapFixtures(){
+      const blocker=blockedLapFixture();
+      lapMessage=blocker?'Prüfstellung wiederherstellen · '+blocker:'';
+      return !blocker;
+    }
+    function allowLapPlayback(){
+      if(!lapViewActive())return false;
+      const allowed=checkLapFixtures();
+      requestRender();
+      return allowed;
+    }
+    function lapPlaybackVisible(){
+      return !document.hidden&&sceneId===lapConfig.scene&&(lapAutoplay||lapViewActive());
+    }
+    function advanceLap(now){
+      if(!lap)return false;
+      const playing=lap.snapshot.state==='playing';
+      if(!lapPlaybackVisible()){
+        if(playing)lap.pause(now);
+        return playing;
+      }
+      if(playing)return lap.advance(now);
+      if(!lapAutoplay)return false;
+      const previousMessage=lapMessage;
+      if(!checkLapFixtures())return previousMessage!==lapMessage;
+      lap.play(now);
+      return true;
+    }
+    function modelClock(seconds){
+      const whole=Math.floor(seconds);
+      return Math.floor(whole/60)+':'+String(whole%60).padStart(2,'0');
+    }
+    function followLap(){
+      if(!lapViewActive()||!lapFollow.checked)return;
+      const [x,y]=lap.snapshot.pose_mm_rad;
+      const [dx,dy,dz]=lap.roomPoint([x,y,620]).map((value,index)=>value/1000-eye[index]);
+      const distance=Math.hypot(dx,dy);
+      if(distance<near)return;
+      yaw=Math.atan2(dy,dx);pitch=Math.atan2(dz,distance);
+    }
+    function updateLapUI(){
+      lapPanel.hidden=!lapViewActive();
+      if(lapPanel.hidden)return;
+      const {state,time_s,duration_s,direction}=lap.snapshot;
+      lapPlay.textContent={ready:'Runde starten',playing:'Pause',paused:'Weiterfahren',docked:'Erneut fahren'}[state];
+      lapReset.disabled=state==='ready';
+      lapTimeline.value=String(time_s);
+      lapClock.textContent=modelClock(time_s)+' / '+modelClock(duration_s)+' Modellzeit';
+      const next=lapMessage||{ready:'Am Dock',playing:direction==='reverse'?'Rückwärts zum Dock':'Vorwärts durch das Labor',paused:'Pausiert',docked:'Wieder angedockt'}[state];
+      if(lapStatus.textContent!==next)lapStatus.textContent=next;
+    }
+    if(lap){
+      document.getElementById('walkthrough-lap-distance').textContent=
+        (lapConfig.length_mm/1000).toLocaleString('de-DE',{maximumFractionDigits:1})+' m · mit Haube · ≥ '+lapConfig.minimum_clearance_mm+' mm Abstand';
+      lapTimeline.max=String(lapConfig.duration_s);
+      for(const rate of lapConfig.playback_rates){
+        const option=document.createElement('option');option.value=String(rate);option.textContent=rate+'×';lapRate.append(option);
+      }
+      lapRate.value=String(lap.snapshot.playback_rate);
+      lapReverse.hidden=!lapConfig.reversal;
+      lapReverse.addEventListener('click',()=>{
+        if(!lapConfig.reversal||!allowLapPlayback())return;
+        lapAutoplay=false;
+        if(lapRoom)setStop(lapConfig.stop_id);
+        const now=performance.now();
+        lap.seek(lapConfig.reversal.time_s);
+        lap.setRate(1,now);
+        lapRate.value='1';
+        lapFollow.checked=true;
+        lap.play(now);
+        requestRender();
+      });
+      lapPlay.addEventListener('click',()=>{
+        const now=performance.now();
+        if(lap.snapshot.state==='playing'){
+          lapAutoplay=false;
+          lap.pause(now);
+        }else if(allowLapPlayback()){
+          lapAutoplay=lapConfig.autoplay===true;
+          lap.play(now);
+        }
+        requestRender();
+      });
+      lapReset.addEventListener('click',()=>{lapAutoplay=false;lap.seek(0);lapMessage='';requestRender();});
+      lapTimeline.addEventListener('input',()=>{
+        if(allowLapPlayback()){
+          lapAutoplay=false;
+          lap.seek(Number(lapTimeline.value));
+        }
+        requestRender();
+      });
+      lapRate.addEventListener('change',()=>{lap.setRate(Number(lapRate.value),performance.now());requestRender();});
+      lapFollow.addEventListener('change',requestRender);
+    }
     function render(){
+      followLap();
+      updateLapUI();
       syncLiftCamera();
       seminarProjection?.update({sceneId,eye_mm:eye.map(v=>v*1000),isolated});
       updateWindowControls();
@@ -513,7 +669,8 @@ __WALKTHROUGH_SEMINAR__</script>
       const frame=CameraMonitorWall.pose(camera,owner?objectMatrix(owner):null);
       const metrics=drawScene(prepareScene('building',true),CameraMonitorWall.projection(camera,frame,width/height),frame.eye_mm.map(v=>v/1000),true);
       const robot=owner&&robots.get(owner.config.robot_id);
-      return {...frame,...metrics,model_time_s:robot?.snapshot.time_s??null,source_kind:camera.kind};
+      const time=owner?.config.mechanism==='tr01_lap'?lap.snapshot.time_s:robot?.snapshot.time_s;
+      return {...frame,...metrics,model_time_s:time??null,source_kind:camera.kind};
     }
     if(monitorConfig){
       const sourceIds=new Set(data.scenes.building.groups.map(g=>g.id));
@@ -604,13 +761,29 @@ __WALKTHROUGH_SEMINAR__</script>
     }
     function tick(now){
       frameRequest=null;
-      try{const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;move(dt);const animating=advanceObjects(now),liftActive=liftDoors?.advance();if(dirty){render();dirty=false;}if(navigationHeld()||animating||liftActive)frameRequest=requestAnimationFrame(tick);else lastTime=null;}
+      try{
+        const dt=lastTime===null?0:Math.min(.06,(now-lastTime)/1000);lastTime=now;
+        if(lapFollow.checked&&navigationHeld())lapFollow.checked=false;
+        move(dt);
+        const animating=advanceObjects(now),liftActive=liftDoors?.advance();
+        const lapChanged=advanceLap(now);
+        if(lapChanged)dirty=true;
+        if(dirty){render();dirty=false;}
+        const lapState=lap?.snapshot.state;
+        const lapRepeating=lapAutoplay&&lapChanged&&lapState==='docked'&&lapPlaybackVisible();
+        if(navigationHeld()||animating||liftActive||lapState==='playing'||lapRepeating)frameRequest=requestAnimationFrame(tick);
+        else lastTime=null;
+      }
       catch(error){clearInputKeys();fail(error);}
     }
     function setStop(id){
       selectedRobot=null;updateRobotUI();
       if(elevator?.boarded)return {status:'rejected_aboard'};
-      if(id!=='lab'){isolated=false;isolationButton.setAttribute('aria-pressed','false');}
+      if(lap)lapFollow.checked=false;
+      if(id!=='lab'){
+        isolated=false;
+        isolationButton.setAttribute('aria-pressed',String(isolated));
+      }
       const stop=stops.find(s=>s.id===id);if(!stop)throw Error('Unknown viewpoint.');
       clearInputKeys();sceneId=stop.scene;stopId=stop.id;selectedLevel=stop.level_id||null;eye=stop.eye_mm.map(v=>v/1000);
       const direction=normalize(stop.target_mm.map((v,i)=>(v-stop.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(Math.max(-.995,Math.min(.995,direction[2])));
@@ -649,7 +822,7 @@ __WALKTHROUGH_SEMINAR__</script>
       event.preventDefault();keyboardKeys.add(event.code);requestRender();
     });
     window.addEventListener('keyup',event=>{if(event.ctrlKey||event.metaKey)clearKeyboardKeys();else{keyboardKeys.delete(event.code);readModifiers(event);}if(keyNames[event.code])requestRender();});
-    const clearMovement=()=>{clearInputKeys();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden)clearMovement();else requestRender();});
+    const clearMovement=()=>{clearInputKeys();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden){lap?.pause(performance.now());clearMovement();}else requestRender();});
     document.addEventListener('focusin',event=>{if(editable(event.target))clearMovement();});
     for(const button of document.querySelectorAll('[data-move]')){
       const name=button.dataset.move;button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);keys.add(name);requestRender();});
@@ -661,7 +834,7 @@ __WALKTHROUGH_SEMINAR__</script>
       pointerPosition=pointerCoordinates(event);
       if(drag&&drag.id===event.pointerId){
         if(!drag.moved&&Math.hypot(event.clientX-drag.startX,event.clientY-drag.startY)>6)drag.moved=true;
-        if(drag.moved){yaw-=(event.clientX-drag.x)*sensitivity;pitch=Math.max(-1.50,Math.min(1.50,pitch-(event.clientY-drag.y)*sensitivity));drag.x=event.clientX;drag.y=event.clientY;root.dataset.freeCamera='true';}
+        if(drag.moved){lapFollow.checked=false;yaw-=(event.clientX-drag.x)*sensitivity;pitch=Math.max(-1.50,Math.min(1.50,pitch-(event.clientY-drag.y)*sensitivity));drag.x=event.clientX;drag.y=event.clientY;root.dataset.freeCamera='true';}
       }
       requestRender();
     });
@@ -685,6 +858,7 @@ __WALKTHROUGH_SEMINAR__</script>
       get robots(){return [...robots.values()].map(r=>r.snapshot);},
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
       get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,display_level:elevator.displayLevel(),walking_allowed:elevator.walkingAllowed,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
+      get tr01Lap(){return lap?{...lap.snapshot,matrix:Array.from(lap.matrix)}:null;},
       get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},
@@ -693,6 +867,7 @@ __WALKTHROUGH_SEMINAR__</script>
     });
     liftDoors?.initialize();setStop(defaultStop);render();dirty=false;
     loadingProgress.value=loadingProgress.max;loading.hidden=true;root.dataset.ready='true';
+    if(lapAutoplay)requestRender();
   }catch(error){fail(error);}
 })();
 </script>

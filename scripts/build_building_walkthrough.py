@@ -41,6 +41,7 @@ def embed_html(template, payload):
     if '__WALKTHROUGH_SEMINAR__' in template:
         template = template.replace('__WALKTHROUGH_SEMINAR__', SEMINAR_SCRIPT.read_text(encoding='utf-8'))
     template = template.replace('__WALKTHROUGH_ROBOTS__', (ROOT/'scripts/templates/quintic_motion.js').read_text()+'\n'+(ROOT/'scripts/walkthrough_robots.js').read_text())
+    template = template.replace('__WALKTHROUGH_TR01_LAP__', (ROOT/'scripts/walkthrough_tr01_lap.js').read_text())
     template = template.replace('__WALKTHROUGH_MONITORS__', (ROOT/'scripts/monitor_frustum.js').read_text()+'\n'+(ROOT/'scripts/camera_monitor_wall.js').read_text())
     return template.replace('__WALKTHROUGH_DATA__', data)
 
@@ -143,7 +144,7 @@ def build(args):
          for path in (Path(__file__), Path(walkthrough_world.__file__), Path(mesh_export.__file__), *reports.values())})
     browser_inputs = merge_pins(world_inputs, overlay['source_files_sha256'] if overlay else {},
         {str(path.relative_to(ROOT)): mesh_export.digest(path)
-         for path in (TEMPLATE, INTERACTION_SCRIPT, SEMINAR_SCRIPT,
+         for path in (TEMPLATE, INTERACTION_SCRIPT, SEMINAR_SCRIPT, ROOT/'scripts/walkthrough_tr01_lap.js',
                       ROOT/'scripts/camera_monitor_wall.js', ROOT/'scripts/monitor_frustum.js')})
     key = hashlib.sha256(json.dumps(browser_inputs, sort_keys=True).encode()).hexdigest()
     stem = 'building-walkthrough-'+key[:12]

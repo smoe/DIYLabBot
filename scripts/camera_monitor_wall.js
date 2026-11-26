@@ -127,7 +127,9 @@
         freshness.textContent=browserAgeLabel(slot,performance.now())||state(slot);
       }
       if(redraw)large.drawImage(slot.canvas,0,0);
-      details.textContent=caption(slot,performance.now()).join(' · ')+(slot.frame?.model_time_s==null?'':(receivedSource?.ids.has(slot.camera_id)?' · Aufnahme-Modellzeit ':' · Arm-Modellzeit ')+slot.frame.model_time_s.toFixed(2)+' s')+(slot.error?' · '+slot.error:'');
+      const clockLabel=receivedSource?.ids.has(slot.camera_id)?'Aufnahme-Modellzeit':
+        cameras.get(slot.camera_id)?.category==='transporter'?'TR01-Modellzeit':'Arm-Modellzeit';
+      details.textContent=caption(slot,performance.now()).join(' · ')+(slot.frame?.model_time_s==null?'':' · '+clockLabel+' '+slot.frame.model_time_s.toFixed(2)+' s')+(slot.error?' · '+slot.error:'');
     }
     function clearFrame(slot){
       slot.hash=null;slot.frame=null;slot.pixel_alpha_min=null;slot.last_capture=null;slot.last_received_capture=null;

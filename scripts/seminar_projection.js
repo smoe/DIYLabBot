@@ -2,16 +2,19 @@
 (function(scope){
   'use strict';
   const finite3=value=>Array.isArray(value)&&value.length===3&&value.every(Number.isFinite);
-  function insideRoom(config,eye){
-    if(!finite3(eye)||eye[2]<config.floor_z_mm||eye[2]>=config.ceiling_z_mm)return false;
-    const polygon=config.room_interior_polygon_mm;let inside=false;
+  function insidePolygon(polygon,[x,y]){
+    let inside=false;
     for(let i=0,j=polygon.length-1;i<polygon.length;j=i++){
       const a=polygon[j],b=polygon[i],dx=b[0]-a[0],dy=b[1]-a[1],length=Math.hypot(dx,dy);
-      const projection=length?((eye[0]-a[0])*dx+(eye[1]-a[1])*dy)/(length*length):-1;
-      if(projection>=0&&projection<=1&&Math.abs((eye[0]-a[0])*dy-(eye[1]-a[1])*dx)<=1e-7*length)return true;
-      if((a[1]>eye[1])!==(b[1]>eye[1])&&eye[0]<(b[0]-a[0])*(eye[1]-a[1])/(b[1]-a[1])+a[0])inside=!inside;
+      const projection=length?((x-a[0])*dx+(y-a[1])*dy)/(length*length):-1;
+      if(projection>=0&&projection<=1&&Math.abs((x-a[0])*dy-(y-a[1])*dx)<=1e-7*length)return true;
+      if((a[1]>y)!==(b[1]>y)&&x<dx*(y-a[1])/dy+a[0])inside=!inside;
     }
     return inside;
+  }
+  function insideRoom(config,eye){
+    return finite3(eye)&&eye[2]>=config.floor_z_mm&&eye[2]<config.ceiling_z_mm&&
+      insidePolygon(config.room_interior_polygon_mm,eye);
   }
   function create({config,gl,host,requestRender}){
     if(!config||!Array.isArray(config.room_interior_polygon_mm)||config.room_interior_polygon_mm.length<3||
@@ -126,5 +129,5 @@
         source_url:config.film.source_url,video_url:config.film.video_url,current_time_s:video.currentTime,duration_s:Number.isFinite(video.duration)?video.duration:null,
         ready_state:video.readyState,frames_uploaded:uploaded,frame_size_px:[video.videoWidth,video.videoHeight],error,autoplay_blocked:blocked};}};
   }
-  const api={insideRoom,create};if(typeof module!=='undefined'&&module.exports)module.exports=api;scope.SeminarProjection=api;
+  const api={insidePolygon,insideRoom,create};if(typeof module!=='undefined'&&module.exports)module.exports=api;scope.SeminarProjection=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
