@@ -72,6 +72,7 @@ class ActiveFleetTests(unittest.TestCase):
                          tuple('BF%02d' % i for i in range(1, 7)))
         legacy = copy.deepcopy(self.profile)
         legacy.pop('vehicle_count')
+        legacy.pop('timing')
         with patch.object(local.model, 'read_json', return_value=legacy):
             self.assertEqual(local.load_profile(), legacy)
         expected = tuple('BF%02d' % i for i in range(1, 21))
@@ -118,6 +119,7 @@ class ActiveFleetTests(unittest.TestCase):
         original['planner'].states['BF20']['active'] = {'mission_id': 'existing'}
         for count in (None, 20):
             profile = copy.deepcopy(self.profile)
+            profile.pop('timing')
             if count is None:
                 profile.pop('vehicle_count')
             else:
@@ -138,6 +140,8 @@ class ActiveFleetTests(unittest.TestCase):
             with self.subTest(count=count):
                 prepared = prepared_map(self.source)
                 profile = {**self.profile, 'vehicle_count': count}
+                if count==20:
+                    profile.pop('timing')
                 engine = PatrolWorldRunner(self.source, prepared['nav'], prepared['graph'],
                     prepared['catalog'], prepared['planner'], profile,
                     geometry_checker=prepared['geometry_checks'],
@@ -170,7 +174,8 @@ class ActiveFleetTests(unittest.TestCase):
                 self.assertEqual({s['id'] for s in snapshot['states']}, expected)
                 self.assertEqual({f['vehicle_id'] for f in snapshot['camera_frames']}, expected)
                 self.assertTrue(snapshot['startup_ready'])
-                self.assertEqual(engine.world.scans, count * len(range(0, 23, engine.scan_step)))
+                scans_per_vehicle = 23*4 if count==6 else len(range(0,23,engine.scan_step))
+                self.assertEqual(engine.world.scans, count*scans_per_vehicle)
                 for frame in snapshot['camera_frames']:
                     self.assertEqual({s['id'] for s in frame['states']}, expected)
                 self.assertEqual({t['vehicle_id'] for t in snapshot['executed_window']['trajectories']}, expected)

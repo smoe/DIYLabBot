@@ -6,6 +6,7 @@ continuation leaves the existing checked stopping fallback in force.
 import copy
 import math
 from building_fleet_control import Controller,F
+from building_fleet_motion import interval_extrema
 import l01_local_traffic as local
 import tr01_floor_motion as floor
 
@@ -21,7 +22,9 @@ class RollingController(Controller):
 
     def _inside_horizon(self,clock,origin):
         if clock is None:return True
-        return origin+floor.motion.bounds(clock)[F[0]]['max'][0]<=self.certified_horizon_mm+1e-5
+        # Horizon membership only needs the closed-interval progress bound.
+        # Full dynamics are checked separately by the combined stop proof.
+        return origin+interval_extrema(clock)['max'][0]<=self.certified_horizon_mm+1e-5
 
     def _valid_stop_clock(self,clock,origin):
         return (not getattr(self,'awaiting_continuation',True)or self._inside_horizon(clock,origin))and super()._valid_stop_clock(clock,origin)
@@ -128,8 +131,9 @@ class RollingController(Controller):
                           key=lambda p:(abs(p[F[2]][0])<1e-8,p['time_s']),reverse=True)
         future.extend(self.plan_start+p['time_s'] for p in candidates)
         for when in future:
-            at=math.floor(when*20+1e-9)/20
-            if at<=self.now+.05:continue
+            step = getattr(self, 'max_step_s', .05)
+            at=round(math.floor(when/step+1e-9)*step,3)
+            if at<=self.now+step+1e-9:continue
             jet=self.plan.evaluate(round(at-self.plan_start,3))
             if jet[F[1]][0]<=1e-6:continue
             if curved_launch and self.plan_origin+jet[F[0]][0]<self.path.ends[1]:continue

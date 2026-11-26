@@ -4,7 +4,7 @@
   "sources": {
     "patrol": {
       "path": "model/building-fleet-patrol.shared.json",
-      "sha256": "8481c14ed548e0a77b2f5f8f28ecdf9c764ef0a0dbb669a81dd87bd7e773436c"
+      "sha256": "190385a3ca2af3c7fbd5cbc5ee47e56ed65e66d6e2e44ead1653c66a24e296e5"
     },
     "python_core": {
       "path": "model/building-fleet-browser-python.shared.json",
@@ -16,7 +16,7 @@
     "version": "314.0.8",
     "loader_module_url": "https://cdn.jsdelivr.net/pyodide/v314.0.8/full/pyodide.mjs",
     "execution": "module_web_worker",
-    "pacing": "source_step_without_wall_clock_catchup",
+    "pacing": "source_step_with_bounded_deadline_recovery",
     "static_route_witnesses": "original_pinned_metadata_for_bit_identical_geometry",
     "delivery": "same_origin_pinned_core",
     "static_geometry": "source_bound_lossless_runtime_cache",

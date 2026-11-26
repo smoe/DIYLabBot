@@ -23,9 +23,21 @@ keinen gemeinsam betriebenen Simulationsserver. Er lädt den in der Quelle
 festgelegten Python-Laufzeitkern sowie das quellgebundene Laufzeitpaket und
 führt den vorhandenen `PatrolWorldRunner` in einem eigenen Worker aus. Die
 übrige Seite bleibt während längerer Berechnungen bedienbar. Physik, anonyme
-Scans, 50-ms-Schritte und Bremsnachweise, Rekrutierung, Buchten-, Aufzug- und
-Bench-Regeln kommen aus denselben Python-Modulen wie beim lokalen Dienst.
-Modellzeit wird nicht vorgezogen, um langsame Berechnungen aufzuholen.
+Scans, Bremsnachweise, Rekrutierung, Buchten-, Aufzug- und Bench-Regeln
+kommen aus denselben Python-Modulen wie beim lokalen Dienst. BF01–BF06
+verwenden im Browser 400-ms-Reglerschritte, solange alle Fahrzeuge im
+Erdgeschoss fahren oder warten und der Aufzug weder belegt noch angefordert
+ist. Andernfalls prüft der Regler im bisherigen 50-ms-Raster. Der archivierte
+Rohvertrag `/2` verwendet weiterhin 50 ms.
+
+Der synthetische Lidar-Abstand zwischen zwei Aufnahmen bleibt 100 ms.
+Die Zustellung erfolgt nach 50 ms. Ein neuer Fahrtbeleg prüft den vollständigen
+Schritt samt Bremskurve gegen genau den Scan, der am geprüften Schrittende
+höchstens 450 ms alt ist. Innerhalb langer Schritte entstehen Scans aus den
+tatsächlich ausgeführten simultanen PVA-Kurven. Der Browser gleicht kurze
+Rechenverzögerungen nur mit weiteren vollständig geprüften Schritten aus.
+Die Anzeige puffert bereits ausgeführte Kurven und vermeidet eine
+Fortschreibung über das letzte ausgeführte Intervall hinaus.
 
 Auf ausreichend langen, freien Geraden ist die leere Flotte auf Schritttempo
 ausgelegt. Das BF01-Profil begrenzt die Geschwindigkeit dort auf 1,45 m/s und
@@ -47,7 +59,9 @@ geprüft und als Ableitungsnachweis gebunden; sie sind keine notwendigen
 Browserdownloads mehr. Der Browser startet kein natives CAD. Das Laufzeitmanifest bindet
 jede Datei mit Größe und SHA256. Aufgezeichnete Programme, Laufjournale,
 Controller-Beobachtungen und alte Sitzungssnapshots gehören nicht in dieses
-Paket. Die statischen Daten beschreiben Wege und Körper, keine ausgeführte
+Paket. Das 400-ms-Update verwendet die bisherige, separat geprüfte
+Geometrie der öffentlichen BF01-Seite. Die statischen Daten beschreiben Wege
+und Körper, keine ausgeführte
 Mission. Download-, Quellen- oder Rechenfehler bleiben sichtbar, statt eine
 gespeicherte Fahrt als aktive Simulation auszugeben.
 

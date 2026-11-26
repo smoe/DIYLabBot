@@ -157,19 +157,7 @@ class ResourceCatalog:
         self._validated_route_bank=self.route_bank_hash(routes)
         # Exact immutable geometry only. Bounded point-query memoization never
         # rounds coordinates and cannot retain an unbounded runtime path bank.
-        self._polygon_refs={id(p):p for _,_,p in self.room_polygons}
-        self._polygon_refs.update({id(row['polygon']):row['polygon']for row in self.regions})
-        self._polygon_bounds={identity:_bounds(polygon)for identity,polygon in self._polygon_refs.items()}
-        self._polygon_numeric_safe={identity:_broad_phase_finite(v for point in polygon for v in point)
-                                    for identity,polygon in self._polygon_refs.items()}
-        exact_geometry={};self._polygon_canonical={}
-        for identity,polygon in self._polygon_refs.items():
-            key=tuple(tuple(point)for point in polygon)
-            self._polygon_canonical[identity]=exact_geometry.setdefault(key,identity)
-        self._distance=lru_cache(maxsize=32768)(lambda point,identity:_point_distance(point,self._polygon_refs[identity]))
-        self._within=lru_cache(maxsize=65536)(lambda point,identity,threshold:
-            (not self._polygon_numeric_safe[identity]or _bounds_may_reach(point,self._polygon_bounds[identity],threshold))
-            and self._distance(point,self._polygon_canonical[identity])<=threshold)
+        self._bind_polygon_queries()
         self._room_index=collections.defaultdict(list);self._rooms_by_level=collections.defaultdict(list)
         self._unindexed_rooms=collections.defaultdict(list);self._room_numeric_padding={}
         for index,(level,_,polygon)in enumerate(self.room_polygons):
@@ -365,6 +353,66 @@ class ResourceCatalog:
                     self._region_keys.add(key)
                     self.regions.append({'level':level,'alias':alias,'polygon':polygon,'bounds':_bounds(polygon)})
 
+    def _bind_polygon_queries(self):
+        """Prepare immutable polygon metadata once, including after restoration."""
+        refs = {id(polygon): polygon for _, _, polygon in self.room_polygons}
+        refs.update({id(row['polygon']): row['polygon'] for row in self.regions})
+        self._polygon_refs = refs
+        self._polygon_bounds = {}
+        self._polygon_numeric_safe = {}
+        self._polygon_canonical = {}
+        geometry = {}
+        extents = {}
+        for identity, polygon in refs.items():
+            lo, hi = self._polygon_bounds[identity] = _bounds(polygon)
+            safe = self._polygon_numeric_safe[identity] = _broad_phase_finite(
+                value for point in polygon for value in point)
+            if safe:
+                extents[identity] = (*lo, *hi, max(math.ulp(value) for value in (*lo, *hi)))
+            key = tuple(tuple(point) for point in polygon)
+            self._polygon_canonical[identity] = geometry.setdefault(key, identity)
+
+        @lru_cache(maxsize=32768)
+        def distance(point, identity):
+            return _point_distance(point, refs[identity])
+
+        @lru_cache(maxsize=32768)
+        def query_ulp(point, threshold):
+            values = (*point, threshold)
+            return max(map(math.ulp, values)) if _broad_phase_finite(values) else None
+
+        @lru_cache(maxsize=65536)
+        def within(point, identity, threshold):
+            bound = extents.get(identity)
+            if bound is not None:
+                ulp = query_ulp(point, threshold)
+                if ulp is not None:
+                    x, y = point
+                    xmin, ymin, xmax, ymax, bound_ulp = bound
+                    reach = threshold + 32 * max(ulp, bound_ulp)
+                    if xmin-x > reach or ymin-y > reach or x-xmax > reach or y-ymax > reach:
+                        return False
+            return distance(point, self._polygon_canonical[identity]) <= threshold
+
+        self._distance = distance
+        self._within = within
+        self._runtime_alias_windows = collections.OrderedDict()
+
+    def _runtime_path_key(self, level, path):
+        if type(path) is not Path or 'position' in vars(path):
+            return None
+        # Windows depend on the centreline and original sample intervals. Bind
+        # the actual inputs, including signed zero, across recreated Path objects.
+        def exact(value):
+            return value.hex() if type(value) is float else value
+
+        pieces = tuple((exact(piece['weight']),
+                        tuple(tuple(map(exact, point)) for point in piece['controls']),
+                        tuple(tuple(map(exact, point)) for point in piece['derivatives'][0]))
+                       for piece in path.pieces)
+        samples = tuple((exact(a), exact(b)) for a, b, _, _ in path.samples)
+        return (level, Path.position, exact(path.length), tuple(map(exact, path.ends)), pieces, samples)
+
     def _raw_windows(self,level,path):
         """Whole-route room semantics and exact raw aliases, before unions."""
         marked=collections.defaultdict(list)
@@ -425,8 +473,19 @@ class ResourceCatalog:
     def _spans(self,level,path,canonical=True):
         identity=(level,id(path));raw=self._raw_alias_windows.get(identity)
         if raw is None:
-            raw=self._raw_windows(level,path)
-            if self._static_paths.get(identity)is path:self._raw_alias_windows[identity]=raw
+            if self._static_paths.get(identity)is path:
+                raw=self._raw_alias_windows[identity]=self._raw_windows(level,path)
+            else:
+                key=self._runtime_path_key(level,path) if self._frozen else None
+                cache=self._runtime_alias_windows
+                if key is not None and key in cache:
+                    cache.move_to_end(key)
+                    raw=cache[key]
+                else:
+                    raw=self._raw_windows(level,path)
+                    if key is not None:
+                        cache[key]=raw
+                        if len(cache)>32:cache.popitem(last=False)
         marked=collections.defaultdict(list)
         for alias,intervals in raw.items():
             key=self.canonical[alias]if canonical else self._find(alias)

@@ -82,6 +82,7 @@ function compileWindow(window,observedEnd,expectedIds=IDS){
 // Display time advances only through received, executed PVA. All wall times here are seconds.
 class ExecutedPlayback {
  constructor(){
+  this.useExecutedBuffer=false;
   this.time=null;
   this.windows=[];
   this.rate=null;
@@ -164,7 +165,8 @@ class ExecutedPlayback {
   // A 0.3 model-second target fits the one-second history. Adjust gently to retain
   // a reserve against late snapshots while keeping the display at or below real time.
   const correction=Math.max(-.2,Math.min(.2,(headroom-.3)*.5));
-  const speed=Math.min(1,(this.rate??1)*(1+correction));
+  const speed=this.useExecutedBuffer?(headroom>=.8?1:Math.min(this.rate??1,Math.max(0,headroom/.8))):
+    Math.min(1,(this.rate??1)*(1+correction));
   const nextTime=Math.min(end,this.time+elapsed*speed);
   while(this.windows.length>1&&this.windows[1].start_s<=nextTime){
    if(this.windows[1].start_s>this.motion.end_s)break;
@@ -344,6 +346,7 @@ async function mount(bridge,payload){
   if(!departed)departed=observedDeparture(connected?previous:null,value,nextMotion,Boolean(blockers().length)||manualPause);
   locations=new Map(value.states.map(state=>[state.id,vehicleLocation(state,payload.locations)]));
   connected=true;runtimeError=null;lastResponse=performance.now();
+  playback.useExecutedBuffer=value.integration_step_s===.4;
   playback.observe(value.session_id,value.model_time_s,nextMotion,lastResponse/1000,!snapshot.paused&&!blockers().length,document.hidden);
   setTargets(snapshot.targets);if(changed)connectWall();paint();
  }

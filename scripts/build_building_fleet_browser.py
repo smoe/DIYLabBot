@@ -133,7 +133,8 @@ def load_browser_source(path=BROWSER_SOURCE):
             raise ValueError('Explicit unchanged same-origin Python core delivery required')
     if (set(runtime) != fields
             or runtime['engine'] != 'pyodide' or runtime['execution'] != 'module_web_worker'
-            or runtime['pacing'] != 'source_step_without_wall_clock_catchup'
+            or runtime['pacing'] not in (
+                'source_step_without_wall_clock_catchup', 'source_step_with_bounded_deadline_recovery')
             or runtime['static_route_witnesses'] !=
                 'original_pinned_metadata_for_bit_identical_geometry'
             or not re.fullmatch(r'\d+\.\d+\.\d+', runtime['version'])

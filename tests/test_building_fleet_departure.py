@@ -66,7 +66,8 @@ class DepartureGeometryTests(unittest.TestCase):
         self.assertGreater(margin, .9 * 1450. * .05 + 500. * .05**2 / 20.)
         corner = Route([[0., 0.], [100., 0.], [100., 100.]], trim_mm=1.)
         self.assertGreater(_fit_margin(corner.pieces, limits), margin)
-        for step, speed, acceleration in ((.051, 100., 50.), (.05, math.nan, 50.), (.05, 10., 0.)):
+        self.assertGreater(_fit_margin(straight.pieces, _limits(.4,1450.,500.)), margin)
+        for step, speed, acceleration in ((.401, 100., 50.), (.05, math.nan, 50.), (.05, 10., 0.)):
             with self.assertRaises(ValueError):
                 _limits(step, speed, acceleration)
 

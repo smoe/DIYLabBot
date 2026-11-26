@@ -287,9 +287,12 @@ Die unabhängige Prüfung bindet ursprüngliche Ausgabe, tatsächlichen Empfang,
 eigene Quittung, Aufzugbeobachtungen und Abschluss an dieselbe Kennung.
 
 Jede Weiterfahrt benötigt den vollständigen Nachweis ihres nächsten
-höchstens 50-ms-Präfixes samt anschließender Bremskurve gegen denselben
-vorhandenen Scan. Einen gespeicherten Bremsrückfall erst nach nachgewiesener
-Ablösung ersetzen; ausgeführten Präfix und Rohvertrag `/2` unabhängig prüfen.
+Präfixes samt anschließender Bremskurve gegen denselben vorhandenen Scan.
+Der Rohvertrag `/2` verwendet höchstens 50 ms. Das Browserprofil BF01–BF06
+verwendet 400 ms ausschließlich im Erdgeschoss bei inaktivem, unbelegtem
+Aufzug ohne offene Aufzuganforderung, andernfalls höchstens 50 ms.
+Einen gespeicherten Bremsrückfall erst nach nachgewiesener Ablösung ersetzen;
+ausgeführten Präfix und Rohvertrag unabhängig prüfen.
 
 Vor BF01-Änderungen [docs/building-fleet-demo.md](docs/building-fleet-demo.md) lesen. K0_013 ist für E2 ausdrücklich zurückgestellt; alle anderen Ziele und der Treppenkern-Ausschluss bleiben verbindlich. Gepinnte TR01-/L01-Module und Quellen nicht für die Flotte ändern. Ein neuer Geometriebefund sperrt die Programmerzeugung; Kreis-/Rasteralarme allein beweisen keine Unpassierbarkeit. Der Kontaktbefund am ursprünglichen L01-Ganggraphen bleibt historisch gültig. BF01 wählt stattdessen ausdrücklich `model/building-fleet-l01-route.shared.json`; dessen separat geprüfte Verbindung erhält die Bench-Sperren und verändert das ursprüngliche Fahrprofil nicht. Neue exportierte Kurven benötigen jeweils eigene Grenz-, Boden- und native Abstandsnachweise. Der frühere breite bodenlose Streifen am EG-Innenport ist historisch nachgewiesen. Die ausdrücklich angeforderte Schwellenkorrektur ergänzt reale Modellkörper mit 8 mm angenommenem Trennspalt; vor einem vollständigen Flottenprogramm neue Boden- und Kurvennachweise erzeugen und die Bodenprüfung nicht umgehen.
 

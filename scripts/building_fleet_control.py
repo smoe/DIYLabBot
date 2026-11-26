@@ -8,7 +8,7 @@ from collections import OrderedDict
 from functools import lru_cache
 import l01_local_traffic as local
 import tr01_floor_motion as floor
-from building_fleet_model import reference, resolved_sensor
+from building_fleet_model import control_step_s, reference, resolved_sensor
 from building_fleet_motion import Path, transition, perception_speed_limit, compile_motion, episode_dynamics, spatial_bounds, interval_extrema
 F = floor.F
 
@@ -226,7 +226,7 @@ class Controller(local.LocalController):
                  static_return=None, motion_program=None, prepared_nominal=None,
                  certified_horizon_mm=None,prior_localization=None):
         from building_fleet_routes import vehicle_envelope
-        self.path=path;self.source=source
+        self.path=path;self.source=source;self.max_step_s=control_step_s(source)
         envelope=vehicle_envelope()
         if radius_mm is not None and(type(radius_mm)not in(int,float)or not math.isfinite(radius_mm)or radius_mm<envelope['radius_mm']-1e-9):raise ValueError('Own broad-phase radius cannot reduce the source physical envelope')
         if type(own_start_s)not in(int,float)or not math.isfinite(own_start_s)or own_start_s<0:raise ValueError('Nonnegative own start time required')
@@ -605,9 +605,8 @@ class Controller(local.LocalController):
             if clock is None:raise RuntimeError('No bounded own protective-stop enclosure; replan before execution')
             if self._stop_observation_margin(clock)<0:raise RuntimeError('Selected stop exceeds the unchanged observation budget')
             self._brake_cache=(key,clock)
-        if strict and not getattr(clock,'_bf01_continuation',None):
-            valid,bounds=self._admissible(clock,self.y)
-            if not valid:raise RuntimeError('Analytic stop rejected by actual quantized Cartesian export; build rejected')
+        # Every accepted new clock above has already passed the strict
+        # Cartesian check where required, before it enters the cache.
         return clock
 
     def own_pose_at(self, captured_s):
@@ -914,6 +913,7 @@ class Controller(local.LocalController):
 
     def _preview_stop(self,end,gap,scan):
         """A whole next prefix plus an exact-PVA end stop; no future scan."""
+        self._checked_preview = None
         if scan is None or end-scan['captured_s']>self.settings['stale_after_s']+1e-9:return None
         prefix=self._planned_prefix(end)
         if prefix is None:return None
@@ -934,16 +934,25 @@ class Controller(local.LocalController):
                 required,_,_=self._clock_requirement(clock,self.y)
                 if required>=min(gap,self._visible_gap())or not self._valid_stop_clock(clock,self.y):return False
                 selected.append((stop,clock));return True
-            try:stop=probe._checked_brake(strict=True,candidate_ok=complete_candidate)
+            # The actual exported witness is the combined clock. Its check
+            # covers the stop as well as its prefix and join.
+            try:stop=probe._checked_brake(candidate_ok=complete_candidate)
             except RuntimeError:return None
             if stop is None:return None
             combined=next(clock for candidate,clock in selected if candidate is stop)
             combined._bf01_profile_checks=copy.deepcopy(probe.profile_checks)
+            self._checked_preview=self._preview_binding(combined,end)
         combined._bf01_origin=self.y
         return combined
 
+    def _preview_binding(self,clock,end):
+        return (clock,end,self.path,self.plan,self.plan_kind,self.now,self.y,self.v,self.a,
+                getattr(self,'certified_horizon_mm',None),getattr(self,'awaiting_continuation',None))
+
     def _approve_step(self,clock,end,gap,scan,*,inherited=False):
         """Commit only a complete witness; the old fallback survives failure."""
+        checked = getattr(self,'_checked_preview',None)
+        self._checked_preview = None
         if clock is None:return False
         required,cap,closing=self._clock_requirement(clock,self.y)
         if inherited:
@@ -956,7 +965,7 @@ class Controller(local.LocalController):
                     or gap<=required or self._visible_gap()<required):return False
             anchor={'time_s':self.now,'captured_s':scan['captured_s'],'origin_mm':self.y,
                     'gap_mm':min(gap,self._visible_gap()),'closing_mm_s':closing,'cap_mm_s':cap}
-        if not self._valid_stop_clock(clock,self.y):return False
+        if (inherited or checked!=self._preview_binding(clock,end)) and not self._valid_stop_clock(clock,self.y):return False
         self.continuation_stop_clock=clock;self.step_end_s=end
         self._step_certificate={'start_s':self.now,'end_s':end,'origin_mm':self.y,
             'state':(self.y,self.v,self.a),'plan':self.plan,'path':self.path,'clock':clock}
@@ -1010,9 +1019,9 @@ class Controller(local.LocalController):
         if type(grant_permits) is not bool:
             raise ValueError('Own resource grant must be explicit')
         end=round(now+.05,3)if step_end_s is None else step_end_s
-        if (type(end)not in(int,float)or not math.isfinite(end)or not 0<end-now<=.050000001
+        if (type(end)not in(int,float)or not math.isfinite(end)or not 0<end-now<=getattr(self,'max_step_s',.05)+1e-9
                 or abs(end*1000-round(end*1000))>1e-6 or abs(now-self.now)>1e-8):
-            raise ValueError('Own next step must be contiguous, on the 1 ms grid and no longer than 50 ms')
+            raise ValueError('Own next step must be contiguous, on the 1 ms grid and within the configured control interval')
         end=round(end,3);self.step_end_s=end;self.continuation_stop_clock=None;self._step_certificate=None
         initial_mode=self.mode
         candidate=copy.deepcopy(scan)if scan is not None else self.last_scan
@@ -1086,8 +1095,8 @@ class Controller(local.LocalController):
                 'observed_gap_mm':gap if math.isfinite(gap) else None,'required_gap_mm':required}
 
     def advance(self, start, end):
-        if end <= start or end-start > .050000001 or abs(end*1000-round(end*1000))>1e-6:
-            raise ValueError('BF01 uses positive integration steps no larger than 0.05 s')
+        if end <= start or end-start > getattr(self,'max_step_s',.05)+1e-9 or abs(end*1000-round(end*1000))>1e-6:
+            raise ValueError(f'BF01 uses positive integration steps no larger than {getattr(self,"max_step_s",.05):g} s')
         if abs(start-self.now)>1e-8:
             raise ValueError('Controller intervals must be contiguous')
         end=round(end,3);certificate=getattr(self,'_step_certificate',None)

@@ -2,6 +2,11 @@
   "format": "solidcraftbot.building-fleet-patrol/1",
   "id": "BF01-Patrol",
   "vehicle_count": 6,
+  "timing": {
+    "ground_step_ms": 400,
+    "scan_latency_ms": 50,
+    "maximum_scan_age_ms": 450
+  },
   "sources": {
     "fleet": {
       "path": "model/building-fleet-demo.shared.json",
