@@ -156,6 +156,7 @@
       ],
       "stop_overrides": {
         "EG": [
+          "outward",
           "inward"
         ],
         "KG": [
@@ -261,7 +262,7 @@
       "The inward EG port faces an unknown core region; no navigation or supported access beyond that port is asserted.",
       "Deliberate connector/floor and rigid frame fusion contacts are construction assumptions, not load or safety qualification.",
       "R3_017 is owner-confirmed as the external metal stair from EG to Roof; it is distinct from the internal R3_028 staircase and does not serve KG.",
-      "KG and EG use only the inward port. The cabin controls are on the right side wall near the opposite upper-floor entrance; the cabin has both door apertures.",
+      "EG uses both ports, KG only inward and the upper floors only outward. The cabin controls are on the right side wall near the upper-floor entrance.",
       "Internal stair guards reuse the atrium profile at #/exterior; dimensions, attachment and clearances are illustrative, not a qualified fall-protection or stair design."
     ],
     "served_extent": {

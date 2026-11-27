@@ -88,7 +88,7 @@ class KitchenTests(unittest.TestCase):
     def test_lift_has_opposite_ports_for_low_and_upper_floors_and_both_cabin_apertures(self):
         lift=self.program['elevator']
         self.assertEqual([(p['level_id'],p['side']) for p in lift['ports'] if p['active']],
-            [('KG','inward'),('EG','inward'),('OG1','outward'),('OG2','outward'),('OG3','outward')])
+            [('KG','inward'),('EG','outward'),('EG','inward'),('OG1','outward'),('OG2','outward'),('OG3','outward')])
         cuts={op['id'] for op in self.expanded['operations'] if op['body']=='BuildingLiftCabin' and op['action']=='cut'}
         self.assertTrue({'LiftPort_EG_outward_CabinCut','LiftPort_EG_inward_CabinCut'}<=cuts)
         cabin=next(v for v in self.program['objects'] if v['id']==lift['object_id'])

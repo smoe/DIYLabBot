@@ -223,18 +223,18 @@ def circulation_geometry(contract, geometry):
     circ = contract.get('circulation')
     if not circ: return []
     bodies = {body['body']: body for body in geometry}; levels = contract['levels']
-    elevator = circ['elevator']; expected_doors = {'KG': ['inward'], 'EG': ['inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']}
+    elevator = circ['elevator']; expected_doors = {'KG': ['inward'], 'EG': ['outward', 'inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']}
     if elevator['doors_by_level'] != expected_doors:
         raise ValueError('Elevator door policy must distinguish EG and upper levels')
     ports = elevator['ports']; active = [port for port in ports if port['active'] is True]
     inactive = [port for port in ports if port['active'] is False]
-    if (len(ports) != 10 or len(active) != 5 or len(inactive) != 5
+    if (len(ports) != 10 or len(active) != 6 or len(inactive) != 4
             or {(port['level_id'], port['side']) for port in active} != {(level, side) for level, sides in expected_doors.items() for side in sides}
             or {(port['level_id'], port['side']) for port in inactive} != {(level['id'], side) for level in levels for side in ('inward', 'outward') if side not in expected_doors[level['id']]}):
-        raise ValueError('Exactly five active and five explicitly closed elevator faces required')
+        raise ValueError('Exactly six active and four explicitly closed elevator faces required')
     closed_targets = {probe['target_body'] for probe in circ['closed_door_probes']}
     if closed_targets != {port['level_id']+'__Wall_'+port['wall'] for port in inactive}:
-        raise ValueError('Every inactive upper inward face requires its associated wall-material witness')
+        raise ValueError('Every inactive elevator face requires its associated wall-material witness')
     deferred = elevator['deferred_stops']
     if deferred:
         raise ValueError('No unmodeled basement stops may remain')
@@ -423,7 +423,7 @@ def circulation_probe_specs(contract):
     connectors = [connector for stair in stairs for connector in stair['connectors']]
     connector_count = len(connectors)
     expected_holes = sum(connector.get('slab_hole_probe_id', 'legacy') is not None for connector in connectors)
-    expected_counts = {'door_probes': 5, 'closed_door_probes': 5, 'slab_hole_probes': expected_holes,
+    expected_counts = {'door_probes': 6, 'closed_door_probes': 4, 'slab_hole_probes': expected_holes,
                        'connection_witnesses': connector_count*3, 'shaft_witnesses': 4,
                        'external_access_witnesses': sum(len(stair['connectors']) for stair in circ.get('external_stairs', []))}
     if any(len(circ.get(key, [])) != count for key, count in expected_counts.items()):

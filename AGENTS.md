@@ -964,7 +964,7 @@ Die bestätigte Aufzugzuordnung lautet außen =
 `W049` zum Flur `C3_020`, innen = `W062` zum `NorthCore` der Obergeschossvorlage.
 Im EG gelten die entsprechenden eigenen Flurflächen; deren Darstellung ist
 weiterhin kein Nachweis einer navigierbaren oder qualifizierten Verbindung.
-EG nur innen, Obergeschosse nur außen; KG nur innen. Halte, aktive Seiten
+EG beidseitig, Obergeschosse nur außen und KG nur innen. Halte, aktive Seiten
 und Höhen aus dem bestehenden Aufzuginterface übernehmen; die Kellerhöhe
 bleibt eine Darstellungsannahme. Türseiten nicht aus Blickrichtung
 oder Gebäudeschwerpunkten neu erraten. Öffnungen in den tatsächlichen

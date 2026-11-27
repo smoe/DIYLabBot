@@ -4,7 +4,7 @@ const {createLiftSession}=require('../scripts/walkthrough_interaction.js');
 const states={KG:-4250,EG:0,OG1:4250,OG2:8500,OG3:12750};
 const object={config:{id:'lift',joint:{type:'prismatic',axis:[0,0,1]},states,reference_state:'EG'},state:'EG',targetState:'EG',value:0,transition:null};
 const ports=Object.entries(states).flatMap(([level_id,z_mm])=>['outward','inward'].map(side=>({
-  id:level_id+side,level_id,z_mm,side,active:side===(['EG','KG'].includes(level_id)?'inward':'outward'),
+  id:level_id+side,level_id,z_mm,side,active:level_id==='EG'||side===(level_id==='KG'?'inward':'outward'),
   plane_x_mm:side==='outward'?0:4000,wall_thickness_mm:200,height_mm:2200,
   exit_eye_mm:[side==='outward'?-400:4400,2000,z_mm+1600],cabin_entry_mm:[2000,2000,z_mm+1600]})));
 const config={object_id:'lift',speed_mm_s:1200,ports,cabin_bounds_mm:{min:[900,900,-100],max:[3100,3100,2300]},
@@ -14,8 +14,9 @@ let doorsOpen=true;
 const cycle={get busy(){return !doorsOpen;},canUsePort:p=>doorsOpen&&p.level_id===object.state};
 const session=createLiftSession(config,object,()=>({status:'accepted'}),cycle);
 const guarded=p=>session.walkingBarriers().some(b=>p.every((v,i)=>v>b.min[i]&&v<b.max[i]));
-assert(guarded([600,2000,1600]),'Inactive EG side stays guarded');
-assert(!guarded([3200,2000,1600]),'Docked active doorway is open for walking');
+assert(!guarded([600,2000,1600]),'Docked outward EG doorway is open for walking');
+assert(!guarded([3200,2000,1600]),'Docked inward EG doorway is open for walking');
+assert(session.doorwayOccupied([1010,2000,1600],150),'An occupied outward threshold blocks departure');
 assert(guarded([3200,2000,5850]),'Absent upper-floor cabin does not open the shaft');
 assert(guarded([2000,2000,3000]),'Shaft above cabin stays guarded');
 assert(guarded([3200,1500,1600]),'Sideways entry outside the aperture stays guarded');
@@ -25,7 +26,7 @@ assert(session.doorwayOccupied(session.attachedEye(),150),'Partial entry blocks 
 session.walkStep([2990,2000,1600],[2100,2400,1600]);
 assert.deepEqual(session.attachedEye(),[2100,2400,1600],'Cabin walking retains exact lateral position');
 assert(!session.doorwayOccupied(session.attachedEye(),150));
-doorsOpen=false;assert(!session.walkingAllowed);assert(guarded([3200,2000,1600]));
+doorsOpen=false;assert(!session.walkingAllowed);assert(guarded([3200,2000,1600]));assert(guarded([600,2000,1600]));
 session.walkStep([2100,2400,1600],[2200,2400,1600]);
 assert.deepEqual(session.attachedEye(),[2100,2400,1600],'No walking while doors move');
 object.state='moving';object.value=6400;object.transition={};

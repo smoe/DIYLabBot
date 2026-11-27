@@ -16,16 +16,18 @@ class ControlsTests(unittest.TestCase):
         self.rectangle=[10107.810810810812,15102.405405405405,12605.702702702703,17303.]
         self.opening=[15608.10810823892,16529.729729741622]
         self.levels=[{'id':name,'z_mm':(n-1)*4250} for n,name in enumerate(('KG','EG','OG1','OG2','OG3'))]
-        self.ports=[{'id':'Port_'+l['id'],'level_id':l['id'],'side':'inward' if i<2 else 'outward',
-                     'active':True,'z_mm':l['z_mm'],'plane_x_mm':12902.702702702703 if i<2 else 9810.810810810812,
-                     'wall_thickness_mm':180,'height_mm':2150}for i,l in enumerate(self.levels)]
+        sides={'KG':['inward'],'EG':['outward','inward'],'OG1':['outward'],'OG2':['outward'],'OG3':['outward']}
+        self.ports=[{'id':'Port_'+l['id']+'_'+side,'level_id':l['id'],'side':side,
+                     'active':True,'z_mm':l['z_mm'],'plane_x_mm':12902.702702702703 if side=='inward' else 9810.810810810812,
+                     'wall_thickness_mm':180,'height_mm':2150}for l in self.levels for side in sides[l['id']]]
         self.model=lift.compile(self.source,self.rectangle,90,self.opening,self.ports,0,self.levels)
         self.shapes={o['body']:o['shape']for o in self.model['operations']}
 
-    def test_five_buttons_and_six_displays_share_floor_codes(self):
+    def test_five_cabin_buttons_and_seven_displays_share_floor_codes(self):
         c=self.model['placements']['controls'];attached=set(self.model['attached_body_ids'])
         self.assertEqual([b['label']for b in c['floor_buttons']],['K','E','1','2','3'])
-        self.assertEqual(len(c['landing_panels']),5);self.assertEqual(len(c['displays']),6)
+        self.assertEqual(len(c['landing_panels']),6);self.assertEqual(len(c['displays']),7)
+        self.assertTrue({'Port_EG_inward','Port_EG_outward'}<={p['port_id']for p in c['landing_panels']})
         for button in c['floor_buttons']:
             self.assertTrue(set(button['body_ids'])<=attached)
         for display in c['displays']:
@@ -39,6 +41,8 @@ class ControlsTests(unittest.TestCase):
             self.assertFalse(set(panel['button_body_ids'])&attached)
 
     def test_all_sills_have_the_declared_clear_gap_and_match_floor_height(self):
+        self.assertEqual({t['port_id']for t in self.model['placements']['thresholds']},
+                         {p['id']for p in self.ports})
         for threshold in self.model['placements']['thresholds']:
             port=next(p for p in self.ports if p['id']==threshold['port_id']);shape=self.shapes[threshold['body_id']]
             self.assertEqual(threshold['gap_mm'],8)

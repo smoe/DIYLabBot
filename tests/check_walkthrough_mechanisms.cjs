@@ -71,4 +71,24 @@ for(const destination of ['OG3','KG','EG']){
   assert.deepEqual(session.attachedEye(),[0,0,cabin.config.states[destination]+1600]);
 }
 assert.equal(session.exit('inward').status,'accepted');
+const groundPorts=ports.filter(p=>p.level_id==='EG'&&p.active);
+assert.equal(groundPorts.length,2);
+for(const callPort of groundPorts){
+  // Park elsewhere before calling from each of the ground-floor sides.
+  cabin.state=cabin.targetState='OG3';cabin.value=cabin.config.states.OG3;
+  for(const door of doors){door.state=door.targetState='closed';door.value=0;door.transition=null;}
+  assert.equal(session.call(callPort.id).status,'accepted');
+  assert.equal(cycle.phase,'travelling');
+  assert(doors.every(o=>o.state==='closed'));
+  finish(cabin);cycle.advance();
+  assert.equal(cycle.phase,'opening');
+  const expected=groundPorts.flatMap(p=>p.door_object_ids).sort();
+  assert.equal(expected.length,8,'Both cabin and landing door pairs open at EG');
+  assert.deepEqual(doors.filter(o=>o.targetState==='open').map(o=>o.config.id).sort(),expected);
+  const moving=doors.filter(o=>o.transition);
+  moving.slice(1).forEach(finish);cycle.advance();
+  assert(groundPorts.every(port=>!cycle.canUsePort(port)),'No threshold opens until both sides settle');
+  finish(moving[0]);cycle.advance();
+  assert(groundPorts.every(port=>cycle.canUsePort(port)));
+}
 console.log('Passed all six freezer drawer interlocks, in-flight conflicts, lift door sequencing, inactive exits and repeated floor changes.');

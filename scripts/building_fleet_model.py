@@ -200,6 +200,40 @@ def control_step_s(source):
     return timing['ground_step_ms']/1000 if timing else .05
 
 
+def lift_route_ports(source, ports):
+    """Select the traversed landing on each level independently of the door cycle."""
+    sides = source['lift'].get('route_sides', {})
+    active = {}
+    for port in ports:
+        if port['active']:
+            active.setdefault(port['level_id'], []).append(port)
+    if set(sides) - set(active):
+        raise ValueError('Configured BF01 route side has no active lift level')
+    result = {}
+    for level, choices in active.items():
+        if level in sides:
+            choices = [port for port in choices if port['side'] == sides[level]]
+        if len(choices) != 1:
+            raise ValueError('One unambiguous BF01 route port required: ' + level)
+        result[level] = choices[0]
+    return result
+
+
+def lift_open_sides_by_level(ports):
+    """Return the simultaneous opening configuration for each docked floor."""
+    sides_by_level = {}
+    for port in ports:
+        if port['active']:
+            sides_by_level.setdefault(port['level_id'], set()).add(port['side'])
+    return {level: tuple(sorted(sides)) for level, sides in sides_by_level.items()}
+
+
+def lift_scan_side_sets(ports):
+    """Include the physical door set at every stop in scan geometry."""
+    return sorted({(), ('inward',), ('outward',),
+                   *lift_open_sides_by_level(ports).values()})
+
+
 def scan_angular_allowance(sensor):
     return sensor['range_mm'] * math.sin(math.radians(sensor['angular_step_deg']))
 

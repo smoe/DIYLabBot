@@ -628,6 +628,7 @@
             "stop_overrides": {
               "const": {
                 "EG": [
+                  "outward",
                   "inward"
                 ],
                 "KG": [

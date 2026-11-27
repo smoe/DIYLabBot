@@ -8,6 +8,8 @@ const {chromium}=require(process.argv[3]||'playwright');
   const data=JSON.parse(html.match(/<script id="walkthrough-data" type="application\/json">([\s\S]*?)<\/script>/)[1]);
   const lift=data.elevator,groups=new Map(data.scenes.building.groups.map(g=>[g.id,g]));
   const cabin=data.objects.find(o=>o.id===lift.object_id),moving=new Set(cabin.moving_body_ids);
+  const groundPorts=lift.ports.filter(p=>p.active&&p.level_id==='EG');
+  assert.deepEqual(groundPorts.map(p=>p.side).sort(),['inward','outward']);
   const report={passed:false,html_sha256:crypto.createHash('sha256').update(html).digest('hex'),floors:[],walk_samples:[],errors:[],timing:'Controlled test clock; no real-time performance claim.'};
   const browser=await chromium.launch({headless:true,executablePath:process.argv[4],args:['--enable-gpu','--enable-webgl','--ignore-gpu-blocklist','--use-gl=angle','--use-angle=metal']});
   try{
@@ -92,7 +94,7 @@ const {chromium}=require(process.argv[3]||'playwright');
     assert.equal((await page.evaluate(id=>window.__buildingWalkthrough.command(id,'OG3'),lift.object_id)).status,'accepted');await settle();
     await walk(ground.cabin_entry_mm,{blocked:true});assert(!(await read()).lift.boarded);
     await walk(ground.exit_eye_mm);
-    report.absent_cabin_display=await checkDisplay(lift.controls.displays.find(d=>d.port_id===ground.id),1);
+    report.absent_cabin_display=await checkDisplay(lift.controls.displays.find(d=>d.port_id===ground.id),ground.side==='outward'?-1:1);
     assert.equal(report.absent_cabin_display.level,'OG3','Ground landing shows the actual cabin floor, not its own floor');
     for(const destination of ['KG','EG','OG1','OG2','OG3']){
       const current=(await read()).camera.level_id,port=lift.ports.find(p=>p.active&&p.level_id===current);
@@ -110,6 +112,11 @@ const {chromium}=require(process.argv[3]||'playwright');
       const after=await read();assert.deepEqual(after.camera.eye_mm.slice(0,2),during.camera.eye_mm.slice(0,2),'Walking locked while moving');
       assert(after.camera.eye_mm.every((v,i)=>Math.abs(v-after.lift.attached_eye_mm[i])<.01));
       await settle();assert.equal((await read()).lift.state,destination);
+      if(destination==='EG'){
+        const open=await page.evaluate(()=>window.__buildingWalkthrough.objects.filter(o=>o.state==='open').map(o=>o.id));
+        assert(groundPorts.every(p=>p.door_object_ids.length===4&&p.door_object_ids.every(id=>open.includes(id))),
+          'Both EG cabin and landing doors fully open after one arrival');
+      }
       const cabinDisplay=await checkDisplay(lift.controls.displays.find(d=>d.port_id===null),1);
       if(['KG','OG3'].includes(destination)){
         const s=await read();await lookAt(lift.fittings.panel.center_mm.map((v,i)=>v+(i===2?s.lift.value_mm-lift.reference_z_mm:0)));

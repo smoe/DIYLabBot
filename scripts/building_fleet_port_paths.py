@@ -20,7 +20,7 @@ class PortPaths:
     def __init__(self, source, navigation):
         self.source=model.validate(copy.deepcopy(source));self.nav=navigation
         self.trim=model.reference(source,'angular_profile')['curve']['corner_trim_mm']
-        self.ports={p['level_id']:copy.deepcopy(p)for p in navigation.mesh.manifest['elevator']['ports']if p['active']}
+        self.ports=copy.deepcopy(model.lift_route_ports(source, navigation.mesh.manifest['elevator']['ports']))
         _,self.aperture,_=_source_aperture(checked_navigation=navigation);self.open_leaves={};self.departures={}
         scene=navigation.mesh.scene
         self.mesh_error=scene['linear_tessellation_deflection_mm']+math.sqrt(3)*scene['maximum_float32_error_mm']

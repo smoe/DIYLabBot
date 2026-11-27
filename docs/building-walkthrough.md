@@ -575,13 +575,13 @@ Die fünf physischen Kabinentasten tragen K, E, 1, 2, 3 und sind anklickbar.
 Sie sitzen zusammen mit der Anzeige auf der rechten Seitenwand, wenn man
 vom Obergeschoss aus eintritt, nahe diesem Eingang. Der obere Handlauf
 endet mit 50 mm angenommenem Freiraum vor der Tafel; der untere läuft darunter
-weiter. Die äußeren Anzeigen und Ruftaster behalten ihre Positionen.
-Eine rote LED-Matrix in der Kabine und je eine am aktiven Zugang jedes
-Geschosses zeigen synchron das der aktuellen Kabinenhöhe nächstgelegene
+weiter. Eine rote LED-Matrix in der Kabine und je eine an jedem aktiven
+Zugang zeigen synchron das der aktuellen Kabinenhöhe nächstgelegene
 Geschoss. Schachttaster und Anzeigen bleiben am Gebäude, die Kabinentafel
 fährt mit. Die Dimensionen bleiben ausdrücklich Darstellungsannahmen.
-KG und EG erlauben nur den inneren Ausgang, auf der Seite ohne Bedienpanel;
-die Obergeschosse nur den äußeren Ausgang. Halte, Höhen und aktive Seiten stammen aus
+Im EG öffnen bei Ankunft beide Kabinen- und beide Schachttüren, unabhängig
+davon, von welcher Seite die Kabine gerufen wurde. Das KG hat einen inneren
+Ausgang und die Obergeschosse je einen äußeren. Halte, Höhen und aktive Seiten stammen aus
 `interface.circulation.elevator`, nicht aus einer zweiten Geschossliste.
 
 Die Kabine und die eingestiegene Kamera bewegen sich gemeinsam. Die Kamera
@@ -606,7 +606,8 @@ stehen bleiben. Die geschlossene innere Schachtwand bleibt in den
 Obergeschossen erhalten, obwohl die EG-Kabine zwei Öffnungen besitzt.
 
 Die verschiebbaren Kabinen- und Schachttüren schließen vor der Fahrt und
-öffnen erst nach der Ankunft auf der aktiven Seite. Edelstahloberflächen,
+öffnen erst nach der Ankunft an den aktiven Zugängen. Beide EG-Schwellen
+bleiben während der Türbewegung gesperrt. Edelstahloberflächen,
 Handläufe und Tastenreihe folgen den Eigentümerfotos; Maße sind angenommen.
 Kabinen- und geschossfeste Metallschwellen verkleinern den bisherigen großen
 Spalt auf angenommene 8 mm; die 3-mm-Oberkante folgt dem Kabinenbodenbelag.
@@ -615,6 +616,21 @@ Unterstützungsflächen und native Abstände müssen am neuen Stand neu geprüft
 Eine reale Steuerung oder Schutzfunktion wird nicht implementiert.
 `lift_operation_implemented` bleibt `false`; die Browserfahrt ist keine
 mechanische, zeitliche oder sicherheitstechnische Aufzugsqualifikation.
+
+Die Ablaufprüfung ohne Browser deckt Rufe von beiden EG-Seiten, die
+Türöffnung nach der Ankunft und beide Schwellen während der Türbewegung ab.
+Der Entwicklungsstand vor der Integration in `master` hat zwei lokale
+Nachweise. Der FreeCAD-Aufbau
+`exports/generated/building-stack-56fb68dd0f11/build-report.json`
+umfasst 5.128 geschlossene Körper, 516 Bereichsprüfungen und 135 Höhenprüfungen.
+An beiden EG-Zugängen bleiben die Öffnungsproben an Wand, Rahmen und Kabine
+frei. Im gezielten Chrome-Test
+`exports/ground-floor-dual-door-walkthrough/eg-dual-door-browser-report.json`
+fährt die Kabine zunächst ins 1. OG und wird von außen ins EG gerufen. Nach
+der Ankunft stehen im EG alle acht Kabinen- und Schachttürblätter offen,
+im 1. OG öffnen vier. Die Berichtspins binden die Ergebnisse an diesen
+Entwicklungsstand. Die weiter unten angegebenen vollständigen Geh- und
+Bediennachweise gehören zur früheren Fassung mit einem aktiven EG-Zugang.
 
 Die Geh-/Bedienprüfung `tests/check_walkthrough_lift_walking_browser.cjs`
 verwendet echte Maus- und Tastaturereignisse am vollständigen nativen Export:

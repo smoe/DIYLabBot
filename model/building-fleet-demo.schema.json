@@ -497,6 +497,9 @@
         "capacity_policy": {
           "const": "derive_from_native_interior_or_one"
         },
+        "route_sides": {
+          "const": {"EG": "inward"}
+        },
         "basis": {
           "const": "owner_assumption_E7"
         }

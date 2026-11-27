@@ -35,7 +35,7 @@ def validate_source(source):
     for name in [lift['id'], lift['area'], lift['reference_opening'], *[s['wall'] for s in lift['sides'].values()]]:
         require(isinstance(name, str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*', name), 'Stable ASCII circulation reference required')
     require(lift['sides']['outward']['wall'] != lift['sides']['inward']['wall'], 'Opposite elevator sides required')
-    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['inward'], 'KG': ['inward']}, 'Owner-confirmed active stop policy required')
+    require(lift['default_sides'] == ['outward'] and lift['stop_overrides'] == {'EG': ['outward', 'inward'], 'KG': ['inward']}, 'Owner-confirmed active stop policy required')
     require(lift['deferred_stops'] == [], 'All declared stops now have concept geometry')
     for name in ('post_wall_factor', 'cabin_wall_factor', 'cabin_clearance_factor'):
         require(type(lift[name]) in (int, float) and math.isfinite(lift[name]) and 0 < lift[name] <= 1, 'Positive illustrative lift proportion required')

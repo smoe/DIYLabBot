@@ -141,7 +141,9 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     const door=model.objects.find(o=>o.id==='OG3.'+check.opening_id+'.Door');
     assert(door&&Math.abs(door.front[0]+1)<1e-8&&Math.abs(door.front[1])<1e-8,'The rendered room door opens toward the window');
   }
-  for(const level of ['KG','EG'])assert.deepEqual(model.elevator.ports.filter(p=>p.level_id===level&&p.active).map(p=>p.side),['inward']);
+  const activeSides=level=>model.elevator.ports.filter(p=>p.level_id===level&&p.active).map(p=>p.side).sort();
+  assert.deepEqual(activeSides('KG'),['inward']);
+  assert.deepEqual(activeSides('EG'),['inward','outward']);
   assert.equal(model.elevator.fittings.panel.side,'southwest');
   assert(model.elevator.fittings.interior.rail_body_ids.every(id=>nativeById.has(id)));
   const seminar = model.seminar_room;

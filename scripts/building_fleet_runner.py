@@ -313,6 +313,7 @@ def native_scan_geometry(navigation):
     mesh=navigation.mesh;elevator=mesh.manifest['elevator'];objects={o['id']:o for o in mesh.manifest['objects']}
     cabin_ids=set(objects[elevator['object_id']]['moving_body_ids'])
     doors=[o for o in objects.values()if o.get('mechanism')=='lift_door']
+    side_sets=model.lift_scan_side_sets(elevator['ports'])
     cabin_doors={b:o for o in doors if o.get('parent_object_id')==elevator['object_id']for b in o['moving_body_ids']}
     landing_doors={b:o for o in doors if o.get('parent_object_id')!=elevator['object_id']for b in o['moving_body_ids']}
     dynamic=cabin_ids|set(cabin_doors)|set(landing_doors)
@@ -329,7 +330,7 @@ def native_scan_geometry(navigation):
             if bb['max'][2]<z+navigation.config['geometry']['floor_band_start_mm']or bb['min'][2]>z+navigation.height:continue
             for triangle in mesh.triangles(group):add(segments,navigation_model.clip_height(triangle,z+navigation.config['geometry']['floor_band_start_mm'],z+navigation.height))
         floor_segments[level]=sorted(segments)
-    for sides in((),('inward',),('outward',)):
+    for sides in side_sets:
         values={elevator['object_id']:elevator['reference_z_mm']}
         for obj in doors:values[obj['id']]=obj['states']['open'if obj.get('parent_object_id')==elevator['object_id']and obj['side']in sides else'closed']
         posed=posed_mesh(mesh,values);segments=set();z=elevator['reference_z_mm']
@@ -338,7 +339,7 @@ def native_scan_geometry(navigation):
             for triangle in posed.triangles(group):add(segments,navigation_model.clip_height(triangle,z+navigation.config['geometry']['floor_band_start_mm'],z+navigation.height))
         cabin_segments[sides]=sorted(segments)
     for level,z in navigation.level_z.items():
-        for sides in((),('inward',),('outward',)):
+        for sides in side_sets:
             values={obj['id']:obj['states']['open'if obj.get('level_id')==level and obj.get('side')in sides else'closed']
                     for obj in doors if obj.get('parent_object_id')!=elevator['object_id']}
             posed=posed_mesh(mesh,values);segments=set()
@@ -663,7 +664,8 @@ class WorldRunner:
         known=[]
         if lift_phase:
             ident=lift_phase['start_port'if lift_phase['kind']=='boarding'else'destination_port']
-            port=self.lift.ports[ident];sides=(port['side'],)
+            port=self.lift.ports[ident]
+            sides=model.lift_open_sides_by_level(self.lift.ports.values())[port['level_id']]
             if sides in self.world.cabin:known.append(self.world.cabin[sides])
             if(level,sides)in self.world.landings:known.append(self.world.landings[level,sides])
         # Only immutable source map indexes and this own allocated port pose
@@ -846,7 +848,10 @@ class WorldRunner:
                 wait=self.require_own_waiting_pose(identity)
                 booking=self.resources.require_mission_booking(identity,action['mission_id'],action['from_level'],action['to_level'])
                 if booking['booking_id']!=action['booking_id']:raise RuntimeError('Lift call changed its immutable mission booking')
-                result=self.lift.request(identity,action['from_level'],action['to_level'],self.now)
+                route_sides=self.source['lift'].get('route_sides', {})
+                result=self.lift.request(identity,action['from_level'],action['to_level'],self.now,
+                    start_side=route_sides.get(action['from_level']),
+                    destination_side=route_sides.get(action['to_level']))
                 request=self.lift.requests[identity]
                 self.lift_requests.append({'vehicle_id':identity,'start_port':request['start_port'],
                     'destination_port':request['end_port'],'slot':None,'requested_s':self.now,'assigned_s':None,

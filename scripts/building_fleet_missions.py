@@ -119,10 +119,7 @@ class MissionPlanner:
         self.states = {vehicle: {'queue': [], 'seen': {}, 'completed': set(),
                         'active': None, 'terminal': None, 'done': False,
                         'requested': False, 'admission_deferred':False, 'home_confirmation': None} for vehicle in nav.homes}
-        self.ports = {p['level_id']: copy.deepcopy(p)
-                      for p in nav.mesh.manifest['elevator']['ports'] if p['active']}
-        if len(self.ports) != sum(p['active'] for p in nav.mesh.manifest['elevator']['ports']):
-            raise ValueError('One unambiguous active port per level required')
+        self.ports = copy.deepcopy(model.lift_route_ports(source, nav.mesh.manifest['elevator']['ports']))
         sensor = nav.sensor
         perception_gap = (sensor['clearance_mm']+sensor['range_error_mm']
                           +sensor['range_mm']*math.sin(math.radians(sensor['angular_step_deg']))

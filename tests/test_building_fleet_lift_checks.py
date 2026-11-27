@@ -166,6 +166,19 @@ class LiftGateTests(unittest.TestCase):
         mesh.manifest['elevator']['ports'][0]['active']=False
         with self.assertRaises(ValueError):checks.gate_at(mesh,'P',timeline,1)
 
+    def test_measurement_pose_opens_both_ground_floor_ports_only(self):
+        mesh, _ = self.fixture()
+        ports = mesh.manifest['elevator']['ports']
+        objects = mesh.manifest['objects']
+        for side in ('inward', 'outward'):
+            identity = 'EG_' + side
+            ports.append({'id': identity, 'active': True, 'level_id': 'EG',
+                          'z_mm': 0., 'side': side, 'door_object_ids': [identity]})
+            objects.append({**objects[1], 'id': identity})
+        both = {'Cabin': 0., 'Door': 0., 'EG_inward': 100., 'EG_outward': 100.}
+        for side in ('inward', 'outward'):
+            self.assertEqual(checks.fully_open_values(mesh, 'EG_' + side), both)
+
     def test_absolute_pose_applies_child_then_cabin_once_without_editing_source(self):
         mesh,_ = self.fixture()
         mesh._posed_bounds_cache={'old_pose':'bounds'};mesh._fleet_band_cache={'old_pose':'band'}

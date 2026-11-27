@@ -9,11 +9,11 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "05a73fc7c7c055d77b3522951165e4aa27fa789cb4deed0afb81fb2aadc684ec"
+      "sha256": "601c54be5e9b0fa39b6d31d26c251bed8a83f1345213844c6f9bbead5aa31592"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "8eb729efd501b615597f0a5bd0b7d61edcd406f39ea827954b22414e0bba3941"
+      "sha256": "89228c1187a4ee42256615c8ab6b0720b2dec4da1e949e5ac5be3583a7023ec2"
     },
     "vehicle": {
       "path": "model/sample-transport-tr01.shared.json",
@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "e3f4a4648005d7b870e850d34ddb96e5ecde13b186ba8dd96dbb29e0bb6198f2"
+      "sha256": "d12c757c37991031d3c177ba0225ac486714ea2f66704a776f6c477062f41e57"
     },
     "lift_geometry": {
       "path": "scripts/lift_fittings.py",
@@ -314,6 +314,7 @@
     "id": "BuildingLift",
     "maximum_capacity": 2,
     "capacity_policy": "derive_from_native_interior_or_one",
+    "route_sides": {"EG": "inward"},
     "basis": "owner_assumption_E7"
   },
   "communication": {

@@ -76,17 +76,17 @@ class CirculationTests(unittest.TestCase):
 
     def test_confirmed_door_policy_one_cabin_and_basement_geometry(self):
         result = self.build(); view = result['interface']; lift = view['elevator']
-        self.assertEqual(lift['doors_by_level'], {'KG': ['inward'], 'EG': ['inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']})
+        self.assertEqual(lift['doors_by_level'], {'KG': ['inward'], 'EG': ['outward', 'inward'], 'OG1': ['outward'], 'OG2': ['outward'], 'OG3': ['outward']})
         self.assertEqual(len(lift['cabin_body_ids']), 1); self.assertEqual(lift['cabin_level'], 'EG')
-        self.assertEqual(len(view['door_probes']), 5); self.assertEqual(len(view['closed_door_probes']), 5)
+        self.assertEqual(len(view['door_probes']), 6); self.assertEqual(len(view['closed_door_probes']), 4)
         self.assertEqual(lift['deferred_stops'], [])
         self.assertTrue(any('KG' in body['id'] for body in result['bodies']))
         self.assertTrue(any(port['level_id'] == 'KG' for port in lift['ports']))
         self.assertTrue(view['basement_geometry_implemented'])
 
-    def test_five_visible_door_frames_match_only_active_faces_and_stay_outside_probes(self):
+    def test_six_visible_door_frames_match_only_active_faces_and_stay_outside_probes(self):
         result = self.build(); view = result['interface']; lift = view['elevator']
-        self.assertEqual(len(lift['door_frame_body_ids']), 5)
+        self.assertEqual(len(lift['door_frame_body_ids']), 6)
         for port in lift['ports']:
             self.assertEqual(port['frame_body_id'] is not None, port['active'])
         for probe in view['door_probes']:
@@ -173,9 +173,10 @@ class CirculationTests(unittest.TestCase):
         self.assertFalse(result['interface']['headroom_qualified']); self.assertFalse(result['interface']['egress_qualified'])
 
     def test_invalid_policy_kg_guess_side_reference_and_nonfitting_recipe_fail(self):
-        for change in ['policy', 'kg', 'side', 'fit', 'count', 'extra', 'second_stair', 'external_same', 'extent']:
+        for change in ['policy', 'eg', 'kg', 'side', 'fit', 'count', 'extra', 'second_stair', 'external_same', 'extent']:
             source = copy.deepcopy(self.source)
             if change == 'policy': source['elevator']['default_sides'] = ['inward']
+            elif change == 'eg': source['elevator']['stop_overrides']['EG'] = ['inward']
             elif change == 'kg': source['elevator']['stop_overrides']['KG'] = ['outward']
             elif change == 'side': source['elevator']['sides']['inward']['wall'] = 'LiftBoxW2'
             elif change == 'fit': source['stairs']['wall_margin_factor'] = 100

@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
+import building_fleet_model as model
 from building_fleet_missions import MissionPlanner, inspection_variants, waypoint_progress, _path
 
 
@@ -87,6 +88,21 @@ class MissionTests(unittest.TestCase):
             self.assertEqual(planner._smooth_lift_wait_approach('EG',points,zones,marks,caps),points)
         planner.graph.shortcut_clear = lambda *args: False
         self.assertEqual(planner._smooth_lift_wait_approach('EG',points,[],[],[]),points)
+
+
+    def test_ground_floor_uses_inward_route_with_both_doors_in_scan_geometry(self):
+        _, nav, _ = fixture()
+        ports = nav.mesh.manifest['elevator']['ports']
+        ports.append({**ports[1], 'id': 'EG.out', 'level_id': 'EG'})
+        source = {'geometry': {'localization_tolerance_mm': 10},
+                  'lift': {'maximum_capacity': 2, 'route_sides': {'EG': 'inward'}}}
+        planner = MissionPlanner(source, nav, Graph())
+        self.assertEqual(planner.ports['EG']['id'], 'EG.in')
+        self.assertEqual(planner.ports['OG3']['id'], 'OG.out')
+        self.assertIn(('inward', 'outward'), model.lift_scan_side_sets(ports))
+        source['lift'].pop('route_sides')
+        with self.assertRaisesRegex(ValueError, 'One unambiguous BF01 route port'):
+            MissionPlanner(source, nav, Graph())
 
     def test_source_loop_phase_changes_preserve_fixed_connector(self):
         loop = {'points_mm': [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]}

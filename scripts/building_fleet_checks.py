@@ -677,6 +677,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
     maps={t.identity:depot.FixedHomeMap(t.identity,navigation.homes,navigation.envelope,aliases,
         cfg['range_error_mm']+source['geometry']['localization_tolerance_mm'])for t in trajectories}
     by_id={t.identity:t for t in trajectories};ports={p['id']:p for p in navigation.mesh.manifest['elevator']['ports']if p['active']}
+    open_sides=model.lift_open_sides_by_level(ports.values())
     paths={};clocks={};scan_history={t.identity:collections.deque(maxlen=8)for t in trajectories};decisions={t.identity:set()for t in trajectories}
     counts=collections.Counter();groups={};minimum=math.inf;checked_stops=0;checked_continuations=0;scan_previous={};global_time=-math.inf
     perceptions=collections.defaultdict(list)
@@ -738,7 +739,7 @@ def check_perception(program,trajectories,source,navigation,catalog,windows):
                 if grant.get('status')=='granted'and not _covered(windows,identity,grant.get('resource'),at,at):raise ValueError('Conditional home matching lacks its actual own depot-room grant')
                 maps[identity].set_own_grant(grant);known=[];port=ports.get(e.get('port_id'))
                 if port is not None and e.get('lift_phase')in('boarding','alighting'):
-                    sides=(port['side'],)
+                    sides=open_sides[port['level_id']]
                     if sides in cabins:known.append(cabins[sides])
                     if(e['level_id'],sides)in landings:known.append(landings[e['level_id'],sides])
                 def match(own,local,index=statics[e['level_id']],known=known,mapped=maps[identity]):

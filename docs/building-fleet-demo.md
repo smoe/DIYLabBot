@@ -1552,9 +1552,13 @@ Die Annahmen E1–E8 bleiben bestehen: bestätigte bzw. unbestätigte Zielnutzun
 Depot nur in R0_004/R0_013 (E3), synthetische getrennte Leerfahrtgrenzen (E4),
 referenzierte Rundumscan-Annahme und 75 mm Abstand (E5), logischer Leitstand
 (E6), höchstens zwei nur bei nachgewiesenem Kabinenfreiraum (E7) und die
-statische L01-TR01-Instanz (E8). Im EG und KG gilt die innere aktive
-Aufzugseite der Quelle; die ältere Dokumentationsangabe „EG beidseitig“
-wird nicht übernommen. Reale Navigation, menschlicher Vergleich, Personen,
+statische L01-TR01-Instanz (E8). Bei diesem historischen Lauf war im EG und
+KG jeweils nur die innere Aufzugseite aktiv. Im aktuellen Gebäude öffnen bei
+einem Halt im EG beide Seiten. BF01 wählt für seine Wege im EG weiterhin die
+innere Seite aus der Flottenquelle, während die Türsteuerung und die
+synthetischen Scans beide offenen Seiten abbilden. Für diese Gebäudeänderung
+sind neue Welt-, Cache- und Fahrtnachweise erforderlich. Reale Navigation,
+menschlicher Vergleich, Personen,
 Tür-/Aufzugsautomatik, Netzwerk, Hardware und Pages bleiben ungeprüft bzw.
 unveröffentlicht.
 

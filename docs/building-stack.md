@@ -341,24 +341,25 @@ eine Aufzugseite, keinen Gebäudeausgang.
 
 | Stopp | Türseiten | Geometrie |
 |---|---|---|
-| EG | Nur innen, gegenüber dem Bedienpanel | Modellierte Öffnung und Rahmen |
+| EG | Außen und innen | Je eine Öffnung mit Rahmen, Schachttüren und Landeschwelle |
 | 1.–3. OG | Nur außen | Innere Seiten bleiben geschlossen |
 | KG | Nur innen | Eigene Raumquelle; Höhe vorläufig angenommen |
 
 Die einmalig referenzierte Öffnung `DLift` liefert die synthetische Lage/Breite
 für die Aufzugdarstellung. Die tatsächlichen Zielwände werden geschnitten;
-Rahmen stehen nicht vor ungebrochenen Wandkörpern. Im Browser begrenzt
-dieselbe aktive Portliste die Ausstiegsseiten. Die bewegte EG-Kabine besitzt
-weiter ihre beiden Öffnungen; die inneren Schachtwände der Obergeschosse
-bleiben dennoch geschlossen. Kabinen- und aktive Schachttüren besitzen
+Rahmen stehen nicht vor ungebrochenen Wandkörpern. Im Browser bestimmt
+dieselbe aktive Portliste die Ausstiegsseiten. Die beiden Kabinenöffnungen
+sind im EG mit ihren Schachttüren verbunden. Die inneren Schachtwände der
+Obergeschosse bleiben geschlossen. Kabinen- und aktive Schachttüren besitzen
 verschiebbare Blätter. Die Edelstahloptik, zwei Handlaufhöhen, dunkler Boden
 und horizontale Tastenreihe folgen den Kabinenfotos; Maße bleiben angenommen.
 Die Eigentümerkorrektur setzt Panel und Anzeige auf die rechte Seitenwand
 nahe dem Eingang aus den Obergeschossen: südliche Wand, westliches Ende.
 Der obere Handlauf endet mit angenommenen 50 mm Abstand vor dem Panel;
 die untere Leiste läuft darunter weiter. Das Telefon bleibt im Nordosten.
-Die Anzeige und die fünf Kabinentasten K/E/1/2/3 sind im Browser funktional;
-die äußeren Anzeigen und Ruftaster bleiben an ihren bestehenden Positionen.
+Die Anzeige und die fünf Kabinentasten K/E/1/2/3 sind im Browser funktional.
+Die beiden EG-Zugänge erhalten jeweils eine Anzeige und einen Ruftaster aus
+dem vorhandenen Rezept.
 
 Die Browserfahrt verschiebt genau eine Kabine und die absolut daran gebundene
 Kamera. Bei vollständig geöffneten Türen ist Gehen möglich; während

@@ -331,9 +331,12 @@ def fully_open_values(mesh, port_id):
     port = active_port(mesh, port_id)
     objects = {obj['id']: obj for obj in mesh.manifest['objects']}
     result = {mesh.manifest['elevator']['object_id']: port['z_mm']}
+    open_doors = {identity for landing in mesh.manifest['elevator']['ports']
+                  if landing['active'] and landing['level_id'] == port['level_id']
+                  for identity in landing['door_object_ids']}
     for obj in objects.values():
         if obj.get('mechanism') == 'lift_door':
-            result[obj['id']] = obj['states']['open' if obj['id'] in port['door_object_ids'] else 'closed']
+            result[obj['id']] = obj['states']['open' if obj['id'] in open_doors else 'closed']
     return result
 
 

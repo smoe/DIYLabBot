@@ -297,10 +297,9 @@ class Navigation:
     def _derive_locations(self):
         threshold=self.radius+self.reserve
         self.level_z={row['id']:row['z_mm']for row in self.mesh.manifest['levels']}
+        route_ports=model.lift_route_ports(self.config, self.mesh.manifest['elevator']['ports'])
         for level,data in self.topological.items():
-            active=[p for p in self.mesh.manifest['elevator']['ports']if p['level_id']==level and p['active']]
-            if len(active)!=1:raise ValueError('BF01 requires an explicit active landing side per level')
-            port=active[0];landing=self.polygons[level][data['landing_neighbors'][port['id']][0]]
+            port=route_ports[level];landing=self.polygons[level][data['landing_neighbors'][port['id']][0]]
             candidates=[self.grids[level].centre(i)for i in self.grids[level].candidates(landing)
                         if nav.point_in_polygon(self.grids[level].centre(i),landing)
                         and self.grids[level].clearance_lower_mm(self.grids[level].centre(i))>=threshold]
@@ -363,8 +362,9 @@ class Navigation:
         """
         from building_fleet_sim import footprint,point_segment_distance
         self.waiting_bay_polygons={};self.road_hubs={}
+        route_ports=model.lift_route_ports(self.config, self.mesh.manifest['elevator']['ports'])
         for level,places in self.waits.items():
-            port=next(p for p in self.mesh.manifest['elevator']['ports']if p['active']and p['level_id']==level)
+            port=route_ports[level]
             direction=1 if port['cabin_entry_mm'][0]>port['exit_eye_mm'][0]else-1
             # Face the cabin before stopping; no turn on the spot at the bay.
             for place in places:place[2]=0. if direction>0 else math.pi

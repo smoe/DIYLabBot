@@ -30,6 +30,7 @@ STATE_FIELDS={'mesh','navigation','grids','floors','certificates','graph','catal
 REPORT_FIELDS={'format','runtime_source_files_sha256','operation_sha256','files',
                'source_config_sha256','derivation_inputs','geometry_selection','qualification'}
 OPERATION_SPEC={
+ 'building_fleet_model.py':('lift_route_ports','lift_open_sides_by_level','lift_scan_side_sets'),
  'building_fleet_routes.py':('Navigation',),
  'building_fleet_navigation.py':('NativeMesh','ClearanceGrid','initial_transform','clip_height',
      'native_rectangle_collisions','closed_mesh_membership','_native_band_index'),
@@ -651,7 +652,9 @@ def _restore_partitioned(path,report,data,source,progress,initial_level):
         index=_restore_segment(row);index._runtime_static_index_binding=(report['source_config_sha256'],kind,key,geometry_sha);return index
     static=_LazyMap(levels,lambda level:bound_segment(level_data(level)['scan_index'],'static',level,report['files'][data['level_files'][level]]['sha256']))
     cabin={sides:bound_segment(row,'cabin',sides,_sha(_json(_pack(row))))for sides,row in data['cabin_indices'].items()}
-    landing_keys=[(level,sides)for level in levels for sides in((),('inward',),('outward',))]
+    side_sets=model.lift_scan_side_sets(mesh.manifest['elevator']['ports'])
+    if set(cabin)!=set(side_sets):raise ValueError('Prepared cabin scans must bind every source door state')
+    landing_keys=[(level,sides)for level in levels for sides in side_sets]
     landings=_LazyMap(landing_keys,lambda key:bound_segment(level_data(key[0])['landing_indices'][key[1]],'landing',key,report['files'][data['level_files'][key[0]]]['sha256']))
     scan_geometry=(_LazyMap(levels,lambda level:static[level].segments),
         {sides:index.segments for sides,index in cabin.items()},_LazyMap(landing_keys,lambda key:landings[key].segments))
