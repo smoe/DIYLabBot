@@ -1,0 +1,56 @@
+{
+  "format": "solidcraftbot.lab3003-cf01-arm-route/1",
+  "sources": {
+    "variant": {
+      "source": "model/lab3003-armc-variant.shared.json",
+      "source_sha256": "a10af93c813792e5a5f165b0988161058c8cb0b1e3909ec7dd91d7a722d9afcb"
+    },
+    "cycle": {
+      "source": "model/lab3003-cf01-cycle.shared.json",
+      "source_sha256": "76ca88b8a07e7ee53b3d57d704bcac44e7a6c70e181078900c353ecad5ae2c1e"
+    },
+    "gripper": {
+      "source": "model/centrifuge-cf01.robot-pickup.shared.json",
+      "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+    },
+    "motion_limits": {
+      "source": "model/cf01-unload-demo.motion.json",
+      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+    },
+    "cassette_grasp": {
+      "source": "model/tr01-l01-workcell.protocol.json",
+      "source_sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+    }
+  },
+  "cassette_approach": {
+    "roll_deg": -45.0,
+    "side_offset_mm": {
+      "B2_Tube01": 12.0,
+      "B2_Tube07": 9.0
+    },
+    "height_mm": 47.0,
+    "corner_trim_mm": 3.0,
+    "extraction_mm": 60.0,
+    "clearance_height_mm": 0.7,
+    "grip_adjustment_mm": 0.12,
+    "alignment_lead_mm": 2.0,
+    "alignment_corner_mm": 0.09
+  },
+  "station_approach": {
+    "roll_deg": 0.0,
+    "axial_travel_mm": 24.0
+  },
+  "loaded_joint_blend_offset_deg": [
+    -48.0,
+    95.0,
+    -25.0,
+    0.0,
+    -70.0,
+    0.0
+  ],
+  "jaw_holds_s": {
+    "grasp": 0.35,
+    "support_release": 1.0,
+    "park_reset": 0.85
+  }
+}

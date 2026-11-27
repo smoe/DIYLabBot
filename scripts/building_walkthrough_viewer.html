@@ -59,6 +59,7 @@
       <p class="notice">Simulation · Leerbewegung</p>
     </section>
     <section class="lift-panel lap-panel" id="walkthrough-lap" aria-label="TR01-Laborrunde" hidden>
+      <div id="walkthrough-lap-controls">
       <p><strong>TR01 · Laborrunde</strong><br><span id="walkthrough-lap-distance"></span></p>
       <div class="lift-actions">
         <button type="button" class="quiet-button lap-primary" id="walkthrough-lap-play">Runde starten</button>
@@ -72,6 +73,16 @@
       </div>
       <label><input type="checkbox" id="walkthrough-lap-follow"> TR01 im Blick behalten</label>
       <p class="notice" id="walkthrough-lap-status" role="status"></p>
+      </div>
+      <div id="walkthrough-cf01" hidden>
+        <div class="lift-actions">
+          <button type="button" class="quiet-button" id="walkthrough-cf01-play" hidden>Übergaben starten</button>
+          <button type="button" class="quiet-button" id="walkthrough-cf01-view">CF01 ansehen</button>
+          <label><input type="checkbox" id="walkthrough-cf01-cutaway"> Rotorschnitt</label>
+        </div>
+        <p class="notice" id="walkthrough-cf01-phase" role="status"></p>
+        <p class="notice" id="walkthrough-cf01-status"></p>
+      </div>
     </section>
     <p id="walkthrough-interaction-hint" class="interaction-hint" hidden aria-hidden="true"></p>
     <div class="move-controls" aria-label="Move camera">
@@ -113,6 +124,7 @@
 <script>__WALKTHROUGH_INTERACTION__
 __WALKTHROUGH_ROBOTS__
 __WALKTHROUGH_TR01_LAP__
+__WALKTHROUGH_LAB3003_CF01__
 __WALKTHROUGH_MONITORS__
 __WALKTHROUGH_SEMINAR__</script>
 <script>
@@ -237,6 +249,12 @@ __WALKTHROUGH_SEMINAR__</script>
     }
     const lapConfig=data.tr01_lap;
     const lap=lapConfig?WalkthroughTR01Lap.create(lapConfig,CF01Motion.Curve):null;
+    const cf01Config=data.lab3003_cf01_cycle;
+    const dockedStart=cf01Config?.docked_start;
+    const fixtureConfig=lapConfig||dockedStart;
+    const createCF01=()=>WalkthroughLab3003CF01.create(cf01Config,WalkthroughInteraction.jointMatrix,
+      {Curve:CF01Motion.Curve,multiply,identity});
+    let cf01=cf01Config?createCF01():null;
     if(lap){
       const visible=new Set(data.scenes[lapConfig.scene].groups.map(group=>group.id));
       if(new Set(lapConfig.body_ids).size!==lapConfig.body_ids.length||!lapConfig.body_ids.includes(lapConfig.cover_body_id))
@@ -247,8 +265,24 @@ __WALKTHROUGH_SEMINAR__</script>
         if(!visible.has(id)||bodyOwners.has(key))throw Error('Missing or multiply bound TR01 body.');
         bodyOwners.set(key,owner);
       }
-      for(const [id,state] of Object.entries(lapConfig.fixture_states)){
-        if(!Number.isFinite(objectStates.get(id)?.config.states[state]))throw Error('Unknown TR01 fixture state.');
+    }
+    for(const [id,state] of Object.entries(fixtureConfig?.fixture_states||{})){
+      if(!Number.isFinite(objectStates.get(id)?.config.states[state]))throw Error('Unknown TR01 fixture state.');
+    }
+    if(cf01){
+      if(lap ? (dockedStart||cf01Config.arm_motion||cf01Config.scene!==lapConfig.scene||
+                 cf01Config.cover_body_id!==lapConfig.cover_body_id) : (!dockedStart||!cf01Config.arm_motion))
+        throw Error('The CF01 delivery requires the checked TR01 dock and cover.');
+      const available=new Set(data.scenes[cf01Config.scene].groups.map(group=>group.id));
+      const {lid,rotor,latches,pusher}=cf01Config.joints;
+      const joints=pusher?[lid,rotor,...latches,pusher]:[lid,rotor,...latches];
+      const bodies=[...joints.flatMap(joint=>joint.body_ids),...cf01.armBodyIds];
+      if(dockedStart)bodies.push(...cf01Config.samples.map(sample=>sample.carrier_body_id));
+      if(!available.has(cf01Config.cover_body_id))throw Error('Missing native TR01 transport cover.');
+      for(const id of bodies){
+        const key=cf01Config.scene+':'+id;
+        if(!available.has(id)||bodyOwners.has(key))throw Error('Missing or multiply bound CF01 body.');
+        bodyOwners.set(key,{config:{id,mechanism:'cf01_cycle'},matrix:()=>cf01.modelMatrix(id)||identity()});
       }
     }
     const robots=new Map((data.robots||[]).map(c=>[c.id,WalkthroughRobots.create(c,objectStates,CF01Motion.Curve)]));
@@ -279,7 +313,7 @@ __WALKTHROUGH_SEMINAR__</script>
     }
     function robotCommand(id,name){
       const robot=robots.get(id);if(!robot)return {status:'unknown_target',id};
-      if(lap?.locked&&lapConfig.parked_robots.includes(id))return {status:'rejected_lap_active',id};
+      if((lap?.locked||cf01?.active)&&fixtureConfig.parked_robots.includes(id))return {status:'rejected_lap_active',id};
       const result=robot.command(name,performance.now());dirty=true;updateRobotUI();requestRender();return result;
     }
     const elevatorConfig=data.elevator||null,elevatorObject=elevatorConfig?objectStates.get(elevatorConfig.object_id):null;
@@ -367,7 +401,7 @@ __WALKTHROUGH_SEMINAR__</script>
     function driveObject(id,name){
       advanceObjects(performance.now());const object=objectStates.get(id),target=object?.config.commands[name]?.target_state;
       if(!object||!target||!Number.isFinite(object.config.states[target]))return {status:'unknown_target',id};
-      if(lap?.locked&&Object.hasOwn(lapConfig.fixture_states,id))return {status:'rejected_lap_active',id};
+      if((lap?.locked||cf01?.active)&&Object.hasOwn(fixtureConfig.fixture_states,id))return {status:'rejected_lap_active',id};
       if(object.transition)return {status:'rejected_busy',id,state:object.state};
       if(object.state===target)return {status:'already_in_state',id,state:object.state};
       const blockers=WalkthroughInteraction.commandBlockers(objectStates,id,name);
@@ -507,6 +541,9 @@ __WALKTHROUGH_SEMINAR__</script>
       return result;
     }
     function requestRender(){dirty=true;if(root.dataset.ready==='true'&&frameRequest===null)frameRequest=requestAnimationFrame(tick);}
+    function hideCF01Body(id,feed){
+      return cf01&&(cf01.hidden(id)||(!feed&&stopId===cf01Config.stop_id&&cf01Cutaway.checked&&id===cf01Config.cutaway_body_id));
+    }
     function drawScene(scene,viewProjection,viewEye,feed=false){
       gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(program);
       gl.bindVertexArray(scene.vao);gl.uniformMatrix4fv(uniforms.viewProjection,false,viewProjection);gl.uniform3fv(uniforms.eye,viewEye);
@@ -514,7 +551,7 @@ __WALKTHROUGH_SEMINAR__</script>
       const textures=feed?null:monitorWall?.textures;
       if(monitorConfig)gl.uniform1f(uniforms.screenImageAspect,monitorConfig.settings.resolution_px[0]/monitorConfig.settings.resolution_px[1]);
       let drawnGroups=0,drawnTriangles=0;
-      for(const group of scene.opaque){const levelsOn=ledBodies.get(group.id);const on=levelsOn?.includes(elevator.displayLevel());
+      for(const group of scene.opaque){if(hideCF01Body(group.id,feed))continue;const levelsOn=ledBodies.get(group.id);const on=levelsOn?.includes(elevator.displayLevel());
         const model=group.object?objectMatrix(group.object):identity();
         if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;
         const isProjection=group.id===seminarConfig?.screen_body_id;
@@ -529,29 +566,34 @@ __WALKTHROUGH_SEMINAR__</script>
         const offset=centre.map((v,i)=>v-viewEye[i]);group.distanceSquared=dot(offset,offset);
       }
       scene.transparent.sort((a,b)=>b.distanceSquared-a.distanceSquared);
-      for(const group of scene.transparent){const model=group.object?objectMatrix(group.object):identity();if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;gl.uniformMatrix4fv(uniforms.modelMatrix,false,model);gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);drawnGroups++;drawnTriangles+=group.count/3;}
+      for(const group of scene.transparent){if(hideCF01Body(group.id,feed))continue;const model=group.object?objectMatrix(group.object):identity();if(feed&&!MonitorFrustum.visible(group.object?multiply(viewProjection,model):viewProjection,group.bounds))continue;gl.uniformMatrix4fv(uniforms.modelMatrix,false,model);gl.uniform4fv(uniforms.materialColor,group.color);gl.drawElements(gl.TRIANGLES,group.count,gl.UNSIGNED_INT,group.offset);drawnGroups++;drawnTriangles+=group.count/3;}
       gl.depthMask(true);gl.disable(gl.BLEND);
       const code=gl.getError();if(code!==gl.NO_ERROR)throw Error('WebGL drawing error '+code+'.');
       return {drawn_native_groups:drawnGroups,drawn_triangles:drawnTriangles};
     }
     const lapPanel=document.getElementById('walkthrough-lap'),lapPlay=document.getElementById('walkthrough-lap-play');
+    const lapControls=document.getElementById('walkthrough-lap-controls');
     const lapReset=document.getElementById('walkthrough-lap-reset'),lapTimeline=document.getElementById('walkthrough-lap-time');
     const lapReverse=document.getElementById('walkthrough-lap-reverse');
     const lapRate=document.getElementById('walkthrough-lap-rate'),lapFollow=document.getElementById('walkthrough-lap-follow');
     const lapStatus=document.getElementById('walkthrough-lap-status'),lapClock=document.getElementById('walkthrough-lap-clock');
+    const cf01Panel=document.getElementById('walkthrough-cf01'),cf01Cutaway=document.getElementById('walkthrough-cf01-cutaway');
+    const cf01Play=document.getElementById('walkthrough-cf01-play');
+    const cf01Phase=document.getElementById('walkthrough-cf01-phase'),cf01Status=document.getElementById('walkthrough-cf01-status');
     const lapRoom=data.laboratories?.find(room=>room.id===lapConfig?.laboratory_id);
     let lapMessage='',lapAutoplay=lapConfig?.autoplay===true;
+    let resumeCF01OnVisibility=false;
     function lapViewActive(){
       if(!lap||sceneId!==lapConfig.scene||selectedLevel!==lapConfig.level_id||elevator?.boarded)return false;
       if(!lapRoom)return stopId===lapConfig.stop_id;
       return SeminarProjection.insidePolygon(lapRoom.interior_polygon_mm,eye.map(value=>value*1000));
     }
     function blockedLapFixture(){
-      for(const [id,expected] of Object.entries(lapConfig.fixture_states)){
+      for(const [id,expected] of Object.entries(fixtureConfig.fixture_states)){
         const object=objectStates.get(id);
         if(object.transition||Math.abs(object.value-object.config.states[expected])>1e-7)return object.config.label;
       }
-      for(const id of lapConfig.parked_robots){
+      for(const id of fixtureConfig.parked_robots){
         const robot=robots.get(id);
         if(!robot||robot.snapshot.busy||robot.snapshot.joints_deg.some((q,i)=>Math.abs(q-robot.config.reference_deg[i])>1e-7))
           return robot?.config.label||id;
@@ -573,7 +615,7 @@ __WALKTHROUGH_SEMINAR__</script>
       return !document.hidden&&sceneId===lapConfig.scene&&(lapAutoplay||lapViewActive());
     }
     function advanceLap(now){
-      if(!lap)return false;
+      if(!lap||(cf01&&(lap.arrived||cf01.snapshot.state!=='ready')))return false;
       const playing=lap.snapshot.state==='playing';
       if(!lapPlaybackVisible()){
         if(playing)lap.pause(now);
@@ -585,6 +627,15 @@ __WALKTHROUGH_SEMINAR__</script>
       if(!checkLapFixtures())return previousMessage!==lapMessage;
       lap.play(now);
       return true;
+    }
+    function advanceCF01(now){
+      if(!cf01||document.hidden)return false;
+      if(cf01.snapshot.state==='ready'&&lap?.arrived&&checkLapFixtures()){
+        lapAutoplay=false;
+        lapFollow.checked=false;
+        return cf01.start(now,true);
+      }
+      return cf01.advance(now);
     }
     function modelClock(seconds){
       const whole=Math.floor(seconds);
@@ -599,15 +650,55 @@ __WALKTHROUGH_SEMINAR__</script>
       yaw=Math.atan2(dy,dx);pitch=Math.atan2(dz,distance);
     }
     function updateLapUI(){
-      lapPanel.hidden=!lapViewActive();
+      const activeDock=dockedStart&&sceneId===cf01Config.scene&&selectedLevel===dockedStart.level_id&&!elevator?.boarded;
+      lapPanel.hidden=!lapViewActive()&&!activeDock;
       if(lapPanel.hidden)return;
+      lapPanel.setAttribute('aria-label',lap?'TR01-Laborrunde':'CF01-Übergaben am TR01-Dock');
+      lapControls.hidden=!lap;
+      if(!lap)return;
       const {state,time_s,duration_s,direction}=lap.snapshot;
+      const station=cf01?.snapshot;
+      const stationOwnsBatch=station&&station.state!=='ready';
       lapPlay.textContent={ready:'Runde starten',playing:'Pause',paused:'Weiterfahren',docked:'Erneut fahren'}[state];
       lapReset.disabled=state==='ready';
+      lapReverse.disabled=lapTimeline.disabled=lapRate.disabled=lapFollow.disabled=Boolean(stationOwnsBatch);
+      lapPlay.disabled=station?.state==='completed';
+      lapReset.textContent=stationOwnsBatch?'Demo neu starten':'Zurücksetzen';
+      if(stationOwnsBatch){
+        lapPlay.textContent={playing:'Pause',paused:'CF01 fortsetzen',completed:'CF01 fertig'}[station.state];
+        lapReset.disabled=station.state!=='completed';
+      }
       lapTimeline.value=String(time_s);
       lapClock.textContent=modelClock(time_s)+' / '+modelClock(duration_s)+' Modellzeit';
       const next=lapMessage||{ready:'Am Dock',playing:direction==='reverse'?'Rückwärts zum Dock':'Vorwärts durch das Labor',paused:'Pausiert',docked:'Wieder angedockt'}[state];
       if(lapStatus.textContent!==next)lapStatus.textContent=next;
+    }
+    function updateCF01UI(){
+      const station=cf01?.snapshot;
+      cf01Panel.hidden=!station||lapPanel.hidden;
+      if(cf01Panel.hidden)return;
+      cf01Play.hidden=!dockedStart;
+      if(dockedStart)cf01Play.textContent={ready:'Übergaben starten',playing:'Pause',
+        paused:'CF01 fortsetzen',completed:'Demo neu starten'}[station.state];
+      cf01Cutaway.disabled=stopId!==cf01Config.stop_id;
+      const phases={docked:'Angedockt',cover_removed:'Haube abgenommen · simuliert',
+        indexing:'Rotor positioniert sich',indexed:'Rotorposition bestätigt',unlocking:'Deckel entriegelt',
+        opening:'Deckel öffnet',open:'Deckel offen',arm_transfer:station.held_tube?
+          'ArmC trägt '+station.held_tube:'ArmC · Übergabe simuliert',
+        pusher_raising:'Stößel fährt aus',pusher_raised:'ArmC fährt zur Kassette',
+        pusher_transfer:'Gefäß auf dem Stößel · ArmC zieht sich zurück',lowering:'Stößel senkt das Gefäß ab',
+        pocket_reached:'Rotorsitz erreicht · Stößel fährt ein',
+        seated:'Gefäß im Rotorsitz bestätigt · simuliert',arm_clear:'ArmC aus dem Arbeitsbereich',
+        closing:'Deckel schließt',locking:'Verriegelung fährt ein',locked:'Deckelverriegelung bestätigt',
+        spinning:'CF01 schleudert',braking:'CF01 bremst',stopped:'CF01 fertig · Stillstand bestätigt'};
+      const label=station.state==='ready'?(dockedStart ? lapMessage||'CF01 · TR01 am Dock' : 'CF01 · startet nach Ankunft'):
+        (station.state==='paused'?'Pausiert · ':'')+(phases[station.phase]||station.phase);
+      if(cf01Phase.textContent!==label)cf01Phase.textContent=label;
+      const rpm=Math.round(station.rpm).toLocaleString('de-DE');
+      cf01Status.textContent='Simulation · '+station.seated.length+'/'+cf01Config.samples.length+
+        (dockedStart?' Gefäße · ':' Tubes · ')+rpm+' U/min · '+station.playback_rate+'×'+
+        (dockedStart?' · Modellzeit '+modelClock(station.time_s)+' / '+modelClock(station.duration_s):'')+
+        (station.lid_locked?' · verriegelt':'')+(stopId===cf01Config.stop_id&&cf01Cutaway.checked?' · Rotorschnitt':'');
     }
     if(lap){
       document.getElementById('walkthrough-lap-distance').textContent=
@@ -619,7 +710,7 @@ __WALKTHROUGH_SEMINAR__</script>
       lapRate.value=String(lap.snapshot.playback_rate);
       lapReverse.hidden=!lapConfig.reversal;
       lapReverse.addEventListener('click',()=>{
-        if(!lapConfig.reversal||!allowLapPlayback())return;
+        if(!lapConfig.reversal||(cf01&&cf01.snapshot.state!=='ready')||!allowLapPlayback())return;
         lapAutoplay=false;
         if(lapRoom)setStop(lapConfig.stop_id);
         const now=performance.now();
@@ -632,7 +723,13 @@ __WALKTHROUGH_SEMINAR__</script>
       });
       lapPlay.addEventListener('click',()=>{
         const now=performance.now();
-        if(lap.snapshot.state==='playing'){
+        if(cf01?.snapshot.state==='playing'){
+          cf01.pause(now);
+        }else if(cf01?.snapshot.state==='paused'){
+          cf01.resume(now);
+        }else if(cf01?.snapshot.state==='completed'){
+          return;
+        }else if(lap.snapshot.state==='playing'){
           lapAutoplay=false;
           lap.pause(now);
         }else if(allowLapPlayback()){
@@ -641,9 +738,13 @@ __WALKTHROUGH_SEMINAR__</script>
         }
         requestRender();
       });
-      lapReset.addEventListener('click',()=>{lapAutoplay=false;lap.seek(0);lapMessage='';requestRender();});
+      lapReset.addEventListener('click',()=>{
+        if(cf01?.active)return;
+        if(cf01?.snapshot.state==='completed')cf01=createCF01();
+        lapAutoplay=false;lap.seek(0);lapMessage='';requestRender();
+      });
       lapTimeline.addEventListener('input',()=>{
-        if(allowLapPlayback()){
+        if((!cf01||cf01.snapshot.state==='ready')&&allowLapPlayback()){
           lapAutoplay=false;
           lap.seek(Number(lapTimeline.value));
         }
@@ -652,9 +753,26 @@ __WALKTHROUGH_SEMINAR__</script>
       lapRate.addEventListener('change',()=>{lap.setRate(Number(lapRate.value),performance.now());requestRender();});
       lapFollow.addEventListener('change',requestRender);
     }
+    if(cf01){
+      document.getElementById('walkthrough-cf01-view').addEventListener('click',()=>setStop(cf01Config.stop_id));
+      cf01Cutaway.addEventListener('change',requestRender);
+      if(dockedStart)cf01Play.addEventListener('click',()=>{
+        const now=performance.now();
+        const state=cf01.snapshot.state;
+        if(state==='playing')cf01.pause(now);
+        else if(state==='paused')cf01.resume(now);
+        else if(checkLapFixtures()){
+          if(state==='completed')cf01=createCF01();
+          setStop(dockedStart.stop_id);
+          cf01.start(now,true);
+        }
+        requestRender();
+      });
+    }
     function render(){
       followLap();
       updateLapUI();
+      updateCF01UI();
       syncLiftCamera();
       seminarProjection?.update({sceneId,eye_mm:eye.map(v=>v*1000),isolated});
       updateWindowControls();
@@ -748,6 +866,7 @@ __WALKTHROUGH_SEMINAR__</script>
         const before=eye.map(v=>v*1000);
         const barriers=sceneId==='building'&&elevator?elevator.walkingBarriers().map(b=>({id:b.id,min:b.min.map(v=>v/1000),max:b.max.map(v=>v/1000)})):[];
         const result=prepareScene(sceneId).collider.move(eye,delta,{barriers,transformsForBody:id=>{
+          if(cf01?.hidden(id))return [];
           const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
           const transforms=[objectMatrix(owner)];
           // During a door transition keep the doorway guarded until fully open.
@@ -767,11 +886,12 @@ __WALKTHROUGH_SEMINAR__</script>
         move(dt);
         const animating=advanceObjects(now),liftActive=liftDoors?.advance();
         const lapChanged=advanceLap(now);
-        if(lapChanged)dirty=true;
+        const cf01Changed=advanceCF01(now);
+        if(lapChanged||cf01Changed)dirty=true;
         if(dirty){render();dirty=false;}
         const lapState=lap?.snapshot.state;
         const lapRepeating=lapAutoplay&&lapChanged&&lapState==='docked'&&lapPlaybackVisible();
-        if(navigationHeld()||animating||liftActive||lapState==='playing'||lapRepeating)frameRequest=requestAnimationFrame(tick);
+        if(navigationHeld()||animating||liftActive||lapState==='playing'||lapRepeating||cf01?.snapshot.state==='playing')frameRequest=requestAnimationFrame(tick);
         else lastTime=null;
       }
       catch(error){clearInputKeys();fail(error);}
@@ -789,7 +909,8 @@ __WALKTHROUGH_SEMINAR__</script>
       const direction=normalize(stop.target_mm.map((v,i)=>(v-stop.eye_mm[i])/1000));yaw=Math.atan2(direction[1],direction[0]);pitch=Math.asin(Math.max(-.995,Math.min(.995,direction[2])));
       for(const button of stopsNode.querySelectorAll('button'))button.setAttribute('aria-pressed',String(button.dataset.stop===id));
       locationLabel.textContent=stop.label;
-      const level=levels.find(l=>l.id===selectedLevel);contextLabel.textContent=(level?.label||selectedLevel||'Building')+' · concept geometry';
+      const level=levels.find(l=>l.id===selectedLevel),parked=data.lab3003_armc_parked;
+      contextLabel.textContent=parked?.stop_id===id?parked.label:(level?.label||selectedLevel||'Building')+' · concept geometry';
       levelSelect.disabled=sceneId!=='building';if(selectedLevel!==null)levelSelect.value=selectedLevel;
       root.dataset.freeCamera='false';announcement.textContent=stop.label+'. '+contextLabel.textContent;for(const object of objectStates.values())updateObjectUI(object);requestRender();
     }
@@ -822,7 +943,21 @@ __WALKTHROUGH_SEMINAR__</script>
       event.preventDefault();keyboardKeys.add(event.code);requestRender();
     });
     window.addEventListener('keyup',event=>{if(event.ctrlKey||event.metaKey)clearKeyboardKeys();else{keyboardKeys.delete(event.code);readModifiers(event);}if(keyNames[event.code])requestRender();});
-    const clearMovement=()=>{clearInputKeys();drag=null;lastTime=null;requestRender();};window.addEventListener('blur',clearMovement);document.addEventListener('visibilitychange',()=>{if(document.hidden){lap?.pause(performance.now());clearMovement();}else requestRender();});
+    const clearMovement=()=>{clearInputKeys();drag=null;lastTime=null;requestRender();};
+    window.addEventListener('blur',clearMovement);
+    document.addEventListener('visibilitychange',()=>{
+      const now=performance.now();
+      if(document.hidden){
+        lap?.pause(now);
+        resumeCF01OnVisibility=cf01?.snapshot.state==='playing';
+        if(resumeCF01OnVisibility)cf01.pause(now);
+        clearMovement();
+      }else{
+        if(resumeCF01OnVisibility)cf01.resume(now);
+        resumeCF01OnVisibility=false;
+        requestRender();
+      }
+    });
     document.addEventListener('focusin',event=>{if(editable(event.target))clearMovement();});
     for(const button of document.querySelectorAll('[data-move]')){
       const name=button.dataset.move;button.addEventListener('pointerdown',event=>{event.preventDefault();button.setPointerCapture(event.pointerId);keys.add(name);requestRender();});
@@ -859,6 +994,7 @@ __WALKTHROUGH_SEMINAR__</script>
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
       get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,display_level:elevator.displayLevel(),walking_allowed:elevator.walkingAllowed,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get tr01Lap(){return lap?{...lap.snapshot,matrix:Array.from(lap.matrix)}:null;},
+      get lab3003CF01(){return cf01?.snapshot||null;},
       get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},
       get camera(){return {eye_mm:eye.map(v=>v*1000),yaw_rad:yaw,pitch_rad:pitch,level_id:selectedLevel};},

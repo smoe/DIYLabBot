@@ -181,6 +181,61 @@ Die Fahrbahn von TR01 bleibt gesondert zu prüfen.
 Studienkörper `People_*` und Fahrzeugrouten entfallen.
 Native Geräte im Gebäude-CAD sind weiterhin fehlende Zielunterstützung.
 
+### CF01-Demo nach der TR01-Runde
+
+Nach der gespielten Rückkehr von TR01 startet die Laborvorschau einmalig den
+synthetischen CF01-Zyklus. Die Probenauswahl bindet zwei mitgeführte Tubes an
+gegenüberliegende Rotorplätze. Das Modell beobachtet die Abnahme der Haube,
+die Übergabe, beide Rotorsitze, den freien Arbeitsbereich und die
+Deckelverriegelung, bevor der vorhandene CF01-Simulator den Schleuderlauf
+freigibt. Ein Sprung mit dem Zeitregler ans Fahrtende löst den Zyklus nicht
+aus. Nach dem Bremsen zeigt der Rundgang den bestätigten Stillstand und die
+gehaltene Parkbremse. „CF01 ansehen“ wechselt zur Stationsansicht. Der
+Rotorschnitt lässt den verriegelten Deckel optisch aus, und die Statuszeile
+zeigt Drehzahl und Wiedergabefaktor.
+
+Die Übergaben sind synthetische Bestätigungen. Der aufgestellte ArmC hat
+zwischen Schulter und Handgelenk 375 mm Reichweite. Die ausgerichtete
+Einsetzpose verlangt bei der aktuellen Greiferbindung rund 407 mm.
+Die Vorschau animiert die CF01-Mechanik. Eine räumliche Arm- und
+Gefäßbahn bis zum Rotorsitz sowie Hardwarebetrieb bleiben offen.
+
+### Langarm am TR01-Dock
+
+Die separate Vorschau bindet ArmC in Labor 3.003 an die
+[280/250-mm-Variante](../model/lab3003-armc-variant.shared.json) des
+CF01-Arbeitsplatzes. Der Armfuß und die sechs Parkwinkel folgen der
+vorhandenen Gebäudeaufstellung. Der native Generator leitet alle Armkörper
+und die Rundgang-Meshes aus der Variante ab. Die Vorschau zeigt den Arm
+mit den neu abgeleiteten Kameraposen und TR01 am Dock in Parkstellung.
+
+Die Einsetzprüfung mit den vorhandenen Greiferbacken sperrt den direkten
+Transfer in die Sitze 1 und 7. In der ausgerichteten Endpose liegt bei
+jedem Drehwinkel mindestens eine Backe teilweise im Rotorkörper. Der
+[Quellgeometrieprüfer](../scripts/check_lab3003_cf01_seat.py) berechnet
+hierfür eine positive untere Schranke der Überdeckung. Die lokale
+FreeCAD-Prüfung bestätigt einen separaten Weg über den ausgefahrenen
+CF01-Stößel. Der Stößel trägt das Gefäß 16 mm über dem Sitz und der
+Schacht führt es beim Absenken. Der separate
+[synthetische Übergabevertrag](../model/cf01-empty-seat-handoff.protocol.json)
+erlaubt das Ausfahren nur am leeren, indexierten und gesicherten Rotorplatz
+bei vollständig geöffnetem Deckel. Das Absenken benötigt eine bestätigte
+Ablage und einen freien Arbeitsbereich. CF01 schließt erst nach bestätigtem
+Sitz und nach dem Parken des Stößels.
+
+Der [Arm-Bahncompiler](../scripts/build_lab3003_cf01_arm_program.py) leitet
+Arm- und Backenkurven aus der
+[Bahnquelle](../model/lab3003-cf01-arm-route.motion.json) ab. Der
+[native Prüfer](../scripts/check_lab3003_cf01_transfer_freecad.py) prüft
+die exakten exportierten Kurven mit dem vorhandenen Greifer und den
+tatsächlichen Kassettenkörpern. Der
+[Rundgangexport](../scripts/build_lab3003_cf01_transfer_walkthrough.py)
+braucht einen passenden vollständigen Bericht für beide Armfahrten und
+die lokale Stößelbewegung. Die Dock-Vorschau startet mit bestätigter
+simulierter Haubenabnahme. Ein Gefäß behält seinen Körper vom Dock über
+Greifer und Stößel bis in den Rotor. Die Anzeige weist Modellzeit und
+Wiedergabefaktor getrennt aus.
+
 Im Rundgang starten der Kühlschrank und der Gefrierschrank im Labor sowie
 beide Küchenkühlschränke geschlossen. Ihre Türen lassen sich per Klick oder
 Leertaste öffnen und schließen. Beim Gefrierschrank muss die Außentür offen

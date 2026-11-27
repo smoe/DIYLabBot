@@ -42,6 +42,8 @@ def embed_html(template, payload):
         template = template.replace('__WALKTHROUGH_SEMINAR__', SEMINAR_SCRIPT.read_text(encoding='utf-8'))
     template = template.replace('__WALKTHROUGH_ROBOTS__', (ROOT/'scripts/templates/quintic_motion.js').read_text()+'\n'+(ROOT/'scripts/walkthrough_robots.js').read_text())
     template = template.replace('__WALKTHROUGH_TR01_LAP__', (ROOT/'scripts/walkthrough_tr01_lap.js').read_text())
+    cycle_script = (ROOT/'scripts/walkthrough_lab3003_cf01.js').read_text() if payload.get('lab3003_cf01_cycle') else ''
+    template = template.replace('__WALKTHROUGH_LAB3003_CF01__', cycle_script)
     template = template.replace('__WALKTHROUGH_MONITORS__', (ROOT/'scripts/monitor_frustum.js').read_text()+'\n'+(ROOT/'scripts/camera_monitor_wall.js').read_text())
     return template.replace('__WALKTHROUGH_DATA__', data)
 
