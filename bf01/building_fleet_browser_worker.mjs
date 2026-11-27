@@ -218,11 +218,78 @@ async function loadPythonBridge(config,progress,onCompactAssetsReady,assetProgre
  const runtime=pyodide.pyimport('building_fleet_browser_runtime');
  if(manifest.format.endsWith('/2'))runtime.bind_verified_extraction(text);
  const inputs={...manifest.inputs,root:'/project',source_files_sha256:Object.fromEntries(Object.entries(manifest.files).map(([name,ref])=>[name,ref.sha256])),browser_config_sha256:config.manifest.sha256};
- return{runtime,inputs,manifest};
+ return{runtime,inputs,manifest,pyodide};
+}
+const nativeArray = value => value?.toJs ? value.toJs({create_proxies:false}) : value;
+
+// Use the same closed segment tests and ordered cell traversal as
+// SegmentIndex.ray. Directions are computed in the Python sensor, so this
+// kernel performs no trigonometry and cannot change beam directions or age.
+function closedSegmentDistance(ox,oy,dx,dy,[a,b]){
+ const sx=b[0]-a[0],sy=b[1]-a[1],qx=a[0]-ox,qy=a[1]-oy;
+ const cross=dx*sy-dy*sx,side=qx*dy-qy*dx;
+ if(Math.abs(cross)<1e-12){
+  if(Math.abs(side)>1e-9)return Infinity;
+  const first=qx*dx+qy*dy,second=(b[0]-ox)*dx+(b[1]-oy)*dy;
+  if(first<0&&second<0)return Infinity;
+  const lo=first<=second?first:second;
+  return lo>0?lo:0;
+ }
+ const distance=(qx*sy-qy*sx)/cross,fraction=side/cross;
+ return distance>=-1e-9&&fraction>=-1e-9&&fraction<=1+1e-9?distance:Infinity;
+}
+
+export function makeStaticRayBatch(segmentData,cellData,cell,boundsData){
+ const segments=nativeArray(segmentData),bounds=nativeArray(boundsData),columns=new Map();
+ for(const [x,y,indices] of nativeArray(cellData)){
+  if(!columns.has(x))columns.set(x,new Map());
+  columns.get(x).set(y,indices);
+ }
+ const seen=new Int32Array(segments.length);
+ return (ox,oy,limit,directionData)=>{
+  const directions=nativeArray(directionData);
+  seen.fill(0);
+  return directions.map(([dx,dy],beam)=>{
+   if(!bounds)return limit;
+   const [xmin,ymin,xmax,ymax]=bounds;
+   let x=Math.floor(ox/cell),y=Math.floor(oy/cell);
+   if((ox<xmin&&ox+dx*limit<xmin||ox>xmax&&ox+dx*limit>xmax||
+       oy<ymin&&oy+dy*limit<ymin||oy>ymax&&oy+dy*limit>ymax)&&
+      limit>=0&&limit<=65536*cell&&Math.abs(dx)<=1&&Math.abs(dy)<=1&&
+      Math.abs(x)<2**40&&Math.abs(y)<2**40)return limit;
+   const sx=dx>=0?1:-1,sy=dy>=0?1:-1;
+   let tx=dx?((x+(sx>0?1:0))*cell-ox)/dx:Infinity;
+   let ty=dy?((y+(sy>0?1:0))*cell-oy)/dy:Infinity;
+   const stepx=dx?cell/Math.abs(dx):Infinity,stepy=dy?cell/Math.abs(dy):Infinity;
+   const stamp=beam+1;
+   let best=limit;
+   const visit=(ix,iy)=>{
+    const indices=columns.get(ix)?.get(iy);
+    if(!indices)return;
+    for(const index of indices){
+     if(seen[index]===stamp)continue;
+     seen[index]=stamp;
+     const hit=closedSegmentDistance(ox,oy,dx,dy,segments[index]);
+     if(hit<best)best=hit;
+    }
+   };
+   for(;;){
+    visit(x,y);
+    const boundary=Math.min(tx,ty);
+    if(best<boundary||boundary>limit)return best;
+    if(tx===ty){
+     visit(x+sx,y);visit(x,y+sy);
+     x+=sx;y+=sy;tx+=stepx;ty+=stepy;
+    }else if(tx<ty){x+=sx;tx+=stepx;}
+    else{y+=sy;ty+=stepy;}
+   }
+  });
+ };
 }
 export async function loadPythonRuntime(config,progress,onCompactAssetsReady){
- const {runtime,inputs,manifest}=await loadPythonBridge(config,progress,onCompactAssetsReady,progress);
+ const {runtime,inputs,manifest,pyodide}=await loadPythonBridge(config,progress,onCompactAssetsReady,progress);
  const count=manifest.vehicle_count??20;
+ if(count===6&&manifest.format.endsWith('/2'))pyodide.registerJsModule('bf01_static_rays',{makeBatch:makeStaticRayBatch});
  const state=parseState(runtime.boot(JSON.stringify(inputs),value=>progress(JSON.parse(value))),count);
  let hasMotion=Boolean(state.has_motion);
  return{initial:state,background:manifest.format.endsWith('/2'),
