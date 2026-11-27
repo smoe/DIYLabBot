@@ -50,6 +50,36 @@ class PortPathTests(unittest.TestCase):
                 path=OwnPath(board['points_mm'],board['corner_trim_mm'],corner_trim_caps=board['corner_trim_caps'])
                 self.assertAlmostEqual(math.remainder(path.evaluate(0)[0][2]-nav.waits[level][0][2],2*math.pi),0)
 
+    def test_ground_boarding_blends_to_a_centered_aperture_crossing_for_the_bound_lane(self):
+        planner, nav, helper = setup()
+        planner.source['depot'] = {'level': 'EG'}
+        planner.ground_boarding = {'waiting_slot': 0, 'cabin_slot': 0,
+                                  'departure_lead_mm': 15, 'alignment_from_port_mm': 240,
+                                  'aperture_center_fraction': .35}
+        waiting = nav.waits['EG'][0]
+        car = own(nav, home=False, pose_mm_rad=waiting[:])
+        lane = planner.cabin_lanes_override[0]['pose_mm']
+        grant = {'status': 'assigned', 'slot': 0, 'start_port': 'EG.in',
+                 'destination_port': 'OG.out', 'boarding_ready': True, 'cabin_pose_mm': lane}
+        action = planner._board(car, grant)
+        inside = helper.boarding('EG', 0, 0, planner.cabin_lanes_override)['points_mm'][-2]
+        crossing_y = lane[1]+.35*(planner.ports['EG']['cabin_entry_mm'][1]-lane[1])
+        self.assertEqual(action['points_mm'], [waiting[:2], [waiting[0]-15, waiting[1]],
+                                               [2580+240, crossing_y], inside, lane[:2]])
+        self.assertEqual(action['terminal']['kind'], 'cabin_park')
+        self.assertTrue(action['allow_lift'])
+        self.assertTrue(action['variable_corner_speed'])
+        path = OwnPath(action['points_mm'], action['corner_trim_mm'])
+        self.assertAlmostEqual(path.evaluate(0)[0][2], math.pi)
+        self.assertAlmostEqual(path.evaluate(path.length)[0][2], math.pi)
+        self.assertEqual(planner._board(car, dict(grant, boarding_ready=False))['kind'], 'hold')
+
+        other = planner.cabin_lanes_override[1]['pose_mm']
+        previous = planner._board(car, dict(grant, slot=1, cabin_pose_mm=other))
+        self.assertNotIn('variable_corner_speed', previous)
+        self.assertEqual(previous['points_mm'],
+                         helper.boarding('EG', 0, 1, planner.cabin_lanes_override)['points_mm'])
+
     def test_all_fixed_port_and_owned_wait_departures_are_prepared_before_runtime(self):
         planner,nav,helper=setup();routes=planner.prepared_routes()
         for level in nav.waits:

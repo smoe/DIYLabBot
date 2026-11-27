@@ -145,13 +145,25 @@ def patrol_policy(profile):
         count = profile['vehicle_count']
         if type(count) is not int or count not in (6, 20):
             raise ValueError('The patrol vehicle_count must be exactly six or twenty')
-    patrol_timing(profile)
+    timing = patrol_timing(profile)
     policy = profile.get('patrol', {})
     startup = policy.get('startup')
     expected = {'termination': 'explicit_stop', 'startup': startup, 'targets': '/missions/targets',
                 'selection': 'oldest_received_visit'}
     if 'corner_timing' in policy:
         expected['corner_timing'] = 'variable_progress'
+    if 'ground_boarding' in policy:
+        boarding = policy['ground_boarding']
+        slots = ('waiting_slot', 'cabin_slot')
+        distances = ('departure_lead_mm', 'alignment_from_port_mm')
+        fraction = 'aperture_center_fraction'
+        if (timing is None or type(boarding) is not dict or set(boarding) != {*slots, *distances, fraction}
+                or any(type(boarding[name]) is not int or boarding[name] < 0 for name in slots)
+                or any(type(boarding[name]) not in (int, float) or not math.isfinite(boarding[name])
+                       or boarding[name] <= 0 for name in distances)
+                or type(boarding[fraction]) not in (int, float) or not 0 < boarding[fraction] <= 1):
+            raise ValueError('Invalid live ground-floor boarding route')
+        expected['ground_boarding'] = boarding
     if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
         raise ValueError('Unsupported continuous empty-patrol policy')
     return policy

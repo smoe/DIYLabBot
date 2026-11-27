@@ -267,7 +267,8 @@ def prepare_route(request,context,*,phase_complete=None):
         velocity=source_perception_limit(source,nav.radius)['applied_velocity_mm_s']
         mark('perception_limit')
         program=compile_motion(path,source,velocity,reverse=action['reverse'],zone_caps=caps,
-            variable_corner_speed=context.get('variable_corner_speed', False) and not action.get('lift_phase'))
+            variable_corner_speed=context.get('variable_corner_speed', False) and
+            (not action.get('lift_phase') or action.get('variable_corner_speed') is True))
         mark('compile_motion')
         driver=Controller(path,source,caps,own_start_s=request['observed']['time_s'],radius_mm=nav.radius,motion_program=program)
         driver.align_initial_heading(request['own_pose_mm_rad'][2])

@@ -18,7 +18,14 @@
     "startup": "own_received_camera_frame",
     "targets": "/missions/targets",
     "selection": "oldest_received_visit",
-    "corner_timing": "variable_progress"
+    "corner_timing": "variable_progress",
+    "ground_boarding": {
+      "waiting_slot": 0,
+      "cabin_slot": 0,
+      "departure_lead_mm": 3,
+      "alignment_from_port_mm": 217.297297297297,
+      "aperture_center_fraction": 0.35
+    }
   },
   "recruitment": {
     "selection": "lowest_feasible_route_eta",

@@ -737,7 +737,8 @@ class WorldRunner:
             self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm,self.source['motion']['zone_velocity_mm_s'])
         caps=zone_caps(self.source,path,action['points_mm'],action['zone_segments'],action['corner_trim_mm'],source_zones)
         velocity_cap=source_perception_limit(self.source,self.nav.radius)['applied_velocity_mm_s']
-        variable = self.variable_corner_speed and not action.get('lift_phase')
+        variable = self.variable_corner_speed and (not action.get('lift_phase') or
+                                                    action.get('variable_corner_speed') is True)
         key=json.dumps([action['points_mm'],action['corner_trim_mm'],action.get('corner_trim_caps',[]),caps,action['reverse'],velocity_cap,variable],sort_keys=True)
         if key not in self._motion_cache:
             self._motion_cache[key]=compile_motion(path,self.source,velocity_cap,reverse=action['reverse'],

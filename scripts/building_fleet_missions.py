@@ -308,7 +308,8 @@ class MissionPlanner:
             raise ValueError('Own waiting grant pose differs from source bay')
         return slot
 
-    def _drive(self, vehicle, level, points, zones, marks, terminal, reverse=False, lift_phase=None, initial_yaw=None,corner_trim_caps=None):
+    def _drive(self, vehicle, level, points, zones, marks, terminal, reverse=False, lift_phase=None,
+               initial_yaw=None, corner_trim_caps=None, *, variable_corner_speed=False):
         trim = self.trim_mm
         path = _path(points, trim,corner_trim_caps)
         if initial_yaw is not None:
@@ -323,6 +324,8 @@ class MissionPlanner:
                   'reverse': reverse, 'allow_lift': lift_phase is not None,
                   'corner_trim_mm': trim, 'prefetch_level': terminal.get('to_level', level)}
         if path.corner_trim_caps:action['corner_trim_caps']=copy.deepcopy(path.corner_trim_caps)
+        if variable_corner_speed:
+            action['variable_corner_speed'] = True
         if lift_phase is not None:
             action['lift_phase'] = copy.deepcopy(lift_phase)
             action['port_id'] = lift_phase['start_port' if lift_phase['kind'] == 'boarding' else 'destination_port']
@@ -484,10 +487,27 @@ class MissionPlanner:
             waiting_slot=next((i for i,wait in enumerate(self.nav.waits[own['level']])if _same(wait[:2],own['pose_mm_rad'][:2])),None)
             if waiting_slot is None:raise ValueError('Boarding requires the actual own source waiting pose')
             geometry=self.port_paths.boarding(own['level'],waiting_slot,slot,self.cabin_lanes_override)
-            return self._drive(own['vehicle_id'],own['level'],geometry['points_mm'],[],[],
+            points, caps = geometry['points_mm'], geometry['corner_trim_caps']
+            settings = getattr(self, 'ground_boarding', None)
+            diagonal = (settings is not None and own['level'] == self.source['depot']['level']
+                        and waiting_slot == settings['waiting_slot'] and slot == settings['cabin_slot'])
+            if diagonal:
+                wait, inside = points[0], points[-2]
+                outward = math.copysign(1., port['exit_eye_mm'][0]-port['plane_x_mm'])
+                lead = wait[0]-outward*settings['departure_lead_mm']
+                align = port['plane_x_mm']+outward*settings['alignment_from_port_mm']
+                crossing_y = park[1]+settings['aperture_center_fraction']*(port['cabin_entry_mm'][1]-park[1])
+                if outward*(lead-align) <= 0 or outward*(align-inside[0]) <= 0:
+                    raise ValueError('Diagonal boarding needs a lead on the landing and a lane alignment inside')
+                # Blend the diagonal into a near-axial aperture crossing.
+                # The original cabin alignment and parking heading are retained.
+                points = [wait, [lead, wait[1]], [align, crossing_y], inside, park]
+                caps = []
+            return self._drive(own['vehicle_id'],own['level'],points,[],[],
                 {'kind':'cabin_park','slot':slot,'from_level':own['level'],
                  'to_level':next(p['level_id']for p in self.ports.values()if p['id']==meta['destination_port'])},
-                lift_phase=meta,initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=geometry['corner_trim_caps'])
+                lift_phase=meta,initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=caps,
+                variable_corner_speed=diagonal)
         x, _ = self._inside_align(port); centre_y = port['cabin_entry_mm'][1]
         outside = port['plane_x_mm']+(1 if port['exit_eye_mm'][0] > port['plane_x_mm'] else -1)*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
         points = []; _append(points, [own['pose_mm_rad'][:2], [outside, own['pose_mm_rad'][1]],

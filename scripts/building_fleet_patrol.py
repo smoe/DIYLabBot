@@ -252,6 +252,7 @@ class PatrolWorldRunner(WorldRunner):
         self.dt = control_step_s(runtime_source)
         if self.dt > .05:
             self.planner.smooth_live_lift_wait = True
+            self.planner.ground_boarding = self.profile['patrol'].get('ground_boarding')
         self._last_control_start_s = -.05
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex
