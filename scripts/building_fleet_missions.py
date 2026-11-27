@@ -55,6 +55,19 @@ def inspection_variants(inspection):
     return variants
 
 
+def _diagonal_port_points(wait, inside, park, port, settings):
+    """Build the landing and lane transition in boarding point order."""
+    outward = math.copysign(1., port['exit_eye_mm'][0]-port['plane_x_mm'])
+    lead = wait[0]-outward*settings['departure_lead_mm']
+    align = port['plane_x_mm']+outward*settings['alignment_from_port_mm']
+    crossing_y = park[1]+settings['aperture_center_fraction']*(port['cabin_entry_mm'][1]-park[1])
+    if outward*(lead-align) <= 0 or outward*(align-inside[0]) <= 0:
+        raise ValueError('Diagonal port route needs a lead on the landing and a lane alignment inside')
+    # The motion compiler blends the landing turn into a near-axial
+    # aperture crossing and retains both source headings.
+    return [wait, [lead, wait[1]], [align, crossing_y], inside, park]
+
+
 def waypoint_progress(path, points):
     """Monotone event locations on the actual shared Path pieces.
 
@@ -492,16 +505,7 @@ class MissionPlanner:
             diagonal = (settings is not None and own['level'] == self.source['depot']['level']
                         and waiting_slot == settings['waiting_slot'] and slot == settings['cabin_slot'])
             if diagonal:
-                wait, inside = points[0], points[-2]
-                outward = math.copysign(1., port['exit_eye_mm'][0]-port['plane_x_mm'])
-                lead = wait[0]-outward*settings['departure_lead_mm']
-                align = port['plane_x_mm']+outward*settings['alignment_from_port_mm']
-                crossing_y = park[1]+settings['aperture_center_fraction']*(port['cabin_entry_mm'][1]-park[1])
-                if outward*(lead-align) <= 0 or outward*(align-inside[0]) <= 0:
-                    raise ValueError('Diagonal boarding needs a lead on the landing and a lane alignment inside')
-                # Blend the diagonal into a near-axial aperture crossing.
-                # The original cabin alignment and parking heading are retained.
-                points = [wait, [lead, wait[1]], [align, crossing_y], inside, park]
+                points = _diagonal_port_points(points[0], points[-2], park, port, settings)
                 caps = []
             return self._drive(own['vehicle_id'],own['level'],points,[],[],
                 {'kind':'cabin_park','slot':slot,'from_level':own['level'],
@@ -530,12 +534,24 @@ class MissionPlanner:
             if waiting.get('status')!='granted'or waiting.get('level')!=own['level']:
                 raise ValueError('An arrival requires its own preallocated destination bay')
             slot=waiting['slot'];geometry=self.port_paths.alighting(own['level'],slot,meta['slot'],self.cabin_lanes_override)
-            marks=[{'point_index':geometry['body_clear_waypoint_on_reverse'],'event':'lift_exited',
+            points, caps = geometry['points_mm'], geometry['corner_trim_caps']
+            body_clear = geometry['body_clear_waypoint_on_reverse']
+            settings = getattr(self, 'basement_alighting', None)
+            diagonal = (settings is not None and own['level'] == 'KG' and meta['same_side']
+                        and slot == settings['waiting_slot'] and meta['slot'] == settings['cabin_slot'])
+            if diagonal:
+                points = list(reversed(_diagonal_port_points(points[-1], points[1], points[0], port, settings)))
+                caps = []
+                # Acknowledge after the final landing blend. The runner
+                # independently checks actual body clearance and its scan.
+                body_clear = len(points)-2
+            marks=[{'point_index':body_clear,'event':'lift_exited',
                 'details':{'direction':'reverse'if meta['same_side']else'forward'}}]
             if meta['same_side']:
-                return self._drive(own['vehicle_id'],own['level'],geometry['points_mm'],[],marks,
+                return self._drive(own['vehicle_id'],own['level'],points,[],marks,
                     {'kind':'same_side_exit_stop','level':own['level'],'slot':slot},True,meta,
-                    initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=geometry['corner_trim_caps'])
+                    initial_yaw=own['pose_mm_rad'][2],corner_trim_caps=caps,
+                    variable_corner_speed=diagonal)
             failures=[]
             for approach in self.wait_approaches[own['level'],slot]:
                 prefix=copy.deepcopy(geometry['points_mm']);_append(prefix,list(reversed(approach)))
