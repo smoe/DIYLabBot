@@ -268,7 +268,9 @@ zwei semantische `camera`-Operationen. FreeCAD, SolidCraft und RViz erhalten
 daraus Kamerabauräume, provisorische Halter und durchsichtige Sichtkegel.
 Kameraartikel, fertigungstaugliche Befestigungen und reale Sichtfelder sind
 weiterhin nicht ausgewählt oder qualifiziert. Stationäre Kameras bleiben
-außerhalb dieses Armaufbaus.
+außerhalb dieses Armaufbaus. Ihre [eigenständigen Modelle](stationary-cameras.md)
+verwenden ein gemeinsames Kameragehäuse und wahlweise einen starren Halter
+oder einen schwenk- und neigbaren Kopf.
 
 | Rolle | Vorläufiger Montagebereich | Bildaufgabe |
 |---|---|---|

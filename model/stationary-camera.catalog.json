@@ -1,0 +1,30 @@
+{
+  "format": "solidcraftbot.stationary-camera/1",
+  "status": "concept_not_for_manufacture",
+  "units": {"length": "mm", "angle": "deg"},
+  "variants": ["fixed", "pan_tilt"],
+  "parameters": {
+    "base_depth": {"expression": 92, "unit": "mm", "range": [84, 100], "description": "Mounting plate depth"},
+    "base_width": {"expression": 94, "unit": "mm", "range": [90, 104], "description": "Mounting plate width"},
+    "base_height": {"expression": 8, "unit": "mm", "range": [6, 10], "description": "Mounting plate thickness"},
+    "head_depth": {"expression": 52, "unit": "mm", "range": [48, 58], "description": "Common camera housing depth"},
+    "head_width": {"expression": 52, "unit": "mm", "range": [48, 56], "description": "Common camera housing width"},
+    "head_height": {"expression": 36, "unit": "mm", "range": [32, 40], "description": "Common camera housing height"},
+    "lens_radius": {"expression": 12, "unit": "mm", "range": [10, 14], "description": "Illustrative lens radius"},
+    "lens_depth": {"expression": 8, "unit": "mm", "range": [6, 10], "description": "Illustrative lens projection"},
+    "pivot_z": {"expression": 72, "unit": "mm", "range": [69, 78], "description": "Optical centre and tilt axis height"},
+    "turret_radius": {"expression": 26, "unit": "mm", "range": [25, 29], "description": "Pan turntable radius"},
+    "turret_height": {"expression": 12, "unit": "mm", "range": [10, 14], "description": "Pan turntable height"},
+    "yoke_thickness": {"expression": 6, "unit": "mm", "range": [5, 7], "description": "Yoke cheeks and bridge thickness"},
+    "yoke_clearance": {"expression": 4, "unit": "mm", "range": [3, 5], "description": "Illustrative gap on each side of the head"},
+    "yoke_depth": {"expression": 20, "unit": "mm", "range": [18, 22], "description": "Yoke profile depth"},
+    "pin_radius": {"expression": 5, "unit": "mm", "range": [4, 6], "description": "Illustrative tilt pivot envelope"},
+    "pan_travel": {"expression": 120, "unit": "deg", "range": [90, 150], "description": "Concept rotation around vertical axis"},
+    "tilt_travel": {"expression": 55, "unit": "deg", "range": [40, 60], "description": "Concept downward tilt from level"}
+  },
+  "limitations": [
+    "Illustrative camera bodies and mechanical envelopes with synthetic travel limits.",
+    "The optical frame defines aim. No sensor, calibration, image feed, lens selection or field coverage is qualified.",
+    "No actuators, cable routing, mounting strength, continuous clearance or manufacturing release."
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stationary-camera.schema.json",
+  "title": "Stationary camera concept family",
+  "type": "object",
+  "required": ["format", "status", "units", "variants", "parameters", "limitations"],
+  "additionalProperties": false,
+  "properties": {
+    "format": {"const": "solidcraftbot.stationary-camera/1"},
+    "status": {"const": "concept_not_for_manufacture"},
+    "units": {"const": {"length": "mm", "angle": "deg"}},
+    "variants": {"const": ["fixed", "pan_tilt"]},
+    "parameters": {
+      "type": "object",
+      "required": ["base_depth", "base_width", "base_height", "head_depth", "head_width", "head_height", "lens_radius", "lens_depth", "pivot_z", "turret_radius", "turret_height", "yoke_thickness", "yoke_clearance", "yoke_depth", "pin_radius", "pan_travel", "tilt_travel"],
+      "minProperties": 17,
+      "maxProperties": 17,
+      "additionalProperties": {"$ref": "#/$defs/parameter"}
+    },
+    "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+  },
+  "$defs": {
+    "parameter": {
+      "type": "object",
+      "required": ["expression", "unit", "range", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "expression": {"type": "number", "exclusiveMinimum": 0},
+        "unit": {"enum": ["mm", "deg"]},
+        "range": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "exclusiveMinimum": 0}},
+        "description": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}
