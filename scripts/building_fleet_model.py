@@ -166,6 +166,20 @@ def patrol_policy(profile):
                 or type(diagonal[fraction]) not in (int, float) or not 0 < diagonal[fraction] <= 1):
             raise ValueError('Invalid live diagonal lift route: '+name)
         expected[name] = diagonal
+    if 'basement_departure' in policy:
+        departure = policy['basement_departure']
+        if (timing is None or type(departure) is not dict or set(departure) != {
+                'waiting_slot', 'target_area', 'join_route_index', 'turn_offset_mm', 'inspection_variant'}
+                or type(departure['target_area']) is not str
+                or not re.fullmatch(r'K0_[0-9]+', departure['target_area'])
+                or any(type(departure[key]) is not int or departure[key] < 0
+                       for key in ('waiting_slot', 'join_route_index', 'inspection_variant'))
+                or departure['join_route_index'] == 0
+                or type(departure['turn_offset_mm']) is not list or len(departure['turn_offset_mm']) != 2
+                or any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0
+                       for value in departure['turn_offset_mm'])):
+            raise ValueError('Invalid live basement waiting-bay departure')
+        expected['basement_departure'] = departure
     if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
         raise ValueError('Unsupported continuous empty-patrol policy')
     return policy

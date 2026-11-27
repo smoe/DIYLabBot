@@ -380,7 +380,32 @@ class MissionPlanner:
         # floor support, resource spans and controller braking certificates.
         return points[:removed]+points[removed+1:]
 
-    def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None,prefix_caps=None):
+    def _shorten_basement_departure(self, points, zones, prefix_count, settings):
+        """Bypass the hub while keeping the door lead and other reserved bays clear."""
+        join = prefix_count - 1 + settings['join_route_index']
+        if join < 3 or join >= len(points) - 1 or any(zone['start_index'] < join for zone in zones):
+            return points
+        lead = points[1]
+        port = self.ports['KG']
+        outward = math.copysign(1., port['exit_eye_mm'][0] - port['plane_x_mm'])
+        offset_x, offset_y = settings['turn_offset_mm']
+        shoulder = [lead[0] + outward * offset_x, lead[1] + offset_y]
+        if outward * (points[join][0] - lead[0]) <= 0:
+            return points
+        proposed = [points[0], lead, shoulder, *points[join:]]
+        others = [polygon for i, polygon in enumerate(self.nav.waiting_bay_polygons['KG'])
+                  if i != settings['waiting_slot']]
+        required = self.nav.reserve + self.port_paths.mesh_error + self.nav.navigation_margin_mm
+        if others and not self.port_paths._bay_sweep_clear(proposed[:5], others, required):
+            return points
+        # Keep distributed resource boundaries on their original source waypoints.
+        for zone in zones:
+            zone['start_index'] += 3 - join
+            zone['end_index'] += 3 - join
+        return proposed
+
+    def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None, prefix_caps=None,
+                   basement_departure=None):
         vehicle, level = own['vehicle_id'], own['level']; state = self.states[vehicle]
         queue = [m for m in state['queue'] if m['mission_id'] not in state['completed']]
         inspections = []; boundary = None
@@ -415,6 +440,11 @@ class MissionPlanner:
         if not prefix and self._home_observed(own):
             _append(initial, [self.nav.homes[vehicle]['departure_xy_mm']])
         choices = [self.variants[level, m['goal']['area']] for m in inspections]
+        if basement_departure and choices:
+            preferred = basement_departure['inspection_variant']
+            variants = choices[0]
+            if preferred < len(variants):
+                choices[0] = [variants[preferred], *variants[:preferred], *variants[preferred+1:]]
         # Every choice follows source route/inspection pieces. Reject cusps,
         # rather than creating a stop at a mission or arbitrary waypoint.
         failures = []
@@ -426,6 +456,8 @@ class MissionPlanner:
                         route = self.graph.route(level, points[-1], loop[0])
                         offset = _append(points, route['points_mm'])
                         zones.extend({**z, 'start_index': z['start_index']+offset, 'end_index': z['end_index']+offset} for z in route.get('zone_segments', []))
+                        if basement_departure and mission is inspections[0]:
+                            points = self._shorten_basement_departure(points, zones, len(initial), basement_departure)
                         before_loop=len(points)-1;_append(points, loop)
                         witness_index=len(points)-1
                         if hasattr(self.nav,'polygons'):
@@ -608,7 +640,18 @@ class MissionPlanner:
                 departure=self.port_paths.waiting_departure(own['level'],slot)
                 if not _same(departure['points_mm'][0],own['pose_mm_rad'][:2]):
                     raise ValueError('Waiting departure must begin at the observed own bay')
-                return self._floor_leg(own,own_grants,departure['points_mm'],prefix_caps=departure['corner_trim_caps'])
+                settings = getattr(self, 'basement_departure', None)
+                waiting = own_grants.get('waiting_place', {})
+                use_shorter_departure = (
+                    settings and terminal['kind'] == 'same_side_exit_stop'
+                    and own['level'] == goal['level'] == waiting.get('level') == 'KG'
+                    and goal['kind'] == 'inspection_pass' and goal['area'] == settings['target_area']
+                    and slot == settings['waiting_slot'] == waiting.get('slot')
+                    and waiting.get('status') == 'granted' and waiting.get('role') == 'start'
+                    and not departure['corner_trim_caps'])
+                return self._floor_leg(own, own_grants, departure['points_mm'],
+                                       prefix_caps=departure['corner_trim_caps'],
+                                       basement_departure=settings if use_shorter_departure else None)
             port = self.ports[own['level']]; direction = 1 if math.cos(wait[2]) > 0 else -1
             clear_x = port['plane_x_mm']-direction*(port['wall_thickness_mm']/2+self.nav.radius+self.nav.reserve+self.nav.navigation_margin_mm)
             hub = self.nav.road_hubs[own['level']]
