@@ -252,6 +252,28 @@ simulierter Haubenabnahme. Ein Gefäß behält seinen Körper vom Dock über
 Greifer und Stößel bis in den Rotor. Die Anzeige weist Modellzeit und
 Wiedergabefaktor getrennt aus.
 
+### Rückgabe an TR01 und Wende im Gang
+
+ArmC wartet zwischen den Übergaben angewinkelt. Die Bahnquelle definiert
+diese Grundstellung für die Bewegung auf der unveränderten CAD-Referenz.
+Beim Rückzug erreicht der Greifer sie nach dem Ausfahren entlang der
+Rotorsitzachse auf dem kürzeren Bogen am offenen Deckel vorbei. Die numerisch
+abgetastete Kopfstrecke beträgt dafür rund 470 mm in rund 12 s Modellzeit
+je Tube. Zuvor lag sie bei rund 1.880 mm in rund 58 s. Die beladene Bahn
+benötigt rund 21 s bis zur Stößelablage. Die vorhandenen Gelenk- und
+Gefäßgrenzen gelten weiter.
+
+Nach dem bestätigten Stillstand bringt ArmC die Tubes in umgekehrter
+Reihenfolge in ihre ursprünglichen Kassettenplätze zurück. Der native
+Prüfer prüft dazu die exakte Zeitumkehr von Arm und Greifer bei derselben
+Belegung und denselben mechanischen Zuständen an den Übergaben. Nach
+Rückgabe beider Tubes und simulierter Bestätigung der Haube fährt TR01
+automatisch los. Der [Rundlauf](../model/lab3003-tr01-return-lap.motion.json)
+enthält eine 180°-Drehung im Gang. Am selben Dock steht TR01 anschließend
+entgegengesetzt, sodass die bearbeiteten Tubes auf der anderen Seite der
+Dockpose stehen. Der Export prüft die zugehörigen Nachweise für Armfahrt,
+Fahrzeugabstand und Bodenunterstützung vor dem Einbetten.
+
 Im Rundgang starten der Kühlschrank und der Gefrierschrank im Labor sowie
 beide Küchenkühlschränke geschlossen. Ihre Türen lassen sich per Klick oder
 Leertaste öffnen und schließen. Beim Gefrierschrank muss die Außentür offen
