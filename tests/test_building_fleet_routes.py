@@ -112,10 +112,14 @@ class WaitingBayTests(unittest.TestCase):
         n.envelope={'length_mm':512,'width_mm':412};n.waits={'EG':[[3500,3000,0],[3500,4500,0]]}
         n.grids={'EG':grid(8000,9000)}
         n.polygons={'EG':{'C':[[0,0],[8000,0],[8000,9000],[0,9000]]}}
-        n.topological={'EG':{'landing_neighbors':{'P':['C']}}}
+        n.topological={'EG':{'landing_neighbors':{'P':['C'], 'Q':['C']}}}
+        n.config={'lift':{'route_sides':{'EG':'inward'}}}
         from types import SimpleNamespace
-        n.mesh=SimpleNamespace(manifest={'elevator':{'ports':[{'id':'P','active':True,'level_id':'EG',
-            'cabin_entry_mm':[1000,3750,0],'exit_eye_mm':[2500,3750,0]}]}})
+        n.mesh=SimpleNamespace(manifest={'elevator':{'ports':[
+            {'id':'P','active':True,'level_id':'EG','side':'inward',
+             'cabin_entry_mm':[1000,3750,0],'exit_eye_mm':[2500,3750,0]},
+            {'id':'Q','active':True,'level_id':'EG','side':'outward',
+             'cabin_entry_mm':[1000,3750,0],'exit_eye_mm':[500,3750,0]}]}})
         n._derive_waiting_bays();hub=n.road_hubs['EG']
         self.assertTrue(all(p[2]==math.pi for p in n.waits['EG']))
         for poly in n.waiting_bay_polygons['EG']:
