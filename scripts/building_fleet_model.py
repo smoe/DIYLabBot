@@ -152,18 +152,20 @@ def patrol_policy(profile):
                 'selection': 'oldest_received_visit'}
     if 'corner_timing' in policy:
         expected['corner_timing'] = 'variable_progress'
-    if 'ground_boarding' in policy:
-        boarding = policy['ground_boarding']
+    for name in ('ground_boarding', 'basement_alighting'):
+        if name not in policy:
+            continue
+        diagonal = policy[name]
         slots = ('waiting_slot', 'cabin_slot')
         distances = ('departure_lead_mm', 'alignment_from_port_mm')
         fraction = 'aperture_center_fraction'
-        if (timing is None or type(boarding) is not dict or set(boarding) != {*slots, *distances, fraction}
-                or any(type(boarding[name]) is not int or boarding[name] < 0 for name in slots)
-                or any(type(boarding[name]) not in (int, float) or not math.isfinite(boarding[name])
-                       or boarding[name] <= 0 for name in distances)
-                or type(boarding[fraction]) not in (int, float) or not 0 < boarding[fraction] <= 1):
-            raise ValueError('Invalid live ground-floor boarding route')
-        expected['ground_boarding'] = boarding
+        if (timing is None or type(diagonal) is not dict or set(diagonal) != {*slots, *distances, fraction}
+                or any(type(diagonal[key]) is not int or diagonal[key] < 0 for key in slots)
+                or any(type(diagonal[key]) not in (int, float) or not math.isfinite(diagonal[key])
+                       or diagonal[key] <= 0 for key in distances)
+                or type(diagonal[fraction]) not in (int, float) or not 0 < diagonal[fraction] <= 1):
+            raise ValueError('Invalid live diagonal lift route: '+name)
+        expected[name] = diagonal
     if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
         raise ValueError('Unsupported continuous empty-patrol policy')
     return policy

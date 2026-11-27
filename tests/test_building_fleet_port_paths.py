@@ -80,6 +80,41 @@ class PortPathTests(unittest.TestCase):
         self.assertEqual(previous['points_mm'],
                          helper.boarding('EG', 0, 1, planner.cabin_lanes_override)['points_mm'])
 
+    def test_basement_diagonal_exit_keeps_open_port_and_body_clear_observation(self):
+        planner, nav, helper = setup()
+        port = dict(planner.ports['EG'], id='KG.in', level_id='KG')
+        planner.ports['KG'] = port
+        nav.waits['KG'] = copy.deepcopy(nav.waits['EG'])
+        helper.open_leaves['KG'] = helper.open_leaves['EG']
+        planner.basement_alighting = {'waiting_slot': 0, 'cabin_slot': 0,
+                                      'departure_lead_mm': 3, 'alignment_from_port_mm': 240,
+                                      'aperture_center_fraction': .25}
+        bay = nav.waits['KG'][0]
+        lane = planner.cabin_lanes_override[0]['pose_mm']
+        car = own(nav, level='KG', home=False, aboard=True, pose_mm_rad=[*lane[:2], bay[2]])
+        grant = {'status': 'assigned', 'slot': 0, 'start_port': 'EG.in',
+                 'destination_port': 'KG.in', 'exit_ready': True}
+        waiting = {'status': 'granted', 'level': 'KG', 'slot': 0, 'pose_mm': bay, 'role': 'destination'}
+        action = planner._alight(car, {'lift': grant, 'waiting_place': waiting})
+        old = helper.alighting('KG', 0, 0, planner.cabin_lanes_override)
+        port_y = lane[1] + .25*(port['cabin_entry_mm'][1]-lane[1])
+        self.assertEqual(action['points_mm'], [lane[:2], old['points_mm'][1], [2820, port_y],
+                                               [bay[0]-3, bay[1]], bay[:2]])
+        self.assertTrue(action['reverse'])
+        self.assertTrue(action['variable_corner_speed'])
+        self.assertEqual(action['lift_phase']['destination_port'], 'KG.in')
+        self.assertEqual(action['terminal'], {'kind':'same_side_exit_stop','level':'KG','slot':0})
+        mark, = action['markers']
+        self.assertEqual(mark['event'], 'lift_exited')
+        self.assertEqual(mark['details'], {'direction':'reverse'})
+        path = OwnPath(action['points_mm'], action['corner_trim_mm'])
+        x, _, yaw = path.evaluate(mark['progress_mm'])[0]
+        nose = x - abs(math.cos(yaw))*nav.envelope['length_mm']/2 - abs(math.sin(yaw))*nav.envelope['width_mm']/2
+        self.assertGreater(nose, port['plane_x_mm'] + port['wall_thickness_mm']/2 + nav.reserve)
+        self.assertLess(mark['progress_mm'], path.length)
+        self.assertAlmostEqual(path.evaluate(path.length)[0][2] + math.pi, bay[2])
+        self.assertEqual(planner._alight(car, {'lift':dict(grant, exit_ready=False), 'waiting_place':waiting})['kind'], 'hold')
+
     def test_all_fixed_port_and_owned_wait_departures_are_prepared_before_runtime(self):
         planner,nav,helper=setup();routes=planner.prepared_routes()
         for level in nav.waits:

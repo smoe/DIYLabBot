@@ -253,6 +253,7 @@ class PatrolWorldRunner(WorldRunner):
         if self.dt > .05:
             self.planner.smooth_live_lift_wait = True
             self.planner.ground_boarding = self.profile['patrol'].get('ground_boarding')
+            self.planner.basement_alighting = self.profile['patrol'].get('basement_alighting')
         self._last_control_start_s = -.05
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex
