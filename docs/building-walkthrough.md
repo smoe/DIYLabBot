@@ -88,7 +88,18 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
   Alt kann auch während einer gehaltenen Pfeiltaste gedrückt oder losgelassen
   werden; die Steuerung wechselt unmittelbar zwischen Drehen und Seitwärtsgehen.
 - **Ziehen** mit Maus oder Finger ändert weiterhin die Blickrichtung.
-- **Q / E** bewegen die Kamera senkrecht; **Shift** beschleunigt das Gehen.
+- Die innere Treppe zwischen Keller und 3. OG und die äußere Fluchttreppe
+  zwischen EG und Dach lassen sich mit den Gehtasten in beide Richtungen
+  benutzen. Die Kamera folgt den modellierten Stufen und Podesten. An den
+  Zwischenpodesten in den nächsten Lauf wenden. Türen zum Betreten oder
+  Verlassen öffnen. Wenn ein offener Türflügel den Wechsel zwischen zwei
+  Läufen versperrt, den Flügel vom Podest aus schließen.
+  Die Fluchttreppe ist vom Flur im 1. OG zugänglich. Ihr unterstes Podest
+  liegt im verglasten EG-Bereich; dort ist in der aktuellen Geometrie keine
+  Tür nach draußen modelliert.
+- **Q / E** senken beziehungsweise heben die Kamera manuell. **Shift**
+  erhöht Gehgeschwindigkeit und senkrechte Geschwindigkeit um den Faktor
+  2,4. Beim Mitfahren bleibt die Kamerahöhe an die Aufzugskabine gebunden.
 - Die Bildschirmknöpfe verschieben die Kamera auch auf Touchgeräten; zum
   Umschauen ziehen. Die seitlichen Knöpfe sind als „Strafe left/right“ bezeichnet.
 - In Eingabefeldern und der Geschossauswahl steuern die Tasten die jeweiligen
@@ -115,7 +126,12 @@ beiden Wegen.
 Die Ortsknöpfe sind Blickpunktwechsel, keine berechneten Gehwege. Freie
 Verschiebungen verwenden die oben beschriebene Kamerakugel-Prüfung an den
 nativen Flächen. Sie ist keine menschliche Körperhülle und kein Nachweis
-realer Begehbarkeit.
+realer Begehbarkeit. Die Treppennavigation verwendet obere, waagerechte
+Flächen der nativen Stufen, Geschossplatten und Dachpodeste. Die Schrittgrenze
+von 250 mm dient der Browsernavigation. Fluchtwege, Kopffreiheit und Robotik
+erfordern eigene Nachweise. Der Test
+`node tests/check_walkthrough_stairs.cjs <index.html>` prüft beide Treppen in
+den nativen Dreiecken eines vollständigen Rundgangexports.
 
 ## Gemeinsame Gebäudeszene und Laborbindung
 

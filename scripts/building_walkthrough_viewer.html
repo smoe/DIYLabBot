@@ -42,7 +42,7 @@
   </header>
   <nav class="places" id="walkthrough-stops" aria-label="Room viewpoints"></nav>
   <section class="stage" id="walkthrough-stage" aria-label="Interactive building model">
-    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. W or Up and S or Down move forward and backward. Left and Right turn; Alt or Option plus Left or Right, or A and D, move sideways. Drag to look, Q or E change height, Shift walks faster. Click a nearby door or window, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
+    <canvas id="walkthrough-canvas" tabindex="0" aria-label="3D building view. W or Up and S or Down move forward and backward, including on stairs. Left and Right turn; Alt or Option plus Left or Right, or A and D, move sideways. Drag to look. Q moves down and E moves up. Shift speeds up walking and height changes. Click a nearby door or window, or face it and press Space, to open or close it." aria-describedby="walkthrough-help"></canvas>
     <div class="caption"><strong id="walkthrough-location">Loading model…</strong><span id="walkthrough-context"></span></div>
     <button class="fullscreen" id="walkthrough-fullscreen" type="button" aria-label="Enter full screen" title="Full screen">⛶</button>
     <div class="crosshair" aria-hidden="true"></div>
@@ -114,7 +114,7 @@
       <label class="visually-hidden" for="walkthrough-level">Building level</label>
       <select class="level-select" id="walkthrough-level" aria-label="Building level"></select>
     </div>
-    <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: walk faster &nbsp; · &nbsp; Tür/Fenster anklicken · nahe Tür/Fenster: Leertaste</div>
+    <div class="help" id="walkthrough-help">W / ↑, S / ↓: walk (including stairs) &nbsp; · &nbsp; ← / →: turn &nbsp; · &nbsp; Alt / Option + ← / → or A / D: strafe &nbsp; · &nbsp; Drag: look &nbsp; · &nbsp; Q / E: down / up &nbsp; · &nbsp; Shift: faster walking and height changes &nbsp; · &nbsp; Tür/Fenster anklicken · nahe Tür/Fenster: Leertaste</div>
   </div>
   <p class="help" id="walkthrough-lab-route" hidden>Vom Doktorandenraum rückwärts in den Flur gehen. Dann nach rechts zur ersten Tür mit dem Schild „3.003 Labor“ und dort eintreten.</p>
   <p class="notice" id="walkthrough-notice">Concept building geometry. Lab 3.003 belongs to this building scene; its room binding is a presentation assumption, not surveyed registration. The elevator is a browser presentation, not a real lift controller.</p>
@@ -532,10 +532,13 @@ __WALKTHROUGH_SEMINAR__</script>
       }
       uploadBuffer(gl.ELEMENT_ARRAY_BUFFER,combined);
       const nav=data.navigation;if(!nav)throw Error('Source-bound camera collision profile required.');
+      const collisionGroups=source.groups.filter(g=>!omitted.has(g.id)&&g.index_count);
       const collider=complete?null:WalkthroughInteraction.createCameraCollider({positions,indices,
-        groups:source.groups.filter(g=>!omitted.has(g.id)&&g.index_count),radius:nav.camera_radius_mm/1000,
+        groups:collisionGroups,radius:nav.camera_radius_mm/1000,
         margin:nav.contact_margin_mm/1000,iterations:nav.max_contact_iterations,slides:nav.max_slides});
-      const result={collider,picker:complete?null:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};
+      const stairs=complete||id!=='building'||isolated?null:
+        WalkthroughInteraction.createStairWalker({positions,indices,groups:collisionGroups,eyeHeight});
+      const result={collider,picker:complete?null:WalkthroughInteraction.createPicker({positions,indices,groups:pickGroups}),stairs,vao,opaque:[...opaque.values(),...movingOpaque],transparent,triangles:length/3,nativeGroups:source.groups.length,opacityOverrides};
       sceneCache.set(key,result);
       if(complete)performance.measure('walkthrough-monitor-scene-preparation',{start:started,end:performance.now()});
       return result;
@@ -860,20 +863,36 @@ __WALKTHROUGH_SEMINAR__</script>
         r=(held('right')||strafe&&held('turnRight')?1:0)-(held('left')||strafe&&held('turnLeft')?1:0),
         z=elevator?.boarded?0:(held('up')?1:0)-(held('down')?1:0);
       const length=Math.hypot(f,r);if(length>1){f/=length;r/=length;}
-      const speed=walkSpeed*(held('fast')?2.4:1),dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
-      const delta=[dx*speed*seconds,dy*speed*seconds,z*verticalSpeed*seconds];
+      const speedFactor=held('fast')?2.4:1,dx=Math.cos(yaw)*f+Math.sin(yaw)*r,dy=Math.sin(yaw)*f-Math.cos(yaw)*r;
+      const delta=[dx*walkSpeed*seconds*speedFactor,dy*walkSpeed*seconds*speedFactor,z*verticalSpeed*seconds*speedFactor];
       if(f||r||z){
         const before=eye.map(v=>v*1000);
         const barriers=sceneId==='building'&&elevator?elevator.walkingBarriers().map(b=>({id:b.id,min:b.min.map(v=>v/1000),max:b.max.map(v=>v/1000)})):[];
-        const result=prepareScene(sceneId).collider.move(eye,delta,{barriers,transformsForBody:id=>{
+        const scene=prepareScene(sceneId);
+        const options={barriers,transformsForBody:id=>{
           if(cf01?.hidden(id))return [];
           const owner=bodyOwners.get(sceneId+':'+id);if(!owner)return [null];
           const transforms=[objectMatrix(owner)];
           // During a door transition keep the doorway guarded until fully open.
           if(['room_door','lift_door','window'].includes(owner.config.mechanism)&&owner.transition)transforms.push(objectMatrix(owner,true));
           return transforms;
-        }});
+        }};
+        const result=scene.stairs&&!elevator?.boarded
+          ?scene.stairs.move(eye,delta,scene.collider,options):scene.collider.move(eye,delta,options);
         eye=result.eye;root.dataset.cameraBlocked=String(result.contacts.length>0);
+        if(result.support){
+          const height=result.support.height*1000;
+          const level=levels.find(item=>Math.abs(item.z_mm-height)<1);
+          const arrival=level?.id||(result.support.roof?'ROOF':null);
+          if(arrival&&arrival!==selectedLevel){
+            if(arrival==='ROOF'&&!levelSelect.querySelector('[value="ROOF"]')){
+              const option=document.createElement('option');option.value=arrival;option.textContent='Roof';option.disabled=true;levelSelect.append(option);
+            }
+            selectedLevel=arrival;levelSelect.value=arrival;
+            locationLabel.textContent='Free camera · '+(level?.label||'Roof');contextLabel.textContent='Building · concept geometry';
+            announcement.textContent=locationLabel.textContent;
+          }
+        }
         if(elevator&&sceneId==='building'){const movement=elevator.walkStep(before,eye.map(v=>v*1000));if(movement.status==='walked_out'){selectedLevel=movement.level_id;levelSelect.value=selectedLevel;locationLabel.textContent='Free camera · '+selectedLevel;contextLabel.textContent='Building';}syncLiftCamera();}
       }
       if(f||r||z){root.dataset.freeCamera='true';dirty=true;}

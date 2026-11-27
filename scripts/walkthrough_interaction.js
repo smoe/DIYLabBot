@@ -319,6 +319,66 @@
     }
     return {move,firstHit};
   }
-  const api={createPicker,jointMatrix,commandBlockers,createLiftDoorCycle,createLiftSession,createCameraCollider};
+  // Stair following is a visitor-camera aid. Use the same native surfaces as
+  // the camera collider, and keep free movement elsewhere in the building.
+  function createStairWalker({positions,indices,groups,eyeHeight}){
+    const stairRoles=new Set(['concept_continuous_stair','concept_external_metal_stair','concept_external_stair_landing']);
+    const floorRoles=new Set(['concept_storey_slab','concept_roof_slab','concept_roof_access_deck']);
+    const stepLimit=.25,stepSpacing=.08,contactTolerance=.002,meshTolerance=1e-5;
+    const bounds=[],surfaces=[],roofHeights=new Set();
+    for(const group of groups){
+      const stair=stairRoles.has(group.role);
+      if(!group.index_count||!stair&&!floorRoles.has(group.role))continue;
+      if(stair)bounds.push(group.bounds_mm);
+      if(group.role==='concept_roof_access_deck')roofHeights.add(group.bounds_mm.max[2]/1000);
+      for(let i=group.index_start;i<group.index_start+group.index_count;i+=3){
+        const [a,b,c]=[indices[i],indices[i+1],indices[i+2]].map(j=>Array.from(positions.slice(3*j,3*j+3)));
+        if(Math.max(Math.abs(b[2]-a[2]),Math.abs(c[2]-a[2]))>meshTolerance)continue;
+        if(cross(sub(b,a),sub(c,a))[2]<=0)continue;
+        surfaces.push({edges:[[a,b],[b,c],[c,a]],height:a[2],stair,body_id:group.id});
+      }
+    }
+    function support(x,y,height,tolerance){
+      let best=null;
+      for(const surface of surfaces){
+        if(Math.abs(surface.height-height)>tolerance||best&&surface.height<=best.height)continue;
+        if(surface.edges.every(([a,b])=>(b[0]-a[0])*(y-a[1])-(b[1]-a[1])*(x-a[0])>=-meshTolerance*Math.hypot(b[0]-a[0],b[1]-a[1])))
+          best=surface;
+      }
+      return best;
+    }
+    function move(start,delta,collider,options){
+      const nearStair=bounds.some(b=>start.every((v,i)=>{
+        const a=(i===2?v-eyeHeight:v)*1000,end=a+delta[i]*1000,margin=i===2?stepLimit*1000:meshTolerance*1000;
+        return Math.min(a,end)<=b.max[i]+margin&&Math.max(a,end)>=b.min[i]-margin;
+      }));
+      if(!nearStair||delta[2]||!Math.hypot(delta[0],delta[1]))return collider.move(start,delta,options);
+      let current=support(start[0],start[1],start[2]-eyeHeight,contactTolerance);
+      if(!current)return collider.move(start,delta,options);
+      let eye=start,followedStairs=false;
+      const contacts=[],count=Math.ceil(Math.hypot(delta[0],delta[1])/stepSpacing),dx=delta[0]/count,dy=delta[1]/count;
+      for(let i=0;i<count;i++){
+        const next=support(eye[0]+dx,eye[1]+dy,current.height,stepLimit);
+        if(!next&&current.stair){contacts.push(current.body_id);break;}
+        const onStairs=current.stair||next?.stair;
+        const dz=onStairs&&next?next.height+eyeHeight-eye[2]:0;
+        const result=collider.move(eye,[dx,dy,dz],options);
+        contacts.push(...result.contacts);
+        const landed=support(result.eye[0],result.eye[1],result.eye[2]-eyeHeight,contactTolerance);
+        if(onStairs&&!landed){contacts.push(current.body_id);break;}
+        eye=result.eye;
+        followedStairs||=Boolean(onStairs);
+        current=landed;
+        if(!current)break;
+      }
+      const landing=followedStairs&&current?{
+        height:current.height,body_id:current.body_id,
+        roof:[...roofHeights].some(height=>Math.abs(height-current.height)<meshTolerance)
+      }:null;
+      return {eye,contacts,support:landing};
+    }
+    return {move};
+  }
+  const api={createPicker,jointMatrix,commandBlockers,createLiftDoorCycle,createLiftSession,createCameraCollider,createStairWalker};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.WalkthroughInteraction=api;
 })(globalThis);

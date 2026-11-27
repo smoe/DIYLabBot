@@ -202,6 +202,17 @@ const {chromium} = require(process.argv[3] || 'playwright');
     for (const fast of [bothShifts, rightShift]) assert(fast / normal > 2.1 && fast / normal < 2.7, 'Shift speeds translation by the configured 2.4 multiplier');
     assert(Math.abs(noShift / normal - 1) < .1, 'Releasing the final physical Shift restores normal speed');
     report.shift_distances_mm = {normal, bothShifts, rightShift, noShift};
+    for (const [key, sign] of [['e', 1], ['q', -1]]) {
+      await reset(); await down(key); await advance(32);
+      const heightChange = ([before, after]) => sign * (after.camera.eye_mm[2] - before.camera.eye_mm[2]);
+      const base = heightChange(await segment());
+      await down('ShiftLeft'); const fast = heightChange(await segment());
+      await up('ShiftLeft'); const restored = heightChange(await segment()); await release();
+      assert(base > 30, key + ' moves in the expected vertical direction');
+      assert(fast / base > 2.1 && fast / base < 2.7, 'Shift accelerates ' + key + ' by 2.4');
+      assert(Math.abs(restored / base - 1) < .1, 'Releasing Shift restores ' + key + ' speed');
+      report.shift_distances_mm[key] = {base, fast, restored};
+    }
     report.checks.push('independent W/Up release in both orders', 'independent physical Shift keys', 'Shift accelerates translation');
     progress('alias independence and Shift speed passed');
 
