@@ -65,14 +65,20 @@ class ActiveFleetTests(unittest.TestCase):
         self.source = model.load()
         self.profile = local.load_profile()
 
+    def untimed_profile(self):
+        profile = copy.deepcopy(self.profile)
+        profile.pop('timing')
+        for route in ('ground_boarding', 'basement_alighting', 'basement_departure'):
+            profile['patrol'].pop(route, None)
+        return profile
+
     def test_source_is_still_twenty_and_current_profile_explicitly_selects_six(self):
         self.assertEqual((self.source['fleet']['count'], self.source['depot']['slots']), (20, 20))
         self.assertEqual(self.profile['vehicle_count'], 6)
         self.assertEqual(model.active_vehicle_ids(self.source, self.profile),
                          tuple('BF%02d' % i for i in range(1, 7)))
-        legacy = copy.deepcopy(self.profile)
+        legacy = self.untimed_profile()
         legacy.pop('vehicle_count')
-        legacy.pop('timing')
         with patch.object(local.model, 'read_json', return_value=legacy):
             self.assertEqual(local.load_profile(), legacy)
         expected = tuple('BF%02d' % i for i in range(1, 21))
@@ -118,8 +124,7 @@ class ActiveFleetTests(unittest.TestCase):
         # A historical state remains untouched; this selection is not a restart.
         original['planner'].states['BF20']['active'] = {'mission_id': 'existing'}
         for count in (None, 20):
-            profile = copy.deepcopy(self.profile)
-            profile.pop('timing')
+            profile = self.untimed_profile()
             if count is None:
                 profile.pop('vehicle_count')
             else:
@@ -139,9 +144,7 @@ class ActiveFleetTests(unittest.TestCase):
         for count in (6, 20):
             with self.subTest(count=count):
                 prepared = prepared_map(self.source)
-                profile = {**self.profile, 'vehicle_count': count}
-                if count==20:
-                    profile.pop('timing')
+                profile = self.profile if count == 6 else {**self.untimed_profile(), 'vehicle_count': 20}
                 engine = PatrolWorldRunner(self.source, prepared['nav'], prepared['graph'],
                     prepared['catalog'], prepared['planner'], profile,
                     geometry_checker=prepared['geometry_checks'],

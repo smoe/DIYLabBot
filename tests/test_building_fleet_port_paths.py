@@ -36,6 +36,33 @@ def setup():
 
 
 class PortPathTests(unittest.TestCase):
+    def test_basement_departure_keeps_the_door_lead_and_preserves_protected_waypoints(self):
+        planner, nav, helper = setup()
+        planner.ports['KG'] = planner.ports['EG']
+        own_bay = nav.waiting_bay_polygons['EG'][0]
+        other_bay = [[x, y + 2500] for x, y in own_bay]
+        nav.waiting_bay_polygons['KG'] = [own_bay, other_bay]
+        points = [[3500, 500], [3400, 500], [3400, 1200], [3600, 1200],
+                  [3800, 1200], [4000, 1200], [4400, 1550], [4450, 2900], [4800, 3000]]
+        settings = {'waiting_slot': 0, 'join_route_index': 2, 'turn_offset_mm': [430, 550]}
+        expected = [*points[:2], [3830, 1050], *points[6:]]
+        zones = [{'start_index': 7, 'end_index': 8}]
+        with patch.object(helper, '_bay_sweep_clear', return_value=True) as clear:
+            self.assertEqual(planner._shorten_basement_departure(points, zones, 5, settings), expected)
+            clear.assert_called_once_with(expected[:5], [other_bay], 88.)
+        self.assertEqual(zones, [{'start_index': 4, 'end_index': 5}])
+
+        blocked = [{'start_index': 7, 'end_index': 8}]
+        with patch.object(helper, '_bay_sweep_clear', return_value=False):
+            self.assertEqual(planner._shorten_basement_departure(points, blocked, 5, settings), points)
+        self.assertEqual(blocked, [{'start_index': 7, 'end_index': 8}])
+
+        protected = [{'start_index': 5, 'end_index': 8}]
+        with patch.object(helper, '_bay_sweep_clear') as clear:
+            self.assertEqual(planner._shorten_basement_departure(points, protected, 5, settings), points)
+            clear.assert_not_called()
+        self.assertEqual(protected, [{'start_index': 5, 'end_index': 8}])
+
     def test_board_and_reverse_share_identical_source_points_caps_and_headings(self):
         planner,nav,helper=setup()
         for level in planner.ports:

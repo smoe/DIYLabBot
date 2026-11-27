@@ -32,6 +32,13 @@
       "departure_lead_mm": 3,
       "alignment_from_port_mm": 217.297297297297,
       "aperture_center_fraction": 0.25
+    },
+    "basement_departure": {
+      "waiting_slot": 0,
+      "target_area": "K0_011",
+      "join_route_index": 2,
+      "turn_offset_mm": [430, 550],
+      "inspection_variant": 2
     }
   },
   "recruitment": {
