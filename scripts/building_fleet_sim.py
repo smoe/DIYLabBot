@@ -277,16 +277,38 @@ class SensorWorld:
     def _first_returns(self,x,y,yaw,static,landing,cabin,peers):
         """Raw ideal distances only; no timestamps, output lists or noise."""
         sensor_range=self.settings['range_mm']
-        directions=tuple((math.cos(yaw+angle),math.sin(yaw+angle))for angle,_,_ in self._beam_angles)
+        if not hasattr(self,'_beam_directions'):
+            self._beam_directions=collections.OrderedDict()
+        # Parked peers still see the active vehicle move. Their unchanged
+        # angular frame can reuse the exact trigonometry across those scans.
+        yaw_key=float(yaw).hex()
+        directions=self._beam_directions.get(yaw_key)
+        if directions is None:
+            directions=tuple((math.cos(yaw+angle),math.sin(yaw+angle))for angle,_,_ in self._beam_angles)
+            self._beam_directions[yaw_key]=directions
+            if len(self._beam_directions)>24:self._beam_directions.popitem(last=False)
+        else:
+            self._beam_directions.move_to_end(yaw_key)
         key=(self._exact_key((x,y,yaw,sensor_range)),static,landing,cabin)
         static_distances=self._static_cache.get(key)
         if static_distances is None:
             self.static_cache_misses+=1;values=[]
-            for dx,dy in directions:
-                distance=static.ray((x,y),(dx,dy),sensor_range)if static is not None else sensor_range
-                if landing is not None:distance=min(distance,landing.ray((x,y),(dx,dy),sensor_range))
-                if cabin is not None:distance=min(distance,cabin.ray((x,y),(dx,dy),sensor_range))
-                values.append(distance)
+            if getattr(self,'_static_ray_batch_factory',None) is not None:
+                values=[sensor_range]*len(directions)
+                for index in (static,landing,cabin):
+                    if index is None:continue
+                    if index not in self._static_ray_batches:
+                        cells=[(x,y,rows) for (x,y),rows in index.cells.items()]
+                        self._static_ray_batches[index]=self._static_ray_batch_factory(
+                            index.segments,cells,index.cell,index._ray_bounds)
+                    batch=self._static_ray_batches[index]
+                    values=list(map(min,values,batch(x,y,sensor_range,directions).to_py()))
+            else:
+                for dx,dy in directions:
+                    distance=static.ray((x,y),(dx,dy),sensor_range)if static is not None else sensor_range
+                    if landing is not None:distance=min(distance,landing.ray((x,y),(dx,dy),sensor_range))
+                    if cabin is not None:distance=min(distance,cabin.ray((x,y),(dx,dy),sensor_range))
+                    values.append(distance)
             static_distances=tuple(values);self.static_rays+=len(directions)
             if self._static_cache_limit:
                 self._static_cache[key]=static_distances

@@ -923,7 +923,9 @@ class Controller(local.LocalController):
         else:
             probe=copy.copy(self);probe.y=self.y+tail[F[0]][0]
             probe.v=tail[F[1]][0];probe.a=tail[F[2]][0];probe.now=round(self.now+duration,3)
-            probe._fallback=None;probe._brake_cache=None;probe._geometry_cache={}
+            # The shallow copy shares immutable-path spatial bounds only.
+            # Each endpoint still computes its own stop and scan witness.
+            probe._fallback=None;probe._brake_cache=None
             probe.profile_checks=[]
             selected=[]
             def complete_candidate(stop):

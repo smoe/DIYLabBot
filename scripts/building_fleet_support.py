@@ -113,7 +113,7 @@ def polygon_union_covers(polygons, query, *, missing_regions=False, _convex_inpu
     at1/4 and3/4 give their exact integral. Optional missing cells are the
     corresponding exact trapezoids; they contain no invented support area.
     """
-    from building_fleet_clearance import _intersection_x, _vertical, _union_length
+    from building_fleet_clearance import _intersection_x, _union_length
     target = query if _convex_inputs else _ccw(query)
     clipped = []
     seen = set()
@@ -142,6 +142,21 @@ def polygon_union_covers(polygons, query, *, missing_regions=False, _convex_inpu
             x = _intersection_x(a, b, c, d)
             if x is not None:
                 xs.add(x)
+    # A strip samples each edge many times. Form its exact affine function
+    # once and retain the same open x-domain used by the vertical section.
+    def edge_lines(poly):
+        lines = []
+        for a, b in zip(poly, poly[1:]+poly[:1]):
+            if a[0] != b[0]:
+                lo, hi = (a[0], b[0]) if a[0] < b[0] else (b[0], a[0])
+                slope = (b[1]-a[1])/(b[0]-a[0])
+                lines.append((lo, hi, slope, a[1]-slope*a[0]))
+        return lines
+    def vertical(lines, x):
+        ys = [slope*x+offset for lo,hi,slope,offset in lines if lo<x<hi]
+        return (min(ys),max(ys)) if ys else None
+    target_lines = edge_lines(target)
+    supports = [edge_lines(poly) for poly in clipped]
     area = Q(0)
     cells = []
     strips = 0
@@ -153,10 +168,10 @@ def polygon_union_covers(polygons, query, *, missing_regions=False, _convex_inpu
         lengths = []
         holes = []
         for x in samples:
-            span = _vertical(target, x)
+            span = vertical(target_lines, x)
             if span is None:
                 raise ArithmeticError('Convex query strip has no interior vertical section')
-            rows = [row for poly in clipped if (row := _vertical(poly, x)) is not None]
+            rows = [row for lines in supports if (row := vertical(lines, x)) is not None]
             rows = _interval_union(rows)
             lengths.append(_union_length(rows))
             if missing_regions:

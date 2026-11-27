@@ -6,9 +6,11 @@ Physics, observations, motion, resources and recruitment remain in the same
 PatrolWorldRunner used by the local executable.
 """
 import copy
+from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
+import struct
 import sys
 
 import building_fleet_model as model
@@ -142,6 +144,24 @@ def _configuration(config):
     return paths, source, profile, copy.deepcopy(pins)
 
 
+def _memoized_roots(isolate):
+    """Reuse the exact shared polynomial result inside the isolated browser worker."""
+    @lru_cache(maxsize=16384)
+    def cached(key):
+        lower, upper, *coefficients = struct.unpack(f'!{len(key)//8}d', key)
+        return tuple(isolate(coefficients, lower, upper))
+
+    def roots(coefficients, lower=0., upper=1.):
+        if (type(coefficients) not in (list, tuple) or not 3 <= len(coefficients) <= 5
+                or type(lower) is not float or type(upper) is not float
+                or any(type(value) is not float for value in coefficients)):
+            return isolate(coefficients, lower, upper)
+        key = struct.pack(f'!{len(coefficients)+2}d', lower, upper, *coefficients)
+        return list(cached(key))
+
+    return roots
+
+
 def _make_engine(paths, source, profile, progress):
     """Restore existing static caches and instantiate the unchanged core."""
     from building_fleet_patrol import PatrolWorldRunner
@@ -160,6 +180,12 @@ def _make_engine(paths, source, profile, progress):
         if prepared.get('static_ray_cache') is not None and engine.dt <= .05:
             from building_fleet_runtime_cache import seed_static_rays
             engine.static_ray_cache = seed_static_rays(engine.world, prepared['static_ray_cache'])
+        if sys.platform == 'emscripten' and engine.dt == .4:
+            from bf01_static_rays import makeBatch
+            engine.world._static_ray_batch_factory = makeBatch
+            engine.world._static_ray_batches = {}
+            from tr01_floor_motion import motion
+            motion.real_roots = _memoized_roots(motion.real_roots)
         return engine
 
     from building_fleet_browser_navigation import BrowserNavigation

@@ -142,6 +142,26 @@ class LiveAdapterTests(unittest.TestCase):
         r._camera_frames = {}
         return r
 
+    def test_open_lift_corridor_is_retained_only_for_the_booked_owner(self):
+        r = self.runner()
+        r.dt = .4
+        r.source = {'depot': {'level': 'EG'}}
+        r.lift.requests = {}
+        lift = {'phase':'idle', 'level':'EG', 'doors_open':True, 'door_open_fraction':1.}
+        r.lift_snapshot = lambda: lift
+        grant = {'status':'granted', 'level':'EG', 'slot':0, 'booking_id':'booking-1'}
+        r.resources.holds = {'BF01':'corridor'}
+        r.resources.own_waiting_grants = lambda identity: {'start':grant}
+        r.vehicles['BF01']['action'] = {'terminal':{'kind':'lift_wait', 'slot':0,
+                                                    'booking_id':'booking-1'}}
+        self.assertTrue(r.keeps_cabin_corridor('BF01','corridor'))
+        self.assertFalse(r.keeps_cabin_corridor('BF02','corridor'))
+        lift['door_open_fraction'] = .8
+        self.assertFalse(r.keeps_cabin_corridor('BF01','corridor'))
+        lift['door_open_fraction'] = 1.
+        r.departures = SimpleNamespace(keeps_corridor=lambda *_:True)
+        self.assertFalse(r.keeps_cabin_corridor('BF01','corridor'))
+
     def test_six_vehicle_timing_uses_short_steps_for_lift_activity(self):
         r = self.runner()
         r.source = {'depot': {'level': 'EG'}}
