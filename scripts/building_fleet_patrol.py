@@ -250,6 +250,8 @@ class PatrolWorldRunner(WorldRunner):
         runtime_source = patrol_source(source, profile) if kwargs.get('output_dir') is None else source
         super().__init__(runtime_source, nav, graph, catalog, planner, **kwargs)
         self.dt = control_step_s(runtime_source)
+        if self.dt > .05:
+            self.planner.smooth_live_lift_wait = True
         self._last_control_start_s = -.05
         self.dispatcher = PatrolDispatcher(source, nav.homes)
         self.session_id = uuid.uuid4().hex

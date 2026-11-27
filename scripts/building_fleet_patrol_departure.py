@@ -110,6 +110,9 @@ class PatrolDepartures:
         action = first['action']
         if first['driver'] is None or not action or action['level'] != home['level']:
             return False
+        keep_for_lift=getattr(world,'keeps_cabin_corridor',None)
+        if keep_for_lift and keep_for_lift(leader,resource):
+            return False
         state = world.planner.states[identity]
         signature = (first['leg_id'], tuple(m['mission_id'] for m in state['queue']),
                      state['admission_deferred'], state['requested'])

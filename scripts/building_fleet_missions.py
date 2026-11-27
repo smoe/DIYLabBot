@@ -341,6 +341,32 @@ class MissionPlanner:
                 and math.dist(actual[:2], expected[:2]) <= tolerance
                 and abs(math.atan2(math.sin(actual[2]-expected[2]), math.cos(actual[2]-expected[2]))) < 1e-6)
 
+    def _smooth_lift_wait_approach(self, level, points, zones, marks, corner_caps):
+        """Remove a short same-direction bend before the straight bay entry."""
+        if len(points) < 4:
+            return points
+        removed = len(points)-3
+        if (any(zone['end_index'] >= removed for zone in zones)
+                or any(mark['point_index'] >= removed for mark in marks)
+                or any(row['point_index'] >= removed for row in corner_caps or [])):
+            return points
+        first, bend, lead, bay = points[-4:]
+        if math.dist(bend, lead) > self.trim_mm:
+            return points
+        def turn(a, b, c):
+            incoming = [b[i]-a[i] for i in range(2)]
+            outgoing = [c[i]-b[i] for i in range(2)]
+            return math.atan2(incoming[0]*outgoing[1]-incoming[1]*outgoing[0],
+                              sum(x*y for x,y in zip(incoming,outgoing)))
+        left, right = turn(first,bend,lead),turn(bend,lead,bay)
+        if left*right <= 0 or abs(left+right) >= math.pi:
+            return points
+        if not self.graph.shortcut_clear(level,first,lead):
+            return points
+        # The complete candidate still needs the usual continuous geometry,
+        # floor support, resource spans and controller braking certificates.
+        return points[:removed]+points[removed+1:]
+
     def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None,prefix_caps=None):
         vehicle, level = own['vehicle_id'], own['level']; state = self.states[vehicle]
         queue = [m for m in state['queue'] if m['mission_id'] not in state['completed']]
@@ -403,6 +429,9 @@ class MissionPlanner:
                     offset = _append(points, route['points_mm'])
                     zones.extend({**z, 'start_index': z['start_index']+offset, 'end_index': z['end_index']+offset} for z in route.get('zone_segments', []))
                     _append(points, ending)
+                    if (getattr(self,'smooth_live_lift_wait',False) and terminal['kind']=='lift_wait'
+                            and level==self.source['depot']['level'] and len(ending)==2):
+                        points=self._smooth_lift_wait_approach(level,points,zones,marks,prefix_caps)
                     if terminal['kind']in('home','capacity_home')and prefix and grants.get('waiting_place',{}).get('status')=='granted':
                         waiting=grants['waiting_place']
                         marks.append({'point_index':len(prefix)-1,'event':'waiting_place_released',

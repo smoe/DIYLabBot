@@ -59,6 +59,28 @@ class BrowserLifecycleTests(unittest.TestCase):
         self.assertEqual(make.call_count, 1)
         return runtime, engine
 
+    def test_browser_root_cache_preserves_exact_inputs_and_independent_results(self):
+        import math
+        from tr01_floor_motion import motion
+
+        calls = []
+        def isolate(coefficients, lower, upper):
+            calls.append((coefficients, lower, upper))
+            return motion.real_roots(coefficients, lower, upper)
+
+        roots = adapter._memoized_roots(isolate)
+        coefficients = [1., -2., 1.]
+        first = roots(coefficients)
+        self.assertEqual(first, [1.])
+        first.clear()
+        self.assertEqual(roots(coefficients), [1.])
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(roots(coefficients, -0., 1.), [1.])
+        self.assertEqual(math.copysign(1., calls[-1][1]), -1.)
+        self.assertEqual(len(calls), 2)
+        with self.assertRaisesRegex(ValueError, 'finite'):
+            roots([math.nan, -2., 1.])
+
     def test_boot_creates_one_fresh_world_and_serializes_progress(self):
         progress = []
         runtime, engine = self.ready(progress.append)

@@ -371,7 +371,7 @@ class ResourceGate:
         while self.index<len(self.spans):
             span=self.spans[self.index];held=e.resources.holds.get(identity)
             if driver.y>span['end_progress_mm']+1e-7:
-                if held==span['resource'] and not (departures and departures.keeps_corridor(identity,held)):
+                if held==span['resource'] and not self._keep_corridor(held,departures):
                     e.release_resource(identity,held,now)
                 self.index+=1;continue
             if held is not None and held!=span['resource']:
@@ -388,9 +388,14 @@ class ResourceGate:
             if driver.y+distance>span['start_progress_mm']+1e-6:raise RuntimeError('Own resource request came too late for its checked stopping envelope')
             return False
         held=e.resources.holds.get(identity)
-        if held and not (departures and departures.keeps_corridor(identity,held)):
+        if held and not self._keep_corridor(held,departures):
             e.release_resource(identity,held,now)
         return True
+
+    def _keep_corridor(self,resource,departures):
+        keep_for_lift=getattr(self.engine,'keeps_cabin_corridor',None)
+        return ((departures and departures.keeps_corridor(self.vehicle,resource))
+                or (keep_for_lift and keep_for_lift(self.vehicle,resource)))
 
 
 class WorldRunner:
@@ -778,6 +783,28 @@ class WorldRunner:
             raise RuntimeError('A physical waiting rest requires its exclusive current source role')
         return grant
 
+    def keeps_cabin_corridor(self,identity,resource):
+        """Continue an owned ground-floor approach into an immediately ready lift."""
+        if getattr(self,'dt',.05)<=.05 or self.resources.holds.get(identity)!=resource:
+            return False
+        row=self.vehicles[identity]
+        action=row['action'] or {}
+        if row.get('boarding_corridor')==resource:
+            return (action.get('lift_phase')or{}).get('kind')=='boarding'
+        terminal=action.get('terminal',{})
+        if terminal.get('kind')!='lift_wait' or row['level']!=self.source['depot']['level']:
+            return False
+        departures=getattr(self,'departures',None)
+        if departures and departures.keeps_corridor(identity,resource):
+            return False  # The existing reserved handover has priority.
+        lift=self.lift_snapshot()
+        if (lift['phase']!='idle' or self.lift.requests or not lift['doors_open']
+                or lift['level']!=row['level'] or lift['door_open_fraction']!=1.):
+            return False
+        grant=self.resources.own_waiting_grants(identity)['start']
+        return (grant.get('status')=='granted' and grant.get('booking_id')==terminal.get('booking_id')
+                and grant.get('level')==row['level'] and grant.get('slot')==terminal.get('slot'))
+
     def park_waiting_bay(self,identity,driver):
         """Release the corridor token only at an observed exclusive bay rest.
 
@@ -790,12 +817,15 @@ class WorldRunner:
         if max(abs(v)for v in velocity+acceleration)>1e-7:
             raise RuntimeError('A waiting bay cannot release its corridor token while moving')
         held=self.resources.holds.get(identity)
+        retain = held is not None and self.keeps_cabin_corridor(identity,held)
+        if retain:
+            row['boarding_corridor']=held
         self.bay_parking_events.append({'event':'waiting_bay_parked','vehicle_id':identity,'time_s':self.now,
             'level':grant['level'],'slot':grant['slot'],'booking_id':grant.get('booking_id'),
-            'released_resource':held,'pose_mm_rad':row['pose_mm_rad'][:],
+            'released_resource':None if retain else held,'pose_mm_rad':row['pose_mm_rad'][:],
             'velocity_mm_rad_s':velocity,'acceleration_mm_rad_s2':acceleration,
             'condition':'exclusive_current_bay_at_exact_source_pose_and_rest; every_other_curve_excludes_occupied_bay'})
-        if held:self.release_resource(identity,held,self.now)
+        if held and not retain:self.release_resource(identity,held,self.now)
 
     def idle_action(self,identity):
         if getattr(self,'_background_preparation',None)is not None and self._background_preparation.pending(identity):return
@@ -844,6 +874,8 @@ class WorldRunner:
                 row['hold_reason']=('lift_travel'if row['aboard']and self.lift.phase=='travelling'else
                     'lift_door_sequence'if row['aboard']and self.lift.phase!='alighting'else
                     'lift_parked'if row['aboard']else'lift_wait'if'lift'in condition else'resource_wait')
+                if row.get('boarding_corridor') and self.lift.phase!='idle' and not self.lift.own_grant(identity).get('boarding_ready'):
+                    self.release_resource(identity,row.pop('boarding_corridor'),self.now)
                 return
             else:raise ValueError('Unimplemented mission action: '+str(kind))
             self.planner.on_action_result(identity,action,result,self.now)
@@ -927,11 +959,26 @@ class WorldRunner:
             if kind=='capacity_home':
                 row['hold_reason']='capacity_home';row['hold_condition']='own_admissible_successor_assignment'
         else:raise ValueError('Unknown physical drive endpoint '+str(kind))
-        actual=floor.motion.Curve(floor.canonical(driver.recorded))
+        points=driver.recorded
+        if action.get('lift_phase'):
+            # Waiting behind the cabin gate can leave many identical rest
+            # knots. A quintic between these jets is exactly constant.
+            points=[]
+            for point in driver.recorded:
+                if (len(points)>=2 and points[-2]['pose_mm_rad']==points[-1]['pose_mm_rad']==point['pose_mm_rad']
+                        and all(not any(row[field]) for row in (points[-2],points[-1],point)
+                                for field in ('velocity_mm_rad_s','acceleration_mm_rad_s2'))):
+                    points[-1]=point
+                else:
+                    points.append(point)
+        actual=floor.motion.Curve(floor.canonical(points))
         if row['level']==self.source['depot']['level']:
             proof=fixed_home_curve_proof(actual,identity,self.nav.homes,self.nav.envelope,self.nav.reserve,row['level'])
             self.depot_checks.append({'vehicle_id':identity,'leg_id':row['leg_id'],'phase':'executed','proof':proof})
         self.check_geometry(identity,action,actual,'executed')
+        if kind=='cabin_park' and row.get('boarding_corridor'):
+            held=row.pop('boarding_corridor')
+            if self.resources.holds.get(identity)==held:self.release_resource(identity,held,self.now)
         if kind in('lift_wait','same_side_exit_stop','capacity_wait'):self.park_waiting_bay(identity,driver)
         if kind=='capacity_home':
             held=self.resources.holds.get(identity)

@@ -211,6 +211,8 @@ class ClearanceCertificate:
         result=self.floor_bank.covers(xy,yaw,L,W,curve_ref=curve_ref)
         if self.lift_context is None:return result
         if start_s is None or end_s is None:raise ValueError('The compiled lift support interval is required')
+        if result['passed']:
+            return dict(result,lift_height_exception_applied=False)
         triangles,body_ids=self.floor_bank.selected(xy,yaw,L,W)
         return self.lift_context.support(xy,yaw,L,W,start_s=start_s,end_s=end_s,
             ordinary_triangles=triangles,ordinary_body_ids=body_ids,

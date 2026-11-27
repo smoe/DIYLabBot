@@ -10,6 +10,7 @@ from bisect import bisect_right
 from time import perf_counter
 from types import SimpleNamespace
 from building_fleet_control import Controller,PreparedNominal,preparation_digest,source_perception_limit,F
+from building_fleet_model import control_step_s
 from building_fleet_motion import Path,compile_motion
 from building_fleet_depot import fixed_home_curve_proof
 from building_fleet_zones import progress_windows
@@ -325,7 +326,13 @@ def prepare_route(request,context,*,phase_complete=None):
     mark('restore_nominal')
     anchor=request['anchor'];origin=anchor['progress_mm'];v=anchor['velocity_mm_s'];a=anchor['acceleration_mm_s2']
     driver.y=origin;driver.v=v;driver.a=a;driver.now=anchor['time_s']
-    candidates=[p for p in driver.nominal_clock.points if origin+5<p[F[0]][0]<=horizon and p[F[1]][0]>1e-6 and abs(p[F[2]][0])<1e-8]
+    # At a confirmed stop the live rolling plan can rejoin an earlier
+    # accelerating or braking knot. The connector must match its entire
+    # endpoint PVA and pass the same bounds and geometry checks.
+    earlier_rest_join = ('horizon_mm' in request and control_step_s(source) > .05
+                         and abs(v) < 1e-8 and abs(a) < 1e-8)
+    candidates=[p for p in driver.nominal_clock.points if origin+5<p[F[0]][0]<=horizon and p[F[1]][0]>1e-6
+                and (earlier_rest_join or abs(p[F[2]][0])<1e-8)]
     # A terminal rest anchor is also valid when no moving nominal node remains.
     if horizon==path.length:candidates.append(driver.nominal_clock.points[-1])
     for target in candidates:

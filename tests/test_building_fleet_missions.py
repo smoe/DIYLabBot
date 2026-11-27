@@ -65,6 +65,29 @@ def mission(mid, level='EG', area='room'):
 
 
 class MissionTests(unittest.TestCase):
+    def test_lift_approach_keeps_the_straight_final_heading_and_checks_the_chord(self):
+        planner, _, _ = fixture()
+        points = [[14000,14800],[14425,15175],[14367,15325],[13625,15325]]
+        checked = []
+
+        def shortcut(level, start, end):
+            checked.append((level,start,end))
+            return True
+
+        planner.graph.shortcut_clear = shortcut
+        smooth = planner._smooth_lift_wait_approach('EG',points,[],[],[])
+        self.assertEqual(smooth, [points[0],*points[2:]])
+        self.assertEqual(checked, [('EG',points[0],points[2])])
+        self.assertEqual(_path(smooth,250).evaluate(_path(smooth,250).length)[0][2], math.pi)
+        for zones,marks,caps in (
+            ([{'end_index':1}],[],[]),
+            ([],[{'point_index':1}],[]),
+            ([],[],[{'point_index':1}]),
+        ):
+            self.assertEqual(planner._smooth_lift_wait_approach('EG',points,zones,marks,caps),points)
+        planner.graph.shortcut_clear = lambda *args: False
+        self.assertEqual(planner._smooth_lift_wait_approach('EG',points,[],[],[]),points)
+
     def test_source_loop_phase_changes_preserve_fixed_connector(self):
         loop = {'points_mm': [[0, 0], [10, 0], [10, 10], [0, 10], [0, 0]]}
         variants = inspection_variants(loop)
