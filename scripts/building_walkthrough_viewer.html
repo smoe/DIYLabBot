@@ -251,10 +251,12 @@ __WALKTHROUGH_SEMINAR__</script>
     const lap=lapConfig?WalkthroughTR01Lap.create(lapConfig,CF01Motion.Curve):null;
     const cf01Config=data.lab3003_cf01_cycle;
     const dockedStart=cf01Config?.docked_start;
+    const processThenLap=Boolean(dockedStart&&lapConfig?.half_turn&&cf01Config.return_samples?.length);
     const fixtureConfig=lapConfig||dockedStart;
     const createCF01=()=>WalkthroughLab3003CF01.create(cf01Config,WalkthroughInteraction.jointMatrix,
       {Curve:CF01Motion.Curve,multiply,identity});
     let cf01=cf01Config?createCF01():null;
+    const transportReady=()=>processThenLap&&cf01.snapshot.state==='completed'&&cf01.snapshot.transport_ready;
     if(lap){
       const visible=new Set(data.scenes[lapConfig.scene].groups.map(group=>group.id));
       if(new Set(lapConfig.body_ids).size!==lapConfig.body_ids.length||!lapConfig.body_ids.includes(lapConfig.cover_body_id))
@@ -270,19 +272,24 @@ __WALKTHROUGH_SEMINAR__</script>
       if(!Number.isFinite(objectStates.get(id)?.config.states[state]))throw Error('Unknown TR01 fixture state.');
     }
     if(cf01){
-      if(lap ? (dockedStart||cf01Config.arm_motion||cf01Config.scene!==lapConfig.scene||
-                 cf01Config.cover_body_id!==lapConfig.cover_body_id) : (!dockedStart||!cf01Config.arm_motion))
+      if((lap&&(cf01Config.scene!==lapConfig.scene||cf01Config.cover_body_id!==lapConfig.cover_body_id))||
+          (dockedStart?(!cf01Config.arm_motion||Boolean(lap)!==processThenLap):(!lap||cf01Config.arm_motion)))
         throw Error('The CF01 delivery requires the checked TR01 dock and cover.');
       const available=new Set(data.scenes[cf01Config.scene].groups.map(group=>group.id));
       const {lid,rotor,latches,pusher}=cf01Config.joints;
       const joints=pusher?[lid,rotor,...latches,pusher]:[lid,rotor,...latches];
       const bodies=[...joints.flatMap(joint=>joint.body_ids),...cf01.armBodyIds];
-      if(dockedStart)bodies.push(...cf01Config.samples.map(sample=>sample.carrier_body_id));
+      const carrierIds=new Set(dockedStart?cf01Config.samples.map(sample=>sample.carrier_body_id):[]);
+      bodies.push(...carrierIds);
       if(!available.has(cf01Config.cover_body_id))throw Error('Missing native TR01 transport cover.');
       for(const id of bodies){
         const key=cf01Config.scene+':'+id;
-        if(!available.has(id)||bodyOwners.has(key))throw Error('Missing or multiply bound CF01 body.');
-        bodyOwners.set(key,{config:{id,mechanism:'cf01_cycle'},matrix:()=>cf01.modelMatrix(id)||identity()});
+        const owner=bodyOwners.get(key);
+        const carrier=processThenLap&&carrierIds.has(id);
+        if(!available.has(id)||(carrier?owner?.config.mechanism!=='tr01_lap':Boolean(owner)))
+          throw Error('Missing or multiply bound CF01 body.');
+        bodyOwners.set(key,{config:{id,mechanism:'cf01_cycle'},
+          matrix:()=>carrier&&transportReady()?lap.matrix:cf01.modelMatrix(id)||identity()});
       }
     }
     const robots=new Map((data.robots||[]).map(c=>[c.id,WalkthroughRobots.create(c,objectStates,CF01Motion.Curve)]));
@@ -612,10 +619,25 @@ __WALKTHROUGH_SEMINAR__</script>
       return allowed;
     }
     function lapPlaybackVisible(){
-      return !document.hidden&&sceneId===lapConfig.scene&&(lapAutoplay||lapViewActive());
+      return !document.hidden&&sceneId===lapConfig.scene&&(processThenLap||lapAutoplay||lapViewActive());
     }
     function advanceLap(now){
-      if(!lap||(cf01&&(lap.arrived||cf01.snapshot.state!=='ready')))return false;
+      if(!lap)return false;
+      if(processThenLap){
+        if(!transportReady())return false;
+        const playing=lap.snapshot.state==='playing';
+        if(!lapPlaybackVisible()){
+          if(playing)lap.pause(now);
+          return playing;
+        }
+        if(playing)return lap.advance(now);
+        if(lap.snapshot.state!=='ready')return false;
+        const previousMessage=lapMessage;
+        if(!checkLapFixtures())return lapMessage!==previousMessage;
+        lap.play(now);
+        return true;
+      }
+      if(cf01&&(lap.arrived||cf01.snapshot.state!=='ready'))return false;
       const playing=lap.snapshot.state==='playing';
       if(!lapPlaybackVisible()){
         if(playing)lap.pause(now);
@@ -630,7 +652,7 @@ __WALKTHROUGH_SEMINAR__</script>
     }
     function advanceCF01(now){
       if(!cf01||document.hidden)return false;
-      if(cf01.snapshot.state==='ready'&&lap?.arrived&&checkLapFixtures()){
+      if(!processThenLap&&cf01.snapshot.state==='ready'&&lap?.arrived&&checkLapFixtures()){
         lapAutoplay=false;
         lapFollow.checked=false;
         return cf01.start(now,true);
@@ -668,9 +690,20 @@ __WALKTHROUGH_SEMINAR__</script>
         lapPlay.textContent={playing:'Pause',paused:'CF01 fortsetzen',completed:'CF01 fertig'}[station.state];
         lapReset.disabled=station.state!=='completed';
       }
+      if(processThenLap){
+        lapPlay.textContent={ready:'Fahrt startet automatisch',playing:'Fahrt pausieren',
+          paused:'Fahrt fortsetzen',docked:'Runde beendet'}[state];
+        lapPlay.disabled=!transportReady()||state==='ready'||state==='docked';
+        lapReset.disabled=state!=='docked';
+        lapTimeline.disabled=true;
+        lapRate.disabled=false;
+        lapFollow.disabled=!transportReady();
+      }
       lapTimeline.value=String(time_s);
       lapClock.textContent=modelClock(time_s)+' / '+modelClock(duration_s)+' Modellzeit';
-      const next=lapMessage||{ready:'Am Dock',playing:direction==='reverse'?'Rückwärts zum Dock':'Vorwärts durch das Labor',paused:'Pausiert',docked:'Wieder angedockt'}[state];
+      const next=lapMessage||{ready:processThenLap?'Am Dock · Abfahrt nach Rückgabe und Haubenfreigabe':'Am Dock',
+        playing:direction==='pivot'?'TR01 wendet um 180°':direction==='reverse'?'Rückwärts zum Dock':'Vorwärts durch das Labor',
+        paused:'Pausiert',docked:processThenLap?'Wieder angedockt · um 180° gedreht':'Wieder angedockt'}[state];
       if(lapStatus.textContent!==next)lapStatus.textContent=next;
     }
     function updateCF01UI(){
@@ -678,8 +711,11 @@ __WALKTHROUGH_SEMINAR__</script>
       cf01Panel.hidden=!station||lapPanel.hidden;
       if(cf01Panel.hidden)return;
       cf01Play.hidden=!dockedStart;
-      if(dockedStart)cf01Play.textContent={ready:'Übergaben starten',playing:'Pause',
-        paused:'CF01 fortsetzen',completed:'Demo neu starten'}[station.state];
+      if(dockedStart){
+        cf01Play.textContent={ready:processThenLap?'Zyklus starten':'Übergaben starten',playing:'Pause',
+          paused:'CF01 fortsetzen',completed:processThenLap?'CF01 fertig':'Demo neu starten'}[station.state];
+        cf01Play.disabled=processThenLap&&station.state==='completed';
+      }
       cf01Cutaway.disabled=stopId!==cf01Config.stop_id;
       const phases={docked:'Angedockt',cover_removed:'Haube abgenommen · simuliert',
         indexing:'Rotor positioniert sich',indexed:'Rotorposition bestätigt',unlocking:'Deckel entriegelt',
@@ -690,13 +726,23 @@ __WALKTHROUGH_SEMINAR__</script>
         pocket_reached:'Rotorsitz erreicht · Stößel fährt ein',
         seated:'Gefäß im Rotorsitz bestätigt · simuliert',arm_clear:'ArmC aus dem Arbeitsbereich',
         closing:'Deckel schließt',locking:'Verriegelung fährt ein',locked:'Deckelverriegelung bestätigt',
-        spinning:'CF01 schleudert',braking:'CF01 bremst',stopped:'CF01 fertig · Stillstand bestätigt'};
+        spinning:'CF01 schleudert',braking:'CF01 bremst',stopped:'CF01 · Stillstand bestätigt',
+        return_indexing:'Rotor positioniert sich zur Entnahme',return_indexed:'Entnahmeposition bestätigt',
+        return_unlocking:'Deckel entriegelt',return_opening:'Deckel öffnet',return_open:'Deckel offen',
+        pickup_presenting:'Stößel fährt zum Gefäß',pickup_contact:'Gefäß liegt auf dem Stößel',
+        pickup_raised:'Gefäß zur Entnahme angehoben',pickup_grasp:'ArmC bringt '+station.held_tube+' zu TR01',
+        cassette_seated:'Gefäß zurück am ursprünglichen Kassettenplatz',return_arm_clear:'ArmC ist in Grundstellung',
+        pickup_pusher_retracting:'Stößel fährt ein',pickup_pusher_parked:'Stößel geparkt',
+        return_closing:'Deckel schließt',return_locking:'Deckel wird verriegelt',
+        return_locked:station.seated.length?'Deckel verriegelt':'Rotor leer · Deckel verriegelt',
+        transport_ready:'Beide Tubes zurück · Haube aufgesetzt · TR01 freigegeben'};
       const label=station.state==='ready'?(dockedStart ? lapMessage||'CF01 · TR01 am Dock' : 'CF01 · startet nach Ankunft'):
         (station.state==='paused'?'Pausiert · ':'')+(phases[station.phase]||station.phase);
       if(cf01Phase.textContent!==label)cf01Phase.textContent=label;
       const rpm=Math.round(station.rpm).toLocaleString('de-DE');
       cf01Status.textContent='Simulation · '+station.seated.length+'/'+cf01Config.samples.length+
-        (dockedStart?' Gefäße · ':' Tubes · ')+rpm+' U/min · '+station.playback_rate+'×'+
+        (processThenLap?' im Rotor · '+station.returned.length+'/'+cf01Config.samples.length+' zurück auf TR01 · ':
+          dockedStart?' Gefäße · ':' Tubes · ')+rpm+' U/min · '+station.playback_rate+'×'+
         (dockedStart?' · Modellzeit '+modelClock(station.time_s)+' / '+modelClock(station.duration_s):'')+
         (station.lid_locked?' · verriegelt':'')+(stopId===cf01Config.stop_id&&cf01Cutaway.checked?' · Rotorschnitt':'');
     }
@@ -723,7 +769,11 @@ __WALKTHROUGH_SEMINAR__</script>
       });
       lapPlay.addEventListener('click',()=>{
         const now=performance.now();
-        if(cf01?.snapshot.state==='playing'){
+        if(processThenLap){
+          if(!transportReady())return;
+          if(lap.snapshot.state==='playing')lap.pause(now);
+          else if(lap.snapshot.state==='paused'&&checkLapFixtures())lap.play(now);
+        }else if(cf01?.snapshot.state==='playing'){
           cf01.pause(now);
         }else if(cf01?.snapshot.state==='paused'){
           cf01.resume(now);
@@ -739,12 +789,12 @@ __WALKTHROUGH_SEMINAR__</script>
         requestRender();
       });
       lapReset.addEventListener('click',()=>{
-        if(cf01?.active)return;
+        if(cf01?.active||(processThenLap&&lap.snapshot.state!=='docked'))return;
         if(cf01?.snapshot.state==='completed')cf01=createCF01();
         lapAutoplay=false;lap.seek(0);lapMessage='';requestRender();
       });
       lapTimeline.addEventListener('input',()=>{
-        if((!cf01||cf01.snapshot.state==='ready')&&allowLapPlayback()){
+        if(!processThenLap&&(!cf01||cf01.snapshot.state==='ready')&&allowLapPlayback()){
           lapAutoplay=false;
           lap.seek(Number(lapTimeline.value));
         }
@@ -761,7 +811,7 @@ __WALKTHROUGH_SEMINAR__</script>
         const state=cf01.snapshot.state;
         if(state==='playing')cf01.pause(now);
         else if(state==='paused')cf01.resume(now);
-        else if(checkLapFixtures()){
+        else if((!processThenLap||state==='ready')&&checkLapFixtures()){
           if(state==='completed')cf01=createCF01();
           setStop(dockedStart.stop_id);
           cf01.start(now,true);
@@ -891,7 +941,8 @@ __WALKTHROUGH_SEMINAR__</script>
         if(dirty){render();dirty=false;}
         const lapState=lap?.snapshot.state;
         const lapRepeating=lapAutoplay&&lapChanged&&lapState==='docked'&&lapPlaybackVisible();
-        if(navigationHeld()||animating||liftActive||lapState==='playing'||lapRepeating||cf01?.snapshot.state==='playing')frameRequest=requestAnimationFrame(tick);
+        const lapStarting=cf01Changed&&transportReady()&&lapState==='ready'&&lapPlaybackVisible();
+        if(navigationHeld()||animating||liftActive||lapState==='playing'||lapRepeating||lapStarting||cf01?.snapshot.state==='playing')frameRequest=requestAnimationFrame(tick);
         else lastTime=null;
       }
       catch(error){clearInputKeys();fail(error);}
@@ -994,6 +1045,10 @@ __WALKTHROUGH_SEMINAR__</script>
       get objects(){return [...objectStates.values()].map(o=>({id:o.config.id,state:o.state,target_state:o.targetState,joint_value:o.value,...(o.config.joint.type==='prismatic'?{displacement_mm:o.value,body_displacements_mm:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}:{angle_deg:o.value,body_angles_deg:Object.fromEntries(o.config.moving_body_ids.map(id=>[id,o.value]))}),model_matrix:Array.from(objectMatrix(o))}));},
       get elevator(){return elevator?{id:elevatorConfig.object_id,boarded:elevator.boarded,state:elevatorObject.state,target_state:elevatorObject.targetState,value_mm:elevatorObject.value,reference_value_mm:elevatorObject.config.states[elevatorObject.config.reference_state],door_phase:liftDoors?.phase||null,display_level:elevator.displayLevel(),walking_allowed:elevator.walkingAllowed,attached_eye_mm:elevator.attachedEye(),last_command:lastLiftCommand?{...lastLiftCommand}:null}:null;},
       get tr01Lap(){return lap?{...lap.snapshot,matrix:Array.from(lap.matrix)}:null;},
+      bodyMatrix:id=>{
+        const owner=bodyOwners.get(sceneId+':'+id);
+        return owner?Array.from(objectMatrix(owner)):null;
+      },
       get lab3003CF01(){return cf01?.snapshot||null;},
       get isolated(){return isolated;},
       get ready(){return root.dataset.ready==='true';},get sceneId(){return sceneId;},get stopId(){return stopId;},

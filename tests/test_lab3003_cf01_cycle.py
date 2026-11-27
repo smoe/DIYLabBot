@@ -19,6 +19,9 @@ class Lab3003CentrifugeCycleTests(unittest.TestCase):
         return [dict(sample, points=[{'time_s': 0}, {'time_s': 4}],
                      jaw_points=[{'time_s': 0}, {'time_s': 4}], grip_s=1, seat_s=2) for sample in samples]
 
+    def return_paths(self):
+        return [dict(path, direction='unload') for path in reversed(self.timed_paths())]
+
     def test_extended_support_trace_holds_station_until_arm_clears(self):
         result = cycle.compile_cycle(arm_paths=self.timed_paths())
         self.assertFalse(result['arm_motion_checked'])
@@ -66,6 +69,69 @@ class Lab3003CentrifugeCycleTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, 'confirmation: support_release'):
             cycle.compile_cycle(arm_paths=self.timed_paths(), feedback=observe)
+
+    def test_return_requires_standstill_and_retains_each_cassette_identity(self):
+        result = cycle.compile_cycle(arm_paths=self.timed_paths(), return_paths=self.return_paths())
+        joined = result['steps']
+        stop = next(step for step in joined if step['phase'] == 'stopped')
+        self.assertTrue(stop['lid_locked'] and stop['brake_held'])
+        self.assertEqual(stop['seated'], ['B2_Tube01', 'B2_Tube07'])
+        self.assertFalse(stop['returned'])
+        self.assertLess(result['stopped_s'], result['transport_ready_s'])
+        for previous, step in zip(joined, joined[1:]):
+            self.assertLess(previous['time_s'], step['time_s'])
+            if step['time_s'] > stop['time_s']:
+                self.assertEqual(step['rpm'], 0)
+                self.assertLessEqual(abs(step['rotor_deg'] - previous['rotor_deg']), 180)
+        expected = ['B2_Tube07', 'B2_Tube01']
+        for index, sample in enumerate(result['return_samples']):
+            identity = expected[index]
+            self.assertEqual(sample['id'], identity)
+            phases = {step['phase']: step for step in joined if step['tube_id'] == identity}
+            contact, raised, grip, seat, clear, parked = (
+                phases[key] for key in ('pickup_contact', 'pickup_raised', 'pickup_grasp',
+                                        'cassette_seated', 'return_arm_clear', 'pickup_pusher_parked'))
+            self.assertEqual([p['time_s'] for p in (raised, grip, seat, clear, parked)],
+                             [sample[key] for key in ('arm_start_s', 'grip_s', 'cassette_release_s',
+                                                      'arm_clear_s', 'pusher_parked_s')])
+            self.assertEqual(contact['pusher_sample_id'], identity)
+            self.assertEqual(contact['lift_mm'], 0)
+            self.assertEqual(raised['pusher_sample_id'], identity)
+            self.assertGreater(raised['lift_mm'], 0)
+            self.assertIsNone(grip['pusher_sample_id'])
+            self.assertNotIn(identity, grip['seated'] + grip['returned'])
+            self.assertEqual(seat['returned'], expected[:index + 1])
+            self.assertFalse(seat['arm_clear'])
+            self.assertTrue(clear['arm_clear'])
+            self.assertEqual(clear['pusher_mm'], raised['pusher_mm'])
+            self.assertEqual(parked['pusher_mm'], 0)
+            self.assertTrue(parked['arm_clear'])
+            self.assertNotIn(identity, parked['seated'])
+            self.assertAlmostEqual(math.remainder(raised['rotor_deg'] + (sample['slot'] - 1) * 30, 360), 0)
+        ready = joined[-1]
+        self.assertEqual(ready['phase'], 'transport_ready')
+        self.assertEqual(ready['returned'], expected)
+        self.assertFalse(ready['seated'] or ready['cover_removed'])
+        self.assertTrue(ready['transport_ready'] and ready['arm_clear'] and ready['lid_locked'])
+        self.assertTrue(all(not step['transport_ready'] for step in joined[:-1]))
+        self.assertEqual(result['duration_s'], ready['time_s'])
+
+    def test_return_requires_original_slot_and_confirmed_cover_before_departure(self):
+        for missing, message in [('cassette_seat', 'cassette_seat'), ('cover_replaced', 'cover_replaced')]:
+            with self.subTest(missing=missing):
+                def observe(event, sample):
+                    if sample is None:
+                        return {'cover_removed': True, 'cover_replaced': event != missing}
+                    return {**cycle.batch.synthetic_feedback(event, sample), 'rotor_slot': sample['slot'],
+                            'empty_confirmed': True, 'extended_confirmed': True, 'rested_confirmed': True,
+                            'parked_confirmed': True, 'presented_confirmed': True, 'destination_empty': True,
+                            'cassette_seated': True, 'cassette_slot': 'wrong slot' if event == missing else sample['id']}
+
+                with self.assertRaisesRegex(ValueError, 'confirmation: ' + message):
+                    cycle.compile_cycle(arm_paths=self.timed_paths(), return_paths=self.return_paths(),
+                                        feedback=observe)
+        with self.assertRaisesRegex(ValueError, 'ordered tube'):
+            cycle.compile_cycle(arm_paths=self.timed_paths(), return_paths=list(reversed(self.return_paths())))
 
     def test_chronology_and_observed_ownership(self):
         result = cycle.compile_cycle()

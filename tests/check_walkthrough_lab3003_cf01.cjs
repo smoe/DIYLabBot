@@ -59,21 +59,28 @@ function config() {
   };
 }
 
-test('lowering preserves the same cassette body from arm to pusher to rotor', () => {
+function supportedFixture(returning = false) {
   // Synthetic channels test custody and transforms, not the native arm path.
   const python = `
-import json, sys
+import json, math, sys
 sys.path.insert(0, 'scripts')
 from lab3003_cf01_cycle import compile_cycle
+returning = sys.argv[1] == 'true'
+home = .1 if returning else 0
 points = [{'time_s': t, 'positions_rad': [angle]+[0]*5, 'velocities_rad_s': [0]*6,
-           'accelerations_rad_s2': [0]*6} for t, angle in enumerate((0, .3, .6, 0))]
+           'accelerations_rad_s2': [0]*6} for t, angle in enumerate((home, .3, .6, home))]
 jaw = [{'time_s': t, 'positions_mm': [gap], 'velocities_mm_s': [0], 'accelerations_mm_s2': [0]}
        for t, gap in enumerate((12, 9, 12, 12))]
 samples = [{'id': label, 'slot': slot, 'points': points, 'jaw_points': jaw, 'grip_s': 1, 'seat_s': 2}
            for label, slot in (('B2_Tube01', 1), ('B2_Tube07', 7))]
-print(json.dumps({'cycle': compile_cycle(arm_paths=samples), 'tracks': samples}))
+returns = [dict(sample, direction='unload',
+                points=[dict(point, time_s=3-point['time_s']) for point in reversed(points)],
+                jaw_points=[dict(point, time_s=3-point['time_s']) for point in reversed(jaw)])
+           for sample in reversed(samples)] if returning else None
+print(json.dumps({'cycle': compile_cycle(arm_paths=samples, return_paths=returns),
+                  'tracks': samples, 'returns': returns, 'home': math.degrees(home)}))
 `;
-  const {cycle, tracks} = JSON.parse(execFileSync('python3', ['-B', '-c', python], {
+  const {cycle, tracks, returns, home} = JSON.parse(execFileSync('python3', ['-B', '-c', python, String(returning)], {
     cwd: path.resolve(__dirname, '..'), encoding: 'utf8',
   }));
   const identity = () => Float32Array.from([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
@@ -93,7 +100,16 @@ print(json.dumps({'cycle': compile_cycle(arm_paths=samples), 'tracks': samples})
   cycle.arm_motion = {samples: tracks, joints: Array.from({length:6}, (_, i) => joint(['Arm'+i], [0,0,1])),
     reference_deg: [0,0,0,0,0,0], tool: {bodies:[{id:'Finger',gap_axis:[.5,0,0]}], reference_gap_mm:12},
     program_sha256:'a'.repeat(64), collision_report_sha256:'b'.repeat(64), native_report_sha256:'c'.repeat(64)};
-  const runtime = create(cycle, jointMatrix, {Curve, multiply, identity});
+  if (returning) {
+    cycle.arm_motion.home_deg = [home,0,0,0,0,0];
+    cycle.arm_motion.return_samples = returns;
+  }
+  return {cycle, motion: {Curve, multiply, identity}};
+}
+
+test('lowering preserves the same cassette body from arm to pusher to rotor', () => {
+  const {cycle, motion} = supportedFixture();
+  const runtime = create(cycle, jointMatrix, motion);
   assert(runtime.start(0, true));
   const sample = cycle.samples[0];
   const at = t => { runtime.advance(t*1000+.001); return runtime.snapshot; };
@@ -115,7 +131,55 @@ print(json.dumps({'cycle': compile_cycle(arm_paths=samples), 'tracks': samples})
 
   const unsafe = structuredClone(cycle);
   unsafe.steps.find(step => step.phase === 'lowering').arm_clear = false;
-  assert.throws(() => create(unsafe, jointMatrix, {Curve, multiply, identity}), /same supported tube/);
+  assert.throws(() => create(unsafe, jointMatrix, motion), /same supported tube/);
+});
+
+test('returned tubes rejoin the covered TR01 cassette only after confirmed standstill and individual handoffs', () => {
+  const {cycle, motion} = supportedFixture(true);
+  const runtime = create(cycle, jointMatrix, motion);
+  const at = t => { runtime.advance(t*1000+.001); return runtime.snapshot; };
+  const originalBody = id => cycle.samples.find(sample => sample.id === id).carrier_body_id;
+  const close = (a, b) => a.every((value, i) => Math.abs(value - b[i]) < 1e-6);
+  assert(runtime.start(0, true));
+  assert(Math.abs(runtime.snapshot.arm_joints_deg[0] - cycle.arm_motion.home_deg[0]) < 1e-6);
+  assert.equal(at(cycle.stopped_s).phase, 'stopped');
+  assert.deepEqual(runtime.snapshot.seated, cycle.samples.map(sample => sample.id));
+  assert.equal(runtime.snapshot.transport_ready, false);
+  for (const sample of cycle.return_samples) {
+    const body = originalBody(sample.id);
+    const contact = cycle.steps.find(step => step.tube_id === sample.id && step.phase === 'pickup_contact').time_s;
+    at(contact-.0001);
+    const seated = Array.from(runtime.modelMatrix(body));
+    assert.equal(at(contact).pusher_sample_id, sample.id);
+    assert(close(seated, Array.from(runtime.modelMatrix(body))));
+    const rising = at((contact+sample.arm_start_s)/2);
+    assert(rising.lift_mm > 0);
+    assert(runtime.modelMatrix(body)[14] > seated[14]);
+    at(sample.grip_s-.0001);
+    const supported = Array.from(runtime.modelMatrix(body));
+    assert.equal(at(sample.grip_s).held_tube, sample.id);
+    assert(close(supported, Array.from(runtime.modelMatrix(body))));
+    assert.notEqual(runtime.modelMatrix(body), null);
+    assert.equal(at(sample.cassette_release_s).held_tube, null);
+    assert.equal(runtime.modelMatrix(body), null);
+    assert.equal(runtime.hidden(body), false);
+    assert(runtime.snapshot.returned.includes(sample.id));
+    assert.equal(runtime.snapshot.transport_ready, false);
+    assert.equal(runtime.hidden('Cover'), true);
+    assert.equal(at(sample.pusher_parked_s).pusher_mm, 0);
+  }
+  assert.equal(at(cycle.duration_s).state, 'completed');
+  assert.equal(runtime.snapshot.transport_ready, true);
+  assert.equal(runtime.hidden('Cover'), false);
+  assert.deepEqual(runtime.snapshot.seated, []);
+  assert.deepEqual(runtime.snapshot.returned, cycle.samples.map(sample => sample.id).reverse());
+
+  const unsafe = structuredClone(cycle);
+  unsafe.steps.at(-1).cover_removed = true;
+  assert.throws(() => create(unsafe, jointMatrix, motion), /cover fitted/);
+  const displaced = structuredClone(cycle);
+  displaced.arm_motion.return_samples[0].points[1].positions_rad[0] += .1;
+  assert.throws(() => create(displaced, jointMatrix, motion), /same raised tube/);
 });
 
 test('requires actual docking, plays once and preserves custody through completion', () => {

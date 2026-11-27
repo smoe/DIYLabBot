@@ -13,6 +13,14 @@ const config = {
 };
 const identity=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
 const transform = (matrix, xyz) => xyz.map((_,i)=>matrix[i]*xyz[0]+matrix[i+4]*xyz[1]+matrix[i+8]*xyz[2]+matrix[i+12]);
+const halfTurnConfig = {
+  ...config,
+  points: [point(0,[930,5615,0]), point(4,[2000,4000,Math.PI]),
+           point(6,[2000,4000,2*Math.PI]), point(8,[930,5615,3*Math.PI])],
+  half_turn: {start_s:4,end_s:6,delta_rad:Math.PI},
+  direction_sections: [{direction:'forward',start_s:0,end_s:4},{direction:'pivot',start_s:4,end_s:6},
+                       {direction:'forward',start_s:6,end_s:8}],
+};
 
 test('uses the certified mixed-unit quintic curve and moves around the original world dock', () => {
   const player=create(config,Curve);
@@ -67,14 +75,43 @@ test('reports the reverse phase only at and after the stationary gear-change kno
   assert.throws(()=>create({...mixed,reversal:{time_s:4.1}},Curve),/stationary knot/);
 });
 
+test('executes the half-turn in the cleared aisle and retains the opposite dock at arrival', () => {
+  const player = create(halfTurnConfig, Curve);
+  player.play(0);
+  player.advance(1250);
+  assert.equal(player.snapshot.direction, 'pivot');
+  assert.deepEqual(player.snapshot.pose_mm_rad.slice(0,2), [2000,4000]);
+  assert(Math.abs(player.snapshot.pose_mm_rad[2]-1.5*Math.PI)<1e-9);
+  player.advance(2000);
+  assert.equal(player.arrived,true);
+  assert.equal(player.snapshot.direction,'forward');
+  const centre = player.roomPoint([930,5615,0]).map(v=>v/1000);
+  for (const [i,value] of transform(player.matrix, [centre[0]+.05,centre[1]-.15,centre[2]]).entries()) {
+    assert(Math.abs(value-[centre[0]-.05,centre[1]+.15,centre[2]][i])<2e-6);
+  }
+  player.seek(0);
+  assert.deepEqual(Array.from(player.matrix),identity);
+});
+
+test('requires a genuine stationary centre and half-turn for an opposite dock', () => {
+  assert.throws(()=>create({...halfTurnConfig,points:halfTurnConfig.points.with(2,point(6,[2001,4000,Math.PI*2]))},Curve),/stationary knots/);
+  assert.throws(()=>create({...halfTurnConfig,half_turn:{...halfTurnConfig.half_turn,delta_rad:Math.PI/2}},Curve),/stationary knots/);
+  assert.throws(()=>create({...halfTurnConfig,points:halfTurnConfig.points.with(3,point(8,[930,5615,2*Math.PI]))},Curve),/same dock/);
+});
+
 if(process.env.TR01_PROGRAM) test('replays the actual model knots and exact dock endpoints',()=>{
   const {routes:[route]}=JSON.parse(readFileSync(process.env.TR01_PROGRAM,'utf8'));
   const player=create({...config,points:route.points,duration_s:route.duration_s,
-    reversal:route.reversal,direction_sections:route.direction_sections},Curve);
+    reversal:route.reversal,half_turn:route.half_turn,direction_sections:route.direction_sections},Curve);
   for(const knot of route.points.filter((_,i)=>i%31===0)){
     player.seek(knot.time_s);
     player.snapshot.pose_mm_rad.forEach((v,i)=>assert(Math.abs(v-knot.pose_mm_rad[i])<1e-7));
   }
   player.seek(route.duration_s);
-  assert.deepEqual(Array.from(player.matrix),identity);
+  if (route.half_turn) {
+    assert(Math.abs(player.matrix[0]+1)<1e-9);
+    assert(Math.abs(player.matrix[5]+1)<1e-9);
+  } else {
+    assert.deepEqual(Array.from(player.matrix),identity);
+  }
 });

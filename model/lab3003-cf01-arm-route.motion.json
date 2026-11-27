@@ -22,6 +22,7 @@
       "source_sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
     }
   },
+  "home_joints_deg": [-78.28831, 9.65802, -101.10678, -7.80772, -88.08537, -35.49701],
   "cassette_approach": {
     "roll_deg": -45.0,
     "side_offset_mm": {
@@ -38,7 +39,8 @@
   },
   "station_approach": {
     "roll_deg": 0.0,
-    "axial_travel_mm": 24.0
+    "axial_travel_mm": 24.0,
+    "retreat_blend_end_fraction": 0.22
   },
   "loaded_joint_blend_offset_deg": [
     -48.0,

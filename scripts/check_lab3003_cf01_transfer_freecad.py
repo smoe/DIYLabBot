@@ -1,5 +1,6 @@
 """Check the Lab 3.003 transfer against native solids and bounded PVA motion."""
 import argparse
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 import itertools
 import json
@@ -37,11 +38,55 @@ def bbox(shape):
 
 
 def lower_distance(a, b):
-    return math.hypot(*(max(0., a[i]-b[i+3], b[i]-a[i+3]) for i in range(3)))
+    return math.hypot(max(0., a[0]-b[3], b[0]-a[3]),
+                      max(0., a[1]-b[4], b[1]-a[4]),
+                      max(0., a[2]-b[5], b[2]-a[5]))
 
 
 def corners(box):
     return itertools.product(*zip(box[:3], box[3:]))
+
+
+def _swept_box(box, frame, joint):
+    """Enclose a rigid shape for the whole travel of its single station joint."""
+    minima = [math.inf]*3
+    maxima = [-math.inf]*3
+    lo, hi = joint['limits']
+    origin = joint['origin']
+    axis = joint['axis']
+    if joint['type'] not in {'revolute', 'slider'}:
+        raise ValueError('A native station sweep requires a rigid revolute or slider joint')
+    if joint['type'] == 'revolute':
+        lo, hi = math.radians(lo), math.radians(hi)
+    for point in corners(box):
+        if joint['type'] == 'slider':
+            endpoints = [robot.transform(frame, cf.plus(point, axis, value)) for value in (lo, hi)]
+            for i, coordinate in enumerate(zip(*endpoints)):
+                minima[i] = min(minima[i], *coordinate)
+                maxima[i] = max(maxima[i], *coordinate)
+            continue
+        offset = [value-zero for value, zero in zip(point, origin)]
+        axial = sum(value*direction for value, direction in zip(offset, axis))
+        center = robot.transform(frame, cf.plus(origin, axis, axial))
+        radial = [value-axial*direction for value, direction in zip(offset, axis)]
+        cross = [axis[1]*radial[2]-axis[2]*radial[1],
+                 axis[2]*radial[0]-axis[0]*radial[2],
+                 axis[0]*radial[1]-axis[1]*radial[0]]
+        for i, row in enumerate(frame[:3]):
+            a = sum(x*y for x, y in zip(row, radial))
+            b = sum(x*y for x, y in zip(row, cross))
+            if hi-lo >= math.tau:
+                amplitude = math.hypot(a, b)
+                probes = (-amplitude, amplitude)
+            else:
+                peak = math.atan2(b, a)
+                extrema = (peak+k*math.pi for k in
+                           range(math.ceil((lo-peak)/math.pi), math.floor((hi-peak)/math.pi)+1))
+                probes = [a*math.cos(angle)+b*math.sin(angle) for angle in (lo, hi, *extrema)]
+            minima[i] = min(minima[i], center[i]+min(probes))
+            maxima[i] = max(maxima[i], center[i]+max(probes))
+    return tuple([value-NUMERICAL_MARGIN_MM for value in minima]+
+                 [value+NUMERICAL_MARGIN_MM for value in maxima])
 
 
 @dataclass(frozen=True)
@@ -157,6 +202,7 @@ class Lab3003TransferOracle:
         self._load_station(station, lab)
         self._tool_body_cache = {}
         self._cargo_body_cache = {}
+        self._rigid_contact_cache = {}
         self._local_bounds = {identity: bbox(shape) for _, identity, shape, _, _ in self.arm}
         self._local_bounds.update({'Tool.'+part['id']: bbox(shape) for part, shape in self.tool})
         self._local_bounds.update({'Carried.'+identity: self.vehicle[identity].box for identity in self.samples})
@@ -351,6 +397,7 @@ class Lab3003TransferOracle:
         if self.vehicle.keys() != expected:
             raise ValueError('Incomplete checked native TR01 geometry')
         self.cargo_axes = {}
+        self.grip_widths = {}
         for identity in self.samples:
             shaft = next(op['shape'] for op in expanded['operations']
                          if op['body'] == identity and op['action'] == 'create')
@@ -359,6 +406,7 @@ class Lab3003TransferOracle:
             origin = robot.transform(self.vehicle_frame, shaft['origin'])
             tip = robot.transform(self.vehicle_frame, cf.plus(shaft['origin'], shaft['axis'], shaft['height']))
             self.cargo_axes[identity] = (origin, tip)
+            self.grip_widths[identity] = 2.*shaft['radius']
 
     def _load_station(self, path, lab):
         source = layout.load(validate_builds=False)
@@ -424,8 +472,11 @@ class Lab3003TransferOracle:
             obstacles = self.fixed + [
                 entry for name, entry in self.vehicle.items()
                 if name not in loaded and (name != 'TransportCover' or cover_on)]
-            obstacles += [body('CF01.'+identity, self.placed(shape, frames[group]), 'station')
-                          for identity, group, shape in self.station_shapes]
+            for identity, group, shape in self.station_shapes:
+                frame = frames[group]
+                box = bbox(shape)
+                obstacles.append(body('CF01.'+identity, self.placed(shape, frame), 'station',
+                                      enclosure=obb(frame, box[:3], box[3:])))
             for identity in loaded:
                 if identity != tube_id or stage in {'release', 'withdraw'}:
                     placement = self.seated_pose(identity, self.samples[identity], rotor_deg,
@@ -503,6 +554,21 @@ class Lab3003TransferOracle:
             return 'proved_vertical_departure_from_cassette_support'
         return None
 
+    def _pair_geometry(self, a, b, gap_mm, carried_from_tcp):
+        """Reuse native geometry only where rigid invariance removes all arm joints."""
+        key = None
+        if a.link == 0 and b.kind in {'dock', 'building', 'fixture'}:
+            key = a.id, b.id
+        elif a.kind == 'tool' and b.kind == 'carried' and carried_from_tcp is not None:
+            key = a.id, b.id, gap_mm if a.jaw_factor else None, tuple(map(tuple, carried_from_tcp))
+        if key is not None and key in self._rigid_contact_cache:
+            return self._rigid_contact_cache[key]
+        distance = a.shape.distToShape(b.shape)[0]
+        overlap = a.shape.common(b.shape).Volume if distance <= NUMERICAL_MARGIN_MM else 0.
+        if key is not None:
+            self._rigid_contact_cache[key] = distance, overlap
+        return distance, overlap
+
     def pose_clearance(self, joints_deg, *, tube_id, stage, gap_mm, rotor_slot, rotor_deg=None,
                        lid_state='open', cover_on=False, seated=(), carried_pose=None,
                        carried_from_tcp=None, margin_mm=0., q_radius_deg=None, gap_radius_mm=0.,
@@ -558,24 +624,22 @@ class Lab3003TransferOracle:
                 shared = min(a.link, b.link)
                 movement = sum((a.radii[k]+b.radii[k])*angles[k] for k in range(shared, 6))
                 movement += (a.jaw_factor+b.jaw_factor)*gap_radius_mm
-            contact = self._contact(a, b, tube_id, stage, cassette_departure)
             threshold = margin_mm+movement+NUMERICAL_MARGIN_MM
             if distance <= threshold:
                 distance = max(distance, directional_lower_distance(a, b))
-            if distance > threshold and contact is None:
+            if distance > threshold:
                 clearance = distance-movement
             elif b.shape is None:
                 clearance = distance-movement
                 if clearance <= threshold-movement:
                     pending.append([a.id, b.id])
             else:
-                distance = a.shape.distToShape(b.shape)[0]
+                contact = self._contact(a, b, tube_id, stage, cassette_departure)
+                distance, overlap = self._pair_geometry(a, b, gap_mm, carried_from_tcp)
                 clearance = distance-movement
-                if distance <= NUMERICAL_MARGIN_MM:
-                    overlap = a.shape.common(b.shape).Volume
-                    if overlap > VOLUME_EPS_MM3:
-                        return {'passed': False, 'collision': [a.id, b.id], 'overlap_mm3': overlap,
-                                'minimum_clearance_mm': 0., 'limiting_pair': [a.id, b.id]}
+                if overlap > VOLUME_EPS_MM3:
+                    return {'passed': False, 'collision': [a.id, b.id], 'overlap_mm3': overlap,
+                            'minimum_clearance_mm': 0., 'limiting_pair': [a.id, b.id]}
                 if contact is not None:
                     contracts[contact] = contracts.get(contact, 0)+1
                     continue
@@ -649,7 +713,38 @@ class Lab3003TransferOracle:
                 'scope': 'Carried vessel stays above the stationary cassette support plane, '
                          'with height bounded below by the stated coefficient times u cubed.'}
 
-    def check_curve(self, sample, *, max_depth=15):
+    def parked_station_clearance(self, home, gap_mm):
+        """Separate the bent parked arm from lid, latch, rotor, lift and seated-tube sweeps."""
+        joints = {joint['child']: joint for joint in self.station_geometry['joints']}
+        sweeps = []
+        for name, group, shape in self.station_shapes:
+            if group == 'Frame':
+                continue
+            joint = joints[group]
+            if joint['parent'] != 'Frame':
+                raise ValueError('A moving native CF01 body has an unsupported ancestor: '+name)
+            sweeps.append(('CF01.'+name, _swept_box(bbox(shape), self.cf_frame, joint)))
+        rotor = joints['RotorGroup']
+        for tube_id, slot in self.samples.items():
+            vessel = self.vehicle[tube_id].shape
+            stored = self.seated_pose(tube_id, slot, 0.)
+            local = self.placed(vessel, robot.multiply(robot.inverse(self.cf_frame), stored))
+            sweeps.append(('Rotor.'+tube_id, _swept_box(bbox(local), self.cf_frame, rotor)))
+            indexed = self.rotor_angle(slot)
+            boxes = [bbox(self.placed(vessel, self.seated_pose(tube_id, slot, indexed, lift)))
+                     for lift in (0., self.station_p['lift_travel'])]
+            sweeps.append(('Lift.'+tube_id, tuple(min(a, b)-NUMERICAL_MARGIN_MM for a, b in zip(
+                boxes[0][:3], boxes[1][:3]))+tuple(max(a, b)+NUMERICAL_MARGIN_MM for a, b in zip(
+                    boxes[0][3:], boxes[1][3:]))))
+        moving = self._moving(home, gap_mm, next(iter(self.samples)), None, None)
+        clearance, arm_body, fixture = min((lower_distance(entry.box, swept), entry.id, name)
+                                           for entry in moving for name, swept in sweeps)
+        return {'passed': clearance > NUMERICAL_MARGIN_MM, 'minimum_clearance_mm': clearance,
+                'limiting_pair': [arm_body, fixture], 'swept_body_count': len(sweeps),
+                'scope': 'Axis-aligned bounds of each native CF01 joint sweep and occupied tube sweep '
+                         'versus the stationary runtime home arm and gripper.'}
+
+    def check_curve(self, sample, *, home=None, mirror=False, max_depth=15):
         """Certify all noncontact pairs between exact polynomial knots where possible."""
         points = sample['points']
         jaw_points = sample['jaw_points']
@@ -660,7 +755,8 @@ class Lab3003TransferOracle:
             raise ValueError('Shared exact channel duration and ordered custody events required')
         if len(arm.points[0][PVA[0]]) != 6 or len(jaw.points[0][PVA[0]]) != 1:
             raise ValueError('Arm and jaw channels must specify exactly six and one coordinates')
-        park = [math.radians(value) for value in self.park]
+        home = self.park if home is None else home
+        park = [math.radians(value) for value in home]
         for point in (arm.points[0], arm.points[-1]):
             if (max(abs(a-b) for a, b in zip(point[PVA[0]], park)) > 1e-8 or
                     any(abs(x) > 1e-8 for key in PVA[1:] for x in point[key])):
@@ -672,6 +768,13 @@ class Lab3003TransferOracle:
                 jaw_limits['min'][0] <= 0. or jaw_limits['max'][0] > self.gripper['open_gap_mm']+1e-8):
             raise ValueError('Arm and jaw coordinates must stay inside mechanism limits between knots')
         tube_id, slot = sample['id'], sample['slot']
+        if mirror:
+            closed, released = self.grip_widths[tube_id], self.gripper['open_gap_mm']
+            parked = self.cassette_gap_mm
+            expected_gaps = [parked, parked, closed, closed, released, released, parked]
+            if ([point[PVA[0]][0] for point in jaw.points] != expected_gaps
+                    or any(any(point[PVA[1]]+point[PVA[2]]) for point in jaw.points)):
+                raise ValueError('Transfer jaws must close on the native shaft and open to the checked release gap')
         grip_q = [math.degrees(value) for value in arm.evaluate(grip)['positions_rad']]
         carried = robot.inverse(self.kin.tool(grip_q))
         seat_q = [math.degrees(value) for value in arm.evaluate(seat)['positions_rad']]
@@ -682,13 +785,13 @@ class Lab3003TransferOracle:
         # change its geometry, so probe the actual bottom and shaft axis.
         witness = max(math.dist(robot.transform(end, p), robot.transform(intended, p))
                       for p in self.cargo_axes[tube_id])
-        if witness > 0.005:
+        if witness > (NUMERICAL_MARGIN_MM/100 if mirror else 0.005):
             return {'passed': False, 'id': tube_id, 'slot': slot, 'seat_axis_error_mm': witness,
                     'reason': 'carried vessel does not reach the modeled pocket'}
         support = self._cassette_departure(arm, grip, tube_id, carried)
         fixed_seats = tuple(identity for identity in self.samples
                             if self.samples[identity] < slot)
-        closed_case = self.pose_clearance(self.park, tube_id=tube_id, rotor_slot=slot,
+        closed_case = self.pose_clearance(home, tube_id=tube_id, rotor_slot=slot,
             stage='approach', gap_mm=jaw.points[0][PVA[0]][0], lid_state='closed',
             cover_on=not fixed_seats, seated=fixed_seats, lift_mm=0.)
         if not closed_case['passed']:
@@ -768,10 +871,11 @@ def _canonical(points, fields):
 def _radius(curve, start, end, center):
     """Bound every polynomial value relative to its midpoint value on the interval."""
     radii = [0.]*len(center)
-    for index, coefficients in enumerate(curve.segments):
+    first = max(0, bisect_left(curve.times, start)-1)
+    last = min(len(curve.segments), bisect_right(curve.times, end))
+    for index in range(first, last):
+        coefficients = curve.segments[index]
         a, b = curve.times[index:index+2]
-        if b < start or a > end:
-            continue
         u, v = max(0., (start-a)/(b-a)), min(1., (end-a)/(b-a))
         for j, values in enumerate(coefficients):
             probes = [u, v, *motion.real_roots(motion.derivative(values), u, v)]
@@ -779,12 +883,104 @@ def _radius(curve, start, end, center):
     return [math.nextafter(value, math.inf) for value in radii]
 
 
-def verify_program(oracle, program_path, *, checkpoint_dir=None):
+def _stationary_arm_hold(track, start, end):
+    points = track['points']
+    times = [point['time_s'] for point in points]
+    if start not in times or end not in times:
+        return False
+    hold = points[times.index(start):times.index(end)+1]
+    return len(hold) >= 2 and all(
+        point[PVA[0]] == hold[0][PVA[0]] and not any(point[PVA[1]]+point[PVA[2]])
+        for point in hold)
+
+
+def _verify_return_samples(loads, returns):
+    """Check exact reversal and matching stationary custody transition poses."""
+    if [(row['id'], row['slot']) for row in returns] != [
+            (row['id'], row['slot']) for row in reversed(loads)]:
+        raise ValueError('Return the last loaded tube first to recreate the checked occupancies')
+    for load, unload in zip(reversed(loads), returns):
+        duration = load['points'][-1]['time_s']
+        jaw = load['jaw_points']
+        if (len(jaw) != 7 or jaw[2]['time_s'] != load['grip_s'] or jaw[4]['time_s'] != load['seat_s']
+                or not _stationary_arm_hold(load, jaw[1]['time_s'], jaw[2]['time_s'])
+                or not _stationary_arm_hold(load, jaw[3]['time_s'], jaw[4]['time_s'])):
+            raise ValueError('Return custody reversal requires both arm poses held throughout jaw travel')
+        if (unload.get('direction') != 'unload' or unload['grip_s'] != duration-jaw[3]['time_s']
+                or unload['seat_s'] != duration-jaw[1]['time_s']):
+            raise ValueError('Return custody must change only after the jaws complete their movement')
+        for channel, fields in (('points', PVA), ('jaw_points', JAW_PVA)):
+            original, reverse = load[channel], unload[channel]
+            if len(original) != len(reverse) or original[0]['time_s'] != 0.:
+                raise ValueError('Return channels must reproduce the entire zero-origin forward motion')
+            for forward, backward in zip(reversed(original), reverse):
+                position, velocity, acceleration = fields
+                if (backward['time_s'] != duration-forward['time_s']
+                        or backward[position] != forward[position]
+                        or backward[velocity] != [-value for value in forward[velocity]]
+                        or backward[acceleration] != forward[acceleration]):
+                    raise ValueError('Return channels must exactly reverse the forward PVA coefficients')
+
+
+def _reflected_evidence(load):
+    duration = load['duration_s']
+    allowance = NUMERICAL_MARGIN_MM/10
+    intervals = [{**interval, 'start_s': duration-interval['end_s'],
+                  'end_s': duration-interval['start_s'],
+                  'clearance_lower_mm': interval['clearance_lower_mm']-allowance}
+                 for interval in reversed(load['intervals'])]
+    return {key: load[key] for key in ('id', 'slot', 'passed', 'duration_s', 'lift_mm',
+                                       'seat_axis_error_mm', 'raised_pose_from_cassette')} | {
+        'intervals': intervals,
+        'source_load_id': load['id'],
+        'reflection_allowance_mm': allowance,
+        'scope': 'Exact time reversal of the certified load arm and jaw curves. '
+                 'The raised target tube and cassette tube keep their physical poses '
+                 'through each stationary jaw change. The other tube, indexed rotor, '
+                 'open lid and extended pusher match the source check at reflected times.',
+    }
+
+
+def _read_positive_checkpoint(path, identity, sample):
+    path = Path(path)
+    if not path.is_file():
+        return None
+    receipt = json.loads(path.read_text())
+    if receipt.get('format') != FORMAT+'/sample' or any(receipt.get(key) != value for key, value in identity.items()):
+        raise ValueError('Native checkpoint inputs changed: '+str(path))
+    evidence = receipt['sample']
+    if evidence.get('passed') is not True:
+        return None
+    start = sample['points'][0]['time_s']
+    for interval in evidence['intervals']:
+        if interval['start_s'] != start or interval['end_s'] <= start or interval['clearance_lower_mm'] <= 0.:
+            raise ValueError('Gapped or nonpositive native checkpoint: '+str(path))
+        start = interval['end_s']
+    if ((evidence['id'], evidence['slot']) != (sample['id'], sample['slot'])
+            or start != sample['points'][-1]['time_s']):
+        raise ValueError('Incomplete native checkpoint: '+str(path))
+    return evidence
+
+
+def verify_program(oracle, program_path, *, checkpoint_dir=None, only_sample=None, resume=False):
     path = Path(program_path).resolve()
     program = json.loads(path.read_text())
     expected = list(oracle.samples.items())
     if program.get('format') != PROGRAM or [(sample['id'], sample['slot']) for sample in program['samples']] != expected:
         raise ValueError('The complete two-vessel ArmC program is required')
+    home = program.get('home_joints_deg')
+    if home is not None:
+        route = 'model/lab3003-cf01-arm-route.motion.json'
+        if (route not in program['source_files_sha256'] or not isinstance(home, list) or len(home) != 6
+                or any(type(q) not in (int, float) or not math.isfinite(q) or not lo <= q <= hi
+                       for q, (lo, hi) in zip(home, oracle.kin.limits))
+                or home != json.loads((ROOT/route).read_text()).get('home_joints_deg')):
+            raise ValueError('Motion home must match the bounded route source')
+    returns = program.get('return_samples')
+    if returns is not None:
+        _verify_return_samples(program['samples'], returns)
+    if only_sample is not None and only_sample not in oracle.samples:
+        raise ValueError('Unknown sample selection')
     pins = dict(oracle.source_pins)
     for key, value in {**program['source_files_sha256'],
             str(Path(__file__).relative_to(ROOT)): VERIFIER_SHA256}.items():
@@ -792,6 +988,15 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None):
             raise ValueError('The proof inputs bind conflicting revision pins: '+key)
         pins[key] = value
     mesh.verify_pins(pins)
+    parked_station = None
+    if home is not None:
+        gaps = {sample['jaw_points'][index]['positions_mm'][0]
+                for sample in program['samples'] for index in (0, -1)}
+        if len(gaps) != 1:
+            raise ValueError('Both directions need a common parked gripper position')
+        parked_station = oracle.parked_station_clearance(home, gaps.pop())
+        if not parked_station['passed']:
+            raise ValueError('Station sweep is unresolved at runtime home: '+str(parked_station))
     digest = robot.digest(path)
     samples = []
     identity = {'program_sha256': digest, 'source_files_sha256': pins,
@@ -807,7 +1012,12 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None):
         checkpoint_dir = Path(checkpoint_dir)
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
     for sample in program['samples']:
-        evidence = oracle.check_curve(sample)
+        if only_sample is not None and sample['id'] != only_sample:
+            continue
+        receipt = checkpoint_dir/(sample['id']+'.json') if checkpoint_dir is not None else None
+        evidence = _read_positive_checkpoint(receipt, identity, sample) if resume and receipt else None
+        if evidence is None:
+            evidence = oracle.check_curve(sample, home=home, mirror=returns is not None)
         samples.append(evidence)
         diagnostic = {key: evidence[key] for key in
                       ('id', 'passed', 'time_s', 'side', 'reason', 'failure', 'queries') if key in evidence}
@@ -818,12 +1028,13 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None):
                 'limiting_pair': interval['detail']['limiting_pair']}
         print(json.dumps(diagnostic), flush=True)
         verify_inputs()
-        if checkpoint_dir is not None:
-            receipt = checkpoint_dir/(sample['id']+'.json')
+        if receipt is not None:
             staged = receipt.with_suffix('.tmp')
             staged.write_text(json.dumps({'format': FORMAT+'/sample', **identity, 'sample': evidence}, indent=2)+'\n')
             staged.replace(receipt)
-    return {'format': FORMAT, 'passed': all(sample['passed'] for sample in samples),
+    complete = only_sample is None
+    passed = all(sample['passed'] for sample in samples)
+    result = {'format': FORMAT if complete else FORMAT+'/partial', 'passed': passed,
             **identity, 'samples': samples,
             'stock_html_sha256': getattr(oracle, 'stock_html_sha256', None),
             'gripper': {**oracle.gripper, 'cassette_open_gap_mm': oracle.cassette_gap_mm},
@@ -836,6 +1047,12 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None):
             'scope': 'Numerical native BRep trajectory verification of the ArmC and actual cassette vessel. '
                      'CF01 index and lid are held during the arm trajectory. Cover handling, machine limits '
                      'and hardware clearance are outside this report.'}
+    if home is not None:
+        result['home_joints_deg'] = home
+        result['parked_station_sweep'] = parked_station
+    if returns is not None and complete and passed:
+        result['return_samples'] = [_reflected_evidence(sample) for sample in reversed(samples)]
+    return result
 
 
 def main():
@@ -846,11 +1063,14 @@ def main():
     parser.add_argument('--dock-certificate', type=Path, required=True)
     parser.add_argument('--pusher-report', type=Path, required=True)
     parser.add_argument('--checkpoint-dir', type=Path)
+    parser.add_argument('--only-sample', help='Write a native checkpoint for just one supported vessel')
+    parser.add_argument('--resume', action='store_true', help='Reuse compatible positive native checkpoints')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     oracle = Lab3003TransferOracle.from_stock(args.stock_preview, args.arm_report,
                                             args.dock_certificate, args.pusher_report)
-    result = verify_program(oracle, args.program, checkpoint_dir=args.checkpoint_dir)
+    result = verify_program(oracle, args.program, checkpoint_dir=args.checkpoint_dir,
+                            only_sample=args.only_sample, resume=args.resume)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2)+'\n')
     if not result['passed']:

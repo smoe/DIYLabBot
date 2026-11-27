@@ -11,6 +11,7 @@ from build_lab3003_tr01_walkthrough import configure_cf01_cycle, read, replace_m
 import centrifuge_robot_pickup as pickup
 import export_building_walkthrough_freecad as mesh
 import lab3003_cf01_cycle
+from lab3003_tr01_return_lap import checked_lap
 import robot_spec as robot
 
 
@@ -38,8 +39,17 @@ def checked_transfer(program_path, proof_path, pusher_path, arm_path, stock_path
             raise ValueError('A native transfer input changed: '+name)
     mesh.verify_pins(program['source_files_sha256'])
     mesh.verify_pins(proof['source_files_sha256'])
-    tracks = program['samples']
-    certified = proof['samples']
+    tracks, returns = program['samples'], program.get('return_samples')
+    checked_tracks(tracks, proof['samples'])
+    if returns is not None:
+        if (proof.get('home_joints_deg') != program['home_joints_deg']
+                or proof.get('parked_station_sweep', {}).get('passed') is not True):
+            raise ValueError('The bent home must match the checked station sweep')
+        checked_tracks(returns, proof['return_samples'])
+    return tracks, returns, proof
+
+
+def checked_tracks(tracks, certified):
     identity = lambda row: (row['id'], row['slot'])
     if (len(tracks) != 2 or [identity(item) for item in tracks] != [identity(item) for item in certified]
             or any(row.get('passed') is not True or not row.get('intervals') for row in certified)):
@@ -48,13 +58,14 @@ def checked_transfer(program_path, proof_path, pusher_path, arm_path, stock_path
         boundary = track['points'][0]['time_s']
         for interval in sorted(row['intervals'], key=lambda value: value['start_s']):
             start, end = interval['start_s'], interval['end_s']
-            if not (math.isclose(start, boundary, abs_tol=1e-9, rel_tol=0) and end > start):
-                raise ValueError('The native certificate contains an uncovered arm interval')
+            clearance = interval['clearance_lower_mm']
+            if not (math.isclose(start, boundary, abs_tol=1e-9, rel_tol=0) and end > start
+                    and math.isfinite(clearance) and clearance > 0):
+                raise ValueError('The native certificate contains an uncovered or unsafe arm interval')
             boundary = end
         if not math.isclose(boundary, track['points'][-1]['time_s'], abs_tol=1e-9, rel_tol=0):
             raise ValueError('The native certificate must cover the entire arm motion')
         mesh.validate_rigid(row['raised_pose_from_cassette'])
-    return tracks, proof
 
 
 def arm_config(lab, binding, scene):
@@ -100,15 +111,23 @@ def tool_mesh(lab, arm, gripper, reference_gap):
     return builder.result(), {'reference_gap_mm': reference_gap, 'bodies': bodies}
 
 
-def build(stock, arm_path, program_path, proof_path, pusher_path, output):
+def build(stock, arm_path, program_path, proof_path, pusher_path, output,
+          *, lap_program=None, lap_report=None):
     payload, native = parked_payload(stock, arm_path)
-    tracks, proof = checked_transfer(program_path, proof_path, pusher_path, arm_path, stock, native)
+    tracks, returns, proof = checked_transfer(program_path, proof_path, pusher_path, arm_path, stock, native)
+    has_return = returns is not None
+    if any((path is not None) != has_return for path in (lap_program, lap_report)):
+        raise ValueError('The return cycle requires matching certified half-turn route inputs')
     lab = next(room for room in payload['laboratories'] if room['id'] == 'Lab3003')
-    cycle = lab3003_cf01_cycle.compile_cycle(arm_paths=tracks)
+    cycle = lab3003_cf01_cycle.compile_cycle(arm_paths=tracks, return_paths=returns)
     supports = {step['tube_id']: step['lift_mm'] for step in cycle['steps'] if step['phase'] == 'pusher_transfer'}
     if any(supports.get(row['id']) != row['lift_mm'] for row in proof['samples']):
         raise ValueError('The station trace differs from the certified support elevation')
-    for sample in cycle['samples']:
+    if returns is not None:
+        raised = {step['tube_id']: step['lift_mm'] for step in cycle['steps'] if step['phase'] == 'pickup_raised'}
+        if any(raised.get(row['id']) != row['lift_mm'] for row in proof['return_samples']):
+            raise ValueError('The unloading trace differs from the certified support elevation')
+    for sample in cycle['samples'] + cycle.get('return_samples', []):
         del sample['points'], sample['jaw_points']
     scene = payload['scenes']['building']
     arm = native['arm']
@@ -134,6 +153,11 @@ def build(stock, arm_path, program_path, proof_path, pusher_path, output):
     cycle['arm_motion_checked'] = True
     cycle['docked_start'] = {key: truck[key] for key in ('level_id', 'fixture_states', 'parked_robots')}
     cycle['docked_start']['stop_id'] = payload['default_stop']
+    if returns is not None:
+        cycle['arm_motion'].update(return_samples=returns, home_deg=proof['home_joints_deg'])
+        payload['tr01_lap'] = checked_lap(truck, lap_program, lap_report, stock, program_path)
+        lap_pins = read(lap_report)['source_files_sha256']
+        payload['source_files_sha256'] = browser.merge_pins(payload['source_files_sha256'], lap_pins)
     cycle['playback_rate'] = 4
     payload.pop('lab3003_armc_parked')
     payload['source_files_sha256'] = browser.merge_pins(payload['source_files_sha256'], proof['source_files_sha256'])
@@ -145,6 +169,8 @@ def build(stock, arm_path, program_path, proof_path, pusher_path, output):
               'html_sha256': mesh.digest(html), 'arm_program_sha256': mesh.digest(program_path),
               'collision_report_sha256': mesh.digest(proof_path), 'pusher_geometry_report_sha256': mesh.digest(pusher_path),
               'browser_checked': False}
+    if lap_report is not None:
+        result['tr01_return_lap_report_sha256'] = mesh.digest(lap_report)
     (output/'preview-report.json').write_text(json.dumps(result, indent=2)+'\n', encoding='utf-8')
     return html
 
@@ -153,9 +179,12 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ('stock-preview', 'armc-report', 'program', 'collision-report', 'pusher-report', 'output-dir'):
         parser.add_argument('--'+name, type=Path, required=True)
+    parser.add_argument('--lap-program', type=Path)
+    parser.add_argument('--lap-report', type=Path)
     args = parser.parse_args()
     path = build(args.stock_preview, args.armc_report, args.program, args.collision_report,
-                 args.pusher_report, mesh.project_path(args.output_dir))
+                 args.pusher_report, mesh.project_path(args.output_dir),
+                 lap_program=args.lap_program, lap_report=args.lap_report)
     print(path, flush=True)
 
 

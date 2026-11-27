@@ -75,6 +75,31 @@ def smooth_clock(nodes):
     return result
 
 
+def chord_clock(nodes):
+    """Give equally sized joint-space steps comparable travel time."""
+    elapsed = 0.
+    result = [(elapsed, nodes[0][1])]
+    for (_, before), (_, after) in zip(nodes, nodes[1:]):
+        elapsed += math.dist(before, after)
+        result.append((elapsed, after))
+    return result
+
+
+def reversed_handoff(track):
+    """Reverse the articulated curve and confirm custody after the jaw travel."""
+    duration = track['points'][-1]['time_s']
+
+    def reverse(points, velocity):
+        return [{**node, 'time_s': duration - node['time_s'],
+                 velocity: [-value for value in node[velocity]]} for node in reversed(points)]
+
+    jaw = track['jaw_points']
+    return {'id': track['id'], 'slot': track['slot'], 'direction': 'unload',
+            'points': reverse(track['points'], VELOCITY),
+            'jaw_points': reverse(jaw, JAW_FIELDS[1]),
+            'grip_s': duration - jaw[3]['time_s'], 'seat_s': duration - jaw[1]['time_s']}
+
+
 class Workspace:
     def __init__(self, stock_preview):
         self.route = preview.read(SOURCE)
@@ -88,7 +113,7 @@ class Workspace:
         lab, = [room for room in payload['laboratories'] if room['id'] == 'Lab3003']
         arm = variant.bind(lab)
         self.stock_sha256 = stock['html_sha256']
-        self.park = arm['park_joints_deg']
+        self.park = self.route['home_joints_deg']
         self.device = {item['id']: item['bound_pose'] for item in lab['device_instances']}
         self.cassette = preview.read(paths['cassette_grasp'])
         self.motion = load_limits(paths['motion_limits'])
@@ -107,6 +132,10 @@ class Workspace:
         scene['arm_fixture'].update(position_mm=[row[3] for row in base[:3]],
                                     yaw_deg=math.degrees(math.atan2(base[1][0], base[0][0])))
         self.kin = pickup.Kinematics(arm['arm'], scene)
+        if (not isinstance(self.park, list) or len(self.park) != len(self.kin.limits)
+                or not all(type(value) in (float, int) and low <= value <= high
+                           for value, (low, high) in zip(self.park, self.kin.limits))):
+            raise ValueError('The runtime home must specify six finite, in-range arm angles')
         self.jets = KinematicJets(self.kin)
         self.gripper = scene['gripper']
         self.ik = {'arm': arm['arm'], 'ap': self.kin.p, 'base': base}
@@ -150,7 +179,7 @@ class Workspace:
         return nodes
 
     def fit(self, nodes, sample_points=()):
-        points = smooth_clock(nodes) if len(nodes) > 2 else [
+        points = smooth_clock(chord_clock(nodes)) if len(nodes) > 2 else [
             point(0., [math.radians(v) for v in nodes[0][1]]),
             point(nodes[-1][0] - nodes[0][0], [math.radians(v) for v in nodes[-1][1]]),
         ]
@@ -177,6 +206,16 @@ class Workspace:
                 raise ValueError('A loaded waypoint forced a stop')
         evidence['applied_time_scale'] = factor
         evidence['joint_bounds'] = motion.bounds(timed)
+        curve = motion.Curve(timed)
+        xyz = []
+        for t0, t1 in zip(curve.times, curve.times[1:]):
+            for index in range(8):
+                q = curve.evaluate(t0 + (t1 - t0) * index / 8)[POSITION]
+                xyz.append([row[3] for row in self.kin.tool([math.degrees(v) for v in q])[:3]])
+        xyz.append([row[3] for row in self.kin.tool([math.degrees(v) for v in timed[-1][POSITION]])[:3]])
+        evidence['sampled_tcp_path_mm'] = sum(math.dist(a, b) for a, b in zip(xyz, xyz[1:]))
+        evidence['tcp_endpoint_distance_mm'] = math.dist(xyz[0], xyz[-1])
+        evidence['duration_s'] = timed[-1]['time_s']
         return timed, evidence
 
     def track(self, sample):
@@ -222,17 +261,24 @@ class Workspace:
         first_q = start[-1][1]
         control = [value + offset for value, offset in zip(vector_at(first_q, last_q, .5),
                                                           self.route['loaded_joint_blend_offset_deg'])]
-        blend = []
-        for index in range(1, 49):
-            u = index / 48
-            blend.append((1. + 4. * u, [(1-u)**2 * a + 2*u*(1-u) * b + u*u * c
-                                         for a, b, c in zip(first_q, control, last_q)]))
+        def blend(u):
+            return [(1-u)**2 * a + 2*u*(1-u) * b + u*u * c for a, b, c in zip(first_q, control, last_q)]
+
+        transit = [(1. + 4. * (i / 48), blend(i / 48)) for i in range(1, 49)]
         end = self.leg(lambda progress: station_pose(vector_at(high_station, raised, progress)),
                        36, 5., 6., last_q)
-        carried = start + blend + end[1:]
-        retreat = [(6. - time, q) for time, q in reversed(carried) if time >= 1.]
-        exposed = retreat[-1][1]
-        retreat.extend((5. + 2.5 * i / 40, vector_at(exposed, self.park, i / 40)) for i in range(1, 41))
+        carried = start + transit + end[1:]
+        retreat = [(6. - time, q) for time, q in reversed(end)]
+        stop_at = station_entry['retreat_blend_end_fraction']
+        if not 0. < stop_at < 1.:
+            raise ValueError('Retreat ends within the station clearance bend')
+        target = blend(stop_at)
+        home_offset = [a - b for a, b in zip(self.park, target)]
+        for i in range(1, 41):
+            progress = i / 40
+            nominal = blend(1. - progress * (1. - stop_at))
+            q = [base + progress**3 * adjust for base, adjust in zip(nominal, home_offset)]
+            retreat.append((1. + 4. * progress, self.park if i == 40 else q))
 
         radius = geometry['radius_mm']
         tube = next(op['shape'] for op in self.cargo['operations'] if op['body'] == identity and op['action'] == 'create')
@@ -277,9 +323,10 @@ def main():
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     workspace = Workspace(args.stock_preview)
+    samples = [workspace.track(sample) for sample in workspace.samples]
     program = {'format': FORMAT, 'source_files_sha256': workspace.pins,
-               'stock_html_sha256': workspace.stock_sha256,
-               'samples': [workspace.track(sample) for sample in workspace.samples],
+               'stock_html_sha256': workspace.stock_sha256, 'home_joints_deg': workspace.park,
+               'samples': samples, 'return_samples': [reversed_handoff(track) for track in reversed(samples)],
                'scope': 'Synthetic arm and jaw PVA with modeled dynamics. Independent native clearance required.'}
     args.out.write_text(json.dumps(program, indent=2, allow_nan=False) + '\n')
 

@@ -1,0 +1,11 @@
+{
+  "format": "solidcraftbot.lab3003-tr01-return-lap/1",
+  "laboratory_id": "Lab3003",
+  "motion": {
+    "source": "model/tr01-l01.motion.json",
+    "source_sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+  },
+  "old_dock_heading_deg": 270,
+  "pivot_deg": 180,
+  "cover_required": true
+}

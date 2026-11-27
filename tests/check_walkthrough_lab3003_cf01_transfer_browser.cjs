@@ -23,7 +23,10 @@ async function main() {
   assert(inline, 'A standalone preview with embedded native scene data is required.');
   const model = JSON.parse(inline[1]);
   const {lab3003_cf01_cycle: cycle} = model;
-  assert.equal(model.tr01_lap, undefined, 'This arm has a docked-start certificate.');
+  const departure = model.tr01_lap;
+  const hasReturns = Array.isArray(cycle.return_samples);
+  assert(!departure || hasReturns && departure.half_turn && !departure.autoplay,
+    'The docked arm may release only a checked, non-repeating departure lap.');
   assert.equal(cycle.arm_motion_checked, true);
   assert.equal(cycle.synthetic, true);
   assert(cycle.docked_start);
@@ -109,7 +112,8 @@ async function main() {
 
     const initial = await snapshot();
     assert.equal(initial.renderer, 'webgl2');
-    assert.equal(initial.lap, null);
+    if (departure) assert.equal(initial.lap.time_s, 0);
+    else assert.equal(initial.lap, null);
     assert.equal(initial.station.state, 'ready');
     assert.equal(initial.station.playback_rate, 4);
     assert.match(await page.locator('#walkthrough-cf01-status').textContent(), /4× · Modellzeit 0:00 \/ /);
@@ -143,7 +147,8 @@ async function main() {
       assert.equal(active.station.pusher_sample_id, null);
       assert.equal(active.station.arm_clear, false);
       assert.deepEqual(active.station.seated, seated);
-      assert(active.station.arm_joints_deg.some((q, i) => Math.abs(q-cycle.arm_motion.reference_deg[i]) > 1e-3));
+      assert(active.station.arm_joints_deg.some((q, i) =>
+        Math.abs(q-(cycle.arm_motion.home_deg ?? cycle.arm_motion.reference_deg)[i]) > 1e-3));
       assert(armBodies.some(id => active.rendered.matrices[id]?.some((value, entry) =>
         Math.abs(value-initial.rendered.matrices[id][entry]) > 1e-4)));
       assert.equal(active.rendered.hidden[sample.carrier_body_id], false);
@@ -222,21 +227,107 @@ async function main() {
     assert(braking.station.rpm > 0 && braking.station.rpm < spinning.station.rpm);
     assert.equal(braking.station.brake_held, false);
     const stopped = await at(cycle.stopped_s+0.15);
-    assert.equal(stopped.station.state, 'completed');
+    assert.equal(stopped.station.state, hasReturns ? 'playing' : 'completed');
     assert.equal(stopped.station.brake_held, true);
     assert.equal(stopped.station.rpm, 0);
     assert.deepEqual(stopped.station.seated, seated);
-    await page.clock.fastForward(1000);
-    assert.deepEqual((await snapshot()).station, stopped.station);
-    assert.match(await play.textContent(), /neu starten/);
-    await play.click({force: true});
-    const replay = (await snapshot()).station;
+    const returned = [];
+    if (hasReturns) for (const sample of cycle.return_samples) {
+      const body = cycle.samples.find(item => item.id === sample.id).carrier_body_id;
+      const contact = cycle.steps.find(step => step.tube_id === sample.id && step.phase === 'pickup_contact').time_s;
+      const base = await at(contact+0.02);
+      assert.equal(base.station.pusher_sample_id, sample.id);
+      assert(!base.station.seated.includes(sample.id));
+      const lifted = await at((contact+sample.arm_start_s)/2);
+      assert.equal(lifted.station.pusher_sample_id, sample.id);
+      assert(lifted.station.lift_mm > base.station.lift_mm);
+      const rise = cycle.joints.pusher.axis.reduce((sum, value, i) => sum + value*1000*
+        (lifted.rendered.matrices[body][12+i]-base.rendered.matrices[body][12+i]), 0);
+      near(rise, lifted.station.lift_mm-base.station.lift_mm, 0.02);
+      const grasp = await at((sample.grip_s+sample.cassette_release_s)/2);
+      assert.equal(grasp.station.held_tube, sample.id);
+      assert.equal(grasp.station.transport_ready, false);
+      assert.notDeepEqual(grasp.rendered.matrices[body], lifted.rendered.matrices[body]);
+      const cassette = await at(sample.cassette_release_s+0.03);
+      assert.equal(cassette.station.held_tube, null);
+      assert.equal(cassette.rendered.hidden[body], false);
+      assert.equal(cassette.rendered.matrices[body], null, 'The original body is now mounted back in TR01.');
+      assert.equal(cassette.station.transport_ready, false);
+      assert.equal(cassette.station.cover_removed, true);
+      const clear = await at(sample.pusher_parked_s+0.03);
+      assert.equal(clear.station.arm_clear, true);
+      assert.equal(clear.station.pusher_mm, 0);
+      if (departure) assert.equal(clear.lap.time_s, 0, 'TR01 remains docked during unloading.');
+      returned.push({id: sample.id, native_body_id: body, lifted_s: lifted.station.time_s,
+        carried_s: grasp.station.time_s, cassette_s: cassette.station.time_s, measured_rise_mm: rise});
+      assert.deepEqual(clear.station.returned, returned.map(item => item.id));
+    }
+    const ready = hasReturns ? await at(cycle.duration_s) : stopped;
+    if (hasReturns) {
+      assert.equal(ready.station.state, 'completed');
+      assert.equal(ready.station.transport_ready, true);
+      assert.equal(ready.station.cover_removed, false);
+      assert.equal(ready.rendered.hidden[cycle.cover_body_id], false);
+      assert.equal(ready.station.lid_locked, true);
+      assert.deepEqual(ready.station.seated, []);
+      assert.deepEqual(ready.station.returned, returned.map(item => item.id));
+    }
+    let lap = null;
+    if (departure) {
+      await page.clock.fastForward(34);
+      assert.equal((await snapshot()).lap.state, 'playing', 'TR01 starts by itself after the station releases it.');
+      async function lapAt(t) {
+        const {lap: before} = await snapshot();
+        const elapsed = (t-before.time_s)*1000/before.playback_rate;
+        await page.clock.fastForward(Math.max(18, Math.ceil(elapsed)+1));
+        const after = await snapshot();
+        assert(after.lap.time_s + 1e-6 >= Math.min(t, departure.duration_s));
+        return after;
+      }
+      async function assertMounted(lapState) {
+        const bodies = await page.evaluate(ids => ids.map(id => window.__buildingWalkthrough.bodyMatrix(id)),
+          [...vesselBodies, cycle.cover_body_id]);
+        assert(bodies.every(matrix => matrix?.length === 16 && matrix.every((value, i) =>
+          Math.abs(value-lapState.matrix[i]) < 1e-6)), 'The WebGL body owners keep both tubes and the cover on TR01.');
+      }
+      const turn = departure.half_turn;
+      const [turnStart, turnEnd] = [turn.start_s, turn.end_s].map(time =>
+        departure.points.find(point => point.time_s === time).pose_mm_rad);
+      for (const i of [0, 1]) near(turnEnd[i], turnStart[i]);
+      near(turnEnd[2]-turnStart[2], Math.PI);
+      const pivot = await lapAt((turn.start_s+turn.end_s)/2);
+      assert.equal(pivot.lap.direction, 'pivot');
+      assert(pivot.station.transport_ready && !pivot.station.cover_removed);
+      await assertMounted(pivot.lap);
+      assert.equal((await changeFixture('open')).status, 'rejected_lap_active');
+      assert(await page.locator('#walkthrough-lap-reset').isDisabled());
+      const docked = await lapAt(departure.duration_s);
+      assert.equal(docked.lap.state, 'docked');
+      for (const i of [0, 1]) near(docked.lap.pose_mm_rad[i], initial.lap.pose_mm_rad[i]);
+      const delta = docked.lap.pose_mm_rad[2]-initial.lap.pose_mm_rad[2];
+      near(Math.cos(delta), -1);
+      near(Math.sin(delta), 0);
+      await assertMounted(docked.lap);
+      await page.clock.fastForward(1000);
+      assert.deepEqual((await snapshot()).lap, docked.lap, 'TR01 remains in the opposite orientation without replay.');
+      lap = {pivot_s: pivot.lap.time_s, docked_s: docked.lap.time_s, pose_mm_rad: docked.lap.pose_mm_rad};
+    } else {
+      await page.clock.fastForward(1000);
+    }
+    assert.deepEqual((await snapshot()).station, ready.station);
+    const reset = departure ? page.locator('#walkthrough-lap-reset') : play;
+    assert(!(await reset.isDisabled()));
+    assert.match(await reset.textContent(), /neu starten|zurücksetzen/);
+    await reset.click({force: true});
+    const afterReset = await snapshot();
+    const replay = afterReset.station;
     assert.equal(replay.time_s, 0);
     assert.equal(replay.cover_removed, false);
     assert.deepEqual(replay.seated, []);
+    if (departure) assert.equal(afterReset.lap.time_s, 0);
     assert.deepEqual(errors, []);
 
-    const result = {passed: true, html_sha256: htmlHash, renderer: initial.renderer, handoffs: witnesses,
+    const result = {passed: true, html_sha256: htmlHash, renderer: initial.renderer, handoffs: witnesses, returned, lap,
       spin_s: spinning.station.time_s, confirmed_stillstand_s: stopped.station.time_s, console_errors: errors};
     fs.writeFileSync(path.join(folder, 'transfer-browser-check.json'), JSON.stringify(result, null, 2)+'\n');
     console.log(JSON.stringify(result));
