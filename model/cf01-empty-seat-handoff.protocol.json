@@ -1,0 +1,14 @@
+{
+  "format": "solidcraftbot.cf01-empty-seat-handoff/1",
+  "sources": {
+    "station": {
+      "source": "model/centrifuge-cf01.shared.json",
+      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+    },
+    "protocol": {
+      "source": "model/centrifuge-cf01.protocol.json",
+      "source_sha256": "6284a2c20853b5b75db28a1350518fd75c132e6b4070aff06b5326149caef17c"
+    }
+  },
+  "purpose": "Opt-in local simulation of presenting the support in a selected empty pocket, accepting a released tube, and seating it after the arm clears."
+}

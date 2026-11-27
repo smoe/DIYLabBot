@@ -23,6 +23,7 @@ test('uses the certified mixed-unit quintic curve and moves around the original 
   assert.deepEqual(player.snapshot.pose_mm_rad,config.points[1].pose_mm_rad);
   player.seek(8);
   assert.equal(player.snapshot.state,'docked');
+  assert.equal(player.arrived,false,'A slider jump does not confirm a delivery.');
   assert.deepEqual(Array.from(player.matrix),identity);
   assert.equal(player.locked,false);
 });
@@ -41,9 +42,11 @@ test('separates wall-clock playback speed from model time and resume', () => {
   player.play(5000);
   player.advance(10000);
   assert.equal(player.snapshot.state,'docked');
+  assert.equal(player.arrived,true,'Playback must finish at the dock to confirm a delivery.');
   assert.equal(player.snapshot.time_s,8);
   player.play(10000);
   assert.equal(player.snapshot.time_s,0);
+  assert.equal(player.arrived,false);
   player.seek(0);
   assert.equal(player.snapshot.state,'ready');
 });

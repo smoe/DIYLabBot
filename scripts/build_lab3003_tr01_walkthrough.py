@@ -11,6 +11,7 @@ import build_building_walkthrough as browser
 import building_stack
 import building_walkthrough
 import export_building_walkthrough_freecad as mesh
+import lab3003_cf01_cycle
 import lab3003_tr01_camera
 import lab_layout_model as layout
 import robot_spec as robot
@@ -189,6 +190,78 @@ def equivalent(a, b):
     return a == b
 
 
+def configure_cf01_cycle(program, lab, scene, *, cycle=None, truck=None):
+    """Bind the simulated station trace to the already checked native bodies."""
+    cycle = lab3003_cf01_cycle.compile_cycle() if cycle is None else cycle
+    truck = program['tr01_lap'] if truck is None else truck
+    if mesh.project_path(lab['layout_source']['source']) != layout.SOURCE:
+        raise ValueError('The CF01 sequence requires the checked L01 equipment layout')
+    source = layout.load(validate_builds=False)
+    item = next(entry for entry in source['instances'] if entry['id'] == 'CF01')
+    devices = {device['id']: device for device in lab['device_instances']}
+    device = devices[item['id']]
+    provider = layout.provider(item['asset'])
+    spec = layout.instance_source(source, item)
+    parameters = provider.parameters(spec)
+    expanded = provider.expanded(spec, parameters)
+    reference = provider.pose(spec, parameters, item['pose'])
+    source_joints = {joint['id']: joint for joint in expanded['joints']}
+    groups = {group['id'] for group in scene['groups']}
+    prefix = device['body_prefix']
+    world = device['world_pose']
+
+    def binding(name, *, additional_components=()):
+        joint = source_joints[name]
+        components = (joint['child'], *additional_components)
+        ids = [prefix+body['id'] for body in expanded['bodies'] if body['component'] in components]
+        if not ids or set(ids) - groups:
+            raise ValueError('Native CF01 joint body coverage is incomplete: '+name)
+        return {
+            'type': 'prismatic' if joint['type'] == 'slider' else joint['type'],
+            'origin_mm': robot.transform(world, joint['origin']),
+            'axis': [sum(row[i]*joint['axis'][i] for i in range(3)) for row in world[:3]],
+            'reference_value': reference[name],
+            'body_ids': ids,
+        }
+
+    concealed_tubes = {
+        prefix+body['id'] for body in expanded['bodies']
+        if body['role'] in ('illustrative_tube', 'closed_cap_envelope')
+    }
+    if not concealed_tubes or concealed_tubes - groups or reference['TubeLift'] != 0:
+        raise ValueError('The CF01 sequence starts with an empty rotor and parked tube lift')
+    for sample in cycle['samples']:
+        slot = f"{sample['slot']:02d}"
+        carrier = devices['TR01']['body_prefix']+sample['id']
+        rotor = [prefix+'Tube'+slot, prefix+'ClosedCap'+slot]
+        if carrier not in truck['body_ids'] or set(rotor) - concealed_tubes:
+            raise ValueError('The simulated load must map to a carried tube and a native CF01 pocket')
+        sample.update(carrier_body_id=carrier, rotor_body_ids=rotor)
+
+    stop = next(value for value in program['stops'] if value['id'] == 'lab')
+    target = robot.transform(world, [0, 0, parameters['lid_z']])
+    x, y, z = [row[3] for row in device['bound_pose'][:3]]
+    eye = robot.transform(lab['transform'], [x+620, y+410, z+1070])
+    program['stops'].append({**stop, 'id': 'cf01-zyklus', 'label': 'Labor 3.003 · CF01',
+                             'eye_mm': eye, 'target_mm': target})
+    joints = {
+        'lid': binding('Lid'),
+        'rotor': binding('Rotor', additional_components=('PresentedTube',)),
+        'latches': [binding(name) for name in ('LatchLeft', 'LatchRight')],
+    }
+    if 'pusher_mm' in cycle['steps'][0]:
+        joints['pusher'] = binding('Lift')
+    cycle.update(scene='building', stop_id='cf01-zyklus', playback_rate=4, joints=joints,
+                 empty_rotor_body_ids=sorted(concealed_tubes),
+                 cutaway_body_id=prefix+'CommandLid',
+                 cover_body_id=truck['cover_body_id'])
+    if cycle['cutaway_body_id'] not in joints['lid']['body_ids']:
+        raise ValueError('The optical cutaway requires the native command lid')
+    program['source_files_sha256'] = browser.merge_pins(program['source_files_sha256'], cycle['source_files_sha256'])
+    mesh.verify_pins(program['source_files_sha256'])
+    program['lab3003_cf01_cycle'] = cycle
+
+
 def build(baseline_dir, cert, output, *, program=None):
     baseline = read(baseline_dir/'build-report.json')
     if not baseline['passed']:
@@ -234,6 +307,7 @@ def build(baseline_dir, cert, output, *, program=None):
     isolated = {group['id'] for group in scene['groups'] if group.get('laboratory_id') == lab['id']}
     program['isolation']['body_ids'] = sorted(set(program['isolation']['body_ids']) | isolated)
     configuration(program, lab, proof, route, ids, cover_id)
+    configure_cf01_cycle(program, lab, scene)
     camera_report.update(lab3003_tr01_camera.assign_monitor(program['camera_wall'], lab, device, frame))
     payload = {**program, 'scenes': {'building': scene}}
     output.mkdir(parents=True)
@@ -246,9 +320,11 @@ def build(baseline_dir, cert, output, *, program=None):
               'default_playback_rate': program['tr01_lap']['default_playback_rate'],
               'autoplay': program['tr01_lap']['autoplay'],
               'onboard_camera': camera_report,
+              'cf01_cycle': program['lab3003_cf01_cycle'],
               'viewer_source_sha256': {str(path.relative_to(ROOT)): mesh.digest(path) for path in
-                   (Path(__file__), Path(lab3003_tr01_camera.__file__), browser.TEMPLATE, browser.SEMINAR_SCRIPT,
-                    ROOT/'scripts/walkthrough_tr01_lap.js', ROOT/'scripts/camera_monitor_wall.js')},
+                   (Path(__file__), Path(lab3003_tr01_camera.__file__), Path(lab3003_cf01_cycle.__file__),
+                    browser.TEMPLATE, browser.SEMINAR_SCRIPT, ROOT/'scripts/walkthrough_tr01_lap.js',
+                    ROOT/'scripts/camera_monitor_wall.js', ROOT/'scripts/walkthrough_lab3003_cf01.js')},
               'reversal': route['reversal'],
               'scope': 'Local covered-TR01 preview with the original worktop and the checked forward and reverse PVA knots.'}
     (output/'tr01-preview-report.json').write_text(json.dumps(report, indent=2)+'\n', encoding='utf-8')

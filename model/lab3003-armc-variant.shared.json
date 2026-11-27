@@ -1,0 +1,16 @@
+{
+  "format": "solidcraftbot.lab3003-armc-variant/1",
+  "laboratory_id": "Lab3003",
+  "device_id": "ArmC",
+  "variant_device_id": "Arm",
+  "sources": {
+    "laboratories": {
+      "source": "model/furnishings/building-laboratories.json",
+      "source_sha256": "aedaafcb48a6f5c77661125b4cc88c83e808be4b3fb2586a86e3679dc1e1c3e0"
+    },
+    "workspace": {
+      "source": "model/synthetic-cf01-workspace.shared.json",
+      "source_sha256": "f4c190cebe4e9f5d6e002619d4e52ec47787e5b1d230c9810b4cf75578876093"
+    }
+  }
+}

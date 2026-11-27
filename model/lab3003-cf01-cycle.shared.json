@@ -1,0 +1,22 @@
+{
+  "format": "solidcraftbot.lab3003-cf01-cycle/1",
+  "laboratory_id": "Lab3003",
+  "sources": {
+    "laboratories": {
+      "source": "model/furnishings/building-laboratories.json",
+      "source_sha256": "aedaafcb48a6f5c77661125b4cc88c83e808be4b3fb2586a86e3679dc1e1c3e0"
+    },
+    "simulation_fixture": {
+      "source": "model/cf01-rack-batch.protocol.json",
+      "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614"
+    },
+    "motion_limits": {
+      "source": "model/cf01-unload-demo.motion.json",
+      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+    }
+  },
+  "samples": [
+    {"id": "B2_Tube01", "slot": 1},
+    {"id": "B2_Tube07", "slot": 7}
+  ]
+}

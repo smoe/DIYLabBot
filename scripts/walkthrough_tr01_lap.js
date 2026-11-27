@@ -32,7 +32,7 @@
     const roomPoint = ([x, y, z]) => world.slice(0, 3).map(row => row[0]*x + row[1]*y + row[2]*z + row[3]);
     const origin = roomPoint([dock[0], dock[1], 0]).map(v => v/1000);
     let state = 'ready', time = 0, rate = config.default_playback_rate, anchor = null;
-    let pose = dock.slice(), matrix = identity();
+    let pose = dock.slice(), matrix = identity(), arrived = false;
 
     function setTime(t) {
       time = Math.min(duration, Math.max(0, t));
@@ -54,6 +54,7 @@
       setTime(time + elapsed/1000*rate);
       if (time === duration) {
         state = 'docked';
+        arrived = true;
         anchor = null;
       }
       return true;
@@ -61,7 +62,10 @@
 
     function play(now) {
       if (state === 'playing') return;
-      if (state === 'docked') setTime(0);
+      if (state === 'docked') {
+        arrived = false;
+        setTime(0);
+      }
       state = 'playing';
       anchor = now;
     }
@@ -75,6 +79,7 @@
 
     function seek(target) {
       if (!Number.isFinite(target)) throw Error('A finite TR01 model time is required.');
+      arrived = false;
       setTime(target);
       state = time === 0 ? 'ready' : time === duration ? 'docked' : 'paused';
       anchor = null;
@@ -89,6 +94,7 @@
     return {
       advance, play, pause, seek, setRate, roomPoint,
       get matrix() { return matrix; },
+      get arrived() { return arrived; },
       get locked() { return state === 'playing' || state === 'paused'; },
       get snapshot() {
         const direction = reversal !== undefined && time >= reversal ? 'reverse' : 'forward';
