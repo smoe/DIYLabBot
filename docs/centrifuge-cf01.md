@@ -84,7 +84,7 @@ Historic directories remain historic; open the report's current `cases` paths.
 | Pickup position | Front, station −Y; selected pocket indexes here |
 | Indexing | At most 2 rpm, **lid closed and locked**, lifter parked, robot clear |
 | Tube presentation | Stop, hold rotor, open lid, then lift 16 mm along tube axis |
-| Lifter | Stationary retracting axial pusher; 12 mm park clearance, 28 mm total stroke |
+| Lifter | Stationary retracting axial pusher in a coaxial guide; 28 mm nominal park gap and 44 mm total stroke |
 | Frame | Origin at base-center underside; +Z up, +X right, approach from −Y |
 
 The pusher reaches through a passage below the selected pocket and retracts
@@ -165,15 +165,11 @@ is unknown; reported pickup coordinates are local station coordinates.
 
 <a id="cf01-power-entry-and-cable"></a>
 
-### Power entry and cable
+### Power entry and chassis bond
 
 `CF01.POWER` is the common interface at the right side of the lower bay. The CAD
-contains an inlet/switch/fuse-module envelope, a removable cord coupler, molded
-strain-relief envelope and a 7 mm outside-diameter cord. Two tangent circular
-bends give a smooth 45 mm centerline bend radius before the cord reaches the
-bench. Both CAD adapters generate an actual round sweep from the same path;
-the displayed cord is a short layout section and its supply-side termination is
-not modeled. The manufacturer's allowable bend radius is still unknown.
+contains an inlet/switch/fuse-module envelope. The detachable mains cord
+assembly is outside the geometry scope.
 
 A chassis earth stud and short green bond lead are represented. PE bonding to
 all steel panels and the lid, electrical isolation, drive/control supplies,
@@ -394,7 +390,7 @@ python -m unittest discover -s tests -v
 ```
 
 `centrifuge_model.py` expands the steel chamber/floor/supports, hollow bay,
-power entry and round cord, spindle encoder, fixed-angle pocket pattern,
+power entry and chassis bond, spindle encoder, fixed-angle pocket pattern,
 tubes, numeral contours, landmarks, lid and ejector once for both CAD adapters.
 `centrifuge_mechanisms.py` adds the shared spindle, caliper, geared hinge and
 powered lock recipes. There are nine rigid groups and eight motion coordinates:
@@ -412,10 +408,10 @@ optimal bounds. This is not a full STEP symmetric-difference comparison.
 
 Each geometry case checks 44 discrete poses: closed/open/pickup, unlocked/spin-ready states, lid samples,
 all 12 index angles and approach/lift samples. A second case changes bottom
-radius, mouth/lid heights, lift travel, enclosure width, wall/floor/lid thickness,
-sensor gap and cord bend radius. Geometry, ports and anchors follow the same
+radius, mouth/lid heights, lift travel, enclosure width, wall/floor/lid thickness
+and sensor gap. Geometry, ports and anchors follow the same
 parameters. Additional samples cover parking-pad and powered-pin strokes.
-Analytic checks cover steel wall/floor/lid, cord, stator and brake-disc volumes
+Analytic checks cover steel wall/floor/lid, stator and brake-disc volumes
 plus the sensor gap. Internal overlaps within each rigid component are cached between
 poses because they do not change under rigid motion. Pairwise
 intersections distinguish internal rigid overlaps from moving-component overlaps.
@@ -469,8 +465,8 @@ now demonstrates tube removal before closure and supported placement into an
 output rack, using a longer arm mounted directly on the bench. The 33-second sequence
 described below remains the earlier centrifuge-only, reversible presentation cycle.
 
-The 33-second illustrative cycle retracts both lid pins, opens the lid to 105°,
-advances the pusher through its 12 mm park gap, raises tube 01 by 16 mm along its
+The archived 33-second illustrative cycle retracts both lid pins, opens the lid to
+105°, advances the pusher through the earlier 12 mm park gap, raises tube 01 by 16 mm along its
 35° tilted axis, holds it for pickup, then reseats the same tube, parks the
 pusher, closes and locks the lid. Axial tube travel corresponds to **13.1 mm
 vertical and 9.2 mm inward**. The rotor remains stopped and its parking brake
@@ -479,6 +475,7 @@ grasp, withdrawal, removal or physical tube contact is simulated. Lift/pin
 timings are illustrative; the lid uses the provisional 10°/s requirement.
 The native GIF plays about 2.25 times faster; the interactive view offers
 0.5×/1×/2× playback and a tube/pusher close-up.
+Current CAD derives a nominal 28 mm park gap from the rotor and pusher geometry.
 
 <a id="cf01-protocol-reproduce-and-view"></a>
 

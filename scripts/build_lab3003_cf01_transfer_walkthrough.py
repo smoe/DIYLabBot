@@ -119,7 +119,16 @@ def build(stock, arm_path, program_path, proof_path, pusher_path, output,
     if any((path is not None) != has_return for path in (lap_program, lap_report)):
         raise ValueError('The return cycle requires matching certified half-turn route inputs')
     lab = next(room for room in payload['laboratories'] if room['id'] == 'Lab3003')
-    cycle = lab3003_cf01_cycle.compile_cycle(arm_paths=tracks, return_paths=returns)
+    index_sweep = proof.get('open_lid_index_sweep')
+    if index_sweep is not None and (not has_return or index_sweep.get('passed') is not True
+            or index_sweep.get('lid_fixture_sweep', {}).get('passed') is not True
+            or index_sweep.get('angle_interval_deg') != [-180., 0.]
+            or index_sweep.get('seated_tube_id') != tracks[0]['id']
+            or not math.isfinite(index_sweep['minimum_clearance_mm'])
+            or index_sweep['minimum_clearance_mm'] <= 0.):
+        raise ValueError('The open-lid index requires a positive native sweep with the first tube seated')
+    cycle = lab3003_cf01_cycle.compile_cycle(
+        arm_paths=tracks, return_paths=returns, keep_lid_open=index_sweep is not None)
     supports = {step['tube_id']: step['lift_mm'] for step in cycle['steps'] if step['phase'] == 'pusher_transfer'}
     if any(supports.get(row['id']) != row['lift_mm'] for row in proof['samples']):
         raise ValueError('The station trace differs from the certified support elevation')

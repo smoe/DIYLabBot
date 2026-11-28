@@ -115,20 +115,6 @@
         44
       ]
     },
-    "power_cable_radius": {
-      "expression": 3.5,
-      "range": [
-        3.5,
-        4
-      ]
-    },
-    "power_cable_bend": {
-      "expression": 45,
-      "range": [
-        45,
-        55
-      ]
-    },
     "bottom_radius": {
       "expression": 80,
       "range": [
@@ -183,13 +169,6 @@
       "range": [
         14,
         18
-      ]
-    },
-    "park_gap": {
-      "expression": 12,
-      "range": [
-        12,
-        12
       ]
     },
     "lid_z": {
@@ -291,7 +270,7 @@
     "format": "solidcraftbot.centrifuge-services/1",
     "power": {
       "id": "CF01.POWER",
-      "topology": "detachable three-conductor mains cord, combined inlet/switch/fuse envelope, protective earth to steel chassis, isolated low-voltage control supply and spindle drive",
+      "topology": "combined inlet/switch/fuse envelope, protective earth to steel chassis, isolated low-voltage control supply and spindle drive",
       "inlet_frame_mm": [
         "base_width/2",
         65,
@@ -313,7 +292,7 @@
       "lid_bond_required": true,
       "strain_relief_required": true,
       "manufacturer_minimum_bend_radius_mm": null,
-      "routing_status": "external cord geometry and short chassis bond represented; complete wiring, lid braid and supply-side termination remain open",
+      "routing_status": "inlet and short chassis bond represented; external mains cord omitted from geometry, with complete wiring, lid braid and supply-side termination open",
       "electrical_validation": "not_performed"
     },
     "rotation": {
@@ -378,7 +357,13 @@
     "owner_timeout_s": 10,
     "mass_pair_tolerance_g": null,
     "tube_mass_limit_g": null,
-    "lift_force_limit_n": null
+    "lift_force_limit_n": null,
+    "pusher": {
+      "shaft_radius_mm": 1.2,
+      "shaft_length_mm": 16,
+      "guide_radius_mm": 1.8,
+      "parked_rotor_clearance_mm": 1
+    }
   },
   "vision": {
     "numerals": "large contrasting 01..12 on rotor face",
@@ -394,7 +379,7 @@
   "operations": [
     "steel_chamber_and_floor",
     "hollow_steel_electrical_bay",
-    "power_entry_and_round_cord",
+    "power_entry_and_chassis_bond",
     "spindle_encoder_with_signal_route",
     "fixed_angle_pocket_pattern",
     "contrasting_slot_numerals",

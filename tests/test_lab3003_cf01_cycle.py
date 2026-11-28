@@ -11,6 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 
 import lab3003_cf01_cycle as cycle
+from centrifuge_control import ControlError
 
 
 class Lab3003CentrifugeCycleTests(unittest.TestCase):
@@ -21,6 +22,74 @@ class Lab3003CentrifugeCycleTests(unittest.TestCase):
 
     def return_paths(self):
         return [dict(path, direction='unload') for path in reversed(self.timed_paths())]
+
+    def test_open_lid_index_keeps_only_one_lid_cycle_per_transfer_pair(self):
+        result = cycle.compile_cycle(arm_paths=self.timed_paths(), return_paths=self.return_paths(),
+                                     keep_lid_open=True)
+        steps = result['steps']
+        self.assertTrue(result['open_lid_indexing'])
+        self.assertIn(str(cycle.open_index.SOURCE.relative_to(cycle.ROOT)), result['source_files_sha256'])
+        evidence = {step['phase']: step for step in steps}
+        starts = ['open_indexing', 'return_open_indexing']
+        ends = ['open_indexed', 'return_open_indexed']
+        self.assertEqual(sum(step['phase'] in ('open', 'return_open') for step in steps), 2)
+        self.assertEqual(sum(step['phase'] in ('closing', 'return_closing') for step in steps), 2)
+        for start, end, prior, sample in zip(starts, ends, ('seated', 'pickup_pusher_parked'),
+                                             ('B2_Tube07', 'B2_Tube01')):
+            with self.subTest(index=start):
+                begin, done = evidence[start], evidence[end]
+                before = steps[steps.index(begin) - 1]
+                self.assertEqual(before['phase'], prior)
+                self.assertEqual(steps[steps.index(begin) + 1], done)
+                self.assertEqual([begin['tube_id'], done['tube_id']], [sample, sample])
+                self.assertFalse(begin['brake_held'])
+                self.assertTrue(done['brake_held'])
+                self.assertEqual(begin['seated'], ['B2_Tube01'])
+                self.assertEqual(begin['lid_deg'], evidence['open']['lid_deg'])
+                self.assertEqual(begin['latch_mm'], evidence['open']['latch_mm'])
+                self.assertEqual(done['rotor_deg'] - begin['rotor_deg'], 180 if start.startswith('return_') else -180)
+                for step in (begin, done):
+                    self.assertEqual(step['lid_deg'], begin['lid_deg'])
+                    self.assertEqual(step['latch_mm'], begin['latch_mm'])
+                    self.assertFalse(step['lid_locked'])
+                    self.assertTrue(step['arm_clear'])
+                    self.assertEqual(step['rpm'], 0)
+                    self.assertEqual(step['pusher_mm'], 0)
+                    self.assertEqual(step['lift_mm'], 0)
+                    self.assertIsNone(step['pusher_sample_id'])
+        self.assertTrue(evidence['spinning']['lid_locked'])
+        self.assertEqual(evidence['spinning']['lid_deg'], 0)
+        self.assertEqual(evidence['spinning']['latch_mm'], [0, 0])
+        self.assertTrue(evidence['transport_ready']['lid_locked'])
+
+    def test_open_index_requires_explicit_clearance_park_and_occupancy_observations(self):
+        for missing in ('workspace_clear', 'parked_confirmed', 'occupancy_confirmed'):
+            with self.subTest(observation=missing):
+                def observe(event, sample):
+                    if sample is None:
+                        return {'cover_removed': True}
+                    flags = {**cycle.batch.synthetic_feedback(event, sample), 'rotor_slot': sample['slot'],
+                             'empty_confirmed': True, 'extended_confirmed': True, 'rested_confirmed': True,
+                             'parked_confirmed': True, 'occupancy_confirmed': True}
+                    if event == 'open_index_ready':
+                        flags[missing] = False
+                    return flags
+
+                with self.assertRaisesRegex(ValueError, 'confirmation: open_index_ready'):
+                    cycle.compile_cycle(arm_paths=self.timed_paths(), keep_lid_open=True, feedback=observe)
+        with self.assertRaisesRegex(ValueError, 'requires the supported loading paths'):
+            cycle.compile_cycle(keep_lid_open=True)
+
+    def test_combined_station_rejects_open_index_during_pending_zero_stroke_handoff(self):
+        sim = cycle._OpenLidHandoffSimulator(
+            initial_slots={slot: {'present': False, 'seated': False, 'mass_g': None} for slot in range(1, 13)})
+        token = sim.execute('acquire', client_id='test')['token']
+        sim.execute('index', token, slot=1)
+        sim.execute('open_lid', token)
+        sim.execute('begin_raise_empty_support', token, slot=1, sample_id='B2_Tube01', empty_confirmed=True)
+        self.assertEqual(sim.execute('status')['lift_mm'], 0)
+        with self.assertRaisesRegex(ControlError, 'Finish the active pusher handoff'):
+            sim.execute('index_open_lid', token, slot=7)
 
     def test_extended_support_trace_holds_station_until_arm_clears(self):
         result = cycle.compile_cycle(arm_paths=self.timed_paths())

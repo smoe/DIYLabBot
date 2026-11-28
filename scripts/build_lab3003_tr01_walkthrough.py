@@ -251,6 +251,9 @@ def configure_cf01_cycle(program, lab, scene, *, cycle=None, truck=None):
     }
     if 'pusher_mm' in cycle['steps'][0]:
         joints['pusher'] = binding('Lift')
+    if cycle.get('open_lid_indexing'):
+        joints['brakes'] = [{**binding(name), 'release_mm': source_joints[name]['limits'][1]}
+                            for name in ('BrakeUpper', 'BrakeLower')]
     cycle.update(scene='building', stop_id='cf01-zyklus', playback_rate=4, joints=joints,
                  empty_rotor_body_ids=sorted(concealed_tubes),
                  cutaway_body_id=prefix+'CommandLid',

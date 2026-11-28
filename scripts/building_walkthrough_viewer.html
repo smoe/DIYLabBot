@@ -276,8 +276,8 @@ __WALKTHROUGH_SEMINAR__</script>
           (dockedStart?(!cf01Config.arm_motion||Boolean(lap)!==processThenLap):(!lap||cf01Config.arm_motion)))
         throw Error('The CF01 delivery requires the checked TR01 dock and cover.');
       const available=new Set(data.scenes[cf01Config.scene].groups.map(group=>group.id));
-      const {lid,rotor,latches,pusher}=cf01Config.joints;
-      const joints=pusher?[lid,rotor,...latches,pusher]:[lid,rotor,...latches];
+      const {lid,rotor,latches,pusher,brakes=[]}=cf01Config.joints;
+      const joints=[lid,rotor,...latches,...(pusher?[pusher]:[]),...brakes];
       const bodies=[...joints.flatMap(joint=>joint.body_ids),...cf01.armBodyIds];
       const carrierIds=new Set(dockedStart?cf01Config.samples.map(sample=>sample.carrier_body_id):[]);
       bodies.push(...carrierIds);
@@ -722,6 +722,7 @@ __WALKTHROUGH_SEMINAR__</script>
       cf01Cutaway.disabled=stopId!==cf01Config.stop_id;
       const phases={docked:'Angedockt',cover_removed:'Haube abgenommen · simuliert',
         indexing:'Rotor positioniert sich',indexed:'Rotorposition bestätigt',unlocking:'Deckel entriegelt',
+        open_indexing:'Rotor indexiert bei offenem Deckel',open_indexed:'Rotorposition bei offenem Deckel bestätigt',
         opening:'Deckel öffnet',open:'Deckel offen',arm_transfer:station.held_tube?
           'ArmC trägt '+station.held_tube:'ArmC · Übergabe simuliert',
         pusher_raising:'Stößel fährt aus',pusher_raised:'ArmC fährt zur Kassette',
@@ -731,6 +732,8 @@ __WALKTHROUGH_SEMINAR__</script>
         closing:'Deckel schließt',locking:'Verriegelung fährt ein',locked:'Deckelverriegelung bestätigt',
         spinning:'CF01 schleudert',braking:'CF01 bremst',stopped:'CF01 · Stillstand bestätigt',
         return_indexing:'Rotor positioniert sich zur Entnahme',return_indexed:'Entnahmeposition bestätigt',
+        return_open_indexing:'Rotor indexiert zur Entnahme bei offenem Deckel',
+        return_open_indexed:'Entnahmeposition bei offenem Deckel bestätigt',
         return_unlocking:'Deckel entriegelt',return_opening:'Deckel öffnet',return_open:'Deckel offen',
         pickup_presenting:'Stößel fährt zum Gefäß',pickup_contact:'Gefäß liegt auf dem Stößel',
         pickup_raised:'Gefäß zur Entnahme angehoben',pickup_grasp:'ArmC bringt '+station.held_tube+' zu TR01',

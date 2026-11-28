@@ -476,9 +476,9 @@ native Bewegungskoordinaten bleiben editierbar.
 
 CF01 ergänzt Stahlfamilie mit offener Güte, Kammer-/Boden-/Deckeldicken,
 Stützpfad und den Dienstvertrag `solidcraftbot.centrifuge-services/1` für
-Netzeingang, PE-Anforderungen und A/B/Z-Spindelgeber. Die portable Operation
-`round_cable` beschreibt einen runden Querschnitt mit Linien-/Kreisbogenpfad;
-SolidCraft und FreeCAD erzeugen daraus native Sweeps. Dienstframes und
+Netzeingang, PE-Anforderungen und A/B/Z-Spindelgeber. Beide CAD-Ableitungen
+enthalten den Geräteeinlass mit Schalter und Sicherung sowie die interne
+Chassis-Erdung. Dienstframes und
 Geberbandbreite werden aus denselben Parametern abgeleitet und im Bericht
 ausgegeben. Die Materialzuordnung ist kein Festigkeitsnachweis; die
 Programmierschnittstelle liefert weiterhin ausschließlich simulierte Rückmeldung.

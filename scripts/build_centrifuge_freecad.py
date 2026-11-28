@@ -35,19 +35,7 @@ def build(spec,p,path):
     latest={}; metadata={b['id']:b for b in source['bodies']}
     for op in source['operations']:
         s=op['shape']; group=groups[metadata[op['body']]['component']]; name=op['id']; kind=s['kind']
-        if kind=='round_cable':
-            o,u,v=App.Vector(*s['plane_origin']),App.Vector(*s['u_axis']),App.Vector(*s['v_axis'])
-            def point(p): return o+u*p[0]+v*p[1]
-            edges=[]
-            for curve in s['curves']:
-                a,b=point(curve['start']),point(curve['end'])
-                edges.append(Part.makeLine(a,b) if curve['kind']=='line' else Part.Arc(a,point(curve['through']),b).toShape())
-            spine=doc.addObject('Part::Feature',name+'_Path'); group.addObject(spine); spine.Shape=Part.Wire(edges)
-            section=doc.addObject('Part::Feature',name+'_Section'); group.addObject(section)
-            section.Shape=Part.Wire([Part.makeCircle(s['radius'],App.Vector(*s['origin']),App.Vector(*s['start_tangent']))])
-            obj=doc.addObject('Part::Sweep',name+'_Sweep'); group.addObject(obj)
-            obj.Sections=[section]; obj.Spine=(spine,['Edge'+str(i+1) for i in range(len(edges))]); obj.Solid=True; obj.Frenet=True
-        elif kind=='profile':
+        if kind=='profile':
             u,v=App.Vector(*s['u_axis']),App.Vector(*s['v_axis']); faces=[]
             for loop in s['loops']:
                 pts=[u*x+v*y for x,y in loop]; faces.append(Part.Face(Part.makePolygon(pts+[pts[0]])))
@@ -117,16 +105,20 @@ def interference(doc,rigid_cache=None):
 
 
 def service_checks(geometry,spec,p):
-    bodies={b['body']:b for b in geometry}; r=p['chamber_inner_radius']+p['chamber_wall']; cable=model.power_cord(spec,p)
+    bodies={b['body']:b for b in geometry}; r=p['chamber_inner_radius']+p['chamber_wall']
     expected={'ContainmentEnvelope':math.pi*(r*r-p['chamber_inner_radius']**2)*(p['chamber_top']-p['chamber_floor_z']-p['chamber_floor']),
               'ChamberFloor':math.pi*(r*r-10**2)*p['chamber_floor'],'CommandLid':math.pi*(r+4)**2*p['lid_thickness'],
-              'PowerCord':math.pi*p['power_cable_radius']**2*cable['centerline_length_mm'],
               'MotorStator':math.pi*(p['motor_outer_radius']**2-24**2)*74,
               'ParkingBrakeDisc':math.pi*(p['brake_disc_radius']**2-8**2)*p['brake_disc_thickness']}
     checks=[{'body':name,'expected_volume_mm3':volume,'relative_error':abs(bodies[name]['volume_mm3']-volume)/volume,
              'passed':abs(bodies[name]['volume_mm3']-volume)/volume<1e-5} for name,volume in expected.items()]
     gap=bodies['RotationSensor']['bbox']['min'][0]-bodies['EncoderTargetRing']['bbox']['max'][0]
     checks.append({'id':'CF01.ENCODER.gap','gap_mm':gap,'expected_gap_mm':p['encoder_gap'],'passed':abs(gap-p['encoder_gap'])<1e-7})
+    park_clearance = bodies['Rotor']['bbox']['min'][2] - bodies['RetractablePusher']['bbox']['max'][2]
+    required = spec['handling']['pusher']['parked_rotor_clearance_mm']
+    checks.append({'id':'CF01.PUSHER.parked_rotor_plane','gap_mm':park_clearance,
+                   'required_gap_mm':required,'passed':park_clearance >= required-1e-8,
+                   'scope':'Vertical native separation for every rotor angle with the pusher parked'})
     return checks
 
 

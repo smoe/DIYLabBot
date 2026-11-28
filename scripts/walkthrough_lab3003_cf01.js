@@ -50,6 +50,7 @@
     const {duration_s: duration, spin_started_s: spinTime, brake_started_s: brakeTime,
       stopped_s: stopTime, steps} = config;
     const returning = config.return_samples !== undefined;
+    const openIndexing = config.open_lid_indexing === true;
     requireCondition([duration, spinTime, brakeTime, stopTime].every(Number.isFinite) &&
       0 < spinTime && spinTime < brakeTime && brakeTime < stopTime &&
       (returning ? stopTime < duration && config.transport_ready_s === duration : stopTime === duration) &&
@@ -61,12 +62,18 @@
       'CF01 returns must preserve the reverse order of the loaded identities.');
 
     let previousTime = -1;
+    let previousStep = null;
     let previousSeated = [];
     let previousReturned = [];
     let removed = false;
     let held = null;
     let supported = null;
     const pusher = Boolean(config.arm_motion);
+    const opened = openIndexing ? steps.find(step => step.phase === 'open') : null;
+    requireCondition(!openIndexing || (pusher && opened?.lid_deg > 0 && !opened.lid_locked),
+      'Open-lid indexing requires the verified lifted-support cycle and its fully open lid.');
+    const openIndexStarts = new Set();
+    let openIndexEnd = null;
     const pickupTimes = new Map();
     for (const step of steps) {
       requireCondition(Number.isFinite(step.time_s) && step.time_s > previousTime &&
@@ -78,6 +85,10 @@
       const afterSpin = returning && step.time_s > stopTime;
       const presented = afterSpin && step.phase === 'pickup_contact';
       const departing = afterSpin && step.phase === 'transport_ready';
+      const openIndexStart = step.phase === 'open_indexing' || step.phase === 'return_open_indexing';
+      const openIndexConfirm = step.phase === 'open_indexed' || step.phase === 'return_open_indexed';
+      if (openIndexEnd !== null) requireCondition(step.phase === openIndexEnd,
+        'An open-lid index must finish before the next station action.');
       requireCondition((!removed || step.cover_removed || departing) &&
         (presented ? previousSeated.includes(step.tube_id) && !step.seated.includes(step.tube_id) &&
           step.seated.length + 1 === previousSeated.length && step.seated.every(id => previousSeated.includes(id)) :
@@ -151,6 +162,29 @@
       if (pusher) requireCondition(step.pusher_sample_id === supported &&
         (!['lowering', 'pocket_reached'].includes(step.phase) || (step.arm_clear && supported !== null)),
         'CF01 must keep the same supported tube until its seating is confirmed.');
+      if (openIndexStart || openIndexConfirm) {
+        requireCondition(openIndexing && step.phase.startsWith('return_') === afterSpin &&
+          step.arm_clear && step.pusher_mm === 0 && step.lift_mm === 0 && held === null && supported === null &&
+          step.cover_removed && !step.lid_locked && near(step.lid_deg, opened.lid_deg) &&
+          step.latch_mm.every((value, i) => near(value, opened.latch_mm[i])) &&
+          step.rpm === 0 && step.seated.length === 1 && samples.has(step.tube_id) &&
+          step.seated.includes(step.tube_id) === afterSpin &&
+          near(previousStep?.lid_deg, step.lid_deg),
+          'Open-lid indexing needs the held open lid, clear arm, parked pusher and confirmed rotor occupancy.');
+        if (openIndexStart) {
+          requireCondition(!openIndexStarts.has(step.phase) && !step.brake_held && previousStep.brake_held &&
+            near(step.rotor_deg, previousStep.rotor_deg) &&
+            previousStep.phase === (afterSpin ? 'pickup_pusher_parked' : 'seated'),
+            'Open-lid indexing must start from the previous parked handoff and release the holding brake.');
+          openIndexStarts.add(step.phase);
+          openIndexEnd = afterSpin ? 'return_open_indexed' : 'open_indexed';
+        } else {
+          requireCondition(step.phase === openIndexEnd && previousStep.tube_id === step.tube_id &&
+            step.brake_held && near(step.rotor_deg - previousStep.rotor_deg, afterSpin ? 180 : -180),
+            'Open-lid index completion requires the opposite rotor position and the holding brake.');
+          openIndexEnd = null;
+        }
+      }
       if (step.time_s < spinTime) {
         requireCondition(step.rpm === 0, 'CF01 cannot spin during docking, access or loading.');
       } else if (!afterSpin) {
@@ -160,13 +194,16 @@
           'CF01 spin requires a clear workspace, a closed and locked lid and all tubes seated.');
       } else {
         requireCondition(step.rpm === 0 && (step.brake_held ||
-          step.phase === 'return_indexing' && closed(step) && step.arm_clear && step.pusher_mm === 0),
-          'CF01 unloading may index only at standstill with a clear workspace, locked lid and parked pusher.');
+          openIndexStart || step.phase === 'return_indexing' && closed(step) && step.arm_clear && step.pusher_mm === 0),
+          'CF01 unloading may index only at standstill with the checked lid state, clear arm and parked pusher.');
       }
+      previousStep = step;
       previousTime = step.time_s;
       previousSeated = step.seated;
       removed = step.cover_removed;
     }
+    requireCondition(openIndexEnd === null && (!openIndexing || openIndexStarts.size === (returning ? 2 : 1)),
+      'The optional open-lid transfers need all paired index acknowledgements.');
 
     const first = steps[0];
     const startIndex = steps.findIndex(step => step.time_s === spinTime);
@@ -191,14 +228,19 @@
   }
 
   function indexJoints(config, samples) {
-    const {lid, rotor, latches} = config.joints || {};
+    const {lid, rotor, latches, brakes} = config.joints || {};
     requireCondition(Array.isArray(latches) && latches.length === 2,
       'CF01 requires two separate latch joints.');
+    requireCondition(brakes === undefined || (Array.isArray(brakes) && brakes.length === 2 &&
+      brakes.every(brake => Number.isFinite(brake?.release_mm) && brake.release_mm > 0) &&
+      near(brakes[0].release_mm, brakes[1].release_mm)),
+      'CF01 brake playback requires both pad joints and their common positive release stroke.');
     const groups = [
       {...lid, type: 'revolute'}, {...rotor, type: 'revolute'},
       ...latches.map(latch => ({...latch, type: 'prismatic'}))
     ];
     if (config.arm_motion) groups.push({...config.joints.pusher, type: 'prismatic'});
+    groups.push(...(brakes || []).map(pad => ({...pad, type: 'prismatic'})));
     const owners = new Map();
     groups.forEach((joint, index) => {
       requireCondition(bodyIds(joint.body_ids) && joint.body_ids.length &&
@@ -216,7 +258,7 @@
       requireCondition(!owners.has(id) || owners.get(id) === 1, 'A seated tube must rotate with the CF01 rotor.');
       owners.set(id, 1);
     }
-    return {groups, owners};
+    return {groups, owners, brakes: brakes || []};
   }
 
   function inverseRigid(matrix) {
@@ -395,7 +437,7 @@
     requireCondition(config && typeof jointMatrix === 'function', 'The CF01 trace requires native joint transforms.');
     const inventory = indexSamples(config);
     const {steps, duration, spin, brake, stop, pickupTimes, returning} = checkedTimeline(config, inventory.samples);
-    const {groups, owners} = indexJoints(config, inventory);
+    const {groups, owners, brakes} = indexJoints(config, inventory);
     const arm = checkedArm(config, steps, groups[1], groups[4], jointMatrix, motion);
     const rate = config.playback_rate ?? 1;
     requireCondition(Number.isFinite(rate) && rate > 0, 'CF01 playback rate must be positive.');
@@ -438,6 +480,7 @@
         values.push(current.pusher_mm);
         arm.update(time, rotor, current.lift_mm);
       }
+      for (const pad of brakes) values.push(step.brake_held ? 0 : pad.release_mm);
       matrices = groups.map((joint, i) => jointMatrix(joint, values[i], joint.reference_value));
     }
 

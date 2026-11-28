@@ -5,19 +5,19 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "601c54be5e9b0fa39b6d31d26c251bed8a83f1345213844c6f9bbead5aa31592"
+      "sha256": "daf7efbb783fe22cfc1f24331183f0f3690af9d83c21e7f724e8df021606c426"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "89228c1187a4ee42256615c8ab6b0720b2dec4da1e949e5ac5be3583a7023ec2"
+      "sha256": "25145e282611db35b8695843e2c07bdb34822a657ba42795fe35a0673a6d8c98"
     },
     "motion": {
       "path": "model/tr01-l01.motion.json",
-      "sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+      "sha256": "50603aee67e13a9a42522a7615e7ab053ff43d1fbaf02c66e8e54a31fa4e9f44"
     },
     "work_areas": {
       "path": "model/tr01-l01-workcell.protocol.json",
-      "sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+      "sha256": "4115f649f0ce542eecf4f710b357925e72bd029fc1c2ac5a80e5c49b74925c03"
     },
     "camera_vehicle": {
       "path": "model/tr01-awareness-camera.shared.json",

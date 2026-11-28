@@ -33,25 +33,22 @@ class BuildingLaboratoryTests(unittest.TestCase):
         self.assertFalse(self.lab['placement_qualified'])
         self.assertFalse(self.lab['metric_registration_qualified'])
 
-    def test_cf01_bench_uses_the_video_arrangement_about_the_existing_anchor(self):
-        import synthetic_workspace
+    def test_cf01_bench_uses_lab_poses_and_native_mounts(self):
         from export_building_walkthrough_freecad import equipment_link_placements, native_equipment_bindings
 
         setup = self.instance['bench_layout']
-        source = synthetic_workspace.load(ROOT / setup['workspace']['source'])['devices']
         devices = {item['id']: item for item in self.lab['device_instances']}
-        anchor = devices[setup['anchor']]
-        source_anchor = source[setup['devices'][setup['anchor']]]
-        anchor_inverse = robot.inverse(anchor['bound_pose'])
-        expected_inverse = robot.inverse(source_anchor['matrix'])
-        for name, original in setup['devices'].items():
+        for name, x, y, yaw in [('CF01', 470, 5210, 90), ('ArmC', 550, 5550, -139),
+                                ('RackCF', 340, 5800, 0), ('RackCF2', 520, 5800, 0)]:
             with self.subTest(device=name):
-                relative = robot.multiply(anchor_inverse, devices[name]['bound_pose'])
-                expected = robot.multiply(expected_inverse, source[original]['matrix'])
-                self.assertLess(max(abs(a-b) for row, ref in zip(relative, expected)
-                                    for a, b in zip(row, ref)), 1e-7)
+                self.assertEqual(devices[name]['host'], 'LeftBench')
+                pose = devices[name]['bound_pose']
+                self.assertEqual([pose[0][3], pose[1][3]], [x, y])
+                self.assertAlmostEqual(math.degrees(math.atan2(pose[1][0], pose[0][0])), yaw)
+                self.assertEqual(pose[2][3], devices['CF01']['bound_pose'][2][3])
+        self.assertAlmostEqual(devices['CF01']['bound_pose'][0][1], -1)
+        self.assertAlmostEqual(devices['CF01']['standalone_pose'][0][1], 1)
         self.assertTrue(devices['ArmC']['direct_mount'])
-        self.assertEqual(anchor['bound_pose'][2][3], devices['ArmC']['bound_pose'][2][3])
         self.assertEqual(devices['ArmC']['park_joints_deg'], setup['park_joints_deg']['ArmC'])
         placements = equipment_link_placements(self.lab, devices['ArmC'])
         for actual, expected in zip(placements['Base_plate'], devices['ArmC']['transform']):
@@ -61,6 +58,25 @@ class BuildingLaboratoryTests(unittest.TestCase):
         supports = {device['supporting_device_id'] for _, device in native_equipment_bindings([self.lab])
                     if 'supporting_device_id' in device}
         self.assertEqual(supports, {'ArmA', 'ArmB'})
+
+    def test_cf01_rack_gap_uses_the_shared_cassette_footprint(self):
+        layout = laboratories.layout
+        source = laboratories.read(self.instance['layout_source'])
+        rack = next(item for item in source['instances'] if item['id'] == 'RackCF')
+        width_x = layout.provider('tube_rack').parameters(layout.instance_source(source, rack))['cassette_length']
+        racks = {d['id']: d for d in self.lab['device_instances'] if d['id'] in ('RackCF', 'RackCF2')}
+        x_a, x_b = (racks[name]['bound_pose'][0][3] for name in ('RackCF', 'RackCF2'))
+        self.assertAlmostEqual(x_b - x_a - width_x, 40)
+        for name in racks:
+            slots = [place for place in self.lab['places'] if place.get('rack_instance') == name]
+            self.assertEqual(len(slots), 24)
+            self.assertEqual({slot['slot_id'] for slot in slots}, {f'{slot:02}' for slot in range(1, 25)})
+
+    def test_cf01_hinge_must_face_the_left_bench_wall(self):
+        wrong = copy.deepcopy(self.instance)
+        wrong['bench_layout']['device_poses']['CF01']['yaw_deg'] = 270
+        with self.assertRaisesRegex(ValueError, 'hinge must face the rear wall'):
+            laboratories.compile_instance(wrong, self.plan, self.p, self.lab['transform'][2][3])
 
     def test_tr01_dock_changes_only_the_building_pose(self):
         from centrifuge_robot_pickup import load as tool_source

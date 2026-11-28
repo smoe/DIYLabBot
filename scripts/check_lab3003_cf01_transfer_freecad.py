@@ -744,6 +744,102 @@ class Lab3003TransferOracle:
                 'scope': 'Axis-aligned bounds of each native CF01 joint sweep and occupied tube sweep '
                          'versus the stationary runtime home arm and gripper.'}
 
+    def open_lid_index_clearance(self):
+        """Check the occupied half-turn with the lid open and the pusher parked."""
+        (tube_id, first_slot), (other, second_slot) = self.samples.items()
+        interval = sorted((self.rotor_angle(first_slot), self.rotor_angle(second_slot)))
+        rotor = next(joint for joint in self.station_geometry['joints'] if joint['id'] == 'Rotor')
+        if rotor['axis'] != [0, 0, 1] or interval != [-180., 0.]:
+            raise ValueError('The open-lid index proof needs the two opposite lab pockets and vertical rotor axis')
+
+        rotating = [('CF01.'+name, shape) for name, group, shape in self.station_shapes if group == rotor['child']]
+        tube_world = self.seated_pose(tube_id, first_slot, 0.)
+        rotating.append(('Rotor.'+tube_id, self.placed(self.vehicle[tube_id].shape,
+                        robot.multiply(robot.inverse(self.cf_frame), tube_world))))
+        exposed_ids = {'CF01.'+name for name, group, _shape in self.station_shapes
+                       if group not in ('Frame', rotor['child'])}
+        parked = self._static(other, 'approach', second_slot, self.rotor_angle(second_slot),
+                              'open', False, (tube_id,), 0.)
+        brake_joints = [joint for joint in self.station_geometry['joints']
+                        if joint['id'] in ('BrakeUpper', 'BrakeLower')]
+        if len(brake_joints) != 2:
+            raise ValueError('The open-lid index proof requires both native parking-brake pads')
+        # The ordinary station CAD pose retains its held-brake policy. The
+        # opt-in rotor index uses the released pad positions from the same joints.
+        brake_values = cf.pose(self.station, self.station_p, 'open')
+        brake_values.update({joint['id']: joint['limits'][1] for joint in brake_joints})
+        released = {}
+        for joint in brake_joints:
+            brake_frame = robot.multiply(self.cf_frame,
+                pickup.rigid_from_cf(self.station_geometry, joint['child'], brake_values))
+            for name, group, shape in self.station_shapes:
+                if group == joint['child']:
+                    key = 'CF01.'+name
+                    released[key] = body(key, self.placed(shape, brake_frame), 'station')
+        fixtures = [entry for entry in parked if entry.kind not in ('station', 'seated')
+                    or entry.id in exposed_ids]
+        fixtures = [released.get(entry.id, entry) for entry in fixtures]
+        if len(rotating) < 2 or not exposed_ids or not released:
+            raise ValueError('The open-index proof requires native rotor, lid, latch and pusher bodies')
+        sweep = self._station_rotation_clearance(rotating, rotor, interval, fixtures)
+        if not sweep['passed']:
+            return sweep
+
+        lid = next(joint for joint in self.station_geometry['joints'] if joint['id'] == 'Lid')
+        lid_bodies = [('CF01.'+name, shape) for name, group, shape in self.station_shapes if group == lid['child']]
+        outside = [entry for entry in parked if entry.kind not in ('station', 'seated')]
+        lid_sweep = self._station_rotation_clearance(lid_bodies, lid, lid['limits'], outside)
+        return {
+            **sweep, 'passed': lid_sweep['passed'], 'angle_interval_deg': interval, 'seated_tube_id': tube_id,
+            'lid_fixture_sweep': lid_sweep,
+            'scope': 'Native rotor and seated vessel sweep against the fully open lid, retracted latches and '
+                     'brake pads, parked pusher and surrounding solids. The full lid opening arc is checked '
+                     'against external fixtures. The shaft and frame interfaces use the separate CF01 checks.',
+        }
+
+    def _station_rotation_clearance(self, rotating, joint, interval, fixtures):
+        if not rotating or not fixtures:
+            raise ValueError('The native station sweep needs its moving and stationary bodies')
+        best, limiting, queries = math.inf, None, 0
+        for name, shape in rotating:
+            bounds = bbox(shape)
+            axis = joint['axis']
+            radius = 0.
+            for point in corners(bounds):
+                offset = [value-center for value, center in zip(point, joint['origin'])]
+                axial = sum(value*direction for value, direction in zip(offset, axis))
+                radius = max(radius, math.hypot(*(value-axial*direction for value, direction in zip(offset, axis))))
+            outer = _swept_box(bounds, self.cf_frame, {**joint, 'limits': interval})
+            for fixed in fixtures:
+                lower = lower_distance(outer, fixed.box)
+                pending = [(*interval, 0)] if lower <= NUMERICAL_MARGIN_MM else []
+                if not pending and lower < best:
+                    best, limiting = lower, [name, fixed.id]
+                while pending:
+                    lo, hi, depth = pending.pop()
+                    outer_interval = _swept_box(bounds, self.cf_frame, {**joint, 'limits': [lo, hi]})
+                    lower = lower_distance(outer_interval, fixed.box)
+                    if lower <= NUMERICAL_MARGIN_MM and fixed.shape is not None:
+                        values = {**cf.pose(self.station, self.station_p, 'open'), joint['id']: (lo+hi)/2}
+                        frame = robot.multiply(self.cf_frame,
+                            pickup.rigid_from_cf(self.station_geometry, joint['child'], values))
+                        distance = self.placed(shape, frame).distToShape(fixed.shape)[0]
+                        queries += 1
+                        lower = distance-2*radius*math.sin(math.radians(hi-lo)/4)-NUMERICAL_MARGIN_MM
+                    if lower > NUMERICAL_MARGIN_MM:
+                        if lower < best:
+                            best, limiting = lower, [name, fixed.id]
+                    elif depth >= 12:
+                        return {'passed': False, 'pair': [name, fixed.id], 'unresolved_deg': [lo, hi]}
+                    else:
+                        mid = (lo+hi)/2
+                        pending.extend([(mid, hi, depth+1), (lo, mid, depth+1)])
+        return {
+            'passed': best > NUMERICAL_MARGIN_MM, 'minimum_clearance_mm': best,
+            'limiting_pair': limiting,
+            'rotating_bodies': len(rotating), 'fixed_bodies': len(fixtures), 'distance_queries': queries,
+        }
+
     def check_curve(self, sample, *, home=None, mirror=False, max_depth=15):
         """Certify all noncontact pairs between exact polynomial knots where possible."""
         points = sample['points']
@@ -962,7 +1058,8 @@ def _read_positive_checkpoint(path, identity, sample):
     return evidence
 
 
-def verify_program(oracle, program_path, *, checkpoint_dir=None, only_sample=None, resume=False):
+def verify_program(oracle, program_path, *, checkpoint_dir=None, only_sample=None, resume=False,
+                   open_lid_index=False):
     path = Path(program_path).resolve()
     program = json.loads(path.read_text())
     expected = list(oracle.samples.items())
@@ -997,6 +1094,13 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None, only_sample=Non
         parked_station = oracle.parked_station_clearance(home, gaps.pop())
         if not parked_station['passed']:
             raise ValueError('Station sweep is unresolved at runtime home: '+str(parked_station))
+    index_sweep = None
+    if open_lid_index:
+        if home is None or returns is None:
+            raise ValueError('Open index requires a checked parked ArmC with both forward and return handoffs')
+        index_sweep = oracle.open_lid_index_clearance()
+        if not index_sweep['passed']:
+            raise ValueError('Open-lid index sweep is unresolved: '+str(index_sweep))
     digest = robot.digest(path)
     samples = []
     identity = {'program_sha256': digest, 'source_files_sha256': pins,
@@ -1050,6 +1154,8 @@ def verify_program(oracle, program_path, *, checkpoint_dir=None, only_sample=Non
     if home is not None:
         result['home_joints_deg'] = home
         result['parked_station_sweep'] = parked_station
+    if index_sweep is not None:
+        result['open_lid_index_sweep'] = index_sweep
     if returns is not None and complete and passed:
         result['return_samples'] = [_reflected_evidence(sample) for sample in reversed(samples)]
     return result
@@ -1065,12 +1171,13 @@ def main():
     parser.add_argument('--checkpoint-dir', type=Path)
     parser.add_argument('--only-sample', help='Write a native checkpoint for just one supported vessel')
     parser.add_argument('--resume', action='store_true', help='Reuse compatible positive native checkpoints')
+    parser.add_argument('--open-lid-index', action='store_true', help='Verify the occupied open-lid index sweep')
     parser.add_argument('--out', type=Path, required=True)
     args = parser.parse_args()
     oracle = Lab3003TransferOracle.from_stock(args.stock_preview, args.arm_report,
                                             args.dock_certificate, args.pusher_report)
     result = verify_program(oracle, args.program, checkpoint_dir=args.checkpoint_dir,
-                            only_sample=args.only_sample, resume=args.resume)
+                            only_sample=args.only_sample, resume=args.resume, open_lid_index=args.open_lid_index)
     args.out.parent.mkdir(parents=True, exist_ok=True)
     args.out.write_text(json.dumps(result, indent=2)+'\n')
     if not result['passed']:

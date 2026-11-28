@@ -9,11 +9,11 @@
   "sources": {
     "building": {
       "path": "model/building-stack.shared.json",
-      "sha256": "601c54be5e9b0fa39b6d31d26c251bed8a83f1345213844c6f9bbead5aa31592"
+      "sha256": "daf7efbb783fe22cfc1f24331183f0f3690af9d83c21e7f724e8df021606c426"
     },
     "walkthrough": {
       "path": "model/building-walkthrough.shared.json",
-      "sha256": "89228c1187a4ee42256615c8ab6b0720b2dec4da1e949e5ac5be3583a7023ec2"
+      "sha256": "25145e282611db35b8695843e2c07bdb34822a657ba42795fe35a0673a6d8c98"
     },
     "vehicle": {
       "path": "model/sample-transport-tr01.shared.json",
@@ -21,7 +21,7 @@
     },
     "angular_profile": {
       "path": "model/tr01-l01.motion.json",
-      "sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+      "sha256": "50603aee67e13a9a42522a7615e7ab053ff43d1fbaf02c66e8e54a31fa4e9f44"
     },
     "sensor": {
       "path": "model/l01-local-traffic.demo.json",
@@ -29,7 +29,7 @@
     },
     "layout": {
       "path": "model/lab-layout-l01.shared.json",
-      "sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+      "sha256": "b59b4cca61a1475bc3104bf8c81255b7dc26b48f2dba3b08eb314b736e6b7a3d"
     },
     "camera": {
       "path": "model/tr01-awareness-camera.shared.json",
@@ -37,7 +37,7 @@
     },
     "l01_route": {
       "path": "model/building-fleet-l01-route.shared.json",
-      "sha256": "d12c757c37991031d3c177ba0225ac486714ea2f66704a776f6c477062f41e57"
+      "sha256": "10276e52456c31e66999754d87a2f63b631c88f7240ced1e2ce5e64f6d4c1751"
     },
     "lift_geometry": {
       "path": "scripts/lift_fittings.py",

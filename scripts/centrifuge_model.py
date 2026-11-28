@@ -62,6 +62,18 @@ def parameters(spec, overrides=None):
     if 2*(p['chamber_inner_radius']+p['chamber_wall']+4)>min(p['base_width'],p['base_depth']): raise ValueError('Chamber outside base')
     if p['chamber_floor_z']+p['chamber_floor']>=p['rotor_bottom']: raise ValueError('Floor/rotor clearance')
     if not mechanisms.requirements(spec,p)['gravity_target_covers_case']: raise ValueError('Lid torque target below provisional gravity margin')
+    ejector = spec['handling']['pusher']
+    for name in ('shaft_radius_mm', 'shaft_length_mm', 'guide_radius_mm', 'parked_rotor_clearance_mm'):
+        size = ejector[name]
+        if type(size) not in (int, float) or not math.isfinite(size) or size <= 0:
+            raise ValueError('Positive finite pusher geometry required: '+name)
+    if ejector['guide_radius_mm'] <= ejector['shaft_radius_mm']:
+        raise ValueError('Pusher requires radial clearance in its guide')
+    bottom, axis = pocket(spec, p, 1)
+    radial_height = ejector['shaft_radius_mm'] * math.hypot(*axis[:2])
+    # Rotation about vertical keeps the entire rotor above its bottom plane.
+    axial_gap = (bottom[2] + radial_height + ejector['parked_rotor_clearance_mm'] - p['rotor_bottom']) / axis[2]
+    p['park_gap'] = math.ceil(axial_gap)
     return p
 
 
@@ -108,19 +120,6 @@ def encoder_measurement(delta_count,interval_s,counts_per_rev=4096):
             'standstill_confirmed':False}
 
 
-def power_cord(spec,p):
-    x,y,z=service_frames(spec,p)['power_inlet']; start=x+34; arc_start=start+14; r=p['power_cable_bend']; end_z=6
-    theta=math.acos(1-(z-end_z)/(2*r)); dx=r*math.sin(theta); drop=r*(1-math.cos(theta))
-    a=[arc_start,z]; b=[arc_start+dx,z-drop]; c=[arc_start+2*dx,end_z]
-    mid1=[arc_start+r*math.sin(theta/2),z-r*(1-math.cos(theta/2))]
-    mid2=[c[0]-r*math.sin(theta/2),end_z+r*(1-math.cos(theta/2))]
-    return {'kind':'round_cable','origin':[start,y,z],'plane_origin':[0,y,0],'u_axis':[1,0,0],'v_axis':[0,0,1],
-            'radius':p['power_cable_radius'],'centerline_bend_radius_mm':r,'start_tangent':[1,0,0],
-            'centerline_length_mm':14+2*r*theta+48,
-            'curves':[{'kind':'line','start':[start,z],'end':a},{'kind':'arc','start':a,'through':mid1,'end':b},
-                      {'kind':'arc','start':b,'through':mid2,'end':c},{'kind':'line','start':c,'end':[c[0]+48,end_z]}]}
-
-
 def expanded(spec, p):
     result = {'components': [{'id':'Frame','grounded':True}, {'id':'RotorGroup','grounded':False},
               {'id':'LidGroup','grounded':False}, {'id':'EjectorGroup','grounded':False}, {'id':'PresentedTube','grounded':False},
@@ -135,6 +134,7 @@ def expanded(spec, p):
     def cyl(name,target,r,h,o,action='create',axis=None): op(name,target,'cylinder',o,action,radius=r,height=h,axis=axis or [0,0,1])
     def box(name,target,size,o,action='create'): op(name,target,'box',o,action,size=size)
     w,d=p['base_width'],p['base_depth']; wall=p['base_wall']; r=p['chamber_inner_radius']+p['chamber_wall']; frames=service_frames(spec,p)
+    ejector = spec['handling']['pusher']
     base=body('BaseHousing','Frame','#c1c8ce','steel_housing')
     box('Housing',base,[w,d,p['base_height']],[-w/2,-d/2,0])
     box('ElectricalBay',base,[w-2*wall,d-2*wall,p['base_height']-wall-p['base_floor']],[-w/2+wall,-d/2+wall,p['base_floor']],'cut')
@@ -151,15 +151,11 @@ def expanded(spec, p):
     for index,(x,y) in enumerate([(-90,-90),(-90,90),(90,-90),(90,90)]):
         post=body('FloorSupport'+str(index),'Frame','#87939e','steel_floor_support')
         cyl('SupportPost'+str(index),post,p['floor_support_radius'],p['chamber_floor_z']-p['base_floor'],[x,y,p['base_floor']])
-    # Power entry and a true round sweep, before the costly rotor booleans.
+    # The chassis retains its power-entry and internal protective-earth hardware.
     inlet=body('PowerEntryModule','Frame','#26323d','power_entry_envelope')
     box('PowerModule',inlet,[15,24,24],[px-15,py-12,pz-12]); box('PowerFlange',inlet,[4,34,34],[px,py-17,pz-17],'join')
     rocker=body('PowerRocker','Frame','#b72d36','switch_envelope'); box('Rocker',rocker,[1.5,6,15],[px+4,py-14,pz-7.5])
     fuse=body('FuseDrawer','Frame','#62717b','fuse_envelope'); box('Fuse',fuse,[1.5,6,15],[px+4,py+8,pz-7.5])
-    plug=body('CordCoupler','Frame','#202a33','cord_connector_envelope'); box('CordCouplerBody',plug,[20,18,20],[px+6,py-9,pz-10])
-    relief=body('CordStrainRelief','Frame','#202a33','strain_relief_envelope'); cyl('Relief',relief,5,8,[px+26,py,pz],axis=[1,0,0])
-    cord=body('PowerCord','Frame','#202a33','power_cable_envelope'); shape=power_cord(spec,p)
-    result['operations'].append({'id':'PowerCordSweep','body':cord,'action':'create','shape':shape})
     earth=body('ProtectiveEarthStud','Frame','#c8aa49','earth_bond_envelope'); cyl('EarthStud',earth,3,8,[px-30,py,p['base_floor']])
     lead=body('ProtectiveEarthLead','Frame','#79b83b','earth_lead_envelope')
     a=[px-12,py,pz-10]; b=[px-30,py,p['base_floor']+8]; length=math.dist(a,b)
@@ -184,7 +180,7 @@ def expanded(spec, p):
         tag=f'{slot:02d}'; bottom,axis=pocket(spec,p,slot)
         # Seat and ejector passage are deliberately separate semantic features.
         cyl('TubeBore'+tag,rotor,p['tube_radius']+0.3,p['tube_length']+12,plus(bottom,axis,-0.3),'cut',axis)
-        cyl('EjectorPassage'+tag,rotor,1.8,31,plus(bottom,axis,-30),'cut',axis)
+        cyl('EjectorPassage'+tag,rotor,ejector['guide_radius_mm'],31,plus(bottom,axis,-30),'cut',axis)
         group='PresentedTube' if slot==1 else 'RotorGroup'
         tube=body('Tube'+tag,group,'#a4dce0','illustrative_tube')
         op('TubeCone'+tag,tube,'cone',bottom,radius=1,top_radius=p['tube_radius'],height=12,axis=axis)
@@ -205,10 +201,19 @@ def expanded(spec, p):
     lid=body('CommandLid','LidGroup','#aeb7c0','steel_lid')
     cyl('LidDisc',lid,r+4,p['lid_thickness'],[0,0,p['lid_z']])
     mechanisms.lid(spec,p,frames['hinge'],body,cyl,box)
-    actuator=body('LiftActuatorEnvelope','Frame','#e9b047','actuator_envelope'); box('LiftDrive',actuator,[18,22,22],[-9,-108,floor_top+2])
     bottom,axis=pocket(spec,p,1)
+    actuator=body('LiftActuatorEnvelope','Frame','#e9b047','actuator_envelope')
+    housing_bottom = floor_top + 2
+    housing_height = 22
+    box('LiftDrive',actuator,[18,22,housing_height],[-9,-108,housing_bottom])
+    shaft_start = -p['park_gap'] - ejector['shaft_length_mm']
+    guide_radius = ejector['guide_radius_mm']
+    guide_radial_height = guide_radius * math.hypot(*axis[:2])
+    guide_start = min(shaft_start - 1, (housing_bottom - guide_radial_height - 1 - bottom[2]) / axis[2])
+    guide_end = (housing_bottom + housing_height + guide_radial_height + 1 - bottom[2]) / axis[2]
+    cyl('LiftDriveGuide',actuator,guide_radius,guide_end-guide_start,plus(bottom,axis,guide_start),'cut',axis)
     pin=body('RetractablePusher','EjectorGroup','#e9b047','ejector_contact_concept')
-    cyl('Pusher',pin,1.2,16,plus(bottom,axis,-p['park_gap']-16),axis=axis)
+    cyl('Pusher',pin,ejector['shaft_radius_mm'],ejector['shaft_length_mm'],plus(bottom,axis,shaft_start),axis=axis)
     datum=body('StationDatumL','Frame','#202f40','custom_station_landmark')
     box('DatumLong',datum,[25,4,1],[-112,-125,p['base_height']]); box('DatumShort',datum,[4,20,1],[-112,-125,p['base_height']],'join')
     for i in range(3):
@@ -273,18 +278,7 @@ def solidcraft_commands(spec,p):
         s=op['shape']; kind=s['kind']; args={'name':op['id'],'operation':'new' if op['action']=='create' else op['action']}
         if op['action']=='create': args['body_name']=op['body']
         else: args['targets']=[op['body']]
-        if kind=='round_cable':
-            path_name=op['id']+'_Path'; profile_name=op['id']+'_Section'; ids=[]; counts={'line':0,'arc':0}
-            add('sketch.create',name=path_name,plane={'origin':s['plane_origin'],'x_dir':s['u_axis'],'y_dir':s['v_axis']})
-            for curve in s['curves']:
-                counts[curve['kind']]+=1; ids.append(('l' if curve['kind']=='line' else 'a')+str(counts[curve['kind']]))
-                if curve['kind']=='line': add('sketch.line',points=[curve['start'],curve['end']],infer=False)
-                else: add('sketch.arc.three_point',start=curve['start'],through=curve['through'],end=curve['end'])
-            add('sketch.finish')
-            add('sketch.create',name=profile_name,plane={'origin':s['origin'],'x_dir':[0,1,0],'y_dir':[0,0,1]})
-            add('sketch.circle.center',center=[0,0],radius=s['radius']); add('sketch.finish')
-            add('solid.sweep',sketch=profile_name,path_sketch=path_name,path=ids,orientation='perpendicular',**args)
-        elif kind=='profile':
+        if kind=='profile':
             add('sketch.create',name=op['id']+'_Profile',plane={'origin':s['origin'],'x_dir':s['u_axis'],'y_dir':s['v_axis']})
             for loop in s['loops']: add('sketch.line',points=loop,closed=True,infer=False)
             add('sketch.finish'); add('solid.extrude',distance=s['depth'],**args)

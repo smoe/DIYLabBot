@@ -4,11 +4,11 @@
   "sources": {
     "walkthrough": {
       "source": "model/building-walkthrough.shared.json",
-      "source_sha256": "89228c1187a4ee42256615c8ab6b0720b2dec4da1e949e5ac5be3583a7023ec2"
+      "source_sha256": "25145e282611db35b8695843e2c07bdb34822a657ba42795fe35a0673a6d8c98"
     },
     "fleet": {
       "source": "model/building-fleet-demo.shared.json",
-      "source_sha256": "72a243bfd3fbe20daaa2053358fc9d0648c82f5973c9f25e22fb47c94ec539d5"
+      "source_sha256": "3bb411c96f1ad71bf0be30335e275275c9f70b21813b39aba5b8a1508b2b64af"
     }
   },
   "settings": {

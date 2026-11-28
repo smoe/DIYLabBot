@@ -109,6 +109,35 @@ async function main() {
       assert(after.station.time_s + 1e-6 >= Math.min(target, cycle.duration_s));
       return after;
     }
+    const openIndices = [];
+    async function checkOpenIndex(prefix) {
+      const before = cycle.steps.find(step => step.phase === prefix+'open_indexing');
+      const after = cycle.steps.find(step => step.phase === prefix+'open_indexed');
+      const lidId = cycle.joints.lid.body_ids[0];
+      const start = await at(before.time_s+0.02);
+      assert.equal(start.station.phase, before.phase);
+      assert.deepEqual(start.station.seated, before.seated);
+      const carried = cycle.samples.find(sample => sample.id === before.seated[0]).carrier_body_id;
+      const lid = await page.evaluate(id => window.__buildingWalkthrough.bodyMatrix(id), lidId);
+      const mid = await at((before.time_s+after.time_s)/2);
+      assert.equal(mid.station.phase, before.phase);
+      assert.equal(mid.station.lid_deg, before.lid_deg);
+      assert.equal(mid.station.rpm, 0);
+      assert.equal(mid.station.pusher_mm, 0);
+      assert.equal(mid.station.held_tube, null);
+      assert.equal(mid.station.arm_clear, true);
+      assert.equal(mid.station.brake_held, false);
+      assert.deepEqual(await page.evaluate(id => window.__buildingWalkthrough.bodyMatrix(id), lidId), lid);
+      assert.notDeepEqual(mid.rendered.matrices[carried], start.rendered.matrices[carried]);
+      for (const id of armBodies) assert.deepEqual(mid.rendered.matrices[id], start.rendered.matrices[id]);
+      if (departure) assert.equal(mid.lap.time_s, 0);
+      const done = await at(after.time_s+0.01);
+      assert.equal(done.station.phase, after.phase);
+      assert.equal(done.station.brake_held, true);
+      assert.equal(done.station.lid_deg, before.lid_deg);
+      openIndices.push({phase: before.phase, tube_id: before.tube_id, start_s: before.time_s,
+        end_s: after.time_s, lid_deg: before.lid_deg, rotation_deg: after.rotor_deg-before.rotor_deg});
+    }
 
     const initial = await snapshot();
     assert.equal(initial.renderer, 'webgl2');
@@ -208,6 +237,7 @@ async function main() {
       witnesses.push({id: sample.id, native_body_id: sample.carrier_body_id, carried_s: active.station.time_s,
         supported_s: raised.station.time_s, lowering_s: lowering.station.time_s, seated_s: parked.station.time_s,
         measured_lowering_mm: descent});
+      if (index === 0 && cycle.open_lid_indexing) await checkOpenIndex('');
     }
 
     const spinStart = await at(cycle.spin_started_s-0.08);
@@ -261,6 +291,7 @@ async function main() {
       returned.push({id: sample.id, native_body_id: body, lifted_s: lifted.station.time_s,
         carried_s: grasp.station.time_s, cassette_s: cassette.station.time_s, measured_rise_mm: rise});
       assert.deepEqual(clear.station.returned, returned.map(item => item.id));
+      if (returned.length === 1 && cycle.open_lid_indexing) await checkOpenIndex('return_');
     }
     const ready = hasReturns ? await at(cycle.duration_s) : stopped;
     if (hasReturns) {
@@ -327,7 +358,8 @@ async function main() {
     if (departure) assert.equal(afterReset.lap.time_s, 0);
     assert.deepEqual(errors, []);
 
-    const result = {passed: true, html_sha256: htmlHash, renderer: initial.renderer, handoffs: witnesses, returned, lap,
+    const result = {passed: true, html_sha256: htmlHash, renderer: initial.renderer, handoffs: witnesses,
+      returned, lap, open_lid_indices: openIndices,
       spin_s: spinning.station.time_s, confirmed_stillstand_s: stopped.station.time_s, console_errors: errors};
     fs.writeFileSync(path.join(folder, 'transfer-browser-check.json'), JSON.stringify(result, null, 2)+'\n');
     console.log(JSON.stringify(result));

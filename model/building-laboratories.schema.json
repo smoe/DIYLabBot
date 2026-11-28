@@ -119,6 +119,19 @@
                 "propertyNames": {"minLength": 1},
                 "additionalProperties": {"type": "string", "minLength": 1}
               },
+              "device_poses": {
+                "type": "object",
+                "propertyNames": {"minLength": 1},
+                "additionalProperties": {
+                  "type": "object",
+                  "required": ["xy_mm"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "xy_mm": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+                    "yaw_deg": {"type": "number"}
+                  }
+                }
+              },
               "park_joints_deg": {
                 "type": "object",
                 "additionalProperties": {

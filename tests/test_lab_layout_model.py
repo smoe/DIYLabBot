@@ -65,11 +65,23 @@ class LabLayoutTests(unittest.TestCase):
 
     def test_bench_racks_use_transporter_cassettes(self):
         racks = [i for i in self.spec['instances'] if i['asset'] == 'tube_rack']
-        self.assertEqual(len(racks), 3)
+        self.assertEqual({rack['id'] for rack in racks}, {'RackPair', 'RackCF', 'RackCF2', 'RackManual'})
+        self.assertEqual({rack['id'] for rack in racks if rack['host'] == 'LeftBench'}, {'RackCF', 'RackCF2'})
         self.assertNotIn('tube_rack', self.spec['assets'])
         self.assertEqual(self.items['TR01']['host'], 'Floor')
         self.assertEqual(model.provider('transporter').parameters(model.instance_source(self.spec,self.items['TR01']))['floor_deck_z'],
                          self.spec['parameters']['vehicle_deck_z'])
+
+    def test_standalone_transfer_keeps_its_bound_cf01_and_arm_poses(self):
+        p = model.parameters(self.spec)
+        for name, position, yaw in [
+                ('CF01', [500, 5250, p['bench_height']], 270),
+                ('ArmC', [600, 5550, p['bench_height'] + p['cf_arm_riser_h']], 0),
+                ('RackCF', [500, 4775, p['bench_height']], 0),
+                ('RackCF2', [220, 4800, p['bench_height']], 0)]:
+            with self.subTest(device=name):
+                self.assertEqual(model.xyz(self.items[name]['xyz'], p), position)
+                self.assertEqual(self.items[name]['yaw_deg'], yaw)
 
     def test_devices_reference_the_catalog_and_cellar_ult_stays_outside_l01(self):
         devices=[i for i in self.spec['instances'] if i['asset'] in model.EQUIPMENT_PROFILES]
