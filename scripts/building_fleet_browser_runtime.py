@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 import struct
 import sys
+import uuid
 
 import building_fleet_model as model
 
@@ -19,7 +20,7 @@ import building_fleet_model as model
 INPUTS = frozenset({'profile', 'navigation_cache', 'graph_cache_report',
     'resource_cache', 'walkthrough_export', 'camera_report', 'vehicle_mesh'})
 COMPACT_INPUTS = frozenset({'profile', 'static_runtime_cache'})
-OPTIONAL = frozenset({'browser_source', 'browser_config_sha256'})
+OPTIONAL = frozenset({'browser_source', 'browser_config_sha256', 'lab3003_reserved'})
 _VERIFIED_EXTRACTION = None
 
 
@@ -60,6 +61,8 @@ def _configuration(config):
     required = inputs | {'root', 'source_files_sha256'}
     if not required <= set(config) or set(config)-required-OPTIONAL:
         raise ValueError('Closed browser engine configuration required')
+    if 'lab3003_reserved' in config and (not compact or config['lab3003_reserved'] is not True):
+        raise ValueError('The laboratory reservation requires an explicit compact demonstration')
     if config['root'] != str(model.ROOT.resolve()):
         raise ValueError('Browser project root differs from the imported engine')
     paths = {name: _path(config[name]) for name in inputs}
@@ -222,6 +225,7 @@ class BrowserRuntime:
         self.callback = None
         self.pins = {}
         self.config_hash = None
+        self.lab3003_reservation_id = None
         self.state = {'status': 'starting', 'phase': 'uninitialized', 'model_time_s': 0.}
 
     def _progress(self, row):
@@ -246,6 +250,9 @@ class BrowserRuntime:
             self.state['browser_static_route_witnesses'] = provenance()
         if hasattr(self.engine, 'static_ray_cache'):
             self.state['static_ray_cache'] = copy.deepcopy(self.engine.static_ray_cache)
+        if self.lab3003_reservation_id is not None:
+            self.state['lab3003_reservation_id'] = self.lab3003_reservation_id
+            self.state['lab3003_reserved'] = self.engine.dispatcher.lab3003_reserved
         return _json(self.state)
 
     def boot(self, config_json, progress_callback=None):
@@ -261,6 +268,9 @@ class BrowserRuntime:
             self._progress({'phase': 'verifying_browser_bundle'})
             paths, source, profile, self.pins = _configuration(config)
             self.engine = _make_engine(paths, source, profile, self._progress)
+            if config.get('lab3003_reserved') is True:
+                self.lab3003_reservation_id = uuid.uuid4().hex
+                self.engine.dispatcher.lab3003_reserved = True
             if 'static_runtime_cache' in paths:
                 self.engine.configure_background_preparation(self.config_hash)
                 if model.read_json(paths['browser_source'])['runtime'].get('depot_departures'):
@@ -305,6 +315,14 @@ class BrowserRuntime:
             self.engine.set_paused(action == 'pause')
         elif action == 'request_job' and set(value) == {'action', 'request_id', 'pickup', 'delivery'}:
             self.engine.request_job(value['pickup'], value['delivery'], value['request_id'])
+        elif action == 'lab3003_docked':
+            if (set(value) != {'action', 'reservation_id'}
+                    or self.lab3003_reservation_id is None
+                    or type(value['reservation_id']) is not str
+                    or value['reservation_id'] != self.lab3003_reservation_id):
+                raise ValueError('A matching live laboratory reservation is required')
+            # This is a synthetic browser observation, not a physical handover.
+            self.engine.dispatcher.lab3003_reserved = False
         else:
             raise ValueError('Expected pause, resume or an identified pickup/delivery request')
         return self._capture()

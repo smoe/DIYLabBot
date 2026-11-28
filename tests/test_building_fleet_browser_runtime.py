@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -19,6 +20,7 @@ class FakeEngine:
         self.paused = False
         self.calls = []
         self.fail = False
+        self.dispatcher = SimpleNamespace(lab3003_reserved=False)
 
     def step(self):
         self.calls.append(('step',))
@@ -41,7 +43,7 @@ class FakeEngine:
 
 
 class BrowserLifecycleTests(unittest.TestCase):
-    def ready(self, callback=None):
+    def ready(self, callback=None, *, laboratory=False):
         runtime = adapter.BrowserRuntime()
         engine = FakeEngine()
         paths, source, profile = {'map': 'immutable-path'}, {'fleet': 'source'}, {'patrol': 'policy'}
@@ -51,7 +53,10 @@ class BrowserLifecycleTests(unittest.TestCase):
             return engine
         with patch.object(adapter, '_configuration', return_value=(paths, source, profile, {'adapter': 'pin'})), \
                 patch.object(adapter, '_make_engine', side_effect=factory) as make:
-            value = json.loads(runtime.boot('{"root":"/fixture"}', callback))
+            config = {'root': '/fixture'}
+            if laboratory:
+                config['lab3003_reserved'] = True
+            value = json.loads(runtime.boot(json.dumps(config), callback))
         self.assertEqual(value['model_time_s'], 0.)
         self.assertEqual(value['integration_step_s'], engine.dt)
         self.assertFalse(value['recording_fallback'])
@@ -89,6 +94,51 @@ class BrowserLifecycleTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'one fresh world'):
             runtime.boot('{}')
         self.assertEqual(engine.calls, [])
+
+    def test_laboratory_reservation_is_opt_in_and_fresh_for_each_boot(self):
+        standard, engine = self.ready()
+        self.assertNotIn('lab3003_reservation_id', json.loads(standard.snapshot()))
+        self.assertNotIn('lab3003_reserved', json.loads(standard.snapshot()))
+        with self.assertRaisesRegex(ValueError, 'matching live'):
+            standard.command('{"action":"lab3003_docked","reservation_id":"foreign"}')
+        self.assertFalse(engine.dispatcher.lab3003_reserved)
+        first, _ = self.ready(laboratory=True)
+        second, _ = self.ready(laboratory=True)
+        a, b = json.loads(first.snapshot()), json.loads(second.snapshot())
+        self.assertTrue(a['lab3003_reserved'])
+        self.assertRegex(a['lab3003_reservation_id'], r'^[a-f0-9]{32}$')
+        self.assertNotEqual(a['lab3003_reservation_id'], b['lab3003_reservation_id'])
+        with self.assertRaisesRegex(ValueError, 'matching live'):
+            second.command(json.dumps({'action': 'lab3003_docked',
+                'reservation_id': a['lab3003_reservation_id']}))
+        self.assertTrue(json.loads(second.snapshot())['lab3003_reserved'])
+
+    def test_only_matching_strict_docking_command_releases_idempotently(self):
+        runtime, engine = self.ready(laboratory=True)
+        identity = json.loads(runtime.snapshot())['lab3003_reservation_id']
+        for value in ({'action': 'lab3003_docked'},
+                      {'action': 'lab3003_docked', 'reservation_id': None},
+                      {'action': 'lab3003_docked', 'reservation_id': 'stale'},
+                      {'action': 'lab3003_docked', 'reservation_id': identity, 'observed': True}):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'matching live'):
+                runtime.command(json.dumps(value))
+            self.assertTrue(engine.dispatcher.lab3003_reserved)
+        command = json.dumps({'action': 'lab3003_docked', 'reservation_id': identity})
+        for _ in range(2):
+            observed = json.loads(runtime.command(command))
+            self.assertFalse(observed['lab3003_reserved'])
+            self.assertEqual(observed['lab3003_reservation_id'], identity)
+        self.assertEqual(engine.calls, [])
+
+    def test_failed_runtime_does_not_accept_docking_observation(self):
+        runtime, engine = self.ready(laboratory=True)
+        identity = json.loads(runtime.snapshot())['lab3003_reservation_id']
+        engine.fail = True
+        with self.assertRaises(RuntimeError):
+            runtime.tick()
+        with self.assertRaisesRegex(RuntimeError, 'not ready'):
+            runtime.command(json.dumps({'action': 'lab3003_docked', 'reservation_id': identity}))
+        self.assertTrue(engine.dispatcher.lab3003_reserved)
 
     def test_tick_and_pause_delegate_once_without_wall_clock_catchup(self):
         runtime, engine = self.ready()
@@ -181,6 +231,21 @@ class BrowserConfigurationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'adapters'):
             adapter._configuration(config)
 
+    def test_laboratory_reservation_requires_the_compact_explicit_opt_in(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            config, _ = self.fixture(root)
+            with self.assertRaisesRegex(ValueError, 'explicit compact'):
+                adapter._configuration({**config, 'lab3003_reserved': True})
+            compact = {'root': str(root), 'profile': config['profile'],
+                       'static_runtime_cache': 'exports/cache-report.json',
+                       'source_files_sha256': config['source_files_sha256']}
+            for value in (False, 1, None, 'true'):
+                with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'explicit compact'):
+                    adapter._configuration({**compact, 'lab3003_reserved': value})
+            with self.assertRaisesRegex(ValueError, 'Closed'):
+                adapter._configuration({**compact, 'lab3003_reservation_id': 'caller-chosen'})
+
     def fixture(self, root):
         def write(path, value):
             file = root/path
@@ -263,6 +328,8 @@ class BrowserConfigurationTests(unittest.TestCase):
             with patch.object(adapter.model, 'ROOT', root), patch.object(adapter.model, 'load', return_value={}):
                 paths, _, _, _ = adapter._configuration(config)
                 self.assertEqual(paths['static_runtime_cache'], cache)
+                reserved_paths, _, _, _ = adapter._configuration({**config, 'lab3003_reserved': True})
+                self.assertEqual(reserved_paths, paths)
                 cache.write_text('{"fixture":"changed"}')
                 with self.assertRaisesRegex(ValueError, 'Changed'):
                     adapter._configuration(config)

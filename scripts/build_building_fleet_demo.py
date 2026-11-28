@@ -150,7 +150,7 @@ def html_budget(additional_bytes):
             'policy':'Presentation target; exceedance is reported without dropping PVA, received telemetry or captures'}
 
 
-def world_presentation(world_path,*,include_monitor_overlay=False,progressive_output=None):
+def world_presentation(world_path,*,include_monitor_overlay=False,progressive_output=None,lab3003_preview=None):
     """Render the checked physical world with the current shared viewer adapter."""
     import build_building_walkthrough as builder
     import walkthrough_world
@@ -169,12 +169,22 @@ def world_presentation(world_path,*,include_monitor_overlay=False,progressive_ou
         if overlay is None:raise ValueError('Source-bound physical monitor wall required')
         payload=builder.attach_monitor_overlay(payload,overlay)
         pins=builder.merge_pins(pins,overlay['source_files_sha256'])
+    template=builder.TEMPLATE.read_text(encoding='utf-8')
+    if lab3003_preview is not None:
+        if progressive_output is None:
+            raise ValueError('Shared laboratory playback requires the progressive fleet viewer')
+        import building_fleet_lab3003 as lab
+        payload=lab.attach(payload,lab3003_preview)
+        template=lab.viewer(template)
+        pins=builder.merge_pins(pins,payload['source_files_sha256'],{
+            str(path.relative_to(ROOT)):native.digest(path) for path in
+            (Path(lab.__file__),ROOT/'scripts/walkthrough_lab3003_cf01.js',ROOT/'scripts/walkthrough_tr01_lap.js')})
     if progressive_output is not None:
         import building_fleet_progressive_presentation as progressive
         payload=progressive.derive(payload,progressive_output,world_report_sha256=native.digest(world_path))
         for path in (Path(progressive.__file__),progressive.SCRIPT,progressive.WORKER):
             pins[str(path.relative_to(ROOT))]=native.digest(path)
-    normal=builder.embed_html(builder.TEMPLATE.read_text(encoding='utf-8'),payload)
+    normal=builder.embed_html(template,payload)
     if progressive_output is not None:
         normal=progressive.attach(normal)
     native.verify_pins(pins)

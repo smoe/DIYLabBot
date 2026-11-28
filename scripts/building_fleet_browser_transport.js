@@ -46,13 +46,14 @@ function create(config,options={}){
  let resolveReady;const ready=new Promise(resolve=>{resolveReady=resolve;});
  const settleReady=()=>{if(resolveReady){resolveReady({status:state.status});resolveReady=null;}};
  let state={format:'solidcraftbot.building-fleet-live-state/1',status:'starting',phase:'loading_browser_engine',paused:false},disposed=false,commandCount=0;
- const requests=new Map(),startupListeners=new Set();
+ const requests=new Map(),startupListeners=new Set(),confirmations=new Map();
+ const rejectConfirmations=error=>{for(const pending of confirmations.values())pending.reject(error);confirmations.clear();};
  const startupState=()=>state.status==='starting'?clone(state):state.status==='error'?{status:'error',error:state.error}:{status:'ready'};
  function notifyStartup(){
   for(const listener of startupListeners)listener(startupState());
   if(state.status!=='starting')startupListeners.clear();
  }
- const fatal=error=>{state={...state,status:'error',error:String(error||'Browser simulation stopped')};settleReady();notifyStartup();};
+ const fatal=error=>{state={...state,status:'error',error:String(error||'Browser simulation stopped')};rejectConfirmations(Error(state.error));settleReady();notifyStartup();};
  const send=command=>{require(!disposed,'This browser simulation has been closed');require(state.status!=='error','The browser simulation stopped; reload to start a new session');worker.postMessage({type:'command',id:++commandCount,command});return commandCount;};
  worker.onmessage=event=>{
   const message=event.data;
@@ -61,6 +62,7 @@ function create(config,options={}){
    const next=message.state;
    if(next?.format!==SNAPSHOT||typeof next.session_id!=='string'||!Number.isFinite(next.model_time_s)){fatal('Invalid executed simulation state');return;}
    if(state.format===SNAPSHOT&&state.session_id===next.session_id&&next.model_time_s<state.model_time_s){fatal('Simulation clock moved backwards');return;}
+   for(const [id,pending]of confirmations)if(next.session_id!==pending.session_id||next.lab3003_reservation_id!==pending.reservation_id){confirmations.delete(id);pending.reject(Error('The laboratory reservation belongs to a different browser session'));}
    state={...clone(next),status:'ready',command_errors:state.command_errors??[]};
    settleReady();if(startupListeners.size)notifyStartup();
   }else if(message.type==='progress'){
@@ -71,7 +73,13 @@ function create(config,options={}){
     for(const key of progressFields)delete state[key];
     Object.assign(state,progress);notifyStartup();
    }else state={...state,...progress};
+  }else if(message.type==='command_ack'){
+   const pending=confirmations.get(message.id);if(!pending)return;
+   if(Object.keys(message).sort().join(',')!=='action,id,lab3003_reserved,reservation_id,session_id,type'||message.action!=='lab3003_docked'||message.reservation_id!==pending.reservation_id||message.session_id!==pending.session_id||message.lab3003_reserved!==false||state.session_id!==pending.session_id||state.lab3003_reservation_id!==pending.reservation_id||state.lab3003_reserved!==false){fatal('Invalid laboratory reservation acknowledgement');return;}
+   confirmations.delete(message.id);
+   pending.resolve({status:'confirmed',action:message.action,reservation_id:message.reservation_id,session_id:message.session_id,lab3003_reserved:false});
   }else if(message.type==='command_error'){
+   const pending=confirmations.get(message.id);if(pending){confirmations.delete(message.id);pending.reject(Error(String(message.error)));}
    const errors=[...(state.command_errors??[]),{request_id:message.request_id??String(message.id),error:String(message.error)}];
    state={...state,command_errors:errors.slice(-100)};
   }else if(message.type==='error')fatal(message.error);
@@ -105,7 +113,12 @@ function create(config,options={}){
    send({action:'request_job',...clone(body)});requests.set(body.request_id,fingerprint);
    return{status:'queued_for_engine',request_id:body.request_id};
   },
-  dispose(){if(disposed)return;disposed=true;startupListeners.clear();worker.terminate();},
+  reportLab3003Docked(reservationId){
+   try{require(!disposed,'This browser simulation has been closed');require(state.status==='ready'&&typeof reservationId==='string'&&REQUEST_ID.test(reservationId)&&state.lab3003_reservation_id===reservationId&&typeof state.lab3003_reserved==='boolean','A matching live laboratory reservation is required');require(confirmations.size<100,'The laboratory confirmation queue is full');}
+   catch(error){return Promise.reject(error);}
+   return new Promise((resolve,reject)=>{const id=commandCount+1;confirmations.set(id,{resolve,reject,reservation_id:reservationId,session_id:state.session_id});try{send({action:'lab3003_docked',reservation_id:reservationId});}catch(error){confirmations.delete(id);reject(error);}});
+  },
+  dispose(){if(disposed)return;disposed=true;rejectConfirmations(Error('This browser simulation has been closed'));startupListeners.clear();worker.terminate();},
   get state(){return clone(state);}
  });
 }

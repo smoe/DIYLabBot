@@ -27,6 +27,71 @@ def dispatcher():
 
 
 class PatrolDispatchTests(unittest.TestCase):
+    def laboratory_dispatcher(self):
+        config = source()
+        config['missions']['targets'][1].update(level='OG3', area='R3_003')
+        return PatrolDispatcher(config, {'BF01': {'level': 'EG'}})
+
+    def test_laboratory_reservation_excludes_patrol_without_changing_default(self):
+        d = self.laboratory_dispatcher()
+        self.assertFalse(d.lab3003_reserved)
+        self.assertEqual(d.assign('BF01', 'EG', 0., admissible_levels={'OG3'})['goal']['area'], 'R3_003')
+        d = self.laboratory_dispatcher()
+        d.lab3003_reserved = True
+        self.assertIsNone(d.assign('BF01', 'EG', 0., admissible_levels={'OG3'},
+            book_goal=lambda *args: self.fail('A reserved laboratory must not be booked')))
+        self.assertEqual(d.counter, 0)
+        self.assertEqual(d.missions, {})
+        self.assertIn(d.assign('BF01', 'EG', 0.)['goal']['area'], ('A', 'C'))
+
+    def test_reserved_laboratory_job_waits_unclaimed_then_recruits_same_identity(self):
+        d = self.laboratory_dispatcher()
+        job = d.request_job(('EG', 'A'), d.LAB3003, 'lab-process', 0.)
+        d.lab3003_reserved = True
+        self.assertEqual(d.queued_jobs(), [])
+        observed = d.recruit('lab-process', [{'vehicle_id': 'BF01', 'eta_s': 1.}], 1.)
+        self.assertEqual(observed, job)
+        self.assertEqual(d.vehicle_jobs, {})
+        self.assertEqual(d.jobs['lab-process']['bids'], [])
+        self.assertIn(d.assign('BF01', 'EG', 1.)['goal']['area'], ('A', 'C'))
+        d.lab3003_reserved = False
+        self.assertEqual([row['request_id'] for row in d.queued_jobs()], ['lab-process'])
+        self.assertEqual(d.recruit('lab-process', [{'vehicle_id': 'BF01', 'eta_s': 1.}], 2.)['vehicle_id'], 'BF01')
+        self.assertEqual(d.assign('BF01', 'EG', 2.)['goal']['area'], 'A')
+        self.assertEqual(d.assign('BF01', 'EG', 2.)['goal']['area'], 'R3_003')
+        self.assertEqual(len(d.jobs), 1)
+        self.assertEqual(d.jobs['lab-process']['created_s'], 0.)
+
+    def test_reservation_blocks_both_job_directions_and_already_recruited_jobs(self):
+        for pickup, delivery in ((('EG', 'A'), ('OG3', 'R3_003')),
+                                 (('OG3', 'R3_003'), ('EG', 'A'))):
+            with self.subTest(pickup=pickup):
+                d = self.laboratory_dispatcher()
+                d.request_job(pickup, delivery, 'p', 0.)
+                d.recruit('p', [{'vehicle_id': 'BF01', 'eta_s': 1.}], 0.)
+                d.lab3003_reserved = True
+                self.assertIsNone(d.assign('BF01', 'EG', 1.))
+                self.assertIsNone(d.jobs['p']['pickup_mission_id'])
+                d.lab3003_reserved = False
+                self.assertEqual((d.assign('BF01', 'EG', 2.)['goal']['level'],
+                    d.assign('BF01', 'EG', 2.)['goal']['level']), (pickup[0], delivery[0]))
+
+    def test_reserved_resume_target_waits_and_outside_jobs_remain_available(self):
+        d = self.laboratory_dispatcher()
+        d.resume_targets['BF01'] = d.LAB3003
+        d.lab3003_reserved = True
+        self.assertIsNone(d.assign('BF01', 'EG', 0.))
+        self.assertEqual(d.resume_targets['BF01'], d.LAB3003)
+        d.request_job(('EG', 'A'), ('EG', 'C'), 'outside', 0.)
+        self.assertEqual([row['request_id'] for row in d.queued_jobs()], ['outside'])
+        self.assertEqual(d.recruit('outside', [{'vehicle_id': 'BF01', 'eta_s': 1.}], 0.)['vehicle_id'], 'BF01')
+        self.assertEqual(d.assign('BF01', 'EG', 1.)['goal']['area'], 'A')
+        d = self.laboratory_dispatcher()
+        d.resume_targets['BF01'] = d.LAB3003
+        d.lab3003_reserved = True
+        d.lab3003_reserved = False
+        self.assertEqual(d.assign('BF01', 'EG', 1.)['goal']['area'], 'R3_003')
+
     def test_patrol_retains_source_and_never_returns_automatically(self):
         config = source()
         before = copy.deepcopy(config)

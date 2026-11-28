@@ -441,9 +441,12 @@ def presentation_locations(source, levels):
     return locations, pins
 
 
-def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_bytecode_compiler=None):
+def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_bytecode_compiler=None,
+          lab3003_preview=None):
     output = local.project_path(output, output=True)
     compact = 'static_runtime_cache' in inputs
+    if lab3003_preview is not None and (not compact or bundle_only):
+        raise ValueError('A shared lab demonstration requires a complete compact browser walkthrough')
     files, browser_source, profile = collect_compact(inputs) if compact else collect(inputs)
     source = model.load()
     vehicle_count = len(model.active_vehicle_ids(source, profile))
@@ -456,6 +459,8 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         raise ValueError('Python runtime delivery must be declared in the leading browser source')
     runtime_inputs = ({key: inputs[key] for key in ('profile', 'browser_source', 'static_runtime_cache')}
                       if compact else inputs)
+    if lab3003_preview is not None:
+        runtime_inputs['lab3003_reserved'] = True
     if python_bytecode_compiler and not browser_source['runtime']['version'].startswith('314.'):
         raise ValueError('The optional import cache currently targets only the pinned Python 3.14 runtime')
     bytecode = prepare_bytecode(files, output, python_bytecode_compiler) if python_bytecode_compiler else None
@@ -473,8 +478,10 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         shutil.copyfile(ROOT / source_path, output / name)
     if not bundle_only:
         args = SimpleNamespace(**inputs)
-        local_report = local.build_page(source, profile, args, output,
-                                       **({'progressive_output': output} if compact else {}))
+        page_options = {'progressive_output': output} if compact else {}
+        if lab3003_preview is not None:
+            page_options['lab3003_preview'] = lab3003_preview
+        local_report = local.build_page(source, profile, args, output, **page_options)
         presentation_pins = local_report['source_files_sha256']
         from walkthrough_world import FILES
         # build_page checked the native world manifest against its report.
@@ -525,6 +532,8 @@ def build(inputs, output, *, bundle_only=False, python_core_dir=None, python_byt
         'qualification': copy.deepcopy(manifest['qualification']), 'bundle_only': bundle_only,
         'files': artifacts, 'uncompressed_runtime_bytes': sum(row['bytes'] for row in files.files.values()),
         'browser_checked': False, 'scope': manifest['scope']}
+    if lab3003_preview is not None:
+        report['inputs']['lab3003_preview'] = local.project_path(lab3003_preview).relative_to(ROOT).as_posix()
     if python_core is not None:
         report['source_files_sha256'].update({name: row['sha256']
             for name, row in python_core['originals'].files.items()})
@@ -542,6 +551,7 @@ def main(argv=None):
     parser.add_argument('--bundle-only', action='store_true')
     parser.add_argument('--python-core-dir', help='Original official core files declared by the browser source')
     parser.add_argument('--static-runtime-cache', help='Source-bound lossless static derivation report')
+    parser.add_argument('--lab3003-preview', help='Checked standalone Lab 3.003 preview to show with the live fleet')
     parser.add_argument('--python-bytecode-compiler', help='Optional compatible CPython 3.14 interpreter for checked-hash source import caches')
     args = parser.parse_args(argv)
     inputs = {name: (ROOT / getattr(args, name)).resolve().relative_to(ROOT.resolve()).as_posix()
@@ -551,7 +561,8 @@ def main(argv=None):
     if args.static_runtime_cache:
         inputs['static_runtime_cache'] = local.project_path(args.static_runtime_cache).relative_to(ROOT).as_posix()
     result = build(inputs, args.output_dir, bundle_only=args.bundle_only,
-                   python_core_dir=args.python_core_dir, python_bytecode_compiler=args.python_bytecode_compiler)
+                   python_core_dir=args.python_core_dir, python_bytecode_compiler=args.python_bytecode_compiler,
+                   lab3003_preview=local.project_path(args.lab3003_preview) if args.lab3003_preview else None)
     print(json.dumps({'passed': result['passed'], 'files': len(result['source_files_sha256']),
         'runtime_archive_bytes': result['files']['runtime.zip']['bytes'],
         'uncompressed_runtime_bytes': result['uncompressed_runtime_bytes']}), flush=True)

@@ -81,6 +81,35 @@ der vollständigen Zielabdeckung oder einer realen Schutzfunktion. Die
 separaten Browser- und Veröffentlichungsberichte binden jeweils die konkret
 geprüften Bytes. Der normale manuelle Rundgang bleibt ohne aktive Flotte.
 
+### Optionale gemeinsame Ansicht mit Labor 3.003
+
+Der kompakte Browserbuild kann über `--lab3003-preview` den separat geprüften
+ArmC-/CF01-Zyklus mit Rückgabe beider Gefäße und anschließender TR01-Laborrunde
+in dieselbe Ansicht aufnehmen. Der Vorschauordner enthält `index.html`,
+`preview-report.json` und `transfer-browser-check.json`. Der Build prüft die
+exakten Vorschau- und Quellenprüfsummen sowie die gemeinsame Gebäude- und
+Gerätebasis. Veraltete Nachweise sperren den Aufbau der gemeinsamen Ansicht.
+
+Die Sitzung reserviert das Patrouillenziel OG3/R3_003. Patrouillen und
+Testaufträge mit diesem Ziel warten. Andere Ziele bleiben verfügbar. Der
+Laborzyklus startet erst bei aktiver Flotte, geladener Geometrie für OG3 und
+bestätigten Modellstellungen der Laboreinrichtung. Erst nach der Rückgabe
+beider Gefäße und dem erneuten Andocken von TR01 am Ende der Laborrunde
+beantragt die Ansicht die Freigabe. Der Worker bestätigt sie mit der
+Reservierungskennung der laufenden Sitzung. Die Ansicht meldet eine fehlende
+oder abgelehnte Bestätigung und erlaubt keinen Neustart des Laborzyklus
+innerhalb derselben Sitzung.
+
+Python- und JavaScript-Tests prüfen die Quellbindung, Zielreservierung und
+Freigabebestätigung. Der separate WebGL-Test
+`tests/check_building_fleet_lab3003_browser.cjs` ist für ein vollständiges
+aktuelles lokales Paket vorgesehen. Die vorhandenen Browsernachweise des
+einzelnen Laborzyklus gehören zu älteren Gebäuderevisionen. Für die gemeinsame
+Ansicht stehen ein aktueller kompletter WebGL-Lauf und ein dynamischer
+Kollisionsnachweis zwischen Flotte und Laborbewegung aus. Der Laborzyklus ist
+synthetische Wiedergabe. Gemeinsame Geräteausführung, Materialbuchung,
+Hardware und Schutzfunktionen bleiben außerhalb dieses Nachweises.
+
 ### Rechenlast mit sechs Fahrzeugen
 
 Ein lokaler Vergleich mit Seed `20261120` verwendete identische statische

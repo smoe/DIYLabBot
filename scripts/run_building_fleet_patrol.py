@@ -50,7 +50,7 @@ def load_profile(path=PROFILE):
     return value
 
 
-def build_page(source, profile, args, output, *, progressive_output=None):
+def build_page(source, profile, args, output, *, progressive_output=None, lab3003_preview=None):
     """Reuse the checked native world and the existing physical monitor wall."""
     from export_building_fleet_vehicle_freecad import checked_camera_report
     camera = project_path(args.camera_report)
@@ -67,7 +67,8 @@ def build_page(source, profile, args, output, *, progressive_output=None):
         raise ValueError('Complete physical vehicle mesh required')
     world = project_path(args.walkthrough_export) / 'world-build-report.json'
     normal, pins = browser.world_presentation(world, include_monitor_overlay=True,
-                                               progressive_output=progressive_output)
+                                               progressive_output=progressive_output,
+                                               lab3003_preview=lab3003_preview)
     payload = {'vehicle_mesh': vehicle, 'camera_presentation': source['camera_presentation'],
         'live': {'state_url': '/api/state', 'jobs_url': '/api/jobs',
             'control_url': '/api/control', 'poll_interval_ms':

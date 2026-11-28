@@ -41,6 +41,8 @@ def target_key(value):
 
 class PatrolDispatcher(Dispatcher):
     """Received coverage and own ETA bids only; no peer/world pose access."""
+    LAB3003 = ('OG3', 'R3_003')
+
     def __init__(self, source, homes):
         super().__init__(source, homes)
         self.last_visit = {key: None for key in self.targets}
@@ -49,6 +51,7 @@ class PatrolDispatcher(Dispatcher):
         self.vehicle_jobs = {}
         self.job_missions = {}
         self.resume_targets = {}
+        self.lab3003_reserved = False
 
     def ready_to_return(self, now):
         return False
@@ -78,13 +81,18 @@ class PatrolDispatcher(Dispatcher):
         self.jobs[request_id] = row
         return copy.deepcopy(row)
 
+    def _uses_reserved_lab(self, row):
+        return self.lab3003_reserved and any(
+            target_key(row[stage]) == self.LAB3003 for stage in ('pickup', 'delivery'))
+
     def queued_jobs(self):
-        return [row for row in self.jobs.values() if row['status'] == 'queued']
+        return [row for row in self.jobs.values()
+                if row['status'] == 'queued' and not self._uses_reserved_lab(row)]
 
     def recruit(self, request_id, bids, now):
         """Atomically choose one finite own bid; repeated calls cannot steal it."""
         row = self.jobs[request_id]
-        if row['status'] != 'queued':
+        if row['status'] != 'queued' or self._uses_reserved_lab(row):
             return copy.deepcopy(row)
         accepted = []
         seen = set()
@@ -114,6 +122,8 @@ class PatrolDispatcher(Dispatcher):
         stage = None
         if request_id is not None:
             job = self.jobs[request_id]
+            if self._uses_reserved_lab(job):
+                return None
             stage = next((s for s in ('pickup', 'delivery') if job[s+'_mission_id'] is None), None)
             if stage is None:
                 return None
@@ -127,6 +137,7 @@ class PatrolDispatcher(Dispatcher):
             if self.queued_jobs():
                 return None
             candidates = [key for key in self.targets if
+                          not (self.lab3003_reserved and key == self.LAB3003) and
                           (key[0] in allowed if allowed is not None else
                            lift_wait_available or key[0] == own_level)]
             resume = self.resume_targets.get(vehicle_id)

@@ -19,9 +19,11 @@ export function validateManifest(manifest,config){
  require(manifest.vehicle_count===undefined||manifest.vehicle_count===6||manifest.vehicle_count===20,'Supported active fleet count required');
  const browser=manifest.browser_config;require(browser&&manifest.files[checkedPath(browser.path)]?.sha256===browser.sha256,'Leading browser configuration must be pinned in the bundle');
  require(manifest.inputs&&typeof manifest.inputs==='object'&&manifest.inputs.browser_source===browser.path,'Source-matched bootstrap inputs required');
+ if('lab3003_reserved' in manifest.inputs)require(manifest.format.endsWith('/2')&&manifest.inputs.lab3003_reserved===true,'An explicit compact laboratory reservation is required');
  if(manifest.format.endsWith('/2')){
   require(runtime.static_geometry==='source_bound_lossless_runtime_cache'&&runtime.route_preparation==='background_worker_with_checked_rolling_prefix','Checked compact geometry and background preparation required');
-  require(Object.keys(manifest.inputs).sort().join(',')==='browser_source,profile,static_runtime_cache'&&manifest.files[checkedPath(manifest.inputs.static_runtime_cache)],'Pinned static runtime derivation required');
+  const inputs=Object.keys(manifest.inputs).sort().join(',');
+  require((inputs==='browser_source,profile,static_runtime_cache'||inputs==='browser_source,lab3003_reserved,profile,static_runtime_cache')&&manifest.files[checkedPath(manifest.inputs.static_runtime_cache)],'Pinned static runtime derivation required');
   require(manifest.static_cache_verification&&typeof manifest.static_cache_verification==='object','Build-checked static operation receipt required');
  }
  if(runtime.delivery!==undefined){
@@ -409,7 +411,15 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
   if(disposed||busy||!runtime)return;busy=true;const began=now(),cyclePlanner=plannerState;
   try{
    while(prepared.length)runtime.completeJob(prepared.shift());
-   while(commands.length){const row=commands.shift();try{emitState(await runtime.command(row.command));if(state.paused){lastCycleEnd=null;nextTickDeadline=null;}}catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
+   while(commands.length){const row=commands.shift();try{
+    const laboratory=row.command.action==='lab3003_docked',before=state;
+    if(laboratory)require(Object.keys(row.command).sort().join(',')==='action,reservation_id'&&typeof row.command.reservation_id==='string'&&row.command.reservation_id.length>0&&row.command.reservation_id===before.lab3003_reservation_id&&typeof before.lab3003_reserved==='boolean','A matching live laboratory reservation is required');
+    const next=await runtime.command(row.command);
+    if(laboratory){const confirmed=parseState(next);require(confirmed.session_id===before.session_id&&confirmed.lab3003_reservation_id===row.command.reservation_id&&confirmed.lab3003_reserved===false,'The engine did not confirm the laboratory release');}
+    emitState(next);
+    if(laboratory)post({type:'command_ack',id:row.id,action:'lab3003_docked',reservation_id:state.lab3003_reservation_id,session_id:state.session_id,lab3003_reserved:false});
+    if(state.paused){lastCycleEnd=null;nextTickDeadline=null;}
+   }catch(error){post({type:'command_error',id:row.id,request_id:row.command.request_id,error:String(error?.message??error)});}}
    if(!state.paused){
     if(state.integration_step_s===.4)nextTickDeadline??=began;
     const next=await runtime.tick(++steps%(runtime.snapshotIntervalSteps??1)===0);
@@ -441,7 +451,7 @@ export function createController({post,loadRuntime=loadPythonRuntime,makePlanner
    }).catch(fail);
   }else if(message?.type==='command'){
    const action=message.command?.action;
-   if(!['pause','resume','request_job'].includes(action)){post({type:'command_error',id:message.id,error:'Unknown simulation command'});return;}
+   if(!['pause','resume','request_job','lab3003_docked'].includes(action)){post({type:'command_error',id:message.id,error:'Unknown simulation command'});return;}
    if(commands.length>=100){post({type:'command_error',id:message.id,request_id:message.command?.request_id,error:'Browser command queue is full'});return;}
    commands.push({id:message.id,command:message.command});schedule(0);
   }else if(message?.type==='dispose'){disposed=true;if(timer!==null)clearTimer(timer);planner?.dispose();runtime?.dispose?.();}
