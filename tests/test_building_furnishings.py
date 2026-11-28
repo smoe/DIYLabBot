@@ -2,6 +2,7 @@
 import copy
 import json
 import hashlib
+import math
 from pathlib import Path
 import sys
 import unittest
@@ -9,6 +10,7 @@ import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import building_stack as stack
 import building_furnishings as furniture
+import build_furnishings_gallery as gallery
 import relative_floorplan as floor
 import wall_worktops
 import building_walkthrough as walkthrough
@@ -24,12 +26,6 @@ MEDIA_COMPATIBLE_PRODUCERS = {
 }
 MEDIA_COMPATIBLE_SITE_PRODUCERS = {'scripts/building_exterior.py'}
 MEDIA_CAMERA_FIELDS = ('default_stop', 'stops', 'levels', 'settings', 'rendering', 'hidden_body_ids')
-
-
-def media_camera_digest(program):
-    projection = {key: program[key] for key in MEDIA_CAMERA_FIELDS}
-    return hashlib.sha256(json.dumps(projection, sort_keys=True, separators=(',', ':'),
-                                     allow_nan=False).encode()).hexdigest()
 
 
 class FurnishingsTests(unittest.TestCase):
@@ -220,7 +216,7 @@ class FurnishingsTests(unittest.TestCase):
             if 'browser_view' in image:
                 self.assertEqual(compatibility['historical_manifest'], image['browser_view']['manifest'])
 
-    def test_public_views_bind_current_sources_and_reviewed_images(self):
+    def test_historical_gallery_keeps_reviewed_images_and_original_bindings(self):
         path=stack.ROOT/'docs/media/building-furnishings.provenance.json'
         proof=json.loads(path.read_text())
         compatibility=json.loads((stack.ROOT/'docs/building-furnishings-media-compatibility.json').read_text())
@@ -233,30 +229,71 @@ class FurnishingsTests(unittest.TestCase):
                          {'path':str(path.relative_to(stack.ROOT)), 'sha256':hashlib.sha256(path.read_bytes()).hexdigest()})
         self.assertFalse(proof['original_photographs_included'])
         self.assertEqual({image['id'] for image in proof['images']},{'Kitchen1008','PhD1002','PhD3002','Kitchen1008_EasterEgg'})
-        # These preserved PNGs predate the explicitly added office devices and
-        # microwave leaf. Validate their last compatible bindings separately;
-        # never promote their old pixels to a current rendering claim.
+        # This status is part of the archived evidence for the earlier gallery.
         status=json.loads((stack.ROOT/'docs/building-furnishings-media-status.json').read_text())
         self.assertIs(status['historical_images_represent_current_model'], False)
         self.assertEqual(status['historical_provenance'], compatibility['historical_provenance'])
         self.assertEqual(set(status['last_compatible_sources_sha256']), set(proof['source_files_sha256']))
         self.assertEqual(set(status['current_sources_sha256']), set(proof['source_files_sha256'])|{'scripts/worktop_equipment.py'})
-        for name,digest in status['current_sources_sha256'].items():
-            self.assertEqual(hashlib.sha256((stack.ROOT/name).read_bytes()).hexdigest(),digest,name)
-        # The equipped lab now belongs to the building frame. Its intentional
-        # camera/scene change is recorded separately from the preserved PNGs.
-        current_camera=media_camera_digest(walkthrough.compile())
-        self.assertEqual(status['current_camera_projection'],
-                         {'fields':list(MEDIA_CAMERA_FIELDS),'sha256':current_camera})
         self.assertIs(status['camera_projection_matches_historical'],False)
         archived_camera=compatibility['camera_projection']['sha256']
-        self.assertNotEqual(current_camera,archived_camera)
+        self.assertEqual(status['current_camera_projection']['fields'],list(MEDIA_CAMERA_FIELDS))
+        self.assertNotEqual(status['current_camera_projection']['sha256'],archived_camera)
         self.assert_media_source_binding(proof, compatibility, status['last_compatible_sources_sha256'], archived_camera, site)
         for image in proof['images']:
             data=(stack.ROOT/image['path']).read_bytes()
             self.assertEqual(data[:8],b'\x89PNG\r\n\x1a\n')
             self.assertEqual(hashlib.sha256(data).hexdigest(),image['sha256'])
             self.assertTrue(image['visual_reviewed'])
+
+    def test_public_views_bind_current_sources_and_reviewed_images(self):
+        proof=gallery.read(gallery.CURRENT_PROOF)
+        self.assertEqual(proof['format'],'solidcraftbot.building-furnishings-gallery/1')
+        self.assertEqual(proof['historical_records'],[gallery.reference(stack.ROOT/name) for name in gallery.HISTORY])
+        self.assertIs(proof['original_photographs_included'],False)
+        self.assertIs(proof['freecad_checks_passed'],True)
+        self.assertIsInstance(proof['cross_cad_checked'],bool)
+        self.assertIs(proof['browser_capture']['passed'],True)
+        program=walkthrough.compile()
+        self.assertEqual(proof['qualification'],program['qualification'])
+        expected_framing=gallery.framing(program)
+        self.assertEqual(proof['framing'].keys(),expected_framing.keys())
+        self.assert_gallery_viewpoint(proof['framing']['phd1002'],expected_framing['phd1002'])
+        pins=proof['source_files_sha256']
+        self.assertTrue(set(program['source_files_sha256']) <= set(pins))
+        self.assertTrue({'scripts/build_furnishings_gallery.py','scripts/capture_building_furnishings_gallery.cjs',
+                         'scripts/build_building_walkthrough.py','scripts/building_walkthrough_viewer.html',
+                         'scripts/export_building_walkthrough_freecad.py'} <= set(pins))
+        for name,digest in pins.items():
+            self.assertEqual(stack.digest(stack.ROOT/name),digest,name)
+        native_builds=proof['native_builds']
+        self.assertEqual(native_builds['building']['source_sha256'],program['scene_sources']['building']['source_sha256'])
+        self.assertEqual(native_builds['lab']['source_sha256'],program['equipment_source']['source_sha256'])
+        destination=gallery.PUBLIC/'furnishings-gallery'/native_builds['building']['revision']
+        views={row['id']:row for row in program['stops']}
+        expected_views={'Kitchen1008':views['kitchen'],'PhD1002':proof['framing']['phd1002'],
+                        'PhD3002':views['phd']}
+        fridge=next(obj for obj in program['objects'] if obj['id']=='Kitchen1008.Fridge.Door')
+        fridge_capture=proof['browser_capture']['fridge']
+        self.assertEqual(fridge_capture['interaction']['id'],fridge['id'])
+        self.assertEqual(fridge_capture['interaction']['status'],'accepted')
+        self.assertEqual(fridge_capture['body_angles_deg'],dict.fromkeys(fridge['moving_body_ids'],fridge['states']['open']))
+        self.assertEqual(len(proof['images']),len(gallery.IMAGE_NAMES))
+        self.assertEqual({image['id'] for image in proof['images']},set(gallery.IMAGE_NAMES))
+        for image in proof['images']:
+            path=destination/gallery.IMAGE_NAMES[image['id']]
+            self.assertEqual({key:image[key] for key in ('path','bytes','sha256')},gallery.reference(path))
+            self.assertEqual(image['pixels'],gallery.png_pixels(path))
+            self.assertIs(image['visual_reviewed'],True)
+            if image['id'] in expected_views:
+                self.assert_gallery_viewpoint(image['viewpoint'],expected_views[image['id']])
+
+    def assert_gallery_viewpoint(self, actual, expected):
+        coordinates={'eye_mm','target_mm'}
+        self.assertEqual({k:v for k,v in actual.items() if k not in coordinates},
+                         {k:v for k,v in expected.items() if k not in coordinates})
+        for field in coordinates:
+            self.assertLess(math.dist(actual[field],expected[field]),1e-7,field)
 
     def test_media_compatibility_rejects_unreviewed_source_and_camera_drift(self):
         proof=json.loads((stack.ROOT/'docs/media/building-furnishings.provenance.json').read_text())

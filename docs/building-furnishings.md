@@ -28,7 +28,7 @@ Die Aufstellung soll den Bereich an der Raumtür für den Schrankzugang frei
 halten. Reale Zugänglichkeit und vollständige Türschwenkbereiche benötigen
 einen eigenen Nachweis.
 
-![Küche 1.008, Browseransicht der nativen schematischen Möblierung](media/kitchen-1-008.png)
+![Küche 1.008, Browseransicht der nativen schematischen Möblierung](media/furnishings-gallery/building-stack-c031b24585f3/kitchen-1-008.png)
 
 Das aktuelle Küchenbild stammt aus dem geprüften Browserrundgang des
 integrierten FreeCAD-Modells. Es zeigt den offenen Raum mit der Tischgruppe
@@ -54,7 +54,7 @@ aus der tatsächlich erzeugten Platte abgeleitet. Die Auswertung weist Geräte
 zurück, die über deren Rand ragen. In 3.002 liegen zwei Sets auf dem langen
 linken Lauf sowie je eines rechts und am Fenster; das kurze Stück hinter der
 Glastür bleibt frei. Gerätemaße und Ausstattung sind Darstellungsannahmen.
-Die nachfolgenden publizierten Bürobilder zeigen den früheren Stand ohne Geräte.
+Die aktuellen Bürobilder zeigen die eingerichteten Arbeitsplätze.
 
 Der Erste-Hilfe-Kasten ist als eigener portabler Möbeltyp beschrieben. Seine Platzierung
 referenziert die Flurtür `D3_002N` und deren Innenseite im Raum `R3_002`;
@@ -72,14 +72,14 @@ Türöffnungen und die dargestellten offenen Türblätter müssen frei bleiben;
 ein vollständiger Türschwenkbereich oder eine reale Bewegungsfreigabe ist
 damit nicht geprüft.
 
-![Doktorandenraum 3.002 mit wandbündiger U-Arbeitsfläche und freier linker Glastür](media/office-3-002.png)
+![Doktorandenraum 3.002 mit wandbündiger U-Arbeitsfläche und freier linker Glastür](media/furnishings-gallery/building-stack-c031b24585f3/office-3-002.png)
 
 Die aktuelle Ansicht stammt aus dem geprüften Browserrundgang: native
 FreeCAD-BReps wurden tesselliert und im Browser dargestellt. Sie zeigt den
 Blick vom Eingang zur Fensterwand. Der Bildnachweis verbindet die
 FreeCAD-Datei, den HTML-Export und die geprüfte Kamerastellung.
-Das unveränderte [Büro 1.002](media/office-1-002.png) behält seine bisherige
-angenommene Vierergruppe.
+Das [Büro 1.002](media/furnishings-gallery/building-stack-c031b24585f3/office-1-002.png)
+zeigt die angenommene Vierergruppe mit Monitoren und Mini-PCs.
 
 ## Ein kleiner Gast im Kühlschrank
 
@@ -92,15 +92,38 @@ Die Scharnierlage und der Öffnungswinkel von 90° sind Darstellungsannahmen.
 Die CAD-Referenz bleibt geschlossen; eine reale Schwenkfreiheit ist nicht geprüft.
 
 Ein Pinguin mit Teetasse sitzt im ergänzten Unterbaukühlschrank. Kühlschrankhülle,
-Innenraum, Fachböden, Tür und Griff sind getrennt modelliert. Die Detailansicht
-blendet Tür und Griff aus; sie ist keine Simulation einer Türbewegung.
+Innenraum, Fachböden, Tür und Griff sind getrennt modelliert. Für die aktuelle
+Detailansicht wurde die Kühlschranktür im Browser geöffnet.
 Welche der auf den Fotos sichtbaren Unterbaueinheiten tatsächlich der
-Kühlschrank ist, bleibt unbestätigt. Die aktuelle Detailansicht ist ein nativer
-SolidCraft-Schnappschuss eines neu aus den gemeinsamen Quellen erzeugten
-306-Körper-Ausschnitts. Sie ist keine Aufnahme eines vollständigen aktuellen
-SolidCraft-Gebäudemodells.
+Kühlschrank ist, bleibt unbestätigt. Der frühere SolidCraft-Ausschnitt mit
+ausgeblendeter Tür bleibt als historische Detailansicht erhalten.
 
-![Easter Egg im Kühlschrank, Tür ausgeblendet](media/kitchen-fridge-easter-egg.png)
+![Easter Egg hinter der geöffneten Kühlschranktür](media/furnishings-gallery/building-stack-c031b24585f3/kitchen-fridge-easter-egg.png)
+
+## Bildnachweise der Möbelgalerie
+
+Die [aktuelle Bildprovenienz](media/building-furnishings-current.provenance.json)
+bindet die vier Bilder an die geprüfte FreeCAD-Komposition, ihren
+Rundgangexport und die neu erfassten Chromium-Ansichten. Der Bildtest prüft
+Bildbytes, Quellpins und Kamerabindungen. Die statischen Browserbilder
+dokumentieren Darstellungsgeometrie. Aufmaß, reale Aufstellung, Ergonomie,
+Bewegung und Türschwenkfreiheit erfordern eigene Nachweise.
+
+Die [historische Bildprovenienz](media/building-furnishings.provenance.json)
+führt die früheren Fassungen und deren Prüfstände. Die ursprünglichen Bilder
+bleiben als [Küche 1.008](media/kitchen-1-008.png),
+[Büro 1.002](media/office-1-002.png), [Büro 3.002](media/office-3-002.png)
+und [Kühlschrankdetail](media/kitchen-fridge-easter-egg.png) zugänglich.
+
+Für eine Aktualisierung einen geprüften Rundgang unter
+`exports/furnishings-walkthrough` ableiten, die Bildaufnahmen prüfen und
+anschließend die sichtgeprüften Bilder binden.
+
+```sh
+python3 scripts/build_furnishings_gallery.py fixtures exports/furnishings-walkthrough exports/furnishings-gallery-viewpoints.json
+node scripts/capture_building_furnishings_gallery.cjs exports/furnishings-walkthrough/index.html exports/furnishings-gallery-capture exports/furnishings-gallery-viewpoints.json
+python3 scripts/build_furnishings_gallery.py record exports/furnishings-walkthrough exports/furnishings-gallery-capture --reviewed
+```
 
 ## Gemeinsame Quellen und Aufbau
 
@@ -177,7 +200,7 @@ nicht ausgeführt. In beiden nativen Fassungen sind alle 924 Paare aus den
 77 Möbelkörpern des Raums und den zwölf Körpern seiner drei Türblätter samt
 Fenstereinsätzen bereits durch ihre Begrenzungsquader getrennt.
 
-Die aktuelle integrierte FreeCAD-Fassung `building-stack-ecc15e1b9dd9`
+Die damalige integrierte FreeCAD-Fassung `building-stack-ecc15e1b9dd9`
 besteht mit 1.944 geschlossenen Körpern, 452 Geometrieproben und
 15 Höhenprüfungen.
 Zusätzliche Prüfungen der tatsächlichen nativen Flächen bestätigen den
@@ -214,9 +237,9 @@ Fünf-Blickpunkte-Browsersitzung gebunden. Nur das Bild von Büro 1.002 bleibt
 erhalten: Für dessen 72 Körper sind die Operationen und Darstellungen mit
 der historischen Quelle und ihrem ursprünglichen Generator exakt gleich.
 
-Die [Bildprovenienz](media/building-furnishings.provenance.json) bindet die
-Ansichten an Quellen, native Revision und lokale Prüfberichte. Diese statischen
-Nachweise ersetzen keine reale Aufstellung oder Bewegungs-/Türschwenkprüfung.
+Die [historische Bildprovenienz](media/building-furnishings.provenance.json)
+bindet die damaligen Ansichten an ihre Quellen, nativen Revisionen und
+Prüfberichte.
 
 ## Gleichmäßige Stuhlverteilung · 13. November 2026
 

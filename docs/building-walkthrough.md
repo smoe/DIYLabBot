@@ -623,6 +623,8 @@ Die vorhandenen Möbelbilder und ihre ursprüngliche Provenienz bleiben erhalten
 Dieser Kompatibilitätsnachweis ist weder ein erneutes Rendern der historischen
 Bilder noch eine zusätzliche CAD- oder Bewegungsqualifikation. Die neuen
 Objektbefehle werden davon getrennt mit der tatsächlichen Browserprüfung geprüft.
+Die [aktuelle Möbelgalerie](building-furnishings.md#bildnachweise-der-möbelgalerie)
+führt eigene Bildnachweise aus einem späteren geprüften Rundgangexport.
 
 
 ## Aufzug benutzen
