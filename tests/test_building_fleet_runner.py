@@ -129,6 +129,17 @@ class RuntimeBoundaryTests(unittest.TestCase):
         self.assertEqual([m['progress_mm']for m in markers],sorted(m['progress_mm']for m in markers))
         self.assertGreater(markers[-1]['progress_mm'],markers[0]['progress_mm']+5000)
 
+    def test_room_door_binding_is_required_only_for_a_crossed_opening(self):
+        world = self.stub()
+        world.route_door_ids = set()
+        world.nav.portals = {'OG1': [{'opening': 'D', 'centre_mm': [0, 0], 'normal': [1, 0],
+                                     'tangent': [0, 1], 'opening_width_mm': 400}]}
+        world.nav.mesh = SimpleNamespace(manifest={'objects': []})
+        self.assertEqual(world.door_markers('OG1', runner.Path([[-1000, 600], [1000, 600]])), [])
+        self.assertEqual(world.route_door_ids, set())
+        with self.assertRaisesRegex(ValueError, 'room-door binding: D'):
+            world.door_markers('OG1', runner.Path([[-1000, 0], [1000, 0]]))
+
     def test_runtime_requires_a_canonical_geometry_checker(self):
         with self.assertRaisesRegex(ValueError,'Canonical'):
             WorldRunner({},None,None,None,None)

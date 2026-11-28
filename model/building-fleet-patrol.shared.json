@@ -26,6 +26,13 @@
       "alignment_from_port_mm": 217.297297297297,
       "aperture_center_fraction": 0.35
     },
+    "ground_boarding_alternate": {
+      "waiting_slot": 1,
+      "cabin_slot": 0,
+      "departure_lead_mm": 3,
+      "alignment_from_port_mm": 100,
+      "aperture_center_fraction": 0.8
+    },
     "basement_alighting": {
       "waiting_slot": 0,
       "cabin_slot": 0,
@@ -39,6 +46,9 @@
       "join_route_index": 2,
       "turn_offset_mm": [430, 550],
       "inspection_variant": 2
+    },
+    "basement_return": {
+      "bypassed_waypoints": 3
     }
   },
   "recruitment": {

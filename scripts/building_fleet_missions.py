@@ -404,6 +404,19 @@ class MissionPlanner:
             zone['end_index'] += 3 - join
         return proposed
 
+    def _shorten_basement_return(self, points, zones, marks, slot, bypassed_waypoints):
+        """Keep the bay's straight park-in heading and bypass the corridor dogleg."""
+        join = len(points) - 3 - bypassed_waypoints
+        if (join < 1 or any(zone['end_index'] >= join for zone in zones)
+                or any(mark['point_index'] >= join for mark in marks)):
+            return points
+        bay_entry = [*points[join-1:join+1], *points[-2:]]
+        others = [polygon for i, polygon in enumerate(self.nav.waiting_bay_polygons['KG']) if i != slot]
+        required = self.nav.reserve + self.port_paths.mesh_error + self.nav.navigation_margin_mm
+        if others and not self.port_paths._bay_sweep_clear(bay_entry, others, required):
+            return points
+        return [*points[:join+1], *points[-2:]]
+
     def _floor_leg(self, own, grants, prefix=None, prefix_marks=None, lift_phase=None, prefix_caps=None,
                    basement_departure=None):
         vehicle, level = own['vehicle_id'], own['level']; state = self.states[vehicle]
@@ -477,6 +490,12 @@ class MissionPlanner:
                     if (getattr(self,'smooth_live_lift_wait',False) and terminal['kind']=='lift_wait'
                             and level==self.source['depot']['level'] and len(ending)==2):
                         points=self._smooth_lift_wait_approach(level,points,zones,marks,prefix_caps)
+                    basement_return = getattr(self, 'basement_return', None)
+                    if (basement_return and basement_departure and len(ending) == 2
+                            and terminal['kind'] == 'lift_wait'
+                            and terminal['slot'] == basement_departure['waiting_slot']):
+                        points = self._shorten_basement_return(points, zones, marks, terminal['slot'],
+                                                               basement_return['bypassed_waypoints'])
                     if terminal['kind']in('home','capacity_home')and prefix and grants.get('waiting_place',{}).get('status')=='granted':
                         waiting=grants['waiting_place']
                         marks.append({'point_index':len(prefix)-1,'event':'waiting_place_released',
@@ -534,8 +553,16 @@ class MissionPlanner:
             geometry=self.port_paths.boarding(own['level'],waiting_slot,slot,self.cabin_lanes_override)
             points, caps = geometry['points_mm'], geometry['corner_trim_caps']
             settings = getattr(self, 'ground_boarding', None)
-            diagonal = (settings is not None and own['level'] == self.source['depot']['level']
-                        and waiting_slot == settings['waiting_slot'] and slot == settings['cabin_slot'])
+            if own['level'] == 'KG' and getattr(self, 'basement_return', None):
+                # Drive the checked basement exit geometry in the other direction.
+                settings = self.basement_alighting
+            elif settings is not None:
+                if own['level'] != self.source['depot']['level']:
+                    settings = None
+                elif waiting_slot != settings['waiting_slot']:
+                    settings = getattr(self, 'ground_boarding_alternate', None)
+            diagonal = (settings is not None and waiting_slot == settings['waiting_slot']
+                        and slot == settings['cabin_slot'])
             if diagonal:
                 points = _diagonal_port_points(points[0], points[-2], park, port, settings)
                 caps = []

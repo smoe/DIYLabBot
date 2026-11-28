@@ -701,8 +701,7 @@ class WorldRunner:
         for portal in self.nav.portals[level]:
             if not portal.get('opening'):continue
             door=next((o for o in objects if o.get('mechanism')=='room_door'and o.get('level_id')==level and o.get('opening_id')==portal['opening']),None)
-            if door is None:raise ValueError('Source path portal lacks a room-door binding')
-            if door.get('initial_state',door['reference_state'])!='open':continue
+            if door is not None and door.get('initial_state',door['reference_state'])!='open':continue
             centre,normal,tangent=portal['centre_mm'],portal['normal'],portal['tangent']
             def signed(p):
                 return sum((p[k]-centre[k])*normal[k]for k in range(2))
@@ -717,6 +716,8 @@ class WorldRunner:
                     else:hi=mid
                 progress=(lo+hi)/2;p=path.position(progress)
                 if abs(sum((p[k]-centre[k])*tangent[k]for k in range(2)))>portal['opening_width_mm']/2:continue
+                if door is None:
+                    raise ValueError('Crossed source path portal lacks a room-door binding: '+portal['opening'])
                 if any(abs(progress-old)<1e-5 for old in found):continue
                 found.append(progress);self.route_door_ids.add(door['id'])
                 markers.append({'event':'door_passed','progress_mm':progress,
