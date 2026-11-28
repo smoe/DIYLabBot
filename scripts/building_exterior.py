@@ -48,6 +48,8 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     a,b=ends(canonical,walls[s['front_wall']]);require(abs(a[0]-b[0])<1e-8,'Straight X-normal front required')
     x=a[0];y0,y1=sorted([a[1],b[1]]);grade=next(v['z_mm'] for v in levels if v['id']=='EG');top=levels[-1]['clear_top_mm']+p['slab_thickness_mm']
     door_policy,door_catalog=doors.load(s['doors']) if 'doors' in s else (None,None)
+    passage_ids=doors.bind_open_passages(door_policy or {},plans)
+    open_passages=[]
     if door_policy is not None:
         doors.validate_overrides(door_policy, plans)
         for field in ('include_areas','exclude_areas'):
@@ -100,8 +102,17 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
         for door in plan['openings']:
             if door['kind']!='door':continue
             target=level['id']+'__Wall_'+door['wall']
+            is_passage=door['id'] in passage_ids[level['id']]
+            require(not is_passage or target not in omitted,'Open passage needs its original wall aperture: '+target)
             if target in omitted:continue
             wa,wb=ends(plan,wallmap[door['wall']]);dx,dy=wb[0]-wa[0],wb[1]-wa[1];length=math.hypot(dx,dy);u=[dx/length,dy/length];normal=[-u[1],u[0]]
+            if is_passage:
+                lo,hi=door['interval']
+                center=[a+(b-a)*(lo+hi)/2 for a,b in zip(wa,wb)]
+                open_passages.append({'level_id':level['id'],'opening_id':door['id'],'wall_body_id':target,
+                    'center_mm':center+[level['z_mm']],'normal_xy':normal,'width_mm':(hi-lo)*length,
+                    'height_mm':p['door_height_mm']})
+                continue
             owner=next(area for area in plan['areas'] if any(v['wall']==door['wall'] for v in area['boundary']))
             direction=next(v['direction'] for v in owner['boundary'] if v['wall']==door['wall']);normal=[v*direction for v in normal]
             hinge=[wa[j]+door['interval'][0]*(wb[j]-wa[j]) for j in (0,1)];width=(door['interval'][1]-door['interval'][0])*length;t=s['door_leaf_mm']
@@ -272,4 +283,5 @@ def compile(s, plans, p, levels, omitted_wall_ids=()):
     box(n+'_LawnCut',lawn,[court_origin[0],court_origin[1],bottom-layer],[court_size[0],court_size[1],layer*3],'cut')
     site_regions.append({'body':n,'material':'left_hardstanding','origin_mm':court_origin,'size_mm':court_size,'boundary_measured':False})
     r['interface']={'body_ids':[v['id'] for v in r['bodies']],'omitted_body_ids':omitted,'door_leaves':door_map,'door_bindings':door_bindings,'glass_body_ids':glass_ids,'frame_body_id':frame_id,'frame_body_ids':frame_ids,'guard_body_ids':guard_ids,'guard_groups':guard_groups,'terrain_body_ids':terrain_ids,'site_body_ids':site_ids,'site_regions':site_regions,'surface_layer_mm':layer,'surface_overrides':surfaces,'opaque_facade_body_ids':opaque_ids,'side_window_groups':window_groups,'window_probes':window_probes,'grade_z_mm':grade,'terrain_bottom_mm':bottom,'facade_plane_x_mm':x,'facade_y_bounds_mm':[y0,y1],'facade_top_mm':top,'door_color':s['door_color'],'dimensions_measured':False,'safety_qualified':False}
+    r['interface']['open_passages']=open_passages
     return r

@@ -131,44 +131,78 @@ function walk(waypoints, options = {}, step = .08) {
   }
 }
 
-const internal = route('concept_continuous_stair', ['KG', 'EG', 'OG1', 'OG2', 'OG3'],
+const interiorLevels = ['KG', 'EG', 'OG1', 'OG2', 'OG3'];
+const internal = route('concept_continuous_stair', interiorLevels,
   level => groupsById.get(`${level}__Area_R3_028`));
-// The open leaves swing over the model's turn between flights. Close the
-// four operable doors for through travel and keep their native leaves in
-// collision, as the browser does after commanding the doors.
-const stairDoors = ['EG.D0_020.Door', ...['OG1', 'OG2', 'OG3'].map(level => `${level}.D3_028.Door`)];
-const closedStairDoors = roomDoorPose(stairDoors, 'closed');
-const [openApproach, openDestination] = internal.slice(3, 5);
-const doorBlocked = collider.move(
-  [openApproach[0], openApproach[1], openApproach[2] + eyeHeight],
-  [openDestination[0] - openApproach[0], openDestination[1] - openApproach[1], 0],
-  roomDoorPose([stairDoors[0]], 'open'));
-assert(doorBlocked.contacts.includes('EG__DoorLeaf_D0_020'), 'An open landing door still blocks the crossing.');
+const basement = {level: 'KG', opening: 'DK013'};
+const ground = {level: 'EG', opening: 'D0_020'};
+const upper = interiorLevels.slice(2).map(level => ({level, opening: 'D3_028'}));
+const cameraClearance = (nav.camera_radius_mm + nav.contact_margin_mm) / 1000;
+
+function assertFloorSupport([x, y, z], label) {
+  const distance = .1;
+  const hit = collider.firstHit([x, y, z + cameraClearance + distance / 2], [0, 0, -distance], {
+    transformsForBody: id => groupsById.get(id)?.role === 'concept_storey_slab' ? [null] : [],
+  });
+  assert(hit && hit.normal[2] > .99, `${label}: expected a native storey floor`);
+  near(hit.time, .5, `${label}: native floor sits at the passage height`);
+}
+
+function stairPassage({level, opening}, landingPoint) {
+  const variants = (program.open_passages || []).filter(row =>
+    row.level_id === level && row.opening_id === opening);
+  assert.equal(variants.length, 1, `${level}/${opening}: one source-bound open passage`);
+  const passage = variants[0];
+  const nativeWall = groupsById.get(passage.wall_body_id);
+  assert.equal(nativeWall?.role, 'concept_storey_wall', 'The wall and its cut remain native.');
+  const leaf = `${level}__DoorLeaf_${opening}`;
+  assert(!scene.groups.some(group => group.id === leaf || group.id.startsWith(leaf+'_')),
+    `${level}/${opening}: no native leaf or associated fittings`);
+  assert(!program.objects.some(object =>
+    object.level_id === level && object.opening_id === opening && object.mechanism === 'room_door'),
+    `${level}/${opening}: no room-door interaction`);
+
+  assert(passage.width_mm > 2 * cameraClearance * 1000);
+  assert(passage.height_mm > (eyeHeight + cameraClearance) * 1000);
+  const [x, y, z] = passage.center_mm.map(value => value / 1000);
+  const [nx, ny] = passage.normal_xy;
+  near(Math.hypot(nx, ny), 1, 'Passage normal is a unit vector');
+  near(z, floorHeights[level], 'Passage starts at the floor');
+  const insideOffset = (landingPoint[0] - x) * nx + (landingPoint[1] - y) * ny;
+  assert(Math.abs(insideOffset) > cameraClearance, 'The approach lies clear of the wall plane.');
+  const outsideOffset = -Math.sign(insideOffset) * .55;
+  const inside = [x + nx * insideOffset, y + ny * insideOffset, z];
+  const outside = [x + nx * outsideOffset, y + ny * outsideOffset, z];
+  for (const point of [inside, [x, y, z], outside]) {
+    assertFloorSupport(point, `${level}/${opening} at ${point}`);
+  }
+  return {inside, outside};
+}
+
+const [wellX, , basementHeight] = internal[0];
+const underReturn = [wellX, internal[2][1], basementHeight];
+const lowerEntry = stairPassage(basement, underReturn);
+internal.unshift(lowerEntry.outside, lowerEntry.inside, underReturn);
+
+for (const record of [ground, ...upper]) {
+  const landing = internal.find(point => point[2] === floorHeights[record.level]);
+  const entry = stairPassage(record, landing);
+  if (record.level === 'OG3') {
+    internal.push(entry.inside, entry.outside);
+  } else {
+    const passageRoute = [landing, entry.inside, entry.outside];
+    walk(passageRoute);
+    walk(passageRoute.toReversed());
+  }
+}
+walk(internal);
+walk(internal.toReversed(), {}, .2);
 
 function roomDoorPoints(id) {
   const door = program.objects.find(object => object.id === id);
   return [door.viewpoint.eye_mm, door.viewpoint.target_mm]
     .map(point => point.map(value => value / 1000));
 }
-
-const basementDoor = 'KG.DK013.Door';
-const [[basementX, basementY]] = roomDoorPoints(basementDoor);
-const [wellX, , basementHeight] = internal[0];
-const basementReturnY = internal[2][1];
-internal.unshift([basementX, basementY, basementHeight], [basementX, basementReturnY, basementHeight],
-  [wellX, basementReturnY, basementHeight]);
-
-const topDoor = stairDoors.at(-1);
-const [[corridorX], [, doorwayY]] = roomDoorPoints(topDoor);
-const [topX, , topHeight] = internal.at(-1);
-const upperExit = [topX, doorwayY, topHeight];
-internal.push(upperExit);
-const exit = [upperExit, [corridorX, doorwayY, topHeight]];
-const openTop = roomDoorPose([topDoor], 'open');
-walk(internal, closedStairDoors);
-walk(exit, openTop);
-walk(exit.toReversed(), openTop);
-walk(internal.toReversed(), closedStairDoors, .2);
 
 const external = route('concept_external_metal_stair', ['EG', 'OG1', 'OG2', 'OG3', 'ROOF'],
   level => groupsById.get(`ExternalFireStair_Entry_${level}`));
@@ -201,8 +235,7 @@ walk(fireEntry, openFireEntry);
 walk(fireEntry.toReversed(), openFireEntry);
 walk([fireEntry[0], fireArrival], closedFireDoors);
 
-// The existing Space interaction ray must be able to reach each door
-// from inside the stair, in both authored poses.
+// The separate fire-stair door remains operable from the stair side.
 function assertDoorPickable(id, viewpoint, state) {
   const door = program.objects.find(object => object.id === id);
   const bodyId = door.moving_body_ids[0];
@@ -224,8 +257,7 @@ function assertDoorPickable(id, viewpoint, state) {
 }
 
 for (const state of ['open', 'closed']) {
-  assertDoorPickable(topDoor, upperExit, state);
   assertDoorPickable(firstFireDoor, fireEntry[0], state);
 }
 
-console.log('Native walkthrough stairs: KG–OG3 and EG–roof in both directions, including the roof deck.');
+console.log('Native walkthrough stairs: all five open interior passages and EG–roof fire stairs in both directions.');

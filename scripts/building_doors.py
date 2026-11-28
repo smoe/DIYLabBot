@@ -33,7 +33,7 @@ def dependencies(ref):
 
 
 def validate(policy,catalog):
-    require(set(policy)-{'opening_overrides','laboratory_corridor_rule'}=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
+    require(set(policy)-{'opening_overrides','laboratory_corridor_rule','open_passages'}=={'format','catalog','default_type','default_material','level_materials','round_window_levels','large_outer_room_rule','include_areas','exclude_areas','exclude_label_terms','provenance'},'Explicit door-selection fields required')
     require(set(catalog)-{'handle'}=={'format','units','status','types','window','materials'},'Explicit door-catalog fields required')
     require(policy['format']=='solidcraftbot.building-doors/1','Unsupported building-door policy')
     require(catalog['format']=='solidcraftbot.room-door-catalog/1' and catalog['units']=={'length':'mm','angle':'deg'},'Typed room-door catalog required')
@@ -99,6 +99,35 @@ def validate(policy,catalog):
         identities.add(identity)
         if 'pose' in override:
             pose=override['pose'];require(isinstance(pose,dict) and set(pose)=={'approach_from','hinge_side','opens_into'} and pose['hinge_side'] in {'left','right'} and all(isinstance(pose[k],str) and pose[k] for k in ('approach_from','opens_into')), 'Explicit door approach, hinge side and opening region required')
+    passages=policy.get('open_passages',[])
+    require(isinstance(passages,list),'Explicit open passage declarations required')
+    for passage in passages:
+        require(isinstance(passage,dict) and set(passage)=={'opening_id','levels'},'Explicit passage opening and levels required')
+        opening_id=passage['opening_id']
+        require(isinstance(opening_id,str) and re.fullmatch('[A-Za-z][A-Za-z0-9_]*',opening_id),'Stable passage opening ID required')
+        levels=passage['levels']
+        require(isinstance(levels,list) and levels and all(isinstance(level,str) and level in LEVELS for level in levels),
+                'Known passage levels required')
+        for level in levels:
+            identity=(level,opening_id)
+            require(identity not in identities,'Open passage conflicts with another declaration')
+            identities.add(identity)
+
+
+def bind_open_passages(policy,plans):
+    """Resolve leafless apertures against the actual storey plans."""
+    result={level:set() for level in plans}
+    for passage in policy.get('open_passages',[]):
+        opening_id=passage['opening_id']
+        for level in passage['levels']:
+            require(level in plans,'Open passage level has no actual plan: '+level)
+            plan=plans[level]
+            opening=next((item for item in plan['openings'] if item['id']==opening_id),None)
+            require(opening is not None and opening['kind']=='door'
+                    and any(wall['id']==opening['wall'] and wall['kind']=='wall' for wall in plan['walls']),
+                    'Open passage requires a door-sized aperture in a retained wall: '+level+'__'+opening_id)
+            result[level].add(opening_id)
+    return result
 
 
 def laboratory_assignments(rule):

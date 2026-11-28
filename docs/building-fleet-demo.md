@@ -777,9 +777,9 @@ quellaktuell. `lift_operation_implemented` bleibt `false`.
 ## Bestätigte Rückstellung von K0_013
 
 Der Eigentümer hat am **20. November 2026** `KG / K0_013` für E2 ausdrücklich
-zurückgestellt. Der bisherige Plan erschließt diesen Raum nur über `DK013`
-an `KW061` aus `R3_028`. Der Treppenkern bleibt vollständig ausgeschlossen;
-diese Entscheidung erlaubt weder seine Durchfahrt noch einen neuen Durchgang.
+zurückgestellt. Der Plan erschließt diesen Raum nur über den offenen Durchgang
+`DK013` an `KW061` aus `R3_028`. Der Treppenkern bleibt vollständig vom
+Flottenfahrgebiet ausgeschlossen.
 K0_013 zählt nicht zur Sollabdeckung dieses BF01-Laufs. Die Rückstellung wird
 in `missions.deferred_targets` der separaten Flottenquelle geführt und ist
 keine Änderung des Gebäude- oder Kellerplans.

@@ -51,7 +51,22 @@
   "provenance": [
     "Owner confirms round viewing windows for laboratories and doctoral writing rooms, excluding secretariat, owner office and kitchens",
     "Owner instructs using larger rooms at drawing-top/bottom and ignoring the few EG/OG3 exceptions",
-    "Owner confirms heavy steel doors throughout KG; mass and protection ratings remain unknown"
+    "Owner confirms heavy steel doors throughout KG; mass and protection ratings remain unknown",
+    "Owner correction 2026-11-28: the inner stairwell entries are open passages on all storeys"
+  ],
+  "open_passages": [
+    {
+      "opening_id": "DK013",
+      "levels": ["KG"]
+    },
+    {
+      "opening_id": "D0_020",
+      "levels": ["EG"]
+    },
+    {
+      "opening_id": "D3_028",
+      "levels": ["OG1", "OG2", "OG3"]
+    }
   ],
   "opening_overrides": [
     {

@@ -277,7 +277,7 @@ Alle nativen PNG-Ansichten oben sind ebenfalls für die Antragsunterlagen abrufb
 
 | System | Bestätigte Reichweite | Aktuelle Darstellung |
 |---|---|---|
-| Inneres Treppenhaus, F03-Bereich 3.028 / EG-Bereich 20 | Keller bis 3. OG | KG–3. OG mit verbundenen Konzeptläufen und Podesten; Kellerhöhe angenommen |
+| Inneres Treppenhaus, F03-Bereich 3.028 / EG-Bereich 20 | Keller bis 3. OG | Verbundene Konzeptläufe, Podeste und offene Zugänge auf allen Geschossen. Kellerhöhe angenommen. |
 | Gebäudeaufzug | Keller bis 3. OG | Statische EG-Kabinenreferenz im CAD, durchgehender Schachtrahmen; im Browser eine bewegte Kabine mit Ruf, Einstieg, Geschosswahl und erlaubtem Ausstieg |
 | Äußere Metall-Fluchttreppe, F03-Bereich 3.017 | Dach bis Boden | Eigenständige Metallkonstruktion mit Podesten und Anschluss am Dach; EG-Ende neben Zugang 22 |
 
@@ -286,6 +286,12 @@ Aufzugs. Ihre Lage wird aus der referenzierten Fläche und dem EG-Ausgang
 abgeleitet. Laufrichtung, Stufenaufteilung, Metallquerschnitte und Anschlussdetails
 sind vorläufige Darstellungsannahmen. Sie sind keine nachgewiesene reale Flucht-
 oder Wartungsroute. Eine Kelleranbindung der Außentreppe wird nicht angelegt.
+
+Die Zugänge des inneren Treppenhauses bleiben als Wandöffnungen erhalten.
+`open_passages` in [model/building-doors.shared.json](../model/building-doors.shared.json)
+bindet die Öffnungen `DK013` im KG, `D0_020` an Raum 20 im EG und `D3_028`
+im 1. bis 3. OG. Dort entfallen Türblätter, Beschläge und Bedienobjekte.
+Die Durchgangsmaße entsprechen den bisherigen Modellannahmen.
 
 ### Gemeinsames Geländer für Atrium und inneres Treppenhaus
 

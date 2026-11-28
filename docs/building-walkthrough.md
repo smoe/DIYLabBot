@@ -91,12 +91,13 @@ in einem Browser mit WebGL 2 öffnen. Es gibt keine CDN- oder Netzwerkbibliothek
 - Die innere Treppe zwischen Keller und 3. OG und die äußere Fluchttreppe
   zwischen EG und Dach lassen sich mit den Gehtasten in beide Richtungen
   benutzen. Die Kamera folgt den modellierten Stufen und Podesten. An den
-  Zwischenpodesten in den nächsten Lauf wenden. Türen zum Betreten oder
-  Verlassen öffnen. Wenn ein offener Türflügel den Wechsel zwischen zwei
-  Läufen versperrt, den Flügel vom Podest aus schließen.
+  Zwischenpodesten in den nächsten Lauf wenden. Die Zugänge zum inneren
+  Treppenhaus sind vom Keller bis zum 3. OG offene Durchgänge.
   Die Fluchttreppe ist vom Flur im 1. OG zugänglich. Ihr unterstes Podest
   liegt im verglasten EG-Bereich; dort ist in der aktuellen Geometrie keine
   Tür nach draußen modelliert.
+  An der Fluchttreppe können offene Türflügel den Wechsel zwischen zwei
+  Läufen versperren. Diese Türflügel vom Podest aus schließen.
 - **Q / E** senken beziehungsweise heben die Kamera manuell. **Shift**
   erhöht Gehgeschwindigkeit und senkrechte Geschwindigkeit um den Faktor
   2,4. Beim Mitfahren bleibt die Kamerahöhe an die Aufzugskabine gebunden.

@@ -362,6 +362,7 @@ def compile(source=None):
             'objects': objects, 'robots': robots, 'elevator': elevator, 'isolation': isolation,
             'laboratories': laboratories, 'microscopy': interface.get('microscopy'), 'kitchenette':interface.get('kitchenette'),
             'places': interface['places'], 'topology': interface['topology'],
+            'open_passages': interface['exterior']['open_passages'],
             'room_signs': interface.get('room_signs'),
             **({'seminar_room': {**seminar, 'film': spec.get('seminar_film')}} if seminar is not None else {}),
             'levels': levels, 'settings': spec['settings'], 'rendering': spec['rendering'],

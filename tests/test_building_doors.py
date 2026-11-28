@@ -55,6 +55,35 @@ class DoorTests(unittest.TestCase):
         self.assertTrue(all(v['material']=='steel' and v['leaf_thickness_mm']==self.catalog['materials']['steel']['thickness_mm'] for v in basement))
         self.assertTrue(all(v['mass_kg'] is None for v in basement))
 
+    def test_internal_stairwell_has_open_passages_on_all_levels(self):
+        expected={'KG':'DK013','EG':'D0_020','OG1':'D3_028','OG2':'D3_028','OG3':'D3_028'}
+        exterior=self.data['exterior']
+        passages=exterior['open_passages']
+        self.assertEqual(len(passages),len(expected))
+        self.assertEqual({p['level_id']:p['opening_id'] for p in passages},expected)
+        probes={probe['id']:probe for probe in self.data['opening_probes']}
+        for passage in passages:
+            key=passage['level_id']+'__'+passage['opening_id']
+            self.assertEqual(probes[key]['target_body'],passage['wall_body_id'])
+            self.assertEqual(passage['height_mm'],self.p['door_height_mm'])
+            self.assertGreater(passage['width_mm'],0)
+            self.assertNotIn(key,exterior['door_leaves'])
+            self.assertNotIn(key,exterior['door_bindings'])
+            leaf=passage['level_id']+'__DoorLeaf_'+passage['opening_id']
+            self.assertFalse(any(body==leaf or body.startswith(leaf+'_') for body in exterior['body_ids']))
+        for level in ('OG1','OG2','OG3'):
+            self.assertIn(level+'__D3_017',exterior['door_leaves'])
+
+    def test_open_passage_rejects_conflicting_or_missing_opening(self):
+        policy=copy.deepcopy(self.policy)
+        override=policy['opening_overrides'][0]
+        policy['open_passages'].append({'opening_id':override['opening_id'],'levels':[override['level_id']]})
+        with self.assertRaisesRegex(ValueError,'conflicts'):
+            doors.validate(policy,self.catalog)
+        plan={'openings':[],'walls':[]}
+        with self.assertRaisesRegex(ValueError,'requires a door-sized aperture'):
+            doors.bind_open_passages({'open_passages':[{'opening_id':'Missing','levels':['EG']}]},{'EG':plan})
+
     def test_demolished_kitchen_partition_does_not_leave_a_floating_door(self):
         self.assertNotIn('OG1__D3_008AB',self.bindings)
         self.assertNotIn('OG1__D3_008AB',self.data['exterior']['door_leaves'])

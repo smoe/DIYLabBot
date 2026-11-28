@@ -241,6 +241,28 @@
         "type": "string"
       }
     },
+    "open_passages": {
+      "description": "Retain the plan aperture at these storeys and omit all installed door parts.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["opening_id", "levels"],
+        "properties": {
+          "opening_id": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+          },
+          "levels": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {"enum": ["KG", "EG", "OG1", "OG2", "OG3"]}
+          }
+        }
+      }
+    },
     "opening_overrides": {
       "type": "array",
       "items": {
