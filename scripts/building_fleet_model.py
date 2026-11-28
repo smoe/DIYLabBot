@@ -152,7 +152,7 @@ def patrol_policy(profile):
                 'selection': 'oldest_received_visit'}
     if 'corner_timing' in policy:
         expected['corner_timing'] = 'variable_progress'
-    for name in ('ground_boarding', 'basement_alighting'):
+    for name in ('ground_boarding', 'ground_boarding_alternate', 'basement_alighting'):
         if name not in policy:
             continue
         diagonal = policy[name]
@@ -180,6 +180,14 @@ def patrol_policy(profile):
                        for value in departure['turn_offset_mm'])):
             raise ValueError('Invalid live basement waiting-bay departure')
         expected['basement_departure'] = departure
+    if 'basement_return' in policy:
+        approach = policy['basement_return']
+        if ('basement_departure' not in expected or 'basement_alighting' not in expected
+                or type(approach) is not dict or set(approach) != {'bypassed_waypoints'}
+                or type(approach['bypassed_waypoints']) is not int or approach['bypassed_waypoints'] <= 0
+                or expected['basement_departure']['waiting_slot'] != expected['basement_alighting']['waiting_slot']):
+            raise ValueError('Invalid live basement return to the reserved lift bay')
+        expected['basement_return'] = approach
     if startup not in ('first_received_camera_frames', 'own_received_camera_frame') or policy != expected:
         raise ValueError('Unsupported continuous empty-patrol policy')
     return policy

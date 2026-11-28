@@ -63,6 +63,24 @@ class PortPathTests(unittest.TestCase):
             clear.assert_not_called()
         self.assertEqual(protected, [{'start_index': 5, 'end_index': 8}])
 
+    def test_basement_return_keeps_the_inspection_and_exclusive_bay_approach(self):
+        planner, nav, helper = setup()
+        other_bay = [[7000, 2000], [7500, 2000], [7500, 2500], [7000, 2500]]
+        nav.waiting_bay_polygons['KG'] = [nav.waiting_bay_polygons['EG'][0], other_bay]
+        points = [[5500, 4500], [5700, 4300], [5800, 4000], [5900, 3500], [6000, 2500],
+                  [4500, 1800], [4800, 1500], [4700, 1000], [4300, 500], [3500, 500]]
+        zones = [{'start_index': 1, 'end_index': 2}]
+        marks = [{'event': 'inspection_completed', 'point_index': 1}]
+        expected = [*points[:5], *points[-2:]]
+        with patch.object(helper, '_bay_sweep_clear', return_value=True) as clear:
+            self.assertEqual(planner._shorten_basement_return(points, zones, marks, 0, 3), expected)
+            clear.assert_called_once_with(expected[-4:], [other_bay], 88.)
+        with patch.object(helper, '_bay_sweep_clear', return_value=False):
+            self.assertEqual(planner._shorten_basement_return(points, zones, marks, 0, 3), points)
+        with patch.object(helper, '_bay_sweep_clear') as clear:
+            self.assertEqual(planner._shorten_basement_return(points, zones, marks, 0, 6), points)
+            clear.assert_not_called()
+
     def test_board_and_reverse_share_identical_source_points_caps_and_headings(self):
         planner,nav,helper=setup()
         for level in planner.ports:
@@ -107,6 +125,18 @@ class PortPathTests(unittest.TestCase):
         self.assertEqual(previous['points_mm'],
                          helper.boarding('EG', 0, 1, planner.cabin_lanes_override)['points_mm'])
 
+        second_waiting = [3650., 1500., math.pi]
+        nav.waits['EG'].append(second_waiting)
+        planner.ground_boarding_alternate = {'waiting_slot': 1, 'cabin_slot': 0, 'departure_lead_mm': 3,
+                                             'alignment_from_port_mm': 100, 'aperture_center_fraction': .8}
+        car = own(nav, home=False, pose_mm_rad=second_waiting)
+        second = planner._board(car, grant)
+        crossing_y = lane[1] + .8*(planner.ports['EG']['cabin_entry_mm'][1]-lane[1])
+        self.assertEqual(second['points_mm'], [second_waiting[:2], [3647., 1500.],
+                                               [2680, crossing_y], inside, lane[:2]])
+        self.assertTrue(second['variable_corner_speed'])
+        self.assertNotIn('variable_corner_speed', planner._board(car, dict(grant, slot=1, cabin_pose_mm=other)))
+
     def test_basement_diagonal_exit_keeps_open_port_and_body_clear_observation(self):
         planner, nav, helper = setup()
         port = dict(planner.ports['EG'], id='KG.in', level_id='KG')
@@ -141,6 +171,18 @@ class PortPathTests(unittest.TestCase):
         self.assertLess(mark['progress_mm'], path.length)
         self.assertAlmostEqual(path.evaluate(path.length)[0][2] + math.pi, bay[2])
         self.assertEqual(planner._alight(car, {'lift':dict(grant, exit_ready=False), 'waiting_place':waiting})['kind'], 'hold')
+
+        planner.basement_return = {'bypassed_waypoints': 3}
+        landing = own(nav, level='KG', home=False, pose_mm_rad=bay)
+        boarding_grant = {'status': 'assigned', 'slot': 0, 'start_port': 'KG.in',
+                          'destination_port': 'EG.in', 'boarding_ready': True, 'cabin_pose_mm': lane}
+        board = planner._board(landing, boarding_grant)
+        self.assertEqual(board['points_mm'], list(reversed(action['points_mm'])))
+        self.assertFalse(board['reverse'])
+        self.assertTrue(board['variable_corner_speed'])
+        self.assertEqual(board['terminal']['kind'], 'cabin_park')
+        self.assertEqual(board['port_id'], 'KG.in')
+        self.assertEqual(planner._board(landing, dict(boarding_grant, boarding_ready=False))['kind'], 'hold')
 
     def test_all_fixed_port_and_owned_wait_departures_are_prepared_before_runtime(self):
         planner,nav,helper=setup();routes=planner.prepared_routes()
