@@ -62,7 +62,7 @@ def validate(source):
             assembly.validate_reference(item[key], root=ROOT)
         if 'bench_layout' in item:
             bench = item['bench_layout']
-            require(isinstance(bench, dict) and set(bench) - {'park_joints_deg'} == {'workspace', 'anchor', 'yaw_deg', 'devices'}
+            require(isinstance(bench, dict) and set(bench) - {'park_joints_deg', 'device_poses'} == {'workspace', 'anchor', 'yaw_deg', 'devices'}
                     and type(bench['yaw_deg']) in (int, float) and math.isfinite(bench['yaw_deg'])
                     and isinstance(bench['devices'], dict) and isinstance(bench['anchor'], str)
                     and bench['anchor'] in bench['devices']
@@ -73,6 +73,14 @@ def validate(source):
             require(isinstance(bench['workspace'], dict) and set(bench['workspace']) == {'source', 'source_sha256'},
                     'Pinned workspace required')
             assembly.validate_reference(bench['workspace'], root=ROOT)
+            device_poses = bench.get('device_poses', {})
+            require(isinstance(device_poses, dict)
+                    and all(isinstance(pose, dict) and set(pose) - {'yaw_deg'} == {'xy_mm'}
+                            and isinstance(pose['xy_mm'], list) and len(pose['xy_mm']) == 2
+                            and all(type(v) in (int, float) and math.isfinite(v)
+                                    for v in [*pose['xy_mm'], pose.get('yaw_deg', 0)])
+                            for pose in device_poses.values()),
+                    'Bench pose overrides require finite room-local XY and optional yaw')
             parking = bench.get('park_joints_deg', {})
             require(isinstance(parking, dict) and parking.keys() <= bench['devices'].keys()
                     and all(isinstance(q, list) and len(q) == 6
@@ -309,6 +317,10 @@ def compile_instance(item, plan, p, z):
         require(floor.point_membership(point[:2], binding['local_interior_polygon_mm']) >= 0,
                 'Laboratory device leaves its destination room: '+device['id'])
         host = device['host']
+        if device['asset'] == 'centrifuge' and host == 'LeftBench':
+            # The CF01 hinge is on its local positive Y side. The mounting
+            # wall is on the bench's negative room-X side.
+            require(bound[0][1] < 0, 'A left-bench centrifuge hinge must face the rear wall')
         direct_mount = device['id'] in moved and device['asset'] == 'arm'
         if host == 'Floor':
             require(abs(point[2]) < 1e-7, 'Floor device must stay on its declared host: '+device['id'])
@@ -406,7 +418,7 @@ def compile(ref, plans, p, levels):
 
 
 def bench_poses(definition, layout_instances, context):
-    """Place the referenced bench arrangement rigidly about its existing anchor."""
+    """Resolve a referenced bench group with installation-specific worktop poses."""
     reference = workspace.load(assembly.validate_reference(definition['workspace'], root=ROOT))
     devices = {device['id']: device for device in layout_instances}
     mapping = definition['devices']
@@ -417,6 +429,8 @@ def bench_poses(definition, layout_instances, context):
     index = robot.inverse(anchor_reference['matrix'])
     xy = layout.xyz(anchor['xyz'], context)
     pose = workspace.pose(xy, definition['yaw_deg'])
+    device_poses = definition.get('device_poses', {})
+    require(device_poses.keys() <= devices.keys(), 'Bench poses must name existing layout devices')
     placements = {}
     for name, source_name in mapping.items():
         device = devices[name]
@@ -425,6 +439,12 @@ def bench_poses(definition, layout_instances, context):
         require(asset == original['asset'] and device['host'] == anchor['host'] != 'Floor'
                 and original['host'] == anchor_reference['host'], 'Bench layout device type or support differs')
         placements[name] = robot.multiply(pose, robot.multiply(index, original['matrix']))
+    for name, override in device_poses.items():
+        device = devices[name]
+        require(device['host'] == anchor['host'] != 'Floor', 'Bench pose changed the supporting worktop')
+        placed = placements[name] if name in placements else layout.matrix(device, context)
+        yaw = override.get('yaw_deg', math.degrees(math.atan2(placed[1][0], placed[0][0])))
+        placements[name] = workspace.pose([*override['xy_mm'], placed[2][3]], yaw)
     return placements
 
 

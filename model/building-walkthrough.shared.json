@@ -4,7 +4,7 @@
   "sources": {
     "building": {
       "source": "model/building-stack.shared.json",
-      "source_sha256": "f6269e2a12c7506dc0db75b10e8c327b7cf677a0382f57b4c6adeee6b899303b"
+      "source_sha256": "c031b24585f308ba33368d0708aaae598d198678736c0d9fba11f79dbe3649c6"
     }
   },
   "seminar_film": {

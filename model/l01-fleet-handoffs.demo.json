@@ -8,7 +8,7 @@
     },
     "workcell": {
       "source": "model/tr01-l01-workcell.protocol.json",
-      "source_sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+      "source_sha256": "4115f649f0ce542eecf4f710b357925e72bd029fc1c2ac5a80e5c49b74925c03"
     }
   },
   "loading_order": [

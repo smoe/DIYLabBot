@@ -4,7 +4,7 @@
   "sources": {
     "station": {
       "source": "model/centrifuge-cf01.shared.json",
-      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604"
+      "source_sha256": "6aa27ed610ec202999dc7e28abaf894d7145675a0f429de9cf8870d0eefc367d"
     },
     "protocol": {
       "source": "model/centrifuge-cf01.protocol.json",

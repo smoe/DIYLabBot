@@ -21,7 +21,7 @@
     },
     "centrifuge": {
       "source": "model/centrifuge-cf01.shared.json",
-      "source_sha256": "f880ad47f6703535cc3bff22ea869f00da9bc3f9d8f3dc9296f7cd4dddd77604",
+      "source_sha256": "6aa27ed610ec202999dc7e28abaf894d7145675a0f429de9cf8870d0eefc367d",
       "report": "cad/centrifuge-cf01/shared-build-report.json",
       "case": "default"
     },
@@ -222,6 +222,17 @@
       "xyz": [
         "cf_x",
         "cf_y-475+left_station_shift_y",
+        "bench_height"
+      ],
+      "yaw_deg": 0
+    },
+    {
+      "id": "RackCF2",
+      "asset": "tube_rack",
+      "host": "LeftBench",
+      "xyz": [
+        220,
+        4800,
         "bench_height"
       ],
       "yaw_deg": 0
@@ -473,9 +484,9 @@
     "TR01 deck regenerated at 900 mm; transport cover omitted for access, no cover-handling mechanism",
     "rack geometry is the existing TR01 24-place tube cassette reused on benches",
     "green floor strips indicate provisional geometric study corridors, not regulated or safe separation distances",
-    "CF01 rotated towards ArmC; station coordinates and ArmC riser revised for oriented sample handling",
+    "Standalone transfer fixture retains its bound CF01 and ArmC poses; the installation mounts CF01 with its hinge toward the wall",
     "Freezer01 fills the reserved bay at the window end of the left bench; its modeled opening is limited to 90 degrees in this installation.",
-    "The left CF01/ArmC/TR01/rack group moves together toward the entrance by left_station_shift_y; its relative geometry is retained.",
+    "The standalone CF01/ArmC/TR01/RackCF fixture moves together by left_station_shift_y; the additional rack is a fixed worktop site.",
     "Fridge01 backs onto the right sidewall behind Door B, faces the aisle and ends before the original right bench; its opening and straight shelf approaches are checked.",
     "Balance01 uses the free left middle worktop; the manual cellar ULT is not part of L01.",
     "DNA handoff uses RackManual on IslandLeft; it is not an implemented extraction device",

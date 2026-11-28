@@ -50,7 +50,9 @@ def parked_payload(stock_preview, armc_report_path):
     parked_groups = {g['id'] for g in stock_scene['groups']}
     if stock_lap['cover_body_id'] not in parked_groups or set(stock_lap['body_ids']) - parked_groups:
         raise ValueError('The docked preview requires the complete covered TR01')
-    payload.pop('lab3003_cf01_cycle', None)
+    previous_cycle = payload.pop('lab3003_cf01_cycle', None)
+    if previous_cycle is not None:
+        payload['stops'] = [stop for stop in payload['stops'] if stop['id'] != previous_cycle['stop_id']]
     scene = replace_mesh(stock_scene, replacement)
     scene['scope'] = 'Parked native ArmC variant and covered TR01 at the Lab 3.003 dock'
     payload['scenes']['building'] = scene

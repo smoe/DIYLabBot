@@ -18,7 +18,7 @@
     },
     "motion": {
       "path": "model/cf01-unload-demo.motion.json",
-      "sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+      "sha256": "90cd075800834c30c2471b1cbac67167f46db43d7aa6de4ff8ad00ff84b728c3"
     },
     "mobile_base": {
       "path": "model/mobile-base-mb01.shared.json",

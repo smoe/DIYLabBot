@@ -12,11 +12,11 @@
   "context": {
     "workspace": {
       "source": "model/synthetic-cf01-workspace.shared.json",
-      "source_sha256": "f4c190cebe4e9f5d6e002619d4e52ec47787e5b1d230c9810b4cf75578876093"
+      "source_sha256": "a0c536182479acb786d9a4800e31455336f14140ae2aff9a881e8eceb7fd465a"
     },
     "pickup": {
       "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-      "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+      "source_sha256": "21825a23adf44f3968f701efa0e948b4470d18cf8207d18654608496b7b3459f"
     },
     "device_ids": [
       "Arm",
@@ -30,7 +30,7 @@
       "role": "tube_handling",
       "tool": {
         "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-        "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+        "source_sha256": "21825a23adf44f3968f701efa0e948b4470d18cf8207d18654608496b7b3459f"
       },
       "target_instance": "QC.Originals",
       "target_interface": "grip_01",

@@ -3,26 +3,26 @@
   "sources": {
     "variant": {
       "source": "model/lab3003-armc-variant.shared.json",
-      "source_sha256": "a10af93c813792e5a5f165b0988161058c8cb0b1e3909ec7dd91d7a722d9afcb"
+      "source_sha256": "f44259cfed9cf50512f2a881e66f87deeca80f688dc7728ac2f221ba60620845"
     },
     "cycle": {
       "source": "model/lab3003-cf01-cycle.shared.json",
-      "source_sha256": "76ca88b8a07e7ee53b3d57d704bcac44e7a6c70e181078900c353ecad5ae2c1e"
+      "source_sha256": "539526277d10c455f3ec70098a753338d4095d510d3f18fd84eee0d08b4bfdcb"
     },
     "gripper": {
       "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-      "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+      "source_sha256": "21825a23adf44f3968f701efa0e948b4470d18cf8207d18654608496b7b3459f"
     },
     "motion_limits": {
       "source": "model/cf01-unload-demo.motion.json",
-      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+      "source_sha256": "90cd075800834c30c2471b1cbac67167f46db43d7aa6de4ff8ad00ff84b728c3"
     },
     "cassette_grasp": {
       "source": "model/tr01-l01-workcell.protocol.json",
-      "source_sha256": "5810721c8b8304c7c53b3b4ddf0787ef2c5aea5dd6b27809aa86a5bf84b8a6f0"
+      "source_sha256": "4115f649f0ce542eecf4f710b357925e72bd029fc1c2ac5a80e5c49b74925c03"
     }
   },
-  "home_joints_deg": [-78.28831, 9.65802, -101.10678, -7.80772, -88.08537, -35.49701],
+  "home_joints_deg": [-50.0, 10.0, -101.0, -8.0, -88.0, -35.0],
   "cassette_approach": {
     "roll_deg": -45.0,
     "side_offset_mm": {
@@ -38,16 +38,16 @@
     "alignment_corner_mm": 0.09
   },
   "station_approach": {
-    "roll_deg": 0.0,
-    "axial_travel_mm": 24.0,
-    "retreat_blend_end_fraction": 0.22
+    "roll_deg": 180.0,
+    "axial_travel_mm": 38.0,
+    "retreat_joint_blend_offset_deg": [10.0, 30.0, -10.0, 0.0, -10.0, 0.0]
   },
   "loaded_joint_blend_offset_deg": [
-    -48.0,
-    95.0,
-    -25.0,
+    10.0,
+    45.0,
+    -10.0,
     0.0,
-    -70.0,
+    -20.0,
     0.0
   ],
   "jaw_holds_s": {

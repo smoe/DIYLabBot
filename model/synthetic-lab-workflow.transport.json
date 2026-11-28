@@ -4,7 +4,7 @@
   "mode": "synthetic_only",
   "workflow": {
     "source": "model/synthetic-lab-workflow.shared.json",
-    "source_sha256": "b0851b1fbd86296b9edb12c81a5818cbf366f11e283b3ebe5f691b509323fe4b"
+    "source_sha256": "8b087b38aef06c70e77914961d4f3b123318b0104adb37d7d4b0e740e2f22986"
   },
   "transport_protocol": {
     "source": "model/async-lab-transport.protocol.json",

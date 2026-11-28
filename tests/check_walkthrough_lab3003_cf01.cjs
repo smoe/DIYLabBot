@@ -59,13 +59,14 @@ function config() {
   };
 }
 
-function supportedFixture(returning = false) {
+function supportedFixture(returning = false, openLid = false) {
   // Synthetic channels test custody and transforms, not the native arm path.
   const python = `
 import json, math, sys
 sys.path.insert(0, 'scripts')
 from lab3003_cf01_cycle import compile_cycle
 returning = sys.argv[1] == 'true'
+open_lid = sys.argv[2] == 'true'
 home = .1 if returning else 0
 points = [{'time_s': t, 'positions_rad': [angle]+[0]*5, 'velocities_rad_s': [0]*6,
            'accelerations_rad_s2': [0]*6} for t, angle in enumerate((home, .3, .6, home))]
@@ -77,10 +78,11 @@ returns = [dict(sample, direction='unload',
                 points=[dict(point, time_s=3-point['time_s']) for point in reversed(points)],
                 jaw_points=[dict(point, time_s=3-point['time_s']) for point in reversed(jaw)])
            for sample in reversed(samples)] if returning else None
-print(json.dumps({'cycle': compile_cycle(arm_paths=samples, return_paths=returns),
+print(json.dumps({'cycle': compile_cycle(arm_paths=samples, return_paths=returns, keep_lid_open=open_lid),
                   'tracks': samples, 'returns': returns, 'home': math.degrees(home)}))
 `;
-  const {cycle, tracks, returns, home} = JSON.parse(execFileSync('python3', ['-B', '-c', python, String(returning)], {
+  const {cycle, tracks, returns, home} = JSON.parse(execFileSync('python3', ['-B', '-c', python,
+    String(returning), String(openLid)], {
     cwd: path.resolve(__dirname, '..'), encoding: 'utf8',
   }));
   const identity = () => Float32Array.from([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
@@ -180,6 +182,50 @@ test('returned tubes rejoin the covered TR01 cassette only after confirmed stand
   const displaced = structuredClone(cycle);
   displaced.arm_motion.return_samples[0].points[1].positions_rad[0] += .1;
   assert.throws(() => create(displaced, jointMatrix, motion), /same raised tube/);
+});
+
+test('open-lid indices animate only the seated load with the arm and pusher parked', () => {
+  const {cycle, motion} = supportedFixture(true, true);
+  cycle.joints.brakes = [
+    {...joint(['UpperPad'], [0, 0, 1]), release_mm: 2},
+    {...joint(['LowerPad'], [0, 0, -1]), release_mm: 2},
+  ];
+  const runtime = create(cycle, jointMatrix, motion);
+  assert(runtime.start(0, true));
+  assert.equal(Math.abs(runtime.modelMatrix('UpperPad')[14]), 0);
+  for (const prefix of ['', 'return_']) {
+    const before = cycle.steps.find(step => step.phase === prefix+'open_indexing');
+    const after = cycle.steps.find(step => step.phase === prefix+'open_indexed');
+    runtime.advance(before.time_s*1000+.001);
+    const lid = Array.from(runtime.modelMatrix('Lid'));
+    const arm = Array.from(runtime.modelMatrix('Arm0'));
+    const pusher = Array.from(runtime.modelMatrix('Pusher'));
+    const tube = Array.from(runtime.modelMatrix('Carrier1'));
+    runtime.advance((before.time_s+after.time_s)*500);
+    assert.deepEqual(Array.from(runtime.modelMatrix('Lid')), lid);
+    assert.deepEqual(Array.from(runtime.modelMatrix('Arm0')), arm);
+    assert.deepEqual(Array.from(runtime.modelMatrix('Pusher')), pusher);
+    assert.notDeepEqual(Array.from(runtime.modelMatrix('Carrier1')), tube);
+    assert(Math.abs(runtime.modelMatrix('UpperPad')[14] - 0.002) < 1e-8);
+    assert(Math.abs(runtime.modelMatrix('LowerPad')[14] + 0.002) < 1e-8);
+    assert.equal(runtime.snapshot.held_tube, null);
+    assert.equal(runtime.snapshot.rpm, 0);
+    runtime.advance(after.time_s*1000+.001);
+    assert.equal(runtime.snapshot.brake_held, true);
+    assert.equal(Math.abs(runtime.modelMatrix('UpperPad')[14]), 0);
+    assert.equal(Math.abs(runtime.modelMatrix('LowerPad')[14]), 0);
+  }
+  for (const overrides of [{arm_clear: false}, {pusher_mm: 4}, {lid_deg: 30}, {latch_mm: [0, 0]}]) {
+    const unsafe = structuredClone(cycle);
+    Object.assign(unsafe.steps.find(step => step.phase === 'return_open_indexed'), overrides);
+    assert.throws(() => create(unsafe, jointMatrix, motion), /Open-lid indexing needs/);
+  }
+  const normal = structuredClone(cycle);
+  delete normal.open_lid_indexing;
+  assert.throws(() => create(normal, jointMatrix, motion), /Open-lid indexing needs/);
+  const missingPad = structuredClone(cycle);
+  missingPad.joints.brakes.pop();
+  assert.throws(() => create(missingPad, jointMatrix, motion), /requires both pad joints/);
 });
 
 test('requires actual docking, plays once and preserves custody through completion', () => {

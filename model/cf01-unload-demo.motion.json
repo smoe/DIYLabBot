@@ -2,9 +2,9 @@
   "format": "solidcraftbot.cf01-unload-demo/1",
   "id": "SYN.CF01.ThreeConsecutiveUnloads",
   "sources": {
-    "pickup": {"source": "model/centrifuge-cf01.robot-pickup.shared.json", "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"},
-    "batch": {"source": "model/cf01-rack-batch.protocol.json", "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614"},
-    "open_lid_index": {"source": "model/cf01-open-lid-index.protocol.json", "source_sha256": "ec0e6d3b8a94c97950e6a3f0aefa30f03a3064b9056afbaa32b2801e6191081f"}
+    "pickup": {"source": "model/centrifuge-cf01.robot-pickup.shared.json", "source_sha256": "21825a23adf44f3968f701efa0e948b4470d18cf8207d18654608496b7b3459f"},
+    "batch": {"source": "model/cf01-rack-batch.protocol.json", "source_sha256": "ffb14bd8baa92218db13fa70a78d39b35b42bd20edc2b36591d5db7d5c8fdcd6"},
+    "open_lid_index": {"source": "model/cf01-open-lid-index.protocol.json", "source_sha256": "2a641623fb7ce54d40fab455c0b4e1edb2d95307ea583a52f1ecaa92e4a3cda6"}
   },
   "initial_state": "full_rotor_after_spin",
   "lid_policy": "open_between_unloads",

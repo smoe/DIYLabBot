@@ -9,11 +9,11 @@
   },
   "layout": {
     "source": "model/lab-layout-l01.shared.json",
-    "source_sha256": "953a32f28782681f4caaadfaee9143b6fb0a01a7ca5e6db37a1909d3d994a247"
+    "source_sha256": "b59b4cca61a1475bc3104bf8c81255b7dc26b48f2dba3b08eb314b736e6b7a3d"
   },
   "floor_motion": {
     "source": "model/tr01-l01.motion.json",
-    "source_sha256": "2cd2195c16a4fea439046a48e210bb5576fe3db5cc4bf52e9d7ffe810413e419"
+    "source_sha256": "50603aee67e13a9a42522a7615e7ab053ff43d1fbaf02c66e8e54a31fa4e9f44"
   },
   "arm_source": {
     "source": "model/robot.json",
@@ -21,11 +21,11 @@
   },
   "tool_reference": {
     "source": "model/centrifuge-cf01.robot-pickup.shared.json",
-    "source_sha256": "6354a924ffa50795af5958841e6b62d4fb81fe9070122d727bf96316ebac21cc"
+    "source_sha256": "21825a23adf44f3968f701efa0e948b4470d18cf8207d18654608496b7b3459f"
   },
   "limits_reference": {
     "source": "model/cf01-unload-demo.motion.json",
-    "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+    "source_sha256": "90cd075800834c30c2471b1cbac67167f46db43d7aa6de4ff8ad00ff84b728c3"
   },
   "cargo_slot_body": "B1_Tube24",
   "actors": {

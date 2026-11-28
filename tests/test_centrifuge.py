@@ -57,13 +57,53 @@ class ModelTests(unittest.TestCase):
             self.assertEqual(len(posts),4)
             self.assertTrue(all(s['origin'][2]==p['base_floor'] and s['origin'][2]+s['height']==p['chamber_floor_z'] for s in posts))
 
-    def test_power_inlet_cord_and_sensor_frames_follow_parameters(self):
-        spec=model.load(); p=model.parameters(spec); a=model.power_cord(spec,p)
-        pp=model.parameters(spec,{'base_width':440,'encoder_gap':1.5}); b=model.power_cord(spec,pp)
-        self.assertAlmostEqual(b['origin'][0]-a['origin'][0],20)
-        for first,second in zip(a['curves'],a['curves'][1:]): self.assertEqual(first['end'],second['start'])
-        self.assertEqual(model.service_frames(spec,pp)['encoder_readhead'][0]-pp['encoder_radius'],1.5)
-        self.assertIsNone(spec['services']['power']['manufacturer_minimum_bend_radius_mm'])
+    def test_power_inlet_and_sensor_frames_without_detachable_cord(self):
+        spec = model.load()
+        default = model.parameters(spec)
+        variant = model.parameters(spec, {'base_width': 440, 'encoder_gap': 1.5})
+        self.assertAlmostEqual(
+            model.service_frames(spec, variant)['power_inlet'][0]
+            - model.service_frames(spec, default)['power_inlet'][0], 20)
+        self.assertEqual(model.service_frames(spec, variant)['encoder_readhead'][0]-variant['encoder_radius'], 1.5)
+        detached_bodies = {'PowerCord', 'CordCoupler', 'CordStrainRelief'}
+        station_bodies = {'PowerEntryModule', 'PowerRocker', 'FuseDrawer', 'ProtectiveEarthStud',
+                          'ProtectiveEarthLead', 'EncoderSignalCable', 'MotorPowerLead'}
+        for parameters in (default, variant):
+            source = model.expanded(spec, parameters)
+            bodies = {body['id'] for body in source['bodies']}
+            self.assertTrue(station_bodies <= bodies)
+            self.assertFalse(detached_bodies & bodies)
+            self.assertFalse(detached_bodies & {op['body'] for op in source['operations']})
+            native = {command['params'].get('body_name')
+                      for command in model.solidcraft_commands(spec, parameters)}
+            self.assertTrue(station_bodies <= native)
+            self.assertFalse(detached_bodies & native)
+
+    def test_parked_pusher_clears_rotor_plane_for_different_pocket_heights(self):
+        spec = model.load()
+        for parameters, expected_gap in (
+                (model.parameters(spec), 28),
+                (model.parameters(spec, {'base_height': 160, 'bottom_radius': 84, 'mouth_clearance': 8,
+                                        'chamber_wall': 26, 'chamber_floor': 16, 'lid_clearance': 8,
+                                        'lid_thickness': 24, 'lift_travel': 18}), 30)):
+            with self.subTest(park_gap_mm=expected_gap):
+                source = model.expanded(spec, parameters)
+                shapes = {op['id']: op['shape'] for op in source['operations']}
+                pusher = shapes['Pusher']
+                guide = shapes['LiftDriveGuide']
+                housing = shapes['LiftDrive']
+                axis = pusher['axis']
+                tip_z = pusher['origin'][2] + pusher['height'] * axis[2]
+                radial = math.hypot(*axis[:2])
+                self.assertEqual(parameters['park_gap'], expected_gap)
+                self.assertGreaterEqual(parameters['rotor_bottom'] - tip_z - pusher['radius'] * radial, 1)
+                self.assertEqual(guide['axis'], axis)
+                self.assertGreater(guide['radius'], pusher['radius'])
+                self.assertLess(guide['origin'][2] + guide['radius'] * radial, housing['origin'][2])
+                self.assertGreater(guide['origin'][2] + guide['height'] * axis[2] - guide['radius'] * radial,
+                                   housing['origin'][2] + housing['size'][2])
+                self.assertEqual(model.pose(spec, parameters, 'pickup')['Lift'],
+                                 expected_gap + parameters['lift_travel'])
 
     def test_encoder_bandwidth_and_resolution_are_requirements(self):
         spec=model.load(); result=model.encoder_requirements(spec,model.parameters(spec))

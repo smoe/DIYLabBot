@@ -42,7 +42,7 @@ def main():
     if context['source_sha256']!=model.digest(model.SOURCE): raise ValueError('Build source changed; regenerate both CADs')
     cad,out=Path(context['cad']),Path(context['out']); reports=[]
     cases=[('default',{}),('mechanism_variant',{'bottom_radius':84,'mouth_clearance':8,'lid_clearance':8,'lift_travel':18,
-            'base_width':420,'base_height':160,'chamber_wall':26,'chamber_floor':16,'lid_thickness':24,'encoder_gap':1.5,'power_cable_bend':55,
+            'base_width':420,'base_height':160,'chamber_wall':26,'chamber_floor':16,'lid_thickness':24,'encoder_gap':1.5,
             'brake_disc_radius':32,'brake_clearance':2,'latch_travel':24})]
     if args.finish_existing:
         reports=json.loads((out/'cases-progress.json').read_text(encoding='utf-8'))

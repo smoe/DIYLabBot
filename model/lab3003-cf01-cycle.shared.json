@@ -4,15 +4,15 @@
   "sources": {
     "laboratories": {
       "source": "model/furnishings/building-laboratories.json",
-      "source_sha256": "aedaafcb48a6f5c77661125b4cc88c83e808be4b3fb2586a86e3679dc1e1c3e0"
+      "source_sha256": "7848f1bdf5d1176646543984cf1d00491d3663eafb2ad475f270b8a38a35e33a"
     },
     "simulation_fixture": {
       "source": "model/cf01-rack-batch.protocol.json",
-      "source_sha256": "9056649237734d830817296c0f4d251f9b59fb829792a5f716ac38db06746614"
+      "source_sha256": "ffb14bd8baa92218db13fa70a78d39b35b42bd20edc2b36591d5db7d5c8fdcd6"
     },
     "motion_limits": {
       "source": "model/cf01-unload-demo.motion.json",
-      "source_sha256": "049b08a766263bf3ef11311a73925c266337da69620fff06224201dc3b224dd3"
+      "source_sha256": "90cd075800834c30c2471b1cbac67167f46db43d7aa6de4ff8ad00ff84b728c3"
     }
   },
   "samples": [

@@ -176,31 +176,39 @@ Möbel und Geräte behalten Maßstab 1. Das Gebäude liefert Boden, Wände, Tür
 und Verglasung; die entsprechenden L01-Hüllrollen werden nicht dupliziert.
 
 Die neue Gebäude-CAD-Fassung enthält die 183 gebundenen Möbel-/Strukturkörper.
-Die 17 Geräteinstanzen werden nur im Browser aus dem geprüften vollständigen
+Die 18 Geräteinstanzen werden im Browser aus dem vollständigen
 Standalone-L01-Layout übernommen. Je Instanz gilt die starre Abbildung
-`Gebäude · gebundene Pose · Standalone-Pose⁻¹`; Normalen und Grenzen folgen
-derselben Abbildung. Auf der linken Arbeitsplatte in 3.003 folgen ArmC, CF01
-und RackCF den relativen Positionen und Ausrichtungen aus der Quelle des
-[CF01-Arbeitsplatzvideos](media/robot-demo-cameras-aligned.mp4). Die Gruppe
-ist an der Position von CF01 verankert. ArmC steht direkt auf der Arbeitsplatte
-und zeigt die für diese Anordnung gewählte aufrechte Parkpose.
-ArmA und ArmB behalten ihre Unterbauten aus der L01-Layoutquelle. Die
-Gerätegeometrie stammt aus der L01-Aufstellung. Die neue Aufstellung ist
-eine statische Referenz für die erneute Bahnprüfung des Probenzyklus.
+`Gebäude · gebundene Pose · Standalone-Pose⁻¹`. Normalen und Grenzen folgen
+derselben Abbildung. Die
+[Gebäudebindung](../model/furnishings/building-laboratories.json)
+legt die Positionen auf der linken Arbeitsplatte in 3.003 fest. CF01 steht
+im Laborbezug bei X = 470 mm, Y = 5.210 mm und 90°, mit dem Deckelscharnier
+zur Rückwand in Richtung −X. ArmC steht direkt auf der Platte bei X = 550 mm,
+Y = 5.550 mm und −139°. Die beiden 24-Platz-Racks `RackCF` und `RackCF2`
+stehen bei X = 340 mm und X = 520 mm, jeweils bei Y = 5.800 mm und 0°.
+Die Kassetten sind 140 mm lang. Zwischen ihren Außenkanten liegen in
+X-Richtung nominal 40 mm.
+
+Die eigenständige L01-Referenz für Transfertests verwendet eigene Einbauposen
+für CF01, ArmC und das erste Rack. Dort steht `RackCF2` bei X = 220 mm und
+Y = 4.800 mm. Die Unterbauten von ArmA und ArmB stammen aus der
+L01-Layoutquelle. Die Einbauposen in 3.003 bilden die statische Grundlage
+für neue Bewegungsnachweise.
+
 TR01 steht beim CF01-Arbeitsplatz im Laborbezug bei X = 930 mm, Y = 5615 mm
 und ist auf 270° ausgerichtet. Dadurch liegt der Kassetten-Eckplatz
 `B2_Tube01` zur Arbeitsplatte hin. Die Gebäudebindung führt die Dockpose
-für die dargestellte TR01-Instanz. Eine diskrete FreeCAD-Prüfung umfasst
-115 Prüfstellungen für die seitliche Greiferanfahrt, den Backenschluss und
-das Freiheben des Gefäßes um 35 mm. Die Prüfung setzt eine abgenommene
-TR01-Transportabdeckung voraus und erfasst beide Endstellungen des CF01-Deckels.
-Die Fahrbahn von TR01 bleibt gesondert zu prüfen.
+für die dargestellte TR01-Instanz. Für die frühere Geräteaufstellung wurden
+115 diskrete Prüfstellungen für die seitliche Greiferanfahrt, den
+Backenschluss und das Freiheben des Gefäßes um 35 mm in FreeCAD geprüft.
+Dieser Nachweis setzt eine abgenommene TR01-Transportabdeckung voraus und
+erfasst beide Endstellungen des damaligen CF01-Deckels.
 Studienkörper `People_*` und Fahrzeugrouten entfallen.
 Native Geräte im Gebäude-CAD sind weiterhin fehlende Zielunterstützung.
 
 ### CF01-Demo nach der TR01-Runde
 
-Nach der gespielten Rückkehr von TR01 startet die Laborvorschau einmalig den
+Nach der gespielten Rückkehr von TR01 startet die frühere Laborvorschau einmalig den
 synthetischen CF01-Zyklus. Die Probenauswahl bindet zwei mitgeführte Tubes an
 gegenüberliegende Rotorplätze. Das Modell beobachtet die Abnahme der Haube,
 die Übergabe, beide Rotorsitze, den freien Arbeitsbereich und die
@@ -211,9 +219,9 @@ gehaltene Parkbremse. „CF01 ansehen“ wechselt zur Stationsansicht. Der
 Rotorschnitt lässt den verriegelten Deckel optisch aus, und die Statuszeile
 zeigt Drehzahl und Wiedergabefaktor.
 
-Die Übergaben sind synthetische Bestätigungen. Der aufgestellte ArmC hat
-zwischen Schulter und Handgelenk 375 mm Reichweite. Die ausgerichtete
-Einsetzpose verlangt bei der aktuellen Greiferbindung rund 407 mm.
+Die Übergaben sind synthetische Bestätigungen. In dieser Aufstellung hat
+ArmC zwischen Schulter und Handgelenk 375 mm Reichweite. Die ausgerichtete
+Einsetzpose verlangte bei der damaligen Greiferbindung rund 407 mm.
 Die Vorschau animiert die CF01-Mechanik. Eine räumliche Arm- und
 Gefäßbahn bis zum Rotorsitz sowie Hardwarebetrieb bleiben offen.
 
@@ -221,8 +229,8 @@ Gefäßbahn bis zum Rotorsitz sowie Hardwarebetrieb bleiben offen.
 
 Die separate Vorschau bindet ArmC in Labor 3.003 an die
 [280/250-mm-Variante](../model/lab3003-armc-variant.shared.json) des
-CF01-Arbeitsplatzes. Der Armfuß und die sechs Parkwinkel folgen der
-vorhandenen Gebäudeaufstellung. Der native Generator leitet alle Armkörper
+CF01-Arbeitsplatzes. Der Armfuß und die sechs CAD-Referenzwinkel folgen der
+Gebäudeaufstellung. Der native Generator leitet alle Armkörper
 und die Rundgang-Meshes aus der Variante ab. Die Vorschau zeigt den Arm
 mit den neu abgeleiteten Kameraposen und TR01 am Dock in Parkstellung.
 
@@ -230,9 +238,9 @@ Die Einsetzprüfung mit den vorhandenen Greiferbacken sperrt den direkten
 Transfer in die Sitze 1 und 7. In der ausgerichteten Endpose liegt bei
 jedem Drehwinkel mindestens eine Backe teilweise im Rotorkörper. Der
 [Quellgeometrieprüfer](../scripts/check_lab3003_cf01_seat.py) berechnet
-hierfür eine positive untere Schranke der Überdeckung. Die lokale
-FreeCAD-Prüfung bestätigt einen separaten Weg über den ausgefahrenen
-CF01-Stößel. Der Stößel trägt das Gefäß 16 mm über dem Sitz und der
+hierfür eine positive untere Schranke der Überdeckung. Für die frühere
+Aufstellung bestätigte die lokale FreeCAD-Prüfung den Weg über den
+ausgefahrenen CF01-Stößel. Der Stößel trägt das Gefäß 16 mm über dem Sitz und der
 Schacht führt es beim Absenken. Der separate
 [synthetische Übergabevertrag](../model/cf01-empty-seat-handoff.protocol.json)
 erlaubt das Ausfahren nur am leeren, indexierten und gesicherten Rotorplatz
@@ -253,16 +261,31 @@ simulierter Haubenabnahme. Ein Gefäß behält seinen Körper vom Dock über
 Greifer und Stößel bis in den Rotor. Die Anzeige weist Modellzeit und
 Wiedergabefaktor getrennt aus.
 
+### Indexieren bei geöffnetem Deckel
+
+Der [lokale Stationsablauf](../scripts/lab3003_cf01_cycle.py) nutzt zwischen
+den beiden Beladungen sowie zwischen den beiden Entnahmen den separaten
+[Befehl zum Indexieren bei geöffnetem Deckel](../model/cf01-open-lid-index.protocol.json).
+Der Deckel bleibt während dieser Schritte vollständig geöffnet und
+gehalten. Die Simulation verlangt bestätigten Stillstand, einen freien
+Arbeitsbereich, den geparkten Stößel und eine Belegung, die mit der
+Probenzuordnung übereinstimmt. Erst der bestätigte Rotorindex und die
+gehaltene Parkbremse geben die nächste Übergabe frei. Der Schleuderlauf
+beginnt bei geschlossenem und verriegeltem Deckel.
+
+Für die Vorschau mit offener Indexierung braucht der Export einen nativen
+Nachweis der Rotorbewegungen mit der jeweiligen Belegung, dem geöffneten
+Deckel und der dazu geprüften Grundpose des Arms.
+
 ### Rückgabe an TR01 und Wende im Gang
 
-ArmC wartet zwischen den Übergaben angewinkelt. Die Bahnquelle definiert
-diese Grundstellung für die Bewegung auf der unveränderten CAD-Referenz.
-Beim Rückzug erreicht der Greifer sie nach dem Ausfahren entlang der
-Rotorsitzachse auf dem kürzeren Bogen am offenen Deckel vorbei. Die numerisch
-abgetastete Kopfstrecke beträgt dafür rund 470 mm in rund 12 s Modellzeit
-je Tube. Zuvor lag sie bei rund 1.880 mm in rund 58 s. Die beladene Bahn
-benötigt rund 21 s bis zur Stößelablage. Die vorhandenen Gelenk- und
-Gefäßgrenzen gelten weiter.
+Die Bahnquelle definiert eine angewinkelte Grundstellung zwischen den
+Übergaben. In der früher geprüften Aufstellung erreichte der Greifer sie
+nach dem Ausfahren entlang der Rotorsitzachse auf einem kurzen Bogen am
+offenen Deckel vorbei. Die numerisch abgetastete Kopfstrecke betrug dafür
+rund 470 mm in rund 12 s Modellzeit je Tube. Zuvor lag sie bei rund 1.880 mm
+in rund 58 s. Die beladene Bahn benötigte rund 21 s bis zur Stößelablage.
+Die Gelenk- und Gefäßgrenzen sind in der Bahnquelle referenziert.
 
 Nach dem bestätigten Stillstand bringt ArmC die Tubes in umgekehrter
 Reihenfolge in ihre ursprünglichen Kassettenplätze zurück. Der native

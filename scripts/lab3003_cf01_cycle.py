@@ -8,14 +8,26 @@ import assembly_model as assembly
 import centrifuge_model as cf
 import centrifuge_protocol as protocol
 import cf01_empty_seat_handoff as support
+import cf01_open_lid_index as open_index
 import cf01_rack_batch as batch
 import lab_layout_model as layout
 import robot_spec as robot
-from centrifuge_control import Simulator
+from centrifuge_control import Simulator, require
 
 
 ROOT = cf.ROOT
 SOURCE = ROOT / 'model/lab3003-cf01-cycle.shared.json'
+
+
+class _OpenLidHandoffSimulator(support.EmptySeatHandoffSimulator, open_index.OpenLidIndexSimulator):
+    """Opt in locally while retaining both simulators' command guards."""
+
+    def execute(self, command, token=None, **args):
+        if command == 'index_open_lid' and self.handoff is not None:
+            self._sync()
+            self._owner(token)
+            require(False, 'InvalidState', 'Finish the active pusher handoff before open-lid indexing')
+        return super().execute(command, token, **args)
 
 
 def _load_source():
@@ -104,7 +116,7 @@ def _arm_path_timings(paths, samples, *, returning=False):
     return paths
 
 
-def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_paths=None):
+def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_paths=None, keep_lid_open=False):
     """Compile fictional confirmation snapshots after TR01 has stopped at the dock.
 
     Optional feedback(event, sample) supplies simulated observations. Sample is
@@ -116,12 +128,15 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
     compiler checks timing and ownership; the geometry proof is independent.
     Optional return paths unload the spun tubes to their original cassette
     slots in reverse order and gate the departure on cover replacement.
+    The separate open-lid mode changes adjacent transfer indexing only.
     """
     if cover_removed is not True:
         raise ValueError('TR01 transport cover removal must be confirmed')
     definition, sources = _load_source()
     samples = definition['samples']
     paths = _arm_path_timings(arm_paths, samples) if arm_paths is not None else None
+    if type(keep_lid_open) is not bool or keep_lid_open and paths is None:
+        raise ValueError('Open-lid indexing requires the supported loading paths and explicit opt-in')
     return_samples = list(reversed(samples))
     if return_paths is not None:
         if paths is None:
@@ -141,6 +156,8 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
     gripper = None
     now = 0.0
     simulator = Simulator if paths is None else support.EmptySeatHandoffSimulator
+    if keep_lid_open:
+        simulator = _OpenLidHandoffSimulator
     sim = simulator(spec=station, clock=lambda: now, qualification=fixture['simulation_qualification'],
                     initial_slots={slot: {'present': False, 'seated': False, 'mass_g': None}
                                    for slot in range(1, slots + 1)})
@@ -196,6 +213,8 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
             if return_paths is not None:
                 reply.update(presented_confirmed=True, cassette_slot=sample['id'],
                              destination_empty=True, cassette_seated=True)
+            if keep_lid_open:
+                reply['occupancy_confirmed'] = True
         if (not isinstance(reply, dict) or any(reply.get(flag) is not True for flag in required)
                 or sample is not None and (reply.get('sample_id') != sample['id']
                                            or type(reply.get('rotor_slot')) is not int
@@ -354,24 +373,39 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
     index_limits = station_motion['station_rotor']
     index_deg_s = 6 * min(index_limits['velocity_rpm'], station['handling']['index_limit_rpm'])
 
-    def open_slot(sample, *, returning=False):
+    def open_slot(sample, *, returning=False, already_open=False):
         nonlocal display_rotor
         prefix = 'return_' if returning else ''
         slot = sample['slot']
         target = -360 * (slot - 1) / slots
         current = display_rotor if returning else sim.encoder_deg
-        rotation = math.remainder(target - current, 360) if returning else target - current
+        rotation = target - sim.encoder_deg
+        if returning and not already_open:
+            rotation = math.remainder(target - current, 360)
         move_s = _quintic_duration(rotation, index_deg_s,
                                    index_limits['acceleration_deg_s2'], index_limits['jerk_deg_s3'])
         advance(poll)
-        snapshot(prefix + 'indexing', sample, brake_held=not move_s)
+        if already_open:
+            observe('open_index_ready', sample, ('workspace_clear', 'parked_confirmed', 'occupancy_confirmed'))
+            state = sim.execute('status')
+            if (not all(state[key] for key in ('standstill_confirmed', 'brake_held', 'robot_clear'))
+                    or state['pusher_handoff'] is not None or state['lift_mm'] != 0 or pusher_mm != 0
+                    or gripper is not None or pusher_sample is not None
+                    or any(item['present'] != (number in rotor) or item['present'] != item['seated']
+                           for number, item in state['slots'].items())
+                    or rotor.get(slot) != (sample['id'] if returning else None)):
+                raise ValueError('Open-lid index needs confirmed clearance, parked pusher and seated rotor inventory')
+        index_phase = prefix + ('open_' if already_open else '')
+        snapshot(index_phase + 'indexing', sample, brake_held=not move_s)
         advance(max(move_s, poll))
-        state = sim.execute('index', token, slot=slot)
+        state = sim.execute('index_open_lid' if already_open else 'index', token, slot=slot)
         if not (state['index_confirmed'] and state['indexed_slot'] == slot and state['brake_held']):
             raise ValueError('CF01 index and holding brake must be confirmed')
         if returning:
             display_rotor = current + rotation
-        snapshot(prefix + 'indexed', sample)
+        snapshot(index_phase + 'indexed', sample)
+        if already_open:
+            return
         advance(poll)
         snapshot(prefix + 'unlocking', sample)
         advance(pin_open_s)
@@ -391,7 +425,7 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
         snapshot(prefix + 'locked', sample)
 
     for index, sample in enumerate(samples):
-        open_slot(sample)
+        open_slot(sample, already_open=keep_lid_open and index > 0)
         slot = sample['slot']
         advance(poll)
         mass = fictitious_masses[slot]
@@ -414,7 +448,8 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
             sim.robot_clear = True
             snapshot('arm_clear', sample)
 
-        close_station(sample)
+        if not keep_lid_open or index == len(samples) - 1:
+            close_station(sample)
 
     if (transported or gripper is not None or pusher_sample is not None
             or rotor != {sample['slot']: sample['id'] for sample in samples}):
@@ -445,10 +480,11 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
     return_trace = {}
     if return_paths is not None:
         display_rotor = stop_angle
-        for sample, path in zip(return_samples, return_paths):
-            open_slot(sample, returning=True)
+        for index, (sample, path) in enumerate(zip(return_samples, return_paths)):
+            open_slot(sample, returning=True, already_open=keep_lid_open and index > 0)
             return_to_cassette(sample, path)
-            close_station(sample, returning=True)
+            if not keep_lid_open or index == len(return_samples) - 1:
+                close_station(sample, returning=True)
         state = sim.execute('status')
         if (rotor or gripper is not None or pusher_sample is not None or pusher_mm != 0
                 or transported != {sample['id'] for sample in samples}
@@ -467,6 +503,8 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
                      ROOT / 'scripts/centrifuge_protocol.py', ROOT / 'scripts/centrifuge_model.py']
     if paths is not None:
         source_paths += [support.SOURCE, Path(support.__file__)]
+    if keep_lid_open:
+        source_paths += [open_index.SOURCE, open_index.SCHEMA, Path(open_index.__file__)]
     return {'steps': steps, 'samples': samples if paths is None else timed_samples, 'duration_s': now,
             'spin_started_s': spin_started, 'brake_started_s': brake_started, 'stopped_s': stopped_at,
             'synthetic': True, 'hardware_qualified': False, 'arm_motion_checked': False,
@@ -474,4 +512,4 @@ def compile_cycle(*, cover_removed=True, feedback=None, arm_paths=None, return_p
                       'and physical operation are separate evidence.' if paths is not None else
                       'Abstract synthetic confirmation and station playback. No arm path, cover handling path or physical operation is certified.'),
             'source_files_sha256': {str(path.relative_to(ROOT)): robot.digest(path) for path in source_paths},
-            **return_trace}
+            **return_trace, **({'open_lid_indexing': True} if keep_lid_open else {})}

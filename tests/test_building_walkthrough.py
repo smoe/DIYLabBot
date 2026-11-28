@@ -107,7 +107,7 @@ class WalkthroughTests(unittest.TestCase):
         self.assertEqual(lab['eye_mm'][2], building['eye_mm'][2])
         self.assertEqual(set(self.program['scene_sources']), {'building'})
         self.assertFalse(self.program['qualification']['lab_to_building_registered'])
-        self.assertEqual(len(self.program['laboratories'][0]['device_instances']), 17)
+        self.assertEqual(len(self.program['laboratories'][0]['device_instances']), 18)
         self.assertTrue(self.program['isolation']['body_ids'])
         self.assertTrue(self.program['topology'])
 
@@ -146,12 +146,13 @@ class WalkthroughTests(unittest.TestCase):
         for window in windows:
             self.assertTrue({window['glass_body'], window['frame_body']} <= set(self.program['isolation']['body_ids']))
 
-    def test_functional_arm_supports_are_kept_separate_from_the_seventeen_devices(self):
+    def test_functional_arm_supports_are_kept_separate_from_the_devices(self):
         import export_building_walkthrough_freecad as export
         bindings = export.native_equipment_bindings(self.program['laboratories'])
         devices = [device for laboratory, device in bindings if not device.get('supporting_device_id')]
         supports = [device for laboratory, device in bindings if device.get('supporting_device_id')]
-        self.assertEqual(len(devices), 17)
+        self.assertEqual(len(devices), 18)
+        self.assertTrue({'RackCF', 'RackCF2'} <= {device['id'] for device in devices})
         self.assertEqual({device['supporting_device_id'] for device in supports}, {'ArmA', 'ArmB'})
         self.assertTrue(next(device for device in devices if device['id'] == 'ArmC')['direct_mount'])
         for support in supports:

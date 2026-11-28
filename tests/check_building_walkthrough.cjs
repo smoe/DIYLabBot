@@ -29,11 +29,11 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
   assert.equal(equippedLabs.length, 1, 'The existing equipment layout remains bound once.');
   const laboratory = equippedLabs[0];
   assert.equal(laboratory.level_id, 'OG3'); assert.equal(laboratory.area, 'R3_003');
-  assert.equal(laboratory.device_instances.length, 17, 'All seventeen existing equipment instances are bound.');
+  assert(['RackCF', 'RackCF2'].every(id => laboratory.device_instances.some(device => device.id === id)),
+    'Both CF01 worktop racks are bound.');
   const nativeIds = nativeScene.groups.map(group => group.id);
   assert.equal(new Set(nativeIds).size, nativeIds.length, 'Native bodies appear exactly once.');
   const equipment = nativeScene.equipment_instances;
-  assert.equal(equipment.length, 17);
   assert.deepEqual(equipment.map(item => item.id).sort(), laboratory.device_instances.map(item => laboratory.id+'.'+item.id).sort());
   for (const device of laboratory.device_instances) {
     const coverage = equipment.find(item => item.id === laboratory.id+'.'+device.id);
@@ -42,7 +42,7 @@ const {detourOpenDoor} = require('./walkthrough_route_detour.cjs');
     assert(groups.length > 0 && groups.every(group => group.level_id === laboratory.level_id));
     assert.equal(new Set(groups.map(group => group.original_body_id)).size, groups.length);
   }
-  assert.equal(nativeScene.equipment_placement_checks.length, 17);
+  assert.equal(nativeScene.equipment_placement_checks.length, laboratory.device_instances.length);
   assert(nativeScene.equipment_placement_checks.every(check => check.passed && check.host_anchor_checked));
   const auxiliary=nativeScene.auxiliary_instances;
   const raisedArms = laboratory.device_instances.filter(device => device.asset === 'arm' && !device.direct_mount).map(device => device.id).sort();

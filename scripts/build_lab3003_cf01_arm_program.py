@@ -32,6 +32,11 @@ def vector_at(a, b, progress):
     return [start + progress * (end - start) for start, end in zip(a, b)]
 
 
+def joint_blend(start, end, offsets, progress):
+    return [value + 2. * progress * (1. - progress) * offset
+            for value, offset in zip(vector_at(start, end, progress), offsets)]
+
+
 def point(time_s, position, fields=motion.FIELDS):
     return {'time_s': time_s, **dict(zip(fields, (position, [0.] * len(position), [0.] * len(position))))}
 
@@ -259,26 +264,16 @@ class Workspace:
         station_pose = lambda xyz: pose(xyz, tilt, station_entry['roll_deg'], yaw)
         last_q = self.inverse(station_pose(high_station))
         first_q = start[-1][1]
-        control = [value + offset for value, offset in zip(vector_at(first_q, last_q, .5),
-                                                          self.route['loaded_joint_blend_offset_deg'])]
-        def blend(u):
-            return [(1-u)**2 * a + 2*u*(1-u) * b + u*u * c for a, b, c in zip(first_q, control, last_q)]
-
-        transit = [(1. + 4. * (i / 48), blend(i / 48)) for i in range(1, 49)]
+        loaded_offsets = self.route['loaded_joint_blend_offset_deg']
+        transit = [(1. + 4. * (i / 48), joint_blend(first_q, last_q, loaded_offsets, i / 48))
+                   for i in range(1, 49)]
         end = self.leg(lambda progress: station_pose(vector_at(high_station, raised, progress)),
                        36, 5., 6., last_q)
         carried = start + transit + end[1:]
         retreat = [(6. - time, q) for time, q in reversed(end)]
-        stop_at = station_entry['retreat_blend_end_fraction']
-        if not 0. < stop_at < 1.:
-            raise ValueError('Retreat ends within the station clearance bend')
-        target = blend(stop_at)
-        home_offset = [a - b for a, b in zip(self.park, target)]
-        for i in range(1, 41):
-            progress = i / 40
-            nominal = blend(1. - progress * (1. - stop_at))
-            q = [base + progress**3 * adjust for base, adjust in zip(nominal, home_offset)]
-            retreat.append((1. + 4. * progress, self.park if i == 40 else q))
+        retreat_offsets = station_entry['retreat_joint_blend_offset_deg']
+        retreat.extend((1. + 4. * (i / 40), joint_blend(last_q, self.park, retreat_offsets, i / 40))
+                       for i in range(1, 41))
 
         radius = geometry['radius_mm']
         tube = next(op['shape'] for op in self.cargo['operations'] if op['body'] == identity and op['action'] == 'create')
