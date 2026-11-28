@@ -380,6 +380,29 @@ class MissionPlanner:
         # floor support, resource spans and controller braking certificates.
         return points[:removed]+points[removed+1:]
 
+    def _smooth_foyer_wait_approach(self, level, points, zones, marks, corner_caps, settings):
+        """Sweep around the first waiting bay and keep the straight parking lead."""
+        join = len(points) - 3 - settings['bypassed_waypoints']
+        if (join < 1 or any(zone['end_index'] > join for zone in zones)
+                or any(mark['point_index'] >= join for mark in marks)
+                or any(cap['point_index'] >= join for cap in corner_caps or [])):
+            return points
+        others = [polygon for slot, polygon in enumerate(self.nav.waiting_bay_polygons[level])
+                  if slot != settings['waiting_slot']]
+        required = self.nav.reserve + self.port_paths.mesh_error + self.nav.navigation_margin_mm
+        sweep = [*points[join-1:join+1], *points[-2:]]
+        candidate = [*points[:join+1], *points[-2:]]
+        try:
+            if not self.graph.shortcut_clear(level, points[join], points[-2]):
+                return points
+            if others and not self.port_paths._bay_sweep_clear(sweep, others, required):
+                return points
+            _path(candidate, self.trim_mm, corner_caps)
+        except ValueError:
+            # Reject an invalid candidate without discarding the source approach.
+            return points
+        return candidate
+
     def _shorten_basement_departure(self, points, zones, prefix_count, settings):
         """Bypass the hub while keeping the door lead and other reserved bays clear."""
         join = prefix_count - 1 + settings['join_route_index']
@@ -489,7 +512,13 @@ class MissionPlanner:
                     _append(points, ending)
                     if (getattr(self,'smooth_live_lift_wait',False) and terminal['kind']=='lift_wait'
                             and level==self.source['depot']['level'] and len(ending)==2):
-                        points=self._smooth_lift_wait_approach(level,points,zones,marks,prefix_caps)
+                        approach = getattr(self, 'foyer_wait_approach', None)
+                        smoothed = points
+                        if self.port_paths is not None and approach and terminal['slot'] == approach['waiting_slot']:
+                            smoothed = self._smooth_foyer_wait_approach(level, points, zones, marks,
+                                                                      prefix_caps, approach)
+                        points = (self._smooth_lift_wait_approach(level, points, zones, marks, prefix_caps)
+                                  if smoothed is points else smoothed)
                     basement_return = getattr(self, 'basement_return', None)
                     if (basement_return and basement_departure and len(ending) == 2
                             and terminal['kind'] == 'lift_wait'

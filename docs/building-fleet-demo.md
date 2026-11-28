@@ -803,6 +803,32 @@ Quellstand weiterhin erforderlich. Die unabhängige Flächenmessung und die
 Negativkontrollen für falsches Geschoss und geschlossene Türen bleiben
 quellaktuell. `lift_operation_implemented` bleibt `false`.
 
+### Kürzere Anfahrt zur EG-Wartebucht 1
+
+Die zeitgesteuerte Flottenpatrouille prüft für die zugesagte Wartebucht 1 im
+Erdgeschoss einen kürzeren Bogen. Geschwindigkeitsabschnitte, Ereignispunkte,
+Eckengrenzen und die gerade Einfahrt in die Bucht bleiben erhalten. Die
+Rechteckhülle wird durchgehend gegen die anderen Wartebuchten geprüft. Bei
+einer abgelehnten Kurve bleibt die bisherige Anfahrt verfügbar. Die regulären
+Boden-, Abstands-, Scan- und Bremsnachweise gelten weiterhin.
+
+Im früheren, separat gebundenen BF02-Versuch sank die nominale Fahrzeit
+bei gleichem Start von 96,394 auf 70,380 Modellsekunden. Die unabhängige
+FreeCAD-Prüfung der einzelnen letzten Anfahrtskurve belegte für 388 Intervalle
+eine statische Abstandsuntergrenze von 401,324 mm. Der lokale Chrome-Lauf
+beobachtete BF02 nach 186,8 Modellsekunden in seiner eigenen Wartebucht.
+Diese Nachweise gehören zur früheren Gebäudefassung und liegen lokal unter
+`exports/building-fleet/bf02-foyer-turn/`.
+
+Die eigenständige FreeCAD-Prüfung derselben archivierten Anfahrtskurve
+besteht auch für die Gebäuderevision `building-stack-c031b24585f3` mit
+6.130 nativen Körpern im gebundenen Modell. Die 388 Prüfintervalle bestätigen
+dieselbe statische Untergrenze. Der lokale Nachweis steht in
+`exports/building-fleet/bf02-foyer-audit/current-native-curve-report-r2.json`.
+Er umfasst nur den Abstand zu statischen Körpern. Eine aktuelle
+Browserfahrt, bewegte Nachbarfahrzeuge, Hardware, reale Durchfahrt und
+Personensicherheit sind dadurch nicht geprüft.
+
 ## Bestätigte Rückstellung von K0_013
 
 Der Eigentümer hat am **20. November 2026** `KG / K0_013` für E2 ausdrücklich

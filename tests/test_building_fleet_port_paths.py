@@ -36,6 +36,41 @@ def setup():
 
 
 class PortPathTests(unittest.TestCase):
+    def test_foyer_curve_keeps_speed_zone_boundary_and_straight_own_bay_entry(self):
+        planner, nav, helper = setup()
+        first_bay = nav.waiting_bay_polygons['EG'][0]
+        nav.waiting_bay_polygons['EG'].append([[3510, 1800], [4020, 1800], [4020, 2200], [3510, 2200]])
+        points = [[5200, 20], [5300, 800], [5700, 1200], [5500, 1450], [5200, 1500],
+                  [5500, 1700], [5700, 1900], [5000, 2000], [3765, 2000]]
+        settings = {'waiting_slot': 1, 'bypassed_waypoints': 4}
+        zones = [{'start_index': 1, 'end_index': 2}]
+        expected = [*points[:3], *points[-2:]]
+        with patch.object(planner.graph, 'shortcut_clear', create=True, return_value=True) as shortcut:
+            with patch.object(helper, '_bay_sweep_clear', return_value=True) as sweep:
+                self.assertEqual(planner._smooth_foyer_wait_approach('EG', points, zones, [], [], settings), expected)
+                shortcut.assert_called_once_with('EG', points[2], points[-2])
+                sweep.assert_called_once_with(expected[-4:], [first_bay], 88.)
+            with patch.object(helper, '_bay_sweep_clear', return_value=False):
+                self.assertEqual(planner._smooth_foyer_wait_approach('EG', points, zones, [], [], settings), points)
+        self.assertEqual(zones, [{'start_index': 1, 'end_index': 2}])
+        marks = [{'point_index': 3}]
+        self.assertEqual(planner._smooth_foyer_wait_approach('EG', points, zones, marks, [], settings), points)
+
+    def test_foyer_curve_keeps_original_approach_when_candidate_is_invalid(self):
+        planner, _, helper = setup()
+        points = [[5200, 20], [5300, 800], [5700, 1200], [5500, 1450], [5200, 1500],
+                  [5500, 1700], [5700, 1900], [5000, 2000], [3765, 2000]]
+        settings = {'waiting_slot': 1, 'bypassed_waypoints': 4}
+        with patch.object(planner.graph, 'shortcut_clear', create=True, return_value=True):
+            with patch.object(helper, '_bay_sweep_clear', side_effect=ValueError('Degenerate curve')) as sweep:
+                result = planner._smooth_foyer_wait_approach('EG', points, [], [], [], settings)
+                self.assertIs(result, points)
+                sweep.assert_called_once()
+            with patch.object(helper, '_bay_sweep_clear', return_value=True):
+                with patch('building_fleet_missions._path', side_effect=ValueError('Invalid candidate shape')):
+                    result = planner._smooth_foyer_wait_approach('EG', points, [], [], [], settings)
+                    self.assertIs(result, points)
+
     def test_basement_departure_keeps_the_door_lead_and_preserves_protected_waypoints(self):
         planner, nav, helper = setup()
         planner.ports['KG'] = planner.ports['EG']
