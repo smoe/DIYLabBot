@@ -33,6 +33,10 @@
       "alignment_from_port_mm": 100,
       "aperture_center_fraction": 0.8
     },
+    "foyer_wait_approach": {
+      "waiting_slot": 1,
+      "bypassed_waypoints": 4
+    },
     "basement_alighting": {
       "waiting_slot": 0,
       "cabin_slot": 0,

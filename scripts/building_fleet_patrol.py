@@ -252,6 +252,7 @@ class PatrolWorldRunner(WorldRunner):
         self.dt = control_step_s(runtime_source)
         if self.dt > .05:
             self.planner.smooth_live_lift_wait = True
+            self.planner.foyer_wait_approach = self.profile['patrol'].get('foyer_wait_approach')
             self.planner.ground_boarding = self.profile['patrol'].get('ground_boarding')
             self.planner.ground_boarding_alternate = self.profile['patrol'].get('ground_boarding_alternate')
             self.planner.basement_alighting = self.profile['patrol'].get('basement_alighting')

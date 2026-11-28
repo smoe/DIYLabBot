@@ -166,6 +166,14 @@ def patrol_policy(profile):
                 or type(diagonal[fraction]) not in (int, float) or not 0 < diagonal[fraction] <= 1):
             raise ValueError('Invalid live diagonal lift route: '+name)
         expected[name] = diagonal
+    if 'foyer_wait_approach' in policy:
+        approach = policy['foyer_wait_approach']
+        if (timing is None or type(approach) is not dict
+                or set(approach) != {'waiting_slot', 'bypassed_waypoints'}
+                or type(approach['waiting_slot']) is not int or approach['waiting_slot'] < 0
+                or type(approach['bypassed_waypoints']) is not int or approach['bypassed_waypoints'] <= 0):
+            raise ValueError('Invalid live foyer approach to an exclusive waiting bay')
+        expected['foyer_wait_approach'] = approach
     if 'basement_departure' in policy:
         departure = policy['basement_departure']
         if (timing is None or type(departure) is not dict or set(departure) != {

@@ -68,7 +68,7 @@ class ActiveFleetTests(unittest.TestCase):
     def untimed_profile(self):
         profile = copy.deepcopy(self.profile)
         profile.pop('timing')
-        for route in ('ground_boarding', 'ground_boarding_alternate', 'basement_alighting',
+        for route in ('ground_boarding', 'ground_boarding_alternate', 'foyer_wait_approach', 'basement_alighting',
                       'basement_departure', 'basement_return'):
             profile['patrol'].pop(route, None)
         return profile
